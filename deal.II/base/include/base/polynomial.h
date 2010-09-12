@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,6 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
-#include <base/std_cxx1x/shared_ptr.h>
 
 #include <vector>
 
@@ -44,7 +43,7 @@ namespace Polynomials
  * happens through the Horner scheme which provides both numerical
  * stability and a minimal number of numerical operations.
  *
- * @author Ralf Hartmann, Guido Kanschat, 2000, 2006, 2009
+ * @author Ralf Hartmann, Guido Kanschat, 2000, 2006
  */
   template <typename number>
   class Polynomial : public Subscriptor
@@ -70,17 +69,11 @@ namespace Polynomials
       Polynomial (const std::vector<number> &coefficients);
 
 				       /**
-					* Constructor creating a zero
-					* polynomial of degree @p n.
-					*/
-      Polynomial (const unsigned int n);
-
-				       /**
 					* Default constructor creating
 					* an illegal object.
 					*/
       Polynomial ();
-
+      
                                        /**
                                         * Return the value of this
                                         * polynomial at the given point.
@@ -90,7 +83,7 @@ namespace Polynomials
                                         * of the evaluation.
                                         */
       number value (const number x) const;
-
+    
                                        /**
                                         * Return the values and the
                                         * derivatives of the
@@ -194,12 +187,12 @@ namespace Polynomials
 					* Add a second polynomial.
 					*/
       Polynomial<number>& operator += (const Polynomial<number>& p);
-
+      
 				       /**
 					* Subtract a second polynomial.
 					*/
       Polynomial<number>& operator -= (const Polynomial<number>& p);
-
+      
                                        /**
                                         * Print coefficients.
                                         */
@@ -227,7 +220,7 @@ namespace Polynomials
                                         */
       static void multiply (std::vector<number>& coefficients,
                             const number factor);
-
+    
                                        /**
                                         * Coefficients of the polynomial
                                         * $\sum_i a_i x^i$. This vector
@@ -279,7 +272,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<number> >
       generate_complete_basis (const unsigned int degree);
-
+    
     private:
 				       /**
 					* Needed by constructor.
@@ -287,7 +280,7 @@ namespace Polynomials
       static std::vector<number> make_vector(unsigned int n,
 					     const double coefficient);
   };
-
+  
 
 /**
  * Lagrange polynomials with equidistant interpolation points in
@@ -341,7 +334,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
-
+    
     private:
 
                                        /**
@@ -352,11 +345,10 @@ namespace Polynomials
                                         * called in the
                                         * constructor.
                                         */
-      static
-      void
+      static 
+      std::vector<double> 
       compute_coefficients (const unsigned int n,
-                            const unsigned int support_point,
-			    std::vector<double>& a);
+                            const unsigned int support_point);
   };
 
 /**
@@ -381,9 +373,9 @@ namespace Polynomials
       std::vector<Polynomial<double> >
       generate_complete_basis (const std::vector<Point<1> >& points);
   };
-
-
-
+  
+  
+  
 /**
  * Legendre polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
@@ -420,33 +412,30 @@ namespace Polynomials
       static
       std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
-
+    
     private:
                                        /**
                                         * Coefficients for the interval $[0,1]$.
                                         */
-      static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > shifted_coefficients;
-
+      static std::vector<const std::vector<double> *> shifted_coefficients;
+    
                                        /**
                                         * Vector with already computed
-                                        * coefficients. For each degree of the
-                                        * polynomial, we keep one pointer to
-                                        * the list of coefficients; we do so
-                                        * rather than keeping a vector of
+                                        * coefficients. For each degree
+                                        * of the polynomial, we keep one
+                                        * pointer to the list of
+                                        * coefficients; we do so rather
+                                        * than keeping a vector of
                                         * vectors in order to simplify
-                                        * programming multithread-safe. In
-                                        * order to avoid memory leak, we use a
-                                        * shared_ptr in order to correctly
-                                        * free the memory of the vectors when
-                                        * the global destructor is called.
+                                        * programming multithread-safe.
                                         */
-      static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > recursive_coefficients;
-
+      static std::vector<const std::vector<double> *> recursive_coefficients;
+    
                                        /**
                                         * Compute coefficients recursively.
                                         */
       static void compute_coefficients (const unsigned int p);
-
+    
                                        /**
                                         * Get coefficients for
                                         * constructor.  This way, it can
@@ -458,28 +447,57 @@ namespace Polynomials
       get_coefficients (const unsigned int k);
   };
 
+/**
+ * Lobatto polynomials of arbitrary degree on <tt>[0,1]</tt>.
+ *
+ * These polynomials are the integrated Legendre polynomials on [0,1]. The first two polynomials are the standard linear shape functions given by $l_0(x) = 1-x$ and $l_1(x) = x$. For $i\geq2$ we use the definition $l_i(x) = \frac{1}{\Vert L_{i-1}\Vert_2}\int_0^x L_{i-1}(t)\,dt, where L_i deontes the i-th Legendre polynomial on [0,1]. The Lobatto polynomials l_0,\ldots,l_k form a complete basis of the polynomials space of degree k.
+ *
+ * Calling the constructor with a given index <tt>k</tt> will generate the polynomial with index <tt>k</tt>. But only for $k\geq1$ the index equals the degree of the polynomial. For <tt>k==0</tt> also a polynomial of degree 1 is generated.
+ *
+ * These polynomials are used for the construction of the shape functions of Nédélec elements of arbitrary order.
+ *
+ * @author Markus Bürg, 2009
+ */
+class Lobatto : public Polynomial<double> {
+   public:
+   /**
+	* Constructor for polynomial of degree <tt>p</tt>. There is an exception for <tt>p==0</tt>, see the general documentation.
+	*/
+      Lobatto (const unsigned int p = 0);
 
+   /**
+	* Return the polynomials with index <tt>0</tt> up to <tt>degree</tt>. There is an exception for <tt>p==0</tt>, see the general
+    * documentation.
+	*/
+      static std::vector<Polynomial<double> > generate_complete_basis (const unsigned int p);
+
+   private:
+   /**
+    * Compute coefficients recursively.
+    */
+      std::vector<double> compute_coefficients (const unsigned int p);
+};
 
 /**
  * Hierarchical polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
- * When Constructing a Hierarchical polynomial of degree <tt>p</tt>,
+ * When Constructing a Hierarchical polynomial of degree <tt>p</tt>, 
  * the coefficients will be computed by a recursion formula.  The
  * coefficients are stored in a static data vector to be available
  * when needed next time.
  *
- * These hierarchical polynomials are based on those of Demkowicz, Oden,
+ * These hierarchical polynomials are based on those of Demkowicz, Oden, 
  * Rachowicz, and Hardy (CMAME 77 (1989) 79-112, Sec. 4). The first two
- * polynomials are the standard linear shape functions given by
+ * polynomials are the standard linear shape functions given by 
  * $\phi_{0}(x) = 1 - x$ and $\phi_{1}(x) = x$. For $l \geq 2$
  * we use the definitions $\phi_{l}(x) = (2x-1)^l - 1, l = 2,4,6,...$
- * and $\phi_{l}(x) = (2x-1)^l - (2x-1), l = 3,5,7,...$. These satisfy the
- * recursion relations $\phi_{l}(x) = (2x-1)\phi_{l-1}, l=3,5,7,...$ and
- * $\phi_{l}(x) = (2x-1)\phi_{l-1} + \phi_{2}, l=4,6,8,...$.
+ * and $\phi_{l}(x) = (2x-1)^l - (2x-1), l = 3,5,7,...$. These satisfy the 
+ * recursion relations $\phi_{l}(x) = (2x-1)\phi_{l-1}, l=3,5,7,...$ and 
+ * $\phi_{l}(x) = (2x-1)\phi_{l-1} + \phi_{2}, l=4,6,8,...$. 
  *
- * The degrees of freedom are the values at the vertices and the
+ * The degrees of freedom are the values at the vertices and the 
  * derivatives at the midpoint. Currently, we do not scale the
- * polynomials in any way, although better conditioning of the
+ * polynomials in any way, although better conditioning of the 
  * element stiffness matrix could possibly be achieved with scaling.
  *
  * Calling the constructor with a given index <tt>p</tt> will generate the
@@ -533,7 +551,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
-
+    
     private:
 				     /**
 				      * Compute coefficients recursively.
@@ -549,22 +567,22 @@ namespace Polynomials
 				      */
      static const std::vector<double> &
      get_coefficients (const unsigned int p);
-
+ 
      static std::vector<const std::vector<double> *> recursive_coefficients;
-   };
+   };  
 }
 
 /** @} */
 
 /* -------------------------- inline functions --------------------- */
 
-namespace Polynomials
+namespace Polynomials 
 {
   template <typename number>
   inline
-  Polynomial<number>::Polynomial ()
+  Polynomial<number>::Polynomial () 
   {}
-
+  
   template <typename number>
   inline
   unsigned int

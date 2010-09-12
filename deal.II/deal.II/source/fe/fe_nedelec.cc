@@ -1,88 +1,96 @@
-//---------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
-//
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
-//
-//    This file is subject to QPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
-//
-//---------------------------------------------------------------------------
-
+#include <base/logstream.h>
+#include <base/utilities.h>
 #include <base/quadrature.h>
+#include <base/quadrature_lib.h>
 #include <base/qprojector.h>
-#include <base/table.h>
 #include <grid/tria.h>
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
-#include <fe/fe.h>
 #include <fe/mapping.h>
 #include <fe/fe_nedelec.h>
+#include <fe/fe_nothing.h>
 #include <fe/fe_values.h>
-
+#include <fe/fe_tools.h>
+#include <lac/full_matrix.h>
+#include <lac/vector.h>
 #include <sstream>
+#include <iostream>
 
-//TODO: implement the adjust_line_dof_index_for_line_orientation_table field,
-//and write a test similar to bits/face_orientation_and_fe_q_02
+//TODO: implement the adjust_quad_dof_index_for_face_orientation_table and
+//adjust_line_dof_index_for_line_orientation_table fields, and write tests
+//similar to bits/face_orientation_and_fe_q_*
+
 
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO: Remove doubled member variable 'degree'
-template <int dim, int spacedim>
-FE_Nedelec<dim,spacedim>::FE_Nedelec (const unsigned int degree)
-		:
-		FiniteElement<dim,spacedim> (
-		  FiniteElementData<dim>(get_dpo_vector(degree), dim,
-					 degree+1, FiniteElementData<dim>::Hcurl, 1),
-				    std::vector<bool> (
-				      FiniteElementData<dim>(get_dpo_vector(degree), dim,
-							     degree+1).dofs_per_cell,false),
-				    std::vector<std::vector<bool> >(
-				      FiniteElementData<dim>(get_dpo_vector(degree), dim,
-							     degree+1).dofs_per_cell,
-				      std::vector<bool>(dim,true))),
-		degree(degree)
+template <int dim>
+FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
+FE_PolyTensor<PolynomialsNedelec<dim>, dim>
+(p,
+ FiniteElementData<dim> (get_dpo_vector (p), dim, p + 1,
+                         FiniteElementData<dim>::Hcurl, 1),
+ std::vector<bool> (PolynomialsNedelec<dim>::compute_n_pols (p), true),
+ std::vector<std::vector<bool> >
+ (PolynomialsNedelec<dim>::compute_n_pols (p),
+  std::vector<bool> (dim, true))),
+deg (p)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
+
+  const unsigned int n_dofs = this->dofs_per_cell;
+
+  this->mapping_type = mapping_nedelec;
+				   // First, initialize the
+				   // generalized support points and
+				   // quadrature weights, since they
+				   // are required for interpolation.
+  initialize_support_points (p);
+  this->inverse_node_matrix.reinit (n_dofs, n_dofs);
+  this->inverse_node_matrix.fill
+    (FullMatrix<double> (IdentityMatrix (n_dofs)));
+				   // From now on, the shape functions
+				   // will be the correct ones, not
+				   // the raw shape functions anymore.
   
-				   // copy constraint and embedding
-				   // matrices if they are
-				   // defined. otherwise leave them at
-				   // invalid size
-  initialize_constraints ();
-  initialize_embedding ();
+				   // Reinit the vectors of
+				   // restriction and prolongation
+				   // matrices to the right sizes.
+				   // Restriction only for isotropic
+				   // refinement
+  this->reinit_restriction_and_prolongation_matrices ();
+				   // Fill prolongation matrices with embedding operators
+  FETools::compute_embedding_matrices (*this, this->prolongation);
   initialize_restriction ();
 
-				   // finally fill in support points
-				   // on cell and face
-  initialize_unit_support_points ();
-  initialize_unit_face_support_points ();
+  FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
 
-				   // finite element classes need to
-				   // initialize the
-				   // adjust_quad_dof_index... table. however,
-				   // for the current element, there are no
-				   // dofs on quads in 3d (i.e. in the
-				   // interior of a face), so there is nothing
-				   // to do
-  if (dim == 3)
-    {
-      Assert (this->dofs_per_quad == 0,
-	      ExcInternalError());
-      Assert (this->adjust_quad_dof_index_for_face_orientation_table.size(0)==
-	      this->dofs_per_quad,
-	      ExcInternalError());
-    }
+  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
+     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
+
+  FETools::compute_face_embedding_matrices<dim,double>
+    (*this, face_embeddings, 0, 0);
+  this->interface_constraints.reinit ((1 << (dim - 1)) * this->dofs_per_face,
+                                      this->dofs_per_face);
+
+  unsigned int target_row = 0;
+
+  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
+    for (unsigned int j = 0; j < face_embeddings[i].m (); ++j)
+      {
+        for (unsigned int k = 0; k < face_embeddings[i].n (); ++k)
+          this->interface_constraints (target_row, k)
+            = face_embeddings[i] (j, k);
+
+        ++target_row;
+      }
 }
 
 
 
-template <int dim, int spacedim>
+template <int dim>
 std::string
-FE_Nedelec<dim,spacedim>::get_name () const
+FE_Nedelec<dim>::get_name () const
 {
 				   // note that the
 				   // FETools::get_fe_from_name
@@ -92,1430 +100,5866 @@ FE_Nedelec<dim,spacedim>::get_name () const
 				   // have to be kept in synch
 
   std::ostringstream namebuf;  
-  namebuf << "FE_Nedelec<" << dim << ">(" << degree << ")";
+  namebuf << "FE_Nedelec<" << dim << ">(" << deg << ")";
 
   return namebuf.str();
 }
 
 
-
-template <int dim, int spacedim>
-FiniteElement<dim,spacedim> *
-FE_Nedelec<dim,spacedim>::clone() const
+template <int dim>
+FiniteElement<dim>
+*FE_Nedelec<dim>::clone () const
 {
-  return new FE_Nedelec<dim,spacedim>(*this);
+  return new FE_Nedelec<dim> (*this);
 }
-
-
-#if deal_II_dimension == 1
-
-template <>
-double
-FE_Nedelec<1>::shape_value_component (const unsigned int ,
-				     const Point<1>    &,
-				     const unsigned int ) const
-{
-  Assert (false, ExcNotImplemented());
-  return 0.;
-}
-
-#endif
-
-#if deal_II_dimension == 2
-
-template <>
-double
-FE_Nedelec<2>::shape_value_component (const unsigned int i,
-				      const Point<2>    &p,
-				      const unsigned int component) const
-{
-  const unsigned int dim = 2;
-  
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component < dim, ExcIndexRange (component, 0, dim));
-  
-  switch (degree)
-    {
-				       // first order Nedelec elements
-      case 1:
-      {
-	switch (i)
-	  {
-						   // (0, 1-x)
-	    case 0: return (component == 0 ? 0 : 1-p(0));
-						   // (0,x)
-	    case 1: return (component == 0 ? 0 : p(0));
-						   // (1-y, 0)
-	    case 2: return (component == 0 ? 1-p(1) : 0);
-						   // (y, 0)
-	    case 3: return (component == 0 ? p(1) : 0);
-                        
-						   // there are only
-						   // four shape
-						   // functions!?
-	    default:
-		  Assert (false, ExcInternalError());
-		  return 0;
-	  };
-      };
-
-					// no other degrees
-					// implemented
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
-  
-  return 0;
-}
-
-#endif
-
-#if deal_II_dimension == 3
-
-template <>
-double
-FE_Nedelec<3>::shape_value_component (const unsigned int i,
-				      const Point<3>    &p,
-				      const unsigned int component) const
-{
-  const unsigned int dim = 3;
-  
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component < dim, ExcIndexRange (component, 0, dim));
-  
-  switch (degree)
-    {
-				       // first order Nedelec
-				       // elements
-      case 1:
-      {
-					 // note that the degrees of
-					 // freedom on opposite faces
-					 // have a common vector
-					 // direction, so simplify that
-					 // a little. these directions
-					 // are:
-					 //
-					 // for lines 2, 3, 6, 7:
-					 //    (1,0,0)
-					 // for lines 0, 1, 4, 5:
-					 //    (0,1,0)
-					 // for lines 8, 9, 10, 11:
-					 //    (0,0,1)
-					 //
-					 // thus, sort out all those
-					 // cases where the component
-					 // is zero anyway, and only
-					 // otherwise compute the
-					 // spatially dependent part
-					 // which is then also the
-					 // return value
-	if (((i<8) && (((i%4>=2) && (component!=0)) ||
-		       ((i%4<2) && (component!=1)))) ||
-	    ((i>=8) && (component != 2)))
-	  return 0;
-
-					       // now we know that the
-					       // only non-zero
-					       // component is
-					       // requested:
-	const double x = p(0),
-		     y = p(1),
-		     z = p(2);
-	switch (i)
-	  {
-	    case  0: return (1-x)*(1-z);
-	    case  1: return     x*(1-z);
-	    case  2: return (1-y)*(1-z);
-	    case  3: return     y*(1-z);
-
-	    case  4: return (1-x)*z;
-	    case  5: return     x*z;
-	    case  6: return (1-y)*z;
-	    case  7: return     y*z;
-
-	    case  8: return (1-x)*(1-y);
-	    case  9: return     x*(1-y);
-	    case 10: return (1-x)*y;
-	    case 11: return     x*y;
-			
-	    default:
-		  Assert (false, ExcInternalError());
-		  return 0;
-	  };
-      };
-
-					// no other degrees
-					// implemented
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
-  
-  return 0;
-}
-
-#endif
-
-#if deal_II_dimension == 1
-
-template <>
-Tensor<1,1>
-FE_Nedelec<1>::shape_grad_component (const unsigned int ,
-				     const Point<1>    &,
-				     const unsigned int ) const
-{
-  Assert (false, ExcNotImplemented());
-  return Tensor<1,1>();
-}
-
-#endif
-
-#if deal_II_dimension == 2
-
-template <>
-Tensor<1,2>
-FE_Nedelec<2>::shape_grad_component (const unsigned int i,
-				     const Point<2>    &,
-				     const unsigned int component) const
-{
-  const unsigned int dim = 2;
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component < dim, ExcIndexRange (component, 0, dim));
-
-  switch (degree)
-    {
-				       // first order Nedelec elements
-      case 1:
-      {
-					 // on the unit cell, the
-					 // gradients of these shape
-					 // functions are constant, so
-					 // we pack them into a table
-					 // for simpler lookup
-					 //
-					 // the format is: first
-					 // index=shape function
-					 // number; second
-					 // index=vector component,
-					 // third index=component
-					 // within gradient
-	static const double unit_gradients[4][2][2]
-	  = { { {0., 0.}, {-1.,0.} },
-	      { {0., 0.}, {+1.,0.} },
-	      { {0.,-1.}, { 0.,0.} },
-	      { {0.,+1.}, { 0.,0.} } };
-	return Tensor<1,dim>(unit_gradients[i][component]);
-      };
-
-					// no other degrees
-					// implemented
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
-  
-  return Tensor<1,dim>();
-}
-
-#endif
-
-#if deal_II_dimension == 3
-
-template <>
-Tensor<1,3>
-FE_Nedelec<3>::shape_grad_component (const unsigned int i,
-				     const Point<3>    &p,
-				     const unsigned int component) const
-{
-  const unsigned int dim = 3;
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component < dim, ExcIndexRange (component, 0, dim));
-
-  switch (degree)
-    {
-				       // first order Nedelec elements
-      case 1:
-      {
-					 // on the unit cell, the
-					 // gradients of these shape
-					 // functions are linear. we
-					 // pack them into an array,
-					 // knowing that it may be
-					 // expensive to recompute the
-					 // whole array each
-					 // time. maybe some clever
-					 // compiler can optimize this
-					 // out, seeing that except
-					 // for one element all the
-					 // other ones are dead
-					 // stores...
-					 //
-					 // the format is: first
-					 // index=shape function
-					 // number; second
-					 // index=vector component,
-					 // third index=component
-					 // within gradient
-	const double x = p(0),
-		     y = p(1),
-		     z = p(2);
-	const double unit_gradients[12][3][3]
-	  = { { {0,      0,      0}, {-(1-z), 0, -(1-x)}, {0, 0, 0} },
-	      { {0,      0,      0}, { (1-z), 0,     -x}, {0, 0, 0} },
-	      { {0, -(1-z), -(1-y)}, {0,      0,      0}, {0, 0, 0} },
-	      { {0,  (1-z),     -y}, {0,      0,      0}, {0, 0, 0} },
-	      
-	      { {0,  0,     0}, {-z, 0, (1-x)}, {0, 0, 0} },
-	      { {0,  0,     0}, { z, 0,     x}, {0, 0, 0} },
-	      { {0, -z, (1-y)}, { 0, 0,     0}, {0, 0, 0} },
-	      { {0,  z,     y}, { 0, 0,     0}, {0, 0, 0} },
-
-	      { {0, 0, 0}, {0, 0, 0}, {-(1-y), -(1-x), 0} },
-	      { {0, 0, 0}, {0, 0, 0}, { (1-y),     -x, 0} },
-	      { {0, 0, 0}, {0, 0, 0}, {    -y,  (1-x), 0} },
-	      { {0, 0, 0}, {0, 0, 0}, {     y,      x, 0} } };
-					 // note: simple check whether
-					 // this can at all be: build
-					 // the sum over all these
-					 // tensors. since the sum of
-					 // the shape functions is a
-					 // constant, the gradient
-					 // must necessarily be
-					 // zero. this is in fact the
-					 // case here, so test
-					 // successfull
-	return Tensor<1,dim>(unit_gradients[i][component]);
-      };
-
-					// no other degrees
-					// implemented
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
-  
-  return Tensor<1,dim>();
-}
-
-#endif
-
-
-#if deal_II_dimension == 1
-
-template <>
-Tensor<2,1>
-FE_Nedelec<1>::shape_grad_grad_component (const unsigned int ,
-					  const Point<1>    &,
-					  const unsigned int ) const
-{
-  Assert (false, ExcNotImplemented());
-  return Tensor<2,1>();
-}
-
-#endif
-
-
-#if deal_II_dimension == 2
-
-template <>
-Tensor<2,2>
-FE_Nedelec<2>::shape_grad_grad_component (const unsigned int i,
-					  const Point<2> &/*p*/,
-					  const unsigned int component) const
-{
-  const unsigned int dim = 2;
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component < dim, ExcIndexRange (component, 0, dim));
-
-  switch (degree)
-    {
-				       // first order Nedelec
-				       // elements. their second
-				       // derivatives on the unit cell
-				       // are zero
-      case 1:
-      {
-	return Tensor<2,dim>();
-      };
-
-					// no other degrees
-					// implemented
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
-
-  return Tensor<2,dim>();
-}
-
-#endif
-
-#if deal_II_dimension == 3
-
-template <>
-Tensor<2,3>
-FE_Nedelec<3>::shape_grad_grad_component (const unsigned int i,
-					  const Point<3>    &/*p*/,
-					  const unsigned int component) const
-{
-  const unsigned int dim = 3;
-  Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
-  Assert (component < dim, ExcIndexRange (component, 0, dim));
-
-  switch (degree)
-    {
-				       // first order Nedelec
-				       // elements. their second
-				       // derivatives on the unit cell
-				       // are constant, but non-zero
-      case 1:
-      {
-					 // the format is: first
-					 // index=shape function
-					 // number; second
-					 // index=vector component,
-					 // third and fourth
-					 // index=component within
-					 // second derivative
-	static const double unit_grad_grads[12][3][3][3]
-	  = {
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 1}, {0, 0, 0}, {1, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0,-1}, {0, 0, 0}, {-1, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-		
-		{ { {0, 0, 0}, {0, 0, 1}, {0, 1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0,-1}, {0,-1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0,-1}, {0, 0, 0}, {-1, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 1}, {0, 0, 0}, {1, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0,-1}, {0,-1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 1}, {0, 1, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 1, 0}, {1, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0,-1, 0}, {-1, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0,-1, 0}, {-1, 0, 0}, {0, 0, 0} } },
-
-		{ { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 0, 0}, {0, 0, 0}, {0, 0, 0} },
-		  { {0, 1, 0}, {1, 0, 0}, {0, 0, 0} } }
-	  };
-
-	return Tensor<2,dim>(unit_grad_grads[i][component]);
-      };
-
-					// no other degrees
-					// implemented
-      default:
-	    Assert (false, ExcNotImplemented());
-    };
-
-  return Tensor<2,dim>();
-}
-
-#endif
 
 //---------------------------------------------------------------------------
-// Auxiliary functions
+// Auxiliary and internal functions
 //---------------------------------------------------------------------------
 
 
+#if deal_II_dimension == 1
 
-template <int dim, int spacedim>
+                   // Set the generalized support
+                   // points and precompute the 
+                   // parts of the projection-based
+                   // interpolation, which does
+                   // not depend on the interpolated
+                   // function.
+template <int dim>
 void
-FE_Nedelec<dim,spacedim>::initialize_constraints ()
+FE_Nedelec<dim>::initialize_support_points (const unsigned int degree)
 {
-				   // copy constraint matrices if they
-				   // are defined. otherwise leave
-				   // them at zero size
-  if (degree<Matrices::n_constraint_matrices+1)
-    {
-      this->interface_constraints.
-        TableBase<2,double>::reinit (this->interface_constraints_size());
-      this->interface_constraints.fill (Matrices::constraint_matrices[degree-1]);
-    };
+  Assert (false, ExcNotImplemented ());
 }
 
+#else
 
-
-template <int dim, int spacedim>
+// Version for 2d and higher. See above for 1d version
+template <int dim>
 void
-FE_Nedelec<dim,spacedim>::initialize_embedding ()
+FE_Nedelec<dim>::initialize_support_points (const unsigned int degree)
 {
-  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
-  if ((degree < Matrices::n_embedding_matrices+1) &&
-      (Matrices::embedding[degree-1][0] != 0))
-    for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-      {
-                                         // copy
-        this->prolongation[iso][c].reinit (this->dofs_per_cell,
-                                      this->dofs_per_cell);
-        this->prolongation[iso][c].fill (Matrices::embedding[degree-1][c]);
-                                         // and make sure that the row
-                                         // sum is 0.5 (for usual
-                                         // elements, the row sum must
-                                         // be 1, but here the shape
-                                         // function is multiplied by
-                                         // the inverse of the
-                                         // Jacobian, which introduces
-                                         // a factor of 1/2 when going
-                                         // from mother to child)
-        for (unsigned int row=0; row<this->dofs_per_cell; ++row)
-          {
-            double sum = 0;
-            for (unsigned int col=0; col<this->dofs_per_cell; ++col)
-              sum += this->prolongation[iso][c](row,col);
-            Assert (std::fabs(sum-.5) < 1e-14,
-                    ExcInternalError());
-          };
-      };
-}
+	               // Create polynomial basis.
+  const std::vector<Polynomials::Polynomial<double> >& lobatto_polynomials
+    = Polynomials::Lobatto::generate_complete_basis (degree + 1);
+  std::vector<Polynomials::Polynomial<double> >
+    lobatto_polynomials_grad (degree + 1);
 
+  for (unsigned int i = 0; i < lobatto_polynomials_grad.size (); ++i)
+    lobatto_polynomials_grad[i] = lobatto_polynomials[i + 1].derivative ();
 
-
-template <int dim, int spacedim>
-void
-FE_Nedelec<dim,spacedim>::initialize_restriction ()
-{
-  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   switch (dim)
     {
-      case 2:   // 2d
-      {
-	switch (degree)
-	  {
-	    case 1:
-	    {
-                                               // this is a strange
-                                               // element, since it is
-                                               // both additive and
-                                               // then it is also
-                                               // not. ideally, we
-                                               // would like to have
-                                               // the value of the
-                                               // shape function on
-                                               // the coarse line to
-                                               // be the mean value of
-                                               // that on the two
-                                               // child ones. thus,
-                                               // one should make it
-                                               // additive. however,
-                                               // additivity only
-                                               // works if an element
-                                               // does not have any
-                                               // continuity
-                                               // requirements, since
-                                               // otherwise degrees of
-                                               // freedom are shared
-                                               // between adjacent
-                                               // elements, and when
-                                               // we make the element
-                                               // additive, that would
-                                               // mean that we end up
-                                               // adding up
-                                               // contributions not
-                                               // only from the child
-                                               // cells of this cell,
-                                               // but also from the
-                                               // child cells of the
-                                               // neighbor, and since
-                                               // we cannot know
-                                               // whether there even
-                                               // exists a neighbor we
-                                               // cannot simply make
-                                               // the element
-                                               // additive.
-					       //
-                                               // so, until someone
-                                               // comes along with a
-                                               // better alternative,
-                                               // we do the following:
-                                               // make the element
-                                               // non-additive, and
-                                               // simply pick the
-                                               // value of one of the
-                                               // child lines for the
-                                               // value of the mother
-                                               // line (note that we
-                                               // have to multiply by
-                                               // two, since the shape
-                                               // functions scale with
-                                               // the inverse
-                                               // Jacobian). we thus
-                                               // throw away the
-                                               // information of one
-                                               // of the child lines,
-                                               // but there seems to
-                                               // be no other way than
-                                               // that...
-                                               //
-                                               // note: to make things
-                                               // consistent, and
-                                               // restriction
-                                               // independent of the
-                                               // order in which we
-                                               // travel across the
-                                               // cells of the coarse
-                                               // grid, we have to
-                                               // make sure that we
-                                               // take the same small
-                                               // line when visiting
-                                               // its two neighbors,
-                                               // to get the value for
-                                               // the mother line. we
-                                               // take the first line
-                                               // always, in the
-                                               // canonical direction
-                                               // of lines
-              for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-                this->restriction[iso][c].reinit (this->dofs_per_cell,
-						  this->dofs_per_cell);
-	      
-	      this->restriction[iso][0](0,0) = 2.;
-	      this->restriction[iso][1](1,1) = 2.;
-	      this->restriction[iso][0](2,2) = 2.;
-	      this->restriction[iso][2](3,3) = 2.;
+      case 2:
+        {
+        	       // Initialize quadratures to obtain
+        	       // quadrature points later on.
+          const QGauss<dim - 1> reference_edge_quadrature (degree + 1);
+          const unsigned int&
+            n_edge_points = reference_edge_quadrature.size ();
+          const unsigned int n_boundary_points
+            = GeometryInfo<dim>::lines_per_cell * n_edge_points;
+          const Quadrature<dim>& edge_quadrature
+            = QProjector<dim>::project_to_all_faces (reference_edge_quadrature);
 
-	      break;
-	    };
-	    
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), leave them
-					       // empty. this does not
-					       // prevent the use of
-					       // this FE, but will
-					       // prevent the use of
-					       // these matrices
-              break;
-	    };
-	  };
-	
-	break;
-      };
+          this->generalized_face_support_points.resize (n_edge_points);
 
+                   // Create face support points.
+          for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+            this->generalized_face_support_points[q_point]
+              = reference_edge_quadrature.point (q_point);
 
-      case 3:   // 3d
-      {
-	switch (degree)
-	  {
-	    case 1:
-	    {
-					       // same principle as in
-					       // 2d, take one child
-					       // cell to get at the
-					       // values of each of
-					       // the 12 lines
-              for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-                this->restriction[iso][c].reinit (this->dofs_per_cell,
-						  this->dofs_per_cell);
-	      this->restriction[iso][0](0,0) = 2.;
-	      this->restriction[iso][1](1,1) = 2.;
-	      this->restriction[iso][0](2,2) = 2.;
-	      this->restriction[iso][2](3,3) = 2.;
+          if (degree > 0)
+            {
+                   // If the polynomial degree is positive
+                   // we have support points on the faces
+                   // and in the interior of a cell.
+              const QGauss<dim> quadrature (degree + 1);
+              const unsigned int& n_interior_points = quadrature.size ();
+
+              this->generalized_support_points.resize
+                (n_boundary_points + n_interior_points);
+              boundary_weights.reinit (n_edge_points, degree);
+
+              for (unsigned int q_point = 0; q_point < n_edge_points;
+                   ++q_point)
+                {
+                  for (unsigned int line = 0;
+                       line < GeometryInfo<dim>::lines_per_cell; ++line)
+                    this->generalized_support_points[line * n_edge_points
+                                                     + q_point]
+                      = edge_quadrature.point
+                        (QProjector<dim>::DataSetDescriptor::face
+                         (line, true, false, false, n_edge_points) + q_point);
+
+                  for (unsigned int i = 0; i < degree; ++i)
+                    boundary_weights (q_point, i)
+                      = reference_edge_quadrature.weight (q_point)
+                        * lobatto_polynomials_grad[i + 1].value
+                          (this->generalized_face_support_points[q_point] (0));
+                }
+
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                this->generalized_support_points[q_point + n_boundary_points]
+                  = quadrature.point (q_point);
+            }
+          
+          else
+            {
+                   // In this case we only need support points
+                   // on the faces of a cell.
+              const Quadrature<dim>& edge_quadrature
+                = QProjector<dim>::project_to_all_faces
+                  (reference_edge_quadrature);
               
-	      this->restriction[iso][4](4,4) = 2.;
-	      this->restriction[iso][5](5,5) = 2.;
-	      this->restriction[iso][4](6,6) = 2.;
-	      this->restriction[iso][6](7,7) = 2.;
-              
-	      this->restriction[iso][0](8,8) = 2.;
-	      this->restriction[iso][1](9,9) = 2.;
-	      this->restriction[iso][2](10,10) = 2.;
-	      this->restriction[iso][3](11,11) = 2.;
-              
-	      break;
-	    };
-	    
-	    default:
-	    {
-					       // in case we don't
-					       // have the matrices
-					       // (yet), leave them
-					       // empty. this does not
-					       // prevent the use of
-					       // this FE, but will
-					       // prevent the use of
-					       // these matrices
-              break;
-	    };
-	  };
-	
-	break;
-      };
+              this->generalized_support_points.resize (n_boundary_points);
+
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_cell; ++line)
+                for (unsigned int q_point = 0; q_point < n_edge_points;
+                     ++q_point)
+                  this->generalized_support_points[line * n_edge_points
+                                                   + q_point]
+                    = edge_quadrature.point
+                      (QProjector<dim>::DataSetDescriptor::face
+                       (line, true, false, false, n_edge_points) + q_point);
+            }
+
+          break;
+        }
+
+      case 3:
+        {
+        	       // Initialize quadratures to obtain
+        	       // quadrature points later on.
+          const QGauss<dim - 2> reference_edge_quadrature (degree + 1);
+          const unsigned int& n_edge_points = reference_edge_quadrature.size ();
+          const Quadrature<dim - 1>& edge_quadrature
+            = QProjector<dim - 1>::project_to_all_faces
+              (reference_edge_quadrature);
+
+          if (degree > 0)
+            {
+                   // If the polynomial degree is positive
+                   // we have support points on the edges,
+                   // faces and in the interior of a cell.
+              const QGauss<dim - 1> reference_face_quadrature (degree + 1);
+              const unsigned int& n_face_points
+                = reference_face_quadrature.size ();
+              const unsigned int n_boundary_points
+                = GeometryInfo<dim>::lines_per_cell * n_edge_points
+                  + GeometryInfo<dim>::faces_per_cell * n_face_points;
+              const QGauss<dim> quadrature (degree + 1);
+              const unsigned int& n_interior_points = quadrature.size ();
+
+              boundary_weights.reinit (n_edge_points + n_face_points,
+                                       2 * (degree + 1) * degree);
+              this->generalized_face_support_points.resize
+                (4 * n_edge_points + n_face_points);
+              this->generalized_support_points.resize
+                (n_boundary_points + n_interior_points);
+
+                   // Create support points on edges.
+              for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+                {
+                  for (unsigned int line = 0;
+                       line < GeometryInfo<dim - 1>::lines_per_cell; ++line)
+                    this->generalized_face_support_points[line * n_edge_points
+                                                          + q_point]
+                      = edge_quadrature.point
+                        (QProjector<dim - 1>::DataSetDescriptor::face
+                         (line, true, false, false, n_edge_points) + q_point);
+
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int j = 0; j < 2; ++j)
+                      {
+                        this->generalized_support_points
+                          [q_point + (i + 4 * j) * n_edge_points]
+                          = Point<dim>
+                            (i, reference_edge_quadrature.point (q_point) (0),
+                             j);
+                        this->generalized_support_points
+                          [q_point + (i + 4 * j + 2) * n_edge_points]
+                          = Point<dim>
+                            (reference_edge_quadrature.point (q_point) (0),
+                             i, j);
+                        this->generalized_support_points
+                          [q_point + (i + 2 * (j + 4)) * n_edge_points]
+                          = Point<dim>
+                            (i, j,
+                             reference_edge_quadrature.point (q_point) (0));
+                      }
+
+                  for (unsigned int i = 0; i < degree; ++i)
+                    boundary_weights (q_point, i)
+                      = reference_edge_quadrature.weight (q_point)
+                        * lobatto_polynomials_grad[i + 1].value
+                          (this->generalized_face_support_points[q_point] (1));
+                }
+
+                   // Create support points on faces.
+              for (unsigned int q_point = 0; q_point < n_face_points;
+                   ++q_point)
+                {
+                  this->generalized_face_support_points[q_point
+                                                        + 4 * n_edge_points]
+                    = reference_face_quadrature.point (q_point);
+
+                  for (unsigned int i = 0; i <= degree; ++i)
+                    for (unsigned int j = 0; j < degree; ++j)
+                      {
+                        boundary_weights (q_point + n_edge_points,
+                                          2 * (i * degree + j))
+                          = reference_face_quadrature.weight (q_point)
+                            * lobatto_polynomials_grad[i].value
+                              (this->generalized_face_support_points
+                               [q_point + 4 * n_edge_points] (0))
+                            * lobatto_polynomials[j + 2].value
+                              (this->generalized_face_support_points
+                               [q_point + 4 * n_edge_points] (1));
+                        boundary_weights (q_point + n_edge_points,
+                                          2 * (i * degree + j) + 1)
+                          = reference_face_quadrature.weight (q_point)
+                            * lobatto_polynomials_grad[i].value
+                              (this->generalized_face_support_points
+                               [q_point + 4 * n_edge_points] (1))
+                            * lobatto_polynomials[j + 2].value
+                              (this->generalized_face_support_points
+                               [q_point + 4 * n_edge_points] (0));
+                      }
+                }
+
+              const Quadrature<dim>& face_quadrature
+                = QProjector<dim>::project_to_all_faces
+                  (reference_face_quadrature);
+
+              for (unsigned int face = 0;
+                   face < GeometryInfo<dim>::faces_per_cell; ++face)
+                for (unsigned int q_point = 0; q_point < n_face_points;
+                      ++q_point)
+                  {
+                    this->generalized_support_points
+                    [face * n_face_points + q_point
+                      + GeometryInfo<dim>::lines_per_cell * n_edge_points]
+                    = face_quadrature.point
+                      (QProjector<dim>::DataSetDescriptor::face
+                       (face, true, false, false, n_face_points) + q_point);
+                  }
+
+                   // Create support points in the interior.
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                this->generalized_support_points[q_point + n_boundary_points]
+                  = quadrature.point (q_point);
+            }
+         
+          else
+            {
+              this->generalized_face_support_points.resize (4 * n_edge_points);
+              this->generalized_support_points.resize
+                (GeometryInfo<dim>::lines_per_cell * n_edge_points);
+
+              for (unsigned int q_point = 0; q_point < n_edge_points;
+                   ++q_point)
+                {
+                  for (unsigned int line = 0;
+                       line < GeometryInfo<dim - 1>::lines_per_cell; ++line)
+                    this->generalized_face_support_points[line * n_edge_points
+                                                          + q_point]
+                      = edge_quadrature.point
+                        (QProjector<dim - 1>::DataSetDescriptor::face
+                         (line, true, false, false, n_edge_points) + q_point);
+
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int j = 0; j < 2; ++j)
+                      {
+                        this->generalized_support_points
+                          [q_point + (i + 4 * j) * n_edge_points]
+                          = Point<dim>
+                            (i, reference_edge_quadrature.point (q_point) (0),
+                             j);
+                        this->generalized_support_points
+                          [q_point + (i + 4 * j + 2) * n_edge_points]
+                          = Point<dim>
+                            (reference_edge_quadrature.point (q_point) (0),
+                             i, j);
+                        this->generalized_support_points
+                          [q_point + (i + 2 * (j + 4)) * n_edge_points]
+                          = Point<dim>
+                            (i, j,
+                             reference_edge_quadrature.point (q_point) (0));
+                      }
+                }
+            }
+          
+          break;
+        }
       
       default:
-	    Assert (false,ExcNotImplemented());
+        Assert (false, ExcNotImplemented ());
+    }
+}
+
+#endif
+
+
+#if deal_II_dimension == 1
+
+                   // Set the restriction matrices.
+template <>
+void
+FE_Nedelec<1>::initialize_restriction ()
+{
+				   // there is only one refinement case in 1d,
+				   // which is the isotropic one
+  for (unsigned int i = 0; i < GeometryInfo<1>::max_children_per_cell; ++i)
+    this->restriction[0][i].reinit(0, 0);
+}
+
+#endif
+
+                   // Restriction operator 
+template <int dim>
+void
+FE_Nedelec<dim>::initialize_restriction ()
+{
+  switch (dim)
+    {
+      case 2:
+        {
+          const unsigned int n_boundary_dofs
+            = GeometryInfo<dim>::lines_per_cell * this->degree;
+          const unsigned int n_dofs
+            = (GeometryInfo<dim>::lines_per_cell + 2 * deg) * this->degree;
+
+          for (unsigned int ref = RefinementCase<dim>::cut_x;
+               ref <= RefinementCase<dim>::isotropic_refinement; ++ref)
+            {
+              const unsigned int index = ref - 1;
+              
+              switch (ref)
+                {
+                  case RefinementCase<dim>::cut_x:
+                    {
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                               (RefinementCase<dim> (ref)); ++child)
+                        {
+                          for (unsigned int dof = child * this->degree;
+                               dof < (child + 1) * this->degree; ++dof)
+                            this->restriction[index][child] (dof, dof) = 1.0;
+
+                          for (unsigned int dof = 2 * this->degree;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<dim>::cut_y:
+                    {
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                               (RefinementCase<dim> (ref)); ++child)
+                        {
+                          for (unsigned int dof = 0; dof < 2 * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+
+                          for (unsigned int dof = (child + 2) * this->degree;
+                               dof < (child + 3) * this->degree; ++dof)
+                            this->restriction[index][child] (dof, dof) = 1.0;
+
+                          for (unsigned int dof = n_boundary_dofs;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<dim>::isotropic_refinement:
+                    {
+                    	         // First we set the values for
+                    	         // the boundary dofs of every
+                    	         // child.
+                    	         
+                                 // child 0
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][0]
+                            (dof + 2 * i * this->degree,
+                             dof + 2 * i * this->degree) = 0.5;
+
+                                 // child 1
+                      for (unsigned int dof = this->degree;
+                           dof < 3 * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.5;
+
+                                 // child 2
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][2]
+                            (dof + 3 * i * this->degree,
+                             dof + 3 * i * this->degree) = 0.5;
+
+                                 // child 3
+                      for (unsigned int dof = this->degree;
+                           dof < 2 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][3]
+                            (dof + 2 * i * this->degree,
+                             dof + 2 * i * this->degree) = 0.5;
+
+                                 // The values for the interior
+                                 // dofs are the same for
+                                 // every child.
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                               (RefinementCase<dim> (ref)); ++child)
+                        for (unsigned int dof = n_boundary_dofs; dof < n_dofs;
+                             ++dof)
+                          this->restriction[index][child] (dof, dof) = 0.25;
+                      
+                      break;
+                    }
+                  
+                  default:
+                    Assert (false, ExcNotImplemented ());
+                }
+            }
+
+          break;
+        }
+
+      case 3:
+        {
+          const unsigned int n_edge_dofs
+            = GeometryInfo<dim>::lines_per_cell * deg;
+          const unsigned int n_boundary_dofs
+            = n_edge_dofs
+              + 2 * GeometryInfo<dim>::faces_per_cell * deg * this->degree;
+          const unsigned int n_dofs
+            = (GeometryInfo<dim>::lines_per_cell
+               + (2 * GeometryInfo<dim>::faces_per_cell + 3 * deg) * deg)
+              * this->degree;
+
+          for (unsigned int ref = RefinementCase<dim>::cut_x;
+               ref <= RefinementCase<dim>::isotropic_refinement; ++ref)
+            {
+              const unsigned int index = ref - 1;
+              
+              switch (ref)
+                {
+                  case RefinementCase<3>::cut_x:
+                    {
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                               (RefinementCase<dim> (ref)); ++child)
+                        {
+                        	     // First we set the values for
+                        	     // the edge dofs.
+                          for (unsigned int dof = 0; dof <= deg; ++dof)
+                            {
+                              for (unsigned int i = 0; i < 3; ++i)
+                                this->restriction[index][child]
+                                  (dof + (child + 4 * i) * this->degree,
+                                   dof + (child + 4 * i) * this->degree)
+                                  = 1.0;
+
+                              this->restriction[index][child]
+                                (dof + (child + 10) * this->degree,
+                                 dof + (child + 10) * this->degree) = 1.0;
+                            }
+
+                          for (unsigned int dof = 2 * this->degree;
+                               dof < 4 * this->degree; ++dof)
+                            for (unsigned int i = 0; i < 2; ++i)
+                              this->restriction[index][child]
+                                (dof + 4 * i * this->degree,
+                                 dof + 4 * i * this->degree) = 0.5;
+
+                        	     // Then we set the values for
+                        	     // the face and the interior
+                        	     // dofs.
+                          for (unsigned int dof
+                                 = n_edge_dofs
+                                   + 2 * child * deg * this->degree;
+                               dof
+                                 < n_edge_dofs
+                                   + 2 * (child + 1) * deg * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 1.0;
+
+                          for (unsigned int dof
+                                 = n_edge_dofs + 4 * deg * this->degree;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<3>::cut_y:
+                    {
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                               (RefinementCase<dim> (ref)); ++child)
+                        {
+                        	     // First we set the values for
+                        	     // the edge dofs.
+                          for (unsigned int dof = 0; dof < 2 * this->degree;
+                               ++dof)
+                            {
+                              for (unsigned int i = 0; i < 2; ++i)
+                                this->restriction[index][child]
+                                  (dof + 4 * i * this->degree,
+                                   dof + 4 * i * this->degree) = 0.5;
+
+                              this->restriction[index][child]
+                                (dof + 2 * (child + 4) * this->degree,
+                                 dof + 2 * (child + 4) * this->degree) = 1.0;
+                            }
+
+                          for (unsigned int dof = (child + 2) * this->degree;
+                               dof < (child + 3) * this->degree; ++dof)
+                            for (unsigned int i = 0; i < 2; ++i)
+                              this->restriction[index][child]
+                                (dof + 4 * i * this->degree,
+                                 dof + 4 * i * this->degree) = 1.0;
+
+                                 // Then we set the values for
+                                 // the face and the interior
+                                 // dofs.
+                          for (unsigned int dof = n_edge_dofs;
+                               dof < n_edge_dofs + 4 * deg * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+
+                          for (unsigned int dof
+                                 = n_edge_dofs
+                                   + 2 * (child + 2) * deg * this->degree;
+                               dof
+                                 < n_edge_dofs
+                                   + 2 * (child + 3) * deg * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 1.0;
+
+                          for (unsigned int dof
+                                 = n_edge_dofs + 8 * deg * this->degree;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<3>::cut_xy:
+                    {
+                                 // child 0
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 4; ++i)
+                            this->restriction[index][0]
+                              (dof + 2 * i * this->degree,
+                               dof + 2 * i * this->degree) = 0.5;
+
+                          this->restriction[index][0] (dof + 8 * this->degree,
+                                                       dof + 8 * this->degree)
+                            = 1.0;
+                        }
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][0]
+                            (dof + 4 * i * deg * this->degree,
+                             dof + 4 * i * deg * this->degree) = 0.5;
+
+                                 // child 1
+                      for (unsigned int dof = this->degree;
+                           dof < 3 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][1]
+                            (dof + 4 * i * this->degree,
+                             dof + 4 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = 9 * this->degree;
+                           dof < 10 * this->degree; ++dof)
+                        this->restriction[2][1] (dof, dof) = 1.0;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 6 * deg * this->degree;
+                           ++dof)
+                        this->restriction[2][1] (dof, dof) = 0.5;
+
+                                 // child 2
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][2]
+                              (dof + 7 * i * this->degree,
+                               dof + 7 * i * this->degree) = 0.5;
+
+                            this->restriction[index][2]
+                              (dof + 10 * this->degree,
+                               dof + 10 * this->degree) = 1.0;
+                        }
+
+                      for (unsigned int dof = 3 * this->degree;
+                           dof < 5 * this->degree; ++dof)
+                        this->restriction[index][2] (dof, dof) = 0.5;
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree;
+                           ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][2]
+                            (dof + 6 * i * deg * this->degree,
+                             dof + 6 * i * deg * this->degree) = 0.5;
+
+                                 // child 3
+                      for (unsigned int dof = this->degree;
+                           dof < 2 * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 4; ++i)
+                            this->restriction[index][3]
+                              (dof + 2 * i * this->degree,
+                               dof + 2 * i * this->degree) = 0.5;
+
+                          this->restriction[index][3]
+                            (dof + 10 * this->degree,
+                             dof + 10 * this->degree) = 1.0;
+                        }
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 4 * deg * this->degree;
+                           ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][3]
+                            (dof + 4 * i * deg * this->degree,
+                             dof + 4 * i * deg * this->degree) = 0.5;
+
+                                 // Some values are the same
+                                 // on every child.
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                              (RefinementCase<dim> (ref)); ++child)
+                        for (unsigned int dof
+                               = n_edge_dofs + 8 * deg * this->degree;
+                             dof < n_dofs; ++dof)
+                          this->restriction[index][child] (dof, dof) = 0.25;
+
+                      break;
+                    }
+
+                  case RefinementCase<3>::cut_z:
+                    {
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                               (RefinementCase<dim> (ref)); ++child)
+                        {
+                          for (unsigned int dof = 4 * child * this->degree;
+                               dof < 4 * (child + 1) * this->degree; ++dof)
+                            for (unsigned int i = 0; i < 2; ++i)
+                              this->restriction[index][child]
+                                (dof + 4 * (2 - child) * i * this->degree,
+                                 dof + 4 * (2 - child) * i * this->degree)
+                                = 1.0 / (i + 1);
+
+                          for (unsigned int dof = n_edge_dofs;
+                               dof < n_edge_dofs + 8 * deg * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+
+                          for (unsigned int dof
+                                 = n_edge_dofs
+                                   + 2 * (child + 4) * deg * this->degree;
+                               dof
+                                 <  n_edge_dofs
+                                    + 2 * (child + 5) * deg * this->degree;
+                               ++ dof)
+                            this->restriction[index][child] (dof, dof) = 1.0;
+
+                          for (unsigned int dof = n_boundary_dofs;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.5;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<3>::cut_xz:
+                    {
+                                 // child 0
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][0]
+                              (dof + 2 * (i + 4) * this->degree,
+                               dof + 2 * (i + 4) * this->degree) = 0.5;
+
+                          this->restriction[index][0] (dof, dof) = 1.0;
+                        }
+
+                      for (unsigned int dof = 2 * this->degree;
+                           dof < 4 * this->degree; ++dof)
+                        this->restriction[index][0] (dof, dof) = 0.5;
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree;
+                           ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][0]
+                            (dof + 8 * i * deg * this->degree,
+                             dof + 8 * i * deg * this->degree) = 0.5;
+
+                                 // child 1
+                      for (unsigned int dof = 4 * this->degree;
+                           dof < 5 * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][1]
+                              (dof + 2 * (i + 2) * this->degree,
+                               dof + 2 * (i + 2) * this->degree) = 0.5;
+
+                          this->restriction[index][1] (dof, dof) = 1.0;
+                        }
+
+                      for (unsigned int dof = 6 * this->degree;
+                           dof < 8 * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.5;
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][1]
+                            (dof + 10 * i * deg * this->degree,
+                             dof + 10 * i * deg * this->degree) = 0.5;
+
+                                 // child 2
+                      for (unsigned int dof = this->degree;
+                           dof < 2 * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][2]
+                              (dof + 2 * (i + 4) * this->degree,
+                               dof + 2 * (i + 4) * this->degree) = 0.5;
+
+                          this->restriction[index][2] (dof, dof) = 1.0;
+                        }
+
+                      for (unsigned int dof = 2 * this->degree;
+                           dof < 4 * this->degree; ++dof)
+                        this->restriction[index][2] (dof, dof) = 0.5;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 4 * deg * this->degree;
+                           ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][2]
+                            (dof + 6 * i * deg * this->degree,
+                             dof + 6 * i * deg * this->degree) = 0.5;
+
+                                 // child 3
+                      for (unsigned int dof = 5 * this->degree;
+                           dof < 6 * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][3]
+                              (dof + 2 * (i + 2) * this->degree,
+                               dof + 2 * (i + 2) * this->degree) = 0.5;
+
+                          this->restriction[index][3] (dof, dof) = 1.0;
+                        }
+
+                      for (unsigned int dof = 6 * this->degree;
+                           dof < 8 * this->degree; ++dof)
+                        this->restriction[index][3] (dof, dof) = 0.5;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 4 * deg * this->degree;
+                           ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][3]
+                            (dof + 8 * i * deg * this->degree,
+                             dof + 8 * i * deg * this->degree) = 0.5;
+
+                                 // Some values are the same
+                                 // on every child.
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                              (RefinementCase<dim> (ref)); ++child)
+                        {
+                          for (unsigned int dof
+                                 = n_edge_dofs + 4 * deg * this->degree;
+                               dof < n_edge_dofs + 8 * deg * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.25;
+
+                          for (unsigned int dof = n_boundary_dofs;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.25;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<3>::cut_yz:
+                    {
+                                 // child 0
+                      for (unsigned int dof = 0; dof < 2 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][0]
+                            (dof + 8 * i * this->degree,
+                             dof + 8 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = 2 * this->degree;
+                           dof < 3 * this->degree; ++dof)
+                        this->restriction[index][0] (dof, dof) = 1.0;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 4 * deg * this->degree;
+                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][0]
+                            (dof + 4 * i * deg * this->degree,
+                             dof + 4 * i * deg * this->degree) = 0.5;
+
+                                 // child 1
+                      for (unsigned int dof = 0; dof < 2 * this->degree;
+                           ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][1]
+                            (dof + 10 * i * this->degree,
+                             dof + 10 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = 3 * this->degree;
+                           dof < 4 * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 1.0;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 6 * deg * this->degree;
+                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.5;
+
+                                 // child 2
+                      for (unsigned int dof = 4 * this->degree;
+                           dof < 6 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][2]
+                            (dof + 4 * i * this->degree,
+                             dof + 4 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = 6 * this->degree;
+                           dof < 7 * this->degree; ++dof)
+                        this->restriction[index][2] (dof, dof) = 1.0;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 4 * deg * this->degree;
+                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][2]
+                            (dof + 6 * i * deg * this->degree,
+                             dof + 6 * i * deg * this->degree) = 0.5;
+
+                                 // child 3
+                      for (unsigned int dof = 4 * this->degree;
+                           dof < 6 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][3]
+                            (dof + 6 * i * this->degree,
+                             dof + 6 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = 7 * this->degree;
+                           dof < 8 * this->degree; ++dof)
+                        this->restriction[index][3] (dof, dof) = 1.0;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 6 * deg * this->degree;
+                           dof < n_edge_dofs + 8 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 2; ++i)
+                          this->restriction[index][3]
+                            (dof + 4 * i * deg * this->degree,
+                             dof + 4 * i * deg * this->degree) = 0.5;
+
+                                 // Some values are the same
+                                 // on every child.
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                              (RefinementCase<dim> (ref)); ++child)
+                        {
+                          for (unsigned int dof = n_edge_dofs;
+                               dof < n_edge_dofs + 4 * deg * this->degree;
+                               ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.25;
+
+                          for (unsigned int dof = n_boundary_dofs;
+                               dof < n_dofs; ++dof)
+                            this->restriction[index][child] (dof, dof) = 0.25;
+                        }
+
+                      break;
+                    }
+
+                  case RefinementCase<3>::isotropic_refinement:
+                    {
+                    	         // Set the values for the
+                    	         // boundary dofs.
+                    	         
+                                 // child 0
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][0]
+                              (dof + 2 * i * this->degree,
+                               dof + 2 * i * this->degree) = 0.5;
+
+                          this->restriction[index][0] (dof + 8 * this->degree,
+                                                       dof + 8 * this->degree)
+                            = 0.5;
+                        }
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 3; ++i)
+                          this->restriction[index][0]
+                            (dof + 4 * i * deg * this->degree,
+                             dof + 4 * i * deg * this->degree) = 0.25;
+
+                                 // child 1
+                      for (unsigned int dof = this->degree;
+                           dof < 3 * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.5;
+
+                      for (unsigned int dof = 9 * this->degree;
+                           dof < 10 * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.5;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.25;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 8 * deg * this->degree;
+                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
+                        this->restriction[index][1] (dof, dof) = 0.25;
+
+                                 // child 2
+                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][2]
+                              (dof + 3 * i * this->degree,
+                               dof + 3 * i * this->degree) = 0.5;
+
+                          this->restriction[index][2] (dof + 10 * this->degree,
+                                                       dof + 10 * this->degree)
+                            = 0.5;
+                        }
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
+                        this->restriction[index][2] (dof, dof) = 0.25;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 6 * deg * this->degree;
+                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
+                        this->restriction[index][2] (dof, dof) = 0.25;
+
+                                 // child 3
+                      for (unsigned int dof = this->degree;
+                           dof < 2 * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][3]
+                              (dof + 2 * i * this->degree,
+                               dof + 2 * i * this->degree) = 0.5;
+
+                          this->restriction[index][3]
+                            (dof + 10 * this->degree, dof + 10 * this->degree)
+                             = 0.5;
+                        }
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 4 * deg * this->degree; ++dof)
+                        this->restriction[index][3] (dof, dof) = 0.25;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 6 * deg * this->degree;
+                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
+                        this->restriction[index][3] (dof, dof) = 0.25;
+
+                                 // child 4
+                      for (unsigned int dof = 4 * this->degree;
+                           dof < 5 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 3; ++i)
+                          this->restriction[index][4]
+                            (dof + 2 * i * this->degree,
+                             dof + 2 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][4]
+                              (dof + 4 * i * deg * this->degree,
+                               dof + 4 * i * deg * this->degree) = 0.25;
+
+                          this->restriction[index][4]
+                            (dof + 10 * deg * this->degree,
+                             dof + 10 * deg * this->degree) = 0.25;
+                        }
+
+                                 // child 5
+                      for (unsigned int dof = 5 * this->degree;
+                           dof < 7 * this->degree; ++dof)
+                        this->restriction[index][5] (dof, dof) = 0.5;
+
+                      for (unsigned int dof = 9 * this->degree;
+                           dof < 10 * this->degree; ++dof)
+                        this->restriction[index][5] (dof, dof) = 0.5;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
+                        this->restriction[index][5] (dof, dof) = 0.25;
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 10 * deg * this->degree;
+                           dof < n_boundary_dofs; ++dof)
+                        this->restriction[index][5] (dof, dof) = 0.25;
+
+                                 // child 6
+                      for (unsigned int dof = 4 * this->degree;
+                           dof < 5 * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 3; ++i)
+                          this->restriction[index][6]
+                            (dof + 3 * i * this->degree,
+                             dof + 3 * i * this->degree) = 0.5;
+
+                      for (unsigned int dof = n_edge_dofs;
+                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][6]
+                              (dof + 6 * i * deg * this->degree,
+                               dof + 6 * i * deg * this->degree) = 0.25;
+
+                          this->restriction[index][6]
+                            (dof + 10 * deg * this->degree,
+                             dof + 10 * deg * this->degree) = 0.25;
+                        }
+
+                                 // child 7
+                      for (unsigned int dof = 5 * this->degree;
+                           dof < 6 * this->degree; ++dof)
+                        {
+                          for (unsigned int i = 0; i < 2; ++i)
+                            this->restriction[index][7]
+                              (dof + 2 * i * this->degree,
+                               dof + 2 * i * this->degree) = 0.5;
+
+                          this->restriction[index][7] (dof + 6 * this->degree,
+                                                       dof + 6 * this->degree)
+                            = 0.5;
+                        }
+
+                      for (unsigned int dof
+                             = n_edge_dofs + 2 * deg * this->degree;
+                           dof < n_edge_dofs + 4 * deg * this->degree; ++dof)
+                        for (unsigned int i = 0; i < 3; ++i)
+                          this->restriction[index][7]
+                            (dof + 4 * i * deg * this->degree,
+                             dof + 4 * i * deg * this->degree) = 0.25;
+
+                                 // The interior values are the
+                                 // same on every child.
+                      for (unsigned int child = 0;
+                           child
+                             < GeometryInfo<dim>::n_children
+                              (RefinementCase<dim> (ref)); ++child)
+                        for (unsigned int dof = n_boundary_dofs; dof < n_dofs;
+                             ++dof)
+                          this->restriction[index][child] (dof, dof) = 0.125;
+                      
+                      break;
+                    }
+                  
+                  default:
+                    Assert (false, ExcNotImplemented ());
+                }
+            }
+          
+          break;
+        }
+        
+      default:
+        Assert (false, ExcNotImplemented ());
     }
 }
 
 
-
-template <int dim, int spacedim>
-void FE_Nedelec<dim,spacedim>::initialize_unit_support_points ()
-{
-  switch (degree)
-    {
-      case 1:
-      {
-					 // all degrees of freedom are
-					 // on edges, and their order
-					 // is the same as the edges
-					 // themselves
-	this->unit_support_points.resize(GeometryInfo<dim>::lines_per_cell);
-	for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-	  {
-	    const unsigned int
-	      vertex_index_0 = GeometryInfo<dim>::line_to_cell_vertices(line,0),
-	      vertex_index_1 = GeometryInfo<dim>::line_to_cell_vertices(line,1);
-	    
-	    const Point<dim>
-	      vertex_0 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_0),
-	      vertex_1 = GeometryInfo<dim>::unit_cell_vertex(vertex_index_1);
-	    
-					     // place dofs right
-					     // between the vertices
-					     // of each line
-	    this->unit_support_points[line] = (vertex_0 + vertex_1) / 2;
-	  };
-	    
-	break;
-      };
-
-      default:
-					     // no higher order
-					     // elements implemented
-					     // right now
-	    Assert (false, ExcNotImplemented());
-    };
-}
-
-
 #if deal_II_dimension == 1
 
 template <>
-void FE_Nedelec<1>::initialize_unit_face_support_points ()
+std::vector<unsigned int>
+FE_Nedelec<1>::get_dpo_vector (const unsigned int degree)
 {
-				   // no faces in 1d, so nothing to do
+  std::vector<unsigned int> dpo (2);
+
+  dpo[0] = 1;
+  dpo[1] = degree;
+  return dpo;
 }
 
 #endif
 
 
-template <int dim, int spacedim>
-void FE_Nedelec<dim,spacedim>::initialize_unit_face_support_points ()
-{
-  switch (degree)
-    {
-      case 1:
-      {
-					 // do this the same as above, but
-					 // for one dimension less
-	this->unit_face_support_points.resize(GeometryInfo<dim-1>::lines_per_cell);
-	for (unsigned int line=0; line<GeometryInfo<dim-1>::lines_per_cell; ++line)
-	  {
-	    const unsigned int
-	      vertex_index_0 = GeometryInfo<dim-1>::line_to_cell_vertices(line,0),
-	      vertex_index_1 = GeometryInfo<dim-1>::line_to_cell_vertices(line,1);
-      
-	    const Point<dim-1>
-	      vertex_0 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_0),
-	      vertex_1 = GeometryInfo<dim-1>::unit_cell_vertex(vertex_index_1);
-
-					     // place dofs right
-					     // between the vertices of each
-					     // line
-	      this->unit_face_support_points[line] = (vertex_0 + vertex_1) / 2;
-	  };
-	break;
-      };
-
-      default:
-					     // no higher order
-					     // elements implemented
-					     // right now
-	    Assert (false, ExcNotImplemented());
-    };	    
-}
-
-
-
-template <int dim, int spacedim>
+template <int dim>
 std::vector<unsigned int>
-FE_Nedelec<dim,spacedim>::get_dpo_vector(const unsigned int degree)
+FE_Nedelec<dim>::get_dpo_vector (const unsigned int degree)
 {
-  Assert (degree == 1, ExcNotImplemented());
+  std::vector<unsigned int> dpo (dim + 1);
 
-				   // for degree==1, put all degrees
-				   // of freedom on the lines, and in
-				   // particular @p{degree} DoFs per
-				   // line:
-  std::vector<unsigned int> dpo(dim+1, 0U);
-  dpo[1] = degree;
+  dpo[0] = 0;
+  dpo[1] = degree + 1;
+  dpo[2] = 2 * degree * (degree + 1);
+
+  if (dim == 3)
+     dpo[3] = 3 * degree * degree * (degree + 1);
 
   return dpo;
 }
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_Nedelec<dim,spacedim>::update_once (const UpdateFlags) const
-{
-				   // even the values have to be
-				   // computed on the real cell, so
-				   // nothing can be done in advance
-  return update_default;
-}
-
-
-
-template <int dim, int spacedim>
-UpdateFlags
-FE_Nedelec<dim,spacedim>::update_each (const UpdateFlags flags) const
-{
-  UpdateFlags out = update_default;
-
-  if (flags & update_values)
-    out |= update_values             | update_covariant_transformation;
-  if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation;
-  if (flags & update_hessians)
-    out |= update_hessians | update_covariant_transformation;
-
-  return out;
-}
-
-
 
 //---------------------------------------------------------------------------
 // Data field initialization
 //---------------------------------------------------------------------------
 
-template <int dim, int spacedim>
-typename Mapping<dim,spacedim>::InternalDataBase *
-FE_Nedelec<dim,spacedim>::get_data (const UpdateFlags      update_flags,
-			   const Mapping<dim,spacedim>    &mapping,
-			   const Quadrature<dim> &quadrature) const
-{
- 				   // generate a new data object and
- 				   // initialize some fields
-   InternalData* data = new InternalData;
-
- 				   // check what needs to be
- 				   // initialized only once and what
- 				   // on every cell/face/subface we
- 				   // visit
-   data->update_once = update_once(update_flags);
-   data->update_each = update_each(update_flags);
-   data->update_flags = data->update_once | data->update_each;
-
-   const UpdateFlags flags(data->update_flags);
-   const unsigned int n_q_points = quadrature.size();
-
- 				   // initialize fields only if really
- 				   // necessary. otherwise, don't
- 				   // allocate memory
-   if (flags & update_values)
-     data->shape_values.resize (this->dofs_per_cell,
-                                std::vector<Tensor<1,dim> > (n_q_points));
-
-   if (flags & update_gradients)
-     data->shape_gradients.resize (this->dofs_per_cell,
-                                   std::vector<Tensor<2,dim> > (n_q_points));
-
- 				   // if second derivatives through
- 				   // finite differencing is required,
- 				   // then initialize some objects for
- 				   // that
-   if (flags & update_hessians)
-     data->initialize_2nd (this, mapping, quadrature);
-
- 				   // next already fill those fields
- 				   // of which we have information by
- 				   // now. note that the shape values
- 				   // and gradients are only those on
- 				   // the unit cell, and need to be
- 				   // transformed when visiting an
- 				   // actual cell
-   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-     for (unsigned int q=0; q<n_q_points; ++q)
-       {
-	 if (flags & update_values)
-	   for (unsigned int c=0; c<dim; ++c)
-	     data->shape_values[i][q][c]
-	       = shape_value_component(i,quadrature.point(q),c);
-	
-	 if (flags & update_gradients)
-	   for (unsigned int c=0; c<dim; ++c)
-	     data->shape_gradients[i][q][c]
-	       = shape_grad_component(i,quadrature.point(q),c);
-       }
-   
-   return data;
-}
-
-
-
-
-//---------------------------------------------------------------------------
-// Fill data of FEValues
-//---------------------------------------------------------------------------
-
-template <int dim, int spacedim>
-void
-FE_Nedelec<dim,spacedim>::fill_fe_values 
-  (const Mapping<dim,spacedim>                      &mapping,
-   const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-   const Quadrature<dim>                            &quadrature,
-   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-   typename Mapping<dim,spacedim>::InternalDataBase &fedata,
-   FEValuesData<dim,spacedim>                       &data,
-   CellSimilarity::Similarity                  &/*cell_similarity*/) const
-{
- 				   // convert data object to internal
- 				   // data for this class. fails with
- 				   // an exception if that is not
- 				   // possible
-  Assert (dynamic_cast<InternalData *> (&fedata) != 0,
-	  ExcInternalError());
-  InternalData &fe_data = static_cast<InternalData &> (fedata);
-
-				   // get the flags indicating the
-				   // fields that have to be filled
-  const UpdateFlags flags(fe_data.current_update_flags());
-
-  const unsigned int n_q_points = quadrature.size();
-				  
-				   // fill shape function
-				   // values. these are vector-valued,
-				   // so we have to transform
-				   // them. since the output format
-				   // (in data.shape_values) is a
-				   // sequence of doubles (one for
-				   // each non-zero shape function
-				   // value, and for each quadrature
-				   // point, rather than a sequence of
-				   // small vectors, we have to use a
-				   // number of conversions
-  if (flags & update_values)
-    {
-      std::vector<Tensor<1,dim> > shape_values (n_q_points);
-
-      Assert (data.shape_values.n_rows() == this->dofs_per_cell * dim,
-	      ExcInternalError());
-      Assert (data.shape_values.n_cols() == n_q_points,
-	      ExcInternalError());
-      
-      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-					   // first transform shape
-					   // values...
-	  Assert (fe_data.shape_values[k].size() == n_q_points,
-		  ExcInternalError());
-	  mapping.transform(fe_data.shape_values[k], shape_values,
-			    mapping_data, mapping_covariant);
-
-					   // then copy over to target:
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d)
-	      data.shape_values[k*dim+d][q] = shape_values[q][d];
-	};
-    };
-  
-      
-  if (flags & update_gradients)
-    {
-      std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
-      std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
-
-      Assert (data.shape_gradients.size() == this->dofs_per_cell * dim,
-	      ExcInternalError());
-      Assert (data.shape_gradients[0].size() == n_q_points,
-	      ExcInternalError());
-
-                                       // loop over all shape
-                                       // functions, and treat the
-                                       // gradients of each shape
-                                       // function at all quadrature
-                                       // points
-      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-                                           // treat the gradients of
-                                           // this particular shape
-                                           // function at all
-                                           // q-points. if Dv is the
-                                           // gradient of the shape
-                                           // function on the unit
-                                           // cell, then
-                                           // (J^-T)Dv(J^-1) is the
-                                           // value we want to have on
-                                           // the real cell. so, we
-                                           // will have to apply a
-                                           // covariant transformation
-                                           // to Dv twice. since the
-                                           // interface only allows
-                                           // multiplication with
-                                           // (J^-1) from the right,
-                                           // we have to trick a
-                                           // little in between
-	  Assert (fe_data.shape_gradients[k].size() == n_q_points,
-		  ExcInternalError());
-                                           // do first transformation
-	  mapping.transform(fe_data.shape_gradients[k], shape_grads1,
-			    mapping_data, mapping_covariant);
-                                           // transpose matrix
-          for (unsigned int q=0; q<n_q_points; ++q)
-            shape_grads2[q] = transpose(shape_grads1[q]);
-                                           // do second transformation
-	  mapping.transform(shape_grads2, shape_grads1,
-			    mapping_data, mapping_covariant);
-                                           // transpose back
-          for (unsigned int q=0; q<n_q_points; ++q)
-            shape_grads2[q] = transpose(shape_grads1[q]);
-          
-					   // then copy over to target:
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d)
-	      data.shape_gradients[k*dim+d][q] = shape_grads2[q][d];
-	};
-    }
-
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell,
-                       QProjector<dim>::DataSetDescriptor::cell(),
-                       mapping_data, fe_data, data);
-}
-
-
-
-template <int dim, int spacedim>
-void
-FE_Nedelec<dim,spacedim>::fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
-				      const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				      const unsigned int                    face,
-				      const Quadrature<dim-1>              &quadrature,
-				      typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-				      typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-				      FEValuesData<dim,spacedim>                    &data) const
-{
- 				   // convert data object to internal
- 				   // data for this class. fails with
- 				   // an exception if that is not
- 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-
-                                   // offset determines which data set
-				   // to take (all data sets for all
-				   // faces are stored contiguously)
-  const typename QProjector<dim>::DataSetDescriptor offset
-    = (QProjector<dim>::DataSetDescriptor::
-       face (face,
-	     cell->face_orientation(face),
-	     cell->face_flip(face),
-	     cell->face_rotation(face),
-             quadrature.size()));
-
-  				   // get the flags indicating the
-				   // fields that have to be filled
-  const UpdateFlags flags(fe_data.current_update_flags());
-
-  const unsigned int n_q_points = quadrature.size();
-				  
-				   // fill shape function
-				   // values. these are vector-valued,
-				   // so we have to transform
-				   // them. since the output format
-				   // (in data.shape_values) is a
-				   // sequence of doubles (one for
-				   // each non-zero shape function
-				   // value, and for each quadrature
-				   // point, rather than a sequence of
-				   // small vectors, we have to use a
-				   // number of conversions
-  if (flags & update_values)
-    {
-                                       // check size of array. in 3d,
-                                       // we have faces oriented both
-                                       // ways
-      Assert (fe_data.shape_values[0].size() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points *
-              (dim == 3 ? 8 : 1),
-              ExcInternalError());
-      
-      std::vector<Tensor<1,dim> > shape_values (n_q_points);
-
-      Assert (data.shape_values.n_rows() == this->dofs_per_cell * dim,
-	      ExcInternalError());
-      Assert (data.shape_values.n_cols() == n_q_points,
-	      ExcInternalError());
-      
-      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-					   // first transform shape
-					   // values...
-	  mapping.transform(make_slice(fe_data.shape_values[k], offset, n_q_points),
-			    shape_values, mapping_data, mapping_covariant);
-
-					   // then copy over to target:
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d)
-	      data.shape_values[k*dim+d][q] = shape_values[q][d];
-	};
-    };
-  
-      
-  if (flags & update_gradients)
-    {
-                                       // check size of array. in 3d,
-                                       // we have faces oriented both
-                                       // ways
-      Assert (fe_data.shape_gradients[0].size() ==
-              GeometryInfo<dim>::faces_per_cell * n_q_points *
-              (dim == 3 ? 8 : 1),
-              ExcInternalError());
-
-      std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
-      std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
-
-      Assert (data.shape_gradients.size() == this->dofs_per_cell * dim,
-	      ExcInternalError());
-      Assert (data.shape_gradients[0].size() == n_q_points,
-	      ExcInternalError());
-
-                                       // loop over all shape
-                                       // functions, and treat the
-                                       // gradients of each shape
-                                       // function at all quadrature
-                                       // points
-      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-                                           // treat the gradients of
-                                           // this particular shape
-                                           // function at all
-                                           // q-points. if Dv is the
-                                           // gradient of the shape
-                                           // function on the unit
-                                           // cell, then
-                                           // (J^-T)Dv(J^-1) is the
-                                           // value we want to have on
-                                           // the real cell. so, we
-                                           // will have to apply a
-                                           // covariant transformation
-                                           // to Dv twice. since the
-                                           // interface only allows
-                                           // multiplication with
-                                           // (J^-1) from the right,
-                                           // we have to trick a
-                                           // little in between
-                                           // 
-                                           // do first transformation
-	  mapping.transform(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
-			    shape_grads1, mapping_data, mapping_covariant);
-                                           // transpose matrix
-          for (unsigned int q=0; q<n_q_points; ++q)
-            shape_grads2[q] = transpose(shape_grads1[q]);
-                                           // do second transformation
-	  mapping.transform(shape_grads2, shape_grads1,
-			    mapping_data, mapping_covariant);
-                                           // transpose back
-          for (unsigned int q=0; q<n_q_points; ++q)
-            shape_grads2[q] = transpose(shape_grads1[q]);
-          
-					   // then copy over to target:
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d)
-	      data.shape_gradients[k*dim+d][q] = shape_grads2[q][d];
-	};
-    }
-
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-}
-
-
-
-template <int dim, int spacedim>
-void
-FE_Nedelec<dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
-					 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-					 const unsigned int                    face,
-					 const unsigned int                    subface,
-					 const Quadrature<dim-1>              &quadrature,
-					 typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-					 typename Mapping<dim,spacedim>::InternalDataBase       &fedata,
-					 FEValuesData<dim,spacedim>                    &data) const
-{
- 				   // convert data object to internal
- 				   // data for this class. fails with
- 				   // an exception if that is not
- 				   // possible
-  InternalData &fe_data = dynamic_cast<InternalData &> (fedata);
-
-                                   // offset determines which data set
-				   // to take (all data sets for all
-				   // faces are stored contiguously)
-  const typename QProjector<dim>::DataSetDescriptor offset
-    = (QProjector<dim>::DataSetDescriptor::
-       subface (face, subface,
-		cell->face_orientation(face),
-		cell->face_flip(face),
-		cell->face_rotation(face),
-		quadrature.size(),
-		cell->subface_case(face)));
-
-  				   // get the flags indicating the
-				   // fields that have to be filled
-  const UpdateFlags flags(fe_data.current_update_flags());
-
-  const unsigned int n_q_points = quadrature.size();
-				  
-				   // fill shape function
-				   // values. these are vector-valued,
-				   // so we have to transform
-				   // them. since the output format
-				   // (in data.shape_values) is a
-				   // sequence of doubles (one for
-				   // each non-zero shape function
-				   // value, and for each quadrature
-				   // point, rather than a sequence of
-				   // small vectors, we have to use a
-				   // number of conversions
-  if (flags & update_values)
-    {
-      Assert (fe_data.shape_values[0].size() ==
- 	      GeometryInfo<dim>::max_children_per_face *
-              GeometryInfo<dim>::faces_per_cell *
-	      n_q_points,
-             ExcInternalError());
-      
-      std::vector<Tensor<1,dim> > shape_values (n_q_points);
-
-      Assert (data.shape_values.n_rows() == this->dofs_per_cell * dim,
-	      ExcInternalError());
-      Assert (data.shape_values.n_cols() == n_q_points,
-	      ExcInternalError());
-      
-      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-					   // first transform shape
-					   // values...
-	  mapping.transform(make_slice(fe_data.shape_values[k], offset, n_q_points),
-			    shape_values, mapping_data, mapping_covariant);
-
-					   // then copy over to target:
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d)
-	      data.shape_values[k*dim+d][q] = shape_values[q][d];
-	};
-    };
-  
-      
-  if (flags & update_gradients)
-    {
-      Assert (fe_data.shape_gradients.size() ==
-              GeometryInfo<dim>::faces_per_cell *
-	      GeometryInfo<dim>::max_children_per_face *
-	      n_q_points,
-              ExcInternalError());
-
-      std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
-      std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
-
-      Assert (data.shape_gradients.size() == this->dofs_per_cell * dim,
-	      ExcInternalError());
-      Assert (data.shape_gradients[0].size() == n_q_points,
-	      ExcInternalError());
-
-                                       // loop over all shape
-                                       // functions, and treat the
-                                       // gradients of each shape
-                                       // function at all quadrature
-                                       // points
-      for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-	{
-                                           // treat the gradients of
-                                           // this particular shape
-                                           // function at all
-                                           // q-points. if Dv is the
-                                           // gradient of the shape
-                                           // function on the unit
-                                           // cell, then
-                                           // (J^-T)Dv(J^-1) is the
-                                           // value we want to have on
-                                           // the real cell. so, we
-                                           // will have to apply a
-                                           // covariant transformation
-                                           // to Dv twice. since the
-                                           // interface only allows
-                                           // multiplication with
-                                           // (J^-1) from the right,
-                                           // we have to trick a
-                                           // little in between
-                                           // 
-                                           // do first transformation
-	  mapping.transform(make_slice(fe_data.shape_gradients[k], offset, n_q_points),
-			    shape_grads1, mapping_data, mapping_covariant);
-                                           // transpose matrix
-          for (unsigned int q=0; q<n_q_points; ++q)
-            shape_grads2[q] = transpose(shape_grads1[q]);
-                                           // do second transformation
-	  mapping.transform(shape_grads2, shape_grads1,
-			    mapping_data, mapping_covariant);
-                                           // transpose back
-          for (unsigned int q=0; q<n_q_points; ++q)
-            shape_grads2[q] = transpose(shape_grads1[q]);
-          
-					   // then copy over to target:
-	  for (unsigned int q=0; q<n_q_points; ++q)
-	    for (unsigned int d=0; d<dim; ++d)
-	      data.shape_gradients[k*dim+d][q] = shape_grads2[q][d];
-	};
-    }
-
-  if (flags & update_hessians)
-    this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
-}
-
-
-
-template <int dim, int spacedim>
-unsigned int
-FE_Nedelec<dim,spacedim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <int dim, int spacedim>
-const FiniteElement<dim,spacedim> &
-FE_Nedelec<dim,spacedim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <int dim, int spacedim>
-unsigned int
-FE_Nedelec<dim,spacedim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
-
-
-
-template <int dim, int spacedim>
+                                 // Chech wheter a given shape
+                                 // function has support on a
+                                 // given face.
+                                 
+                                 // We just switch through the
+                                 // faces of the cell and return
+                                 // true, if the shape function
+                                 // has support on the face
+                                 // and false otherwise.
+template <int dim>
 bool
-FE_Nedelec<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
-				      const unsigned int face_index) const
+FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
+                                      const unsigned int face_index) const
 {
   Assert (shape_index < this->dofs_per_cell,
-	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
+          ExcIndexRange (shape_index, 0, this->dofs_per_cell));
   Assert (face_index < GeometryInfo<dim>::faces_per_cell,
-	  ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
+          ExcIndexRange (face_index, 0, GeometryInfo<dim>::faces_per_cell));
 
-  switch (degree)
+  switch (dim)
     {
-      case 1:
-      {
-        switch (dim)
+      case 2:
+        switch (face_index)
           {
+            case 0:
+              if (!((shape_index > deg) && (shape_index < 2 * this->degree)))
+                return true;
+               
+              else
+                return false;
+
+             case 1:
+               if ((shape_index > deg) &&
+                   (shape_index
+                      < GeometryInfo<2>::lines_per_cell * this->degree))
+                 return true;
+               
+               else
+                 return false;
+
+             case 2:
+               if (shape_index < 3 * this->degree)
+                 return true;
+               
+               else
+                 return false;
+
+             case 3:
+               if (!((shape_index >= 2 * this->degree) &&
+                     (shape_index < 3 * this->degree)))
+                 return true;
+               
+               else
+                 return false;
+             
+             default:
+               {
+                 Assert (false, ExcNotImplemented ());
+                 return false;
+               }
+          }
+
+      case 3:
+        switch (face_index)
+          {
+            case 0:
+              if (((shape_index > deg) && (shape_index < 2 * this->degree)) ||
+                  ((shape_index >= 5 * this->degree) &&
+                   (shape_index < 6 * this->degree)) ||
+                  ((shape_index >= 9 * this->degree) &&
+                   (shape_index < 10 * this->degree)) ||
+                  ((shape_index >= 11 * this->degree) &&
+                   (shape_index
+                      < GeometryInfo<3>::lines_per_cell * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 2 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 7 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 9 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 10 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 11 * deg)
+                        * this->degree)))
+                return false;
+               
+              else
+                return true;
+
+            case 1:
+              if (((shape_index > deg) && (shape_index < 4 * this->degree)) ||
+                  ((shape_index >= 5 * this->degree) &&
+                   (shape_index < 8 * this->degree)) ||
+                  ((shape_index >= 9 * this->degree) &&
+                   (shape_index < 10 * this->degree)) ||
+                  ((shape_index >= 11 * this->degree) &&
+                   (shape_index
+                      < GeometryInfo<3>::lines_per_cell * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 2 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                        * this->degree)) ||
+                   ((shape_index
+                       >= (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                          * this->degree) &&
+                    (shape_index
+                       < (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                         * this->degree)) ||
+                   ((shape_index
+                       >= (GeometryInfo<3>::lines_per_cell + 7 * deg)
+                          * this->degree) &&
+                    (shape_index
+                       < (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                         * this->degree)) ||
+                   ((shape_index
+                       >= (GeometryInfo<3>::lines_per_cell + 9 * deg)
+                          * this->degree) &&
+                    (shape_index
+                       < (GeometryInfo<3>::lines_per_cell + 10 * deg)
+                         * this->degree)) ||
+                   ((shape_index
+                       >= (GeometryInfo<3>::lines_per_cell + 11 * deg)
+                          * this->degree) &&
+                    (shape_index
+                       < (GeometryInfo<3>::lines_per_cell + 12 * deg)
+                         * this->degree)))
+                return true;
+               
+              else
+                return false;
+
             case 2:
-            {
-                                               // only on the one
-                                               // non-adjacent face
-                                               // are the values
-                                               // actually zero. list
-                                               // these in a table
-              const unsigned int
-                opposite_faces[GeometryInfo<2>::faces_per_cell]
-                = { 1, 0, 3, 2};
-              
-              return (face_index != opposite_faces[shape_index]);
-            };
-            
+              if ((shape_index < 3 * this->degree) ||
+                  ((shape_index >= 4 * this->degree) &&
+                   (shape_index < 7 * this->degree)) ||
+                  ((shape_index >= 8 * this->degree) &&
+                   (shape_index < 10 * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 2 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 3 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 9 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 10 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 11 * deg)
+                        * this->degree)))
+                return true;
+               
+              else
+                return false;
+
             case 3:
-            {
-                                               // the shape functions
-                                               // are zero on the two
-                                               // faces opposite the
-                                               // two faces adjacent
-                                               // to the line the
-                                               // shape function is
-                                               // defined on
-              const unsigned int
-                opposite_faces[GeometryInfo<3>::lines_per_cell][2]
-                = { {1,5}, {0,5}, {3,5}, {2,5},
-		    {1,4}, {0,4}, {3,4}, {2,4},
-		    {1,3}, {0,3}, {1,2}, {0,2}};
-              
-              return ((face_index != opposite_faces[shape_index][0])
-                      &&
-                      (face_index != opposite_faces[shape_index][1]));
-            };
+              if ((shape_index < 2 * this->degree) ||
+                  ((shape_index >= 3 * this->degree) &&
+                   (shape_index < 6 * this->degree)) ||
+                  ((shape_index >= 7 * this->degree) &&
+                   (shape_index < 8 * this->degree)) ||
+                  ((shape_index >= 10 * this->degree) &&
+                   (shape_index
+                      < GeometryInfo<3>::lines_per_cell * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 2 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 3 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 9 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 10 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 11 * deg)
+                        * this->degree)))
+                return true;
+               
+              else
+                return false;
+
+            case 4:
+              if ((shape_index < 4 * this->degree) ||
+                  ((shape_index >= 8 * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 2 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 3 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 7 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 10 * deg)
+                        * this->degree)))
+                return true;
+               
+              else
+                return false;
+
+            case 5:
+              if (((shape_index >= 4 * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 2 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 3 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 7 * deg)
+                        * this->degree)) ||
+                  ((shape_index
+                      >= (GeometryInfo<3>::lines_per_cell + 10 * deg)
+                         * this->degree) &&
+                   (shape_index
+                      < (GeometryInfo<3>::lines_per_cell + 12 * deg)
+                        * this->degree)))
+                return true;
+               
+              else
+                return false;
             
-            default: Assert (false, ExcNotImplemented());
-          };
-      };
-      
-      default:  // other degree
-            Assert (false, ExcNotImplemented());
-    };
-  
+            default:
+              {
+                Assert (false, ExcNotImplemented ());
+                return false;
+              }
+          }
+
+      default:
+        {
+          Assert (false, ExcNotImplemented ());
+          return false;
+        }
+    }
+}
+
+template <int dim>
+bool
+FE_Nedelec<dim>::hp_constraints_are_implemented () const
+{
   return true;
 }
 
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Nedelec<dim>::hp_vertex_dof_identities (const FiniteElement<dim>& fe_other)
+const
+{
+                   // Nedelec elements do not have any dofs
+                   // on vertices, hence return an empty vector.
+  return std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Nedelec<dim>::hp_line_dof_identities (const FiniteElement<dim>& fe_other)
+const
+{
+				   // we can presently only compute these
+				   // identities if both FEs are
+				   // FE_Nedelec or if the other one is an
+				   // FE_Nothing
+  if (const FE_Nedelec<dim> *fe_nedelec_other
+        = dynamic_cast<const FE_Nedelec<dim>*> (&fe_other))
+    {
+				       // dofs are located on lines, so
+				       // two dofs are identical, if their
+				       // edge shape functions have the
+				       // same polynomial degree.
+      std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+      for (unsigned int i = 0;
+           i < std::min (fe_nedelec_other->degree, this->degree); ++i)
+        identities.push_back (std::make_pair (i, i));
+
+      return identities;
+    }
+
+  else
+    if (dynamic_cast<const FE_Nothing<dim>*> (&fe_other) != 0)
+      {
+				       // the FE_Nothing has no
+				       // degrees of freedom, so there
+				       // are no equivalencies to be
+				       // recorded
+        return std::vector<std::pair<unsigned int, unsigned int> > ();
+      }
+
+    else
+      {
+        Assert (false, ExcNotImplemented ());
+        return std::vector<std::pair<unsigned int, unsigned int> > ();
+      }
+}
+
+template <int dim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_Nedelec<dim>::hp_quad_dof_identities (const FiniteElement<dim>& fe_other)
+const
+{
+				   // we can presently only compute
+				   // these identities if both FEs are
+				   // FE_Nedelec or if the other one is an
+				   // FE_Nothing
+  if (const FE_Nedelec<dim> *fe_nedelec_other
+        = dynamic_cast<const FE_Nedelec<dim>*> (&fe_other))
+    {
+				       // dofs are located on the interior
+				       // of faces, so two dofs are identical,
+				       // if their face shape functions have
+				       // the same polynomial degree.
+      const unsigned int p = fe_nedelec_other->degree;
+      const unsigned int q = this->degree;
+      const unsigned int p_min = std::min (p, q);
+      std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+      for (unsigned int i = 0; i < p_min; ++i)
+        for (unsigned int j = 0; j < p_min - 1; ++j)
+          {
+            identities.push_back (std::make_pair ((i + 1) * (q + 1) + j,
+                                                  (i + 1) * (p + 1) + j));
+            identities.push_back (std::make_pair (i + (j + q + 2) * q,
+                                                  i + (j + p + 2) * p));
+          }
+
+      return identities;
+    }
+
+  else
+    if (dynamic_cast<const FE_Nothing<dim>*> (&fe_other) != 0)
+      {
+				       // the FE_Nothing has no
+				       // degrees of freedom, so there
+				       // are no equivalencies to be
+				       // recorded
+        return std::vector<std::pair<unsigned int, unsigned int> > ();
+      }
+
+    else
+      {
+        Assert (false, ExcNotImplemented ());
+        return std::vector<std::pair<unsigned int, unsigned int> > ();
+      }
+}
+
+                   // In this function we compute the face
+                   // interpolation matrix. This is usually
+                   // done by projection-based interpolation,
+                   // but, since one can compute the entries
+                   // easy per hand, we save some computation
+                   // time at this point and just fill in the
+                   // correct values.
+template <int dim>
+void
+FE_Nedelec<dim>::get_face_interpolation_matrix
+  (const FiniteElement<dim>& source, FullMatrix<double>& interpolation_matrix)
+const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // Nedelec element
+  typedef FE_Nedelec<dim> FEN;
+  typedef FiniteElement<dim> FEL;
+
+  AssertThrow ((source.get_name ().find ("FE_Nedelec<") == 0) ||
+               (dynamic_cast<const FEN*> (&source) != 0),
+                typename FEL::ExcInterpolationNotImplemented());
+  Assert (interpolation_matrix.m () == source.dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.m (),
+                                source.dofs_per_face));
+  Assert (interpolation_matrix.n () == this->dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.n (),
+                                this->dofs_per_face));
+
+				   // ok, source is a Nedelec element, so
+				   // we will be able to do the work
+  const FE_Nedelec<dim> &source_fe
+    = dynamic_cast<const FE_Nedelec<dim>&> (source);
+
+				   // Make sure, that the element,
+                   // for which the DoFs should be
+                   // constrained is the one with
+                   // the higher polynomial degree.
+                   // Actually the procedure will work
+                   // also if this assertion is not
+                   // satisfied. But the matrices
+                   // produced in that case might
+				   // lead to problems in the
+                   // hp procedures, which use this
+				   // method.
+  Assert (this->dofs_per_face <= source_fe.dofs_per_face,
+          typename FEL::ExcInterpolationNotImplemented ());
+  interpolation_matrix = 0;
+
+                   // On lines we can just identify
+                   // all degrees of freedom.
+  for (unsigned int i = 0; i <= deg; ++i)
+    interpolation_matrix (i, i) = 1.0;
+
+                   // In 3d we have some lines more
+                   // and a face. The procedure stays
+                   // the same as above, but we have
+                   // to take a bit more care of the
+                   // indices of the degrees of
+                   // freedom.
+  if (dim == 3)
+    for (unsigned int i = 0; i <= deg; ++i)
+      {
+        for (unsigned int j = 1; j < GeometryInfo<dim>::lines_per_face; ++j)
+          interpolation_matrix (j * source_fe.degree + i,
+                                j * this->degree + i) = 1.0;
+         
+        for (unsigned int j = 0; j < deg; ++j)
+          {
+            interpolation_matrix
+              (i + (j + GeometryInfo<2>::lines_per_cell) * source_fe.degree,
+               i + (j + GeometryInfo<2>::lines_per_cell) * this->degree)
+              = 1.0;
+            interpolation_matrix
+              ((i * (source_fe.degree - 1)
+               + GeometryInfo<2>::lines_per_cell) * source_fe.degree + j,
+               (i * deg + GeometryInfo<2>::lines_per_cell) * this->degree)
+              = 1.0;
+          }
+      }
+}
+
+#if deal_II_dimension == 1
+
+template <int dim>
+void
+FE_Nedelec<dim>::get_subface_interpolation_matrix
+  (const FiniteElement<dim>& source, const unsigned int subface,
+   FullMatrix<double>& interpolation_matrix) const
+{
+  Assert (false, ExcNotImplemented ());
+}
+
+#else
+
+                   // In this function we compute the
+                   // subface interpolation matrix.
+                   // This is done by a projection-
+                   // based interpolation. Therefore
+                   // we first interpolate the
+                   // shape functions of the higher
+                   // order element on the lowest
+                   // order edge shape functions.
+                   // Then the remaining part of
+                   // the interpolated shape
+                   // functions is projected on the
+                   // higher order edge shape
+                   // functions, the face shape
+                   // functions and the interior
+                   // shape functions (if they all
+                   // exist).
+template <int dim>
+void
+FE_Nedelec<dim>::get_subface_interpolation_matrix
+  (const FiniteElement<dim>& source, const unsigned int subface,
+   FullMatrix<double>& interpolation_matrix) const
+{
+				   // this is only implemented, if the
+				   // source FE is also a
+				   // Nedelec element
+  typedef FE_Nedelec<dim> FEN;
+  typedef FiniteElement<dim> FEL;
+
+  AssertThrow ((source.get_name ().find ("FE_Nedelec<") == 0) ||
+               (dynamic_cast<const FEN*> (&source) != 0),
+                typename FEL::ExcInterpolationNotImplemented ());
+  Assert (interpolation_matrix.m () == source.dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.m (),
+                                source.dofs_per_face));
+  Assert (interpolation_matrix.n () == this->dofs_per_face,
+          ExcDimensionMismatch (interpolation_matrix.n (),
+                                this->dofs_per_face));
+
+				   // ok, source is a Nedelec element, so
+				   // we will be able to do the work
+  const FE_Nedelec<dim> &source_fe
+    = dynamic_cast<const FE_Nedelec<dim>&> (source);
+
+				   // Make sure, that the element,
+                   // for which the DoFs should be
+                   // constrained is the one with
+                   // the higher polynomial degree.
+                   // Actually the procedure will work
+                   // also if this assertion is not
+                   // satisfied. But the matrices
+                   // produced in that case might
+				   // lead to problems in the
+                   // hp procedures, which use this
+				   // method.
+  Assert (this->dofs_per_face <= source_fe.dofs_per_face,
+          typename FEL::ExcInterpolationNotImplemented ());
+  interpolation_matrix = 0;
+		           // Perform projection-based interpolation
+				   // as usual.
+  switch (dim)
+    {
+      case 2:
+        {
+          const QGauss<dim - 1> reference_edge_quadrature (this->degree);
+          const Quadrature<dim - 1>& edge_quadrature
+            = QProjector<dim - 1>::project_to_child
+              (reference_edge_quadrature, subface);
+          const unsigned int& n_edge_points = edge_quadrature.size ();
+          const std::vector<Point<dim - 1> >&
+            quadrature_points = edge_quadrature.get_points ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+          for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+            {
+              const double weight = 2.0 * edge_quadrature.weight (q_point);
+
+              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+                interpolation_matrix (0, dof)
+                  += weight
+                     * this->shape_value_component
+                       (dof, Point<dim> (0.0, quadrature_points[q_point] (0)),
+                        1);
+            }
+         
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+          for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+            if (std::abs (interpolation_matrix (0, dof)) < 1e-14)
+              interpolation_matrix (0, dof) = 0.0;
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+          if (deg > 0)
+            {
+            	                  // Shift value for scaling
+            	                  // of quadrature points.
+              const double shift[2] = {0.0, -1.0};
+              const std::vector<Polynomials::Polynomial<double> >&
+                lobatto_polynomials
+                  = Polynomials::Lobatto::generate_complete_basis
+                    (this->degree);
+              FullMatrix<double> assembling_matrix (deg, n_edge_points);
+              std::vector<Polynomials::Polynomial<double> >
+                lobatto_polynomials_grad (this->degree);
+
+              for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+                   ++i)
+                lobatto_polynomials_grad[i]
+                  = lobatto_polynomials[i + 1].derivative ();
+
+                                  // Set up the system matrix
+                                  // and right hand side
+                                  // vector.
+              for (unsigned int q_point = 0; q_point < n_edge_points;
+                   ++q_point)
+                {
+               	  const double tmp = 2.0 * quadrature_points[q_point] (0)
+               	                     + shift[subface];
+               	  const double weight
+               	    = std::sqrt (2.0 * edge_quadrature.weight (q_point));
+
+                  for (unsigned int i = 0; i < deg; ++i)
+                    assembling_matrix (i, q_point)
+                      = weight * lobatto_polynomials_grad[i + 1].value (tmp);
+               	}
+               	  
+              FullMatrix<double> system_matrix (deg, deg);
+              
+              assembling_matrix.mTmult (system_matrix, assembling_matrix);
+              
+              FullMatrix<double> system_matrix_inv (deg, deg);
+              
+              system_matrix_inv.invert (system_matrix);
+                  
+              Vector<double> solution (deg);
+              Vector<double> system_rhs (deg);
+              
+              for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
+                {
+                  system_rhs = 0;
+                  
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    {
+                      const double tmp
+                        = 2.0 * quadrature_points[q_point] (0)
+                          + shift[subface];
+                      const double weight
+                        = 2.0 * edge_quadrature.weight (q_point)
+                          * (this->shape_value_component
+                             (dof, Point<dim> (0.0,
+                                               quadrature_points[q_point] (0)),
+                              1) - interpolation_matrix (0, dof));
+                        
+                      for (unsigned int i = 0;  i < deg; ++i)
+                        system_rhs (i)
+                          += weight
+                             * lobatto_polynomials_grad[i + 1].value (tmp);
+                    }
+
+                  system_matrix_inv.vmult (solution, system_rhs);
+
+                  for (unsigned int i = 0; i < deg; ++i)
+                    if (std::abs (solution (i)) > 1e-14)
+                      interpolation_matrix (i + 1, dof) = solution (i);
+                }
+            }
+
+          break;
+        }
+
+      case 3:
+        {
+          const QGauss<dim - 2> reference_edge_quadrature (this->degree);
+
+          switch (subface)
+            {
+              case 0:
+                {
+                  const Quadrature<dim - 2>& edge_quadrature
+                    = QProjector<dim - 2>::project_to_child
+                      (reference_edge_quadrature, 0);
+                  const unsigned int n_edge_points = edge_quadrature.size ();
+                  const std::vector<Point<dim - 2> >&
+                    edge_quadrature_points = edge_quadrature.get_points ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    {
+                      const double
+                        weight = 2.0 * edge_quadrature.weight (q_point);
+
+                      for (unsigned int i = 0; i < 2; ++i)
+                        for (unsigned int dof = 0; dof < this->dofs_per_face;
+                             ++dof)
+                          {
+                            interpolation_matrix (i * source_fe.degree, dof)
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (0.5 * i,
+                                     edge_quadrature_points[q_point] (0), 0.0),
+                                     1);
+                            interpolation_matrix ((i + 2) * source_fe.degree,
+                                                  dof)
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (edge_quadrature_points[q_point] (0),
+                                     0.5 * i, 0.0), 0);
+                          }
+                    }
+                  
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int dof = 0; dof < this->dofs_per_face;
+                         ++dof)
+                      {
+                        if (std::abs (interpolation_matrix
+                                      (i * source_fe.degree, dof)) < 1e-14)
+                          interpolation_matrix (i * source_fe.degree, dof)
+                            = 0.0;
+                  
+                        if (std::abs (interpolation_matrix
+                                      ((i + 2) * source_fe.degree, dof))
+                              < 1e-14)
+                          interpolation_matrix ((i + 2) * source_fe.degree,
+                                                dof) = 0.0;
+                      }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+                  if (deg > 0)
+                    {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+                      const QGauss<dim - 1> reference_face_quadrature
+                        (this->degree);
+                      const Quadrature<dim - 1>& face_quadrature
+                        = QProjector<dim - 1>::project_to_child
+                          (reference_face_quadrature, 0);
+                      const std::vector<Polynomials::Polynomial<double> >&
+                        legendre_polynomials
+                          = Polynomials::Legendre::generate_complete_basis
+                            (deg);
+                      const std::vector<Polynomials::Polynomial<double> >&
+                        lobatto_polynomials
+                          = Polynomials::Lobatto::generate_complete_basis
+                            (this->degree);
+                      const std::vector<Point<dim - 1> >&
+                        face_quadrature_points = face_quadrature.get_points ();
+                      const unsigned int& n_face_points
+                        = face_quadrature.size ();
+                      FullMatrix<double> assembling_matrix
+                        (deg, n_edge_points);
+                      FullMatrix<double> system_matrix (deg, deg);
+                      FullMatrix<double> system_matrix_inv (deg, deg);
+                      std::vector<Polynomials::Polynomial<double> >
+                        lobatto_polynomials_grad (this->degree);
+                      
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        lobatto_polynomials_grad[i]
+                          = lobatto_polynomials[i + 1].derivative ();
+
+                                  // Shifted and scaled
+                                  // quadrature points on
+                                  // the four edges of a
+                                  // face.
+                      std::vector<std::vector<Point<dim> > >
+                        edge_quadrature_points_full_dim
+                        (GeometryInfo<dim>::lines_per_face);
+                  
+                      for (unsigned int line = 0;
+                           line < GeometryInfo<dim>::lines_per_face; ++line)
+                        edge_quadrature_points_full_dim.resize (n_edge_points);
+                                  
+                      for (unsigned int q_point = 0; q_point < n_edge_points;
+                           ++q_point)
+                        {
+                          edge_quadrature_points_full_dim[0][q_point]
+                            = Point<dim> (0.0,
+                                          edge_quadrature_points[q_point] (0),
+                                          0.0);
+                          edge_quadrature_points_full_dim[1][q_point]
+                            = Point<dim> (0.5,
+                                          edge_quadrature_points[q_point] (0),
+                                          0.0);
+                          edge_quadrature_points_full_dim[2][q_point]
+                            = Point<dim> (edge_quadrature_points[q_point] (0),
+                                          0.0, 0.0);
+                          edge_quadrature_points_full_dim[3][q_point]
+                            = Point<dim> (edge_quadrature_points[q_point] (0),
+                                          0.5, 0.0);
+                        }
+                  
+                      Vector<double> solution (deg);
+                      Vector<double> system_rhs (deg);
+
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
+                        {
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	      for (unsigned int q_point = 0;
+                  	           q_point < n_edge_points; ++q_point)
+                  	        {
+                  	 	      const double tmp
+                  	 	        = 2.0 * edge_quadrature_points[q_point] (0);
+                  	 	      const double weight
+                  	 	        = std::sqrt (2.0 * edge_quadrature.weight
+                  	 	                           (q_point));
+
+                              for (unsigned int i = 0; i < deg; ++i)
+                                assembling_matrix (i, q_point)
+                                  = weight
+                                    * lobatto_polynomials_grad[i + 1].value
+                                      (tmp);
+                  	        }
+                     
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.invert (system_matrix);
+                     
+                          for (unsigned int line = 0;
+                               line < GeometryInfo<dim>::lines_per_face;
+                               ++line)
+                            {
+                                  // Set up the right hand side.
+                     	      system_rhs = 0;
+                     	
+                              for (unsigned int q_point = 0;
+                                   q_point < n_edge_points; ++q_point)
+                                {
+                                  const double right_hand_side_value
+                                    = std::sqrt (2.0 * edge_quadrature.weight
+                                                       (q_point))
+                                      * (this->shape_value_component
+                                         (this->face_to_cell_index (dof, 4),
+                                          edge_quadrature_points_full_dim[line][q_point],
+                                          1)
+                                         - interpolation_matrix
+                                           (line * source_fe.degree, dof));
+                                  const double tmp
+                                    = 2.0 * edge_quadrature_points[q_point] (0);
+                                 
+                                  for (unsigned int i = 0; i < deg; ++i)
+                                    system_rhs (i)
+                                      += right_hand_side_value
+                                         * lobatto_polynomials_grad[i + 1].value
+                                           (tmp);
+                                }
+
+                              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                              for (unsigned int i = 0; i < deg; ++i)
+                                if (std::abs (solution (i)) > 1e-14)
+                                  interpolation_matrix
+                                    (line * source_fe.degree + i + 1, dof)
+                                    = solution (i);
+                            }
+
+                          assembling_matrix.reinit (deg * this->degree,
+                                                    n_face_points);
+                          system_rhs.reinit (assembling_matrix.m ());
+                          system_rhs = 0;
+
+                                  // Now we project the remaining
+                                  // part on the face shape
+                                  // functions. First on the
+                                  // horizontal ones, then on
+                                  // the vertical ones. 
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0),
+                                 2.0 * face_quadrature_points[q_point] (1),
+                                 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0.0),
+                                   1);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       (i * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 1);
+                        
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                              
+                              const double weight
+                                = std::sqrt (4.0 * face_quadrature.weight
+                                                   (q_point));
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp1 = weight * L_i;
+                                  const double tmp2
+                                    = right_hand_side_value * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    {
+                           	          const double l_j
+                           	            = lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                           	          
+                           	          assembling_matrix (i * deg + j, q_point)
+                           	            = tmp1 * l_j;
+                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
+                                    }
+                                }
+                            }
+
+                          system_matrix.reinit (assembling_matrix.m (),
+                                                assembling_matrix.m ());
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.reinit (system_matrix.m (),
+                                                    system_matrix.m ());
+                          system_matrix_inv.invert (system_matrix);
+                          solution.reinit (system_matrix_inv.m ());
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                  ((i + 4) * source_fe.degree + j - i, dof)
+                                  = solution (i * deg + j);
+                          
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                          system_rhs = 0;
+
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0),
+                                 2.0 * face_quadrature_points[q_point] (1),
+                                 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0.0),
+                                   0);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       ((i + 2) * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 0);
+
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp = right_hand_side_value
+                                                     * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += tmp
+                                         * lobatto_polynomials[j + 2].value
+                                           (quadrature_point (1));
+                                }
+                            }
+
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                (i + (j + source_fe.degree + 3)
+                                 * source_fe.degree, dof) = solution (i * deg
+                                                                      + j);
+                        }
+                    }
+
+                  break;
+                }
+
+              case 1:
+                {
+                  const Quadrature<dim - 2>& edge_quadrature_x
+                    = QProjector<dim - 2>::project_to_child
+                      (reference_edge_quadrature, 1);
+                  const Quadrature<dim - 2>& edge_quadrature_y
+                    = QProjector<dim - 2>::project_to_child
+                      (reference_edge_quadrature, 0);
+                  const std::vector<Point<dim - 2> >&
+                    edge_quadrature_x_points = edge_quadrature_x.get_points ();
+                  const std::vector<Point<dim - 2> >&
+                    edge_quadrature_y_points = edge_quadrature_y.get_points ();
+                  const unsigned int& n_edge_points
+                    = edge_quadrature_x.size ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    {
+                      const double weight
+                        = 2.0 * edge_quadrature_x.weight (q_point);
+
+                      for (unsigned int i = 0; i < 2; ++i)
+                        for (unsigned int dof = 0; dof < this->dofs_per_face;
+                             ++dof)
+                          {
+                            interpolation_matrix (i * source_fe.degree, dof)
+                              += this->shape_value_component
+                                 (this->face_to_cell_index (dof, 4),
+                                  Point<dim>
+                                  (0.5 * (i + 1),
+                                   edge_quadrature_y_points[q_point] (0), 0.0),
+                                  1);
+                            interpolation_matrix
+                            ((i + 2) * source_fe.degree, dof)
+                              += this->shape_value_component
+                                 (this->face_to_cell_index (dof, 4),
+                                  Point<dim>
+                                  (edge_quadrature_x_points[q_point] (0),
+                                   0.5 * i, 0.0), 0);
+                          }
+                    }
+               
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int dof = 0; dof < this->dofs_per_face;
+                         ++dof)
+                      {
+                        if (std::abs (interpolation_matrix
+                                      (i * source_fe.degree, dof)) < 1e-14)
+                          interpolation_matrix (i * source_fe.degree, dof)
+                            = 0.0;
+                     
+                        if (std::abs (interpolation_matrix
+                                      ((i + 2) * source_fe.degree, dof))
+                              < 1e-14)
+                          interpolation_matrix ((i + 2) * source_fe.degree,
+                                                dof) = 0.0;
+                      }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+                  if (deg > 0)
+                    {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+                      const QGauss<dim - 1> reference_face_quadrature
+                        (this->degree);
+                      const Quadrature<dim - 1>& face_quadrature
+                        = QProjector<dim - 1>::project_to_child
+                          (reference_face_quadrature, 1);
+                      const std::vector<Point<dim - 1> >&
+                        face_quadrature_points = face_quadrature.get_points ();
+                      const std::vector<Polynomials::Polynomial<double> >&
+                        legendre_polynomials
+                          = Polynomials::Legendre::generate_complete_basis
+                            (deg);
+                      const std::vector<Polynomials::Polynomial<double> >&
+                        lobatto_polynomials
+                          = Polynomials::Lobatto::generate_complete_basis
+                            (this->degree);
+                      const unsigned int&
+                        n_face_points = face_quadrature.size ();
+                      FullMatrix<double> assembling_matrix (deg,
+                                                            n_edge_points);
+                      FullMatrix<double> system_matrix (deg, deg);
+                      FullMatrix<double> system_matrix_inv (deg, deg);
+                      std::vector<Polynomials::Polynomial<double> >
+                        lobatto_polynomials_grad (this->degree);
+
+                      for (unsigned int i = 0;
+                           i < lobatto_polynomials_grad.size (); ++i)
+                        lobatto_polynomials_grad[i]
+                          = lobatto_polynomials[i + 1].derivative ();
+                     
+                                  // Shifted and scaled
+                                  // quadrature points and
+                                  // weights on the four
+                                  // edges of a face.
+                      std::vector<std::vector<double> > edge_quadrature_points
+                        (GeometryInfo<dim>::lines_per_face);
+                      std::vector<std::vector<double> >
+                        edge_quadrature_weights
+                          (GeometryInfo<dim>::lines_per_face);
+                      std::vector<std::vector<Point<dim> > >
+                        edge_quadrature_points_full_dim
+                          (GeometryInfo<dim>::lines_per_face);
+                  
+                      for (unsigned int line = 0;
+                           line < GeometryInfo<dim>::lines_per_face; ++line)
+                        {
+                  	      edge_quadrature_points.resize (n_edge_points);
+                          edge_quadrature_points_full_dim.resize
+                            (n_edge_points);
+                          edge_quadrature_weights.resize (n_edge_points);
+                        }
+                  
+                      for (unsigned int q_point = 0; q_point < n_edge_points;
+                           ++q_point)
+                        {
+                  	      edge_quadrature_points[0][q_point]
+                  	        = 2.0 * edge_quadrature_y_points[q_point] (0);
+                  	      edge_quadrature_points[1][q_point]
+                  	        = edge_quadrature_points[0][q_point];
+                  	      edge_quadrature_points[2][q_point]
+                  	        = 2.0 * edge_quadrature_x_points[q_point] (0)
+                  	          - 1.0;
+                  	      edge_quadrature_points[3][q_point]
+                  	        = edge_quadrature_points[2][q_point];
+                          edge_quadrature_points_full_dim[0][q_point]
+                            = Point<dim>
+                              (0.5, edge_quadrature_y_points[q_point] (0),
+                               0.0);
+                          edge_quadrature_points_full_dim[1][q_point]
+                            = Point<dim>
+                              (1.0, edge_quadrature_y_points[q_point] (0),
+                               0.0);
+                          edge_quadrature_points_full_dim[2][q_point]
+                            = Point<dim>
+                              (edge_quadrature_x_points[q_point] (0), 0.0,
+                               0.0);
+                          edge_quadrature_points_full_dim[3][q_point]
+                            = Point<dim>
+                              (edge_quadrature_x_points[q_point] (0), 0.5,
+                               0.0);
+                          edge_quadrature_weights[0][q_point]
+                            = std::sqrt (2.0 * edge_quadrature_y.weight
+                                               (q_point));
+                          edge_quadrature_weights[1][q_point]
+                            = edge_quadrature_weights[0][q_point];
+                          edge_quadrature_weights[2][q_point]
+                            = std::sqrt (2.0 * edge_quadrature_x.weight
+                                               (q_point));
+                          edge_quadrature_weights[3][q_point]
+                            = edge_quadrature_weights[2][q_point];
+                        }
+                  
+                      Vector<double> system_rhs (system_matrix.m ());
+                      Vector<double> solution (system_rhs.size ());
+
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                          ++dof)
+                        {
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	      for (unsigned int q_point = 0;
+                  	           q_point < n_edge_points; ++q_point)
+                  	        {
+                  	 	       const double tmp
+                  	 	         = 2.0 * edge_quadrature_y_points[q_point] (0);
+                  	 	       const double weight
+                  	 	         = std::sqrt (2.0 * edge_quadrature_y.weight
+                  	 	                            (q_point));
+
+                               for (unsigned int i = 0; i < deg; ++i)
+                                 assembling_matrix (i, q_point)
+                                   = weight
+                                     * lobatto_polynomials_grad[i + 1].value
+                                       (tmp);
+                  	        }
+                     
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.invert (system_matrix);
+                     
+                          for (unsigned int line = 0;
+                               line < GeometryInfo<dim - 1>::lines_per_cell;
+                               ++line)
+                            {
+                                  // Set up the right hand side.
+                              system_rhs = 0;
+                           
+                              for (unsigned int q_point = 0;
+                                   q_point < n_edge_points; ++q_point)
+                                {
+                                   const double right_hand_side_value
+                                     = edge_quadrature_weights[line][q_point]
+                                       * (this->shape_value_component
+                                          (this->face_to_cell_index (dof, 4),
+                                           edge_quadrature_points_full_dim[line][q_point],
+                                           1) - interpolation_matrix
+                                                (line * source_fe.degree,
+                                                 dof));
+                                 
+                                   for (unsigned int i = 0; i < deg; ++i)
+                                     system_rhs (i)
+                                       += right_hand_side_value
+                                          * lobatto_polynomials_grad[i + 1].value
+                                            (edge_quadrature_points[line][q_point]);
+                                }
+
+                              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                              for (unsigned int i = 0; i < solution.size ();
+                                   ++i)
+                                if (std::abs (solution (i)) > 1e-14)
+                                  interpolation_matrix
+                                  (line * source_fe.degree + i + 1, dof)
+                                    = solution (i);
+                            }
+
+                                  // Now we project the remaining
+                                  // part on the face shape
+                                  // functions. First on the
+                                  // horizontal ones, then on
+                                  // the vertical ones. 
+                          assembling_matrix.reinit (deg * this->degree,
+                                                    n_face_points);
+                          system_rhs.reinit (assembling_matrix.m ());
+                          system_rhs = 0;
+
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0)
+                                 - 1.0,
+                                 2.0 * face_quadrature_points[q_point] (1),
+                                 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0),
+                                   1);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       (i * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 1);
+                        
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                                
+                              const double weight
+                                = std::sqrt (4.0 * face_quadrature.weight
+                                                   (q_point));
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp1 = weight * L_i;
+                                  const double tmp2 = right_hand_side_value
+                                                      * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    {
+                           	          const double l_j
+                           	            = lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                           	          
+                           	          assembling_matrix (i * deg + j, q_point)
+                           	            = tmp1 * l_j;
+                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
+                                    }
+                                }
+                            }
+
+                          system_matrix.reinit (assembling_matrix.m (),
+                                                assembling_matrix.m ());
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.reinit (system_matrix.m (),
+                                                    system_matrix.m ());
+                          system_matrix_inv.invert (system_matrix);
+                          solution.reinit (system_matrix_inv.m ());
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                ((i + 4) * source_fe.degree + j - i, dof)
+                                  = solution (i * deg + j);
+                          
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                          system_rhs = 0;
+
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0)
+                                 - 1.0,
+                                 2.0 * face_quadrature_points[q_point] (1),
+                                 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0),
+                                   0);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       ((i + 2) * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 0);
+
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp
+                                    = right_hand_side_value * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += tmp
+                                         * lobatto_polynomials[j + 2].value
+                                           (quadrature_point (1));
+                                }
+                            }
+
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                (i + (j + source_fe.degree + 3)
+                                     * source_fe.degree, dof)
+                                  = solution (i * deg + j);
+                        }
+                    }
+
+                  break;
+                }
+
+              case 2:
+                {
+                  const Quadrature<dim - 2>& edge_quadrature_x
+                    = QProjector<dim - 2>::project_to_child
+                      (reference_edge_quadrature, 0);
+                  const Quadrature<dim - 2>& edge_quadrature_y
+                    = QProjector<dim - 2>::project_to_child
+                      (reference_edge_quadrature, 1);
+                  const unsigned int& n_edge_points
+                    = edge_quadrature_x.size ();
+                  const std::vector<Point<dim - 2> >&
+                    edge_quadrature_x_points = edge_quadrature_x.get_points ();
+                  const std::vector<Point<dim - 2> >&
+                    edge_quadrature_y_points = edge_quadrature_y.get_points ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    {
+                      const double weight
+                        = 2.0 * edge_quadrature_x.weight (q_point);
+
+                      for (unsigned int i = 0; i < 2; ++i)
+                        for (unsigned int dof = 0; dof < this->dofs_per_face;
+                             ++dof)
+                          {
+                            interpolation_matrix (i * source_fe.degree, dof)
+                              += this->shape_value_component
+                                 (this->face_to_cell_index (dof, 4),
+                                  Point<dim>
+                                  (0.5 * i,
+                                   edge_quadrature_y_points[q_point] (0), 0.0),
+                                  1);
+                            interpolation_matrix ((i + 2) * source_fe.degree,
+                                                  dof)
+                              += this->shape_value_component
+                                 (this->face_to_cell_index (dof, 4),
+                                  Point<dim>
+                                  (edge_quadrature_x_points[q_point] (0),
+                                   0.5 * (i + 1), 0.0), 0);
+                          }
+                    }
+               
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int dof = 0; dof < this->dofs_per_face;
+                         ++dof)
+                      {
+                        if (std::abs (interpolation_matrix
+                                      (i * source_fe.degree, dof)) < 1e-14)
+                          interpolation_matrix (i * source_fe.degree, dof)
+                            = 0.0;
+                        
+                        if (std::abs (interpolation_matrix
+                                      ((i + 2) * source_fe.degree, dof))
+                              < 1e-14)
+                          interpolation_matrix ((i + 2) * source_fe.degree,
+                                                dof) = 0.0;
+                      }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+                  if (deg > 0)
+                    {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+                      const QGauss<dim - 1> reference_face_quadrature (this->degree);
+                      const Quadrature<dim - 1>& face_quadrature
+                        = QProjector<dim - 1>::project_to_child
+                          (reference_face_quadrature, 2);
+                      const std::vector<Point<dim - 1> >&
+                        face_quadrature_points = face_quadrature.get_points ();
+                      const std::vector<Polynomials::Polynomial<double> >& legendre_polynomials
+                        = Polynomials::Legendre::generate_complete_basis (deg);
+                      const std::vector<Polynomials::Polynomial<double> >& lobatto_polynomials
+                        = Polynomials::Lobatto::generate_complete_basis (this->degree);
+                      const unsigned int& n_face_points
+                        = face_quadrature.size ();
+                      FullMatrix<double> assembling_matrix (deg,
+                                                            n_edge_points);
+                      FullMatrix<double> system_matrix (deg, deg);
+                      FullMatrix<double> system_matrix_inv (deg, deg);
+                      std::vector<Polynomials::Polynomial<double> >
+                        lobatto_polynomials_grad (this->degree);
+
+                      for (unsigned int i = 0;
+                           i < lobatto_polynomials_grad.size (); ++i)
+                        lobatto_polynomials_grad[i]
+                          = lobatto_polynomials[i + 1].derivative ();
+                      
+                                  // Shifted and scaled
+                                  // quadrature points and
+                                  // weights on the four
+                                  // edges of a face.
+                      std::vector<std::vector<double> >
+                        edge_quadrature_points
+                        (GeometryInfo<dim>::lines_per_face);
+                      std::vector<std::vector<double> >
+                        edge_quadrature_weights
+                        (GeometryInfo<dim>::lines_per_face);
+                      std::vector<std::vector<Point<dim> > >
+                        edge_quadrature_points_full_dim
+                        (GeometryInfo<dim>::lines_per_face);
+                  
+                      for (unsigned int line = 0;
+                           line < GeometryInfo<dim>::lines_per_face; ++line)
+                        {
+                  	      edge_quadrature_points.resize (n_edge_points);
+                          edge_quadrature_points_full_dim.resize
+                            (n_edge_points);
+                          edge_quadrature_weights.resize (n_edge_points);
+                        }
+                  
+                      for (unsigned int q_point = 0; q_point < n_edge_points;
+                           ++q_point)
+                        {
+                  	      edge_quadrature_points[0][q_point]
+                  	        = 2.0 * edge_quadrature_y_points[q_point] (0)
+                  	          - 1.0;
+                  	      edge_quadrature_points[1][q_point]
+                  	        = edge_quadrature_points[0][q_point];
+                  	      edge_quadrature_points[2][q_point]
+                  	        = 2.0 * edge_quadrature_x_points[q_point] (0);
+                  	      edge_quadrature_points[3][q_point]
+                  	        = edge_quadrature_points[2][q_point];
+                          edge_quadrature_points_full_dim[0][q_point]
+                            = Point<dim>
+                              (0.0, edge_quadrature_y_points[q_point] (0),
+                               0.0);
+                          edge_quadrature_points_full_dim[1][q_point]
+                            = Point<dim>
+                              (0.5, edge_quadrature_y_points[q_point] (0),
+                               0.0);
+                          edge_quadrature_points_full_dim[2][q_point]
+                            = Point<dim>
+                              (edge_quadrature_x_points[q_point] (0), 0.5,
+                               0.0);
+                          edge_quadrature_points_full_dim[3][q_point]
+                            = Point<dim>
+                              (edge_quadrature_x_points[q_point] (0), 1.0,
+                               0.0);
+                          edge_quadrature_weights[0][q_point]
+                            = std::sqrt (2.0 * edge_quadrature_y.weight
+                                               (q_point));
+                          edge_quadrature_weights[1][q_point]
+                            = edge_quadrature_weights[0][q_point];
+                          edge_quadrature_weights[2][q_point]
+                            = std::sqrt (2.0 * edge_quadrature_x.weight
+                                               (q_point));
+                          edge_quadrature_weights[3][q_point]
+                            = edge_quadrature_weights[2][q_point];
+                        }
+                      
+                      Vector<double> system_rhs (system_matrix.m ());
+                      Vector<double> solution (system_rhs.size ());
+
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
+                        {
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	      for (unsigned int q_point = 0;
+                  	           q_point < n_edge_points; ++q_point)
+                  	        {
+                  	 	      const double weight
+                  	 	        = std::sqrt (2.0 * edge_quadrature_y.weight
+                  	 	                           (q_point));
+                  	   	      const double tmp
+                  	   	        = 2.0 * edge_quadrature_y_points[q_point] (0)
+                  	   	          - 1.0;
+
+                              for (unsigned int i = 0; i < deg; ++i)
+                                assembling_matrix (i, q_point)
+                                  = weight
+                                    * lobatto_polynomials_grad[i + 1].value
+                                      (tmp);
+                  	        }
+                     
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.invert (system_matrix);
+                     
+                          for (unsigned int line = 0;
+                               line < GeometryInfo<dim - 1>::lines_per_cell;
+                               ++line)
+                            {
+                                  // Set up the right hand side.
+                              system_rhs = 0;
+                           
+                              for (unsigned int q_point = 0;
+                                   q_point < n_edge_points; ++q_point)
+                                {
+                                  const double right_hand_side_value
+                                    = edge_quadrature_weights[line][q_point]
+                                      * (this->shape_value_component
+                                         (this->face_to_cell_index (dof, 4),
+                                          edge_quadrature_points_full_dim[line][q_point],
+                                          1) - interpolation_matrix
+                                               (line * source_fe.degree, dof));
+                                 
+                                  for (unsigned int i = 0; i < deg; ++i)
+                                    system_rhs (i)
+                                      += right_hand_side_value
+                                         * lobatto_polynomials_grad[i + 1].value
+                                           (edge_quadrature_points[line][q_point]);
+                                }
+
+                              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                              for (unsigned int i = 0; i < solution.size ();
+                                   ++i)
+                                if (std::abs (solution (i)) > 1e-14)
+                                  interpolation_matrix
+                                  (line * source_fe.degree + i + 1, dof)
+                                    = solution (i);
+                            }
+
+                          assembling_matrix.reinit (deg * this->degree,
+                                                    n_face_points);
+                          system_rhs.reinit (assembling_matrix.m ());
+                          system_rhs = 0;
+
+                                  // Now we project the remaining
+                                  // part on the face shape
+                                  // functions. First on the
+                                  // horizontal ones, then on
+                                  // the vertical ones. 
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0),
+                                 2.0 * face_quadrature_points[q_point] (1)
+                                 - 1.0, 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0.0),
+                                   1);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       (i * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 1);
+                        
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                              
+                              const double weight
+                                = std::sqrt (4.0 * reference_face_quadrature.weight
+                                                   (q_point));
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp1 = weight * L_i;
+                                  const double tmp2
+                                    = right_hand_side_value * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    {
+                           	          const double l_j
+                           	            = lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                           	          
+                           	          assembling_matrix (i * deg + j, q_point)
+                           	            = tmp1 * l_j;
+                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
+                                    }
+                                }
+                            }
+
+                          system_matrix.reinit (assembling_matrix.m (),
+                                                assembling_matrix.m ());
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.reinit (system_matrix.m (),
+                                                    system_matrix.m ());
+                          system_matrix_inv.invert (system_matrix);
+                          solution.reinit (system_matrix_inv.m ());
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                ((i + 4) * source_fe.degree + j - i, dof)
+                                  = solution (i * deg + j);
+                          
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                          system_rhs = 0;
+
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0),
+                                 2.0 * face_quadrature_points[q_point] (1)
+                                 - 1.0, 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0.0),
+                                   0);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       ((i + 2) * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 0);
+
+                              right_hand_side_value *= 4.0 * face_quadrature.weight (q_point);
+                       
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp = right_hand_side_value * L_i;
+                          
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += tmp
+                                         * lobatto_polynomials[j + 2].value
+                                           (quadrature_point (1));
+                                }
+                            }
+
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                (i + (j + source_fe.degree + 3)
+                                 * source_fe.degree, dof)
+                                  = solution (i * deg + j);
+                        }
+                    }
+
+                  break;
+                }
+
+              case 3:
+                {
+                  const Quadrature<dim - 2>& edge_quadrature
+                    = QProjector<dim - 2>::project_to_child
+                      (reference_edge_quadrature, 1);
+                  const unsigned int& n_edge_points = edge_quadrature.size ();
+                  const std::vector<Point<dim - 2> >&
+                    edge_quadrature_points = edge_quadrature.get_points ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    {
+                      const double weight
+                        = 2.0 * edge_quadrature.weight (q_point);
+
+                      for (unsigned int i = 0; i < 2; ++i)
+                        for (unsigned int dof = 0; dof < this->dofs_per_face;
+                             ++dof)
+                          {
+                            interpolation_matrix (i * source_fe.degree, dof)
+                              += this->shape_value_component
+                                 (this->face_to_cell_index (dof, 4),
+                                  Point<dim>
+                                  (0.5 * (i + 1),
+                                   edge_quadrature_points[q_point] (0), 0.0),
+                                  1);
+                            interpolation_matrix ((i + 2) * source_fe.degree,
+                                                  dof)
+                              += this->shape_value_component
+                                 (this->face_to_cell_index (dof, 4),
+                                  Point<dim>
+                                  (edge_quadrature_points[q_point] (0),
+                                   0.5 * (i + 1), 0.0), 0);
+                          }
+                    }
+               
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int dof = 0; dof < this->dofs_per_face;
+                         ++dof)
+                      {
+                        if (std::abs (interpolation_matrix
+                                      (i * source_fe.degree, dof)) < 1e-14)
+                          interpolation_matrix (i * source_fe.degree, dof)
+                            = 0.0;
+                     
+                        if (std::abs (interpolation_matrix
+                                      ((i + 2) * source_fe.degree, dof))
+                              < 1e-14)
+                          interpolation_matrix ((i + 2) * source_fe.degree,
+                                                dof) = 0.0;
+                      }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+                  if (deg > 1)
+                    {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+                      const QGauss<dim - 1>
+                        reference_face_quadrature (this->degree);
+                      const Quadrature<dim - 1>& face_quadrature
+                        = QProjector<dim - 1>::project_to_child
+                          (reference_face_quadrature, 3);
+                      const std::vector<Point<dim - 1> >&
+                        face_quadrature_points = face_quadrature.get_points ();
+                      const std::vector<Polynomials::Polynomial<double> >&
+                        legendre_polynomials
+                          = Polynomials::Legendre::generate_complete_basis
+                            (deg);
+                      const std::vector<Polynomials::Polynomial<double> >&
+                        lobatto_polynomials
+                          = Polynomials::Lobatto::generate_complete_basis
+                            (this->degree);
+                      const unsigned int& n_face_points
+                        = face_quadrature.size ();
+                      FullMatrix<double> assembling_matrix (deg,
+                                                            n_edge_points);
+                      FullMatrix<double> system_matrix (deg, deg);
+                      FullMatrix<double> system_matrix_inv (deg, deg);
+                      std::vector<Polynomials::Polynomial<double> >
+                        lobatto_polynomials_grad (this->degree);
+
+                      for (unsigned int i = 0;
+                           i < lobatto_polynomials_grad.size (); ++i)
+                        lobatto_polynomials_grad[i]
+                          = lobatto_polynomials[i + 1].derivative ();
+                      
+                                  // Shifted and scaled
+                                  // quadrature points on
+                                  // the four edges of a
+                                  // face.
+                      std::vector<std::vector<Point<dim> > >
+                        edge_quadrature_points_full_dim
+                        (GeometryInfo<dim>::lines_per_face);
+                  
+                      for (unsigned int line = 0;
+                           line < GeometryInfo<dim>::lines_per_face; ++line)
+                        edge_quadrature_points_full_dim.resize
+                          (n_edge_points);
+                  
+                      for (unsigned int q_point = 0; q_point < n_edge_points;
+                           ++q_point)
+                        {
+                          edge_quadrature_points_full_dim[0][q_point]
+                            = Point<dim>
+                              (0.5, edge_quadrature_points[q_point] (0), 0.0);
+                          edge_quadrature_points_full_dim[1][q_point]
+                            = Point<dim>
+                              (1.0, edge_quadrature_points[q_point] (0), 0.0);
+                          edge_quadrature_points_full_dim[2][q_point]
+                            = Point<dim> (edge_quadrature_points[q_point] (0),
+                                          0.5, 0.0);
+                          edge_quadrature_points_full_dim[3][q_point]
+                            = Point<dim> (edge_quadrature_points[q_point] (0),
+                                          1.0, 0.0);
+                        }
+                  
+                      Vector<double> system_rhs (system_matrix.m ());
+                      Vector<double> solution (system_rhs.size ());
+
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
+                        {
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	      for (unsigned int q_point = 0;
+                  	           q_point < n_edge_points; ++q_point)
+                  	        {
+                  	 	      const double tmp
+                  	 	        = 2.0 * edge_quadrature_points[q_point] (0)
+                  	 	          - 1.0;
+                  	 	      const double weight
+                  	 	        = std::sqrt (2.0 * edge_quadrature.weight
+                  	 	                           (q_point));
+
+                              for (unsigned int i = 0; i < deg; ++i)
+                                assembling_matrix (i, q_point)
+                                  = weight
+                                    * lobatto_polynomials_grad[i + 1].value
+                                      (tmp);
+                  	        }
+                     
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.invert (system_matrix);
+                     
+                          for (unsigned int line = 0;
+                               line < GeometryInfo<dim - 1>::lines_per_cell;
+                               ++line)
+                            {
+                                  // Set up the right hand side.
+                              system_rhs = 0;
+                        
+                              for (unsigned int q_point = 0;
+                                   q_point < n_edge_points; ++q_point)
+                                {
+                                  const double right_hand_side_value
+                                    = std::sqrt (2.0 * edge_quadrature.weight
+                                                       (q_point))
+                                      * (this->shape_value_component
+                                         (this->face_to_cell_index (dof, 4),
+                                          edge_quadrature_points_full_dim[line][q_point],
+                                          1) - interpolation_matrix
+                                               (line * source_fe.degree, dof));
+                                  const double tmp
+                                    = 2.0 * edge_quadrature_points[q_point] (0)
+                                      - 1.0;
+                                 
+                                  for (unsigned int i = 0; i < deg; ++i)
+                                    system_rhs (i)
+                                      += right_hand_side_value
+                                         * lobatto_polynomials_grad[i + 1].value
+                                           (tmp);
+                                }
+
+                              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                              for (unsigned int i = 0; i < solution.size ();
+                                   ++i)
+                                if (std::abs (solution (i)) > 1e-14)
+                                  interpolation_matrix
+                                  (line * source_fe.degree + i + 1, dof)
+                                    = solution (i);
+                            }
+
+                          assembling_matrix.reinit (deg * this->degree,
+                                                    n_face_points);
+                          system_rhs.reinit (assembling_matrix.m ());
+                          system_rhs = 0;
+
+                                  // Now we project the remaining
+                                  // part on the face shape
+                                  // functions. First on the
+                                  // horizontal ones, then on
+                                  // the vertical ones. 
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0)
+                                 - 1.0,
+                                 2.0 * face_quadrature_points[q_point] (1)
+                                 - 1.0, 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0.0),
+                                   1);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       (i * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 1);
+                        
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                              
+                              const double weight
+                                = std::sqrt (4.0 * face_quadrature.weight
+                                                   (q_point));
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp1 = weight * L_i;
+                                  const double tmp2 = right_hand_side_value
+                                                      * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    {
+                           	          const double l_j
+                           	            = lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                           	          
+                           	          assembling_matrix (i * deg + j, q_point)
+                           	            = tmp1 * l_j;
+                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
+                                    }
+                                }
+                            }
+
+                          system_matrix.reinit (assembling_matrix.m (),
+                                                assembling_matrix.m ());
+                          assembling_matrix.mTmult (system_matrix,
+                                                    assembling_matrix);
+                          system_matrix_inv.reinit (system_matrix.m (),
+                                                    system_matrix.m ());
+                          system_matrix_inv.invert (system_matrix);
+                          solution.reinit (system_matrix.m ());
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                ((i + 4) * source_fe.degree + j - i, dof)
+                                  = solution (i * deg + j);
+                          
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                          system_rhs = 0;
+
+                          for (unsigned int q_point = 0;
+                               q_point < n_face_points; ++q_point)
+                            {
+                              const Point<dim> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0)
+                                 - 1.0,
+                                 2.0 * face_quadrature_points[q_point] (1)
+                                 - 1.0, 0.0);
+                              double right_hand_side_value
+                                = this->shape_value_component
+                                  (this->face_to_cell_index (dof, 4),
+                                   Point<dim>
+                                   (face_quadrature_points[q_point] (0),
+                                    face_quadrature_points[q_point] (1), 0.0),
+                                   0);
+
+                              for (unsigned int i = 0; i < 2; ++i)
+                                for (unsigned int j = 0; j < source_fe.degree;
+                                     ++j)
+                                  right_hand_side_value
+                                    -= interpolation_matrix
+                                       ((i + 2) * source_fe.degree + j, dof)
+                                       * source_fe.shape_value_component
+                                         (i * source_fe.degree + j,
+                                          quadrature_point, 0);
+
+                              right_hand_side_value
+                                *= 4.0 * face_quadrature.weight (q_point);
+                        
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                {
+                                  const double L_i
+                                    = legendre_polynomials[i].value
+                                      (quadrature_point (0));
+                                  const double tmp
+                                    = right_hand_side_value * L_i;
+                           
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += tmp
+                                         * lobatto_polynomials[j + 2].value
+                                           (quadrature_point (1));
+                                }
+                            }
+
+                          system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the interpolation
+                                  // matrix only, if they are
+                                  // not too small.
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            for (unsigned int j = 0; j < deg; ++j)
+                              if (std::abs (solution (i * deg + j)) > 1e-14)
+                                interpolation_matrix
+                                (i + (j + source_fe.degree + 3)
+                                 * source_fe.degree, dof)
+                                  = solution (i * deg + j);
+                        }
+                    }
+                  
+                  break;
+                }
+              
+              default:
+                Assert (false, ExcNotImplemented ());
+            }
+          
+          break;
+        }
+      
+      default:
+        Assert (false, ExcNotImplemented ());
+    }
+}
+
+#endif
+
+                   // Since this is a vector valued element,
+                   // we cannot interpolate a scalar function.
+template <int dim>
+void FE_Nedelec<dim>::interpolate (std::vector<double>&, const std::vector<double>&) const {
+   Assert(false, ExcNotImplemented ());
+}
 
 
-template <int dim, int spacedim>
+                   // Interpolate a function, which is given by
+                   // its values at the generalized support
+                   // points in the finite element space on the
+                   // reference cell.
+                   // This is done as usual by projection-based
+                   // interpolation.
+template <int dim>
+void
+FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
+                              const std::vector<Vector<double> >& values,
+                              unsigned int offset) const
+{
+  Assert (values.size () == this->generalized_support_points.size (),
+          ExcDimensionMismatch (values.size (),
+                                this->generalized_support_points.size ()));
+  Assert (local_dofs.size () == this->dofs_per_cell,
+          ExcDimensionMismatch (local_dofs.size (),this->dofs_per_cell));
+  Assert (values[0].size () >= offset + this->n_components (),
+          ExcDimensionMismatch (values[0].size (),
+                                offset + this->n_components ()));
+  std::fill (local_dofs.begin (), local_dofs.end (), 0.);
+
+  if (offset < dim)
+    switch (dim)
+      {
+        case 2:
+          {
+            const QGauss<dim - 1> reference_edge_quadrature (this->degree);
+            const unsigned int& n_edge_points
+              = reference_edge_quadrature.size ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+            for (unsigned int i = 0; i < 2; ++i)
+              {
+                for (unsigned int q_point = 0; q_point < n_edge_points;
+                     ++q_point)
+                  local_dofs[i * this->degree]
+                    += reference_edge_quadrature.weight (q_point)
+                       * values[q_point + i * n_edge_points] (1);
+               
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                if (std::abs (local_dofs[i * this->degree]) < 1e-14)
+                  local_dofs[i * this->degree] = 0.0;
+              }
+
+            if (offset == 0)
+              for (unsigned int i = 0; i < 2; ++i)
+                {
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    local_dofs[(i + 2) * this->degree]
+                      += reference_edge_quadrature.weight (q_point)
+                         * values[q_point + (i + 2) * n_edge_points] (0);
+                  
+                  if (std::abs (local_dofs[(i + 2) * this->degree]) < 1e-14)
+                    local_dofs[(i + 2) * this->degree] = 0.0;
+                }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+            if (deg > 0)
+              {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+                const std::vector<Polynomials::Polynomial<double> >&
+                  lobatto_polynomials
+                    = Polynomials::Lobatto::generate_complete_basis
+                      (this->degree);
+                const unsigned int
+                  line_coordinate[GeometryInfo<2>::lines_per_cell]
+                    = {1, 1, 0, 0};
+                std::vector<Polynomials::Polynomial<double> >
+                  lobatto_polynomials_grad (this->degree);
+
+                for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+                     ++i)
+                  lobatto_polynomials_grad[i]
+                    = lobatto_polynomials[i + 1].derivative ();
+                
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                FullMatrix<double> system_matrix (deg, deg);
+
+                for (unsigned int i = 0; i < system_matrix.m (); ++i)
+                  for (unsigned int j = 0; j < system_matrix.n (); ++j)
+                    for (unsigned int q_point = 0; q_point < n_edge_points;
+                         ++q_point)
+                      system_matrix (i, j)
+                        += boundary_weights (q_point, j)
+                           * lobatto_polynomials_grad[i + 1].value
+                             (this->generalized_face_support_points[q_point]
+                              (1));
+
+                FullMatrix<double> system_matrix_inv (deg, deg);
+
+                system_matrix_inv.invert (system_matrix);
+                
+                Vector<double> system_rhs (system_matrix.m ());
+                Vector<double> solution (system_rhs.size ());
+
+                for (unsigned int line = 0;
+                     line < GeometryInfo<dim>::lines_per_cell; ++line)
+                  if ((line < 2) || (offset == 0))
+                    {
+                                  // Set up the right hand side.
+                      system_rhs = 0;
+                        
+                      for (unsigned int q_point = 0; q_point < n_edge_points;
+                           ++q_point)
+                        {
+                          const double tmp
+                            = values[line * n_edge_points + q_point]
+                              (line_coordinate[line])
+                              - local_dofs[line * this->degree]
+                              * this->shape_value_component
+                                (line * this->degree,
+                                 this->generalized_support_points[line
+                                                                  * n_edge_points
+                                                                  + q_point],
+                                 line_coordinate[line]);
+
+                          for (unsigned int i = 0; i < system_rhs.size ();
+                               ++i)
+                            system_rhs (i) += boundary_weights (q_point, i)
+                                              * tmp;
+                        }
+
+                      system_matrix_inv.vmult (solution, system_rhs);
+                        
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                      for (unsigned int i = 0; i < solution.size (); ++i)
+                        if (std::abs (solution (i)) > 1e-14)
+                          local_dofs[line * this->degree + i + 1]
+                            = solution (i);
+                    }
+
+                                  // Then we go on to the
+                                  // interior shape
+                                  // functions. Again we
+                                  // set up the system
+                                  // matrix and use it
+                                  // for both, the
+                                  // horizontal and the
+                                  // vertical, interior
+                                  // shape functions.
+                const QGauss<dim> reference_quadrature (this->degree);
+                const std::vector<Polynomials::Polynomial<double> >&
+                  legendre_polynomials
+                    = Polynomials::Legendre::generate_complete_basis (deg);
+                const unsigned int& n_interior_points
+                  = reference_quadrature.size ();
+
+                system_matrix.reinit (deg * this->degree, deg * this->degree);
+                system_matrix = 0;
+
+                for (unsigned int i = 0; i <= deg; ++i)
+                  for (unsigned int j = 0; j < deg; ++j)
+                    for (unsigned int k = 0; k <= deg; ++k)
+                      for (unsigned int l = 0; l < deg; ++l)
+                        for (unsigned int q_point = 0;
+                             q_point < n_interior_points; ++q_point)
+                          system_matrix (i * deg + j, k * deg + l)
+                            += reference_quadrature.weight (q_point)
+                               * legendre_polynomials[i].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points]
+                                  (0))
+                               * lobatto_polynomials[j + 2].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points]
+                                  (1))
+                               * lobatto_polynomials_grad[k].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points]
+                                  (0))
+                               * lobatto_polynomials[l + 2].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points]
+                                  (1));
+
+                system_matrix_inv.reinit (system_matrix.m (),
+                                          system_matrix.m ());
+                system_matrix_inv.invert (system_matrix);
+                solution.reinit (system_matrix_inv.m ());
+                system_rhs.reinit (system_matrix.m ());
+
+                if (offset == 0)
+                  {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                    system_rhs = 0;
+                    
+                    for (unsigned int q_point = 0;
+                         q_point < n_interior_points; ++q_point)
+                      {
+                        double tmp
+                          = values[q_point + GeometryInfo<dim>::lines_per_cell
+                                   * n_edge_points] (0);
+
+                        for (unsigned int i = 0; i < 2; ++i)
+                          for (unsigned int j = 0; j <= deg; ++j)
+                            tmp -= local_dofs[(i + 2) * this->degree + j]
+                                   * this->shape_value_component
+                                     ((i + 2) * this->degree + j,
+                                      this->generalized_support_points[q_point
+                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                       * n_edge_points],
+                                      0);
+
+                        for (unsigned int i = 0; i <= deg; ++i)
+                          for (unsigned int j = 0; j < deg; ++j)
+                            system_rhs (i * deg + j)
+                              += reference_quadrature.weight (q_point) * tmp
+                                 * lobatto_polynomials_grad[i].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points]
+                                    (0))
+                                 * lobatto_polynomials[j + 2].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points]
+                                    (1));
+                      }
+
+                    system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                    for (unsigned int i = 0; i <= deg; ++i)
+                      for (unsigned int j = 0; j < deg; ++j)
+                        if (std::abs (solution (i * deg + j)) > 1e-14)
+                           local_dofs[(i + GeometryInfo<dim>::lines_per_cell)
+                                      * deg + j
+                                      + GeometryInfo<dim>::lines_per_cell]
+                             = solution (i * deg + j);
+                  }
+
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                system_rhs = 0;
+
+                for (unsigned int q_point = 0; q_point < n_interior_points;
+                     ++q_point)
+                  {
+                    double tmp
+                      = values[q_point + GeometryInfo<dim>::lines_per_cell
+                               * n_edge_points] (1);
+
+                    for (unsigned int i = 0; i < 2; ++i)
+                      for (unsigned int j = 0; j <= deg; ++j)
+                        tmp -= local_dofs[i * this->degree + j]
+                               * this->shape_value_component
+                                 (i * this->degree + j,
+                                  this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points],
+                                  1);
+
+                    for (unsigned i = 0; i <= deg; ++i)
+                      for (unsigned int j = 0; j < deg; ++j)
+                        system_rhs (i * deg + j)
+                          += reference_quadrature.weight (q_point) * tmp
+                             * lobatto_polynomials_grad[i].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points]
+                                (1))
+                             * lobatto_polynomials[j + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points]
+                                (0));
+                  }
+
+                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                for (unsigned int i = 0; i <= deg; ++i)
+                  for (unsigned int j = 0; j < deg; ++j)
+                    if (std::abs (solution (i * deg + j)) > 1e-14)
+                      local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                      + deg) * this->degree]
+                        = solution (i * deg + j);
+              }
+
+            break;
+          }
+
+        case 3:
+          {
+            const QGauss<dim - 2>
+              reference_edge_quadrature (this->degree);
+            const unsigned int&
+              n_edge_points = reference_edge_quadrature.size ();
+
+                                  // Let us begin with the
+                                  // interpolation part.
+            for (unsigned int i = 0; i < 4; ++i)
+              {
+                for (unsigned int q_point = 0; q_point < n_edge_points;
+                     ++q_point)
+                  local_dofs[(i + 8) * this->degree]
+                    += reference_edge_quadrature.weight (q_point)
+                       * values[q_point + (i + 8) * n_edge_points] (2);
+               
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                if (std::abs (local_dofs[(i + 8) * this->degree]) < 1e-14)
+                  local_dofs[(i + 8) * this->degree] = 0.0;
+              }
+
+            if (offset < dim - 1)
+              {
+                for (unsigned int i = 0; i < 2; ++i)
+                  for (unsigned int j = 0; j < 2; ++j)
+                    {
+                      for (unsigned int q_point = 0; q_point < n_edge_points;
+                           ++q_point)
+                        local_dofs[(i + 4 * j) * this->degree]
+                          += reference_edge_quadrature.weight (q_point)
+                             * values[q_point + (i + 4 * j) * n_edge_points]
+                               (1);
+                     
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                      if (std::abs (local_dofs[(i + 4 * j) * this->degree])
+                            < 1e-14)
+                        local_dofs[(i + 4 * j) * this->degree] = 0.0;
+                    }
+
+                if (offset == 0)
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int j = 0; j < 2; ++j)
+                      {
+                        for (unsigned int q_point = 0;
+                             q_point < n_edge_points; ++q_point)
+                          local_dofs[(i + 4 * j + 2) * this->degree]
+                            += reference_edge_quadrature.weight (q_point)
+                               * values[q_point + (i + 4 * j + 2)
+                                        * n_edge_points] (0);
+                        
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                        if (std::abs (local_dofs[(i + 4 * j + 2)
+                                                 * this->degree]) < 1e-14)
+                          local_dofs[(i + 4 * j + 2) * this->degree] = 0.0;
+                      }
+              }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order shape
+                                  // functions to consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+            if (deg > 0)
+              {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+                const std::vector<Polynomials::Polynomial<double> >&
+                  lobatto_polynomials
+                    = Polynomials::Lobatto::generate_complete_basis
+                      (this->degree);
+                const unsigned int
+                  line_coordinate[GeometryInfo<3>::lines_per_cell]
+                    = {1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
+                FullMatrix<double> system_matrix (deg, deg);
+                FullMatrix<double> system_matrix_inv (deg, deg);
+                std::vector<Polynomials::Polynomial<double> >
+                  lobatto_polynomials_grad (this->degree);
+
+                for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+                     ++i)
+                  lobatto_polynomials_grad[i]
+                    = lobatto_polynomials[i + 1].derivative ();
+                
+                Vector<double> system_rhs (system_matrix.m ());
+                Vector<double> solution (system_rhs.size ());
+
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                for (unsigned int i = 0; i < system_matrix.m (); ++i)
+                  for (unsigned int j = 0; j < system_matrix.n (); ++j)
+                    for (unsigned int q_point = 0; q_point < n_edge_points;
+                         ++q_point)
+                      system_matrix (i, j)
+                        += boundary_weights (q_point, j)
+                           * lobatto_polynomials_grad[i + 1].value
+                             (this->generalized_face_support_points[q_point]
+                              (1));
+
+                system_matrix_inv.invert (system_matrix);
+
+                for (unsigned int line = 0;
+                     line < GeometryInfo<dim>::lines_per_cell; ++line)
+                  {
+                                  // Set up the right hand side.
+                    system_rhs = 0;
+
+                    if ((((line == 0) || (line == 1) || (line == 4) ||
+                          (line == 5)) && (offset < dim - 1)) ||
+                        (((line == 2) || (line == 3) || (line == 6) ||
+                          (line == 7)) && (offset == 0)) || (line > 7))
+                      {
+                        for (unsigned int q_point = 0; q_point < n_edge_points;
+                             ++q_point)
+                          {
+                            double tmp
+                              = values[line * n_edge_points + q_point]
+                                (line_coordinate[line])
+                                - local_dofs[line * this->degree]
+                                * this->shape_value_component
+                                  (line * this->degree,
+                                   this->generalized_support_points[line
+                                                                    * this->degree
+                                                                    + q_point],
+                                   line_coordinate[line]);
+
+                            for (unsigned int i = 0; i < system_rhs.size ();
+                                 ++i)
+                              system_rhs (i)
+                                += boundary_weights (q_point, i) * tmp;
+                          }
+
+                        system_matrix_inv.vmult (solution, system_rhs);
+                           
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                        for (unsigned int i = 0; i < solution.size (); ++i)
+                          if (std::abs (solution (i)) > 1e-14)
+                            local_dofs[line * this->degree + i + 1]
+                              = solution (i);
+                      }
+                  }
+
+                                  // Then we go on to the
+                                  // face shape functions.
+                                  // Again we set up the
+                                  // system matrix and
+                                  // use it for both, the
+                                  // horizontal and the
+                                  // vertical, shape
+                                  // functions.
+                const std::vector<Polynomials::Polynomial<double> >&
+                  legendre_polynomials
+                    = Polynomials::Legendre::generate_complete_basis (deg);
+                const unsigned int
+                  n_face_points = n_edge_points * n_edge_points;
+
+                system_matrix.reinit (deg * this->degree, deg * this->degree);
+                system_matrix = 0;
+
+                for (unsigned int i = 0; i <= deg; ++i)
+                  for (unsigned int j = 0; j < deg; ++j)
+                    for (unsigned int k = 0; k <= deg; ++k)
+                      for (unsigned int l = 0; l < deg; ++l)
+                        for (unsigned int q_point = 0; q_point < n_face_points;
+                             ++q_point)
+                          system_matrix (i * deg + j, k * deg + l)
+                            += boundary_weights (q_point + n_edge_points,
+                                                 2 * (k * deg + l))
+                               * legendre_polynomials[i].value
+                                 (this->generalized_face_support_points[q_point
+                                                                        + 4
+                                                                        * n_edge_points]
+                                  (0))
+                               * lobatto_polynomials[j + 2].value
+                                 (this->generalized_face_support_points[q_point
+                                                                        + 4
+                                                                        * n_edge_points]
+                                  (1));
+
+                system_matrix_inv.reinit (system_matrix.m (),
+                                          system_matrix.n ());
+                system_matrix_inv.invert (system_matrix);
+                solution.reinit (system_matrix.m ());
+                system_rhs.reinit (system_matrix.m ());
+
+                for (unsigned int face = 0;
+                     face < GeometryInfo<dim>::faces_per_cell; ++face)
+                  {
+                    switch (face)
+                      {
+                        case 0:
+                          {
+                            if (offset < dim - 1)
+                              {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                              	system_rhs = 0;
+                              	
+                                for (unsigned int q_point = 0;
+                                     q_point < n_face_points; ++q_point)
+                                  {
+                                    double tmp
+                                      = values[q_point
+                                               + GeometryInfo<dim>::lines_per_cell
+                                               * n_edge_points] (1);
+
+                                    for (unsigned int i = 0; i < 2; ++i)
+                                      for (unsigned int j = 0; j <= deg; ++j)
+                                        tmp
+                                          -= local_dofs[4 * i * this->degree
+                                                        + j]
+                                             * this->shape_value_component
+                                               (4 * i * this->degree + j,
+                                                this->generalized_support_points[q_point
+                                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                                 * n_edge_points],
+                                                1);
+
+                                    for (unsigned int i = 0; i <= deg; ++i)
+                                      for (unsigned int j = 0; j < deg; ++j)
+                                        system_rhs (i * deg + j)
+                                         += boundary_weights
+                                            (q_point + n_edge_points,
+                                             2 * (i * deg + j)) * tmp;
+                                  }
+
+                                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                for (unsigned int i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    if (std::abs (solution (i * deg + j))
+                                          > 1e-14)
+                                      local_dofs[(i
+                                                  + GeometryInfo<dim>::lines_per_cell)
+                                                 * deg + j
+                                                 + GeometryInfo<dim>::lines_per_cell]
+                                        = solution (i * deg + j);
+                              }
+                            
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                            system_rhs = 0;
+
+                            for (unsigned int q_point = 0;
+                                 q_point < n_face_points; ++q_point)
+                              {
+                                double tmp
+                                  = values[q_point
+                                           + GeometryInfo<dim>::lines_per_cell
+                                           * n_edge_points] (2);
+
+                                for (unsigned int i = 0; i < 2; ++i)
+                                  for (unsigned int j = 0; j <= deg; ++j)
+                                    tmp -= local_dofs[2 * (i + 4)
+                                                      * this->degree + j]
+                                           * this->shape_value_component
+                                             (2 * (i + 4) * this->degree + j,
+                                              this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points],
+                                              2);
+
+                                for (unsigned i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += boundary_weights
+                                         (q_point + n_edge_points,
+                                          2 * (i * deg + j) + 1)
+                                         * tmp;
+                              }
+
+                            system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                            for (unsigned int i = 0; i <= deg; ++i)
+                              for (unsigned int j = 0; j < deg; ++j)
+                                if (std::abs (solution (i * deg + j)) > 1e-14)
+                                  local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                                  + deg)
+                                             * this->degree]
+                                    = solution (i * deg + j);
+
+                            break;
+                          }
+
+                        case 1:
+                          {
+                            if (offset < dim - 1)
+                              {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                              	system_rhs = 0;
+                              	
+                                for (unsigned int q_point = 0;
+                                     q_point < n_face_points; ++q_point)
+                                  {
+                                    double tmp
+                                      = values[q_point
+                                               + GeometryInfo<dim>::lines_per_cell
+                                               * n_edge_points
+                                               + n_face_points] (1);
+
+                                    for (unsigned int i = 0; i < 2; ++i)
+                                      for (unsigned int j = 0; j <= deg; ++j)
+                                        tmp -= local_dofs[(4 * i + 1)
+                                                          * this->degree + j]
+                                               * this->shape_value_component
+                                                 ((4 * i + 1) * this->degree
+                                                  + j,
+                                                  this->generalized_support_points[q_point
+                                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                                   * n_edge_points
+                                                                                   + n_face_points],
+                                                  1);
+
+                                    for (unsigned int i = 0; i <= deg; ++i)
+                                      for (unsigned int j = 0; j < deg; ++j)
+                                        system_rhs (i * deg + j)
+                                          += boundary_weights
+                                             (q_point + n_edge_points,
+                                              2 * (i * deg + j)) * tmp;
+                                  }
+
+                                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                for (unsigned int i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    if (std::abs (solution (i * deg + j))
+                                          > 1e-14)
+                                      local_dofs[(i + GeometryInfo<dim>::lines_per_cell
+                                                  + 2 * this->degree) * deg + j
+                                                  + GeometryInfo<dim>::lines_per_cell]
+                                        = solution (i * deg + j);
+                              }
+                            
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                            system_rhs = 0;
+
+                            for (unsigned int q_point = 0;
+                                 q_point < n_face_points; ++q_point)
+                              {
+                                double tmp
+                                  = values[q_point
+                                           + GeometryInfo<dim>::lines_per_cell
+                                           * n_edge_points + n_face_points]
+                                    (2);
+
+                                for (unsigned int i = 0; i < 2; ++i)
+                                  for (unsigned int j = 0; j <= deg; ++j)
+                                    tmp -= local_dofs[(2 * (i + 4) + 1)
+                                                      * this->degree + j]
+                                           * this->shape_value_component
+                                             ((2 * (i + 4) + 1) * this->degree
+                                              + j,
+                                              this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + n_face_points],
+                                              2);
+
+                                for (unsigned i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += boundary_weights
+                                         (q_point + n_edge_points,
+                                          2 * (i * deg + j) + 1) * tmp;
+                              }
+
+                            system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                            for (unsigned int i = 0; i <= deg; ++i)
+                              for (unsigned int j = 0; j < deg; ++j)
+                                if (std::abs (solution (i * deg + j)) > 1e-14)
+                                  local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                                  + 3 * deg)
+                                             * this->degree]
+                                    = solution (i * deg + j);
+
+                            break;
+                          }
+
+                        case 2:
+                          {
+                            if (offset == 0)
+                              {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                              	system_rhs = 0;
+                              	
+                                for (unsigned int q_point = 0;
+                                     q_point < n_face_points;
+                                     ++q_point)
+                                  {
+                                    double tmp
+                                      = values[q_point
+                                               + GeometryInfo<dim>::lines_per_cell
+                                               * n_edge_points
+                                               + 2 * n_face_points] (0);
+
+                                    for (unsigned int i = 0; i < 2; ++i)
+                                      for (unsigned int j = 0; j <= deg; ++j)
+                                        tmp -= local_dofs[(4 * i + 2)
+                                                          * this->degree + j]
+                                               * this->shape_value_component
+                                                 ((4 * i + 2) * this->degree
+                                                  + j,
+                                                  this->generalized_support_points[q_point
+                                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                                   * n_edge_points
+                                                                                   + 2
+                                                                                   * n_face_points],
+                                                  0);
+
+                                      for (unsigned int i = 0; i <= deg; ++i)
+                                        for (unsigned int j = 0; j < deg; ++j)
+                                          system_rhs (i * deg + j)
+                                            += boundary_weights
+                                               (q_point + n_edge_points,
+                                                2 * (i * deg + j) + 1) * tmp;
+                                  }
+
+                                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                for (unsigned int i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    if (std::abs (solution (i * deg + j))
+                                          > 1e-14)
+                                      local_dofs[(i + GeometryInfo<dim>::lines_per_cell
+                                                  + 4 * this->degree) * deg
+                                                 + j
+                                                 + GeometryInfo<dim>::lines_per_cell]
+                                        = solution (i * deg + j);
+                              }
+
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                            system_rhs = 0;
+                            
+                            for (unsigned int q_point = 0;
+                                 q_point < n_face_points; ++q_point)
+                              {
+                                double tmp
+                                  = values[q_point
+                                           + GeometryInfo<dim>::lines_per_cell
+                                           * n_edge_points + 2 * n_face_points]
+                                    (2);
+
+                                for (unsigned int i = 0; i < 2; ++i)
+                                  for (unsigned int j = 0; j <= deg; ++j)
+                                    tmp -= local_dofs[(i + 8) * this->degree
+                                                      + j]
+                                           * this->shape_value_component
+                                             ((i + 8) * this->degree + j,
+                                              this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + 2
+                                                                               * n_face_points],
+                                              2);
+
+                                for (unsigned i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += boundary_weights
+                                         (q_point + n_edge_points,
+                                          2 * (i * deg + j)) * tmp;
+                              }
+
+                            system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                            for (unsigned int i = 0; i <= deg; ++i)
+                              for (unsigned int j = 0; j < deg; ++j)
+                                if (std::abs (solution (i * deg + j)) > 1e-14)
+                                 local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                                 + 5 * deg) * this->degree]
+                                   = solution (i * deg + j);
+
+                            break;
+                          }
+
+                        case 3:
+                          {
+                            if (offset == 0)
+                              {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                                system_rhs = 0;
+                                
+                                for (unsigned int q_point = 0;
+                                     q_point < n_face_points; ++q_point)
+                                  {
+                                    double tmp
+                                      = values[q_point
+                                               + GeometryInfo<dim>::lines_per_cell
+                                               * n_edge_points + 3
+                                               * n_face_points] (0);
+
+                                    for (unsigned int i = 0; i < 2; ++i)
+                                      for (unsigned int j = 0; j <= deg; ++j)
+                                        tmp -= local_dofs[(4 * i + 3)
+                                                          * this->degree + j]
+                                               * this->shape_value_component
+                                                 ((4 * i + 3) * this->degree
+                                                  + j,
+                                                  this->generalized_support_points[q_point
+                                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                                   * n_edge_points
+                                                                                   + 3
+                                                                                   * n_face_points],
+                                                  0);
+
+                                    for (unsigned int i = 0; i <= deg; ++i)
+                                      for (unsigned int j = 0; j < deg; ++j)
+                                        system_rhs (i * deg + j)
+                                          += boundary_weights
+                                             (q_point + n_edge_points,
+                                              2 * (i * deg + j) + 1) * tmp;
+                                  }
+
+                                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                for (unsigned int i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    if (std::abs (solution (i * deg + j))
+                                          > 1e-14)
+                                      local_dofs[(i + GeometryInfo<dim>::lines_per_cell
+                                                  + 6 * this->degree) * deg + j
+                                                  + GeometryInfo<dim>::lines_per_cell]
+                                        = solution (i * deg + j);
+                              }
+                            
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                            system_rhs = 0;
+
+                            for (unsigned int q_point = 0;
+                                 q_point < n_face_points; ++q_point)
+                              {
+                                double tmp
+                                  = values[q_point
+                                           + GeometryInfo<dim>::lines_per_cell
+                                           * n_edge_points + 3 * n_face_points]
+                                    (2);
+
+                                for (unsigned int i = 0; i < 2; ++i)
+                                  for (unsigned int j = 0; j <= deg; ++j)
+                                    tmp -= local_dofs[(i + 10) * this->degree
+                                                      + j]
+                                           * this->shape_value_component
+                                             ((i + 10) * this->degree + j,
+                                              this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + 3
+                                                                               * n_face_points],
+                                              2);
+
+                                for (unsigned i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    system_rhs (i * deg + j)
+                                      += boundary_weights
+                                         (q_point + n_edge_points,
+                                          2 * (i * deg + j)) * tmp;
+                              }
+
+                            system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                            for (unsigned int i = 0; i <= deg; ++i)
+                              for (unsigned int j = 0; j < deg; ++j)
+                                if (std::abs (solution (i * deg + j)) > 1e-14)
+                                  local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                                  + 7 * deg) * this->degree]
+                                    = solution (i * deg + j);
+
+                            break;
+                          }
+
+                        case 4:
+                          {
+                            if (offset < dim - 1)
+                              {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                                if (offset == 0)
+                                  {
+                                    system_rhs = 0;
+                                    
+                                    for (unsigned int q_point = 0;
+                                         q_point < n_face_points; ++q_point)
+                                      {
+                                        double tmp
+                                          = values[q_point
+                                                   + GeometryInfo<dim>::lines_per_cell
+                                                   * n_edge_points + 4
+                                                   * n_face_points] (0);
+
+                                        for (unsigned int i = 0; i < 2; ++i)
+                                          for (unsigned int j = 0; j <= deg; ++j)
+                                            tmp -= local_dofs[(i + 2)
+                                                              * this->degree
+                                                              + j]
+                                                   * this->shape_value_component
+                                                     ((i + 2) * this->degree
+                                                      + j,
+                                                      this->generalized_support_points[q_point
+                                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                                       * n_edge_points
+                                                                                       + 4
+                                                                                       * n_face_points],
+                                                      0);
+
+                                        for (unsigned int i = 0; i <= deg; ++i)
+                                          for (unsigned int j = 0; j < deg; ++j)
+                                            system_rhs (i * deg + j)
+                                              += boundary_weights
+                                                 (q_point + n_edge_points,
+                                                  2 * (i * deg + j)) * tmp;
+                                      }
+
+                                    system_matrix_inv.vmult
+                                      (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                    for (unsigned int i = 0; i <= deg; ++i)
+                                      for (unsigned int j = 0; j < deg; ++j)
+                                        if (std::abs (solution (i * deg + j))
+                                              > 1e-14)
+                                          local_dofs[(i + GeometryInfo<dim>::lines_per_cell
+                                                      + 8 * this->degree) * deg
+                                                      + j
+                                                      + GeometryInfo<dim>::lines_per_cell]
+                                            = solution (i * deg + j);
+                                  }
+                                
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                                system_rhs = 0;
+
+                                for (unsigned int q_point = 0;
+                                     q_point < n_face_points; ++q_point)
+                                  {
+                                    double tmp
+                                      = values[q_point
+                                               + GeometryInfo<dim>::lines_per_cell
+                                               * n_edge_points + 4
+                                               * n_face_points] (1);
+
+                                    for (unsigned int i = 0; i < 2; ++i)
+                                      for (unsigned int j = 0; j <= deg; ++j)
+                                        tmp -= local_dofs[i * this->degree + j]
+                                               * this->shape_value_component
+                                                 (i * this->degree + j,
+                                                  this->generalized_support_points[q_point
+                                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                                   * n_edge_points
+                                                                                   + 4
+                                                                                   * n_face_points],
+                                                  1);
+
+                                    for (unsigned i = 0; i <= deg; ++i)
+                                      for (unsigned int j = 0; j < deg; ++j)
+                                        system_rhs (i * deg + j)
+                                          += boundary_weights
+                                             (q_point + n_edge_points,
+                                              2 * (i * deg + j) + 1) * tmp;
+                                  }
+
+                                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                for (unsigned int i = 0; i <= deg; ++i)
+                                  for (unsigned int j = 0; j < deg; ++j)
+                                    if (std::abs (solution (i * deg + j))
+                                          > 1e-14)
+                                      local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                                      + 9 * deg)
+                                                 * this->degree]
+                                        = solution (i * deg + j);
+                              }
+
+                            break;
+                          }
+
+                        default:
+                          if (offset < dim - 1)
+                            {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                              if (offset == 0)
+                                {
+                                  system_rhs = 0;
+                                  
+                                  for (unsigned int q_point = 0;
+                                       q_point < n_face_points; ++q_point)
+                                    {
+                                      double tmp
+                                        = values[q_point
+                                                 + GeometryInfo<dim>::lines_per_cell
+                                                 * n_edge_points
+                                                 + 5 * n_face_points] (0);
+
+                                      for (unsigned int i = 0; i < 2; ++i)
+                                        for (unsigned int j = 0; j <= deg; ++j)
+                                          tmp -= local_dofs[(i + 6)
+                                                            * this->degree + j]
+                                                 * this->shape_value_component
+                                                   ((i + 6) * this->degree + j,
+                                                    this->generalized_support_points[q_point
+                                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                                     * n_edge_points
+                                                                                     + 5
+                                                                                     * n_face_points],
+                                                    0);
+
+                                      for (unsigned int i = 0; i <= deg; ++i)
+                                        for (unsigned int j = 0; j < deg; ++j)
+                                          system_rhs (i * deg + j)
+                                            += boundary_weights
+                                               (q_point + n_edge_points,
+                                                2 * (i * deg + j)) * tmp;
+                                    }
+
+                                  system_matrix_inv.vmult
+                                    (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                                  for (unsigned int i = 0; i <= deg; ++i)
+                                    for (unsigned int j = 0; j < deg; ++j)
+                                      if (std::abs (solution (i * deg + j))
+                                            > 1e-14)
+                                        local_dofs[(i + GeometryInfo<dim>::lines_per_cell
+                                                    + 10 * this->degree)
+                                                   * deg + j
+                                                   + GeometryInfo<dim>::lines_per_cell]
+                                          = solution (i * deg + j);
+                                }
+                              
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                              system_rhs = 0;
+
+                              for (unsigned int q_point = 0;
+                                   q_point < n_face_points; ++q_point)
+                                {
+                                  double tmp
+                                    = values[q_point
+                                             + GeometryInfo<dim>::lines_per_cell
+                                             * n_edge_points + 5
+                                             * n_face_points] (1);
+
+                                  for (unsigned int i = 0; i < 2; ++i)
+                                    for (unsigned int j = 0; j <= deg; ++j)
+                                      tmp -= local_dofs[(i + 4)
+                                                        * this->degree + j]
+                                             * this->shape_value_component
+                                               ((i + 4) * this->degree + j,
+                                                this->generalized_support_points[q_point
+                                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                                 * n_edge_points
+                                                                                 + 5
+                                                                                 * n_face_points],
+                                                1);
+
+                                  for (unsigned i = 0; i <= deg; ++i)
+                                    for (unsigned int j = 0; j < deg; ++j)
+                                      system_rhs (i * deg + j)
+                                        += boundary_weights
+                                           (q_point + n_edge_points,
+                                            2 * (i * deg + j) + 1) * tmp;
+                                }
+
+                              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                              for (unsigned int i = 0; i <= deg; ++i)
+                                for (unsigned int j = 0; j < deg; ++j)
+                                  if (std::abs (solution (i * deg + j))
+                                        > 1e-14)
+                                    local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                                    + 11 * deg) * this->degree]
+                                      = solution (i * deg + j);
+                            }
+                      }
+                  }
+
+                                  // Finally we project
+                                  // the remaining parts
+                                  // of the function on
+                                  // the interior shape
+                                  // functions.
+                const QGauss<dim> reference_quadrature (this->degree);
+                const unsigned int&
+                  n_interior_points = reference_quadrature.size ();
+
+                                  // We create the
+                                  // system matrix.
+                system_matrix.reinit (this->degree * deg * deg,
+                                      this->degree * deg * deg);
+                system_matrix = 0;
+
+                for (unsigned int i = 0; i <= deg; ++i)
+                  for (unsigned int j = 0; j < deg; ++j)
+                    for (unsigned int k = 0; k < deg; ++k)
+                      for (unsigned int l = 0; l <= deg; ++l)
+                        for (unsigned int m = 0; m < deg; ++m)
+                          for (unsigned int n = 0; n < deg; ++n)
+                            for (unsigned int q_point = 0;
+                                 q_point < n_interior_points; ++q_point)
+                              system_matrix ((i * deg + j) * deg + k,
+                                             (l * deg + m) * deg + n)
+                                += reference_quadrature.weight (q_point)
+                                   * legendre_polynomials[i].value
+                                     (this->generalized_support_points[q_point
+                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                       * n_edge_points
+                                                                       + GeometryInfo<dim>::faces_per_cell
+                                                                       * n_face_points]
+                                      (0)) * lobatto_polynomials[j + 2].value
+                                             (this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points]
+                                              (1))
+                                           * lobatto_polynomials[k + 2].value
+                                             (this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points]
+                                              (2))
+                                           * lobatto_polynomials_grad[l].value
+                                             (this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points]
+                                              (0))
+                                           * lobatto_polynomials[m + 2].value
+                                             (this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points]
+                                              (1))
+                                           * lobatto_polynomials[n + 2].value
+                                             (this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points]
+                                              (2));
+
+                system_matrix_inv.reinit (system_matrix.m (),
+                                          system_matrix.m ());
+                system_matrix_inv.invert (system_matrix);
+                system_rhs.reinit (system_matrix_inv.m ());
+                solution.reinit (system_matrix.m ());
+
+                if (offset < dim - 1)
+                  {
+                    if (offset == 0)
+                      {
+                                  // Set up the right hand side.
+                        system_rhs = 0;
+                        
+                        for (unsigned int q_point = 0;
+                             q_point < n_interior_points; ++q_point)
+                          {
+                            double tmp
+                              = values[q_point
+                                       + GeometryInfo<dim>::lines_per_cell
+                                       * n_edge_points
+                                       + GeometryInfo<dim>::faces_per_cell
+                                       * n_face_points] (0);
+
+                            for (unsigned int i = 0; i <= deg; ++i)
+                              {
+                                for (unsigned int j = 0; j < 2; ++j)
+                                  for (unsigned int k = 0; k < 2; ++k)
+                                    tmp -= local_dofs[i + (j + 4 * k + 2)
+                                                      * this->degree]
+                                           * this->shape_value_component
+                                             (i + (j + 4 * k + 2)
+                                              * this->degree,
+                                              this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points],
+                                              0);
+
+                                for (unsigned int j = 0; j < deg; ++j)
+                                  for (unsigned int k = 0; k < 4; ++k)
+                                    tmp -= local_dofs[(i + 2 * (k + 2)
+                                                       * this->degree
+                                                       + GeometryInfo<dim>::lines_per_cell)
+                                                      * deg + j
+                                                      + GeometryInfo<dim>::lines_per_cell]
+                                           * this->shape_value_component
+                                             ((i + 2 * (k + 2) * this->degree
+                                               + GeometryInfo<dim>::lines_per_cell)
+                                              * deg + j
+                                              + GeometryInfo<dim>::lines_per_cell,
+                                              this->generalized_support_points[q_point
+                                                                               + GeometryInfo<dim>::lines_per_cell
+                                                                               * n_edge_points
+                                                                               + GeometryInfo<dim>::faces_per_cell
+                                                                               * n_face_points],
+                                              0);
+                              }
+
+                            for (unsigned int i = 0; i <= deg; ++i)
+                              for (unsigned int j = 0; j < deg; ++j)
+                                for (unsigned int k = 0; k < deg; ++k)
+                                  system_rhs ((i * deg + j) * deg + k)
+                                    += reference_quadrature.weight (q_point)
+                                       * tmp
+                                       * lobatto_polynomials_grad[i].value
+                                         (this->generalized_support_points[q_point
+                                                                           + GeometryInfo<dim>::lines_per_cell
+                                                                           * n_edge_points
+                                                                           + GeometryInfo<dim>::faces_per_cell
+                                                                           * n_face_points]
+                                          (0))
+                                         * lobatto_polynomials[j + 2].value
+                                           (this->generalized_support_points[q_point
+                                                                             + GeometryInfo<dim>::lines_per_cell
+                                                                             * n_edge_points
+                                                                             + GeometryInfo<dim>::faces_per_cell
+                                                                             * n_face_points]
+                                          (1))
+                                         * lobatto_polynomials[k + 2].value
+                                           (this->generalized_support_points[q_point
+                                                                             + GeometryInfo<dim>::lines_per_cell
+                                                                             * n_edge_points
+                                                                             + GeometryInfo<dim>::faces_per_cell
+                                                                             * n_face_points]
+                                          (2));
+                          }
+
+                        system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                        for (unsigned int i = 0; i <= deg; ++i)
+                          for (unsigned int j = 0; j < deg; ++j)
+                            for (unsigned int k = 0; k < deg; ++k)
+                              if (std::abs (solution ((i * deg + j) * deg + k))
+                                    > 1e-14)
+                                local_dofs[((i + 2
+                                             * GeometryInfo<dim>::faces_per_cell)
+                                            * deg + j
+                                            + GeometryInfo<dim>::lines_per_cell
+                                            + 2
+                                            * GeometryInfo<dim>::faces_per_cell)
+                                           * deg + k
+                                           + GeometryInfo<dim>::lines_per_cell]
+                                = solution ((i * deg + j) * deg + k);
+                      }
+                    
+                                  // Set up the right hand side.
+                    system_rhs = 0;
+
+                    for (unsigned int q_point = 0; q_point < n_interior_points;
+                         ++q_point)
+                      {
+                        double tmp
+                          = values[q_point + GeometryInfo<dim>::lines_per_cell
+                                   * n_edge_points
+                                   + GeometryInfo<dim>::faces_per_cell
+                                   * n_face_points] (1);
+
+                        for (unsigned int i = 0; i <= deg; ++i)
+                          for (unsigned int j = 0; j < 2; ++j)
+                            {
+                              for (unsigned int k = 0; k < 2; ++k)
+                                tmp -= local_dofs[i + (4 * j + k)
+                                                  * this->degree]
+                                       * this->shape_value_component
+                                         (i + (4 * j + k) * this->degree,
+                                          this->generalized_support_points[q_point
+                                                                           + GeometryInfo<dim>::lines_per_cell
+                                                                           * n_edge_points
+                                                                           + GeometryInfo<dim>::faces_per_cell
+                                                                           * n_face_points],
+                                          1);
+
+                              for (unsigned int k = 0; k < deg; ++k)
+                                tmp -= local_dofs[(i + 2 * j * this->degree
+                                                   + GeometryInfo<dim>::lines_per_cell)
+                                                  * deg + k
+                                                  + GeometryInfo<dim>::lines_per_cell]
+                                       * this->shape_value_component
+                                         ((i + 2 * j * this->degree
+                                           + GeometryInfo<dim>::lines_per_cell)
+                                          * deg + k
+                                          + GeometryInfo<dim>::lines_per_cell,
+                                          this->generalized_support_points[q_point
+                                                                           + GeometryInfo<dim>::lines_per_cell
+                                                                           * n_edge_points
+                                                                           + GeometryInfo<dim>::faces_per_cell
+                                                                           * n_face_points],
+                                          1)
+                                       + local_dofs[i + ((2 * j + 9) * deg + k
+                                                    + GeometryInfo<dim>::lines_per_cell)
+                                                    * this->degree]
+                                       * this->shape_value_component
+                                         (i + ((2 * j + 9) * deg + k
+                                          + GeometryInfo<dim>::lines_per_cell)
+                                          * this->degree,
+                                          this->generalized_support_points[q_point
+                                                                           + GeometryInfo<dim>::lines_per_cell
+                                                                           * n_edge_points
+                                                                           + GeometryInfo<dim>::faces_per_cell
+                                                                           * n_face_points],
+                                          1);
+                            }
+
+                        for (unsigned int i = 0; i <= deg; ++i)
+                          for (unsigned int j = 0; j < deg; ++j)
+                            for (unsigned int k = 0; k < deg; ++k)
+                              system_rhs ((i * deg + j) * deg + k)
+                                += reference_quadrature.weight (q_point) * tmp
+                                   * lobatto_polynomials_grad[i].value
+                                     (this->generalized_support_points[q_point
+                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                       * n_edge_points
+                                                                       + GeometryInfo<dim>::faces_per_cell
+                                                                       * n_face_points]
+                                      (1))
+                                   * lobatto_polynomials[j + 2].value
+                                     (this->generalized_support_points[q_point
+                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                       * n_edge_points
+                                                                       + GeometryInfo<dim>::faces_per_cell
+                                                                       * n_face_points]
+                                      (0))
+                                   * lobatto_polynomials[k + 2].value
+                                     (this->generalized_support_points[q_point
+                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                       * n_edge_points
+                                                                       + GeometryInfo<dim>::faces_per_cell
+                                                                       * n_face_points]
+                                      (2));
+                      }
+
+                    system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                    for (unsigned int i = 0; i <= deg; ++i)
+                      for (unsigned int j = 0; j < deg; ++j)
+                        for (unsigned int k = 0; k < deg; ++k)
+                          if (std::abs (solution ((i * deg + j) * deg + k))
+                                > 1e-14)
+                            local_dofs[((i + this->degree + 2
+                                         * GeometryInfo<dim>::faces_per_cell)
+                                        * deg + j
+                                        + GeometryInfo<dim>::lines_per_cell + 2
+                                        * GeometryInfo<dim>::faces_per_cell)
+                                       * deg + k
+                                       + GeometryInfo<dim>::lines_per_cell]
+                              = solution ((i * deg + j) * deg + k);
+                  }
+                
+                                  // Set up the right hand side.
+                system_rhs = 0;
+
+                for (unsigned int q_point = 0; q_point < n_interior_points;
+                     ++q_point)
+                  {
+                    double tmp
+                      = values[q_point + GeometryInfo<dim>::lines_per_cell
+                               * n_edge_points
+                               + GeometryInfo<dim>::faces_per_cell
+                               * n_face_points] (2);
+
+                    for (unsigned int i = 0; i <= deg; ++i)
+                      for (unsigned int j = 0; j < 4; ++j)
+                        {
+                          tmp -= local_dofs[i + (j + 8) * this->degree]
+                                 * this->shape_value_component
+                                   (i + (j + 8) * this->degree,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points],
+                                    2);
+
+                          for (unsigned int k = 0; k < deg; ++k)
+                            tmp -= local_dofs[i + ((2 * j + 1) * deg + k
+                                                   + GeometryInfo<dim>::lines_per_cell)
+                                              * this->degree]
+                                   * this->shape_value_component
+                                     (i + ((2 * j + 1) * deg + k
+                                           + GeometryInfo<dim>::lines_per_cell)
+                                      * this->degree,
+                                      this->generalized_support_points[q_point
+                                                                       + GeometryInfo<dim>::lines_per_cell
+                                                                       * n_edge_points
+                                                                       + GeometryInfo<dim>::faces_per_cell
+                                                                       * n_face_points],
+                                      2);
+                        }
+
+                    for (unsigned int i = 0; i <= deg; ++i)
+                      for (unsigned int j = 0; j < deg; ++j)
+                        for (unsigned int k = 0; k < deg; ++k)
+                          system_rhs ((i * deg + j) * deg + k)
+                            += reference_quadrature.weight (q_point) * tmp
+                               * lobatto_polynomials_grad[i].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points
+                                                                   + GeometryInfo<dim>::faces_per_cell
+                                                                   * n_face_points]
+                                  (2))
+                               * lobatto_polynomials[j + 2].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points
+                                                                   + GeometryInfo<dim>::faces_per_cell
+                                                                   * n_face_points]
+                                  (0))
+                               * lobatto_polynomials[k + 2].value
+                                 (this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points
+                                                                   + GeometryInfo<dim>::faces_per_cell
+                                                                   * n_face_points]
+                                  (1));
+                  }
+
+                system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                for (unsigned int i = 0; i <= deg; ++i)
+                  for (unsigned int j = 0; j < deg; ++j)
+                    for (unsigned int k = 0; k < deg; ++k)
+                      if (std::abs (solution ((i * deg + j) * deg + k))
+                            > 1e-14)
+                        local_dofs[i + ((j + 2
+                                         * (deg + GeometryInfo<dim>::faces_per_cell))
+                                        * deg + k
+                                        + GeometryInfo<dim>::lines_per_cell)
+                                   * this->degree]
+                          = solution ((i * deg + j) * deg + k);
+              }
+            
+            break;
+          }
+        
+        default:
+          Assert (false, ExcNotImplemented ());
+      }
+}
+
+
+                   // Interpolate a function, which is given by
+                   // its values at the generalized support
+                   // points in the finite element space on the
+                   // reference cell.
+                   // This is done as usual by projection-based
+                   // interpolation.
+template <int dim>
+void
+FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
+                              const VectorSlice<const std::vector<std::vector<double> > >& values)
+const
+{
+  Assert (values.size () == this->n_components (),
+          ExcDimensionMismatch (values.size (), this->n_components ()));
+  Assert (values[0].size () == this->generalized_support_points.size (),
+          ExcDimensionMismatch (values[0].size (),
+                                this->generalized_support_points.size ()));
+  Assert (local_dofs.size () == this->dofs_per_cell,
+          ExcDimensionMismatch (local_dofs.size (), this->dofs_per_cell));
+  std::fill (local_dofs.begin (), local_dofs.end (), 0.0);
+
+  switch (dim)
+    {
+      case 2:
+        {
+                                  // Let us begin with the
+                                  // interpolation part.
+          const QGauss<dim - 1> reference_edge_quadrature (this->degree);
+          const unsigned int&
+            n_edge_points = reference_edge_quadrature.size ();
+
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              {
+                for (unsigned int q_point = 0; q_point < n_edge_points;
+                     ++q_point)
+                  local_dofs[(i + 2 * j) * this->degree]
+                    += reference_edge_quadrature.weight (q_point)
+                       * values[1 - j][q_point + (i + 2 * j) * n_edge_points];
+               
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                if (std::abs (local_dofs[(i + 2 * j) * this->degree]) < 1e-14)
+                  local_dofs[(i + 2 * j) * this->degree] = 0.0;
+              }
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order edge
+                                  // shape functions to
+                                  // consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+          if (deg > 0)
+            {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+              const std::vector<Polynomials::Polynomial<double> >&
+                lobatto_polynomials
+                  = Polynomials::Lobatto::generate_complete_basis
+                    (this->degree);
+              FullMatrix<double> system_matrix (deg, deg);
+              std::vector<Polynomials::Polynomial<double> >
+                lobatto_polynomials_grad (this->degree);
+              
+              for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+                   ++i)
+                lobatto_polynomials_grad[i]
+                  = lobatto_polynomials[i + 1].derivative ();
+
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+              for (unsigned int i = 0; i < system_matrix.m (); ++i)
+                for (unsigned int j = 0; j < system_matrix.n (); ++j)
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                     system_matrix (i, j)
+                       += boundary_weights (q_point, j)
+                          * lobatto_polynomials_grad[i + 1].value
+                            (this->generalized_face_support_points[q_point]
+                             (1));
+
+              FullMatrix<double> system_matrix_inv (deg, deg);
+              
+              system_matrix_inv.invert (system_matrix);
+              
+              const unsigned int
+                line_coordinate[GeometryInfo<2>::lines_per_cell]
+                  = {1, 1, 0, 0};
+              Vector<double> system_rhs (system_matrix.m ());
+              Vector<double> solution (system_rhs.size ());
+
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_cell; ++line)
+                {
+                                  // Set up the right hand side.
+                  system_rhs = 0;
+
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    {
+                      const double tmp
+                        = values[line_coordinate[line]][line * n_edge_points
+                                                        + q_point]
+                          - local_dofs[line * this->degree]
+                          * this->shape_value_component
+                            (line * this->degree,
+                             this->generalized_support_points[line
+                                                              * n_edge_points
+                                                              + q_point],
+                             line_coordinate[line]);
+
+                      for (unsigned int i = 0; i < system_rhs.size (); ++i)
+                        system_rhs (i) += boundary_weights (q_point, i) * tmp;
+                    }
+
+                  system_matrix_inv.vmult (solution, system_rhs);
+               
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                  for (unsigned int i = 0; i < solution.size (); ++i)
+                    if (std::abs (solution (i)) > 1e-14)
+                      local_dofs[line * this->degree + i + 1] = solution (i);
+                }
+
+                                  // Then we go on to the
+                                  // interior shape
+                                  // functions. Again we
+                                  // set up the system
+                                  // matrix and use it
+                                  // for both, the
+                                  // horizontal and the
+                                  // vertical, interior
+                                  // shape functions.
+              const QGauss<dim> reference_quadrature (this->degree);
+              const unsigned int&
+                n_interior_points = reference_quadrature.size ();
+              const std::vector<Polynomials::Polynomial<double> >&
+                legendre_polynomials
+                  = Polynomials::Legendre::generate_complete_basis (deg);
+              
+              system_matrix.reinit (deg * this->degree, deg * this->degree);
+              system_matrix = 0;
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k <= deg; ++k)
+                    for (unsigned int l = 0; l < deg; ++l)
+                      for (unsigned int q_point = 0;
+                           q_point < n_interior_points; ++q_point)
+                        system_matrix (i * deg + j, k * deg + l)
+                          += reference_quadrature.weight (q_point)
+                             * legendre_polynomials[i].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points]
+                                (0))
+                             * lobatto_polynomials[j + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points]
+                                (1))
+                             * lobatto_polynomials_grad[k].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points]
+                                (0))
+                             * lobatto_polynomials[l + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points]
+                                (1));
+
+              system_matrix_inv.reinit (system_matrix.m (),
+                                        system_matrix.m ());
+              system_matrix_inv.invert (system_matrix);
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+              system_rhs.reinit (system_matrix_inv.m ());
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = values[0][q_point + GeometryInfo<dim>::lines_per_cell
+                                * n_edge_points];
+
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int j = 0; j <= deg; ++j)
+                      tmp -= local_dofs[(i + 2) * this->degree + j]
+                             * this->shape_value_component
+                               ((i + 2) * this->degree + j,
+                                this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points],
+                                0);
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      system_rhs (i * deg + j)
+                        += reference_quadrature.weight (q_point) * tmp
+                           * lobatto_polynomials_grad[i].value
+                             (this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points]
+                              (0))
+                           * lobatto_polynomials[j + 2].value
+                             (this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points]
+                              (1));
+                }
+
+              solution.reinit (system_matrix.m ());
+              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  if (std::abs (solution (i * deg + j)) > 1e-14)
+                     local_dofs[(i + GeometryInfo<dim>::lines_per_cell) * deg
+                                + j + GeometryInfo<dim>::lines_per_cell]
+                       = solution (i * deg + j);
+
+              system_rhs = 0;
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = values[1][q_point + GeometryInfo<dim>::lines_per_cell
+                                * n_edge_points];
+
+                  for (unsigned int i = 0; i < 2; ++i)
+                    for (unsigned int j = 0; j <= deg; ++j)
+                      tmp -= local_dofs[i * this->degree + j]
+                             * this->shape_value_component
+                               (i * this->degree + j,
+                                this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points],
+                                1);
+
+                  for (unsigned i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      system_rhs (i * deg + j)
+                        += reference_quadrature.weight (q_point) * tmp
+                           * lobatto_polynomials_grad[i].value
+                             (this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points]
+                              (1))
+                           * lobatto_polynomials[j + 2].value
+                             (this->generalized_support_points[q_point
+                                                               + GeometryInfo<dim>::lines_per_cell
+                                                               * n_edge_points]
+                              (0));
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  if (std::abs (solution (i * deg + j)) > 1e-14)
+                     local_dofs[i + (j + GeometryInfo<dim>::lines_per_cell
+                                     + deg) * this->degree]
+                       = solution (i * deg + j);
+            }
+
+          break;
+        }
+
+      case 3:
+        {
+                                  // Let us begin with the
+                                  // interpolation part.
+          const QGauss<dim - 2> reference_edge_quadrature (this->degree);
+          const unsigned int&
+            n_edge_points = reference_edge_quadrature.size ();
+
+          for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+            {
+              for (unsigned int i = 0; i < 4; ++i)
+                local_dofs[(i + 8) * this->degree]
+                  += reference_edge_quadrature.weight (q_point)
+                     * values[2][q_point + (i + 8) * n_edge_points];
+
+              for (unsigned int i = 0; i < 2; ++i)
+                for (unsigned int j = 0; j < 2; ++j)
+                  for (unsigned int k = 0; k < 2; ++k)
+                    local_dofs[(i + 2 * (2 * j + k)) * this->degree]
+                      += reference_edge_quadrature.weight (q_point)
+                         * values[1 - k][q_point + (i + 2 * (2 * j + k))
+                                         * n_edge_points];
+            }
+         
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+          for (unsigned int i = 0; i < 4; ++i)
+            if (std::abs (local_dofs[(i + 8) * this->degree]) < 1e-14)
+              local_dofs[(i + 8) * this->degree] = 0.0;
+         
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = 0; k < 2; ++k)
+                if (std::abs (local_dofs[(i + 2 * (2 * j + k)) * this->degree])
+                      < 1e-14)
+                  local_dofs[(i + 2 * (2 * j + k)) * this->degree] = 0.0;
+
+                                  // If the degree is greater
+                                  // than 0, then we have still
+                                  // some higher order shape
+                                  // functions to consider.
+                                  // Here the projection part
+                                  // starts. The dof values
+                                  // are obtained by solving
+                                  // a linear system of
+                                  // equations.
+          if (deg > 0)
+            {
+                    			  // We start with projection
+                    			  // on the higher order edge
+                    			  // shape function.
+              const std::vector<Polynomials::Polynomial<double> >&
+                lobatto_polynomials
+                  = Polynomials::Lobatto::generate_complete_basis
+                    (this->degree);
+              FullMatrix<double> system_matrix (deg, deg);
+              std::vector<Polynomials::Polynomial<double> >
+                lobatto_polynomials_grad (this->degree);
+              
+              for (unsigned int i = 0; i < lobatto_polynomials_grad.size ();
+                   ++i)
+                lobatto_polynomials_grad[i]
+                  = lobatto_polynomials[i + 1].derivative ();
+              
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+              for (unsigned int i = 0; i < system_matrix.m (); ++i)
+                for (unsigned int j = 0; j < system_matrix.n (); ++j)
+                  for (unsigned int q_point = 0; q_point < n_edge_points;
+                       ++q_point)
+                    system_matrix (i, j)
+                      += boundary_weights (q_point, j)
+                         * lobatto_polynomials_grad[i + 1].value
+                           (this->generalized_face_support_points[q_point]
+                            (1));
+
+              FullMatrix<double> system_matrix_inv (deg, deg);
+              
+              system_matrix_inv.invert (system_matrix);
+
+              const unsigned int
+                line_coordinate[GeometryInfo<3>::lines_per_cell]
+                  = {1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 2, 2};
+              Vector<double> system_rhs (system_matrix.m ());
+              Vector<double> solution (system_rhs.size ());
+
+              for (unsigned int line = 0;
+                   line < GeometryInfo<dim>::lines_per_cell; ++line)
+                {
+                                  // Set up the right hand side.
+                  system_rhs = 0;
+                  
+                  for (unsigned int q_point = 0; q_point <= deg; ++q_point)
+                    {
+                      const double tmp
+                        = values[line_coordinate[line]][line * this->degree
+                                                        + q_point]
+                          - local_dofs[line * this->degree]
+                          * this->shape_value_component
+                            (line * this->degree,
+                             this->generalized_support_points[line
+                                                              * this->degree
+                                                              + q_point],
+                             line_coordinate[line]);
+
+                      for (unsigned int i = 0; i < system_rhs.size (); ++i)
+                           system_rhs (i) += boundary_weights (q_point, i)
+                                             * tmp;
+                    }
+
+                  system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                  for (unsigned int i = 0; i < solution.size (); ++i)
+                    if (std::abs (solution (i)) > 1e-14)
+                      local_dofs[line * this->degree + i + 1] = solution (i);
+                }
+
+                                  // Then we go on to the
+                                  // face shape functions.
+                                  // Again we set up the
+                                  // system matrix and
+                                  // use it for both, the
+                                  // horizontal and the
+                                  // vertical, shape
+                                  // functions.
+              const std::vector<Polynomials::Polynomial<double> >&
+                legendre_polynomials
+                  = Polynomials::Legendre::generate_complete_basis (deg);
+              const unsigned int n_face_points = n_edge_points * n_edge_points;
+              
+              system_matrix.reinit (deg * this->degree, deg * this->degree);
+              system_matrix = 0;
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k <= deg; ++k)
+                    for (unsigned int l = 0; l < deg; ++l)
+                      for (unsigned int q_point = 0; q_point < n_face_points;
+                           ++q_point)
+                        system_matrix (i * deg + j, k * deg + l)
+                          += boundary_weights (q_point + n_edge_points,
+                                               2 * (k * deg + l))
+                             * legendre_polynomials[i].value
+                               (this->generalized_face_support_points[q_point
+                                                                      + 4
+                                                                      * n_edge_points]
+                                (0))
+                             * lobatto_polynomials[j + 2].value
+                               (this->generalized_face_support_points[q_point
+                                                                      + 4
+                                                                      * n_edge_points]
+                                (1));
+
+              system_matrix_inv.reinit (system_matrix.m (),
+                                        system_matrix.m ());
+              system_matrix_inv.invert (system_matrix);
+              solution.reinit (system_matrix.m ());
+              system_rhs.reinit (system_matrix.m ());
+              
+              const unsigned int
+                face_coordinates[GeometryInfo<3>::faces_per_cell][2]
+                  = {{1, 2}, {1, 2}, {0, 2}, {0, 2}, {0, 1}, {0, 1}};
+              const unsigned int
+                edge_indices[GeometryInfo<3>::faces_per_cell][GeometryInfo<3>::lines_per_face]
+                  = {{0, 4, 8, 10}, {1, 5, 9, 11}, {2, 6, 8, 9},
+                     {3, 7, 10, 11}, {2, 3, 0, 1}, {6, 7, 4, 5}};
+
+              for (unsigned int face = 0;
+                   face < GeometryInfo<dim>::faces_per_cell; ++face)
+                {
+                                  // Set up the right hand side
+                                  // for the horizontal shape
+                                  // functions.
+                  system_rhs = 0;
+
+                  for (unsigned int q_point = 0; q_point < n_face_points;
+                       ++q_point)
+                    {
+                      double tmp
+                        = values[face_coordinates[face][0]][q_point
+                                                            + GeometryInfo<dim>::lines_per_cell
+                                                            * n_edge_points];
+
+                      for (unsigned int i = 0; i < 2; ++i)
+                        for (unsigned int j = 0; j <= deg; ++j)
+                          tmp -= local_dofs[edge_indices[face][i]
+                                            * this->degree + j]
+                                 * this->shape_value_component
+                                   (edge_indices[face][i] * this->degree + j,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points],
+                                    face_coordinates[face][0]);
+
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < deg; ++j)
+                          system_rhs (i * deg + j)
+                            += boundary_weights (q_point + n_edge_points,
+                                                 2 * (i * deg + j)) * tmp;
+                    }
+
+                  system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      if (std::abs (solution (i * deg + j)) > 1e-14)
+                        local_dofs[(2 * face * this->degree + i
+                                    + GeometryInfo<dim>::lines_per_cell) * deg
+                                   + j + GeometryInfo<dim>::lines_per_cell]
+                          = solution (i * deg + j);
+
+                                  // Set up the right hand side
+                                  // for the vertical shape
+                                  // functions.
+                  system_rhs = 0;
+
+                  for (unsigned int q_point = 0; q_point < n_face_points;
+                       ++q_point)
+                    {
+                      double tmp
+                        = values[face_coordinates[face][1]][q_point
+                                                            + GeometryInfo<dim>::lines_per_cell
+                                                            * n_edge_points];
+
+                      for (unsigned int i = 2;
+                           i < GeometryInfo<dim>::lines_per_face; ++i)
+                        for (unsigned int j = 0; j <= deg; ++j)
+                          tmp -= local_dofs[edge_indices[face][i]
+                                            * this->degree + j]
+                                 * this->shape_value_component
+                                   (edge_indices[face][i] * this->degree + j,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points],
+                                    face_coordinates[face][1]);
+
+                      for (unsigned i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < deg; ++j)
+                          system_rhs (i * deg + j)
+                            += boundary_weights (q_point + n_edge_points,
+                                                 2 * (i * deg + j) + 1)
+                               * tmp;
+                    }
+
+                  system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      if (std::abs (solution (i * deg + j)) > 1e-14)
+                        local_dofs[((2 * face + 1) * deg + j + GeometryInfo<dim>::lines_per_cell)
+                                   * this->degree + i]
+                          = solution (i * deg + j);
+                }
+
+                                  // Finally we project
+                                  // the remaining parts
+                                  // of the function on
+                                  // the interior shape
+                                  // functions.
+              const QGauss<dim> reference_quadrature (this->degree);
+              const unsigned int
+                n_interior_points = reference_quadrature.size ();
+
+                                  // We create the
+                                  // system matrix.
+              system_matrix.reinit (this->degree * deg * deg,
+                                    this->degree * deg * deg);
+              system_matrix = 0;
+
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    for (unsigned int l = 0; l <= deg; ++l)
+                      for (unsigned int m = 0; m < deg; ++m)
+                        for (unsigned int n = 0; n < deg; ++n)
+                          for (unsigned int q_point = 0;
+                               q_point < n_interior_points; ++q_point)
+                            system_matrix ((i * deg + j) * deg + k,
+                                           (l * deg + m) * deg + n)
+                              += reference_quadrature.weight (q_point)
+                                 * legendre_polynomials[i].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points]
+                                    (0))
+                                 * lobatto_polynomials[j + 2].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points]
+                                    (1))
+                                 * lobatto_polynomials[k + 2].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points]
+                                    (2))
+                                 * lobatto_polynomials_grad[l].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points]
+                                    (0))
+                                 * lobatto_polynomials[m + 2].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points]
+                                    (1))
+                                 * lobatto_polynomials[n + 2].value
+                                   (this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points]
+                                    (2));
+
+              system_matrix_inv.reinit (system_matrix.m (),
+                                        system_matrix.m ());
+              system_matrix_inv.invert (system_matrix);
+                                  // Set up the right hand side.
+              system_rhs.reinit (system_matrix.m ());
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = values[0][q_point + GeometryInfo<dim>::lines_per_cell
+                                * n_edge_points
+                                + GeometryInfo<dim>::faces_per_cell
+                                * n_face_points];
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    {
+                      for (unsigned int j = 0; j < 2; ++j)
+                        for (unsigned int k = 0; k < 2; ++k)
+                          tmp -= local_dofs[i + (j + 4 * k + 2) * this->degree]
+                                 * this->shape_value_component
+                                   (i + (j + 4 * k + 2) * this->degree,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points],
+                                    0);
+
+                      for (unsigned int j = 0; j < deg; ++j)
+                        for (unsigned int k = 0; k < 4; ++k)
+                          tmp -= local_dofs[(i + 2 * (k + 2) * this->degree
+                                             + GeometryInfo<dim>::lines_per_cell)
+                                            * deg + j
+                                            + GeometryInfo<dim>::lines_per_cell]
+                                 * this->shape_value_component
+                                   ((i + 2 * (k + 2) * this->degree
+                                     + GeometryInfo<dim>::lines_per_cell)
+                                    * deg + j
+                                    + GeometryInfo<dim>::lines_per_cell,
+                                   this->generalized_support_points[q_point
+                                                                    + GeometryInfo<dim>::lines_per_cell
+                                                                    * n_edge_points
+                                                                    + GeometryInfo<dim>::faces_per_cell
+                                                                    * n_face_points],
+                                   0);
+                    }
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      for (unsigned int k = 0; k < deg; ++k)
+                        system_rhs ((i * deg + j) * deg + k)
+                          += reference_quadrature.weight (q_point) * tmp
+                             * lobatto_polynomials_grad[i].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (0))
+                             * lobatto_polynomials[j + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (1))
+                             * lobatto_polynomials[k + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (2));
+                }
+
+              solution.reinit (system_rhs.size ());
+              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    if (std::abs (solution ((i * deg + j) * deg + k)) > 1e-14)
+                      local_dofs[((i + 2 * GeometryInfo<dim>::faces_per_cell)
+                                  * deg + j + GeometryInfo<dim>::lines_per_cell
+                                  + 2 * GeometryInfo<dim>::faces_per_cell)
+                                 * deg + k + GeometryInfo<dim>::lines_per_cell]
+                        = solution ((i * deg + j) * deg + k);
+
+                                  // Set up the right hand side.
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = values[1][q_point + GeometryInfo<dim>::lines_per_cell
+                                * n_edge_points
+                                + GeometryInfo<dim>::faces_per_cell
+                                * n_face_points];
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < 2; ++j)
+                      {
+                        for (unsigned int k = 0; k < 2; ++k)
+                          tmp -= local_dofs[i + (4 * j + k) * this->degree]
+                                 * this->shape_value_component
+                                   (i + (4 * j + k) * this->degree,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points],
+                                    1);
+
+                        for (unsigned int k = 0; k < deg; ++k)
+                          tmp -= local_dofs[(i + 2 * j * this->degree
+                                             + GeometryInfo<dim>::lines_per_cell)
+                                            * deg + k
+                                            + GeometryInfo<dim>::lines_per_cell]
+                                 * this->shape_value_component
+                                   ((i + 2 * j * this->degree
+                                     + GeometryInfo<dim>::lines_per_cell)
+                                    * deg + k
+                                    + GeometryInfo<dim>::lines_per_cell,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points],
+                                    1)
+                                 + local_dofs[i + ((2 * j + 9) * deg + k
+                                                   + GeometryInfo<dim>::lines_per_cell)
+                                              * this->degree]
+                                 * this->shape_value_component
+                                   (i + ((2 * j + 9) * deg + k
+                                          + GeometryInfo<dim>::lines_per_cell)
+                                    * this->degree,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points],
+                                    1);
+                      }
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      for (unsigned int k = 0; k < deg; ++k)
+                        system_rhs ((i * deg + j) * deg + k)
+                          += reference_quadrature.weight (q_point) * tmp
+                             * lobatto_polynomials_grad[i].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (1))
+                             * lobatto_polynomials[j + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (0))
+                             * lobatto_polynomials[k + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (2));
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    if (std::abs (solution ((i * deg + j) * deg + k)) > 1e-14)
+                      local_dofs[((i + this->degree + 2
+                                   * GeometryInfo<dim>::faces_per_cell) * deg
+                                  + j + GeometryInfo<dim>::lines_per_cell + 2
+                                  * GeometryInfo<dim>::faces_per_cell) * deg
+                                  + k + GeometryInfo<dim>::lines_per_cell]
+                        = solution ((i * deg + j) * deg + k);
+
+                                  // Set up the right hand side.
+              system_rhs = 0;
+
+              for (unsigned int q_point = 0; q_point < n_interior_points;
+                   ++q_point)
+                {
+                  double tmp
+                    = values[2][q_point + GeometryInfo<dim>::lines_per_cell
+                                * n_edge_points
+                                + GeometryInfo<dim>::faces_per_cell
+                                * n_face_points];
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < 4; ++j)
+                      {
+                        tmp -= local_dofs[i + (j + 8) * this->degree]
+                               * this->shape_value_component
+                                 (i + (j + 8) * this->degree,
+                                  this->generalized_support_points[q_point
+                                                                   + GeometryInfo<dim>::lines_per_cell
+                                                                   * n_edge_points
+                                                                   + GeometryInfo<dim>::faces_per_cell
+                                                                   * n_face_points],
+                                  2);
+
+                        for (unsigned int k = 0; k < deg; ++k)
+                          tmp -= local_dofs[i + ((2 * j + 1) * deg + k
+                                                 + GeometryInfo<dim>::lines_per_cell)
+                                            * this->degree]
+                                 * this->shape_value_component
+                                   (i + ((2 * j + 1) * deg + k
+                                         + GeometryInfo<dim>::lines_per_cell)
+                                    * this->degree,
+                                    this->generalized_support_points[q_point
+                                                                     + GeometryInfo<dim>::lines_per_cell
+                                                                     * n_edge_points
+                                                                     + GeometryInfo<dim>::faces_per_cell
+                                                                     * n_face_points],
+                                    2);
+                      }
+
+                  for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int j = 0; j < deg; ++j)
+                      for (unsigned int k = 0; k < deg; ++k)
+                        system_rhs ((i * deg + j) * deg + k)
+                          += reference_quadrature.weight (q_point) * tmp
+                             * lobatto_polynomials_grad[i].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (2))
+                             * lobatto_polynomials[j + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (0))
+                             * lobatto_polynomials[k + 2].value
+                               (this->generalized_support_points[q_point
+                                                                 + GeometryInfo<dim>::lines_per_cell
+                                                                 * n_edge_points
+                                                                 + GeometryInfo<dim>::faces_per_cell
+                                                                 * n_face_points]
+                                (1));
+                }
+
+              system_matrix_inv.vmult (solution, system_rhs);
+
+                                  // Add the computed values
+                                  // to the resulting vector
+                                  // only, if they are not
+                                  // too small.
+              for (unsigned int i = 0; i <= deg; ++i)
+                for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int k = 0; k < deg; ++k)
+                    if (std::abs (solution ((i * deg + j) * deg + k)) > 1e-14)
+                      local_dofs[i + ((j + 2 * (deg
+                                                + GeometryInfo<dim>::faces_per_cell))
+                                      * deg + k
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                 * this->degree]
+                        = solution ((i * deg + j) * deg + k);
+            }
+          
+          break;
+        }
+      
+      default:
+        Assert (false, ExcNotImplemented ());
+    }
+}
+
+
+template <int dim>
 unsigned int
-FE_Nedelec<dim,spacedim>::memory_consumption () const
+FE_Nedelec<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());
   return 0;
 }
 
 
-
-template <int dim, int spacedim>
-unsigned int
-FE_Nedelec<dim,spacedim>::get_degree () const
-{
-  return degree;
-}
-
-
 template class FE_Nedelec<deal_II_dimension>;
 
 DEAL_II_NAMESPACE_CLOSE
-

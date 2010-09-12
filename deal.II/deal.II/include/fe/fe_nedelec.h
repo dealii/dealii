@@ -1,21 +1,17 @@
-//---------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
-//
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006 by the deal.II authors
-//
-//    This file is subject to QPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
-//
-//---------------------------------------------------------------------------
 #ifndef __deal2__fe_nedelec_h
 #define __deal2__fe_nedelec_h
 
 #include <base/config.h>
+#include <base/table.h>
+#include <base/tensor.h>
+#include <base/tensor_base.h>
+#include <base/polynomials_nedelec.h>
+#include <base/polynomial.h>
+#include <base/tensor_product_polynomials.h>
 #include <base/geometry_info.h>
 #include <fe/fe.h>
+#include <fe/fe_poly_tensor.h>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -26,173 +22,59 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of continuous Nedelec elements for the space
- * H_curl. Note, however, that continuity only concerns the tangential
- * component of the vector field.
+ * Implementation of Nédélec elements, conforming with the
+ * space H<sup>curl</sup>. These elements generate vector fields with
+ * tangential components continuous between mesh cells.
  *
- * The constructor of this class takes the degree @p p of this finite
- * element. However, presently, only lowest order elements
- * (i.e. <tt>p==1</tt>) are implemented. For a general overview of this
- * element and its properties, see the report by Anna Schneebeli that
- * is linked from the general documentation page of the library.
+ * We follow the usual definition of the degree of Nédélec elements,
+ * which denotes the polynomial degree of the lowest complete polynomial
+ * subspace contained in the Nédélec space. Then, approximation order of
+ * the function itself is <i>degree</i>.
  *
- * This class has not yet been implemented for the codimension one case
+ * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
  *
+ * @todo Even if this element is implemented for two and three space
+ * dimensions, the definition of the node values relies on
+ * consistently oriented faces in 3D. Therefore, care should be taken
+ * on complicated meshes.
  *
- * <h3>Restriction on transformations</h3>
+ * <h3>Interpolation</h3>
  *
- * In some sense, the implementation of this element is not complete,
- * but you will rarely notice. Here is the fact: since the element is
- * vector-valued already on the unit cell, the Jacobian matrix (or its
- * inverse) is needed already to generate the values of the shape
- * functions on the cells in real space. This is in contrast to most
- * other elements, where you only need the Jacobian for the
- * gradients. Thus, to generate the gradients of Nedelec shape
- * functions, one would need to have the derivatives of the inverse of
- * the Jacobian matrix.
+ * The @ref GlossInterpolation "interpolation" operators associated
+ * with the Nédélec element are constructed such that interpolation and
+ * computing the curl are commuting operations. We require this
+ * from interpolating arbitrary functions as well as the #restriction
+ * matrices.
  *
- * Basically, the Nedelec shape functions can be understood as the
- * gradients of scalar shape functions on the real cell. They are thus
- * the inverse Jacobian matrix times the gradients of scalar shape
- * functions on the unit cell. The gradient of Nedelec shape functions
- * is then, by the product rule, the sum of first the derivative (with
- * respect to true coordinates) of the inverse Jacobian times the
- * gradient (in unit coordinates) of the scalar shape function, plus
- * second the inverse Jacobian times the derivative (in true
- * coordinates) of the gradient (in unit coordinates) of the scalar
- * shape functions. Note that each of the derivatives in true
- * coordinates can be expressed as inverse Jacobian times gradient in
- * unit coordinates.
+ * <h4>Node values</h4>
  *
- * The problem is the derivative of the inverse Jacobian. This rank-3
- * tensor can actually be computed (and we did so in very early
- * versions of the library), but is a large task and very time
- * consuming, so we dropped it. Since it is not available, we simply
- * drop this first term.
+ * The @ref GlossNodes "node values" on edges are the moments of the
+ * tangential component of the interpolated function with respect to
+ * the traces of the Nédélec polynomials. Higher-order Nédélec spaces
+ * also have face and interior nodes.
  *
- * What this means for the present case: first the computation of
- * gradients of Nedelec shape functions is wrong. Second, you will not
- * notice this usually, for two reasons:
+ * <h4>Generalized support points</h4>
  *
- * The first reason is that the gradient of the Jacobian vanishes if
- * the cells are mapped by an affine mapping, to which the usual
- * bilinear mapping reduces if the cell is a parallelogram. Then the
- * gradient of the shape functions is computed exact, since the first
- * term is zero.
- *
- * Second, with the Nedelec elements, you will usually want to compute
- * the curl, and extract and sum up the respective elements of the
- * full gradient tensor. However, the curl of the Jacobian vanishes,
- * so for the curl of shape functions the first term is irrelevant,
- * and the curl will be computed correctly as well.
- * 
- * 
- * <h3>Interpolation to finer and coarser meshes</h3>
- *
- * Each finite element class in deal.II provides matrices that are
- * used to interpolate from coarser to finer meshes and the other way
- * round. Interpolation from a mother cell to its children is usually
- * trivial, since finite element spaces are normally nested and this
- * kind of interpolation is therefore exact. On the other hand, when
- * we interpolate from child cells to the mother cell, we usually have
- * to throw away some information.
- *
- * For continuous elements, this transfer usually happens by
- * interpolating the values on the child cells at the support points
- * of the shape functions of the mother cell. However, for
- * discontinuous elements, we often use a projection from the child
- * cells to the mother cell. The projection approach is only possible
- * for discontinuous elements, since it cannot be guaranteed that the
- * values of the projected functions on one cell and its neighbor
- * match. In this case, only an interpolation can be
- * used. (Internally, whether the values of a shape function are
- * interpolated or projected, or better: whether the matrices the
- * finite element provides are to be treated with the properties of a
- * projection or of an interpolation, is controlled by the
- * @p restriction_is_additive flag. See there for more information.)
- *
- * Here, things are not so simple: since the element has some
- * continuity requirements across faces, we can only resort to some
- * kind of interpolation. On the other hand, for the lowest order
- * elements, the values of generating functionals are the (constant)
- * tangential values of the shape functions. We would therefore really
- * like to take the mean value of the tangential values of the child
- * faces, and make this the value of the mother face. Then, however,
- * taking a mean value of two piecewise constant function is not an
- * interpolation, but a restriction. Since this is not possible, we
- * cannot use this.
- *
- * To make a long story somewhat shorter, when interpolating from
- * refined edges to a coarse one, we do not take the mean value, but
- * pick only one (the one from the first child edge). While this is
- * not optimal, it is certainly a valid choice (using an interpolation
- * point that is not in the middle of the cell, but shifted to one
- * side), and it also preserves the order of the interpolation.
- * 
- *
- * <h3>Numbering of the degrees of freedom (DoFs)</h3>
- *
- * Nedelec elements have their degrees of freedom on edges, with shape
- * functions being vector valued and pointing in tangential
- * direction. We use the standard enumeration and direction of edges
- * in deal.II, yielding the following shape functions in 2d:
- *
- *   @verbatim
- *       3
- *    2-->--3
- *    |     |
- *   0^     ^1
- *    |     |
- *    0-->--1
- *       2
- *   @endverbatim
- *
- * For the 3d case, the ordering follows the same scheme: the lines
- * are numbered as described in the documentation of the
- * Triangulation class, i.e.
- *   @verbatim
- *       *---7---*        *---7---*
- *      /|       |       /       /|
- *     4 |       11     4       5 11
- *    /  10      |     /       /  |
- *   *   |       |    *---6---*   |
- *   |   *---3---*    |       |   *
- *   |  /       /     |       9  /
- *   8 0       1      8       | 1
- *   |/       /       |       |/
- *   *---2---*        *---2---*
- *   @endverbatim
- * and their directions are as follows:
- *   @verbatim
- *         *--->---*        *--->---*
- *        /|       |       /       /|
- *       ^ |       ^      ^       ^ ^
- *      /  ^       |     /       /  |
- *     *   |       |    *--->---*   |
- *     |   *--->---*    |       |   *
- *     |  /       /     |       ^  /
- *     ^ ^       ^      ^       | ^
- *     |/       /       |       |/
- *     *--->---*        *--->---*
- *   @endverbatim
- *
- * The element does not make much sense in 1d, so it is not
- * implemented there.
+ * The node values above rely on integrals, which will be computed by
+ * quadrature rules themselves. The generalized support points are a
+ * set of points such that this quadrature can be performed with
+ * sufficient accuracy. The points needed are thode of
+ * QGauss<sub>k+1</sub> on each edge and QGauss<sub>k+2</sub> on each face and in
+ * the interior of the cell (or none for N<sub>1</sub>).
  *
  *
- * @author Wolfgang Bangerth, Anna Schneebeli, 2002, 2003
+ * @author Markus Bürg, 2009
  */
-template <int dim, int spacedim=dim>
-class FE_Nedelec : public FiniteElement<dim,spacedim>
-{
-  public:
+template <int dim>
+class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
+   public:
 				     /**
-				      * Constructor for the Nedelec
+				      * Constructor for the Nédélec
 				      * element of degree @p p.
 				      */
-    FE_Nedelec (const unsigned int p);
-    
+      FE_Nedelec (const unsigned int p);
+
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
@@ -204,254 +86,99 @@ class FE_Nedelec : public FiniteElement<dim,spacedim>
 				      */
     virtual std::string get_name () const;
 
-				     /**
-				      * Return the value of the
-				      * @p componentth vector
-				      * component of the @p ith shape
-				      * function at the point
-				      * @p p. See the
-				      * FiniteElement base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual double shape_value_component (const unsigned int i,
-					  const Point<dim> &p,
-					  const unsigned int component) const;
 
 				     /**
-				      * Return the gradient of the
-				      * @p componentth vector
-				      * component of the @p ith shape
-				      * function at the point
-				      * @p p. See the
-				      * FiniteElement base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
+				      * Check whether a shape function
+				      * may be non-zero on a face.
 				      */
-    virtual Tensor<1,dim> shape_grad_component (const unsigned int i,
-						const Point<dim> &p,
-						const unsigned int component) const;
+    virtual bool has_support_on_face (const unsigned int shape_index, const unsigned int face_index) const;
 
 				     /**
-				      * Return the second derivative
-				      * of the @p componentth vector
-				      * component of the @p ith shape
-				      * function at the point
-				      * @p p. See the
-				      * FiniteElement base
-				      * class for more information
-				      * about the semantics of this
-				      * function.
-				      */
-    virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
-						     const Point<dim> &p,
-						     const unsigned int component) const;
-
-				     /**
-				      * Return the polynomial degree
-				      * of this finite element,
-				      * i.e. the value passed to the
-				      * constructor.
-				      */
-    unsigned int get_degree () const;
-    
-				     /**
-				      * Number of base elements in a
-				      * mixed discretization. Here,
-				      * this is of course equal to
-				      * one.
-				      */
-    virtual unsigned int n_base_elements () const;
-    
-				     /**
-				      * Access to base element
-				      * objects. Since this element is
-				      * atomic, <tt>base_element(0)</tt> is
-				      * @p this, and all other
-				      * indices throw an error.
-				      */
-    virtual const FiniteElement<dim,spacedim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * Multiplicity of base element
-                                      * @p index. Since this is an
-                                      * atomic element,
-                                      * <tt>element_multiplicity(0)</tt>
-                                      * returns one, and all other
-                                      * indices will throw an error.
-                                      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
-    
-				     /**
-				      * This function returns
-				      * @p true, if the shape
-				      * function @p shape_index has
-				      * non-zero values on the face
-				      * @p face_index. For the lowest
-				      * order Nedelec elements, this
-				      * is actually the case for the
-				      * one on which the shape
-				      * function is defined and all
-				      * neighboring ones.
+				      * Return whether this element implements its
+				      * hanging node constraints in the new way, which
+				      * has to be used to make elements "hp compatible".
 				      *
-				      * Implementation of the
-				      * interface in
-				      * FiniteElement
+				      * For the <tt>FE_Nedelec</tt> class the result is
+				      * always true (independent of the degree of the
+				      * element), as it implements the complete set of
+				      * functions necessary for hp capability.
 				      */
-    virtual bool has_support_on_face (const unsigned int shape_index,
-				      const unsigned int face_index) const;
+    virtual bool hp_constraints_are_implemented () const;
 
 				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      *
-				      * This function is made virtual,
-				      * since finite element objects
-				      * are usually accessed through
-				      * pointers to their base class,
-				      * rather than the class itself.
+				      * If, on a vertex, several finite elements are
+				      * active, the hp code first assigns the degrees
+				      * of freedom of each of these FEs different global
+				      * indices. It then calls this function to find
+				      * out which of them should get identical values,
+				      * and consequently can receive the same global DoF
+				      * index. This function therefore returns a list
+				      * of identities between DoFs of the present finite
+				      * element object with the DoFs of fe_other, which
+				      * is a reference to a finite element object representing
+				      * one of the other finite elements active on this
+				      * particular vertex. The function computes which
+				      * of the degrees of freedom of the two finite
+				      * element objects are equivalent, and returns a
+				      * list of pairs of global dof indices in identities.
+				      * The first index of each pair denotes one of the
+				      * vertex dofs of the present element, whereas the
+				      * second is the corresponding index of the other
+				      * finite element.
 				      */
+    virtual std::vector<std::pair<unsigned int, unsigned int> > hp_vertex_dof_identities (const FiniteElement<dim>& fe_other) const;
+
+				     /**
+				      * Same as hp_vertex_dof_indices(), except that
+				      * the function treats degrees of freedom on lines.
+				      */
+    virtual std::vector<std::pair<unsigned int, unsigned int> > hp_line_dof_identities (const FiniteElement<dim>& fe_other) const;
+
+				     /**
+				      * Same as hp_vertex_dof_indices(), except that
+				      * the function treats degrees of freedom on lines.
+				      */
+    virtual std::vector<std::pair<unsigned int, unsigned int> > hp_quad_dof_identities (const FiniteElement<dim>& fe_other) const;
+
+				     /**
+				      * Return the matrix interpolating from a face of one
+				      * element to the face of the neighboring element. The
+				      * size of the matrix is then <tt>source.dofs_per_face</tt>
+				      * times <tt>this->dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to implement this function.
+				      * They may only provide interpolation matrices for certain
+				      * source finite elements, for example those from the same
+				      * family. If they don't implement interpolation from a given
+				      * element, then they must throw an exception of type
+				      * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
+				      */
+    virtual void get_face_interpolation_matrix (const FiniteElement<dim>& source, FullMatrix<double>& matrix) const;
+
+				     /**
+				      * Return the matrix interpolating from a face of one element
+				      * to the subface of the neighboring element. The size of
+				      * the matrix is then <tt>source.dofs_per_face</tt> times
+				      * <tt>this->dofs_per_face</tt>.
+				      *
+				      * Derived elements will have to implement this function.
+				      * They may only provide interpolation matrices for certain
+				      * source finite elements, for example those from the same
+				      * family. If they don't implement interpolation from a given
+				      * element, then they must throw an exception of type
+				      * <tt>ExcInterpolationNotImplemented</tt>.
+				      */
+    virtual void get_subface_interpolation_matrix (const FiniteElement<dim>& source, const unsigned int subface, FullMatrix<double>& matrix) const;
+
+    virtual void interpolate (std::vector<double>& local_dofs, const std::vector<double>& values) const;
+
+    virtual void interpolate (std::vector<double>& local_dofs, const std::vector<Vector<double> >& values, unsigned int offset = 0) const;
+    virtual void interpolate (std::vector<double>& local_dofs, const VectorSlice<const std::vector<std::vector<double> > >& values) const;
     virtual unsigned int memory_consumption () const;
-
-
-				     /**
-				      * Declare a nested class which
-				      * will hold static definitions of
-				      * various matrices such as
-				      * constraint and embedding
-				      * matrices. The definition of
-				      * the various static fields are
-				      * in the files <tt>fe_nedelec_[23]d.cc</tt>
-				      * in the source directory.
-				      */
-    struct Matrices
-    {
-					 /**
-					  * Embedding matrices. For
-					  * each element type (the
-					  * first index) there are as
-					  * many embedding matrices as
-					  * there are children per
-					  * cell. The first index
-					  * starts with linear
-					  * elements and goes up in
-					  * polynomial degree. The
-					  * array may grow in the
-					  * future with the number of
-					  * elements for which these
-					  * matrices have been
-					  * computed. If for some
-					  * element, the matrices have
-					  * not been computed then you
-					  * may use the element
-					  * nevertheless but can not
-					  * access the respective
-					  * fields.
-					  */
-	static const double * const
-	embedding[][GeometryInfo<dim>::max_children_per_cell];
-
-					 /**
-					  * Number of elements (first
-					  * index) the above field
-					  * has. Equals the highest
-					  * polynomial degree for
-					  * which the embedding
-					  * matrices have been
-					  * computed.
-					  */
-	static const unsigned int n_embedding_matrices;
-
-					 /**
-					  * As the
-					  * @p embedding_matrices
-					  * field, but for the
-					  * interface constraints. One
-					  * for each element for which
-					  * it has been computed.
-					  */
-	static const double * const constraint_matrices[];
-
-					 /**
-					  * Like
-					  * @p n_embedding_matrices,
-					  * but for the number of
-					  * interface constraint
-					  * matrices.
-					  */
-	static const unsigned int n_constraint_matrices;
-    };
-  protected:    
-				     /**
-				      * @p clone function instead of
-				      * a copy constructor.
-				      *
-				      * This function is needed by the
-				      * constructors of @p FESystem.
-				      */
-    virtual FiniteElement<dim,spacedim> * clone() const;
-  
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
-    virtual
-    typename Mapping<dim,spacedim>::InternalDataBase *
-    get_data (const UpdateFlags,
-	      const Mapping<dim,spacedim>& mapping,
-	      const Quadrature<dim>& quadrature) const ;
-
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * FiniteElement.
-				      */
-    virtual void
-    fill_fe_values (const Mapping<dim,spacedim>                      &mapping,
-		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-		    const Quadrature<dim>                            &quadrature,
-		    typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
-		    typename Mapping<dim,spacedim>::InternalDataBase &fe_internal,
-		    FEValuesData<dim,spacedim>                       &data,
-		    CellSimilarity::Similarity                  &cell_similarity) const;
+    virtual FiniteElement<dim> * clone() const;
     
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * FiniteElement.
-				      */
-    virtual void
-    fill_fe_face_values (const Mapping<dim,spacedim> &mapping,
-			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			 const unsigned int                    face_no,
-			 const Quadrature<dim-1>                &quadrature,
-			 typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-			 typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
-			 FEValuesData<dim,spacedim>& data) const ;
-    
-				     /**
-				      * Implementation of the same
-				      * function in
-				      * FiniteElement.
-				      */
-    virtual void
-    fill_fe_subface_values (const Mapping<dim,spacedim> &mapping,
-			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-			    const unsigned int                    face_no,
-			    const unsigned int                    sub_no,
-			    const Quadrature<dim-1>                &quadrature,
-			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_internal,
-			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_internal,
-			    FEValuesData<dim,spacedim>& data) const ;
-
   private:
-    
-				     /**
+    				 /**
 				      * Only for internal use. Its
 				      * full name is
 				      * @p get_dofs_per_object_vector
@@ -461,91 +188,32 @@ class FE_Nedelec : public FiniteElement<dim,spacedim>
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
 				      */
-    static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
-
+    static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
 
 				     /**
-				      * Initialize the hanging node
-				      * constraints matrices. Called
+				      * Initialize the @p
+				      * generalized_support_points
+				      * field of the FiniteElement
+				      * class and fill the tables with
+				      * interpolation weights
+				      * (#boundary_weights and
+				      * #interior_weights). Called
 				      * from the constructor.
 				      */
-    void initialize_constraints ();
+    void initialize_support_points (const unsigned int degree);
 
 				     /**
-				      * Initialize the embedding
-				      * matrices. Called from the
-				      * constructor.
-				      */
-    void initialize_embedding ();
-
-				     /**
-				      * Initialize the restriction
-				      * matrices. Called from the
-				      * constructor.
+				      * Initialize the interpolation
+				      * from functions on refined mesh
+				      * cells onto the father
+				      * cell. According to the
+				      * philosophy of the
+				      * Nédélec element, this
+				      * restriction operator preserves
+				      * the curl of a function
+				      * weakly.
 				      */
     void initialize_restriction ();
-    
-				     /**
-				      * Initialize the
-				      * @p unit_support_points field
-				      * of the FiniteElement
-				      * class. Called from the
-				      * constructor.
-				      */
-    void initialize_unit_support_points ();
-
-				     /**
-				      * Initialize the
-				      * @p unit_face_support_points field
-				      * of the FiniteElement
-				      * class. Called from the
-				      * constructor.
-				      */
-    void initialize_unit_face_support_points ();
-    
-				     /**
-				      * Given a set of flags indicating
-				      * what quantities are requested
-				      * from a @p FEValues object,
-				      * return which of these can be
-				      * precomputed once and for
-				      * all. Often, the values of
-				      * shape function at quadrature
-				      * points can be precomputed, for
-				      * example, in which case the
-				      * return value of this function
-				      * would be the logical and of
-				      * the input @p flags and
-				      * @p update_values.
-				      *
-				      * For the present kind of finite
-				      * element, this is exactly the
-				      * case.
-				      */
-    virtual UpdateFlags update_once (const UpdateFlags flags) const;
-  
-				     /**
-				      * This is the opposite to the
-				      * above function: given a set of
-				      * flags indicating what we want
-				      * to know, return which of these
-				      * need to be computed each time
-				      * we visit a new cell.
-				      *
-				      * If for the computation of one
-				      * quantity something else is
-				      * also required (for example, we
-				      * often need the covariant
-				      * transformation when gradients
-				      * need to be computed), include
-				      * this in the result as well.
-				      */
-    virtual UpdateFlags update_each (const UpdateFlags flags) const;
-    
-				     /**
-				      * Degree of the polynomials.
-				      */  
-    const unsigned int degree;
 
 				     /**
 				      * Fields of cell-independent data.
@@ -555,7 +223,7 @@ class FE_Nedelec : public FiniteElement<dim,spacedim>
 				      * see the documentation of the
 				      * base class.
 				      */
-    class InternalData : public FiniteElement<dim,spacedim>::InternalDataBase
+    class InternalData : public FiniteElement<dim>::InternalDataBase
     {
       public:
 					 /**
@@ -581,7 +249,7 @@ class FE_Nedelec : public FiniteElement<dim,spacedim>
 					  * multiplication with the
 					  * Jacobian of the mapping.
 					  */
-	std::vector<std::vector<Tensor<1,dim> > > shape_values;
+	std::vector<std::vector<Tensor<1, dim> > > shape_values;
 
 					 /**
 					  * Array with shape function
@@ -601,125 +269,37 @@ class FE_Nedelec : public FiniteElement<dim,spacedim>
 					  * multiplication) when
 					  * visiting an actual cell.
 					  */
-	std::vector<std::vector<Tensor<2,dim> > > shape_gradients;
+	std::vector<std::vector<Tensor<2, dim> > > shape_gradients;
     };
+
+    const unsigned int deg;
+				     /**
+				      * These are the factors
+				      * multiplied to a function in
+				      * the
+				      * #generalized_face_support_points
+				      * when computing the
+				      * integration.
+				      */
+    Table<2, double> boundary_weights;
     
 				     /**
 				      * Allow access from other
 				      * dimensions.
 				      */
-    template <int , int> friend class FE_Nedelec;
+    template <int dim1> friend class FE_Nedelec;
 };
-
-/*@}*/
-
-#ifndef DOXYGEN
-
 
 /* -------------- declaration of explicit specializations ------------- */
 
-template <>
-void FE_Nedelec<1,1>::initialize_unit_face_support_points ();
+#ifndef DOXYGEN
 
 template <>
-double
-FE_Nedelec<1,1>::shape_value_component (const unsigned int ,
-                                      const Point<1>    &,
-                                      const unsigned int ) const;
-
+std::vector<unsigned int> FE_Nedelec<1>::get_dpo_vector (const unsigned int);
 template <>
-double
-FE_Nedelec<2,2>::shape_value_component (const unsigned int ,
-                                      const Point<2>    &,
-                                      const unsigned int ) const;
+void
+FE_Nedelec<1>::initialize_restriction();
 
-template <>
-double
-FE_Nedelec<3,3>::shape_value_component (const unsigned int ,
-                                      const Point<3>    &,
-                                      const unsigned int ) const;
-
-template <>
-Tensor<1,1>
-FE_Nedelec<1,1>::shape_grad_component (const unsigned int ,
-                                     const Point<1>    &,
-                                     const unsigned int ) const;
-
-template <>
-Tensor<1,2>
-FE_Nedelec<2,2>::shape_grad_component (const unsigned int ,
-                                     const Point<2>    &,
-                                     const unsigned int ) const;
-
-template <>
-Tensor<1,3>
-FE_Nedelec<3,3>::shape_grad_component (const unsigned int ,
-                                     const Point<3>    &,
-                                     const unsigned int ) const;
-
-template <>
-Tensor<2,1>
-FE_Nedelec<1,1>::shape_grad_grad_component (const unsigned int ,
-                                          const Point<1>    &,
-                                          const unsigned int ) const;
-
-template <>
-Tensor<2,2>
-FE_Nedelec<2,2>::shape_grad_grad_component (const unsigned int ,
-                                          const Point<2>    &,
-                                          const unsigned int ) const;
-
-template <>
-Tensor<2,3>
-FE_Nedelec<3,3>::shape_grad_grad_component (const unsigned int ,
-                                          const Point<3>    &,
-                                          const unsigned int ) const;
-
-
-
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-template <> 
-const double * const 
-FE_Nedelec<1,1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
-
-template <>
-const unsigned int FE_Nedelec<1,1>::Matrices::n_embedding_matrices;
-
-template <>
-const double * const FE_Nedelec<1,1>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Nedelec<1,1>::Matrices::n_constraint_matrices;
-
-template <> 
-const double * const 
-FE_Nedelec<2,2>::Matrices::embedding[][GeometryInfo<2>::max_children_per_cell];
-
-template <>
-const unsigned int FE_Nedelec<2,2>::Matrices::n_embedding_matrices;
-
-template <>
-const double * const FE_Nedelec<2,2>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Nedelec<2,2>::Matrices::n_constraint_matrices;
-
-template <> 
-const double * const 
-FE_Nedelec<3,3>::Matrices::embedding[][GeometryInfo<3>::max_children_per_cell];
-
-template <>
-const unsigned int FE_Nedelec<3,3>::Matrices::n_embedding_matrices;
-
-template <>
-const double * const FE_Nedelec<3,3>::Matrices::constraint_matrices[];
-
-template <>
-const unsigned int FE_Nedelec<3,3>::Matrices::n_constraint_matrices;
-
-#endif
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
