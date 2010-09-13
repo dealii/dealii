@@ -1754,10 +1754,9 @@ const
 template <int dim>
 void
 FE_Nedelec<dim>::get_subface_interpolation_matrix(
-                                                  const FiniteElement<dim>&,
-                                                  const unsigned int,
-                                                  FullMatrix<double>&)
-const
+  const FiniteElement<dim>&,
+  const unsigned int,
+  FullMatrix<double>&) const
 {
   Assert (false, ExcNotImplemented ());
 }
@@ -1782,9 +1781,10 @@ const
                    // exist).
 template <int dim>
 void
-FE_Nedelec<dim>::get_subface_interpolation_matrix
-  (const FiniteElement<dim>& source, const unsigned int subface,
-   FullMatrix<double>& interpolation_matrix) const
+FE_Nedelec<dim>::get_subface_interpolation_matrix(
+  const FiniteElement<dim>& source,
+  const unsigned int subface,
+  FullMatrix<double>& interpolation_matrix) const
 {
 				   // this is only implemented, if the
 				   // source FE is also a
@@ -2055,6 +2055,9 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                         lobatto_polynomials_grad[i]
                           = lobatto_polynomials[i + 1].derivative ();
 
+//TODO:[Markus Buerg] We should not need those, since the projections
+//on each face should just be copies of each other.
+		      
                                   // Shifted and scaled
                                   // quadrature points on
                                   // the four edges of a
@@ -5594,8 +5597,7 @@ const
                                                             + GeometryInfo<dim>::lines_per_cell
                                                             * n_edge_points];
 
-                      for (unsigned int i = 2;
-                           i < GeometryInfo<dim>::lines_per_face; ++i)
+                      for (int i = 2; i < (int) GeometryInfo<dim>::lines_per_face; ++i)
                         for (unsigned int j = 0; j <= deg; ++j)
                           tmp -= local_dofs[edge_indices[face][i]
                                             * this->degree + j]
