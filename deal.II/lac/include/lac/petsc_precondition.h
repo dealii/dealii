@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,7 +80,7 @@ namespace PETScWrappers
                                         * where we need to pass this matrix to
                                         * the PETSc solvers.
                                         */
-      operator const Mat () const;
+      operator Mat () const;
 
                                        /**
                                         * Function that takes a Krylov
