@@ -153,7 +153,7 @@ main()
   check<FE_DGPNonparametric> (0,4);
   check1<FE_DGPMonomial> (0,3);
 
-  check1<FE_Nedelec> (1,1);
+  check1<FE_Nedelec> (0,1);
   check1<FE_RaviartThomas> (0,4);
   check1<FE_RaviartThomasNodal> (0,2);
   
