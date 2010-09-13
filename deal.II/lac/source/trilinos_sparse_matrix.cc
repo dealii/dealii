@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -390,8 +390,6 @@ namespace TrilinosWrappers
 
 	return;
       }
-
-    const unsigned int n_rows = sparsity_pattern.n_rows();
 
     Assert (exchange_data == false, ExcNotImplemented());
     if (input_row_map.Comm().MyPID() == 0)

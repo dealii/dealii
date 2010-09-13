@@ -1405,7 +1405,6 @@ ParameterHandler::log_parameters_section (LogStream &out)
 				   // one. make sure they are
 				   // sorted by using the
 				   // appropriate iterators
-  bool first_entry = true;
   for (boost::property_tree::ptree::const_assoc_iterator
 	 p = current_section.ordered_begin();
        p != current_section.not_found(); ++p)
