@@ -2,7 +2,7 @@
 //    check_derivatives.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2005, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,7 +101,7 @@ void check1 (const unsigned int min_degree,
 
 // Nedelec exists only in 2d/3d
 template <>
-void check<FE_Nedelec> (const unsigned int min_degree,
+void check1<FE_Nedelec> (const unsigned int min_degree,
 			 const unsigned int max_degree)
 {
   for (unsigned int degree=min_degree; degree<=max_degree; ++degree)
@@ -153,7 +153,7 @@ main()
   check<FE_DGPNonparametric> (0,4);
   check1<FE_DGPMonomial> (0,3);
 
-  check<FE_Nedelec> (1,1);
+  check1<FE_Nedelec> (1,1);
   check1<FE_RaviartThomas> (0,4);
   check1<FE_RaviartThomasNodal> (0,2);
   
