@@ -245,7 +245,7 @@ template <int dim>
 inline
 double Point<dim>::operator () (const unsigned int index) const
 {
-  Assert (index<dim, ExcIndexRange (index, 0, dim));
+  AssertIndexRange((int) index, dim);
   return this->values[index];
 }
 
@@ -255,7 +255,7 @@ template <int dim>
 inline
 double & Point<dim>::operator () (const unsigned int index)
 {
-  Assert (index<dim, ExcIndexRange (index, 0, dim));
+  AssertIndexRange((int) index, dim);
   return this->values[index];
 }
 
