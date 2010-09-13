@@ -165,7 +165,8 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * element, then they must throw an exception of type
 				      * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
 				      */
-    virtual void get_face_interpolation_matrix (const FiniteElement<dim>& source, FullMatrix<double>& matrix) const;
+    virtual void get_face_interpolation_matrix (const FiniteElement<dim>& source,
+						FullMatrix<double>& matrix) const;
 
 				     /**
 				      * Return the matrix interpolating from a face of one element
@@ -180,7 +181,9 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * element, then they must throw an exception of type
 				      * <tt>ExcInterpolationNotImplemented</tt>.
 				      */
-    virtual void get_subface_interpolation_matrix (const FiniteElement<dim>& source, const unsigned int subface, FullMatrix<double>& matrix) const;
+    virtual void get_subface_interpolation_matrix (const FiniteElement<dim>& source,
+						   const unsigned int subface,
+						   FullMatrix<double>& matrix) const;
 
     virtual void interpolate (std::vector<double>& local_dofs, const std::vector<double>& values) const;
 

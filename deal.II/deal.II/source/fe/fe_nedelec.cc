@@ -141,7 +141,7 @@ FiniteElement<dim>
                    // function.
 template <int dim>
 void
-FE_Nedelec<dim>::initialize_support_points (const unsigned int degree)
+FE_Nedelec<dim>::initialize_support_points (const unsigned int)
 {
   Assert (false, ExcNotImplemented ());
 }
@@ -1580,7 +1580,7 @@ FE_Nedelec<dim>::hp_constraints_are_implemented () const
 
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
-FE_Nedelec<dim>::hp_vertex_dof_identities (const FiniteElement<dim>& fe_other)
+FE_Nedelec<dim>::hp_vertex_dof_identities (const FiniteElement<dim>&)
 const
 {
                    // Nedelec elements do not have any dofs
@@ -1743,7 +1743,7 @@ const
   if (dim == 3)
     for (unsigned int i = 0; i <= deg; ++i)
       {
-        for (unsigned int j = 1; j < GeometryInfo<dim>::lines_per_face; ++j)
+        for (int j = 1; j < (int) GeometryInfo<dim>::lines_per_face; ++j)
           interpolation_matrix (j * source_fe.degree + i,
                                 j * this->degree + i) = 1.0;
          
@@ -1766,9 +1766,9 @@ const
 
 template <int dim>
 void
-FE_Nedelec<dim>::get_subface_interpolation_matrix
-  (const FiniteElement<dim>& source, const unsigned int subface,
-   FullMatrix<double>& interpolation_matrix) const
+FE_Nedelec<dim>::get_subface_interpolation_matrix(
+						  const FiniteElement<dim>&, const unsigned int,
+   FullMatrix<double>&) const
 {
   Assert (false, ExcNotImplemented ());
 }
@@ -2341,8 +2341,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                   for (unsigned int q_point = 0; q_point < n_edge_points;
                        ++q_point)
                     {
-                      const double weight
-                        = 2.0 * edge_quadrature_x.weight (q_point);
+//                       const double weight
+//                         = 2.0 * edge_quadrature_x.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
@@ -2735,8 +2735,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                   for (unsigned int q_point = 0; q_point < n_edge_points;
                        ++q_point)
                     {
-                      const double weight
-                        = 2.0 * edge_quadrature_x.weight (q_point);
+//                       const double weight
+//                         = 2.0 * edge_quadrature_x.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
@@ -3115,8 +3115,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                   for (unsigned int q_point = 0; q_point < n_edge_points;
                        ++q_point)
                     {
-                      const double weight
-                        = 2.0 * edge_quadrature.weight (q_point);
+//                       const double weight
+//                         = 2.0 * edge_quadrature.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
@@ -3825,7 +3825,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                   local_dofs[(i + 8) * this->degree] = 0.0;
               }
 
-            if (offset < dim - 1)
+            if (offset+1 < dim)
               {
                 for (unsigned int i = 0; i < 2; ++i)
                   for (unsigned int j = 0; j < 2; ++j)
@@ -3923,7 +3923,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                     system_rhs = 0;
 
                     if ((((line == 0) || (line == 1) || (line == 4) ||
-                          (line == 5)) && (offset < dim - 1)) ||
+                          (line == 5)) && (offset+1 < dim)) ||
                         (((line == 2) || (line == 3) || (line == 6) ||
                           (line == 7)) && (offset == 0)) || (line > 7))
                       {
@@ -4010,7 +4010,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                       {
                         case 0:
                           {
-                            if (offset < dim - 1)
+                            if (offset+1 < dim)
                               {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4114,7 +4114,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
 
                         case 1:
                           {
-                            if (offset < dim - 1)
+                            if (offset+1 < dim)
                               {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4437,7 +4437,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
 
                         case 4:
                           {
-                            if (offset < dim - 1)
+                            if (offset+1 < dim)
                               {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4550,7 +4550,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                           }
 
                         default:
-                          if (offset < dim - 1)
+                          if (offset+1 < dim)
                             {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4733,7 +4733,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                 system_rhs.reinit (system_matrix_inv.m ());
                 solution.reinit (system_matrix.m ());
 
-                if (offset < dim - 1)
+                if (offset+1 < dim)
                   {
                     if (offset == 0)
                       {
@@ -5569,8 +5569,7 @@ const
                                                             + GeometryInfo<dim>::lines_per_cell
                                                             * n_edge_points];
 
-                      for (unsigned int i = 2;
-                           i < GeometryInfo<dim>::lines_per_face; ++i)
+                      for (int i = 2;i < (int) GeometryInfo<dim>::lines_per_face; ++i)
                         for (unsigned int j = 0; j <= deg; ++j)
                           tmp -= local_dofs[edge_indices[face][i]
                                             * this->degree + j]
