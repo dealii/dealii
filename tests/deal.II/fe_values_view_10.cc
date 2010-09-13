@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -91,7 +91,7 @@ void test_hyper_sphere()
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
 		    FE_RaviartThomas<dim>(1), 1,
-		    FE_Nedelec<dim>(1), 1);
+		    FE_Nedelec<dim>(0), 1);
   test(tr, fe);
 }
 

@@ -1,5 +1,5 @@
 
-DEAL::FE=FESystem<2>[FE_Q<2>(1)-FE_RaviartThomas<2>(1)-FE_Nedelec<2>(1)]
+DEAL::FE=FESystem<2>[FE_Q<2>(1)-FE_RaviartThomas<2>(1)-FE_Nedelec<2>(0)]
 DEAL::component=0
 DEAL::0.807 4.36
 DEAL::0.807 5.29
@@ -25,7 +25,7 @@ DEAL::5.84 -6.75
 DEAL::5.84 6.75
 DEAL::9.52 -11.0
 DEAL::9.52 11.0
-DEAL::FE=FESystem<3>[FE_Q<3>(1)-FE_RaviartThomas<3>(1)-FE_Nedelec<3>(1)]
+DEAL::FE=FESystem<3>[FE_Q<3>(1)-FE_RaviartThomas<3>(1)-FE_Nedelec<3>(0)]
 DEAL::component=0
 DEAL::2.37 4.73 9.46
 DEAL::2.37 4.73 9.46

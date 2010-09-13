@@ -1,5 +1,5 @@
 
 DEAL::n_dofs=9
-DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0617
-DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0968
+DEAL::FE_Nedelec<2>(0), P_0, rel. error=0
+DEAL::FE_Nedelec<2>(0), P_1, rel. error=0.0617
+DEAL::FE_Nedelec<2>(0), P_2, rel. error=0.0968
