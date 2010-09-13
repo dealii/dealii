@@ -1,16 +1,3 @@
-//---------------------------------------------------------------------------
-//    $Id$
-//    Version: $Name$
-//
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
-//
-//    This file is subject to QPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
-//
-//---------------------------------------------------------------------------
-
 #include <base/logstream.h>
 #include <base/utilities.h>
 #include <base/quadrature.h>
@@ -1767,8 +1754,10 @@ const
 template <int dim>
 void
 FE_Nedelec<dim>::get_subface_interpolation_matrix(
-						  const FiniteElement<dim>&, const unsigned int,
-   FullMatrix<double>&) const
+                                                  const FiniteElement<dim>&,
+                                                  const unsigned int,
+                                                  FullMatrix<double>&)
+const
 {
   Assert (false, ExcNotImplemented ());
 }
@@ -1850,7 +1839,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                   // interpolation part.
           for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
             {
-              const double weight = 2.0 * edge_quadrature.weight (q_point);
+              const double weight = edge_quadrature.weight (q_point);
 
               for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
                 interpolation_matrix (0, dof)
@@ -1905,7 +1894,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                	  const double tmp = 2.0 * quadrature_points[q_point] (0)
                	                     + shift[subface];
                	  const double weight
-               	    = std::sqrt (2.0 * edge_quadrature.weight (q_point));
+               	    = std::sqrt (edge_quadrature.weight (q_point));
 
                   for (unsigned int i = 0; i < deg; ++i)
                     assembling_matrix (i, q_point)
@@ -1934,7 +1923,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                         = 2.0 * quadrature_points[q_point] (0)
                           + shift[subface];
                       const double weight
-                        = 2.0 * edge_quadrature.weight (q_point)
+                        = edge_quadrature.weight (q_point)
                           * (this->shape_value_component
                              (dof, Point<dim> (0.0,
                                                quadrature_points[q_point] (0)),
@@ -1978,7 +1967,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                        ++q_point)
                     {
                       const double
-                        weight = 2.0 * edge_quadrature.weight (q_point);
+                        weight = edge_quadrature.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
@@ -2072,12 +2061,9 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                   // face.
                       std::vector<std::vector<Point<dim> > >
                         edge_quadrature_points_full_dim
-                        (GeometryInfo<dim>::lines_per_face);
+                        (GeometryInfo<dim>::lines_per_face,
+                         std::vector<Point<dim> > (n_edge_points));
                   
-                      for (unsigned int line = 0;
-                           line < GeometryInfo<dim>::lines_per_face; ++line)
-                        edge_quadrature_points_full_dim.resize (n_edge_points);
-                                  
                       for (unsigned int q_point = 0; q_point < n_edge_points;
                            ++q_point)
                         {
@@ -2097,35 +2083,32 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           0.5, 0.0);
                         }
                   
-                      Vector<double> solution (deg);
-                      Vector<double> system_rhs (deg);
-
-                      for (unsigned int dof = 0; dof < this->dofs_per_face;
-                           ++dof)
-                        {
                                   // Set up the system matrix.
                                   // This can be used for all
                                   // edges.
-                  	      for (unsigned int q_point = 0;
-                  	           q_point < n_edge_points; ++q_point)
-                  	        {
-                  	 	      const double tmp
-                  	 	        = 2.0 * edge_quadrature_points[q_point] (0);
-                  	 	      const double weight
-                  	 	        = std::sqrt (2.0 * edge_quadrature.weight
-                  	 	                           (q_point));
+                  	  for (unsigned int q_point = 0;
+                  	       q_point < n_edge_points; ++q_point)
+                  	    {
+                  	 	  const double tmp
+                  	 	    = 2.0 * edge_quadrature_points[q_point] (0);
+                  	 	  const double weight
+                  	 	    = std::sqrt (edge_quadrature.weight (q_point));
 
-                              for (unsigned int i = 0; i < deg; ++i)
-                                assembling_matrix (i, q_point)
-                                  = weight
-                                    * lobatto_polynomials_grad[i + 1].value
-                                      (tmp);
-                  	        }
+                          for (unsigned int i = 0; i < deg; ++i)
+                            assembling_matrix (i, q_point)
+                               = weight * lobatto_polynomials_grad[i + 1].value
+                                          (tmp);
+                  	    }
                      
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.invert (system_matrix);
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.invert (system_matrix);
                      
+                      Vector<double> solution (deg);
+                      Vector<double> system_rhs (deg);
+                      
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
                           for (unsigned int line = 0;
                                line < GeometryInfo<dim>::lines_per_face;
                                ++line)
@@ -2137,7 +2120,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                    q_point < n_edge_points; ++q_point)
                                 {
                                   const double right_hand_side_value
-                                    = std::sqrt (2.0 * edge_quadrature.weight
+                                    = std::sqrt (edge_quadrature.weight
                                                        (q_point))
                                       * (this->shape_value_component
                                          (this->face_to_cell_index (dof, 4),
@@ -2168,9 +2151,44 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                     = solution (i);
                             }
 
-                          assembling_matrix.reinit (deg * this->degree,
-                                                    n_face_points);
-                          system_rhs.reinit (assembling_matrix.m ());
+                      assembling_matrix.reinit (deg * this->degree,
+                                                n_face_points);
+                     
+                      for (unsigned int q_point = 0; q_point < n_face_points;
+                           ++q_point)
+                        {
+                          const Point<dim - 1> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0),
+                                 2.0 * face_quadrature_points[q_point] (1));
+                          const double weight
+                            = std::sqrt (face_quadrature.weight (q_point));
+                        
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            {
+                              const double tmp
+                                = weight * legendre_polynomials[i].value
+                                           (quadrature_point (0));
+                              
+                              for (unsigned int j = 0; j < deg; ++j)
+                           	    assembling_matrix (i * deg + j, q_point)
+                           	      = tmp * lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                            }
+                        }
+                            	
+                      system_matrix.reinit (assembling_matrix.m (),
+                                            assembling_matrix.m ());
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.reinit (system_matrix.m (),
+                                                system_matrix.m ());
+                      system_matrix_inv.invert (system_matrix);
+                      solution.reinit (system_matrix_inv.m ());
+                      system_rhs.reinit (system_matrix_inv.m ());
+                      
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
+                        {
                           system_rhs = 0;
 
                                   // Now we project the remaining
@@ -2204,42 +2222,23 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 1);
                         
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
+                                *= face_quadrature.weight (q_point);
                               
-                              const double weight
-                                = std::sqrt (4.0 * face_quadrature.weight
-                                                   (q_point));
-                        
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
-                                  const double tmp1 = weight * L_i;
-                                  const double tmp2
-                                    = right_hand_side_value * L_i;
+                                  const double tmp
+                                    = right_hand_side_value
+                                      * legendre_polynomials[i].value
+                                        (quadrature_point (0));
                            
                                   for (unsigned int j = 0; j < deg; ++j)
-                                    {
-                           	          const double l_j
-                           	            = lobatto_polynomials[j + 2].value
-                           	              (quadrature_point (1));
-                           	          
-                           	          assembling_matrix (i * deg + j, q_point)
-                           	            = tmp1 * l_j;
-                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
-                                    }
+                                    system_rhs (i * deg + j)
+                                      += tmp
+                                         * lobatto_polynomials[j + 2].value
+                           	               (quadrature_point (1));
                                 }
                             }
 
-                          system_matrix.reinit (assembling_matrix.m (),
-                                                assembling_matrix.m ());
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.reinit (system_matrix.m (),
-                                                    system_matrix.m ());
-                          system_matrix_inv.invert (system_matrix);
-                          solution.reinit (system_matrix_inv.m ());
                           system_matrix_inv.vmult (solution, system_rhs);
 
                                   // Add the computed values
@@ -2284,15 +2283,14 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 0);
 
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
+                                *= face_quadrature.weight (q_point);
                         
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
-                                  const double tmp = right_hand_side_value
-                                                     * L_i;
+                                  const double tmp
+                                    = right_hand_side_value
+                                      * legendre_polynomials[i].value
+                                        (quadrature_point (0));
                            
                                   for (unsigned int j = 0; j < deg; ++j)
                                     system_rhs (i * deg + j)
@@ -2341,27 +2339,29 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                   for (unsigned int q_point = 0; q_point < n_edge_points;
                        ++q_point)
                     {
-//                       const double weight
-//                         = 2.0 * edge_quadrature_x.weight (q_point);
+                      const double weight
+                        = edge_quadrature_x.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
                              ++dof)
                           {
                             interpolation_matrix (i * source_fe.degree, dof)
-                              += this->shape_value_component
-                                 (this->face_to_cell_index (dof, 4),
-                                  Point<dim>
-                                  (0.5 * (i + 1),
-                                   edge_quadrature_y_points[q_point] (0), 0.0),
-                                  1);
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (0.5 * (i + 1),
+                                     edge_quadrature_y_points[q_point] (0), 0.0),
+                                    1);
                             interpolation_matrix
                             ((i + 2) * source_fe.degree, dof)
-                              += this->shape_value_component
-                                 (this->face_to_cell_index (dof, 4),
-                                  Point<dim>
-                                  (edge_quadrature_x_points[q_point] (0),
-                                   0.5 * i, 0.0), 0);
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (edge_quadrature_x_points[q_point] (0),
+                                     0.5 * i, 0.0), 0);
                           }
                     }
                
@@ -2434,22 +2434,16 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                   // weights on the four
                                   // edges of a face.
                       std::vector<std::vector<double> > edge_quadrature_points
-                        (GeometryInfo<dim>::lines_per_face);
+                        (GeometryInfo<dim>::lines_per_face,
+                         std::vector<double> (n_edge_points));
                       std::vector<std::vector<double> >
                         edge_quadrature_weights
-                          (GeometryInfo<dim>::lines_per_face);
+                          (GeometryInfo<dim>::lines_per_face,
+                           std::vector<double> (n_edge_points));
                       std::vector<std::vector<Point<dim> > >
                         edge_quadrature_points_full_dim
-                          (GeometryInfo<dim>::lines_per_face);
-                  
-                      for (unsigned int line = 0;
-                           line < GeometryInfo<dim>::lines_per_face; ++line)
-                        {
-                  	      edge_quadrature_points.resize (n_edge_points);
-                          edge_quadrature_points_full_dim.resize
-                            (n_edge_points);
-                          edge_quadrature_weights.resize (n_edge_points);
-                        }
+                          (GeometryInfo<dim>::lines_per_face,
+                           std::vector<Point<dim> > (n_edge_points));
                   
                       for (unsigned int q_point = 0; q_point < n_edge_points;
                            ++q_point)
@@ -2480,46 +2474,41 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                               (edge_quadrature_x_points[q_point] (0), 0.5,
                                0.0);
                           edge_quadrature_weights[0][q_point]
-                            = std::sqrt (2.0 * edge_quadrature_y.weight
-                                               (q_point));
+                            = std::sqrt (edge_quadrature_y.weight (q_point));
                           edge_quadrature_weights[1][q_point]
                             = edge_quadrature_weights[0][q_point];
                           edge_quadrature_weights[2][q_point]
-                            = std::sqrt (2.0 * edge_quadrature_x.weight
-                                               (q_point));
+                            = std::sqrt (edge_quadrature_x.weight (q_point));
                           edge_quadrature_weights[3][q_point]
                             = edge_quadrature_weights[2][q_point];
                         }
                   
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	  for (unsigned int q_point = 0;
+                  	       q_point < n_edge_points; ++q_point)
+                  	    {
+                  	 	  const double tmp
+                  	 	    = 2.0 * edge_quadrature_y_points[q_point] (0);
+                  	 	  const double weight
+                  	 	    = std::sqrt (edge_quadrature_y.weight (q_point));
+
+                          for (unsigned int i = 0; i < deg; ++i)
+                            assembling_matrix (i, q_point)
+                              = weight
+                                * lobatto_polynomials_grad[i + 1].value (tmp);
+                  	    }
+                     
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.invert (system_matrix);
+                     
                       Vector<double> system_rhs (system_matrix.m ());
                       Vector<double> solution (system_rhs.size ());
 
                       for (unsigned int dof = 0; dof < this->dofs_per_face;
                           ++dof)
-                        {
-                                  // Set up the system matrix.
-                                  // This can be used for all
-                                  // edges.
-                  	      for (unsigned int q_point = 0;
-                  	           q_point < n_edge_points; ++q_point)
-                  	        {
-                  	 	       const double tmp
-                  	 	         = 2.0 * edge_quadrature_y_points[q_point] (0);
-                  	 	       const double weight
-                  	 	         = std::sqrt (2.0 * edge_quadrature_y.weight
-                  	 	                            (q_point));
-
-                               for (unsigned int i = 0; i < deg; ++i)
-                                 assembling_matrix (i, q_point)
-                                   = weight
-                                     * lobatto_polynomials_grad[i + 1].value
-                                       (tmp);
-                  	        }
-                     
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.invert (system_matrix);
-                     
                           for (unsigned int line = 0;
                                line < GeometryInfo<dim - 1>::lines_per_cell;
                                ++line)
@@ -2565,9 +2554,45 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                   // functions. First on the
                                   // horizontal ones, then on
                                   // the vertical ones. 
-                          assembling_matrix.reinit (deg * this->degree,
-                                                    n_face_points);
-                          system_rhs.reinit (assembling_matrix.m ());
+                      assembling_matrix.reinit (deg * this->degree,
+                                                n_face_points);
+                      
+                      for (unsigned int q_point = 0;
+                           q_point < n_face_points; ++q_point)
+                        {
+                          const Point<dim - 1> quadrature_point
+                                (2.0 * face_quadrature_points[q_point] (0)
+                                 - 1.0,
+                                 2.0 * face_quadrature_points[q_point] (1));
+                          const double weight
+                            = std::sqrt (face_quadrature.weight (q_point));
+                        
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            {
+                              const double tmp
+                                = weight * legendre_polynomials[i].value
+                                           (quadrature_point (0));
+                           
+                              for (unsigned int j = 0; j < deg; ++j)
+                           	    assembling_matrix (i * deg + j, q_point)
+                           	      = tmp * lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                            }
+                        }
+                            
+                      system_matrix.reinit (assembling_matrix.m (),
+                                            assembling_matrix.m ());
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.reinit (system_matrix.m (),
+                                                system_matrix.m ());
+                      system_matrix_inv.invert (system_matrix);
+                      solution.reinit (system_matrix_inv.m ());
+                      system_rhs.reinit (assembling_matrix.m ());
+                      
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                          ++dof)
+                        {
                           system_rhs = 0;
 
                           for (unsigned int q_point = 0;
@@ -2597,42 +2622,23 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 1);
                         
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
-                                
-                              const double weight
-                                = std::sqrt (4.0 * face_quadrature.weight
-                                                   (q_point));
+                                *= face_quadrature.weight (q_point);
                         
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
-                                  const double tmp1 = weight * L_i;
-                                  const double tmp2 = right_hand_side_value
-                                                      * L_i;
+                                  const double tmp
+                                    = right_hand_side_value
+                                      * legendre_polynomials[i].value
+                                        (quadrature_point (0));
                            
                                   for (unsigned int j = 0; j < deg; ++j)
-                                    {
-                           	          const double l_j
-                           	            = lobatto_polynomials[j + 2].value
+                                    system_rhs (i * deg + j)
+                                      = tmp
+                                        * lobatto_polynomials[j + 2].value
                            	              (quadrature_point (1));
-                           	          
-                           	          assembling_matrix (i * deg + j, q_point)
-                           	            = tmp1 * l_j;
-                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
-                                    }
                                 }
                             }
 
-                          system_matrix.reinit (assembling_matrix.m (),
-                                                assembling_matrix.m ());
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.reinit (system_matrix.m (),
-                                                    system_matrix.m ());
-                          system_matrix_inv.invert (system_matrix);
-                          solution.reinit (system_matrix_inv.m ());
                           system_matrix_inv.vmult (solution, system_rhs);
 
                                   // Add the computed values
@@ -2678,15 +2684,14 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 0);
 
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
+                                *= face_quadrature.weight (q_point);
                         
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
                                   const double tmp
-                                    = right_hand_side_value * L_i;
+                                    = right_hand_side_value
+                                      * legendre_polynomials[i].value
+                                        (quadrature_point (0));
                            
                                   for (unsigned int j = 0; j < deg; ++j)
                                     system_rhs (i * deg + j)
@@ -2735,27 +2740,29 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                   for (unsigned int q_point = 0; q_point < n_edge_points;
                        ++q_point)
                     {
-//                       const double weight
-//                         = 2.0 * edge_quadrature_x.weight (q_point);
+                      const double weight
+                        = edge_quadrature_x.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
                              ++dof)
                           {
                             interpolation_matrix (i * source_fe.degree, dof)
-                              += this->shape_value_component
-                                 (this->face_to_cell_index (dof, 4),
-                                  Point<dim>
-                                  (0.5 * i,
-                                   edge_quadrature_y_points[q_point] (0), 0.0),
-                                  1);
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (0.5 * i,
+                                     edge_quadrature_y_points[q_point] (0), 0.0),
+                                    1);
                             interpolation_matrix ((i + 2) * source_fe.degree,
                                                   dof)
-                              += this->shape_value_component
-                                 (this->face_to_cell_index (dof, 4),
-                                  Point<dim>
-                                  (edge_quadrature_x_points[q_point] (0),
-                                   0.5 * (i + 1), 0.0), 0);
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (edge_quadrature_x_points[q_point] (0),
+                                     0.5 * (i + 1), 0.0), 0);
                           }
                     }
                
@@ -2824,22 +2831,16 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                   // edges of a face.
                       std::vector<std::vector<double> >
                         edge_quadrature_points
-                        (GeometryInfo<dim>::lines_per_face);
+                        (GeometryInfo<dim>::lines_per_face,
+                         std::vector<double> (n_edge_points));
                       std::vector<std::vector<double> >
                         edge_quadrature_weights
-                        (GeometryInfo<dim>::lines_per_face);
+                        (GeometryInfo<dim>::lines_per_face,
+                         std::vector<double> (n_edge_points));
                       std::vector<std::vector<Point<dim> > >
                         edge_quadrature_points_full_dim
-                        (GeometryInfo<dim>::lines_per_face);
-                  
-                      for (unsigned int line = 0;
-                           line < GeometryInfo<dim>::lines_per_face; ++line)
-                        {
-                  	      edge_quadrature_points.resize (n_edge_points);
-                          edge_quadrature_points_full_dim.resize
-                            (n_edge_points);
-                          edge_quadrature_weights.resize (n_edge_points);
-                        }
+                        (GeometryInfo<dim>::lines_per_face,
+                         std::vector<Point<dim> > (n_edge_points));
                   
                       for (unsigned int q_point = 0; q_point < n_edge_points;
                            ++q_point)
@@ -2870,47 +2871,44 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                               (edge_quadrature_x_points[q_point] (0), 1.0,
                                0.0);
                           edge_quadrature_weights[0][q_point]
-                            = std::sqrt (2.0 * edge_quadrature_y.weight
-                                               (q_point));
+                            = std::sqrt (edge_quadrature_y.weight (q_point));
                           edge_quadrature_weights[1][q_point]
                             = edge_quadrature_weights[0][q_point];
                           edge_quadrature_weights[2][q_point]
-                            = std::sqrt (2.0 * edge_quadrature_x.weight
-                                               (q_point));
+                            = std::sqrt (edge_quadrature_x.weight (q_point));
                           edge_quadrature_weights[3][q_point]
                             = edge_quadrature_weights[2][q_point];
                         }
                       
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	  for (unsigned int q_point = 0;
+                  	       q_point < n_edge_points; ++q_point)
+                  	    {
+                  	 	  const double weight
+                  	        = std::sqrt (edge_quadrature_y.weight
+                  	                     (q_point));
+               	   	      const double tmp
+               	   	        = 2.0 * edge_quadrature_y_points[q_point] (0)
+               	   	          - 1.0;
+
+                          for (unsigned int i = 0; i < deg; ++i)
+                            assembling_matrix (i, q_point)
+                              = weight
+                                * lobatto_polynomials_grad[i + 1].value
+                                  (tmp);
+                        }
+                     
+                      assembling_matrix.mTmult (system_matrix,
+                                               assembling_matrix);
+                      system_matrix_inv.invert (system_matrix);
+                     
                       Vector<double> system_rhs (system_matrix.m ());
                       Vector<double> solution (system_rhs.size ());
 
                       for (unsigned int dof = 0; dof < this->dofs_per_face;
                            ++dof)
-                        {
-                                  // Set up the system matrix.
-                                  // This can be used for all
-                                  // edges.
-                  	      for (unsigned int q_point = 0;
-                  	           q_point < n_edge_points; ++q_point)
-                  	        {
-                  	 	      const double weight
-                  	 	        = std::sqrt (2.0 * edge_quadrature_y.weight
-                  	 	                           (q_point));
-                  	   	      const double tmp
-                  	   	        = 2.0 * edge_quadrature_y_points[q_point] (0)
-                  	   	          - 1.0;
-
-                              for (unsigned int i = 0; i < deg; ++i)
-                                assembling_matrix (i, q_point)
-                                  = weight
-                                    * lobatto_polynomials_grad[i + 1].value
-                                      (tmp);
-                  	        }
-                     
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.invert (system_matrix);
-                     
                           for (unsigned int line = 0;
                                line < GeometryInfo<dim - 1>::lines_per_cell;
                                ++line)
@@ -2950,16 +2948,50 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                     = solution (i);
                             }
 
-                          assembling_matrix.reinit (deg * this->degree,
-                                                    n_face_points);
-                          system_rhs.reinit (assembling_matrix.m ());
-                          system_rhs = 0;
+                      assembling_matrix.reinit (deg * this->degree,
+                                                n_face_points);
+                      
+                      for (unsigned int q_point = 0;
+                           q_point < n_face_points; ++q_point)
+                        {
+                           const double weight
+                             = std::sqrt (face_quadrature.weight (q_point));
+                           const Point<dim - 1> quadrature_point
+                             (2.0 * face_quadrature_points[q_point] (0),
+                              2.0 * face_quadrature_points[q_point] (1) - 1.0);
+                           
+                           for (unsigned int i = 0; i <= deg; ++i)
+                             {
+                               const double tmp
+                                 = weight * legendre_polynomials[i].value
+                                            (quadrature_point (0));
+                           
+                               for (unsigned int j = 0; j < deg; ++j)
+                           	     assembling_matrix (i * deg + j, q_point)
+                           	       = tmp * lobatto_polynomials[j + 2].value
+                           	               (quadrature_point (1));
+                             }
+                        }
+                      
+                      system_matrix.reinit (assembling_matrix.m (),
+                                            assembling_matrix.m ());
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.reinit (system_matrix.m (),
+                                                system_matrix.m ());
+                      system_matrix_inv.invert (system_matrix);
+                      solution.reinit (system_matrix_inv.m ());
+                      system_rhs.reinit (assembling_matrix.m ());
+                      system_rhs = 0;
 
                                   // Now we project the remaining
                                   // part on the face shape
                                   // functions. First on the
                                   // horizontal ones, then on
                                   // the vertical ones. 
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
+                        {
                           for (unsigned int q_point = 0;
                                q_point < n_face_points; ++q_point)
                             {
@@ -2986,42 +3018,23 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 1);
                         
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
+                                *= face_quadrature.weight (q_point);
                               
-                              const double weight
-                                = std::sqrt (4.0 * reference_face_quadrature.weight
-                                                   (q_point));
-                        
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
-                                  const double tmp1 = weight * L_i;
-                                  const double tmp2
-                                    = right_hand_side_value * L_i;
+                                  const double tmp
+                                    = right_hand_side_value
+                                      * legendre_polynomials[i].value
+                                        (quadrature_point (0));
                            
                                   for (unsigned int j = 0; j < deg; ++j)
-                                    {
-                           	          const double l_j
-                           	            = lobatto_polynomials[j + 2].value
-                           	              (quadrature_point (1));
-                           	          
-                           	          assembling_matrix (i * deg + j, q_point)
-                           	            = tmp1 * l_j;
-                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
-                                    }
+                                      system_rhs (i * deg + j)
+                                        +=  tmp
+                                            * lobatto_polynomials[j + 2].value
+                           	                  (quadrature_point (1));
                                 }
                             }
 
-                          system_matrix.reinit (assembling_matrix.m (),
-                                                assembling_matrix.m ());
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.reinit (system_matrix.m (),
-                                                    system_matrix.m ());
-                          system_matrix_inv.invert (system_matrix);
-                          solution.reinit (system_matrix_inv.m ());
                           system_matrix_inv.vmult (solution, system_rhs);
 
                                   // Add the computed values
@@ -3065,14 +3078,15 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                          (i * source_fe.degree + j,
                                           quadrature_point, 0);
 
-                              right_hand_side_value *= 4.0 * face_quadrature.weight (q_point);
+                              right_hand_side_value *= face_quadrature.weight
+                                                       (q_point);
                        
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
-                                  const double tmp = right_hand_side_value * L_i;
+                                  const double tmp
+                                    = right_hand_side_value
+                                       * legendre_polynomials[i].value
+                                         (quadrature_point (0));
                           
                                   for (unsigned int j = 0; j < deg; ++j)
                                     system_rhs (i * deg + j)
@@ -3115,27 +3129,28 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                   for (unsigned int q_point = 0; q_point < n_edge_points;
                        ++q_point)
                     {
-//                       const double weight
-//                         = 2.0 * edge_quadrature.weight (q_point);
+                      const double weight = edge_quadrature.weight (q_point);
 
                       for (unsigned int i = 0; i < 2; ++i)
                         for (unsigned int dof = 0; dof < this->dofs_per_face;
                              ++dof)
                           {
                             interpolation_matrix (i * source_fe.degree, dof)
-                              += this->shape_value_component
-                                 (this->face_to_cell_index (dof, 4),
-                                  Point<dim>
-                                  (0.5 * (i + 1),
-                                   edge_quadrature_points[q_point] (0), 0.0),
-                                  1);
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (0.5 * (i + 1),
+                                     edge_quadrature_points[q_point] (0), 0.0),
+                                    1);
                             interpolation_matrix ((i + 2) * source_fe.degree,
                                                   dof)
-                              += this->shape_value_component
-                                 (this->face_to_cell_index (dof, 4),
-                                  Point<dim>
-                                  (edge_quadrature_points[q_point] (0),
-                                   0.5 * (i + 1), 0.0), 0);
+                              += weight
+                                 * this->shape_value_component
+                                   (this->face_to_cell_index (dof, 4),
+                                    Point<dim>
+                                    (edge_quadrature_points[q_point] (0),
+                                     0.5 * (i + 1), 0.0), 0);
                           }
                     }
                
@@ -3209,12 +3224,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                   // face.
                       std::vector<std::vector<Point<dim> > >
                         edge_quadrature_points_full_dim
-                        (GeometryInfo<dim>::lines_per_face);
-                  
-                      for (unsigned int line = 0;
-                           line < GeometryInfo<dim>::lines_per_face; ++line)
-                        edge_quadrature_points_full_dim.resize
-                          (n_edge_points);
+                        (GeometryInfo<dim>::lines_per_face,
+                         std::vector<Point<dim> > (n_edge_points));
                   
                       for (unsigned int q_point = 0; q_point < n_edge_points;
                            ++q_point)
@@ -3233,36 +3244,34 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           1.0, 0.0);
                         }
                   
+                                  // Set up the system matrix.
+                                  // This can be used for all
+                                  // edges.
+                  	  for (unsigned int q_point = 0;
+                           q_point < n_edge_points; ++q_point)
+              	        {
+               	 	      const double tmp
+               	 	        = 2.0 * edge_quadrature_points[q_point] (0)
+               	 	          - 1.0;
+               	 	      const double weight
+                 	 	    = std::sqrt (edge_quadrature.weight (q_point));
+
+                          for (unsigned int i = 0; i < deg; ++i)
+                            assembling_matrix (i, q_point)
+                              = weight
+                                * lobatto_polynomials_grad[i + 1].value
+                                  (tmp);
+               	        }
+                     
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.invert (system_matrix);
+                     
                       Vector<double> system_rhs (system_matrix.m ());
                       Vector<double> solution (system_rhs.size ());
 
                       for (unsigned int dof = 0; dof < this->dofs_per_face;
                            ++dof)
-                        {
-                                  // Set up the system matrix.
-                                  // This can be used for all
-                                  // edges.
-                  	      for (unsigned int q_point = 0;
-                  	           q_point < n_edge_points; ++q_point)
-                  	        {
-                  	 	      const double tmp
-                  	 	        = 2.0 * edge_quadrature_points[q_point] (0)
-                  	 	          - 1.0;
-                  	 	      const double weight
-                  	 	        = std::sqrt (2.0 * edge_quadrature.weight
-                  	 	                           (q_point));
-
-                              for (unsigned int i = 0; i < deg; ++i)
-                                assembling_matrix (i, q_point)
-                                  = weight
-                                    * lobatto_polynomials_grad[i + 1].value
-                                      (tmp);
-                  	        }
-                     
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.invert (system_matrix);
-                     
                           for (unsigned int line = 0;
                                line < GeometryInfo<dim - 1>::lines_per_cell;
                                ++line)
@@ -3274,8 +3283,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                    q_point < n_edge_points; ++q_point)
                                 {
                                   const double right_hand_side_value
-                                    = std::sqrt (2.0 * edge_quadrature.weight
-                                                       (q_point))
+                                    = std::sqrt (edge_quadrature.weight
+                                                 (q_point))
                                       * (this->shape_value_component
                                          (this->face_to_cell_index (dof, 4),
                                           edge_quadrature_points_full_dim[line][q_point],
@@ -3306,11 +3315,46 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                     = solution (i);
                             }
 
-                          assembling_matrix.reinit (deg * this->degree,
-                                                    n_face_points);
-                          system_rhs.reinit (assembling_matrix.m ());
-                          system_rhs = 0;
+                      assembling_matrix.reinit (deg * this->degree,
+                                                n_face_points);
+                      
+                      for (unsigned int q_point = 0;
+                           q_point < n_face_points; ++q_point)
+                        {
+                          const double weight
+                            = std::sqrt (face_quadrature.weight
+                                         (q_point));
+                          const Point<dim - 1> quadrature_point
+                             (2.0 * face_quadrature_points[q_point] (0) - 1.0,
+                              2.0 * face_quadrature_points[q_point] (1) - 1.0);
+                        
+                          for (unsigned int i = 0; i <= deg; ++i)
+                            {
+                              const double tmp
+                                = weight * legendre_polynomials[i].value
+                                           (quadrature_point (0));
+                           
+                              for (unsigned int j = 0; j < deg; ++j)
+                           	    assembling_matrix (i * deg + j, q_point)
+                           	      = tmp * lobatto_polynomials[j + 2].value
+                           	              (quadrature_point (1));
+                            }
+                        }
 
+                      system_matrix.reinit (assembling_matrix.m (),
+                                            assembling_matrix.m ());
+                      assembling_matrix.mTmult (system_matrix,
+                                                assembling_matrix);
+                      system_matrix_inv.reinit (system_matrix.m (),
+                                                system_matrix.m ());
+                      system_matrix_inv.invert (system_matrix);
+                      solution.reinit (system_matrix.m ());
+                      system_rhs.reinit (assembling_matrix.m ());
+                      system_rhs = 0;
+
+                      for (unsigned int dof = 0; dof < this->dofs_per_face;
+                           ++dof)
+                        {
                                   // Now we project the remaining
                                   // part on the face shape
                                   // functions. First on the
@@ -3343,42 +3387,23 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 1);
                         
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
-                              
-                              const double weight
-                                = std::sqrt (4.0 * face_quadrature.weight
-                                                   (q_point));
+                                *= face_quadrature.weight (q_point);
                         
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
-                                  const double L_i
-                                    = legendre_polynomials[i].value
-                                      (quadrature_point (0));
-                                  const double tmp1 = weight * L_i;
-                                  const double tmp2 = right_hand_side_value
-                                                      * L_i;
+                                  const double tmp
+                                    = right_hand_side_value
+                                       * legendre_polynomials[i].value
+                                         (quadrature_point (0));
                            
                                   for (unsigned int j = 0; j < deg; ++j)
-                                    {
-                           	          const double l_j
-                           	            = lobatto_polynomials[j + 2].value
-                           	              (quadrature_point (1));
-                           	          
-                           	          assembling_matrix (i * deg + j, q_point)
-                           	            = tmp1 * l_j;
-                                      system_rhs (i * deg + j) +=  tmp2 * l_j;
-                                    }
+                                    system_rhs (i * deg + j)
+                                      +=  tmp
+                                          * lobatto_polynomials[j + 2].value
+                           	                (quadrature_point (1));
                                 }
                             }
 
-                          system_matrix.reinit (assembling_matrix.m (),
-                                                assembling_matrix.m ());
-                          assembling_matrix.mTmult (system_matrix,
-                                                    assembling_matrix);
-                          system_matrix_inv.reinit (system_matrix.m (),
-                                                    system_matrix.m ());
-                          system_matrix_inv.invert (system_matrix);
-                          solution.reinit (system_matrix.m ());
                           system_matrix_inv.vmult (solution, system_rhs);
 
                                   // Add the computed values
@@ -3424,7 +3449,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix
                                           quadrature_point, 0);
 
                               right_hand_side_value
-                                *= 4.0 * face_quadrature.weight (q_point);
+                                *= face_quadrature.weight (q_point);
                         
                               for (unsigned int i = 0; i <= deg; ++i)
                                 {
@@ -3825,7 +3850,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                   local_dofs[(i + 8) * this->degree] = 0.0;
               }
 
-            if (offset+1 < dim)
+            if (offset + 1 < dim)
               {
                 for (unsigned int i = 0; i < 2; ++i)
                   for (unsigned int j = 0; j < 2; ++j)
@@ -3923,7 +3948,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                     system_rhs = 0;
 
                     if ((((line == 0) || (line == 1) || (line == 4) ||
-                          (line == 5)) && (offset+1 < dim)) ||
+                          (line == 5)) && (offset + 1 < dim)) ||
                         (((line == 2) || (line == 3) || (line == 6) ||
                           (line == 7)) && (offset == 0)) || (line > 7))
                       {
@@ -4010,7 +4035,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                       {
                         case 0:
                           {
-                            if (offset+1 < dim)
+                            if (offset + 1 < dim)
                               {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4114,7 +4139,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
 
                         case 1:
                           {
-                            if (offset+1 < dim)
+                            if (offset + 1 < dim)
                               {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4437,7 +4462,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
 
                         case 4:
                           {
-                            if (offset+1 < dim)
+                            if (offset + 1 < dim)
                               {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4550,7 +4575,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                           }
 
                         default:
-                          if (offset+1 < dim)
+                          if (offset + 1 < dim)
                             {
                                   // Set up the right hand side
                                   // for the horizontal shape
@@ -4733,7 +4758,7 @@ FE_Nedelec<dim>::interpolate (std::vector<double>& local_dofs,
                 system_rhs.reinit (system_matrix_inv.m ());
                 solution.reinit (system_matrix.m ());
 
-                if (offset+1 < dim)
+                if (offset + 1 < dim)
                   {
                     if (offset == 0)
                       {
@@ -5569,7 +5594,8 @@ const
                                                             + GeometryInfo<dim>::lines_per_cell
                                                             * n_edge_points];
 
-                      for (int i = 2;i < (int) GeometryInfo<dim>::lines_per_face; ++i)
+                      for (unsigned int i = 2;
+                           i < GeometryInfo<dim>::lines_per_face; ++i)
                         for (unsigned int j = 0; j <= deg; ++j)
                           tmp -= local_dofs[edge_indices[face][i]
                                             * this->degree + j]

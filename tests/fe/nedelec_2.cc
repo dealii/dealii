@@ -28,12 +28,12 @@
 
 template <int dim>
 void
-plot (const Triangulation<dim> &tr)
+plot (const Triangulation<dim> &tr, const unsigned int p)
 {
   deallog << dim << "d, "
           << tr.n_active_cells() << " CELLS" << std::endl;
 
-  FE_Nedelec<dim> fe_ned(1);
+  FE_Nedelec<dim> fe_ned (p);
   
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe_ned);
@@ -87,7 +87,7 @@ plot (const Triangulation<dim> &tr)
 
 template<int dim>
 inline void
-check ()
+check (const unsigned int p)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
@@ -95,12 +95,12 @@ check ()
                                    // first everything on a
                                    // once-refined grid
   tr.refine_global (1);
-  plot (tr);
+  plot (tr, p);
 
                                    // then same with one cell refined
   tr.begin_active()->set_refine_flag ();
   tr.execute_coarsening_and_refinement ();
-  plot (tr);
+  plot (tr, p);
 }
 
 
@@ -113,9 +113,12 @@ main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
-  check<2>();
-  check<3>();
+  deallog << "Degree 0:" << std::endl;
+  check<2> (0);
+  check<3> (0);
+  deallog << "Degree 1:" << std::endl;
+  check<2> (1);
+  check<3> (1);
   
   return 0;
 }
