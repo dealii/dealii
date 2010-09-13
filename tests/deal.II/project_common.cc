@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -92,14 +92,6 @@ class F :  public Function<dim>
 };
 
 
-
-DeclException1 (ExcFailedProjection,
-		double,
-		<< "The projection was supposed to exactly represent the "
-		<< "original function, but the relative residual is "
-		<< arg1);
-
-
 template <int dim>
 void do_project (const Triangulation<dim> &triangulation,
 		 const FiniteElement<dim> &fe,
@@ -143,8 +135,10 @@ void do_project (const Triangulation<dim> &triangulation,
 	      << std::endl;
 	  
       if (q<=p-order_difference)
-	Assert (error.l2_norm() <= 1e-10*projection.l2_norm(),
-		ExcFailedProjection(error.l2_norm() / projection.l2_norm()));
+	if (error.l2_norm() > 1e-10*projection.l2_norm())
+	deallog << "Projection failed with relative error "
+		<< error.l2_norm() / projection.l2_norm()
+		<< std::endl;
     }
 }
 
