@@ -9,7 +9,7 @@ DEAL::1.0 1.0
 DEAL::Checking Q1 against Q1 in 2d:
 DEAL::Checking Q1 against Q1 in 3d:
 DEAL::8.0 1.0
-DEAL::1.00 1.00 
+DEAL::1.0 1.0 
 DEAL::Checking Q1 against Q1 in 3d:
 DEAL::Checking Q1 against Q2 in 1d:
 DEAL::Checking Q2 against Q1 in 1d:
@@ -79,7 +79,7 @@ DEAL::1.0 1.0
 DEAL::Checking DGQ0 against DGQ1 in 3d:
 DEAL::Checking DGQ1 against DGQ0 in 3d:
 DEAL::8.0 1.0
-DEAL::1.00 1.00 
+DEAL::1.0 1.0 
 DEAL::Checking DGQ0 against DGQ2 in 1d:
 DEAL::Checking DGQ2 against DGQ0 in 1d:
 DEAL::5.3 2.3
@@ -163,8 +163,8 @@ DEAL::1.0 1.0
 DEAL::Checking DGP0 against DGP0 in 3d:
 DEAL::Checking DGP0 against DGP1 in 1d:
 DEAL::Checking DGP1 against DGP0 in 1d:
-DEAL::1.0 1.00
-DEAL::1.00 1.00 
+DEAL::1.0 1.0
+DEAL::1.0 1.0 
 DEAL::Checking DGP0 against DGP1 in 2d:
 DEAL::Checking DGP1 against DGP0 in 2d:
 DEAL::1.0 1.0
@@ -239,10 +239,10 @@ DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 3d:
 DEAL::Checking DGP3 against DGP3 in 3d:
-DEAL::Checking Nedelec1 against Nedelec1 in 2d:
-DEAL::Checking Nedelec1 against Nedelec1 in 2d:
-DEAL::Checking Nedelec1 against Nedelec1 in 3d:
-DEAL::Checking Nedelec1 against Nedelec1 in 3d:
+DEAL::Checking Nedelec0 against Nedelec0 in 2d:
+DEAL::Checking Nedelec0 against Nedelec0 in 2d:
+DEAL::Checking Nedelec0 against Nedelec0 in 3d:
+DEAL::Checking Nedelec0 against Nedelec0 in 3d:
 DEAL::Checking FE_Q<1>(1)3 against FE_Q<1>(2)3 in 1d:
 DEAL::Checking FE_Q<1>(2)3 against FE_Q<1>(1)3 in 1d:
 DEAL::Checking FE_DGQ<1>(2)2 against FE_DGQ<1>(3)2 in 1d:
@@ -251,8 +251,8 @@ DEAL::Checking FE_DGP<1>(3)1 against FE_DGP<1>(1)1 in 1d:
 DEAL::1.5 1.0
 DEAL::0.50 0.50 0.50 -0.50 
 DEAL::Checking FE_DGP<1>(1)1 against FE_DGP<1>(3)1 in 1d:
-DEAL::1.0 1.00
-DEAL::1.00 1.00 
+DEAL::1.0 1.0
+DEAL::1.0 1.0 
 DEAL::Checking FE_Q<2>(1)3 against FE_Q<2>(2)3 in 2d:
 DEAL::Checking FE_Q<2>(2)3 against FE_Q<2>(1)3 in 2d:
 DEAL::Checking FE_DGQ<2>(2)2 against FE_DGQ<2>(3)2 in 2d:
