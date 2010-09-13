@@ -1,3 +1,16 @@
+//---------------------------------------------------------------------------
+//      $Id: polynomial.cc 21932 2010-09-12 09:03:07Z buerg $   
+//    Version: $Name$
+//
+//    Copyright (C) 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
 #ifndef __deal2__polynomials_nedelec_h
 #define __deal2__polynomials_nedelec_h
 
