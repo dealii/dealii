@@ -30347,7 +30347,7 @@ cell_data
 0
 
 DEAL::Checking DGQ2 in 3d:
-DEAL::Checking Nedelec1 in 2d:
+DEAL::Checking Nedelec0 in 2d:
 object "vertices" class array type float rank 1 shape 3 items 224 data follows
 0.0	0.50	0.0	
 0.0	1.0	0.0	
@@ -34674,4 +34674,4 @@ cell_data
 
 0
 
-DEAL::Checking Nedelec1 in 3d:
+DEAL::Checking Nedelec0 in 3d:

@@ -137,7 +137,6 @@ endif
 		false ; \
 	  fi
 
-
 ############################################################
 # Generate a report for the present date, in which the
 # results (indicated by a "+" for a successful test, and a
@@ -160,6 +159,12 @@ report+mail:
 	@cat testresults | \
 	 mail -s "Regression results from `id -un` on `hostname`" regression-tests@dealii.org
 	@rm testresults
+
+######################################################################
+# Update a reference file
+######################################################################
+%/update: %/output
+	  @../try_replace.sh $(@D)
 
 
 ############################################################
@@ -194,6 +199,8 @@ output: $(tests:%=%/output)
 build: $(tests:%=%/exe)
 
 refs: $(tests:%=%/ref)
+
+update: $(tests:%=%/update)
 
 ############################################################
 # Cleanup targets

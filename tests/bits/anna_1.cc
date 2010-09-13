@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2002, 2003, 2004, 2005, 2010 by the deal.II authors and Anna Schneebeli
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,7 @@ class SystemTest
 
 template <int dim>
 SystemTest<dim>::SystemTest () :
-                fe (FE_Nedelec<dim>(1), 2,
+                fe (FE_Nedelec<dim>(0), 2,
                     FE_Q<dim>(1), 1),
 		dof_handler (triangulation)
 {}

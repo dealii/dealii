@@ -483,13 +483,13 @@ DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 2d:
 DEAL::Checking DGP3 against DGP3 in 3d:
 DEAL::Checking DGP3 against DGP3 in 3d:
-DEAL::Checking Nedelec1 against Nedelec1 in 2d:
+DEAL::Checking Nedelec0 against Nedelec0 in 2d:
 DEAL::0
 DEAL::0
-DEAL::Checking Nedelec1 against Nedelec1 in 2d:
+DEAL::Checking Nedelec0 against Nedelec0 in 2d:
 DEAL::0
 DEAL::0
-DEAL::Checking Nedelec1 against Nedelec1 in 3d:
+DEAL::Checking Nedelec0 against Nedelec0 in 3d:
 DEAL::8
 DEAL::10
 DEAL::0
@@ -498,7 +498,7 @@ DEAL::8
 DEAL::10
 DEAL::0
 DEAL::4
-DEAL::Checking Nedelec1 against Nedelec1 in 3d:
+DEAL::Checking Nedelec0 against Nedelec0 in 3d:
 DEAL::8
 DEAL::10
 DEAL::0

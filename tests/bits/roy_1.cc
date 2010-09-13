@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,14 +58,14 @@ void check ()
   check_el (FE_DGP<dim>(2));
 
   if (dim > 1)
-    check_el (FE_Nedelec<dim>(1));
+    check_el (FE_Nedelec<dim>(0));
 
   check_el (FESystem<dim> (FE_Q<dim>(1), 2));
   check_el (FESystem<dim> (FE_Q<dim>(1), 1,
                            FE_Q<dim>(1), 1));
 
   if (dim > 1)
-    check_el (FESystem<dim> (FE_Nedelec<dim>(1), 2));
+    check_el (FESystem<dim> (FE_Nedelec<dim>(0), 2));
 }
 
 

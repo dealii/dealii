@@ -404,7 +404,7 @@ DEAL::19
 DEAL::20
 DEAL::6520
 DEAL::380465900
-DEAL::Checking Nedelec1 in 2d:
+DEAL::Checking Nedelec0 in 2d:
 DEAL::0 
 DEAL::2 
 DEAL::4 
@@ -419,7 +419,7 @@ DEAL::10
 DEAL::7
 DEAL::125
 DEAL::37714
-DEAL::Checking Nedelec1 in 3d:
+DEAL::Checking Nedelec0 in 3d:
 DEAL::0 
 DEAL::14 
 DEAL::28 
@@ -929,7 +929,7 @@ DEAL::292
 DEAL::29
 DEAL::3836
 DEAL::129456648
-DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(1)2 in 2d:
+DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(0)2 in 2d:
 DEAL::0 
 DEAL::21 
 DEAL::42 
@@ -944,7 +944,7 @@ DEAL::69
 DEAL::16
 DEAL::2566
 DEAL::38783979
-DEAL::Checking FE_Nedelec<2>(1)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(1),2)2 in 2d:
+DEAL::Checking FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(0),2)2 in 2d:
 DEAL::0 1 85 86 87 88 111 114 162 163 165 168 172 175 179 182 193 194 
 DEAL::33 
 DEAL::66 

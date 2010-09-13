@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2008, 2009 by the deal.II authors and Anna Schneebeli
+//    Copyright (C) 2002, 2003, 2004, 2005, 2008, 2009, 2010 by the deal.II authors and Anna Schneebeli
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -138,7 +138,7 @@ void BoundaryFunction<dim>::vector_value (const Point<dim>   &,
                                  // second component: Q1_Element
 template <int dim>
 ImposeBC<dim>::ImposeBC() :
-                fe (FE_Nedelec<dim>(1), 1, FE_Q<dim>(1), 1),
+                fe (FE_Nedelec<dim>(0), 1, FE_Q<dim>(1), 1),
                 dof_handler (triangulation)			 
 {}
 

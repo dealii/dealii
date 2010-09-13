@@ -126,7 +126,7 @@ DEAL::Basis function 2 has support on face 3
 DEAL::Basis function 3 has support on face 3
 DEAL::Basis function 4 has support on face 3
 DEAL::Basis function 5 has support on face 3
-DEAL::FE_Nedelec<dim>(1)
+DEAL::FE_Nedelec<dim>(0)
 DEAL::Basis function 0 has support on face 0
 DEAL::Basis function 2 has support on face 0
 DEAL::Basis function 3 has support on face 0
@@ -173,7 +173,7 @@ DEAL::Basis function 4 has support on face 3
 DEAL::Basis function 5 has support on face 3
 DEAL::Basis function 6 has support on face 3
 DEAL::Basis function 7 has support on face 3
-DEAL::FESystem<dim> (FE_Nedelec<dim>(1), 2)
+DEAL::FESystem<dim> (FE_Nedelec<dim>(0), 2)
 DEAL::Basis function 0 has support on face 0
 DEAL::Basis function 1 has support on face 0
 DEAL::Basis function 4 has support on face 0

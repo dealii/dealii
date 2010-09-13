@@ -674,8 +674,8 @@ DEAL::419
 DEAL::140
 DEAL::49600
 DEAL::10791200
-DEAL::Checking Nedelec1 in 2d:
-DEAL::Checking Nedelec1 in 3d:
+DEAL::Checking Nedelec0 in 2d:
+DEAL::Checking Nedelec0 in 3d:
 DEAL::Checking RaviartThomas0 in 2d:
 DEAL::Checking RaviartThomas1 in 2d:
 DEAL::Checking RaviartThomas2 in 2d:
@@ -5453,5 +5453,5 @@ DEAL::9
 DEAL::10
 DEAL::100
 DEAL::450
-DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(1)2 in 2d:
-DEAL::Checking FE_Nedelec<2>(1)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(1),2)2 in 2d:
+DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(0)2 in 2d:
+DEAL::Checking FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(0),2)2 in 2d:

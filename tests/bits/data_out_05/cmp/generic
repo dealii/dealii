@@ -1553,8 +1553,8 @@ LOOKUP_TABLE default
 SCALARS cell_data double 1
 LOOKUP_TABLE default
 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 3.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 4.0 5.0 5.0 5.0 5.0 5.0 5.0 5.0 5.0 6.0 6.0 6.0 6.0 6.0 6.0 6.0 6.0 7.0 7.0 7.0 7.0 7.0 7.0 7.0 7.0 8.0 8.0 8.0 8.0 8.0 8.0 8.0 8.0 9.0 9.0 9.0 9.0 9.0 9.0 9.0 9.0 10. 10. 10. 10. 10. 10. 10. 10. 11. 11. 11. 11. 11. 11. 11. 11. 12. 12. 12. 12. 12. 12. 12. 12. 13. 13. 13. 13. 13. 13. 13. 13. 14. 14. 14. 14. 14. 14. 14. 14. 
-DEAL::Checking Nedelec1 in 2d:
-DEAL::Checking FE_Nedelec<2>(1)
+DEAL::Checking Nedelec0 in 2d:
+DEAL::Checking FE_Nedelec<2>(0)
 DEAL::Component mask: vector vector 
 # vtk DataFile Version 3.0
 #This file was generated 
@@ -1664,8 +1664,8 @@ VECTORS node_data_2 double
 SCALARS cell_data double 1
 LOOKUP_TABLE default
 0.0 0.0 0.0 0.0 1.0 1.0 1.0 1.0 2.0 2.0 2.0 2.0 3.0 3.0 3.0 3.0 4.0 4.0 4.0 4.0 5.0 5.0 5.0 5.0 6.0 6.0 6.0 6.0 
-DEAL::Checking Nedelec1 in 3d:
-DEAL::Checking FE_Nedelec<3>(1)
+DEAL::Checking Nedelec0 in 3d:
+DEAL::Checking FE_Nedelec<3>(0)
 DEAL::Component mask: vector vector vector 
 # vtk DataFile Version 3.0
 #This file was generated 

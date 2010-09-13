@@ -41,9 +41,9 @@ DEAL::OK
 DEAL::Checking DGQ2 in 3d:
 DEAL::0
 DEAL::OK
-DEAL::Checking Nedelec1 in 2d:
+DEAL::Checking Nedelec0 in 2d:
 DEAL::0
 DEAL::OK
-DEAL::Checking Nedelec1 in 3d:
+DEAL::Checking Nedelec0 in 3d:
 DEAL::0
 DEAL::OK

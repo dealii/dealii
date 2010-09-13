@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors and
+//    Copyright (C) 2005, 2010 by the deal.II authors and
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,7 +38,7 @@ void test ()
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
 
-  FE_Nedelec<dim> fe (1);
+  FE_Nedelec<dim> fe (0);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
 

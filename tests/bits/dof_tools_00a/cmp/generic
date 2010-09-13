@@ -107,7 +107,7 @@ DEAL::Checking DGP3 in 3d:
 DEAL::n_dofs:440
 DEAL:: 440
 DEAL:: 440
-DEAL::Checking Nedelec1 in 2d:
+DEAL::Checking Nedelec0 in 2d:
 DEAL::n_dofs:29
 DEAL:: 29 29
 DEAL:: 29 0
@@ -115,7 +115,7 @@ DEAL:: 29
 DEAL:: 29
 DEAL:: 29 29
 DEAL:: 29 0
-DEAL::Checking Nedelec1 in 3d:
+DEAL::Checking Nedelec0 in 3d:
 DEAL::n_dofs:142
 DEAL:: 142 142 142
 DEAL:: 142 0 0
@@ -375,7 +375,7 @@ DEAL:: 324
 DEAL:: 324
 DEAL:: 190 134
 DEAL:: 190 134
-DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(1)2 in 2d:
+DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(0)2 in 2d:
 DEAL::n_dofs:218
 DEAL:: 160 29 29 29 29
 DEAL:: 160 29 0 29 0
@@ -383,7 +383,7 @@ DEAL:: 218
 DEAL:: 218
 DEAL:: 189 218
 DEAL:: 189 29
-DEAL::Checking FE_Nedelec<2>(1)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(1),2)2 in 2d:
+DEAL::Checking FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(0),2)2 in 2d:
 DEAL::n_dofs:339
 DEAL:: 29 29 40 40 57 29 29 29 29 57 29 29 29 29
 DEAL:: 29 0 40 40 57 29 0 29 0 57 29 0 29 0

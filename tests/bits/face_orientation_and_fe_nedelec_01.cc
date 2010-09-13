@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -210,5 +210,5 @@ template <int dim>
 void test ()
 {
   if (dim > 1)
-    test_with_wrong_face_orientation (FE_Nedelec<dim>(1), 0);
+    test_with_wrong_face_orientation (FE_Nedelec<dim>(0), 0);
 }

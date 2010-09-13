@@ -18305,7 +18305,7 @@ cell_data
 
 0
 
-DEAL::Checking Nedelec1 in 2d:
+DEAL::Checking Nedelec0 in 2d:
 object "vertices" class array type float rank 1 shape 2 items 28 data follows
 0.50	0.0	
 1.0	0.0	
@@ -18965,7 +18965,7 @@ triangle {
 1.0000 sg 75.000 11476. m 122.55 11463. l 150.00 15290. l 102.45 15304. lf
 0 sg 75.000 11476. m 122.55 11463. l 150.00 15290. l 102.45 15304. lx
 showpage
-DEAL::Checking Nedelec1 in 3d:
+DEAL::Checking Nedelec0 in 3d:
 object "vertices" class array type float rank 1 shape 3 items 120 data follows
 0.50	0.0	0.0	
 1.0	0.0	0.0	
