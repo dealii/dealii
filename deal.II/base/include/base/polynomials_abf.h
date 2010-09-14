@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
 //
@@ -27,10 +26,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-/**
- * @addtogroup Polynomials
- * @{
- */
 
 /**
  * This class implements the <i>H<sup>div</sup></i>-conforming,
@@ -48,7 +43,9 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k,k+2</sub>)</i> and <i>(Q<sub>k+2,k,k</sub>,
  * Q<sub>k,k+2,k</sub>, Q<sub>k,k,k+2</sub>)</i> in 2D and 3D, resp.
  *
- * @author Oliver Kayser-Herold, 2006 based on code from Guido Kanschat
+ * @ingroup Polynomials
+ * @author Oliver Kayser-Herold, based on code from Guido Kanschat
+ * @date 2006
  */
 template <int dim>
 class PolynomialsABF
@@ -114,6 +111,12 @@ class PolynomialsABF
     unsigned int degree () const;
 
 				     /**
+				      * Return the name of the space ,
+				      * which is <tt>ABF</tt>.
+				      */
+    std::string name () const;
+    
+				     /**
 				      * Return the number of
 				      * polynomials in the space
 				      * <TT>RT(degree)</tt> without
@@ -168,7 +171,6 @@ class PolynomialsABF
     mutable std::vector<Tensor<2,dim> > p_grad_grads;
 };
 
-/** @} */
 
 template <int dim>
 inline unsigned int
@@ -177,12 +179,23 @@ PolynomialsABF<dim>::n() const
   return n_pols;
 }
 
+
 template <int dim>
 inline unsigned int
 PolynomialsABF<dim>::degree() const
 {
   return my_degree;
 }
+
+
+template <int dim>
+inline std::string
+PolynomialsABF<dim>::name() const
+{
+  return "ABF";
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

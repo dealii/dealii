@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,10 +25,6 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-/**
- * @addtogroup Polynomials
- * @{
- */
 
 /**
  * This class implements the <i>H<sup>div</sup></i>-conforming,
@@ -44,7 +39,9 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k,k+1</sub>)</i> and <i>(Q<sub>k+1,k,k</sub>,
  * Q<sub>k,k+1,k</sub>, Q<sub>k,k,k+1</sub>)</i> in 2D and 3D, resp.
  *
- * @author Guido Kanschat, 2005
+ * @ingroup Polynomials
+ * @author Guido Kanschat
+ * @date 2005
  */
 template <int dim>
 class PolynomialsRaviartThomas
@@ -103,6 +100,12 @@ class PolynomialsRaviartThomas
 				      * the highest polynomial degree.
 				      */
     unsigned int degree () const;
+
+				     /**
+				      * Return the name of the space ,
+				      * which is <tt>RaviartThomas</tt>.
+				      */
+    std::string name () const;
     
 				     /**
 				      * Return the number of
@@ -149,7 +152,6 @@ class PolynomialsRaviartThomas
     create_polynomials (const unsigned int k);
 };
 
-/** @} */
 
 template <int dim>
 inline unsigned int
@@ -158,12 +160,23 @@ PolynomialsRaviartThomas<dim>::n() const
   return n_pols;
 }
 
+
 template <int dim>
 inline unsigned int
 PolynomialsRaviartThomas<dim>::degree() const
 {
   return my_degree;
 }
+
+
+template <int dim>
+inline std::string
+PolynomialsRaviartThomas<dim>::name() const
+{
+  return "RaviartThomas";
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

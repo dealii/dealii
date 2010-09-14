@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
-//      $Id: polynomial.cc 21932 2010-09-12 09:03:07Z buerg $   
-//    Version: $Name$
+//    $Id: polynomial.cc 21932 2010-09-12 09:03:07Z buerg $   
 //
 //    Copyright (C) 2010 by the deal.II authors
 //
@@ -27,15 +26,11 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-/**
- * @addtogroup Polynomials
- * @{
- */
 
 /**
- * This class implements the <i>H<sup>curl</sup></i>-conforming,
- * vector-valued Nédélec polynomials as proposed in the book of
- * P. Solin, K. Segeth and I. Dolezel.
+ * This class implements the first family <i>H<sup>curl</sup></i>-conforming,
+ * vector-valued polynomials, proposed by J.-C. Nédélec in 1980
+ * (Numer. Math. 35).
  *
  * The Nédélec polynomials are constructed such that the curl
  * is in the tensor product polynomial space <i>Q<sub>k</sub></i>.
@@ -45,7 +40,9 @@ DEAL_II_NAMESPACE_OPEN
  * Q<sub>k+1,k</sub>)</i> and <i>(Q<sub>k,k+1,k+1</sub>,
  * Q<sub>k+1,k,k+1</sub>, Q<sub>k+1,k+1,k</sub>)</i> in 2D and 3D, resp.
  *
- * @author Markus Bürg, 2009
+ * @ingroup Polynomials
+ * @author Markus Bürg
+ * @date 2009, 2010
  */
 template <int dim>
 class PolynomialsNedelec
@@ -104,6 +101,12 @@ class PolynomialsNedelec
     unsigned int degree () const;
     
 				     /**
+				      * Return the name of the space ,
+				      * which is <tt>Nedelec</tt>.
+				      */
+    std::string name () const;
+    
+				     /**
 				      * Return the number of
 				      * polynomials in the space
 				      * <TT>N(degree)</tt> without
@@ -145,7 +148,6 @@ class PolynomialsNedelec
     static std::vector<std::vector< Polynomials::Polynomial< double > > > create_polynomials (const unsigned int k);
 };
 
-/** @} */
 
 template <int dim>
 inline unsigned int PolynomialsNedelec<dim>::n () const
@@ -153,11 +155,22 @@ inline unsigned int PolynomialsNedelec<dim>::n () const
   return n_pols;
 }
 
+
 template <int dim>
 inline unsigned int PolynomialsNedelec<dim>::degree () const
 {
   return my_degree;
 }
+
+
+template <int dim>
+inline std::string
+PolynomialsNedelec<dim>::name() const
+{
+  return "Nedelec";
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

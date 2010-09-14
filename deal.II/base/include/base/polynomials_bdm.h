@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
@@ -28,11 +27,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * @addtogroup Polynomials
- * @{
- */
-
-/**
  * This class implements the <i>H<sup>div</sup></i>-conforming,
  * vector-valued Brezzi-Douglas-Marini polynomials as described in the
  * book by Brezzi and Fortin.
@@ -56,7 +50,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo Second derivatives in 3D are missing.
  *
- * @author Guido Kanschat, 2003, 2005, 2009
+ * @ingroup Polynomials
+ * @author Guido Kanschat
+ * @date 2003, 2005, 2009
  */
 template <int dim>
 class PolynomialsBDM
@@ -118,6 +114,12 @@ class PolynomialsBDM
     unsigned int degree () const;
 
 				     /**
+				      * Return the name of the space ,
+				      * which is <tt>BDM</tt>.
+				      */
+    std::string name () const;
+    
+				     /**
 				      * Return the number of
 				      * polynomials in the space
 				      * <TT>BDM(degree)</tt> without
@@ -174,7 +176,6 @@ class PolynomialsBDM
     mutable std::vector<Tensor<2,dim> > p_grad_grads;
 };
 
-/** @} */
 
 template <int dim>
 inline unsigned int
@@ -183,12 +184,23 @@ PolynomialsBDM<dim>::n() const
   return n_pols;
 }
 
+
 template <int dim>
 inline unsigned int
 PolynomialsBDM<dim>::degree() const
 {
   return polynomial_space.degree();
 }
+
+
+template <int dim>
+inline std::string
+PolynomialsBDM<dim>::name() const
+{
+  return "BDM";
+}
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
