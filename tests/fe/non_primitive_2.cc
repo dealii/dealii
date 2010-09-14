@@ -196,7 +196,7 @@ create_stokes_matrix_3 (const DoFHandler<dim> &dof_handler,
 
 template <int dim>
 void
-test ()
+test (const unsigned int p)
 {
   Triangulation<dim> triangulation;
   
@@ -210,7 +210,7 @@ test ()
 	  << ", n_cells=" << triangulation.n_active_cells()
 	  << std::endl;
   
-  FESystem<dim> fe (FE_Nedelec<dim>(1), 1,
+  FESystem<dim> fe (FE_Nedelec<dim>(p), 1,
 		    FE_Q<dim>(1), 1);
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
@@ -257,9 +257,12 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-
-  test<2> ();
-  test<3> ();
+  deallog << "Degree 0: " << std::endl;
+  test<2> (0);
+  test<3> (0);
+  deallog << "Degree 1: " << std::endl;
+  test<2> (1);
+  test<3> (1);
 }
 
 
