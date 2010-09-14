@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -110,20 +110,16 @@ int main ()
   CHECK_ALL(DGP,1);
   CHECK_ALL(DGP,3);
 
-  CHECK(Nedelec, 1, 2);
-  CHECK(Nedelec, 1, 3);
+  CHECK(Nedelec, 0, 2);
+  CHECK(Nedelec, 0, 3);
 
   CHECK(RaviartThomas, 0, 2);
   CHECK(RaviartThomas, 1, 2);
   CHECK(RaviartThomas, 2, 2);
+  CHECK(RaviartThomas, 0, 3);
+  CHECK(RaviartThomas, 1, 3);
+  CHECK(RaviartThomas, 2, 3);
 
-  CHECK(RaviartThomasNodal, 0, 2);
-  CHECK(RaviartThomasNodal, 1, 2);
-  CHECK(RaviartThomasNodal, 2, 2);
-  CHECK(RaviartThomasNodal, 0, 3);
-  CHECK(RaviartThomasNodal, 1, 3);
-  CHECK(RaviartThomasNodal, 2, 3);
-      
   CHECK_SYS1(FE_Q<1>(1),  3,1);
   CHECK_SYS1(FE_DGQ<1>(2),2,1);
   CHECK_SYS1(FE_DGP<1>(3),1,1);
@@ -168,12 +164,12 @@ int main ()
 
 				   // systems with Nedelec elements
   CHECK_SYS2 (FE_DGQ<2>(3), 1,
-	      FE_Nedelec<2>(1), 2,
+	      FE_Nedelec<2>(0), 2,
 	      2);
-  CHECK_SYS3(FE_Nedelec<2>(1), 1,
+  CHECK_SYS3(FE_Nedelec<2>(0), 1,
 	     FESystem<2>(FE_DGQ<2>(1),2), 1,
 	     FESystem<2>(FE_Q<2>(2),1,
-			 FE_Nedelec<2>(1),2),2,
+			 FE_Nedelec<2>(0),2),2,
 	     2);
   
   deallog << "OK" << std::endl;
