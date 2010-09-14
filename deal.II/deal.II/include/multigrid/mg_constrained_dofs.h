@@ -124,7 +124,7 @@ class MGConstrainedDoFs : public Subscriptor
                                       * be set or not.
 				      */
 
-    const bool set_boundary_values () const;
+    bool set_boundary_values () const;
   private:
 
 				     /**
@@ -270,7 +270,7 @@ MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 }
 
 inline
-const bool 
+bool 
 MGConstrainedDoFs::set_boundary_values () const
 {
   const bool boundary_values_need_to_be_set 
