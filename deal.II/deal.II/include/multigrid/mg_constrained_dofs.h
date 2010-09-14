@@ -119,6 +119,12 @@ class MGConstrainedDoFs : public Subscriptor
     const std::vector<std::vector<bool> > &
       get_refinement_edge_boundary_indices () const;
 
+				     /**
+				      * Return if boundary_indices need to 
+                                      * be set or not.
+				      */
+
+    const bool set_boundary_values () const;
   private:
 
 				     /**
@@ -262,6 +268,16 @@ MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 {
   return refinement_edge_boundary_indices;
 }
+
+inline
+const bool 
+MGConstrainedDoFs::set_boundary_values () const
+{
+  const bool boundary_values_need_to_be_set 
+    = boundary_indices.size()!=0;
+  return boundary_values_need_to_be_set;
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

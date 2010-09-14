@@ -574,14 +574,14 @@ namespace MeshWorker
 	
 					 /**
 					  * Initialize the matrices
-					  * #interface_up and #interface_down
+					  * #interface_in and #interface_out
 					  * used for local refinement
 					  * with continuous
 					  * Galerkin methods.
 					  */
 
-	void initialize_interfaces(MGLevelObject<MATRIX>& interface_up,
-			       MGLevelObject<MATRIX>& interface_down);
+	void initialize_interfaces(MGLevelObject<MATRIX>& interface_in,
+			       MGLevelObject<MATRIX>& interface_out);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -628,8 +628,17 @@ namespace MeshWorker
     void assemble(MATRIX& G,
 		  const FullMatrix<double>& M,
 		  const std::vector<unsigned int>& i1,
+		  const std::vector<unsigned int>& i2);
+
+					 /**
+					  * Assemble a single matrix
+					  * into a global matrix.
+					  */
+    void assemble(MATRIX& G,
+		  const FullMatrix<double>& M,
+		  const std::vector<unsigned int>& i1,
 		  const std::vector<unsigned int>& i2,
-                  const unsigned int level = -1);
+                  const unsigned int level);
 	
 					 /**
 					  * Assemble a single matrix
@@ -638,14 +647,23 @@ namespace MeshWorker
     void assemble_transpose(MATRIX& G,
 			    const FullMatrix<double>& M,
 			    const std::vector<unsigned int>& i1,
-			    const std::vector<unsigned int>& i2,
-                            const unsigned int level = -1);
+			    const std::vector<unsigned int>& i2);
 
 					 /**
 					  * Assemble a single matrix
 					  * into a global matrix.
 					  */
-    void assemble_down(MATRIX& G,
+    void assemble_in(MATRIX& G,
+		  const FullMatrix<double>& M,
+		  const std::vector<unsigned int>& i1,
+		  const std::vector<unsigned int>& i2,
+                  const unsigned int level = -1);
+
+					 /**
+					  * Assemble a single matrix
+					  * into a global matrix.
+					  */
+    void assemble_out(MATRIX& G,
 		  const FullMatrix<double>& M,
 		  const std::vector<unsigned int>& i1,
 		  const std::vector<unsigned int>& i2,
@@ -680,7 +698,7 @@ namespace MeshWorker
 					  * refinement edge, coupling
 					  * coarse to fine.
 					  */
-	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_up;
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_in;
 	
 					 /**
 					  * The matrix used for face
@@ -689,7 +707,7 @@ namespace MeshWorker
 					  * refinement edge, coupling
 					  * fine to coarse.
 					  */
-	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_down;
+	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_out;
       /**
        * A pointer to the object containing constraints.
        */
@@ -1463,10 +1481,10 @@ namespace MeshWorker
     template <class MATRIX>
     inline void
     MGMatrixSimple<MATRIX>::initialize_interfaces(
-      MGLevelObject<MATRIX>& up, MGLevelObject<MATRIX>& down)
+      MGLevelObject<MATRIX>& in, MGLevelObject<MATRIX>& out)
     {
-      interface_up = &up;
-      interface_down = &down;
+      interface_in = &in;
+      interface_out = &out;
     }
 
 
@@ -1479,6 +1497,23 @@ namespace MeshWorker
       info.initialize_matrices(1, interior_face);
     }
 
+
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble(
+      MATRIX& G,
+      const FullMatrix<double>& M,
+      const std::vector<unsigned int>& i1,
+      const std::vector<unsigned int>& i2)
+    {
+      AssertDimension(M.m(), i1.size());
+      AssertDimension(M.n(), i2.size());
+      
+        for (unsigned int j=0; j<i1.size(); ++j)
+          for (unsigned int k=0; k<i2.size(); ++k)
+            if (std::fabs(M(j,k)) >= threshold)
+              G.add(i1[j], i2[k], M(j,k));
+    }
 
 
     template <class MATRIX>
@@ -1505,23 +1540,46 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-              if(mg_constrained_dofs->at_refinement_edge(level, i1[j])==false &&
-                  mg_constrained_dofs->at_refinement_edge(level, i2[k])==false)
-                if((mg_constrained_dofs->is_boundary_index(level, i1[j])==false &&
-                     mg_constrained_dofs->is_boundary_index(level, i2[k])==false)
-                    ||
-                    (mg_constrained_dofs->is_boundary_index(level, i1[j])==true &&
-                     mg_constrained_dofs->is_boundary_index(level, i2[k])==true
-                    &&
-                    i1[j] == i2[k])
-                    )
-                  G.add(i1[j], i2[k], M(j,k));
+              if (!mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                  !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+              {
+                if (mg_constrained_dofs->set_boundary_values())
+                {
+                  if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+                        !mg_constrained_dofs->is_boundary_index(level, i2[k]))
+                      ||
+                      (mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
+                       mg_constrained_dofs->is_boundary_index(level, i2[k]) &&
+                       i1[j] == i2[k]))
+                    G.add(i1[j], i2[k], M(j,k));
+                }
+                else
+                    G.add(i1[j], i2[k], M(j,k));
+            }
       }
     }
     
+    
     template <class MATRIX>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_down(
+    MGMatrixSimple<MATRIX>::assemble_transpose(
+      MATRIX& G,
+      const FullMatrix<double>& M,
+      const std::vector<unsigned int>& i1,
+      const std::vector<unsigned int>& i2)
+    {
+      AssertDimension(M.n(), i1.size());
+      AssertDimension(M.m(), i2.size());
+      
+      for (unsigned int j=0; j<i1.size(); ++j)
+	for (unsigned int k=0; k<i2.size(); ++k)
+	  if (std::fabs(M(k,j)) >= threshold)
+	    G.add(i1[j], i2[k], M(k,j));
+    }
+
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble_in(
       MATRIX& G,
       const FullMatrix<double>& M,
       const std::vector<unsigned int>& i1,
@@ -1543,23 +1601,28 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-              if(mg_constrained_dofs->at_refinement_edge(level, i1[j])==true &&
-                  mg_constrained_dofs->at_refinement_edge(level, i2[k])==false)
-                if((mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==false &&
-                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==false)
-                    ||
-                    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==true &&
-                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==true
-                     &&
-                    i1[j] == i2[k])
-                    )
-                  G.add(i1[j], i2[k], M(j,k));
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                  !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+              {
+                if (mg_constrained_dofs->set_boundary_values())
+                {
+                  if((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+                        !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
+                      ||
+                      (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+                       mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+                       i1[j] == i2[k]))
+                    G.add(i1[j], i2[k], M(j,k));
+                }
+                else
+                    G.add(i1[j], i2[k], M(j,k));
+              }
       }
     }
     
     template <class MATRIX>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_transpose(
+    MGMatrixSimple<MATRIX>::assemble_out(
       MATRIX& G,
       const FullMatrix<double>& M,
       const std::vector<unsigned int>& i1,
@@ -1581,17 +1644,22 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-              if(mg_constrained_dofs->at_refinement_edge(level, i1[j])==true &&
-                  mg_constrained_dofs->at_refinement_edge(level, i2[k])==false)
-                if((mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==false &&
-                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==false) 
-                    ||
-                    (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j])==true &&
-                     mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])==true
-                    &&
-                    i1[j] == i2[k])
-                    )
-                  G.add(i1[j], i2[k], M(k,j));
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                  !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+              {
+                if (mg_constrained_dofs->set_boundary_values())
+                {
+                  if((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+                        !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])) 
+                      ||
+                      (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
+                       mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
+                       i1[j] == i2[k]))
+                    G.add(i1[j], i2[k], M(k,j));
+                }
+                else
+                    G.add(i1[j], i2[k], M(k,j));
+              }
       }
     }
     
@@ -1605,8 +1673,8 @@ namespace MeshWorker
       assemble((*matrix)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
       if(mg_constrained_dofs != 0)
       {
-        assemble_transpose((*interface_down)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
-        assemble_down((*interface_up)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
+        assemble_out((*interface_out)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
+        assemble_in((*interface_in)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
       }
     }
     
@@ -1628,6 +1696,13 @@ namespace MeshWorker
             assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
             assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
             assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
+          }
+          else
+          {
+            assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
+            assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
+            assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
+            assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
           }
 	}
       else

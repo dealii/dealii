@@ -285,8 +285,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// impose boundary conditions
 				// but only in the column of
 				// the prolongation matrix
-  if(mg_constrained_dofs != 0)
-  if (mg_constrained_dofs->get_boundary_indices().size() != 0)
+  if (mg_constrained_dofs != 0)
+  if (mg_constrained_dofs->set_boundary_values())
     {
       std::vector<unsigned int> constrain_indices;
       for (int level=n_levels-2; level>=0; --level)
