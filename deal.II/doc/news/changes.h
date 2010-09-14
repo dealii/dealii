@@ -251,12 +251,19 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li>
+  <p>
+  Fixed: The method FEValuesViews::Vector::curl aborted the program in 2d under certain
+  circumstances. This is now fixed.
+  <br>
+  (Andrea Bonito, WB 2010/09/14)
+  </p>
 
   <li><p>Improved: MeshWorker::loop() now uses WorkStream for multithreading
   <br>
   (GK 2010/09/10)
   </p>
-  
+
   <li>
   <p>
   Fixed: The method FEValuesViews::SymmetricTensor< 2, dim, spacedim >::get_function_divergences
