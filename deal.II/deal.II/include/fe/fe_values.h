@@ -3870,17 +3870,16 @@ namespace FEValuesViews
               if (snc != -1) {
                  curl_type return_value;
 
-                 switch (shape_function_data[shape_function].single_nonzero_component_index) {
-                    case 0: {
-                       return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
-                       return return_value;
-                    }
+						  // the single
+						  // nonzero component
+						  // can only be zero
+						  // or one in 2d
+                 if (shape_function_data[shape_function].single_nonzero_component_index == 0)
+		   return_value[0] = -1.0 * fe_values.shape_gradients[snc][q_point][1];
+		 else
+		   return_value[0] = fe_values.shape_gradients[snc][q_point][0];
 
-                    default: {
-                       return_value[0] = fe_values.shape_gradients[snc][q_point][2];
-                       return return_value;
-                    }
-                 }
+		 return return_value;
               }
 
               else {
