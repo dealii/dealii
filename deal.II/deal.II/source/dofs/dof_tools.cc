@@ -1645,12 +1645,14 @@ namespace internal
                                         * element used on any of the
                                         * face's subfaces.
                                         */
-      template <int dim, typename face_iterator>
+      template <typename face_iterator>
       unsigned int
       get_most_dominating_subface_fe_index (const face_iterator &face)
       {
-
-	const unsigned int spacedim=dim;
+	const unsigned int dim
+	  = face_iterator::AccessorType::dimension;
+	const unsigned int spacedim
+	  = face_iterator::AccessorType::space_dimension;
 
         unsigned int dominating_subface_no = 0;
         for (; dominating_subface_no<face->n_children();
@@ -1877,6 +1879,64 @@ namespace internal
     static
     void
     make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1> &/*dof_handler*/,
+					    ConstraintMatrix        &/*constraints*/,
+					    dealii::internal::int2type<1>)
+    {
+				       // we may have to compute
+				       // constraints for
+				       // vertices. gotta think about
+				       // that a bit more
+//TODO[WB]: think about what to do here...
+    }
+
+
+    static
+    void
+    make_hp_hanging_node_constraints (const dealii::DoFHandler<1,2> &,
+				      ConstraintMatrix    &)
+    {
+				       // nothing to do for regular
+				       // dof handlers in 1d
+    }
+
+
+
+    static
+    void
+    make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,2> &,
+					    ConstraintMatrix    &,
+					    dealii::internal::int2type<1>)
+    {
+				       // nothing to do for regular
+				       // dof handlers in 1d
+    }
+
+
+    static
+    void
+    make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
+				      ConstraintMatrix    &)
+    {
+				       // nothing to do for regular
+				       // dof handlers in 1d
+    }
+
+
+
+    static
+    void
+    make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
+					    ConstraintMatrix    &,
+					    dealii::internal::int2type<1>)
+    {
+				       // nothing to do for regular
+				       // dof handlers in 1d
+    }
+
+
+    static
+    void
+    make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1,2> &/*dof_handler*/,
 					    ConstraintMatrix        &/*constraints*/,
 					    dealii::internal::int2type<1>)
     {
@@ -2601,7 +2661,7 @@ namespace internal
 						     // can be
 						     // constrained to
                     const unsigned int dominating_fe_index
-                      = get_most_dominating_subface_fe_index<dim> (cell->face(face));
+                      = get_most_dominating_subface_fe_index (cell->face(face));
 
 		    const FiniteElement<dim,spacedim> &dominating_fe
 		      = dof_handler.get_fe()[dominating_fe_index];
@@ -6436,6 +6496,14 @@ DoFTools::extract_hanging_node_dofs
 
 #endif
 
+
+#if deal_II_dimension < 3
+template
+void
+DoFTools::
+make_hanging_node_constraints (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
+			       ConstraintMatrix &constraints);
+#endif
 
 
 
