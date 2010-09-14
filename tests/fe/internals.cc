@@ -160,6 +160,8 @@ main()
   CHECK_ALL(Q_Hierarchical,1,3);
   CHECK_ALL(Q_Hierarchical,2,3);
 
+  CHECK_ALL(Nedelec, 0, 2);
+  CHECK_ALL(Nedelec, 0, 3);
   CHECK_ALL(Nedelec, 1, 2);
   CHECK_ALL(Nedelec, 1, 3);
   
@@ -187,6 +189,14 @@ main()
  	     2);
 
                                    // systems with Nedelec elements
+  CHECK_SYS2 (FE_DGQ<2>(3), 1,
+              FE_Nedelec<2>(0), 2,
+              2);
+  CHECK_SYS3(FE_Nedelec<2>(0), 1,
+ 	     FESystem<2>(FE_DGQ<2>(3),3), 1,
+ 	     FESystem<2>(FE_Q<2>(2),3,
+ 			 FE_Nedelec<2>(0),2),2,
+ 	     2);
   CHECK_SYS2 (FE_DGQ<2>(3), 1,
               FE_Nedelec<2>(1), 2,
               2);

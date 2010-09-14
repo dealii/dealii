@@ -425,15 +425,17 @@ template <int dim>
 void
 FE_Nedelec<dim>::initialize_restriction ()
 {
+				   // To save some computation time we just
+				   // put in the correct values, which can
+				   // be calculated by projection-based
+				   // interpolation.
   switch (dim)
     {
       case 2:
         {
           const unsigned int n_boundary_dofs
             = GeometryInfo<dim>::lines_per_cell * this->degree;
-          const unsigned int n_dofs
-            = (GeometryInfo<dim>::lines_per_cell + 2 * deg) * this->degree;
-
+          
           for (unsigned int ref = RefinementCase<dim>::cut_x;
                ref <= RefinementCase<dim>::isotropic_refinement; ++ref)
             {
@@ -443,89 +445,100 @@ FE_Nedelec<dim>::initialize_restriction ()
                 {
                   case RefinementCase<dim>::cut_x:
                     {
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                               (RefinementCase<dim> (ref)); ++child)
+                      for (unsigned int i = 0; i <= deg; ++i)
                         {
-                          for (unsigned int dof = child * this->degree;
-                               dof < (child + 1) * this->degree; ++dof)
-                            this->restriction[index][child] (dof, dof) = 1.0;
-
-                          for (unsigned int dof = 2 * this->degree;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
+                          for (unsigned int j = 0; j < 2; ++j)
+                            this->restriction[index][j] (i + j * this->degree,
+                                                         i + j * this->degree)
+                              = 2.0;
+                          
+                          for (unsigned int j = 2;
+                               j < GeometryInfo<dim>::lines_per_cell; ++j)
+                            for (unsigned int k = 0; k < 2; ++k)
+                              this->restriction[index][k]
+                              (i + j * this->degree, i + j * this->degree)
+                                = 1.0;
+                          
+                          for (unsigned int j = 0; j < deg; ++j)
+                            for (unsigned int k = 0; k < 2; ++k)
+                              for (unsigned int child = 0;
+                                   child < GeometryInfo<dim>::n_children
+                                           (RefinementCase<dim> (ref));
+                                   ++ child)
+                                this->restriction[index][child]
+                                ((i + k * this->degree) * deg + j
+                                 + n_boundary_dofs,
+                                 (i + k * this->degree) * deg + j
+                                 + n_boundary_dofs) = 1.0;
                         }
-
+                      
                       break;
                     }
-
+                  
                   case RefinementCase<dim>::cut_y:
                     {
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                               (RefinementCase<dim> (ref)); ++child)
+                      for (unsigned int i = 0; i < this->degree; ++i)
                         {
-                          for (unsigned int dof = 0; dof < 2 * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
-
-                          for (unsigned int dof = (child + 2) * this->degree;
-                               dof < (child + 3) * this->degree; ++dof)
-                            this->restriction[index][child] (dof, dof) = 1.0;
-
-                          for (unsigned int dof = n_boundary_dofs;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
+                          for (unsigned int j = 0; j < 2; ++j)
+                            {
+                              for (unsigned int k = 0; k < 2; ++k)
+                                this->restriction[index][k]
+                                (i + j * this->degree, i + j * this->degree)
+                                  = 1.0;
+                          
+                              this->restriction[index][j]
+                              (i + (j + 2) * this->degree,
+                               i + (j + 2) * this->degree) = 2.0;
+                            }
+                          
+                          for (unsigned int j = 0; j < deg; ++j)
+                            for (unsigned int k = 0; k < 2; ++k)
+                              for (unsigned int child = 0;
+                                   child < GeometryInfo<dim>::n_children
+                                           (RefinementCase<dim> (ref));
+                                   ++ child)
+                                this->restriction[index][child]
+                                ((i + k * this->degree) * deg + j
+                                 + n_boundary_dofs,
+                                 (i + k * this->degree) * deg + j
+                                 + n_boundary_dofs) = 1.0;
                         }
-
+                      
                       break;
                     }
-
+                  
                   case RefinementCase<dim>::isotropic_refinement:
                     {
-                    	         // First we set the values for
-                    	         // the boundary dofs of every
-                    	         // child.
-                    	         
-                                 // child 0
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][0]
-                            (dof + 2 * i * this->degree,
-                             dof + 2 * i * this->degree) = 0.5;
-
-                                 // child 1
-                      for (unsigned int dof = this->degree;
-                           dof < 3 * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.5;
-
-                                 // child 2
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][2]
-                            (dof + 3 * i * this->degree,
-                             dof + 3 * i * this->degree) = 0.5;
-
-                                 // child 3
-                      for (unsigned int dof = this->degree;
-                           dof < 2 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][3]
-                            (dof + 2 * i * this->degree,
-                             dof + 2 * i * this->degree) = 0.5;
-
-                                 // The values for the interior
-                                 // dofs are the same for
-                                 // every child.
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                               (RefinementCase<dim> (ref)); ++child)
-                        for (unsigned int dof = n_boundary_dofs; dof < n_dofs;
-                             ++dof)
-                          this->restriction[index][child] (dof, dof) = 0.25;
+                      for (unsigned int i = 0; i < this->degree; ++i)
+                        {
+                          for (unsigned int j = 0; j < 2; ++j)
+                            {
+                              this->restriction[index][j]
+                              (i + j * this->degree, i + j * this->degree)
+                                = 1.0;
+                              this->restriction[index][j]
+                              (i + 2 * this->degree, i + 2 * this->degree)
+                                = 1.0;
+                              this->restriction[index][j + 2]
+                              (i + j * this->degree, i + j * this->degree)
+                                 = 1.0;
+                              this->restriction[index][j + 2]
+                              (i + 3 * this->degree, i + 3 * this->degree)
+                                 = 1.0;
+                            }
+                          
+                          for (unsigned int j = 0; j < deg; ++j)
+                            for (unsigned int k = 0; k < 2; ++k)
+                              for (unsigned int child = 0;
+                                   child < GeometryInfo<dim>::n_children
+                                           (RefinementCase<dim> (ref));
+                                   ++ child)
+                                this->restriction[index][child]
+                                ((i + k * this->degree) * deg + j
+                                 + n_boundary_dofs,
+                                 (i + k * this->degree) * deg + j
+                                 + n_boundary_dofs) = 0.5;
+                        }
                       
                       break;
                     }
@@ -545,10 +558,6 @@ FE_Nedelec<dim>::initialize_restriction ()
           const unsigned int n_boundary_dofs
             = n_edge_dofs
               + 2 * GeometryInfo<dim>::faces_per_cell * deg * this->degree;
-          const unsigned int n_dofs
-            = (GeometryInfo<dim>::lines_per_cell
-               + (2 * GeometryInfo<dim>::faces_per_cell + 3 * deg) * deg)
-              * this->degree;
 
           for (unsigned int ref = RefinementCase<dim>::cut_x;
                ref <= RefinementCase<dim>::isotropic_refinement; ++ref)
@@ -559,647 +568,368 @@ FE_Nedelec<dim>::initialize_restriction ()
                 {
                   case RefinementCase<3>::cut_x:
                     {
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                               (RefinementCase<dim> (ref)); ++child)
-                        {
-                        	     // First we set the values for
-                        	     // the edge dofs.
-                          for (unsigned int dof = 0; dof <= deg; ++dof)
-                            {
-                              for (unsigned int i = 0; i < 3; ++i)
-                                this->restriction[index][child]
-                                  (dof + (child + 4 * i) * this->degree,
-                                   dof + (child + 4 * i) * this->degree)
-                                  = 1.0;
-
-                              this->restriction[index][child]
-                                (dof + (child + 10) * this->degree,
-                                 dof + (child + 10) * this->degree) = 1.0;
-                            }
-
-                          for (unsigned int dof = 2 * this->degree;
-                               dof < 4 * this->degree; ++dof)
-                            for (unsigned int i = 0; i < 2; ++i)
-                              this->restriction[index][child]
-                                (dof + 4 * i * this->degree,
-                                 dof + 4 * i * this->degree) = 0.5;
-
-                        	     // Then we set the values for
-                        	     // the face and the interior
-                        	     // dofs.
-                          for (unsigned int dof
-                                 = n_edge_dofs
-                                   + 2 * child * deg * this->degree;
-                               dof
-                                 < n_edge_dofs
-                                   + 2 * (child + 1) * deg * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 1.0;
-
-                          for (unsigned int dof
-                                 = n_edge_dofs + 4 * deg * this->degree;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
-                        }
-
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][j] (i + j * this->degree,
+                                                         i + j * this->degree)
+                              = 2.0;
+                            this->restriction[index][j] (i + 2 * this->degree,
+                                                         i + 2 * this->degree)
+                              = 1.0;
+                            this->restriction[index][j] (i + 3 * this->degree,
+                                                         i + 3 * this->degree)
+                              = 1.0;
+                            this->restriction[index][j]
+                            (i + (j + 4) * this->degree,
+                             i + (j + 4) * this->degree) = 2.0;
+                            this->restriction[index][j] (i + 6 * this->degree,
+                                                         i + 6 * this->degree)
+                              = 1.0;
+                            this->restriction[index][j] (i + 7 * this->degree,
+                                                         i + 7 * this->degree)
+                              = 1.0;
+                            this->restriction[index][j]
+                            (i + (j + 8) * this->degree,
+                             i + (j + 8) * this->degree) = 2.0;
+                            this->restriction[index][j]
+                            (i + (j + 10) * this->degree,
+                             i + (j + 10) * this->degree) = 2.0;
+                          }
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][j]
+                            (i + j * this->degree * deg + n_edge_dofs,
+                             i + j * this->degree + deg + n_edge_dofs) = 2.0;
+                            
+                            for (unsigned int k = 0; k < 4; ++k)
+                              this->restriction[index][j]
+                              (i + (2 * k + 4) * this->degree * deg
+                                 + n_edge_dofs,
+                               i + (2 * k + 4) * this->degree * deg
+                                 + n_edge_dofs) = 1.0;
+                          }
+                      
                       break;
                     }
 
                   case RefinementCase<3>::cut_y:
                     {
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                               (RefinementCase<dim> (ref)); ++child)
-                        {
-                        	     // First we set the values for
-                        	     // the edge dofs.
-                          for (unsigned int dof = 0; dof < 2 * this->degree;
-                               ++dof)
-                            {
-                              for (unsigned int i = 0; i < 2; ++i)
-                                this->restriction[index][child]
-                                  (dof + 4 * i * this->degree,
-                                   dof + 4 * i * this->degree) = 0.5;
-
-                              this->restriction[index][child]
-                                (dof + 2 * (child + 4) * this->degree,
-                                 dof + 2 * (child + 4) * this->degree) = 1.0;
-                            }
-
-                          for (unsigned int dof = (child + 2) * this->degree;
-                               dof < (child + 3) * this->degree; ++dof)
-                            for (unsigned int i = 0; i < 2; ++i)
-                              this->restriction[index][child]
-                                (dof + 4 * i * this->degree,
-                                 dof + 4 * i * this->degree) = 1.0;
-
-                                 // Then we set the values for
-                                 // the face and the interior
-                                 // dofs.
-                          for (unsigned int dof = n_edge_dofs;
-                               dof < n_edge_dofs + 4 * deg * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
-
-                          for (unsigned int dof
-                                 = n_edge_dofs
-                                   + 2 * (child + 2) * deg * this->degree;
-                               dof
-                                 < n_edge_dofs
-                                   + 2 * (child + 3) * deg * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 1.0;
-
-                          for (unsigned int dof
-                                 = n_edge_dofs + 8 * deg * this->degree;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
-                        }
-
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][j] (i, i) = 1.0;
+                            this->restriction[index][j] (i + this->degree,
+                                                         i + this->degree)
+                              = 1.0;
+                            this->restriction[index][j]
+                            (i + (j + 2) * this->degree,
+                             i + (j + 2) * this->degree) = 2.0;
+                            this->restriction[index][j] (i + 4 * this->degree,
+                                                         i + 4 * this->degree)
+                              = 1.0;
+                            this->restriction[index][j] (i + 5 * this->degree,
+                                                         i + 5 * this->degree)
+                              = 1.0;
+                            
+                            for (unsigned int k = 3; k < 6; ++k)
+                              this->restriction[index][j]
+                              (i + (j + 2 * k) * this->degree,
+                               i + (j + 2 * k) * this->degree) = 2.0;
+                          }
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][j] (i + n_edge_dofs,
+                                                         i + n_edge_dofs)
+                              = 1.0;
+                            this->restriction[index][j]
+                            (i + 2 * this->degree * deg + n_edge_dofs,
+                             i + 2 * this->degree * deg + n_edge_dofs) = 1.0;
+                            this->restriction[index][j]
+                            (i + (2 * j + 4) * this->degree * deg
+                               + n_edge_dofs,
+                             i + (2 * j + 4) * this->degree * deg
+                               + n_edge_dofs) = 2.0;
+                            this->restriction[index][j]
+                            (i + 8 * this->degree * deg + n_edge_dofs,
+                             i + 8 * this->degree * deg + n_edge_dofs) = 1.0;
+                            this->restriction[index][j]
+                            (i + 10 * this->degree * deg + n_edge_dofs,
+                             i + 10 * this->degree * deg + n_edge_dofs) = 1.0;
+                          }
+                      
                       break;
                     }
 
                   case RefinementCase<3>::cut_xy:
                     {
-                                 // child 0
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                      for (unsigned int i = 0; i <= deg; ++i)
                         {
-                          for (unsigned int i = 0; i < 4; ++i)
-                            this->restriction[index][0]
-                              (dof + 2 * i * this->degree,
-                               dof + 2 * i * this->degree) = 0.5;
-
-                          this->restriction[index][0] (dof + 8 * this->degree,
-                                                       dof + 8 * this->degree)
-                            = 1.0;
+                          for (unsigned int j = 0; j < 2; ++j)
+                            {
+                              this->restriction[index][2 * j] (i, i) = 1.0;
+                              this->restriction[index][2 * j + 1]
+                              (i + this->degree, i + this->degree) = 1.0;
+                              this->restriction[index][j]
+                              (i + 2 * this->degree, i + 2 * this->degree)
+                                = 1.0;
+                              this->restriction[index][j + 2]
+                              (i + 3 * this->degree, i + 3 * this->degree)
+                                = 1.0;
+                              this->restriction[index][2 * j]
+                              (i + 4 * this->degree, i + 4 * this->degree)
+                                = 1.0;
+                              this->restriction[index][2 * j + 1]
+                              (i + 5 * this->degree, i + 5 * this->degree)
+                                = 1.0;
+                              this->restriction[index][j]
+                              (i + 6 * this->degree, i + 6 * this->degree)
+                                = 1.0;
+                              this->restriction[index][j + 2]
+                              (i + 7 * this->degree, i + 7 * this->degree)
+                                = 1.0;
+                            }
+                        
+                          for (unsigned int j = 0; j < 4; ++j)
+                            this->restriction[index][j]
+                            (i + (j + 8) * this->degree,
+                             i + (j + 8) * this->degree) = 2.0;
                         }
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][0]
-                            (dof + 4 * i * deg * this->degree,
-                             dof + 4 * i * deg * this->degree) = 0.5;
-
-                                 // child 1
-                      for (unsigned int dof = this->degree;
-                           dof < 3 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][1]
-                            (dof + 4 * i * this->degree,
-                             dof + 4 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = 9 * this->degree;
-                           dof < 10 * this->degree; ++dof)
-                        this->restriction[2][1] (dof, dof) = 1.0;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 6 * deg * this->degree;
-                           ++dof)
-                        this->restriction[2][1] (dof, dof) = 0.5;
-
-                                 // child 2
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][2]
-                              (dof + 7 * i * this->degree,
-                               dof + 7 * i * this->degree) = 0.5;
-
-                            this->restriction[index][2]
-                              (dof + 10 * this->degree,
-                               dof + 10 * this->degree) = 1.0;
-                        }
-
-                      for (unsigned int dof = 3 * this->degree;
-                           dof < 5 * this->degree; ++dof)
-                        this->restriction[index][2] (dof, dof) = 0.5;
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree;
-                           ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][2]
-                            (dof + 6 * i * deg * this->degree,
-                             dof + 6 * i * deg * this->degree) = 0.5;
-
-                                 // child 3
-                      for (unsigned int dof = this->degree;
-                           dof < 2 * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 4; ++i)
-                            this->restriction[index][3]
-                              (dof + 2 * i * this->degree,
-                               dof + 2 * i * this->degree) = 0.5;
-
-                          this->restriction[index][3]
-                            (dof + 10 * this->degree,
-                             dof + 10 * this->degree) = 1.0;
-                        }
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 4 * deg * this->degree;
-                           ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][3]
-                            (dof + 4 * i * deg * this->degree,
-                             dof + 4 * i * deg * this->degree) = 0.5;
-
-                                 // Some values are the same
-                                 // on every child.
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                              (RefinementCase<dim> (ref)); ++child)
-                        for (unsigned int dof
-                               = n_edge_dofs + 8 * deg * this->degree;
-                             dof < n_dofs; ++dof)
-                          this->restriction[index][child] (dof, dof) = 0.25;
-
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][2 * j] (i + n_edge_dofs,
+                                                             i + n_edge_dofs)
+                              = 1.0;
+                            this->restriction[index][2 * j + 1]
+                            (i + 2 * this->degree * deg + n_edge_dofs,
+                             i + 2 * this->degree * deg + n_edge_dofs) = 1.0;
+                            this->restriction[index][j]
+                            (i + 4 * this->degree * deg + n_edge_dofs,
+                             i + 4 * this->degree * deg + n_edge_dofs) = 1.0;
+                            this->restriction[index][j + 2]
+                            (i + 6 * this->degree * deg + n_edge_dofs,
+                             i + 6 * this->degree * deg + n_edge_dofs) = 1.0;
+                            
+                            for (unsigned int k = 0; k < 4; ++k)
+                              this->restriction[index][k]
+                              (i + 2 * (j + 4) * this->degree * deg
+                                 + n_edge_dofs,
+                               i + 2 * (j + 4) * this->degree * deg
+                                 + n_edge_dofs) = 0.5;
+                          }
+                      
                       break;
                     }
 
                   case RefinementCase<3>::cut_z:
                     {
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                               (RefinementCase<dim> (ref)); ++child)
-                        {
-                          for (unsigned int dof = 4 * child * this->degree;
-                               dof < 4 * (child + 1) * this->degree; ++dof)
-                            for (unsigned int i = 0; i < 2; ++i)
-                              this->restriction[index][child]
-                                (dof + 4 * (2 - child) * i * this->degree,
-                                 dof + 4 * (2 - child) * i * this->degree)
-                                = 1.0 / (i + 1);
-
-                          for (unsigned int dof = n_edge_dofs;
-                               dof < n_edge_dofs + 8 * deg * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
-
-                          for (unsigned int dof
-                                 = n_edge_dofs
-                                   + 2 * (child + 4) * deg * this->degree;
-                               dof
-                                 <  n_edge_dofs
-                                    + 2 * (child + 5) * deg * this->degree;
-                               ++ dof)
-                            this->restriction[index][child] (dof, dof) = 1.0;
-
-                          for (unsigned int dof = n_boundary_dofs;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.5;
-                        }
-
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < 4; ++j)
+                          for (unsigned int k = 0; k < 2; ++k)
+                            {
+                              this->restriction[index][k]
+                              (i + (j + 4 * k) * this->degree,
+                               i + (j + 4 * k) * this->degree) = 2.0;
+                              this->restriction[index][k]
+                              (i + (j + 8) * this->degree,
+                               i + (j + 8) * this->degree) = 1.0;
+                            }
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            for (unsigned int k = 0; k < 3; ++k)
+                              this->restriction[index][j]
+                              (i + 2 * k * this->degree * deg + n_edge_dofs,
+                               i + 2 * k * this->degree * deg + n_edge_dofs)
+                                = 1.0;
+                            
+                            this->restriction[index][j]
+                            (i + 2 * (j + 4) * this->degree * deg
+                               + n_edge_dofs,
+                             i + 2 * (j + 4) * this->degree * deg
+                               + n_edge_dofs) = 2.0;
+                          }
+                      
                       break;
                     }
 
                   case RefinementCase<3>::cut_xz:
                     {
-                                 // child 0
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][0]
-                              (dof + 2 * (i + 4) * this->degree,
-                               dof + 2 * (i + 4) * this->degree) = 0.5;
-
-                          this->restriction[index][0] (dof, dof) = 1.0;
-                        }
-
-                      for (unsigned int dof = 2 * this->degree;
-                           dof < 4 * this->degree; ++dof)
-                        this->restriction[index][0] (dof, dof) = 0.5;
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree;
-                           ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][0]
-                            (dof + 8 * i * deg * this->degree,
-                             dof + 8 * i * deg * this->degree) = 0.5;
-
-                                 // child 1
-                      for (unsigned int dof = 4 * this->degree;
-                           dof < 5 * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][1]
-                              (dof + 2 * (i + 2) * this->degree,
-                               dof + 2 * (i + 2) * this->degree) = 0.5;
-
-                          this->restriction[index][1] (dof, dof) = 1.0;
-                        }
-
-                      for (unsigned int dof = 6 * this->degree;
-                           dof < 8 * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.5;
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][1]
-                            (dof + 10 * i * deg * this->degree,
-                             dof + 10 * i * deg * this->degree) = 0.5;
-
-                                 // child 2
-                      for (unsigned int dof = this->degree;
-                           dof < 2 * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][2]
-                              (dof + 2 * (i + 4) * this->degree,
-                               dof + 2 * (i + 4) * this->degree) = 0.5;
-
-                          this->restriction[index][2] (dof, dof) = 1.0;
-                        }
-
-                      for (unsigned int dof = 2 * this->degree;
-                           dof < 4 * this->degree; ++dof)
-                        this->restriction[index][2] (dof, dof) = 0.5;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 4 * deg * this->degree;
-                           ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][2]
-                            (dof + 6 * i * deg * this->degree,
-                             dof + 6 * i * deg * this->degree) = 0.5;
-
-                                 // child 3
-                      for (unsigned int dof = 5 * this->degree;
-                           dof < 6 * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][3]
-                              (dof + 2 * (i + 2) * this->degree,
-                               dof + 2 * (i + 2) * this->degree) = 0.5;
-
-                          this->restriction[index][3] (dof, dof) = 1.0;
-                        }
-
-                      for (unsigned int dof = 6 * this->degree;
-                           dof < 8 * this->degree; ++dof)
-                        this->restriction[index][3] (dof, dof) = 0.5;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 4 * deg * this->degree;
-                           ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][3]
-                            (dof + 8 * i * deg * this->degree,
-                             dof + 8 * i * deg * this->degree) = 0.5;
-
-                                 // Some values are the same
-                                 // on every child.
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                              (RefinementCase<dim> (ref)); ++child)
-                        {
-                          for (unsigned int dof
-                                 = n_edge_dofs + 4 * deg * this->degree;
-                               dof < n_edge_dofs + 8 * deg * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.25;
-
-                          for (unsigned int dof = n_boundary_dofs;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.25;
-                        }
-
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][j] (i + j * this->degree,
+                                                         i + j * this->degree)
+                              = 2.0;
+                            this->restriction[index][j + 2]
+                            (i + (j + 4) * this->degree,
+                             i + (j + 4) * this->degree) = 2.0;
+                            
+                            for (unsigned int k = 0; k < 2; ++k)
+                              {
+                                this->restriction[index][j]
+                                (i + (k + 2) * this->degree,
+                                 i + (k + 2) * this->degree) = 1.0;
+                                this->restriction[index][j + 2]
+                                (i + (k + 6) * this->degree,
+                                 i + (k + 6) * this->degree) = 1.0;
+                                this->restriction[index][2 * j]
+                                (i + 2 * (k + 4) * this->degree,
+                                 i + 2 * (k + 4) * this->degree) = 1.0;
+                                this->restriction[index][2 * j + 1]
+                                (i + (2 * k + 9) * this->degree,
+                                 i + (2 * k + 9) * this->degree) = 1.0;
+                              }
+                          }
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            this->restriction[index][2 * j] (i + n_edge_dofs,
+                                                             i + n_edge_dofs)
+                              = 1.0;
+                            this->restriction[index][2 * j + 1]
+                            (i + 2 * this->degree * deg + n_edge_dofs,
+                             i + 2 * this->degree * deg + n_edge_dofs) = 1.0;
+                            
+                            for (unsigned int k = 0; k < 2; ++k)
+                              {
+                                this->restriction[index][j + 2 * k]
+                                (i + 4 * this->degree * deg + n_edge_dofs,
+                                 i + 4 * this->degree * deg + n_edge_dofs)
+                                   = 0.5;
+                                this->restriction[index][j + 2 * k]
+                                (i + 6 * this->degree * deg + n_edge_dofs,
+                                 i + 6 * this->degree * deg + n_edge_dofs)
+                                   = 0.5;
+                                this->restriction[index][j + 2 * k]
+                                (i + 2 * (k + 4) * this->degree * deg
+                                   + n_edge_dofs,
+                                 i + 2 * (k + 4) * this->degree * deg
+                                   + n_edge_dofs) = 1.0;
+                              }
+                          }
+                      
                       break;
                     }
 
                   case RefinementCase<3>::cut_yz:
                     {
-                                 // child 0
-                      for (unsigned int dof = 0; dof < 2 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][0]
-                            (dof + 8 * i * this->degree,
-                             dof + 8 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = 2 * this->degree;
-                           dof < 3 * this->degree; ++dof)
-                        this->restriction[index][0] (dof, dof) = 1.0;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 4 * deg * this->degree;
-                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][0]
-                            (dof + 4 * i * deg * this->degree,
-                             dof + 4 * i * deg * this->degree) = 0.5;
-
-                                 // child 1
-                      for (unsigned int dof = 0; dof < 2 * this->degree;
-                           ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][1]
-                            (dof + 10 * i * this->degree,
-                             dof + 10 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = 3 * this->degree;
-                           dof < 4 * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 1.0;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 6 * deg * this->degree;
-                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.5;
-
-                                 // child 2
-                      for (unsigned int dof = 4 * this->degree;
-                           dof < 6 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][2]
-                            (dof + 4 * i * this->degree,
-                             dof + 4 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = 6 * this->degree;
-                           dof < 7 * this->degree; ++dof)
-                        this->restriction[index][2] (dof, dof) = 1.0;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 4 * deg * this->degree;
-                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][2]
-                            (dof + 6 * i * deg * this->degree,
-                             dof + 6 * i * deg * this->degree) = 0.5;
-
-                                 // child 3
-                      for (unsigned int dof = 4 * this->degree;
-                           dof < 6 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][3]
-                            (dof + 6 * i * this->degree,
-                             dof + 6 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = 7 * this->degree;
-                           dof < 8 * this->degree; ++dof)
-                        this->restriction[index][3] (dof, dof) = 1.0;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 6 * deg * this->degree;
-                           dof < n_edge_dofs + 8 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 2; ++i)
-                          this->restriction[index][3]
-                            (dof + 4 * i * deg * this->degree,
-                             dof + 4 * i * deg * this->degree) = 0.5;
-
-                                 // Some values are the same
-                                 // on every child.
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                              (RefinementCase<dim> (ref)); ++child)
-                        {
-                          for (unsigned int dof = n_edge_dofs;
-                               dof < n_edge_dofs + 4 * deg * this->degree;
-                               ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.25;
-
-                          for (unsigned int dof = n_boundary_dofs;
-                               dof < n_dofs; ++dof)
-                            this->restriction[index][child] (dof, dof) = 0.25;
-                        }
-
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          for (unsigned int k = 0; k < 2; ++k)
+                            {
+                          	  for (unsigned int l = 0; l < 2; ++l)
+                          	    {
+                                  this->restriction[index][j + 2 * l]
+                                  (i + (k + 4 * l) * this->degree,
+                                   i + (k + 4 * l) * this->degree) = 1.0;
+                                  this->restriction[index][2 * j + l]
+                                  (i + (k + 2 * (l + 4)) * this->degree,
+                                   i + (k + 2 * (l + 4)) * this->degree) = 1.0;
+                          	    }
+                          	
+                              this->restriction[index][j + 2 * k]
+                              (i + (j + 4 * k + 2) * this->degree,
+                               i + (j + 4 * k + 2) * this->degree) = 2.0;
+                          }
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            for (unsigned int child = 0;
+                                 child < GeometryInfo<dim>::n_children
+                                         (RefinementCase<dim> (ref)); ++child)
+                              this->restriction[index][child]
+                              (i + 2 * j * this->degree * deg + n_edge_dofs,
+                               i + 2 * j * this->degree * deg + n_edge_dofs)
+                                = 0.5;
+                          
+                            for (unsigned int k = 0; k < 2; ++k)
+                              {
+                                this->restriction[index][j + 2 * k]
+                                (i + 2 * (j + 2) * this->degree * deg
+                                   + n_edge_dofs,
+                                 i + 2 * (j + 2) * this->degree * deg
+                                   + n_edge_dofs) = 1.0;
+                                this->restriction[index][2 * j + k]
+                                (i + 2 * (j + 4) * this->degree * deg
+                                   + n_edge_dofs,
+                                 i + 2 * (j + 4) * this->degree * deg
+                                   + n_edge_dofs) = 1.0;
+                              }
+                          }
+                      
                       break;
                     }
 
                   case RefinementCase<3>::isotropic_refinement:
                     {
-                    	         // Set the values for the
-                    	         // boundary dofs.
-                    	         
-                                 // child 0
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
+                      for (unsigned int i = 0; i <= deg; ++i)
+                        for (unsigned int j = 0; j < 2; ++j)
+                          {
+                            for (unsigned int k = 0; k < 2; ++k)
+                              {
+                                this->restriction[index][2 * j + k]
+                                (i + k * this->degree, i + k * this->degree)
+                                  = 1.0;
+                                this->restriction[index][j + 2 * k]
+                                (i + (k + 2) * this->degree,
+                                 i + (k + 2) * this->degree) = 1.0;
+                                this->restriction[index][2 * (j + 2) + k]
+                                (i + (k + 4) * this->degree,
+                                 i + (k + 4) * this->degree) = 1.0;
+                                this->restriction[index][j + 2 * (k + 2)]
+                                (i + (k + 6) * this->degree,
+                                 i + (k + 6) * this->degree) = 1.0;
+                                this->restriction[index][4 * j + k]
+                                (i + (k + 8) * this->degree,
+                                 i + (k + 8) * this->degree) = 1.0;
+                              }
+                            
+                            this->restriction[index][2 * (2 * j + 1)]
+                            (i + 10 * this->degree, i + 10 * this->degree)
+                              = 1.0;
+                            this->restriction[index][4 * j + 3]
+                            (i + 11 * this->degree, i + 11 * this->degree)
+                              = 1.0;
+                          }
+                      
+                      for (unsigned int i = 0; i < 2 * this->degree * deg; ++i)
                         {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][0]
-                              (dof + 2 * i * this->degree,
-                               dof + 2 * i * this->degree) = 0.5;
-
-                          this->restriction[index][0] (dof + 8 * this->degree,
-                                                       dof + 8 * this->degree)
-                            = 0.5;
+                          for (unsigned int j = 0; j < 4; ++j)
+                            {
+                              this->restriction[index][2 * j] (i + n_edge_dofs,
+                                                               i + n_edge_dofs)
+                                = 0.5;
+                              this->restriction[index][2 * j + 1]
+                              (i + 2 * this->degree * deg + n_edge_dofs,
+                               i + 2 * this->degree * deg + n_edge_dofs) = 0.5;
+                              this->restriction[index][j]
+                              (i + 8 * this->degree * deg + n_edge_dofs,
+                               i + 8 * this->degree * deg + n_edge_dofs) = 0.5;
+                              this->restriction[index][j + 4]
+                              (i + 10 * this->degree * deg + n_edge_dofs,
+                               i + 10 * this->degree * deg + n_edge_dofs)
+                                 = 0.5;
+                            }
+                          
+                          for (unsigned int j = 0; j < 2; ++j)
+                            for (unsigned int k = 0; k < 2; ++k)
+                              for (unsigned int l = 0; l < 2; ++l)
+                                this->restriction[index][j + 2 * (2 * k + l)]
+                                (i + 2 * (l + 2) * this->degree * deg
+                                   + n_edge_dofs,
+                                 i + 2 * (l + 2) * this->degree * deg
+                                   + n_edge_dofs) = 0.5;
                         }
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 3; ++i)
-                          this->restriction[index][0]
-                            (dof + 4 * i * deg * this->degree,
-                             dof + 4 * i * deg * this->degree) = 0.25;
-
-                                 // child 1
-                      for (unsigned int dof = this->degree;
-                           dof < 3 * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.5;
-
-                      for (unsigned int dof = 9 * this->degree;
-                           dof < 10 * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.5;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.25;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 8 * deg * this->degree;
-                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
-                        this->restriction[index][1] (dof, dof) = 0.25;
-
-                                 // child 2
-                      for (unsigned int dof = 0; dof <= deg; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][2]
-                              (dof + 3 * i * this->degree,
-                               dof + 3 * i * this->degree) = 0.5;
-
-                          this->restriction[index][2] (dof + 10 * this->degree,
-                                                       dof + 10 * this->degree)
-                            = 0.5;
-                        }
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
-                        this->restriction[index][2] (dof, dof) = 0.25;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 6 * deg * this->degree;
-                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
-                        this->restriction[index][2] (dof, dof) = 0.25;
-
-                                 // child 3
-                      for (unsigned int dof = this->degree;
-                           dof < 2 * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][3]
-                              (dof + 2 * i * this->degree,
-                               dof + 2 * i * this->degree) = 0.5;
-
-                          this->restriction[index][3]
-                            (dof + 10 * this->degree, dof + 10 * this->degree)
-                             = 0.5;
-                        }
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 4 * deg * this->degree; ++dof)
-                        this->restriction[index][3] (dof, dof) = 0.25;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 6 * deg * this->degree;
-                           dof < n_edge_dofs + 10 * deg * this->degree; ++dof)
-                        this->restriction[index][3] (dof, dof) = 0.25;
-
-                                 // child 4
-                      for (unsigned int dof = 4 * this->degree;
-                           dof < 5 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 3; ++i)
-                          this->restriction[index][4]
-                            (dof + 2 * i * this->degree,
-                             dof + 2 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][4]
-                              (dof + 4 * i * deg * this->degree,
-                               dof + 4 * i * deg * this->degree) = 0.25;
-
-                          this->restriction[index][4]
-                            (dof + 10 * deg * this->degree,
-                             dof + 10 * deg * this->degree) = 0.25;
-                        }
-
-                                 // child 5
-                      for (unsigned int dof = 5 * this->degree;
-                           dof < 7 * this->degree; ++dof)
-                        this->restriction[index][5] (dof, dof) = 0.5;
-
-                      for (unsigned int dof = 9 * this->degree;
-                           dof < 10 * this->degree; ++dof)
-                        this->restriction[index][5] (dof, dof) = 0.5;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 6 * deg * this->degree; ++dof)
-                        this->restriction[index][5] (dof, dof) = 0.25;
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 10 * deg * this->degree;
-                           dof < n_boundary_dofs; ++dof)
-                        this->restriction[index][5] (dof, dof) = 0.25;
-
-                                 // child 6
-                      for (unsigned int dof = 4 * this->degree;
-                           dof < 5 * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 3; ++i)
-                          this->restriction[index][6]
-                            (dof + 3 * i * this->degree,
-                             dof + 3 * i * this->degree) = 0.5;
-
-                      for (unsigned int dof = n_edge_dofs;
-                           dof < n_edge_dofs + 2 * deg * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][6]
-                              (dof + 6 * i * deg * this->degree,
-                               dof + 6 * i * deg * this->degree) = 0.25;
-
-                          this->restriction[index][6]
-                            (dof + 10 * deg * this->degree,
-                             dof + 10 * deg * this->degree) = 0.25;
-                        }
-
-                                 // child 7
-                      for (unsigned int dof = 5 * this->degree;
-                           dof < 6 * this->degree; ++dof)
-                        {
-                          for (unsigned int i = 0; i < 2; ++i)
-                            this->restriction[index][7]
-                              (dof + 2 * i * this->degree,
-                               dof + 2 * i * this->degree) = 0.5;
-
-                          this->restriction[index][7] (dof + 6 * this->degree,
-                                                       dof + 6 * this->degree)
-                            = 0.5;
-                        }
-
-                      for (unsigned int dof
-                             = n_edge_dofs + 2 * deg * this->degree;
-                           dof < n_edge_dofs + 4 * deg * this->degree; ++dof)
-                        for (unsigned int i = 0; i < 3; ++i)
-                          this->restriction[index][7]
-                            (dof + 4 * i * deg * this->degree,
-                             dof + 4 * i * deg * this->degree) = 0.25;
-
-                                 // The interior values are the
-                                 // same on every child.
-                      for (unsigned int child = 0;
-                           child
-                             < GeometryInfo<dim>::n_children
-                              (RefinementCase<dim> (ref)); ++child)
-                        for (unsigned int dof = n_boundary_dofs; dof < n_dofs;
-                             ++dof)
-                          this->restriction[index][child] (dof, dof) = 0.125;
                       
                       break;
                     }
@@ -1207,6 +937,15 @@ FE_Nedelec<dim>::initialize_restriction ()
                   default:
                     Assert (false, ExcNotImplemented ());
                 }
+              
+              for (unsigned int i = 0; i < 3 * this->degree * deg * deg; ++i)
+                for (unsigned int child = 0;
+                     child < GeometryInfo<dim>::n_children
+                             (RefinementCase<dim> (ref)); ++child)
+                  this->restriction[index][child] (i + n_boundary_dofs,
+                                                   i + n_boundary_dofs)
+                    = 2.0 / GeometryInfo<dim>::n_children
+                            (RefinementCase<dim> (ref));
             }
           
           break;
