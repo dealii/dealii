@@ -37,11 +37,24 @@ template <int dim, int spacedim> class MappingQ;
  * space H<sup>curl</sup>. These elements generate vector fields with
  * tangential components continuous between mesh cells.
  *
- * We follow the usual definition of the degree of Nédélec elements,
- * which denotes the polynomial degree of the lowest complete polynomial
- * subspace contained in the Nédélec space. Then, approximation order of
- * the function itself is <i>degree</i>. In this scheme, the lowest
- * order element would be created by the call FE_Nedelec<dim>(0).
+ * We follow the convention that the degree of Nédélec elements
+ * denotes the polynomial degree of the largest complete polynomial
+ * subspace contained in the Nédélec space. This leads to the consistently
+ * numbered sequence of spaces
+ * @f[
+ *   Q_{k+1}
+ *   \stackrel{\text{grad}}{\rightarrow}
+ *   \text{Nedelec}_k
+ *   \stackrel{\text{curl}}{\rightarrow}
+ *   \text{RaviartThomas}_k
+ *   \stackrel{\text{div}}{\rightarrow}
+ *   DGQ_{k}
+ * @f]
+ * Consequently, approximation order of
+ * the Nedelec space equals the value <i>degree</i> given to the constructor.
+ * In this scheme, the lowest order element would be created by the call
+ * FE_Nedelec<dim>(0). Note that this follows the convention of Brezzi and
+ * Raviart, though not the one used in the original paper by Nedelec.
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
