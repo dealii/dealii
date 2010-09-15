@@ -40,7 +40,8 @@ template <int dim, int spacedim> class MappingQ;
  * We follow the usual definition of the degree of Nédélec elements,
  * which denotes the polynomial degree of the lowest complete polynomial
  * subspace contained in the Nédélec space. Then, approximation order of
- * the function itself is <i>degree</i>.
+ * the function itself is <i>degree</i>. In this scheme, the lowest
+ * order element would be created by the call FE_Nedelec<dim>(0).
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
