@@ -171,7 +171,7 @@ void test ()
 //           new FE_DGP<dim>(3),
 
                                            // a non-primitive FE
-          (dim != 1 ? new FE_Nedelec<dim>(1) : 0),
+          (dim != 1 ? new FE_Nedelec<dim>(0) : 0),
 
                                            // some composed elements
                                            // of increasing
@@ -210,16 +210,16 @@ void test ()
                                            // elements, to make things
                                            // really difficult
           (dim != 1 ?
-           new FESystem<dim>(FE_Nedelec<dim>(1), 2)
+           new FESystem<dim>(FE_Nedelec<dim>(0), 2)
            : 0),
           (dim != 1 ?
-           new FESystem<dim>(FE_Nedelec<dim>(1), 2,
+           new FESystem<dim>(FE_Nedelec<dim>(0), 2,
                              FE_Q<dim> (2), 2)
            : 0),
           (dim != 1 ?
-           new FESystem<dim>(FE_Nedelec<dim>(1), 2,
+           new FESystem<dim>(FE_Nedelec<dim>(0), 2,
                              FE_DGQ<dim> (2), 2,
-                             FESystem<dim>(FE_Nedelec<dim>(1), 2,
+                             FESystem<dim>(FE_Nedelec<dim>(0), 2,
                                            FE_Q<dim> (2), 2), 2)
            : 0),          
     };
