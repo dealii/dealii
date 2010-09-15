@@ -38,9 +38,19 @@ template <int dim, int spacedim> class MappingQ;
  *
  * We follow the usual definition of the degree of RT elements, which
  * denotes the polynomial degree of the largest complete polynomial
- * subspace contained in the RT space. Then, approciamtion order of
+ * subspace contained in the RT space. Then, approxiamtion order of
  * the function itself is <i>degree+1</i>, as with usual polynomial
- * spaces.
+ * spaces. The numbering so chosen implies the sequence
+ * @f[
+ *   Q_{k+1}
+ *   \stackrel{\text{grad}}{\rightarrow}
+ *   \text{Nedelec}_k
+ *   \stackrel{\text{curl}}{\rightarrow}
+ *   \text{RaviartThomas}_k
+ *   \stackrel{\text{div}}{\rightarrow}
+ *   DGQ_{k}
+ * @f]
+ * The lowest order element is consequently FE_RaviartThomas(0).
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
