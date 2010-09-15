@@ -102,7 +102,7 @@ void test_hyper_sphere()
 
   FESystem<dim> fe (FE_Q<dim>(1), 1,
 		    FE_RaviartThomas<dim>(1), 1,
-		    FE_Nedelec<dim>(1), 1);
+		    FE_Nedelec<dim>(0), 1);
   test(tr, fe);
 }
 
