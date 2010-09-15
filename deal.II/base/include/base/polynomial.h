@@ -468,26 +468,35 @@ namespace Polynomials
  *
  * @author Markus B&uuml;rg, 2009
  */
-class Lobatto : public Polynomial<double> {
-   public:
-   /**
-	* Constructor for polynomial of degree <tt>p</tt>. There is an exception for <tt>p==0</tt>, see the general documentation.
-	*/
+  class Lobatto : public Polynomial<double>
+  {
+    public:
+				       /**
+					* Constructor for polynomial of degree
+					* <tt>p</tt>. There is an exception
+					* for <tt>p==0</tt>, see the general
+					* documentation.
+					*/
       Lobatto (const unsigned int p = 0);
 
-   /**
-	* Return the polynomials with index <tt>0</tt> up to <tt>degree</tt>. There is an exception for <tt>p==0</tt>, see the general
-    * documentation.
-	*/
-      static std::vector<Polynomial<double> > generate_complete_basis (const unsigned int p);
+				       /**
+					* Return the polynomials with index
+					* <tt>0</tt> up to
+					* <tt>degree</tt>. There is an
+					* exception for <tt>p==0</tt>, see the
+					* general documentation.
+					*/
+      static std::vector<Polynomial<double> >
+      generate_complete_basis (const unsigned int p);
 
-   private:
-   /**
-    * Compute coefficients recursively.
-    */
+    private:
+				       /**
+					* Compute coefficients recursively.
+					*/
       std::vector<double> compute_coefficients (const unsigned int p);
-};
+  };
 
+  
 /**
  * Hierarchical polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
