@@ -33,13 +33,13 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of Nédélec elements, conforming with the
+ * Implementation of N&eacute;d&eacute;lec elements, conforming with the
  * space H<sup>curl</sup>. These elements generate vector fields with
  * tangential components continuous between mesh cells.
  *
- * We follow the convention that the degree of Nédélec elements
+ * We follow the convention that the degree of N&eacute;d&eacute;lec elements
  * denotes the polynomial degree of the largest complete polynomial
- * subspace contained in the Nédélec space. This leads to the consistently
+ * subspace contained in the N&eacute;d&eacute;lec space. This leads to the consistently
  * numbered sequence of spaces
  * @f[
  *   Q_{k+1}
@@ -67,7 +67,7 @@ template <int dim, int spacedim> class MappingQ;
  * <h3>Interpolation</h3>
  *
  * The @ref GlossInterpolation "interpolation" operators associated
- * with the Nédélec element are constructed such that interpolation and
+ * with the N&eacute;d&eacute;lec element are constructed such that interpolation and
  * computing the curl are commuting operations. We require this
  * from interpolating arbitrary functions as well as the #restriction
  * matrices.
@@ -76,7 +76,7 @@ template <int dim, int spacedim> class MappingQ;
  *
  * The @ref GlossNodes "node values" on edges are the moments of the
  * tangential component of the interpolated function with respect to
- * the traces of the Nédélec polynomials. Higher-order Nédélec spaces
+ * the traces of the N&eacute;d&eacute;lec polynomials. Higher-order N&eacute;d&eacute;lec spaces
  * also have face and interior nodes.
  *
  * <h4>Generalized support points</h4>
@@ -89,13 +89,13 @@ template <int dim, int spacedim> class MappingQ;
  * the interior of the cell (or none for N<sub>1</sub>).
  *
  *
- * @author Markus Bürg, 2009
+ * @author Markus B&uuml;rg, 2009
  */
 template <int dim>
 class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
    public:
 				     /**
-				      * Constructor for the Nédélec
+				      * Constructor for the N&eacute;d&eacute;lec
 				      * element of degree @p p.
 				      */
       FE_Nedelec (const unsigned int p);
@@ -236,7 +236,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * cells onto the father
 				      * cell. According to the
 				      * philosophy of the
-				      * Nédélec element, this
+				      * N&eacute;d&eacute;lec element, this
 				      * restriction operator preserves
 				      * the curl of a function
 				      * weakly.
