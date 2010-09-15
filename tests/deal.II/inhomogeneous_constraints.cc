@@ -690,7 +690,8 @@ void LaplaceProblem<dim>::run ()
       assemble_test_2 ();
 
       solve ();
-      postprocess ();
+      if (cycle < 2)
+	postprocess ();
     }
 }
 
