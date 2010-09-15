@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -450,13 +450,23 @@ namespace Polynomials
 /**
  * Lobatto polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
- * These polynomials are the integrated Legendre polynomials on [0,1]. The first two polynomials are the standard linear shape functions given by $l_0(x) = 1-x$ and $l_1(x) = x$. For $i\geq2$ we use the definition $l_i(x) = \frac{1}{\Vert L_{i-1}\Vert_2}\int_0^x L_{i-1}(t)\,dt, where L_i deontes the i-th Legendre polynomial on [0,1]. The Lobatto polynomials l_0,\ldots,l_k form a complete basis of the polynomials space of degree k.
+ * These polynomials are the integrated Legendre polynomials on [0,1]. The
+ * first two polynomials are the standard linear shape functions given by
+ * $l_0(x) = 1-x$ and $l_1(x) = x$. For $i\geq2$ we use the definition $l_i(x)
+ * = \frac{1}{\Vert L_{i-1}\Vert_2}\int_0^x L_{i-1}(t)\,dt$, where $L_i$
+ * denotes the $i$-th Legendre polynomial on $[0,1]$. The Lobatto polynomials
+ * $l_0,\ldots,l_k$ form a complete basis of the polynomials space of degree
+ * $k$.
  *
- * Calling the constructor with a given index <tt>k</tt> will generate the polynomial with index <tt>k</tt>. But only for $k\geq1$ the index equals the degree of the polynomial. For <tt>k==0</tt> also a polynomial of degree 1 is generated.
+ * Calling the constructor with a given index <tt>k</tt> will generate the
+ * polynomial with index <tt>k</tt>. But only for $k\geq 1$ the index equals
+ * the degree of the polynomial. For <tt>k==0</tt> also a polynomial of degree
+ * 1 is generated.
  *
- * These polynomials are used for the construction of the shape functions of Nédélec elements of arbitrary order.
+ * These polynomials are used for the construction of the shape functions of
+ * N&eacute;d&eacute;lec elements of arbitrary order.
  *
- * @author Markus Bürg, 2009
+ * @author Markus B&uuml;rg, 2009
  */
 class Lobatto : public Polynomial<double> {
    public:
