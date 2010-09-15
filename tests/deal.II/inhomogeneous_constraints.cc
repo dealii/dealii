@@ -98,6 +98,29 @@ class LaplaceProblem
 
 
 template <int dim>
+class BoundaryValues : public Function<dim>
+{
+  public:
+    BoundaryValues () : Function<dim> () {}
+    
+    virtual double value (const Point<dim>   &p,
+			  const unsigned int  component) const;
+};
+
+
+template <int dim>
+double
+BoundaryValues<dim>::value (const Point<dim>   &p,
+			   const unsigned int  /*component*/) const
+{
+  double sum = 0;
+  for (unsigned int d=0; d<dim; ++d)
+    sum += std::sin(deal_II_numbers::PI*p[d]);
+  return sum;
+}
+
+
+template <int dim>
 class RightHandSide : public Function<dim>
 {
   public:
@@ -126,12 +149,20 @@ LaplaceProblem<dim>::LaplaceProblem ()
 		dof_handler (triangulation),
 		max_degree (5)
 {
-  for (unsigned int degree=2; degree<=max_degree; ++degree)
-    {
-      fe_collection.push_back (FE_Q<dim>(degree));
-      quadrature_collection.push_back (QGauss<dim>(degree+1));
-      face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
-    }
+  if (dim == 2)
+    for (unsigned int degree=2; degree<=max_degree; ++degree)
+      {
+	fe_collection.push_back (FE_Q<dim>(degree));
+	quadrature_collection.push_back (QGauss<dim>(degree+1));
+	face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
+      }
+  else
+    for (unsigned int degree=1; degree<max_degree-1; ++degree)
+      {
+	fe_collection.push_back (FE_Q<dim>(degree));
+	quadrature_collection.push_back (QGauss<dim>(degree+1));
+	face_quadrature_collection.push_back (QGauss<dim-1>(degree+1));
+      }
 }
 
 
@@ -154,29 +185,36 @@ void LaplaceProblem<dim>::setup_system ()
   hanging_nodes_only.clear ();
   test_all_constraints.clear ();
 
-				   // add boundary conditions as
-				   // inhomogeneous constraints here. In
-				   // contrast to step-27, we choose a
-				   // constant function with value 1 here.
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_nodes_only);
+  hanging_nodes_only.close ();
+
+				   // add boundary conditions as inhomogeneous
+				   // constraints here, do it after having
+				   // added the hanging node constraints in
+				   // order to be consistent and skip dofs
+				   // that are already constrained (i.e., are
+				   // hanging nodes on the boundary in 3D). In
+				   // contrast to step-27, we choose a sine
+				   // function.
   {
+    test_all_constraints.merge (hanging_nodes_only);
     std::map<unsigned int,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
-					      ConstantFunction<dim>(1.),
+					      BoundaryValues<dim>(),
 					      boundary_values);
     std::map<unsigned int,double>::const_iterator boundary_value = boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
-	test_all_constraints.add_line(boundary_value->first);
-	test_all_constraints.set_inhomogeneity (boundary_value->first, 
-						boundary_value->second);
+	if (!test_all_constraints.is_constrained(boundary_value->first))
+	  {
+	    test_all_constraints.add_line(boundary_value->first);
+	    test_all_constraints.set_inhomogeneity (boundary_value->first, 
+						    boundary_value->second);
+	  }
       }
   }
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_nodes_only);
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   test_all_constraints);
-  hanging_nodes_only.close ();
   test_all_constraints.close ();
 
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
@@ -302,7 +340,7 @@ void LaplaceProblem<dim>::assemble_reference ()
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
-					    ConstantFunction<dim>(1.),
+					    BoundaryValues<dim>(),
 					    boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
 				      reference_matrix,
@@ -473,12 +511,10 @@ void LaplaceProblem<dim>::solve ()
   cg.solve (reference_matrix, solution, reference_rhs,
 	    preconditioner);
 
-  // test also distribute function
   Vector<double> solution_test (solution);
-
   hanging_nodes_only.distribute (solution);
 
-  // test also distribute function
+				// test also distribute function
   test_all_constraints.distribute(solution_test);
   solution_test -= solution;
   deallog << "Distribute error: " << solution_test.l2_norm () << std::endl;
@@ -616,6 +652,14 @@ void LaplaceProblem<2>::create_coarse_grid ()
 }
 
 
+template <>
+void LaplaceProblem<3>::create_coarse_grid ()
+{
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (1);
+}
+
+
 
 template <int dim>
 void LaplaceProblem<dim>::run () 
@@ -628,14 +672,17 @@ void LaplaceProblem<dim>::run ()
       setup_system ();
 
       deallog << std::endl << std::endl
-	      << "   Number of active cells:       "
+	      << "   Number of active cells:             "
 	      << triangulation.n_active_cells()
 	      << std::endl
-	      << "   Number of degrees of freedom: "
+	      << "   Number of degrees of freedom:       "
 	      << dof_handler.n_dofs()
 	      << std::endl
-	      << "   Number of constraints       : "
+	      << "   Number of hanging node constraints: "
 	      << hanging_nodes_only.n_constraints()
+	      << std::endl
+	      << "   Total number of constraints:        "
+	      << test_all_constraints.n_constraints()
 	      << std::endl;
 
       assemble_reference ();
@@ -648,7 +695,8 @@ void LaplaceProblem<dim>::run ()
 }
 
 
-				   // this function is copied verbatim from step-27
+				   // this function is copied verbatim from
+				   // step-27
 template <int dim>
 void
 LaplaceProblem<dim>::
@@ -796,6 +844,18 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  LaplaceProblem<2> laplace_problem;
-  laplace_problem.run ();
+  {
+    deallog.push("2d");
+    LaplaceProblem<2> laplace_problem;
+    laplace_problem.run ();
+    deallog.pop();
+  }
+
+  {
+    deallog.push("3d");
+    LaplaceProblem<3> laplace_problem;
+    laplace_problem.run ();
+    deallog.pop();
+  }
 }
+
