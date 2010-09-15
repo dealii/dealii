@@ -31,6 +31,15 @@ inconvenience this causes.
 
 <ol>
 
+<li> The FE_Nedelec class had previously implemented the lowest order
+when the value 1 was passed to the constructor. This has now been
+adjusted: the lowest order now results from passing 0, making this
+consistent with the FE_RaviartThomas class and following the convention
+used in by Brezzi and Raviart (though not in the original paper of
+Nedelec).
+<br>
+(Markus B&uuml;rg 2010/09/14)</li>
+
 <li> The fields DoFHandler::tria and DoFHandler::selected_fe are now
 private instead of protected. Inheriting classes can only access them
 through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
