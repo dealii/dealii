@@ -53,6 +53,14 @@ namespace Polynomials
 
 
   template <typename number>
+  Polynomial<number>::Polynomial (const unsigned int n)
+                  :
+                  coefficients(n+1, 0.)
+  {}
+
+
+
+  template <typename number>
   void
   Polynomial<number>::value (const number         x,
                              std::vector<number> &values) const
@@ -157,7 +165,7 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator *= (const Polynomial<number>& p)
   {
-				     // Degree of the product
+                                     // Degree of the product
     unsigned int new_degree = this->degree() + p.degree();
 
     std::vector<number> new_coefficients(new_degree+1, 0.);
@@ -175,8 +183,8 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator += (const Polynomial<number>& p)
   {
-				     // if necessary expand the number
-				     // of coefficients we store
+                                     // if necessary expand the number
+                                     // of coefficients we store
     if (p.coefficients.size() > coefficients.size())
       coefficients.resize (p.coefficients.size(), 0.);
 
@@ -191,8 +199,8 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator -= (const Polynomial<number>& p)
   {
-				     // if necessary expand the number
-				     // of coefficients we store
+                                     // if necessary expand the number
+                                     // of coefficients we store
     if (p.coefficients.size() > coefficients.size())
       coefficients.resize (p.coefficients.size(), 0.);
 
@@ -329,7 +337,7 @@ namespace Polynomials
   template <typename number>
   std::vector<number>
   Monomial<number>::make_vector(unsigned int n,
-				double coefficient)
+                                double coefficient)
   {
     std::vector<number> result(n+1, 0.);
     result[n] = coefficient;
@@ -339,8 +347,8 @@ namespace Polynomials
 
   template <typename number>
   Monomial<number>::Monomial (unsigned int n,
-			      double coefficient)
-		  : Polynomial<number>(make_vector(n, coefficient))
+                              double coefficient)
+                  : Polynomial<number>(make_vector(n, coefficient))
   {}
 
 
@@ -358,17 +366,47 @@ namespace Polynomials
 
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
                                             const unsigned int support_point)
-		  :
-                  Polynomial<double>(compute_coefficients(n,support_point))
-  {}
-
-
-
-  std::vector<double>
-  LagrangeEquidistant::compute_coefficients (const unsigned int n,
-                                             const unsigned int support_point)
   {
-    std::vector<double> a (n+1);
+    if (n <= 10)
+      {
+        this->coefficients.resize(n+1);
+        compute_coefficients(n, support_point, this->coefficients);
+      }
+    else
+      {
+                                         // We have precomputed tables
+                                         // up to degree 10. For
+                                         // higher order, we have to
+                                         // compute by hand.
+
+                                         // Start with the constant one
+        this->coefficients.resize(1);
+        this->coefficients[0] = 1.;
+
+                                         // Then compute the Lagrange
+                                         // polynomial as the product
+                                         // of linear factors
+        std::vector<double> two (2, 1.);
+
+        for (unsigned int k=0;k<=n;++k)
+          {
+            if (k != support_point)
+              {
+                two[0] = -1.*k/n;
+                Polynomial<double> factor(two);
+                factor.scale(1.*n/(support_point - k));
+                (*this) *= factor;
+              }
+          }
+      }
+  }
+
+
+  void
+  LagrangeEquidistant::compute_coefficients (const unsigned int n,
+                                             const unsigned int support_point,
+                                             std::vector<double>& a)
+  {
     Assert(support_point<n+1, ExcIndexRange(support_point, 0, n+1));
 
     unsigned int n_functions=n+1;
@@ -575,14 +613,12 @@ namespace Polynomials
           break;
         }
         default:
-              Assert(false, ExcNotImplemented());
+              Assert(false, ExcInternalError())
       }
 
     Assert(x!=0, ExcInternalError());
     for (unsigned int i=0; i<n_functions; ++i)
       a[i]=x[support_point*n_functions+i];
-
-    return a;
   }
 
 
@@ -613,50 +649,50 @@ namespace Polynomials
   Lagrange::generate_complete_basis (const std::vector<Point<1> >& points)
   {
     std::vector<Polynomial<double> > p(points.size());
-				     // polynomials are built as
-				     // products of linear
-				     // factors. The coefficient in
-				     // front of the linear term is
-				     // always 1.
+                                     // polynomials are built as
+                                     // products of linear
+                                     // factors. The coefficient in
+                                     // front of the linear term is
+                                     // always 1.
     std::vector<double> linear(2, 1.);
-				     // We start with a constant polynomial
+                                     // We start with a constant polynomial
     std::vector<double> one(1, 1.);
 
     for (unsigned int i=0;i<p.size();++i)
       {
-					 // Construct interpolation formula
-	p[i] = Polynomial<double>(one);
-	for (unsigned int k=0;k<points.size();++k)
-	  if (k != i)
-	    {
-	      linear[0] = -points[k](0);
-	      Polynomial<double> factor(linear);
-	      factor *= 1./(points[i](0)-points[k](0));
-	      p[i] *= factor;
-	    }
+                                         // Construct interpolation formula
+        p[i] = Polynomial<double>(one);
+        for (unsigned int k=0;k<points.size();++k)
+          if (k != i)
+            {
+              linear[0] = -points[k](0);
+              Polynomial<double> factor(linear);
+              factor *= 1./(points[i](0)-points[k](0));
+              p[i] *= factor;
+            }
       }
 
-				     // Since the previous operation
-				     // is subject to round-off error
-				     // amplification, we correct the
-				     // polynomials here.
+                                     // Since the previous operation
+                                     // is subject to round-off error
+                                     // amplification, we correct the
+                                     // polynomials here.
     for (unsigned int i=0;i<p.size();++i)
       {
-	for (unsigned int k=0;k<points.size();++k)
-	  {
-	    const double value = p[i].value(points[k](0));
-	    Polynomial<double> q = p[k];
-	    if (i==k)
-	      {
-		q *= 1.-value;
-		p[i] += q;
-	      }
-	    else
-	      {
-		q *= -value;
-		p[i] += q;
-	      }
-	  }
+        for (unsigned int k=0;k<points.size();++k)
+          {
+            const double value = p[i].value(points[k](0));
+            Polynomial<double> q = p[k];
+            if (i==k)
+              {
+                q *= 1.-value;
+                p[i] += q;
+              }
+            else
+              {
+                q *= -value;
+                p[i] += q;
+              }
+          }
       }
 
     return p;
@@ -666,22 +702,12 @@ namespace Polynomials
 // ------------------ class Legendre --------------- //
 
 
-//TODO:[?] This class leaks memory, but only at the very end of a program.
-// Since it expands the Legendre<number>::coefficients array, the elements
-// of this static variable are not destroyed at the end of the program
-// run. While this is not a problem (since the returned memory could
-// not be used anyway then), it is a little confusing when looking at
-// a memory checker such as "purify". Maybe, this should be handled somehow
-// to avoid this confusion in future.
-
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<const std::vector<double> *>
-  Legendre::recursive_coefficients(20,
-				   static_cast<const std::vector<double>*>(0));
-  std::vector<const std::vector<double> *>
-  Legendre::shifted_coefficients(20,
-				 static_cast<const std::vector<double>*>(0));
+  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  Legendre::recursive_coefficients(20);
+  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  Legendre::shifted_coefficients(20);
 
 
   Legendre::Legendre (const unsigned int k)
@@ -721,11 +747,12 @@ namespace Polynomials
                                      // already exist?
     if ((recursive_coefficients.size() < k+1) ||
         ((recursive_coefficients.size() >= k+1) &&
-         (recursive_coefficients[k] == 0)))
+         (recursive_coefficients[k] ==
+          std_cxx1x::shared_ptr<const std::vector<double> >())))
                                        // no, then generate the
                                        // respective coefficients
       {
-        recursive_coefficients.resize (k+1, 0);
+        recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
@@ -745,9 +772,16 @@ namespace Polynomials
             (*c1)[1] = 1.;
 
                                              // now make these arrays
-                                             // const
-            recursive_coefficients[0] = c0;
-            recursive_coefficients[1] = c1;
+                                             // const. use shared_ptr for
+                                             // recursive_coefficients because
+                                             // that avoids a memory leak that
+                                             // would appear if we used plain
+                                             // pointers.
+            recursive_coefficients[0] =
+              std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+            recursive_coefficients[1] =
+              std_cxx1x::shared_ptr<const std::vector<double> >(c1);
+
                                              // Compute polynomials
                                              // orthogonal on [0,1]
             c0 = new std::vector<double>(*c0);
@@ -758,8 +792,8 @@ namespace Polynomials
             Polynomial<double>::shift<SHIFT_TYPE> (*c1, -1.);
             Polynomial<double>::scale(*c1, 2.);
             Polynomial<double>::multiply(*c1, std::sqrt(3.));
-            shifted_coefficients[0]=c0;
-            shifted_coefficients[1]=c1;
+            shifted_coefficients[0]=std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+            shifted_coefficients[1]=std_cxx1x::shared_ptr<const std::vector<double> >(c1);
           }
         else
           {
@@ -793,14 +827,16 @@ namespace Polynomials
                                              // created vector to the
                                              // const pointer in the
                                              // coefficients array
-            recursive_coefficients[k] = ck;
+            recursive_coefficients[k] =
+              std_cxx1x::shared_ptr<const std::vector<double> >(ck);
                                              // and compute the
                                              // coefficients for [0,1]
             ck = new std::vector<double>(*ck);
             Polynomial<double>::shift<SHIFT_TYPE> (*ck, -1.);
             Polynomial<double>::scale(*ck, 2.);
             Polynomial<double>::multiply(*ck, std::sqrt(2.*k+1.));
-            shifted_coefficients[k] = ck;
+            shifted_coefficients[k] =
+              std_cxx1x::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }
@@ -948,15 +984,15 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                      // check: does the information
                                      // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
-	  ((recursive_coefficients.size() >= k+1) &&
+          ((recursive_coefficients.size() >= k+1) &&
            (recursive_coefficients[k] == 0)) )
-				           // no, then generate the
-				           // respective coefficients
+                                           // no, then generate the
+                                           // respective coefficients
       {
-	recursive_coefficients.resize (k+1, 0);
+        recursive_coefficients.resize (k+1, 0);
 
-	if (k<=1)
-	  {
+        if (k<=1)
+          {
                                              // create coefficients
                                              // vectors for k=0 and k=1
                                              //
@@ -965,37 +1001,37 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                              // later assign it to the
                                              // coefficients array to
                                              // make it const
-	    std::vector<double> *c0 = new std::vector<double>(2);
-	    (*c0)[0] =  1.;
-	    (*c0)[1] = -1.;
+            std::vector<double> *c0 = new std::vector<double>(2);
+            (*c0)[0] =  1.;
+            (*c0)[1] = -1.;
 
-	    std::vector<double> *c1 = new std::vector<double>(2);
-	    (*c1)[0] = 0.;
-	    (*c1)[1] = 1.;
+            std::vector<double> *c1 = new std::vector<double>(2);
+            (*c1)[0] = 0.;
+            (*c1)[1] = 1.;
 
                                              // now make these arrays
                                              // const
-	    recursive_coefficients[0] = c0;
-	    recursive_coefficients[1] = c1;
-	  }
-	else if (k==2)
-	  {
+            recursive_coefficients[0] = c0;
+            recursive_coefficients[1] = c1;
+          }
+        else if (k==2)
+          {
             coefficients_lock.release ();
-	    compute_coefficients(1);
-	    coefficients_lock.acquire ();
+            compute_coefficients(1);
+            coefficients_lock.acquire ();
 
-	    std::vector<double> *c2 = new std::vector<double>(3);
+            std::vector<double> *c2 = new std::vector<double>(3);
 
-	    const double a = 1.; //1./8.;
+            const double a = 1.; //1./8.;
 
-	    (*c2)[0] =   0.*a;
-	    (*c2)[1] =  -4.*a;
-	    (*c2)[2] =   4.*a;
+            (*c2)[0] =   0.*a;
+            (*c2)[1] =  -4.*a;
+            (*c2)[2] =   4.*a;
 
-	    recursive_coefficients[2] = c2;
-	  }
-	else
-	  {
+            recursive_coefficients[2] = c2;
+          }
+        else
+          {
                                              // for larger numbers,
                                              // compute the coefficients
                                              // recursively. to do so,
@@ -1004,39 +1040,39 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                              // allow the called
                                              // function to acquire it
                                              // itself
-	    coefficients_lock.release ();
-	    compute_coefficients(k-1);
-	    coefficients_lock.acquire ();
+            coefficients_lock.release ();
+            compute_coefficients(k-1);
+            coefficients_lock.acquire ();
 
-	    std::vector<double> *ck = new std::vector<double>(k+1);
+            std::vector<double> *ck = new std::vector<double>(k+1);
 
-	    const double a = 1.; //1./(2.*k);
+            const double a = 1.; //1./(2.*k);
 
-	    (*ck)[0] = - a*(*recursive_coefficients[k-1])[0];
+            (*ck)[0] = - a*(*recursive_coefficients[k-1])[0];
 
-	    for (unsigned int i=1; i<=k-1; ++i)
-		(*ck)[i] = a*( 2.*(*recursive_coefficients[k-1])[i-1]
-			       - (*recursive_coefficients[k-1])[i] );
+            for (unsigned int i=1; i<=k-1; ++i)
+                (*ck)[i] = a*( 2.*(*recursive_coefficients[k-1])[i-1]
+                               - (*recursive_coefficients[k-1])[i] );
 
-	    (*ck)[k] = a*2.*(*recursive_coefficients[k-1])[k-1];
-	                                  // for even degrees, we need
-	                                  // to add a multiple of
-	                                  // basis fcn phi_2
-	    if ( (k%2) == 0 )
-	      {
-		double b = 1.; //8.;
-		//for (unsigned int i=1; i<=k; i++)
-		//  b /= 2.*i;
+            (*ck)[k] = a*2.*(*recursive_coefficients[k-1])[k-1];
+                                          // for even degrees, we need
+                                          // to add a multiple of
+                                          // basis fcn phi_2
+            if ( (k%2) == 0 )
+              {
+                double b = 1.; //8.;
+                //for (unsigned int i=1; i<=k; i++)
+                //  b /= 2.*i;
 
-		(*ck)[1] += b*(*recursive_coefficients[2])[1];
-		(*ck)[2] += b*(*recursive_coefficients[2])[2];
-	      }
+                (*ck)[1] += b*(*recursive_coefficients[2])[1];
+                (*ck)[2] += b*(*recursive_coefficients[2])[2];
+              }
                                              // finally assign the newly
                                              // created vector to the
                                              // const pointer in the
                                              // coefficients array
-	    recursive_coefficients[k] = ck;
-	  };
+            recursive_coefficients[k] = ck;
+          };
       };
   }
 
@@ -1045,21 +1081,21 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
   const std::vector<double> &
   Hierarchical::get_coefficients (const unsigned int k)
   {
-				   // first make sure the coefficients
-				   // get computed if so necessary
+                                   // first make sure the coefficients
+                                   // get computed if so necessary
     compute_coefficients (k);
 
-				   // then get a pointer to the array
-				   // of coefficients. do that in a MT
+                                   // then get a pointer to the array
+                                   // of coefficients. do that in a MT
                                      // safe way
     coefficients_lock.acquire ();
     const std::vector<double> *p = recursive_coefficients[k];
     coefficients_lock.release ();
 
-				   // return the object pointed
-				   // to. since this object does not
-				   // change any more once computed,
-				   // this is MT safe
+                                   // return the object pointed
+                                   // to. since this object does not
+                                   // change any more once computed,
+                                   // this is MT safe
     return *p;
   }
 
