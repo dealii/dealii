@@ -38,9 +38,9 @@ template <int dim, int spacedim> class MappingQ;
  * tangential components continuous between mesh cells.
  *
  * We follow the convention that the degree of N&eacute;d&eacute;lec elements
- * denotes the polynomial degree of the largest complete polynomial
- * subspace contained in the N&eacute;d&eacute;lec space. This leads to the consistently
- * numbered sequence of spaces
+ * denotes the polynomial degree of the largest complete polynomial subspace
+ * contained in the N&eacute;d&eacute;lec space. This leads to the
+ * consistently numbered sequence of spaces
  * @f[
  *   Q_{k+1}
  *   \stackrel{\text{grad}}{\rightarrow}
