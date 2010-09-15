@@ -223,9 +223,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * generalized_support_points
 				      * field of the FiniteElement
 				      * class and fill the tables with
-				      * interpolation weights
-				      * (#boundary_weights and
-				      * #interior_weights). Called
+				      * interpolation weights. Called
 				      * from the constructor.
 				      */
     void initialize_support_points (const unsigned int degree);
