@@ -57,7 +57,7 @@ namespace internal
   }
 }
 
-    
+
 
 namespace hp
 {
@@ -69,6 +69,7 @@ namespace hp
  * This class has not yet been implemented for the use in the codimension
  * one case (<tt>spacedim != dim </tt>).
  *
+ * @ingroup dofs
  * @ingroup hp
  */
   template <int dim, int spacedim=dim>
@@ -79,7 +80,7 @@ namespace hp
     public:
       typedef typename IteratorSelector::CellAccessor         cell_accessor;
       typedef typename IteratorSelector::FaceAccessor         face_accessor;
-      
+
       typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
       typedef typename IteratorSelector::line_iterator line_iterator;
       typedef typename IteratorSelector::active_line_iterator active_line_iterator;
@@ -105,7 +106,7 @@ namespace hp
                                         * declared elsewhere.
                                         */
       typedef typename FunctionMap<spacedim>::type FunctionMap;
-    
+
                                        /**
                                         * Make the dimension available
                                         * in function templates.
@@ -117,7 +118,7 @@ namespace hp
                                         * in function templates.
                                         */
       static const unsigned int space_dimension = spacedim;
-    
+
                                        /**
                                         * When the arrays holding the
                                         * DoF indices are set up, but
@@ -159,18 +160,18 @@ namespace hp
 					*/
       static const unsigned int default_fe_index = numbers::invalid_unsigned_int;
 
-      
+
                                        /**
                                         * Constructor. Take @p tria as the
                                         * triangulation to work on.
                                         */
       DoFHandler (const Triangulation<dim,spacedim> &tria);
-    
+
                                        /**
                                         * Destructor.
                                         */
       virtual ~DoFHandler ();
-    
+
                                        /**
                                         * Go through the triangulation and
                                         * distribute the degrees of freedoms
@@ -216,7 +217,7 @@ namespace hp
                                         * time when @p distribute_dofs was called.
                                         */
       virtual void clear ();
-    
+
                                        /**
                                         * Renumber degrees of freedom based on
                                         * a list of new dof numbers for all the
@@ -340,7 +341,7 @@ namespace hp
 					* <tt>end()</tt>.
 					*/
       cell_iterator        end (const unsigned int level) const;
-    
+
 				       /**
 					* Return a raw iterator which is the first
 					* iterator not on level. If @p level is
@@ -537,7 +538,7 @@ namespace hp
 					* <tt>end()</tt>.
 					*/
       line_iterator        end_line (const unsigned int level) const;
-    
+
 				       /**
 					* Return a raw iterator which is the first
 					* iterator not on level. If @p level is
@@ -591,7 +592,7 @@ namespace hp
 					*  active line on level @p level.
 					*/
       active_line_iterator last_active_line (const unsigned int level) const;
-				       /*@}*/	  
+				       /*@}*/
 
 				       /*---------------------------------------*/
 
@@ -634,7 +635,7 @@ namespace hp
 					* <tt>end()</tt>.
 					*/
       quad_iterator        end_quad (const unsigned int level) const;
-    
+
 				       /**
 					* Return a raw iterator which is the first
 					* iterator not on level. If @p level is
@@ -735,7 +736,7 @@ namespace hp
 					* <tt>end()</tt>.
 					*/
       hex_iterator        end_hex (const unsigned int level) const;
-    
+
 				       /**
 					* Return a raw iterator which is the first
 					* iterator not on level. If @p level is
@@ -853,7 +854,7 @@ namespace hp
                                         * triangulation underlying this object.
                                         */
       const Triangulation<dim,spacedim> & get_tria () const;
-    
+
                                        /**
                                         * Determine an estimate for the
                                         * memory consumption (in bytes)
@@ -932,9 +933,9 @@ namespace hp
 		      int,
 		      << "You tried to do something on level " << arg1
 		      << ", but this level is empty.");
-      
+
     protected:
-    
+
                                        /**
                                         * Address of the triangulation to
                                         * work on.
@@ -1098,7 +1099,7 @@ namespace hp
                                         * the Triangulation objects.
                                         */
       internal::hp::DoFFaces<dim> * faces;
-      
+
 
                                        /**
                                         * Store the number of dofs
@@ -1234,13 +1235,13 @@ namespace hp
 
 
 
-  
+
 #endif
-    
+
 }
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
 
-  
+
