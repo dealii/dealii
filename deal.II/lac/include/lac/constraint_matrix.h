@@ -382,7 +382,7 @@ class ConstraintMatrix : public Subscriptor
 				      * line. Always returns true if not in
 				      * the distributed case.
 				      */
-    bool can_store_line(unsigned int line_index) const;
+    bool can_store_line (const unsigned int line_index) const;
 
 				     /**
 				      * This function copies the content of @p
