@@ -49,6 +49,7 @@ namespace internal
  *
 //TODO:[WB] Extend MGDoFHandler doc
  *
+ * @ingroup dofs
  * @author Wolfgang Bangerth, 1998, 1999
  */
 template <int dim, int spacedim=dim>
@@ -58,7 +59,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
   public:
     typedef typename IteratorSelector::CellAccessor cell_accessor;
     typedef typename IteratorSelector::FaceAccessor face_accessor;
-    
+
     typedef typename IteratorSelector::raw_line_iterator raw_line_iterator;
     typedef typename IteratorSelector::line_iterator line_iterator;
     typedef typename IteratorSelector::active_line_iterator active_line_iterator;
