@@ -614,55 +614,6 @@ class ConstraintMatrix : public Subscriptor
 				      * object may not be constrained in the
 				      * second. If this is nevertheless the
 				      * case, an exception is thrown.
-				      *
-				      * However, the following is possible:
-				      * if DoF @p x is constrained to dofs
-				      * @p x_i for some set of indices @p i,
-				      * then the DoFs @p x_i may be further
-				      * constrained by the constraints
-				      * object given as argument, although
-				      * not to other DoFs that are
-				      * constrained in either of the two
-				      * objects. Note that it is not
-				      * possible that the DoFs @p x_i are
-				      * constrained within the present
-				      * object.
-				      *
-				      * Because of simplicity of
-				      * implementation, and also to avoid
-				      * cycles, this operation is not
-				      * symmetric: degrees of freedom that
-				      * are constrained in the given
-				      * argument object may not be
-				      * constrained to DoFs that are
-				      * themselves constrained within the
-				      * present object.
-				      *
-				      * The aim of these merging operations
-				      * is that if, for example, you have
-				      * hanging nodes that are constrained
-				      * to the degrees of freedom adjacent
-				      * to them, you cannot originally,
-				      * i.e. within one object, constrain
-				      * these adjacent nodes
-				      * further. However, that may be
-				      * desirable in some cases, for example
-				      * if they belong to a symmetry
-				      * boundary for which the nodes on one
-				      * side of the domain should have the
-				      * same values as those on the other
-				      * side. In that case, you would first
-				      * construct a costraints object
-				      * holding the hanging nodes
-				      * constraints, and a second one that
-				      * contains the constraints due to the
-				      * symmetry boundary. You would then
-				      * finally merge this second one into
-				      * the first, possibly eliminating
-				      * constraints of hanging nodes to
-				      * adjacent boundary nodes by
-				      * constraints to nodes at the opposite
-				      * boundary.
 				      */
     void merge (const ConstraintMatrix &other_constraints);
 
