@@ -96,12 +96,20 @@ namespace internals
  *
  * <h3>Using the %ConstraintMatrix for Dirichlet boundary conditions</h3>
  *
- * The ConstraintMatrix provides an alternative for implementinging
- * Dirichlet boundary conditions (the standard way that is extensively
- * discussed in the tutorial programs is to use
- * MatrixTools::apply_boundary_values). The general principle of Dirichlet
- * conditions are algebraic constraints of the form $x_{i} = b_i$, which
- * fits into the form described above.
+ * The ConstraintMatrix provides an alternative for implementinging Dirichlet
+ * boundary conditions (the standard way that is extensively discussed in the
+ * tutorial programs is to use MatrixTools::apply_boundary_values). The
+ * general principle of Dirichlet conditions are algebraic constraints of the
+ * form $x_{i} = b_i$, which fits into the form described above. 
+ *
+ * Please note that when combining adaptively refined meshes with hanging node
+ * constraints and inhomogeneous Dirichlet boundary conditions within one
+ * ConstraintMatrix object, the hanging node constraints should always be set
+ * first, and then Dirichlet boundary conditions should be interpolated. This
+ * makes sure that the discretization remains H<sup>1</sup> conforming as is
+ * needed e.g. for the Laplace equation in 3D, as hanging nodes on the
+ * boundary should be still set to the weighted average of neighbors, and not
+ * the actual Dirichlet value.
  *
  *
  * <h3>Description of constraints</h3>
@@ -778,6 +786,14 @@ class ConstraintMatrix : public Subscriptor
                                       */
     const std::vector<std::pair<unsigned int,double> >*
     get_constraint_entries (unsigned int line) const;
+
+                                     /**
+                                      * Returns the value of the inhomogeneity
+                                      * stored in the constrained dof @p
+                                      * line. Unconstrained dofs also return a
+                                      * zero value.
+                                      */
+    double get_inhomogeneity (unsigned int line) const;
 
 				     /**
 				      * Print the constraint lines. Mainly
@@ -2094,6 +2110,18 @@ ConstraintMatrix::get_constraint_entries (unsigned int line) const
 {
   if (is_constrained(line))
     return &lines[lines_cache[calculate_line_index(line)]].entries;
+  else
+    return 0;
+}
+
+
+
+inline
+double
+ConstraintMatrix::get_inhomogeneity (unsigned int line) const
+{
+  if (is_constrained(line))
+    return lines[lines_cache[calculate_line_index(line)]].inhomogeneity;
   else
     return 0;
 }

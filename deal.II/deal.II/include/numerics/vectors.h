@@ -687,31 +687,43 @@ class VectorTools
 
 
 				     /**
-				      * Insert the (algebraic) constraints
-				      * due to Dirichlet boundary conditions
-				      * to the ConstraintMatrix. This
-				      * function makes up the list of
-				      * degrees of freedom subject to
-				      * Dirichlet boundary conditions and
-				      * the values to be assigned to them,
-				      * by interpolation around the
-				      * boundary. If the ConstraintMatrix @p
-				      * constraints contained values or
-				      * other constraints before, the new
-				      * ones are added, or the old ones
-				      * overwritten if a node of the
-				      * boundary part to be used was already
-				      * in the list of constraints. This is
-				      * handled by using inhomogeneous
-				      * constraints. Please note that when
-				      * combining adaptive meshes and this
-				      * kind of constraints, the Dirichlet
-				      * conditions should be set first, and
-				      * then completed by hanging node
-				      * constraints, in order to make sure
-				      * that the discretization remains
-				      * consistent.
+				      * Insert the (algebraic) constraints due
+				      * to Dirichlet boundary conditions into
+				      * a ConstraintMatrix @p
+				      * constraints. This function identifies
+				      * the degrees of freedom subject to
+				      * Dirichlet boundary conditions, adds
+				      * them to the list of constrained DoFs
+				      * in @p constraints and sets the
+				      * respective inhomogeneity to the value
+				      * interpolated around the boundary. If
+				      * this routine encounters a DoF that
+				      * already is constrained (for instance
+				      * by a hanging node constraint, see
+				      * below, or any other type of
+				      * constraint, e.g. from periodic
+				      * boundary conditions), the old setting
+				      * of the constraint (dofs the entry is
+				      * constrained to, inhomogeneities) is
+				      * kept and nothing happens.
 				      *
+				      * Please note that when combining
+				      * adaptively refined meshes with hanging
+				      * node constraints and inhomogeneous
+				      * Dirichlet boundary conditions within
+				      * one ConstraintMatrix object, the
+				      * hanging node constraints should always
+				      * be set first, and then Dirichlet
+				      * boundary conditions should be
+				      * interpolated. This makes sure that the
+				      * discretization remains H<sup>1</sup>
+				      * conforming as is needed e.g. for the
+				      * Laplace equation in 3D, as hanging
+				      * nodes on the boundary should be still
+				      * set to the weighted average of
+				      * neighbors, and not the actual
+				      * Dirichlet value.
+ *				      *
 				      * The parameter @p boundary_component
 				      * corresponds to the number @p
 				      * boundary_indicator of the face.  255
@@ -880,25 +892,42 @@ class VectorTools
 				       std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 				     /**
-				      * Project a function to the boundary
-				      * of the domain, using the given
-				      * quadrature formula for the faces. If
-				      * the ConstraintMatrix @p constraints
-				      * contained values or other
-				      * constraints before, the new ones are
-				      * added, or the old ones overwritten
-				      * if a node of the boundary part to be
-				      * used was already in the list of
-				      * constraints. This is handled by
-				      * using inhomogeneous
-				      * constraints. Please note that when
-				      * combining adaptive meshes and this
-				      * kind of constraints, the Dirichlet
-				      * conditions should be set first, and
-				      * then completed by hanging node
-				      * constraints, in order to make sure
-				      * that the discretization remains
-				      * consistent.
+				      * Project a function to the boundary of
+				      * the domain, using the given quadrature
+				      * formula for the faces. This function
+				      * identifies the degrees of freedom
+				      * subject to Dirichlet boundary
+				      * conditions, adds them to the list of
+				      * constrained DoFs in @p constraints and
+				      * sets the respective inhomogeneity to
+				      * the value resulting from the
+				      * projection operation. If this routine
+				      * encounters a DoF that already is
+				      * constrained (for instance by a hanging
+				      * node constraint, see below, or any
+				      * other type of constraint, e.g. from
+				      * periodic boundary conditions), the old
+				      * setting of the constraint (dofs the
+				      * entry is constrained to,
+				      * inhomogeneities) is kept and nothing
+				      * happens.
+				      *
+				      * Please note that when combining
+				      * adaptively refined meshes with hanging
+				      * node constraints and inhomogeneous
+				      * Dirichlet boundary conditions within
+				      * one ConstraintMatrix object, the
+				      * hanging node constraints should always
+				      * be set first, and then Dirichlet
+				      * boundary conditions should be
+				      * interpolated. This makes sure that the
+				      * discretization remains H<sup>1</sup>
+				      * conforming as is needed e.g. for the
+				      * Laplace equation in 3D, as hanging
+				      * nodes on the boundary should be still
+				      * set to the weighted average of
+				      * neighbors, and not the actual
+				      * Dirichlet value.
 				      *
 				      * If @p component_mapping is empty, it
 				      * is assumed that the number of

@@ -1236,6 +1236,10 @@ VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space
 					  std::map<unsigned int,double> &boundary_values,
 					  const std::vector<bool>       &component_mask_)
 {
+  //ConstraintMatrix boundary_constraints();
+  //  interpolate_boundary_values (dof, boundary_component, boundary_function, 
+  //			       boundary_constraints, component_mask);
+  
   const unsigned int dim=DH::dimension;
   const unsigned int spacedim=DH::space_dimension;
 
@@ -1732,132 +1736,6 @@ VectorTools::interpolate_boundary_values (const DH                 &dof,
 
 // ----------- interpolate_boundary_values for ConstraintMatrix --------------
 
-// TODO (M.K.): There is a lot of duplicated code with the above
-// function. We should unify all these interpolate_boundary_values functions
-// in one way or the other.
-
-#if deal_II_dimension == 1
-
-//TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hp::DoFHandler.
-
-//template <int dim, template <int, int> class DH, int spacedim>
-
-template <class DH>
-void
-VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension> &,
-					  const DH                &dof,
-					  const unsigned char      boundary_component,
-					  const Function<DH::space_dimension> &boundary_function,
-					  ConstraintMatrix        &constraints,
-					  const std::vector<bool> &component_mask_)
-{
-  const unsigned int dim=DH::dimension;
-  const unsigned int spacedim=DH::space_dimension;
-
-  Assert (boundary_component != 255,
-	  ExcInvalidBoundaryIndicator());
-  Assert ((component_mask_.size() == 0) ||
-	  (component_mask_.size() == dof.get_fe().n_components()),
-	  ExcMessage ("The number of components in the mask has to be either "
-		      "zero or equal to the number of components in the finite "
-		      "element."));
-
-				   // check whether boundary values at
-				   // the left or right boundary of
-				   // the line are
-				   // requested. direction denotes
-				   // the neighboring direction in
-				   // which we seek the boundary,
-				   // i.e. 0 is left boundary and 1 is
-				   // right.
-  const unsigned int direction = boundary_component;
-  Assert (direction < 2, ExcInvalidBoundaryIndicator());
-
-				   // first find the outermost active
-				   // cell by first traversing the coarse
-				   // grid to its end and then going
-				   // to the children
-  typename DH::cell_iterator outermost_cell = dof.begin(0);
-  while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
-    outermost_cell = outermost_cell->neighbor(direction);
-
-  while (outermost_cell->has_children())
-    outermost_cell = outermost_cell->child(direction);
-
-                                   // get the FE corresponding to this
-                                   // cell
-  const FiniteElement<dim,spacedim> &fe = outermost_cell->get_fe();
-  Assert (fe.n_components() == boundary_function.n_components,
-	  ExcDimensionMismatch(fe.n_components(), boundary_function.n_components));
-
-				   // set the component mask to either
-				   // the original value or a vector
-				   // of trues
-  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					  std::vector<bool> (fe.n_components(), true) :
-					  component_mask_);
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcNoComponentSelected());
-
-				   // now set the value of the
-				   // outermost degree of
-				   // freedom. setting also
-				   // creates the entry in the map
-				   // if it did not exist
-				   // beforehand
-				   //
-				   // save some time by requesting
-				   // values only once for each point,
-				   // irrespective of the number of
-				   // components of the function
-  Vector<double> function_values (fe.n_components());
-  if (fe.n_components() == 1)
-    function_values(0)
-      = boundary_function.value (outermost_cell->vertex(direction));
-  else
-    boundary_function.vector_value (outermost_cell->vertex(direction),
-				    function_values);
-
-  for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-    if (component_mask[fe.face_system_to_component_index(i).first])
-      {
-				   // TODO: should we clear the other
-				   // entries in the line here?
-	const unsigned int row = outermost_cell->vertex_dof_index(direction,i,
-								  outermost_cell->active_fe_index());
-	constraints.add_line (row);
-	constraints.set_inhomogeneity (row,
-		    function_values(fe.face_system_to_component_index(i).first));
-      }
-}
-
-
-//TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hp::DoFHandler.
-
-// Implementation for 1D
-template <class DH>
-void
-VectorTools::interpolate_boundary_values
-  (const Mapping<DH::dimension, DH::space_dimension>     &mapping,
-   const DH                                              &dof,
-   const typename FunctionMap<DH::space_dimension>::type &function_map,
-   ConstraintMatrix                                      &constraints,
-   const std::vector<bool>                               &component_mask)
-{
-  for (typename FunctionMap<DH::space_dimension>::type::const_iterator i=function_map.begin();
-       i!=function_map.end(); ++i)
-    interpolate_boundary_values (mapping, dof, i->first, *i->second,
-				 constraints, component_mask);
-}
-
-
-//TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hp::DoFHandler.
-
-
-#else
 
 
 template <class DH>
@@ -1869,317 +1747,20 @@ VectorTools::interpolate_boundary_values
   ConstraintMatrix                                      &constraints,
   const std::vector<bool>                               &component_mask_)
 {
-  const unsigned int dim=DH::dimension;
-
-  Assert ((component_mask_.size() == 0) ||
-	  (component_mask_.size() == dof.get_fe().n_components()),
-	  ExcMessage ("The number of components in the mask has to be either "
-		      "zero or equal to the number of components in the finite "
-		      "element."));
-
-
-				   // if for whatever reason we were
-				   // passed an empty map, return
-				   // immediately
-  if (function_map.size() == 0)
-    return;
-
-  Assert (function_map.find(255) == function_map.end(),
-	  ExcInvalidBoundaryIndicator());
-
-  const unsigned int        n_components = DoFTools::n_components(dof);
-  const bool                fe_is_system = (n_components != 1);
-
-  for (typename FunctionMap<DH::space_dimension>::type::const_iterator i=function_map.begin();
-       i!=function_map.end(); ++i)
-    Assert (n_components == i->second->n_components,
-	    ExcDimensionMismatch(n_components, i->second->n_components));
-
-				   // set the component mask to either
-				   // the original value or a vector
-				   // of trues
-  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					  std::vector<bool> (n_components, true) :
-					  component_mask_);
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcNoComponentSelected());
-
-				   // field to store the indices
-  std::vector<unsigned int> face_dofs;
-  face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
-
-  std::vector<Point<DH::space_dimension> >  dof_locations;
-  dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
-
-				   // array to store the values of the
-				   // boundary function at the boundary
-				   // points. have to arrays for scalar and
-				   // vector functions to use the more
-				   // efficient one respectively
-  std::vector<double>          dof_values_scalar;
-  std::vector<Vector<double> > dof_values_system;
-  dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
-  dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
-
-				   // before we start with the loop over all
-				   // cells create an hp::FEValues object
-				   // that holds the interpolation points of
-				   // all finite elements that may ever be
-				   // in use
-  hp::FECollection<dim> finite_elements (dof.get_fe());
-  hp::QCollection<dim-1>  q_collection;
-  for (unsigned int f=0; f<finite_elements.size(); ++f)
+  std::map<unsigned int,double> boundary_values;
+  interpolate_boundary_values (mapping, dof, function_map,
+			       boundary_values, component_mask_);
+  std::map<unsigned int,double>::const_iterator boundary_value = 
+    boundary_values.begin();
+  for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
     {
-      const FiniteElement<dim> &fe = finite_elements[f];
-
-				       // generate a quadrature rule on the
-				       // face from the unit support
-				       // points. this will be used to
-				       // obtain the quadrature points on
-				       // the real cell's face
-				       //
-				       // to do this, we check whether
-				       // the FE has support points on
-				       // the face at all:
-      if (fe.has_face_support_points())
-	q_collection.push_back (Quadrature<dim-1>(fe.get_unit_face_support_points()));
-      else
+      if (!constraints.is_constrained(boundary_value->first))
 	{
-					   // if not, then we should try a
-					   // more clever way. the idea is
-					   // that a finite element may not
-					   // offer support points for all
-					   // its shape functions, but maybe
-					   // only some. if it offers
-					   // support points for the
-					   // components we are interested
-					   // in in this function, then
-					   // that's fine. if not, the
-					   // function we call in the finite
-					   // element will raise an
-					   // exception. the support points
-					   // for the other shape functions
-					   // are left uninitialized (well,
-					   // initialized by the default
-					   // constructor), since we don't
-					   // need them anyway.
-					   //
-					   // As a detour, we must make sure
-					   // we only query
-					   // face_system_to_component_index
-					   // if the index corresponds to a
-					   // primitive shape
-					   // function. since we know that
-					   // all the components we are
-					   // interested in are primitive
-					   // (by the above check), we can
-					   // safely put such a check in
-					   // front
-	  std::vector<Point<dim-1> > unit_support_points (fe.dofs_per_face);
-
-	  for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-	    if (fe.is_primitive (fe.face_to_equivalent_cell_index(i)))
-	      if (component_mask[fe.face_system_to_component_index(i).first]
-		  == true)
-		unit_support_points[i] = fe.unit_face_support_point(i);
-
-	  q_collection.push_back (Quadrature<dim-1>(unit_support_points));
-        }
+	  constraints.add_line (boundary_value->first);
+	  constraints.set_inhomogeneity (boundary_value->first,
+					 boundary_value->second);
+	}
     }
-				   // now that we have a q_collection object
-				   // with all the right quadrature points,
-				   // create an hp::FEFaceValues object that
-				   // we can use to evaluate the boundary
-				   // values at
-  hp::MappingCollection<dim> mapping_collection (mapping);
-  hp::FEFaceValues<dim> x_fe_values (mapping_collection, finite_elements, q_collection,
-				     update_quadrature_points);
-
-  typename DH::active_cell_iterator cell = dof.begin_active(),
-				    endc = dof.end();
-  for (; cell!=endc; ++cell)
-    for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-	 ++face_no)
-      {
-        const FiniteElement<dim,DH::space_dimension> &fe = cell->get_fe();
-
-					 // we can presently deal only with
-					 // primitive elements for boundary
-					 // values. this does not preclude
-					 // us using non-primitive elements
-					 // in components that we aren't
-					 // interested in, however. make
-					 // sure that all shape functions
-					 // that are non-zero for the
-					 // components we are interested in,
-					 // are in fact primitive
-	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-	  {
-	    const std::vector<bool> &nonzero_component_array
-	      = cell->get_fe().get_nonzero_components (i);
-	    for (unsigned int c=0; c<n_components; ++c)
-	      if ((nonzero_component_array[c] == true)
-		  &&
-		  (component_mask[c] == true))
-		Assert (cell->get_fe().is_primitive (i),
-			ExcMessage ("This function can only deal with requested boundary "
-				    "values that correspond to primitive (scalar) base "
-				    "elements"));
-	  }
-
-	typename DH::face_iterator face = cell->face(face_no);
-	const unsigned char boundary_component = face->boundary_indicator();
-	if (function_map.find(boundary_component) != function_map.end())
-	  {
-					     // face is of the right
-					     // component
-	    x_fe_values.reinit(cell, face_no);
-	    const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values();
-
-					     // get indices, physical
-					     // location and boundary values
-					     // of dofs on this face
-            face_dofs.resize (fe.dofs_per_face);
-	    face->get_dof_indices (face_dofs, cell->active_fe_index());
-	    const std::vector<Point<DH::space_dimension> > &dof_locations
-              = fe_values.get_quadrature_points ();
-
-	    if (fe_is_system)
-	      {
-                                                 // resize array. avoid
-                                                 // construction of a memory
-                                                 // allocating temporary if
-                                                 // possible
-                if (dof_values_system.size() < fe.dofs_per_face)
-                  dof_values_system.resize (fe.dofs_per_face,
-                                            Vector<double>(fe.n_components()));
-                else
-                  dof_values_system.resize (fe.dofs_per_face);
-
-		function_map.find(boundary_component)->second
-                  ->vector_value_list (dof_locations, dof_values_system);
-
-						 // enter those dofs into
-						 // the list that match the
-						 // component
-						 // signature. avoid the
-						 // usual complication that
-						 // we can't just use
-						 // *_system_to_component_index
-						 // for non-primitive FEs
-		for (unsigned int i=0; i<face_dofs.size(); ++i)
-                  {
-                    unsigned int component;
-                    if (fe.is_primitive())
-                      component = fe.face_system_to_component_index(i).first;
-                    else
-                      {
-                                                         // non-primitive
-                                                         // case. make sure
-                                                         // that this
-                                                         // particular shape
-                                                         // function _is_
-                                                         // primitive, and
-                                                         // get at it's
-                                                         // component. use
-                                                         // usual trick to
-                                                         // transfer face
-                                                         // dof index to
-                                                         // cell dof index
-                        const unsigned int cell_i
-                          = (dim == 1 ?
-                             i
-                             :
-                             (dim == 2 ?
-                              (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
-                              :
-                              (dim == 3 ?
-                               (i<4*fe.dofs_per_vertex ?
-                                i
-                                :
-                                (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                 i+4*fe.dofs_per_vertex
-                                 :
-                                 i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
-                               :
-                               numbers::invalid_unsigned_int)));
-                        Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
-
-                                                         // make sure that
-                                                         // if this is not a
-                                                         // primitive shape
-                                                         // function, then
-                                                         // all the
-                                                         // corresponding
-                                                         // components in
-                                                         // the mask are not
-                                                         // set
-                        if (!fe.is_primitive(cell_i))
-                          for (unsigned int c=0; c<n_components; ++c)
-                            if (fe.get_nonzero_components(cell_i)[c])
-                              Assert (component_mask[c] == false,
-                                      FETools::ExcFENotPrimitive());
-
-                                                         // let's pick the
-                                                         // first of
-                                                         // possibly more
-                                                         // than one
-                                                         // non-zero
-                                                         // components. if
-                                                         // shape function
-                                                         // is
-                                                         // non-primitive,
-                                                         // then we will
-                                                         // ignore the
-                                                         // result in the
-                                                         // following
-                                                         // anyway,
-                                                         // otherwise
-                                                         // there's only one
-                                                         // non-zero
-                                                         // component which
-                                                         // we will use
-                        component = (std::find (fe.get_nonzero_components(cell_i).begin(),
-                                                fe.get_nonzero_components(cell_i).end(),
-                                                true)
-                                     -
-                                     fe.get_nonzero_components(cell_i).begin());
-                      }
-
-                    if (component_mask[component] == true)
-		      {
-				   // TODO: check whether we should clear
-				   // the current line first...
-			constraints.add_line (face_dofs[i]);
-			constraints.set_inhomogeneity (face_dofs[i],
-						       dof_values_system[i](component));
-		      }
-                  }
-	      }
-	    else
-					       // fe has only one component,
-					       // so save some computations
-	      {
-						 // get only the one
-						 // component that this
-						 // function has
-                dof_values_scalar.resize (fe.dofs_per_face);
-		function_map.find(boundary_component)->second
-                  ->value_list (dof_locations, dof_values_scalar, 0);
-
-						 // enter into list
-
-		for (unsigned int i=0; i<face_dofs.size(); ++i)
-				   // TODO: check whether we should clear
-				   // the current line first...
-		  {
-		    constraints.add_line (face_dofs[i]);
-		    constraints.set_inhomogeneity (face_dofs[i],
-						   dof_values_scalar[i]);
-		  }
-	      }
-	  }
-      }
 }
 
 
@@ -2200,7 +1781,6 @@ VectorTools::interpolate_boundary_values
 			       component_mask);
 }
 
-#endif
 
 
 template <class DH>
@@ -2437,26 +2017,6 @@ VectorTools::project_boundary_values (const DoFHandler<dim,spacedim>    &dof,
 
 // ----- implementation for project_boundary_values with ConstraintMatrix -----
 
-#if deal_II_dimension == 1
-
-// Implementation for 1D
-template <int dim, int spacedim>
-void
-VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mapping,
-				      const DoFHandler<dim,spacedim>    &dof,
-				      const typename FunctionMap<spacedim>::type &boundary_functions,
-				      const Quadrature<dim-1>  &,
-				      ConstraintMatrix &constraints,
-				      std::vector<unsigned int> component_mapping)
-{
-  Assert (component_mapping.size() == 0, ExcNotImplemented());
-				   // projection in 1d is equivalent
-				   // to interpolation
-  interpolate_boundary_values (mapping, dof, boundary_functions,
-			       constraints, std::vector<bool>());
-}
-
-#else
 
 
 template <int dim, int spacedim>
@@ -2468,160 +2028,23 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
 				      ConstraintMatrix &constraints,
 				      std::vector<unsigned int> component_mapping)
 {
-//TODO:[?] In VectorTools::project_boundary_values, no condensation of sparsity
-//    structures, matrices and right hand sides or distribution of
-//    solution vectors is performed. This is ok for dim<3 because then
-//    there are no constrained nodes on the boundary, but is not
-//    acceptable for higher dimensions. Fix this.
-
-  if (component_mapping.size() == 0)
+  std::map<unsigned int,double> boundary_values;
+  project_boundary_values (mapping, dof, boundary_functions, q,
+			   boundary_values, component_mapping);
+  std::map<unsigned int,double>::const_iterator boundary_value = 
+    boundary_values.begin();
+  for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
     {
-      AssertDimension (dof.get_fe().n_components(), boundary_functions.begin()->second->n_components);
-				       // I still do not see why i
-				       // should create another copy
-				       // here
-      component_mapping.resize(dof.get_fe().n_components());
-      for (unsigned int i= 0 ;i < component_mapping.size() ; ++i)
-	component_mapping[i] = i;
+      if (!constraints.is_constrained(boundary_value->first))
+	{
+	  constraints.add_line (boundary_value->first);
+	  constraints.set_inhomogeneity (boundary_value->first,
+					 boundary_value->second);
+	}
     }
-  else
-    AssertDimension (dof.get_fe().n_components(), component_mapping.size());
-
-  std::vector<unsigned int> dof_to_boundary_mapping;
-  std::set<unsigned char> selected_boundary_components;
-  for (typename FunctionMap<spacedim>::type::const_iterator i=boundary_functions.begin();
-       i!=boundary_functions.end(); ++i)
-    selected_boundary_components.insert (i->first);
-
-  DoFTools::map_dof_to_boundary_indices (dof, selected_boundary_components,
-					 dof_to_boundary_mapping);
-
-				   // Done if no degrees of freedom on
-				   // the boundary
-  if (dof.n_boundary_dofs (boundary_functions) == 0)
-    return;
-				   // set up sparsity structure
-  SparsityPattern sparsity(dof.n_boundary_dofs (boundary_functions),
-			   dof.max_couplings_between_boundary_dofs());
-  DoFTools::make_boundary_sparsity_pattern (dof,
-					    boundary_functions,
-					    dof_to_boundary_mapping,
-					    sparsity);
-
-				   // note: for three or more dimensions, there
-				   // may be constrained nodes on the boundary
-				   // in this case the boundary mass matrix has
-				   // to be condensed and the solution is to
-				   // be distributed afterwards, which is not
-				   // yet implemented. The reason for this is
-				   // that we cannot simply use the condense
-				   // family of functions, since the matrices
-				   // and vectors do not use the global
-				   // numbering but rather the boundary
-				   // numbering, i.e. the condense function
-				   // needs to use another indirection. There
-				   // should be not many technical problems,
-				   // but it needs to be implemented
-  if (dim>=3)
-    {
-#ifdef DEBUG
-// Assert that there are no hanging nodes at the boundary
-      int level = -1;
-      for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof.begin_active();
-	   cell != dof.end(); ++cell)
-	for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
-	  {
-	    if (cell->at_boundary(f))
-	      {
-		if (level == -1)
-		  level = cell->level();
-		else
-		  {
-		    Assert (level == cell->level(), ExcNotImplemented());
-		  }
-	      }
-	  }
-#endif
-    }
-  sparsity.compress();
-
-
-				   // make mass matrix and right hand side
-  SparseMatrix<double> mass_matrix(sparsity);
-  Vector<double>       rhs(sparsity.n_rows());
-
-
-  MatrixCreator::create_boundary_mass_matrix (mapping, dof, q,
-					      mass_matrix, boundary_functions,
-					      rhs, dof_to_boundary_mapping, (const Function<spacedim>*) 0,
-					      component_mapping);
-
-				   // For certain weird elements,
-				   // there might be degrees of
-				   // freedom on the boundary, but
-				   // their shape functions do not
-				   // have support there. Let's
-				   // eliminate them here.
-
-//TODO: Maybe we should figure out if the element really needs this
-
-  FilteredMatrix<Vector<double> > filtered_mass_matrix(mass_matrix, true);
-  FilteredMatrix<Vector<double> > filtered_precondition;
-  std::vector<bool> excluded_dofs(mass_matrix.m(), false);
-
-  double max_element = 0.;
-  for (unsigned int i=0;i<mass_matrix.m();++i)
-    if (mass_matrix.diag_element(i) > max_element)
-      max_element = mass_matrix.diag_element(i);
-
-  for (unsigned int i=0;i<mass_matrix.m();++i)
-    if (mass_matrix.diag_element(i) < 1.e-8 * max_element)
-      {
-	filtered_mass_matrix.add_constraint(i, 0.);
-	filtered_precondition.add_constraint(i, 0.);
-	mass_matrix.diag_element(i) = 1.;
-	excluded_dofs[i] = true;
-      }
-
-  Vector<double> boundary_projection (rhs.size());
-
-				   // Allow for a maximum of 5*n
-				   // steps to reduce the residual by
-				   // 10^-12. n steps may not be
-				   // sufficient, since roundoff
-				   // errors may accumulate for badly
-				   // conditioned matrices
-  ReductionControl        control(5*rhs.size(), 0., 1.e-12, false, false);
-  GrowingVectorMemory<> memory;
-  SolverCG<>              cg(control,memory);
-
-  PreconditionSSOR<> prec;
-  prec.initialize(mass_matrix, 1.2);
-  filtered_precondition.initialize(prec, true);
-				   // solve
-  cg.solve (filtered_mass_matrix, boundary_projection, rhs, filtered_precondition);
-  filtered_precondition.apply_constraints(boundary_projection, true);
-  filtered_precondition.clear();
-				   // fill in boundary values
-  for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
-    if (dof_to_boundary_mapping[i] != DoFHandler<dim,spacedim>::invalid_dof_index
-    && ! excluded_dofs[dof_to_boundary_mapping[i]])
-				       // this dof is on one of the
-				       // interesting boundary parts
-				       //
-				       // remember: i is the global dof
-				       // number, dof_to_boundary_mapping[i]
-				       // is the number on the boundary and
-				       // thus in the solution vector
-      {
-				   // TODO: check whether we should clear
-				   // the entries in this line first.
-	constraints.add_line (i);
-	constraints.set_inhomogeneity (i, boundary_projection(dof_to_boundary_mapping[i]));
-      }
 }
 
-#endif
+
 
 template <int dim, int spacedim>
 void

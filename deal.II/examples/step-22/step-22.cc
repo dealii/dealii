@@ -573,49 +573,52 @@ void StokesProblem<dim>::setup_dofs ()
 				   // Now comes the implementation of
 				   // Dirichlet boundary conditions, which
 				   // should be evident after the discussion
-				   // in the introduction. All that changed
-				   // is that the function already appears
-				   // in the setup functions, whereas we
-				   // were used to see it in some assembly
-				   // routine. Further down below where we
-				   // set up the mesh, we will associate the
-				   // top boundary where we impose Dirichlet
-				   // boundary conditions with boundary
-				   // indicator 1.  We will have to pass
-				   // this boundary indicator as second
-				   // argument to the function below
-				   // interpolating boundary values.  There
-				   // is one more thing, though.  The
-				   // function describing the Dirichlet
-				   // conditions was defined for all
-				   // components, both velocity and
-				   // pressure. However, the Dirichlet
-				   // conditions are to be set for the
-				   // velocity only.  To this end, we use a
-				   // <code>component_mask</code> that
+				   // in the introduction. All that changed is
+				   // that the function already appears in the
+				   // setup functions, whereas we were used to
+				   // see it in some assembly routine. Further
+				   // down below where we set up the mesh, we
+				   // will associate the top boundary where we
+				   // impose Dirichlet boundary conditions
+				   // with boundary indicator 1.  We will have
+				   // to pass this boundary indicator as
+				   // second argument to the function below
+				   // interpolating boundary values.  There is
+				   // one more thing, though.  The function
+				   // describing the Dirichlet conditions was
+				   // defined for all components, both
+				   // velocity and pressure. However, the
+				   // Dirichlet conditions are to be set for
+				   // the velocity only.  To this end, we use
+				   // a <code>component_mask</code> that
 				   // filters out the pressure component, so
 				   // that the condensation is performed on
-				   // velocity degrees of freedom
-				   // only. Since we use adaptively refined
-				   // grids the constraint matrix needs then
-				   // also be filled with hanging node
-				   // constraints needs to generated from
-				   // the DoF handler. Note the order of the
-				   // two functions &mdash; we first insert
-				   // the boundary values into the
-				   // constraint matrix, and then introduce
-				   // the hanging node constraints.
+				   // velocity degrees of freedom only. Since
+				   // we use adaptively refined grids the
+				   // constraint matrix needs to be first
+				   // filled with hanging node constraints
+				   // generated from the DoF handler. Note the
+				   // order of the two functions &mdash; we
+				   // first compute the hanging node
+				   // constraints, and then insert the
+				   // boundary values into the constraint
+				   // matrix. This makes sure that we respect
+				   // H<sup>1</sup> conformity on boundaries
+				   // with hanging nodes (in three space
+				   // dimensions), where the hanging node
+				   // needs to dominate the Dirichlet boundary
+				   // values.
   {
     constraints.clear ();
     std::vector<bool> component_mask (dim+1, true);
     component_mask[dim] = false;
+    DoFTools::make_hanging_node_constraints (dof_handler,
+					     constraints);
     VectorTools::interpolate_boundary_values (dof_handler,
 					      1,
 					      BoundaryValues<dim>(),
 					      constraints,
 					      component_mask);
-    DoFTools::make_hanging_node_constraints (dof_handler,
-					     constraints);
   }
 
   constraints.close ();

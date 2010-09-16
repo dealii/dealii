@@ -262,6 +262,21 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <ol>
   <li>
   <p>
+  Fixed: The methods VectorTools::interpolate_boundary_values and
+  VectorTools::project_boundary_values with ConstraintMatrix argument added
+  inhomogeneities also to DoFs that were already constrained when entering the
+  call without changing the list of DoFs that those were constrained to. This
+  lead to wrong results for inhomogeneous constraints in case e.g.
+  DoFTools::make_hanging_node_constraints was called before. Now, the correct
+  way for combining hanging node constraints and Dirichlet conditions in one
+  ConstraintMatrix is to first make the hanging node constraints, and then
+  interpolate/project the boundary values.
+  <br>
+  (Luca Heltai, Martin Kronbichler 2010/09/16)
+  </p>
+
+  <li>
+  <p>
   Fixed: The method FEValuesViews::Vector::curl aborted the program in 2d under certain
   circumstances. This is now fixed.
   <br>
