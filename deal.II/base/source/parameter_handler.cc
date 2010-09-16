@@ -836,7 +836,7 @@ void ParameterHandler::enter_subsection (const std::string &subsection)
 				   // if necessary create subsection
   if (!entries->get_child_optional (get_current_full_path(subsection)))
     entries->add_child (get_current_full_path(subsection),
-		       boost::property_tree::ptree());
+			boost::property_tree::ptree());
 
 				   // then enter it
   subsection_path.push_back (subsection);
@@ -1009,13 +1009,33 @@ ParameterHandler::print_parameters (std::ostream     &out,
   switch (style)
     {
       case XML:
-					     // call the writer
-					     // function and exit as
-					     // there is nothing
-					     // further to do down in
-					     // this function
-	    write_xml (out, *entries);
-	    return out;
+      {
+					 // call the writer
+					 // function and exit as
+					 // there is nothing
+					 // further to do down in
+					 // this function
+					 //
+					 // XML has a requirement that
+					 // there can only be one
+					 // single top-level entry,
+					 // but we may have multiple
+					 // entries and sections.  we
+					 // work around this by
+					 // creating a tree just for
+					 // this purpose with the
+					 // single top-level node
+					 // "ParameterHandler" and
+					 // assign the existing tree
+					 // under it
+	boost::property_tree::ptree single_node_tree;
+	single_node_tree.add_child("ParameterHandler",
+				   *entries);
+
+	write_xml (out, single_node_tree);
+	return out;
+      }
+
 
       case JSON:
 					     // call the writer

@@ -1295,34 +1295,39 @@ namespace Patterns
  *   this:
  *   @code
  *   <?xml version="1.0" encoding="utf-8"?>
- *   <Maximal_20number_20of_20iterations>
- *     <value>10</value>
- *     <default_value>10</default_value>
- *     <documentation>A parameter that describes the maximal number of iterations the CG method is to take before giving up on a matrix.</documentation>
- *     <pattern>0</pattern>
- *     <pattern_description>[Integer range 1...1000 (inclusive)]</pattern_description>
- *   </Maximal_20number_20of_20iterations>
- *   <Preconditioner>
- *     <Kind><value>SSOR</value>
- *       <default_value>SSOR</default_value>
- *       <documentation>A string that describes the kind of preconditioner to use.</documentation>
- *       <pattern>1</pattern>
- *       <pattern_description>SSOR|Jacobi</pattern_description>
- *     </Kind>
- *     <Relaxation_20factor>
- *       <value>1.0</value>
- *       <default_value>1.0</default_value>
- *       <documentation>The numerical value (between zero and one) for the relaxation factor to use in the preconditioner.</documentation>
- *       <pattern>2</pattern>
- *       <pattern_description>[Floating point range 0...1 (inclusive)]</pattern_description>
- *     </Relaxation_20factor>
- *   </Preconditioner>
+ *   <ParameterHandler>
+ *     <Maximal_20number_20of_20iterations>
+ *       <value>10</value>
+ *       <default_value>10</default_value>
+ *       <documentation>A parameter that describes the maximal number of iterations the CG method is to take before giving up on a matrix.</documentation>
+ *       <pattern>0</pattern>
+ *       <pattern_description>[Integer range 1...1000 (inclusive)]</pattern_description>
+ *     </Maximal_20number_20of_20iterations>
+ *     <Preconditioner>
+ *       <Kind><value>SSOR</value>
+ *         <default_value>SSOR</default_value>
+ *         <documentation>A string that describes the kind of preconditioner to use.</documentation>
+ *         <pattern>1</pattern>
+ *         <pattern_description>SSOR|Jacobi</pattern_description>
+ *       </Kind>
+ *       <Relaxation_20factor>
+ *         <value>1.0</value>
+ *         <default_value>1.0</default_value>
+ *         <documentation>The numerical value (between zero and one) for the relaxation factor to use in the preconditioner.</documentation>
+ *         <pattern>2</pattern>
+ *         <pattern_description>[Floating point range 0...1 (inclusive)]</pattern_description>
+ *       </Relaxation_20factor>
+ *     </Preconditioner>
+ *   <ParameterHandler>
  *   @endcode
  *   This representation closely resembles the directory/file structure
  *   discussed above. The only difference is that directory and file
  *   names are mangled: since they should only contain letters and
  *   numbers, every character in their names that's not one is replaced
  *   by an underscore followed by its two-digit hexadecimal representation.
+ *   In addition, the entire tree is wrapped into a tag
+ *   <code>ParameterHandler</code> to satisfy the XML requirement that there
+ *   be only a single top-level construct in each file.
  *
  *
  *   @ingroup input
@@ -1379,6 +1384,11 @@ class ParameterHandler : public Subscriptor
 					    * Write out everything as
 					    * an <a href="http://en.wikipedia.org/wiki/XML>XML</a>
 					    * file.
+					    *
+					    * See the general
+					    * documentation of this
+					    * class for an example of
+					    * output.
 					    */
 	  XML = 4,
 
