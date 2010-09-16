@@ -1,0 +1,5 @@
+
+DEAL:3d::Number of DoFs: 163
+DEAL:3d::Number of hanging nodes: 33
+DEAL:3d::Total number of constraints: 134
+DEAL:3d::Check that both constraint matrices are identical... OK.

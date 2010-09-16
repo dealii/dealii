@@ -23,8 +23,7 @@ default: run-tests
 
 tests_x = block_info block_matrices \
 	user_data_* \
-	constraints \
-	constraint_graph \
+	constraint* \
 	inhomogeneous_constraints \
 	inhomogeneous_constraints_nonsymmetric \
 	inhomogeneous_constraints_block \
