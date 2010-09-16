@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,11 +14,15 @@
 /**
  * @defgroup dofs Degrees of Freedom
  *
- * This module groups classes and namespace that have to do with handling
- * degrees of freedom. The central class of this group is the DoFHandler
- * class: it is built on top of a triangulation and a finite element class and
- * allocated degrees of freedom on each cell of the triangulation as required
- * for the finite element space described by the finite element object.
+ * This module groups classes and namespaces that have to do with
+ * handling degrees of freedom. The central class of this group is the
+ * DoFHandler class: it is built on top of a triangulation and a
+ * finite element class and allocated degrees of freedom on each cell
+ * of the triangulation as required for the finite element space
+ * described by the finite element object. There are other variants of
+ * the DoFHandler class such as hp::DoFHandler,
+ * parallel::distributed::DoFHandler and MGDoFHandler that do similar
+ * things for more special cases.
  *
  * DoFHandlers extend Triangulation objects (and the other classes in the @ref
  * grid module) in that they, too, offer iterators that run over all cells,
@@ -28,7 +32,7 @@
  * example, they allow to query the indices of the degrees of freedom
  * associated with the present cell.
  *
- * In addition to the DoFHandler class, this module holds a number of
+ * In addition to the DoF handler classes, this module holds a number of
  * auxiliary classes not commonly used in application programs, as well as
  * three classes that are not directly associated with the data structures of
  * the DoFHandler class. The first of these is the ConstraintMatrix class that
