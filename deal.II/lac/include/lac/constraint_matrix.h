@@ -345,6 +345,7 @@ namespace internals
  * constrained nodes need to get their values in a second step.
  *
  * @ingroup dofs
+ * @ingroup constraints
  * @author Wolfgang Bangerth, Martin Kronbichler, 1998, 2004, 2008, 2009
  */
 class ConstraintMatrix : public Subscriptor
