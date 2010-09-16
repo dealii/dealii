@@ -54,6 +54,15 @@ namespace internals
 }
 
 
+//TODO[WB]: We should have a function of the kind
+//   ConstraintMatrix::add_constraint (const unsigned int constrained_dof,
+//                const std::vector<std::pair<unsigned int, double> > &entries,
+//                const double inhomogeneity = 0);
+// rather than building up constraints piecemeal through add_line/add_entry
+// etc. This would also eliminate the possibility of accidentally changing
+// existing constraints into something pointless, see the discussion on the
+// mailing list on "Tiny bug in interpolate_boundary_values" in Sept. 2010.
+
 /**
  * This class implements dealing with linear (possibly inhomogeneous)
  * constraints on degrees of freedom. In particular, it handles constraints of
@@ -100,7 +109,7 @@ namespace internals
  * boundary conditions (the standard way that is extensively discussed in the
  * tutorial programs is to use MatrixTools::apply_boundary_values). The
  * general principle of Dirichlet conditions are algebraic constraints of the
- * form $x_{i} = b_i$, which fits into the form described above. 
+ * form $x_{i} = b_i$, which fits into the form described above.
  *
  * Please note that when combining adaptively refined meshes with hanging node
  * constraints and inhomogeneous Dirichlet boundary conditions within one
