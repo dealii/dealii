@@ -1,9 +1,9 @@
 
 DEAL::n_dofs=72
-DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0217
-DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0391
+DEAL::FE_Nedelec<2>(0), P_0, rel. error=0
+DEAL::FE_Nedelec<2>(0), P_1, rel. error=0.0217
+DEAL::FE_Nedelec<2>(0), P_2, rel. error=0.0391
 DEAL::n_dofs=576
-DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
-DEAL::FE_Nedelec<3>(1), P_1, rel. error=0.00599
-DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.0106
+DEAL::FE_Nedelec<3>(0), P_0, rel. error=0
+DEAL::FE_Nedelec<3>(0), P_1, rel. error=0.00599
+DEAL::FE_Nedelec<3>(0), P_2, rel. error=0.0106

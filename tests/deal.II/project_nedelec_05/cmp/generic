@@ -1,13 +1,13 @@
 
 DEAL::n_dofs=19
-DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0531
-DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0863
+DEAL::FE_Nedelec<2>(0), P_0, rel. error=0
+DEAL::FE_Nedelec<2>(0), P_1, rel. error=0.0531
+DEAL::FE_Nedelec<2>(0), P_2, rel. error=0.0863
 DEAL::n_dofs=19
-DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0597
-DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0930
+DEAL::FE_Nedelec<2>(0), P_0, rel. error=0
+DEAL::FE_Nedelec<2>(0), P_1, rel. error=0.0597
+DEAL::FE_Nedelec<2>(0), P_2, rel. error=0.0930
 DEAL::n_dofs=19
-DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
-DEAL::FE_Nedelec<2>(1), P_1, rel. error=0.0498
-DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.0767
+DEAL::FE_Nedelec<2>(0), P_0, rel. error=0
+DEAL::FE_Nedelec<2>(0), P_1, rel. error=0.0498
+DEAL::FE_Nedelec<2>(0), P_2, rel. error=0.0767
