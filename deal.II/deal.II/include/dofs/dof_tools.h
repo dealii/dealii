@@ -447,6 +447,8 @@ class DoFTools
 				      * subdomain_id for which it is
 				      * responsible. This feature is
 				      * used in step-32.
+				      *
+				      * @ingroup constraints
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -603,6 +605,8 @@ class DoFTools
 				      * subdomain_id for which it is
 				      * responsible. This feature is
 				      * used in step-32.
+				      *
+				      * @ingroup constraints
 				      */
     template <class DH, class SparsityPattern>
     static
@@ -764,6 +768,8 @@ class DoFTools
                                       * well.
 				      * Not implemented for
 				      * hp::DoFHandler.
+				      *
+				      * @ingroup constraints
 				      */
     template<class DH, class SparsityPattern>
     static void
@@ -875,6 +881,8 @@ class DoFTools
 				      * function) can be either a
 				      * ::DoFHandler, hp::DoFHandler,
 				      * or MGDoFHandler.
+				      *
+				      * @ingroup constraints
 				      */
     template <class DH>
     static void
@@ -1854,6 +1862,8 @@ class DoFTools
 				      * boundary values. This function is used
 				      * in step-36, for
 				      * example.
+				      *
+				      * @ingroup constraints
 				      */
     template <int dim, int spacedim, template <int, int> class DH>
     static void
