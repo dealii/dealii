@@ -70,11 +70,6 @@ Local<dim>::cell(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
   if (!cells) return;
   const unsigned int cell = info.cell->user_index();
 
-  deallog << "Cell " << std::setw(2) << cell << ':';
-  for (unsigned int i=0;i<info.indices.size();++i)
-    deallog << ' ' << info.indices[i];
-  deallog << std::endl;
-
 				   // Fill local residuals
   for (unsigned int k=0;k<info.n_vectors();++k)
     for (unsigned int b=0;b<info.vector(k).n_blocks();++b)
@@ -102,24 +97,15 @@ Local<dim>::cell(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
 
 template <int dim>
 void
-Local<dim>::bdry(MeshWorker::DoFInfo<dim>& info, CellInfo&) const
-{
-  const unsigned int cell = info.cell->user_index();
-  deallog << "Bdry " << std::setw(2) << cell;
-  deallog << std::endl;
-}
+Local<dim>::bdry(MeshWorker::DoFInfo<dim>& , CellInfo&) const
+{}
 
 
 template <int dim>
 void
-Local<dim>::face(MeshWorker::DoFInfo<dim>& info1, MeshWorker::DoFInfo<dim>& info2,
+Local<dim>::face(MeshWorker::DoFInfo<dim>& , MeshWorker::DoFInfo<dim>&,
 		 CellInfo&, CellInfo&) const
-{
-  const unsigned int cell1 = info1.cell->user_index();
-  const unsigned int cell2 = info2.cell->user_index();
-  deallog << "Face " << cell1 << '|' << cell2;
-  deallog << std::endl;
-}
+{}
 
 
 template <int dim>
