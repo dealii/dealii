@@ -65,60 +65,19 @@ namespace internals
 
 /**
  * This class implements dealing with linear (possibly inhomogeneous)
- * constraints on degrees of freedom. In particular, it handles constraints of
- * the form $x_{i_1} = \sum_{j=2}^M a_{i_j} x_{i_j} + b_i$. In the context of
- * adaptive finite elements, such constraints appear most frequently as
- * "hanging nodes" and for implementing Dirichlet boundary conditions in
- * strong form. The class is meant to deal with a limited number of
- * constraints relative to the total number of degrees of freedom, for example
- * a few per cent up to maybe 30 per cent; and with a linear combination of
- * $M$ other degrees of freedom where $M$ is also relatively small (no larger
- * than at most around the average number of entries per row of a linear
- * system). It is <em>not</em> meant to describe full rank linear systems.
+ * constraints on degrees of freedom. The concept and origin of such
+ * constraints is extensively described in the @ref constraints module. The
+ * class is meant to deal with a limited number of constraints relative to the
+ * total number of degrees of freedom, for example a few per cent up to maybe
+ * 30 per cent; and with a linear combination of $M$ other degrees of freedom
+ * where $M$ is also relatively small (no larger than at most around the
+ * average number of entries per row of a linear system). It is <em>not</em>
+ * meant to describe full rank linear systems.
  *
  * The algorithms used in the implementation of this class are described in
- * some detail in the @ref hp_paper "hp paper".
- *
- *
- * <h3>Using the %ConstraintMatrix for hanging nodes</h3>
- *
- * For example, when using Q1 and Q2 elements (i.e. using
- * FE_Q&lt;dim,spacedim&gt;(1) and FE_Q&lt;dim,spacedim&gt;(2)) on the two
- * marked cells of the mesh
- *
- * @image html hp-refinement-simple.png
- *
- * there are three constraints: first $x_2=\frac 12 x_0 + \frac 12 x_1$,
- * then $x_4=\frac 14 x_0 + \frac 34 x_1$, and finally the identity
- * $x_3=x_1$. All three constraints fit the form given above. Similar
- * constraints occur as hanging nodes even if all used finite elements are
- * identical. While they are most frequent for hanging nodes, constraints of
- * the given form appear also in other contexts, see for example the
- * application the step-11 tutorial program.
- *
- * Homogenous constraints of this form also arise in the context of vector-valued
- * fields, for example if one wants to enforce boundary conditions of the form
- * $\vec{v}\cdot\vec{n}=0$. For example, the
- * VectorTools::compute_no_normal_flux_constraints function computes
- * such constraints.
- *
- *
- * <h3>Using the %ConstraintMatrix for Dirichlet boundary conditions</h3>
- *
- * The ConstraintMatrix provides an alternative for implementinging Dirichlet
- * boundary conditions (the standard way that is extensively discussed in the
- * tutorial programs is to use MatrixTools::apply_boundary_values). The
- * general principle of Dirichlet conditions are algebraic constraints of the
- * form $x_{i} = b_i$, which fits into the form described above.
- *
- * Please note that when combining adaptively refined meshes with hanging node
- * constraints and inhomogeneous Dirichlet boundary conditions within one
- * ConstraintMatrix object, the hanging node constraints should always be set
- * first, and then Dirichlet boundary conditions should be interpolated. This
- * makes sure that the discretization remains H<sup>1</sup> conforming as is
- * needed e.g. for the Laplace equation in 3D, as hanging nodes on the
- * boundary should be still set to the weighted average of neighbors, and not
- * the actual Dirichlet value.
+ * some detail in the @ref hp_paper "hp paper". There is also a significant
+ * amount of documentation on how to use this class in the
+ * @ref constraints module.
  *
  *
  * <h3>Description of constraints</h3>
@@ -140,7 +99,7 @@ namespace internals
  * DoFTools::make_hanging_node_constraints() function. The use of these
  * objects is first explained in step-6.
  *
- * Matrices of the present type are organized in lines (rows), but only those
+ * Objects of the present type are organized in lines (rows), but only those
  * lines are stored where constraints are present. New constraints are added
  * by adding new lines using the add_line() function, and then populating it
  * using the add_entry() function to a given line, or add_entries() to add
@@ -148,201 +107,6 @@ namespace internals
  * be set using the set_inhomogeneity() function. After all constraints have
  * been added, you need to call close(), which compresses the storage format
  * and sorts the entries.
- *
- * <h3>Eliminating constraints</h3>
- *
- * Constraint matrices are used to handle hanging nodes and other constrained
- * degrees of freedom. When building the global system matrix and the right
- * hand sides, one can build them without taking care of the constraints,
- * purely on a topological base, i.e. by a loop over cells. In order to do
- * actual calculations, you have to 'condense' the linear system: eliminate
- * constrained degrees of freedom and distribute the appropriate values to the
- * unconstrained dofs. This changes the sparsity pattern of the sparse
- * matrices used in finite element calculations and is thus a quite expensive
- * operation. The general scheme of things is then that you build your system,
- * you eliminate (condense) away constrained nodes using the condense()
- * functions of this class, then you solve the remaining system, and finally
- * you compute the values of constrained nodes from the values of the
- * unconstrained ones using the distribute() function. Note that the
- * condense() function is applied to matrix and right hand side of the linear
- * system, while the distribute() function is applied to the solution
- * vector.
- *
- * This scheme of first building a linear system and then eliminating
- * constrained degrees of freedom is inefficient, and a bottleneck if there
- * are many constraints and matrices are full, i.e. especially for 3d and/or
- * higher order or hp finite elements. We therefore offer a second way of
- * building linear systems, using the add_entries_local_to_global() and
- * distribute_local_to_global() functions discussed below. The resulting
- * linear systems are equivalent to what one gets after calling the condense()
- * functions.
- *
- *
- * <h4>Condensing matrices and sparsity patterns</h4>
- *
- * As mentioned above, the first way of using constraints is to build linear
- * systems without regards to constraints and then "condensing" them away.
- * Condensation of a matrix is done in four steps: first one builds the
- * sparsity pattern (e.g. using DoFTools::create_sparsity_pattern()); then the
- * sparsity pattern of the condensed matrix is made out of the original
- * sparsity pattern and the constraints; third, the global matrix is
- * assembled; and fourth, the matrix is finally condensed. To do these steps,
- * you have (at least) two possibilities:
- *
- * <ul>
- * <li> Use two different sparsity patterns and two different matrices: you
- * may eliminate the lines and rows connected with a constraint and create a
- * totally new sparsity pattern and a new system matrix. This has the
- * advantage that the resulting system of equations is smaller and free from
- * artifacts of the condensation process and is therefore faster in the
- * solution process since no unnecessary multiplications occur (see
- * below). However, there are two major drawbacks: keeping two matrices at the
- * same time can be quite unacceptable if you're short of memory. Secondly,
- * the condensation process is expensive, since <em>all</em> entries of the
- * matrix have to be copied, not only those which are subject to constraints.
- *
- * This procedure is therefore not advocated and not discussed in the @ref
- * Tutorial.
- *
- * <li> Use only one sparsity pattern and one matrix: doing it this way, the
- * condense functions add nonzero entries to the sparsity pattern of the large
- * matrix (with constrained nodes in it) where the condensation process of the
- * matrix will create additional nonzero elements. In the condensation process
- * itself, lines and rows subject to constraints are distributed to the lines
- * and rows of unconstrained nodes. The constrained lines remain in place,
- * however, unlike in the first possibility described above. In order not to
- * disturb the solution process, these lines and rows are filled with zeros
- * and an appropriate positive value on the main diagonal (we choose an
- * average of the magnitudes of the other diagonal elements, so as to make
- * sure that the new diagonal entry has the same order of magnitude as the
- * other entries; this preserves the scaling properties of the matrix). The
- * corresponding value in the right hand sides is set to zero. This way, the
- * constrained node will always get the value zero upon solution of the
- * equation system and will not couple to other nodes any more.
- *
- * This method has the advantage that only one matrix and sparsity pattern is
- * needed thus using less memory. Additionally, the condensation process is
- * less expensive, since not all but only constrained values in the matrix
- * have to be copied. On the other hand, the solution process will take a bit
- * longer, since matrix vector multiplications will incur multiplications with
- * zeroes in the lines subject to constraints. Additionally, the vector size
- * is larger than in the first possibility, resulting in more memory
- * consumption for those iterative solution methods using a larger number of
- * auxiliary vectors (e.g. methods using explicit orthogonalization
- * procedures).
- *
- * Nevertheless, this process is overall more efficient due to its lower
- * memory consumption and the one among the two discussed here that is
- * exclusively discussed in the @ref Tutorial.
- * </ul>
- *
- * This class provides two sets of @p condense functions: those taking two
- * arguments refer to the first possibility above, those taking only one do
- * their job in-place and refer to the second possibility.
- *
- * The condensation functions exist for different argument types. The
- * in-place functions (i.e. those following the second way) exist for
- * arguments of type SparsityPattern, SparseMatrix and
- * BlockSparseMatrix. Note that there are no versions for arguments of type
- * PETScWrappers::SparseMatrix() or any of the other PETSc or Trilinos
- * matrix wrapper classes. This is due to the fact that it is relatively
- * hard to get a representation of the sparsity structure of PETSc matrices,
- * and to modify them; this holds in particular, if the matrix is actually
- * distributed across a cluster of computers. If you want to use
- * PETSc/Trilinos matrices, you can either copy an already condensed deal.II
- * matrix, or build the PETSc/Trilinos matrix in the already condensed form,
- * see the discussion below.
- *
- *
- * <h5>Condensing vectors</h5>
- *
- * Condensing vectors works exactly as described above for matrices. Note that
- * condensation is an idempotent operation, i.e. doing it more than once on a
- * vector or matrix yields the same result as doing it only once: once an
- * object has been condensed, further condensation operations don't change it
- * any more.
- *
- * In contrast to the matrix condensation functions, the vector condensation
- * functions exist in variants for PETSc and Trilinos vectors. However,
- * using them is typically expensive, and should be avoided. You should use
- * the same techniques as mentioned above to avoid their use.
- *
- *
- * <h5>Treatment of inhomogeneous constraints</h5>
- *
- * In case some constraint lines have inhomogeneities (which is typically
- * the case if the constraint comes from implementation of inhomogeneous
- * boundary conditions), the situation is a bit more complicated. This is
- * because the elimination of the non-diagonal values in the matrix generate
- * contributions in the eliminated rows in the vector. This means that
- * inhomogeneities can only be handled with functions that act
- * simultaneously on a matrix and a vector. This means that all
- * inhomogeneities are ignored in case the respective condense function is
- * called without any matrix (or if the matrix has already been condensed
- * before).
- *
- * The use of ConstraintMatrix for implementing Dirichlet boundary conditions
- * is discussed in the step-22 tutorial program.
- *
- *
- * <h3>Avoiding explicit condensation</h3>
- *
- * Sometimes, one wants to avoid explicit condensation of a linear system
- * after it has been built at all. There are two main reasons for wanting to
- * do so:
- *
- * <ul>
- * <li>
- * Condensation is an expensive operation, in particular if there
- * are many constraints and/or if the matrix has many nonzero entries. Both
- * is typically the case for 3d, or high polynomial degree computations, as
- * well as for hp finite element methods, see for example the @ref hp_paper
- * "hp paper". This is the case discussed in the hp tutorial program, @ref
- * step_27 "step-27", as well as in step-22 and @ref step_31
- * "step-31".
- *
- * <li>
- * There may not be a condense() function for the matrix you use (this
- * is, for example, the case for the PETSc and Trilinos wrapper classes,
- * where we have no access to the underlying representation of the matrix,
- * and therefore cannot efficiently implement the condense()
- * operation). This is the case discussed in step-17, @ref
- * step_18 "step-18", step-31, and step-32.
- * </ul>
- *
- * In this case, one possibility is to distribute local entries to the final
- * destinations right at the moment of transferring them into the global
- * matrices and vectors, and similarly build a sparsity pattern in the
- * condensed form at the time it is set up originally.
- *
- * This class offers support for these operations as well. For example, the
- * add_entries_local_to_global() function adds nonzero entries to a sparsity
- * pattern object. It not only adds a given entry, but also all entries that
- * we will have to write to if the current entry corresponds to a constrained
- * degree of freedom that will later be eliminated. Similarly, one can use the
- * distribute_local_to_global() functions to directly distribute entries in
- * vectors and matrices when copying local contributions into a global matrix
- * or vector. These calls make a subsequent call to condense() unnecessary.
- *
- * Note that, despite their name which describes what the function really
- * does, the distribute_local_to_global() functions has to be applied to
- * matrices and right hand side vectors, whereas the distribute() function
- * discussed below is applied to the solution vector after solving the linear
- * system.
- *
- *
- * <h3>Distributing constraints</h3>
- *
- * After solving the condensed system of equations, the solution vector has
- * to be redistributed. This is done by the two distribute() functions, one
- * working with two vectors, one working in-place. The operation of
- * distribution undoes the condensation process in some sense, but it should
- * be noted that it is not the inverse operation. Basically, distribution
- * sets the values of the constrained nodes to the value that is computed
- * from the constraint given the values of the unconstrained nodes plus
- * possible inhomogeneities. This is usually necessary since the condensed
- * linear systems only describe the equations for unconstrained nodes, and
- * constrained nodes need to get their values in a second step.
  *
  * @ingroup dofs
  * @ingroup constraints

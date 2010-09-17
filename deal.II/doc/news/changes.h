@@ -54,6 +54,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
   <li>
+  <p>New: Documentation of how to handle constraints on degrees of freedom
+  has been centralized in a new documentation module on @ref constraints.
+  <br>
+  (WB 2010/09/16)
+  </p>
+
+  <li>
   <p>Fixed: When using Trilinos and deal.II both with static libraries,
   a linker error would occur whenever a program linked both the 2d and
   3d libraries of deal.II. This is now fixed.
