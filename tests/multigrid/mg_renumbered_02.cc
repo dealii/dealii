@@ -163,7 +163,7 @@ void OutputCreator<dim>::cell(
   const FEValuesBase<dim>& fe = info.fe_values();
   const std::vector<std::vector<double> >& uh = info.values[0];
 
-  const unsigned int square_root = std::pow(fe.n_quadrature_points, 1./dim)+.5;
+  const unsigned int square_root = static_cast<unsigned int>(std::pow(fe.n_quadrature_points, 1./dim)+.5);
   for (unsigned int k1=0; k1<square_root; ++k1)
   {
     for (unsigned int k2=0; k2<square_root; ++k2)
@@ -253,7 +253,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   info_box.initialize_update_flags();
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
   info_box.add_update_flags(update_flags, true, true, true, true);
-  
+
   NamedData<MGLevelObject<Vector<double> >* > data;
   data.add(&v, "mg_vector");
   info_box.cell_selector.add("mg_vector");
