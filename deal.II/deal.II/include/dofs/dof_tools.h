@@ -471,10 +471,10 @@ class DoFTools
 				      * in which equation. For
 				      * example, if wanted to solve
 				      * the Stokes equations,
-				      * @verbatim
-				      * -\Delta \vec u + \nabla p = 0,
-				      * \div u                    = 0
-				      * @endverbatim
+				      * @f{align*}
+				      * -\Delta \mathbf u + \nabla p &= 0,\\
+				      * \text{div}\ u                    &= 0
+				      * @f}
 				      * in two space dimensions,
 				      * using stable Q2/Q1 mixed
 				      * elements (using the FESystem
@@ -484,11 +484,13 @@ class DoFTools
 				      * rather may want to give the
 				      * following pattern of
 				      * couplings:
-				      * @verbatim
-				      *   1 0 1
-				      *   0 1 1
-				      *   1 1 0
-				      * @endverbatim
+				      * @f[
+				      * \begin{array}{ccc}
+				      *   1 & 0 & 1 \\
+				      *   0 & 1 & 1 \\
+				      *   1 & 1 & 0
+				      * \end{array}
+				      * @f]
 				      * where "1" indicates that two
 				      * variables (i.e. components of
 				      * the FESystem) couple in the
