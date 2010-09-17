@@ -2122,6 +2122,10 @@ namespace internal
 				      * indices, and $\vec n$ by the
 				      * vector specified as the second
 				      * argument.
+				      *
+				      * The function does not add constraints
+				      * if a degree of freedom is already
+				      * constrained in the constraints object.
 				      */
     template <int dim>
     void
@@ -2129,6 +2133,7 @@ namespace internal
 		    const Tensor<1,dim>       &constraining_vector,
 		    ConstraintMatrix          &constraints)
     {
+      
 				       // choose the DoF that has the
 				       // largest component in the
 				       // constraining_vector as the
@@ -2152,23 +2157,29 @@ namespace internal
 	  {
 	    if (std::fabs(constraining_vector[0]) > std::fabs(constraining_vector[1]))
 	      {
-		constraints.add_line (dof_indices.dof_indices[0]);
+		if (!constraints.is_constrained(dof_indices.dof_indices[0]))
+		  {
+		    constraints.add_line (dof_indices.dof_indices[0]);
 
-		if (std::fabs (constraining_vector[1]/constraining_vector[0])
-		    > std::numeric_limits<double>::epsilon())
-		  constraints.add_entry (dof_indices.dof_indices[0],
-					 dof_indices.dof_indices[1],
-					 -constraining_vector[1]/constraining_vector[0]);
+		    if (std::fabs (constraining_vector[1]/constraining_vector[0])
+			> std::numeric_limits<double>::epsilon())
+		      constraints.add_entry (dof_indices.dof_indices[0],
+					     dof_indices.dof_indices[1],
+					     -constraining_vector[1]/constraining_vector[0]);
+		  }
 	      }
 	    else
 	      {
-		constraints.add_line (dof_indices.dof_indices[1]);
+		if (!constraints.is_constrained(dof_indices.dof_indices[1]))
+		  {
+		    constraints.add_line (dof_indices.dof_indices[1]);
 
-		if (std::fabs (constraining_vector[0]/constraining_vector[1])
-		    > std::numeric_limits<double>::epsilon())
-		  constraints.add_entry (dof_indices.dof_indices[1],
-					 dof_indices.dof_indices[0],
-					 -constraining_vector[0]/constraining_vector[1]);
+		    if (std::fabs (constraining_vector[0]/constraining_vector[1])
+			> std::numeric_limits<double>::epsilon())
+		      constraints.add_entry (dof_indices.dof_indices[1],
+					     dof_indices.dof_indices[0],
+					     -constraining_vector[0]/constraining_vector[1]);
+		  }
 	      }
 	    break;
 	  }
@@ -2179,54 +2190,63 @@ namespace internal
 		&&
 		(std::fabs(constraining_vector[0]) >= std::fabs(constraining_vector[2])))
 	      {
-		constraints.add_line (dof_indices.dof_indices[0]);
+		if (!constraints.is_constrained(dof_indices.dof_indices[0]))
+		  {
+		    constraints.add_line (dof_indices.dof_indices[0]);
 
-		if (std::fabs (constraining_vector[1]/constraining_vector[0])
-		    > std::numeric_limits<double>::epsilon())
-		  constraints.add_entry (dof_indices.dof_indices[0],
-					 dof_indices.dof_indices[1],
-					 -constraining_vector[1]/constraining_vector[0]);
+		    if (std::fabs (constraining_vector[1]/constraining_vector[0])
+			> std::numeric_limits<double>::epsilon())
+		      constraints.add_entry (dof_indices.dof_indices[0],
+					     dof_indices.dof_indices[1],
+					     -constraining_vector[1]/constraining_vector[0]);
 
-		if (std::fabs (constraining_vector[2]/constraining_vector[0])
-		    > std::numeric_limits<double>::epsilon())
-		  constraints.add_entry (dof_indices.dof_indices[0],
-					 dof_indices.dof_indices[2],
-					 -constraining_vector[2]/constraining_vector[0]);
+		    if (std::fabs (constraining_vector[2]/constraining_vector[0])
+			> std::numeric_limits<double>::epsilon())
+		      constraints.add_entry (dof_indices.dof_indices[0],
+					     dof_indices.dof_indices[2],
+					     -constraining_vector[2]/constraining_vector[0]);
+		  }
 	      }
 	    else
 	      if ((std::fabs(constraining_vector[1]) >= std::fabs(constraining_vector[0]))
 		  &&
 		  (std::fabs(constraining_vector[1]) >= std::fabs(constraining_vector[2])))
 		{
-		  constraints.add_line (dof_indices.dof_indices[1]);
+		  if (!constraints.is_constrained(dof_indices.dof_indices[1]))
+		    {
+		      constraints.add_line (dof_indices.dof_indices[1]);
 
-		  if (std::fabs (constraining_vector[0]/constraining_vector[1])
-		      > std::numeric_limits<double>::epsilon())
-		    constraints.add_entry (dof_indices.dof_indices[1],
-					   dof_indices.dof_indices[0],
-					   -constraining_vector[0]/constraining_vector[1]);
+		      if (std::fabs (constraining_vector[0]/constraining_vector[1])
+			  > std::numeric_limits<double>::epsilon())
+			constraints.add_entry (dof_indices.dof_indices[1],
+					       dof_indices.dof_indices[0],
+					       -constraining_vector[0]/constraining_vector[1]);
 
-		  if (std::fabs (constraining_vector[2]/constraining_vector[1])
-		      > std::numeric_limits<double>::epsilon())
-		    constraints.add_entry (dof_indices.dof_indices[1],
-					   dof_indices.dof_indices[2],
-					   -constraining_vector[2]/constraining_vector[1]);
+		      if (std::fabs (constraining_vector[2]/constraining_vector[1])
+			  > std::numeric_limits<double>::epsilon())
+			constraints.add_entry (dof_indices.dof_indices[1],
+					       dof_indices.dof_indices[2],
+					       -constraining_vector[2]/constraining_vector[1]);
+		    }
 		}
 	      else
 		{
-		  constraints.add_line (dof_indices.dof_indices[2]);
+		  if (!constraints.is_constrained(dof_indices.dof_indices[2]))
+		    {
+		      constraints.add_line (dof_indices.dof_indices[2]);
 
-		  if (std::fabs (constraining_vector[0]/constraining_vector[2])
-		      > std::numeric_limits<double>::epsilon())
-		    constraints.add_entry (dof_indices.dof_indices[2],
-					   dof_indices.dof_indices[0],
-					   -constraining_vector[0]/constraining_vector[2]);
+		      if (std::fabs (constraining_vector[0]/constraining_vector[2])
+			  > std::numeric_limits<double>::epsilon())
+			constraints.add_entry (dof_indices.dof_indices[2],
+					       dof_indices.dof_indices[0],
+					       -constraining_vector[0]/constraining_vector[2]);
 
-		  if (std::fabs (constraining_vector[1]/constraining_vector[2])
-		      > std::numeric_limits<double>::epsilon())
-		    constraints.add_entry (dof_indices.dof_indices[2],
-					   dof_indices.dof_indices[1],
-					   -constraining_vector[1]/constraining_vector[2]);
+		      if (std::fabs (constraining_vector[1]/constraining_vector[2])
+			  > std::numeric_limits<double>::epsilon())
+			constraints.add_entry (dof_indices.dof_indices[2],
+					       dof_indices.dof_indices[1],
+					       -constraining_vector[1]/constraining_vector[2]);
+		    }
 		}
 
 	    break;
@@ -3788,11 +3808,16 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 					     // constrained. enter
 					     // this into the
 					     // constraint matrix
+					     //
+					     // ignore dofs already
+					     // constrained
 	    for (unsigned int i=0; i<dim; ++i)
-	      {
-		constraints.add_line (same_dof_range[0]->first.dof_indices[i]);
-						 // no add_entries here
-	      }
+	      if (!constraints.is_constrained (same_dof_range[0]
+					       ->first.dof_indices[i]))
+		{
+		  constraints.add_line (same_dof_range[0]->first.dof_indices[i]);
+						   // no add_entries here
+		}
 
 	    break;
 	  }

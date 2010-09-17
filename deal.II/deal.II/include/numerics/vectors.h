@@ -707,23 +707,22 @@ class VectorTools
 				      * constrained to, inhomogeneities) is
 				      * kept and nothing happens.
 				      *
-				      * Please note that when combining
-				      * adaptively refined meshes with hanging
-				      * node constraints and inhomogeneous
-				      * Dirichlet boundary conditions within
+				      * @note When combining adaptively
+				      * refined meshes with hanging node
+				      * constraints and boundary conditions
+				      * like from the current function within
 				      * one ConstraintMatrix object, the
 				      * hanging node constraints should always
-				      * be set first, and then Dirichlet
-				      * boundary conditions should be
-				      * interpolated. This makes sure that the
-				      * discretization remains H<sup>1</sup>
-				      * conforming as is needed e.g. for the
-				      * Laplace equation in 3D, as hanging
-				      * nodes on the boundary should be still
-				      * set to the weighted average of
-				      * neighbors, and not the actual
-				      * Dirichlet value.
- *				      *
+				      * be set first, and then the boundary
+				      * conditions since boundary conditions
+				      * are not set in the second operation on
+				      * degrees of freedom that are already
+				      * constrained. This makes sure that the
+				      * discretization remains conforming as
+				      * is needed. See the discussion on
+				      * conflicting constraints in the module
+				      * on @ref constraints .
+				      *
 				      * The parameter @p boundary_component
 				      * corresponds to the number @p
 				      * boundary_indicator of the face.  255
@@ -919,22 +918,21 @@ class VectorTools
 				      * inhomogeneities) is kept and nothing
 				      * happens.
 				      *
-				      * Please note that when combining
-				      * adaptively refined meshes with hanging
-				      * node constraints and inhomogeneous
-				      * Dirichlet boundary conditions within
+				      * @note When combining adaptively
+				      * refined meshes with hanging node
+				      * constraints and boundary conditions
+				      * like from the current function within
 				      * one ConstraintMatrix object, the
 				      * hanging node constraints should always
-				      * be set first, and then Dirichlet
-				      * boundary conditions should be
-				      * interpolated. This makes sure that the
-				      * discretization remains H<sup>1</sup>
-				      * conforming as is needed e.g. for the
-				      * Laplace equation in 3D, as hanging
-				      * nodes on the boundary should be still
-				      * set to the weighted average of
-				      * neighbors, and not the actual
-				      * Dirichlet value.
+				      * be set first, and then the boundary
+				      * conditions since boundary conditions
+				      * are not set in the second operation on
+				      * degrees of freedom that are already
+				      * constrained. This makes sure that the
+				      * discretization remains conforming as
+				      * is needed. See the discussion on
+				      * conflicting constraints in the module
+				      * on @ref constraints .
 				      *
 				      * If @p component_mapping is empty, it
 				      * is assumed that the number of
@@ -1006,7 +1004,9 @@ class VectorTools
 				      * first, and then completed by hanging
 				      * node constraints, in order to make sure
 				      * that the discretization remains
-				      * consistent.
+				      * consistent. See the discussion on
+				      * conflicting constraints in the
+				      * module on @ref constraints .
 				      *
 				      * This function is explecitly written to
 				      * use with the FE_Nedelec elements. Thus
@@ -1176,6 +1176,22 @@ class VectorTools
 				      * The last argument is denoted to
 				      * compute the normal vector $\vec n$ at
 				      * the boundary points.
+				      *
+				      * @note When combining adaptively
+				      * refined meshes with hanging node
+				      * constraints and boundary conditions
+				      * like from the current function within
+				      * one ConstraintMatrix object, the
+				      * hanging node constraints should always
+				      * be set first, and then the boundary
+				      * conditions since boundary conditions
+				      * are not set in the second operation on
+				      * degrees of freedom that are already
+				      * constrained. This makes sure that the
+				      * discretization remains conforming as
+				      * is needed. See the discussion on
+				      * conflicting constraints in the module
+				      * on @ref constraints .
 				      *
 				      *
 				      * <h4>Computing constraints in 2d</h4>
