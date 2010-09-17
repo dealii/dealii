@@ -273,13 +273,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   VectorTools::project_boundary_values with ConstraintMatrix argument added
   inhomogeneities also to DoFs that were already constrained when entering the
   call without changing the list of DoFs that those were constrained to. This
-  lead to wrong results for inhomogeneous constraints in case e.g.
+  leads to wrong results for inhomogeneous constraints in case e.g.
   DoFTools::make_hanging_node_constraints was called before. Now, the correct
   way for combining hanging node constraints and Dirichlet conditions in one
   ConstraintMatrix is to first make the hanging node constraints, and then
-  interpolate/project the boundary values.
+  interpolate/project the boundary values. The latter operation will then
+  simply not add any new constraints if a DoF is already constrained. The
+  same is also true for VectorTools::compute_no_normal_flux_constraints.
   <br>
-  (Luca Heltai, Martin Kronbichler 2010/09/16)
+  (Luca Heltai, Martin Kronbichler, WB 2010/09/16)
   </p>
 
   <li>
