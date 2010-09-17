@@ -499,8 +499,12 @@ if test "x$with_trilinos" != "x" -a "x$with_trilinos" != "xno" ; then
   fi
 fi
 
-
-
+dnl Strangely some Linux boxes (noteably OpenSuse) need to
+dnl *explicitly* link with gfortran libraries. This is definately
+dnl needed for ARPACk interfaces to work correctly; so we do that here:
+if test "x$with_arpack" != "x" -a "x$with_arpack" != "xno" ; then
+   LDFLAGS="-lgfortran $LDFLAGS"
+fi
 
 
 dnl -------------------------------------------------------------
@@ -607,12 +611,13 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- checking compiler flags --------------------)
 
-dnl Possibly add some flags is optimizations are requested
+dnl Possibly add some flags if optimizations are requested
 DEAL_II_CHECK_CPU_OPTIMIZATIONS
 
 dnl Last check: test whether CXXFLAGS and F77FLAGS are ok
 DEAL_II_CHECK_CXXFLAGS_CONSISTENCY
 DEAL_II_CHECK_F77FLAGS_CONSISTENCY
+DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
 
 
 
