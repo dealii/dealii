@@ -477,8 +477,10 @@ class FETools
 				      * to use this function mostly.
 				      */
     template <int dim, typename number, int spacedim>
-    static void compute_projection_matrices(const FiniteElement<dim,spacedim> &fe,
-					    std::vector<std::vector<FullMatrix<number> > >& matrices);
+    static void compute_projection_matrices(
+      const FiniteElement<dim,spacedim> &fe,
+      std::vector<std::vector<FullMatrix<number> > >& matrices,
+      const bool isotropic_only = false);
 
 				     /**
                                       * Projects scalar data defined in

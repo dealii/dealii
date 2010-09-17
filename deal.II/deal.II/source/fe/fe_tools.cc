@@ -933,7 +933,7 @@ FETools::compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
 template <>
 void
 FETools::compute_projection_matrices(const FiniteElement<1,2>&,
-				     std::vector<std::vector<FullMatrix<double> > >& )
+				     std::vector<std::vector<FullMatrix<double> > >&, bool)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -942,7 +942,7 @@ FETools::compute_projection_matrices(const FiniteElement<1,2>&,
 template <>
 void
 FETools::compute_projection_matrices(const FiniteElement<2,3>&,
-				     std::vector<std::vector<FullMatrix<double> > >& )
+				     std::vector<std::vector<FullMatrix<double> > >&, bool)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -953,7 +953,8 @@ FETools::compute_projection_matrices(const FiniteElement<2,3>&,
 template <int dim, typename number, int spacedim>
 void
 FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
-				     std::vector<std::vector<FullMatrix<number> > >& matrices)
+				     std::vector<std::vector<FullMatrix<number> > >& matrices,
+				     const bool isotropic_only)
 {
   const unsigned int n  = fe.dofs_per_cell;
   const unsigned int nd = fe.n_components();
@@ -1005,9 +1006,12 @@ FETools::compute_projection_matrices(const FiniteElement<dim,spacedim>& fe,
     mass.gauss_jordan();
   }
 
-				   // loop over all possible refinement cases
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case < RefinementCase<dim>::isotropic_refinement+1; ++ref_case)
+				   // loop over all possible
+				   // refinement cases
+  unsigned int ref_case = (isotropic_only)
+			  ? RefinementCase<dim>::isotropic_refinement
+			  : RefinementCase<dim>::cut_x;
+  for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
     {
       const unsigned int
 	nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
@@ -2257,7 +2261,7 @@ void FETools::compute_face_embedding_matrices<deal_II_dimension,double>
 
 template
 void FETools::compute_projection_matrices<deal_II_dimension>
-(const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&);
+(const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&, bool);
 
 template
 void FETools::interpolate<deal_II_dimension>

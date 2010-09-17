@@ -267,6 +267,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+
+  <li><p>New: FE_DGVector implements discontinuous elements based on
+  vector valued polynomial spaces.
+  <br>
+  (GK 2010/09/17)
+  </p></li>
+
   <li>
   <p>
   Fixed: The methods VectorTools::interpolate_boundary_values and
