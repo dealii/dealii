@@ -26,7 +26,7 @@ namespace MeshWorker
 {
   namespace Assembler
   {
-    
+
 /**
  * A class that, instead of assembling into a matrix or vector,
  * outputs the results on a cell to a gnuplot patch. This works only
@@ -53,7 +53,7 @@ namespace MeshWorker
 					  * the points.
 					  */
 	void initialize(unsigned int dim, unsigned int n_vectors, unsigned int n_points);
-	
+
 					 /**
 					  * Set the stream #os to
 					  * which data is written. If
@@ -62,7 +62,7 @@ namespace MeshWorker
 					  * to #deallog.
 					  */
 	void initialize_stream(std::ostream& stream);
-	
+
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -83,14 +83,14 @@ namespace MeshWorker
 	template <int dim>
 	void initialize_info(DoFInfo<dim>& info,
 			     bool interior_face);
-	
+
 					 /**
 					  * Assemble the local values
 					  * into the global vectors.
 					  */
 	template<int dim>
 	void assemble(const DoFInfo<dim>& info);
-	
+
 					 /**
 					  * Assemble both local values
 					  * into the global vectors.
@@ -111,16 +111,16 @@ namespace MeshWorker
 	void write(const T& t) const;
 
         void write_endl () const;
-	
+
 	unsigned int patch_dimension;
 	unsigned int n_vectors;
 	unsigned int n_points;
-	
+
 	std::ostream* os;
     };
 
 //----------------------------------------------------------------------//
-    
+
     template <typename T>
     inline void
     GnuplotPatch::write(const T& d) const
@@ -139,15 +139,15 @@ namespace MeshWorker
       else
 	(*os) << std::endl;
     }
-    
-    
-    inline 
+
+
+    inline
     GnuplotPatch::GnuplotPatch()
 		    :
 		    os(0)
     {}
-    
-    
+
+
     inline void
     GnuplotPatch::initialize(unsigned int dim, unsigned int np, unsigned int nv)
     {
@@ -156,7 +156,7 @@ namespace MeshWorker
       n_points = np;
     }
 
-    
+
     inline void
     GnuplotPatch::initialize_stream(std::ostream& stream)
     {
@@ -172,14 +172,14 @@ namespace MeshWorker
       info.initialize_quadrature(n_points, n_vectors);
     }
 
-    
+
     template <int dim>
     inline void
     GnuplotPatch::assemble(const DoFInfo<dim>& info)
     {
       const unsigned int n_q_points = info.n_quadrature_points();
       const unsigned int nv = info.n_quadrature_values();
-      const unsigned int square_root = std::pow(n_q_points, 1./dim)+.5;
+      const unsigned int square_root = static_cast<unsigned int>(std::pow(n_q_points, 1./dim)+.5);
       for (unsigned int k1=0; k1<square_root; ++k1)
       {
         for (unsigned int k2=0; k2<square_root; ++k2)
@@ -195,8 +195,8 @@ namespace MeshWorker
       }
       write_endl();
     }
-    
-    
+
+
     template <int dim>
     inline void
     GnuplotPatch::assemble(const DoFInfo<dim>& /*info1*/, const DoFInfo<dim>& /*info2*/)
