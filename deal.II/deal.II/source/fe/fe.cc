@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -113,7 +113,6 @@ FiniteElement<dim,spacedim>::FiniteElement (
   const std::vector<std::vector<bool> > &nonzero_c)
 		:
 		FiniteElementData<dim> (fe_data),
-		cached_primitivity(false),
 		adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
 								  this->dofs_per_quad : 0 ,
 								  dim==3 ? 8 : 0),
@@ -156,12 +155,11 @@ FiniteElement<dim,spacedim>::FiniteElement (
 				    // nonzero_components vector.
    const_cast<std::vector<unsigned int>&>
    (n_nonzero_components_table) = compute_n_nonzero_components(nonzero_components);
-   const_cast<bool&>
-   (cached_primitivity) = std::find_if (n_nonzero_components_table.begin(),
-				      n_nonzero_components_table.end(),
-				      std::bind2nd(std::not_equal_to<unsigned int>(),
-						   1U))
-		      == n_nonzero_components_table.end();
+   this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
+				       n_nonzero_components_table.end(),
+				       std::bind2nd(std::not_equal_to<unsigned int>(),
+						    1U))
+			 == n_nonzero_components_table.end());
    
    
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
@@ -189,7 +187,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
 				   // only one (vector-)component; if
 				   // the element is not primitive,
 				   // leave these tables empty.
-  if (cached_primitivity)
+  if (this->is_primitive())
     {
       system_to_component_table.resize(this->dofs_per_cell);
       face_system_to_component_table.resize(this->dofs_per_face);

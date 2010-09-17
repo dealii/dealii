@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,7 +34,8 @@ FiniteElementData<dim>::FiniteElementData ()
 		components(0),
 		blocks(0),
 		degree(0),
-		conforming_space(unknown)
+		conforming_space(unknown),
+		cached_primitivity(false)
 {}
 
 

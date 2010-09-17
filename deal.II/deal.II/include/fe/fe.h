@@ -1397,24 +1397,7 @@ class FiniteElement : public Subscriptor,
     bool
     is_primitive (const unsigned int i) const;
 
-				     /**
-				      * Return whether the entire
-				      * finite element is primitive,
-				      * in the sense that all its
-				      * shape functions are
-				      * primitive. If the finite
-				      * element is scalar, then this
-				      * is always the case.
-				      *
-				      * Since this is an extremely
-				      * common operation, the result
-				      * is cached in the
-				      * #cached_primitivity
-				      * variable which is computed in
-				      * the constructor.
-				      */
-    bool
-    is_primitive () const;
+    FiniteElementData<dim>::is_primitive;
     
 				     /**
 				      * Number of base elements in a
@@ -2000,18 +1983,6 @@ class FiniteElement : public Subscriptor,
     void reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only=false,
 						      const bool isotropic_prolongation_only=false);
     
-    
-				     /**
-				      * Store whether all shape
-				      * functions are primitive. Since
-				      * finding this out is a very
-				      * common operation, we cache the
-				      * result, i.e. compute the value
-				      * in the constructor for simpler
-				      * access.
-				      */
-    const bool cached_primitivity;
-
  				     /**
 				      * Vector of projection
 				      * matrices. See
@@ -2862,20 +2833,10 @@ FiniteElement<dim,spacedim>::is_primitive (const unsigned int i) const
 				   //
 				   // for good measure, short circuit the test
 				   // if the entire FE is primitive
-  return ((cached_primitivity == true)
-	  ||
+  return (is_primitive() ||
 	  (n_nonzero_components_table[i] == 1));
 }
 
-
-
-template <int dim, int spacedim>  
-inline
-bool
-FiniteElement<dim,spacedim>::is_primitive () const
-{
-  return cached_primitivity;
-}
 
 
 DEAL_II_NAMESPACE_CLOSE
