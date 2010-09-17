@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -255,12 +255,12 @@ void LaplaceProblem<dim>::setup_system ()
   system_rhs.reinit (dof_handler.n_dofs());
 
   constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   constraints);
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),
 					    constraints);
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraints);
   constraints.close ();
 
   CompressedSetSparsityPattern csp (dof_handler.n_dofs(),
