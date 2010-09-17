@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: fe_raviart_thomas.h 18166 2009-01-09 21:21:16Z kanschat $
+//    $Id$
 //
 //    Copyright (C) 2010 by the deal.II authors
 //
@@ -30,6 +30,17 @@ template <int dim, int spacedim> class MappingQ;
 
 /**
  * DG elements based on vector valued polynomials.
+ *
+ * These elements use vector valued polynomial spaces as they have
+ * been introduced for H<sup>div</sup> and H<sup>curl</sup> conforming
+ * finite elements, but do not use the usual continuity of these
+ * elements. Thus, they are suitable for DG and hybrid formulations
+ * involving these function spaces.
+ *
+ * The template argument <tt>POLY</tt> refers to a vector valued
+ * polynomial space like PolynomialsRaviartThomas or
+ * PolynomialsNedelec. Note that the dimension of the polynomial space
+ * and the argument <tt>dim</tt> must coincide.
  *
  * @ingroup fe
  * @author Guido Kanschat
