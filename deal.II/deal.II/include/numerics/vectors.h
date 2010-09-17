@@ -765,6 +765,8 @@ class VectorTools
 				      *
 				      * See the general doc for more
 				      * information.
+				      *
+				      * @ingroup constraints
 				      */
   template <class DH>
   static
@@ -785,6 +787,7 @@ class VectorTools
 				      * function. Calls the other function
 				      * with remapped arguments.
 				      *
+				      * @ingroup constraints
 				      */
   template <class DH>
   static
@@ -801,6 +804,8 @@ class VectorTools
 				      * interpolate_boundary_values()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      *
+				      * @ingroup constraints
 				      */
   template <class DH>
   static
@@ -817,6 +822,8 @@ class VectorTools
 				      * interpolate_boundary_values()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      *
+				      * @ingroup constraints
 				      */
   template <class DH>
   static
@@ -952,6 +959,8 @@ class VectorTools
 				      * used for this component in @p
 				      * dof. By default, no remapping is
 				      * applied.
+				      *
+				      * @ingroup constraints
 				      */
   template <int dim, int spacedim>
   static void project_boundary_values (const Mapping<dim, spacedim>   &mapping,
@@ -965,6 +974,8 @@ class VectorTools
 				      * Calls the project_boundary_values()
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
+				      *
+				      * @ingroup constraints
 				      */
   template <int dim, int spacedim>
   static void project_boundary_values (const DoFHandler<dim,spacedim> &dof,
@@ -1047,6 +1058,8 @@ class VectorTools
 				      * last step we project $(I-P_0-P_e)\vec{f}$
 				      * on the bubble shape functions defined on
 				      * the face.
+				      *
+				      * @ingroup constraints
 				      */
    template <int dim>
    static void project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
@@ -1058,6 +1071,8 @@ class VectorTools
 
 				     /**
 				      * Same as above for the hp-namespace.
+				      *
+				      * @ingroup constraints
 				      */
    template <int dim>
    static void project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
@@ -1362,6 +1377,8 @@ class VectorTools
 				      * way it is created, it is not
 				      * constrained to be zero at
 				      * these points.
+				      *
+				      * @ingroup constraints
 				      */
   template <int dim, template <int, int> class DH, int spacedim>
   static
