@@ -1,5 +1,3 @@
-#define BAERBEL_MG_TEST 1
-
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <base/logstream.h>
