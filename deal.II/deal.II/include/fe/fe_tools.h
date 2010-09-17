@@ -475,6 +475,11 @@ class FETools
 				      * is the format used in
 				      * FiniteElement, where we want
 				      * to use this function mostly.
+				      *
+				      * @arg isotropic_only Set
+				      * to <code>true</code> if you only
+				      * want to compute matrices for
+				      * isotropic refinement.
 				      */
     template <int dim, typename number, int spacedim>
     static void compute_projection_matrices(
