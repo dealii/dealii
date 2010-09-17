@@ -103,4 +103,22 @@ FE_DGVector<POLY,dim,spacedim>::interpolate(
   Assert(false, ExcNotImplemented());
 }
 
+template <class POLY, int dim, int spacedim>
+void
+FE_DGVector<POLY,dim,spacedim>::interpolate(
+  std::vector<double>& /*local_dofs*/,
+  const VectorSlice<const std::vector<std::vector<double> > >& /*values*/) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <class POLY, int dim, int spacedim>
+unsigned int
+FE_DGVector<POLY,dim,spacedim>::memory_consumption() const
+{
+  Assert(false, ExcNotImplemented());
+  return 0;
+}
+
 DEAL_II_NAMESPACE_CLOSE
