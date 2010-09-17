@@ -178,7 +178,7 @@ class Step12
 				     // <code>system_matrix</code>.
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
-    
+
     Vector<double>       solution;
     Vector<double>       right_hand_side;
 
@@ -201,7 +201,7 @@ class Step12
 				     // below.
     typedef MeshWorker::DoFInfo<dim> DoFInfo;
     typedef MeshWorker::IntegrationInfo<dim> CellInfo;
-    
+
 				     // The following three functions
 				     // are then the ones that get called
 				     // inside the generic loop over all
@@ -264,7 +264,7 @@ void Step12<dim>::setup_system ()
 				   // building the pattern, this object is
 				   // copied to <code>sparsity_pattern</code>
 				   // and can be discarded.
-  
+
 				   // To build the sparsity pattern for DG
 				   // discretizations, we can call the
 				   // function analogue to
@@ -311,7 +311,7 @@ void Step12<dim>::assemble_system ()
 				   // the global sparse matrix and the
 				   // right hand side vector.
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  
+
 				   // First, we initialize the
 				   // quadrature formulae and the
 				   // update flags in the worker base
@@ -326,9 +326,9 @@ void Step12<dim>::assemble_system ()
 				   // over this value three times.
   const unsigned int n_gauss_points = dof_handler.get_fe().degree+1;
   info_box.initialize_gauss_quadrature(n_gauss_points,
-						 n_gauss_points,
-						 n_gauss_points);
-  
+				       n_gauss_points,
+				       n_gauss_points);
+
 				   // These are the types of values we
 				   // need for integrating our
 				   // system. They are added to the
@@ -364,7 +364,7 @@ void Step12<dim>::assemble_system ()
   MeshWorker::Assembler::SystemSimple<SparseMatrix<double>, Vector<double> >
     assembler;
   assembler.initialize(system_matrix, right_hand_side);
-  
+
 				   // Finally, the integration loop
 				   // over all active cells
 				   // (determined by the first
