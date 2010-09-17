@@ -2,7 +2,7 @@
 //    fe_data_test.cc,v 1.14 2003/11/28 11:52:35 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,8 @@
 #include <fstream>
 
 #include <base/logstream.h>
+#include <base/polynomials_raviart_thomas.h>
+
 #include <grid/tria_iterator.h>
 #include <dofs/dof_accessor.h>
 #include <fe/fe_q.h>
@@ -24,6 +26,10 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_raviart_thomas.h>
+#include <fe/fe_nedelec.h>
+#include <fe/fe_bdm.h>
+#include <fe/fe_dg_vector.h>
+
 #include <fe/fe_system.h>
 
 //TODO: Find support_on_face problems for test-no. > 7
@@ -63,20 +69,60 @@ void test_fe_datas()
 				       FE_Q<dim> (2), 1));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   
-				   // Check Raviart-Thomas in 2d only
-  if (dim==2)
+
+				   // Check vector elements in 2d and higher only
+  if (dim>1)
     {
+				   // Vector DG elements
+      fe_datas.push_back(
+	new FE_DGVector<PolynomialsRaviartThomas<dim>,dim>(0, mapping_raviart_thomas));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(
+	new FE_DGVector<PolynomialsRaviartThomas<dim>,dim>(1, mapping_raviart_thomas));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(
+	new FE_DGVector<PolynomialsNedelec<dim>,dim>(0, mapping_nedelec));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(
+	new FE_DGVector<PolynomialsNedelec<dim>,dim>(1, mapping_nedelec));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+
+				       // Hdiv elements
       FE_RaviartThomas<dim>* rt0 = new FE_RaviartThomas<dim>(0);
-      FE_RaviartThomas<dim>* rt1 = new FE_RaviartThomas<dim>(1);
       fe_datas.push_back(rt0);
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+
+      FE_RaviartThomas<dim>* rt1 = new FE_RaviartThomas<dim>(1);
       fe_datas.push_back(rt1);
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+
       fe_datas.push_back(new FE_RaviartThomas<dim>(2));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(new FESystem<dim>(*rt1, 1,
 					   FE_DGQ<dim> (1), 1));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+
+				       // Hcurl elements
+      FE_Nedelec<dim>* ned0 = new FE_Nedelec<dim>(0);
+      fe_datas.push_back(ned0);
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      FE_Nedelec<dim>* ned1 = new FE_Nedelec<dim>(1);
+      fe_datas.push_back(ned1);
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+    }
+  if (dim==2)
+    {
+      fe_datas.push_back(
+	new FE_DGVector<PolynomialsBDM<dim>,dim>(1, mapping_bdm));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(
+	new FE_DGVector<PolynomialsBDM<dim>,dim>(2, mapping_bdm));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      
+      fe_datas.push_back(new FE_BDM<dim>(1));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FE_BDM<dim>(2));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;     
     }
   if (dim>1)
     {
@@ -141,7 +187,8 @@ void test_fe_datas()
       deallog << "first_face_quad_index=" << fe_data->first_face_quad_index << std::endl;
       deallog << "dofs_per_face=" << fe_data->dofs_per_face << std::endl;
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
-      deallog << "components=" << fe_data->components << std::endl
+      deallog << "primitive=" << (fe_data->is_primitive() ? "yes" : "no") << std::endl
+	      << "components=" << fe_data->components << std::endl
 	      << "blocks=" << fe_data->n_blocks() << std::endl
 	      << "degree=" << fe_data->tensor_degree() << std::endl
 	      << "conformity=";
