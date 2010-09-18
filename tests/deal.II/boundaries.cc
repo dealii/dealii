@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2005, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,7 +57,7 @@ template <int dim>
 const Quadrature<dim-1> &
 boundary_q (const DoFHandler<dim> &)
 {
-  static const QGauss4<dim-1> q;
+  static const QGauss<dim-1> q(4);
   return q;
 }
 

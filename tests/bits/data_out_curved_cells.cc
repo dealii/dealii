@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -142,7 +142,7 @@ void curved_grid (std::ofstream &out)
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
   sparsity_pattern.compress ();
   SparseMatrix<double> S(sparsity_pattern);
-  QGauss4<2> quadrature;
+  QGauss<2> quadrature(4);
   MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
 				   // set up the boundary values for
 				   // the laplace problem

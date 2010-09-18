@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -256,7 +256,7 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
 template <class Vector, class Matrix, class Sparsity>
 void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system () 
 {
-  QGauss2<2>  quadrature_formula;
+  QGauss<2>  quadrature_formula(2);
   FEValues<2> fe_values (fe, quadrature_formula, 
 			 UpdateFlags(update_values    |
 				     update_gradients |

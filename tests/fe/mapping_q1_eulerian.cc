@@ -1,5 +1,5 @@
 // mapping_q1_eulerian.cc,v 1.3 2002/06/26 12:28:54 guido Exp
-// Copyright (C) 2001, 2002, 2005 Michael Stadler, Wolfgang Bangerth
+// Copyright (C) 2001, 2002, 2005, 2010 Michael Stadler, Wolfgang Bangerth
 //
 
 #include "../tests.h"
@@ -47,7 +47,7 @@ show_values(FiniteElement<dim>& fe,
   MappingQ1Eulerian<dim> mapping(map_points, flowfield_dof_handler);
 
 
-  QGauss2<dim> quadrature_formula;
+  QGauss<dim> quadrature_formula(2);
   
   FEValues<dim> fe_values(mapping, fe, quadrature_formula,
 			  UpdateFlags(update_values |

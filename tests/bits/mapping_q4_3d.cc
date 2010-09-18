@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -47,7 +47,7 @@ int main ()
   dof_handler.distribute_dofs (fe);
 
   MappingQ<3> mapping(4);
-  QGauss3<2> q_face;
+  QGauss<2> q_face(3);
   FEFaceValues<3> fe_face_values (mapping, fe, q_face,
                                   update_normal_vectors |
                                   update_JxW_values);

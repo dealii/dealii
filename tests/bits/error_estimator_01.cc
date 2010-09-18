@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2007 by the deal.II authors
+//    Copyright (C) 2004, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,7 +56,7 @@ template <int dim>
 Quadrature<dim-1> &
 get_q_face (Function<dim>&)
 {
-  static QGauss4<dim-1> q;
+  static QGauss<dim-1> q(4);
   return q;
 }
 

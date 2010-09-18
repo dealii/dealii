@@ -4,7 +4,7 @@
 /*    fe_tools_test.cc,v 1.6 2003/04/09 15:49:54 wolf Exp       */
 /*    Version:                                           */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2007 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2007, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -113,7 +113,7 @@ void test(const Triangulation<dim> &tria,
   DoFTools::make_hanging_node_constraints (dof_handler2, constraints2);
   constraints2.close();
   
-  QGauss4<dim> quadrature;
+  QGauss<dim> quadrature(4);
   TestFunction function;
   VectorTools::project(mapping,
     dof_handler1,

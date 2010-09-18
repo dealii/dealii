@@ -367,7 +367,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
                                    // objects
   if (true)
     {
-      const QGauss6<dim> q;
+      const QGauss<dim> q(6);
       FEValues<dim> fe_values(mapping, fe, q, update_all);
       fe_values.reinit(dof.begin_active());
       check_values_and_derivatives (fe, fe_values, q);

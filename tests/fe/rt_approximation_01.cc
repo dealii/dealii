@@ -2,7 +2,7 @@
 //    rt_approximation_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -454,7 +454,7 @@ int main ()
   dof_handler = new DoFHandler<2> (tria_test);
   dof_handler->distribute_dofs (fe);
 
-  QGauss6<2> quad_temp;
+  QGauss<2> quad_temp(6);
   deallog << "DoFs per quad: " << fe.dofs_per_quad
 	  << ", dofs per line: " << fe.dofs_per_line
 	  << ", dofs per vertex: " <<  fe.dofs_per_vertex

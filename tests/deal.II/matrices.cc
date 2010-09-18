@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,7 +65,7 @@ check_boundary (const DoFHandler<dim> &dof,
   typename FunctionMap<dim>::type function_map;
   function_map[0] = &coefficient;
 
-  QGauss6<dim-1> face_quadrature;
+  QGauss<dim-1> face_quadrature(6);
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,

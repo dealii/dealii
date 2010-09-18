@@ -1,5 +1,5 @@
 // mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -78,7 +78,7 @@ plot_faces(Mapping<dim> &mapping,
 {
   deallog.push(name);
 
-  QGauss4<dim-1> q;
+  QGauss<dim-1> q(4);
   const unsigned int nq = (unsigned int) (.01 + std::pow(q.n_quadrature_points, 1./(dim-1)));
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
@@ -122,7 +122,7 @@ plot_subfaces(Mapping<dim> &mapping,
 {
   deallog.push(name);
 
-  QGauss4<dim-1> q;
+  QGauss<dim-1> q(4);
   const unsigned int nq = (unsigned int) (.01 + std::pow(q.n_quadrature_points, 1./(dim-1)));
 
   FESubfaceValues<dim> fe_values(mapping, fe, q,
@@ -185,7 +185,7 @@ compute_area(Mapping<dim> &mapping,
 	     FiniteElement<dim> &fe,
 	     typename DoFHandler<dim>::cell_iterator &cell)
 {
-  QGauss4<dim> gauss4;
+  QGauss<dim> gauss4(4);
   FEValues<dim> fe_values(mapping, fe, gauss4,
 			UpdateFlags(update_JxW_values));
   fe_values.reinit(cell);

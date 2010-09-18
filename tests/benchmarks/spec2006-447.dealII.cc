@@ -4,7 +4,7 @@
 /*    $Id$       */
 /*    Version: $Name$                                          */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004, 2008 by the deal.II authors */
+/*    Copyright (C) 2002, 2003, 2004, 2008, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -2129,7 +2129,7 @@ namespace DualFunctional
 				     // formula, have abbreviations
 				     // for the number of quadrature
 				     // points and shape functions...
-    QGauss4<dim> quadrature;
+    QGauss<dim> quadrature(4);
     MappingQ<dim> mapping (4);    
     FEValues<dim>  fe_values (mapping, dof_handler.get_fe(), quadrature,
 			      update_gradients |

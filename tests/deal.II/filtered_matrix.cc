@@ -112,7 +112,7 @@ check ()
   
   MappingQ<dim> mapping(2);
   FE_Q<dim> element(1);
-  QGauss4<dim> quadrature;
+  QGauss<dim> quadrature(4);
   
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
