@@ -1141,7 +1141,7 @@ namespace LaplaceSolver
   {
     Vector<float> estimated_error_per_cell (this->triangulation->n_active_cells());
     KellyErrorEstimator<dim>::estimate (this->dof_handler,
-					QGauss3<dim-1>(),
+					QGauss<dim-1>(3),
 					typename FunctionMap<dim>::type(),
 					this->solution,
 					estimated_error_per_cell);
@@ -2926,7 +2926,7 @@ namespace LaplaceSolver
     {
       MappingQ<dim> mapping(4);
       KellyErrorEstimator<dim>::estimate (mapping, primal_solver.dof_handler,
-					  QGauss3<dim-1>(),
+					  QGauss<dim-1>(3),
 					  typename FunctionMap<dim>::type(),
 					  primal_solver.solution,
 					  error_indicators);

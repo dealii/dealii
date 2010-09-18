@@ -427,7 +427,7 @@ void project (const Mapping<dim>       &mapping,
 	      const Function<dim>      &function,
 	      Vector<double>           &vec,
 	      const bool                enforce_zero_boundary = false,
-	      const Quadrature<dim-1>  & = QGauss2<dim-1>(),
+	      const Quadrature<dim-1>  & = QGauss<dim-1>(2),
 	      const bool                project_to_boundary_first = false)
 {
   Assert (dof.get_fe().n_components() == function.n_components,

@@ -54,7 +54,7 @@ void check_this (Triangulation<3> &tria)
                             u);
   
   KellyErrorEstimator<3>::estimate (dof_handler,
-                                    QGauss2<2>(),
+                                    QGauss<2>(2),
                                     FunctionMap<3>::type(),
                                     u,
                                     e);

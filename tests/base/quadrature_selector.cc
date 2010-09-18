@@ -45,12 +45,12 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check ("gauss", 2, QGauss2<1>());
-  check ("gauss", 2, QGauss2<2>());
-  check ("gauss", 2, QGauss2<3>());
+  check ("gauss", 2, QGauss<1>(2));
+  check ("gauss", 2, QGauss<2>(2));
+  check ("gauss", 2, QGauss<3>(2));
   
-  check ("gauss", 2, QGauss2<3>());
-  check ("gauss", 6, QGauss6<3>());
+  check ("gauss", 2, QGauss<3>(2));
+  check ("gauss", 6, QGauss<3>(6));
   check ("gauss", 10, QGauss<3>(10));
 
   check ("weddle", 0, QWeddle<2>());

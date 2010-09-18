@@ -70,7 +70,7 @@ check_boundary (const hp::DoFHandler<dim> &dof,
   function_map[0] = &coefficient;
 
   hp::QCollection<dim-1> face_quadrature;
-  face_quadrature.push_back (QGauss6<dim-1>());
+  face_quadrature.push_back (QGauss<dim-1>(6));
   
   std::vector<unsigned int> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,
@@ -150,7 +150,7 @@ check ()
   mapping.push_back (MappingQ<dim>(3));
 
   hp::QCollection<dim> quadrature;
-  quadrature.push_back (QGauss6<dim>());
+  quadrature.push_back (QGauss<dim>(6));
 
 				   // create sparsity pattern. note
 				   // that different components should
