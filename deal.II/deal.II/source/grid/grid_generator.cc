@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2638,7 +2638,7 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 
   SparseMatrix<double> S(sparsity_pattern);
 
-  QGauss4<dim> quadrature;
+  QGauss<dim> quadrature(4);
 
   MatrixCreator::create_laplace_matrix(mapping_q1, dof_handler, quadrature, S);
 
