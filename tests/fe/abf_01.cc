@@ -628,7 +628,7 @@ int main (int /*argc*/, char **/*argv*/)
   hn_constraints.close ();
   MappingQ1<2> map_default;
   project (map_default, *dof_handler, hn_constraints,
-	   QGauss6<2> (), ConstantFunction<2>(1., 2),
+	   QGauss<2> (6), ConstantFunction<2>(1., 2),
 	   solution);
 
   EvaluateDerivative (dof_handler, solution);

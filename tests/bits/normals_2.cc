@@ -49,7 +49,7 @@ void check (const Triangulation<dim> &tria,
   dof_handler.distribute_dofs (fe);
   deallog.threshold_double(1.e-10);
 
-  QGauss3<dim-1> q_face;
+  QGauss<dim-1> q_face(3);
   
   FEFaceValues<dim>    fe_face_values (mapping, fe, q_face,
                                        update_normal_vectors | update_JxW_values);

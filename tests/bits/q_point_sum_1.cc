@@ -37,7 +37,7 @@ void check (const Triangulation<dim> &tria)
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
-  QGauss3<dim-1> q_face;
+  QGauss<dim-1> q_face(3);
   
   FEFaceValues<dim>    fe_face_values (fe, q_face,
                                        update_q_points | update_JxW_values);

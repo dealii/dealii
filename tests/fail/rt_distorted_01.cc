@@ -349,7 +349,7 @@ int main (int /*argc*/, char **/*argv*/)
 					   hn_constraints);
   hn_constraints.close ();
   VectorTools::project (*dof_handler, hn_constraints,
-			QGauss6<2> (), TestMap1<2>(2),
+			QGauss<2> (6), TestMap1<2>(2),
 			solution);
 
 				   // Project reference solution onto RT FE field
@@ -360,7 +360,7 @@ int main (int /*argc*/, char **/*argv*/)
   hn_constraints_def.close ();
 
   VectorTools::project (*dof_handler_def, hn_constraints_def,
-			QGauss6<2> (), TestMap1<2>(2),
+			QGauss<2> (6), TestMap1<2>(2),
 			solution_q);
 
   MappingQ1Eulerian<2> *mapping_euler
@@ -379,12 +379,12 @@ int main (int /*argc*/, char **/*argv*/)
     {
 				       // Rotate element
       VectorTools::project (*dof_handler_def, hn_constraints_def,
-			    QGauss6<2> (), TestDef1<2>(2, rotat),
+			    QGauss<2> (6), TestDef1<2>(2, rotat),
 			    deformation);
 
 				       // Project 1 function to element
       VectorTools::project (*mapping_euler, *dof_handler, hn_constraints,
-			    QGauss6<2> (), TestMap1<2>(2),
+			    QGauss<2> (6), TestMap1<2>(2),
 			    solution);
 
 				       // Write output files
@@ -412,12 +412,12 @@ int main (int /*argc*/, char **/*argv*/)
   for (double scale = -0.75; scale < 4.0; scale += 0.25)
     {
       VectorTools::project (*dof_handler_def, hn_constraints_def,
-			    QGauss6<2> (), TestDef2<2>(2, scale),
+			    QGauss<2> (6), TestDef2<2>(2, scale),
 			    deformation);
 
 				       // Project 1 function to element
       VectorTools::project (*mapping_euler, *dof_handler, hn_constraints,
-			    QGauss6<2> (), TestMap1<2>(2),
+			    QGauss<2> (6), TestMap1<2>(2),
 			    solution);
 
       char buf[1000];
@@ -433,12 +433,12 @@ int main (int /*argc*/, char **/*argv*/)
   for (double scale = -1.0; scale < 1.0; scale += 0.25)
     {
       VectorTools::project (*dof_handler_def, hn_constraints_def,
-			    QGauss6<2> (), TestDef3<2>(2, scale),
+			    QGauss<2> (6), TestDef3<2>(2, scale),
 			    deformation);
 
 				       // Project 1 function to element
       VectorTools::project (*mapping_euler, *dof_handler, hn_constraints,
-			    QGauss6<2> (), TestMap1<2>(2),
+			    QGauss<2> (6), TestMap1<2>(2),
 			    solution);
 
       char buf[1000];

@@ -359,7 +359,7 @@ double TestProjection (Mapping<2> &mapping,
 					       hn_constraints);
       hn_constraints.close ();
       VectorTools::project (mapping, *dof_handler, hn_constraints,
-			    QGauss6<2> (), pol,
+			    QGauss<2> (6), pol,
 			    solution);
 
 				       // Now evaluate error ...
@@ -490,7 +490,7 @@ int main ()
       {
 					 // Rotate element
 	VectorTools::project (*dof_handler_def, hn_constraints_def,
-			      QGauss6<2> (), TestDef1<2>(2, rotat),
+			      QGauss<2> (6), TestDef1<2>(2, rotat),
 			      deformation);
 	deallog << "phi = " << rotat << std::endl;
 	TestProjection (mapping_euler, dof_handler);
@@ -500,7 +500,7 @@ int main ()
     for (double scale = -0.75; scale < 4.0; scale += 0.25)
       {
 	VectorTools::project (*dof_handler_def, hn_constraints_def,
-			      QGauss6<2> (), TestDef2<2>(2, scale),
+			      QGauss<2> (6), TestDef2<2>(2, scale),
 			      deformation);
 	deallog << "scale = " << scale << std::endl;
 	TestProjection (mapping_euler, dof_handler);
@@ -510,7 +510,7 @@ int main ()
     for (double scale = -1.0; scale < 1.0; scale += 0.25)
       {
 	VectorTools::project (*dof_handler_def, hn_constraints_def,
-			      QGauss6<2> (), TestDef3<2>(2, scale),
+			      QGauss<2> (6), TestDef3<2>(2, scale),
 			      deformation);
 	deallog << "scale = " << scale << std::endl;
 	TestProjection (mapping_euler, dof_handler);

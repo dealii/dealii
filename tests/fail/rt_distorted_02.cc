@@ -370,7 +370,7 @@ int main ()
 					   hn_constraints);
   hn_constraints.close ();
   VectorTools::project (dof_handler, hn_constraints,
-			QGauss6<2> (), TestMap1<2>(2),
+			QGauss<2> (6), TestMap1<2>(2),
 			solution);
 
 				   // Project reference solution onto RT FE field
@@ -381,7 +381,7 @@ int main ()
   hn_constraints_def.close ();
 
   VectorTools::project (dof_handler_def, hn_constraints_def,
-			QGauss6<2> (), TestMap1<2>(2),
+			QGauss<2> (6), TestMap1<2>(2),
 			solution_q);
   
   MappingQ1Eulerian<2> mapping_euler (deformation, dof_handler_def);
@@ -396,7 +396,7 @@ int main ()
     {
 				       // Rotate element
       VectorTools::project (dof_handler_def, hn_constraints_def,
-			    QGauss6<2> (), TestDef1<2>(2, rotat),
+			    QGauss<2> (6), TestDef1<2>(2, rotat),
 			    deformation);
       sprintf (buf,"phi = %e FE_RT Area %e  FE_Q Area %e\n",
 	       rotat,
@@ -409,7 +409,7 @@ int main ()
   for (double scale = -0.75; scale < 4.0; scale += 0.25)
     {
       VectorTools::project (dof_handler_def, hn_constraints_def,
-			    QGauss6<2> (), TestDef2<2>(2, scale),
+			    QGauss<2> (6), TestDef2<2>(2, scale),
 			    deformation);
       sprintf (buf,"Scale = %e FE_RT Area %e  FE_Q Area %e\n",
 	       scale,
@@ -422,7 +422,7 @@ int main ()
   for (double scale = -1.0; scale < 1.0; scale += 0.25)
     {
       VectorTools::project (dof_handler_def, hn_constraints_def,
-			    QGauss6<2> (), TestDef3<2>(2, scale),
+			    QGauss<2> (6), TestDef3<2>(2, scale),
 			    deformation);
       sprintf (buf,"Scale = %e FE_RT Area %e  FE_Q Area %e\n",
 	       scale,
