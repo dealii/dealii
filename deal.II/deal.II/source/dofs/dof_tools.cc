@@ -1912,40 +1912,42 @@ namespace internal
     }
 
 
-    static
-    void
-    make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
-				      ConstraintMatrix    &)
-    {
-				       // nothing to do for regular
-				       // dof handlers in 1d
-    }
+//   currently not used but may be in the future:
+  
+//     static
+//     void
+//     make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
+// 				      ConstraintMatrix    &)
+//     {
+// 				       // nothing to do for regular
+// 				       // dof handlers in 1d
+//     }
 
 
 
-    static
-    void
-    make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
-					    ConstraintMatrix    &,
-					    dealii::internal::int2type<1>)
-    {
-				       // nothing to do for regular
-				       // dof handlers in 1d
-    }
+//     static
+//     void
+//     make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
+// 					    ConstraintMatrix    &,
+// 					    dealii::internal::int2type<1>)
+//     {
+// 				       // nothing to do for regular
+// 				       // dof handlers in 1d
+//     }
 
 
-    static
-    void
-    make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1,2> &/*dof_handler*/,
-					    ConstraintMatrix        &/*constraints*/,
-					    dealii::internal::int2type<1>)
-    {
-				       // we may have to compute
-				       // constraints for
-				       // vertices. gotta think about
-				       // that a bit more
-//TODO[WB]: think about what to do here...
-    }
+//     static
+//     void
+//     make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1,2> &/*dof_handler*/,
+// 					    ConstraintMatrix        &/*constraints*/,
+// 					    dealii::internal::int2type<1>)
+//     {
+// 				       // we may have to compute
+// 				       // constraints for
+// 				       // vertices. gotta think about
+// 				       // that a bit more
+// //TODO[WB]: think about what to do here...
+//     }
 #endif
 
 
