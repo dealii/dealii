@@ -17,7 +17,7 @@
 char logname[] = "project_nedelec_03/output";
 
 
-#include "project_common.cc"
+#include "project_common.h"
 
 
 template <int dim>

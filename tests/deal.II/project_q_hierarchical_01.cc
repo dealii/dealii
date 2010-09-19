@@ -17,7 +17,7 @@
 char logname[] = "project_q_hierarchical_01/output";
 
 
-#include "project_common.cc"
+#include "project_common.h"
 
 
 template <int dim>

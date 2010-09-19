@@ -1,4 +1,4 @@
-//----------------------------  project_common.cc  ---------------------------
+//----------------------------  project_common.h  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  project_common.cc  ---------------------------
+//----------------------------  project_common.h  ---------------------------
 
 
 // common framework to check whether an element of polynomial order p can
