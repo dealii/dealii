@@ -60,63 +60,20 @@ task_%/output : task_%/exe
 
 
 ############################################################
-tests_x =  geometry_info_* \
-	   logtest \
-	   logstream_end \
-	   log_* \
-	   reference \
-	   quadrature_* \
-	   qprojector \
-	   gauss_lobatto \
-	   path_search \
-	   named_data \
-	   slice_vector \
-	   table \
-	   table_handler* \
-	   tensor \
-	   tensor_* \
-	   point_* \
-	   index_set_* \
-	   symmetric_tensor_* \
-	   full_tensor_* \
-           timer \
-	   polynomial* \
-	   auto_derivative_function \
-	   anisotropic_* \
-           hierarchical \
-	   data_out_base \
-	   data_out_reader_* \
-	   data_out_base_* \
-	   function_* \
-           functions_* \
-	   utilities_* \
-	   work_stream_* \
-	   is_finite* \
-	   number_traits_* \
-	   thread_validity_* \
-	   task_* \
-	   parallel_* \
-	   mutex_* \
-	   scalar_* \
-	   conditional_ostream \
-	   convergence_table_* \
-	   polynomial_minus_equals
+
+# all .cc-files are tests, though the test bdm.cc appears to be dysfunctional
+# and we don't want the data_out_base_tecplot_bin test if we haven't found the
+# corresponding libraries:
+ifneq (tecio, $(findstring tecio, $LIBS))
+  tests = $(filter-out bdm data_out_base_tecplot_bin, $(basename $(wildcard *)))
+else
+  tests = $(filter-out bdm, $(basename $(wildcard *)))
+endif
 
 # add threading tests. note that we have
 # to list them individually, without wildcards, because the .cc files are
 # generated and don't exist yet (so wildcard expansion will fail)
-tests_x += threads_01 threads_02
-
-
-ifeq (tecio, $(findstring tecio, $LIBS))
-  tests_x += data_out_base_tecplot_bin
-endif
-
-# from above list of regular expressions, generate the real set of
-# tests
-expand = $(shell echo $(addsuffix .cc,$(1)) \
-           | $(PERL) -pi -e 's/\.cc//g;')
-tests = $(call expand,$(tests_x))
+tests += threads_01 threads_02
 
 
 ############################################################
