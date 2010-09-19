@@ -15,24 +15,11 @@
 // merge and print a bunch of ConstrainMatrices
 
 #include "../tests.h"
-#include <dofs/dof_handler.h>
-#include <grid/tria.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
-#include <grid/tria_boundary.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <lac/sparse_matrix.h>
-#include <base/parameter_handler.h>
-#include <dofs/dof_accessor.h>
 #include <lac/constraint_matrix.h>
-#include <dofs/dof_tools.h>
-#include <grid/grid_out.h>
 #include <base/logstream.h>
 
 #include <fstream>
-#include <cmath>
-#include <cstdlib>
+#include <iomanip>
 
 
 std::ofstream logfile("constraints_merge/output");
