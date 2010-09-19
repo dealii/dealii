@@ -1,4 +1,4 @@
-//----------------------------  constraints.cc  ---------------------------
+//----------------------------  constraints_merge_02.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  constraints.cc  ---------------------------
+//----------------------------  constraints_merge_02.cc  ---------------------------
 
 
 // merge and print a bunch of ConstrainMatrices. test the case that we
