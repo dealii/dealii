@@ -1,0 +1,18 @@
+
+DEAL::Checking ConstraintMatrix::merge
+DEAL::Checking with open objects
+    0 11:  1.0
+    1 12:  0.12
+    1 13:  0.38
+    1 4:  0.50
+    10 11:  1.0
+    3 12:  0.25
+    3 13:  0.75
+DEAL::Checking with closed objects
+    0 11:  1.0
+    1 4:  0.50
+    1 12:  0.12
+    1 13:  0.38
+    3 12:  0.25
+    3 13:  0.75
+    10 11:  1.0
