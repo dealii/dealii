@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_11.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <fe/mapping_q.h>
 
 // check

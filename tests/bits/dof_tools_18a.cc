@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_1a.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/sparsity_pattern.h>
 
 // check
@@ -94,7 +94,7 @@ check_this (const DoFHandler<dim> &dof_handler)
 {
 				   // since we can't forward declare
 				   // check_this in this file (it is forward
-				   // declared in dof_tools_common.cc), we
+				   // declared in dof_tools_common.h), we
 				   // also can't make the driver file aware of
 				   // the overload for 1d. to avoid linker
 				   // errors, we can consequently not overload

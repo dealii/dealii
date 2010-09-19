@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_2d.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/block_sparsity_pattern.h>
 
 // check

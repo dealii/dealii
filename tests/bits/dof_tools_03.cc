@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_3.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/constraint_matrix.h>
 #include <lac/vector.h>
 

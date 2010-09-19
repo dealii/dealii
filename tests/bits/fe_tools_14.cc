@@ -12,7 +12,7 @@
 //----------------------------  fe_tools_14.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "fe_tools_common.h"
 
 // check
 //   FE::hp_constraints_are_implemented ()

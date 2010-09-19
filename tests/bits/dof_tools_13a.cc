@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_13a.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/vector.h>
 
 // check

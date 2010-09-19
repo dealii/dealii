@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_6.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 
 // check
 //   DoFTools::extract_subdomain_dofs

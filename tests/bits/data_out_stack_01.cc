@@ -12,7 +12,7 @@
 //----------------------------  data_out_stack_01.cc  ---------------------------
 
 #include "../tests.h"
-#include "data_out_common.cc"
+#include "data_out_common.h"
 #include <lac/sparsity_pattern.h>
 #include <numerics/data_out_stack.h>
 

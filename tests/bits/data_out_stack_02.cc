@@ -16,7 +16,7 @@
 // on some it failed linking in the past due to non-existence of weak symbols
 
 #include "../tests.h"
-#include "data_out_common.cc"
+#include "data_out_common.h"
 #include <lac/sparsity_pattern.h>
 #include <numerics/data_out_stack.h>
 

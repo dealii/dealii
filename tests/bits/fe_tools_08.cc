@@ -12,7 +12,7 @@
 //----------------------------  fe_tools_08.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "fe_tools_common.h"
 #include <lac/sparsity_pattern.h>
 
 // check

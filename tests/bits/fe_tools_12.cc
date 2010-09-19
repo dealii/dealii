@@ -12,7 +12,7 @@
 //----------------------------  fe_tools_12.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "fe_tools_common.h"
 
 // check
 //   FETools::get_projection_matrix

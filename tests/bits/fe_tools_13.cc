@@ -12,7 +12,7 @@
 //----------------------------  fe_tools_13.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "fe_tools_common.h"
 
 // check
 //   FE::face_to_equivalent_cell_index

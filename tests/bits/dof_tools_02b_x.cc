@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_2b.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/compressed_set_sparsity_pattern.h>
 
 // check

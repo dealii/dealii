@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_9.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 
 // check
 //   DoFTools::map_dof_to_boundary_indices(const DoFHandler<int>     &,

@@ -12,7 +12,7 @@
 //----------------------------  fe_tools_cpfqpm_04.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "fe_tools_common.h"
 #include <base/quadrature_lib.h>
 
 // check

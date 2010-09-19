@@ -14,7 +14,7 @@
 // same as the the test with number _01, but check for block vectors
 
 #include "../tests.h"
-#include "data_out_common.cc"
+#include "data_out_common.h"
 #include <lac/sparsity_pattern.h>
 #include <numerics/data_out_faces.h>
 
@@ -72,7 +72,7 @@ check_this (const DoFHandler<dim> &dof_handler,
 {
 				   // since we can't forward declare
 				   // check_this in this file (it is forward
-				   // declared in data_out_common.cc), we
+				   // declared in data_out_common.h), we
 				   // also can't make the driver file aware of
 				   // the overload for 1d. to avoid linker
 				   // errors, we can consequently not overload

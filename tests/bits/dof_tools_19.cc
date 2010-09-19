@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_19.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/constraint_matrix.h>
 #include <base/function.h>
 #include <base/quadrature_lib.h>

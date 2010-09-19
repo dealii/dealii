@@ -12,7 +12,7 @@
 //----------------------------  dof_tools_1c.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 
 // check
 //   DoFTools::
