@@ -2,7 +2,7 @@
 //    deformed_projection.h,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -473,7 +473,7 @@ void project (const Mapping<dim>       &mapping,
 	      const Function<dim>      &function,
 	      Vector<double>           &vec,
 	      const bool                enforce_zero_boundary = false,
-	      const Quadrature<dim-1>  & = QGauss2<dim-1>(),
+	      const Quadrature<dim-1>  & = QGauss<dim-1>(2),
 	      const bool                project_to_boundary_first = false)
 {
   Assert (dof.get_fe().n_components() == function.n_components,
@@ -727,7 +727,7 @@ void check (const FiniteElement<2> &fe)
       MappingQ1<2> map_default;
       
       project (map_default, *dof_handler, hn_constraints,
-	       QGauss6<2> (), TestMap1<2>(2),
+	       QGauss<2> (6), TestMap1<2>(2),
 	       solution);
 
 				       // Test the core functionality
