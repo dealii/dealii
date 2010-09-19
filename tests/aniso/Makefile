@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -21,19 +21,8 @@ default: run-tests
 
 ############################################################
 
-tests_x = refine_and_coarsen_anisotropic \
-          fe_tools \
-          solution_transfer \
-          mesh_3d_21 \
-          hp_constraints* \
-          up_and_down
-
-# from above list of regular expressions, generate the real set of
-# tests
-expand = $(shell echo $(addsuffix .cc,$(1)) \
-           | $(PERL) -pi -e 's/\.cc//g;')
-tests = $(call expand,$(tests_x))
-
+# all .cc-files are tests:
+tests = $(basename $(wildcard *.cc))
 
 ############################################################
 

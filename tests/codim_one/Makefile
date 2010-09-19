@@ -21,25 +21,8 @@ default: run-tests
 
 ############################################################
 
-tests_x = grid* \
-	mapping* \
-	interpolation* \
-	surface* \
-	data_out* \
-	projection*\
-	integrate*\
-	gradients*\
-	tensor_matrix_conversion*\
-	bem*
-
-
-
-# from above list of regular expressions, generate the real set of
-# tests
-expand = $(shell echo $(addsuffix .cc,$(1)) \
-           | $(PERL) -pi -e 's/\.cc//g;')
-tests = $(call expand,$(tests_x))
-
+# all .cc-files are tests:
+tests = $(basename $(wildcard *.cc))
 
 ############################################################
 

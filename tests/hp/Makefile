@@ -21,35 +21,8 @@ default: run-tests
 
 ############################################################
 
-tests_x = hp_dof_handler \
-	  crash_* \
-	  q_collection_* \
-	  mapping_collection_* \
-	  fe_collection_* \
-	  fe_nothing_* \
-	  continuous_* \
-	  n_dofs \
-	  random \
-	  step-* \
-	  n_active_fe_indices \
-	  integrate_difference \
-	  hp_*_dof_identities_* \
-	  hp_hanging_nodes_* \
-	  interpolate_* \
-	  hp_constraints_* \
-	  matrices* \
-	  vectors* \
-	  get_active_fe_indices \
-	  create_* \
-	  renumber_* \
-	  dof_renumbering_* \
-	  compare*
-
-# from above list of regular expressions, generate the real set of
-# tests
-expand = $(shell echo $(addsuffix .cc,$(1)) \
-           | $(PERL) -pi -e 's/\.cc//g;')
-tests = $(call expand,$(tests_x))
+# all .cc-files are tests:
+tests = $(basename $(wildcard *.cc))
 
 ############################################################
 
