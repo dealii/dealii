@@ -1,0 +1,16 @@
+
+DEAL::---------------------------------------------------------
+DEAL::P-Order: 1  Number of degrees of freedom: 100821
+DEAL::L2-Norm of test function 0.903652
+DEAL::Normed L2-Error 1: 0  Normed L2-Error 2: 0
+DEAL::Normed L2-Diff: 0   OK
+DEAL::---------------------------------------------------------
+DEAL::P-Order: 2  Number of degrees of freedom: 169802
+DEAL::L2-Norm of test function 0.135132
+DEAL::Normed L2-Error 1: 0  Normed L2-Error 2: 0
+DEAL::Normed L2-Diff: 0   OK
+DEAL::---------------------------------------------------------
+DEAL::P-Order: 3  Number of degrees of freedom: 123144
+DEAL::L2-Norm of test function 1.75723
+DEAL::Normed L2-Error 1: 0  Normed L2-Error 2: 0
+DEAL::Normed L2-Diff: 0   OK

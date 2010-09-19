@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,11 +53,11 @@
 template <int dim>
 class TestFunction : public Function<dim>
 {
-private:
+  private:
     std::vector<Polynomials::Polynomial<double> > base;
     const unsigned int p_order;
     
-public:
+  public:
     TestFunction (const unsigned int p_order);
     
     virtual double value (const Point<dim>   &p,
@@ -67,15 +67,15 @@ public:
 
 template <int dim>
 TestFunction<dim>::TestFunction (const unsigned int p_order) :
-    p_order (p_order)
+		p_order (p_order)
 {
-    std::vector<double> coeff(p_order);
+  std::vector<double> coeff(p_order);
     
-    for (unsigned int d = 0; d < dim; ++d)
+  for (unsigned int d = 0; d < dim; ++d)
     {
-	for (unsigned int c = 0; c < p_order; ++c)
-	    coeff[c] = (double) rand () / (double) RAND_MAX;
-	base.push_back (Polynomials::Polynomial<double> (coeff));
+      for (unsigned int c = 0; c < p_order; ++c)
+	coeff[c] = (double) rand () / (double) RAND_MAX;
+      base.push_back (Polynomials::Polynomial<double> (coeff));
     }    
 }
 
@@ -84,21 +84,21 @@ template <int dim>
 double TestFunction<dim>::value (const Point<dim>   &p,
 				 const unsigned int  /*component*/) const
 {
-    double val = base[0].value(p(0));
-    for (unsigned int i = 1; i < dim; ++i)
-	val *= base[i].value(p(i));
-    return val;
+  double val = base[0].value(p(0));
+  for (unsigned int i = 1; i < dim; ++i)
+    val *= base[i].value(p(i));
+  return val;
 }
 
 
 template <int dim>
 class TestFEQConstraints 
 {
- public:
+  public:
     TestFEQConstraints (unsigned int p_order, unsigned int refinements);
     void run ();
     
- private:
+  private:
     const unsigned int refinements;
     const unsigned int p_order;
     
@@ -117,10 +117,10 @@ class TestFEQConstraints
 template <int dim>
 TestFEQConstraints<dim>::TestFEQConstraints (unsigned int p_order,
 					     unsigned int refinements) :
-    refinements (refinements),
-    p_order (p_order),
-    fe (p_order),
-    dof_handler (triangulation)
+		refinements (refinements),
+		p_order (p_order),
+		fe (p_order),
+		dof_handler (triangulation)
 {
 }
 
@@ -131,143 +131,146 @@ TestFEQConstraints<dim>::TestFEQConstraints (unsigned int p_order,
 template <int dim>
 void TestFEQConstraints<dim>::refine_grid_random ()
 {
-    const unsigned int n_cells = triangulation.n_active_cells();
-    Vector<double> estimated_error_per_cell (n_cells);
+  const unsigned int n_cells = triangulation.n_active_cells();
+  Vector<double> estimated_error_per_cell (n_cells);
     
-    for (unsigned int i = 0; i < n_cells; ++i)
-	estimated_error_per_cell(i) = (double) rand () / (double) RAND_MAX;
+  for (unsigned int i = 0; i < n_cells; ++i)
+    estimated_error_per_cell(i) = (double) rand () / (double) RAND_MAX;
     
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						     estimated_error_per_cell,
-						     0.3, 0.03);
-    triangulation.execute_coarsening_and_refinement ();
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
+  triangulation.execute_coarsening_and_refinement ();
 }
 
 
 template <int dim>
 void TestFEQConstraints<dim>::make_grid_and_dofs ()
 {
-    GridGenerator::hyper_cube (triangulation, -1, 1);
-    triangulation.refine_global (2);
+  GridGenerator::hyper_cube (triangulation, -1, 1);
+  triangulation.refine_global (2);
     
-    for (unsigned int i = 0; i < refinements; ++i)
-	refine_grid_random ();
+  for (unsigned int i = 0; i < refinements; ++i)
+    refine_grid_random ();
     
-    dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs (fe);
     
-    deallog << "---------------------------------------------------------"
-	    << std::endl;
-    deallog << "P-Order: " << p_order
-	    << "  Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << std::endl;
+  deallog << "---------------------------------------------------------"
+	  << std::endl;
+  deallog << "P-Order: " << p_order
+	  << "  Number of degrees of freedom: "
+	  << dof_handler.n_dofs()
+	  << std::endl;
     
-    hanging_node_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (dof_handler,
-					     hanging_node_constraints);
-    hanging_node_constraints.close ();
+  hanging_node_constraints.clear ();
+  DoFTools::make_hanging_node_constraints (dof_handler,
+					   hanging_node_constraints);
+  hanging_node_constraints.close ();
 }
 
 
 template <int dim>
 void TestFEQConstraints<dim>::output_grid () const
 {
-    std::ofstream output ("test_feq3.eps");
-    GridOut grid_out;
-    grid_out.write_eps (triangulation, output);
+  std::ofstream output ("test_feq3.eps");
+  GridOut grid_out;
+  grid_out.write_eps (triangulation, output);
 }
 
 
 template <int dim>
 void TestFEQConstraints<dim>::test ()
 {
-    TestFunction<dim> test_function (p_order);
-    double l2test,
-	l2norm1,
-	l2norm2,
-	l2error;
+  TestFunction<dim> test_function (p_order);
+  double l2test,
+    l2norm1,
+    l2norm2,
+    l2error;
 
-    Vector<double> solution;
-    solution.reinit (dof_handler.n_dofs ());
-    hanging_node_constraints.distribute (solution);
+  Vector<double> solution;
+  solution.reinit (dof_handler.n_dofs ());
+  hanging_node_constraints.distribute (solution);
 
-    QGauss<dim> quadrature (p_order + 1);
+  QGauss<dim> quadrature (p_order + 1);
 
-    Vector<double> norm_per_cell (triangulation.n_active_cells ());
-    VectorTools::interpolate (dof_handler, test_function, solution);
+  Vector<double> norm_per_cell (triangulation.n_active_cells ());
+  VectorTools::interpolate (dof_handler, test_function, solution);
 
-    // First error check. Simply the interpolation error of the used FE-Space
-    // on the given triangulation.
-    VectorTools::integrate_difference (dof_handler, solution,
-				       ZeroFunction<dim>(1),
-				       norm_per_cell,
-				       quadrature,
-				       VectorTools::L2_norm);
-    l2test = norm_per_cell.l2_norm ();
-    deallog << "L2-Norm of test function " 
-	    << l2test << std::endl;
+				   // First error check. Simply the interpolation error of the used FE-Space
+				   // on the given triangulation.
+  VectorTools::integrate_difference (dof_handler, solution,
+				     ZeroFunction<dim>(1),
+				     norm_per_cell,
+				     quadrature,
+				     VectorTools::L2_norm);
+  l2test = norm_per_cell.l2_norm ();
+  deallog << "L2-Norm of test function " 
+	  << l2test << std::endl;
     
-    // First error check. Simply the interpolation error of the used FE-Space
-    // on the given triangulation.
-    VectorTools::integrate_difference (dof_handler, solution,
-				       test_function,
-				       norm_per_cell,
-				       quadrature,
-				       VectorTools::L2_norm);
-    l2norm1 = norm_per_cell.l2_norm () / l2test;
+				   // First error check. Simply the interpolation error of the used FE-Space
+				   // on the given triangulation.
+  VectorTools::integrate_difference (dof_handler, solution,
+				     test_function,
+				     norm_per_cell,
+				     quadrature,
+				     VectorTools::L2_norm);
+  l2norm1 = norm_per_cell.l2_norm () / l2test;
 
-    // Second error check. Interpolation error, after redistribution of the
-    // values onto the DoFs on the hanging nodes.
-    hanging_node_constraints.distribute (solution);
-    VectorTools::integrate_difference (dof_handler, solution,
-				       test_function,
-				       norm_per_cell,
-				       quadrature,
-				       VectorTools::L2_norm);
-    l2norm2 = norm_per_cell.l2_norm () / l2test;
-    l2error = fabs (l2norm1 - l2norm2);
-    deallog << "Normed L2-Error 1: " << l2norm1 
-	    << "  Normed L2-Error 2: " << l2norm2 << std::endl 
-	    << "Normed L2-Diff: " << l2error << "   ";
-    if (l2error < 1.0e-16)
-	deallog << "OK" << std::endl;
-    else
-	deallog << "Error !" << std::endl;
+				   // Second error check. Interpolation error, after redistribution of the
+				   // values onto the DoFs on the hanging nodes.
+  hanging_node_constraints.distribute (solution);
+  VectorTools::integrate_difference (dof_handler, solution,
+				     test_function,
+				     norm_per_cell,
+				     quadrature,
+				     VectorTools::L2_norm);
+  l2norm2 = norm_per_cell.l2_norm () / l2test;
+  l2error = fabs (l2norm1 - l2norm2);
+  deallog << "Normed L2-Error 1: " << l2norm1 
+	  << "  Normed L2-Error 2: " << l2norm2 << std::endl 
+	  << "Normed L2-Diff: " << l2error << "   ";
+  if (l2error < 1.0e-16)
+    deallog << "OK" << std::endl;
+  else
+    deallog << "Error !" << std::endl;
 }
 
 
 template <int dim>
 void TestFEQConstraints<dim>::run () 
 {
-    make_grid_and_dofs ();
+  make_grid_and_dofs ();
 //  output_grid ();
-    test ();
+  test ();
 }
 
 
 int main () 
 {
-    std::ofstream logfile("fe_q_constraints/output");
-    deallog.attach(logfile);
-    deallog.depth_console(0);
+  std::ofstream logfile("fe_q_constraints/output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-    unsigned int ref_level[] = {5, 4, 3, 3, 2, 2};
+  unsigned int ref_level[] = {5, 4, 3, 3, 2, 2};
     
-    // Initialise the random generator with an arbitrary number. This
-    // should ensure reproducible results.
-    srand (4375384);
+				   // Initialise the random generator with an
+				   // arbitrary number. This should ensure
+				   // reproducible results.
+  srand (4375384);
     
-    // With these parameters, the elements are tested up to a polynomial
-    // degree of 6. The triangulation is refined 2 times uniformly and
-    // several times (pseudo-) randomly.
-    TestFEQConstraints<3> *test;
-    for (unsigned int p = 1; p < 7; ++p)
+				   // With these parameters, the elements are
+				   // tested up to a polynomial degree of
+				   // 6. The triangulation is refined 2 times
+				   // uniformly and several times (pseudo-)
+				   // randomly.
+  TestFEQConstraints<3> *test;
+  for (unsigned int p = 1; p < 4; ++p)
     {
-	test = new TestFEQConstraints<3> (p, ref_level[p-1]);
-	test->run ();
-	delete test;
+      test = new TestFEQConstraints<3> (p, ref_level[p-1]);
+      test->run ();
+      delete test;
     }
 
-    return 0;
+  return 0;
 }
