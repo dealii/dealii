@@ -140,118 +140,6 @@ class QGaussLobatto : public Quadrature<dim>
 
 
 /**
- * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
- *
- *  2-Point-Gauss quadrature formula, exact for polynomials of degree 3.
- *
- *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
- */
-template <int dim>
-class QGauss2 : public Quadrature<dim>
-{
-  public:
-    QGauss2 ();
-};
-
-
-/**
- * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
- *
- *  3-Point-Gauss quadrature formula, exact for polynomials of degree 5.
- *
- *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
- */
-template <int dim>
-class QGauss3 : public Quadrature<dim>
-{
-  public:
-    QGauss3 ();
-};
-
-
-/**
- * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
- *
- * 4-Point-Gauss quadrature formula, exact for polynomials of degree 7.
- *
- *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
- */
-template <int dim>
-class QGauss4 : public Quadrature<dim>
-{
-  public:
-    QGauss4 ();
-};
-
-
-/**
- * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
- *
- *  5-Point-Gauss quadrature formula, exact for polynomials of degree 9.
- *
- *  Reference: Ward Cheney, David Kincaid: "Numerical Mathematics and Computing".
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
- */
-template <int dim>
-class QGauss5 : public Quadrature<dim>
-{
-  public:
-    QGauss5 ();
-};
-
-
-/**
- * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
- *
- *  6-Point-Gauss quadrature formula, exact for polynomials of degree 11.
- *  We have not found explicit
- *  representations of the zeros of the Legendre functions of sixth
- *  and higher degree. If anyone finds them, please replace the existing
- *  numbers by these expressions.
- *
- *  Reference: J. E. Akin: "Application and Implementation of Finite
- *  Element Methods"
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
- */
-template <int dim>
-class QGauss6 : public Quadrature<dim>
-{
-  public:
-    QGauss6 ();
-};
-
-
-/**
- * @deprecated Use QGauss for arbitrary order Gauss formulae instead!
- *
- *  7-Point-Gauss quadrature formula, exact for polynomials of degree 13.
- *  We have not found explicit
- *  representations of the zeros of the Legendre functions of sixth
- *  and higher degree. If anyone finds them, please replace the existing
- *  numbers by these expressions.
- *
- *  Reference: J. E. Akin: "Application and Implementation of Finite
- *  Element Methods"
- *  For a comprehensive list of Gaussian quadrature formulae, see also:
- *  A. H. Strout, D. Secrest: "Gaussian Quadrature Formulas"
- */
-template <int dim>
-class QGauss7 : public Quadrature<dim>
-{
-  public:
-    QGauss7 ();
-};
-
-
-/**
  * Midpoint quadrature rule, exact for linear polynomials.
  */
 template <int dim>
@@ -565,12 +453,6 @@ QGaussLobatto<1>::gamma(const unsigned int n) const;
 template <> std::vector<double> QGaussLog<1>::set_quadrature_points(const unsigned int) const;
 template <> std::vector<double> QGaussLog<1>::set_quadrature_weights(const unsigned int) const;
 
-template <> QGauss2<1>::QGauss2 ();
-template <> QGauss3<1>::QGauss3 ();
-template <> QGauss4<1>::QGauss4 ();
-template <> QGauss5<1>::QGauss5 ();
-template <> QGauss6<1>::QGauss6 ();
-template <> QGauss7<1>::QGauss7 ();
 template <> QMidpoint<1>::QMidpoint ();
 template <> QTrapez<1>::QTrapez ();
 template <> QSimpson<1>::QSimpson ();

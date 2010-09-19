@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,16 +27,7 @@ create_quadrature (const std::string &s,
   if(s == "gauss")
     {
       AssertThrow(order >= 2, ExcInvalidQGaussOrder(order));
-      switch(order)
-	{
-	  case  2: return QGauss2<dim>();
-	  case  3: return QGauss3<dim>();
-	  case  4: return QGauss4<dim>();
-	  case  5: return QGauss5<dim>();
-	  case  6: return QGauss6<dim>();
-	  case  7: return QGauss7<dim>();
-	  default: return QGauss<dim>(order);
-	}
+      return QGauss<dim>(order);
     }
   else
     {
@@ -54,7 +45,7 @@ create_quadrature (const std::string &s,
 				   // return something to suppress
 				   // stupid warnings by some
 				   // compilers
-  return QGauss2<dim>();
+  return Quadrature<dim>();
 }
 
 

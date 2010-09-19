@@ -30,6 +30,12 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> The <code>QGauss2, QGauss3, ..., QGauss7</code> classes &mdash; deprecated
+for more than 6 years already &mdash; have finally been removed.
+You should use code like <code>QGauss@<dim@>(4)</code> instead.
+<br>
+(WB 2010/09/19)</li>
+
 
 <li> The FE_Nedelec class had previously implemented the lowest order
 when the value 1 was passed to the constructor. This has now been
