@@ -21,33 +21,8 @@ default: run-tests
 
 ############################################################
 
-tests_x=fe_data_test traits fe_tools fe_tools_* mapping \
-        mapping_c1 shapes derivatives function numbering mapping_*_eulerian \
-        transfer internals derivatives_face \
-	dgq_1 \
-	q_* \
-	interpolate_q1 \
-	rt_* \
-	abf_* \
-	fe_sys_* \
-	rtdiff \
-	rtn_* \
-	interpolate_rt interpolate_rtn \
-	dgp_monomial_1 dgp_monomial_2 \
-	system_index system_1 interpolate_system \
-        non_primitive_* \
-        nedelec* \
-	up_and_down \
-	check_derivatives \
-	injection_* \
-	copy_* \
-	cell_similarity_*
-
-# from above list of regular expressions, generate the real set of
-# tests
-expand = $(shell echo $(addsuffix .cc,$(1)) \
-           | $(PERL) -pi -e 's/\.cc//g;')
-tests = $(call expand,$(tests_x))
+# all .cc-files are tests:
+tests = $(basename $(wildcard *.cc))
 
 ############################################################
 

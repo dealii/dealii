@@ -1,6 +1,6 @@
 ############################################################
 # $Id$
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -20,14 +20,8 @@ default: run-tests
 
 ############################################################
 
-tests_x = tridiagonal_ev1 solver_cg full_matrix_*
-
-
-# from above list of regular expressions, generate the real set of
-# tests
-expand = $(shell echo $(addsuffix .cc,$(1)) \
-           | $(PERL) -pi -e 's/\.cc//g;')
-tests = $(call expand,$(tests_x))
+# all .cc-files are tests:
+tests = $(basename $(wildcard *.cc))
 
 ############################################################
 
