@@ -252,6 +252,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>lac</h3>
 
 <ol>
+  <li><p>New: The ConstraintMatrix::merge function now takes a second
+  argument that indicates what should happen if the two objects to be
+  merged have constraints on the very same degree of freedom.
+  <br>
+  (WB 2010/09/18)
+  </p></li>
+
   <li><p>Updated: Changes to the <code>SLEPcWrappers</code> to preserve
   compatibility with SLEPc version 3.1. Main new updated features are
   new solver classes: (i) Power; and (ii) Generalized Davidson.

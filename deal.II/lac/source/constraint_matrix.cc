@@ -552,61 +552,13 @@ void ConstraintMatrix::close ()
 
 
 
-void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
+void
+ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
+			 const MergeConflictBehavior merge_conflict_behavior)
 {
 				   //TODO: this doesn't work with IndexSets yet. [TH]
   AssertThrow(local_lines.size()==0, ExcNotImplemented());
   AssertThrow(other_constraints.local_lines.size()==0, ExcNotImplemented());
-
-				   // first check whether the
-				   // constraints in the two objects
-				   // are for different degrees of
-				   // freedom
-#ifdef DEBUG
-  if (true)
-    {
-				       // first insert all dofs in
-				       // this object into a list...
-      std::set<unsigned int> this_dofs;
-      for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
-	   line!=lines.end(); ++line)
-	this_dofs.insert (line->line);
-
-				       // ...then check whether it
-				       // appears in the other object
-				       // as well (in which case we
-				       // would need to issue an
-				       // error). note that we have to
-				       // do this in a somewhat
-				       // complicated style since the
-				       // two objects may not be
-				       // sorted
-      for (std::vector<ConstraintLine>::const_iterator
-	     line=other_constraints.lines.begin();
-	   line!=other_constraints.lines.end(); ++line)
-	AssertThrow (this_dofs.find (line->line) == this_dofs.end(),
-		     ExcDoFIsConstrainedFromBothObjects (line->line));
-
-				       // finally check the following:
-				       // while we allow that in this
-				       // object nodes are constrained
-				       // to other nodes that are
-				       // constrained in the given
-				       // argument, we do not allow
-				       // the reverse, i.e. the nodes
-				       // to which the constraints in
-				       // the other object hold may
-				       // not be constrained here
-      for (std::vector<ConstraintLine>::const_iterator
-	     line=other_constraints.lines.begin();
-	   line!=other_constraints.lines.end(); ++line)
-	for (std::vector<std::pair<unsigned int,double> >::const_iterator
-	     e=line->entries.begin();
-	   e!=line->entries.end(); ++e)
-	  AssertThrow (this_dofs.find (e->first) == this_dofs.end(),
-		       ExcDoFIsConstrainedToConstrainedDoF (e->first));
-    }
-#endif
 
 				   // store the previous state with
 				   // respect to sorting
@@ -617,116 +569,39 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
     lines_cache.resize(other_constraints.lines_cache.size(),
 		       numbers::invalid_unsigned_int);
 
-				   // first action is to fold into the
-				   // present object possible
-				   // constraints in the second
-				   // object. for this, loop over all
+				   // first action is to fold into the present
+				   // object possible constraints in the
+				   // second object. we don't strictly need to
+				   // do this any more since the
+				   // ConstraintMatrix has learned to deal
+				   // with chains of constraints in the
+				   // close() function, but we have
+				   // traditionally done this and it's not
+				   // overly hard to do.
+				   //
+				   // for this, loop over all
 				   // constraints and replace the
 				   // constraint lines with a new one
 				   // where constraints are replaced
-				   // if necessary. use the same tmp
-				   // object over again to avoid
-				   // excessive memory allocation
+				   // if necessary.
   std::vector<std::pair<unsigned int,double> > tmp;
-  std::vector<std::vector<ConstraintLine>::const_iterator> tmp_other_lines;
   for (std::vector<ConstraintLine>::iterator line=lines.begin();
        line!=lines.end(); ++line)
     {
-				       // copy the line of old object
-				       // modulo dofs constrained in
-				       // the second object. for this
-				       // purpose, first search the
-				       // respective constraint line
-				       // (if any, otherwise a null
-				       // pointer) in the other object
-				       // for each of the entries in
-				       // this line
-				       //
-				       // store whether we have to
-				       // resolve entries, since if
-				       // not there is no need to copy
-				       // the line one-to-one
       tmp.clear ();
-      tmp_other_lines.clear ();
-      tmp_other_lines.reserve (line->entries.size());
-
-
-      bool entries_to_resolve = false;
-
-      for (unsigned int i=0; i<line->entries.size(); ++i)
-	{
-	  if (other_constraints.sorted == true)
-	    {
-					       // as the array is
-					       // sorted, use a
-					       // bindary find to
-					       // check for the
-					       // existence of the
-					       // element. if it does
-					       // not exist, then the
-					       // pointer may still
-					       // point into tha
-					       // array, but to an
-					       // element of which the
-					       // indices do not
-					       // match, so return the
-					       // end iterator
-	      ConstraintLine index_comparison;
-	      index_comparison.line = line->entries[i].first;
-
-	      std::vector<ConstraintLine>::const_iterator
-		it = std::lower_bound (other_constraints.lines.begin (),
-				       other_constraints.lines.end (),
-				       index_comparison);
-	      if ((it != other_constraints.lines.end ()) &&
-		  (it->line != index_comparison.line))
-		it = other_constraints.lines.end ();
-
-	      tmp_other_lines.push_back (it);
-	    }
-	  else
-	    {
-	      std::vector<ConstraintLine>::const_iterator
-		it = other_constraints.lines.end ();
-
-	      for (std::vector<ConstraintLine>::const_iterator
-		     p=other_constraints.lines.begin();
-		   p!=other_constraints.lines.end(); ++p)
-		if (p->line == line->entries[i].first)
-		  {
-		    it = p;
-		    break;
-		  }
-
-	      tmp_other_lines.push_back (it);
-	    };
-
-	  if (tmp_other_lines.back() != other_constraints.lines.end ())
-	    entries_to_resolve = true;
-	};
-      Assert (tmp_other_lines.size() == line->entries.size(),
-	      ExcInternalError());
-
-				       // now we have for each entry
-				       // in the present line whether
-				       // it needs to be resolved
-				       // using the new object, and if
-				       // so which constraint line to
-				       // use. first check whether we
-				       // have to resolve anything at
-				       // all, otherwise leave the
-				       // line as is
-      if (entries_to_resolve == false)
-	continue;
-
-				       // something to resolve, so go
-				       // about it
       for (unsigned int i=0; i<line->entries.size(); ++i)
 	{
 					   // if the present dof is not
-					   // constrained, then simply
-					   // copy it over
-	  if (tmp_other_lines[i] == other_constraints.lines.end())
+					   // constrained, or if we won't take
+					   // the constraint from the other
+					   // object, then simply copy it over
+	  if (!other_constraints.is_constrained(line->entries[i].first)
+	      ||
+	      ((merge_conflict_behavior != right_object_wins)
+	       &&
+	       other_constraints.is_constrained(line->entries[i].first)
+	       &&
+	       this->is_constrained(line->entries[i].first)))
 	    tmp.push_back(line->entries[i]);
 	  else
 					     // otherwise resolve
@@ -738,32 +613,70 @@ void ConstraintMatrix::merge (const ConstraintMatrix &other_constraints)
 					     // with multiplied
 					     // weights
 	    {
-	      Assert (tmp_other_lines[i]->line == line->entries[i].first,
+	      const std::vector<std::pair<unsigned int,double> >*
+		other_line
+		= other_constraints.get_constraint_entries (line->entries[i].first);
+	      Assert (other_line != 0,
 		      ExcInternalError());
-
+	      
 	      const double weight = line->entries[i].second;
+	      
 	      for (std::vector<std::pair<unsigned int, double> >::const_iterator
-		     j=tmp_other_lines[i]->entries.begin();
-		   j!=tmp_other_lines[i]->entries.end(); ++j)
+		     j=other_line->begin();
+		   j!=other_line->end(); ++j)
 		tmp.push_back (std::make_pair(j->first, j->second*weight));
 
-	      line->inhomogeneity += tmp_other_lines[i]->inhomogeneity *
-		line->entries[i].second;
-	    };
-	};
+	      line->inhomogeneity += other_constraints.get_inhomogeneity(line->entries[i].first) *
+				     line->entries[i].second;
+	    }
+	}
 				       // finally exchange old and
 				       // newly resolved line
       line->entries.swap (tmp);
-    };
+    }
 
 
 
-				   // next action: append new lines at
-				   // the end
-  lines.insert (lines.end(),
-		other_constraints.lines.begin(),
-		other_constraints.lines.end());
+				   // next action: append those lines at the
+				   // end that we want to add
+  for (std::vector<ConstraintLine>::const_iterator
+	 line=other_constraints.lines.begin();
+       line!=other_constraints.lines.end(); ++line)
+    if (!is_constrained(line->line))
+      lines.push_back (*line);
+    else
+      {
+					 // the constrained dof we want to
+					 // copy from the other object is also
+					 // constrained here. let's see what
+					 // we should do with that
+	switch (merge_conflict_behavior)
+	  {
+	    case no_conflicts_allowed:
+		  AssertThrow (false,
+			       ExcDoFIsConstrainedFromBothObjects (line->line));
+		  break;
+		  
+	    case left_object_wins:
+						   // ignore this constraint
+		  break;
+		  
+	    case right_object_wins:
+						   // we need to replace the
+						   // existing constraint by
+						   // the one from the other
+						   // object
+		  lines[lines_cache[calculate_line_index(line->line)]].entries
+		    = line->entries;
+		  lines[lines_cache[calculate_line_index(line->line)]].inhomogeneity
+		    = line->inhomogeneity;
+		  break;
 
+	    default:
+		  Assert (false, ExcNotImplemented());
+	  }
+      }
+  
 				   // if the object was sorted before,
 				   // then make sure it is so
 				   // afterwards as well. otherwise

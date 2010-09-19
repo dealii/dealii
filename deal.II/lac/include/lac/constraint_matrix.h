@@ -116,6 +116,47 @@ class ConstraintMatrix : public Subscriptor
 {
   public:
 				     /**
+				      * An enum that describes what should
+				      * happen if the two ConstraintMatrix
+				      * objects involved in a call to the
+				      * merge() function happen to have
+				      * constraints on the same degrees of
+				      * freedom.
+				      */
+    enum MergeConflictBehavior
+    {
+					   /**
+					    * Throw an exception if the two
+					    * objects concerned have
+					    * conflicting constraints on the
+					    * same degree of freedom.
+					    */
+	  no_conflicts_allowed,
+
+					   /**
+					    * In an operation
+					    * <code>cm1.merge(cm2)</code>, if
+					    * <code>cm1</code> and
+					    * <code>cm2</code> have
+					    * constraints on the same degree
+					    * of freedom, take the one from
+					    * <code>cm1</code>.
+					    */
+	  left_object_wins,
+
+					   /**
+					    * In an operation
+					    * <code>cm1.merge(cm2)</code>, if
+					    * <code>cm1</code> and
+					    * <code>cm2</code> have
+					    * constraints on the same degree
+					    * of freedom, take the one from
+					    * <code>cm2</code>.
+					    */
+	  right_object_wins
+    };
+    
+				     /**
 				      * Constructor. The supplied IndexSet
 				      * defines which indices might be
 				      * constrained inside this
@@ -370,7 +411,8 @@ class ConstraintMatrix : public Subscriptor
 				      * other argument is closed, then
 				      * merging may be significantly faster.
 				      *
-				      * Note that the constraints in each of
+				      * Using the default value of the second
+				      * arguments, the constraints in each of
 				      * the two objects (the old one
 				      * represented by this object and the
 				      * argument) may not refer to the same
@@ -378,9 +420,13 @@ class ConstraintMatrix : public Subscriptor
 				      * freedom that is constrained in one
 				      * object may not be constrained in the
 				      * second. If this is nevertheless the
-				      * case, an exception is thrown.
+				      * case, an exception is thrown. However,
+				      * this behavior can be changed by
+				      * providing a different value for the
+				      * second argument.
 				      */
-    void merge (const ConstraintMatrix &other_constraints);
+    void merge (const ConstraintMatrix &other_constraints,
+		const MergeConflictBehavior merge_conflict_behavior = no_conflicts_allowed);
 
 				     /**
 				      * Shift all entries of this matrix
@@ -510,7 +556,7 @@ class ConstraintMatrix : public Subscriptor
                                       * constrained.
                                       */
     const std::vector<std::pair<unsigned int,double> >*
-    get_constraint_entries (unsigned int line) const;
+    get_constraint_entries (const unsigned int line) const;
 
                                      /**
                                       * Returns the value of the inhomogeneity

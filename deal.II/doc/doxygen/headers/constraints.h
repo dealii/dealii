@@ -337,4 +337,8 @@
  *   VectorTools::interpolate_boundary_values() function that returns
  *   a std::map and use it as input for MatrixTools::apply_boundary_values()
  *   to set boundary nodes to their correct value.
+ *
+ * Either behavior can also be achieved by building two separate
+ * ConstraintMatrix objects and calling ConstraintMatrix::merge function with
+ * a particular second argument.
  */
