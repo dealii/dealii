@@ -19,6 +19,8 @@ nofail-dirs = a-framework \
 	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
 	      $(shell if test "$(USE_CONTRIB_TRILINOS)" = yes ; then echo trilinos ; fi) \
 	      $(shell if test "$(USE_CONTRIB_UMFPACK)" = yes ; then echo umfpack ; fi) \
+	      $(shell if test "$(USE_CONTRIB_METIS)" = yes ; then echo metis ; fi) \
+	      $(shell if test "$(USE_CONTRIB_HSL)" = yes ; then echo hsl ; fi) \
 	      $(shell if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ;\
                 then echo lapack ; fi)
 
