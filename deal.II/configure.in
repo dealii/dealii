@@ -739,7 +739,7 @@ AH_BOTTOM(
  * functionality to the PETScWrappers that does not exist in previous
  * versions of PETSc.  Examples of usage can be found in
  * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
- * their own anological macros, since SLEPc and PETSc must have
+ * their own analogical macros, since SLEPc and PETSc must have
  * identical version numbers anyways.
  */
 #define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
