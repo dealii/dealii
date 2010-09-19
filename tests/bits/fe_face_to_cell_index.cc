@@ -11,7 +11,7 @@
 //----------------------------  fe_tools_14.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 
 // comparison of the results of
 //   FE::face_to_equivalent_cell_index (i)

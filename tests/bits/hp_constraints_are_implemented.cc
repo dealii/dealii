@@ -12,7 +12,7 @@
 //----------------------------  hp_constraints_are_implemented.cc  ---------------------------
 
 #include "../tests.h"
-#include "dof_tools_common.cc"
+#include "dof_tools_common.h"
 #include <lac/vector.h>
 
 // check

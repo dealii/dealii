@@ -12,7 +12,7 @@
 //----------------------------  subface_interpolation.cc  ---------------------------
 
 #include "../tests.h"
-#include "fe_tools_common.cc"
+#include "fe_tools_common.h"
 
 // check
 //   FE::subface_interpolation
