@@ -64,7 +64,7 @@ class JobIdentifier
 				      * <tt>file</tt>. Typically, this
 				      * can be called from a program
 				      * with the argument
-				      * <tt>__FILE__</tt> and is uded
+				      * <tt>__FILE__</tt> and is used
 				      * in the deal.II test suite.
 				      */
     static std::string base_name(const char* filename);
