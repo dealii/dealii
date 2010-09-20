@@ -226,6 +226,11 @@ namespace MeshWorker
       template <class ASSEMBLER>
       void assemble(ASSEMBLER& ass) const;
 
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+      
 
 				       /**
 					* The data for the cell.
@@ -478,6 +483,11 @@ namespace MeshWorker
 					*/
       std_cxx1x::shared_ptr<VectorDataBase<dim, spacedim> > global_data;
 
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+      
     private:
 				       /**
 					* Use the finite element
@@ -607,6 +617,11 @@ namespace MeshWorker
 				       unsigned int n_boundary_points,
 				       unsigned int n_face_points);
 
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+      
 				       /**
 					* The set of update flags
 					* for boundary cell integration.

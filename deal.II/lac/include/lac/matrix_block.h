@@ -17,6 +17,7 @@
 #include <base/named_data.h>
 #include <base/smartpointer.h>
 #include <base/std_cxx1x/shared_ptr.h>
+#include <base/memory_consumption.h>
 #include <lac/block_indices.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
@@ -290,8 +291,13 @@ class MatrixBlock
 				      * matching #matrix.
 				      */
     template<class VECTOR>
-    void Tvmult_add (VECTOR& w, const VECTOR& v) const;
-
+    void Tvmult_add (VECTOR& w, const VECTOR& v) const;    
+    
+				     /**
+				      * The memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+    
 				     /**
 				      * The block number computed from
 				      * an index by using
@@ -365,6 +371,11 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
     void reinit(const BlockSparsityPattern& sparsity);
     
 				     /**
+				      * The memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+
+				     /**
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
 				      */
@@ -427,6 +438,11 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<M
 				      * the block at position <i>i</i>.
 				      */
     MatrixBlock<MATRIX>& block(unsigned int i);
+    
+				     /**
+				      * The memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
     
 				     /**
 				      * Access the matrix at position
@@ -644,6 +660,16 @@ MatrixBlock<MATRIX>::Tvmult_add (VECTOR& w, const VECTOR& v) const
 }
 
 
+template <class MATRIX>
+inline
+unsigned int
+MatrixBlock<MATRIX>::memory_consumption () const
+{
+  unsigned int mem = sizeof(*this)
+		     + MemoryConsumption::memory_consumption(matrix)
+		     - sizeof(matrix);
+  return mem;
+}
 
 //----------------------------------------------------------------------//
 

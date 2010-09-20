@@ -36,6 +36,21 @@ LocalResults<number>::reinit(const BlockIndices& bi)
       quadrature_values[k][i] = 0.;
 }
 
+
+template <typename number>
+unsigned int
+LocalResults<number>::memory_consumption () const
+{
+  unsigned int mem = sizeof(*this)
+		     + MemoryConsumption::memory_consumption(J)
+		     + MemoryConsumption::memory_consumption(R)
+		     + MemoryConsumption::memory_consumption(M1)
+		     + MemoryConsumption::memory_consumption(M2)
+		     + MemoryConsumption::memory_consumption(quadrature_values);
+  return mem;
+}
+
+
 template class LocalResults<float>;
 template class LocalResults<double>;
 

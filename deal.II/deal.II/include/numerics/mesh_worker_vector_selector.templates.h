@@ -69,6 +69,8 @@ namespace MeshWorker
   {
     Assert(false, ExcNotImplemented());
   }
+  
+
 //----------------------------------------------------------------------//
 
   template <class VECTOR, int dim, int spacedim>
@@ -139,6 +141,16 @@ namespace MeshWorker
 	VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
 	fe.get_function_hessians(src, make_slice(index, start, size), dst, true);
       }
+  }
+
+
+  template <class VECTOR, int dim, int spacedim>
+  unsigned int
+  VectorData<VECTOR, dim, spacedim>::memory_consumption () const
+  {
+    unsigned int mem = VectorSelector::memory_consumption();
+    mem += sizeof (data);
+    return mem;
   }
 
 //----------------------------------------------------------------------//
@@ -213,6 +225,16 @@ namespace MeshWorker
 	VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
 	fe.get_function_hessians(src, make_slice(index, start, size), dst, true);
       }
+  }
+
+
+  template <class VECTOR, int dim, int spacedim>
+  unsigned int
+  MGVectorData<VECTOR, dim, spacedim>::memory_consumption () const
+  {
+    unsigned int mem = VectorSelector::memory_consumption();
+    mem += sizeof (data);
+    return mem;
   }
 }
 

@@ -333,6 +333,11 @@ namespace MeshWorker
 					* at quadrature point <i>k</i>
 					*/
       number quadrature_value(unsigned int k, unsigned int i) const;
+
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
       
     private:
 				       /**

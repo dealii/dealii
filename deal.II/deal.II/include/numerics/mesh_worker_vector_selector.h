@@ -166,6 +166,11 @@ namespace MeshWorker
       template <class STREAM>
       void print (STREAM& s) const;
       
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+      
     protected:
 				       /**
 					* Selection of the vectors
@@ -314,6 +319,11 @@ namespace MeshWorker
 	unsigned int n_comp,
 	unsigned int start,
 	unsigned int size) const;     
+      
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
   };
 
   
@@ -377,7 +387,13 @@ namespace MeshWorker
 	unsigned int component,
 	unsigned int n_comp,
 	unsigned int start,
-	unsigned int size) const;
+	unsigned int size) const;      
+
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+
     private:
       NamedData<SmartPointer<const VECTOR,VectorData<VECTOR,dim,spacedim> > > data;
   };
@@ -445,6 +461,12 @@ namespace MeshWorker
 	unsigned int n_comp,
 	unsigned int start,
 	unsigned int size) const;
+      
+				       /**
+					* The memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+
     private:
       NamedData<SmartPointer<const MGLevelObject<VECTOR>,MGVectorData<VECTOR,dim,spacedim> > > data;
   };
@@ -579,7 +601,17 @@ namespace MeshWorker
       s << " '" << v.name(hessian_selection(i)) << '\'';
     s << std::endl;
   }
+
+
+  inline unsigned int
+  VectorSelector::memory_consumption () const
+  {
+    unsigned int mem = sizeof(*this);
+    return mem;
+  }
+  
 }
+
 
 DEAL_II_NAMESPACE_CLOSE
 
