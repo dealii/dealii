@@ -199,10 +199,10 @@ namespace MeshWorker
   void
   IntegrationInfoBox<dim,sdim>::initialize_update_flags ()
   {
-    cell_flags = update_JxW_values;
-    boundary_flags = UpdateFlags(update_JxW_values | update_normal_vectors);
-    face_flags = boundary_flags;
-    neighbor_flags = update_default;
+    cell_flags |= update_JxW_values;
+    boundary_flags |= UpdateFlags(update_JxW_values | update_normal_vectors);
+    face_flags |= boundary_flags;
+    neighbor_flags |= update_default;
 
     if (cell_selector.has_values() != 0) cell_flags |= update_values;
     if (cell_selector.has_gradients() != 0) cell_flags |= update_gradients;

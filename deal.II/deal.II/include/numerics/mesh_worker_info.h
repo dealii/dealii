@@ -1279,6 +1279,8 @@ namespace MeshWorker
 	     const Mapping<dim,sdim>& mapping,
 	     const BlockInfo* block_info)
   {
+    initialize_update_flags();
+    
     cell.template initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
 						  cell_flags, block_info);
     boundary.template initialize<FEFaceValues<dim,sdim> >(el, mapping, boundary_quadrature,
@@ -1300,6 +1302,8 @@ namespace MeshWorker
 	     const Mapping<1,1>& mapping,
 	     const BlockInfo* block_info)
   {
+    initialize_update_flags();
+    
     const int dim = 1;
     const int sdim = 1;
 
@@ -1317,9 +1321,11 @@ namespace MeshWorker
 	     const Mapping<1,2>& mapping,
 	     const BlockInfo* block_info)
   {
+    initialize_update_flags();
+    
     const int dim = 1;
     const int sdim = 2;
-
+    
     cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
 					 cell_flags, block_info);
   }
