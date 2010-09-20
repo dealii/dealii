@@ -126,20 +126,21 @@ FiniteElement<dim>
                    // interpolation, which does
                    // not depend on the interpolated
                    // function.
-template <int dim>
+template <>
 void
-FE_Nedelec<dim>::initialize_support_points (const unsigned int)
+FE_Nedelec<1>::initialize_support_points (const unsigned int)
 {
   Assert (false, ExcNotImplemented ());
 }
 
-#else
+#elif deal_II_dimension == 2
 
-// Version for 2d and higher. See above for 1d version
-template <int dim>
+template <>
 void
-FE_Nedelec<dim>::initialize_support_points (const unsigned int degree)
+FE_Nedelec<2>::initialize_support_points (const unsigned int degree)
 {
+  const int dim = 2;
+  
 	               // Create polynomial basis.
   const std::vector<Polynomials::Polynomial<double> >& lobatto_polynomials
     = Polynomials::Lobatto::generate_complete_basis (degree + 1);
@@ -149,256 +150,258 @@ FE_Nedelec<dim>::initialize_support_points (const unsigned int degree)
   for (unsigned int i = 0; i < lobatto_polynomials_grad.size (); ++i)
     lobatto_polynomials_grad[i] = lobatto_polynomials[i + 1].derivative ();
 
-  switch (dim)
+				   // Initialize quadratures to obtain
+				   // quadrature points later on.
+  const QGauss<dim - 1> reference_edge_quadrature (degree + 1);
+  const unsigned int&
+    n_edge_points = reference_edge_quadrature.size ();
+  const unsigned int n_boundary_points
+    = GeometryInfo<dim>::lines_per_cell * n_edge_points;
+  const Quadrature<dim>& edge_quadrature
+    = QProjector<dim>::project_to_all_faces (reference_edge_quadrature);
+
+  this->generalized_face_support_points.resize (n_edge_points);
+
+				   // Create face support points.
+  for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+    this->generalized_face_support_points[q_point]
+      = reference_edge_quadrature.point (q_point);
+
+  if (degree > 0)
     {
-      case 2:
-        {
-        	       // Initialize quadratures to obtain
-        	       // quadrature points later on.
-          const QGauss<dim - 1> reference_edge_quadrature (degree + 1);
-          const unsigned int&
-            n_edge_points = reference_edge_quadrature.size ();
-          const unsigned int n_boundary_points
-            = GeometryInfo<dim>::lines_per_cell * n_edge_points;
-          const Quadrature<dim>& edge_quadrature
-            = QProjector<dim>::project_to_all_faces (reference_edge_quadrature);
+				       // If the polynomial degree is positive
+				       // we have support points on the faces
+				       // and in the interior of a cell.
+      const QGauss<dim> quadrature (degree + 1);
+      const unsigned int& n_interior_points = quadrature.size ();
 
-          this->generalized_face_support_points.resize (n_edge_points);
+      this->generalized_support_points.resize
+	(n_boundary_points + n_interior_points);
+      boundary_weights.reinit (n_edge_points, degree);
 
-                   // Create face support points.
-          for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
-            this->generalized_face_support_points[q_point]
-              = reference_edge_quadrature.point (q_point);
+      for (unsigned int q_point = 0; q_point < n_edge_points;
+	   ++q_point)
+	{
+	  for (unsigned int line = 0;
+	       line < GeometryInfo<dim>::lines_per_cell; ++line)
+	    this->generalized_support_points[line * n_edge_points
+					     + q_point]
+	      = edge_quadrature.point
+	      (QProjector<dim>::DataSetDescriptor::face
+	       (line, true, false, false, n_edge_points) + q_point);
 
-          if (degree > 0)
-            {
-                   // If the polynomial degree is positive
-                   // we have support points on the faces
-                   // and in the interior of a cell.
-              const QGauss<dim> quadrature (degree + 1);
-              const unsigned int& n_interior_points = quadrature.size ();
+	  for (unsigned int i = 0; i < degree; ++i)
+	    boundary_weights (q_point, i)
+	      = reference_edge_quadrature.weight (q_point)
+	      * lobatto_polynomials_grad[i + 1].value
+	      (this->generalized_face_support_points[q_point] (0));
+	}
 
-              this->generalized_support_points.resize
-                (n_boundary_points + n_interior_points);
-              boundary_weights.reinit (n_edge_points, degree);
+      for (unsigned int q_point = 0; q_point < n_interior_points;
+	   ++q_point)
+	this->generalized_support_points[q_point + n_boundary_points]
+	  = quadrature.point (q_point);
+    }
 
-              for (unsigned int q_point = 0; q_point < n_edge_points;
-                   ++q_point)
-                {
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<dim>::lines_per_cell; ++line)
-                    this->generalized_support_points[line * n_edge_points
-                                                     + q_point]
-                      = edge_quadrature.point
-                        (QProjector<dim>::DataSetDescriptor::face
-                         (line, true, false, false, n_edge_points) + q_point);
+  else
+    {
+				       // In this case we only need support points
+				       // on the faces of a cell.
+      const Quadrature<dim>& edge_quadrature
+	= QProjector<dim>::project_to_all_faces
+	(reference_edge_quadrature);
 
-                  for (unsigned int i = 0; i < degree; ++i)
-                    boundary_weights (q_point, i)
-                      = reference_edge_quadrature.weight (q_point)
-                        * lobatto_polynomials_grad[i + 1].value
-                          (this->generalized_face_support_points[q_point] (0));
-                }
+      this->generalized_support_points.resize (n_boundary_points);
 
-              for (unsigned int q_point = 0; q_point < n_interior_points;
-                   ++q_point)
-                this->generalized_support_points[q_point + n_boundary_points]
-                  = quadrature.point (q_point);
-            }
+      for (unsigned int line = 0;
+	   line < GeometryInfo<dim>::lines_per_cell; ++line)
+	for (unsigned int q_point = 0; q_point < n_edge_points;
+	     ++q_point)
+	  this->generalized_support_points[line * n_edge_points
+					   + q_point]
+	    = edge_quadrature.point
+	    (QProjector<dim>::DataSetDescriptor::face
+	     (line, true, false, false, n_edge_points) + q_point);
+    }
+}
 
-          else
-            {
-                   // In this case we only need support points
-                   // on the faces of a cell.
-              const Quadrature<dim>& edge_quadrature
-                = QProjector<dim>::project_to_all_faces
-                  (reference_edge_quadrature);
+#else
 
-              this->generalized_support_points.resize (n_boundary_points);
+template <>
+void
+FE_Nedelec<3>::initialize_support_points (const unsigned int degree)
+{
+  const int dim = 3;
+  
+	               // Create polynomial basis.
+  const std::vector<Polynomials::Polynomial<double> >& lobatto_polynomials
+    = Polynomials::Lobatto::generate_complete_basis (degree + 1);
+  std::vector<Polynomials::Polynomial<double> >
+    lobatto_polynomials_grad (degree + 1);
 
-              for (unsigned int line = 0;
-                   line < GeometryInfo<dim>::lines_per_cell; ++line)
-                for (unsigned int q_point = 0; q_point < n_edge_points;
-                     ++q_point)
-                  this->generalized_support_points[line * n_edge_points
-                                                   + q_point]
-                    = edge_quadrature.point
-                      (QProjector<dim>::DataSetDescriptor::face
-                       (line, true, false, false, n_edge_points) + q_point);
-            }
+  for (unsigned int i = 0; i < lobatto_polynomials_grad.size (); ++i)
+    lobatto_polynomials_grad[i] = lobatto_polynomials[i + 1].derivative ();
 
-          break;
-        }
+				   // Initialize quadratures to obtain
+				   // quadrature points later on.
+  const QGauss<1> reference_edge_quadrature (degree + 1);
+  const unsigned int& n_edge_points = reference_edge_quadrature.size ();
+  const Quadrature<dim - 1>& edge_quadrature
+    = QProjector<dim - 1>::project_to_all_faces
+    (reference_edge_quadrature);
 
-      case 3:
-        {
-        	       // Initialize quadratures to obtain
-        	       // quadrature points later on.
-          const QGauss<1> reference_edge_quadrature (degree + 1);
-          const unsigned int& n_edge_points = reference_edge_quadrature.size ();
-          const Quadrature<dim - 1>& edge_quadrature
-            = QProjector<dim - 1>::project_to_all_faces
-              (reference_edge_quadrature);
+  if (degree > 0)
+    {
+				       // If the polynomial degree is positive
+				       // we have support points on the edges,
+				       // faces and in the interior of a cell.
+      const QGauss<dim - 1> reference_face_quadrature (degree + 1);
+      const unsigned int& n_face_points
+	= reference_face_quadrature.size ();
+      const unsigned int n_boundary_points
+	= GeometryInfo<dim>::lines_per_cell * n_edge_points
+	+ GeometryInfo<dim>::faces_per_cell * n_face_points;
+      const QGauss<dim> quadrature (degree + 1);
+      const unsigned int& n_interior_points = quadrature.size ();
 
-          if (degree > 0)
-            {
-                   // If the polynomial degree is positive
-                   // we have support points on the edges,
-                   // faces and in the interior of a cell.
-              const QGauss<dim - 1> reference_face_quadrature (degree + 1);
-              const unsigned int& n_face_points
-                = reference_face_quadrature.size ();
-              const unsigned int n_boundary_points
-                = GeometryInfo<dim>::lines_per_cell * n_edge_points
-                  + GeometryInfo<dim>::faces_per_cell * n_face_points;
-              const QGauss<dim> quadrature (degree + 1);
-              const unsigned int& n_interior_points = quadrature.size ();
+      boundary_weights.reinit (n_edge_points + n_face_points,
+			       2 * (degree + 1) * degree);
+      this->generalized_face_support_points.resize
+	(4 * n_edge_points + n_face_points);
+      this->generalized_support_points.resize
+	(n_boundary_points + n_interior_points);
 
-              boundary_weights.reinit (n_edge_points + n_face_points,
-                                       2 * (degree + 1) * degree);
-              this->generalized_face_support_points.resize
-                (4 * n_edge_points + n_face_points);
-              this->generalized_support_points.resize
-                (n_boundary_points + n_interior_points);
+				       // Create support points on edges.
+      for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
+	{
+	  for (unsigned int line = 0;
+	       line < GeometryInfo<dim - 1>::lines_per_cell; ++line)
+	    this->generalized_face_support_points[line * n_edge_points
+						  + q_point]
+	      = edge_quadrature.point
+	      (QProjector<dim - 1>::DataSetDescriptor::face
+	       (line, true, false, false, n_edge_points) + q_point);
 
-                   // Create support points on edges.
-              for (unsigned int q_point = 0; q_point < n_edge_points; ++q_point)
-                {
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<dim - 1>::lines_per_cell; ++line)
-                    this->generalized_face_support_points[line * n_edge_points
-                                                          + q_point]
-                      = edge_quadrature.point
-                        (QProjector<dim - 1>::DataSetDescriptor::face
-                         (line, true, false, false, n_edge_points) + q_point);
+	  for (unsigned int i = 0; i < 2; ++i)
+	    for (unsigned int j = 0; j < 2; ++j)
+	      {
+		this->generalized_support_points
+		  [q_point + (i + 4 * j) * n_edge_points]
+		  = Point<dim>
+		  (i, reference_edge_quadrature.point (q_point) (0),
+		   j);
+		this->generalized_support_points
+		  [q_point + (i + 4 * j + 2) * n_edge_points]
+		  = Point<dim>
+		  (reference_edge_quadrature.point (q_point) (0),
+		   i, j);
+		this->generalized_support_points
+		  [q_point + (i + 2 * (j + 4)) * n_edge_points]
+		  = Point<dim>
+		  (i, j,
+		   reference_edge_quadrature.point (q_point) (0));
+	      }
 
-                  for (unsigned int i = 0; i < 2; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                      {
-                        this->generalized_support_points
-                          [q_point + (i + 4 * j) * n_edge_points]
-                          = Point<dim>
-                            (i, reference_edge_quadrature.point (q_point) (0),
-                             j);
-                        this->generalized_support_points
-                          [q_point + (i + 4 * j + 2) * n_edge_points]
-                          = Point<dim>
-                            (reference_edge_quadrature.point (q_point) (0),
-                             i, j);
-                        this->generalized_support_points
-                          [q_point + (i + 2 * (j + 4)) * n_edge_points]
-                          = Point<dim>
-                            (i, j,
-                             reference_edge_quadrature.point (q_point) (0));
-                      }
+	  for (unsigned int i = 0; i < degree; ++i)
+	    boundary_weights (q_point, i)
+	      = reference_edge_quadrature.weight (q_point)
+	      * lobatto_polynomials_grad[i + 1].value
+	      (this->generalized_face_support_points[q_point] (1));
+	}
 
-                  for (unsigned int i = 0; i < degree; ++i)
-                    boundary_weights (q_point, i)
-                      = reference_edge_quadrature.weight (q_point)
-                        * lobatto_polynomials_grad[i + 1].value
-                          (this->generalized_face_support_points[q_point] (1));
-                }
+				       // Create support points on faces.
+      for (unsigned int q_point = 0; q_point < n_face_points;
+	   ++q_point)
+	{
+	  this->generalized_face_support_points[q_point
+						+ 4 * n_edge_points]
+	    = reference_face_quadrature.point (q_point);
 
-                   // Create support points on faces.
-              for (unsigned int q_point = 0; q_point < n_face_points;
-                   ++q_point)
-                {
-                  this->generalized_face_support_points[q_point
-                                                        + 4 * n_edge_points]
-                    = reference_face_quadrature.point (q_point);
+	  for (unsigned int i = 0; i <= degree; ++i)
+	    for (unsigned int j = 0; j < degree; ++j)
+	      {
+		boundary_weights (q_point + n_edge_points,
+				  2 * (i * degree + j))
+		  = reference_face_quadrature.weight (q_point)
+		  * lobatto_polynomials_grad[i].value
+		  (this->generalized_face_support_points
+		   [q_point + 4 * n_edge_points] (0))
+		  * lobatto_polynomials[j + 2].value
+		  (this->generalized_face_support_points
+		   [q_point + 4 * n_edge_points] (1));
+		boundary_weights (q_point + n_edge_points,
+				  2 * (i * degree + j) + 1)
+		  = reference_face_quadrature.weight (q_point)
+		  * lobatto_polynomials_grad[i].value
+		  (this->generalized_face_support_points
+		   [q_point + 4 * n_edge_points] (1))
+		  * lobatto_polynomials[j + 2].value
+		  (this->generalized_face_support_points
+		   [q_point + 4 * n_edge_points] (0));
+	      }
+	}
 
-                  for (unsigned int i = 0; i <= degree; ++i)
-                    for (unsigned int j = 0; j < degree; ++j)
-                      {
-                        boundary_weights (q_point + n_edge_points,
-                                          2 * (i * degree + j))
-                          = reference_face_quadrature.weight (q_point)
-                            * lobatto_polynomials_grad[i].value
-                              (this->generalized_face_support_points
-                               [q_point + 4 * n_edge_points] (0))
-                            * lobatto_polynomials[j + 2].value
-                              (this->generalized_face_support_points
-                               [q_point + 4 * n_edge_points] (1));
-                        boundary_weights (q_point + n_edge_points,
-                                          2 * (i * degree + j) + 1)
-                          = reference_face_quadrature.weight (q_point)
-                            * lobatto_polynomials_grad[i].value
-                              (this->generalized_face_support_points
-                               [q_point + 4 * n_edge_points] (1))
-                            * lobatto_polynomials[j + 2].value
-                              (this->generalized_face_support_points
-                               [q_point + 4 * n_edge_points] (0));
-                      }
-                }
+      const Quadrature<dim>& face_quadrature
+	= QProjector<dim>::project_to_all_faces
+	(reference_face_quadrature);
 
-              const Quadrature<dim>& face_quadrature
-                = QProjector<dim>::project_to_all_faces
-                  (reference_face_quadrature);
+      for (unsigned int face = 0;
+	   face < GeometryInfo<dim>::faces_per_cell; ++face)
+	for (unsigned int q_point = 0; q_point < n_face_points;
+	     ++q_point)
+	  {
+	    this->generalized_support_points
+	      [face * n_face_points + q_point
+	       + GeometryInfo<dim>::lines_per_cell * n_edge_points]
+	      = face_quadrature.point
+	      (QProjector<dim>::DataSetDescriptor::face
+	       (face, true, false, false, n_face_points) + q_point);
+	  }
 
-              for (unsigned int face = 0;
-                   face < GeometryInfo<dim>::faces_per_cell; ++face)
-                for (unsigned int q_point = 0; q_point < n_face_points;
-                      ++q_point)
-                  {
-                    this->generalized_support_points
-                    [face * n_face_points + q_point
-                      + GeometryInfo<dim>::lines_per_cell * n_edge_points]
-                    = face_quadrature.point
-                      (QProjector<dim>::DataSetDescriptor::face
-                       (face, true, false, false, n_face_points) + q_point);
-                  }
+				       // Create support points in the interior.
+      for (unsigned int q_point = 0; q_point < n_interior_points;
+	   ++q_point)
+	this->generalized_support_points[q_point + n_boundary_points]
+	  = quadrature.point (q_point);
+    }
 
-                   // Create support points in the interior.
-              for (unsigned int q_point = 0; q_point < n_interior_points;
-                   ++q_point)
-                this->generalized_support_points[q_point + n_boundary_points]
-                  = quadrature.point (q_point);
-            }
+  else
+    {
+      this->generalized_face_support_points.resize (4 * n_edge_points);
+      this->generalized_support_points.resize
+	(GeometryInfo<dim>::lines_per_cell * n_edge_points);
 
-          else
-            {
-              this->generalized_face_support_points.resize (4 * n_edge_points);
-              this->generalized_support_points.resize
-                (GeometryInfo<dim>::lines_per_cell * n_edge_points);
+      for (unsigned int q_point = 0; q_point < n_edge_points;
+	   ++q_point)
+	{
+	  for (unsigned int line = 0;
+	       line < GeometryInfo<dim - 1>::lines_per_cell; ++line)
+	    this->generalized_face_support_points[line * n_edge_points
+						  + q_point]
+	      = edge_quadrature.point
+	      (QProjector<dim - 1>::DataSetDescriptor::face
+	       (line, true, false, false, n_edge_points) + q_point);
 
-              for (unsigned int q_point = 0; q_point < n_edge_points;
-                   ++q_point)
-                {
-                  for (unsigned int line = 0;
-                       line < GeometryInfo<dim - 1>::lines_per_cell; ++line)
-                    this->generalized_face_support_points[line * n_edge_points
-                                                          + q_point]
-                      = edge_quadrature.point
-                        (QProjector<dim - 1>::DataSetDescriptor::face
-                         (line, true, false, false, n_edge_points) + q_point);
-
-                  for (unsigned int i = 0; i < 2; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                      {
-                        this->generalized_support_points
-                          [q_point + (i + 4 * j) * n_edge_points]
-                          = Point<dim>
-                            (i, reference_edge_quadrature.point (q_point) (0),
-                             j);
-                        this->generalized_support_points
-                          [q_point + (i + 4 * j + 2) * n_edge_points]
-                          = Point<dim>
-                            (reference_edge_quadrature.point (q_point) (0),
-                             i, j);
-                        this->generalized_support_points
-                          [q_point + (i + 2 * (j + 4)) * n_edge_points]
-                          = Point<dim>
-                            (i, j,
-                             reference_edge_quadrature.point (q_point) (0));
-                      }
-                }
-            }
-
-          break;
-        }
-
-      default:
-        Assert (false, ExcNotImplemented ());
+	  for (unsigned int i = 0; i < 2; ++i)
+	    for (unsigned int j = 0; j < 2; ++j)
+	      {
+		this->generalized_support_points
+		  [q_point + (i + 4 * j) * n_edge_points]
+		  = Point<dim>
+		  (i, reference_edge_quadrature.point (q_point) (0),
+		   j);
+		this->generalized_support_points
+		  [q_point + (i + 4 * j + 2) * n_edge_points]
+		  = Point<dim>
+		  (reference_edge_quadrature.point (q_point) (0),
+		   i, j);
+		this->generalized_support_points
+		  [q_point + (i + 2 * (j + 4)) * n_edge_points]
+		  = Point<dim>
+		  (i, j,
+		   reference_edge_quadrature.point (q_point) (0));
+	      }
+	}
     }
 }
 

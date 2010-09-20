@@ -326,6 +326,18 @@ template <>
 void
 FE_Nedelec<1>::initialize_restriction();
 
+template <>
+void
+FE_Nedelec<1>::initialize_support_points (const unsigned int degree);
+
+template <>
+void
+FE_Nedelec<2>::initialize_support_points (const unsigned int degree);
+
+template <>
+void
+FE_Nedelec<3>::initialize_support_points (const unsigned int degree);
+
 #endif // DOXYGEN
 
 /*@}*/
