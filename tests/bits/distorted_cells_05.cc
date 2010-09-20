@@ -66,8 +66,9 @@ class MyBoundary : public Boundary<dim>
 	return Point<dim>(0,0,1.25);
       }
 
+    virtual
     Point<dim>
-    project_to_surface (const typename Triangulation<dim>::line_iterator &line,
+    project_to_surface (const typename Triangulation<dim>::line_iterator &,
 			const Point<dim> &p) const
       {
 	deallog << "Projecting line point " << p << std::endl;
@@ -78,8 +79,9 @@ class MyBoundary : public Boundary<dim>
 	  return p;
       }
 
+    virtual
     Point<dim>
-    project_to_surface (const typename Triangulation<dim>::quad_iterator &line,
+    project_to_surface (const typename Triangulation<dim>::quad_iterator &,
 			const Point<dim> &p) const
       {
 	deallog << "Projecting quad point " << p << std::endl;
@@ -89,6 +91,15 @@ class MyBoundary : public Boundary<dim>
 	return Point<dim>(p[0], p[1],
 			  1.25-2.25*std::max(std::fabs(p[0]),
 					     std::fabs(p[1])));
+      }
+
+    virtual
+    Point<dim>
+    project_to_surface (const typename Triangulation<dim>::hex_iterator &,
+			const Point<dim> &) const
+      {
+	Assert (false, ExcInternalError());
+	return Point<dim>();
       }
 };
 
