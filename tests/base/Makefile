@@ -60,7 +60,7 @@ task_%/output : task_%/exe
 # all .cc-files are tests, though the test bdm.cc appears to be dysfunctional
 # and we don't want the data_out_base_tecplot_bin test if we haven't found the
 # corresponding libraries:
-ifneq (tecio, $(findstring tecio, $LIBS))
+ifeq (, $(findstring tecio, $LIBS))
   tests = $(filter-out bdm data_out_base_tecplot_bin, $(basename $(wildcard *)))
 else
   tests = $(filter-out bdm, $(basename $(wildcard *)))
