@@ -594,14 +594,41 @@ namespace MeshWorker
       void initialize_update_flags();
 
 				       /**
+					* Add FEValues UpdateFlags for
+					* integration on all objects
+					* (cells, boundary faces and
+					* all interior faces).
+					*/
+      void add_update_flags_all (const UpdateFlags flags);
+
+				       /**
+					* Add FEValues UpdateFlags for
+					* integration on cells.
+					*/
+      void add_update_flags_cell(const UpdateFlags flags);
+      
+				       /**
+					* Add FEValues UpdateFlags for
+					* integration on boundary faces.
+					*/
+      void add_update_flags_boundary(const UpdateFlags flags);
+      
+				       /**
+					* Add FEValues UpdateFlags for
+					* integration on interior faces.
+					*/
+      void add_update_flags_face(const UpdateFlags flags);
+      
+				       /**
 					* Add additional update flags
 					* to the ones already set in
 					* this program. The four
 					* boolean flags indicate
 					* wether the additional flags
 					* should be set for cell,
-					* boundary, interelement face,
-					* or neighbor integration, or
+					* boundary, interelement face
+					* for the cell itself
+					* or neighbor cell, or
 					* any combination thereof.
 					*/
       void add_update_flags(const UpdateFlags flags,
@@ -1450,6 +1477,43 @@ namespace MeshWorker
   {
     cell_quadrature = QGauss<1>(cp);
   }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_all (const UpdateFlags flags)
+  {
+    add_update_flags(flags, true, true, true, true);
+  }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_cell (const UpdateFlags flags)
+  {
+    add_update_flags(flags, true, false, false, false);
+  }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_boundary (const UpdateFlags flags)
+  {
+    add_update_flags(flags, false, true, false, false);
+  }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_face (const UpdateFlags flags)
+  {
+    add_update_flags(flags, false, false, true, true);
+  }
+  
 }
 
 DEAL_II_NAMESPACE_CLOSE

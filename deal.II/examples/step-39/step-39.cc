@@ -577,14 +577,16 @@ Step39<dim>::assemble_matrix()
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
   info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
 				   // which values to update in these
-				   // points. We call
-				   // <tt>initialize_update_flags</tt>
-				   // first in order to set default
-				   // values. Then, we add what we
-				   // need additionally.
-  info_box.initialize_update_flags();
+				   // points. Update flags are
+				   // initialized to some default
+				   // values to be able to
+				   // integrate. Here, we add what we
+				   // need additionally, namely the
+				   // values and gradients of shape
+				   // functions on all objects (cells,
+				   // boundary and interior faces).
   UpdateFlags update_flags = update_values | update_gradients;
-  info_box.add_update_flags(update_flags, true, true, true, true);
+  info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
 
 				   // This is the object into which we
@@ -628,9 +630,8 @@ Step39<dim>::assemble_mg_matrix()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = mg_dof_handler.get_fe().tensor_degree()+1;
   info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
-  info_box.initialize_update_flags();
   UpdateFlags update_flags = update_values | update_gradients;
-  info_box.add_update_flags(update_flags, true, true, true, true);
+  info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
 
   MeshWorker::DoFInfo<dim> dof_info(mg_dof_handler);
@@ -674,9 +675,8 @@ Step39<dim>::assemble_right_hand_side()
   MeshWorker::IntegrationInfoBox<dim> info_box;
   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
   info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
-  info_box.initialize_update_flags();
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
-  info_box.add_update_flags(update_flags, true, true, true, true);
+  info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
   
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
@@ -855,11 +855,18 @@ Step39<dim>::estimate()
 				   // Then, we tell the Meshworker::VectorSelector
 				   // for cells, that we need the
 				   // second derivatives of this
-				   // solution (to compute the Laplacian).
+				   // solution (to compute the
+				   // Laplacian). Therefore, the
+				   // boolean arguments selecting
+				   // function values and first
+				   // derivatives a false, only the
+				   // last one selecting second
+				   // derivatives is true.
   info_box.cell_selector.add("solution", false, false, true);
 				   // On interior and boundary faces,
 				   // we need the function values and
-				   // the first derivatives.
+				   // the first derivatives, but not
+				   // second derivatives.
   info_box.boundary_selector.add("solution", true, true, false);
   info_box.face_selector.add("solution", true, true, false);
 
@@ -868,8 +875,7 @@ Step39<dim>::estimate()
 				   // update flags are already
 				   // adjusted to the values and
 				   // derivatives we requested above.
-  info_box.initialize_update_flags();
-  info_box.add_update_flags(update_quadrature_points, false, true, false, false);
+  info_box.add_update_flags_boundary(update_quadrature_points);
   info_box.initialize(fe, mapping, solution_data);
   
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
