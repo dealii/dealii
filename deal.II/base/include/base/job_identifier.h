@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -55,6 +55,20 @@ class JobIdentifier
 				      */
     static const char* program_id();
 
+				     /**
+				      * Obtain the base name of the
+				      * file currently being
+				      * compiled. That is, if the file
+				      * is <tt>mypath/file.cc</tt>
+				      * return just
+				      * <tt>file</tt>. Typically, this
+				      * can be called from a program
+				      * with the argument
+				      * <tt>__FILE__</tt> and is uded
+				      * in the deal.II test suite.
+				      */
+    static std::string base_name(const char* filename);
+    
 				     /**
 				      * Return the value of <tt>id</tt>.
 				      */
