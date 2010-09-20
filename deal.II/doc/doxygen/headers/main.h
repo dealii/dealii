@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -127,7 +127,10 @@
  *   The DoFHandler class and its associates are described in the @ref
  *   dofs module. In addition, there are specialized versions that can
  *   handle multilevel and hp discretizations. These are described in
- *   the @ref mg and @ref hp modules.
+ *   the @ref mg and @ref hp modules. Finite element methods frequently
+ *   imply constraints on degrees of freedom, such as for hanging nodes
+ *   or nodes at which boundary conditions apply; dealing with such
+ *   constraints is described in the @ref constraints module.
  *
  *
  *   <li> <b>%Mapping</b>: The next step in a finite element program
