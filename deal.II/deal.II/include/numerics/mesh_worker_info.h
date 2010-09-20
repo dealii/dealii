@@ -567,6 +567,11 @@ namespace MeshWorker
 					*/
       typedef IntegrationInfo<dim, spacedim> CellInfo;
 
+				       /**
+					* Default constructor.
+					*/
+      IntegrationInfoBox ();
+      
       void initialize(const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
 		      const BlockInfo* block_info = 0);

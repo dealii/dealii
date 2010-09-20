@@ -194,6 +194,15 @@ namespace MeshWorker
   
 //----------------------------------------------------------------------//
 
+  template<int dim, int sdim>
+  IntegrationInfoBox<dim,sdim>::IntegrationInfoBox()
+  {
+    cell_flags = update_default;
+    boundary_flags = update_default;
+    face_flags = update_default;
+    neighbor_flags = update_default;
+  }
+  
 
   template<int dim, int sdim>
   void
