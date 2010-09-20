@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"                  
+	  "http://www.w3.org/TR/html4/loose.dtd">                        
+
+<html>                                                                          
+  <head>                            
+    <title>The deal.II Readme on interfacing to ARPACK</title>
+    <link href="screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>"> 
+    <meta name="copyright" content="Copyright (C) 2010 by the deal.II authors">
+    <meta name="date" content="$Date: 2010-05-05 (Thu, 05 May 2010) $">
+    <meta name="svn_id" content="$Id: readme-arpack.html$">
+    <meta name="keywords" content="deal.II"> 
+  </head>                                                                      
+  <body> 
+
+    
+    <h1>Using and Installing <acronym>ARPACK</acronym></h1>
+    <p> <a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a> 
+    is a collection of Fortran77 subroutines designed to solve large
+    scale eigenvalue problems.
+
+    After you downloaded the Fortran version of <acronym>ARPACK</acronym>
+    and the patch unzip the files you got. That will create a directory 
+    named <acronym>ARPACK</acronym>. If you need further instructions 
+    please read the README file or the <a href="http://www.caam.rice.edu/software/ARPACK/SRC/instruction.arpack">instructions</a>. We will explain 
+    here in a few steps what has to be done to be able to compile 
+    <acronym>ARPACK</acronym>.
+    </p>
+
+    <ul>
+      <li>edit ARmake.inc</li>
+      <ul>
+        <li>change home to the correct directory</li>
+        <li>choose which <acronym>BLAS</acronym> and 
+        <acronym>LAPACK</acronym> you would like to use</li>
+      </ul>
+      <li>change the file second.f in the UTIL directory</li>
+      <li>do <code>make lib</code> in the current directory 
+      to build the standard library <code>libarpack_$(PLAT).a</code>
+      </li>
+    </ul>
+
+    <p>
+    Note: For compilation of <acronym>ARPACK</acronym> we emphasise
+    adding the compiler flag <code>-fPIC</code>. This is a definate
+    requirement if we are compiling <acronym>deal.II</acronym> with
+    shared libraries (which is the default). If we had preferred to be
+    compiling <acronym>deal.II</acronym> without shared libraries,
+    that's ok too; in that case we would do exactly the same thing
+    as described above, but this time omitting
+    the <code>-fPIC</code> flag from the scheme.
+    </p>
+
+    <p>
+    Try to run one of the examples and compare the output. 
+    How the output should look like is stated in the README 
+    that can be found in the <code>EXAMPLES</code> directory.
+    </p> 
+
+    <p>
+    If that output you produced looks like it should you can 
+    proceed to comile <acronym>deal.II</acronym> with 
+    <acronym>ARPACK</acronym>.
+    </p>
+
+    <h1>Interfacing <acronym>deal.II</acronym>
+      to <acronym>ARPACK</acronym></h1>
+
+    <p> To be able to use the interface of <acronym>deal.II</acronym>
+    for <acronym>ARPACK</acronym> we then
+      configure <acronym>deal.II</acronym> with the following
+      additional option:
+	<code>--with-arpack=path/to/arpack</code>
+    </p>
+  </body>
+</html>
