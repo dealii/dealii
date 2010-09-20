@@ -186,6 +186,25 @@ report+mail:
 	    fi ; \
 	  done
 
+############################################################
+# by default, all .cc-files are tests. individual Makefiles
+# may overrule this:
+ifeq ($(tests),)
+tests = $(basename $(wildcard *.cc))
+endif
+
+############################################################
+# link with all libraries:
+libraries = $(lib-deal2-1d.g) \
+            $(lib-deal2-2d.g) \
+            $(lib-deal2-3d.g) \
+            $(lib-lac.g)  \
+            $(lib-base.g)
+libraries_o = $(lib-deal2-1d.o) \
+            $(lib-deal2-2d.o) \
+            $(lib-deal2-3d.o) \
+            $(lib-lac.o)  \
+            $(lib-base.o)
 
 ############################################################
 # After all these general rules, here is the target to be
@@ -208,7 +227,7 @@ update: $(tests:%=%/update)
 
 clean:
 	-rm -f Makefile.depend Makefile.tests */obj.$(OBJEXT) \
-               */obj.g.$(OBJEXT) */output *~
+               */obj.g.$(OBJEXT) */output *~ */status */OK
 
 distclean: clean
 	-rm -f */exe *.testcase *.gpl *.eps *.gnuplot

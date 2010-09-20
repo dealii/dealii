@@ -15,12 +15,6 @@ include ../Makefile.paths
 include $D/common/Make.global_options
 debug-mode = on
 
-default: run-tests 
-
-############################################################
-
-# all .cc-files are tests:
-tests = $(basename $(wildcard *.cc))
 
 ############################################################
 # phony header file to force compilation whenever

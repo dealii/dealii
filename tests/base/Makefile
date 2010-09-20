@@ -9,15 +9,11 @@
 
 include ../Makefile.paths
 include $D/common/Make.global_options
-debug-mode = on
 
-libraries += $(lib-lac.g)  \
-             $(lib-base.g)
 
 default: run-tests
 
 ############################################################
-
 # rules to generate the threading tests. the .cc files are
 # automatically generated; note that for the output generation, we
 # have to sort the output since otherwise in MT mode things would come

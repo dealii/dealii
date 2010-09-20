@@ -9,25 +9,6 @@
 
 include ../Makefile.paths
 include $D/common/Make.global_options
-debug-mode = on
-
-libraries = $(lib-lac.g)  \
-            $(lib-base.g)
-libraries_o = $(lib-lac.o)  \
-            $(lib-base.o)
-
-default: run-tests 
-
-############################################################
-
-# all .cc-files are tests:
-tests = $(basename $(wildcard *.cc))
-
-############################################################
-
-
 include ../Makefile.rules
 include Makefile.depend
 include Makefile.tests
-
-.PHONY: default
