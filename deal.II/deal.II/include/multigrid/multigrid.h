@@ -664,47 +664,14 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
   VECTOR2& dst,
   const VECTOR2& src) const
 {
-#ifdef BAERBEL_MG_TEST
-  const unsigned int min_l = multigrid->solution.get_minlevel();
-  const unsigned int max_l = multigrid->solution.get_maxlevel();
-  deallog << "PreconditionMG in " << src.l2_norm() << std::endl;
-#endif
   transfer->copy_to_mg(*mg_dof_handler,
 		       multigrid->defect,
 		       src);
-#ifdef BAERBEL_MG_TEST
-  for(unsigned int l=min_l; l<max_l; ++l)
-  deallog << "defect [" << l << "] " << multigrid->defect[l].l2_norm() << std::endl;
-#endif
   multigrid->cycle();
 
-#ifdef BAERBEL_MG_TEST
-  for(unsigned int l=min_l; l<max_l; ++l)
-  deallog << "solution [" << l << "] " << multigrid->solution[l].l2_norm() << std::endl;
-#endif
   transfer->copy_from_mg(*mg_dof_handler,
 			 dst,
 			 multigrid->solution);
-#ifdef BAERBEL_MG_TEST
-  deallog << "PreconditionMG out " << dst.l2_norm() << std::endl;
-
-  /*
-  DataOut<dim> data_out;
-  data_out.attach_dof_handler (*mg_dof_handler);
-  VECTOR2 tmp;
-  tmp.reinit(dst);
-  tmp = dst;
-  transfer->constraints->distribute(tmp);
-  data_out.add_data_vector (tmp, "mg");
-  data_out.build_patches ();
-
-  std::ostringstream filename;
-  filename << "mg.gpl";
-
-  std::ofstream output (filename.str().c_str());
-  data_out.write_gnuplot (output);
-  */
-#endif
 }
 
 
