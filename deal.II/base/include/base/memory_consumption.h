@@ -30,51 +30,45 @@ DEAL_II_NAMESPACE_OPEN
  * by an STL <tt>std::map<></tt> object?), but rather to aid in the search for
  * memory bottlenecks.
  *
- * The functions in this namespace work basically by reducing each
- * object to its basics as far as they are known from this place. They
- * do not attempt to know what goes on in each object, if they are not
- * basic types (such as <tt>int</tt> or <tt>double</tt>) or STL containers (such
- * as <tt>vectors</tt>). The method goes as follows: if the object with
- * which a <tt>memory_consumption</tt> function from this namespace is an
- * atomic type, the return its size by applying the <tt>sizeof</tt>
- * operator to it. If this is not the case, then try to reduce it to
- * more basic types.
+ * This namespace has a single member function memory_consumption()
+ * and a lot of specializations. Depending on the argument type of the
+ * function, there are several modes of operation:
  *
- * For example, if it is a C-style array or a standard C++ <tt>std::vector</tt>,
- * then sum up the sizes of the array elements by calling
- * <tt>memory_consumption</tt> on each of them. This way, we can also
- * reduce objects of type <tt>std::vector<std::vector<double> ></tt> to its atomic
- * types, and can thus determine the memory used even if the sizes of
- * the elements of the outermost vector differ (e.g. the first
- * sub-vector has 3 and the second sub-vector has 10 elements).
+ * <ol>
+ * <li> The argument is a standard C++ data type, namely,
+ * <tt>bool</tt>, <tt>float</tt>, <tt>double</tt> or any of the
+ * integer types. In that case, memory_consumption() simple returns
+ * <tt>sizeof</tt> of its argument. The libary also provides an
+ * estimate for the amount of memory occupied by a
+ * <tt>std::string</tt> this way.
  *
- * There are two exceptions to simply adding up the sizes of the
- * subobjects: for C++ <tt>std::vector</tt> objects, we also have to add the
- * size of the vector object, i.e. <tt>sizeof(vector<T>)</tt>, to the sizes
- * of the elements. Secondly, for the most common used vectors, such
- * as <tt>std::vector<double></tt> and <tt>std::vector<unsigned int></tt> we determine the
- * size without a loop but rather directly, since we know that the
- * sizes of the elements are constant.
+ * <li> For objects, which are neither standard types, nor vectors,
+ * memory_consumption() will simply call the member function of same
+ * name. It is up to the implementation of the data type to provide a
+ * good estimate of the amount of memory used. Inside this function,
+ * the use of MemoryConsumpton::memory_consumption() for compounds of
+ * the class helps to obtain this estimate. Most classes in the
+ * deal.II library have such a member function.
  *
- * Finally, if we cannot reduce a type <tt>T</tt> further, because it is
- * neither atomic nor a known C++ data type, we call a member function
- * <tt>T::memory_consumption</tt> on it, which we assume to exist. Almost
- * all classes in the deal.II library have such a function. This way,
- * if we call <tt>memory_consumption(v)</tt> on a vector <tt>v</tt> of type
- * <tt>FullMatrix<double></tt>, we first reduce this to a loop in which we
- * call <tt>memory_consumption(v[i])</tt>, and because there is no such
- * function handling this explicitly, we try to call
- * <tt>v[i].memory_consumption()</tt>.
+ * <li> For vectors and C++ arrays of objects, memory_consumption()
+ * recursively calls itself for all entries and adds the results to
+ * the size of the object itself. Some optimized specializations for
+ * standard data types exist.
  *
+ * <li> For vectors of regular pointers, memory_consumption(T*)
+ * returns the size of the vector of pointers, ignoring the size of
+ * the objects.
+ *
+ * </ol>
  *
  * <h3>Extending this namespace</h3>
  *
- * The functions in this namespace and the functionality provided by
- * it live on the assumption that there is either a function
+ * The function in this namespace and the functionality provided by
+ * it relies on the assumption that there is either a specialized function
  * <tt>memory_consumption(T)</tt> in this namespace determining the amount
- * of memory use by objects of type <tt>T</tt>, or that the class <tt>T</tt> has
- * a function of that name as member function. While the latter is
- * true for almost all class in deal.II, we have only implemented the
+ * of memory used by objects of type <tt>T</tt>, or that the class <tt>T</tt> has
+ * a  member function of that name. While the latter is
+ * true for almost all classes in deal.II, we have only implemented the
  * first kind of functions for the most common data types, such as
  * atomic types, strings, C++ vectors, C-style arrays, and C++
  * pairs. These functions therefore do not cover, for example, C++
@@ -82,10 +76,33 @@ DEAL_II_NAMESPACE_OPEN
  * them and send them to us for inclusion.
  *
  * @ingroup memory
- * @author Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, documentation updated by Guido Kanschat
+ * @date 2000
  */
 namespace MemoryConsumption
 {
+
+				   /**
+				    * This function is the generic
+				    * interface for determining the
+				    * memory used by an object. If no
+				    * specialization for the type
+				    * <tt>T</tt> is specified, it will
+				    * call the member function
+				    * <tt>t.memory_consumption()</tt>.
+				    *
+				    * The library provides
+				    * specializations for all basic
+				    * C++ data types. Every additional
+				    * type needs to have a member
+				    * function memory_consumption()
+				    * callable for constant objects to
+				    * be used in this framework.
+				    */
+  template <typename T>
+  inline
+  unsigned int memory_consumption (const T &t);
+
 				   /**
 				    * Determine the amount of memory
 				    * in bytes consumed by a <tt>bool</tt>
@@ -160,18 +177,21 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const std::string &s);
 
 				   /**
-				    * Determine an estimate of the
-				    * amount of memory in bytes
-				    * consumed by a <tt>std::vector</tt> of
-				    * certain elements. It does so by
-				    * looping over all elements of the
-				    * vector and determining their
-				    * sizes using the
-				    * <tt>memory_consumption</tt>
-				    * functions. If the elements are
-				    * of constant size, there might be
-				    * another global function
-				    * <tt>memory_consumption</tt> for this
+				    * Determine the amount of memory
+				    * in bytes consumed by a
+				    * <tt>std::vector</tt> of elements
+				    * of type <tt>T</tt> by
+				    * recursively calling
+				    * memory_consumption() for each entry.
+				    *
+				    * This function loops over all
+				    * entries of the vector and
+				    * determines their sizes using
+				    * memory_consumption() for each
+				    * <tt>v[i]</tt>. If the entries
+				    * are of constant size, there
+				    * might be another global function
+				    * memory_consumption() for this
 				    * data type or if there is a
 				    * member function of that class of
 				    * that names that returns a
@@ -325,10 +345,10 @@ namespace MemoryConsumption
 
 				   /**
 				    * Return the amount of memory
-				    * used by a pointer. Make sure
-				    * that you are really interested
-				    * in this, and not the amount of
-				    * memory required by the object
+				    * used by a pointer.
+				    *
+				    * @note This returns the size of
+				    * the pointer, not of the object
 				    * pointed to.
 				    */
   template <typename T>
@@ -337,15 +357,11 @@ namespace MemoryConsumption
 
 				   /**
 				    * Return the amount of memory
-				    * used by a pointer. Make sure
-				    * that you are really interested
-				    * in this, and not the amount of
-				    * memory required by the object
-				    * pointed to.
+				    * used by a pointer.
 				    *
-				    * This function is the same as
-				    * above, but for non-const
-				    * pointers
+				    * @note This returns the size of
+				    * the pointer, not of the object
+				    * pointed to.
 				    */
   template <typename T>
   inline
@@ -353,11 +369,7 @@ namespace MemoryConsumption
 
 				   /**
 				    * Return the amount of memory
-				    * used by a void pointer. Make
-				    * sure that you are really
-				    * interested in this, and not
-				    * the amount of memory required
-				    * by the object pointed to.
+				    * used by a void pointer.
 				    *
 				    * Note that we needed this
 				    * function since <tt>void</tt> is no
@@ -365,36 +377,25 @@ namespace MemoryConsumption
 				    * not caught by the general
 				    * <tt>T*</tt> template function
 				    * above.
+				    *
+				    * @note This returns the size of
+				    * the pointer, not of the object
+				    * pointed to.
 				    */
   inline
   unsigned int memory_consumption (void * const);
 
 				   /**
 				    * Return the amount of memory used
-				    * by a shared pointer. Make
-				    * sure that you are really
-				    * interested in this, and not the
-				    * amount of memory required by the
-				    * object pointed to.
+				    * by a shared pointer.
+				    *
+				    * @note This returns the size of
+				    * the pointer, not of the object
+				    * pointed to.
 				    */
   template <typename T>
   inline
   unsigned int memory_consumption (const std_cxx1x::shared_ptr<T> &);
-
-				   /**
-				    * For all other types which are
-				    * not explicitly listed: try if
-				    * there is a member function
-				    * called
-				    * <tt>memory_consumption</tt>. If
-				    * this is not the case, then the
-				    * compiler will in any case
-				    * complain that this last exit
-				    * does not work.
-				    */
-  template <typename T>
-  inline
-  unsigned int memory_consumption (const T &t);
 }
 
 
