@@ -3,6 +3,7 @@
 #
 # Copyright (c) the deal.II authors 2003
 
+SHELL=/bin/bash
 ###############################
 # Configured variables
 
