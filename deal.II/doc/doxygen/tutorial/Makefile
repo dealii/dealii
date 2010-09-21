@@ -107,10 +107,11 @@ $(example-toc):
 	@echo "</ol></td><td width=\"50%\" valign=\"top\"><ol>" >> $@
 	@echo "  <li value=\"3\"> <a href=\"#Results\" class=bold>Results</a>" >> $@
 	@cat generated/$(call get_basename, $@)_toc.results >> $@
-	@echo "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>" >> $@
-	@cat generated/$(call get_basename, $@)_toc.plain >> $@
 	@echo "</ol> </td> </tr> </table>" >> $@
 
+# To revert, enter those lines before the last
+#	@echo "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>" >> $@
+#	@cat generated/$(call get_basename, $@)_toc.plain >> $@
 
 
 $(example-dox-prog):
