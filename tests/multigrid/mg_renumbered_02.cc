@@ -126,25 +126,6 @@ void diff (Vector<double> &diff, const MGDoFHandler<dim> &dof,
   }
 }
 
-template <int dim>
-void print(const MGDoFHandler<dim> &dof, std::vector<std::vector<bool> > &interface_dofs)
-{
-  const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
-  for(unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
-  {
-    deallog << std::endl;
-    deallog << "Level " << l << std::endl;
-    for (typename MGDoFHandler<dim>::cell_iterator
-        cell = dof.begin(l);
-        cell != dof.end(l); ++cell)
-    {
-      cell->get_mg_dof_indices(dof_indices);
-      for(unsigned int i=0; i<dofs_per_cell; ++i)
-        deallog << ' ' << interface_dofs[l][dof_indices[i]];
-    }
-  }
-}
 
 template <int dim>
 class OutputCreator : public Subscriptor
@@ -188,15 +169,14 @@ class LaplaceProblem
 
   private:
     void setup_system ();
-    void test ();
     void test_boundary ();
     void output_gpl(const MGDoFHandler<dim> &dof,
         MGLevelObject<Vector<double> > &v);
     void refine_local ();
 
     Triangulation<dim>   triangulation;
-    const MappingQ1<dim>      mapping;
-    FESystem<dim>            fe;
+    const MappingQ1<dim> mapping;
+    FESystem<dim>        fe;
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
 
     const unsigned int degree;
@@ -263,6 +243,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
 
   MeshWorker::Assembler::GnuplotPatch assembler;
   assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
+  assembler.set_precision(4);
 
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
@@ -276,40 +257,6 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
       assembler);
   }
 }
-
-
-  template <int dim>
-void LaplaceProblem<dim>::test ()
-{
-  typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
-  dirichlet_boundary[0] =             &dirichlet_bc;
-  MGTools::make_boundary_list (mg_dof_handler_renumbered, dirichlet_boundary,
-			       boundary_indices_renumbered);
-  MGTransferPrebuilt<Vector<double> > mg_transfer_renumbered;
-  mg_transfer_renumbered.build_matrices(mg_dof_handler_renumbered, boundary_indices_renumbered);
-
-  Vector<double> test;
-  test.reinit(mg_dof_handler_renumbered.n_dofs());
-
-  MGLevelObject<Vector<double> > u(0, triangulation.n_levels()-1);
-  MGLevelObject<Vector<double> > d(0, triangulation.n_levels()-1);
-
-  initialize(mg_dof_handler_renumbered, test);
-  mg_transfer_renumbered.copy_to_mg(mg_dof_handler_renumbered, u, test);
-
-  for(unsigned int l=0; l<triangulation.n_levels(); ++l)
-  {
-    diff(d[l], mg_dof_handler_renumbered, u[l],l);
-    deallog << l << " " << u[l].l2_norm() << '\t'
-      << d[l].l2_norm()<< std::endl;
-    for(unsigned int i=0; i<d[l].size(); ++i)
-      if(d[l](i)!=0)
-        deallog << i << " " << d[l](i) << std::endl;
-  }
-  output_gpl(mg_dof_handler_renumbered, d);
-}
-
 
   template <int dim>
 void LaplaceProblem<dim>::test_boundary ()

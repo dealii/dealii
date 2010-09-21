@@ -290,6 +290,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
 
   MeshWorker::Assembler::GnuplotPatch assembler;
   assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
+  assembler.set_precision(4);
 
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
