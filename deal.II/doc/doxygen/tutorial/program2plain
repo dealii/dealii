@@ -21,10 +21,11 @@ while (<>) {
     next if (m!^\s*//!);
     if (s!^\s*/\*.*\*/!!g)
     {
-	print unless m/^\s*$/;
+	print unless (m/^\s*$/);
+	next;
     }    
     #Find begin of block comment
-    if (0 && s!/\*.*!!)
+    if (s!/\*.*!!)
     {
 	$block_comment = 1;
 	# Print unless empty
@@ -40,8 +41,8 @@ while (<>) {
 	    $block_comment = 0;
             # Print unless empty
 	    print unless m/^\s*$/;
-	    next;
 	}
+	next;
     }
     print;
 }	
