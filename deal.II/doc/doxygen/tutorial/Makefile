@@ -152,11 +152,9 @@ $(example-doxygen):
 	@cat generated/$(call get_basename, $@)_prog.dox >> $@
 	@cat $D/examples/$(call get_basename, $@)/doc/results.dox \
 		| $(PERL) create_anchors >> $@
-	@echo " */" >> $@
-	@echo " /**" >> $@
-	@echo " * <a name=\"PlainProg\"></a>" >> $@
-	@echo " * <h1> The plain program</h1>" >> $@
-	@echo " * @example " $(call get_basename, $@).cc >> $@
+	@echo " <a name=\"PlainProg\"></a>" >> $@
+	@echo " <h1> The plain program</h1>" >> $@
+	@echo " @include \"$(call get_basename, $@).cc\"" >> $@
 	@echo " */" >> $@
 
 # Previous version of the lines after the last 'create_anchor'
@@ -169,7 +167,7 @@ validate-xrefs:
 
 
 clean:
-	-rm -f $(example-toc) \
+	-rm -f  plain/*.cc $(example-toc) \
 		$(example-toc-prog) $(example-toc-plain) \
 		$(example-toc-intro) $(example-toc-results) \
 		$(example-dox-prog) $(example-dox-plain) $(example-doxygen)
