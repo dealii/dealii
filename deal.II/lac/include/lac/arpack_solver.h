@@ -21,6 +21,42 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Interface for using ARPACK. ARPACK is a collection of Fortran77
+ * subroutines designed to solve large scale eigenvalue problems. 
+ * Here we interface to the routines dnaupd and dneupd of ARPACK. 
+ * The package is designed to compute a few eigenvalues and 
+ * corresponding eigenvectors of a general n by n matrix A. It is
+ * most appropriate for large sparse matrices A.
+ *
+ * In this class we make use of the method applied to the 
+ * generalized eigenspectrum problem $(A-\lambda B)x=0$, for 
+ * $x\neq0$; where $A$ is a system matrix, $B$ is a mass matrix, 
+ * and $\lambda, x$ are a set of eigenvalues and eigenvectors 
+ * respectively.
+ *
+ * The ArpackSolver can be used in application codes in the 
+ * following way:
+ @verbatim
+  SolverControl solver_control (1000, 1e-9);
+  ArpackSolver (solver_control);
+  system.solve (A, B, lambda, x, size_of_spectrum);
+ @endverbatim
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where
+ * the variable <code>const unsigned int size_of_spectrum</code> 
+ * tells ARPACK the number of eigenvector/eigenvalue pairs to 
+ * solve for. 
+ *
+ * Through the AdditionalData the user can specify some of the 
+ * parameters to be set.
+ *
+ * For further information on how the ARPACK routines dnaupd and
+ * dneupd work and also how to set the parameters appropriately
+ * please take a look into the ARPACK manual.
+ *
+ * @author Bärbel Janssen, Agnieszka Miedlar, 2010.
+ */
+
 extern "C" void dnaupd_(int *ido, char *bmat, const unsigned int *n, char *which,
 			const unsigned int *nev, const double *tol, double *resid, int *ncv,
 			double *v, int *ldv, int *iparam, int *ipntr,
@@ -34,10 +70,16 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
 			double *v, int *ldv, int *iparam, int *ipntr,
 			double *workd, double *workl, int *lworkl, int *info);
 
+/**
+ * Class to interface with the ARPACK routines.
+ */
 
 class ArpackSolver : public Subscriptor
 {
   public:
+    /**
+     * Enum to choose the eigenvalues of interest.
+     */
     enum which 
     {
       algebraically_largest,
@@ -51,6 +93,11 @@ class ArpackSolver : public Subscriptor
       both_ends
     };
 
+    /**
+     * Standardized data struct to pipe
+     * additional data to the solver,
+     * should it be needed.
+     */
     struct AdditionalData 
     {
       const unsigned int number_of_arnoldi_vectors;
@@ -59,29 +106,34 @@ class ArpackSolver : public Subscriptor
           const unsigned int number_of_arnoldi_vectors = 15,
           const which eigenvalue_of_interest = largest_magnitude);
     };
+
+    /**
+     * Access to the object that
+     * controls convergence.
+     */
     SolverControl &control () const;
 
+    /**
+     * Constructor.
+     */
     ArpackSolver(SolverControl& control,
        const AdditionalData& data = AdditionalData());
 
-    template <typename VECTOR, typename MATRIX, typename INVERSE>
+    /**
+     * Solve the generalized eigensprectrum
+     * problem $A x=\lambda B x$ by calling 
+     * dneupd and dnaupd of ARPACK.
+     */
+    template <typename VECTOR, typename MATRIX1, 
+             typename MATRIX2, typename INVERSE>
     void solve(
-        const MATRIX &A,
-        const MATRIX &B,
+        const MATRIX1 &A,
+        const MATRIX2 &B,
         const INVERSE& inverse,
-        std::vector<double> &eigenvalues_r, 
-        std::vector<double> &eigenvalues_i, 
+        std::vector<std::complex<double> > &eigenvalues, 
         std::vector<VECTOR> &eigenvectors,
         const unsigned int n_eigenvalues);
 
-    template <typename VECTOR, typename MATRIX, typename INVERSE>
-    void solve(
-        const MATRIX &A,
-        const INVERSE& inverse,
-        std::vector<double> &eigenvalues_r, 
-        std::vector<double> &eigenvalues_i, 
-        std::vector<VECTOR> &eigenvectors,
-        const unsigned int n_eigenvalues);
   protected:
 
     /**
@@ -96,7 +148,12 @@ class ArpackSolver : public Subscriptor
      * this particular solver.
      */
     const AdditionalData additional_data;
+
   private:
+
+    /**
+     * Exceptions.
+     */
     DeclException2 (ExcInvalidNumberofEigenvalues, int, int, 
         << "Number of wanted eigenvalues " << arg1 
         << " is larger that the size of the matrix " << arg2); 
@@ -150,13 +207,13 @@ ArpackSolver::ArpackSolver (SolverControl& control,
 
 {}
 
-template <typename VECTOR, typename MATRIX, typename INVERSE>
+template <typename VECTOR, typename MATRIX1, 
+         typename MATRIX2, typename INVERSE>
 void ArpackSolver::solve (
-    const MATRIX &system_matrix,
-    const MATRIX &mass_matrix,
+    const MATRIX1 &system_matrix,
+    const MATRIX2 &mass_matrix,
     const INVERSE& inverse,
-    std::vector<double> &eigenvalues_real, 
-    std::vector<double> &eigenvalues_im, 
+    std::vector<std::complex<double> > &eigenvalues, 
     std::vector<VECTOR> &eigenvectors,
     const unsigned int n_eigenvalues)
 {
@@ -243,7 +300,8 @@ void ArpackSolver::solve (
   // if the starting vector is used it has to be in resid
   std::vector<double> resid(n, 1.);
 
-  // number of Arnoldi basis vectors specified by user in p      
+  // number of Arnoldi basis vectors specified 
+  // in additional_data      
   int ncv = additional_data.number_of_arnoldi_vectors;
 
   int ldv = n;
@@ -275,7 +333,7 @@ void ArpackSolver::solve (
   for(unsigned int i=0; i<3*n; ++i)
     workd[i] = 0.0;
 
-  int lworkl = 3*ncv*(ncv + 2);
+  int lworkl = 3*ncv*(ncv + 6);
   std::vector<double> workl (lworkl, 0.);
   //information out of the iteration
   int info = 1; 
@@ -388,7 +446,6 @@ void ArpackSolver::solve (
 
     std::vector<int> select (ncv, 0);
 
-    // Arnoldi basis vectors
     int ldz = n;
 
     std::vector<double> z (ldz*ncv, 0.);
@@ -398,6 +455,9 @@ void ArpackSolver::solve (
 
     int lworkev = 3*ncv;
     std::vector<double> workev (lworkev, 0.);
+
+    std::vector<double> eigenvalues_real (n_eigenvalues, 0.);
+    std::vector<double> eigenvalues_im (n_eigenvalues, 0.);
 
     // call of ARPACK dneupd routine
     dneupd_(&rvec, howmany, &select[0], &eigenvalues_real[0], 
@@ -424,20 +484,16 @@ void ArpackSolver::solve (
         eigenvectors[i](j) = v[i*n+j];
 
     delete[] workd;
-  }
-}
 
-template <typename VECTOR, typename MATRIX, typename INVERSE>
-void ArpackSolver::solve (
-    const MATRIX &system_matrix,
-    const INVERSE& inverse,
-    std::vector<double> &eigenvalues_real, 
-    std::vector<double> &eigenvalues_im, 
-    std::vector<VECTOR> &eigenvectors,
-    const unsigned int n_eigenvalues)
-{
-  solve (system_matrix, IdentityMatrix(system_matrix.n()), 
-      inverse, eigenvalues_real, eigenvalues_im, n_eigenvalues);
+    AssertDimension (eigenvalues.size(), eigenvalues_real.size());
+    AssertDimension (eigenvalues.size(), eigenvalues_im.size());
+
+    for(unsigned int i=0; i<eigenvalues.size(); ++i)
+    {
+      eigenvalues[i].real() = eigenvalues_real[i];
+      eigenvalues[i].imag() = eigenvalues_im[i];
+    }
+  }
 }
 
 SolverControl& ArpackSolver::control () const
