@@ -26,7 +26,7 @@ example-toc        = $(addsuffix _toc.combined,$(gen-example-names))
 # same for intermediate files for doxygen output
 example-dox-prog   = $(addsuffix _prog.dox,$(gen-example-names))
 example-dox-plain  = $(addsuffix _plain.dox,$(gen-example-names))
-
+example-plain      = $(addprefix plain/,$(addsuffix .cc,$(example-names)))
 
 # finally a target for combined Doxygen files
 example-doxygen     = $(addprefix doxygen/,$(addsuffix .h,$(example-names)))
@@ -119,6 +119,9 @@ $(example-dox-prog):
 	  | $(PERL) program2doxygen \
 	  > $@
 
+$(example-plain):
+	@echo ================== Making $@
+	@cat $D/examples/$(call get_basename, $(@F))/$(@F) | $(PERL) program2plain >> $@
 
 $(example-dox-plain):
 	@echo ================== Making $@
@@ -148,9 +151,15 @@ $(example-doxygen):
 	@cat generated/$(call get_basename, $@)_prog.dox >> $@
 	@cat $D/examples/$(call get_basename, $@)/doc/results.dox \
 		| $(PERL) create_anchors >> $@
-	@cat generated/$(call get_basename, $@)_plain.dox >> $@
+	@echo " */" >> $@
+	@echo " /**" >> $@
+	@echo " * <a name=\"PlainProg\"></a>" >> $@
+	@echo " * <h1> The plain program</h1>" >> $@
+	@echo " * @example " $(call get_basename, $@).cc >> $@
 	@echo " */" >> $@
 
+# Previous version of the lines after the last 'create_anchor'
+#	@cat generated/$(call get_basename, $@)_plain.dox >> $@
 
 validate-xrefs:
 	@$(PERL) $D/common/scripts/validate-xrefs.pl \
@@ -182,11 +191,12 @@ Makefile.dep: $(shell echo $D/examples/*/*.cc $D/examples/*/doc/*.dox) Makefile
 			generated/$${i}_toc.results \
 			generated/$${i}_toc.prog \
 			generated/$${i}_toc.plain ; \
+		echo plain/$$i.cc : `echo $D/examples/$${i}/*.cc` ; \
 		echo doxygen/$$i.h : generated/$${i}_prog.dox generated/$${i}_plain.dox \
 				generated/$${i}_toc.combined \
 				$D/examples/$$i/doc/intro.dox \
 				$D/examples/$$i/doc/results.dox \
-			 ; \
+				plain/$$i.cc ; \
 		echo generated/$${i}_toc.intro : \
 				$D/examples/$$i/doc/intro.dox \
 			 ; \

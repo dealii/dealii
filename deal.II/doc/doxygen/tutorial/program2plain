@@ -1,0 +1,48 @@
+#---------------------------------------------------------------------------
+#    $Id$
+#    Version: $Name$
+#
+#    Copyright (C) 2010 by the deal.II authors
+#
+#    This file is subject to QPL and may not be  distributed
+#    without copyright and license information. Please refer
+#    to the file deal.II/doc/license.html for the  text  and
+#    further information on this license.
+#
+#---------------------------------------------------------------------------
+
+# Remove all comments from the source file
+
+# The variable tracing whether we are inside a block comment
+
+my $block_comment = 0;
+while (<>) {
+    # Eliminate comment lines
+    next if (m!^\s*//!);
+    if (s!^\s*/\*.*\*/!!g)
+    {
+	print unless m/^\s*$/;
+    }    
+    #Find begin of block comment
+    if (0 && s!/\*.*!!)
+    {
+	$block_comment = 1;
+	# Print unless empty
+	print unless m/^\s*$/;
+	next;
+    }
+    
+    # Find end of block comment
+    if ($block_comment != 0)
+    {
+	if (s!.*\*/!!)
+	{
+	    $block_comment = 0;
+            # Print unless empty
+	    print unless m/^\s*$/;
+	    next;
+	}
+    }
+    print;
+}	
+
