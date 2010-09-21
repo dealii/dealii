@@ -38,6 +38,7 @@ DEAL_II_NAMESPACE_OPEN
  * solver changes. AdditionalData of this class currently does not
  * contain any data.
  *
+ * @ingroup Solvers
  * @author Guido Kanschat
  * @date 2010
  */
