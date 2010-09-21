@@ -36,7 +36,7 @@ namespace internal
   {
     return false;
   }
-  
+
   template <class ACCESSOR>
   inline bool is_active_iterator(const TriaActiveIterator<ACCESSOR>&)
   {
@@ -104,9 +104,9 @@ namespace MeshWorker
     const bool integrate_cell          = (cell_worker != 0);
     const bool integrate_boundary      = (boundary_worker != 0);
     const bool integrate_interior_face = (face_worker != 0);
-    
+
     dof_info.reset();
-    
+
     dof_info.cell.reinit(cell);
     info.cell.reinit(dof_info.cell);
 				     // Execute this, if cells
@@ -120,7 +120,7 @@ namespace MeshWorker
 				     // computations between cell and
 				     // face action.
     info.post_cell(dof_info);
-    
+
     if (integrate_interior_face || integrate_boundary)
       for (unsigned int face_no=0; face_no < GeometryInfo<ITERATOR::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
 	{
@@ -140,7 +140,7 @@ namespace MeshWorker
 					       // Interior face
 	      typename ITERATOR::AccessorType::Container::cell_iterator
 		neighbor = cell->neighbor(face_no);
-	      
+
 					       // Deal with
 					       // refinement edges
 					       // from the refined
@@ -155,12 +155,12 @@ namespace MeshWorker
 		{
 		  Assert(!cell->has_children(), ExcInternalError());
 		  Assert(!neighbor->has_children(), ExcInternalError());
-		  
+
 		  std::pair<unsigned int, unsigned int> neighbor_face_no
 		    = cell->neighbor_of_coarser_neighbor(face_no);
 		  typename ITERATOR::AccessorType::Container::face_iterator nface
 		    = neighbor->face(neighbor_face_no.first);
-		  
+
 		  dof_info.interior_face_available[face_no] = true;
 		  dof_info.exterior_face_available[face_no] = true;
 		  dof_info.interior[face_no].reinit(cell, face, face_no);
@@ -168,7 +168,7 @@ namespace MeshWorker
 		  dof_info.exterior[face_no].reinit(
 		    neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
 		  info.subface.reinit(dof_info.exterior[face_no]);
-		  
+
 		  face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
 			      info.face, info.subface);
 		}
@@ -180,7 +180,7 @@ namespace MeshWorker
 						   // only do this
 						   // from one side.
 		  if (unique_faces_only && (neighbor < cell)) continue;
-		  
+
 						   // If iterator
 						   // is active
 						   // and neighbor
@@ -189,7 +189,7 @@ namespace MeshWorker
 						   // internal face.
 		  if (internal::is_active_iterator(cell) && neighbor->has_children())
 		    continue;
-		  
+
 		  unsigned int neighbor_face_no = cell->neighbor_of_neighbor(face_no);
 		  Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
 						   // Regular interior face
@@ -200,7 +200,7 @@ namespace MeshWorker
 		  dof_info.exterior[face_no].reinit(
 		    neighbor, neighbor->face(neighbor_face_no), neighbor_face_no);
 		  info.neighbor.reinit(dof_info.exterior[face_no]);
-		  
+
 		  face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
 			      info.face, info.neighbor);
 		}
@@ -211,14 +211,14 @@ namespace MeshWorker
 				     // computations between face and
 				     // cell action.
     info.post_faces(dof_info);
-    
+
 				     // Execute this, if faces
 				     // have to be handled first
     if (integrate_cell && !cells_first)
       cell_worker(dof_info.cell, info.cell);
   }
-  
-  
+
+
 /**
  * The main work function of this namespace. It is a loop over all
  * cells in an iterator range, in which cell_action() is called for
@@ -249,14 +249,14 @@ namespace MeshWorker
 	    bool cells_first = true)
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
-    
+
     assembler.initialize_info(dof_info.cell, false);
     for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
       {
 	assembler.initialize_info(dof_info.interior[i], true);
 	assembler.initialize_info(dof_info.exterior[i], true);
       }
-    
+
 				     // Loop over all cells
 #ifdef DEAL_II_MESHWORKER_PARALLEL
     WorkStream::run(begin, end,
@@ -267,7 +267,11 @@ namespace MeshWorker
 #else
     for (ITERATOR cell = begin; cell != end; ++cell)
       {
-	cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info, info, cell_worker, boundary_worker, face_worker, cells_first, true);
+	cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info,
+						  info, cell_worker,
+						  boundary_worker, face_worker,
+						  cells_first,
+						  true);
 	dof_info.assemble(assembler);
       }
 #endif
