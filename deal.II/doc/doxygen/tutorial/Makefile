@@ -6,9 +6,8 @@ include ../../../common/Make.global_options
 
 # plain names of those files that we shall treat. simply take all those
 # directories in examples/ that have a /doc subdirectory
-example-names = $(subst $D/examples/,,    \
-                        $(subst /doc,,    \
-                                $(shell echo $D/examples/*/doc)))
+example-names = $(subst /doc,,    \
+                        $(shell cd $D/examples && echo */doc))
 
 
 
