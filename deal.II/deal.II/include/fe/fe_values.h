@@ -1875,43 +1875,56 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 
 
 				     //@}
-				     /// @name FunctionAccess Access to values of global finite element functions
+				     /// @name Access to values and derivatives of global finite element fields
 				     //@{
 
 				     /**
-				      * Returns the values of the
-				      * finite element function
-				      * characterized by
-				      * <tt>fe_function</tt> restricted to
-				      * the cell, face or subface
-				      * selected the last time the
-				      * <tt>reinit</tt> function of the
-				      * derived class was called, at
-				      * the quadrature points.
+				      * Returns the values of a finite
+				      * element function restricted to
+				      * the current cell, face or
+				      * subface selected the last time
+				      * the <tt>reinit</tt> function
+				      * of the derived class was
+				      * called, at the quadrature
+				      * points.
 				      *
-				      * If the present cell is not an
-				      * active one the interpolated
-				      * function values are returned.
+				      * If the present cell is not
+				      * active then values are
+				      * interpolated to the current
+				      * cell and point values are
+				      * computed from that.
 				      *
-				      * To get values of
-				      * multi-component elements,
-				      * there is another
+				      * This function may only be used
+				      * if the finite element in use
+				      * is a scalar one, i.e. has only
+				      * one vector component.  To get
+				      * values of multi-component
+				      * elements, there is another
 				      * get_function_values() below,
 				      * returning a vector of vectors
 				      * of results.
 				      *
-				      * This function may only be used if the
-				      * finite element in use is a scalar one,
-				      * i.e. has only one vector component. If
-				      * it is a vector-valued one, then use
-				      * the other get_function_values()
-				      * function.
+				      * @param[in] fe_function A
+				      * vector of values that
+				      * describes (globally) the
+				      * finite element function that
+				      * this function should evaluate
+				      * at the quadrature points of
+				      * the current cell.
 				      *
-				      * The function assumes that the
-				      * <tt>values</tt> object already has the
-				      * correct size.
+				      * @param[out] values The values
+				      * of the function specified by
+				      * fe_function at the quadrature
+				      * points of the current cell.
+				      * The object is assume to
+				      * already have the correct size.
 				      *
-				      * The actual data type of the
+				      * @post <code>values[q]</code>
+				      * will contain the value of the
+				      * field described by fe_function
+				      * at the $q$th quadrature point.
+				      *
+				      * @note The actual data type of the
 				      * input vector may be either a
 				      * Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one
@@ -1929,27 +1942,27 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 			      std::vector<number>& values) const;
 
 				     /**
-				      * Access to vector valued finite
-				      * element functions.
-				      *
 				      * This function does the same as
 				      * the other
 				      * get_function_values(), but
 				      * applied to multi-component
-				      * elements.
+				      * (vector-valued) elements. The
+				      * meaning of the arguments is as
+				      * explained there.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one
-				      * of the sequential PETSc or
-				      * Trilinos vector wrapper
-				      * classes. It represents a
-				      * global vector of DoF values
-				      * associated with the DofHandler
-				      * object with which this
-				      * FEValues object was last
-				      * initialized.
+				      * @post <code>values[q]</code>
+				      * is a vector of values of the
+				      * field described by fe_function
+				      * at the $q$th quadrature
+				      * point. The size of the vector
+				      * accessed by
+				      * <code>values[q]</code> equals
+				      * the number of components of
+				      * the finite element,
+				      * i.e. <code>values[q](c)</code>
+				      * returns the value of the $c$th
+				      * vector component at the $q$th
+				      * quadrature point.
 				      */
     template <class InputVector, typename number>
     void get_function_values (const InputVector       &fe_function,
@@ -2099,28 +2112,60 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 			      VectorSlice<std::vector<std::vector<double> > > values,
 			      const bool quadrature_points_fastest) const;
 
+				     //@}
+				     /// @name Access to gradients of global finite element fields
+				     //@{
+
 				     /**
-				      * Compute the gradients of the finite
-				      * element function characterized
-				      * by @p fe_function restricted to
-				      * @p cell at the quadrature points.
+				      * Compute the gradients of a
+				      * finite element at the
+				      * quadrature points of a
+				      * cell. This function is the
+				      * equivalent of the
+				      * corresponding
+				      * get_function_values() function
+				      * (see there for more
+				      * information) but evaluates the
+				      * finite element field's
+				      * gradient instead of its value.
 				      *
-				      * If the present cell is not an active
-				      * one the interpolated function values
-				      * are returned.
+				      * This function may only be used
+				      * if the finite element in use
+				      * is a scalar one, i.e. has only
+				      * one vector component. There is
+				      * a corresponding function of
+				      * the same name for
+				      * vector-valued finite elements.
 				      *
-				      * This function may only be used if the
-				      * finite element in use is a scalar one,
-				      * i.e. has only one vector component. If
-				      * it is a vector-valued one, then use
-				      * the other get_function_gradients()
-				      * function.
+				      * @param[in] fe_function A
+				      * vector of values that
+				      * describes (globally) the
+				      * finite element function that
+				      * this function should evaluate
+				      * at the quadrature points of
+				      * the current cell.
 				      *
-				      * The function assumes that the
-				      * @p gradients object already has the
-				      * right size.
+				      * @param[out] gradients The gradients
+				      * of the function specified by
+				      * fe_function at the quadrature
+				      * points of the current cell.
+				      * The gradients are computed
+				      * in real space (as opposed to
+				      * on the unit cell).
+				      * The object is assume to
+				      * already have the correct size.
 				      *
-				      * The actual data type of the
+				      * @post
+				      * <code>gradients[q]</code> will
+				      * contain the gradient of the
+				      * field described by fe_function
+				      * at the $q$th quadrature
+				      * point. <code>gradients[q][d]</code>
+				      * represents the derivative in
+				      * coordinate direction $d$ at
+				      * quadrature point $q$.
+				      *
+				      * @note The actual data type of the
 				      * input vector may be either a
 				      * Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one
@@ -2132,75 +2177,46 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * object with which this
 				      * FEValues object was last
 				      * initialized.
-				      *
-				      * The output are the gradients
-				      * of the function represented by
-				      * these DoF values, as computed
-				      * in real space (as opposed to
-				      * on the unit cell).
 				      */
     template <class InputVector>
     void get_function_gradients (const InputVector      &fe_function,
 				 std::vector<Tensor<1,spacedim> > &gradients) const;
 
 				     /**
-				      * @deprecated Use
-				      * get_function_gradients() instead.
-				      */
-    template <class InputVector>
-    void get_function_grads (const InputVector      &fe_function,
-			     std::vector<Tensor<1,spacedim> > &gradients) const;
-
-				     /**
-				      * Compute the gradients of the finite
-				      * element function characterized
-				      * by @p fe_function restricted to
-				      * @p cell at the quadrature points.
-				      *
-				      * If the present cell is not an active
-				      * one the interpolated function values
-				      * are returned.
-				      *
-				      * The function assumes that the
-				      * @p gradients object already has the
-				      * right size.
-				      *
 				      * This function does the same as
-				      * the other get_function_values(),
-				      * but applied to multi-component
-				      * elements.
+				      * the other
+				      * get_function_gradients(), but
+				      * applied to multi-component
+				      * (vector-valued) elements. The
+				      * meaning of the arguments is as
+				      * explained there.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one
-				      * of the sequential PETSc or
-				      * Trilinos vector wrapper
-				      * classes. It represents a
-				      * global vector of DoF values
-				      * associated with the DofHandler
-				      * object with which this
-				      * FEValues object was last
-				      * initialized.
-				      *
-				      * The output are the gradients
-				      * of the function represented by
-				      * these DoF values, as computed
-				      * in real space (as opposed to
-				      * on the unit cell).
+				      * @post
+				      * <code>gradients[q]</code> is a
+				      * vector of gradients of the
+				      * field described by fe_function
+				      * at the $q$th quadrature
+				      * point. The size of the vector
+				      * accessed by
+				      * <code>gradients[q]</code>
+				      * equals the number of
+				      * components of the finite
+				      * element,
+				      * i.e. <code>gradients[q][c]</code>
+				      * returns the gradient of the
+				      * $c$th vector component at the
+				      * $q$th quadrature
+				      * point. Consequently,
+				      * <code>gradients[q][c][d]</code>
+				      * is the derivative in
+				      * coordinate direction $d$ of
+				      * the $c$th vector component of
+				      * the vector field at quadrature
+				      * point $q$ of the current cell.
 				      */
     template <class InputVector>
     void get_function_gradients (const InputVector               &fe_function,
 				 std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
-
-
-				     /**
-				      * @deprecated Use
-				      * get_function_gradients() instead.
-				      */
-    template <class InputVector>
-    void get_function_grads (const InputVector               &fe_function,
-			     std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
 
 				     /**
 				      * Function gradient access with
@@ -2212,15 +2228,6 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     void get_function_gradients (const InputVector& fe_function,
 				 const VectorSlice<const std::vector<unsigned int> >& indices,
 				 std::vector<Tensor<1,spacedim> >& gradients) const;
-
-				     /**
-				      * @deprecated Use
-				      * get_function_gradients() instead.
-				      */
-    template <class InputVector>
-    void get_function_grads (const InputVector& fe_function,
-			     const VectorSlice<const std::vector<unsigned int> >& indices,
-			     std::vector<Tensor<1,spacedim> >& gradients) const;
 
 				     /**
 				      * Function gradient access with
@@ -2239,32 +2246,92 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * get_function_gradients() instead.
 				      */
     template <class InputVector>
+    void get_function_grads (const InputVector      &fe_function,
+			     std::vector<Tensor<1,spacedim> > &gradients) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
+				      */
+    template <class InputVector>
+    void get_function_grads (const InputVector               &fe_function,
+			     std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
+				      */
+    template <class InputVector>
+    void get_function_grads (const InputVector& fe_function,
+			     const VectorSlice<const std::vector<unsigned int> >& indices,
+			     std::vector<Tensor<1,spacedim> >& gradients) const;
+
+				     /**
+				      * @deprecated Use
+				      * get_function_gradients() instead.
+				      */
+    template <class InputVector>
     void get_function_grads (const InputVector& fe_function,
 			     const VectorSlice<const std::vector<unsigned int> >& indices,
 			     std::vector<std::vector<Tensor<1,spacedim> > >& gradients,
 			     bool quadrature_points_fastest = false) const;
 
+				     //@}
+				     /// @name Access to Hessians (second derivatives) of global finite element fields
+				     //@{
+
 				     /**
 				      * Compute the tensor of second
-				      * derivatives of the finite
-				      * element function characterized
-				      * by @p fe_function restricted
-				      * to @p cell at the quadrature
-				      * points.
+				      * derivatives of a finite
+				      * element at the quadrature
+				      * points of a cell. This
+				      * function is the equivalent of
+				      * the corresponding
+				      * get_function_values() function
+				      * (see there for more
+				      * information) but evaluates the
+				      * finite element field's second
+				      * derivatives instead of its
+				      * value.
 				      *
-				      * The function assumes that the
-				      * @p hessians object
-				      * already has the correct size.
+				      * This function may only be used
+				      * if the finite element in use
+				      * is a scalar one, i.e. has only
+				      * one vector component. There is
+				      * a corresponding function of
+				      * the same name for
+				      * vector-valued finite elements.
 				      *
-				      * This function may only be used if the
-				      * finite element in use is a scalar one,
-				      * i.e. has only one vector component. If
-				      * it is a vector-valued one, then use
-				      * the other
-				      * get_function_hessians()
-				      * function.
+				      * @param[in] fe_function A
+				      * vector of values that
+				      * describes (globally) the
+				      * finite element function that
+				      * this function should evaluate
+				      * at the quadrature points of
+				      * the current cell.
 				      *
-				      * The actual data type of the
+				      * @param[out] hessians The Hessians
+				      * of the function specified by
+				      * fe_function at the quadrature
+				      * points of the current cell.
+				      * The Hessians are computed
+				      * in real space (as opposed to
+				      * on the unit cell).
+				      * The object is assume to
+				      * already have the correct size.
+				      *
+				      * @post <code>hessians[q]</code>
+				      * will contain the Hessian of
+				      * the field described by
+				      * fe_function at the $q$th
+				      * quadrature
+				      * point. <code>gradients[q][i][j]</code>
+				      * represents the $(i,j)$th
+				      * component of the matrix of
+				      * second derivatives at
+				      * quadrature point $q$.
+				      *
+				      * @note The actual data type of the
 				      * input vector may be either a
 				      * Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one
@@ -2276,54 +2343,43 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * object with which this
 				      * FEValues object was last
 				      * initialized.
-				      *
-				      * The output are the second
-				      * derivatives of the function
-				      * represented by these DoF
-				      * values, as computed in real
-				      * space (as opposed to on the
-				      * unit cell).
 				      */
     template <class InputVector>
     void
     get_function_hessians (const InputVector& fe_function,
 			   std::vector<Tensor<2,spacedim> >& hessians) const;
 
-
 				     /**
-				      * Compute the tensor of second
-				      * derivatives of the finite
-				      * element function characterized
-				      * by @p fe_function restricted to
-				      * @p cell at the quadrature points.
-				      *
-				      * The function assumes that the
-				      * @p hessians object already has
-				      * the right size.
-				      *
 				      * This function does the same as
-				      * the other one with the same
-				      * name, but applies to
-				      * vector-valued finite elements.
+				      * the other
+				      * get_function_hessians(), but
+				      * applied to multi-component
+				      * (vector-valued) elements. The
+				      * meaning of the arguments is as
+				      * explained there.
 				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one
-				      * of the sequential PETSc or
-				      * Trilinos vector wrapper
-				      * classes. It represents a
-				      * global vector of DoF values
-				      * associated with the DofHandler
-				      * object with which this
-				      * FEValues object was last
-				      * initialized.
-				      *
-				      * The output are the second derivatives
-				      * of the function represented by
-				      * these DoF values, as computed
-				      * in real space (as opposed to
-				      * on the unit cell).
+				      * @post <code>hessians[q]</code>
+				      * is a vector of Hessians of the
+				      * field described by fe_function
+				      * at the $q$th quadrature
+				      * point. The size of the vector
+				      * accessed by
+				      * <code>hessians[q]</code>
+				      * equals the number of
+				      * components of the finite
+				      * element,
+				      * i.e. <code>hessians[q][c]</code>
+				      * returns the Hessian of the
+				      * $c$th vector component at the
+				      * $q$th quadrature
+				      * point. Consequently,
+				      * <code>values[q][c][i][j]</code>
+				      * is the $(i,j)$th component of
+				      * the matrix of second
+				      * derivatives of the $c$th
+				      * vector component of the vector
+				      * field at quadrature point $q$
+				      * of the current cell.
 				      */
     template <class InputVector>
     void
@@ -2375,35 +2431,66 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				  std::vector<std::vector<Tensor<2,spacedim> > >&,
 				  bool = false) const;
 
-
 				     /**
-				      * Compute the (scalar) Laplacian
-				      * of the finite element function
-				      * characterized by @p
-				      * fe_function restricted to @p
-				      * cell at the quadrature
-				      * points. The Laplacian output
-				      * vector is equivalent to
-				      * getting
-				      * <tt>trace(hessians)</tt>,
-				      * where <tt>hessian</tt> would
+				      * Compute the (scalar) Laplacian (i.e. the trace of the tensor of second
+				      * derivatives) of a finite
+				      * element at the quadrature
+				      * points of a cell. This
+				      * function is the equivalent of
+				      * the corresponding
+				      * get_function_values() function
+				      * (see there for more
+				      * information) but evaluates the
+				      * finite element field's second
+				      * derivatives instead of its
+				      * value.
+				      *
+				      * This function may only be used
+				      * if the finite element in use
+				      * is a scalar one, i.e. has only
+				      * one vector component. There is
+				      * a corresponding function of
+				      * the same name for
+				      * vector-valued finite elements.
+				      *
+				      * @param[in] fe_function A
+				      * vector of values that
+				      * describes (globally) the
+				      * finite element function that
+				      * this function should evaluate
+				      * at the quadrature points of
+				      * the current cell.
+				      *
+				      * @param[out] laplacians The Laplacians
+				      * of the function specified by
+				      * fe_function at the quadrature
+				      * points of the current cell.
+				      * The Laplacians are computed
+				      * in real space (as opposed to
+				      * on the unit cell).
+				      * The object is assume to
+				      * already have the correct size.
+				      *
+				      * @post <code>laplacians[q]</code>
+				      * will contain the Laplacian of
+				      * the field described by
+				      * fe_function at the $q$th
+				      * quadrature
+				      * point. <code>gradients[q][i][j]</code>
+				      * represents the $(i,j)$th
+				      * component of the matrix of
+				      * second derivatives at
+				      * quadrature point $q$.
+				      *
+				      * @post For each component of
+				      * the output vector, there holds
+				      * <code>laplacians[q]=trace(hessians[q])</code>,
+				      * where <tt>hessians</tt> would
 				      * be the output of the
 				      * get_function_hessians()
 				      * function.
 				      *
-				      * The function assumes that the
-				      * @p laplacians object
-				      * already has the correct size.
-				      *
-				      * This function may only be used if the
-				      * finite element in use is a scalar one,
-				      * i.e. has only one vector component. If
-				      * it is a vector-valued one, then use
-				      * the other
-				      * get_function_laplacians()
-				      * function.
-				      *
-				      * The actual data type of the
+				      * @note The actual data type of the
 				      * input vector may be either a
 				      * Vector&lt;T&gt;,
 				      * BlockVector&lt;T&gt;, or one
@@ -2415,65 +2502,44 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * object with which this
 				      * FEValues object was last
 				      * initialized.
-				      *
-				      * The output are the traces of
-				      * the second derivatives
-				      * (i.e. Laplacians) of the
-				      * function represented by these
-				      * DoF values, as computed in
-				      * real space (as opposed to on
-				      * the unit cell).
 				      */
     template <class InputVector, typename number>
     void
     get_function_laplacians (const InputVector& fe_function,
 			     std::vector<number>& laplacians) const;
 
-
 				     /**
-				      * Compute the (scalar) Laplacian
-				      * of the finite element function
-				      * characterized by @p
-				      * fe_function restricted to @p
-				      * cell at the quadrature
-				      * points. The Laplacian output
-				      * vector is equivalent to
-				      * getting
-				      * <tt>trace(hessians)</tt>, with
-				      * <tt>hessian</tt> corresponding
-				      * to the output of the
+				      * This function does the same as
+				      * the other
+				      * get_function_laplacians(), but
+				      * applied to multi-component
+				      * (vector-valued) elements. The
+				      * meaning of the arguments is as
+				      * explained there.
+				      *
+				      * @post <code>laplacians[q]</code>
+				      * is a vector of Laplacians of the
+				      * field described by fe_function
+				      * at the $q$th quadrature
+				      * point. The size of the vector
+				      * accessed by
+				      * <code>laplacians[q]</code>
+				      * equals the number of
+				      * components of the finite
+				      * element,
+				      * i.e. <code>laplacians[q][c]</code>
+				      * returns the Laplacian of the
+				      * $c$th vector component at the
+				      * $q$th quadrature
+				      * point.
+				      *
+				      * @post For each component of
+				      * the output vector, there holds
+				      * <code>laplacians[q][c]=trace(hessians[q][c])</code>,
+				      * where <tt>hessians</tt> would
+				      * be the output of the
 				      * get_function_hessians()
 				      * function.
-				      *
-				      * The function assumes that the
-				      * @p laplacians object
-				      * already has the correct size.
-				      *
-				      * This function does the same as
-				      * the other one with the same
-				      * name, but applies to
-				      * vector-valued finite elements.
-				      *
-				      * The actual data type of the
-				      * input vector may be either a
-				      * Vector&lt;T&gt;,
-				      * BlockVector&lt;T&gt;, or one
-				      * of the sequential PETSc or
-				      * Trilinos vector wrapper
-				      * classes. It represents a
-				      * global vector of DoF values
-				      * associated with the DofHandler
-				      * object with which this
-				      * FEValues object was last
-				      * initialized.
-				      *
-				      * The output are the traces of
-				      * the second derivatives (i.e.
-				      * Laplacians) of the function
-				      * represented by these DoF
-				      * values, as computed in real
-				      * space (as opposed to on the
-				      * unit cell).
 				      */
     template <class InputVector, typename number>
     void
@@ -2519,8 +2585,6 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
       const VectorSlice<const std::vector<unsigned int> >& indices,
       std::vector<std::vector<number> >& laplacians,
       bool quadrature_points_fastest = false) const;
-
-
 				     //@}
 
 				     /**
@@ -4108,9 +4172,9 @@ namespace FEValuesViews
 	return symmetrize(return_value);
       }
   }
-  
-  
-  
+
+
+
   template <int dim, int spacedim>
           inline
           typename SymmetricTensor<2, dim, spacedim>::value_type
