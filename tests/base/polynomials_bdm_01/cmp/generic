@@ -1,6 +1,4 @@
 
-DEAL::Name: polynomials_bdm_01.cc 18 polynomials_bdm_01 18446744073709551615 polynomials_bdm_01
-DEAL::File:polynomials_bdm_01
 DEAL::BDM1<2>
 DEAL::BDM1<2>	0.00 0.00	1.00	0	0	1.00	0	0	0	0
 DEAL::BDM1<2>	0.250 0.00	1.00	0	0	1.00	0.250	0	-0.250	0

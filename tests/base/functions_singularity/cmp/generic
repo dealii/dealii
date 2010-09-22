@@ -1,0 +1,10 @@
+
+DEAL::Functions::LSingularityFunction
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::LSingularityGradFunction
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::Gradient consistency 
