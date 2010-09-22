@@ -199,20 +199,21 @@ namespace SparsityTools
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				   /**
 				    * Communciate rows in a compressed
-				    * sparsity pattern over MPI. The @param
-				    * csp is modified inline. All entries in
-				    * rows that belong to a different
+				    * sparsity pattern over MPI. The parameter
+				    * @p csp is modified inline. All entries
+				    * in rows that belong to a different
 				    * processor are send to them and added
 				    * there. The ownership is determined by
-				    * parameter @param rows_per_cpu. The
-				    * IndexSet @param myrange should be the
-				    * one used in the constructor of the
-				    * CompressedSimpleSparsityPattern. All
-				    * rows contained in @param myrange are
-				    * checked in @param csp.  This function
-				    * needs to be used with
+				    * the parameter @p rows_per_cpu. The
+				    * IndexSet @p myrange should be the one
+				    * used in the constructor of the
+				    * CompressedSimpleSparsityPattern. Only
+				    * the rows in @p csp contained in @p
+				    * myrange are checked for transfer. This
+				    * function needs to be used with
 				    * PETScWrappers::MPI::SparseMatrix for it
-				    * to work correctly.
+				    * to work correctly in a parallel
+				    * calculation.
 				    */
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t & csp,
