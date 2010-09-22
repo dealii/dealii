@@ -33,8 +33,7 @@ DEAL_II_NAMESPACE_OPEN
  * CPU time and the wallclock time elapsed since the timer was started
  * last time. Information is retrieved from the system on the basis of
  * clock cycles since last time the computer was booted for the CPU
- * time. On a SUN workstation, this information is exact to about a
- * microsecond.
+ * time.
  *
  *
  * <h3>Usage</h3>
