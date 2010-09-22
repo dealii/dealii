@@ -26,6 +26,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+template <typename number>
+PreconditionBlockBase<number>::~PreconditionBlockBase ()
+{}
+
+
 template <class MATRIX, typename inverse_type>
 PreconditionBlock<MATRIX,inverse_type>::PreconditionBlock (bool store)
 		: PreconditionBlockBase<inverse_type>(store),

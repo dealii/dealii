@@ -56,6 +56,11 @@ class PreconditionBlockBase
 				      */
     PreconditionBlockBase(bool store_diagonals = false);
 
+				     /**
+				      * The virtual destructor
+				      */
+    ~PreconditionBlockBase();
+    
     				     /**
 				      * Deletes the inverse diagonal
 				      * block matrices if existent hence
