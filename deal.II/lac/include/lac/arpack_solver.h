@@ -77,10 +77,12 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
 class ArpackSolver : public Subscriptor
 {
   public:
-    /**
-     * Enum to choose the eigenvalues of interest.
-     */
-    enum which 
+				     /**
+				      * An enum that lists the possible
+				      * choices for which eigenvalues to
+				      * compute in the solve() function.
+				      */
+    enum WhichEigenvalues 
     {
       algebraically_largest,
       algebraically_smallest,
@@ -101,10 +103,10 @@ class ArpackSolver : public Subscriptor
     struct AdditionalData 
     {
       const unsigned int number_of_arnoldi_vectors;
-      const which eigenvalue_of_interest;
+      const WhichEigenvalues eigenvalue_of_interest;
       AdditionalData(
           const unsigned int number_of_arnoldi_vectors = 15,
-          const which eigenvalue_of_interest = largest_magnitude);
+          const WhichEigenvalues eigenvalue_of_interest = largest_magnitude);
     };
 
     /**
@@ -193,7 +195,7 @@ class ArpackSolver : public Subscriptor
 
 ArpackSolver::AdditionalData::
 AdditionalData (const unsigned int number_of_arnoldi_vectors,
-    const which eigenvalue_of_interest)
+    const WhichEigenvalues eigenvalue_of_interest)
   : 
     number_of_arnoldi_vectors(number_of_arnoldi_vectors),
     eigenvalue_of_interest(eigenvalue_of_interest)
