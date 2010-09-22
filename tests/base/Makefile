@@ -61,9 +61,9 @@ task_%/output : task_%/exe
 # and we don't want the data_out_base_tecplot_bin test if we haven't found the
 # corresponding libraries:
 ifeq (, $(findstring tecio, $LIBS))
-  tests = $(filter-out bdm data_out_base_tecplot_bin, $(basename $(wildcard *)))
+  tests = $(filter-out data_out_base_tecplot_bin, $(basename $(wildcard *.cc)))
 else
-  tests = $(filter-out bdm, $(basename $(wildcard *)))
+  tests = $(basename $(wildcard *.cc))
 endif
 
 # add threading tests. note that we have
