@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -323,10 +322,11 @@ namespace Functions
   
   
 /**
- * Singularity on the L-shaped domain in 2D.
+ * Harmonic singularity on the L-shaped domain in 2D.
  *
  * @ingroup functions
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat
+ * @date 1999
  */
   class LSingularityFunction : public Function<2>
   {
@@ -357,6 +357,53 @@ namespace Functions
       virtual void laplacian_list (const std::vector<Point<2> > &points,
 				   std::vector<double>          &values,
 				   const unsigned int            component = 0) const;
+  };
+  
+  
+  
+/**
+ * Gradient of the harmonic singularity on the L-shaped domain in 2D.
+ *
+ * The gradient of LSingularityFunction, which is a vector valued
+ * function with vanishing curl and divergence.
+ *
+ * @ingroup functions
+ * @author Guido Kanschat, 2010
+ */
+  class LSingularityGradFunction : public Function<2>
+  {
+    public:
+				       /**
+					* Default constructor setting
+					* the dimension to 2.
+					*/
+      LSingularityGradFunction ();
+      virtual double value (const Point<2>   &p,
+			    const unsigned int  component) const;
+      
+      virtual void value_list (const std::vector<Point<2> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component) const;
+
+      virtual void vector_value_list (const std::vector<Point<2> >& points,
+				      std::vector<Vector<double> >& values) const;
+      
+      virtual Tensor<1,2> gradient (const Point<2>     &p,
+				    const unsigned int  component) const;
+      
+      virtual void gradient_list (const std::vector<Point<2> > &points,
+				  std::vector<Tensor<1,2> >    &gradients,
+				  const unsigned int            component) const;
+      
+      virtual void vector_gradient_list (const std::vector<Point<2> > &,
+					 std::vector<std::vector<Tensor<1,2> > >&) const;
+      
+      virtual double laplacian (const Point<2>   &p,
+				const unsigned int  component) const;
+      
+      virtual void laplacian_list (const std::vector<Point<2> > &points,
+				   std::vector<double>          &values,
+				   const unsigned int            component) const;
   };
   
   

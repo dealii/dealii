@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -916,10 +915,10 @@ namespace Functions
       values[i] = 0.;
   }
   
-  
+
   Tensor<1,2>
   LSingularityFunction::gradient (const Point<2>   &p,
-				  const unsigned int) const
+				      const unsigned int d) const
   {
     double x = p(0);
     double y = p(1);
@@ -976,6 +975,132 @@ namespace Functions
 	gradients[i][0][0] = 2./3.*(std::sin(2./3.*phi)*x + std::cos(2./3.*phi)*y)/r43;
 	gradients[i][0][1] = 2./3.*(std::sin(2./3.*phi)*y - std::cos(2./3.*phi)*x)/r43;
       }
+  }
+  
+//////////////////////////////////////////////////////////////////////
+  
+  LSingularityGradFunction::LSingularityGradFunction ()
+		  :
+		  Function<2> (2)
+  {}
+
+  
+  double
+  LSingularityGradFunction::value (const Point<2>   &p,
+				   const unsigned int d) const
+  {
+    AssertIndexRange(d,2);
+    
+    const double x = p(0);
+    const double y = p(1);
+    const double phi = std::atan2(y,-x)+M_PI;
+    const double r43 = std::pow(x*x+y*y,2./3.);
+
+    return 2./3.*(std::sin(2./3.*phi)*p(d) +
+		  (d==0
+		   ? (std::cos(2./3.*phi)*y)
+		   : (-std::cos(2./3.*phi)*x)))
+		  /r43;
+  }
+  
+  
+  void
+  LSingularityGradFunction::value_list (
+    const std::vector<Point<2> >& points,
+    std::vector<double>& values,
+    const unsigned int d) const
+  {
+    AssertIndexRange(d, 2);
+    AssertDimension(values.size(), points.size());
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	const Point<2>& p = points[i];
+	const double x = p(0);
+	const double y = p(1);
+	const double phi = std::atan2(y,-x)+M_PI;
+	const double r43 = std::pow(x*x+y*y,2./3.);
+	
+	values[i] = 2./3.*(std::sin(2./3.*phi)*p(d) +
+			   (d==0
+			    ? (std::cos(2./3.*phi)*y)
+			    : (-std::cos(2./3.*phi)*x)))
+			   /r43;
+      }
+  }
+  
+  
+  void
+  LSingularityGradFunction::vector_value_list (
+    const std::vector<Point<2> >& points,
+    std::vector<Vector<double> >& values) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      {
+	AssertDimension(values[i].size(), 2);
+	const Point<2>& p = points[i];
+	const double x = p(0);
+	const double y = p(1);
+	const double phi = std::atan2(y,-x)+M_PI;
+	const double r43 = std::pow(x*x+y*y,2./3.);
+
+	values[i](0) = 2./3.*(std::sin(2./3.*phi)*x + std::cos(2./3.*phi)*y)/r43;
+	values[i](1) = 2./3.*(std::sin(2./3.*phi)*y - std::cos(2./3.*phi)*x)/r43;
+      }
+  }
+  
+  
+  double
+  LSingularityGradFunction::laplacian (const Point<2>   &,
+				   const unsigned int) const
+  {
+    return 0.;
+  }
+  
+  
+  void
+  LSingularityGradFunction::laplacian_list (const std::vector<Point<2> > &points,
+					std::vector<double>            &values,
+					const unsigned int) const
+  {
+    Assert (values.size() == points.size(),
+	    ExcDimensionMismatch(values.size(), points.size()));
+    
+    for (unsigned int i=0;i<points.size();++i)
+      values[i] = 0.;
+  }
+  
+  
+  
+  Tensor<1,2>
+  LSingularityGradFunction::gradient (
+    const Point<2>   &/*p*/,
+    const unsigned int /*component*/) const
+  {
+    Assert(false, ExcNotImplemented());
+    return Tensor<1,2>();
+  }
+  
+  
+  void
+  LSingularityGradFunction::gradient_list (
+    const std::vector<Point<2> >& /*points*/,
+    std::vector<Tensor<1,2> >& /*gradients*/,
+    const unsigned int /*component*/) const
+  {
+    Assert(false, ExcNotImplemented());
+  }
+  
+  
+  void
+  LSingularityGradFunction::vector_gradient_list (
+    const std::vector<Point<2> >& /*points*/,
+    std::vector<std::vector<Tensor<1,2> > >& /*gradients*/) const
+  {
+    Assert(false, ExcNotImplemented());
   }
   
 //////////////////////////////////////////////////////////////////////
