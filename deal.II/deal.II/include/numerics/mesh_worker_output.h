@@ -64,16 +64,6 @@ namespace MeshWorker
 	void initialize_stream(std::ostream& stream);
 
 					 /**
-					  * Set the precision
-                                          * of the stream to
-					  * which data is written. If
-					  * no stream was selected with
-					  * initialize_stream(), this 
-                                          * effects #deallog.
-					  */
-        void set_precision (const unsigned int n);
-
-					 /**
 					  * Initialize the local data
 					  * in the
 					  * DoFInfo
@@ -148,15 +138,6 @@ namespace MeshWorker
 	deallog << std::endl;
       else
 	(*os) << std::endl;
-    }
-
-    inline void
-    GnuplotPatch::set_precision(const unsigned int n)
-    {
-      if (os == 0)
-        deallog << std::setprecision(n);
-      else
-        (*os) << std::setprecision(n);
     }
 
     inline
