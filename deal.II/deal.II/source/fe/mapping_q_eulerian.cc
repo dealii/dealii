@@ -153,7 +153,7 @@ compute_mapping_support_points
   const unsigned int n_support_pts = support_quadrature.n_quadrature_points;
   const unsigned int n_components  = euler_dof_handler->get_fe().n_components();
 
-  Assert (n_components >= dim, ExcWrongNoOfComponents() );
+  Assert (n_components >= spacedim, ExcWrongNoOfComponents() );
 
   std::vector<Vector<double> > shift_vector(n_support_pts,Vector<double>(n_components));
 
@@ -175,7 +175,7 @@ compute_mapping_support_points
   for(unsigned int q=0; q<n_support_pts; ++q)
     {
       a[q] = fe_values.quadrature_point(q);
-      for(unsigned int d=0; d<dim; ++d)
+      for(unsigned int d=0; d<spacedim; ++d)
 	a[q](d) += shift_vector[q](d);
     }
 }
