@@ -66,10 +66,13 @@ double Function<dim>::value (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::vector_value (const Point<dim> &,
-				  Vector<double>   &) const
+void Function<dim>::vector_value (
+  const Point<dim>& p,
+  Vector<double>& v) const
 {
-  Assert (false, ExcPureFunctionCalled());
+  AssertDimension(v.size(), this->n_components);
+  for (unsigned int i=0;i<this->n_components;++i)
+    v(i) = value(p, i);
 }
 
 
@@ -114,10 +117,13 @@ Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::vector_gradient (const Point<dim>       &,
-				     std::vector<Tensor<1,dim> > &) const
+void Function<dim>::vector_gradient (
+  const Point<dim>& p,
+  std::vector<Tensor<1,dim> >& v) const
 {
-  Assert (false, ExcPureFunctionCalled());
+  AssertDimension(v.size(), this->n_components);
+  for (unsigned int i=0;i<this->n_components;++i)
+    v[i] = gradient(p, i);
 }
 
 

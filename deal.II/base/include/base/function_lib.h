@@ -46,41 +46,22 @@ namespace Functions
   class SquareFunction : public Function<dim>
   {
     public:
-				       /**
-					* Function value at one point.
-					*/
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-      
-				       /**
-					* Function values at multiple points.
-					*/
+			    const unsigned int  component = 0) const;      
+      virtual void vector_value (const Point<dim>   &p,
+				 Vector<double>     &values) const;
       virtual void value_list (const std::vector<Point<dim> > &points,
 			       std::vector<double>            &values,
 			       const unsigned int              component = 0) const;
-      
-				       /**
-					* Gradient at one point.
-					*/
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				      const unsigned int  component = 0) const;
-      
-				       /**
-					  Gradients at multiple points.
-				       */
+      virtual void vector_gradient (const Point<dim>   &p,
+				    std::vector<Tensor<1,dim> >    &gradient) const;
       virtual void gradient_list (const std::vector<Point<dim> > &points,
 				  std::vector<Tensor<1,dim> >    &gradients,
 				  const unsigned int              component = 0) const;
-      
-				       /**
-					* Laplacian of the function at one point.
-					*/
       virtual double laplacian (const Point<dim>   &p,
 				const unsigned int  component = 0) const;
-      
-				       /**
-					* Laplacian of the function at multiple points.
-					*/
       virtual void laplacian_list (const std::vector<Point<dim> > &points,
 				   std::vector<double>            &values,
 				   const unsigned int              component = 0) const;

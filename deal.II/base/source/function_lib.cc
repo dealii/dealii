@@ -44,8 +44,18 @@ namespace Functions
   {
     return p.square();
   }
+
   
-  
+  template<int dim>
+  void
+  SquareFunction<dim>::vector_value (const Point<dim>   &p,
+				     Vector<double>     &values) const
+  {
+    AssertDimension(values.size(), 1);
+    values(0) = p.square();
+  }
+
+
   template<int dim>
   void
   SquareFunction<dim>::value_list (const std::vector<Point<dim> > &points,
@@ -92,11 +102,22 @@ namespace Functions
   SquareFunction<dim>::gradient (const Point<dim>   &p,
 				 const unsigned int) const
   {
-    return p*2;
+    return p*2.;
   }
   
   
-  
+  template<int dim>
+  void
+  SquareFunction<dim>::vector_gradient (
+    const Point<dim>& p,
+    std::vector<Tensor<1,dim> >& values) const
+  {
+    AssertDimension(values.size(), 1);
+    values[0] = p*2.;
+  }
+
+
+ 
   template<int dim>
   void
   SquareFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
@@ -918,7 +939,7 @@ namespace Functions
 
   Tensor<1,2>
   LSingularityFunction::gradient (const Point<2>   &p,
-				      const unsigned int d) const
+				  const unsigned int) const
   {
     double x = p(0);
     double y = p(1);
