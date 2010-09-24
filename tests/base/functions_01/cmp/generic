@@ -1,1 +1,46 @@
 
+DEAL::Functions::SquareFunction<1>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::SquareFunction<2>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::SquareFunction<3>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::CosineFunction<1>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::CosineFunction<2>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::CosineFunction<3>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::ExpFunction<1>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::ExpFunction<2>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
+DEAL::Functions::ExpFunction<3>
+DEAL::value vs vector value list
+DEAL::value list vs vector value list
+DEAL::gradient vs vector gradient list
+DEAL::gradient list vs vector gradient list
