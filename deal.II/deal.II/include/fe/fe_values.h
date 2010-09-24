@@ -1875,7 +1875,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 
 
 				     //@}
-				     /// @name Access to values and derivatives of global finite element fields
+				     /// @name Access to values of global finite element fields
 				     //@{
 
 				     /**
@@ -2113,7 +2113,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 			      const bool quadrature_points_fastest) const;
 
 				     //@}
-				     /// @name Access to gradients of global finite element fields
+				     /// @name Access to derivatives of global finite element fields
 				     //@{
 
 				     /**
@@ -2277,7 +2277,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 			     bool quadrature_points_fastest = false) const;
 
 				     //@}
-				     /// @name Access to Hessians (second derivatives) of global finite element fields
+				     /// @name Access to second derivatives (Hessian matrices and Laplacians) of global finite element fields
 				     //@{
 
 				     /**
