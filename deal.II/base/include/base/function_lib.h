@@ -251,6 +251,55 @@ namespace Functions
   
   
 /**
+ * Gradient of the cosine-shaped pillow function.
+ *
+ * This is a vector-valued function with @p dim components, the
+ * gradient of CosineFunction. On the square [-1,1], it has tangential
+ * boundary conditions zero. Thus, it can be used to test
+ * implementations of Maxwell operators without bothering about
+ * boundary terms.
+ *
+ * @ingroup functions
+ * @author Guido Kanschat, 2010
+ */
+  template<int dim>
+  class CosineGradFunction : public Function<dim>
+  {
+    public:
+				       /**
+					* Constructor, creating a
+					* function with @p dim components.
+					*/
+      CosineGradFunction ();
+      
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component) const;      
+      virtual void vector_value (const Point<dim>   &p,
+				 Vector<double>     &values) const;
+      virtual void value_list (const std::vector<Point<dim> > &points,
+			       std::vector<double>            &values,
+			       const unsigned int              component) const;
+      
+      virtual void vector_value_list (const std::vector<Point<dim> >& points,
+				      std::vector<Vector<double> >& values) const;
+      
+      virtual Tensor<1,dim> gradient (const Point<dim>   &p,
+				      const unsigned int  component) const;
+      
+      virtual void gradient_list (const std::vector<Point<dim> > &points,
+				  std::vector<Tensor<1,dim> >    &gradients,
+				  const unsigned int              component) const;
+      
+      virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
+					 std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+
+      virtual double laplacian (const Point<dim>   &p,
+				const unsigned int  component) const;
+  };
+  
+  
+  
+/**
  * Product of exponential functions in each coordinate direction.
  *
  * @ingroup functions

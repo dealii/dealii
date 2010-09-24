@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -248,6 +248,22 @@ class Function : public FunctionTime,
 				    std::vector<Vector<double> >   &values) const;
     
 				     /**
+				      * For each component of the
+				      * function, fill a vector of
+				      * values, one for each point.
+				      *
+				      * The default implementation of
+				      * this function in Function calls
+				      * value_list() for each
+				      * component. In order to improve
+				      * performance, this can be
+				      * reimplemented in derived
+				      * classes to speed up performance.
+				      */
+    virtual void vector_values (const std::vector<Point<dim> >& points,
+				std::vector<std::vector<double> >& values) const;
+
+				     /**
 				      * Return the gradient of the
 				      * specified component of the
 				      * function at the given point.
@@ -276,6 +292,22 @@ class Function : public FunctionTime,
 				std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
     
+				     /**
+				      * For each component of the
+				      * function, fill a vector of
+				      * gradient values, one for each point.
+				      *
+				      * The default implementation of
+				      * this function in Function calls
+				      * value_list() for each
+				      * component. In order to improve
+				      * performance, this can be
+				      * reimplemented in derived
+				      * classes to speed up performance.
+				      */
+    virtual void vector_gradients (const std::vector<Point<dim> >            &points,
+				   std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
+      
 				     /**
 				      * Set <tt>gradients</tt> to the gradients of
 				      * the function at the <tt>points</tt>,

@@ -108,6 +108,18 @@ void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 
 
 template <int dim>
+void Function<dim>::vector_values (
+  const std::vector<Point<dim> >& points,
+  std::vector<std::vector<double> >& values) const
+{
+  const unsigned int n = this->n_components;
+  AssertDimension (values.size(), n);
+  for (unsigned int i=0;i<n;++i)
+    value_list(points, values[i], i);
+}
+
+
+template <int dim>
 Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 				       const unsigned int) const
 {
@@ -153,6 +165,18 @@ void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >        
 	      ExcDimensionMismatch(gradients[i].size(), n_components));
       vector_gradient (points[i], gradients[i]);
     }
+}
+
+
+template <int dim>
+void Function<dim>::vector_gradients (
+  const std::vector<Point<dim> >& points,
+  std::vector<std::vector<Tensor<1,dim> > >& values) const
+{
+  const unsigned int n = this->n_components;
+  AssertDimension (values.size(), n);
+  for (unsigned int i=0;i<n;++i)
+    gradient_list(points, values[i], i);
 }
 
 
