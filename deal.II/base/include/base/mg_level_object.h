@@ -91,10 +91,20 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Coarsest level for multigrid.
 				      */
+    unsigned int min_level () const;
+    
+				     /**
+				      * Finest level for multigrid.
+				      */
+    unsigned int max_level () const;
+    
+				     /**
+				      * @deprecated Replaced by min_level()
+				      */
     unsigned int get_minlevel () const;
     
 				     /**
-				      * Ignored
+				      * @deprecated Replaced by max_level()
 				      */
     unsigned int get_maxlevel () const;
     
@@ -199,6 +209,22 @@ MGLevelObject<Object>::get_minlevel () const
 template<class Object>
 unsigned int
 MGLevelObject<Object>::get_maxlevel () const
+{
+  return minlevel + objects.size() - 1;
+}
+
+
+template<class Object>
+unsigned int
+MGLevelObject<Object>::min_level () const
+{
+  return minlevel;
+}
+
+
+template<class Object>
+unsigned int
+MGLevelObject<Object>::max_level () const
 {
   return minlevel + objects.size() - 1;
 }

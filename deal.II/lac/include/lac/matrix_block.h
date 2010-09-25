@@ -18,6 +18,7 @@
 #include <base/smartpointer.h>
 #include <base/std_cxx1x/shared_ptr.h>
 #include <base/memory_consumption.h>
+#include <base/mg_level_object.h>
 #include <lac/block_indices.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/sparse_matrix.h>
@@ -408,7 +409,7 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <class MATRIX>
-class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >
+class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > > >
 {
   public:
 				     /**
@@ -426,18 +427,26 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<M
     void add(unsigned int row, unsigned int column,
 	     const std::string& name,
 	     const BlockIndices* block_indices = 0);
-    
+
+				     /**
+				      * For matrices using a
+				      * SparsityPattern, this function
+				      * reinitializes each matrix in
+				      * the vector with the correct
+				      * pattern from the block system.
+				      */
+    void reinit(const MGLevelObject<BlockSparsityPattern>& sparsity);
 				     /**
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
 				      */
-    const MatrixBlock<MATRIX>& block(unsigned int i) const;
+    const MGLevelObject<MatrixBlock<MATRIX> >& block(unsigned int i) const;
     
 				     /**
 				      * Access a reference to
 				      * the block at position <i>i</i>.
 				      */
-    MatrixBlock<MATRIX>& block(unsigned int i);
+    MGLevelObject<MatrixBlock<MATRIX> >& block(unsigned int i);
     
 				     /**
 				      * The memory used by this object.
@@ -461,10 +470,11 @@ namespace internal
 {
   template <class MATRIX>
   void
-  reinit(MatrixBlockVector<MATRIX>& v, const BlockSparsityPattern& p)
+  reinit(MatrixBlockVector<MATRIX>&, const BlockSparsityPattern&)
   {
     Assert(false, ExcNotImplemented());
   }
+
   
   template <typename number>
   void
@@ -472,6 +482,25 @@ namespace internal
   {
     for (unsigned int i=0;i<v.size();++i)
       v(i)->matrix.reinit(p.block(v(i)->row, v(i)->column));
+  }
+
+
+  template <class MATRIX>
+  void
+  reinit(MGMatrixBlockVector<MATRIX>&, const MGLevelObject<BlockSparsityPattern>&)
+  {
+    Assert(false, ExcNotImplemented());
+  }
+  
+  
+  template <typename number>
+  void
+  reinit(MGMatrixBlockVector<dealii::SparseMatrix<number> >& v,
+	 const MGLevelObject<BlockSparsityPattern>& sparsity)
+  {
+    for (unsigned int i=0;i<v.size();++i)
+      for (unsigned int level=sparsity.min_level(); level <= sparsity.max_level();++level)
+	v(i)->matrix[level].reinit(sparsity[level].block(v(i)->row, v(i)->column));
   }
   
 }
@@ -713,6 +742,55 @@ MatrixBlockVector<MATRIX>::block(unsigned int i)
 template <class MATRIX>
 inline MATRIX&
 MatrixBlockVector<MATRIX>::matrix(unsigned int i)
+{
+  return (*this)(i)->matrix;
+}
+
+
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX>
+inline void
+MGMatrixBlockVector<MATRIX>::add(
+  unsigned int row, unsigned int column,
+  const std::string& name,
+  const BlockIndices* block_indices)
+{
+  std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > >
+    p(new MGLevelObject<MatrixBlock<MATRIX> >(row, column, block_indices));
+  NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
+}
+
+
+template <class MATRIX>
+inline void
+MGMatrixBlockVector<MATRIX>::reinit(const MGLevelObject<BlockSparsityPattern>& sparsity)
+{
+  internal::reinit(*this, sparsity);
+}
+
+
+
+template <class MATRIX>
+inline const MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block(unsigned int i) const
+{
+  return *this->read(i);
+}
+
+
+template <class MATRIX>
+inline MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block(unsigned int i)
+{
+  return *(*this)(i);
+}
+
+
+template <class MATRIX>
+inline MATRIX&
+MGMatrixBlockVector<MATRIX>::matrix(unsigned int i)
 {
   return (*this)(i)->matrix;
 }
