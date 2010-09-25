@@ -735,7 +735,7 @@ bool ParameterHandler::read_input (const std::string &filename,
 
       return read_input (input);
     }
-  catch (const ExcIO &)
+  catch (const PathSearch::ExcFileNotFound&)
     {
       std::cerr << "ParameterHandler::read_input: could not open file <"
 		<< filename << "> for reading." << std::endl;
