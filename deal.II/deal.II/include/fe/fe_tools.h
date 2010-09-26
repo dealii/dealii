@@ -55,7 +55,7 @@ class ConstraintMatrix;
  * on each cell. Furthermore it provides the difference matrix
  * $id-I_h$ that is needed for evaluating $(id-I_h)z$ for e.g. the
  * dual solution $z$.
- * 
+ *
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
@@ -101,7 +101,7 @@ class FETools
 					  */
 	virtual ~FEFactoryBase();
     };
-    
+
 				     /**
 				      * A concrete class for factory
 				      * objects creating finite
@@ -115,7 +115,7 @@ class FETools
 				      * element class wishes to
 				      * interpret this number) given
 				      * as argument to get().
-				      * 
+				      *
 				      * @author Guido Kanschat, 2006
 				      */
     template <class FE>
@@ -129,7 +129,7 @@ class FETools
 	virtual FiniteElement<FE::dimension,FE::dimension>*
 	get (const unsigned int degree) const;
     };
-    
+
 				     /**
 				      * @warning In most cases, you
 				      * will probably want to use
@@ -185,7 +185,7 @@ class FETools
       std::vector<unsigned int>& renumbering,
       std::vector<unsigned int>& block_data,
       bool return_start_indices = true);
-    
+
 				     /**
 				      * @name Generation of local matrices
 				      * @{
@@ -210,7 +210,7 @@ class FETools
     get_interpolation_matrix(const FiniteElement<dim,spacedim> &fe1,
                              const FiniteElement<dim,spacedim> &fe2,
                              FullMatrix<number> &interpolation_matrix);
-    
+
 				     /**
 				      * Gives the interpolation matrix
 				      * that interpolates a @p fe1-
@@ -226,7 +226,7 @@ class FETools
 				      * space due to @p fe1 is not a subset of
 				      * the finite element space due to
 				      * @p fe2, as if it were a subset then
-				      * the @p interpolation_matrix would be 
+				      * the @p interpolation_matrix would be
 				      * only the unit matrix.
 				      */
     template <int dim, typename number, int spacedim>
@@ -269,7 +269,7 @@ class FETools
     static void get_projection_matrix(const FiniteElement<dim,spacedim> &fe1,
 				      const FiniteElement<dim,spacedim> &fe2,
 				      FullMatrix<number> &matrix);
-    
+
 				     /**
 				      * Compute the matrix of nodal
 				      * values of a finite element
@@ -316,7 +316,7 @@ class FETools
     template <int dim, int spacedim>
     static void compute_node_matrix(FullMatrix<double>& M,
 				    const FiniteElement<dim,spacedim>& fe);
-    
+
 				     /**
 				      * For all possible (isotropic
 				      * and anisotropic) refinement
@@ -726,14 +726,14 @@ class FETools
 
 
 				     /**
-				      * This method implements the 
+				      * This method implements the
 				      * FETools::compute_projection_from_quadrature_points_matrix
-				      * method for faces of a mesh. 
+				      * method for faces of a mesh.
 				      * The matrix that it returns, X, is face specific
 				      * and its size is fe.dofs_per_cell by
 				      * rhs_quadrature.size().
 				      * The dimension, dim must be larger than 1 for this class,
-				      * since Quadrature<dim-1> objects are required. See the 
+				      * since Quadrature<dim-1> objects are required. See the
 				      * documentation on the Quadrature class for more information.
 				      */
     template <int dim, int spacedim>
@@ -746,7 +746,7 @@ class FETools
 						unsigned int face,
 						FullMatrix<double>       &X);
 
-    
+
 
 				     //@}
 				     /**
@@ -820,7 +820,7 @@ class FETools
                  const InVector          &u1,
                  const DH2<dim,spacedim> &dof2,
                  OutVector               &u2);
-    
+
 				     /**
 				      * Gives the interpolation of a
 				      * the @p dof1-function @p u1 to
@@ -854,15 +854,15 @@ class FETools
 				      * at the DoF values on the
 				      * discontinuities.
 				      */
-    template <int dim, int spacedim, 
+    template <int dim, int spacedim,
               template <int, int> class DH1,
-              template <int, int> class DH2,              
+              template <int, int> class DH2,
               class InVector, class OutVector>
     static void interpolate (const DH1<dim,spacedim>  &dof1,
 			     const InVector           &u1,
 			     const DH2<dim,spacedim>  &dof2,
 			     const ConstraintMatrix   &constraints,
-			     OutVector&                u2);    
+			     OutVector&                u2);
 
 				     /**
 				      * Gives the interpolation of the
@@ -965,8 +965,8 @@ class FETools
     static void interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
 					 const InVector &z1,
 					 const FiniteElement<dim,spacedim> &fe2,
-					 OutVector &z1_difference);    
-    
+					 OutVector &z1_difference);
+
 				     /**
 				      * Gives $(Id-I_h)z_1$ for a given
 				      * @p dof1-function $z_1$, where $I_h$
@@ -991,7 +991,7 @@ class FETools
 					 const DoFHandler<dim,spacedim>&  dof2,
 					 const ConstraintMatrix& constraints2,
 					 OutVector&              z1_difference);
-    
+
 				     /**
 				      * $L^2$ projection for
 				      * discontinuous
@@ -1011,7 +1011,7 @@ class FETools
 			    const InVector&        u1,
 			    const DoFHandler<dim,spacedim>& dof2,
 			    OutVector&             u2);
-    
+
 				     /**
 				      * Gives the patchwise
 				      * extrapolation of a @p dof1
@@ -1030,7 +1030,7 @@ class FETools
 				      * does not satisfy continuity
 				      * requirements of the given
 				      * finite elements.
-				      * 
+				      *
 				      * When you use continuous
 				      * elements on grids with hanging
 				      * nodes, please use the
@@ -1051,7 +1051,7 @@ class FETools
     static void extrapolate (const DoFHandler<dim,spacedim>& dof1,
 			     const InVector&        z1,
 			     const DoFHandler<dim,spacedim>& dof2,
-			     OutVector&             z2);    
+			     OutVector&             z2);
 
 				     /**
 				      * Gives the patchwise
@@ -1078,7 +1078,7 @@ class FETools
 			     const InVector&         z1,
 			     const DoFHandler<dim,spacedim>&  dof2,
 			     const ConstraintMatrix& constraints,
-			     OutVector&              z2);    
+			     OutVector&              z2);
 				     //@}
 				     /**
 				      * The numbering of the degrees
@@ -1145,8 +1145,8 @@ class FETools
     template <int dim>
     static
     std::vector<unsigned int>
-    hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe_data);    
-    
+    hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe_data);
+
 				     /**
 				      * This is the reverse function
 				      * to the above one, generating
@@ -1171,7 +1171,7 @@ class FETools
     static
     std::vector<unsigned int>
     lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe_data);
-    
+
 				     /**
 				      * Parse the name of a finite
 				      * element and generate a finite
@@ -1229,7 +1229,7 @@ class FETools
 				      * make your own elements known
 				      * to this function, use the
 				      * add_fe_name() function.
-				      * This function does not work 
+				      * This function does not work
 				      * if one wants to get a codimension
 				      * 1 finite element.
 				      */
@@ -1289,7 +1289,7 @@ class FETools
 				      * destroy it later on. The
 				      * object will be deleted at the
 				      * end of the program's lifetime.
-				      * 
+				      *
 				      * If the name of the element
 				      * is already in use, an exception
 				      * is thrown. Thus, functionality
@@ -1324,7 +1324,7 @@ class FETools
     template <int dim, int spacedim>
     static void add_fe_name (const std::string& name,
 			     const FEFactoryBase<dim,spacedim>* factory);
-    
+
 				     /**
 				      * The string used for
 				      * get_fe_from_name() cannot be
@@ -1343,7 +1343,7 @@ class FETools
 		    std::string,
 		    << "Can't re-generate a finite element from the string '"
 		    << arg1 << "'.");
-    
+
 				     /**
 				      * The string used for
 				      * get_fe_from_name() cannot be
@@ -1369,7 +1369,7 @@ class FETools
 		    << " in the finite element string must match "
 		    << "the space dimension "
 		    << arg2 << ".");
-    
+
 				     /**
 				      * Exception
 				      *
@@ -1442,20 +1442,6 @@ class FETools
     DeclException2 (ExcNotGreaterThan,
 	           int,	int,
 		   << arg1 << " must be greater than " << arg2);
-
-  private:
-				     /**
-				      * Return a finite element that
-				      * is created using the beginning
-				      * of <tt>name</tt> and eat away
-				      * the part of <tt>name</tt>
-				      * defining this element.
-				      */
-    template <int dim, int spacedim>
-    static
-    FiniteElement<dim,spacedim> *
-    get_fe_from_name_aux (std::string &name);
-    
 };
 
 
