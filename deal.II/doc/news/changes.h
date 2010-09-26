@@ -281,6 +281,12 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
 
+  <li><p>Changed: FETools is now a namespace rather than a class with only
+  static member functions.
+  <br>
+  (WB 2010/09/25)
+  </p></li>
+
   <li><p>New: FE_DGVector implements discontinuous elements based on
   vector valued polynomial spaces.
   <br>
