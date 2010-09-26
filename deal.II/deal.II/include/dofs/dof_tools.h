@@ -1958,12 +1958,14 @@ class DoFTools
 
 /* ------------------------- explicit specializations -------------- */
 
+#ifndef DOXYGEN
+
 template <>
 void
 DoFTools::map_dof_to_boundary_indices (const DoFHandler<1,1>       &dof_handler,
                                        std::vector<unsigned int> &mapping);
 
-
+#endif
 
 /* ------------------------- inline functions -------------- */
 
