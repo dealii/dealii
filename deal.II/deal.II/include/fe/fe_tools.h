@@ -420,7 +420,7 @@ class FETools
 				      * used in computing constraint
 				      * matrices. It is not
 				      * sufficiently tested yet.
-				     */
+				      */
     template <int dim, typename number, int spacedim>
     static void
     compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
@@ -674,53 +674,53 @@ class FETools
                                                        const Quadrature<dim>    &quadrature,
                                                        FullMatrix<double>       &I_q);
 
-                                        /**
-                                         * Computes the projection of tensorial
-                                         * (first-order tensor)
-                                         * data stored at the quadrature points
-                                         * @p vector_of_tensors_at_qp
-                                         * to data @p vector_of_tensors_at_nodes
-                                         * at the support points of the cell.
-                                         * The data in
-                                         * @p vector_of_tensors_at_qp
-                                         * is ordered sequentially following the
-                                         * quadrature point numbering.
-                                         * The size of
-                                         * @p vector_of_tensors_at_qp
-                                         * must correspond to the number of columns
-                                         * of @p projection_matrix.
-                                         * The size of @p vector_of_tensors_at_nodes
-                                         * must correspond to the number of rows of
-                                         * @p vector_of_tensors_at_nodes .
-                                         * The projection matrix
-                                         * @p projection_matrix desribes the
-                                         * projection of scalar data from the
-                                         * quadrature points and can be obtained
-                                         * from the
-                                         * FETools::compute_projection_from_quadrature_points_matrix
-                                         * function.
-                                         */
-        template <int dim>
-        static
-        void
-        compute_projection_from_quadrature_points(
-                        const FullMatrix<double>    &projection_matrix,
-                        const std::vector< Tensor<1, dim > >    &vector_of_tensors_at_qp,
-                        std::vector< Tensor<1, dim > >          &vector_of_tensors_at_nodes);
+				     /**
+				      * Computes the projection of tensorial
+				      * (first-order tensor)
+				      * data stored at the quadrature points
+				      * @p vector_of_tensors_at_qp
+				      * to data @p vector_of_tensors_at_nodes
+				      * at the support points of the cell.
+				      * The data in
+				      * @p vector_of_tensors_at_qp
+				      * is ordered sequentially following the
+				      * quadrature point numbering.
+				      * The size of
+				      * @p vector_of_tensors_at_qp
+				      * must correspond to the number of columns
+				      * of @p projection_matrix.
+				      * The size of @p vector_of_tensors_at_nodes
+				      * must correspond to the number of rows of
+				      * @p vector_of_tensors_at_nodes .
+				      * The projection matrix
+				      * @p projection_matrix desribes the
+				      * projection of scalar data from the
+				      * quadrature points and can be obtained
+				      * from the
+				      * FETools::compute_projection_from_quadrature_points_matrix
+				      * function.
+				      */
+    template <int dim>
+    static
+    void
+    compute_projection_from_quadrature_points(
+      const FullMatrix<double>    &projection_matrix,
+      const std::vector< Tensor<1, dim > >    &vector_of_tensors_at_qp,
+      std::vector< Tensor<1, dim > >          &vector_of_tensors_at_nodes);
 
 
 
-                                        /**
-                                         * same as last function but for a
-                                         * @p SymmetricTensor .
-                                         */
-        template <int dim>
-        static
-        void
-        compute_projection_from_quadrature_points(
-                        const FullMatrix<double>    &projection_matrix,
-                        const std::vector< SymmetricTensor<2, dim > >   &vector_of_tensors_at_qp,
-                        std::vector< SymmetricTensor<2, dim > >         &vector_of_tensors_at_nodes);
+				     /**
+				      * same as last function but for a
+				      * @p SymmetricTensor .
+				      */
+    template <int dim>
+    static
+    void
+    compute_projection_from_quadrature_points(
+      const FullMatrix<double>    &projection_matrix,
+      const std::vector< SymmetricTensor<2, dim > >   &vector_of_tensors_at_qp,
+      std::vector< SymmetricTensor<2, dim > >         &vector_of_tensors_at_nodes);
 
 
 
@@ -740,11 +740,11 @@ class FETools
     static
     void
     compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, spacedim> &fe,
-						const Quadrature<dim-1>    &lhs_quadrature,
-						const Quadrature<dim-1>    &rhs_quadrature,
-						const typename DoFHandler<dim, spacedim>::active_cell_iterator & cell,
-						unsigned int face,
-						FullMatrix<double>       &X);
+							   const Quadrature<dim-1>    &lhs_quadrature,
+							   const Quadrature<dim-1>    &rhs_quadrature,
+							   const typename DoFHandler<dim, spacedim>::active_cell_iterator & cell,
+							   unsigned int face,
+							   FullMatrix<double>       &X);
 
 
 
@@ -855,9 +855,9 @@ class FETools
 				      * discontinuities.
 				      */
     template <int dim, int spacedim,
-              template <int, int> class DH1,
-              template <int, int> class DH2,
-              class InVector, class OutVector>
+	      template <int, int> class DH1,
+	      template <int, int> class DH2,
+	      class InVector, class OutVector>
     static void interpolate (const DH1<dim,spacedim>  &dof1,
 			     const InVector           &u1,
 			     const DH2<dim,spacedim>  &dof2,
@@ -896,21 +896,21 @@ class FETools
 				  const FiniteElement<dim,spacedim> &fe2,
 				  OutVector                &u1_interpolated);
 
-                                     /**
-                                      * Same as last function, except
-                                      * that the dof handler objects
-                                      * might be of type
-                                      * @p hp::DoFHandler.
-                                      */
+				     /**
+				      * Same as last function, except
+				      * that the dof handler objects
+				      * might be of type
+				      * @p hp::DoFHandler.
+				      */
     template <int dim,
-              template <int> class DH,
-              class InVector, class OutVector, int spacedim>
+	      template <int> class DH,
+	      class InVector, class OutVector, int spacedim>
     static void back_interpolate (const DH<dim>            &dof1,
 				  const InVector           &u1,
 				  const FiniteElement<dim,spacedim> &fe2,
 				  OutVector                &u1_interpolated);
 
-                                     /**
+				     /**
 				      * Gives the interpolation of the
 				      * @p dof1-function @p u1 to a
 				      * @p dof2-function, and
@@ -1377,12 +1377,12 @@ class FETools
 				      */
     DeclException0 (ExcInvalidFE);
 
-                                     /**
-                                      * The finite element must be
+				     /**
+				      * The finite element must be
 				      * @ref GlossPrimitive "primitive".
 				      *
 				      * @ingroup Exceptions
-                                      */
+				      */
     DeclException0 (ExcFENotPrimitive);
 				     /**
 				      * Exception
@@ -1440,8 +1440,8 @@ class FETools
 				      * @ingroup Exceptions
 				      */
     DeclException2 (ExcNotGreaterThan,
-	           int,	int,
-		   << arg1 << " must be greater than " << arg2);
+		    int,	int,
+		    << arg1 << " must be greater than " << arg2);
 };
 
 
