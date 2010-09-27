@@ -125,6 +125,7 @@ class MGConstrainedDoFs : public Subscriptor
 				      */
 
     bool set_boundary_values () const;
+    bool continuity_across_edges () const;
   private:
 
 				     /**
@@ -278,6 +279,20 @@ MGConstrainedDoFs::set_boundary_values () const
   return boundary_values_need_to_be_set;
 }
 
+inline
+bool 
+MGConstrainedDoFs::continuity_across_edges () const
+{
+  bool is_continuous = false;
+  for(unsigned int l=0; l<refinement_edge_indices.size(); ++l)
+    for(unsigned int i=0; i<refinement_edge_indices[l].size(); ++i)
+      if(refinement_edge_indices[l][i])
+      {
+        is_continuous = true;
+        return is_continuous;
+      }
+  return is_continuous;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

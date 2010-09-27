@@ -644,15 +644,28 @@ namespace MeshWorker
 					  * Assemble a single matrix
 					  * into a global matrix.
 					  */
-    void assemble_transpose(MATRIX& G,
+
+    void assemble_up(MATRIX& G,
 			    const FullMatrix<double>& M,
 			    const std::vector<unsigned int>& i1,
-			    const std::vector<unsigned int>& i2);
+			    const std::vector<unsigned int>& i2,
+                            const unsigned int level = -1);
+					 /**
+					  * Assemble a single matrix
+					  * into a global matrix.
+					  */
+
+    void assemble_down(MATRIX& G,
+			    const FullMatrix<double>& M,
+			    const std::vector<unsigned int>& i1,
+			    const std::vector<unsigned int>& i2,
+                            const unsigned int level = -1);
 
 					 /**
 					  * Assemble a single matrix
 					  * into a global matrix.
 					  */
+
     void assemble_in(MATRIX& G,
 		  const FullMatrix<double>& M,
 		  const std::vector<unsigned int>& i1,
@@ -663,6 +676,7 @@ namespace MeshWorker
 					  * Assemble a single matrix
 					  * into a global matrix.
 					  */
+
     void assemble_out(MATRIX& G,
 		  const FullMatrix<double>& M,
 		  const std::vector<unsigned int>& i1,
@@ -1002,14 +1016,14 @@ namespace MeshWorker
 					  * the fine and the coarse
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> interface_down;
+	std::vector<MatrixPtr> interface_out;
 	
 					 /**
 					  * The interface matrix between
 					  * the coarse and the fine
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> interface_up;	
+	std::vector<MatrixPtr> interface_in;	
       
       /**
        * A pointer to the object containing the block structure.
@@ -1562,19 +1576,72 @@ namespace MeshWorker
     
     template <class MATRIX>
     inline void
-    MGMatrixSimple<MATRIX>::assemble_transpose(
+    MGMatrixSimple<MATRIX>::assemble_up(
       MATRIX& G,
       const FullMatrix<double>& M,
       const std::vector<unsigned int>& i1,
-      const std::vector<unsigned int>& i2)
+      const std::vector<unsigned int>& i2,
+      const unsigned int level)
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
       
-      for (unsigned int j=0; j<i1.size(); ++j)
-	for (unsigned int k=0; k<i2.size(); ++k)
-	  if (std::fabs(M(k,j)) >= threshold)
-	    G.add(i1[j], i2[k], M(k,j));
+      if(mg_constrained_dofs == 0)
+      {
+        for (unsigned int j=0; j<i1.size(); ++j)
+          for (unsigned int k=0; k<i2.size(); ++k)
+            if (std::fabs(M(k,j)) >= threshold)
+              G.add(i1[j], i2[k], M(k,j));
+      }
+      else
+      {
+        for (unsigned int j=0; j<i1.size(); ++j)
+          for (unsigned int k=0; k<i2.size(); ++k)
+            if (std::fabs(M(k,j)) >= threshold)
+            {
+              if(!mg_constrained_dofs->at_refinement_edge(level, i1[j]) ||
+                  mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+              {
+                if(!mg_constrained_dofs->continuity_across_edges())
+                  G.add(i1[j], i2[k], M(k,j));
+              }
+            }
+      }
+    }
+
+    template <class MATRIX>
+    inline void
+    MGMatrixSimple<MATRIX>::assemble_down(
+      MATRIX& G,
+      const FullMatrix<double>& M,
+      const std::vector<unsigned int>& i1,
+      const std::vector<unsigned int>& i2,
+      const unsigned int level)
+    {
+      AssertDimension(M.m(), i1.size());
+      AssertDimension(M.n(), i2.size());
+      
+      if(mg_constrained_dofs == 0)
+      {
+        for (unsigned int j=0; j<i1.size(); ++j)
+          for (unsigned int k=0; k<i2.size(); ++k)
+            if (std::fabs(M(j,k)) >= threshold)
+              G.add(i1[j], i2[k], M(j,k));
+      }
+      else
+      {
+        for (unsigned int j=0; j<i1.size(); ++j)
+          for (unsigned int k=0; k<i2.size(); ++k)
+            if (std::fabs(M(j,k)) >= threshold)
+            {
+              if(!mg_constrained_dofs->at_refinement_edge(level, i1[j]) ||
+                  mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+              {
+                if(!mg_constrained_dofs->continuity_across_edges())
+                  G.add(i1[j], i2[k], M(j,k));
+              }
+            }
+      }
     }
 
     template <class MATRIX>
@@ -1615,7 +1682,7 @@ namespace MeshWorker
                     G.add(i1[j], i2[k], M(j,k));
                 }
                 else
-                    G.add(i1[j], i2[k], M(j,k));
+                  G.add(i1[j], i2[k], M(j,k));
               }
       }
     }
@@ -1671,10 +1738,12 @@ namespace MeshWorker
     {
       const unsigned int level = info.cell->level();
       assemble((*matrix)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
+
       if(mg_constrained_dofs != 0)
+      //if(interface_in != 0 && interface_out != 0 && level>0)
       {
-        assemble_out((*interface_out)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
         assemble_in((*interface_in)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
+        assemble_out((*interface_out)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
       }
     }
     
@@ -1712,8 +1781,13 @@ namespace MeshWorker
 					   // which is done by
 					   // the coarser cell
           assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
-          assemble_transpose((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices);
-          assemble((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
+          //assemble_transpose((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices);
+          //assemble((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
+          if(level1>0)
+          {
+          assemble_up((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+          assemble_down((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+          }
 	}
     }
     

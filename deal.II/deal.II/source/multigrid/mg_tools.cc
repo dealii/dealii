@@ -1495,6 +1495,9 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
       std::fill (cell_dofs.begin(), cell_dofs.end(), false);
       std::fill (boundary_cell_dofs.begin(), boundary_cell_dofs.end(), false);
 
+      if(fe.conforms(FiniteElementData<dim>::H1))
+      {
+        deallog << "conforms H1" << std::endl;
       for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
 	{
 	  const typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_nr);
@@ -1509,7 +1512,7 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 	      if (neighbor->level() < cell->level())
 		{
 		  for (unsigned int j=0; j<dofs_per_face; ++j)
-		    cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+                      cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
 
 		  has_coarser_neighbor = true;
 		}
@@ -1535,6 +1538,7 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 	  if (boundary_cell_dofs[i])
 	    boundary_interface_dofs[level][local_dof_indices[i]] = true;
 	}
+    }
     }
 }
 
