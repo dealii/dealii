@@ -102,8 +102,8 @@ BlockSparsityPatternBase<SparsityPatternBase> &
 BlockSparsityPatternBase<SparsityPatternBase>::
 operator = (const BlockSparsityPatternBase<SparsityPatternBase> &bsp)
 {
-  Assert (rows == bsp.rows, ExcIncompatibleSizes(rows, bsp.rows));
-  Assert (columns == bsp.columns, ExcIncompatibleSizes(columns, bsp.columns));
+  Assert (rows == bsp.rows, ExcDimensionMismatch(rows, bsp.rows));
+  Assert (columns == bsp.columns, ExcDimensionMismatch(columns, bsp.columns));
 				   // copy objects
   for (unsigned int i=0; i<rows; ++i)
     for (unsigned int j=0; j<columns; ++j)

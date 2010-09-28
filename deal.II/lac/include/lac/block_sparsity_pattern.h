@@ -400,13 +400,6 @@ class BlockSparsityPatternBase : public Subscriptor
 				     /**
 				      * Exception
 				      */
-    DeclException2 (ExcIncompatibleSizes,
-		    int, int,
-		    << "The number of blocks " << arg1 << " and " << arg2
-		    << " are different.");
-				     /**
-				      * Exception
-				      */
     DeclException0 (ExcInvalidConstructorCall);
 				     //@}
 
