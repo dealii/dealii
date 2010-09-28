@@ -1497,7 +1497,6 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 
       if(fe.conforms(FiniteElementData<dim>::H1))
       {
-        deallog << "conforms H1" << std::endl;
       for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
 	{
 	  const typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_nr);
