@@ -1523,10 +1523,23 @@ namespace MeshWorker
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
       
+      if(mg_constrained_dofs == 0)
+      {
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
               G.add(i1[j], i2[k], M(j,k));
+      }
+      else
+      {
+        for (unsigned int j=0; j<i1.size(); ++j)
+          for (unsigned int k=0; k<i2.size(); ++k)
+            if (std::fabs(M(j,k)) >= threshold)
+            {
+                if(!mg_constrained_dofs->continuity_across_refinement_edges())
+                  G.add(i1[j], i2[k], M(j,k));
+            }
+      }
     }
 
 
@@ -1598,14 +1611,9 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(k,j)) >= threshold)
-            {
-              if(!mg_constrained_dofs->at_refinement_edge(level, i1[j]) ||
-                  mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-              {
-                if(!mg_constrained_dofs->continuity_across_edges())
-                  G.add(i1[j], i2[k], M(k,j));
-              }
-            }
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                  !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
+                G.add(i1[j], i2[k], M(k,j));
       }
     }
 
@@ -1633,14 +1641,9 @@ namespace MeshWorker
         for (unsigned int j=0; j<i1.size(); ++j)
           for (unsigned int k=0; k<i2.size(); ++k)
             if (std::fabs(M(j,k)) >= threshold)
-            {
-              if(!mg_constrained_dofs->at_refinement_edge(level, i1[j]) ||
-                  mg_constrained_dofs->at_refinement_edge(level, i2[k]))
-              {
-                if(!mg_constrained_dofs->continuity_across_edges())
+              if(mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
+                  !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   G.add(i1[j], i2[k], M(j,k));
-              }
-            }
       }
     }
 
@@ -1740,7 +1743,6 @@ namespace MeshWorker
       assemble((*matrix)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
 
       if(mg_constrained_dofs != 0)
-      //if(interface_in != 0 && interface_out != 0 && level>0)
       {
         assemble_in((*interface_in)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
         assemble_out((*interface_out)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);

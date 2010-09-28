@@ -125,7 +125,12 @@ class MGConstrainedDoFs : public Subscriptor
 				      */
 
     bool set_boundary_values () const;
-    bool continuity_across_edges () const;
+
+				     /**
+				      * Return if the finite element requires 
+                                      * continuity across refinement edges.
+                                      */
+    bool continuity_across_refinement_edges () const;
   private:
 
 				     /**
@@ -281,7 +286,7 @@ MGConstrainedDoFs::set_boundary_values () const
 
 inline
 bool 
-MGConstrainedDoFs::continuity_across_edges () const
+MGConstrainedDoFs::continuity_across_refinement_edges () const
 {
   bool is_continuous = false;
   for(unsigned int l=0; l<refinement_edge_indices.size(); ++l)
