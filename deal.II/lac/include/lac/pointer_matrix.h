@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,17 @@
 DEAL_II_NAMESPACE_OPEN
 
 template<class VECTOR> class VectorMemory;
+
+class IdentityMatrix;
+template <typename number> class FullMatrix;
+template <typename number> class LAPACKFullMatrix;
+template <typename number> class SparseMatrix;
+template <typename number> class BlockSparseMatrix;
+template <typename number> class SparseMatrixEZ;
+template <typename number> class BlockSparseMatrixEZ;
+template <typename number> class BlockMatrixArray;
+template <typename number> class TridiagonalMatrix;
+
 
 /*! @addtogroup Matrix2
  *@{
@@ -53,7 +64,7 @@ class PointerMatrixBase : public Subscriptor
 				      * BlockMatrixArray.
 				      */
     typedef typename VECTOR::value_type value_type;
-    
+
 				     /**
 				      * Virtual destructor.  Does
 				      * nothing except making sure that
@@ -67,63 +78,63 @@ class PointerMatrixBase : public Subscriptor
 				      * matrix pointed to.
 				      */
     virtual void clear () = 0;
-    
+
 				     /**
 				      * Find out if two matrices point
 				      * to the same object.
 				      */
     bool operator == (const PointerMatrixBase<VECTOR>&) const;
-    
+
 				     /**
 				      * Find out if two matrices do
 				      * not point to the same object.
 				      */
     bool operator != (const PointerMatrixBase<VECTOR>&) const;
-    
+
 				     /**
 				      * Find out if this pointer is
 				      * less.
 				      */
     bool operator < (const PointerMatrixBase<VECTOR>&) const;
-    
+
 				     /**
 				      * Find out if this pointer is
 				      * less or equal.
 				      */
     bool operator <= (const PointerMatrixBase<VECTOR>&) const;
-    
+
 				     /**
 				      * Find out if this pointer is
 				      * greater.
 				      */
     bool operator > (const PointerMatrixBase<VECTOR>&) const;
-    
+
 				     /**
 				      * Find out if this pointer is
 				      * greater or equal.
 				      */
     bool operator >= (const PointerMatrixBase<VECTOR>&) const;
-    
-    
+
+
 				     /**
 				      * Matrix-vector product.
 				      */
     virtual void vmult (VECTOR& dst,
 			const VECTOR& src) const = 0;
-    
+
 				     /**
 				      * Tranposed matrix-vector product.
 				      */
     virtual void Tvmult (VECTOR& dst,
 			 const VECTOR& src) const = 0;
-    
+
 				     /**
 				      * Matrix-vector product, adding to
 				      * <tt>dst</tt>.
 				      */
     virtual void vmult_add (VECTOR& dst,
 			    const VECTOR& src) const = 0;
-    
+
 				     /**
 				      * Tranposed matrix-vector product,
 				      * adding to <tt>dst</tt>.
@@ -170,7 +181,7 @@ class PointerMatrix : public PointerMatrixBase<VECTOR>
 				      * SmartPointer for this object.
 				      */
     PointerMatrix(const char* name);
-    
+
 				     /**
 				      * Constructor. <tt>M</tt> points
 				      * to a matrix which must live
@@ -185,13 +196,13 @@ class PointerMatrix : public PointerMatrixBase<VECTOR>
 
 				     // Use doc from base class
     virtual void clear();
-    
+
 				     /**
 				      * Return whether the object is
-				      * empty. 
+				      * empty.
 				      */
     bool empty () const;
-    
+
 				     /**
 				      * Assign a new matrix
 				      * pointer. Deletes the old pointer
@@ -199,33 +210,33 @@ class PointerMatrix : public PointerMatrixBase<VECTOR>
 				      * @see SmartPointer
 				      */
     const PointerMatrix& operator= (const MATRIX* M);
-    
+
 				     /**
 				      * Matrix-vector product.
 				      */
     virtual void vmult (VECTOR& dst,
 			const VECTOR& src) const;
-    
+
 				     /**
 				      * Tranposed matrix-vector product.
 				      */
     virtual void Tvmult (VECTOR& dst,
 			 const VECTOR& src) const;
-    
+
 				     /**
 				      * Matrix-vector product, adding to
 				      * <tt>dst</tt>.
 				      */
     virtual void vmult_add (VECTOR& dst,
 			    const VECTOR& src) const;
-    
+
 				     /**
 				      * Tranposed matrix-vector product,
 				      * adding to <tt>dst</tt>.
 				      */
     virtual void Tvmult_add (VECTOR& dst,
 			     const VECTOR& src) const;
-    
+
   private:
 				     /**
 				      * Return the address of the
@@ -300,10 +311,10 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 
 				     // Use doc from base class
     virtual void clear();
-    
+
 				     /**
 				      * Return whether the object is
-				      * empty. 
+				      * empty.
 				      */
     bool empty () const;
 
@@ -313,7 +324,7 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * vectors.
 				      */
     void set_memory(VectorMemory<VECTOR>* mem);
-    
+
 				     /**
 				      * Assign a new matrix
 				      * pointer. Deletes the old pointer
@@ -321,33 +332,33 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * @see SmartPointer
 				      */
     const PointerMatrixAux& operator= (const MATRIX* M);
-    
+
 				     /**
 				      * Matrix-vector product.
 				      */
     virtual void vmult (VECTOR& dst,
 			const VECTOR& src) const;
-    
+
 				     /**
 				      * Tranposed matrix-vector product.
 				      */
     virtual void Tvmult (VECTOR& dst,
 			 const VECTOR& src) const;
-    
+
 				     /**
 				      * Matrix-vector product, adding to
 				      * <tt>dst</tt>.
 				      */
     virtual void vmult_add (VECTOR& dst,
 			    const VECTOR& src) const;
-    
+
 				     /**
 				      * Tranposed matrix-vector product,
 				      * adding to <tt>dst</tt>.
 				      */
     virtual void Tvmult_add (VECTOR& dst,
 			     const VECTOR& src) const;
-    
+
   private:
 				     /**
 				      * Return the address of the
@@ -365,7 +376,7 @@ class PointerMatrixAux : public PointerMatrixBase<VECTOR>
 				      * auxiliary vector.
 				      */
     mutable SmartPointer<VectorMemory<VECTOR>,PointerMatrixAux<MATRIX,VECTOR> > mem;
-    
+
 				     /**
 				      * The pointer to the actual matrix.
 				      */
@@ -407,7 +418,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      * SmartPointer for this object.
 				      */
     PointerMatrixVector (const char* name);
-    
+
 				     /**
 				      * Constructor. <tt>M</tt> points
 				      * to a matrix which must live
@@ -422,13 +433,13 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 
 				     // Use doc from base class
     virtual void clear();
-    
+
 				     /**
 				      * Return whether the object is
-				      * empty. 
+				      * empty.
 				      */
     bool empty () const;
-    
+
 				     /**
 				      * Assign a new matrix
 				      * pointer. Deletes the old pointer
@@ -436,7 +447,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      * @see SmartPointer
 				      */
     const PointerMatrixVector& operator= (const Vector<number>* M);
-    
+
 				     /**
 				      * Matrix-vector product,
 				      * actually the scalar product of
@@ -451,7 +462,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      */
     virtual void vmult (Vector<number>& dst,
 			const Vector<number>& src) const;
-    
+
 				     /**
 				      * Tranposed matrix-vector
 				      * product, actually the
@@ -467,7 +478,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      */
     virtual void Tvmult (Vector<number>& dst,
 			 const Vector<number>& src) const;
-    
+
 				     /**
 				      * Matrix-vector product, adding to
 				      * <tt>dst</tt>.
@@ -480,7 +491,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      */
     virtual void vmult_add (Vector<number>& dst,
 			    const Vector<number>& src) const;
-    
+
 				     /**
 				      * Tranposed matrix-vector product,
 				      * adding to <tt>dst</tt>.
@@ -493,7 +504,7 @@ class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 				      */
     virtual void Tvmult_add (Vector<number>& dst,
 			     const Vector<number>& src) const;
-    
+
   private:
 				     /**
 				      * Return the address of the
@@ -535,16 +546,6 @@ new_pointer_matrix_base(MATRIX& matrix, const VECTOR&, const char* name = "Point
 {
   return new PointerMatrixAux<MATRIX, VECTOR>(0, &matrix, name);
 }
-
-class IdentityMatrix;
-template <typename number> class FullMatrix;
-template <typename number> class LAPACKFullMatrix;
-template <typename number> class SparseMatrix;
-template <typename number> class BlockSparseMatrix;
-template <typename number> class SparseMatrixEZ;
-template <typename number> class BlockSparseMatrixEZ;
-template <typename number> class BlockMatrixArray;
-template <typename number> class TridiagonalMatrix;
 
 /**
  * Specialized version for IdentityMatrix.
@@ -677,7 +678,7 @@ new_pointer_matrix_base(const TridiagonalMatrix<numberm>& matrix, const Vector<n
 //---------------------------------------------------------------------------
 
 template<class VECTOR>
-inline 
+inline
 PointerMatrixBase<VECTOR>::~PointerMatrixBase ()
 {}
 
@@ -1037,7 +1038,7 @@ PointerMatrixVector<number>::vmult (
 {
   Assert (m != 0, ExcNotInitialized());
   Assert (dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
-  
+
   dst(0) = *m * src;
 }
 
@@ -1050,7 +1051,7 @@ PointerMatrixVector<number>::Tvmult (
 {
   Assert (m != 0, ExcNotInitialized());
   Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
-  
+
   dst.equ (src(0), *m);
 }
 
@@ -1063,7 +1064,7 @@ PointerMatrixVector<number>::vmult_add (
 {
   Assert (m != 0, ExcNotInitialized());
   Assert (dst.size() == 1, ExcDimensionMismatch(dst.size(), 1));
-  
+
   dst(0) += *m * src;
 }
 
@@ -1076,7 +1077,7 @@ PointerMatrixVector<number>::Tvmult_add (
 {
   Assert (m != 0, ExcNotInitialized());
   Assert(src.size() == 1, ExcDimensionMismatch(src.size(), 1));
-  
+
   dst.add (src(0), *m);
 }
 
