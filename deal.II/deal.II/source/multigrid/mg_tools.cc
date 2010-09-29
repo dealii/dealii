@@ -1479,9 +1479,6 @@ extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
   const unsigned int   dofs_per_face   = fe.dofs_per_face;
 
-
-  deallog << "dofs_per_face" << dofs_per_face << std::endl;
-
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
   std::vector<unsigned int> face_dof_indices (dofs_per_face);
 
