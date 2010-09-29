@@ -27,6 +27,19 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+template <class MATRIX> class MatrixBlock;
+
+namespace internal
+{
+  template <class MATRIX>
+  void
+  reinit(MatrixBlock<MATRIX>& v, const BlockSparsityPattern& p);
+
+  template <typename number>
+  void
+  reinit(MatrixBlock<dealii::SparseMatrix<number> >&, const BlockSparsityPattern&);
+}
+
 /**
  * A wrapper around a matrix object, storing the coordinates in a
  * block matrix as well.
@@ -72,6 +85,10 @@ DEAL_II_NAMESPACE_OPEN
  * Here, we have not gained very much, except that we do not need to
  * set up empty blocks in the block system.
  *
+ * @note This class expects, that the row and column BlockIndices
+ * objects for the system are equal. If they are not, some functions
+ * will throw ExcNotImplemented.
+ *
  * @todo Example for the product preconditioner of the pressure Schur
  * complement.
  *
@@ -82,6 +99,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <class MATRIX>
 class MatrixBlock
+  : public Subscriptor
 {
   public:
 				     /**
@@ -101,9 +119,22 @@ class MatrixBlock
 				      * initializing the matrix.
 				      */
 
-    MatrixBlock(unsigned int i, unsigned int j,
-		const BlockIndices* block_indices = 0);
+    MatrixBlock(unsigned int i, unsigned int j);
 
+				     /**
+				      * Reinitialize the matrix for a
+				      * new BlockSparsityPattern. This
+				      * adujusts the #matrix as well
+				      * as the #block_indices.
+				      *
+				      * @note The row and column block
+				      * structure of the sparsity
+				      * pattern must be equal.
+				      */
+    void reinit(const BlockSparsityPattern& sparsity);
+    
+    operator MATRIX() const;
+    
 				     /**
 				      * Add <tt>value</tt> to the
 				      * element (<i>i,j</i>). Throws
@@ -327,7 +358,7 @@ class MatrixBlock
 				      * The matrix itself
 				      */
     MATRIX matrix;
-
+  private:
 				     /**
 				      * The BlockIndices of the whole
 				      * system. Using row() and
@@ -336,7 +367,9 @@ class MatrixBlock
 				      * row and column degrees of
 				      * freedom for this block.
 				      */
-    SmartPointer<const BlockIndices, MatrixBlock<MATRIX> > block_indices;
+    BlockIndices block_indices;
+    
+    friend void internal::reinit<>(MatrixBlock<MATRIX>&, const BlockSparsityPattern&);
 };
 
 
@@ -358,9 +391,7 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
 				      * position <tt>(row,column)</tt>
 				      * in the block system.
 				      */
-    void add(unsigned int row, unsigned int column,
-	     const std::string& name,
-	     const BlockIndices* block_indices);
+    void add(unsigned int row, unsigned int column, const std::string& name);
 
 				     /**
 				      * For matrices using a
@@ -370,6 +401,25 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
 				      * pattern from the block system.
 				      */
     void reinit(const BlockSparsityPattern& sparsity);
+    
+				     /**
+				      * Clears the object.
+				      *
+				      * Since often only clearing of
+				      * the individual matrices is
+				      * desired, but not removing the
+				      * blocks themselves, there is an
+				      * optional argument. If the
+				      * argument is missing or @p
+				      * false, all matrices will be
+				      * mepty, but the size of this
+				      * object and the block positions
+				      * will not change. If @p
+				      * really_clean is @p true, then
+				      * the object will contain no
+				      * blocks at the end.
+				      */
+    void clear (bool really_clean = false);
     
 				     /**
 				      * The memory used by this object.
@@ -409,7 +459,8 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <class MATRIX>
-class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > > >
+class MGMatrixBlockVector
+  : public NamedData<std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > > >
 {
   public:
 				     /**
@@ -419,15 +470,10 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MGLevelObject
 				      * argument allows to give the
 				      * matrix a name for later
 				      * identification.
-				      *
-				      * @deprecated The final
-				      * argument is ignored and will
-				      * be removed in a future release.
 				      */
     void add(unsigned int row, unsigned int column,
-	     const std::string& name,
-	     const BlockIndices* block_indices = 0);
-
+	     const std::string& name);
+    
 				     /**
 				      * For matrices using a
 				      * SparsityPattern, this function
@@ -436,6 +482,26 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MGLevelObject
 				      * pattern from the block system.
 				      */
     void reinit(const MGLevelObject<BlockSparsityPattern>& sparsity);
+    
+				     /**
+				      * Clears the object.
+				      *
+				      * Since often only clearing of
+				      * the individual matrices is
+				      * desired, but not removing the
+				      * blocks themselves, there is an
+				      * optional argument. If the
+				      * argument is missing or @p
+				      * false, all matrices will be
+				      * mepty, but the size of this
+				      * object and the block positions
+				      * will not change. If @p
+				      * really_clean is @p true, then
+				      * the object will contain no
+				      * blocks at the end.
+				      */
+    void clear (bool really_clean = false);
+    
 				     /**
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
@@ -452,15 +518,6 @@ class MGMatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MGLevelObject
 				      * The memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
-				     /**
-				      * Access the matrix at position
-				      * <i>i</i> for read and write
-				      * access.
-				      */
-    MATRIX& matrix(unsigned int i);
-
-
 };
 
 
@@ -470,40 +527,23 @@ namespace internal
 {
   template <class MATRIX>
   void
-  reinit(MatrixBlockVector<MATRIX>&, const BlockSparsityPattern&)
+  reinit(MatrixBlock<MATRIX>& v, const BlockSparsityPattern& p)
   {
-    Assert(false, ExcNotImplemented());
+    Assert(p.get_row_indices() == p.get_column_indices(), ExcNotImplemented());
+    v.block_indices = p.get_row_indices();
   }
 
   
   template <typename number>
   void
-  reinit(MatrixBlockVector<dealii::SparseMatrix<number> >& v, const BlockSparsityPattern& p)
+  reinit(MatrixBlock<dealii::SparseMatrix<number> >& v, const BlockSparsityPattern& p)
   {
-    for (unsigned int i=0;i<v.size();++i)
-      v(i)->matrix.reinit(p.block(v(i)->row, v(i)->column));
+    Assert(p.get_row_indices() == p.get_column_indices(), ExcNotImplemented());
+    v.block_indices = p.get_row_indices();
+    v.matrix.reinit(p.block(v.row, v.column));
   }
-
-
-  template <class MATRIX>
-  void
-  reinit(MGMatrixBlockVector<MATRIX>&, const MGLevelObject<BlockSparsityPattern>&)
-  {
-    Assert(false, ExcNotImplemented());
-  }
-  
-  
-  template <typename number>
-  void
-  reinit(MGMatrixBlockVector<dealii::SparseMatrix<number> >& v,
-	 const MGLevelObject<BlockSparsityPattern>& sparsity)
-  {
-    for (unsigned int i=0;i<v.size();++i)
-      for (unsigned int level=sparsity.min_level(); level <= sparsity.max_level();++level)
-	v(i)->matrix[level].reinit(sparsity[level].block(v(i)->row, v(i)->column));
-  }
-  
 }
+
 
 template <class MATRIX>
 inline
@@ -518,6 +558,7 @@ template <class MATRIX>
 inline
 MatrixBlock<MATRIX>::MatrixBlock(const MatrixBlock<MATRIX>& M)
 		:
+		Subscriptor(),
 		row(M.row),
 		column(M.column),
 		matrix(M.matrix),
@@ -527,11 +568,27 @@ MatrixBlock<MATRIX>::MatrixBlock(const MatrixBlock<MATRIX>& M)
 
 template <class MATRIX>
 inline
-MatrixBlock<MATRIX>::MatrixBlock(unsigned int i, unsigned int j,
-				 const BlockIndices* block_indices)
+MatrixBlock<MATRIX>::MatrixBlock(unsigned int i, unsigned int j)
 		:
-		row(i), column(j), block_indices(block_indices)
+		row(i), column(j)
 {}
+
+
+template <class MATRIX>
+inline
+void
+MatrixBlock<MATRIX>::reinit(const BlockSparsityPattern& sparsity)
+{
+  internal::reinit(*this, sparsity);
+}
+
+
+template <class MATRIX>
+inline
+MatrixBlock<MATRIX>::operator MATRIX() const
+{
+  return matrix;
+}
 
 
 template <class MATRIX>
@@ -541,12 +598,12 @@ MatrixBlock<MATRIX>::add (
   const unsigned int gj,
   const typename MATRIX::value_type value)
 {
-  Assert(block_indices != 0, ExcNotInitialized());
+  Assert(block_indices.size() != 0, ExcNotInitialized());
 
   const std::pair<unsigned int, unsigned int> bi
-    = block_indices->global_to_local(gi);
+    = block_indices.global_to_local(gi);
   const std::pair<unsigned int, unsigned int> bj
-    = block_indices->global_to_local(gj);
+    = block_indices.global_to_local(gj);
 
   Assert (bi.first == row, ExcBlockIndexMismatch(bi.first, row));
   Assert (bj.first == column, ExcBlockIndexMismatch(bj.first, column));
@@ -564,7 +621,7 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         row_indices,
 				  const FullMatrix<number>&        values,
 				  const bool                       elide_zero_values)
 {
-  Assert(block_indices != 0, ExcNotInitialized());
+  Assert(block_indices.size() != 0, ExcNotInitialized());
 
   AssertDimension (row_indices.size(), values.m());
   AssertDimension (col_indices.size(), values.n());
@@ -586,9 +643,9 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
 			  const bool,
 			  const bool)
 {
-  Assert(block_indices != 0, ExcNotInitialized());
+  Assert(block_indices.size() != 0, ExcNotInitialized());
   const std::pair<unsigned int, unsigned int> bi
-    = block_indices->global_to_local(b_row);
+    = block_indices.global_to_local(b_row);
 
 				   // In debug mode, we check whether
 				   // all indices are in the correct
@@ -604,7 +661,7 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
   for (unsigned int j=0;j<n_cols;++j)
     {
       const std::pair<unsigned int, unsigned int> bj
-	= block_indices->global_to_local(col_indices[j]);
+	= block_indices.global_to_local(col_indices[j]);
       Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
 
       matrix.add(bi.second, bj.second, values[j]);
@@ -621,7 +678,7 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int> &indices,
 			  const FullMatrix<number>        &values,
 			  const bool                       elide_zero_values)
 {
-  Assert(block_indices != 0, ExcNotInitialized());
+  Assert(block_indices.size() != 0, ExcNotInitialized());
 
   AssertDimension (indices.size(), values.m());
   Assert (values.n() == values.m(), ExcNotQuadratic());
@@ -642,7 +699,7 @@ MatrixBlock<MATRIX>::add (const unsigned int               row,
 			  const std::vector<number>       &values,
 			  const bool                       elide_zero_values)
 {
-  Assert(block_indices != 0, ExcNotInitialized());
+  Assert(block_indices.size() != 0, ExcNotInitialized());
   AssertDimension (col_indices.size(), values.size());
   add (row, col_indices.size(), &col_indices[0], &values[0],
        elide_zero_values);
@@ -706,10 +763,9 @@ template <class MATRIX>
 inline void
 MatrixBlockVector<MATRIX>::add(
   unsigned int row, unsigned int column,
-  const std::string& name,
-  const BlockIndices* block_indices)
+  const std::string& name)
 {
-  std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column, block_indices));
+  std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column));
   NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
 }
 
@@ -718,7 +774,26 @@ template <class MATRIX>
 inline void
 MatrixBlockVector<MATRIX>::reinit(const BlockSparsityPattern& sparsity)
 {
-  internal::reinit(*this, sparsity);
+  for (unsigned int i=0;i<this->size();++i)
+    {
+      block(i).reinit(sparsity);
+    }
+}
+
+
+template <class MATRIX>
+inline void
+MatrixBlockVector<MATRIX>::clear(bool really_clean)
+{
+  if (really_clean)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else
+    {
+      for (unsigned int i=0;i<this->size();++i)
+	matrix(i).clear();
+    }
 }
 
 
@@ -754,22 +829,12 @@ template <class MATRIX>
 inline void
 MGMatrixBlockVector<MATRIX>::add(
   unsigned int row, unsigned int column,
-  const std::string& name,
-  const BlockIndices* block_indices)
+  const std::string& name)
 {
   std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > >
-    p(new MGLevelObject<MatrixBlock<MATRIX> >(row, column, block_indices));
+    p(new MGLevelObject<MatrixBlock<MATRIX> >(row, column));
   NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
 }
-
-
-template <class MATRIX>
-inline void
-MGMatrixBlockVector<MATRIX>::reinit(const MGLevelObject<BlockSparsityPattern>& sparsity)
-{
-  internal::reinit(*this, sparsity);
-}
-
 
 
 template <class MATRIX>
@@ -789,11 +854,46 @@ MGMatrixBlockVector<MATRIX>::block(unsigned int i)
 
 
 template <class MATRIX>
-inline MATRIX&
-MGMatrixBlockVector<MATRIX>::matrix(unsigned int i)
+inline void
+MGMatrixBlockVector<MATRIX>::reinit(const MGLevelObject<BlockSparsityPattern>& sparsity)
 {
-  return (*this)(i)->matrix;
+  for (unsigned int i=0;i<this->size();++i)
+    {
+      MGLevelObject<MatrixBlock<MATRIX> >& o = block(i);
+      const unsigned int row = o[o.min_level()].row;
+      const unsigned int col = o[o.min_level()].column;
+
+      o.resize(sparsity.min_level(), sparsity.max_level());
+      for (unsigned int level = o.min_level();level <= o.max_level();++level)
+	{
+	  o[level].row = row;
+	  o[level].column = col;
+	  internal::reinit(o[level], sparsity[level]);
+	}
+    }
 }
+
+
+template <class MATRIX>
+inline void
+MGMatrixBlockVector<MATRIX>::clear(bool really_clean)
+{
+  if (really_clean)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+  else
+    {
+      for (unsigned int i=0;i<this->size();++i)
+	{
+	  MGLevelObject<MatrixBlock<MATRIX> >& o = block(i);
+	  for (unsigned int level = o.min_level();level <= o.max_level();++level)
+	    o[level].matrix.clear();
+	}
+    }
+}
+
+
 
 
 
