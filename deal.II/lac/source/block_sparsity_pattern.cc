@@ -343,11 +343,17 @@ BlockSparsityPattern::reinit(
 	const unsigned int start = rows.local_to_global(i, 0);
 	const unsigned int length = rows.block_size(i);
 
-	VectorSlice<const std::vector<unsigned int> >
-	  block_rows(row_lengths[j], start, length);
-	block(i,j).reinit(rows.block_size(i),
-			  cols.block_size(j),
-			  block_rows);
+	if (row_lengths[j].size()==1)
+	  block(i,j).reinit(rows.block_size(i),
+			    cols.block_size(j), row_lengths[j][0], i==j);
+	else
+	  {
+	    VectorSlice<const std::vector<unsigned int> >
+	      block_rows(row_lengths[j], start, length);
+	    block(i,j).reinit(rows.block_size(i),
+			      cols.block_size(j),
+			      block_rows);
+	  }
       }
   this->collect_sizes();
   Assert (this->row_indices == rows, ExcInternalError());

@@ -73,6 +73,9 @@ namespace TrilinosWrappers
  * You will in general not want to use this class, but one of the
  * derived classes.
  *
+ * @todo Handle opitmization of diagonal elements of the underlying
+ * SparsityPattern correctly.
+ *
  * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, 2000, 2001
  */
@@ -514,8 +517,22 @@ class BlockSparsityPattern : public BlockSparsityPatternBase<SparsityPattern>
 				      * two BlockIndices for the block
 				      * structures of matrix rows and
 				      * columns as well as a row
-				      * length vector in the format
-				      * produced by DoFTools.
+				      * length vector.
+				      *
+				      * The row length vector should
+				      * be in the format produced by
+				      * DoFTools. Alternatively, there
+				      * is a simplified version,
+				      * where each of the inner
+				      * vectors has length one. Then,
+				      * the corresponding entry is
+				      * used as the maximal row length.
+				      *
+				      * For the diagonal blocks, the
+				      * inner SparsityPattern is
+				      * initialized with optimized
+				      * diagonals, while this is not
+				      * done for the off-diagonal blocks. 
 				      */
     void reinit (const BlockIndices& row_indices,
 		 const BlockIndices& col_indices,
