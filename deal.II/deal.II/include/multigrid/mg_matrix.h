@@ -14,16 +14,75 @@
 #define __deal2__mg_matrix_h
 
 #include <lac/vector.h>
+#include <lac/pointer_matrix.h>
 #include <lac/sparse_matrix.h>
 #include <multigrid/mg_base.h>
 #include <base/mg_level_object.h>
+#include <base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 /*!@addtogroup mg */
 /*@{*/
 
+namespace MG
+{
+
 /**
+ * Multilevel matrix. This matrix stores an MGLevelObject of
+ * PointerMatrixBase objects. It implementes the interface defined in
+ * MGMatrixBase, so that it can be used as a matrix in Multigrid.
+ *
+ * @author Guido Kanschat
+ * @date 2002, 2010
+ */
+  template <class VECTOR = Vector<double> >
+  class Matrix
+    : public MGMatrixBase<VECTOR>
+  {
+    public:
+				       /**
+					* Default constructor for an
+					* empty object.
+					*/
+      Matrix();
+      
+				       /**
+					* Constructor setting up
+					* pointers to the matrices in
+					* <tt>M</tt> by calling initialize().
+					*/
+      template <class MATRIX>
+      Matrix(const MGLevelObject<MATRIX>& M);
+      
+				       /**
+					* Initialize the object such
+					* that the level
+					* multiplication uses the
+					* matrices in <tt>M</tt>
+					*/
+      template <class MATRIX>
+      void
+      initialize(const MGLevelObject<MATRIX>& M);
+      
+      virtual void vmult (const unsigned int level, VECTOR& dst, const VECTOR& src) const;
+      virtual void vmult_add (const unsigned int level, VECTOR& dst, const VECTOR& src) const;
+      virtual void Tvmult (const unsigned int level, VECTOR& dst, const VECTOR& src) const;
+      virtual void Tvmult_add (const unsigned int level, VECTOR& dst, const VECTOR& src) const;
+      
+				       /**
+					* Memory used by this object.
+					*/
+      unsigned int memory_consumption () const;
+    private:
+      MGLevelObject<std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > > matrices;
+  };
+  
+}
+
+/**
+ * @deprecated Use the much simpler class MG::Matrix instead.
+ *
  * Multilevel matrix. This class implements the interface defined by
  * MGMatrixBase, using MGLevelObject of an arbitrary
  * matrix class.
@@ -195,6 +254,84 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 };
 
 /*@}*/
+
+/*----------------------------------------------------------------------*/
+
+namespace MG
+{
+  template <class VECTOR>
+  template <class MATRIX>
+  inline void
+  Matrix<VECTOR>::initialize (const MGLevelObject<MATRIX>& p)
+  {
+    matrices.resize(p.min_level(), p.max_level());
+    for (unsigned int level=p.min_level();level <= p.max_level();++level)
+      matrices[level] = std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > (new_pointer_matrix_base(p[level], VECTOR()));
+  }
+  
+  
+  template <class VECTOR>
+  template <class MATRIX>
+  Matrix<VECTOR>::Matrix (const MGLevelObject<MATRIX>& p)
+  {
+    initialize(p);
+  }
+  
+  
+  template <class VECTOR>
+  Matrix<VECTOR>::Matrix ()
+  {}
+
+
+  template <class VECTOR>
+  void
+  Matrix<VECTOR>::vmult  (
+    const unsigned int level,
+    VECTOR& dst,
+    const VECTOR& src) const
+  {
+    matrices[level]->vmult(dst, src);
+  }
+
+
+  template <class VECTOR>
+  void
+  Matrix<VECTOR>::vmult_add  (
+    const unsigned int level,
+    VECTOR& dst,
+    const VECTOR& src) const
+  {
+    matrices[level]->vmult_add(dst, src);
+  }
+
+
+  template <class VECTOR>
+  void
+  Matrix<VECTOR>::Tvmult  (const unsigned int level,
+			   VECTOR& dst,
+			   const VECTOR& src) const
+  {
+    matrices[level]->Tvmult(dst, src);
+  }
+
+
+  template <class VECTOR>
+  void
+  Matrix<VECTOR>::Tvmult_add  (const unsigned int level,
+			       VECTOR& dst,
+			       const VECTOR& src) const
+  {
+    matrices[level]->Tvmult_add(dst, src);
+  }
+
+
+  template <class VECTOR>
+  unsigned int
+  Matrix<VECTOR>::memory_consumption () const
+  {
+    return sizeof(*this) + matrices->memory_consumption();
+  }
+}
 
 /*----------------------------------------------------------------------*/
 

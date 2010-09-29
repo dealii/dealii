@@ -193,6 +193,118 @@ class MGSmootherIdentity : public MGSmootherBase<VECTOR>
 };
 
 
+namespace MG
+{
+/**
+ * Smoother using relaxation classes.
+ *
+ * A relaxation class is an object that has two member functions,
+ * @code
+ * void  step(VECTOR& x, const VECTOR& d) const;
+ * void Tstep(VECTOR& x, const VECTOR& d) const;
+ * @endcode
+ * performing one step of the smoothing scheme.
+ *
+ * This class performs smoothing on each level. The operation can be
+ * controlled by several parameters. First, the relaxation parameter
+ * @p omega is used in the underlying relaxation method. @p steps is
+ * the number of relaxation steps on the finest level (on all levels
+ * if @p variable is off). If @p variable is @p true, the number of
+ * smoothing steps is doubled on each coarser level. This results in a
+ * method having the complexity of the W-cycle, but saving grid
+ * transfers. This is the method proposed by Bramble at al.
+ *
+ * The option @p symmetric switches on alternating between the
+ * smoother and its transpose in each step as proposed by Bramble.
+ *
+ * @p transpose uses the transposed smoothing operation using
+ * <tt>Tstep</tt> instead of the regular <tt>step</tt> of the
+ * relaxation scheme.
+ *
+ * If you are using block matrices, the second @p initialize function
+ * offers the possibility to extract a single block for smoothing. In
+ * this case, the multigrid method must be used only with the vector
+ * associated to that single block.
+ *
+ * @author Guido Kanschat,
+ * @date 2003, 2009, 2010
+ */
+template<class RELAX, class VECTOR>
+class SmootherRelaxation : public MGSmoother<VECTOR>
+{
+  public:
+				     /**
+				      * Constructor. Sets memory and
+				      * smoothing parameters.
+				      */
+    SmootherRelaxation(const unsigned int steps = 1,
+		       const bool variable = false,
+		       const bool symmetric = false,
+		       const bool transpose = false);
+    
+				     /**
+				      * Initialize for matrices. This
+				      * function initializes the
+				      * smoothing operator with the
+				      * same smoother for each level.
+				      *
+				      * @p additional_data is an
+				      * object of type
+				      * @p RELAX::AdditionalData and
+				      * is handed to the
+				      * initialization function of the
+				      * relaxation method.
+				      */
+    template <class MATRIX2>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
+		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
+
+    template <class MATRIX2, class DATA>
+    void initialize (const MGLevelObject<MATRIX2>& matrices,
+		     const MGLevelObject<DATA>& additional_data);
+				     /**
+				      * Initialize for matrix
+				      * blocks. This function
+				      * initializes the smoothing
+				      * operator with the same
+				      * smoother for each level.
+				      *
+				      * @p additional_data is an
+				      * object of type
+				      * @p RELAX::AdditionalData and
+				      * is handed to the
+				      * initialization function of the
+				      * relaxation method.
+				      */
+//     template <class MATRIX2>
+//     void initialize (const MGLevelObject<MatrixBlock<MATRIX2> >& matrices,
+// 		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
+
+				     /**
+				      * Empty all vectors.
+				      */
+    void clear ();
+
+				     /**
+				      * The actual smoothing method.
+				      */
+    virtual void smooth (const unsigned int level,
+			 VECTOR&            u,
+			 const VECTOR&      rhs) const;
+
+    				     /**
+				      * Memory used by this object.
+				      */
+    unsigned int memory_consumption () const;
+  private:
+ 				     /**
+				      * Object containing relaxation
+				      * methods.
+				      */
+    MGLevelObject<RELAX> smoothers;
+};
+}
+
 /**
  * Smoother using relaxation classes.
  *
@@ -635,6 +747,110 @@ MGSmoother<VECTOR>::set_transpose (const bool flag)
 
 //----------------------------------------------------------------------//
 
+namespace MG
+{
+  template <class RELAX, class VECTOR>
+  inline
+  SmootherRelaxation<RELAX, VECTOR>::SmootherRelaxation(
+    const unsigned int steps,
+    const bool variable,
+    const bool symmetric,
+    const bool transpose)
+		  : MGSmoother<VECTOR>(steps, variable, symmetric, transpose)
+  {}
+  
+  
+  template <class RELAX, class VECTOR>
+  inline void
+  SmootherRelaxation<RELAX, VECTOR>::clear ()
+  {
+    smoothers.clear();
+  }
+  
+  
+  template <class RELAX, class VECTOR>
+  template <class MATRIX2>
+  inline void
+  SmootherRelaxation<RELAX, VECTOR>::initialize (
+    const MGLevelObject<MATRIX2>& m,
+    const typename RELAX::AdditionalData& data)
+  {
+    const unsigned int min = m.get_minlevel();
+    const unsigned int max = m.get_maxlevel();
+    
+    smoothers.resize(min, max);
+    
+    for (unsigned int i=min;i<=max;++i)
+      smoothers[i].initialize(m[i], data);
+  }
+
+  
+  template <class RELAX, class VECTOR>
+  template <class MATRIX2, class DATA>
+  inline void
+  SmootherRelaxation<RELAX, VECTOR>::initialize (
+    const MGLevelObject<MATRIX2>& m,
+    const MGLevelObject<DATA>& data)
+  {
+    const unsigned int min = m.get_minlevel();
+    const unsigned int max = m.get_maxlevel();
+    
+    Assert (data.get_minlevel() == min,
+	    ExcDimensionMismatch(data.get_minlevel(), min));
+    Assert (data.get_maxlevel() == max,
+	    ExcDimensionMismatch(data.get_maxlevel(), max));
+    
+    smoothers.resize(min, max);
+    
+    for (unsigned int i=min;i<=max;++i)
+      smoothers[i].initialize(m[i], data[i]);
+  }
+
+  template <class RELAX, class VECTOR>
+  inline void
+  SmootherRelaxation<RELAX, VECTOR>::smooth(
+    const unsigned int level,
+    VECTOR& u,
+    const VECTOR& rhs) const
+  {
+    unsigned int maxlevel = smoothers.get_maxlevel();
+    unsigned int steps2 = this->steps;
+
+    if (this->variable)
+      steps2 *= (1<<(maxlevel-level));
+
+    bool T = this->transpose;
+    if (this->symmetric && (steps2 % 2 == 0))
+      T = false;
+    if (this->debug > 0)
+      deallog << 'S' << level << ' ';
+
+    for (unsigned int i=0; i<steps2; ++i)
+      {
+	if (T)
+	  smoothers[level].Tstep(u, rhs);
+	else
+	  smoothers[level].step(u, rhs);
+	if (this->symmetric)
+	  T = !T;
+      }
+  }
+
+
+  template <class RELAX, class VECTOR>
+  inline unsigned int
+  SmootherRelaxation<RELAX, VECTOR>::
+  memory_consumption () const
+  {
+    return sizeof(*this)
+      + smoothers.memory_consumption()
+      + this->mem->memory_consumption();
+  }
+}
+
+
+//----------------------------------------------------------------------//
+
 template <class MATRIX, class RELAX, class VECTOR>
 inline
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
@@ -822,7 +1038,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   VECTOR& u,
   const VECTOR& rhs) const
 {
-  unsigned int maxlevel = matrices.get_maxlevel();
+  unsigned int maxlevel = smoothers.get_maxlevel();
   unsigned int steps2 = this->steps;
 
   if (this->variable)
