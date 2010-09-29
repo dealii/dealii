@@ -193,7 +193,7 @@ class MGSmootherIdentity : public MGSmootherBase<VECTOR>
 };
 
 
-namespace MG
+namespace mg
 {
 /**
  * Smoother using relaxation classes.
@@ -747,7 +747,7 @@ MGSmoother<VECTOR>::set_transpose (const bool flag)
 
 //----------------------------------------------------------------------//
 
-namespace MG
+namespace mg
 {
   template <class RELAX, class VECTOR>
   inline

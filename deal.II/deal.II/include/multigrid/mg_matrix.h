@@ -25,9 +25,8 @@ DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup mg */
 /*@{*/
 
-namespace MG
+namespace mg
 {
-
 /**
  * Multilevel matrix. This matrix stores an MGLevelObject of
  * PointerMatrixBase objects. It implementes the interface defined in
@@ -257,7 +256,7 @@ class MGMatrixSelect : public MGMatrixBase<Vector<number> >
 
 /*----------------------------------------------------------------------*/
 
-namespace MG
+namespace mg
 {
   template <class VECTOR>
   template <class MATRIX>

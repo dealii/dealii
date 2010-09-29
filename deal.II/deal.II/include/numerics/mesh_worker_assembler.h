@@ -1945,6 +1945,7 @@ namespace MeshWorker
       MatrixPtrVector& m)
     {
       block_info = b;
+      AssertDimension(block_info->local().size(), block_info->global().size());
       matrices = &m;
     }
     
