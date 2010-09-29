@@ -196,7 +196,7 @@ namespace internal
 					  *
 					  * If the object is not part
 					  * of an active cell, then no
-					  * degrtees of freedom have
+					  * degrees of freedom have
 					  * been distributed and zero
 					  * is returned.
                                           */
