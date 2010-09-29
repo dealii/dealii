@@ -904,9 +904,10 @@ namespace MeshWorker
     class MGMatrixLocalBlocksToGlobalBlocks
     {
       public:
-					 /// The object that is stored
-	typedef std_cxx1x::shared_ptr<MatrixBlock<MGLevelObject<MATRIX> > > MatrixPtr;
-
+	typedef MGMatrixBlockVector<MATRIX> MatrixPtrVector;
+	typedef SmartPointer<MatrixPtrVector, MGMatrixLocalBlocksToGlobalBlocks<MATRIX,number> >
+	MatrixPtrVectorPtr;
+	
 					 /**
 					  * Constructor, initializing
 					  * the #threshold, which
@@ -923,7 +924,7 @@ namespace MeshWorker
 					  * cell matrix vectors.
 					  */
 	void initialize(const BlockInfo* block_info,
-		        std::vector<MatrixPtr>& matrices);
+			MatrixPtrVector& matrices);
 
 					 /**
 					  * Multigrid methods on
@@ -936,7 +937,7 @@ namespace MeshWorker
 					  * refinement edge, which are
 					  * set by this method.
 					  */
-	void initialize_edge_flux(std::vector<MatrixPtr>& up, std::vector<MatrixPtr>& down);
+	void initialize_edge_flux(MatrixPtrVector& up, MatrixPtrVector& down);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -995,35 +996,35 @@ namespace MeshWorker
 					  * stored as a vector of
 					  * pointers.
 					  */
-	std::vector<MatrixPtr> matrices;
+	MatrixPtrVectorPtr matrices;
 	
 					 /**
 					  * The flux matrix between
 					  * the fine and the coarse
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> flux_down;
+	MatrixPtrVectorPtr flux_down;
 	
 					 /**
 					  * The flux matrix between
 					  * the coarse and the fine
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> flux_up;	
+	MatrixPtrVectorPtr flux_up;	
 
 					 /**
 					  * The interface matrix between
 					  * the fine and the coarse
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> interface_out;
+	MatrixPtrVectorPtr interface_out;
 	
 					 /**
 					  * The interface matrix between
 					  * the coarse and the fine
 					  * level at refinement edges.
 					  */
-	std::vector<MatrixPtr> interface_in;	
+	MatrixPtrVectorPtr interface_in;	
       
       /**
        * A pointer to the object containing the block structure.
@@ -1939,11 +1940,12 @@ namespace MeshWorker
     
     template <class MATRIX, typename number>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(const BlockInfo* b,
-								  std::vector<MatrixPtr>& m)
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(
+      const BlockInfo* b,
+      MatrixPtrVector& m)
     {
       block_info = b;
-      matrices = m;
+      matrices = &m;
     }
     
 
@@ -1954,7 +1956,7 @@ namespace MeshWorker
       DOFINFO& info,
       bool interior_face) const
     {
-      info.initialize_matrices(matrices, interior_face);
+      info.initialize_matrices(*matrices, interior_face);
     }
 
 
@@ -1962,8 +1964,8 @@ namespace MeshWorker
     template <class MATRIX, typename number>
     inline void
     MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize_edge_flux(
-      std::vector<MatrixPtr>& up,
-      std::vector<MatrixPtr>& down)
+      MatrixPtrVector& up,
+      MatrixPtrVector& down)
     {
       flux_up = up;
       flux_down = down;
@@ -2020,19 +2022,18 @@ namespace MeshWorker
     template <class MATRIX, typename number>
     template <class DOFINFO>
     inline void
-    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(
-      const DOFINFO& info)
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble(const DOFINFO& info)
     {
       const unsigned int level = info.cell->level();
       
-      for (unsigned int i=0;i<matrices.size();++i)
+      for (unsigned int i=0;i<matrices->size();++i)
 	{
 					   // Row and column index of
 					   // the block we are dealing with
-	  const unsigned int row = matrices[i]->row;
-	  const unsigned int col = matrices[i]->column;
+	  const unsigned int row = matrices->block(i)[level].row;
+	  const unsigned int col = matrices->block(i)[level].column;
 
-	  assemble(matrices[i]->matrix[level], info.matrix(i,false).matrix, row, col,
+	  assemble(matrices->block(i)[level].matrix, info.matrix(i,false).matrix, row, col,
 		   info.indices, info.indices, level, level);
 	}
     }
@@ -2048,33 +2049,39 @@ namespace MeshWorker
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
       
-      for (unsigned int i=0;i<matrices.size();++i)
+      for (unsigned int i=0;i<matrices->size();++i)
 	{
+	  MGLevelObject<MatrixBlock<MATRIX> >& o = matrices->block(i);
+	  
 					   // Row and column index of
 					   // the block we are dealing with
-	  const unsigned int row = matrices[i]->row;
-	  const unsigned int col = matrices[i]->column;
+	  const unsigned int row = o[level1].row;
+	  const unsigned int col = o[level1].column;
 
 	  if (level1 == level2)
 	    {
-	      assemble(matrices[i]->matrix[level1], info1.matrix(i,false).matrix, row, col, info1.indices, info1.indices, level1, level1);
-	      assemble(matrices[i]->matrix[level1], info1.matrix(i,true).matrix, row, col, info1.indices, info2.indices, level1, level2);
-	      assemble(matrices[i]->matrix[level1], info2.matrix(i,false).matrix, row, col, info2.indices, info2.indices, level2, level2);
-	      assemble(matrices[i]->matrix[level1], info2.matrix(i,true).matrix, row, col, info2.indices, info1.indices, level2, level1);
+	      assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
+		       info1.indices, info1.indices, level1, level1);
+	      assemble(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
+		       info1.indices, info2.indices, level1, level2);
+	      assemble(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
+		       info2.indices, info2.indices, level2, level2);
+	      assemble(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
+		       info2.indices, info1.indices, level2, level1);
 	    }
 	  else
 	    {
 	      Assert(level1 > level2, ExcNotImplemented());
-	      if (flux_up.size() != 0)
+	      if (flux_up->size() != 0)
 		{
 						   // Do not add M22,
 						   // which is done by
 						   // the coarser cell
-		  assemble(matrices[i]->matrix[level1], info1.matrix(i,false).matrix, row, col,
+		  assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
 			   info1.indices, info1.indices, level1, level1);	      
-		  assemble(flux_up[i]->matrix[level1], info1.matrix(i,true).matrix, row, col,
+		  assemble(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
 			   info1.indices, info2.indices, level1, level2, true);
-		  assemble(flux_down[i]->matrix[level1], info2.matrix(i,true).matrix, row, col,
+		  assemble(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
 			   info2.indices, info1.indices, level2, level1);
 		}
 	    }

@@ -224,15 +224,23 @@ namespace MeshWorker
 					* column coordinates. The
 					* matrices themselves are
 					* resized by reinit().
-					*
-					* The template parameter @p
-					* MatrixPtr should point to
-					* a MatrixBlock
-					* instantiation in order to
-					* provide row and column info.
 					*/
       template <class MATRIX>
       void initialize_matrices(const MatrixBlockVector<MATRIX>& matrices,
+			       bool both);
+
+				       /**
+					* Allocate a local matrix
+					* for each of the global
+					* level objects in @p
+					* matrices. Additionally,
+					* set their block row and
+					* column coordinates. The
+					* matrices themselves are
+					* resized by reinit().
+					*/
+      template <class MATRIX>
+      void initialize_matrices(const MGMatrixBlockVector<MATRIX>& matrices,
 			       bool both);
 
 				       /**
@@ -414,6 +422,33 @@ namespace MeshWorker
       {
 	const unsigned int row = matrices.block(i).row;
 	const unsigned int col = matrices.block(i).column;
+
+	M1[i].row = row;
+	M1[i].column = col;
+	if (both)
+	  {
+	    M2[i].row = row;
+	    M2[i].column = col;
+	  }
+      }
+  }
+
+
+  template <typename number>
+  template <class MATRIX>
+  inline void
+  LocalResults<number>::initialize_matrices(
+    const MGMatrixBlockVector<MATRIX>& matrices,
+    bool both)
+  {
+    M1.resize(matrices.size());
+    if (both)
+      M2.resize(matrices.size());
+    for (unsigned int i=0;i<matrices.size();++i)
+      {
+	const MGLevelObject<MatrixBlock<MATRIX> >& o = matrices.block(i);
+	const unsigned int row = o[o.min_level()].row;
+	const unsigned int col = o[o.min_level()].column;
 
 	M1[i].row = row;
 	M1[i].column = col;
