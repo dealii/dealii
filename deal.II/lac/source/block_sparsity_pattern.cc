@@ -334,6 +334,8 @@ BlockSparsityPattern::reinit(
   const BlockIndices& cols,
   const std::vector<std::vector<unsigned int> >& row_lengths)
 {
+  AssertDimension (row_lengths.size(), cols.size());
+  
   this->reinit(rows.size(), cols.size());
   for (unsigned int j=0;j<cols.size();++j)
     for (unsigned int i=0;i<rows.size();++i)
