@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -403,8 +403,12 @@ SparseDirectMA27::~SparseDirectMA27()
       {
                                          // close down client
         Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
-        write (detached_mode_data->server_client_pipe[1], "7", 1);
-
+					 // Assign the result of write
+					 // and reset the variable to
+					 // avoid compiler warnings
+//TODO:[WB] Should t be used to trace errors?
+        ssize_t t = write (detached_mode_data->server_client_pipe[1], "7", 1);
+	t = 0;
                                          // then also delete data
         delete detached_mode_data;
         detached_mode_data = 0;
@@ -452,8 +456,13 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
                                        // write and from which the
                                        // slave process will read its
                                        // stdin
-      pipe(detached_mode_data->server_client_pipe);
-      pipe(detached_mode_data->client_server_pipe);      
+
+				       // Assign the return value to a
+				       // variable to avoid compiler
+				       // warnings
+//TODO:[WB] Use t to trace errors?      
+      int t = pipe(detached_mode_data->server_client_pipe);
+      t = pipe(detached_mode_data->client_server_pipe);      
 
                                        // fflush(NULL) is said to be a
                                        // good idea before fork()
