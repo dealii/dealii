@@ -125,7 +125,8 @@ class MatrixBlock
 				      * Reinitialize the matrix for a
 				      * new BlockSparsityPattern. This
 				      * adujusts the #matrix as well
-				      * as the #block_indices.
+				      * as the #row_indices and
+				      * #column_indices.
 				      *
 				      * @note The row and column block
 				      * structure of the sparsity
@@ -133,7 +134,8 @@ class MatrixBlock
 				      */
     void reinit(const BlockSparsityPattern& sparsity);
     
-    operator MATRIX() const;
+    operator MATRIX&();
+    operator const MATRIX&() const;
     
 				     /**
 				      * Add <tt>value</tt> to the
@@ -333,7 +335,7 @@ class MatrixBlock
 				     /**
 				      * The block number computed from
 				      * an index by using
-				      * #block_indices does not match
+				      * BlockIndices does not match
 				      * the block coordinates stored
 				      * in this object.
 				      */
@@ -360,14 +362,22 @@ class MatrixBlock
     MATRIX matrix;
   private:
 				     /**
-				      * The BlockIndices of the whole
-				      * system. Using row() and
-				      * column(), this allows us to
-				      * find the index of the first
-				      * row and column degrees of
-				      * freedom for this block.
+				      * The rwo BlockIndices of the
+				      * whole system. Using row(),
+				      * this allows us to find the
+				      * index of the first row degree
+				      * of freedom for this block.
 				      */
-    BlockIndices block_indices;
+    BlockIndices row_indices;
+				     /**
+				      * The column BlockIndices of the
+				      * whole system. Using column(),
+				      * this allows us to find the
+				      * index of the first column
+				      * degree of freedom for this
+				      * block.
+				      */
+    BlockIndices column_indices;
     
     friend void internal::reinit<>(MatrixBlock<MATRIX>&, const BlockSparsityPattern&);
 };
@@ -383,9 +393,16 @@ class MatrixBlock
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
 template <class MATRIX>
-class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >
+class MatrixBlockVector
+  :
+  private NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >
 {
   public:
+				     /**
+				      * The type of object stored.
+				      */
+    typedef MatrixBlock<MATRIX> value_type;
+    
 				     /**
 				      * Add a new matrix block at the
 				      * position <tt>(row,column)</tt>
@@ -430,13 +447,13 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
 				      */
-    const MatrixBlock<MATRIX>& block(unsigned int i) const;
+    const value_type& block(unsigned int i) const;
     
 				     /**
 				      * Access a reference to
 				      * the block at position <i>i</i>.
 				      */
-    MatrixBlock<MATRIX>& block(unsigned int i);
+    value_type& block(unsigned int i);
     
 				     /**
 				      * Access the matrix at position
@@ -445,7 +462,9 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
 				      */
     MATRIX& matrix(unsigned int i);
 
-
+    Subscriptor::subscribe;
+    Subscriptor::unsubscribe;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::size;
 };
 
 
@@ -460,9 +479,14 @@ class MatrixBlockVector : public NamedData<std_cxx1x::shared_ptr<MatrixBlock<MAT
  */
 template <class MATRIX>
 class MGMatrixBlockVector
-  : public NamedData<std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > > >
+  : private NamedData<std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > > >
 {
   public:
+				     /**
+				      * The type of object stored.
+				      */
+    typedef MGLevelObject<MatrixBlock<MATRIX> > value_type;
+    
 				     /**
 				      * Add a new matrix block at the
 				      * position <tt>(row,column)</tt>
@@ -506,18 +530,24 @@ class MGMatrixBlockVector
 				      * Access a constant reference to
 				      * the block at position <i>i</i>.
 				      */
-    const MGLevelObject<MatrixBlock<MATRIX> >& block(unsigned int i) const;
+    const value_type& block(unsigned int i) const;
     
 				     /**
 				      * Access a reference to
 				      * the block at position <i>i</i>.
 				      */
-    MGLevelObject<MatrixBlock<MATRIX> >& block(unsigned int i);
+    value_type& block(unsigned int i);
     
 				     /**
 				      * The memory used by this object.
 				      */
     unsigned int memory_consumption () const;
+
+    Subscriptor::subscribe;
+    Subscriptor::unsubscribe;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::size;
+
+  private:
 };
 
 
@@ -529,8 +559,8 @@ namespace internal
   void
   reinit(MatrixBlock<MATRIX>& v, const BlockSparsityPattern& p)
   {
-    Assert(p.get_row_indices() == p.get_column_indices(), ExcNotImplemented());
-    v.block_indices = p.get_row_indices();
+    v.row_indices = p.get_row_indices();
+    v.column_indices = p.get_column_indices();
   }
 
   
@@ -538,8 +568,8 @@ namespace internal
   void
   reinit(MatrixBlock<dealii::SparseMatrix<number> >& v, const BlockSparsityPattern& p)
   {
-    Assert(p.get_row_indices() == p.get_column_indices(), ExcNotImplemented());
-    v.block_indices = p.get_row_indices();
+    v.row_indices = p.get_row_indices();
+    v.column_indices = p.get_column_indices();
     v.matrix.reinit(p.block(v.row, v.column));
   }
 }
@@ -562,7 +592,8 @@ MatrixBlock<MATRIX>::MatrixBlock(const MatrixBlock<MATRIX>& M)
 		row(M.row),
 		column(M.column),
 		matrix(M.matrix),
-		block_indices(M.block_indices)
+		row_indices(M.row_indices),
+		column_indices(M.column_indices)
 {}
 
 
@@ -585,7 +616,15 @@ MatrixBlock<MATRIX>::reinit(const BlockSparsityPattern& sparsity)
 
 template <class MATRIX>
 inline
-MatrixBlock<MATRIX>::operator MATRIX() const
+MatrixBlock<MATRIX>::operator MATRIX&()
+{
+  return matrix;
+}
+
+
+template <class MATRIX>
+inline
+MatrixBlock<MATRIX>::operator const MATRIX&() const
 {
   return matrix;
 }
@@ -598,12 +637,13 @@ MatrixBlock<MATRIX>::add (
   const unsigned int gj,
   const typename MATRIX::value_type value)
 {
-  Assert(block_indices.size() != 0, ExcNotInitialized());
+  Assert(row_indices.size() != 0, ExcNotInitialized());
+  Assert(column_indices.size() != 0, ExcNotInitialized());
 
   const std::pair<unsigned int, unsigned int> bi
-    = block_indices.global_to_local(gi);
+    = row_indices.global_to_local(gi);
   const std::pair<unsigned int, unsigned int> bj
-    = block_indices.global_to_local(gj);
+    = column_indices.global_to_local(gj);
 
   Assert (bi.first == row, ExcBlockIndexMismatch(bi.first, row));
   Assert (bj.first == column, ExcBlockIndexMismatch(bj.first, column));
@@ -616,18 +656,19 @@ template <class MATRIX>
 template <typename number>
 inline
 void
-MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         row_indices,
-				  const std::vector<unsigned int>& col_indices,
+MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         r_indices,
+				  const std::vector<unsigned int>& c_indices,
 				  const FullMatrix<number>&        values,
 				  const bool                       elide_zero_values)
 {
-  Assert(block_indices.size() != 0, ExcNotInitialized());
-
-  AssertDimension (row_indices.size(), values.m());
-  AssertDimension (col_indices.size(), values.n());
+  Assert(row_indices.size() != 0, ExcNotInitialized());
+  Assert(column_indices.size() != 0, ExcNotInitialized());
+  
+  AssertDimension (r_indices.size(), values.m());
+  AssertDimension (c_indices.size(), values.n());
 
   for (unsigned int i=0; i<row_indices.size(); ++i)
-    add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+    add (r_indices[i], c_indices.size(), &c_indices[0], &values(i,0),
 	 elide_zero_values);
 }
 
@@ -643,9 +684,11 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
 			  const bool,
 			  const bool)
 {
-  Assert(block_indices.size() != 0, ExcNotInitialized());
+  Assert(row_indices.size() != 0, ExcNotInitialized());
+  Assert(column_indices.size() != 0, ExcNotInitialized());
+  
   const std::pair<unsigned int, unsigned int> bi
-    = block_indices.global_to_local(b_row);
+    = row_indices.global_to_local(b_row);
 
 				   // In debug mode, we check whether
 				   // all indices are in the correct
@@ -661,7 +704,7 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
   for (unsigned int j=0;j<n_cols;++j)
     {
       const std::pair<unsigned int, unsigned int> bj
-	= block_indices.global_to_local(col_indices[j]);
+	= column_indices.global_to_local(col_indices[j]);
       Assert(bj.first == column, ExcBlockIndexMismatch(bj.first, column));
 
       matrix.add(bi.second, bj.second, values[j]);
@@ -678,8 +721,9 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int> &indices,
 			  const FullMatrix<number>        &values,
 			  const bool                       elide_zero_values)
 {
-  Assert(block_indices.size() != 0, ExcNotInitialized());
-
+  Assert(row_indices.size() != 0, ExcNotInitialized());
+  Assert(column_indices.size() != 0, ExcNotInitialized());
+  
   AssertDimension (indices.size(), values.m());
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
@@ -699,7 +743,9 @@ MatrixBlock<MATRIX>::add (const unsigned int               row,
 			  const std::vector<number>       &values,
 			  const bool                       elide_zero_values)
 {
-  Assert(block_indices.size() != 0, ExcNotInitialized());
+  Assert(row_indices.size() != 0, ExcNotInitialized());
+  Assert(column_indices.size() != 0, ExcNotInitialized());
+  
   AssertDimension (col_indices.size(), values.size());
   add (row, col_indices.size(), &col_indices[0], &values[0],
        elide_zero_values);
@@ -765,8 +811,8 @@ MatrixBlockVector<MATRIX>::add(
   unsigned int row, unsigned int column,
   const std::string& name)
 {
-  std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > p(new MatrixBlock<MATRIX>(row, column));
-  NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
+  std_cxx1x::shared_ptr<value_type> p(new value_type(row, column));
+  NamedData<std_cxx1x::shared_ptr<value_type> >::add(p, name);
 }
 
 
@@ -832,8 +878,11 @@ MGMatrixBlockVector<MATRIX>::add(
   const std::string& name)
 {
   std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > >
-    p(new MGLevelObject<MatrixBlock<MATRIX> >(row, column));
-  NamedData<std_cxx1x::shared_ptr<MatrixBlock<MATRIX> > >::add(p, name);
+    p(new value_type(0, 1));
+  (*p)[0].row = row;
+  (*p)[0].column = column;
+  
+  NamedData<std_cxx1x::shared_ptr<value_type> >::add(p, name);
 }
 
 
