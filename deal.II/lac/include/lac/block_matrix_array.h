@@ -483,6 +483,14 @@ class BlockTrianglePrecondition
     
 				     /**
 				      * Constructor. This matrix must be
+				      * block-quadratic, and
+				      * <tt>n_blocks</tt> is the
+				      * number of blocks in each direction.
+				      */
+    BlockTrianglePrecondition (unsigned int n_blocks);
+    
+				     /**
+				      * Constructor. This matrix must be
 				      * block-quadratic. The additional
 				      * parameter allows for backward
 				      * insertion instead of forward.

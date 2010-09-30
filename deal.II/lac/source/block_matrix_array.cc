@@ -287,6 +287,15 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
 
 
 template <typename number>
+BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
+  unsigned int block_rows)
+		:
+		BlockMatrixArray<number> (block_rows, block_rows),
+		backward(false)
+{}
+
+
+template <typename number>
 void
 BlockTrianglePrecondition<number>::initialize(
   unsigned int n_block_rows,
