@@ -24,8 +24,8 @@
 
 
 template <typename T>
-void verify (const T &t1,
-	     const T &t2)
+void verify (T &t1,
+	     T &t2)
 {
 				   // save data to archive
   std::ostringstream oss;
