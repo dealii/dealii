@@ -462,8 +462,8 @@ class MatrixBlockVector
 				      */
     MATRIX& matrix(unsigned int i);
 
-    Subscriptor::subscribe;
-    Subscriptor::unsubscribe;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
     NamedData<std_cxx1x::shared_ptr<value_type> >::size;
 };
 
@@ -543,8 +543,8 @@ class MGMatrixBlockVector
 				      */
     unsigned int memory_consumption () const;
 
-    Subscriptor::subscribe;
-    Subscriptor::unsubscribe;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
     NamedData<std_cxx1x::shared_ptr<value_type> >::size;
 
   private:
