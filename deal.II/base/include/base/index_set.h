@@ -390,7 +390,7 @@ class IndexSet
         static bool nth_index_compare (const IndexSet::Range & x,
 				       const IndexSet::Range & y)
           {
-	    return (x.nth_index_in_set+(x.end-x.begin) < 
+	    return (x.nth_index_in_set+(x.end-x.begin) <
 		    y.nth_index_in_set+(y.end-y.begin));
           }
 
@@ -526,7 +526,9 @@ void
 IndexSet::add_range (const unsigned int begin,
 		     const unsigned int end)
 {
-  Assert (begin < index_space_size,
+  Assert ((begin < index_space_size)
+	  ||
+	  ((begin == index_space_size) && (end == index_space_size)),
 	  ExcIndexRange (begin, 0, index_space_size));
   Assert (end <= index_space_size,
 	  ExcIndexRange (end, 0, index_space_size+1));
