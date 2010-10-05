@@ -114,7 +114,7 @@ Explicit::operator() (NamedData<Vector<double>*>& out, const NamedData<Vector<do
 	m(i,i) += 1.;
     }
   this->notifications.clear();
-  unsigned int i = in.find("Previous time");
+  unsigned int i = in.find("Previous iterate");
   m.vmult(*out(0), *in(i));
 }
 

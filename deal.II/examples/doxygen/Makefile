@@ -12,9 +12,16 @@
 ###########################################################################
 include ../../common/Make.global_options
 
-all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT) \
-     compressed_block_sparsity_pattern$(EXEEXT) \
-     theta_timestepping$(EXEEXT)
+SHELL=/bin/bash
+
+tests = $(wildcard *.cc)
+exe =  $(tests:%.cc=%$(EXEEXT))
+ok = $(tests:%.cc=%.ok)
+
+all: $(exe)
+
+run: $(ok)
+	for prog in $(exe) ; do ./$$prog ; done
 
 ######################################################################
 # Compilation of source code
@@ -26,6 +33,12 @@ all: product_matrix$(EXEEXT) block_matrix_array$(EXEEXT) \
 ./%.$(OBJEXT) :
 	@echo ==============optimized===== $(<F)
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+
+######################################################################
+# Running the programs
+######################################################################
+%.ok: %$(EXEEXT)
+	./$<
 
 ######################################################################
 # Specific targets
@@ -53,7 +66,7 @@ theta_timestepping$(EXEEXT): theta_timestepping.g.$(OBJEXT) $(lib-deal2-2d.g) $(
 
 
 clean:
-	-rm -f *~ *.$(OBJEXT) $(all)
+	-rm -f *~ *.$(OBJEXT) $(exe)
 
 
 .PHONY: all clean
