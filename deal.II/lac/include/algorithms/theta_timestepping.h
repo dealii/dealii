@@ -85,7 +85,7 @@ namespace Algorithms
  * operators.
  *
  * The explicit Operator #op_explicit receives in its input in first
- * place the vector <tt>"Previous time"</tt>, which is the solution
+ * place the vector <tt>"Previous iterate"</tt>, which is the solution
  * value after the previous timestep. It is followed by all vectors
  * provided to ThetaTimestepping::operator() as input
  * argument. #op_explicit is supposed to write its result into the
@@ -307,8 +307,7 @@ namespace Algorithms
 					* implicit part of the
 					* scheme. It will receive in
 					* its input data the vector
-					* "Previous time
-					* data". Information on the
+					* "Previous time". Information on the
 					* timestep should be obtained
 					* from implicit_data().
 					*
