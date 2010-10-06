@@ -30,7 +30,6 @@
 #include <fe/fe.h>
 #include <fe/fe_update_flags.h>
 #include <fe/mapping.h>
-#include <fe/mapping_q.h>
 #include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_dof_accessor.h>
 
