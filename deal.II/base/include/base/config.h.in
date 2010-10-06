@@ -527,9 +527,6 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
-
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -587,7 +584,7 @@
  * functionality to the PETScWrappers that does not exist in previous
  * versions of PETSc.  Examples of usage can be found in
  * lac/source/petsc_matrix_base.h.  Note: SLEPcWrappers do not need
- * their own anological macros, since SLEPc and PETSc must have
+ * their own analogical macros, since SLEPc and PETSc must have
  * identical version numbers anyways.
  */
 #define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
