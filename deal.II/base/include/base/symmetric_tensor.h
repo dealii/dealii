@@ -968,7 +968,13 @@ class SymmetricTensor
 				      */
     static unsigned int memory_consumption ();
 
-
+                     /**
+                      * Read or write the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+    
   private:
 				     /**
 				      * A structure that describes
@@ -2136,7 +2142,14 @@ SymmetricTensor<2,3>::unrolled_to_component_indices (const unsigned int i)
   return table[i];
 }
 
-
+template <int rank, int dim>
+template <class Archive>
+inline    
+void 
+SymmetricTensor<rank,dim>::serialize(Archive & ar, const unsigned int)
+{
+  ar & data;
+} 
 
 
 #endif // DOXYGEN

@@ -266,6 +266,13 @@ class Tensor<0,dim>
                     int,
                     << "dim must be positive, but was " << arg1);
 
+                     /**
+                      * Read or write the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+
   private:
 				     /**
 				      * The value of this scalar object.
@@ -548,8 +555,16 @@ class Tensor<1,dim>
     DeclException1 (ExcDimTooSmall,
                     int,
                     << "dim must be positive, but was " << arg1);
+                    
+                     /**
+                      * Read or write the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+    
   private:
-				     /**
+  				     /**
 				      * Store the values in a simple
 				      * array.  For <tt>dim==0</tt> store
 				      * one element, because otherways
@@ -811,6 +826,13 @@ void Tensor<0,dim>::clear ()
   value = 0;
 }
 
+template <int dim>
+template <class Archive>
+inline
+void Tensor<0,dim>::serialize(Archive & ar, const unsigned int)
+{
+  ar & value;
+}
 
 /*---------------------------- Inline functions: Tensor<1,dim> ------------------------*/
 
@@ -1175,6 +1197,13 @@ Tensor<1,dim>::memory_consumption ()
 }
 
 
+template <int dim>
+template <class Archive>
+inline
+void Tensor<1,dim>::serialize(Archive & ar, const unsigned int)
+{
+  ar & values;
+}
 #endif // DOXYGEN
 
 

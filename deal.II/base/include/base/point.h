@@ -177,6 +177,13 @@ class Point : public Tensor<1,dim>
 				      * representing the two points.
 				      */
     double distance (const Point<dim> &p) const;
+
+                     /**
+                      * Read or write the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
 };
 
 /*------------------------------- Inline functions: Point ---------------------------*/
@@ -340,6 +347,18 @@ inline
 Point<dim> Point<dim>::operator / (const double factor) const
 {
   return (Point<dim>(*this) /= factor);
+}
+
+
+template <int dim>
+template <class Archive>
+inline
+void 
+Point<dim>::serialize(Archive & ar, const unsigned int)
+{
+                                     // forward to serialization
+                                     // function in the base class
+  ar &  static_cast<Tensor<1,dim> &>(*this);
 }
 
 #endif // DOXYGEN

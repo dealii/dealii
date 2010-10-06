@@ -243,6 +243,13 @@ class Tensor
                     int,
                     << "Invalid tensor index " << arg1);
 
+                     /**
+                      * Read or write the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+
   private:
 				     /**
 				      * Array of tensors holding the
@@ -487,6 +494,15 @@ Tensor<rank_,dim>::memory_consumption ()
 {
   return sizeof(Tensor<rank_,dim>);
 }
+
+template <int rank_, int dim>
+template <class Archive>
+inline
+void 
+Tensor<rank_,dim>::serialize(Archive & ar, const unsigned int)
+{
+  ar & subtensor;
+}    
 
 #endif // DOXYGEN
 /* ----------------- Non-member functions operating on tensors. ------------ */
