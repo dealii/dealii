@@ -252,9 +252,9 @@ build-test-do:
 	cd examples ; $(MAKE)
 	@echo END MAKE EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
 	@echo
-	@echo BEGIN MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
-	cd examples/doxygen ; $(MAKE)
-	@echo END MAKE DOXYGENTUTORIALS OUTPUT `date -u '+%Y-%m-%d %T'`
+	@echo BEGIN MAKE RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
+	cd examples/doxygen ; $(MAKE) run
+	@echo END MAKE RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`
 	@echo
 #	if test -d tests ; then \
 #	   @echo BEGIN MAKE TESTS OUTPUT `date -u '+%Y-%m-%d %T'` ; \
