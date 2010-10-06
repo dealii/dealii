@@ -241,7 +241,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 		  GXX_VERSION_STRING=`($CXX -V 2>&1) | grep "^pgCC"`
                   full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*pgCC\s+(\S+).*/\1/g;'`
     		  GXX_VERSION=pgCC`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
-    		  GXX_VERSION_DETAILED="$GXX_VERSION"
+    		  GXX_VERSION_DETAILED=pgCC"$full_version"
   	          AC_MSG_RESULT(C++ compiler is Portland Group C++ $full_version)
                 else
 
