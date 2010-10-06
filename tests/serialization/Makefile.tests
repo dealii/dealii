@@ -1,5 +1,0 @@
-point/exe : point/obj.g.$(OBJEXT) $(libraries)
-symmetric_tensor/exe : symmetric_tensor/obj.g.$(OBJEXT) $(libraries)
-tensor_base/exe : tensor_base/obj.g.$(OBJEXT) $(libraries)
-tensor_base_scalar/exe : tensor_base_scalar/obj.g.$(OBJEXT) $(libraries)
-tensor/exe : tensor/obj.g.$(OBJEXT) $(libraries)
