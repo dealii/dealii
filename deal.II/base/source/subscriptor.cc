@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -164,7 +164,8 @@ void Subscriptor::do_subscribe (const char* id) const
 void Subscriptor::do_unsubscribe (const char* id) const
 {
 #ifdef DEBUG
-  Assert (counter>0, ExcNotUsed());
+  const char* name = (id != 0) ? id : unknown_subscriber;
+  Assert (counter>0, ExcNoSubscriber(object_info->name(), name));
 				   // This is for the case that we do
 				   // not abort after the exception
   if (counter == 0)
@@ -174,7 +175,6 @@ void Subscriptor::do_unsubscribe (const char* id) const
   --counter;
   
 #if DEAL_USE_MT == 0
-  const char* name = (id != 0) ? id : unknown_subscriber;
   map_iterator it = counter_map.find(name);
   Assert (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
   Assert (it->second > 0, ExcNoSubscriber(object_info->name(), name));

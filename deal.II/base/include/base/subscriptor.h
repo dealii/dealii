@@ -143,14 +143,6 @@ class Subscriptor
     DeclException2(ExcNoSubscriber, char*, char*,
 		   << "No subscriber with identifier \"" << arg2
 		   << "\" did subscribe to this object of class " << arg1);
-
-				     /**
-				      * Exception: object should be
-				      * used when
-				      * Subscriptor::unsubscribe() is
-				      * called.
-				      */
-    DeclException0(ExcNotUsed);
 				     //@}
 
   private:
