@@ -12,6 +12,6 @@ DEAL::Construct D
 DEAL::Destruct D
 DEAL::ExcInUse (counter, object_info->name(), infostring)
 DEAL::Destruct C
-DEAL::ExcNotUsed()
+DEAL::ExcNoSubscriber(object_info->name(), name)
 DEAL::Destruct B
 DEAL::Destruct A
