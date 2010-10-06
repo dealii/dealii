@@ -1,4 +1,4 @@
-//----------------------------  tensor_base.cc  ---------------------------
+//----------------------------  tensor_base_scalar.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  tensor_base.cc  ---------------------------
+//----------------------------  tensor_base_scalar.cc  ---------------------------
 
 // check serialization for Tensor<1,dim>
 
