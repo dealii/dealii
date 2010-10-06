@@ -732,6 +732,7 @@ CXXFLAGSG
 DEAL_II_COMPILER_SUPPORTS_MPI
 GXX_VERSION_DETAILED
 GXX_VERSION
+GXX_BRAND
 ac_ct_CXX
 CXXFLAGS
 CXX
@@ -3690,6 +3691,7 @@ fi
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
 
     full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*version (\d\.\d\.\d).*/\1/g;'`
+    GXX_BRAND=GNU
     GXX_VERSION=gcc`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
     GXX_VERSION_DETAILED=gcc$full_version
 
@@ -3703,12 +3705,14 @@ $as_echo "C++ compiler is $GXX_VERSION (subversion $GXX_VERSION_DETAILED)" >&6; 
     if test "x$is_ibm_xlc" != "x"  ; then
                         { $as_echo "$as_me:$LINENO: result: C++ compiler is IBM xlC" >&5
 $as_echo "C++ compiler is IBM xlC" >&6; }
+      GXX_BRAND=IBM
       GXX_VERSION=ibm_xlc
       GXX_VERSION_DETAILED="$GXX_VERSION"
     else
 
             mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
       if test "x$mips_pro" != "x" ; then
+        GXX_BRAND=MIPSpro
         case "$mips_pro" in
           *7.0* | *7.1* | *7.2* | *7.3*)
                                     { $as_echo "$as_me:$LINENO: result: C++ compiler is $mips_pro" >&5
@@ -3756,6 +3760,7 @@ $as_echo "C++ compiler is unknown version but accepted MIPSpro compiler version"
 				is_pgi="`($CXX -V 2>&1) | grep 'Portland'`"
 
         if test "x$is_intel_icc" != "x" -a "x$is_pgi" == "x" ; then
+	  GXX_BRAND=Intel
 	  version_string="`($CXX -V 2>&1) | grep 'Version'` `($CXX -help 2>&1) | grep 'Version'`"
 	  version5="`echo $version_string | grep 'Version 5'`"
 	  version6="`echo $version_string | grep 'Version 6'`"
@@ -3804,6 +3809,7 @@ $as_echo "C++ compiler is icc" >&6; }
           if test "x$is_dec_cxx" != "x" ; then
             { $as_echo "$as_me:$LINENO: result: C++ compiler is Compaq-cxx" >&5
 $as_echo "C++ compiler is Compaq-cxx" >&6; }
+            GXX_BRAND=Compaq
             GXX_VERSION=compaq_cxx
             GXX_VERSION_DETAILED="$GXX_VERSION"
           else
@@ -3813,6 +3819,7 @@ $as_echo "C++ compiler is Compaq-cxx" >&6; }
             if test "x$is_sun_cc_1$is_sun_cc_2" != "x" ; then
               { $as_echo "$as_me:$LINENO: result: C++ compiler is Sun Workshop compiler" >&5
 $as_echo "C++ compiler is Sun Workshop compiler" >&6; }
+              GXX_BRAND=SunWorkshop
               GXX_VERSION=sun_workshop
               GXX_VERSION_DETAILED="$GXX_VERSION"
             else
@@ -3821,6 +3828,7 @@ $as_echo "C++ compiler is Sun Workshop compiler" >&6; }
               if test "x$is_sun_forte_cc" != "x" ; then
                 { $as_echo "$as_me:$LINENO: result: C++ compiler is Sun Forte compiler" >&5
 $as_echo "C++ compiler is Sun Forte compiler" >&6; }
+                GXX_BRAND=SunForte
                 GXX_VERSION=sun_forte
                 GXX_VERSION_DETAILED="$GXX_VERSION"
               else
@@ -3829,6 +3837,7 @@ $as_echo "C++ compiler is Sun Forte compiler" >&6; }
   	        if test "x$is_pgcc" != "x" ; then
 		  GXX_VERSION_STRING=`($CXX -V 2>&1) | grep "^pgCC"`
                   full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*pgCC\s+(\S+).*/\1/g;'`
+		  GXX_BRAND=PortlandGroup
     		  GXX_VERSION=pgCC`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
     		  GXX_VERSION_DETAILED=pgCC"$full_version"
   	          { $as_echo "$as_me:$LINENO: result: C++ compiler is Portland Group C++ $full_version" >&5
@@ -3839,7 +3848,8 @@ $as_echo "C++ compiler is Portland Group C++ $full_version" >&6; }
   	          if test "x$is_aCC" != "x" ; then
   	            { $as_echo "$as_me:$LINENO: result: C++ compiler is HP aCC" >&5
 $as_echo "C++ compiler is HP aCC" >&6; }
-  	            GXX_VERSION=hp_aCC
+  	            GXX_BRAND=HP
+                    GXX_VERSION=hp_aCC
   	            GXX_VERSION_DETAILED="$GXX_VERSION"
                   else
 
@@ -3847,7 +3857,8 @@ $as_echo "C++ compiler is HP aCC" >&6; }
   	            if test "x$is_bcc" != "x" ; then
   	              { $as_echo "$as_me:$LINENO: result: C++ compiler is Borland C++" >&5
 $as_echo "C++ compiler is Borland C++" >&6; }
-  	              GXX_VERSION=borland_bcc
+  	              GXX_BRAND=Borland
+		      GXX_VERSION=borland_bcc
   	              GXX_VERSION_DETAILED="$GXX_VERSION"
                     else
 
@@ -3856,7 +3867,8 @@ $as_echo "C++ compiler is Borland C++" >&6; }
   	              if test "x$is_kai_cc" != "x" ; then
   	                { $as_echo "$as_me:$LINENO: result: C++ compiler is KAI C++" >&5
 $as_echo "C++ compiler is KAI C++" >&6; }
-  	                GXX_VERSION=kai_cc
+  	                GXX_BRAND=KAI
+			GXX_VERSION=kai_cc
    	                GXX_VERSION_DETAILED="$GXX_VERSION"
                       else
 
@@ -3864,12 +3876,14 @@ $as_echo "C++ compiler is KAI C++" >&6; }
                         if test "x$is_pathscale" != "x" ; then
                           { $as_echo "$as_me:$LINENO: result: C++ compiler is PathScale C++" >&5
 $as_echo "C++ compiler is PathScale C++" >&6; }
-  	                  GXX_VERSION=pathscale_cc
+  	                  GXX_BRAND=PathScale
+			  GXX_VERSION=pathscale_cc
    	                  GXX_VERSION_DETAILED="$GXX_VERSION"
                         else
                                                     { $as_echo "$as_me:$LINENO: result: Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&5
 $as_echo "Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org" >&6; }
-                          GXX_VERSION=unknown_cc
+                          GXX_BRAND=Unknown
+			  GXX_VERSION=unknown_cc
                           GXX_VERSION_DETAILED="$GXX_VERSION"
                         fi
                       fi
@@ -5027,7 +5041,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
  	  ;;
 
-      portland_group)
+      pgCC*)
 	  	  	  	            	   	  	                                	  	                       	  	  	  	  	  	  	   	  	  CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
@@ -5216,6 +5230,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	;;
     esac
   fi
+
 
 
 
@@ -5745,7 +5760,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
-	portland_group*)
+	pgCC*)
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
@@ -9222,7 +9237,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
-  if test ! "x$GXX_VERSION" = "xportland_group" ; then
+  if test ! "x$GXX_BRAND" = "PortlandGroup" ; then
     { $as_echo "$as_me:$LINENO: checking for __builtin_expect" >&5
 $as_echo_n "checking for __builtin_expect... " >&6; }
     ac_ext=cpp

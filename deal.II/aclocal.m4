@@ -103,6 +103,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
 
     full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*version (\d\.\d\.\d).*/\1/g;'`
+    GXX_BRAND=GNU
     GXX_VERSION=gcc`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
     GXX_VERSION_DETAILED=gcc$full_version
 
@@ -122,6 +123,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       dnl know how to check the version number, so assume that is sufficiently
       dnl high...
       AC_MSG_RESULT(C++ compiler is IBM xlC)
+      GXX_BRAND=IBM
       GXX_VERSION=ibm_xlc
       GXX_VERSION_DETAILED="$GXX_VERSION"
     else
@@ -129,6 +131,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
       dnl Check whether we are dealing with the MIPSpro C++ compiler
       mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
       if test "x$mips_pro" != "x" ; then
+        GXX_BRAND=MIPSpro
         case "$mips_pro" in
           *7.0* | *7.1* | *7.2* | *7.3*)
             dnl MIPSpro 7.3 does not support standard C++, therefore it is not
@@ -174,6 +177,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	is_pgi="`($CXX -V 2>&1) | grep 'Portland'`"
 
         if test "x$is_intel_icc" != "x" -a "x$is_pgi" == "x" ; then
+	  GXX_BRAND=Intel
 	  version_string="`($CXX -V 2>&1) | grep 'Version'` `($CXX -help 2>&1) | grep 'Version'`"
 	  version5="`echo $version_string | grep 'Version 5'`"
 	  version6="`echo $version_string | grep 'Version 6'`"
@@ -214,6 +218,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
           if test "x$is_dec_cxx" != "x" ; then
             AC_MSG_RESULT(C++ compiler is Compaq-cxx)
+            GXX_BRAND=Compaq
             GXX_VERSION=compaq_cxx
             GXX_VERSION_DETAILED="$GXX_VERSION"
           else
@@ -223,6 +228,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
             is_sun_cc_2="`($CXX -V 2>&1) | grep 'Sun C++'`"
             if test "x$is_sun_cc_1$is_sun_cc_2" != "x" ; then
               AC_MSG_RESULT(C++ compiler is Sun Workshop compiler)
+              GXX_BRAND=SunWorkshop
               GXX_VERSION=sun_workshop
               GXX_VERSION_DETAILED="$GXX_VERSION"
             else
@@ -231,6 +237,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
               is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
               if test "x$is_sun_forte_cc" != "x" ; then
                 AC_MSG_RESULT(C++ compiler is Sun Forte compiler)
+                GXX_BRAND=SunForte
                 GXX_VERSION=sun_forte
                 GXX_VERSION_DETAILED="$GXX_VERSION"
               else
@@ -240,6 +247,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	        if test "x$is_pgcc" != "x" ; then
 		  GXX_VERSION_STRING=`($CXX -V 2>&1) | grep "^pgCC"`
                   full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*pgCC\s+(\S+).*/\1/g;'`
+		  GXX_BRAND=PortlandGroup
     		  GXX_VERSION=pgCC`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
     		  GXX_VERSION_DETAILED=pgCC"$full_version"
   	          AC_MSG_RESULT(C++ compiler is Portland Group C++ $full_version)
@@ -249,7 +257,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	          is_aCC="`($CXX -V 2>&1) | grep 'aCC'`"
   	          if test "x$is_aCC" != "x" ; then
   	            AC_MSG_RESULT(C++ compiler is HP aCC)
-  	            GXX_VERSION=hp_aCC
+  	            GXX_BRAND=HP
+                    GXX_VERSION=hp_aCC
   	            GXX_VERSION_DETAILED="$GXX_VERSION"
                   else
 
@@ -257,7 +266,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	            is_bcc="`($CXX -h 2>&1) | grep 'Borland'`"
   	            if test "x$is_bcc" != "x" ; then
   	              AC_MSG_RESULT(C++ compiler is Borland C++)
-  	              GXX_VERSION=borland_bcc
+  	              GXX_BRAND=Borland
+		      GXX_VERSION=borland_bcc
   	              GXX_VERSION_DETAILED="$GXX_VERSION"
                     else
 
@@ -274,7 +284,8 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	              is_kai_cc="$is_kai_cc`($CXX -v 2>&1) | grep /KCC/`"
   	              if test "x$is_kai_cc" != "x" ; then
   	                AC_MSG_RESULT(C++ compiler is KAI C++)
-  	                GXX_VERSION=kai_cc
+  	                GXX_BRAND=KAI
+			GXX_VERSION=kai_cc
    	                GXX_VERSION_DETAILED="$GXX_VERSION"
                       else
 
@@ -282,12 +293,14 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
                         is_pathscale="`($CXX -v 2>&1) | grep PathScale`"
                         if test "x$is_pathscale" != "x" ; then
                           AC_MSG_RESULT(C++ compiler is PathScale C++)
-  	                  GXX_VERSION=pathscale_cc
+  	                  GXX_BRAND=PathScale
+			  GXX_VERSION=pathscale_cc
    	                  GXX_VERSION_DETAILED="$GXX_VERSION"
                         else
                           dnl  Aw, nothing suitable found...
                           AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
-                          GXX_VERSION=unknown_cc
+                          GXX_BRAND=Unknown
+			  GXX_VERSION=unknown_cc
                           GXX_VERSION_DETAILED="$GXX_VERSION"
                         fi
                       fi
@@ -801,7 +814,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             ])
  	  ;;
 
-      portland_group)
+      pgCC*)
 	  dnl Suppress warnings:
 	  dnl  #68: "integer conversion resulted in a change of sign". This
 	  dnl       is what we get every time we use
@@ -1945,7 +1958,7 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
-	portland_group*)
+	pgCC*)
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
@@ -4574,7 +4587,7 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_HAVE_BUILTIN_EXPECT, dnl
 [
-  if test ! "x$GXX_VERSION" = "xportland_group" ; then
+  if test ! "x$GXX_BRAND" = "PortlandGroup" ; then
     AC_MSG_CHECKING(for __builtin_expect)
     AC_LANG(C++)
     CXXFLAGS="$CXXFLAGSG"
