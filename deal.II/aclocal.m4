@@ -238,9 +238,11 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
   	        dnl Portland Group C++?
   	        is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
   	        if test "x$is_pgcc" != "x" ; then
-  	          AC_MSG_RESULT(C++ compiler is Portland Group C++)
-  	          GXX_VERSION=portland_group
-    	          GXX_VERSION_DETAILED="$GXX_VERSION"
+		  GXX_VERSION_STRING=`($CXX -V 2>&1) | grep "^pgCC"`
+                  full_version=`echo "$GXX_VERSION_STRING" | perl -pi -e 's/.*pgCC\s+(\S+).*/\1/g;'`
+    		  GXX_VERSION=pgCC`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
+    		  GXX_VERSION_DETAILED="$GXX_VERSION"
+  	          AC_MSG_RESULT(C++ compiler is Portland Group C++ $full_version)
                 else
 
   	          dnl HP aCC?
@@ -1211,8 +1213,10 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   	        dnl Portland Group C?
   	        is_pgcc="`($CC -V 2>&1) | grep 'Portland Group'`"
   	        if test "x$is_pgcc" != "x" ; then
-  	          AC_MSG_RESULT(C compiler is Portland Group C)
-  	          CC_VERSION=portland_group
+		  CC_VERSION_STRING=`($CC -V 2>&1) | grep "^pgcc"`
+                  full_version=`echo "$CC_VERSION_STRING" | perl -pi -e 's/.*pgcc\s+(\S+).*/\1/g;'`
+    		  CC_VERSION=pgcc`echo $full_version | perl -pi -e 's/(\d\.\d).*/\1/g;'`
+  	          AC_MSG_RESULT(C compiler is Portland Group C $full_version)
   	        else
 
   	          dnl HP aCC?
