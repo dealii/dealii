@@ -55,11 +55,9 @@ void test ()
 {
   const unsigned int dim=3;
 
-  double a1[3] = {1, 2, 3};
-  Tensor<1,dim> t1(a1);
+  Tensor<0,dim> t1(1.);
 
-  double a2[3] = {3, 6, 9};
-  Tensor<1,dim> t2(a2);
+  Tensor<0,dim> t2(2.);
 
   verify (t1, t2);
 }
@@ -67,7 +65,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("tensor_base/output");
+  std::ofstream logfile("tensor_base_scalar/output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);

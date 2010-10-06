@@ -14,7 +14,7 @@
 // check serialization for Tensor<1,dim>
 
 #include "../tests.h"
-#include <base/tensor.h>
+#include <base/point.h>
 #include <base/logstream.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -55,19 +55,17 @@ void test ()
 {
   const unsigned int dim=3;
 
-  double a1[3] = {1, 2, 3};
-  Tensor<1,dim> t1(a1);
+  Point<dim> p1(1.,2.,3.);
 
-  double a2[3] = {3, 6, 9};
-  Tensor<1,dim> t2(a2);
+  Point<dim> p2(4.,5.,6.);
 
-  verify (t1, t2);
+  verify (p1, p2);
 }
 
 
 int main ()
 {
-  std::ofstream logfile("tensor_base/output");
+  std::ofstream logfile("point/output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
