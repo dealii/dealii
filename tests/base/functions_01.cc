@@ -34,6 +34,7 @@
   F f;								\
   check_function_value_consistency(f, 5);				\
   check_function_gradient_consistency(f, 5);			\
+  check_gradient(f, 5); \
 }  
   
 
@@ -57,6 +58,9 @@ int main()
   CHECK(Functions::CosineFunction<1>);
   CHECK(Functions::CosineFunction<2>);
   CHECK(Functions::CosineFunction<3>);
+  CHECK(Functions::CosineGradFunction<1>);
+  CHECK(Functions::CosineGradFunction<2>);
+  CHECK(Functions::CosineGradFunction<3>);
   CHECK(Functions::ExpFunction<1>);
   CHECK(Functions::ExpFunction<2>);
   CHECK(Functions::ExpFunction<3>);  

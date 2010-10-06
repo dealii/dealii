@@ -30,31 +30,6 @@
 #include <fstream>
 #include <string>
 
-
-/**
- * A class replacing the implemented derivatives of a function with
- * difference quotients. This way, the correctness of the
- * implementation can be tested.
- */
-template <int dim>
-class DerivativeTestFunction :
-  public AutoDerivativeFunction<dim>
-{
-  public:
-    DerivativeTestFunction(const Function<dim>&, const double h);
-    ~DerivativeTestFunction();
-    
-    virtual void vector_value (const Point<dim>& points, Vector<double>& value) const;
-    virtual double value (const Point<dim>& points, const unsigned int component) const;
-    virtual void vector_value_list (const std::vector< Point< dim > > &points,
-				    std::vector< Vector< double > > &values) const;
-    
-  private:
-    const Function<dim>& func;
-};
-
-
-
 template<int dim>
 void
 check_function_consistency(
@@ -275,48 +250,3 @@ int main()
   check_function_consistency(fl, flg, 5);
 }
 
-
-template <int dim>
-DerivativeTestFunction<dim>::DerivativeTestFunction(const Function<dim>& f,
-						    const double h)
-		:
-		AutoDerivativeFunction<dim>(h, f.n_components),
-		func(f)
-{
-  this->set_formula(AutoDerivativeFunction<dim>::FourthOrder);
-}
-
-
-template <int dim>
-DerivativeTestFunction<dim>::~DerivativeTestFunction()
-{}
-
-
-template <int dim>
-void
-DerivativeTestFunction<dim>::vector_value_list (
-  const std::vector< Point< dim > > &points,
-  std::vector< Vector< double > > &values) const
-{
-  func.vector_value_list(points, values);
-}
-
-
-template<int dim>
-void DerivativeTestFunction<dim>::vector_value (
-  const Point<dim>& point,
-  Vector<double>& value) const
-{
-  func.vector_value(point, value);
-}
-
-
-template<int dim>
-double DerivativeTestFunction<dim>::value (
-    const Point<dim>& point,
-    const unsigned int comp) const
-{
-//  std::cerr << '[' << point << '!' << func.value(point, comp) << ']';
-  
-  return func.value(point, comp);
-}
