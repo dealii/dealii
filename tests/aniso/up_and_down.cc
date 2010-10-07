@@ -17,6 +17,7 @@
 #include <dofs/dof_accessor.h>
 #include <grid/grid_generator.h>
 #include <grid/grid_tools.h>
+#include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_system.h>
