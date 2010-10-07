@@ -11,44 +11,11 @@
 //
 //----------------------------  tensor_base_scalar.cc  ---------------------------
 
-// check serialization for Tensor<1,dim>
+// check serialization for Tensor<0,dim>
 
+#include "serialization.h"
 #include "../tests.h"
 #include <base/tensor.h>
-#include <base/logstream.h>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <sstream>
-#include <fstream>
-#include <iomanip>
-
-
-template <typename T>
-void verify (T &t1,
-	     T &t2)
-{
-				   // save data to archive
-  std::ostringstream oss;
-  {
-    boost::archive::text_oarchive oa(oss);
-    oa << t1;
-				     // archive and stream closed when
-				     // destructors are called
-  }
-  deallog << oss.str() << std::endl;
-
-				   // verify correctness of the
-				   // serialization
-  {
-    std::istringstream  iss(oss.str());
-    boost::archive::text_iarchive ia(iss);
-
-
-    ia >> t2;
-
-    Assert (t1 == t2, ExcInternalError());
-  }
-}
 
 
 void test ()
