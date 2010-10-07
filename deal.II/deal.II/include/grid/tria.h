@@ -187,7 +187,6 @@ namespace internal
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
- * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
     template <int dim>
@@ -206,7 +205,6 @@ namespace internal
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
- * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
     template <>
@@ -271,7 +269,6 @@ namespace internal
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
- * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
     template <>
@@ -330,7 +327,6 @@ namespace internal
  * and since access to the number of lines etc is a rather frequent
  * operation, this was not an optimal solution.
  *
- * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
     template <>

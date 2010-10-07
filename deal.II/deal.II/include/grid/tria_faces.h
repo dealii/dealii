@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,6 @@ namespace internal
  *
  * This general template is only provided to enable a specialisation below.
  *
- * @ingroup grid
  * @author Tobias Leicht, 2006
  */
 
@@ -57,7 +56,6 @@ namespace internal
  * Faces only have a meaning in <tt>dim@>=1</tt>. In <tt>dim=1</tt> they are vertices,
  * which are handled differently, so only for <tt>dim@>=2</tt> the use of TriaFaces
  * is reasonable, for <tt>dim=1</tt> the class is empty.
- * @ingroup grid
  */
     template<>
     class TriaFaces<1>
@@ -75,7 +73,6 @@ namespace internal
 
 /**
  * In <tt>dim=2</tt> the cells are quads, the faces accordingly are lines. 
- * @ingroup grid
  */
     template<>
     class TriaFaces<2>
@@ -98,7 +95,6 @@ namespace internal
 /**
  * In <tt>dim=3</tt> the cells are hexes, the faces accordingly are quads. In
  * addition to that we also have to enable the storage of lines.
- * @ingroup grid
  */	
     template<>
     class TriaFaces<3>

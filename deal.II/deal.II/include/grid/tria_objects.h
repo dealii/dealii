@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,6 @@ namespace internal
  * Objects of these classes are included in the TriaLevel and TriaFaces
  * classes.
  *
- * @ingroup grid
  * @author Tobias Leicht, Guido Kanschat, 2006, 2007
  */
     
@@ -430,7 +429,6 @@ namespace internal
  * For hexahedrons the data of TriaObjects needs to be extended, as we can obtain faces
  * (quads) in non-standard-orientation, therefore we declare a class TriaObjectsHex, which
  * additionaly contains a bool-vector of the face-orientations.
- * @ingroup grid
  */
     
     class TriaObjectsHex: public TriaObjects<TriaObject<3> >
@@ -547,7 +545,6 @@ namespace internal
  * can obtain faces (quads) with lines in non-standard-orientation, therefore we
  * declare a class TriaObjectsQuad3D, which additionaly contains a bool-vector
  * of the line-orientations.
- * @ingroup grid
  */
     
     class TriaObjectsQuad3D: public TriaObjects<TriaObject<2> >
