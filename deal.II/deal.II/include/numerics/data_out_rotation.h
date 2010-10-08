@@ -53,6 +53,8 @@ namespace internal
 	
 	const dealii::hp::QCollection<dim> q_collection;
 	dealii::hp::FEValues<dim,spacedim> x_fe_values;
+	
+	std::vector<Point<spacedim> > patch_evaluation_points;
     };
   }
 }

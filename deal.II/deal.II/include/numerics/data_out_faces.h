@@ -54,6 +54,7 @@ namespace internal
 	dealii::hp::FEFaceValues<dim> x_fe_values;
 
 	std::vector<Point<dim> > patch_normals;
+	std::vector<Point<spacedim> > patch_evaluation_points;
     };
   }
 }

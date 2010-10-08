@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -81,6 +81,28 @@ class DataPostprocessor: public Subscriptor
     virtual ~DataPostprocessor ();
 
 				     /**
+				      * @deprecated
+				      *
+				      * This function only exists for backward
+				      * compatibility as this is the interface
+				      * provided by previous versions of the
+				      * library. The default implementation of
+				      * the other function of same name below
+				      * calls this function by simply dropping
+				      * the argument that denotes the
+				      * evaluation points. Since this function
+				      * might at one point go away, you should
+				      * overload the other function instead.
+				      */
+    virtual
+    void
+    compute_derived_quantities_scalar (const std::vector<double>         &uh,
+				       const std::vector<Tensor<1,dim> > &duh,
+				       const std::vector<Tensor<2,dim> > &dduh,
+				       const std::vector<Point<dim> >    &normals,
+				       std::vector<Vector<double> >      &computed_quantities) const;
+				       
+				     /**
 				      * This is the main function which actually
 				      * performs the postprocessing. The last
 				      * argument is a reference to the
@@ -113,16 +135,22 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<Tensor<1,dim> > &duh,
 				       const std::vector<Tensor<2,dim> > &dduh,
 				       const std::vector<Point<dim> >    &normals,
-				       std::vector<Vector<double> >      &computed_quantities) const;
+				       const std::vector<Point<dim> >    &evaluation_points,
+				       std::vector<Vector<double> >      &computed_quantities) const;			       
     
 				     /**
-				      * Same as above function, but
-				      * this function is called when
-				      * the original data vector
-				      * represents vector data,
-				      * i.e. the finite element in use
-				      * has multiple vector
-				      * components.
+				      * @deprecated
+				      *
+				      * This function only exists for backward
+				      * compatibility as this is the interface
+				      * provided by previous versions of the
+				      * library. The default implementation of
+				      * the other function of same name below
+				      * calls this function by simply dropping
+				      * the argument that denotes the
+				      * evaluation points. Since this function
+				      * might at one point go away, you should
+				      * overload the other function instead.
 				      */
     virtual
     void
@@ -131,6 +159,24 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
 				       const std::vector<Point<dim> >                  &normals,
 				       std::vector<Vector<double> >                    &computed_quantities) const;
+				       
+				     /**
+				      * Same as the
+				      * compute_derived_quantities_scalar()
+				      * function, but this function is called
+				      * when the original data vector
+				      * represents vector data, i.e. the
+				      * finite element in use has multiple
+				      * vector components.
+				      */
+    virtual
+    void
+    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+				       const std::vector<Point<dim> >                  &normals,
+				       const std::vector<Point<dim> >                  &evaluation_points,
+				       std::vector<Vector<double> >                    &computed_quantities) const;			       
 
 				     /**
 				      * Return the vector of strings describing

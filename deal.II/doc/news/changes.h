@@ -280,6 +280,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>Changed: The DataPostprocessor functions now take an additional
+  argument that indicates the location of an evaluation point. For backward
+  compatibility, the old function signature still exists so that applications
+  that overload one of the existing functions continue to work.
+  The old signature has been deprecated, however, and will be removed in a
+  future version.
+  <br>
+  (Scott Miller 2010/10/08)
+  </p></li>
 
   <li><p>Changed: FETools is now a namespace rather than a class with only
   static member functions.

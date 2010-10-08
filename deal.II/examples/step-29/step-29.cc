@@ -2,7 +2,7 @@
 /* Author: Moritz Allmaras, Texas A&M University, 2007 */
 
 /*                                                                */
-/*    Copyright (C) 2007, 2008 by the deal.II authors and M. Allmaras   */
+/*    Copyright (C) 2007, 2008, 2010 by the deal.II authors and M. Allmaras   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -414,6 +414,7 @@ class ComputeIntensity : public DataPostprocessor<dim>
       const std::vector< std::vector< Tensor< 1, dim > > > &, 
       const std::vector< std::vector< Tensor< 2, dim > > > &, 
       const std::vector< Point< dim > > &,
+      const std::vector<Point<dim> > &,
       std::vector< Vector< double > > &
     ) const;
 
@@ -518,6 +519,7 @@ ComputeIntensity<dim>::compute_derived_quantities_vector (
   const std::vector< std::vector< Tensor< 1, dim > > >  & /*duh*/,
   const std::vector< std::vector< Tensor< 2, dim > > >  & /*dduh*/,
   const std::vector< Point< dim > >                     & /*normals*/,
+  const std::vector<Point<dim> >                        & /*evaluation_points*/,
   std::vector< Vector< double > >                       & computed_quantities
 ) const
 {

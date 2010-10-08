@@ -768,12 +768,18 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 		  if (update_flags & update_hessians)
 		    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 								    data.patch_hessians);
+								    
+		  if (update_flags & update_quadrature_points)
+		    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+		    
+		    
 		  std::vector<Point<DH::space_dimension> > dummy_normals;
 		  postprocessor->
 		    compute_derived_quantities_scalar(data.patch_values,
 						      data.patch_gradients,
 						      data.patch_hessians,
 						      dummy_normals,
+						      data.patch_evaluation_points,
 						      data.postprocessed_values[dataset]);
 		}
 	      else
@@ -791,12 +797,18 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 		  if (update_flags & update_hessians)
 		    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 								    data.patch_hessians_system);
+		  
+		  if (update_flags & update_quadrature_points)
+		    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+		  
 		  std::vector<Point<DH::space_dimension> > dummy_normals;
+		  
 		  postprocessor->
 		    compute_derived_quantities_vector(data.patch_values_system,
 						      data.patch_gradients_system,
 						      data.patch_hessians_system,
 						      dummy_normals,
+						      data.patch_evaluation_points,
 						      data.postprocessed_values[dataset]);
 		}
 

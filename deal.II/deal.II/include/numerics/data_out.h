@@ -122,6 +122,8 @@ namespace internal
 	const dealii::hp::QCollection<dim> q_collection;
 	const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
 	dealii::hp::FEValues<dim,spacedim> x_fe_values;
+	
+	std::vector<Point<spacedim> > patch_evaluation_points;
 
 	const std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
     };

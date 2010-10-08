@@ -170,11 +170,16 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 		  if (update_flags & update_hessians)
 		    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 								    data.patch_hessians);
+		  
+		  if (update_flags & update_quadrature_points)
+		    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();						   
+								    
 		  postprocessor->
 		    compute_derived_quantities_scalar(data.patch_values,
 						      data.patch_gradients,
 						      data.patch_hessians,
 						      data.patch_normals,
+						      data.patch_evaluation_points,
 						      data.postprocessed_values[dataset]);
 		}
 	      else
@@ -192,11 +197,16 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 		  if (update_flags & update_hessians)
 		    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 								    data.patch_hessians_system);
+								    
+		  if (update_flags & update_quadrature_points)
+		    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+		    
 		  postprocessor->
 		    compute_derived_quantities_vector(data.patch_values_system,
 						      data.patch_gradients_system,
 						      data.patch_hessians_system,
 						      data.patch_normals,
+						      data.patch_evaluation_points,
 						      data.postprocessed_values[dataset]);
 		}
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,11 +35,25 @@ compute_derived_quantities_scalar (const std::vector<double>         &/*uh*/,
 }
 
 
+template <int dim>
+void
+DataPostprocessor<dim>::
+compute_derived_quantities_scalar (const std::vector<double>         &uh,
+				   const std::vector<Tensor<1,dim> > &duh,
+				   const std::vector<Tensor<2,dim> > &dduh,
+				   const std::vector<Point<dim> >    &normals,
+				   const std::vector<Point<dim> >    &/*evaluation_points*/,
+				   std::vector<Vector<double> >      &computed_quantities) const
+{
+  compute_derived_quantities_scalar(uh, duh, dduh, normals, computed_quantities);
+}
+
+
 
 template <int dim>
 void
 DataPostprocessor<dim>::
-compute_derived_quantities_vector (const std::vector<Vector<double> >              &/*uh*/,
+compute_derived_quantities_vector (const std::vector<Vector<double> > &/*uh*/,
 				   const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
 				   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
 				   const std::vector<Point<dim> >                  &/*normals*/,
@@ -47,6 +61,21 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
 {
   computed_quantities.clear();
   AssertThrow(false,ExcPureFunctionCalled());
+}
+
+
+
+template <int dim>
+void
+DataPostprocessor<dim>::
+compute_derived_quantities_vector (const std::vector<Vector<double> > &uh,
+				   const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				   const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+				   const std::vector<Point<dim> >                  &normals,
+				   const std::vector<Point<dim> >                  &/*evaluation_points*/,
+				   std::vector<Vector<double> >                    &computed_quantities) const
+{
+  compute_derived_quantities_vector(uh, duh, dduh, normals, computed_quantities);
 }
 
 
