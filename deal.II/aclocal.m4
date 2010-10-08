@@ -5561,6 +5561,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   if test "$USE_CONTRIB_PETSC" = "yes" ; then
     DEAL_II_CONFIGURE_PETSC_VERSION
     DEAL_II_CONFIGURE_PETSC_ARCH
+    DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
     DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
     DEAL_II_CONFIGURE_PETSC_COMPLEX
 
@@ -5672,6 +5673,20 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
   fi
 
   AC_MSG_RESULT($PETSC_VERSION)
+])
+
+
+dnl -------------------------------------------------------------
+dnl Make sure that if PETSc was built with/without MPI, then
+dnl deal.II was built with the same flags.
+dnl
+dnl Usage: DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
+[
+dnl TODO: This does nothing yet. Add this functionality asap 
+dnl (Toby D. Young)
 ])
 
 
