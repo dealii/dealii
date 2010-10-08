@@ -526,6 +526,10 @@ namespace MeshWorker
  * <li> It stores information on finite element vectors and whether
  * their data should be used to compute values or derivatives of
  * functions at quadrature points.
+ *
+ * <li> It makes educated guesses on quadrature rules and update
+ * flags, so that minimal code has to be written when default
+ * parameters are sufficient.
  * </ol>
  *
  * In order to allow for sufficient generality, a few steps have to be
@@ -541,10 +545,16 @@ namespace MeshWorker
  * the selectors filled before and adds all the flags needed to get
  * the selection. Additional flags can be set with add_update_flags().
  *
- * Finally, we need to choose quadrature formulas. If you choose to
- * use Gauss formulas only, use initialize_gauss_quadrature() with
- * appropriate values. Otherwise, you can fill the variables
- * #cell_quadrature, #boundary_quadrature and #face_quadrature directly.
+ * Finally, we need to choose quadrature formulas. In the simplest
+ * case, you might be happy with the default settings, which are
+ * <i>n</i>-point Gauss formulas. If only derivatives of the shape
+ * functions are used (#update_values is not set) <i>n</i> equals the
+ * highest polynomial degree in the FiniteElement, if #update_values
+ * is set, <i>n</i> is one higher than this degree.  If you choose to
+ * use Gauss formulas of other size, use initialize_gauss_quadrature()
+ * with appropriate values. Otherwise, you can fill the variables
+ * #cell_quadrature, #boundary_quadrature and #face_quadrature
+ * directly.
  *
  * In order to save time, you can set the variables boundary_fluxes
  * and interior_fluxes of the base class to false, thus telling the
@@ -571,17 +581,56 @@ namespace MeshWorker
 					* Default constructor.
 					*/
       IntegrationInfoBox ();
-      
+
+				       /**
+					* Initialize the
+					* IntegrationInfo objects
+					* contained.
+					*
+					* Before doing so, add update
+					* flags necessary to produce
+					* the data needed and also
+					* set uninitialized quadrature
+					* rules to Gauss formulas,
+					* which integrate polynomial
+					* bilinear forms exactly.
+					*/
       void initialize(const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
 		      const BlockInfo* block_info = 0);
 
+				       /**
+					* Initialize the
+					* IntegrationInfo objects
+					* contained.
+					*
+					* Before doing so, add update
+					* flags necessary to produce
+					* the data needed and also
+					* set uninitialized quadrature
+					* rules to Gauss formulas,
+					* which integrate polynomial
+					* bilinear forms exactly.
+					*/
       template <typename VECTOR>
       void initialize(const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
 		      const NamedData<VECTOR*>& data,
 		      const BlockInfo* block_info = 0);
 
+				       /**
+					* Initialize the
+					* IntegrationInfo objects
+					* contained.
+					*
+					* Before doing so, add update
+					* flags necessary to produce
+					* the data needed and also
+					* set uninitialized quadrature
+					* rules to Gauss formulas,
+					* which integrate polynomial
+					* bilinear forms exactly.
+					*/
       template <typename VECTOR>
       void initialize(const FiniteElement<dim, spacedim>& el,
 		      const Mapping<dim, spacedim>& mapping,
@@ -637,17 +686,26 @@ namespace MeshWorker
 			    const bool face = true,
 			    const bool neighbor = true);
 
-				       /** Assign n-point Gauss
+				       /**
+					* Assign n-point Gauss
 					* quadratures to each of the
 					* quadrature rules. Here, a
 					* size of zero points means
 					* that no loop over these grid
 					* entities should be
 					* performed.
+					*
+					* If the parameter
+					* <tt>force</tt> is true, then
+					* all quadrature sets are
+					* filled with new quadrature
+					* ruels. If it is false, then
+					* only empty rules are changed.
 					*/
       void initialize_gauss_quadrature(unsigned int n_cell_points,
 				       unsigned int n_boundary_points,
-				       unsigned int n_face_points);
+				       unsigned int n_face_points,
+				       const bool force = true);
 
 				       /**
 					* The memory used by this object.
@@ -1303,15 +1361,144 @@ namespace MeshWorker
   }
 
 
+//----------------------------------------------------------------------//
+  
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,1>::initialize_gauss_quadrature(
+    const unsigned int cp,
+    const unsigned int,
+    const unsigned int,
+    bool force)
+  {
+    if (force || cell_quadrature.size() == 0)
+      cell_quadrature = QGauss<1>(cp);
+  }
+
+
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,2>::initialize_gauss_quadrature(
+    const unsigned int cp,
+    const unsigned int,
+    const unsigned int,
+    bool force)
+  {
+    if (force || cell_quadrature.size() == 0)
+      cell_quadrature = QGauss<1>(cp);
+  }
+
+  
   template <int dim, int sdim>
   inline
   void
-  IntegrationInfoBox<dim,sdim>::
-  initialize(const FiniteElement<dim,sdim>& el,
-	     const Mapping<dim,sdim>& mapping,
-	     const BlockInfo* block_info)
+  IntegrationInfoBox<dim,sdim>::initialize_gauss_quadrature(
+    unsigned int cp,
+    unsigned int bp,
+    unsigned int fp,
+    bool force)
+  {
+    if (force || cell_quadrature.size() == 0)
+      cell_quadrature = QGauss<dim>(cp);
+    if (force || boundary_quadrature.size() == 0)
+      boundary_quadrature = QGauss<dim-1>(bp);
+    if (force || face_quadrature.size() == 0)
+      face_quadrature = QGauss<dim-1>(fp);
+  }
+
+
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_all (const UpdateFlags flags)
+  {
+    add_update_flags(flags, true, true, true, true);
+  }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_cell (const UpdateFlags flags)
+  {
+    add_update_flags(flags, true, false, false, false);
+  }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_boundary (const UpdateFlags flags)
+  {
+    add_update_flags(flags, false, true, false, false);
+  }
+
+  
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::add_update_flags_face (const UpdateFlags flags)
+  {
+    add_update_flags(flags, false, false, true, true);
+  }
+  
+  
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,1>::initialize(
+    const FiniteElement<1,1>& el,
+    const Mapping<1,1>& mapping,
+    const BlockInfo* block_info)
   {
     initialize_update_flags();
+    initialize_gauss_quadrature(
+      (cell_flags & update_values) ? (el.tensor_degree()+1) : el.tensor_degree(), 1, 1, false);
+    
+    const int dim = 1;
+    const int sdim = 1;
+    
+    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
+					 cell_flags, block_info);
+  }
+
+
+
+  template <>
+  inline
+  void
+  IntegrationInfoBox<1,2>::initialize(
+    const FiniteElement<1,2>& el,
+    const Mapping<1,2>& mapping,
+    const BlockInfo* block_info)
+  {
+    initialize_update_flags();
+    initialize_gauss_quadrature(
+      (cell_flags & update_values) ? (el.tensor_degree()+1) : el.tensor_degree(), 1, 1, false);
+    
+    const int dim = 1;
+    const int sdim = 2;
+    
+    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
+					 cell_flags, block_info);
+  }
+
+
+  template <int dim, int sdim>
+  inline
+  void
+  IntegrationInfoBox<dim,sdim>::initialize(
+    const FiniteElement<dim,sdim>& el,
+    const Mapping<dim,sdim>& mapping,
+    const BlockInfo* block_info)
+  {
+    initialize_update_flags();
+    initialize_gauss_quadrature(
+      (cell_flags & update_values) ? (el.tensor_degree()+1) : el.tensor_degree(),
+      (boundary_flags & update_values) ? (el.tensor_degree()+1) : el.tensor_degree(),
+      (face_flags & update_values) ? (el.tensor_degree()+1) : el.tensor_degree(), false);
     
     cell.template initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
 						  cell_flags, block_info);
@@ -1325,45 +1512,6 @@ namespace MeshWorker
 							  neighbor_flags, block_info);
   }
 
-
-  template <>
-  inline
-  void
-  IntegrationInfoBox<1,1>::
-  initialize(const FiniteElement<1,1>& el,
-	     const Mapping<1,1>& mapping,
-	     const BlockInfo* block_info)
-  {
-    initialize_update_flags();
-    
-    const int dim = 1;
-    const int sdim = 1;
-
-    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
-					 cell_flags, block_info);
-  }
-
-
-
-  template <>
-  inline
-  void
-  IntegrationInfoBox<1,2>::
-  initialize(const FiniteElement<1,2>& el,
-	     const Mapping<1,2>& mapping,
-	     const BlockInfo* block_info)
-  {
-    initialize_update_flags();
-    
-    const int dim = 1;
-    const int sdim = 2;
-    
-    cell.initialize<FEValues<dim,sdim> >(el, mapping, cell_quadrature,
-					 cell_flags, block_info);
-  }
-
-
-//----------------------------------------------------------------------//
 
   template <int dim, int sdim>
   template <typename VECTOR>
@@ -1441,79 +1589,6 @@ namespace MeshWorker
   {}
 
 
-  template <int dim, int sdim>
-  inline
-  void
-  IntegrationInfoBox<dim,sdim>::initialize_gauss_quadrature(
-    unsigned int cp,
-    unsigned int bp,
-    unsigned int fp)
-  {
-    cell_quadrature = QGauss<dim>(cp);
-    boundary_quadrature = QGauss<dim-1>(bp);
-    face_quadrature = QGauss<dim-1>(fp);
-  }
-
-
-  template <>
-  inline
-  void
-  IntegrationInfoBox<1,1>::
-  initialize_gauss_quadrature(const unsigned int cp,
-			      const unsigned int,
-			      const unsigned int)
-  {
-    cell_quadrature = QGauss<1>(cp);
-  }
-
-
-  template <>
-  inline
-  void
-  IntegrationInfoBox<1,2>::
-  initialize_gauss_quadrature(const unsigned int cp,
-			      const unsigned int,
-			      const unsigned int)
-  {
-    cell_quadrature = QGauss<1>(cp);
-  }
-
-  
-  template <int dim, int sdim>
-  inline
-  void
-  IntegrationInfoBox<dim,sdim>::add_update_flags_all (const UpdateFlags flags)
-  {
-    add_update_flags(flags, true, true, true, true);
-  }
-
-  
-  template <int dim, int sdim>
-  inline
-  void
-  IntegrationInfoBox<dim,sdim>::add_update_flags_cell (const UpdateFlags flags)
-  {
-    add_update_flags(flags, true, false, false, false);
-  }
-
-  
-  template <int dim, int sdim>
-  inline
-  void
-  IntegrationInfoBox<dim,sdim>::add_update_flags_boundary (const UpdateFlags flags)
-  {
-    add_update_flags(flags, false, true, false, false);
-  }
-
-  
-  template <int dim, int sdim>
-  inline
-  void
-  IntegrationInfoBox<dim,sdim>::add_update_flags_face (const UpdateFlags flags)
-  {
-    add_update_flags(flags, false, false, true, true);
-  }
-  
 }
 
 DEAL_II_NAMESPACE_CLOSE

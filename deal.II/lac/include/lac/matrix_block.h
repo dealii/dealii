@@ -479,13 +479,35 @@ class MatrixBlockVector
  */
 template <class MATRIX>
 class MGMatrixBlockVector
-  : private NamedData<std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > > >
+  : public Subscriptor
 {
   public:
 				     /**
 				      * The type of object stored.
 				      */
     typedef MGLevelObject<MatrixBlock<MATRIX> > value_type;
+				     /**
+				      * Constructor, determining which
+				      * matrices should be stored.
+				      *
+				      * If <tt>edge_matrices</tt> is
+				      * true, then objects for edge
+				      * matrices for discretizations
+				      * with degrees of freedom on
+				      * faces are allocated.
+				      *
+				      * If <tt>edge_flux_matrices</tt>
+				      * is true, then objects for DG
+				      * fluxes on the refinement edge
+				      * are allocated.
+				      */
+    MGMatrixBlockVector(const bool edge_matrices = false,
+			const bool edge_flux_matrices = false);
+
+				     /**
+				      * The number of blocks.
+				      */
+    unsigned int size () const;
     
 				     /**
 				      * Add a new matrix block at the
@@ -504,8 +526,35 @@ class MGMatrixBlockVector
 				      * reinitializes each matrix in
 				      * the vector with the correct
 				      * pattern from the block system.
+				      *
+				      * This function reinitializes
+				      * the level matrices.
 				      */
-    void reinit(const MGLevelObject<BlockSparsityPattern>& sparsity);
+    void reinit_matrix(const MGLevelObject<BlockSparsityPattern>& sparsity);
+				     /**
+				      * For matrices using a
+				      * SparsityPattern, this function
+				      * reinitializes each matrix in
+				      * the vector with the correct
+				      * pattern from the block system.
+				      *
+				      * This function reinitializes
+				      * the matrices for degrees of
+				      * freedom on the refinement edge.
+				      */
+    void reinit_edge(const MGLevelObject<BlockSparsityPattern>& sparsity);
+				     /**
+				      * For matrices using a
+				      * SparsityPattern, this function
+				      * reinitializes each matrix in
+				      * the vector with the correct
+				      * pattern from the block system.
+				      *
+				      * This function reinitializes
+				      * the flux matrices over the
+				      * refinement edge.
+				      */
+    void reinit_edge_flux(const MGLevelObject<BlockSparsityPattern>& sparsity);
     
 				     /**
 				      * Clears the object.
@@ -528,26 +577,88 @@ class MGMatrixBlockVector
     
 				     /**
 				      * Access a constant reference to
-				      * the block at position <i>i</i>.
+				      * the matrix block at position <i>i</i>.
 				      */
     const value_type& block(unsigned int i) const;
     
 				     /**
 				      * Access a reference to
-				      * the block at position <i>i</i>.
+				      * the matrix block at position <i>i</i>.
 				      */
     value_type& block(unsigned int i);
+    
+				     /**
+				      * Access a constant reference to
+				      * the edge matrix block at position <i>i</i>.
+				      */
+    const value_type& block_in(unsigned int i) const;
+    
+				     /**
+				      * Access a reference to
+				      * the edge matrix block at position <i>i</i>.
+				      */
+    value_type& block_in(unsigned int i);
+    
+				     /**
+				      * Access a constant reference to
+				      * the edge matrix block at position <i>i</i>.
+				      */
+    const value_type& block_out(unsigned int i) const;
+    
+				     /**
+				      * Access a reference to
+				      * the edge matrix block at position <i>i</i>.
+				      */
+    value_type& block_out(unsigned int i);
+    
+				     /**
+				      * Access a constant reference to
+				      * the  edge flux matrix block at position <i>i</i>.
+				      */
+    const value_type& block_up(unsigned int i) const;
+    
+				     /**
+				      * Access a reference to
+				      * the  edge flux matrix block at position <i>i</i>.
+				      */
+    value_type& block_up(unsigned int i);
+    
+				     /**
+				      * Access a constant reference to
+				      * the  edge flux matrix block at position <i>i</i>.
+				      */
+    const value_type& block_down(unsigned int i) const;
+    
+				     /**
+				      * Access a reference to
+				      * the edge flux matrix block at position <i>i</i>.
+				      */
+    value_type& block_down(unsigned int i);
     
 				     /**
 				      * The memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-
-    NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
-    NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
-    NamedData<std_cxx1x::shared_ptr<value_type> >::size;
-
   private:
+				     /// Clear one of the matrix objects
+    void clear_object(NamedData<MGLevelObject<MatrixBlock<MATRIX> > >&);
+    
+				     /// Flag for storing #matrices_in and #matrices_out
+    const bool edge_matrices;
+
+				     /// Flag for storing #flux_matrices_up and #flux_matrices_down
+    const bool edge_flux_matrices;
+    
+				     /// The level matrices
+    NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices;
+	       /// The matrix from the interior of a level to the refinement edge
+    NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices_in;
+	       /// The matrix from the refinement edge to the interior of a level
+    NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices_out;
+	       /// The DG flux from a level to the lower level
+    NamedData<MGLevelObject<MatrixBlock<MATRIX> > > flux_matrices_down;
+	       /// The DG flux from the lower level to a level
+    NamedData<MGLevelObject<MatrixBlock<MATRIX> > > flux_matrices_up;
 };
 
 
@@ -872,17 +983,45 @@ MatrixBlockVector<MATRIX>::matrix(unsigned int i)
 //----------------------------------------------------------------------//
 
 template <class MATRIX>
+inline
+MGMatrixBlockVector<MATRIX>::MGMatrixBlockVector(
+  const bool e, const bool f)
+		:
+		edge_matrices(e),
+		edge_flux_matrices(f)
+{}
+
+
+template <class MATRIX>
+inline
+unsigned int
+MGMatrixBlockVector<MATRIX>::size () const
+{
+  return matrices.size();
+}
+
+
+template <class MATRIX>
 inline void
 MGMatrixBlockVector<MATRIX>::add(
   unsigned int row, unsigned int column,
   const std::string& name)
 {
-  std_cxx1x::shared_ptr<MGLevelObject<MatrixBlock<MATRIX> > >
-    p(new value_type(0, 1));
-  (*p)[0].row = row;
-  (*p)[0].column = column;
+  MGLevelObject<MatrixBlock<MATRIX> > p(0, 1);
+  p[0].row = row;
+  p[0].column = column;
   
-  NamedData<std_cxx1x::shared_ptr<value_type> >::add(p, name);
+  matrices.add(p, name);
+  if (edge_matrices)
+    {
+      matrices_in.add(p, name);
+      matrices_out.add(p, name);
+    }
+  if (edge_flux_matrices)
+    {
+      flux_matrices_up.add(p, name);
+      flux_matrices_down.add(p, name);
+    }
 }
 
 
@@ -890,7 +1029,7 @@ template <class MATRIX>
 inline const MGLevelObject<MatrixBlock<MATRIX> >&
 MGMatrixBlockVector<MATRIX>::block(unsigned int i) const
 {
-  return *this->read(i);
+  return matrices.read(i);
 }
 
 
@@ -898,13 +1037,77 @@ template <class MATRIX>
 inline MGLevelObject<MatrixBlock<MATRIX> >&
 MGMatrixBlockVector<MATRIX>::block(unsigned int i)
 {
-  return *(*this)(i);
+  return matrices(i);
+}
+
+
+template <class MATRIX>
+inline const MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_in(unsigned int i) const
+{
+  return matrices_in.read(i);
+}
+
+
+template <class MATRIX>
+inline MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_in(unsigned int i)
+{
+  return matrices_in(i);
+}
+
+
+template <class MATRIX>
+inline const MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_out(unsigned int i) const
+{
+  return matrices_out.read(i);
+}
+
+
+template <class MATRIX>
+inline MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_out(unsigned int i)
+{
+  return matrices_out(i);
+}
+
+
+template <class MATRIX>
+inline const MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_up(unsigned int i) const
+{
+  return flux_matrices_up.read(i);
+}
+
+
+template <class MATRIX>
+inline MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_up(unsigned int i)
+{
+  return flux_matrices_up(i);
+}
+
+
+template <class MATRIX>
+inline const MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_down(unsigned int i) const
+{
+  return flux_matrices_down.read(i);
+}
+
+
+template <class MATRIX>
+inline MGLevelObject<MatrixBlock<MATRIX> >&
+MGMatrixBlockVector<MATRIX>::block_down(unsigned int i)
+{
+  return flux_matrices_down(i);
 }
 
 
 template <class MATRIX>
 inline void
-MGMatrixBlockVector<MATRIX>::reinit(const MGLevelObject<BlockSparsityPattern>& sparsity)
+MGMatrixBlockVector<MATRIX>::reinit_matrix(const MGLevelObject<BlockSparsityPattern>& sparsity)
 {
   for (unsigned int i=0;i<this->size();++i)
     {
@@ -925,6 +1128,70 @@ MGMatrixBlockVector<MATRIX>::reinit(const MGLevelObject<BlockSparsityPattern>& s
 
 template <class MATRIX>
 inline void
+MGMatrixBlockVector<MATRIX>::reinit_edge(const MGLevelObject<BlockSparsityPattern>& sparsity)
+{
+  for (unsigned int i=0;i<this->size();++i)
+    {
+      MGLevelObject<MatrixBlock<MATRIX> >& o = block(i);
+      const unsigned int row = o[o.min_level()].row;
+      const unsigned int col = o[o.min_level()].column;
+
+      block_in(i).resize(sparsity.min_level(), sparsity.max_level());
+      block_out(i).resize(sparsity.min_level(), sparsity.max_level());
+      for (unsigned int level = o.min_level();level <= o.max_level();++level)
+	{
+	  block_in(i)[level].row = row;
+	  block_in(i)[level].column = col;
+	  internal::reinit(block_in(i)[level], sparsity[level]);
+	  block_out(i)[level].row = row;
+	  block_out(i)[level].column = col;
+	  internal::reinit(block_out(i)[level], sparsity[level]);
+	}
+    }
+}
+
+
+template <class MATRIX>
+inline void
+MGMatrixBlockVector<MATRIX>::reinit_edge_flux(const MGLevelObject<BlockSparsityPattern>& sparsity)
+{
+  for (unsigned int i=0;i<this->size();++i)
+    {
+      MGLevelObject<MatrixBlock<MATRIX> >& o = block(i);
+      const unsigned int row = o[o.min_level()].row;
+      const unsigned int col = o[o.min_level()].column;
+
+      block_up(i).resize(sparsity.min_level(), sparsity.max_level());
+      block_down(i).resize(sparsity.min_level(), sparsity.max_level());
+      for (unsigned int level = o.min_level();level <= o.max_level();++level)
+	{
+	  block_up(i)[level].row = row;
+	  block_up(i)[level].column = col;
+	  internal::reinit(block_up(i)[level], sparsity[level]);
+	  block_down(i)[level].row = row;
+	  block_down(i)[level].column = col;
+	  internal::reinit(block_down(i)[level], sparsity[level]);
+	}
+      
+    }
+}
+
+
+template <class MATRIX>
+inline void
+MGMatrixBlockVector<MATRIX>::clear_object(NamedData<MGLevelObject<MatrixBlock<MATRIX> > >& mo)
+{
+  for (unsigned int i=0;i<mo.size();++i)
+    {
+      MGLevelObject<MatrixBlock<MATRIX> >& o = mo(i);
+      for (unsigned int level = o.min_level();level <= o.max_level();++level)
+	o[level].matrix.clear();
+    }
+}
+
+
+template <class MATRIX>
+inline void
 MGMatrixBlockVector<MATRIX>::clear(bool really_clean)
 {
   if (really_clean)
@@ -933,12 +1200,11 @@ MGMatrixBlockVector<MATRIX>::clear(bool really_clean)
     }
   else
     {
-      for (unsigned int i=0;i<this->size();++i)
-	{
-	  MGLevelObject<MatrixBlock<MATRIX> >& o = block(i);
-	  for (unsigned int level = o.min_level();level <= o.max_level();++level)
-	    o[level].matrix.clear();
-	}
+      clear_object(matrices);
+      clear_object(matrices_in);
+      clear_object(matrices_out);
+      clear_object(flux_matrices_up);
+      clear_object(flux_matrices_down);
     }
 }
 

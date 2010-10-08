@@ -570,27 +570,33 @@ Step39<dim>::assemble_matrix()
 				   // such that they always point to
 				   // the current cell. To this end,
 				   // we need to tell it first, where
-				   // and what to compute,
+				   // and what to compute. Since we
+				   // are not doing anything fancy, we
+				   // can rely on their standard
+				   // choice for quadrature rules.
+				   //
+				   // Since their default update flags
+				   // are minimal, we add what we need
+				   // additionally, namely the values
+				   // and gradients of shape functions
+				   // on all objects (cells, boundary
+				   // and interior faces). Afterwards,
+				   // we are ready to initialize the
+				   // container, which will create all
+				   // necessary FEValuesBase objects
+				   // for integration.
   MeshWorker::IntegrationInfoBox<dim> info_box;
-				   // namely, which quadrature
-				   // formulas to use and
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
-				   // which values to update in these
-				   // points. Update flags are
-				   // initialized to some default
-				   // values to be able to
-				   // integrate. Here, we add what we
-				   // need additionally, namely the
-				   // values and gradients of shape
-				   // functions on all objects (cells,
-				   // boundary and interior faces).
   UpdateFlags update_flags = update_values | update_gradients;
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
 
 				   // This is the object into which we
-				   // integrate local data.
+				   // integrate local data. It is
+				   // filled by the local integration
+				   // routines in MatrixIntegrator and
+				   // then used by the assembler to
+				   // distribute the information into
+				   // the global matrix.
   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
 				   // Finally, we need an object that
@@ -628,8 +634,6 @@ void
 Step39<dim>::assemble_mg_matrix()
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  const unsigned int n_gauss_points = mg_dof_handler.get_fe().tensor_degree()+1;
-  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points, n_gauss_points);
   UpdateFlags update_flags = update_values | update_gradients;
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
@@ -673,8 +677,6 @@ void
 Step39<dim>::assemble_right_hand_side()
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
   UpdateFlags update_flags = update_quadrature_points | update_values | update_gradients;
   info_box.add_update_flags_all(update_flags);
   info_box.initialize(fe, mapping);
