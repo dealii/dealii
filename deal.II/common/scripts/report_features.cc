@@ -94,7 +94,7 @@ int main()
   std::cout << "dealii-feature: PETSc="
 	    << PETSC_VERSION_MAJOR << '.'
 	    << PETSC_VERSION_MINOR << '.'
-	    << PETSC_VERSION_SUBMINOR << 'p'
+	    << PETSC_VERSION_SUBMINOR << '-p'
 	    << PETSC_VERSION_PATCH << std::endl;
 #endif
 
@@ -102,7 +102,7 @@ int main()
   std::cout << "dealii-feature: SLEPc="
 	    << SLEPC_VERSION_MAJOR << '.'
 	    << SLEPC_VERSION_MINOR << '.'
-	    << SLEPC_VERSION_SUBMINOR << 'p'
+	    << SLEPC_VERSION_SUBMINOR << '-p'
 	    << SLEPC_VERSION_PATCH << std::endl;
 #endif
   
