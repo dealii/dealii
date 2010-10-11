@@ -280,6 +280,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>Fixed: The methods VectorTools::project_boundary_values_curl_conforming
+  set the boundary values now also H(curl)-conforming, when hanging node
+  constraints are present.
+  <br>
+  (Markus Buerg, 2010/10/11)
+  </p></li>
+
   <li><p>Changed: The DataPostprocessor functions now take an additional
   argument that indicates the location of an evaluation point. For backward
   compatibility, the old function signature still exists so that applications

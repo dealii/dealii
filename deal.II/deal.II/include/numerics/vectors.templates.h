@@ -3135,14 +3135,18 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                   
                                                    // Add the computed
                                                    // constraints to the
-                                                   // constraint matrix.
+                                                   // constraint matrix,
+                                                   // if the degree of
+                                                   // freedom is not
+                                                   // already constrained.
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                    {
-                      constraints.add_line (face_dof_indices[dof]);
-                      
-                      if (std::abs (dof_values[dof]) > 1e-14)
-                        constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
-                    }
+                    if (!(constraints.is_constrained (face_dof_indices[dof])))
+                      {
+                        constraints.add_line (face_dof_indices[dof]);
+                        
+                        if (std::abs (dof_values[dof]) > 1e-14)
+                          constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
+                      }
                 }
          
         break;
@@ -3280,9 +3284,11 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                 }
          
                                          // Add the computed constraints
-                                         // to the constraint matrix.
+                                         // to the constraint matrix, if
+                                         // the degree of freedom is not
+                                         // already constrained.
         for (unsigned int dof = 0; dof < n_dofs; ++dof)
-          if (projected_dofs[dof] != -1)
+          if ((projected_dofs[dof] != -1) && !(constraints.is_constrained (dof)))
             {
               constraints.add_line (dof);
               constraints.set_inhomogeneity (dof, computed_constraints[dof]);
@@ -3363,12 +3369,13 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                                                       cell->active_fe_index ());
                   
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                    {
-                      constraints.add_line (face_dof_indices[dof]);
-                      
-                      if (std::abs (dof_values[dof]) > 1e-14)
-                        constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
-                    }
+                    if (!(constraints.is_constrained (face_dof_indices[dof])))
+                      {
+                        constraints.add_line (face_dof_indices[dof]);
+                        
+                        if (std::abs (dof_values[dof]) > 1e-14)
+                          constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
+                      }
                 }
          
         break;
@@ -3474,7 +3481,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                 }
          
         for (unsigned int dof = 0; dof < n_dofs; ++dof)
-          if (projected_dofs[dof] != -1)
+          if ((projected_dofs[dof] != -1) && !(constraints.is_constrained (dof)))
             {
               constraints.add_line (dof);
               constraints.set_inhomogeneity (dof, computed_constraints[dof]);
