@@ -16,6 +16,11 @@
 ###############################################################################
 
 
+######################################################################
+# Since most of our makefiles at some ponit use bash features, choose
+# bash as default shell here once and for all
+SHELL=/bin/bash
+
 
 ######################################################
 # the following lines will be replaced by the output
