@@ -1,0 +1,159 @@
+
+DEAL::Size 4 Unknowns 9
+DEAL::SOR-diff:0
+DEAL:no-fail:cg::Starting value 3.000
+DEAL:no-fail:cg::Convergence step 3 value 0
+DEAL:no-fail:Bicgstab::Starting value 3.000
+DEAL:no-fail:Bicgstab::Convergence step 3 value 0
+DEAL:no-fail:GMRES::Starting value 3.000
+DEAL:no-fail:GMRES::Convergence step 3 value 0
+DEAL:no-fail:GMRES::Starting value 3.000
+DEAL:no-fail:GMRES::Convergence step 3 value 0
+DEAL:no-fail:QMRS::Starting value 3.000
+DEAL:no-fail:QMRS::Convergence step 3 value 0
+DEAL:no:Richardson::Starting value 3.000
+DEAL:no:Richardson::Convergence step 24 value 0.0007118
+DEAL:no:cg::Starting value 3.000
+DEAL:no:cg::Convergence step 3 value 0
+DEAL:no:Bicgstab::Starting value 3.000
+DEAL:no:Bicgstab::Convergence step 3 value 0
+DEAL:no:GMRES::Starting value 3.000
+DEAL:no:GMRES::Convergence step 3 value 0
+DEAL:no:GMRES::Starting value 3.000
+DEAL:no:GMRES::Convergence step 3 value 0
+DEAL:no:QMRS::Starting value 3.000
+DEAL:no:QMRS::Convergence step 3 value 0
+DEAL:rich:Richardson::Starting value 3.000
+DEAL:rich:Richardson::Convergence step 42 value 0.0008696
+DEAL:rich:cg::Starting value 3.000
+DEAL:rich:cg::Convergence step 3 value 0
+DEAL:rich:Bicgstab::Starting value 3.000
+DEAL:rich:Bicgstab::Convergence step 3 value 0
+DEAL:rich:GMRES::Starting value 1.800
+DEAL:rich:GMRES::Convergence step 3 value 0
+DEAL:rich:GMRES::Starting value 1.800
+DEAL:rich:GMRES::Convergence step 3 value 0
+DEAL:rich:QMRS::Starting value 3.000
+DEAL:rich:QMRS::Convergence step 3 value 0
+DEAL:ssor:RichardsonT::Starting value 3.000
+DEAL:ssor:RichardsonT::Convergence step 7 value 0.0006128
+DEAL:ssor:Richardson::Starting value 3.000
+DEAL:ssor:Richardson::Convergence step 7 value 0.0006128
+DEAL:ssor:cg::Starting value 3.000
+DEAL:ssor:cg::Convergence step 4 value 6.018e-05
+DEAL:ssor:Bicgstab::Starting value 3.000
+DEAL:ssor:Bicgstab::Convergence step 2 value 0.0003670
+DEAL:ssor:GMRES::Starting value 1.920
+DEAL:ssor:GMRES::Convergence step 3 value 0.0003574
+DEAL:ssor:GMRES::Starting value 1.920
+DEAL:ssor:GMRES::Convergence step 3 value 0.0003574
+DEAL:ssor:QMRS::Starting value 3.000
+DEAL:ssor:QMRS::Convergence step 4 value 0.0001345
+DEAL:sor:RichardsonT::Starting value 3.000
+DEAL:sor:RichardsonT::Convergence step 7 value 0.0004339
+DEAL:sor:Richardson::Starting value 3.000
+DEAL:sor:Richardson::Convergence step 7 value 0.0004339
+DEAL:sor:cg::Starting value 3.000
+DEAL:sor:cg::Failure step 100 value 0.2585
+DEAL:sor::Iterative method reported convergence failure in step 100 with residual 0.258509
+DEAL:sor:Bicgstab::Starting value 3.000
+DEAL:sor:Bicgstab::Convergence step 5 value 0
+DEAL:sor:GMRES::Starting value 1.462
+DEAL:sor:GMRES::Convergence step 5 value 0
+DEAL:sor:GMRES::Starting value 1.462
+DEAL:sor:GMRES::Convergence step 5 value 0
+DEAL:psor:RichardsonT::Starting value 3.000
+DEAL:psor:RichardsonT::Convergence step 8 value 0.0004237
+DEAL:psor:Richardson::Starting value 3.000
+DEAL:psor:Richardson::Convergence step 8 value 0.0004237
+DEAL:psor:cg::Starting value 3.000
+DEAL:psor:cg::Failure step 100 value 0.1024
+DEAL:psor::Iterative method reported convergence failure in step 100 with residual 0.102391
+DEAL:psor:Bicgstab::Starting value 3.000
+DEAL:psor:Bicgstab::Convergence step 4 value 0.0002656
+DEAL:psor:GMRES::Starting value 1.467
+DEAL:psor:GMRES::Convergence step 5 value 0.0006649
+DEAL:psor:GMRES::Starting value 1.467
+DEAL:psor:GMRES::Convergence step 5 value 0.0006649
+DEAL::Size 12 Unknowns 121
+DEAL::SOR-diff:0
+DEAL:no-fail:cg::Starting value 11.00
+DEAL:no-fail:cg::Failure step 10 value 0.1496
+DEAL:no-fail::Iterative method reported convergence failure in step 10 with residual 0.149566
+DEAL:no-fail:Bicgstab::Starting value 11.00
+DEAL:no-fail:Bicgstab::Convergence step 10 value 0.0002572
+DEAL:no-fail:GMRES::Starting value 11.00
+DEAL:no-fail:GMRES::Failure step 10 value 0.8414
+DEAL:no-fail::Iterative method reported convergence failure in step 10 with residual 0.841354
+DEAL:no-fail:GMRES::Starting value 11.00
+DEAL:no-fail:GMRES::Failure step 10 value 0.8414
+DEAL:no-fail::Iterative method reported convergence failure in step 10 with residual 0.841354
+DEAL:no-fail:QMRS::Starting value 11.00
+DEAL:no-fail:QMRS::Failure step 10 value 0.4215
+DEAL:no-fail::Iterative method reported convergence failure in step 10 with residual 0.421504
+DEAL:no:Richardson::Starting value 11.00
+DEAL:no:Richardson::Failure step 100 value 0.3002
+DEAL:no::Iterative method reported convergence failure in step 100 with residual 0.300171
+DEAL:no:cg::Starting value 11.00
+DEAL:no:cg::Convergence step 15 value 0.0005794
+DEAL:no:Bicgstab::Starting value 11.00
+DEAL:no:Bicgstab::Convergence step 10 value 0.0002572
+DEAL:no:GMRES::Starting value 11.00
+DEAL:no:GMRES::Convergence step 43 value 0.0009788
+DEAL:no:GMRES::Starting value 11.00
+DEAL:no:GMRES::Convergence step 43 value 0.0009788
+DEAL:no:QMRS::Starting value 11.00
+DEAL:no:QMRS::Convergence step 16 value 0.0002583
+DEAL:rich:Richardson::Starting value 11.00
+DEAL:rich:Richardson::Failure step 100 value 1.219
+DEAL:rich::Iterative method reported convergence failure in step 100 with residual 1.2187
+DEAL:rich:cg::Starting value 11.00
+DEAL:rich:cg::Convergence step 15 value 0.0005794
+DEAL:rich:Bicgstab::Starting value 11.00
+DEAL:rich:Bicgstab::Convergence step 10 value 0.0002572
+DEAL:rich:GMRES::Starting value 6.600
+DEAL:rich:GMRES::Convergence step 42 value 0.0007803
+DEAL:rich:GMRES::Starting value 6.600
+DEAL:rich:GMRES::Convergence step 42 value 0.0007803
+DEAL:rich:QMRS::Starting value 11.00
+DEAL:rich:QMRS::Convergence step 16 value 0.0002583
+DEAL:ssor:RichardsonT::Starting value 11.00
+DEAL:ssor:RichardsonT::Convergence step 48 value 0.0009502
+DEAL:ssor:Richardson::Starting value 11.00
+DEAL:ssor:Richardson::Convergence step 48 value 0.0009502
+DEAL:ssor:cg::Starting value 11.00
+DEAL:ssor:cg::Convergence step 8 value 0.0005816
+DEAL:ssor:Bicgstab::Starting value 11.00
+DEAL:ssor:Bicgstab::Convergence step 4 value 0.0003834
+DEAL:ssor:GMRES::Starting value 13.27
+DEAL:ssor:GMRES::Convergence step 7 value 0.0008206
+DEAL:ssor:GMRES::Starting value 13.27
+DEAL:ssor:GMRES::Convergence step 7 value 0.0008206
+DEAL:ssor:QMRS::Starting value 11.00
+DEAL:ssor:QMRS::Convergence step 9 value 0.0004140
+DEAL:sor:RichardsonT::Starting value 11.00
+DEAL:sor:RichardsonT::Convergence step 88 value 0.0009636
+DEAL:sor:Richardson::Starting value 11.00
+DEAL:sor:Richardson::Convergence step 88 value 0.0009636
+DEAL:sor:cg::Starting value 11.00
+DEAL:sor:cg::Failure step 100 value 5.643
+DEAL:sor::Iterative method reported convergence failure in step 100 with residual 5.64329
+DEAL:sor:Bicgstab::Starting value 11.00
+DEAL:sor:Bicgstab::Convergence step 12 value 0.0007246
+DEAL:sor:GMRES::Starting value 7.322
+DEAL:sor:GMRES::Convergence step 23 value 0.0006981
+DEAL:sor:GMRES::Starting value 7.322
+DEAL:sor:GMRES::Convergence step 23 value 0.0006981
+DEAL:psor:RichardsonT::Starting value 11.00
+DEAL:psor:RichardsonT::Convergence step 89 value 0.0009736
+DEAL:psor:Richardson::Starting value 11.00
+DEAL:psor:Richardson::Convergence step 89 value 0.0009736
+DEAL:psor:cg::Starting value 11.00
+DEAL:psor:cg::Failure step 100 value 2.935
+DEAL:psor::Iterative method reported convergence failure in step 100 with residual 2.93488
+DEAL:psor:Bicgstab::Starting value 11.00
+DEAL:psor:Bicgstab::Convergence step 10 value 0.0003167
+DEAL:psor:GMRES::Starting value 7.345
+DEAL:psor:GMRES::Convergence step 20 value 0.0008491
+DEAL:psor:GMRES::Starting value 7.345
+DEAL:psor:GMRES::Convergence step 20 value 0.0008491
