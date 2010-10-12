@@ -769,7 +769,7 @@ void LaplaceProblem::solve ()
 				   // the default arguments (which are
 				   // <code>SparseMatrix@<double@></code> and
 				   // <code>Vector@<double@></code>):
-  SolverCG<>              cg (solver_control);
+  SolverCG<>              solver (solver_control);
 
 				   // Now solve the system of equations. The
 				   // CG solver takes a preconditioner as its
@@ -777,7 +777,7 @@ void LaplaceProblem::solve ()
 				   // delve into this yet, so we tell it to
 				   // use the identity operation as
 				   // preconditioner:
-  cg.solve (system_matrix, solution, system_rhs,
+  solver.solve (system_matrix, solution, system_rhs,
 	    PreconditionIdentity());
 				   // Now that the solver has done its
 				   // job, the solution variable

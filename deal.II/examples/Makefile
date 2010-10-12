@@ -22,6 +22,9 @@ clean:
 	$(addsuffix $(EXEEXT),$(basename $(shell echo step-*/step-*.cc))) \
 	doxygen/*.o doxygen/*.exe */Makefile.dep
 
+# Create plain.cc in each subdirectory
+plain: $(steps)
+	for step in $(steps) ; do cd $$step; perl $D/doc/doxygen/tutorial/program2plain $$step.cc > plain.cc ; cd .. ; done
 
 # for each build/run/clean target: strip the build- prefix of the
 # target and build in that directory

@@ -696,13 +696,13 @@ template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              cg (solver_control);
+  SolverCG<>              solver (solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
 
-  cg.solve (system_matrix, solution, system_rhs,
-	    preconditioner);
+  solver.solve (system_matrix, solution, system_rhs,
+		preconditioner);
 
   hanging_node_constraints.distribute (solution);
 }
