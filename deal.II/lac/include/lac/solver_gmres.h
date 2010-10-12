@@ -891,9 +891,9 @@ SolverFGMRES<VECTOR>::solve (
 
   // Iteration starts here
 
+  VECTOR* aux = this->memory.alloc();
   do
     {
-      VECTOR* aux = this->memory.alloc();
       aux->reinit(x);
       A.vmult(*aux, x);
       aux->sadd(-1., 1., b);
@@ -941,8 +941,9 @@ SolverFGMRES<VECTOR>::solve (
       for (unsigned int j=0;j<y.size();++j)
 	x.add(y(j), z[j]);
 
-      this->memory.free(aux);
     } while (iteration_state == SolverControl::iterate);
+
+  this->memory.free(aux);
 
   deallog.pop();
 				   // in case of failure: throw
