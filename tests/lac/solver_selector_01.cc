@@ -10,6 +10,7 @@
 //
 //----------------------------------------------------------------------
 
+// Test the SolverSelector class.
 
 #include "../tests.h"
 #include "testmatrix.h"
@@ -31,23 +32,18 @@ check(const MATRIX& A, const VECTOR& f)
   names.push_back("gmres");
   names.push_back("fgmres");
 
+  ReductionControl cont1(100, 0., 1.e-4);
+  SolverControl cont2(100, 1.e-7);
   SolverSelector<VECTOR> solver;
   PreconditionSSOR<SparseMatrix<double> > pre;
   pre.initialize(A);
   
   VECTOR u;
   u.reinit(f);
-  
-  std::vector<std::string>::const_iterator name;
-  for (name = names.begin(); name != names.end();++name)
-    {
-      solver.select(*name);
-      u = 0.;
-      solver.solve(A, u, f, pre);
-    }
 
-  ReductionControl cont1(100, 0., 1.e-4);
-  solver.control = cont1;
+  std::vector<std::string>::const_iterator name;
+  
+  solver.set_control(cont1);
   for (name = names.begin(); name != names.end();++name)
     {
       solver.select(*name);
@@ -55,8 +51,7 @@ check(const MATRIX& A, const VECTOR& f)
       solver.solve(A, u, f, pre);
     }
   
-  SolverControl cont2(100, 1.e-7);
-  solver.control = cont2;
+  solver.set_control(cont2);
   for (name = names.begin(); name != names.end();++name)
     {
       solver.select(*name);
