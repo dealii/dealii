@@ -140,6 +140,12 @@ class SolverSelector : public Subscriptor
 				      * class are all lower case.
 				      */
     void select(const std::string& name);
+
+				     /**
+				      * Set a new SolverControl. This needs to
+				      * be set before solving.
+				      */
+    void set_control(SolverControl & ctrl);
     
 				     /**
 				      * Set the additional data. For more
@@ -189,27 +195,17 @@ class SolverSelector : public Subscriptor
 		    std::string, << "Solver " << arg1 << " does not exist. Use one of "
 		    << std::endl << get_solver_names());
 
-				     /**
-				      * Stores the @p ReductionControl that
-				      * is needed in the constructor of
-				      * each @p Solver class. This
-				      * data member is public, so that
-				      * it can easily be changed from
-				      * its default values. If you
-				      * create a SolverControl or
-				      * ReductionControl object with
-				      * the values needed, you can
-				      * simply use <tt>solver.control
-				      * = my_control</tt> to set the
-				      * values here.
-				      *
-				      * This object is updated in
-				      * solve(), thus declared mutable
-				      * here.
-				      */
-    mutable ReductionControl control;
+    
 
   protected:
+				     /**
+				      * Stores the @p SolverControl that is
+				      * needed in the constructor of each @p
+				      * Solver class. This can be changed with
+				      * @p set_control().
+				      */
+    SmartPointer< SolverControl, SolverSelector< VECTOR > > 	control;
+
 				     /**
 				      * Stores the name of the solver.
 				      */
@@ -255,7 +251,7 @@ template <class VECTOR>
 SolverSelector<VECTOR>::SolverSelector(const std::string    &solver_name,
 				       SolverControl        &control,
 				       VectorMemory<VECTOR> &) :
-		control(control),
+		control(&control),
 		solver_name(solver_name)
 {}
 
@@ -273,7 +269,6 @@ SolverSelector<VECTOR>::select(const std::string& name)
 }
 
 
-
 template <class VECTOR>
 template<class Matrix, class Preconditioner>
 void
@@ -286,36 +281,44 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
   
   if (solver_name=="richardson")
     {
-      SolverRichardson<VECTOR> solver(control,vector_memory,
+      SolverRichardson<VECTOR> solver(*control, vector_memory,
 				      richardson_data);
       solver.solve(A,x,b,precond);
     }       
   else if (solver_name=="cg")
     {
-      SolverCG<VECTOR> solver(control,vector_memory,
+      SolverCG<VECTOR> solver(*control, vector_memory,
 			      cg_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
-      SolverBicgstab<VECTOR> solver(control,vector_memory,
+      SolverBicgstab<VECTOR> solver(*control, vector_memory,
 				    bicgstab_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
-      SolverGMRES<VECTOR> solver(control,vector_memory,
+      SolverGMRES<VECTOR> solver(*control,vector_memory,
 				 gmres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="fgmres")
     {
-      SolverFGMRES<VECTOR> solver(control,vector_memory,
+      SolverFGMRES<VECTOR> solver(*control,vector_memory,
 				  fgmres_data);
       solver.solve(A,x,b,precond);
     }
   else
     Assert(false,ExcSolverDoesNotExist(solver_name));
+}
+
+
+template <class VECTOR>
+void SolverSelector<VECTOR>::set_control(
+  SolverControl & ctrl)
+{
+  control=&ctrl;
 }
 
 
