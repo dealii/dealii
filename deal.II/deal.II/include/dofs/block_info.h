@@ -17,6 +17,8 @@
 #include <base/memory_consumption.h>
 #include <lac/block_indices.h>
 
+#include <iomanip>
+
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
@@ -173,6 +175,14 @@ class BlockInfo : public Subscriptor
     unsigned int base_element(unsigned int i) const;
 
 				     /**
+				      * Write a summary of the block
+				      * structure to the stream. 
+				      */
+    template <class OS>
+    void
+    print(OS& stream) const;
+    
+				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
@@ -268,6 +278,38 @@ BlockInfo::n_base_elements() const
   return base_elements.size();
 }
 
+
+
+template <class OS>
+inline
+void
+BlockInfo::print (OS& os) const
+{
+  os << "global   dofs " << std::setw(5) << global().total_size() << " blocks";
+  for (unsigned int i=0;i<global().size();++i)
+    os << ' ' << std::setw(5) << global().block_size(i);
+  os << std::endl;
+
+  if (local().size() == 0)
+    {
+      os << "local dofs not initialized" << std::endl;
+    }
+  else
+    {
+      os << "local    dofs " << std::setw(5) << local().total_size() << " blocks";
+      for (unsigned int i=0;i<local().size();++i)
+	os << ' '  << std::setw(5) << local().block_size(i);
+      os << std::endl;
+    }
+  
+  for (unsigned int l=0;l<levels.size();++l)
+    {
+      os << "level " << std::setw(2) << l << " dofs " << std::setw(5) << level(l).total_size() << " blocks";
+      for (unsigned int i=0;i<level(l).size();++i)
+	os << ' '  << std::setw(5) << level(l).block_size(i);
+      os << std::endl;
+    }
+}
 
 
 inline
