@@ -308,6 +308,7 @@ namespace PETScWrappers
                                         * can use pointers to this class.
                                         */
       virtual ~MatrixBase ();
+
                                        /**
                                         * This operator assigns a scalar to a
                                         * matrix. Since this does usually not
@@ -1125,7 +1126,7 @@ namespace PETScWrappers
 					*  by this matrix on this CPU.
 					*/
       unsigned int memory_consumption() const;
-      
+
                                        /**
                                         * Exception
                                         */
