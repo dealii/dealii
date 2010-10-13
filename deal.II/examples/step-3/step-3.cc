@@ -117,13 +117,13 @@ using namespace dealii;
                                  // i.e. all the functions that actually do
                                  // anything, are in the private section of
                                  // the class:
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem ();
 
     void run ();
-    
+
 				     // Then there are the member functions
 				     // that mostly do what their names
 				     // suggest. Since they do not need to be
@@ -236,7 +236,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 	    << std::endl;
 				   // Note the distinction between
 				   // n_active_cells() and n_cells().
-  
+
 				   // Next we enumerate all the degrees of
 				   // freedom. This is done by using the
 				   // distribute_dofs function, as we have
@@ -260,7 +260,7 @@ void LaplaceProblem::make_grid_and_dofs ()
 				   // As we have seen in the previous example,
 				   // we set up a sparsity pattern for the
 				   // system matrix and tag those entries that
-				   // might be nonzero.  
+				   // might be nonzero.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
   sparsity_pattern.copy_from(c_sparsity);
@@ -361,7 +361,7 @@ void LaplaceProblem::make_grid_and_dofs ()
                                  // Using all this, we will assemble the
                                  // linear system for this problem in the
                                  // following function:
-void LaplaceProblem::assemble_system () 
+void LaplaceProblem::assemble_system ()
 {
 				   // Ok, let's start: we need a quadrature
 				   // formula for the evaluation of the
@@ -415,7 +415,7 @@ void LaplaceProblem::assemble_system ()
 				   // weights, or short <code>JxW</code>) are computed;
 				   // since we need them, we have to list
 				   // <code>update_JxW_values</code> as well:
-  FEValues<2> fe_values (fe, quadrature_formula, 
+  FEValues<2> fe_values (fe, quadrature_formula,
 			 update_values | update_gradients | update_JxW_values);
                                    // The advantage of this proceeding is that
 				   // we can specify what kind of information
@@ -428,7 +428,7 @@ void LaplaceProblem::assemble_system ()
 				   // etc are computed on each cell,
 				   // regardless whether they are needed or
 				   // not.
-  
+
 				   // For use further down below, we define
 				   // two short cuts for values that will be
 				   // used very frequently. First, an
@@ -746,7 +746,7 @@ void LaplaceProblem::assemble_system ()
 				 // direct methods are no longer
 				 // usable and you are forced to use
 				 // methods like CG.
-void LaplaceProblem::solve () 
+void LaplaceProblem::solve ()
 {
 				   // First, we need to have an object that
 				   // knows how to tell the CG algorithm when
@@ -778,7 +778,7 @@ void LaplaceProblem::solve ()
 				   // use the identity operation as
 				   // preconditioner:
   solver.solve (system_matrix, solution, system_rhs,
-	    PreconditionIdentity());
+		PreconditionIdentity());
 				   // Now that the solver has done its
 				   // job, the solution variable
 				   // contains the nodal values of the
@@ -859,7 +859,7 @@ void LaplaceProblem::output_results () const
 				 // element programs work. Since the names are
 				 // mostly self-explanatory, there is not much
 				 // to comment about:
-void LaplaceProblem::run () 
+void LaplaceProblem::run ()
 {
   make_grid_and_dofs ();
   assemble_system ();
@@ -879,7 +879,7 @@ void LaplaceProblem::run ()
 				 // of the top-level class and calling
 				 // its principle function. This is
 				 // what is done here as well:
-int main () 
+int main ()
 {
   LaplaceProblem laplace_problem;
   laplace_problem.run ();
