@@ -16,6 +16,7 @@ nofail-dirs = a-framework \
               hp        \
               aniso     \
               codim_one \
+              serialization \
 	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
 	      $(shell if test "$(USE_CONTRIB_TRILINOS)" = yes ; then echo trilinos ; fi) \
 	      $(shell if test "$(USE_CONTRIB_UMFPACK)" = yes ; then echo umfpack ; fi) \
