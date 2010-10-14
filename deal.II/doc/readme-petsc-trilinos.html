@@ -188,7 +188,24 @@ make install
       where <code>N</code> is the number of compile jobs you want to run in
       parallel.
       </p>
-    </p>
+
+      <p>
+	Trilinos sometimes searches for other libraries but can't find
+	them if they are not in the usual directories or have other
+	names. A common example are BLAS or LAPACK. In a case like
+	this, you may have to specifically pass the directories and/or
+	library names under which they can be found
+	to <code>cmake</code>. For example, this may mean to add the
+	following flags to the call above:
+	<code>
+	  <pre>
+      -D BLAS_LIBRARY_NAMES:STRING=goto \
+      -D BLAS_LIBRARY_DIRS:STRING=/apps/GotoBLAS/lib64 \
+      -D LAPACK_LIBRARY_NAMES:STRING=lapack \
+      -D LAPACK_LIBRARY_DIRS:STRING=/apps/lapack-3.2.1/lib64
+	  </pre>
+	</code>
+      </p>
 
       <h3>Configuring for installed Trilinos packages</h3>
 
