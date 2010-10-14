@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -735,10 +735,8 @@ template <typename Number>
 void Vector<Number>::add (const Number a, const Vector<Number>& v,
 			  const Number b, const Vector<Number>& w)
 {
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+  Assert (numbers::is_finite(b),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -762,8 +760,7 @@ template <typename Number>
 void Vector<Number>::sadd (const Number x,
 			   const Vector<Number>& v)
 {
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -787,12 +784,9 @@ void Vector<Number>::sadd (const Number x, const Number a,
 			   const Vector<Number>& v, const Number b,
                            const Vector<Number>& w)
 {
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x),ExcNumberNotFinite());
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+  Assert (numbers::is_finite(b),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -907,10 +901,8 @@ template <typename Number>
 void Vector<Number>::equ (const Number a, const Vector<Number>& u,
 			  const Number b, const Vector<Number>& v)
 {
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
+  Assert (numbers::is_finite(b),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));

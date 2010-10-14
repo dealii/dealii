@@ -806,6 +806,7 @@ namespace mg
       smoothers[i].initialize(m[i], data[i]);
   }
 
+  
   template <class RELAX, class VECTOR>
   inline void
   SmootherRelaxation<RELAX, VECTOR>::smooth(

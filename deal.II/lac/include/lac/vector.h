@@ -1103,10 +1103,7 @@ template <typename Number>
 inline
 Vector<Number> & Vector<Number>::operator = (const Number s)
 {
-  Assert (numbers::is_finite(s),
-          ExcMessage("The given value is not finite but either infinite or "
-		     "Not A Number (NaN)"));
-
+  Assert (numbers::is_finite(s), ExcNumberNotFinite());
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size>internal::Vector::minimum_parallel_grain_size)
@@ -1129,10 +1126,7 @@ inline
 Vector<std::complex<float> > &
 Vector<std::complex<float> >::operator = (const std::complex<float> s)
 {
-  Assert (numbers::is_finite(s),
-          ExcMessage("The given value is not finite but either infinite or "
-		     "Not A Number (NaN)"));
-
+  Assert (numbers::is_finite(s), ExcNumberNotFinite());
   if (s != std::complex<float>())
     Assert (vec_size!=0, ExcEmptyObject());
   if (vec_size!=0)
@@ -1263,8 +1257,7 @@ inline
 Vector<Number> & Vector<Number>::operator *= (const Number factor)
 {
 
-  Assert (numbers::is_finite(factor),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
 
   scale (factor);
   return *this;
@@ -1277,8 +1270,7 @@ inline
 Vector<Number> &
 Vector<Number>::operator /= (const Number factor)
 {
-  Assert (numbers::is_finite(factor),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
   Assert (factor != Number(0.), ExcZero() );
 
   this->operator *= (Number(1.)/factor);
@@ -1292,8 +1284,7 @@ inline
 void
 Vector<Number>::scale (const Number factor)
 {
-  Assert (numbers::is_finite(factor),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
 
@@ -1360,8 +1351,7 @@ void
 Vector<Number>::add (const Number a,
 		     const Vector<Number>& v)
 {
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
@@ -1383,10 +1373,8 @@ Vector<Number>::sadd (const Number x,
 		      const Number a,
 		      const Vector<Number>& v)
 {
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x),ExcNumberNotFinite());
+  Assert (numbers::is_finite(a),ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));

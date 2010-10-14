@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1249,8 +1249,7 @@ void ChunkSparseMatrix<number>::set (const unsigned int i,
 				     const number value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   Assert (cols != 0, ExcNotInitialized());
 				   // it is allowed to set elements of
@@ -1275,8 +1274,7 @@ void ChunkSparseMatrix<number>::add (const unsigned int i,
 				     const number value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   Assert (cols != 0, ExcNotInitialized());
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2597,9 +2597,7 @@ namespace TrilinosWrappers
 		     const TrilinosScalar value)
   {
 
-    Assert (numbers::is_finite(value),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     set (i, 1, &j, &value, false);
   }
@@ -2704,9 +2702,7 @@ namespace TrilinosWrappers
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
 	    const double value = values[j];
-	    Assert (numbers::is_finite(value),
-		    ExcMessage("The given value is not finite but either "
-			       "infinite or Not A Number (NaN)"));
+	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 	    if (value != 0)
 	      {
 		column_indices[n_columns] = col_indices[j];
@@ -2800,9 +2796,7 @@ namespace TrilinosWrappers
 		     const TrilinosScalar value)
   {
 
-    Assert (numbers::is_finite(value),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     if (value == 0)
       {
@@ -2935,9 +2929,7 @@ namespace TrilinosWrappers
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
 	    const double value = values[j];
-	    Assert (numbers::is_finite(value),
-		    ExcMessage("The given value is not finite but either "
-			       "infinite or Not A Number (NaN)"));
+	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 	    if (value != 0)
 	      {
 		column_indices[n_columns] = col_indices[j];

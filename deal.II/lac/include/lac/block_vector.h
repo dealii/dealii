@@ -482,8 +482,7 @@ BlockVector<Number> &
 BlockVector<Number>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(s), ExcNumberNotFinite());
  
   BaseClass::operator = (s);
   return *this;
@@ -531,8 +530,7 @@ template <typename Number>
 void BlockVector<Number>::scale (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
   for (unsigned int i=0; i<this->n_blocks();++i)
     this->components[i].scale(factor);

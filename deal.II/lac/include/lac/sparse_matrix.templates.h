@@ -492,9 +492,7 @@ SparseMatrix<number>::add (const unsigned int  row,
   for (unsigned int j=0; j<n_cols; ++j)
     {
       const number value = values[j];
-      Assert (numbers::is_finite(value),
-	      ExcMessage("The given value is not finite but either "
-			 "infinite or Not A Number (NaN)"));
+      Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
 #ifdef DEBUG
       if (elide_zero_values==true && value == 0)
@@ -555,9 +553,7 @@ SparseMatrix<number>::set (const unsigned int  row,
       for (unsigned int j=0; j<n_cols; ++j)
 	{
 	  const number value = values[j];
-	  Assert (numbers::is_finite(value),
-		  ExcMessage("The given value is not finite but either "
-			     "infinite or Not A Number (NaN)"));
+	  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
 	  if (value == 0)
 	    continue;
@@ -593,9 +589,7 @@ SparseMatrix<number>::set (const unsigned int  row,
       for (unsigned int j=0; j<n_cols; ++j)
 	{
 	  const number value = values[j];
-	  Assert (numbers::is_finite(value),
-		  ExcMessage("The given value is not finite but either "
-			     "infinite or Not A Number (NaN)"));
+	  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
 	  if (index != next_row_index && my_cols[index] == col_indices[j])
 	    goto set_value_checked;

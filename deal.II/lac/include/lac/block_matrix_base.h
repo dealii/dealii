@@ -1814,8 +1814,7 @@ BlockMatrixBase<MatrixType>::set (const unsigned int i,
 {
   prepare_set_operation();
 
-  Assert (numbers::is_finite(value),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   const std::pair<unsigned int,unsigned int>
     row_index = row_block_indices.global_to_local (i),
@@ -1997,8 +1996,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
                                   const value_type value)
 {
 
-  Assert (numbers::is_finite(value),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   prepare_add_operation();
 

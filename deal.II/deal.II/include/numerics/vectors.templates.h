@@ -1945,6 +1945,9 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
 				   // have support there. Let's
 				   // eliminate them here.
 
+				   // The Bogner-Fox-Schmidt element
+				   // is an example for those.
+
 //TODO: Maybe we should figure out if the element really needs this
 
   FilteredMatrix<Vector<double> > filtered_mass_matrix(mass_matrix, true);
@@ -1988,6 +1991,9 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
   for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
     if (dof_to_boundary_mapping[i] != DoFHandler<dim,spacedim>::invalid_dof_index
     && ! excluded_dofs[dof_to_boundary_mapping[i]])
+      {
+	Assert(numbers::is_finite(boundary_projection(dof_to_boundary_mapping[i])), ExcNumberNotFinite());
+	
 				       // this dof is on one of the
 				       // interesting boundary parts
 				       //
@@ -1995,7 +2001,8 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
 				       // number, dof_to_boundary_mapping[i]
 				       // is the number on the boundary and
 				       // thus in the solution vector
-      boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
+	boundary_values[i] = boundary_projection(dof_to_boundary_mapping[i]);
+      }
 }
 
 #endif
@@ -4370,7 +4377,7 @@ namespace internal
             }
                                            // append result of this cell
                                            // to the end of the vector
-          Assert (numbers::is_finite(diff), ExcInternalError());
+          Assert (numbers::is_finite(diff), ExcNumberNotFinite());
           difference(index) = diff;
         }
     }

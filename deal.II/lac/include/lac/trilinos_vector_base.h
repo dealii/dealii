@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1140,9 +1140,7 @@ namespace TrilinosWrappers
   VectorBase::operator = (const TrilinosScalar s)
   {
 
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     const int ierr = vector->PutScalar(s);
 
@@ -1423,9 +1421,7 @@ namespace TrilinosWrappers
   VectorBase::operator *= (const TrilinosScalar a)
   {
 
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const int ierr = vector->Scale(a);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1440,15 +1436,11 @@ namespace TrilinosWrappers
   VectorBase::operator /= (const TrilinosScalar a)
   {
 
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const TrilinosScalar factor = 1./a;
 
-    Assert (numbers::is_finite(factor),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
     const int ierr = vector->Scale(factor);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1493,9 +1485,7 @@ namespace TrilinosWrappers
   VectorBase::add (const TrilinosScalar s)
   {
 
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     unsigned int n_local = local_size();
     for (unsigned int i=0; i<n_local; i++)
@@ -1512,9 +1502,7 @@ namespace TrilinosWrappers
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
 
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const int ierr = vector->Update(a, *(v.vector), 1.);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1534,12 +1522,8 @@ namespace TrilinosWrappers
     Assert (size() == w.size(),
 	    ExcDimensionMismatch(size(), w.size()));
 
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
     const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), 1.);
 
@@ -1556,9 +1540,7 @@ namespace TrilinosWrappers
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
 
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     const int ierr = vector->Update(1., *(v.vector), s);
 
@@ -1576,12 +1558,8 @@ namespace TrilinosWrappers
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
 
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const int ierr = vector->Update(a, *(v.vector), s);
 
@@ -1604,15 +1582,9 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(size(), w.size()));
 
 
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
     const int ierr = vector->Update(a, *(v.vector), b, *(w.vector), s);
 
@@ -1638,18 +1610,10 @@ namespace TrilinosWrappers
     Assert (size() == x.size(),
 	    ExcDimensionMismatch(size(), x.size()));
 
-    Assert (numbers::is_finite(s),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(c),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(s), ExcNumberNotFinite());
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    Assert (numbers::is_finite(b), ExcNumberNotFinite());
+    Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
                                         // Update member can only
 				        // input two other vectors so
@@ -1682,9 +1646,7 @@ namespace TrilinosWrappers
 		   const VectorBase     &v)
   {
 
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
 				   // If we don't have the same map, copy.
     if (local_range() != v.local_range())
@@ -1726,12 +1688,8 @@ namespace TrilinosWrappers
     Assert (v.size() == w.size(),
 	    ExcDimensionMismatch (v.size(), w.size()));
 
-    Assert (numbers::is_finite(a),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
-    Assert (numbers::is_finite(b),
-	    ExcMessage("The given value is not finite but "
-		       "either infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(a), ExcNumberNotFinite());
+    Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
 				   // If we don't have the same map, copy.
     if (local_range() != v.local_range())

@@ -641,6 +641,19 @@ namespace StandardExceptions
   DeclException0 (ExcDivideByZero);
 
 				   /**
+				    * Exception raised if a number is
+				    * not finite.
+				    *
+				    * This exception should be used to
+				    * catch infinite or not a number
+				    * results of arithmetic operations
+				    * that do not result from a
+				    * division by zero (use
+				    * ExcDivideByZero for those).
+				    */
+  DeclException0 (ExcNumberNotFinite);
+  
+				   /**
 				    * Trying to allocate a new
 				    * object failed due to lack of
 				    * free memory.

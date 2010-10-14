@@ -1392,8 +1392,7 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 				  const number value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));
@@ -1420,8 +1419,7 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
 				  const number value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   Assert (i<m(), ExcIndexRange(i,0,m()));
   Assert (j<n(), ExcIndexRange(j,0,n()));

@@ -884,6 +884,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
 	new_value += (static_cast<typename VectorType::value_type>
 		      (vec(next_constraint->entries[i].first)) *
                       next_constraint->entries[i].second);
+      Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
       vec(next_constraint->line) = new_value;
     }
 }

@@ -423,8 +423,7 @@ BlockSparseMatrixEZ<Number>::set (const unsigned int i,
 				  const Number value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),
@@ -444,8 +443,7 @@ BlockSparseMatrixEZ<Number>::add (const unsigned int i,
 				  const Number value)
 {
 
-  Assert (numbers::is_finite(value), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
   const std::pair<unsigned int,unsigned int>
     row_index = row_indices.global_to_local (i),

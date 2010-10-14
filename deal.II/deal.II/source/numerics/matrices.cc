@@ -1164,10 +1164,13 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim, spacedim> &,
 		{
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_unsigned_int)
-		      matrix.add(dof_to_boundary_mapping[dofs[i]],
-				 dof_to_boundary_mapping[dofs[j]],
-				 cell_matrix(i,j));
-
+		      {
+			Assert(numbers::is_finite(cell_matrix(i,j)), ExcNumberNotFinite());
+			matrix.add(dof_to_boundary_mapping[dofs[i]],
+				   dof_to_boundary_mapping[dofs[j]],
+				   cell_matrix(i,j));
+		      }
+		  Assert(numbers::is_finite(cell_vector(i)), ExcNumberNotFinite());
 		  rhs_vector(dof_to_boundary_mapping[dofs[i]]) += cell_vector(i);
 		}
 	    }

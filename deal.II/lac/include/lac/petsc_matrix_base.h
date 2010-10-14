@@ -1424,9 +1424,7 @@ namespace PETScWrappers
 		   const PetscScalar  value)
   {
 
-    Assert (numbers::is_finite(value),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     set (i, 1, &j, &value, false);
   }
@@ -1529,9 +1527,7 @@ namespace PETScWrappers
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
 	    const PetscScalar value = values[j];
-	    Assert (numbers::is_finite(value),
-		    ExcMessage("The given value is not finite but either "
-			       "infinite or Not A Number (NaN)"));
+	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 	    if (value != PetscScalar())
 	      {
 		column_indices[n_columns] = col_indices[j];
@@ -1560,9 +1556,7 @@ namespace PETScWrappers
 		   const PetscScalar  value)
   {
 
-    Assert (numbers::is_finite(value),
-	    ExcMessage("The given value is not finite but either "
-		       "infinite or Not A Number (NaN)"));
+    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     if (value == PetscScalar())
       {
@@ -1683,9 +1677,7 @@ namespace PETScWrappers
 	for (unsigned int j=0; j<n_cols; ++j)
 	  {
 	    const PetscScalar value = values[j];
-	    Assert (numbers::is_finite(value),
-		    ExcMessage("The given value is not finite but either "
-			       "infinite or Not A Number (NaN)"));
+	    Assert (numbers::is_finite(value), ExcNumberNotFinite());
 	    if (value != PetscScalar())
 	      {
 		column_indices[n_columns] = col_indices[j];

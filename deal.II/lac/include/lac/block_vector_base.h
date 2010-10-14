@@ -2019,8 +2019,7 @@ BlockVectorBase<VectorType>::add (const unsigned int  n_indices,
 template <class VectorType>
 void BlockVectorBase<VectorType>::add (const value_type a)
 {
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   for (unsigned int i=0;i<n_blocks();++i)
     {
@@ -2049,8 +2048,7 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType>& v)
 {
 
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2070,10 +2068,8 @@ void BlockVectorBase<VectorType>::add (const value_type a,
                                        const BlockVectorBase<VectorType>& w)
 {
 
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2094,8 +2090,7 @@ void BlockVectorBase<VectorType>::sadd (const value_type x,
                                         const BlockVectorBase<VectorType>& v)
 {
 
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2113,10 +2108,8 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& v)
 {
 
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x), ExcNumberNotFinite());
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2136,12 +2129,9 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& w)
 {
 
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x), ExcNumberNotFinite());
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2165,14 +2155,10 @@ void BlockVectorBase<VectorType>::sadd (const value_type x, const value_type a,
                                         const BlockVectorBase<VectorType>& y)
 {
 
-  Assert (numbers::is_finite(x),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(c),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(x), ExcNumberNotFinite());
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  Assert (numbers::is_finite(b), ExcNumberNotFinite());
+  Assert (numbers::is_finite(c), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2209,10 +2195,8 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
                                        const BlockVectorBase<VectorType>& w)
 {
 
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (numbers::is_finite(b),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
+  Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2245,8 +2229,7 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
                                        const BlockVector2 &v)
 {
 
-  Assert (numbers::is_finite(a),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (n_blocks() == v.n_blocks(),
 	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
@@ -2262,8 +2245,7 @@ BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const value_type s)
 {
 
-  Assert (numbers::is_finite(s),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = s;
@@ -2276,8 +2258,7 @@ template <class VectorType>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType>& v)
 {
-  Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  AssertDimension(n_blocks(), v.n_blocks());
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = v.components[i];
@@ -2291,8 +2272,7 @@ template <class VectorType2>
 BlockVectorBase<VectorType>&
 BlockVectorBase<VectorType>::operator = (const BlockVectorBase<VectorType2> &v)
 {
-  Assert (n_blocks() == v.n_blocks(),
-	  ExcDimensionMismatch(n_blocks(), v.n_blocks()));
+  AssertDimension(n_blocks(), v.n_blocks());
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] = v.components[i];
@@ -2326,8 +2306,7 @@ bool
 BlockVectorBase<VectorType>::
 operator == (const BlockVectorBase<VectorType2> &v) const
 {
-  Assert (block_indices == v.block_indices,
-          ExcDifferentBlockIndices());
+  Assert (block_indices == v.block_indices, ExcDifferentBlockIndices());
 
   for (unsigned int i=0;i<n_blocks();++i)
     if ( ! (components[i] == v.components[i]))
@@ -2344,8 +2323,7 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator *= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] *= factor;
@@ -2361,9 +2339,8 @@ BlockVectorBase<VectorType> &
 BlockVectorBase<VectorType>::operator /= (const value_type factor)
 {
 
-  Assert (numbers::is_finite(factor),
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
-  Assert (factor > 0., ExcZero() );
+  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+  Assert (factor > 0., ExcDivideByZero() );
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i] /= factor;

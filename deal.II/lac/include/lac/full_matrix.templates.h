@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -146,8 +146,7 @@ FullMatrix<number> &
 FullMatrix<number>::operator *= (const number factor)
 {
 
-  Assert (numbers::is_finite(factor), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
   number       *p = &(*this)(0,0);
   const number *e = &(*this)(0,0) + n()*m();
@@ -164,16 +163,14 @@ FullMatrix<number> &
 FullMatrix<number>::operator /= (const number factor)
 {
 
-  Assert (numbers::is_finite(factor), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
   number       *p = &(*this)(0,0);
   const number *e = &(*this)(0,0) + n()*m();
 
   const number factor_inv = number(1.)/factor;
 
-  Assert (numbers::is_finite(factor_inv), 
-          ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(factor_inv), ExcNumberNotFinite());
  
   while (p != e)
     *p++ *= factor_inv;
