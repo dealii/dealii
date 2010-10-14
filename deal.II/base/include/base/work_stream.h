@@ -521,7 +521,7 @@ namespace WorkStream
 				     // pipeline
     internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>
       iterator_range_to_item_stream (begin, end,
-				     queue_length * chunk_size,
+				     queue_length,
 				     chunk_size,
 				     sample_scratch_data,
 				     sample_copy_data);
