@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,7 +129,31 @@ namespace TrilinosWrappers
 					// ... and then solve!
     ierr = solver.Iterate (solver_control.max_steps(),
 			   solver_control.tolerance());
-    AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
+
+				     // report errors in more detail
+				     // than just by checking whether
+				     // the return status is zero or
+				     // greater. the error strings are
+				     // taken from the implementation
+				     // of the AztecOO::Iterate
+				     // function
+    switch (ierr)
+      {
+	case -1:
+	      AssertThrow (false, ExcMessage("AztecOO::Iterate error code -1: "
+					     "option not implemented"));
+	case -2:
+	      AssertThrow (false, ExcMessage("AztecOO::Iterate error code -2: "
+					     "numerical breakdown"));
+	case -3:
+	      AssertThrow (false, ExcMessage("AztecOO::Iterate error code -3: "
+					     "loss of precision"));
+	case -4:
+	      AssertThrow (false, ExcMessage("AztecOO::Iterate error code -4: "
+					     "GMRES hessenberg ill-conditioned"));
+	default:
+	      AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
+      }
 
 					// Finally, let the deal.II
 					// SolverControl object know
