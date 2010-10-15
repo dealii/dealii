@@ -892,9 +892,9 @@ SolverFGMRES<VECTOR>::solve (
   // Iteration starts here
 
   VECTOR* aux = this->memory.alloc();
+  aux->reinit(x);
   do
     {
-      aux->reinit(x);
       A.vmult(*aux, x);
       aux->sadd(-1., 1., b);
 
