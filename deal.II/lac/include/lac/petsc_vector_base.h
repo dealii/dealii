@@ -509,6 +509,13 @@ namespace PETScWrappers
                                         */
       VectorBase & mult ();
 
+				       /**
+                                        * A collective piecewise
+					* multiply operation of two
+					* vectors.
+                                        */
+      VectorBase & mult (const VectorBase &v);
+
                                        /**
                                         * Return whether the vector contains
                                         * only elements with value zero. This
