@@ -1342,6 +1342,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 
 				   // divide by diagonal element
 	  *dst_ptr -= s * om;
+	  Assert(val[*rowstart_ptr]!= 0., ExcDivideByZero());
 	  *dst_ptr /= val[*rowstart_ptr];
 	};
 
@@ -1363,6 +1364,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 	    s += val[j] * dst(cols->colnums[j]);
 
 	  *dst_ptr -= s * om;
+	  Assert(val[*rowstart_ptr]!= 0., ExcDivideByZero());
 	  *dst_ptr /= val[*rowstart_ptr];
 	};
       return;
@@ -1395,6 +1397,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 
 				       // divide by diagonal element
       *dst_ptr -= s * om;
+      Assert(val[*rowstart_ptr]!= 0., ExcDivideByZero());
       *dst_ptr /= val[*rowstart_ptr];
     };
 
@@ -1418,6 +1421,7 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
       for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)
 	s += val[j] * dst(cols->colnums[j]);
       *dst_ptr -= s * om;
+      Assert(val[*rowstart_ptr]!= 0., ExcDivideByZero());
       *dst_ptr /= val[*rowstart_ptr];
     };
 }
@@ -1481,7 +1485,8 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst,
 	  if (col < row)
 	    s -= val[j] * dst(col);
 	}
-
+      
+      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -1508,6 +1513,7 @@ SparseMatrix<number>::TSOR (Vector<somenumber>& dst,
 	if (cols->colnums[j] > row)
 	  s -= val[j] * dst(cols->colnums[j]);
 
+      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
 
       if (row == 0)
@@ -1551,6 +1557,7 @@ SparseMatrix<number>::PSOR (Vector<somenumber>& dst,
 	    }
 	}
 
+      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -1587,6 +1594,7 @@ SparseMatrix<number>::TPSOR (Vector<somenumber>& dst,
 	    s -= val[j] * dst(col);
 	}
 
+      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
 }
@@ -1647,6 +1655,7 @@ SparseMatrix<number>::SOR_step (Vector<somenumber> &v,
 	{
 	  s -= val[j] * v(cols->colnums[j]);
 	}
+      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       v(row) += s * om / val[cols->rowstart[row]];
     }
 }
@@ -1675,6 +1684,7 @@ SparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
 	{
 	  s -= val[j] * v(cols->colnums[j]);
 	}
+      Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       v(row) += s * om / val[cols->rowstart[row]];
     }
 }
@@ -1726,6 +1736,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst,
 	    }
 	}
       dst(i) -= s * om;
+      Assert(val[cols->rowstart[i]]!= 0., ExcDivideByZero());
       dst(i) /= val[cols->rowstart[i]];
     }
 
@@ -1740,6 +1751,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst,
 	      if (static_cast<unsigned int>(i)<j) s += val[j] * dst(p);
 	    }
 	}
+      Assert(val[cols->rowstart[i]]!= 0., ExcDivideByZero());
       dst(i) -= s * om / val[cols->rowstart[i]];
     }
 }

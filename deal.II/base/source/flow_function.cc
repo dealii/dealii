@@ -185,7 +185,9 @@ namespace Functions
 					const double Re)
 		  :
 		  radius(r), Reynolds(Re)
-  {}
+  {
+    Assert(Reynolds != 0., ExcMessage("Reynolds number cannot be zero"));
+  }
 
 
   template<int dim>

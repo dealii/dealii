@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -922,22 +922,27 @@ FilteredMatrix<VECTOR>::apply_constraints (
   const bool  /* matrix_is_symmetric */) const
 {
   GrowingVectorMemory<VECTOR> mem;
-  VECTOR* tmp_vector = mem.alloc();
+  typename VectorMemory<VECTOR>::Pointer tmp_vector(mem);
   tmp_vector->reinit(v);
   const_index_value_iterator       i = constraints.begin();
   const const_index_value_iterator e = constraints.end();
   for (; i!=e; ++i)
-    (*tmp_vector)(i->first) = -i->second;
+    {
+      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      (*tmp_vector)(i->first) = -i->second;
+    }
   
 				   // This vmult is without bc, to get
 				   // the rhs correction in a correct
 				   // way.
   matrix->vmult_add(v, *tmp_vector);
-  mem.free(tmp_vector);
 				   // finally set constrained
 				   // entries themselves
   for (i=constraints.begin(); i!=e; ++i)
-    v(i->first) = i->second;
+    {
+      Assert(numbers::is_finite(i->second), ExcNumberNotFinite());
+      v(i->first) = i->second;
+    }
 }
 
 
@@ -968,7 +973,10 @@ FilteredMatrix<VECTOR>::post_filter (const VECTOR &in,
   const_index_value_iterator       i = constraints.begin();
     const const_index_value_iterator e = constraints.end();
     for (; i!=e; ++i)
-      out(i->first) = in(i->first);
+      {
+	Assert(numbers::is_finite(in(i->first)), ExcNumberNotFinite());
+	out(i->first) = in(i->first);
+      }
 }
 
 
