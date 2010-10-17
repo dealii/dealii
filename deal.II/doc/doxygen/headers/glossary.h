@@ -116,8 +116,9 @@
  *
  * For the purpose of a discretization, blocks are the better concept to use
  * since it is not always possible to address individual components of a
- * solution. This is, in particular, the case for non-@ref GlossPrimitive
- * "primitive" elements. Take for instance the solution of the mixed Laplacian
+ * solution. This is, in particular, the case for non-@ref
+ * GlossPrimitive "primitive"
+ * elements. Take for instance the solution of the mixed Laplacian
  * system with the FE_RaviartThomas element (see step-20). There, the first
  * <tt>dim</tt> components are the directional velocities. Since the shape
  * functions are linear combinations of those, these <tt>dim</tt> components

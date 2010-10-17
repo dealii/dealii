@@ -19,4 +19,6 @@
  * loops over all cells and faces.
  * All classes and functions of this module are in the MeshWorker
  * namespace, which also contains documentation on the usage.
+ *
+ * @ingroup Integrators
  */
