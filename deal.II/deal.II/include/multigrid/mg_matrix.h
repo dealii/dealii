@@ -63,6 +63,11 @@ namespace mg
       template <class MATRIX>
       void
       initialize(const MGLevelObject<MATRIX>& M);
+
+				       /**
+					* Access matrix on a level.
+					*/
+      const PointerMatrixBase<VECTOR>& operator[] (unsigned int level) const;
       
       virtual void vmult (const unsigned int level, VECTOR& dst, const VECTOR& src) const;
       virtual void vmult_add (const unsigned int level, VECTOR& dst, const VECTOR& src) const;
@@ -260,7 +265,8 @@ namespace mg
 {
   template <class VECTOR>
   template <class MATRIX>
-  inline void
+  inline
+  void
   Matrix<VECTOR>::initialize (const MGLevelObject<MATRIX>& p)
   {
     matrices.resize(p.min_level(), p.max_level());
@@ -271,6 +277,7 @@ namespace mg
   
   template <class VECTOR>
   template <class MATRIX>
+  inline
   Matrix<VECTOR>::Matrix (const MGLevelObject<MATRIX>& p)
   {
     initialize(p);
@@ -278,9 +285,19 @@ namespace mg
   
   
   template <class VECTOR>
+  inline
   Matrix<VECTOR>::Matrix ()
   {}
 
+  
+  template <class VECTOR>
+  inline
+  const PointerMatrixBase<VECTOR>&
+  Matrix<VECTOR>::operator[] (unsigned int level) const
+  {
+    return *matrices[level];
+  }
+  
 
   template <class VECTOR>
   void
@@ -325,6 +342,7 @@ namespace mg
 
 
   template <class VECTOR>
+  inline
   unsigned int
   Matrix<VECTOR>::memory_consumption () const
   {
