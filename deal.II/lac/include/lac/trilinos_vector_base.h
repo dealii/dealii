@@ -905,6 +905,16 @@ namespace TrilinosWrappers
 				       /**
 					* Exception
 					*/
+      DeclException0 (ExcGhostsPresent);
+
+				       /**
+					* Exception
+					*/
+      DeclException0 (ExcDifferentParallelPartitioning);
+
+				       /**
+					* Exception
+					*/
       DeclException1 (ExcTrilinosError,
 		      int,
 		      << "An error with error number " << arg1
@@ -1270,7 +1280,8 @@ namespace TrilinosWrappers
   unsigned int
   VectorBase::size () const
   {
-    return (unsigned int) vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID();
+    return (unsigned int) (vector->Map().MaxAllGID() + 1 - 
+			   vector->Map().MinAllGID());
   }
 
 
@@ -1300,8 +1311,10 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::operator * (const VectorBase &vec) const
   {
-    Assert (local_range() == vec.local_range(),
-	    ExcDimensionMismatch(size(), vec.size()));
+    Assert (vector->Map().SameAs(vec.vector->Map()),
+	    ExcDifferentParallelPartitioning());
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());
 
     TrilinosScalar result;
 
@@ -1327,8 +1340,9 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::mean_value () const
   {
-    TrilinosScalar mean;
+    Assert (vector->Map().UniqueGIDs()==true, ExcGhostsPresent());
 
+    TrilinosScalar mean;
     const int ierr = vector->MeanValue (&mean);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -1341,8 +1355,10 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::l1_norm () const
   {
-    TrilinosScalar d;
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());
 
+    TrilinosScalar d;
     const int ierr = vector->Norm1 (&d);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -1355,8 +1371,10 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::l2_norm () const
   {
-    TrilinosScalar d;
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());
 
+    TrilinosScalar d;
     const int ierr = vector->Norm2 (&d);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -1369,26 +1387,17 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::lp_norm (const TrilinosScalar p) const
   {
-                                        // get a representation of the
-                                        // vector and loop over all
-                                        // the elements
-    TrilinosScalar *start_ptr;
-    int leading_dimension;
-    int ierr = vector->ExtractView (&start_ptr, &leading_dimension);
-    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());
 
     TrilinosScalar norm = 0;
     TrilinosScalar sum=0;
+    const unsigned int n_local = local_size();
 
-    const TrilinosScalar * ptr  = start_ptr;
-
-                                       // add up elements
-				       // TODO: This
-				       // won't work in parallel like
-				       // this. Find out a better way to
-				       // this in that case.
-    while (ptr != start_ptr+size())
-      sum += std::pow(std::fabs(*ptr++), p);
+                                        // loop over all the elements because
+                                        // Trilinos does not support lp norms
+    for (unsigned int i=0; i<n_local; i++)
+      sum += std::pow(std::fabs((*vector)[0][i]), p);
 
     norm = std::pow(sum, static_cast<TrilinosScalar>(1./p));
 
@@ -1401,8 +1410,10 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::linfty_norm () const
   {
-    TrilinosScalar d;
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());
 
+    TrilinosScalar d;
     const int ierr = vector->NormInf (&d);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -1456,6 +1467,8 @@ namespace TrilinosWrappers
   {
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     const int ierr = vector->Update (1.0, *(v.vector), 1.0);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1471,6 +1484,8 @@ namespace TrilinosWrappers
   {
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     const int ierr = vector->Update (-1.0, *(v.vector), 1.0);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1501,6 +1516,8 @@ namespace TrilinosWrappers
   {
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
@@ -1521,6 +1538,10 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (size() == w.size(),
 	    ExcDimensionMismatch(size(), w.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
+    Assert (vector->Map().SameAs(w.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
@@ -1539,6 +1560,8 @@ namespace TrilinosWrappers
   {
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
@@ -1557,6 +1580,8 @@ namespace TrilinosWrappers
   {
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
@@ -1580,7 +1605,10 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (size() == w.size(),
 	    ExcDimensionMismatch(size(), w.size()));
-
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
+    Assert (vector->Map().SameAs(w.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
@@ -1609,6 +1637,12 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(size(), w.size()));
     Assert (size() == x.size(),
 	    ExcDimensionMismatch(size(), x.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
+    Assert (vector->Map().SameAs(w.vector->Map()),
+	    ExcDifferentParallelPartitioning());
+    Assert (vector->Map().SameAs(x.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
@@ -1633,6 +1667,8 @@ namespace TrilinosWrappers
   {
     Assert (size() == factors.size(),
 	    ExcDimensionMismatch(size(), factors.size()));
+    Assert (vector->Map().SameAs(factors.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     const int ierr = vector->Multiply (1.0, *(factors.vector), *vector, 0.0);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1645,24 +1681,17 @@ namespace TrilinosWrappers
   VectorBase::equ (const TrilinosScalar  a,
 		   const VectorBase     &v)
   {
-
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
 				   // If we don't have the same map, copy.
-    if (local_range() != v.local_range())
+    if (vector->Map().SameAs(v.vector->Map())==false)
       {
-	vector.reset();
-	last_action = Zero;
 	*vector = *v.vector;
 	*this *= a;
       }
     else
       {
 				   // Otherwise, just update
-	Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		ExcMessage ("The Epetra maps in the assignment operator ="
-			    " do not match, even though the local_range "
-			    " seems to be the same. Check vector setup!"));
 	int ierr;
 	ierr = vector->GlobalAssemble(last_action);
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
@@ -1684,7 +1713,6 @@ namespace TrilinosWrappers
 		   const TrilinosScalar  b,
 		   const VectorBase     &w)
   {
-
     Assert (v.size() == w.size(),
 	    ExcDimensionMismatch (v.size(), w.size()));
 
@@ -1692,21 +1720,17 @@ namespace TrilinosWrappers
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
 				   // If we don't have the same map, copy.
-    if (local_range() != v.local_range())
+     if (vector->Map().SameAs(v.vector->Map())==false)
       {
-	vector.reset();
-	last_action = Zero;
 	*vector = *v.vector;
-	sadd (a, b, w);
+	sadd(a, b, w);
       }
     else
       {
 				   // Otherwise, just update
-	Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		ExcMessage ("The Epetra maps in the assignment operator ="
-			    " do not match, even though the local_range "
-			    " seems to be the same. Check vector setup!"));
 	int ierr;
+	Assert (vector->Map().SameAs(w.vector->Map()),
+		ExcDifferentParallelPartitioning());
 	ierr = vector->GlobalAssemble(last_action);
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -1726,9 +1750,12 @@ namespace TrilinosWrappers
   {
     Assert (v.size() == w.size(),
 	    ExcDimensionMismatch (v.size(), w.size()));
-
     Assert (size() == w.size(),
 	    ExcDimensionMismatch (size(), w.size()));
+    Assert (vector->Map().SameAs(v.vector->Map()),
+	    ExcDifferentParallelPartitioning());
+    Assert (vector->Map().SameAs(w.vector->Map()),
+	    ExcDifferentParallelPartitioning());
 
     const int ierr = vector->ReciprocalMultiply(1.0, *(w.vector),
 						*(v.vector), 0.0);
