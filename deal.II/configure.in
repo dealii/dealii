@@ -785,6 +785,7 @@ process_files="common/Make.global_options
                common/scripts/make_dependencies.pl
 	       Version
                doc/Makefile
+	       doc/title.html
 	       doc/doxygen/Makefile
                doc/doxygen/options.dox
                doc/doxygen/options.136
