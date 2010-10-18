@@ -12,6 +12,7 @@
 
 #include <base/qprojector.h>
 #include <base/polynomial_space.h>
+#include <base/tensor_product_polynomials.h>
 #include <fe/fe_values.h>
 #include <fe/fe_poly.h>
 
