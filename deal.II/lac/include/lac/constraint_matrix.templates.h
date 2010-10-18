@@ -901,9 +901,27 @@ namespace internals
 				   // obtained directly by some local entry
 				   // (local_row) or some constraints
 				   // (constraint_position). This is not
-				   // directly used in
-				   // the user code, but accessed via the
+				   // directly used in the user code, but
+				   // accessed via the
 				   // GlobalRowsFromLocal.
+				   //
+				   // The actions performed here correspond to
+				   // reshaping the constraint information
+				   // from global degrees of freedom to local
+				   // ones (i.e., cell-related DoFs), and also
+				   // transforming the constraint information
+				   // from compressed row storage (each local
+				   // dof that is constrained has a list of
+				   // constraint entries associated to it)
+				   // into compressed column storage based on
+				   // the cell-related DoFs (we have a list of
+				   // global degrees of freedom, and to each
+				   // we have a list of local rows where the
+				   // entries come from). To increase the
+				   // speed, we additionally store whether an
+				   // entry is generated directly from the
+				   // local degrees of freedom or whether it
+				   // comes from a constraint.
   struct Distributing
   {
       Distributing (const unsigned int global_row = numbers::invalid_unsigned_int,
@@ -954,8 +972,7 @@ namespace internals
 
 				   // this is a cache for constraints that
 				   // are encountered on a local level.
-				   // corresponds to functionality also
-				   // provided by
+				   // The functionality is similar to
 				   // std::vector<std::vector<std::pair<uint,double>
 				   // > >, but tuned so that frequent memory
 				   // allocation for each entry is
@@ -1070,6 +1087,24 @@ namespace internals
 				   // means that a global dof might also have
 				   // indirect contributions from a local dof via
 				   // a constraint, besides the direct ones.
+				   //
+				   // The actions performed here correspond to
+				   // reshaping the constraint information
+				   // from global degrees of freedom to local
+				   // ones (i.e., cell-related DoFs), and also
+				   // transforming the constraint information
+				   // from compressed row storage (each local
+				   // dof that is constrained has a list of
+				   // constraint entries associated to it)
+				   // into compressed column storage based on
+				   // the cell-related DoFs (we have a list of
+				   // global degrees of freedom, and to each
+				   // we have a list of local rows where the
+				   // entries come from). To increase the
+				   // speed, we additionally store whether an
+				   // entry is generated directly from the
+				   // local degrees of freedom or whether it
+				   // comes from a constraint.
   class GlobalRowsFromLocal
   {
     public:

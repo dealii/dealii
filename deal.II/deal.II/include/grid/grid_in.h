@@ -50,7 +50,7 @@ class SubCellData;
  * way. Since such cases are very hard to detect, the library does not make
  * any attempt to abort on such situations, and you will get a triangulation
  * that probably does not do what you want. A solution to this problem is the
- * PersistantTriangulation class.
+ * PersistentTriangulation class.
  *
  * Note: if you experience unexpected problems with the use of this
  * class, be sure to read the documentation right until the end, and
@@ -140,8 +140,8 @@ class SubCellData;
  *
  * <li> <tt>Cubit</tt> format: deal.II doesn't directly support importing from
  * Cubit at this time. However, Cubit can export in UCD format using a simple
- * plugin, and the resulting UCD file can then be read by this class. The
- * plugin script can be found on the deal.II wiki page,
+ * plug-in, and the resulting UCD file can then be read by this class. The
+ * plug-in script can be found on the deal.II wiki page,
  * http://sourceforge.net/apps/mediawiki/dealii/index.php?title=Mesh_Input_and_Output_Interfaces .
  *
  * There is also a little program, written by Jean-Paul Pelteret, that

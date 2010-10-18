@@ -1817,7 +1817,7 @@ ConstraintMatrix::add_entry (const unsigned int line,
 
 				   // if in debug mode, check whether an
 				   // entry for this column already
-				   // exists and if its the same as
+				   // exists and if it's the same as
 				   // the one entered at present
 				   //
 				   // in any case: exit the function if an
