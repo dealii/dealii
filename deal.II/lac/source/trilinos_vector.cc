@@ -115,7 +115,7 @@ namespace TrilinosWrappers
     Vector::reinit (const Epetra_Map &input_map,
 		    const bool        fast)
     {
-      if (!vector->Map().SameAs(input_map))
+      if (vector->Map().SameAs(input_map)==false)
 	vector.reset (new Epetra_FEVector(input_map));
       else if (fast == false)
 	{
@@ -279,49 +279,26 @@ namespace TrilinosWrappers
     {
 				// distinguish three cases. First case: both
 				// vectors have the same layout (just need to
-				// copy the local data). Second case: vectors
-				// have the same size, but different
-				// layout. The calling vector has a wider
-				// local range than the input vector, and the
-				// input vector has a 1-to-1 map (need to
-				// import data). The third case means that we
-				// have to rebuild the calling vector.
-      if (size() == v.size() &&
-	  local_range() == v.local_range())
+				// copy the local data, not reset the memory
+				// and the underlying Epetra_Map). The third
+				// case means that we have to rebuild the
+				// calling vector.
+      if (vector->Map().SameAs(v.vector->Map()))
 	{
-	  Assert (vector->Map().SameAs(v.vector->Map()) == true,
-		  ExcMessage ("The Epetra maps in the assignment operator ="
-			      " do not match, even though the local_range"
-			      " seems to be the same. Check vector setup or"
-			      " use reinit()!"));
-
-	  const int ierr = vector->Update(1.0, *v.vector, 0.0);
-	  Assert (ierr == 0, ExcTrilinosError(ierr));
-
+	  *vector = *v.vector;
 	  last_action = Zero;
 	}
-      else if (size() == v.size() && local_range().first<=v.local_range().first &&
-	       local_range().second>=v.local_range().second &&
-	       v.vector->Map().UniqueGIDs())
+				// Second case: vectors have the same global
+				// size, but different parallel layouts (and
+				// one of them a one-to-one mapping). Then we
+				// can call the import/export functionality.
+      else if (size() == v.size() &&
+	       (v.vector->Map().UniqueGIDs() || vector->Map().UniqueGIDs()))
 	{
-	  Epetra_Import data_exchange (vector->Map(), v.vector->Map());
-	  const int ierr = vector->Import(*v.vector, data_exchange, Insert);
-	  Assert (ierr == 0, ExcTrilinosError(ierr));
+	  reinit (v, false, true);
 	}
-      else if (size() == v.size() && local_range().first>=v.local_range().first &&
-	       local_range().second<=v.local_range().second &&
-	       vector->Map().UniqueGIDs())
-	{
-	  for (unsigned int i=0; i<local_size(); ++i)
-	    {
-	      Assert (v.trilinos_vector().Map().MyGID(vector->Map().GID(i)),
-		      ExcMessage ("The right hand side vector does not contain "
-				  "all local elements present in the left hand "
-				  "side vector in the assignment operation =, "
-				  "which is not allowed. Use reinit()."));
-	      (*vector)[0][i] = v(vector->Map().GID(i));
-	    }
-	}
+				// Third case: Vectors do not have the same
+				// size.
       else
 	{
 	  vector.reset (new Epetra_FEVector(*v.vector));
