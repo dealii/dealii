@@ -5770,27 +5770,7 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
 	 ++face_no)
       {
         const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-
-				   // we can presently deal only with
-				   // primitive elements for boundary
-				   // values. make sure that all shape
-				   // functions that are non-zero for
-				   // the components we are interested
-				   // in, are in fact primitive
-	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-	  {
-	    const std::vector<bool> &nonzero_component_array
-	      = cell->get_fe().get_nonzero_components (i);
-	    for (unsigned int c=0; c<n_components; ++c)
-	      if ((nonzero_component_array[c] == true)
-		  &&
-		  (component_mask[c] == true))
-		Assert (cell->get_fe().is_primitive (i),
-			ExcMessage ("This function can only deal with requested boundary "
-				    "values that correspond to primitive (scalar) base "
-				    "elements"));
-	  }
-
+	
 	typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 	if (face->boundary_indicator () == 0)
 	                           // face is of the right component
@@ -5804,8 +5784,25 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
 					     // that match the component
 					     // signature.
 	    for (unsigned int i=0; i<face_dofs.size(); ++i)
-	      if (component_mask[fe.face_system_to_component_index(i).first])
-		zero_boundary_constraints.add_line (face_dofs[i]);
+	      {
+						 // Find out if a dof
+						 // has a contribution
+						 // in this component,
+						 // and if so, add it
+						 // to the list
+		const std::vector<bool> &nonzero_component_array
+		  = cell->get_fe().get_nonzero_components (i);
+		bool nonzero = false;
+		for (unsigned int c=0; c<n_components; ++c)
+		  if (nonzero_component_array[c] && component_mask[c])
+		    {
+		      nonzero = true;
+		      break;
+		    }
+		
+		if (nonzero)
+		  zero_boundary_constraints.add_line (face_dofs[i]);
+	      }
 	  }
       }
 }

@@ -1861,7 +1861,23 @@ class DoFTools
                                      /**
 				      * Make a constraint matrix for the
 				      * constraints that result from zero
-				      * boundary values. This function is used
+				      * boundary values.
+				      *
+				      * This function constrains all
+				      * degrees of freedom on the
+				      * boundary. Optionally, you can
+				      * add a component mask, which
+				      * restricts this functionality
+				      * to a subset of an FESystem.
+				      *
+				      * For non-@ref GlossPrimitive "primitive"
+				      * shape functions, any degree of freedom
+				      * is affected that belongs to a
+				      * shape function where at least
+				      * one of its nonzero components
+				      * is affected.
+				      *
+				      * This function is used
 				      * in step-36, for
 				      * example.
 				      *
