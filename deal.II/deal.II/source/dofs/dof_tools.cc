@@ -4325,16 +4325,14 @@ DoFTools::dof_indices_with_subdomain_association (const DH           &dof_handle
   while (index < dof_handler.n_dofs())
     {
 				       // find first_of
-      while ((subdomain_association[index] != subdomain)
-	     &&
-	     (index < dof_handler.n_dofs()))
+      while ((index < dof_handler.n_dofs()) &&
+	     (subdomain_association[index] != subdomain))
 	++index;
       const unsigned int begin = index;
 
 				       // find first_not_of
-      while ((subdomain_association[index] == subdomain)
-	     &&
-	     (index < dof_handler.n_dofs()))
+      while ((index < dof_handler.n_dofs()) &&
+	     (subdomain_association[index] == subdomain))
 	++index;
       const unsigned int end = index;
 
