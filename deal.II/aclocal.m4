@@ -828,6 +828,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       assertion
 	  dnl #128: a similar case -- code not reachable because there's
 	  dnl       a return that's active for a particular space dimension
+	  dnl #155: no va_start() seen -- happens alwas in lines 138 and 891
+	  dnl       and seems to be spurious
           dnl #177: "function declared but not used": might happen with
           dnl       templates and conditional compilation
  	  dnl #175: "out-of-bounds array indices": the same reason as
@@ -838,8 +840,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl       somewhere in BOOST with BOOST_ASSERT. I have no idea
 	  dnl       what happens here
  	  dnl #284: "NULL references not allowed"
-	  CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
-          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+	  CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
+          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284"
           CXXFLAGSPIC="-Kpic"
           ;;
 
