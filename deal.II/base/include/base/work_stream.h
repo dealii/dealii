@@ -487,6 +487,16 @@ namespace WorkStream
 				    * stream that will be worked on by the
 				    * worker and copier functions one after
 				    * the other on the same thread.
+				    *
+				    * @note If your data objects are large,
+				    * or their constructors are expensive,
+				    * it is helpful to keep in mind
+				    * that <tt>queue_length</tt>
+				    * copies of the <tt>ScratchData</tt>
+				    * object and
+				    * <tt>queue_length*chunk_size</tt>
+				    * copies of the <tt>CopyData</tt>
+				    * object are generated.
 				    */
   template <typename Worker,
 	    typename Copier,
@@ -587,6 +597,16 @@ namespace WorkStream
 				    * stream that will be worked on by the
 				    * worker and copier functions one after
 				    * the other on the same thread.
+				    *
+				    * @note If your data objects are large,
+				    * or their constructors are expensive,
+				    * it is helpful to keep in mind
+				    * that <tt>queue_length</tt>
+				    * copies of the <tt>ScratchData</tt>
+				    * object and
+				    * <tt>queue_length*chunk_size</tt>
+				    * copies of the <tt>CopyData</tt>
+				    * object are generated.
 				    */
   template <typename MainClass,
 	    typename Iterator,
