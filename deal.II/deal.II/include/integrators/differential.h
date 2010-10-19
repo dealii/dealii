@@ -1,0 +1,192 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+#ifndef __deal2__integrators_differential_h
+#define __deal2__integrators_differential_h
+
+
+#include <base/config.h>
+#include <base/exceptions.h>
+#include <base/quadrature.h>
+#include <lac/full_matrix.h>
+#include <fe/mapping.h>
+#include <fe/fe_values.h>
+#include <numerics/mesh_worker_info.h>
+
+DEAL_II_NAMESPACE_OPEN
+
+namespace LocalIntegrators
+{
+/**
+ * @brief Local integrators related to first order differential operators and their traces.
+ *
+ * @author Guido Kanschat
+ * @date 2010
+ */
+  namespace Differential
+  {
+/**
+ * Cell matrix for divergence. The derivative is on the trial function.
+ *
+ * \f[
+ * \int_Z v\nabla \cdot u \,dx
+ * \f]
+ */
+    template <int dim>
+    void divergence_matrix (
+      FullMatrix<double>& M,
+      const FEValuesBase<dim>& fe,
+      const FEValuesBase<dim>& fetest,
+      double factor = 1.)
+    {
+      unsigned int fecomp = fe.get_fe().n_components();
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+      AssertDimension(fecomp, dim);
+      AssertDimension(M.m(), t_dofs);
+      AssertDimension(M.n(), n_dofs);
+	
+      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+	{
+	  const double dx = fe.JxW(k) * factor;
+	  for (unsigned i=0;i<t_dofs;++i)
+	    {
+	      const double vv = fetest.shape_value(i,k);
+	      for (unsigned int d=0;d<dim;++d)
+		for (unsigned j=0;j<n_dofs;++j)
+		  {
+		    const double du = fe.shape_grad_component(j,k,d)[d];
+		    M(i,j) += dx * du * vv;
+		  }
+	    }
+	}
+    }
+/**
+ * Cell matrix for divergence. The derivative is on the test function.
+ *
+ * \f[
+ * \int_Z \nabla u \cdot v\,dx
+ * \f]
+ */
+    template <int dim>
+    void gradient_matrix(
+      FullMatrix<double>& M,
+      const FEValuesBase<dim>& fe,
+      const FEValuesBase<dim>& fetest,
+      double factor = 1.)
+    {
+      unsigned int fecomp = fetest.get_fe().n_components();
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+      const unsigned int n_dofs = fe.dofs_per_cell;
+
+      AssertDimension(fecomp, dim);
+      AssertDimension(fe.get_fe().n_components(), 1);
+      AssertDimension(M.m(), t_dofs);
+      AssertDimension(M.n(), n_dofs);
+	
+      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+	{
+	  const double dx = fe.JxW(k) * factor;
+	  for (unsigned int d=0;d<dim;++d)
+	    for (unsigned i=0;i<t_dofs;++i)
+	      {
+		const double vv = fetest.shape_value_component(i,k,d);
+		for (unsigned j=0;j<n_dofs;++j)
+		  {
+		    const Tensor<1,dim>& Du = fe.shape_grad(j,k);
+		    M(i,j) += dx * vv * Du[d];
+		  }
+	      }
+	}
+    }
+
+/**
+ * The trace of the divergence
+ * operator, namely the product
+ * of the normal component of the
+ * vector valued trial space and
+ * the test space.
+ * @f[
+ * \int_F (\mathbf u\cdot \mathbf n) v \,ds
+ * @f]
+ */
+    template<int dim>
+    void
+    u_dot_n_matrix (
+      FullMatrix<double>& M,
+      const FEValuesBase<dim>& fe,
+      const FEValuesBase<dim>& fetest,
+      double factor = 1.)
+    {
+      unsigned int fecomp = fe.get_fe().n_components();
+      const unsigned int n_dofs = fe.dofs_per_cell;
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+	
+      AssertDimension(fecomp, dim);
+      AssertDimension(fetest.get_fe().n_components(), 1);
+      AssertDimension(M.m(), t_dofs);
+      AssertDimension(M.n(), n_dofs);
+	
+      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+	{
+	  const Tensor<1,dim> ndx = factor * fe.JxW(k) * fe.normal_vector(k);
+	  for (unsigned i=0;i<t_dofs;++i)
+	    for (unsigned j=0;j<n_dofs;++j)
+	      for (unsigned int d=0;d<dim;++d)
+		M(i,j) += ndx[d] * fe.shape_value_component(j,k,d)
+			  * fetest.shape_value(i,k);
+	}
+    }
+
+/**
+ * The trace of the divergence
+ * operator, namely the product
+ * of the normal component of the
+ * vector valued trial space and
+ * the test space.
+ * @f[
+ * \int_F (\mathbf f\cdot \mathbf n) v \,ds
+ * @f]
+ */
+    template<int dim>
+    void
+    u_dot_n_residual (
+      Vector<double>& result,
+      const FEValuesBase<dim>& fe,
+      const FEValuesBase<dim>& fetest,
+      const VectorSlice<const std::vector<std::vector<double> > >& data,
+      double factor = 1.)
+    {
+      unsigned int fecomp = fe.get_fe().n_components();
+      const unsigned int t_dofs = fetest.dofs_per_cell;
+	
+      AssertDimension(fecomp, dim);
+      AssertDimension(fetest.get_fe().n_components(), 1);
+      AssertDimension(result.size(), t_dofs);	
+      AssertVectorVectorDimension (data, dim, fe.n_quadrature_points);	
+	
+      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+	{
+	  const Tensor<1,dim> ndx = factor * fe.normal_vector(k) * fe.JxW(k);      
+	    
+	  for (unsigned i=0;i<t_dofs;++i)
+	    for (unsigned int d=0;d<dim;++d)
+	      result(i) += ndx[d] * fetest.shape_value(i,k) * data[d][k];
+	}
+    }
+  }
+}
+
+
+DEAL_II_NAMESPACE_CLOSE
+
+#endif
