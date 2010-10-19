@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Functions in this namespace follow a generic signature. In the
  * simplest case, you have two related functions
- * \begin{code}
+ * @code
  *   template <int dim>
  *   void
  *   cell_matrix (
@@ -61,7 +61,7 @@ DEAL_II_NAMESPACE_OPEN
  *     const FEValuesBase<dim>& fe,
  *     const std::vector<Tensor<1,dim> >& input,
  *     const double factor = 1.);
- * \end{code}
+ * @endcode
  *
  * There is typically a pair of functions for the same operator, the
  * function <tt>cell_residual</tt> implementing the mapping of the
@@ -73,7 +73,7 @@ DEAL_II_NAMESPACE_OPEN
  * <ul>
  * <li> FullMatrix&lt;double&gt; for matrices
  * <li> BlockVector&ltdouble&gt; for vectors
- * </li>
+ * </ul>
  *
  * The next argument is the FEValuesBase object representing the
  * finite element for integration. If the integrated operator maps
@@ -104,7 +104,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * With these matrices, the function called by MeshWorker::loop()
  * could be written like
- * \begin{code}
+ * @code
 using namespace ::dealii:: LocalIntegrators;
 
 template <int dim>
@@ -116,7 +116,7 @@ void MatrixIntegrator<dim>::cell(
   Differential::div_primal_matrix(dinfo.matrix(1,false).matrix, info.fe_values(0), info.fe_values(1));
   L2::cell_matrix(dinfo.matrix(2,false).matrix, info.fe_values(1));
 }
- * \end{code}
+ * @endcode
  * See step-42 for a worked out example of this code.
  */
 namespace LocalIntegrators

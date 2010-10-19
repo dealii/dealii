@@ -55,7 +55,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_components = fe.get_fe().n_components();
-      
+
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
 	{
 	  const double dx = fe.JxW(k) * factor;
@@ -74,7 +74,7 @@ namespace LocalIntegrators
  * \int_F \Bigl(\gamma u v - \partial_n u v - u \partial_n v\Bigr)\;ds.
  * @f]
  *
- * Here, &gamma; is the <tt>penalty</tt> parameter suitably computed
+ * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed
  * with compute_penalty().
  *
  * @author Guido Kanschat
@@ -89,10 +89,10 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int n_comp = fe.get_fe().n_components();
-	
+
       Assert (M.m() == n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
       Assert (M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
-	
+
       for (unsigned k=0;k<fe.n_quadrature_points;++k)
 	{
 	  const double dx = fe.JxW(k) * factor;
@@ -117,7 +117,7 @@ namespace LocalIntegrators
  * Here, <i>u</i> is the finite element function whose values and
  * gradient are given in the arguments <tt>input</tt> and
  * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
- * boundary value in the argument <tt>data</tt>. &gamma; is the usual
+ * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
  * penalty parameter.
  */
       template <int dim>
@@ -136,7 +136,7 @@ namespace LocalIntegrators
 	AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
 	AssertVectorVectorDimension(Dinput, n_comp, fe.n_quadrature_points);
 	AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
-	
+
 	for (unsigned k=0;k<fe.n_quadrature_points;++k)
 	  {
 	    const double dx = factor * fe.JxW(k);
@@ -149,7 +149,7 @@ namespace LocalIntegrators
 		  const double v= fe.shape_value_component(i,k,d);
 		  const double u= input[d][k];
 		  const double g= data[d][k];
-		  
+
 		  result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
 		}
 	  }
@@ -195,10 +195,10 @@ namespace LocalIntegrators
       AssertDimension(M21.m(), n_dofs);
       AssertDimension(M22.n(), n_dofs);
       AssertDimension(M22.m(), n_dofs);
-	
+
       const double nui = factor1;
       const double nue = (factor2 < 0) ? factor1 : factor2;
-	
+
       for (unsigned k=0;k<fe1.n_quadrature_points;++k)
 	{
 	  const double dx = fe1.JxW(k);
@@ -217,7 +217,7 @@ namespace LocalIntegrators
 		      const double dnui = n * fe1.shape_grad(j,k);
 		      const double ue = fe2.shape_value(j,k);
 		      const double dnue = n * fe2.shape_grad(j,k);
-			
+
 		      M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
 		      M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
 		      M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
@@ -234,7 +234,7 @@ namespace LocalIntegrators
 			const double dnui = n * fe1.shape_grad_component(j,k,d);
 			const double ue = fe2.shape_value_component(j,k,d);
 			const double dnue = n * fe2.shape_grad_component(j,k,d);
-			  
+
 			M11(i,j) += dx*(-.5*nui*dnvi*ui-.5*nui*dnui*vi+penalty*ui*vi);
 			M12(i,j) += dx*( .5*nui*dnvi*ue-.5*nue*dnue*vi-penalty*vi*ue);
 			M21(i,j) += dx*(-.5*nue*dnve*ui+.5*nui*dnui*ve-penalty*ui*ve);
