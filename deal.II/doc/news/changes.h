@@ -252,7 +252,16 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>lac</h3>
 
 <ol>
-  <li><p>New: The ConstraintMatrix::merge function now takes a second
+
+  <li><p>New: The classes RelaxationBlockSOR and RelaxationBlockSSOR
+  implement overlapping Schwarz relaxation methods. Additionally,
+  their base class RelaxationBlock and the helper class BlockList have
+  been added to the library.
+  <br>
+  (GK 2010/10/19)
+  </p></li>
+  
+  <li><p>Improved: The ConstraintMatrix::merge function now takes a second
   argument that indicates what should happen if the two objects to be
   merged have constraints on the very same degree of freedom.
   <br>

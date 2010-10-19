@@ -699,7 +699,13 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * elements outside the diagonal blocks may be distributed
  * arbitrarily.
  *
- * See PreconditionBlock for requirements on the matrix.
+ * See PreconditionBlock for requirements on the matrix. The blocks
+ * used in this class must be contiguous and non-overlapping. An
+ * overlapping Schwarz relaxation method can be found in
+ * RelaxationBlockSOR; that class does not offer preconditioning,
+ * though.
+ *
+ * <h3>Permutations</h3>
  *
  * Optionally, the entries of the source vector can be treated in the
  * order of the indices in the permutation vector set by
@@ -712,6 +718,8 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
  * Therefore, the permutation vector can only swap whole blocks. It
  * may not change the order inside blocks or swap single indices
  * between blocks.
+ *
+ * <h3>Instantiations</h3>
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -918,7 +926,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
  * based on the implementation in PreconditionBlockSOR.  This
  * class requires storage of the diagonal blocks and their inverses.
  *
- * See PreconditionBlock for requirements on the matrix.
+ * See PreconditionBlock for requirements on the matrix. The blocks
+ * used in this class must be contiguous and non-overlapping. An
+ * overlapping Schwarz relaxation method can be found in
+ * RelaxationBlockSSOR; that class does not offer preconditioning,
+ * though.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
