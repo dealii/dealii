@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,6 @@
 //----------------------------------------------------------------------
 
 #include "../tests.h"
-#include <base/logstream.h>
 #include <dofs/block_info.h>
 #include <multigrid/mg_dof_handler.h>
 #include <grid/tria.h>
@@ -81,7 +80,8 @@ void test_fe (const FiniteElement<dim>& fe)
 
 int main () 
 {
-  std::ofstream logfile("block_info/output");
+  std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console(0);
 

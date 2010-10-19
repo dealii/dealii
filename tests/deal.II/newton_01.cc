@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,7 @@
 //
 //-----------------------------------------------------------------------------
 
+#include "../tests.h"
 #include <numerics/operator.h>
 #include <numerics/newton.h>
 #include <numerics/vectors.h>
@@ -125,9 +126,10 @@ void test ()
 
 int main()
 {
-  std::ofstream logfile("newton_01/output");
+  std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.depth_console(10);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   test ();

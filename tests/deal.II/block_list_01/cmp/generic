@@ -1,0 +1,52 @@
+
+DEAL::FE_Q<2>(1)
+DEAL::Block 0   0    1    2    3   
+DEAL::Block 1   1    4    3    5   
+DEAL::Block 2   2    3    6    7   
+DEAL::Block 3   3    5    7    8   
+DEAL::Block 4   4    9    5    10  
+DEAL::Block 5   9    11   10   12  
+DEAL::Block 6   5    10   8    13  
+DEAL::Block 7   10   12   13   14  
+DEAL::Block 8   6    7    15   16  
+DEAL::Block 9   7    8    16   17  
+DEAL::Block 10  15   16   18   19  
+DEAL::Block 11  16   17   19   20  
+DEAL::Block 12  8    13   17   21  
+DEAL::Block 13  13   14   21   22  
+DEAL::Block 14  17   21   20   23  
+DEAL::Block 15  21   22   23   24  
+DEAL::FE_Q<2>(2)
+DEAL::Block 0   0    1    2    3    4    5    6    7    8   
+DEAL::Block 1   1    9    3    10   5    11   12   13   14  
+DEAL::Block 2   2    3    15   16   17   18   7    19   20  
+DEAL::Block 3   3    10   16   21   18   22   13   23   24  
+DEAL::Block 4   9    25   10   26   11   27   28   29   30  
+DEAL::Block 5   25   31   26   32   27   33   34   35   36  
+DEAL::Block 6   10   26   21   37   22   38   29   39   40  
+DEAL::Block 7   26   32   37   41   38   42   35   43   44  
+DEAL::Block 8   15   16   45   46   47   48   19   49   50  
+DEAL::Block 9   16   21   46   51   48   52   23   53   54  
+DEAL::Block 10  45   46   55   56   57   58   49   59   60  
+DEAL::Block 11  46   51   56   61   58   62   53   63   64  
+DEAL::Block 12  21   37   51   65   52   66   39   67   68  
+DEAL::Block 13  37   41   65   69   66   70   43   71   72  
+DEAL::Block 14  51   65   61   73   62   74   67   75   76  
+DEAL::Block 15  65   69   73   77   74   78   71   79   80  
+DEAL::FE_RaviartThomas<2>(0)
+DEAL::Block 0   0    1    2    3   
+DEAL::Block 1   1    4    5    6   
+DEAL::Block 2   7    8    3    9   
+DEAL::Block 3   8    10   6    11  
+DEAL::Block 4   4    12   13   14  
+DEAL::Block 5   12   15   16   17  
+DEAL::Block 6   10   18   14   19  
+DEAL::Block 7   18   20   17   21  
+DEAL::Block 8   22   23   9    24  
+DEAL::Block 9   23   25   11   26  
+DEAL::Block 10  27   28   24   29  
+DEAL::Block 11  28   30   26   31  
+DEAL::Block 12  25   32   19   33  
+DEAL::Block 13  32   34   21   35  
+DEAL::Block 14  30   36   33   37  
+DEAL::Block 15  36   38   35   39  
