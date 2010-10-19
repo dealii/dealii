@@ -899,8 +899,8 @@ void MixedLaplaceProblem<dim>::solve ()
     m_inverse;
   m_inverse.initialize(system_matrix.block(0,0), identity);
   m_inverse.solver.select("cg");
-  ReductionControl inner_control(1000, 0., 1.e-13);
-  m_inverse.solver.control = inner_control;
+  static ReductionControl inner_control(1000, 0., 1.e-13);
+  m_inverse.solver.set_control(inner_control);
   
   Vector<double> tmp (solution.block(0).size());
 
@@ -935,7 +935,7 @@ void MixedLaplaceProblem<dim>::solve ()
       preconditioner;
     preconditioner.initialize(approximate_schur_complement, identity);
     preconditioner.solver.select("cg");
-    preconditioner.solver.control = inner_control;
+    preconditioner.solver.set_control(inner_control);
 
     
     SolverControl solver_control (solution.block(1).size(),
