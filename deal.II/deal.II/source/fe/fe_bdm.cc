@@ -74,20 +74,20 @@ FE_BDM<dim>::FE_BDM (const unsigned int deg)
   this->reinit_restriction_and_prolongation_matrices(true, true);
   FETools::compute_embedding_matrices (*this, this->prolongation, true);
   
-//   FullMatrix<double> face_embeddings[GeometryInfo<dim>::subfaces_per_face];
-//   for (unsigned int i=0; i<GeometryInfo<dim>::subfaces_per_face; ++i)
-//     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
-//   FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0);
-//   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
-// 				     this->dofs_per_face);
-//   unsigned int target_row=0;
-//   for (unsigned int d=0;d<GeometryInfo<dim>::subfaces_per_face;++d)
-//     for (unsigned int i=0;i<face_embeddings[d].m();++i)
-//       {
-// 	for (unsigned int j=0;j<face_embeddings[d].n();++j)
-// 	  this->interface_constraints(target_row,j) = face_embeddings[d](i,j);
-// 	++target_row;
-//       }
+  FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
+  for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_face; ++i)
+    face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
+  FETools::compute_face_embedding_matrices(*this, face_embeddings, 0, 0);
+  this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
+				     this->dofs_per_face);
+  unsigned int target_row=0;
+  for (unsigned int d=0;d<GeometryInfo<dim>::max_children_per_face;++d)
+    for (unsigned int i=0;i<face_embeddings[d].m();++i)
+      {
+	for (unsigned int j=0;j<face_embeddings[d].n();++j)
+	  this->interface_constraints(target_row,j) = face_embeddings[d](i,j);
+	++target_row;
+      }
 }
 
 
