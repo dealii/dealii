@@ -1,6 +1,16 @@
-// up_and_down.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
-// (c) Wolfgang Bangerth
+//--------------------------------------------------------------------------
+//    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
+//    Version: 
 //
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//--------------------------------------------------------------------------
+
 // Try something remarkably simple: take some arbitrary (discrete)
 // function and transfer it to a coarser grid. transfer it back to the
 // fine grid. store it and call it X. transfer down to the coarse grid
