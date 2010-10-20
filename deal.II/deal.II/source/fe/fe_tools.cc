@@ -763,9 +763,7 @@ namespace FETools
   }
 
 
-// This function is tested by tests/fe/internals, since it produces the matrices printed there
-
-//TODO:[GK] Is this correct for vector valued?
+// This function is tested by tests/fe/internals, since it produces the matrices printed there  
   template <int dim, typename number, int spacedim>
   void
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
@@ -773,29 +771,23 @@ namespace FETools
 				  const unsigned int face_coarse,
 				  const unsigned int face_fine)
   {
+    Assert(face_coarse==0, ExcNotImplemented());
+    Assert(face_fine==0, ExcNotImplemented());
+    
     const unsigned int nc = GeometryInfo<dim>::max_children_per_face;
     const unsigned int n  = fe.dofs_per_face;
     const unsigned int nd = fe.n_components();
     const unsigned int degree = fe.degree;
-
+    
+    const bool normal = fe.conforms(FiniteElementData<dim>::Hdiv);
+    const bool tangential = fe.conforms(FiniteElementData<dim>::Hcurl);
+    
     for (unsigned int i=0;i<nc;++i)
       {
 	Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(),n));
 	Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
       }
-
-				     // Set up meshes, one with a single
-				     // reference cell and refine it once
-    Triangulation<dim,spacedim> tria;
-    GridGenerator::hyper_cube (tria, 0, 1);
-    tria.refine_global(1);
-
-    MappingCartesian<dim> mapping;
-    QGauss<dim-1> q_gauss(degree+1);
-    const Quadrature<dim> q_fine = QProjector<dim>::project_to_face(q_gauss, face_fine);
-
-    const unsigned int nq = q_fine.size();
-
+    
 				     // In order to make the loops below
 				     // simpler, we introduce vectors
 				     // containing for indices 0-n the
@@ -849,6 +841,25 @@ namespace FETools
       }
     Assert (k == fe.dofs_per_face, ExcInternalError());
 
+				     // Set up meshes, one with a single
+				     // reference cell and refine it once
+    Triangulation<dim,spacedim> tria;
+    GridGenerator::hyper_cube (tria, 0, 1);
+    tria.refine_global(1);
+    MappingCartesian<dim> mapping;
+
+				     // Setup quadrature and FEValues
+				     // for a face. We cannot use
+				     // FEFaceValues and
+				     // FESubfaceValues because of
+				     // some nifty handling of
+				     // refinement cases. Guido stops
+				     // disliking and instead starts
+				     // hating the anisotropic implementation
+    QGauss<dim-1> q_gauss(degree+1);
+    const Quadrature<dim> q_fine = QProjector<dim>::project_to_face(q_gauss, face_fine);
+    const unsigned int nq = q_fine.size();
+
     FEValues<dim> fine (mapping, fe, q_fine,
 			update_quadrature_points | update_JxW_values | update_values);
 
@@ -868,12 +879,21 @@ namespace FETools
     fine.reinit(tria.begin_active());
     FullMatrix<number> A(nq*nd, n);
     for (unsigned int j=0;j<n;++j)
-      for (unsigned int d=0;d<nd;++d)
-	for (unsigned int k=0;k<nq;++k)
-	  A(k*nd+d,j) = fine.shape_value_component(face_f_dofs[j],k,d);
-
+      for (unsigned int k=0;k<nq;++k)
+	if (nd != dim)
+	  for (unsigned int d=0;d<nd;++d)
+	    A(k*nd+d,j) = fine.shape_value_component(face_f_dofs[j],k,d);
+	else
+	  {
+	    if (normal)
+	      A(k*nd,j) = fine.shape_value_component(face_f_dofs[j],k,0);
+	    if (tangential)
+	      for (unsigned int d=1;d<dim;++d)
+		A(k*nd+d,j) = fine.shape_value_component(face_f_dofs[j],k,d);
+	  }
+    
     Householder<double> H(A);
-
+    
     Vector<number> v_coarse(nq*nd);
     Vector<number> v_fine(n);
 
@@ -904,10 +924,18 @@ namespace FETools
 					     // function values of the
 					     // coarse grid function in
 					     // each quadrature point.
-	    for (unsigned int d=0;d<nd;++d)
-	      for (unsigned int k=0;k<nq;++k)
-		v_coarse(k*nd+d) = coarse.shape_value_component (face_c_dofs[i],k,d);
-
+	    for (unsigned int k=0;k<nq;++k)
+	      if (nd != dim)
+		for (unsigned int d=0;d<nd;++d)
+		  v_coarse(k*nd+d) = coarse.shape_value_component (face_c_dofs[i],k,d);
+	      else
+	  {
+	    if (normal)
+	      v_coarse(k*nd) = coarse.shape_value_component(face_c_dofs[i],k,0);
+	    if (tangential)
+	      for (unsigned int d=1;d<dim;++d)
+		v_coarse(k*nd+d) = coarse.shape_value_component(face_c_dofs[i],k,d);
+	  }
 					     // solve the least squares
 					     // problem.
 	    const double result = H.least_squares(v_fine, v_coarse);
