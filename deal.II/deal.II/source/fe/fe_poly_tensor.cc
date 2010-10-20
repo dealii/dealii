@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -852,8 +852,19 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		      = sign_change[i] * shape_values[k][d];
 		break;
 	      }
+	      case mapping_nedelec: {
+	         std::vector<Tensor<1,dim> > shape_values (n_q_points);
+	           mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
+	         shape_values, mapping_data, mapping_covariant);
+	         
+   	         for (unsigned int k = 0; k < n_q_points; ++k)
+	            for (unsigned int d = 0; d < dim; ++d)
+	               data.shape_values(first+d,k) = shape_values[k][d];
+	      
+	         break;
+	      }
 	      default:
-		Assert(false, ExcNotImplemented());
+		    Assert(false, ExcNotImplemented());
 	    }
 	}
       
@@ -908,6 +919,46 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
 		
 		break;
+	      }
+	      
+	      case mapping_nedelec: {
+                                           // treat the gradients of
+                                           // this particular shape
+                                           // function at all
+                                           // q-points. if Dv is the
+                                           // gradient of the shape
+                                           // function on the unit
+                                           // cell, then
+                                           // (J^-T)Dv(J^-1) is the
+                                           // value we want to have on
+                                           // the real cell. so, we
+                                           // will have to apply a
+                                           // covariant transformation
+                                           // to Dv twice. since the
+                                           // interface only allows
+                                           // multiplication with
+                                           // (J^-1) from the right,
+                                           // we have to trick a
+                                           // little in between
+                                           
+                                           // do first transformation
+	      	 mapping.transform (make_slice (fe_data.shape_grads[i], offset, n_q_points),
+	      	   shape_grads1, mapping_data, mapping_covariant);
+                                           // transpose matrix	      	 
+	      	 for (unsigned int k = 0; k < n_q_points; ++k)
+	      	    shape_grads2[k] = transpose (shape_grads1[k]);
+                                           // do second transformation	      	 
+	      	 mapping.transform (shape_grads2, shape_grads1,
+	      	   mapping_data, mapping_covariant);
+                                           // transpose back	      	 
+	      	 for (unsigned int k = 0; k < n_q_points; ++k)
+	      	    shape_grads2[k] = transpose (shape_grads1[k]);
+	      	    
+	      	 for (unsigned int k = 0; k < n_q_points; ++k)
+	      	    for (unsigned int d = 0; d < dim; ++d)
+	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];	      	 
+					   // then copy over to target:
+	         break;
 	      }
 	      
 	      default:
