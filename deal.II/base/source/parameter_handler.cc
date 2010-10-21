@@ -147,7 +147,8 @@ namespace Patterns
       {
 	std::ostringstream description;
 
-	description << "[Integer range "
+	description << description_init
+	        <<" range "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]";
 	return description.str();
@@ -215,14 +216,15 @@ namespace Patterns
 
   std::string Double::description () const
   {
+	std::ostringstream description;
+	
 				     // check whether valid bounds
 				     // were specified, and if so
 				     // output their values
     if (lower_bound <= upper_bound)
       {
-	std::ostringstream description;
-
-	description << "[Floating point range "
+	description << description_init
+	        << " "
 		    << lower_bound << "..." << upper_bound
 		    << " (inclusive)]";
 	return description.str();
@@ -230,7 +232,10 @@ namespace Patterns
     else
 				       // if no bounds were given, then
 				       // return generic string
-      return "[Double]";
+	  {
+	  description << description_init
+	              << "]";
+      return description.str();
   }
 
 
@@ -278,7 +283,14 @@ namespace Patterns
 
   std::string Selection::description () const
   {
-    return sequence;
+    std::ostringstream description;
+    
+    description << description_init
+                << " "
+                << sequence
+                << " ]";
+                
+    return description.str();
   }
 
 
@@ -379,9 +391,11 @@ namespace Patterns
   {
     std::ostringstream description;
 
-    description << "list of <" << pattern->description() << ">"
+    description << description_init
+                << " list of <" << pattern->description() << ">"
                 << " of length " << min_elements << "..." << max_elements
-                << " (inclusive)";
+                << " (inclusive)"
+                << "]";
 
     return description.str();
   }
@@ -483,7 +497,14 @@ namespace Patterns
 
   std::string MultipleSelection::description () const
   {
-    return sequence;
+    std::ostringstream description;
+    
+    description << description_init
+                << " "
+                << sequence
+                << " ]";
+                
+    return description.str();
   }
 
 
@@ -533,7 +554,12 @@ namespace Patterns
 
   std::string Anything::description () const
   {
-    return "[Anything]";
+    std::ostringstream description;
+    
+    description << description_init
+                << "]"
+                
+    return description.str();
   }
 
 
