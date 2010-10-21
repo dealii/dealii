@@ -18,6 +18,7 @@
 #include <grid/grid_tools.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_values.h>
+#include <fe/mapping_cartesian.h>
 
 #include <vector>
 #include <fstream>
@@ -57,7 +58,8 @@ plot (const Triangulation<dim> &tr, const unsigned int p)
   QTrapez<dim> quadrature;
   std::vector<Vector<double> > shape_values (quadrature.n_quadrature_points,
                                              Vector<double>(dim));
-  FEValues<dim> fe(fe_ned, quadrature,
+  MappingCartesian<dim> mapping;
+  FEValues<dim> fe(mapping, fe_ned, quadrature,
                    update_values|update_q_points);
 
   for (typename DoFHandler<dim>::active_cell_iterator

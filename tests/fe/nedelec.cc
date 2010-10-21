@@ -1,9 +1,26 @@
-// nedelec.cc,v 1.5 2003/04/21 16:22:48 wolf Exp
-// (c) Wolfgang Bangerth
+//----------------------------------------------------------------------
+//    rt_1.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
+//    Version: 
 //
+//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------------------------------------------------
+
 // Show the shape functions of the Nedelec element on a grid with only
 // one cell. This cell is rotated, stretched, scaled, etc, and on each
 // of these cells each time we evaluate the shape functions.
+
+// Shape functions and their gradients are output in gnuplot format,
+// prefixed by an identifier for the transformation. To produce a
+// gnuplot file for the values of functions of degree K with
+// transformation N, do
+
+// perl -n -e 'print if s/DEAL:NedelecK-TransformN::value//' nedelec/output
 
 #include "../tests.h"
 #include <base/quadrature_lib.h>
@@ -91,7 +108,9 @@ plot_shape_functions(const unsigned int p)
 				   // triangulations
   for (unsigned int transform=0; transform<4; ++transform)
     {
-      deallog << "GRID TRANSFORMATION " << transform << std::endl;
+      std::ostringstream ost;
+      ost << "Nedelec" << p << "-Transform" << transform;
+      deallog.push(ost.str());
       
       transform_grid (tr, transform);
 
@@ -105,39 +124,42 @@ plot_shape_functions(const unsigned int p)
       FEValues<dim> fe(fe_ned, q, update_values|update_gradients|update_q_points);
       fe.reinit(c);
       
-      unsigned int q_point=0;
-      for (unsigned int mz=0;mz<=((dim>2) ? div : 0) ;++mz)
-	for (unsigned int my=0;my<=((dim>1) ? div : 0) ;++my)
-	  for (unsigned int mx=0;mx<=div;++mx)
+      for (unsigned int q_point=0;q_point< q.size();++q_point)
+	{
+					   // Output function in
+					   // gnuplot readable format,
+					   // namely x y z u0x u0y u0z u1x...
+	  deallog << "value    " << q_point << '\t' << fe.quadrature_point(q_point);
+	  
+	  for (unsigned int i=0;i<fe_ned.dofs_per_cell;++i)
 	    {
-	      deallog << "q_point(" << q_point << ")=" << fe.quadrature_point(q_point)
-		      << std::endl;
-	      
-	      for (unsigned int i=0;i<fe_ned.dofs_per_cell;++i)
-		{
-		  deallog << "  phi(" << i << ") = [";
-		  for (unsigned int c=0; c<fe.get_fe().n_components(); ++c)
-		    deallog << " " << fe.shape_value_component(i,q_point,c);
-		  deallog << " ]" << std::endl;
-		};
-	      for (unsigned int i=0;i<fe_ned.dofs_per_cell;++i)
-		{
-		  deallog << "  grad phi(" << i << ") = ";
-		  for (unsigned int c=0; c<dim; ++c)
-                    {
-                      deallog << "[";
-                      for (unsigned int d=0; d<dim; ++d)
-                        deallog << " " << fe.shape_grad_component(i,q_point,c)[d];
-                      deallog << " ]" << std::endl;
-                      if (c != dim-1)
-                        deallog << "                ";
-                    };
-		};
-
-              q_point++;
+	      for (unsigned int c=0; c<dim; ++c)
+		deallog << '\t' << fe.shape_value_component(i,q_point,c);
 	    }
 
+					   // Output the gradients in
+					   // similar fashion
+	  deallog << std::endl << "gradient " << q_point << '\t' << fe.quadrature_point(q_point);
+	  
+	  for (unsigned int i=0;i<fe_ned.dofs_per_cell;++i)
+	    {
+	      for (unsigned int c=0; c<dim; ++c)
+		{
+		  for (unsigned int d=0; d<dim; ++d)
+		    deallog << '\t' << fe.shape_grad_component(i,q_point,c)[d];
+		}
+	    }
+	  deallog << std::endl;
+	  
+	  if ((q_point+1) % (2*div-1) == 0)
+	    {
+	      deallog << "value    " << std::endl;
+	      deallog << "gradient " << std::endl;
+	    }
+	}
+      
       deallog << std::endl;
+      deallog.pop();
     }
 }
 
