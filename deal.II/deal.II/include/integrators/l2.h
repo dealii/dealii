@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace LocalIntegrators
 {
 /**
- * @brief Local integrators related to <i>L<sup>2</sup</i>-inner products.
+ * @brief Local integrators related to <i>L<sup>2</sup></i>-inner products.
  *
  * @author Guido Kanschat
  * @date 2010
@@ -64,7 +64,7 @@ namespace LocalIntegrators
     }
 
 /**
- * <i>L<sup>2</sup</i>-inner product for scalar functions.
+ * <i>L<sup>2</sup></i>-inner product for scalar functions.
  *
  * \f[
  * (f,v)
@@ -88,7 +88,7 @@ namespace LocalIntegrators
     }
 
 /**
- * <i>L<sup>2</sup</i>-inner product for a slice of a vector valued
+ * <i>L<sup>2</sup></i>-inner product for a slice of a vector valued
  * right hand side.
  *
  * \f[
