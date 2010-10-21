@@ -548,6 +548,9 @@ CompressedSparsityPattern::n_nonzero_elements () const
 template void CompressedSparsityPattern::Line::add_entries(unsigned int *,
 							   unsigned int *,
 							   const bool);
+template void CompressedSparsityPattern::Line::add_entries(const unsigned int *,
+							   const unsigned int *,
+							   const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void CompressedSparsityPattern::Line::
 add_entries(std::vector<unsigned int>::iterator,
