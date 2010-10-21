@@ -62,7 +62,7 @@ void HelperClass::run (ParameterHandler &prm)
 
 
 
-void check (const char *p)
+void check ()
 {
   class MultipleParameterLoop prm;
   HelperClass h;
@@ -80,7 +80,7 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  check ("multiple_parameter_loop_01/prm");
+  check ();
 
   return 0;
 }
