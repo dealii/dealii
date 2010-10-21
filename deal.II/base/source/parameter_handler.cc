@@ -107,6 +107,8 @@ namespace Patterns
 #endif
 
 
+  const char* Integer::description_init = "[Integer";
+
   Integer::Integer (const int lower_bound,
 		    const int upper_bound)
                   :
@@ -183,6 +185,8 @@ namespace Patterns
           0;
 #endif
 
+  const char* Double::description_init = "[Double";
+
   Double::Double (const double lower_bound,
 		  const double upper_bound)
                   :
@@ -246,6 +250,9 @@ namespace Patterns
     return new Double(lower_bound, upper_bound);
   }
 
+
+
+  const char* Selection::description_init = "[Selection";
 
 
   Selection::Selection (const std::string &seq)
@@ -318,6 +325,9 @@ namespace Patterns
 #else
           numbers::invalid_unsigned_int;
 #endif
+
+
+  const char* List::description_init = "[List";
 
 
   List::List (const PatternBase  &p,
@@ -417,6 +427,9 @@ namespace Patterns
 	    MemoryConsumption::memory_consumption(*pattern));
   }
 
+
+
+  const char* MultipleSelection::description_init = "[MultipleSelection";
 
 
   MultipleSelection::MultipleSelection (const std::string &seq)
@@ -539,6 +552,9 @@ namespace Patterns
     return new Bool();
   }
 
+
+
+  const char* Anything::description_init = "[Anything";
 
 
   Anything::Anything ()

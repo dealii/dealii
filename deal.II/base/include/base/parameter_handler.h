@@ -276,13 +276,12 @@ namespace Patterns
 					* a valid range.
 					*/
       const int upper_bound;
-      
-                       /**
-                    * Initial part of description
-                    */
-      static const char* description_init;              
+
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
-  const char* Integer::description_init = "[Integer";
 
 				   /**
                                     * Test for the string being a
@@ -416,13 +415,12 @@ namespace Patterns
 					* a valid range.
 					*/
       const double upper_bound;
-      
-                       /**
-                    * Initial part of description
-                    */
-      static const char* description_init;              
+
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
-  const char* Double::description_init = "[Double";
 
 				   /**
                                     * Test for the string being one
@@ -496,12 +494,11 @@ namespace Patterns
 					*/
       std::string sequence;
 
-                       /**
-                    * Initial part of description
-                    */
-      static const char* description_init;              
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
-  const char* Selection::description_init = "[Selection";
 
 
                                    /**
@@ -615,12 +612,11 @@ namespace Patterns
                                         */
       const unsigned int max_elements;
 
-                       /**
-                    * Initial part of description
-                    */
-      static const char* description_init;              
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
-  const char* List::description_init = "[List";
 
 				   /**
                                     * This class is much like the
@@ -713,12 +709,11 @@ namespace Patterns
 					*/
       std::string sequence;
 
-                       /**
-                    * Initial part of description
-                    */
-      static const char* description_init;              
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
-  const char* MultipleSelection::description_init = "[MultipleSelection";
 
 				   /**
                                     * Test for the string being
@@ -789,12 +784,11 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                       /**
-                    * Initial part of description
-                    */
-      static const char* description_init;              
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
-  const char* Anything::description_init = "[Anything";
 }
 
 
