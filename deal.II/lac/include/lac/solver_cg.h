@@ -367,6 +367,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	A.vmult(Ad,d);
 
 	alpha = d*Ad;
+	Assert(alpha != 0., ExcDivideByZero());
 	alpha = gh/alpha;
 
 	g.add(alpha,Ad);
@@ -382,6 +383,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	precondition.vmult(h,g);
 
 	beta = gh;
+	Assert(beta != 0., ExcDivideByZero());
 	gh   = g*h;
 	beta = gh/beta;
 
@@ -397,7 +399,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
 	    eigen_beta_alpha = beta/alpha;
 	    offdiagonal.push_back(std::sqrt(beta)/alpha);
 	  }
-
+	
 	if (additional_data.compute_all_condition_numbers && (diagonal.size()>1))
 	  {
 	    TridiagonalMatrix<double> T(diagonal.size(), true);

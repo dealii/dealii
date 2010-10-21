@@ -393,6 +393,8 @@ Number Vector<Number>::operator * (const Vector<Number2>& v) const
     sum3 += *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
   sum += sum3;
 
+  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  
   return sum;
 }
 
@@ -452,6 +454,8 @@ Vector<Number>::norm_sqr () const
     sum3 += numbers::NumberTraits<Number>::abs_square(*X++);
   sum += sum3;
 
+  Assert(numbers::is_finite(sum), ExcNumberNotFinite());
+  
   return sum;
 }
 
@@ -855,8 +859,7 @@ template <typename Number>
 void Vector<Number>::equ (const Number a,
 			  const Vector<Number>& u)
 {
-  Assert (numbers::is_finite(a),
-	  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
@@ -879,8 +882,7 @@ template <typename Number2>
 void Vector<Number>::equ (const Number a,
 			  const Vector<Number2>& u)
 {
-  Assert (numbers::is_finite(a),
-	  ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
+  Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
