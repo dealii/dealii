@@ -217,7 +217,7 @@ namespace Patterns
   std::string Double::description () const
   {
 	std::ostringstream description;
-	
+
 				     // check whether valid bounds
 				     // were specified, and if so
 				     // output their values
@@ -232,10 +232,11 @@ namespace Patterns
     else
 				       // if no bounds were given, then
 				       // return generic string
-	  {
-	  description << description_init
-	              << "]";
-      return description.str();
+      {
+	description << description_init
+		    << "]";
+	return description.str();
+      }
   }
 
 
@@ -284,12 +285,12 @@ namespace Patterns
   std::string Selection::description () const
   {
     std::ostringstream description;
-    
+
     description << description_init
                 << " "
                 << sequence
                 << " ]";
-                
+
     return description.str();
   }
 
@@ -498,12 +499,12 @@ namespace Patterns
   std::string MultipleSelection::description () const
   {
     std::ostringstream description;
-    
+
     description << description_init
                 << " "
                 << sequence
                 << " ]";
-                
+
     return description.str();
   }
 
@@ -555,10 +556,10 @@ namespace Patterns
   std::string Anything::description () const
   {
     std::ostringstream description;
-    
+
     description << description_init
-                << "]"
-                
+                << "]";
+
     return description.str();
   }
 
