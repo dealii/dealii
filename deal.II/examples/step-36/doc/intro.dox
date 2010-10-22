@@ -100,9 +100,13 @@ step-4. The things that are different are the following:
 
 <ul> 
 
-<li>The main class (now named <code>EigenvalueProblem</code>) now no
+<li>The main class (named <code>EigenvalueProblem</code>) now no
 longer has a single solution vector, but a whole set of vectors for
-the various eigenfunctions we want to compute.</li>
+the various eigenfunctions we want to compute. Moreover, the
+<code>main</code> function, which has the top-level control over
+everything here, initializes and finalizes the interface to SLEPc and
+PETSc simultaneouly via <code>SlepcInitialize</code> and
+<code>SlepFinalize</code>.</li>
 
 <li>We use PETSc matrices and vectors as in step-17 and
 step-18 since that is what the SLEPc eigenvalue solvers

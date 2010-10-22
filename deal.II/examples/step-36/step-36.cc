@@ -559,8 +559,10 @@ int main (int argc, char **argv)
 				       // initialize the SLEPc work
 				       // space which inherently
 				       // initializes the PETSc work
-				       // space, run the whole
-				       // program, ...
+				       // space, then go ahead run the
+				       // whole program. After that is
+				       // done, we finalize the
+				       // SLEPc-PETSc work.
       SlepcInitialize (&argc, &argv, 0, 0);
 
       {
