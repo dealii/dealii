@@ -1,0 +1,12 @@
+
+DEAL:0:2d::Exception: --------------------------------------------------------
+An error occurred in file <constraint_matrix.cc> in function
+    void dealii::ConstraintMatrix::distribute(VectorType&) const [with VectorType = dealii::TrilinosWrappers::MPI::Vector]
+The violated condition was: 
+    vec.vector_partitioner().IsOneToOne()
+The name and call sequence of the exception was:
+    ExcMessage ("Distribute does not work on vectors with overlapping parallel partitioning.")
+Additional Information: 
+Distribute does not work on vectors with overlapping parallel partitioning.
+--------------------------------------------------------
+

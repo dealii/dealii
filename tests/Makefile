@@ -6,14 +6,16 @@ include Makefile.paths
 include $D/common/Make.global_options
 
 # first define the directories we should work on
-nofail-dirs = a-framework \
-	      base      \
-              lac       \
-              fe        \
-              deal.II   \
-              multigrid \
-              bits      \
-              hp        \
+nofail-dirs = a-framework       \
+	      base              \
+              lac               \
+              fe                \
+              deal.II           \
+              multigrid         \
+              bits              \
+              hp                \
+	      distributed_grids \
+	      mpi               \
               aniso     \
               codim_one \
               serialization \

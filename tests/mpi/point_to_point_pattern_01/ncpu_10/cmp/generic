@@ -1,0 +1,22 @@
+
+DEAL:mpi::Processor 0 wants to send to 7 4 
+DEAL:mpi::Processor 1 wants to send to 8 5 
+DEAL:mpi::Processor 2 wants to send to 9 6 
+DEAL:mpi::Processor 3 wants to send to 0 7 4 
+DEAL:mpi::Processor 4 wants to send to 1 8 5 
+DEAL:mpi::Processor 5 wants to send to 2 9 6 
+DEAL:mpi::Processor 6 wants to send to 3 0 7 4 
+DEAL:mpi::Processor 7 wants to send to 4 1 8 5 
+DEAL:mpi::Processor 8 wants to send to 5 2 9 6 
+DEAL:mpi::Processor 9 wants to send to 6 3 0 7 4 
+DEAL:mpi::Exchanging data...
+DEAL:mpi::Processor 0 will receive from 3 6 9 
+DEAL:mpi::Processor 1 will receive from 4 7 
+DEAL:mpi::Processor 2 will receive from 5 8 
+DEAL:mpi::Processor 3 will receive from 6 9 
+DEAL:mpi::Processor 4 will receive from 0 3 6 7 9 
+DEAL:mpi::Processor 5 will receive from 1 4 7 8 
+DEAL:mpi::Processor 6 will receive from 2 5 8 9 
+DEAL:mpi::Processor 7 will receive from 0 3 6 9 
+DEAL:mpi::Processor 8 will receive from 1 4 7 
+DEAL:mpi::Processor 9 will receive from 2 5 8 

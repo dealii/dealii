@@ -1,0 +1,7 @@
+
+DEAL:2d::Block 0 has 2401 dofs
+DEAL:2d::Block 1 has 2401 dofs
+DEAL:2d::Block 2 has 1024 dofs
+DEAL:3d::Block 0 has 117649 dofs
+DEAL:3d::Block 1 has 117649 dofs
+DEAL:3d::Block 2 has 32768 dofs

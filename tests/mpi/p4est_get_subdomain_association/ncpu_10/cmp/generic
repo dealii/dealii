@@ -1,0 +1,30 @@
+
+DEAL:1:2d::hyper_cube
+DEAL:1:2d::dofh.n_dofs() 45 20 36 20 32 36 20 32 16 32
+DEAL:1:2d::dofh.n_locally_owned_dofs() 20
+DEAL:1:2d::25
+DEAL:1:2d::   15
+DEAL:1:2d::   16
+DEAL:1:2d::   19
+DEAL:1:2d::   21
+DEAL:1:2d::   23
+DEAL:1:2d::   45
+DEAL:1:2d::   46
+DEAL:1:2d::   47
+DEAL:1:2d::   48
+DEAL:1:2d::   49
+DEAL:1:2d::   50
+DEAL:1:2d::   51
+DEAL:1:2d::   52
+DEAL:1:2d::   53
+DEAL:1:2d::   54
+DEAL:1:2d::   55
+DEAL:1:2d::   56
+DEAL:1:2d::   57
+DEAL:1:2d::   58
+DEAL:1:2d::   59
+DEAL:1:2d::   60
+DEAL:1:2d::   61
+DEAL:1:2d::   62
+DEAL:1:2d::   63
+DEAL:1:2d::   64

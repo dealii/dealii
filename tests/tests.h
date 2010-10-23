@@ -20,6 +20,7 @@
 #include <base/job_identifier.h>
 #include <base/logstream.h>
 #include <base/exceptions.h>
+#include <base/utilities.h>
 #include <cmath>
 #include <fstream>
 
@@ -109,6 +110,22 @@ struct SetGrainSizes
 
 }
 set_grain_sizes;
+
+
+
+// append the directory name with an output file name that indicates
+// the number of MPI processes
+std::string output_file_for_mpi (const std::string &directory)
+{
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  return (directory + "/ncpu_" +
+	  Utilities::int_to_string (Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) +
+	  "/output");
+#else
+  return (directory + "/ncpu_1/output");
+#endif
+}
+
 
 
 #endif // __tests_tests_h

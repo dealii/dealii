@@ -84,10 +84,9 @@ void test ()
 	      << std::endl;
 
       for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-	Assert ((subdomain_association[i] == subdomain)
-		==
-		(index_set.is_element(i) == true),
-		ExcInternalError());
+	if (subdomain_association[i] == subdomain)
+	  Assert (index_set.is_element(i) == true,
+		  ExcInternalError());
     }
 
   deallog << "OK" << std::endl;

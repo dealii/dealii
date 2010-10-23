@@ -1,0 +1,9 @@
+
+DEAL:2d::Total number of dofs: 402
+DEAL:2d::Component 0 has 169 global dofs
+DEAL:2d::Component 1 has 169 global dofs
+DEAL:2d::Component 2 has 64 global dofs
+DEAL:3d::Total number of dofs: 4906
+DEAL:3d::Component 0 has 2197 global dofs
+DEAL:3d::Component 1 has 2197 global dofs
+DEAL:3d::Component 2 has 512 global dofs

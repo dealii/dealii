@@ -1,0 +1,122 @@
+//---------------------------------------------------------------------------
+//    $Id: 3d_refinement_02.cc 19830 2009-10-12 18:19:51Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+// test distributed solution_transfer with one processor (several solutions)
+
+#include "../tests.h"
+#include "coarse_grid_common.h"
+#include <base/logstream.h>
+#include <base/tensor.h>
+#include <grid/tria.h>
+#include <distributed/tria.h>
+#include <distributed/solution_transfer.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/grid_generator.h>
+#include <grid/grid_out.h>
+#include <grid/grid_in.h>
+#include <grid/intergrid_map.h>
+
+#include <lac/petsc_vector.h>
+#include <fe/fe_q.h>
+
+#include <fstream>
+#include <cstdlib>
+
+
+template<int dim>
+void test(std::ostream& /*out*/)
+{
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+
+  GridGenerator::hyper_cube(tr);
+  tr.refine_global (1);
+  DoFHandler<dim> dofh(tr);
+  static const FE_Q<dim> fe(2);
+  dofh.distribute_dofs (fe);
+
+  parallel::distributed::SolutionTransfer<dim, Vector<double> > soltrans(dofh);
+  parallel::distributed::SolutionTransfer<dim, Vector<double> > soltrans2(dofh);
+
+  for (typename Triangulation<dim>::active_cell_iterator
+	     cell = tr.begin_active();
+	   cell != tr.end(); ++cell)
+    {
+      cell->set_refine_flag();
+    }
+
+  tr.prepare_coarsening_and_refinement();
+
+  Vector<double> solution(dofh.n_dofs());
+
+  Vector<double> solution1(dofh.n_dofs());
+  solution1=1.0;
+
+  Vector<double> solution2(dofh.n_dofs());
+  solution2=2.0;
+
+  std::vector< const Vector<double>* > sols;
+  sols.push_back(&solution1);
+  sols.push_back(&solution2);
+
+  soltrans.prepare_for_coarsening_and_refinement(solution);
+  soltrans2.prepare_for_coarsening_and_refinement(sols);
+
+  tr.execute_coarsening_and_refinement ();
+
+  dofh.distribute_dofs (fe);
+
+  Vector<double> interpolated_solution(dofh.n_dofs());
+  Vector<double> interpolated_solution1(dofh.n_dofs());
+  Vector<double> interpolated_solution2(dofh.n_dofs());
+
+  std::vector< Vector<double>* > sols_i;
+  sols_i.push_back(&interpolated_solution1);
+  sols_i.push_back(&interpolated_solution2);
+
+  soltrans.interpolate(interpolated_solution);
+  soltrans2.interpolate(sols_i);
+
+  deallog << "#dofs:" << dofh.n_dofs() << std::endl;
+
+  deallog << "norm: " << interpolated_solution1.l2_norm() << " " << interpolated_solution2.l2_norm() << " " << interpolated_solution.l2_norm() << std::endl;
+
+}
+
+
+int main(int argc, char *argv[])
+{
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Init (&argc,&argv);
+#else
+  (void)argc;
+  (void)argv;
+#endif
+
+  std::ofstream logfile("solution_transfer_04/output");
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+
+  deallog.push("2d");
+  test<2>(logfile);
+  deallog.pop();
+  deallog.push("3d");
+  test<3>(logfile);
+  deallog.pop();
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Finalize();
+#endif
+}

@@ -2,7 +2,7 @@
 //    fe_tools.cc,v 1.1 2003/11/28 15:03:26 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -106,6 +106,10 @@ void test_projection (const FiniteElement<dim>& fe1,
   FullMatrix<double> P(n2,n1);
 
   FETools::get_projection_matrix(fe1, fe2, P);
+  for (unsigned int i=0; i<n2; ++i)
+    for (unsigned int j=0; j<n1; ++j)
+      if (std::fabs(P(i,j)) < 1e-12)
+	P(i,j) = 0;
   P.print_formatted(out, 3, false, 5);
 }
 

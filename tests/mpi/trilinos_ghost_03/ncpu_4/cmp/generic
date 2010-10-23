@@ -1,0 +1,5 @@
+
+DEAL:0::numproc=4
+DEAL:0::ExcGhostsPresent()
+DEAL:0::l2norm: 0
+DEAL:0::OK

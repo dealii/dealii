@@ -1,0 +1,26 @@
+
+DEAL:0:2d::Total dofs=44
+DEAL:0:2d::{[0,7]}
+DEAL:0:2d::****
+DEAL:0:2d::{[0,3], [22,25]}
+DEAL:0:2d::Dofs owned by processor 0: {[0,3], [22,25]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 1: {[4,5], [26,27]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 2: {[6,7], [28,29]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 3: {[8,9], [30,31]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 4: {[10,11], [32,33]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 5: {[12,13], [34,35]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 6: {[14,15], [36,37]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 7: {[16,17], [38,39]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 8: {[18,19], [40,41]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 9: {[20,21], [42,43]}
+DEAL:0:2d::
+DEAL:0:2d::0 22 1 23 2 24 3 25 

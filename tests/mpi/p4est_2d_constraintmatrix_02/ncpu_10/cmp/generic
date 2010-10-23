@@ -1,0 +1,41 @@
+
+DEAL:0:2d::step 0
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 1
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 2
+DEAL:0:2d::    7 6:  0.5
+    7 8:  0.5
+****
+DEAL:0:2d::    7 6:  0.5
+    7 8:  0.5
+ok
+DEAL:0:2d::step 3
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 4
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 5
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 6
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 7
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 8
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 9
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 10
+DEAL:0:2d::****
+DEAL:0:2d::ok
+DEAL:0:2d::step 11
+DEAL:0:2d::****
+DEAL:0:2d::ok

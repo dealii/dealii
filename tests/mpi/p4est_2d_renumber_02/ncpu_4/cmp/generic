@@ -1,0 +1,14 @@
+
+DEAL:0:2d::Total dofs=20
+DEAL:0:2d::{[0,7]}
+DEAL:0:2d::****
+DEAL:0:2d::{[0,3], [10,13]}
+DEAL:0:2d::Dofs owned by processor 0: {[0,3], [10,13]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 1: {[4,5], [14,15]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 2: {[6,7], [16,17]}
+DEAL:0:2d::
+DEAL:0:2d::Dofs owned by processor 3: {[8,9], [18,19]}
+DEAL:0:2d::
+DEAL:0:2d::0 10 1 11 2 12 3 13 

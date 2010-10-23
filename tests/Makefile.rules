@@ -14,7 +14,7 @@ normalize = $D/common/scripts/normalize.pl
 # in the report with it. for a branch, prefix everything
 # with x-branch-name/ so that tests run from the branch will show up
 # in different folders on the webpage.
-WORKDIR = $(notdir $(shell pwd))
+WORKDIR = x-branch_distributed_grids/$(notdir $(shell pwd))
 
 verbose = off
 
@@ -75,7 +75,7 @@ endif
 %/output : %/exe
 	@echo =====Running======= $<
 	@echo Running > $(dir $@)/status
-	@$(ULIMIT) -t 2400 ; ./$< ; \
+	@$(ULIMIT) -t $(if $(ULIMIT_LIMIT),$(ULIMIT_LIMIT),300) ; ./$< ; \
 	  if test ! $$? = 0 ; then rm $@ ; false ; fi
 	@perl -pi $(normalize)  $@
 
@@ -143,6 +143,13 @@ endif
 # "-" for a failing one) for all tests is summarized. Use
 # universal time in order to be able to run this target
 # anywhere anytime
+#
+# in the mpi directory, we may find the situation that a
+# test did not compile. in that case, there is no 'status'
+# file in the xx/ncpu_4/ directory, but one in xx/ (because
+# we never made it to the stage where we run things in
+# parallel). If that is the case, then try to find the other
+# file
 ############################################################
 report:
 	@-$(MAKE) -k run-tests
@@ -150,7 +157,21 @@ report:
 	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
 	@echo 'Id: ' $(ID)
 	@for test in $(sort $(tests)) ; do \
-	  echo `date -u +"%Y-%m-%d %H:%M"` "`perl $D/common/scripts/status_to_report.pl $$test/status`" "$(WORKDIR)/$$test" ; \
+	  case $$test in \
+            *ncpu_*) \
+	        if test -f $$test/status ; then \
+                  file=$$test/status ; \
+                else \
+		  file=`echo $$test | $(PERL) -pi -e 's/ncpu_\d+//g;'`/status ; \
+		fi ; \
+		;; \
+	    *) \
+		file=$$test/status ; \
+		;; \
+	  esac ; \
+	  echo `date -u +"%Y-%m-%d %H:%M"` \
+               "`perl $D/common/scripts/status_to_report.pl $$file`" \
+               "`echo $(WORKDIR)/$$test | sed s#/ncpu#---ncpu#g`" ; \
 	done
 
 
@@ -226,8 +247,9 @@ update: $(tests:%=%/update)
 ############################################################
 
 clean:
-	-rm -f Makefile.depend Makefile.tests */obj.$(OBJEXT) \
-               */obj.g.$(OBJEXT) */output *~ */status */OK
+	-rm -f Makefile.depend Makefile.*tests */obj.$(OBJEXT) \
+		*/obj.g.$(OBJEXT) */output *~ */*.vtu */*.pvtu \
+		*/status */OK
 
 distclean: clean
 	-rm -f */exe *.testcase *.gpl *.eps *.gnuplot

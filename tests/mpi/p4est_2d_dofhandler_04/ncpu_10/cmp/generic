@@ -1,0 +1,62 @@
+
+DEAL:0:2d::hyper_cube
+DEAL:0:2d::#local cells:0
+DEAL:0:2d::dofh.n_dofs() 0 9 6 0 6 22 0 0 0 0
+DEAL:0:2d::dofh.n_locally_owned_dofs() 0
+DEAL:0:2d::# in locally_active_dofs:0
+DEAL:0:2d::{}
+DEAL:0:2d::#local cells:0
+DEAL:0:2d::dofh.n_dofs() 0 25 0 20 0 20 4 8 22 0
+DEAL:0:2d::dofh.n_locally_owned_dofs() 0
+DEAL:0:2d::# in locally_active_dofs:0
+DEAL:0:2d::{}
+DEAL:0:2d::#local cells:2
+DEAL:0:2d::dofh.n_dofs() 15 28 16 22 34 5 22 25 15 22
+DEAL:0:2d::dofh.n_locally_owned_dofs() 15
+DEAL:0:2d::# in locally_active_dofs:15
+DEAL:0:2d::{[0,14]}
+DEAL:0:2d::#local cells:9
+DEAL:0:2d::dofh.n_dofs() 51 50 43 38 42 51 47 41 56 41
+DEAL:0:2d::dofh.n_locally_owned_dofs() 51
+DEAL:0:2d::# in locally_active_dofs:51
+DEAL:0:2d::{[0,50]}
+DEAL:0:2d::#local cells:21
+DEAL:0:2d::dofh.n_dofs() 113 99 86 110 109 84 87 100 89 101
+DEAL:0:2d::dofh.n_locally_owned_dofs() 113
+DEAL:0:2d::# in locally_active_dofs:113
+DEAL:0:2d::{[0,112]}
+DEAL:0:2d::#local cells:38
+DEAL:0:2d::dofh.n_dofs() 202 187 188 201 183 179 186 178 177 194
+DEAL:0:2d::dofh.n_locally_owned_dofs() 202
+DEAL:0:2d::# in locally_active_dofs:202
+DEAL:0:2d::{[0,201]}
+DEAL:0:2d::#local cells:73
+DEAL:0:2d::dofh.n_dofs() 358 385 361 368 381 356 365 356 354 370
+DEAL:0:2d::dofh.n_locally_owned_dofs() 358
+DEAL:0:2d::# in locally_active_dofs:358
+DEAL:0:2d::{[0,357]}
+DEAL:0:2d::#local cells:151
+DEAL:0:2d::dofh.n_dofs() 766 723 728 735 732 732 722 716 711 731
+DEAL:0:2d::dofh.n_locally_owned_dofs() 766
+DEAL:0:2d::# in locally_active_dofs:766
+DEAL:0:2d::{[0,765]}
+DEAL:0:2d::#local cells:303
+DEAL:0:2d::dofh.n_dofs() 1520 1447 1460 1449 1459 1437 1452 1429 1446 1452
+DEAL:0:2d::dofh.n_locally_owned_dofs() 1520
+DEAL:0:2d::# in locally_active_dofs:1520
+DEAL:0:2d::{[0,1519]}
+DEAL:0:2d::#local cells:592
+DEAL:0:2d::dofh.n_dofs() 2908 2840 2839 2870 2897 2885 2859 2796 2826 2854
+DEAL:0:2d::dofh.n_locally_owned_dofs() 2908
+DEAL:0:2d::# in locally_active_dofs:2908
+DEAL:0:2d::{[0,2907]}
+DEAL:0:2d::#local cells:1162
+DEAL:0:2d::dofh.n_dofs() 5695 5592 5567 5558 5595 5573 5564 5549 5573 5550
+DEAL:0:2d::dofh.n_locally_owned_dofs() 5695
+DEAL:0:2d::# in locally_active_dofs:5695
+DEAL:0:2d::{[0,5694]}
+DEAL:0:2d::#local cells:2296
+DEAL:0:2d::dofh.n_dofs() 11116 10972 11059 11049 11050 10989 11020 10936 10920 11037
+DEAL:0:2d::dofh.n_locally_owned_dofs() 11116
+DEAL:0:2d::# in locally_active_dofs:11116
+DEAL:0:2d::{[0,11115]}
