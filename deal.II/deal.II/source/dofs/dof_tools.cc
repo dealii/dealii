@@ -4775,6 +4775,7 @@ DoFTools::count_dofs_per_component (
 	  ExcInternalError());
 
 				     // reduce information from all CPUs
+#ifdef DEAL_II_USE_P4EST
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
   if (const parallel::distributed::Triangulation<dim> * tria
       = (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
@@ -4785,6 +4786,7 @@ DoFTools::count_dofs_per_component (
       MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
 		      MPI_INT, MPI_SUM, tria->get_communicator());
     }
+#endif
 #endif
 }
 
