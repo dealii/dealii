@@ -47,6 +47,8 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_USE_P4EST
 
+#error A
+
 namespace internal
 {
   namespace p4est
@@ -2963,10 +2965,11 @@ namespace parallel
   }
 }
 
-
 #endif // DEAL_II_USE_P4EST
 
 
+
+#ifdef DEAL_II_USE_P4EST
 
 // explicit instantiations
 namespace internal
@@ -3009,6 +3012,8 @@ namespace parallel
 #  endif
   }
 }
+
+#endif // DEAL_II_USE_P4EST
 
 
 DEAL_II_NAMESPACE_CLOSE
