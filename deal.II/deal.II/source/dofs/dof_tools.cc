@@ -4847,6 +4847,7 @@ count_dofs_per_block (const DoFHandler<dim,spacedim>& dof_handler,
       += std::count(dofs_by_block.begin(), dofs_by_block.end(),
 		    block);
 
+#ifdef DEAL_II_USE_P4EST
 #if DEAL_II_COMPILER_SUPPORTS_MPI
 				   // if we are working on a parallel
 				   // mesh, we now need to collect
@@ -4860,6 +4861,7 @@ count_dofs_per_block (const DoFHandler<dim,spacedim>& dof_handler,
       MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0], n_target_blocks,
 		      MPI_INT, MPI_SUM, tria->get_communicator());
     }
+#endif
 #endif
 }
 
