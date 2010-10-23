@@ -47,8 +47,6 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_USE_P4EST
 
-#error A
-
 namespace internal
 {
   namespace p4est
