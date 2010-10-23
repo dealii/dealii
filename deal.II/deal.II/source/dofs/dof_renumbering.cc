@@ -852,6 +852,7 @@ namespace DoFRenumbering
 	      cumulated += all_dof_counts[c+n_buckets*i];
 	  }
 #else
+	(void)tria;
 	Assert (false, ExcInternalError());
 #endif
       }
