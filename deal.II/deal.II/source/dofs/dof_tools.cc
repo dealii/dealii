@@ -4568,6 +4568,7 @@ IndexSet
 DoFTools::dof_indices_with_subdomain_association (const DH           &dof_handler,
 						  const types::subdomain_id_t subdomain)
 {
+#ifdef DEAL_II_USE_P4EST
 				   // if the DoFHandler is distributed, the
 				   // only thing we can usefully ask is for
 				   // its locally owned subdomain
@@ -4582,7 +4583,8 @@ DoFTools::dof_indices_with_subdomain_association (const DH           &dof_handle
 	  ExcMessage ("For parallel::distributed::Triangulation objects and "
 		      "associated DoF handler objects, asking for any subdomain other "
 		      "than the locally owned one does not make sense."));
-
+#endif
+  
   IndexSet index_set (dof_handler.n_dofs());
 
   std::vector<unsigned int> local_dof_indices;
