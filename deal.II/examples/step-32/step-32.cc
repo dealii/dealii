@@ -77,7 +77,6 @@
 				 // matrices.
 #include <base/index_set.h>
 
-#include <distributed/dof_handler.h>
 #include <distributed/tria.h>
 #include <distributed/solution_transfer.h>
 #include <distributed/grid_refinement.h>
