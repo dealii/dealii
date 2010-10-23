@@ -1264,7 +1264,7 @@ void CellAccessor<dim, spacedim>::recursively_set_material_id (const unsigned ch
 
 
 template <int dim, int spacedim>
-unsigned int CellAccessor<dim, spacedim>::subdomain_id () const
+types::subdomain_id_t CellAccessor<dim, spacedim>::subdomain_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
@@ -1274,7 +1274,7 @@ unsigned int CellAccessor<dim, spacedim>::subdomain_id () const
 
 template <int dim, int spacedim>
 void
-CellAccessor<dim, spacedim>::set_subdomain_id (const unsigned int new_subdomain_id) const
+CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index]
@@ -1293,6 +1293,20 @@ CellAccessor<dim, spacedim>::parent () const
   
   return q;
 }
+
+
+template <int dim, int spacedim>
+void
+CellAccessor<dim, spacedim>::
+recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const
+{
+  set_subdomain_id (new_subdomain_id);
+
+  if (this->has_children())
+    for (unsigned int c=0; c<this->n_children(); ++c)
+      this->child(c)->recursively_set_subdomain_id (new_subdomain_id);
+}
+
 
 
 template <int dim, int spacedim>

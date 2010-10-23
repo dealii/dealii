@@ -62,6 +62,7 @@ namespace hp
 }
 template <int dim, int spacedim> class MGDoFHandler;
 
+
 /*------------------------------------------------------------------------*/
 
 /**
@@ -1521,22 +1522,22 @@ class Triangulation : public Subscriptor
 				      * Reset this triangulation into a
 				      * virgin state by deleting all data.
 				      *
-				      * Note that this operation is only allowed
-				      * if no subscriptions to this object exist
-				      * any more, such as DoFHandler objects
-				      * using it.
+				      * Note that this operation is only
+				      * allowed if no subscriptions to this
+				      * object exist any more, such as
+				      * DoFHandler objects using it.
 				      */
-    void clear ();
+    virtual void clear ();
 
 				     /**
 				      * Sets the mesh smoothing to @p
 				      * mesh_smoothing. This overrides
 				      * the MeshSmoothing given to the
-				      * constructor. It is allow to
+				      * constructor. It is allowed to
 				      * call this function only if
-				      * triangulation is empty.
+				      * the triangulation is empty.
 				      */
-    void set_mesh_smoothing(const MeshSmoothing mesh_smoothing);
+    virtual void set_mesh_smoothing (const MeshSmoothing mesh_smoothing);
 
 				     /**
 				      * If @p dim==spacedim, assign a boundary
@@ -1945,13 +1946,13 @@ class Triangulation : public Subscriptor
 				      *  RefinementListener. Adding
 				      *  listeners to the
 				      *  Triangulation allows other
-				      *  classes to be informed, when
+				      *  classes to be informed when
 				      *  the Triangulation is refined.
 				      */
     void add_refinement_listener (RefinementListener &listener) const;
 
 				     /**
-				      *  Removes a
+				      *  Remove a
 				      *  RefinementListener. When some
 				      *  class needs no longer to be
 				      *  informed about refinements,
@@ -2295,8 +2296,9 @@ class Triangulation : public Subscriptor
 				      *  Iterator to the first active
 				      *  cell on level @p level.
 				      *
-				      *  This function calls @p begin_active_line
-				      *  in 1D and @p begin_active_quad in 2D.
+				      *  This function calls @p
+				      *  begin_active_line in 1D and @p
+				      *  begin_active_quad in 2D.
 				      */
     active_cell_iterator begin_active(const unsigned int level = 0) const;
 
@@ -2346,8 +2348,9 @@ class Triangulation : public Subscriptor
     raw_cell_iterator    last_raw () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  cell of the level @p level, used or not.
+				      *  Return an iterator pointing to the
+				      *  last cell of the level @p level, used
+				      *  or not.
 				      *
 				      *  This function calls @p last_raw_line
 				      *  in 1D and @p last_raw_quad in 2D.
@@ -2355,8 +2358,8 @@ class Triangulation : public Subscriptor
     raw_cell_iterator    last_raw (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used cell.
+				      *  Return an iterator pointing to the
+				      *  last used cell.
 				      *
 				      *  This function calls @p last_line
 				      *  in 1D and @p last_quad in 2D.
@@ -2364,8 +2367,8 @@ class Triangulation : public Subscriptor
     cell_iterator        last () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used cell on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last used cell on level @p level.
 				      *
 				      *  This function calls @p last_line
 				      *  in 1D and @p last_quad in 2D.
@@ -2373,17 +2376,18 @@ class Triangulation : public Subscriptor
     cell_iterator        last (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active cell.
+				      *  Return an iterator pointing to the
+				      *  last active cell.
 				      *
-				      *  This function calls @p last_active_line
-				      *  in 1D and @p last_active_quad in 2D.
+				      *  This function calls @p
+				      *  last_active_line in 1D and @p
+				      *  last_active_quad in 2D.
 				      */
     active_cell_iterator last_active () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active cell on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last active cell on level @p level.
 				      *
 				      *  This function calls @p last_active_line
 				      *  in 1D and @p last_active_quad in 2D.
@@ -2420,8 +2424,9 @@ class Triangulation : public Subscriptor
 				      *  Iterator to the first active
 				      *  face.
 				      *
-				      *  This function calls @p begin_active_line
-				      *  in 2D and @p begin_active_quad in 3D.
+				      *  This function calls @p
+				      *  begin_active_line in 2D and @p
+				      *  begin_active_quad in 3D.
 				      */
     active_face_iterator begin_active_face() const;
 
@@ -2437,16 +2442,18 @@ class Triangulation : public Subscriptor
     raw_face_iterator    end_face () const;
 
 				     /**
-				      * Return a raw iterator which is past the end.
-				      * This is the same as <tt>end()</tt> and is
-				      * only for combatibility with older versions.
+				      * Return a raw iterator which is past
+				      * the end.  This is the same as
+				      * <tt>end()</tt> and is only for
+				      * combatibility with older versions.
 				      */
     raw_face_iterator    end_raw_face () const;
 
     				     /**
-				      * Return an active iterator which is past the end.
-				      * This is the same as <tt>end()</tt> and is
-				      * only for combatibility with older versions.
+				      * Return an active iterator which is
+				      * past the end.  This is the same as
+				      * <tt>end()</tt> and is only for
+				      * combatibility with older versions.
 				      */
     active_face_iterator end_active_face () const;
 
@@ -2460,20 +2467,21 @@ class Triangulation : public Subscriptor
     raw_face_iterator    last_raw_face () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used face.
+				      *  Return an iterator pointing to the
+				      *  last used face.
 				      *
-				      *  This function calls @p last_line
-				      *  in 2D and @p last_quad in 3D.
+				      *  This function calls @p last_line in
+				      *  2D and @p last_quad in 3D.
 				      */
     face_iterator        last_face () const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active face.
+				      *  Return an iterator pointing to the
+				      *  last active face.
 				      *
-				      *  This function calls @p last_active_line
-				      *  in 2D and @p last_active_quad in 3D.
+				      *  This function calls @p
+				      *  last_active_line in 2D and @p
+				      *  last_active_quad in 3D.
 				      */
     active_face_iterator last_active_face () const;
 
@@ -2487,8 +2495,8 @@ class Triangulation : public Subscriptor
 				      */
 				     /*@{*/
 				     /**
-				      *  Iterator to the first line, used
-				      *  or not, on level @p level. If a level
+				      *  Iterator to the first line, used or
+				      *  not, on level @p level. If a level
 				      *  has no lines, a past-the-end iterator
 				      *  is returned.
 				      *  If lines are no cells, i.e. for @p dim>1
@@ -2531,18 +2539,18 @@ class Triangulation : public Subscriptor
     line_iterator        end_line (const unsigned int level) const;
 
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p level is
-				      * the last level, then this returns
-				      * <tt>end()</tt>.
+				      * Return a raw iterator which is the
+				      * first iterator not on level. If @p
+				      * level is the last level, then this
+				      * returns <tt>end()</tt>.
 				      */
     raw_line_iterator    end_raw_line (const unsigned int level) const;
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p level
-				      * is the last level, then this returns
-				      * <tt>end()</tt>.
+				      * first iterator not on level. If @p
+				      * level is the last level, then this
+				      * returns <tt>end()</tt>.
 				      */
     active_line_iterator end_active_line (const unsigned int level) const;
 
@@ -2554,36 +2562,37 @@ class Triangulation : public Subscriptor
     last_raw_line () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  line of the level @p level, used or not.
+				      *  Return an iterator pointing to the
+				      *  last line of the level @p level, used
+				      *  or not.
 				      */
     raw_line_iterator
     last_raw_line (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used line.
+				      *  Return an iterator pointing to the
+				      *  last used line.
 				      */
     line_iterator
     last_line () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used line on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last used line on level @p level.
 				      */
     line_iterator
     last_line (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active line.
+				      *  Return an iterator pointing to the
+				      *  last active line.
 				      */
     active_line_iterator
     last_active_line () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active line on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last active line on level @p level.
 				      */
     active_line_iterator
     last_active_line (const unsigned int level) const;
@@ -2597,12 +2606,12 @@ class Triangulation : public Subscriptor
     				     /*@{
 				      */
     				     /**
-				      *  Iterator to the first quad, used
-				      *  or not, on the given level. If a level
+				      *  Iterator to the first quad, used or
+				      *  not, on the given level. If a level
 				      *  has no quads, a past-the-end iterator
-				      *  is returned.
-				      *  If quads are no cells, i.e. for $dim>2$
-				      *  no level argument must be given.
+				      *  is returned.  If quads are no cells,
+				      *  i.e. for $dim>2$ no level argument
+				      *  must be given.
 
 				      */
     raw_quad_iterator
@@ -2639,18 +2648,18 @@ class Triangulation : public Subscriptor
     quad_iterator        end_quad (const unsigned int level) const;
 
 				     /**
-				      * Return a raw iterator which is the first
-				      * iterator not on level. If @p level is
-				      * the last level, then this returns
-				      * <tt>end()</tt>.
+				      * Return a raw iterator which is the
+				      * first iterator not on level. If @p
+				      * level is the last level, then this
+				      * returns <tt>end()</tt>.
 				      */
     raw_quad_iterator    end_raw_quad (const unsigned int level) const;
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p level
-				      * is the last level, then this returns
-				      * <tt>end()</tt>.
+				      * first iterator not on level. If @p
+				      * level is the last level, then this
+				      * returns <tt>end()</tt>.
 				      */
     active_quad_iterator end_active_quad (const unsigned int level) const;
 
@@ -2662,37 +2671,38 @@ class Triangulation : public Subscriptor
     last_raw_quad () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  quad of the level @p level, used or not.
+				      *  Return an iterator pointing to the
+				      *  last quad of the level @p level, used
+				      *  or not.
 
 				      */
     raw_quad_iterator
     last_raw_quad (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used quad.
+				      *  Return an iterator pointing to the
+				      *  last used quad.
 				      */
     quad_iterator
     last_quad () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used quad on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last used quad on level @p level.
 				      */
     quad_iterator
     last_quad (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active quad.
+				      *  Return an iterator pointing to the
+				      *  last active quad.
 				      */
     active_quad_iterator
     last_active_quad () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active quad on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last active quad on level @p level.
 				      */
     active_quad_iterator
     last_active_quad (const unsigned int level) const;
@@ -2755,9 +2765,9 @@ class Triangulation : public Subscriptor
 
     				     /**
 				      * Return an active iterator which is the
-				      * first iterator not on level. If @p level
-				      * is the last level, then this returns
-				      * <tt>end()</tt>.
+				      * first iterator not on level. If @p
+				      * level is the last level, then this
+				      * returns <tt>end()</tt>.
 				      */
     active_hex_iterator end_active_hex (const unsigned int level) const;
 
@@ -2769,37 +2779,38 @@ class Triangulation : public Subscriptor
     last_raw_hex () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  hex of the level @p level, used or not.
+				      *  Return an iterator pointing to the
+				      *  last hex of the level @p level, used
+				      *  or not.
 
 				      */
     raw_hex_iterator
     last_raw_hex (const unsigned int level) const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used hex.
+				      *  Return an iterator pointing to the
+				      *  last used hex.
 				      */
     hex_iterator
     last_hex () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  used hex on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last used hex on level @p level.
 				      */
     hex_iterator
     last_hex (const unsigned int level) const;
 
     				     /**
-				      *  Return an iterator pointing to the last
-				      *  active hex.
+				      *  Return an iterator pointing to the
+				      *  last active hex.
 				      */
     active_hex_iterator
     last_active_hex () const;
 
 				     /**
-				      *  Return an iterator pointing to the last
-				      *  active hex on level @p level.
+				      *  Return an iterator pointing to the
+				      *  last active hex on level @p level.
 				      */
     active_hex_iterator
     last_active_hex (const unsigned int level) const;
@@ -2913,26 +2924,28 @@ class Triangulation : public Subscriptor
     unsigned int n_raw_hexs (const unsigned int level) const;
 
 				     /**
-				      *  Return total number of used hexahedra,
-				      *  active or not.
+				      *  Return total number of used
+				      *  hexahedra, active or not.
 				      */
     unsigned int n_hexs() const;
 
 				     /**
-				      *  Return total number of used hexahedra,
-				      *  active or not on level @p level.
+				      *  Return total number of used
+				      *  hexahedra, active or not on level @p
+				      *  level.
 				      */
     unsigned int n_hexs(const unsigned int level) const;
 
 				     /**
-				      *  Return total number of active hexahedra,
-				      *  active or not.
+				      *  Return total number of active
+				      *  hexahedra, active or not.
 				      */
     unsigned int n_active_hexs() const;
 
 				     /**
-				      *  Return total number of active hexahedra,
-				      *  active or not on level @p level.
+				      *  Return total number of active
+				      *  hexahedra, active or not on level @p
+				      *  level.
 				      */
     unsigned int n_active_hexs(const unsigned int level) const;
 
@@ -2944,8 +2957,8 @@ class Triangulation : public Subscriptor
 
     				     /**
 				      *  Return total number of used cells,
-				      *  active or not.
-				      *  Maps to <tt>n_lines()</tt> in one space
+				      *  active or not.  Maps to
+				      *  <tt>n_lines()</tt> in one space
 				      *  dimension and so on.
 				      */
     unsigned int n_cells () const;
@@ -2953,22 +2966,22 @@ class Triangulation : public Subscriptor
     				     /**
 				      *  Return total number of used cells,
 				      *  active or not, on level @p level.
-				      *  Maps to <tt>n_lines(level)</tt> in one space
-				      *  dimension and so on.
+				      *  Maps to <tt>n_lines(level)</tt> in
+				      *  one space dimension and so on.
 				      */
     unsigned int n_cells (const unsigned int level) const;
 
     				     /**
 				      *  Return total number of active cells.
-				      *  Maps to <tt>n_active_lines()</tt> in one space
-				      *  dimension and so on.
+				      *  Maps to <tt>n_active_lines()</tt> in
+				      *  one space dimension and so on.
 				      */
     unsigned int n_active_cells () const;
 
     				     /**
-				      * Return total number of active cells
-				      * on level @p level.
-				      * Maps to <tt>n_active_lines(level)</tt> in one
+				      * Return total number of active cells on
+				      * level @p level.  Maps to
+				      * <tt>n_active_lines(level)</tt> in one
 				      * space dimension and so on.
 				      */
     unsigned int n_active_cells (const unsigned int level) const;
@@ -3159,6 +3172,13 @@ class Triangulation : public Subscriptor
 		    << ", but this level is empty.");
 				     /*@}*/
   protected:
+				     /**
+				      *  Do some smoothing in the process
+				      *  of refining the triangulation. See
+				      *  the general doc of this class for
+				      *  more information about this.
+				      */
+    MeshSmoothing                    smooth_grid;
 
 				     /**
 				      *  Write a bool vector to the given stream,
@@ -3202,16 +3222,13 @@ class Triangulation : public Subscriptor
 				  std::istream            &in);
 
   private:
-
 				     /**
-				      * The (public) clear() will only
-				      * work when the triangulation is
-				      * not subscriped to by other
-				      * users. The
-				      * clear_despite_subscriptions()
-				      * function now allows the
-				      * triangulation being cleared
-				      * even when there are
+				      * The (public) function clear() will
+				      * only work when the triangulation is
+				      * not subscribed to by other users. The
+				      * clear_despite_subscriptions() function
+				      * now allows the triangulation being
+				      * cleared even when there are
 				      * subscriptions.
 				      *
 				      * Make sure, you know what you
@@ -3327,14 +3344,7 @@ class Triangulation : public Subscriptor
 				      */
     bool                             anisotropic_refinement;
 
-				     /**
-				      *  Do some smoothing in the process
-				      *  of refining the triangulation. See
-				      *  the general doc of this class for
-				      *  more information about this.
-				      */
-    MeshSmoothing                    smooth_grid;
-
+    
 				     /**
 				      * A flag that determines whether
 				      * we are to check for distorted

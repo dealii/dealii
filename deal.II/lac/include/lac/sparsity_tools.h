@@ -199,21 +199,42 @@ namespace SparsityTools
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				   /**
 				    * Communciate rows in a compressed
-				    * sparsity pattern over MPI. The parameter
-				    * @p csp is modified inline. All entries
-				    * in rows that belong to a different
-				    * processor are send to them and added
-				    * there. The ownership is determined by
-				    * the parameter @p rows_per_cpu. The
-				    * IndexSet @p myrange should be the one
-				    * used in the constructor of the
+				    * sparsity pattern over MPI.
+				    *
+				    * @param csp is the sparsity
+				    * pattern that has been built
+				    * locally and for which we need to
+				    * exchange entries with other
+				    * processors to make sure that
+				    * each processor knows all the
+				    * elements of the rows of a matrix
+				    * it stores and that may
+				    * eventually be written to. This
+				    * sparsity pattern will be changes
+				    * as a result of this function:
+				    * All entries in rows that belong
+				    * to a different processor are
+				    * sent to them and added there.
+				    *
+				    * @param rows_per_cpu determines ownership of rows.
+				    *
+				    * @param mpi_comm is the MPI
+				    * communicator that is shared
+				    * between the processors that all
+				    * participate in this operation.
+				    *
+				    * @param myrange indicates the
+				    * range of elements stored locally
+				    * and should be the one used in
+				    * the constructor of the
 				    * CompressedSimpleSparsityPattern. Only
-				    * the rows in @p csp contained in @p
-				    * myrange are checked for transfer. This
-				    * function needs to be used with
-				    * PETScWrappers::MPI::SparseMatrix for it
-				    * to work correctly in a parallel
-				    * calculation.
+				    * rows contained in myrange are
+				    * checked in csp for transfer.
+				    * This function needs to be used
+				    * with
+				    * PETScWrappers::MPI::SparseMatrix
+				    * for it to work correctly in a
+				    * parallel computation.
 				    */
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t & csp,
@@ -222,7 +243,7 @@ namespace SparsityTools
 				   const IndexSet & myrange);
 #endif
 
-  
+
 				   /**
 				    * Exception
 				    */

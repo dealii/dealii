@@ -11,8 +11,6 @@
 //
 //---------------------------------------------------------------------------
 
-#include <iostream>
-
 #include <base/quadrature_lib.h>
 #include <base/qprojector.h>
 #include <base/thread_management.h>
@@ -46,6 +44,8 @@
 #include <hp/dof_handler.h>
 
 #include <base/std_cxx1x/shared_ptr.h>
+
+#include <iostream>
 
 
 DEAL_II_NAMESPACE_OPEN

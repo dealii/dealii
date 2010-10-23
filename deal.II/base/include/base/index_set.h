@@ -46,6 +46,9 @@ DEAL_II_NAMESPACE_OPEN
  * words, you need to specify the size of the index space
  * $[0,\text{size})$ of which objects of this class are a subset.
  *
+ * The data structures used in this class along with a rationale can be found
+ * in the @ref distributed_paper "Distributed Computing paper".
+ *
  * @author Wolfgang Bangerth, 2009
  */
 class IndexSet
@@ -269,6 +272,22 @@ class IndexSet
 				      * write() function.
 				      */
     void read(std::istream & in);
+
+				     /**
+				      * Writes the IndexSet into a binary,
+				      * compact representation, that can be
+				      * read in again using the block_read()
+				      * function.
+				      */
+    void block_write(std::ostream & out) const;
+
+				     /**
+				      * Constructs the IndexSet from a binary
+				      * representation given by the stream
+				      * @param in written by the write_block()
+				      * function.
+				      */
+    void block_read(std::istream & in);
 
 
 #ifdef DEAL_II_USE_TRILINOS

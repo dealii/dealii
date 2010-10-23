@@ -18,9 +18,12 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/smartpointer.h>
+#include <base/index_set.h>
 #include <dofs/block_info.h>
 #include <dofs/dof_iterator_selector.h>
+#include <dofs/number_cache.h>
 #include <dofs/function_map.h>
+#include <dofs/dof_handler_policy.h>
 
 #include <vector>
 #include <map>
@@ -105,6 +108,19 @@ namespace internal
  * algorithms.
  *
  *
+ * <h3>Interaction with distributed meshes</h3>
+ *
+ * Upon construction, this class takes a reference to a triangulation
+ * object. In most cases, this will be a reference to an object of
+ * type Triangulation, i.e. the class that represents triangulations
+ * that entirely reside on a single processor. However, it can also be
+ * of type parallel::distributed::Triangulation (see, for example,
+ * step-32, step-40 and in particular the @ref distributed module) in
+ * which case the DoFHandler object will proceed to only manage
+ * degrees of freedom on locally owned and ghost cells. This process
+ * is entirely transparent to the used.
+ *
+ *
  * <h3>User defined renumbering schemes</h3>
  *
  * The DoFRenumbering class offers a number of renumbering schemes like the
@@ -131,7 +147,7 @@ class DoFHandler  :  public Subscriptor
   public:
     typedef typename IteratorSelector::CellAccessor         cell_accessor;
     typedef typename IteratorSelector::FaceAccessor         face_accessor;
-    
+
     typedef typename IteratorSelector::raw_line_iterator    raw_line_iterator;
     typedef typename IteratorSelector::line_iterator        line_iterator;
     typedef typename IteratorSelector::active_line_iterator active_line_iterator;
@@ -208,7 +224,7 @@ class DoFHandler  :  public Subscriptor
 				      * value.
 				      */
     static const unsigned int default_fe_index = 0;
-    
+
 				     /**
 				      * Standard constructor, not
 				      * initializing any data. After
@@ -224,12 +240,12 @@ class DoFHandler  :  public Subscriptor
 				      * triangulation to work on.
 				      */
     DoFHandler ( const Triangulation<dim,spacedim> &tria);
-    
+
 				     /**
 				      * Destructor.
 				      */
     virtual ~DoFHandler ();
-    
+
 				     /**
 				      * Assign a Triangulation and a
 				      * FiniteElement to the
@@ -286,7 +302,7 @@ class DoFHandler  :  public Subscriptor
 				      * in the same object.
 				      */
     void initialize_local_block_info();
-    
+
 				     /**
 				      * Clear all data of this object and
 				      * especially delete the lock this object
@@ -300,31 +316,68 @@ class DoFHandler  :  public Subscriptor
                                         * a list of new dof numbers for all the
                                         * dofs.
                                         *
-                                        * @p new_numbers is an array of integers
-                                        * with size equal to the number of dofs
-                                        * on the present grid. It stores the new
-                                        * indices after renumbering in the
-                                        * order of the old indices.
-                                        *
                                         * This function is called by
                                         * the functions in
                                         * DoFRenumbering function
                                         * after computing the ordering
                                         * of the degrees of freedom.
-                                        * However, you can call this
-                                        * function yourself, which is
-                                        * necessary if a user wants to
-                                        * implement an ordering scheme
-                                        * herself, for example
-                                        * downwind numbering.
+                                        * This function is called, for
+                                        * example, by the functions in
+                                        * the DoFRenumbering
+                                        * namespace, but it can of
+                                        * course also be called from
+                                        * user code.
 					*
-					* The @p new_number array must
-					* have a size equal to the
+					* @arg new_number This array
+					* must have a size equal to
+					* the number of degrees of
+					* freedom owned by the current
+					* processor, i.e. the size
+					* must be equal to what
+					* n_locally_owned_dofs()
+					* returns. If only one
+					* processor participates in
+					* storing the current mesh,
+					* then this equals the total
 					* number of degrees of
-					* freedom. Each entry must
-					* state the new global DoF
-					* number of the degree of
-					* freedom referenced.
+					* freedom, i.e. the result of
+					* n_dofs(). The contents of
+					* this array are the new
+					* global indices for each
+					* freedom listed in the
+					* IndexSet returned by
+					* locally_owned_dofs(). In the
+					* case of a sequential mesh
+					* this means that the array is
+					* a list of new indices for
+					* each of the degrees of
+					* freedom on the current
+					* mesh. In the case that we
+					* have a
+					* parallel::distributed::Triangulation
+					* underlying this DoFHandler
+					* object, the array is a list
+					* of new indices for all the
+					* locally owned degrees of
+					* freedom, enumerated in the
+					* same order as the currently
+					* locally owned DoFs. In other
+					* words, assume that degree of
+					* freedom <code>i</code> is
+					* currently locally owned,
+					* then
+					* <code>new_numbers[locally_owned_dofs().index_within_set(i)]</code>
+					* returns the new global DoF
+					* index of
+					* <code>i</code>. Since the
+					* IndexSet of
+					* locally_owned_dofs() is
+					* complete in the sequential
+					* case, the latter convention
+					* for the content of the array
+					* reduces to the former in the
+					* case that only one processor
+					* participates in the mesh.
                                         */
     void renumber_dofs (const std::vector<unsigned int> &new_numbers);
 
@@ -927,10 +980,35 @@ class DoFHandler  :  public Subscriptor
 
 
 				     /**
-				      * Return number of degrees of freedom.
-				      * Included in this number are those
+				      * Return the global number of
+				      * degrees of freedom. If the
+				      * current object handles all
+				      * degrees of freedom itself
+				      * (even if you may intend to
+				      * solve your linear system in
+				      * parallel, such as in step-17
+				      * or step-18), then this number
+				      * equals the number of locally
+				      * owned degrees of freedom since
+				      * this object doesn't know
+				      * anything about what you want
+				      * to do with it and believes
+				      * that it owns every degree of
+				      * freedom it knows about.
+				      *
+				      * On the other hand, if this
+				      * object operates on a
+				      * parallel::distributed::Triangulation
+				      * object, then this function
+				      * returns the global number of
+				      * degrees of freedom,
+				      * accumulated over all
+				      * processors.
+				      *
+				      * In either case, included in
+				      * the returned number are those
 				      * DoFs which are constrained by
-				      * hanging nodes.
+				      * hanging nodes, see @ref constraints.
 				      */
     unsigned int n_dofs () const;
 
@@ -994,7 +1072,99 @@ class DoFHandler  :  public Subscriptor
 				      * initialize_local_block_indices().
 				      */
     const BlockInfo& block_info() const;
-    
+
+
+				     /**
+				      * Return the number of
+				      * degrees of freedom that
+				      * belong to this
+				      * process.
+				      *
+				      * If this is a sequential job,
+				      * then the result equals that
+				      * produced by n_dofs(). On the
+				      * other hand, if we are
+				      * operating on a
+				      * parallel::distributed::Triangulation,
+				      * then it includes only the
+				      * degrees of freedom that the
+				      * current processor owns. Note
+				      * that in this case this does
+				      * not include all degrees of
+				      * freedom that have been
+				      * distributed on the current
+				      * processor's image of the mesh:
+				      * in particular, some of the
+				      * degrees of freedom on the
+				      * interface between the cells
+				      * owned by this processor and
+				      * cells owned by other
+				      * processors may be theirs, and
+				      * degrees of freedom on ghost
+				      * cells are also not necessarily
+				      * included.
+				      */
+    unsigned int n_locally_owned_dofs() const;
+
+				     /**
+				      * Return an IndexSet describing
+				      * the set of locally owned DoFs
+				      * as a subset of
+				      * 0..n_dofs(). The number of
+				      * elements of this set equals
+				      * n_locally_owned_dofs().
+				      */
+    const IndexSet & locally_owned_dofs() const;
+
+
+				     /**
+				      * Returns a vector that
+				      * stores the locally owned
+				      * DoFs of each processor. If
+				      * you are only interested in
+				      * the number of elements
+				      * each processor owns then
+				      * n_dofs_per_processor() is
+				      * a better choice.
+				      *
+				      * If this is a sequential job,
+				      * then the vector has a single
+				      * element that equals the
+				      * IndexSet representing the
+				      * entire range [0,n_dofs()].
+				      */
+    const std::vector<IndexSet> &
+    locally_owned_dofs_per_processor () const;
+
+				     /**
+				      * Return a vector that
+				      * stores the number of
+				      * degrees of freedom each
+				      * processor that
+				      * participates in this
+				      * triangulation owns
+				      * locally. The sum of all
+				      * these numbers equals the
+				      * number of degrees of
+				      * freedom that exist
+				      * globally, i.e. what
+				      * n_dofs() returns.
+				      *
+				      * Each element of the vector
+				      * returned by this function
+				      * equals the number of
+				      * elements of the
+				      * corresponding sets
+				      * returned by
+				      * global_dof_indices().
+				      *
+				      * If this is a sequential job,
+				      * then the vector has a single
+				      * element equal to n_dofs().
+				      */
+    const std::vector<unsigned int> &
+    n_locally_owned_dofs_per_processor () const;
+
 				     /**
 				      * Return a constant reference to
 				      * the selected finite element
@@ -1023,11 +1193,6 @@ class DoFHandler  :  public Subscriptor
 				      */
     virtual unsigned int memory_consumption () const;
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcInvalidTriangulation);
-    
     				     /**
 				      * @todo Replace by ExcInternalError.
 				      */
@@ -1072,22 +1237,30 @@ class DoFHandler  :  public Subscriptor
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
-    
-    
+
+
   protected:
 				     /**
 				      * The object containing
 				      * information on the block structure.
 				      */
     BlockInfo block_info_object;
-    
-  private:
+
+				     /**
+				      * Array to store the indices for
+				      * degrees of freedom located at
+				      * vertices.
+				      */
+    std::vector<unsigned int>      vertex_dofs;
+
+
 
 				     /**
 				      * Address of the triangulation to
 				      * work on.
 				      */
-    SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> > tria;
+    SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> >
+    tria;
 
 				     /**
 				      * Store a pointer to the finite element
@@ -1101,7 +1274,30 @@ class DoFHandler  :  public Subscriptor
 				      * function (this clears all data of
 				      * this object as well, though).
 				      */
-    SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> > selected_fe;
+    SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> >
+    selected_fe;
+
+				     /**
+				      * An object that describes how degrees
+				      * of freedom should be distributed and
+				      * renumbered.
+				      */
+    std_cxx1x::shared_ptr<internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+
+				     /**
+				      * A structure that contains all
+				      * sorts of numbers that
+				      * characterize the degrees of
+				      * freedom this object works on.
+				      *
+				      * For most members of this
+				      * structure, there is an
+				      * accessor function in this
+				      * class that returns its value.
+				      */
+    internal::DoFHandler::NumberCache number_cache;
+
+  private:
 
 				     /**
 				      * Copy constructor. I can see no reason
@@ -1150,19 +1346,6 @@ class DoFHandler  :  public Subscriptor
     internal::DoFHandler::DoFFaces<dim> *faces;
 
 				     /**
-				      * Store the number of dofs
-				      * created last time.
-				      */
-    unsigned int              used_dofs;
-
-				     /**
-				      * Array to store the indices for
-				      * degrees of freedom located at
-				      * vertices.
-				      */
-    std::vector<unsigned int>      vertex_dofs;
-
-				     /**
 				      * Make accessor objects friends.
 				      */
     template <int, class> friend class DoFAccessor;
@@ -1171,6 +1354,7 @@ class DoFHandler  :  public Subscriptor
     friend class internal::DoFCellAccessor::Implementation;
 
     friend class internal::DoFHandler::Implementation;
+    friend class internal::DoFHandler::Policy::Implementation;
 };
 
 
@@ -1193,7 +1377,39 @@ inline
 unsigned int
 DoFHandler<dim,spacedim>::n_dofs () const
 {
-  return used_dofs;
+  return number_cache.n_global_dofs;
+}
+
+
+template <int dim, int spacedim>
+unsigned int
+DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
+{
+  return number_cache.n_locally_owned_dofs;
+}
+
+
+template <int dim, int spacedim>
+const IndexSet &
+DoFHandler<dim, spacedim>::locally_owned_dofs() const
+{
+  return number_cache.locally_owned_dofs;
+}
+
+
+template <int dim, int spacedim>
+const std::vector<unsigned int> &
+DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
+{
+  return number_cache.n_locally_owned_dofs_per_processor;
+}
+
+
+template <int dim, int spacedim>
+const std::vector<IndexSet> &
+DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor () const
+{
+  return number_cache.locally_owned_dofs_per_processor;
 }
 
 

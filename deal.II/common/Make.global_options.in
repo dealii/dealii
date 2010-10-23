@@ -89,6 +89,9 @@ DEAL_II_METIS_LIBDIR = @DEAL_II_METIS_LIBDIR@
 USE_CONTRIB_HSL      = @USE_CONTRIB_HSL@
 USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
 
+USE_CONTRIB_P4EST    = @USE_CONTRIB_P4EST@
+DEAL_II_P4EST_DIR    = @DEAL_II_P4EST_DIR@
+
 TARGET               = @target@
 
 ######################################################
@@ -348,7 +351,8 @@ F77FLAGS.g   = @DEFS@ @F77FLAGSG@  $(INCLUDE)
 F77FLAGS.o   = @DEFS@ @F77FLAGSO@  $(INCLUDE)
 
 # compile flags for C compiler
-CFLAGS = @CFLAGS@
+CFLAGS.g = @CFLAGSG@
+CFLAGS.o = @CFLAGSO@
 
 # if in debug mode, add TBB assertions
 ifeq ($(enable-threads),yes)
@@ -368,7 +372,12 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
       include $(DEAL_II_PETSC_DIR)/bmake/common/variables
     endif
   else
+    # PETSC's $(PETSC_ARCH)/conf/petscvariables include file happens
+    # to have a variable $(CXX) of itself. we need to save our own
+    # variable and restore it later. this isn't pretty :-(
+    SAVE_CXX := $(CXX)
     include $(DEAL_II_PETSC_DIR)/conf/variables
+    CXX := $(SAVE_CXX)
   endif
   CXXFLAGS.g += $(GCXX_PETSCFLAGS)
   CXXFLAGS.o += $(OCXX_PETSCFLAGS)

@@ -448,7 +448,7 @@ namespace SparsityTools
 	    {
 	      row_idx+=rows_per_cpu[myid]-1;
 	      continue;
-}
+	    }
 
 	  unsigned int rlen = csp.row_length(row);
 

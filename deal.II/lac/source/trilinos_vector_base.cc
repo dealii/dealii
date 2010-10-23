@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 
+#include <base/memory_consumption.h>
 #include <lac/trilinos_vector_base.h>
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -397,8 +398,13 @@ namespace TrilinosWrappers
   unsigned int
   VectorBase::memory_consumption () const
   {
-    AssertThrow(false, ExcNotImplemented() );
-    return 0;
+				     //TODO[TH]: No accurate memory
+				     //consumption for Trilinos vectors
+				     //yet. This is a rough approximation with
+				     //one index and the value per local
+				     //entry.
+    return sizeof(*this)
+      + this->local_size()*( sizeof(double)+sizeof(int) );
   }
 
 } /* end of namespace TrilinosWrappers */

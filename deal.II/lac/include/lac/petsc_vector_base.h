@@ -664,7 +664,7 @@ namespace PETScWrappers
       void ratio (const VectorBase &a,
                   const VectorBase &b);
 
-                                       /**
+				       /**
 					* Updates the ghost values of this
 					* vector. This is necessary after any
 					* modification before reading ghost
@@ -753,7 +753,7 @@ namespace PETScWrappers
 					*/
       bool ghosted;
 
-                                       /**
+				       /**
 					* This vector contains the global
 					* indices of the ghost values. The
 					* location in this vector denotes the

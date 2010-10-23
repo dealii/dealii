@@ -20,6 +20,8 @@
 #include <base/index_set.h>
 #include <lac/constraint_matrix.h>
 #include <dofs/function_map.h>
+#include <dofs/dof_handler.h>
+#include <fe/fe.h>
 
 #include <vector>
 #include <set>
@@ -457,7 +459,7 @@ class DoFTools
 			   SparsityPattern        &sparsity_pattern,
 			   const ConstraintMatrix &constraints = ConstraintMatrix(),
 			   const bool              keep_constrained_dofs = true,
-			   const unsigned int      subdomain_id = numbers::invalid_unsigned_int);
+			   const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id);
 
 				     /**
 				      * Locate non-zero entries for
@@ -618,7 +620,7 @@ class DoFTools
 			   SparsityPattern          &sparsity_pattern,
 			   const ConstraintMatrix   &constraints = ConstraintMatrix(),
 			   const bool                keep_constrained_dofs = true,
-			   const unsigned int        subdomain_id = numbers::invalid_unsigned_int);
+			   const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id);
 
 				     /**
 				      * @deprecated This is the old
@@ -763,10 +765,10 @@ class DoFTools
 				     /**
 				      * This function does the same as
 				      * the other with the same name,
-				      * but it gets a ConstraintMatrix 
-                                      * additionally. 
-                                      * This is for the case where you 
-                                      * have fluxes but constraints as 
+				      * but it gets a ConstraintMatrix
+                                      * additionally.
+                                      * This is for the case where you
+                                      * have fluxes but constraints as
                                       * well.
 				      * Not implemented for
 				      * hp::DoFHandler.
@@ -1169,8 +1171,80 @@ class DoFTools
     template <class DH>
     static void
     extract_subdomain_dofs (const DH           &dof_handler,
-			    const unsigned int  subdomain_id,
+			    const types::subdomain_id_t subdomain_id,
 			    std::vector<bool>  &selected_dofs);
+
+
+				     /**
+				      * Extract the set of global DoF
+				      * indices that are owned by the
+				      * current processor. For regular
+				      * DoFHandler objects, this set
+				      * is the complete set with all
+				      * DoF indices. In either case,
+				      * it equals what
+				      * DoFHandler::locally_owned_dofs()
+				      * returns.
+				      */
+    template <class DH>
+    static void
+    extract_locally_owned_dofs (const DH & dof_handler,
+				IndexSet & dof_set);
+
+
+				     /**
+				      * Extract the set of global DoF
+				      * indices that are active on the
+				      * current DoFHandler. For
+				      * regular DoFHandlers, these are
+				      * all DoF indices, but for
+				      * DoFHandler objects built on
+				      * parallel::distributed::Triangulation
+				      * this set is a superset of
+				      * DoFHandler::locally_owned_dofs()
+				      * and contains all DoF indices
+				      * that live on all locally owned
+				      * cells (including on the
+				      * interface to ghost
+				      * cells). However, it does not
+				      * contain the DoF indices that
+				      * are exclusively defined on
+				      * ghost or artificial cells (see
+				      * @ref GlossArtificialCell "the
+				      * glossary").
+				      *
+				      * The degrees of freedom identified by
+				      * this function equal those obtained
+				      * from the
+				      * dof_indices_with_subdomain_association()
+				      * function when called with the locally
+				      * owned subdomain id.
+				      */
+    template <class DH>
+    static void
+    extract_locally_active_dofs (const DH & dof_handler,
+				 IndexSet & dof_set);
+
+				     /**
+				      * Extract the set of global DoF
+				      * indices that are active on the
+				      * current DoFHandler. For
+				      * regular DoFHandlers, these are
+				      * all DoF indices, but for
+				      * DoFHandler objects built on
+				      * parallel::distributed::Triangulation
+				      * this set is the union of
+				      * DoFHandler::locally_owned_dofs()
+				      * and the DoF indices on all
+				      * ghost cells. In essence, it is
+				      * the DoF indices on all cells
+				      * that are not artificial (see
+				      * @ref GlossArtificialCell "the glossary").
+				      */
+    template <class DH>
+    static void
+    extract_locally_relevant_dofs (const DH & dof_handler,
+				   IndexSet & dof_set);
 
 				     /**
 				      * Extract a vector that represents the
@@ -1196,13 +1270,13 @@ class DoFTools
 				      * consist of as many vectors as there
 				      * are true arguments in
 				      * <tt>component_select</tt>, each of
-				      * which will be one in one component and
+				      * which will be one in one vector component and
 				      * zero in all others. We store this
 				      * object in a vector of vectors, where
 				      * the outer vector is of the size of the
 				      * number of selected components, and
 				      * each inner vector has as many
-				      * components as there are degrees of
+				      * components as there are (locally owned) degrees of
 				      * freedom in the selected
 				      * components. Note that any matrix
 				      * associated with this null space must
@@ -1279,11 +1353,27 @@ class DoFTools
 				      * function, or use the
 				      * <tt>GridTools::get_subdomain_association</tt>
 				      * function.
+				      *
+				      * Note that this function is of
+				      * questionable use for DoFHandler objects built on
+				      * parallel::distributed::Triangulation
+				      * since in that case ownership of
+				      * individual degrees of freedom by MPI
+				      * processes is controlled by the DoF
+				      * handler object, not based on some
+				      * geometric algorithm in conjunction
+				      * with subdomain id. In particular, the
+				      * degrees of freedom identified by the
+				      * functions in this namespace as
+				      * associated with a subdomain are not
+				      * the same the
+				      * DoFHandler class
+				      * identifies as those it owns.
                                       */
     template <class DH>
     static void
     get_subdomain_association (const DH                  &dof_handler,
-                               std::vector<unsigned int> &subdomain);
+                               std::vector<types::subdomain_id_t> &subdomain);
 
                                      /**
                                       * Count how many degrees of freedom are
@@ -1307,25 +1397,27 @@ class DoFTools
 				      * @em cells with this subdomain, use the
 				      * <tt>GridTools::count_cells_with_subdomain_association</tt>
 				      * function.
+				      *
+				      * Note that this function is of
+				      * questionable use for DoFHandler objects built on
+				      * parallel::distributed::Triangulation
+				      * since in that case ownership of
+				      * individual degrees of freedom by MPI
+				      * processes is controlled by the DoF
+				      * handler object, not based on some
+				      * geometric algorithm in conjunction
+				      * with subdomain id. In particular, the
+				      * degrees of freedom identified by the
+				      * functions in this namespace as
+				      * associated with a subdomain are not
+				      * the same the
+				      * DoFHandler class
+				      * identifies as those it owns.
                                       */
     template <class DH>
     static unsigned int
     count_dofs_with_subdomain_association (const DH           &dof_handler,
-                                           const unsigned int  subdomain);
-
-				     /**
-				      * Similar to the previous
-				      * function, but do not just
-				      * return the number of degrees
-				      * of freedom that are owned by a
-				      * given subdomain, but return a
-				      * set of their indices.
-				      */
-    template <class DH>
-    static
-    IndexSet
-    dof_indices_with_subdomain_association (const DH           &dof_handler,
-					    const unsigned int  subdomain);
+                                           const types::subdomain_id_t subdomain);
 
                                      /**
                                       * Count how many degrees of freedom are
@@ -1342,12 +1434,70 @@ class DoFTools
                                       * therefore store how many degrees of
                                       * freedom of each vector component are
                                       * associated with the given subdomain.
+				      *
+				      * Note that this function is of
+				      * questionable use for DoFHandler objects built on
+				      * parallel::distributed::Triangulation
+				      * since in that case ownership of
+				      * individual degrees of freedom by MPI
+				      * processes is controlled by the DoF
+				      * handler object, not based on some
+				      * geometric algorithm in conjunction
+				      * with subdomain id. In particular, the
+				      * degrees of freedom identified by the
+				      * functions in this namespace as
+				      * associated with a subdomain are not
+				      * the same the
+				      * DoFHandler class
+				      * identifies as those it owns.
                                       */
     template <class DH>
     static void
     count_dofs_with_subdomain_association (const DH           &dof_handler,
-                                           const unsigned int  subdomain,
+                                           const types::subdomain_id_t subdomain,
 					   std::vector<unsigned int> &n_dofs_on_subdomain);
+
+				     /**
+				      * Return a set of indices that denotes
+				      * the degrees of freedom that live on
+				      * the given subdomain, i.e. that are on
+				      * cells owned by the current
+				      * processor. Note that this includes the
+				      * ones that this subdomain "owns"
+				      * (i.e. the ones for which
+				      * get_subdomain_association() returns a
+				      * value equal to the subdomain given
+				      * here and that are selected by the
+				      * extract_locally_owned() function) but
+				      * also all of those that sit on the
+				      * boundary between the given subdomain
+				      * and other subdomain. In essence,
+				      * degrees of freedom that sit on
+				      * boundaries between subdomain will be
+				      * in the index sets returned by this
+				      * function for more than one subdomain.
+				      *
+				      * Note that this function is of
+				      * questionable use for DoFHandler objects built on
+				      * parallel::distributed::Triangulation
+				      * since in that case ownership of
+				      * individual degrees of freedom by MPI
+				      * processes is controlled by the DoF
+				      * handler object, not based on some
+				      * geometric algorithm in conjunction
+				      * with subdomain id. In particular, the
+				      * degrees of freedom identified by the
+				      * functions in this namespace as
+				      * associated with a subdomain are not
+				      * the same the
+				      * DoFHandler class
+				      * identifies as those it owns.
+				      */
+    template <class DH>
+    static
+    IndexSet
+    dof_indices_with_subdomain_association (const DH           &dof_handler,
+					    const types::subdomain_id_t subdomain);
 
                                      /**
 				      * Count how many degrees of
@@ -1454,12 +1604,22 @@ class DoFTools
 				      * step-31, and
 				      * step-32 tutorial
 				      * programs.
+				      *
+				      * @pre The dofs_per_block
+				      * variable has as many
+				      * components as the finite
+				      * element used by the
+				      * dof_handler argument has
+				      * blocks, or alternatively as
+				      * many blocks as are enumerated
+				      * in the target_blocks argument
+				      * if given.
 				      */
     template <int dim, int spacedim>
     static void
     count_dofs_per_block (const DoFHandler<dim,spacedim>&     dof_handler,
 			  std::vector<unsigned int>& dofs_per_block,
-			  std::vector<unsigned int>  target_block
+			  std::vector<unsigned int>  target_blocks
 			  = std::vector<unsigned int>());
 
 				     /**

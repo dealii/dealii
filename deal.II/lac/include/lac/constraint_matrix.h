@@ -243,11 +243,9 @@ class ConstraintMatrix : public Subscriptor
 				      */
 
 				     /**
-				      * Add a new line to the
-				      * matrix. If the line already
-				      * exists, then the function
-				      * simply returns without doing
-				      * anything.
+				      * Add a new line to the matrix. If the
+				      * line already exists, then the function
+				      * simply returns without doing anything.
 				      */
     void add_line (const unsigned int line);
 
@@ -1371,6 +1369,10 @@ class ConstraintMatrix : public Subscriptor
 				      * or Trilinos vector wrapper class, or
 				      * any other type having the same
 				      * interface.
+				      *
+				      * Note that if called with a @p
+				      * TrilinosWrappers::MPI::Vector it may
+				      * not contain ghost elements.
 				      */
     template <class VectorType>
     void distribute (VectorType &vec) const;

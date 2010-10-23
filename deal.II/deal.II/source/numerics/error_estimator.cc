@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -226,7 +226,7 @@ namespace internal
 					  * The subdomain id we are to care
 					  * for.
 					  */
-	const unsigned int subdomain_id;
+	const types::subdomain_id_t subdomain_id;
 					 /**
 					  * The material id we are to care
 					  * for.
@@ -251,7 +251,7 @@ namespace internal
 		      const dealii::hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
 		      const bool         need_quadrature_points,
 		      const unsigned int n_solution_vectors,
-		      const unsigned int subdomain_id,
+		      const types::subdomain_id_t subdomain_id,
 		      const unsigned int material_id,
 		      const typename FunctionMap<DH::dimension>::type *neumann_bc,
 		      const std::vector<bool>                component_mask,
@@ -275,7 +275,7 @@ namespace internal
 		  const dealii::hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
 		  const bool     need_quadrature_points,
 		  const unsigned int n_solution_vectors,
-		  const unsigned int subdomain_id,
+		  const types::subdomain_id_t subdomain_id,
 		  const unsigned int material_id,
 		  const typename FunctionMap<DH::dimension>::type *neumann_bc,
 		  const std::vector<bool>                component_mask,
@@ -383,6 +383,7 @@ namespace internal
 					   // exists in the global map
 	  Assert (face_integrals.find (p->first) == face_integrals.end(),
 		  ExcInternalError());
+
 	  for (unsigned int i=0; i<p->second.size(); ++i)
 	    Assert (p->second[i] >= 0, ExcInternalError());
 
@@ -828,7 +829,7 @@ namespace internal
     {
       const unsigned int n_solution_vectors = solutions.size();
 
-      const unsigned int subdomain_id = parallel_data.subdomain_id;
+      const types::subdomain_id_t subdomain_id = parallel_data.subdomain_id;
       const unsigned int material_id  = parallel_data.material_id;
 
 				       // empty our own copy of the local face
@@ -901,7 +902,7 @@ namespace internal
 					   // material_id), or if one of the
 					   // neighbors behind the face is on
 					   // the subdomain we care for
-	  if ( ! ( ((subdomain_id == numbers::invalid_unsigned_int)
+	  if ( ! ( ((subdomain_id == types::invalid_subdomain_id)
 		    ||
 		    (cell->subdomain_id() == subdomain_id))
 		   &&
@@ -921,7 +922,7 @@ namespace internal
 	      if (face->has_children() == false)
 		care_for_cell |= ((cell->neighbor(face_no)->subdomain_id()
 				   == subdomain_id) ||
-				  (subdomain_id == numbers::invalid_unsigned_int))
+				  (subdomain_id == types::invalid_subdomain_id))
 				 &&
 				 ((cell->neighbor(face_no)->material_id()
 				   == material_id) ||
@@ -939,7 +940,7 @@ namespace internal
 			  ->material_id() == material_id)
 			 &&
 			 (subdomain_id ==
-			  numbers::invalid_unsigned_int)))
+			  types::invalid_subdomain_id)))
 		      {
 			care_for_cell = true;
 			break;
@@ -1015,7 +1016,7 @@ estimate (const Mapping<1,spacedim>      &mapping,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
 				   // just pass on to the other function
@@ -1039,7 +1040,7 @@ estimate (const DH   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1061,7 +1062,7 @@ estimate (const DH   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1084,7 +1085,7 @@ estimate (const Mapping<1,spacedim>      &mapping,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
 				   // just pass on to the other function
@@ -1107,7 +1108,7 @@ estimate (const DH   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1129,7 +1130,7 @@ estimate (const DH   &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<1>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1152,7 +1153,7 @@ estimate (const Mapping<1,spacedim>                    &/*mapping*/,
           const std::vector<bool>                &/*component_mask_*/,
           const Function<1>                   */*coefficient*/,
           const unsigned int,
-          const unsigned int                   /*subdomain_id*/,
+          const types::subdomain_id_t          /*subdomain_id*/,
           const unsigned int                   /*material_id*/)
 {
   Assert (false, ExcInternalError());
@@ -1172,9 +1173,32 @@ estimate (const Mapping<1,spacedim>                    &mapping,
           const std::vector<bool>                  &component_mask_,
           const Function<1>                   *coefficient,
           const unsigned int,
-          const unsigned int                  subdomain_id,
+          const types::subdomain_id_t         subdomain_id_,
           const unsigned int                  material_id)
 {
+  if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
+      (&dof_handler.get_tria())
+      != 0)
+    Assert ((subdomain_id_ == types::invalid_subdomain_id)
+	    ||
+	    (subdomain_id_ ==
+	     dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>&>
+	     (dof_handler.get_tria()).locally_owned_subdomain()),
+	    ExcMessage ("For parallel distributed triangulations, the only "
+			"valid subdomain_id that can be passed here is the "
+			"one that corresponds to the locally owned subdomain id."));
+
+  const types::subdomain_id_t subdomain_id
+    = ((dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
+	(&dof_handler.get_tria())
+	!= 0)
+       ?
+       dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>&>
+       (dof_handler.get_tria()).locally_owned_subdomain()
+       :
+       subdomain_id_);
+
+
   const unsigned int n_components       = dof_handler.get_fe().n_components();
   const unsigned int n_solution_vectors = solutions.size();
 
@@ -1273,7 +1297,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   typename DH::active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int cell_index=0; cell != dof_handler.end();
        ++cell, ++cell_index)
-    if (((subdomain_id == numbers::invalid_unsigned_int)
+    if (((subdomain_id == types::invalid_subdomain_id)
          ||
          (cell->subdomain_id() == subdomain_id))
         &&
@@ -1416,7 +1440,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const std::vector<bool> &component_mask,
           const Function<dim>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
 				   // just pass on to the other function
@@ -1439,7 +1463,7 @@ estimate (const DH                &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<dim>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1462,7 +1486,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const std::vector<bool> &component_mask,
           const Function<dim>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
 				   // just pass on to the other function
@@ -1485,7 +1509,7 @@ estimate (const DH                &dof_handler,
           const std::vector<bool> &component_mask,
           const Function<dim>     *coefficients,
           const unsigned int       n_threads,
-          const unsigned int       subdomain_id,
+          const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1510,9 +1534,32 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const std::vector<bool>                  &component_mask_,
           const Function<dim>                 *coefficients,
           const unsigned int                   ,
-          const unsigned int                   subdomain_id,
+          const types::subdomain_id_t          subdomain_id_,
           const unsigned int                   material_id)
 {
+  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+      (&dof_handler.get_tria())
+      != 0)
+    Assert ((subdomain_id_ == types::invalid_subdomain_id)
+	    ||
+	    (subdomain_id_ ==
+	     dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+	     (dof_handler.get_tria()).locally_owned_subdomain()),
+	    ExcMessage ("For parallel distributed triangulations, the only "
+			"valid subdomain_id that can be passed here is the "
+			"one that corresponds to the locally owned subdomain id."));
+
+  const types::subdomain_id_t subdomain_id
+    = ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+	(&dof_handler.get_tria())
+	!= 0)
+       ?
+       dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
+       (dof_handler.get_tria()).locally_owned_subdomain()
+       :
+       subdomain_id_);
+
+
   const unsigned int n_components = dof_handler.get_fe().n_components();
 
   				   // sanity checks
@@ -1610,7 +1657,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end();
        ++cell, ++present_cell)
-    if ( ((subdomain_id == numbers::invalid_unsigned_int)
+    if ( ((subdomain_id == types::invalid_subdomain_id)
           ||
           (cell->subdomain_id() == subdomain_id))
          &&
@@ -1660,7 +1707,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const std::vector<bool>                  &component_mask,
           const Function<dim>                 *coefficients,
           const unsigned int                   n_threads,
-          const unsigned int                   subdomain_id,
+          const types::subdomain_id_t          subdomain_id,
           const unsigned int                   material_id)
 {
 				   // forward to the function with the QCollection
@@ -1682,7 +1729,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
 					 const unsigned int                   n_threads,
-                                         const unsigned int       subdomain_id,
+                                         const types::subdomain_id_t subdomain_id,
                                          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1703,7 +1750,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
 					 const std::vector<bool>                  &component_mask,
 					 const Function<dim>                 *coefficients,
 					 const unsigned int                   n_threads,
-                                         const unsigned int       subdomain_id,
+                                         const types::subdomain_id_t subdomain_id,
                                          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1806,6 +1853,10 @@ INSTANTIATE(PETScWrappers::BlockVector,DoFHandler<deal_II_dimension>);
 
 INSTANTIATE(PETScWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
 INSTANTIATE(PETScWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(PETScWrappers::MPI::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(PETScWrappers::MPI::BlockVector,DoFHandler<deal_II_dimension>);
+
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS

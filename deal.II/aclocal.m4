@@ -319,7 +319,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 
 
 dnl -------------------------------------------------------------
-dnl See whether the compiler we have has MPI build in (e.g. if it
+dnl See whether the compiler we have has MPI built in (e.g. if it
 dnl is actually mpiCC, etc)
 dnl
 dnl Usage: DEAL_II_DETERMINE_IF_SUPPORTS_MPI
@@ -339,6 +339,12 @@ AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
           AC_MSG_RESULT(yes)
 	  AC_DEFINE(DEAL_II_COMPILER_SUPPORTS_MPI, 1,
                     [Defined if the compiler supports including <mpi.h>])
+
+          dnl Export this variable so that we can refer to it
+	  dnl from contrib/configure.in when configuring p4est
+	  DEAL_II_COMPILER_SUPPORTS_MPI=1
+	  export DEAL_II_COMPILER_SUPPORTS_MPI
+
           DEAL_II_USE_MPI=yes
         ],
         [
@@ -1289,7 +1295,8 @@ dnl Set C compiler flags to their default values. They will be
 dnl modified according to other options in later steps of
 dnl configuration
 dnl
-dnl CFLAGS  : flags for optimized mode
+dnl CFLAGS.o  : flags for optimized mode
+dnl CFLAGS.g  : flags for debug mode
 dnl
 dnl Usage: DEAL_II_SET_CC_FLAGS
 dnl
@@ -1298,7 +1305,8 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 [
   dnl First the flags for gcc compilers
   if test "$GCC" = yes ; then
-    CFLAGS="$CFLAGS -O3 -funroll-loops -funroll-all-loops -fstrict-aliasing"
+    CFLAGSO="$CFLAGS -O3 -funroll-loops -funroll-all-loops -fstrict-aliasing"
+    CFLAGSG="$CFLAGS -g"
     dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
     dnl anything to avoid a warning. on AIX make sure we always pass -lpthread
     dnl because this seems to be somehow required to make things work. Likewise
@@ -1340,18 +1348,18 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 
     case "$CC_VERSION" in
       ibm_xlc)
-          CFLAGS="$CFLAGS -O2"
+          CFLAGSO="$CFLAGS -O2"
           CFLAGSPIC="-fPIC"
 	  SHLIBLD="$CXX"
           ;;
 
       MIPSpro*)
-          CFLAGS="$CFLAGS -O2"
+          CFLAGSO="$CFLAGS -O2"
           CFLAGSPIC="-KPIC"
           ;;
 
       intel_icc*)
-          CFLAGS="$CFLAGS -O2 -unroll"
+          CFLAGSO="$CFLAGS -O2 -unroll"
     	  case "$CC_VERSION" in
 	    intel_icc5 | intel_icc6 | intel_icc7 | intel_icc8 | intel_icc9)
                 CFLAGSPIC="-KPIC"
@@ -1379,7 +1387,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	      ;;
           esac
 
-          CFLAGS="$CFLAGS -ansi_alias -vec_report0"
+          CFLAGSO="$CFLAGSO -ansi_alias -vec_report0"
 
 	  dnl If we are on an x86 platform, add -tpp6 to optimization
 	  dnl flags
@@ -1412,7 +1420,7 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 
       *)
           AC_MSG_RESULT(Unknown C compiler - using generic options)
-	  CFLAGS="$CFLAGS -O2"
+	  CFLAGSO="$CFLAGSO -O2"
           ;;
     esac
   fi
@@ -5492,6 +5500,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_NETCDF, dnl
 ])
 
 
+
 dnl ------------------------------------------------------------
 dnl Check whether PETSc is installed, and if so store the
 dnl respective links
@@ -7018,6 +7027,49 @@ AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
 dnl    fi
   else
     AC_CHECK_LIB(z, crc32)
+  fi
+])
+
+
+
+
+dnl ------------------------------------------------------------
+dnl Check whether P4EST is to be used to parallelize meshes
+dnl
+dnl Usage: DEAL_II_CONFIGURE_P4EST
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
+[
+  AC_MSG_CHECKING(whether p4est shall be used)
+
+  AC_ARG_WITH(p4est,
+    [ --with-p4est=/path/to/p4est makes deal.II use p4est to distribute meshes
+                     on a cluster computer],
+    use_p4est=$withval,
+    use_p4est=no)
+
+  if test "x$use_p4est" != "xno" ; then
+    AC_MSG_RESULT(yes)
+
+    if test ! -d "${use_p4est}/DEBUG" -o ! -d "${use_p4est}/FAST" ; then
+    echo "${use_p4est}/DEBUG"
+      AC_MSG_ERROR([p4est directories $use_p4est/DEBUG or $use_p4est/FAST not found])
+    fi
+
+    AC_DEFINE(DEAL_II_USE_P4EST, 1,
+              [Defined if we are to use the p4est library to distribute
+               meshes on a cluster computer.])
+    USE_CONTRIB_P4EST=yes
+    export USE_CONTRIB_P4EST
+
+    DEAL_II_P4EST_DIR=${use_p4est}
+    export DEAL_II_P4EST_DIR
+
+    CXXFLAGSG="$CXXFLAGSG -I$use_p4est/DEBUG/include"
+    CXXFLAGSO="$CXXFLAGSO -I$use_p4est/FAST/include"
+  else
+    AC_MSG_RESULT(no)
   fi
 ])
 

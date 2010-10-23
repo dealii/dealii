@@ -916,12 +916,26 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
 				      */
     BlockCompressedSimpleSparsityPattern (const std::vector<unsigned int>& row_block_sizes,
 				    const std::vector<unsigned int>& col_block_sizes);
-
+    
 				     /**
-				      * Resize the matrix to a tensor
-				      * product of matrices with
-				      * dimensions defined by the
-				      * arguments.
+				      * Initialize the pattern with symmetric
+				      * blocks. The number of IndexSets in the
+				      * vector determine the number of rows
+				      * and columns of blocks. The size of
+				      * each block is determined by the size()
+				      * of the respective IndexSet. Each block
+				      * only stores the rows given by the
+				      * values in the IndexSet, which is
+				      * useful for distributed memory parallel
+				      * computations and usually corresponds
+				      * to the locally owned DoFs.
+				      */
+    BlockCompressedSimpleSparsityPattern (const std::vector<IndexSet> & partitioning);
+    
+				     /**
+				      * Resize the pattern to a tensor product
+				      * of matrices with dimensions defined by
+				      * the arguments.
 				      *
 				      * The matrix will have as many
 				      * block rows and columns as
@@ -935,6 +949,15 @@ class BlockCompressedSimpleSparsityPattern : public BlockSparsityPatternBase<Com
     void reinit (const std::vector< unsigned int > &row_block_sizes,
 		 const std::vector< unsigned int > &col_block_sizes);
 
+				     /**
+				      * Resize the pattern with symmetric
+				      * blocks determined by the size() of
+				      * each IndexSet. See the constructor
+				      * taking a vector of IndexSets for
+				      * details.
+				      */
+    void reinit(const std::vector<IndexSet> & partitioning);
+    
 				     /**
 				      * Allow the use of the reinit
 				      * functions of the base class as
@@ -1030,17 +1053,14 @@ namespace TrilinosWrappers
 
     				     /**
 				      * Initialize the pattern with an array
-				      * of index sets that specifies both
-				      * rows and columns of the matrix (so
-				      * the final matrix will be a square
-				      * matrix), where the IndexSet
-				      * specifies the parallel distribution
-				      * of the degrees of freedom on the
-				      * individual block.  This function is
-				      * equivalent to calling the second
-				      * constructor with the length of the
-				      * mapping vector and then entering the
-				      * index values.
+				      * of index sets that specifies both rows
+				      * and columns of the matrix (so the
+				      * final matrix will be a square matrix),
+				      * where the size() of the IndexSets
+				      * specifies the size of the blocks and
+				      * the values in each IndexSet denotes
+				      * the rows that are going to be saved in
+				      * each block.
 				      */
       BlockSparsityPattern (const std::vector<IndexSet>& parallel_partitioning,
 			    const MPI_Comm &communicator = MPI_COMM_WORLD);
@@ -1074,10 +1094,9 @@ namespace TrilinosWrappers
 
 				     /**
 				      * Resize the matrix to a square tensor
-				      * product of matrices with parallel
-				      * distribution according to the
-				      * specifications in the array of
-				      * Epetra_Maps.
+				      * product of matrices. See the
+				      * constructor that takes a vector of
+				      * IndexSets for details.
 				      */
       void reinit (const std::vector<IndexSet>& parallel_partitioning,
 		   const MPI_Comm             & communicator = MPI_COMM_WORLD);

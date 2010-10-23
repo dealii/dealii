@@ -265,6 +265,33 @@ BlockSparsityPatternBase<SparsityPatternBase>::print(std::ostream& out) const
 }
 
 
+template <>
+void
+BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::print(std::ostream& out) const
+{
+  unsigned int k=0;
+  for (unsigned int ib=0;ib<n_block_rows();++ib)
+    {
+      for (unsigned int i=0;i<block(ib,0).n_rows();++i)
+	{
+	  out << '[' << i+k;
+	  unsigned int l=0;
+	  for (unsigned int jb=0;jb<n_block_cols();++jb)
+	    {
+	      const CompressedSimpleSparsityPattern & b = block(ib,jb);
+	      if (b.row_index_set().size()==0 || b.row_index_set().is_element(i))
+		for (unsigned int j=0;j<b.n_cols();++j)
+		  if (b.exists(i,j))
+		    out << ',' << l+j;
+	      l += b.n_cols();
+	    }
+	  out << ']' << std::endl;
+	}
+      k += block(ib,0).n_rows();
+    }
+}
+
+
 template <class SparsityPatternBase>
 void
 BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(std::ostream &out) const
@@ -598,6 +625,21 @@ BlockCompressedSimpleSparsityPattern (const std::vector<unsigned int>& row_indic
 }
 
 
+BlockCompressedSimpleSparsityPattern::
+BlockCompressedSimpleSparsityPattern (const std::vector<IndexSet> & partitioning)
+		:
+		BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(partitioning.size(),
+									  partitioning.size())
+{
+  for (unsigned int i=0;i<partitioning.size();++i)
+    for (unsigned int j=0;j<partitioning.size();++j)
+      this->block(i,j).reinit(partitioning[i].size(),
+			      partitioning[j].size(),
+			      partitioning[i]);
+  this->collect_sizes();
+}
+
+
 
 void
 BlockCompressedSimpleSparsityPattern::reinit (
@@ -612,6 +654,19 @@ BlockCompressedSimpleSparsityPattern::reinit (
   this->collect_sizes();
 }
 
+void
+BlockCompressedSimpleSparsityPattern::reinit (
+  const std::vector< IndexSet > & partitioning)
+{
+  BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::
+    reinit(partitioning.size(), partitioning.size());
+  for (unsigned int i=0;i<partitioning.size();++i)
+    for (unsigned int j=0;j<partitioning.size();++j)
+      this->block(i,j).reinit(partitioning[i].size(),
+			      partitioning[j].size(),
+			      partitioning[i]);
+  this->collect_sizes();
+}
 
 
 #ifdef DEAL_II_USE_TRILINOS

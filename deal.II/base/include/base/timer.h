@@ -106,64 +106,13 @@ class Timer
     Timer (MPI_Comm mpi_communicator,
 	   bool sync_wall_time = false);
 
-
-				     /**
-				      * Structure to save collective data
-				      * measured by this timer class. Queried
-				      * by get_data() or printed with
-				      * print_data() after calling stop().
-				      */
-    struct TimeMinMaxAvg
-    {
-	double sum;
-	double min;
-	double max;
-	unsigned int min_index;
-	unsigned int max_index;
-	double avg;
-
-					 /**
-					  * Set the time values to @p
-					  * val, and the MPI rank to
-					  * the given @p rank.
-					  */
-	void set(const double val,
-		 const unsigned int rank)
-	  {
-	    sum = min = max = val;
-	    min_index = max_index = rank;
-	  }
-
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-					 /**
-					  * Given two structures
-					  * indicating timer
-					  * information, do the
-					  * reduction by choosing the
-					  * one with the longer time
-					  * interval. This is a max
-					  * operation and therefore a
-					  * reduction.
-					  *
-					  * Arguments are passed as
-					  * void pointers to satisfy
-					  * the MPI requirement of
-					  * reduction operations.
-					  */
-	static void max_reduce ( const void * in_lhs_,
-				 void * inout_rhs_,
-				 int * len,
-				 MPI_Datatype * );
-#endif
-    };
-
 				     /**
 				      * Returns a reference to the data
 				      * structure with global timing
 				      * information. Filled after calling
 				      * stop().
 				      */
-    const TimeMinMaxAvg & get_data() const;
+    const Utilities::System::MinMaxAvg & get_data() const;
 
 				     /**
 				      * Prints the data to the given stream.
@@ -285,7 +234,7 @@ class Timer
 				      */
     bool sync_wall_time;
 
-    TimeMinMaxAvg mpi_data;
+    Utilities::System::MinMaxAvg mpi_data;
 #endif
 };
 
@@ -566,7 +515,7 @@ class TimerOutput
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
 inline
-const Timer::TimeMinMaxAvg &
+const Utilities::System::MinMaxAvg &
 Timer::get_data() const
 {
   return mpi_data;

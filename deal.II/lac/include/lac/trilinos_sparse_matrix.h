@@ -3231,7 +3231,9 @@ namespace TrilinosWrappers
 				   // the content -- this is what we need
 				   // since we're going to overwrite that
 				   // anyway in the vmult operation.
-    temp_vector.reinit(dst, true);
+				   // TODO[TH]: workaround, because fast is
+				   // not reliable with MPI right now.
+    temp_vector.reinit(dst, false);
 
     vmult (temp_vector, src);
     dst += temp_vector;

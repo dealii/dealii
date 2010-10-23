@@ -83,6 +83,22 @@ dnl -------------------------------------------------------------
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------- configuring C/C++ compilers ----------------)
 
+
+dnl See if the user has specified --enable-mpi. If so, and if $CXX and $CC have
+dnl not been set to a particular value, then override them with 'mpiCC' and 'mpicc'.
+AC_ARG_ENABLE(mpi,
+	AS_HELP_STRING([--enable-mpi],
+	[Select MPI-enabled compilers and MPI support in deal.II.]),
+	[
+	  AC_MSG_CHECKING(whether to explicitly use MPI)
+	  if test "x$enableval" = "xyes" ; then
+	    AC_MSG_RESULT(yes)
+	    if test "x$CXX" = "x" ; then CXX=mpiCC ; fi
+	    if test "x$CC" = "x" ; then CC=mpicc ; fi
+	  else
+	    AC_MSG_RESULT(no)
+	  fi])
+
 dnl Find a C compiler. This modifies the variable CC.
 dnl In order to get the absolute path of the compiler, use the
 dnl second line
@@ -132,7 +148,8 @@ DEAL_II_DETERMINE_CC_BRAND
 DEAL_II_SET_CC_FLAGS
 
 AC_SUBST(CC_VERSION)
-AC_SUBST(CFLAGS)
+AC_SUBST(CFLAGSO)
+AC_SUBST(CFLAGSG)
 AC_SUBST(CFLAGSPIC)
 
 dnl -------------------------------------------------------------
@@ -296,7 +313,8 @@ case "$target" in
 esac
 
 if test "x$enableshared" = "xyes" ; then
-  CFLAGS="$CFLAGS $CFLAGSPIC"
+  CFLAGSO="$CFLAGSO $CFLAGSPIC"
+  CFLAGSG="$CFLAGSG $CFLAGSPIC"
   CXXFLAGSG="$CXXFLAGSG $CXXFLAGSPIC"
   CXXFLAGSO="$CXXFLAGSO $CXXFLAGSPIC"
   F77FLAGSG="$F77FLAGSG $F77FLAGSPIC"
@@ -446,6 +464,14 @@ AC_SUBST(DEAL_II_SCALAPACK_DIR) dnl MUMPS dependency
 AC_SUBST(DEAL_II_BLACS_DIR)     dnl MUMPS dependency
 AC_SUBST(DEAL_II_BLACS_ARCH)
 AC_SUBST(DEAL_II_DEFINE_DEAL_II_USE_MUMPS)
+
+DEAL_II_CONFIGURE_P4EST
+AC_SUBST(DEAL_II_USE_P4EST)
+AC_SUBST(USE_CONTRIB_P4EST)
+AC_SUBST(DEAL_II_P4EST_DIR)
+
+
+
 
 dnl Make sure we configure for libraries used by other libraries. For
 dnl example, UMFPACK needs blas, and so does LAPACK.

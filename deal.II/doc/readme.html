@@ -473,26 +473,30 @@
 
     <li>
       <p>
+      <code>--enable-mpi</code>: If given this
+      flag, <code>./configure</code> chooses <code>mpiCC</code>
+      and <code>mpicc</code> as the C++ and C compilers, respectively,
+      unless the <code>$CXX</code> and <code>$CC</code> environment
+      variables have specifically been set to something else. If these
+      compilers exist and indeed support MPI, then this also switches
+      on support for MPI in the library.
+      </p>
+
+    <li>
+      <p>
       <code>--with-cpu=...</code>: Enable specific optimization
       flags for a particular processor. Programs compiled with these options
-      might not execute on an other system, but will be faster by up to
-      30 percent on the CPU selected.
+      might not execute on an other system, but may be faster on the
+      particular CPU selected.
       </p>
 
       <p>
       For a complete list of supported values of this switch, you may
       take a look at the file <code>aclocal.m4</code> in the top-level
       directory. However, the most commonly used value
-      is <code>--with-cpu=native</code> indicating that the compiler
+      is <code>--with-cpu=native</code>, indicating that the compiler
       should determine the CPU we are running on by itself and
       optimize for it.
-      </p>
-
-      <p>
-      Optimizations currently only work in conjunction with gcc. Without the
-      option <code>--with-cpu=xxx</code>, no cpu specific optimization is applied.
-      Furthermore, CPU specific optimization is switched on only for the compilation
-      of the optimized library versions.
       </p>
 
     <li>
@@ -657,6 +661,21 @@
       </p>
     </dd>
 
+    <a name="p4est"></a>
+    <dt>p4est</dt>
+    <dd>
+      <p>
+	p4est is a library that <acronym>deal.II</acronym> uses to
+	distribute very large meshes across multiple processors (think
+	meshes with a billion cells on 10,000 processors). Using and
+	installing p4est is discussed <a href="external-libs/p4est.html"
+					 target="body">here</a>.
+	To configure <acronym>deal.II</acronym> with p4est, you will
+	need to use the <code>--with-path=/path/to/path</code>
+	switch to the <code>./configure</code> script.
+      </p>
+    </dd>
+
     <a name="blas"></a>
     <dt>BLAS, LAPACK</dt>
 
@@ -730,10 +749,10 @@
     <a name="mumps"></a>
     <dt>MUltifrontal Massively Parallel sparse direct Solver (MUMPS)</dt>
     <dd>
-      It is possible to make use some subroutines that make use of the 
+      It is possible to make use some subroutines that make use of the
       <a href="http://mumps.enseeiht.fr"
-      target="_top">MUltifrontal Massively Parallel sparse direct Solver  
-      (MUMPS)</a>. For a detailed description of how to compile MUMPS (and 
+      target="_top">MUltifrontal Massively Parallel sparse direct Solver
+      (MUMPS)</a>. For a detailed description of how to compile MUMPS (and
       some dependencies) and linking with deal.II, see
       <a href="external-libs/mumps.html" target="body">this page</a>.
     </dd>
@@ -754,7 +773,7 @@
     <a name="ARPACK"></a>
     <dt>ARPACK</dt>
     <dd>
-      There is a wrapper for the 
+      There is a wrapper for the
       <a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a>
       library, which has its own license; if you want to use it with deal.II,
       please read it and make sure that you agree with it.

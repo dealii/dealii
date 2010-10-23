@@ -232,6 +232,40 @@ IndexSet::read(std::istream & in)
 }
 
 
+void
+IndexSet::block_write(std::ostream & out) const
+{
+  Assert (out, ExcIO());
+  out.write(reinterpret_cast<const char*>(&index_space_size),
+	    sizeof(index_space_size));
+  size_t n_ranges = ranges.size();
+  out.write(reinterpret_cast<const char*>(&n_ranges),
+	    sizeof(n_ranges));
+  if (ranges.size())
+    out.write (reinterpret_cast<const char*>(&*ranges.begin()),
+	       reinterpret_cast<const char*>(&*ranges.end())
+	       - reinterpret_cast<const char*>(&*ranges.begin()));
+  Assert (out, ExcIO());
+}
+
+void
+IndexSet::block_read(std::istream & in)
+{
+  unsigned int size;
+  size_t n_ranges;
+  in.read(reinterpret_cast<char*>(&size), sizeof(size));
+  in.read(reinterpret_cast<char*>(&n_ranges), sizeof(n_ranges));
+				   // we have to clear ranges first
+  ranges.clear();
+  set_size(size);  
+  ranges.resize(n_ranges, Range(0,0));
+  if (n_ranges)
+    in.read(reinterpret_cast<char*>(&*ranges.begin()),
+	    reinterpret_cast<char*>(&*ranges.end())
+	    - reinterpret_cast<char*>(&*ranges.begin()));
+}
+
+
 
 void
 IndexSet::subtract_set (const IndexSet & other)

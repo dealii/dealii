@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,9 +11,14 @@
 //
 //---------------------------------------------------------------------------
 
+#include <base/template_constraints.h>
 #include <lac/vector.h>
+#include <lac/block_vector_base.h>
+#include <lac/block_vector.h>
 #include <lac/petsc_vector.h>
+#include <lac/petsc_block_vector.h>
 #include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
 
 #include <grid/grid_refinement.h>
 #include <grid/tria_accessor.h>
@@ -29,73 +34,121 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace 
+namespace
 {
-  template <typename number>
-  inline
-  number
-  max_element (const Vector<number> &criteria)
+  namespace internal
   {
-    return *std::max_element(criteria.begin(), criteria.end());
-  }
-
-  
-
-  template <typename number>
-  inline
-  number
-  min_element (const Vector<number> &criteria)
-  {
-    return *std::min_element(criteria.begin(), criteria.end());
-  }
+    template <typename number>
+    inline
+    number
+    max_element (const Vector<number> &criteria)
+    {
+      return *std::max_element(criteria.begin(), criteria.end());
+    }
 
 
-#ifdef DEAL_II_USE_PETSC  
-  PetscScalar
-  max_element (const PETScWrappers::Vector &criteria)
-  {
-                                     // this is horribly slow (since we have
-                                     // to get the array of values from PETSc
-                                     // in every iteration), but works
-    PetscScalar m = 0;
-    for (unsigned int i=0; i<criteria.size(); ++i)
-      m = std::max (m, criteria(i));
-    return m;
-  }
+
+    template <typename number>
+    inline
+    number
+    min_element (const Vector<number> &criteria)
+    {
+      return *std::min_element(criteria.begin(), criteria.end());
+    }
 
 
-  PetscScalar
-  min_element (const PETScWrappers::Vector &criteria)
-  {
-                                     // this is horribly slow (since we have
-                                     // to get the array of values from PETSc
-                                     // in every iteration), but works
-    PetscScalar m = criteria(0);
-    for (unsigned int i=1; i<criteria.size(); ++i)
-      m = std::min (m, criteria(i));
-    return m;
-  }
+#ifdef DEAL_II_USE_PETSC
+    PetscScalar
+    max_element (const PETScWrappers::Vector &criteria)
+    {
+				       // this is horribly slow (since we have
+				       // to get the array of values from PETSc
+				       // in every iteration), but works
+      PetscScalar m = 0;
+      for (unsigned int i=0; i<criteria.size(); ++i)
+	m = std::max (m, criteria(i));
+      return m;
+    }
+
+
+    PetscScalar
+    min_element (const PETScWrappers::Vector &criteria)
+    {
+				       // this is horribly slow (since we have
+				       // to get the array of values from PETSc
+				       // in every iteration), but works
+      PetscScalar m = criteria(0);
+      for (unsigned int i=1; i<criteria.size(); ++i)
+	m = std::min (m, criteria(i));
+      return m;
+    }
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS  
-  TrilinosScalar
-  max_element (const TrilinosWrappers::Vector &criteria)
-  {
-    TrilinosScalar m = 0;
-    criteria.trilinos_vector().MaxValue(&m);
-    return m;
-  }
+#ifdef DEAL_II_USE_TRILINOS
+    TrilinosScalar
+    max_element (const TrilinosWrappers::Vector &criteria)
+    {
+      TrilinosScalar m = 0;
+      criteria.trilinos_vector().MaxValue(&m);
+      return m;
+    }
 
 
-  TrilinosScalar
-  min_element (const TrilinosWrappers::Vector &criteria)
-  {
-    TrilinosScalar m = 0;
-    criteria.trilinos_vector().MinValue(&m);
-    return m;
-  }
+    TrilinosScalar
+    min_element (const TrilinosWrappers::Vector &criteria)
+    {
+      TrilinosScalar m = 0;
+      criteria.trilinos_vector().MinValue(&m);
+      return m;
+    }
 #endif
+  }
+
+
+  template <typename Vector>
+  typename constraint_and_return_value<!IsBlockVector<Vector>::value,
+				       typename Vector::value_type>::type
+  min_element (const Vector &criteria)
+  {
+    return internal::min_element (criteria);
+  }
+
+
+  template <typename Vector>
+  typename constraint_and_return_value<!IsBlockVector<Vector>::value,
+				       typename Vector::value_type>::type
+  max_element (const Vector &criteria)
+  {
+    return internal::max_element (criteria);
+  }
+
+
+  template <typename Vector>
+  typename constraint_and_return_value<IsBlockVector<Vector>::value,
+				       typename Vector::value_type>::type
+  min_element (const Vector &criteria)
+  {
+    typename Vector::value_type t = internal::min_element(criteria.block(0));
+    for (unsigned int b=1; b<criteria.n_blocks(); ++b)
+      t = std::min (t, internal::min_element(criteria.block(b)));
+
+    return t;
+  }
+
+
+  template <typename Vector>
+  typename constraint_and_return_value<IsBlockVector<Vector>::value,
+				       typename Vector::value_type>::type
+  max_element (const Vector &criteria)
+  {
+    typename Vector::value_type t = internal::max_element(criteria.block(0));
+    for (unsigned int b=1; b<criteria.n_blocks(); ++b)
+      t = std::max (t, internal::max_element(criteria.block(b)));
+
+    return t;
+  }
+
 }
 
 
@@ -119,7 +172,7 @@ namespace
   {
     int i,j;
     typename Vector::value_type v;
-  
+
     if (r<=l)
       return;
 
@@ -128,7 +181,7 @@ namespace
     j = r;
     do
       {
-	do 
+	do
 	  {
 	    ++i;
 	  }
@@ -138,7 +191,7 @@ namespace
 	    --j;
 	  }
 	while ((a(ind[j])<v) && (j>0));
-      
+
 	if (i<j)
 	  std::swap (ind[i], ind[j]);
 	else
@@ -146,7 +199,7 @@ namespace
       }
     while (i<j);
     qsort_index(a,ind,l,i-1);
-    qsort_index(a,ind,i+1,r);  
+    qsort_index(a,ind,i+1,r);
   }
 }
 
@@ -161,18 +214,18 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
-  
+
 				   // when all indicators are zero we
 				   // do not need to refine but only
 				   // to coarsen
   if (criteria.all_zero())
     return;
-  
+
   typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
 
 //TODO: This is undocumented, looks fishy and seems unnecessary
-  
+
   double new_threshold=threshold;
 				   // when threshold==0 find the
 				   // smallest value in criteria
@@ -185,7 +238,7 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
 	    && (criteria(index)<new_threshold))
 	new_threshold=criteria(index);
     }
-  
+
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) >= new_threshold)
       cell->set_refine_flag();
@@ -204,7 +257,7 @@ void GridRefinement::coarsen (Triangulation<dim,spacedim> &tria,
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active();
   const unsigned int n_cells = criteria.size();
-  
+
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) <= threshold)
       if (!cell->refine_flag_set())
@@ -240,7 +293,7 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
 				       // refining cells and instead try to
 				       // only coarsen as many as it would
 				       // take to get to the target
-      
+
 				       // as we have no information on cells
 				       // being refined isotropically or
 				       // anisotropically, assume isotropic
@@ -293,10 +346,10 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
       refine_cells  = static_cast<int> (refine_cells * alpha);
       coarsen_cells = static_cast<int> (coarsen_cells * alpha);
     }
-  
+
   if (refine_cells || coarsen_cells)
     {
-      dealii::Vector<typename Vector::value_type> tmp(criteria);
+      dealii::Vector<typename Vector::value_type> tmp (criteria);
       if (refine_cells)
 	{
 	  std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
@@ -332,12 +385,13 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   Assert ((bottom_fraction>=0) && (bottom_fraction<=1), ExcInvalidParameterValue());
   Assert (top_fraction+bottom_fraction <= 1, ExcInvalidParameterValue());
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
-  
+
 				   // let tmp be the cellwise square of the
 				   // error, which is what we have to sum
 				   // up and compare with
 				   // @p{fraction_of_error*total_error}.
-  dealii::Vector<typename Vector::value_type> tmp(criteria);
+  dealii::Vector<typename Vector::value_type> tmp;
+  tmp = criteria;
   const double total_error = tmp.l1_norm();
 
 				   // sort the largest criteria to the
@@ -397,7 +451,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
 	return;
       }
   }
-  
+
 
 				   // in some rare cases it may happen that
 				   // both thresholds are the same (e.g. if
@@ -433,14 +487,14 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   if ((top_threshold == max_element(criteria)) &&
       (top_fraction != 1))
     top_threshold *= 0.999;
-  
+
   if (bottom_threshold>=top_threshold)
     bottom_threshold = 0.999*top_threshold;
-  
+
 				   // actually flag cells
   if (top_threshold < max_element(criteria))
     refine (tria, criteria, top_threshold);
-  
+
   if (bottom_threshold > min_element(criteria))
     coarsen (tria, criteria, bottom_threshold);
 }
@@ -455,21 +509,21 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
   Assert (criteria.is_non_negative (), ExcNegativeCriteria());
-  
+
 				   // get an increasing order on
 				   // the error indicator
   std::vector<unsigned int> tmp(criteria.size());
   for (unsigned int i=0;i<criteria.size();++i)
     tmp[i] = i;
-  
+
   qsort_index(criteria,tmp,0,criteria.size()-1);
-  
+
   double s0 = 0.75 * criteria(tmp[0]);
   double E  = criteria.l1_norm();
-  
+
   unsigned int N = criteria.size();
   unsigned int M = 0;
-  
+
 				   // The first M cells are refined
 				   // to minimize the expected error
 				   // multiplied with the expected
@@ -482,13 +536,13 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 				   // N+3*M (N is the current number
 				   // of cells)
   double min = (3.*(1.+M)+N) * (E-s0);
-  
+
   unsigned int minArg = N-1;
-  
+
   for (M=1;M<criteria.size();++M)
     {
       s0+= 0.75 * criteria(tmp[M]);
-      
+
       if ( (3.*(1+M)+N)*(E-s0) <= min)
 	{
 	  min = (3.*(1+M)+N)*(E-s0);
@@ -500,370 +554,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 
 
 // explicit instantiations
-template
-void
-GridRefinement::
-refine<deal_II_dimension,Vector<float>,deal_II_dimension>
-       (Triangulation<deal_II_dimension> &,
-        const Vector<float> &,
-        const double);
-
-template
-void
-GridRefinement::
-refine<deal_II_dimension,Vector<double>,deal_II_dimension>
-       (Triangulation<deal_II_dimension> &,
-        const Vector<double> &,
-        const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,Vector<float>,deal_II_dimension>
-       (Triangulation<deal_II_dimension> &,
-         const Vector<float> &,
-         const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,Vector<double>,deal_II_dimension>
-       (Triangulation<deal_II_dimension> &,
-         const Vector<double> &,
-         const double);
-
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,Vector<double>,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const Vector<double> &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,Vector<float>,deal_II_dimension>
- (Triangulation<deal_II_dimension> &,
-  const Vector<float> &,
-  const double,
-  const double,
-  const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<double>,deal_II_dimension>
- (Triangulation<deal_II_dimension> &,
-  const Vector<double> &,
-  const double,
-  const double,
-  const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<float>,deal_II_dimension>
- (Triangulation<deal_II_dimension> &,
-  const Vector<float> &,
-  const double,
-  const double,
-  const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,Vector<float>,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const Vector<float> &);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,Vector<double>,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const Vector<double> &);
-
-#ifdef DEAL_II_USE_PETSC
-template
-void
-GridRefinement::
-refine<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
- (Triangulation<deal_II_dimension> &,
-  const PETScWrappers::Vector &,
-  const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const PETScWrappers::Vector &,
- const double);
-
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const PETScWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const PETScWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const PETScWrappers::Vector &);
-#endif
-
-#ifdef DEAL_II_USE_TRILINOS
-template
-void
-GridRefinement::
-refine<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
- (Triangulation<deal_II_dimension> &,
-  const TrilinosWrappers::Vector &,
-  const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const TrilinosWrappers::Vector &,
- const double);
-
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const TrilinosWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const TrilinosWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const TrilinosWrappers::Vector &);
-#endif
-
-
-
-#if deal_II_dimension != 3
-// explicit instantiations
-template
-void
-GridRefinement::
-refine<deal_II_dimension,Vector<float>,deal_II_dimension+1>
-       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-        const Vector<float> &,
-        const double);
-
-template
-void
-GridRefinement::
-refine<deal_II_dimension,Vector<double>,deal_II_dimension+1>
-       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-        const Vector<double> &,
-        const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,Vector<float>,deal_II_dimension+1>
-       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-         const Vector<float> &,
-         const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,Vector<double>,deal_II_dimension+1>
-       (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-         const Vector<double> &,
-         const double);
-
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,Vector<double>,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const Vector<double> &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,Vector<float>,deal_II_dimension+1>
- (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-  const Vector<float> &,
-  const double,
-  const double,
-  const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<double>,deal_II_dimension+1>
- (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-  const Vector<double> &,
-  const double,
-  const double,
-  const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,Vector<float>,deal_II_dimension+1>
- (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-  const Vector<float> &,
-  const double,
-  const double,
-  const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,Vector<float>,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const Vector<float> &);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,Vector<double>,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const Vector<double> &);
-
-#ifdef DEAL_II_USE_PETSC
-template
-void
-GridRefinement::
-refine<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
- (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-  const PETScWrappers::Vector &,
-  const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const PETScWrappers::Vector &,
- const double);
-
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const PETScWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const PETScWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,PETScWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const PETScWrappers::Vector &);
-#endif
-
-#ifdef DEAL_II_USE_TRILINOS
-template
-void
-GridRefinement::
-refine<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
- (Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-  const TrilinosWrappers::Vector &,
-  const double);
-
-template
-void
-GridRefinement::
-coarsen<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const TrilinosWrappers::Vector &,
- const double);
-
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_number<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const TrilinosWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_fixed_fraction<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const TrilinosWrappers::Vector &,
- const double,
- const double,
- const unsigned int);
-
-template
-void
-GridRefinement::
-refine_and_coarsen_optimize<deal_II_dimension,TrilinosWrappers::Vector,deal_II_dimension+1>
-(Triangulation<deal_II_dimension,deal_II_dimension+1> &,
- const TrilinosWrappers::Vector &);
-#endif
-
-
-#endif
+#include "grid_refinement.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

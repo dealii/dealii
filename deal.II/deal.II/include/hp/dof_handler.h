@@ -21,6 +21,7 @@
 #include <base/smartpointer.h>
 #include <dofs/function_map.h>
 #include <dofs/dof_iterator_selector.h>
+#include <dofs/number_cache.h>
 #include <hp/fe_collection.h>
 
 #include <vector>
@@ -800,12 +801,37 @@ namespace hp
                                        /*---------------------------------------*/
 
 
-                                       /**
-                                        * Return number of degrees of freedom.
-                                        * Included in this number are those
-                                        * DoFs which are constrained by
-                                        * hanging nodes.
-                                        */
+				       /**
+					* Return the global number of
+					* degrees of freedom. If the
+					* current object handles all
+					* degrees of freedom itself
+					* (even if you may intend to
+					* solve your linear system in
+					* parallel, such as in step-17
+					* or step-18), then this number
+					* equals the number of locally
+					* owned degrees of freedom since
+					* this object doesn't know
+					* anything about what you want
+					* to do with it and believes
+					* that it owns every degree of
+					* freedom it knows about.
+					*
+					* On the other hand, if this
+					* object operates on a
+					* parallel::distributed::Triangulation
+					* object, then this function
+					* returns the global number of
+					* degrees of freedom,
+					* accumulated over all
+					* processors.
+					*
+					* In either case, included in
+					* the returned number are those
+					* DoFs which are constrained by
+					* hanging nodes, see @ref constraints.
+					*/
       unsigned int n_dofs () const;
 
                                        /**
@@ -840,6 +866,97 @@ namespace hp
                                         */
       unsigned int
       n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const;
+
+				       /**
+					* Return the number of
+					* degrees of freedom that
+					* belong to this
+					* process.
+					*
+					* If this is a sequential job,
+					* then the result equals that
+					* produced by n_dofs(). On the
+					* other hand, if we are
+					* operating on a
+					* parallel::distributed::Triangulation,
+					* then it includes only the
+					* degrees of freedom that the
+					* current processor owns. Note
+					* that in this case this does
+					* not include all degrees of
+					* freedom that have been
+					* distributed on the current
+					* processor's image of the mesh:
+					* in particular, some of the
+					* degrees of freedom on the
+					* interface between the cells
+					* owned by this processor and
+					* cells owned by other
+					* processors may be theirs, and
+					* degrees of freedom on ghost
+					* cells are also not necessarily
+					* included.
+					*/
+      unsigned int n_locally_owned_dofs() const;
+
+				       /**
+					* Return an IndexSet describing
+					* the set of locally owned DoFs
+					* as a subset of
+					* 0..n_dofs(). The number of
+					* elements of this set equals
+					* n_locally_owned_dofs().
+					*/
+      const IndexSet & locally_owned_dofs() const;
+
+
+				       /**
+					* Returns a vector that
+					* stores the locally owned
+					* DoFs of each processor. If
+					* you are only interested in
+					* the number of elements
+					* each processor owns then
+					* n_dofs_per_processor() is
+					* a better choice.
+					*
+					* If this is a sequential job,
+					* then the vector has a single
+					* element that equals the
+					* IndexSet representing the
+					* entire range [0,n_dofs()].
+					*/
+      const std::vector<IndexSet> &
+      locally_owned_dofs_per_processor () const;
+
+				       /**
+					* Return a vector that
+					* stores the number of
+					* degrees of freedom each
+					* processor that
+					* participates in this
+					* triangulation owns
+					* locally. The sum of all
+					* these numbers equals the
+					* number of degrees of
+					* freedom that exist
+					* globally, i.e. what
+					* n_dofs() returns.
+					*
+					* Each element of the vector
+					* returned by this function
+					* equals the number of
+					* elements of the
+					* corresponding sets
+					* returned by
+					* global_dof_indices().
+					*
+					* If this is a sequential job,
+					* then the vector has a single
+					* element equal to n_dofs().
+					*/
+      const std::vector<unsigned int> &
+      n_locally_owned_dofs_per_processor () const;
 
                                        /**
                                         * Return a constant reference to
@@ -1100,12 +1217,18 @@ namespace hp
                                         */
       internal::hp::DoFFaces<dim> * faces;
 
-
-                                       /**
-                                        * Store the number of dofs
-                                        * created last time.
-                                        */
-      unsigned int used_dofs;
+				       /**
+					* A structure that contains all
+					* sorts of numbers that
+					* characterize the degrees of
+					* freedom this object works on.
+					*
+					* For most members of this
+					* structure, there is an
+					* accessor function in this
+					* class that returns its value.
+					*/
+      internal::DoFHandler::NumberCache number_cache;
 
                                        /**
                                         * Array to store the indices
@@ -1200,15 +1323,44 @@ namespace hp
 
 /* ----------------------- Inline functions ---------------------------------- */
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   inline
   unsigned int
   DoFHandler<dim,spacedim>::n_dofs () const
   {
-    Assert (finite_elements != 0,
-	    ExcMessage ("No finite element collection is associated with "
-			"this DoFHandler"));
-    return used_dofs;
+    return number_cache.n_global_dofs;
+  }
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
+  {
+    return number_cache.n_locally_owned_dofs;
+  }
+
+
+  template <int dim, int spacedim>
+  const IndexSet &
+  DoFHandler<dim, spacedim>::locally_owned_dofs() const
+  {
+    return number_cache.locally_owned_dofs;
+  }
+
+
+  template <int dim, int spacedim>
+  const std::vector<unsigned int> &
+  DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
+  {
+    return number_cache.n_locally_owned_dofs_per_processor;
+  }
+
+
+  template <int dim, int spacedim>
+  const std::vector<IndexSet> &
+  DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor () const
+  {
+    return number_cache.locally_owned_dofs_per_processor;
   }
 
 

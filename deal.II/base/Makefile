@@ -21,9 +21,10 @@ h-files      = $(sort $(shell echo include/base/*.h))
 # libbase. do similarly for the threading building block things if threading
 # is enabled
 ifeq ($(enable-parser),yes)
-  extra-o-files  = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+  extra-o-files   = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
   extra-g.o-files = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
 endif
+
 
 # production rules
 $(LIBDIR)/base/%.g.$(OBJEXT) :
@@ -60,6 +61,15 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $D/lib/libtbb$(shared-lib-suffix)
   endif
 
+  ifeq ($(USE_CONTRIB_P4EST),yes)
+    deplibs.g += $(DEAL_II_P4EST_DIR)/DEBUG/lib/libp4est.so \
+                 $(DEAL_II_P4EST_DIR)/DEBUG/lib/libsc.so \
+		 -Wl,-rpath,$(DEAL_II_P4EST_DIR)/DEBUG/lib
+    deplibs.o += $(DEAL_II_P4EST_DIR)/FAST/lib/libp4est.so \
+                 $(DEAL_II_P4EST_DIR)/FAST/lib/libsc.so \
+		 -Wl,-rpath,$(DEAL_II_P4EST_DIR)/FAST/lib
+  endif
+
 else
   deplibs.g =
   deplibs.o =
@@ -74,23 +84,23 @@ lib: $(LIBDIR)/libbase.g$(lib-suffix) $(LIBDIR)/libbase$(lib-suffix)
 libg: $(LIBDIR)/libbase.g$(lib-suffix)
 libo: $(LIBDIR)/libbase$(lib-suffix)
 
-$(LIBDIR)/libbase$(static-lib-suffix): $(o-files)
+$(LIBDIR)/libbase$(static-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files) $(extra-o-files)
 	@$(RANLIB) $@
 
-$(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files)
+$(LIBDIR)/libbase.g$(static-lib-suffix): $(go-files) $(extra-g.o-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files) $(extra-g.o-files)
 	@$(RANLIB) $@
 
 
-$(LIBDIR)/libbase$(shared-lib-suffix): $(o-files)
+$(LIBDIR)/libbase$(shared-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====base=============optimized==$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base) $(call DEAL_II_ADD_SONAME,base) $(o-files) $(extra-o-files)  $(deplibs.o)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,base) $@
 
-$(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files)
+$(LIBDIR)/libbase.g$(shared-lib-suffix): $(go-files) $(extra-g.o-files)
 	@echo "=====base=============debug======$(MT)== Linking library:   $(@F)"
 	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,base.g) $(call DEAL_II_ADD_SONAME,base.g) $(go-files) $(extra-g.o-files)  $(deplibs.g)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,base.g) $@

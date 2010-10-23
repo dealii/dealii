@@ -216,6 +216,29 @@ namespace Utilities
                                       */
     double get_cpu_load ();
 
+				     /**
+				      * Structure that hold information about
+				      * memory usage in kB. Used by
+				      * get_memory_stats(). See man 5 proc
+				      * entry /status for details.
+				      */
+    struct MemoryStats
+    {
+	unsigned long int VmPeak; /** peak virtual memory size in kB */
+	unsigned long int VmSize; /** current virtual memory size in kB */
+	unsigned long int VmHWM; /** peak resident memory size in kB */
+	unsigned long int VmRSS; /** current resident memory size in kB */
+    };
+    
+    
+				     /**
+				      * Fills the @param stats structure with
+				      * information about the memory
+				      * consumption of this process. This is
+				      * only implemented on Linux.
+				      */
+    void get_memory_stats (MemoryStats & stats);
+    
 
                                      /**
                                       * Return the name of the host this
@@ -331,6 +354,38 @@ namespace Utilities
 				      */
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
 
+
+				     /**
+				      * Data structure to store the result of
+				      * calculate_collective_mpi_min_max_avg.
+				      */
+    struct MinMaxAvg
+    {
+	double sum;
+	double min;
+	double max;
+	unsigned int min_index;
+	unsigned int max_index;
+	double avg;
+    };
+
+				     /**
+				      * Returns sum, average, minimum,
+				      * maximum, processor id of minimum and
+				      * maximum as a collective operation of
+				      * on the given MPI communicator @param
+				      * mpi_communicator . Each processor's
+				      * value is given in @param my_value and
+				      * the result will be returned in @param
+				      * result . The result is available on all
+				      * machines.
+				      */
+    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
+					      const double my_value,
+					      MinMaxAvg & result);
+    
+
+    
 				     /**
 				      * A class that is used to initialize the
 				      * MPI system at the beginning of a

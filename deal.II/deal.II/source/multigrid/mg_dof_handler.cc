@@ -30,6 +30,14 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int, int> class Triangulation;
+  }
+}
+
 
 //TODO[WB]: this class is currently only implemented for dim==spacedim. to
 //make the general case happen it should undergo a similar transformation as
@@ -489,7 +497,8 @@ namespace internal
 	  {
 	    const unsigned int dim = 1;
 
-	    Assert (mg_dof_handler.get_tria().n_levels() > 0, DoFHandler<1>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.get_tria().n_levels() > 0,
+		    ExcMessage("Invalid triangulation"));
 
 					     //////////////////////////
 					     // DESTRUCTION
@@ -567,7 +576,8 @@ namespace internal
 	void reserve_space (MGDoFHandler<2,spacedim> &mg_dof_handler)
 	  {
 	    const unsigned int dim = 2;
-	    Assert (mg_dof_handler.get_tria().n_levels() > 0, DoFHandler<2>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.get_tria().n_levels() > 0,
+		    ExcMessage("Invalid triangulation"));
 
 					     ////////////////////////////
 					     // DESTRUCTION
@@ -656,7 +666,8 @@ namespace internal
 	  {
 	    const unsigned int dim = 3;
 
-	    Assert (mg_dof_handler.get_tria().n_levels() > 0, DoFHandler<3>::ExcInvalidTriangulation());
+	    Assert (mg_dof_handler.get_tria().n_levels() > 0,
+		    ExcMessage("Invalid triangulation"));
 
 					     ////////////////////////////
 					     // DESTRUCTION
@@ -831,7 +842,13 @@ MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tri
 		:
 		DoFHandler<dim,spacedim> (tria),
 		mg_faces (NULL)
-{}
+{
+  Assert ((dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+	   (&tria)
+	   == 0),
+	  ExcMessage ("The given triangulation is parallel distributed but "
+		      "this class does not currently support this."));
+}
 
 
 

@@ -1,0 +1,115 @@
+<br>
+
+<i>This program was contributed by Timo Heister, Martin Kronbichler and Wolfgang
+Bangerth.
+<br>
+This material is based upon work partly supported by the National
+Science Foundation under Award No. EAR-0426271 and The California Institute of
+Technology. Any opinions, findings, and conclusions or recommendations
+expressed in this publication are those of the author and do not
+necessarily reflect the views of the National Science Foundation or of The
+California Institute of Technology.
+</i>
+
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+Given today's computers, most finite element computations can be done on
+a single machine. The majority of previous tutorial programs therefore
+shows only this, possibly splitting up work among a number of
+processors that, however, can all access the same, shared memory
+space. That said, there are problems that are simply too big for a
+single machine and in that case the problem has to be split up in a
+suitable way among multiple machines each of which contributes its
+part to the whole. A simple way to do that was shown in step-17 and
+step-18, where we show how a program can use <a
+href="http://www.mpi-forum.org/" target="_top">MPI</a> to parallelize
+assembling the linear system, storing it, solving it, and computing
+error estimators. All of these operations scale relatively trivially,
+but there was one significant drawback: for this to be moderately
+simple to implement, each MPI processor had to keep its own copy of
+the entire Triangulation and DoFHandler objects. Consequently, while
+we can suspect (with good reasons) that the operations listed above
+can scale to thousands of computers and problem sizes of billions of
+cells and billions of degrees of freedom, building the one big mesh for the
+entire problem these thousands of computers are solving on every last
+processor is clearly not going to scale: it is going to take forever,
+and maybe more importantly no single machine will have enough memory
+to store a mesh that has a billion cells (at least not at the time of
+writing this). In reality, programs like step-17 and step-18 can
+therefore not be run on more than maybe 100 or 200 processors and even
+there storing the Triangulation and DoFHandler objects consumes the
+vast majority of memory on each machine.
+
+Consequently, we need to approach the problem differently: to scale to
+very large problems each processor can only store its own little piece
+of the Triangulation and DoFHandler objects. deal.II implements such a
+scheme in the parallel::distributed namespace and the classes
+therein. It builds on an external library, <a
+href="http://www.p4est.org/">p4est</a> (a play on the expression
+<i>parallel forest</i> that describes the parallel storage of a
+hierarchically constructed mesh as a forest of quad- or
+oct-trees). You need to <a
+href="../../external-libs/p4est.html">install and configure p4est</a>
+but apart from that all of its workings are hidden under the surface
+of deal.II.
+
+In essence, what the parallel::distributed::Triangulation class and
+associated parallel::distributed::DoFHandler objects do is to split
+the global mesh so that every processor only stores a small bit it
+"owns" along with one layer of "ghost" cells that surround the ones it
+owns. What happens in the rest of the domain on which we want to solve
+the partial differential equation is unknown to each processor and can
+only be inferred through communication with other machines if such
+information is needed. This implies that we also have to think about
+problems in a different way than we did in, for example, step-17 and
+step-18: no processor can have the entire solution vector for
+postprocessing, for example, and every part of a program has to be
+parallelized because no processor has all the information necessary
+for sequential operations.
+
+A general overview of how this parallelization happens is described in
+the @ref distributed documentation module. You should read it for a
+top-level overview before reading through the source code of this
+program. A concise discussion of many terms we will use in the program
+is also provided in the @ref distributed_paper "Distributed Computing paper".
+It is probably worthwhile reading it for background information on how
+things work internally in this program.
+
+
+<h3>The testcase</h3>
+
+This program solves essentially re-solves what we already do in
+step-6, i.e. it solves the Laplace equation
+@f{align*}
+  -\Delta u &= f \qquad &&\text{in}\ \Omega=[0,1]^2, \\
+  u &= 0 \qquad &&\text{on}\ \partial\Omega.
+@f}
+The difference of course is now that we want to do so on a mesh that
+may have a billion cells, with a billion or so degrees of
+freedom. There is no doubt that doing so is completely silly for such
+a simple problem, but the point of a tutorial program is, after all,
+not to do something useful but to show how useful programs can be
+implemented using deal.II. Be that as it may, to make things at least
+a tiny bit interesting, we choose the right hand side as a
+discontinuous function,
+@f{align*}
+  f(x,y)
+  =
+  \left\{
+  \begin{array}{ll}
+    1 & \text{if}\ y < \frac 12 + \frac 14 \sin(4\pi x), \\
+    -1 & \text{otherwise},
+  \end{array}
+  \right.
+@f}
+so that the solution has a singularity along the sinusoidal line
+snaking its way through the domain. As a consequence, mesh refinement
+will be concentrated along this line. You can see this in the mesh
+picture shown below in the results section.
+
+Rather than continuing here and giving a long introduction, let us go
+straight to the program code. If you have read through step-6 and the
+@ref distributed documentation module, most of things that are going
+to happen should be familiar to you already.

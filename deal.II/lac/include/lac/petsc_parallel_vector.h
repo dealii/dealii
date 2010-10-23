@@ -187,7 +187,7 @@ namespace PETScWrappers
         explicit Vector (const MPI_Comm     &communicator,
                          const unsigned int  n,
                          const unsigned int  local_size);
-    
+
 	
                                          /**
                                           * Copy-constructor from deal.II
@@ -229,7 +229,7 @@ namespace PETScWrappers
                          const unsigned int  local_size);
 
 
-                                         /**
+					 /**
 					  * Constructs a new parallel PETSc
 					  * vector from an Indexset. Note that
 					  * @p local must be contiguous and
@@ -375,7 +375,7 @@ namespace PETScWrappers
         void reinit (const Vector &v,
                      const bool    fast = false);
 
-                                         /**
+					 /**
 					  * Reinit as a ghosted vector. See
 					  * constructor with same signature
 					  * for more details.

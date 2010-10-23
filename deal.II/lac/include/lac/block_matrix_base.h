@@ -17,6 +17,7 @@
 #include <base/config.h>
 #include <base/table.h>
 #include <base/smartpointer.h>
+#include <base/memory_consumption.h>
 #include <lac/block_indices.h>
 #include <lac/exceptions.h>
 #include <lac/full_matrix.h>
@@ -898,6 +899,16 @@ class BlockMatrixBase : public Subscriptor
 				      */
     const BlockIndices & get_column_indices () const;
 
+    				       /**
+					* Determine an estimate for the memory
+					* consumption (in bytes) of this
+					* object. Note that only the memory
+					* reserved on the current processor is
+					* returned in case this is called in
+					* an MPI-based program.
+					*/
+      unsigned int memory_consumption () const;
+    
       				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -1707,6 +1718,29 @@ copy_from (const BlockMatrixType &source)
       block(r,c).copy_from (source.block(r,c));
 
   return *this;
+}
+
+
+template <class MatrixType>
+unsigned int
+BlockMatrixBase<MatrixType>::memory_consumption () const
+{
+  unsigned int mem =
+    MemoryConsumption::memory_consumption(row_block_indices)+
+    MemoryConsumption::memory_consumption(column_block_indices)+
+    MemoryConsumption::memory_consumption(sub_objects)+
+    MemoryConsumption::memory_consumption(counter_within_block)+
+    MemoryConsumption::memory_consumption(column_indices)+
+    MemoryConsumption::memory_consumption(column_values);
+
+  for (unsigned int r=0; r<n_block_rows(); ++r)
+    for (unsigned int c=0; c<n_block_cols(); ++c)
+      {
+	MatrixType *p = this->sub_objects[r][c];
+	mem += MemoryConsumption::memory_consumption(*p);
+      }
+
+  return mem;
 }
 
 

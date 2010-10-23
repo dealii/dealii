@@ -4042,6 +4042,8 @@ namespace internal
 		  subcells[i]->set_parent (cell->index ());
 	      }
 
+
+
 					     // set child index for
 					     // even children children
 					     // i=0,2 (0)
@@ -9152,9 +9154,9 @@ Triangulation<dim, spacedim>::
 Triangulation (const MeshSmoothing smooth_grid,
 	       const bool check_for_distorted_cells)
 		:
+		smooth_grid(smooth_grid),
 		faces(NULL),
 		anisotropic_refinement(false),
-		smooth_grid(smooth_grid),
 		check_for_distorted_cells(check_for_distorted_cells)
 {
 				   // set default boundary for all
@@ -9178,6 +9180,7 @@ Triangulation (const Triangulation<dim, spacedim> &)
 }
 
 
+
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::~Triangulation ()
 {
@@ -9186,6 +9189,7 @@ Triangulation<dim, spacedim>::~Triangulation ()
   levels.clear ();
   delete faces;
 }
+
 
 
 template <int dim, int spacedim>
@@ -11648,6 +11652,8 @@ unsigned int Triangulation<dim, spacedim>::n_lines () const
 
 #if deal_II_dimension == 1
 
+
+
 template <>
 unsigned int Triangulation<1,1>::n_raw_lines (const unsigned int level) const
 {
@@ -12013,6 +12019,7 @@ Triangulation<dim, spacedim>::get_used_vertices () const
 
 #if deal_II_dimension == 1
 
+
 template <>
 unsigned int Triangulation<1,1>::max_adjacent_cells () const
 {
@@ -12060,6 +12067,13 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
 {
   prepare_coarsening_and_refinement ();
 
+				   // verify a case with which we have had
+				   // some difficulty in the past (see the
+				   // deal.II/coarsening_* tests)
+  if (smooth_grid & limit_level_difference_at_vertices)
+    Assert (satisfies_level1_at_vertex_rule (*this) == true,
+	    ExcInternalError());
+
 				   // Inform RefinementListeners
                                    // about beginning of refinement.
   typename std::list<RefinementListener *>::iterator ref_listener =
@@ -12071,8 +12085,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
   execute_coarsening();
 
   const DistortedCellList
-    cells_with_distorted_children
-    = execute_refinement();
+    cells_with_distorted_children = execute_refinement();
 
 				   // verify a case with which we have had
 				   // some difficulty in the past (see the
@@ -12274,6 +12287,8 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags ()
   std::vector<bool> previous_coarsen_flags (n_active_cells());
   save_coarsen_flags (previous_coarsen_flags);
 
+  std::vector<int> vertex_level (vertices.size(), 0);
+
   bool continue_iterating = true;
 
   do
@@ -12288,7 +12303,7 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags ()
 					   // store highest level one
 					   // of the cells adjacent to
 					   // a vertex belongs to
-	  std::vector<int> vertex_level (vertices.size(), 0);
+	  std::fill (vertex_level.begin(), vertex_level.end(), 0);
 	  active_cell_iterator cell = begin_active(),
 			       endc = end();
 	  for (; cell!=endc; ++cell)
@@ -12553,6 +12568,62 @@ bool Triangulation<1,2>::prepare_coarsening_and_refinement ()
 
 namespace
 {
+
+				   // check if the given @param cell marked
+				   // for coarsening would produce an
+				   // unrefined island. To break up long
+				   // chains of these cells we recursively
+				   // check our neighbors in case we change
+				   // this cell. This reduces the number of
+				   // outer iterations dramatically.
+  template <int dim, int spacedim>
+  void
+  possibly_do_not_produce_unrefined_islands(
+    const typename Triangulation<dim,spacedim>::cell_iterator &cell)
+  {
+    Assert (cell->has_children(), ExcInternalError());
+
+    unsigned int n_neighbors=0;
+						       // count all neighbors
+						       // that will be refined
+						       // along the face of our
+						       // cell after the next
+						       // step
+    unsigned int count=0;
+    for (unsigned int n=0; n<GeometryInfo<dim>::faces_per_cell; ++n)
+      {
+	const typename Triangulation<dim,spacedim>::cell_iterator neighbor = cell->neighbor(n);
+	if (neighbor.state() == IteratorState::valid)
+	  {
+	    ++n_neighbors;
+	    if (face_will_be_refined_by_neighbor(cell,n))
+	      ++count;
+	  }
+      }
+						       // clear coarsen flags if
+						       // either all existing
+						       // neighbors will be
+						       // refined or all but one
+						       // will be and the cell
+						       // is in the interior of
+						       // the domain
+    if (count==n_neighbors ||
+	(count>=n_neighbors-1 &&
+	 n_neighbors == GeometryInfo<dim>::faces_per_cell) )
+      {
+	for (unsigned int c=0; c<cell->n_children(); ++c)
+	  cell->child(c)->clear_coarsen_flag();
+
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (!cell->at_boundary(face)
+	      &&
+	      ( !cell->neighbor(face)->active() )
+	      && (cell_will_be_coarsened(cell->neighbor(face))) )
+	    possibly_do_not_produce_unrefined_islands<dim,spacedim>( cell->neighbor(face) );
+      }
+  }
+
+
 				   // see if the current cell needs to
 				   // be refined to avoid unrefined
 				   // islands.
@@ -12926,11 +12997,9 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 	cell->clear_coarsen_flag();
     }
 
-
   bool mesh_changed_in_this_loop = false;
   do
     {
-
 				       //////////////////////////////////////
 				       // STEP 1:
 				       //    do not coarsen a cell if 'most of
@@ -12947,47 +13016,12 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 
 	  for (cell=begin(); cell!=endc; ++cell)
 	    {
-	      if (!cell->active())
-		{
 						   // only do something if this
 						   // cell will be coarsened
-		  if (cell_will_be_coarsened(cell))
-		    {
-		      unsigned int n_neighbors=0;
-						       // count all neighbors
-						       // that will be refined
-						       // along the face of our
-						       // cell after the next
-						       // step
-		      unsigned int count=0;
-		      for (unsigned int n=0;
-			   n<GeometryInfo<dim>::faces_per_cell; ++n)
-			{
-			  const cell_iterator neighbor = cell->neighbor(n);
-			  if (neighbor.state() == IteratorState::valid)
-			    {
-			      ++n_neighbors;
-			      if (face_will_be_refined_by_neighbor(cell,n))
-				++count;
-			    }
-			}
-						       // clear coarsen flags if
-						       // either all existing
-						       // neighbors will be
-						       // refined or all but one
-						       // will be and the cell
-						       // is in the interior of
-						       // the domain
-		      if (count==n_neighbors ||
-			  (count>=n_neighbors-1 &&
-			   n_neighbors==
-			   GeometryInfo<dim>::faces_per_cell))
-			for (unsigned int c=0; c<cell->n_children(); ++c)
-			  cell->child(c)->clear_coarsen_flag();
-		    }
-		}  // if (!cell->active())
-	    }  // for (all cells)
-	} // if (smooth_grid & ...)
+	      if (!cell->active() && cell_will_be_coarsened(cell))
+		possibly_do_not_produce_unrefined_islands<dim,spacedim>(cell);
+	    }
+	}
 
 
 				       //////////////////////////////////////
@@ -13000,6 +13034,31 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 				       //    priority.
 				       //    If patch_level_1 is set, this will
 				       //    be automatically fulfilled.
+				       //
+				       //    there is one corner case
+				       //    to consider: if this is a
+				       //    distributed
+				       //    triangulation, there may
+				       //    be refined islands on the
+				       //    boundary of which we own
+				       //    only part (e.g. a single
+				       //    cell in the corner of a
+				       //    domain). the rest of the
+				       //    island is ghost cells and
+				       //    it *looks* like the area
+				       //    around it (artificial
+				       //    cells) are coarser but
+				       //    this is only because they
+				       //    may actually be equally
+				       //    fine on other
+				       //    processors. it's hard to
+				       //    detect this case but we
+				       //    can do the following:
+				       //    only set coarsen flags to
+				       //    remove this refined
+				       //    island if all cells we
+				       //    want to set flags on are
+				       //    locally owned
       if (smooth_grid & (eliminate_refined_inner_islands |
 			 eliminate_refined_boundary_islands) &&
 	  !(smooth_grid & patch_level_1))
@@ -13008,7 +13067,11 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 	  const cell_iterator endc = end();
 
 	  for (cell=begin(); cell!=endc; ++cell)
-	    if (!cell->active() || (cell->active() && cell->refine_flag_set()))
+	    if (!cell->active() ||
+		(cell->active() &&
+		 cell->refine_flag_set() &&
+		 !cell->is_ghost() &&
+		 !cell->is_artificial()))
 	      {
 						 // check whether all
 						 // children are
@@ -13027,7 +13090,9 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 		bool all_children_active = true;
 		if (!cell->active())
 		  for (unsigned int c=0; c<cell->n_children(); ++c)
-		    if (!cell->child(c)->active())
+		    if (!cell->child(c)->active() ||
+			cell->child(c)->is_ghost() ||
+			cell->child(c)->is_artificial())
 		      {
 			all_children_active = false;
 			break;

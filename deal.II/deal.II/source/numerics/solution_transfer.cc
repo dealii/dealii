@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim, typename VECTOR, class DH>
-SolutionTransfer<dim, VECTOR, DH>::SolutionTransfer(const DH &dof):
+SolutionTransfer<dim, VECTOR, DH>::SolutionTransfer(const DH &dof)
+		:
 		dof_handler(&dof, typeid(*this).name()),
 		n_dofs_old(0),
 		prepared_for(none)
@@ -67,9 +68,9 @@ void SolutionTransfer<dim, VECTOR, DH>::clear ()
 
 template<int dim, typename VECTOR, class DH>
 void SolutionTransfer<dim, VECTOR, DH>::prepare_for_pure_refinement()
-{ 
+{
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
-  Assert(prepared_for!=coarsening_and_refinement, 
+  Assert(prepared_for!=coarsening_and_refinement,
 	 ExcAlreadyPrepForCoarseAndRef());
 
   clear();
@@ -84,7 +85,7 @@ void SolutionTransfer<dim, VECTOR, DH>::prepare_for_pure_refinement()
   typename DH::active_cell_iterator cell = dof_handler->begin_active(),
 				    endc = dof_handler->end();
 
-  for (unsigned int i=0; cell!=endc; ++cell, ++i) 
+  for (unsigned int i=0; cell!=endc; ++cell, ++i)
     {
       indices_on_cell[i].resize(cell->get_fe().dofs_per_cell);
 				       // on each cell store the indices of the
@@ -100,7 +101,7 @@ void SolutionTransfer<dim, VECTOR, DH>::prepare_for_pure_refinement()
 }
 
 
-template<int dim, typename VECTOR, class DH>  
+template<int dim, typename VECTOR, class DH>
 void
 SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
 						  VECTOR       &out) const
@@ -122,10 +123,10 @@ SolutionTransfer<dim, VECTOR, DH>::refine_interpolate(const VECTOR &in,
     pointerstruct,
     cell_map_end=cell_map.end();
 
-  for (; cell!=endc; ++cell) 
+  for (; cell!=endc; ++cell)
     {
       pointerstruct=cell_map.find(std::make_pair(cell->level(),cell->index()));
-      
+
       if (pointerstruct!=cell_map_end)
 					 // this cell was refined or not
 					 // touched at all, so we can get
@@ -160,9 +161,9 @@ SolutionTransfer<dim, VECTOR, DH>::
 prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
-  Assert(!prepared_for!=coarsening_and_refinement, 
+  Assert(!prepared_for!=coarsening_and_refinement,
 	 ExcAlreadyPrepForCoarseAndRef());
-  
+
   const unsigned int in_size=all_in.size();
   Assert(in_size!=0, ExcNoInVectorsGiven());
 
@@ -185,7 +186,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
   typename DH::active_cell_iterator
     act_cell = dof_handler->begin_active(),
     endc = dof_handler->end();
-  for (; act_cell!=endc; ++act_cell) 
+  for (; act_cell!=endc; ++act_cell)
     {
       if (act_cell->coarsen_flag_set())
 	++n_cells_to_coarsen;
@@ -201,7 +202,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
   for (; cell!=endc; ++cell)
     if (!cell->active() && cell->child(0)->coarsen_flag_set())
       ++n_coarsen_fathers;
-  
+
   if (n_cells_to_coarsen)
     Assert(n_cells_to_coarsen>=2*n_coarsen_fathers, ExcInternalError());
 
@@ -211,18 +212,18 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
   std::vector<std::vector<unsigned int> >
     (n_cells_to_stay_or_refine)
     .swap(indices_on_cell);
-  
+
   std::vector<std::vector<Vector<typename VECTOR::value_type> > >
     (n_coarsen_fathers,
      std::vector<Vector<typename VECTOR::value_type> > (in_size))
     .swap(dof_values_on_cell);
-  
+
 				   // we need counters for
 				   // the 'to_stay_or_refine' cells 'n_sr' and
 				   // the 'coarsen_fathers' cells 'n_cf',
   unsigned int n_sr=0, n_cf=0;
-  cell = dof_handler->begin();  
-  for (; cell!=endc; ++cell) 
+  cell = dof_handler->begin();
+  for (; cell!=endc; ++cell)
     {
       if (cell->active() && !cell->coarsen_flag_set())
 	{
@@ -250,7 +251,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
 	  std::vector<Vector<typename VECTOR::value_type> >(in_size,
 								Vector<typename VECTOR::value_type>(dofs_per_cell))
 	    .swap(dof_values_on_cell[n_cf]);
-      
+
 	  for (unsigned int j=0; j<in_size; ++j)
 	    {
 					       // store the data of each of
@@ -307,10 +308,10 @@ interpolate (const std::vector<VECTOR> &all_in,
 
   typename DH::cell_iterator cell = dof_handler->begin(),
 			     endc = dof_handler->end();
-  for (; cell!=endc; ++cell) 
+  for (; cell!=endc; ++cell)
     {
       pointerstruct=cell_map.find(std::make_pair(cell->level(),cell->index()));
-      
+
       if (pointerstruct!=cell_map_end)
 	{
 	  const std::vector<unsigned int> * const indexptr
@@ -320,7 +321,7 @@ interpolate (const std::vector<VECTOR> &all_in,
 	    =pointerstruct->second.dof_values_ptr;
 
 	  const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-	  
+
 					   // cell stayed or is
 					   // refined
 	  if (indexptr)

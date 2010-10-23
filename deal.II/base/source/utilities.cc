@@ -423,6 +423,40 @@ namespace Utilities
 #endif
 
 
+    
+    void get_memory_stats (MemoryStats & stats)
+    {
+      stats.VmPeak = stats.VmSize = stats.VmHWM = stats.VmRSS = 0;
+
+				       // parsing /proc/self/stat would be a
+				       // lot easier, but it does not contain
+				       // VmHWM, so we use /status instead.
+#if defined(__linux__)  
+      std::ifstream file("/proc/self/status");
+      std::string line;
+      std::string name;
+      while (!file.eof())
+	{
+	  file >> name;
+	  if (name == "VmPeak:")
+	    file >> stats.VmPeak;
+	  else if (name == "VmSize:")
+	    file >> stats.VmSize;
+	  else if (name == "VmHWM:")
+	    file >> stats.VmHWM;
+	  else if (name == "VmRSS:")
+	    {
+	      file >> stats.VmRSS;
+	      break; //this is always the last entry
+	    }
+	  
+	  getline(file, line);
+	}
+#endif
+    }
+    
+    
+
     std::string get_hostname ()
     {
       const unsigned int N=1024;
@@ -516,6 +550,82 @@ namespace Utilities
     }
 
 
+    namespace 
+    {
+				       // custom MIP_Op for
+				       // calculate_collective_mpi_min_max_avg
+      void max_reduce ( const void * in_lhs_,
+			void * inout_rhs_,
+			int * len,
+			MPI_Datatype * )
+      {
+	const MinMaxAvg * in_lhs = static_cast<const MinMaxAvg*>(in_lhs_);
+	MinMaxAvg * inout_rhs = static_cast<MinMaxAvg*>(inout_rhs_);
+	
+	Assert(*len==1, ExcInternalError());
+	
+	inout_rhs->sum += in_lhs->sum;
+	if (inout_rhs->min>in_lhs->min)
+	  {
+	    inout_rhs->min = in_lhs->min;
+	    inout_rhs->min_index = in_lhs->min_index;
+	  }
+	else if (inout_rhs->min == in_lhs->min)
+	  { // choose lower cpu index when tied to make operator cumutative
+	    if (inout_rhs->min_index > in_lhs->min_index)
+	      inout_rhs->min_index = in_lhs->min_index;
+	  }
+	
+	if (inout_rhs->max < in_lhs->max)
+	  {
+	  inout_rhs->max = in_lhs->max;
+	  inout_rhs->max_index = in_lhs->max_index;
+	  }
+	else if (inout_rhs->max == in_lhs->max)
+	  { // choose lower cpu index when tied to make operator cumutative
+	    if (inout_rhs->max_index > in_lhs->max_index)
+	      inout_rhs->max_index = in_lhs->max_index;
+	  }
+      }
+    }
+    
+    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
+					      double my_value,
+					      MinMaxAvg & result)
+    {
+      unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
+      unsigned int numproc = dealii::Utilities::System::get_n_mpi_processes(mpi_communicator);
+      
+      MPI_Op op;
+      int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      
+      MinMaxAvg in;
+      in.sum = in.min = in.max = my_value;
+      in.min_index = in.max_index = my_id;
+      
+      MPI_Datatype type;
+      int lengths[]={3,2};
+      MPI_Aint displacements[]={0,offsetof(MinMaxAvg, min_index)};
+      MPI_Datatype types[]={MPI_DOUBLE, MPI_INT};
+      
+      ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+      
+      ierr = MPI_Type_commit(&type);
+      ierr = MPI_Allreduce ( &in, &result, 1, type, op, mpi_communicator );
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+	  
+      ierr = MPI_Type_free (&type);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+	  
+      ierr = MPI_Op_free(&op);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+      result.avg = result.sum / numproc;
+    }
+
+    
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
 						  const std::vector<unsigned int> & destinations)
@@ -605,7 +715,18 @@ namespace Utilities
       return 0;
     }
 
-
+    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
+					      double my_value,
+					      MinMaxAvg & result)
+    {
+      result.sum = my_value;
+      result.avg = my_value;
+      result.min = my_value;
+      result.max = my_value;
+      result.min_index = 0;
+      result.max_index = 0;      
+    }
+    
 
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
     {

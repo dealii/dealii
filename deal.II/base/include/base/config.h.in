@@ -251,6 +251,10 @@
 /* Defined if a MUMPS installation was found and is going to be used */
 #undef DEAL_II_USE_MUMPS
 
+/* Defined if we are to use the p4est library to distribute meshes on a
+   cluster computer. */
+#undef DEAL_II_USE_P4EST
+
 /* Defined if a PETSc installation was found and is going to be used */
 #undef DEAL_II_USE_PETSC
 

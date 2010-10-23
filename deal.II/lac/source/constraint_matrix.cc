@@ -1924,7 +1924,11 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
       vec(it->line) = new_value;
     }
 
-  vec.compress ();
+				   // some processes might not apply
+				   // constraints, so we need to explicitly
+				   // state, that the others are doing an
+				   // insert here:
+  vec.compress (Insert);
 }
 
 
@@ -2018,6 +2022,9 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 	}
     }
 
+				   // force every processor to write something
+  unsigned int idx = vec.block(0).local_range().first;
+  vec(idx) = vec(idx);
   vec.compress ();
 }
 

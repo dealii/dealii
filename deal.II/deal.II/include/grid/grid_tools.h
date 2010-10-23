@@ -68,7 +68,7 @@ class GridTools
 				      * Same function, but for 1d.
 				      */
     static
-    double diameter (const Triangulation<1> &tria); 
+    double diameter (const Triangulation<1> &tria);
 				     /**
 				      * Same function, but for 1d, 2sd.
 				      */
@@ -95,7 +95,7 @@ class GridTools
     static
     double cell_measure (const std::vector<Point<dim> > &all_vertices,
 			 const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
- 
+
 				     /**
 				      * Remove vertices that are not
 				      * referenced by any of the
@@ -124,7 +124,7 @@ class GridTools
 				      * by that class, so we have to
 				      * eliminate unused vertices
 				      * beforehand.
-				      * 
+				      *
 				      * Not implemented for the
 				      * codimension one case.
 				      */
@@ -133,7 +133,7 @@ class GridTools
     void delete_unused_vertices (std::vector<Point<spacedim> >    &vertices,
 				 std::vector<CellData<dim> > &cells,
 				 SubCellData                 &subcelldata);
-    
+
 				     /**
 				      * Remove vertices that are duplicated,
 				      * due to the input of a structured grid,
@@ -164,7 +164,7 @@ class GridTools
 				     SubCellData                 &subcelldata,
 				     std::vector<unsigned int>   &considered_vertices,
 				     const double                 tol=1e-12);
-    
+
 				     /**
 				      * Transform the vertices of the
 				      * given triangulation by
@@ -362,7 +362,7 @@ class GridTools
                                       * the unit cell. In this case,
                                       * even points at a very small
                                       * distance outside the unit cell
-                                      * are allowed. 
+                                      * are allowed.
                                       *
                                       * If a point lies on the
                                       * boundary of two or more cells,
@@ -379,7 +379,7 @@ class GridTools
                                       * outside an actual unit cell,
                                       * due to numerical roundoff.
                                       * Therefore, the point returned
-                                      * by this function should 
+                                      * by this function should
                                       * be projected onto the unit cell,
                                       * using GeometryInfo::project_to_unit_cell.
                                       * This is not automatically performed
@@ -445,7 +445,7 @@ class GridTools
     template <class Container>
     static void
     get_active_neighbors (const typename Container::active_cell_iterator        &cell,
-			  std::vector<typename Container::active_cell_iterator> &active_neighbors);    
+			  std::vector<typename Container::active_cell_iterator> &active_neighbors);
 
 				     /**
 				      * Produce a sparsity pattern in which
@@ -462,7 +462,7 @@ class GridTools
     static void
     get_face_connectivity_of_cells (const Triangulation<dim, spacedim> &triangulation,
 				    SparsityPattern                    &connectivity);
-    
+
                                      /**
                                       * Use the METIS partitioner to generate
                                       * a partitioning of the active cells
@@ -571,7 +571,7 @@ class GridTools
     partition_triangulation (const unsigned int     n_partitions,
 			     const SparsityPattern &cell_connection_graph,
 			     Triangulation<dim,spacedim>    &triangulation);
-    
+
                                      /**
                                       * For each active cell, return in the
                                       * output array to which subdomain (as
@@ -590,16 +590,21 @@ class GridTools
     template <int dim, int spacedim>
     static void
     get_subdomain_association (const Triangulation<dim, spacedim>  &triangulation,
-                               std::vector<unsigned int> &subdomain);
+                               std::vector<types::subdomain_id_t> &subdomain);
 
                                      /**
                                       * Count how many cells are uniquely
                                       * associated with the given @p subdomain
                                       * index.
                                       *
-                                      * This function will generate an
-                                      * exception if there are no cells with
-                                      * the given @p subdomain index.
+                                      * This function may return zero
+                                      * if there are no cells with the
+                                      * given @p subdomain index. This
+                                      * can happen, for example, if
+                                      * you try to partition a coarse
+                                      * mesh into more partitions (one
+                                      * for each processor) than there
+                                      * are cells in the mesh.
 				      *
 				      * This function returns the number of
 				      * cells associated with one
@@ -612,7 +617,7 @@ class GridTools
     template <int dim, int spacedim>
     static unsigned int
     count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
-                                            const unsigned int        subdomain);
+                                            const types::subdomain_id_t         subdomain);
 
                                      /**
                                       * Given two mesh containers
@@ -789,7 +794,7 @@ class GridTools
     typename Triangulation<dim,spacedim>::DistortedCellList
     fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
 				  Triangulation<dim,spacedim> &triangulation);
-    
+
                                      /**
                                       * Exception
                                       */
@@ -849,7 +854,7 @@ void GridTools::transform (const Predicate    &predicate,
 {
   Assert (triangulation.n_levels() == 1,
 	  ExcTriangulationHasBeenRefined());
-  
+
   std::vector<bool> treated_vertices (triangulation.n_vertices(),
 				      false);
 
@@ -880,7 +885,7 @@ std::vector<typename DH::active_cell_iterator>
 GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
 {
   std::vector<typename DH::active_cell_iterator> child_cells;
-  
+
   if (cell->has_children())
     {
       for (unsigned int child=0;
@@ -900,7 +905,7 @@ GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
 }
 
 
-  
+
 #if deal_II_dimension == 1
 
 template <class Container>
@@ -923,7 +928,7 @@ GridTools::get_active_neighbors(const typename Container::active_cell_iterator  
 	  {
 	    while (neighbor_child->has_children())
 	      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
-	
+
 	    Assert (neighbor_child->neighbor(n==0 ? 1 : 0)==cell,
 		    ExcInternalError());
 	  }

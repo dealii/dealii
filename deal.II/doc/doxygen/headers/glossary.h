@@ -426,13 +426,14 @@
  * <dd>The "distributed computing paper" is a paper by W. Bangerth,
  * C. Burstedde, T. Heister and M. Kronbichler titled "Algorithms and Data
  * Structures for Massively Parallel Generic Finite Element Codes" that
- * described the implementation of parallel distributed computing in deal.II,
+ * describes the implementation of parallel distributed computing in deal.II,
  * i.e. computations where not only the linear system is split onto different
  * machines as in, for example, step-18, but also the Triangulation and
  * DoFHandler objects. In essence, it is a guide to the parallel::distributed
  * namespace.
  *
- * The paper is currently in preparation.
+ * The paper is submitted to the ACM Transactions on Mathematical Software
+ * (ACM TOMS).
  * </dd>
  *
  *
@@ -608,21 +609,21 @@ Article{JK10,
  * polynomials. Let us give some examples:
  *
  * <table><tr>
- * <th>Element</th>
- * <th>Function space</th>
- * <th>Node values</th></tr>
- * <tr><th>FE_Q, FE_DGQ</th>
- * <td><i>Q<sub>k</sub></i></td>
- * <td>values in support points</td></tr>
- * <tr><th>FE_DGP</th>
- * <td><i>P<sub>k</sub></i></td>
- * <td>moments with respect to Legendre polynomials</td></tr>
- * <tr><th>FE_RaviartThomas (2d)</th>
- * <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
- * <td>moments on edges and in the interior</td></tr>
- * <tr><th>FE_RaviartThomasNodal</th>
- * <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
- * <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
+ *   <th>Element</th>
+ *   <th>Function space</th>
+ *   <th>Node values</th></tr>
+ *   <tr><th>FE_Q, FE_DGQ</th>
+ *     <td><i>Q<sub>k</sub></i></td>
+ *     <td>values in support points</td></tr>
+ *   <tr><th>FE_DGP</th>
+ *     <td><i>P<sub>k</sub></i></td>
+ *     <td>moments with respect to Legendre polynomials</td></tr>
+ *   <tr><th>FE_RaviartThomas (2d)</th>
+ *     <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
+ *     <td>moments on edges and in the interior</td></tr>
+ *   <tr><th>FE_RaviartThomasNodal</th>
+ *     <td><i>Q<sub>k+1,k</sub> x Q<sub>k,k+1</sub></i></td>
+ *     <td>Gauss points on edges(faces) and anisotropic Gauss points in the interior</td></tr>
  * </table>
  *
  * <dt class="glossary">@anchor GlossPrimitive <b>Primitive finite
@@ -633,7 +634,7 @@ Article{JK10,
  * a vector-valued element has exactly one nonzero component if an element is
  * primitive. This includes, in particular, all scalar elements as well as
  * vector-valued elements assembled via the FESystem class from other
- * primitive (for example scalar) elements as shown in step-8, 
+ * primitive (for example scalar) elements as shown in step-8,
  * step-29, step-22 and several others. On the other hand,
  * the FE_RaviartThomas class used in step-20 and step-21, or the FE_Nedelec
  * class provide non-primitive finite elements because there, each
@@ -660,16 +661,15 @@ Article{JK10,
  * cell is associated with.
  *
  * For programs that are parallelized based on MPI but where each processor
- * stores the entire triangulation (as in, for example, step-18
- * or step-32, subdomain ids are assigned to cells by
+ * stores the entire triangulation (as in, for example, step-18, but not in
+ * step-32), subdomain ids are assigned to cells by
  * partitioning a mesh, and each MPI process then only works on those cells it
- * "owns", i.e. that belong to a subdomain that it is associated with
+ * "owns", i.e. that belong to a subdomain that the processor is associated with
  * (traditionally, this is the case for the subdomain id whose numerical value
  * coincides with the rank of the MPI process within the MPI
  * communicator). Partitioning is typically done using the
  * GridTools::partition() function, but any other method can also be used to
- * do this though most simple ideas will likely lead to less well balanced
- * numbers of degrees of freedom on the various subdomains.
+ * do this.
  *
  * On the other hand, for programs that are parallelized using MPI but
  * where meshes are held distributed across several processors using

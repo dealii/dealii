@@ -16,6 +16,7 @@
 
 #ifdef DEAL_II_USE_PETSC
 
+#  include <base/memory_consumption.h>
 #  include <lac/petsc_vector.h>
 #  include <lac/petsc_parallel_vector.h>
 #  include <cmath>
@@ -43,7 +44,7 @@ namespace PETScWrappers
       if (dynamic_cast<const PETScWrappers::Vector *>(&vector) != 0)
         {
  #if (PETSC_VERSION_MAJOR <= 2) && (PETSC_VERSION_MINOR < 3)
-          PetscScalar *ptr;
+         PetscScalar *ptr;
           int ierr
             = VecGetArray (vector.vector, &ptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -1053,12 +1054,24 @@ namespace PETScWrappers
   }
 
 
-
   unsigned int
   VectorBase::memory_consumption () const
-  {
-    AssertThrow(false, ExcNotImplemented() );
-    return 0;
+  {    
+    unsigned int mem = sizeof(Vec)+sizeof(LastAction::Values)
+      +MemoryConsumption::memory_consumption(ghosted)
+      +MemoryConsumption::memory_consumption(ghost_indices);
+
+				     // TH: I am relatively sure that PETSc is
+				     // storing the local data in a contigious
+				     // block without indices:
+    mem += local_size()*sizeof(PetscScalar);
+				     // assume that PETSc is storing one index
+				     // and one double per ghost element
+    if (ghosted)
+      mem += ghost_indices.n_elements()*(sizeof(PetscScalar)+sizeof(int));
+
+				     //TODO[TH]: size of constant memory for PETSc?
+    return mem;
   }
 
 
@@ -1123,8 +1136,8 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
-}
-
+  }
+  
 
   
 }

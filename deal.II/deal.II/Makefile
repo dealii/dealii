@@ -214,7 +214,7 @@ Makefile.dep: $(cc-files) $(h-files) \
 		$(inst-files) \
 		Makefile $D/common/Make.global_options
 	@echo "===================================== Remaking deal.II/Makefile"
-	@(for dir in dofs fe grid hp multigrid numerics ; do \
+	@(for dir in dofs fe grid hp multigrid numerics distributed ; do \
 		$D/common/scripts/make_dependencies $(INCLUDE) "-B\$$(LIBDIR)" `echo $D/deal.II/source/$$dir/*cc` \
 		| $(PERL) -p -e 's!LIBDIR\)/(.*):!LIBDIR)/DIM_PLACEHOLDER/$$1:!g;' \
 		| $(PERL) -pe 's!((\.g)?.$(OBJEXT)):!_DIM_PLACEHOLDER$$1:!g;' \

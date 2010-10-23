@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -302,6 +302,10 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
   for (typename DH::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
+      Assert (!cell->is_ghost() &&
+	      !cell->is_artificial(),
+	      ExcNotImplemented());
+
       Assert (patch != patches.end(), ExcInternalError());
 
 				       // first fill in the vertices of the patch

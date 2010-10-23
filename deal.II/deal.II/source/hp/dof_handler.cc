@@ -31,6 +31,15 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace parallel
+{
+  namespace distributed
+  {
+    template <int, int> class Triangulation;
+  }
+}
+
+
 namespace internal
 {
   namespace hp
@@ -1587,9 +1596,14 @@ namespace hp
   DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
                   :
                   tria(&tria, typeid(*this).name()),
-		  faces (NULL),
-                  used_dofs (0)
+		  faces (NULL)
   {
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+	     (&tria)
+	     == 0),
+	    ExcMessage ("The given triangulation is parallel distributed but "
+			"this class does not currently support this."));
+    
     create_active_fe_table ();
     tria.add_refinement_listener (*this);
   }
@@ -2924,7 +2938,7 @@ namespace hp
                         MemoryConsumption::memory_consumption (tria) +
                         MemoryConsumption::memory_consumption (levels) +
                         MemoryConsumption::memory_consumption (*faces) +
-                        MemoryConsumption::memory_consumption (used_dofs) +
+                        MemoryConsumption::memory_consumption (number_cache) +
                         MemoryConsumption::memory_consumption (vertex_dofs) +
                         MemoryConsumption::memory_consumption (vertex_dofs_offsets) +
                         MemoryConsumption::memory_consumption (has_children));
@@ -3491,7 +3505,7 @@ namespace hp
 	  = internal::hp::DoFHandler::Implementation::template distribute_dofs_on_cell<spacedim> (cell,
 							       next_free_dof);
 
-      used_dofs = next_free_dof;
+      number_cache.n_global_dofs = next_free_dof;
     }
 
 
@@ -3505,7 +3519,7 @@ namespace hp
 				     // lower-dimensional objects
 				     // where elements come together
     std::vector<unsigned int>
-      constrained_indices (used_dofs, numbers::invalid_unsigned_int);
+      constrained_indices (number_cache.n_global_dofs, numbers::invalid_unsigned_int);
     compute_vertex_dof_identities (constrained_indices);
     compute_line_dof_identities (constrained_indices);
     compute_quad_dof_identities (constrained_indices);
@@ -3514,9 +3528,9 @@ namespace hp
 				     // new numbers to those which are
 				     // not constrained
     std::vector<unsigned int>
-      new_dof_indices (used_dofs, numbers::invalid_unsigned_int);
+      new_dof_indices (number_cache.n_global_dofs, numbers::invalid_unsigned_int);
     unsigned int next_free_dof = 0;
-    for (unsigned int i=0; i<used_dofs; ++i)
+    for (unsigned int i=0; i<number_cache.n_global_dofs; ++i)
       if (constrained_indices[i] == numbers::invalid_unsigned_int)
 	{
 	  new_dof_indices[i] = next_free_dof;
@@ -3526,7 +3540,7 @@ namespace hp
 				     // then loop over all those that
 				     // are constrained and record the
 				     // new dof number for those:
-    for (unsigned int i=0; i<used_dofs; ++i)
+    for (unsigned int i=0; i<number_cache.n_global_dofs; ++i)
       if (constrained_indices[i] != numbers::invalid_unsigned_int)
 	{
 	  Assert (new_dof_indices[constrained_indices[i]] !=
@@ -3536,7 +3550,7 @@ namespace hp
 	  new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
 	}
 
-    for (unsigned int i=0; i<used_dofs; ++i)
+    for (unsigned int i=0; i<number_cache.n_global_dofs; ++i)
       {
 	Assert (new_dof_indices[i] != numbers::invalid_unsigned_int,
 		ExcInternalError());
@@ -3549,8 +3563,23 @@ namespace hp
 				     // used dof indices
     renumber_dofs_internal (new_dof_indices, internal::int2type<dim>());
 
-    used_dofs = next_free_dof;
+				     // now set the elements of the
+				     // number cache appropriately
+    number_cache.n_global_dofs        = next_free_dof;
+    number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
 
+    number_cache.locally_owned_dofs
+      = IndexSet (number_cache.n_global_dofs);
+    number_cache.locally_owned_dofs.add_range (0,
+					       number_cache.n_global_dofs);
+
+    number_cache.n_locally_owned_dofs_per_processor
+      = std::vector<unsigned int> (1,
+				   number_cache.n_global_dofs);
+
+    number_cache.locally_owned_dofs_per_processor
+      = std::vector<IndexSet> (1,
+			       number_cache.locally_owned_dofs);
 
                                      // finally restore the user flags
     const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);

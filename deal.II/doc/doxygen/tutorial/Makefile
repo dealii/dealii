@@ -44,7 +44,7 @@ all: $(example-doxygen) toc.html
 #
 # make steps.png
 #
-#  by hand. This way, we avoid testing for neato during
+#  by hand. This way, we avoid testing for dot during
 #  configuration. The map only needs to be generated after changes in
 #  the structure of the tutorials.
 toc.html: steps.cmapx toc.html.in
@@ -52,13 +52,13 @@ toc.html: steps.cmapx toc.html.in
 	@perl make_toc.pl > toc.html
 
 # generate dot file
-steps.dot: steps.pl $D/examples/*/doc/tooltip
+steps.dot: steps.pl $D/examples/*/doc/tooltip $D/examples/*/doc/builds-on
 	@echo ================== Making $@
 	@perl $< > $@
 
 steps.png: steps.dot
 	@echo ================== Making $@
-	@neato -Tpng -Tcmapx -O $<
+	@dot -Tpng -Tcmapx -O $<
 	@mv steps.dot.png steps.png
 	@mv steps.dot.cmapx steps.cmapx
 

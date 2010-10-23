@@ -970,8 +970,8 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   for (unsigned int l=0; l<this->dofs->get_tria().n_levels(); ++l)
     {
       unsigned int max_index = 0;
-      for (cell_iterator cell=first_cell(); cell != this->dofs->end();
-           cell = next_cell(cell))
+      for (cell_iterator cell=first_locally_owned_cell(); cell != this->dofs->end();
+           cell = next_locally_owned_cell(cell))
         if (static_cast<unsigned int>(cell->level()) == l)
           max_index = std::max (max_index,
                                 static_cast<unsigned int>(cell->index()));
@@ -983,19 +983,19 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   std::vector<std::pair<cell_iterator, unsigned int> > all_cells;
   {
 				     // set the index of the first
-				     // cell. if first_cell/next_cell
+				     // cell. if first_locally_owned_cell/next_locally_owned_cell
 				     // returns non-active cells, then
 				     // the index is not usable
 				     // anyway, but otherwise we
 				     // should keep track where we are
     unsigned int index;
-    if (first_cell()->has_children())
+    if (first_locally_owned_cell()->has_children())
       index = 0;
     else
       index = std::distance (this->dofs->begin_active(),
-			     active_cell_iterator(first_cell()));
-    for (cell_iterator cell=first_cell(); cell != this->dofs->end();
-	 cell = next_cell(cell))
+			     active_cell_iterator(first_locally_owned_cell()));
+    for (cell_iterator cell=first_locally_owned_cell(); cell != this->dofs->end();
+	 cell = next_locally_owned_cell(cell))
       {
 	Assert (static_cast<unsigned int>(cell->level()) <
 		cell_to_patch_index_map.size(),
@@ -1020,10 +1020,10 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 					 // ignore it. same if we are
 					 // at the end of the range
 	if (!cell->has_children() &&
-	    next_cell(cell) != this->dofs->end() &&
-	    !next_cell(cell)->has_children())
+	    next_locally_owned_cell(cell) != this->dofs->end() &&
+	    !next_locally_owned_cell(cell)->has_children())
 	  index += std::distance (active_cell_iterator(cell),
-				  active_cell_iterator(next_cell(cell)));
+				  active_cell_iterator(next_locally_owned_cell(cell)));
       }
   }
 
@@ -1114,6 +1114,41 @@ DataOut<dim,DH>::next_cell (const typename DataOut<dim,DH>::cell_iterator &cell)
   typename DH::active_cell_iterator active_cell = cell;
   ++active_cell;
   return active_cell;
+}
+
+
+
+template <int dim, class DH>
+typename DataOut<dim,DH>::cell_iterator
+DataOut<dim,DH>::first_locally_owned_cell ()
+{
+  typename DataOut<dim,DH>::cell_iterator
+    cell = this->dofs->begin_active ();
+
+				   // skip cells if the current one
+				   // has no children (is active) and
+				   // is a ghost or artificial cell
+  while ((cell != this->dofs->end()) &&
+	 (cell->has_children() == false) &&
+	 (cell->is_ghost() || cell->is_artificial()))
+    cell = next_cell(cell);
+
+  return cell;
+}
+
+
+
+template <int dim, class DH>
+typename DataOut<dim,DH>::cell_iterator
+DataOut<dim,DH>::next_locally_owned_cell (const typename DataOut<dim,DH>::cell_iterator &old_cell)
+{
+  typename DataOut<dim,DH>::cell_iterator
+    cell = next_cell(old_cell);
+  while ((cell != this->dofs->end()) &&
+	 (cell->has_children() == false) &&
+	 (cell->is_ghost() || cell->is_artificial()))
+    cell = next_cell(cell);
+  return cell;
 }
 
 

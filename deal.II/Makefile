@@ -267,6 +267,7 @@ build-test-do:
 
 .PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
         online-doc doc printable-doc tex-doc contrib \
+	contrib-functionparser \
         clean clean-contrib clean-base clean-lac clean-dealII \
 	clean-doc clean-examples clean-lib clean-tests clean-common-scripts \
 	distclean \

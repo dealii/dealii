@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,7 +68,7 @@ namespace TrilinosWrappers
  * to avoid using the wrong data, you need to call Vector::compress()
  * before you actually use the vectors.
  *
-  * <h3>Parallel communication model</h3>
+ * <h3>Parallel communication model</h3>
  *
  * The parallel functionality of Trilinos is built on top of the Message
  * Passing Interface (MPI). MPI's communication model is built on

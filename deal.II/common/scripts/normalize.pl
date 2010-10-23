@@ -1,7 +1,7 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 2001, 2003, 2005, the deal.II authors
+# Copyright (C) 2001, 2003, 2005, 2010, the deal.II authors
 #
 # Remove insignificant volatile data from output files of tests
 #
@@ -48,3 +48,7 @@ s/-0\.00/0.00/g;
 
 #s/value.*//;
 #s/with residual.*//;
+
+
+# remove deal.II debug output
+s/^DEAL.*::_.*\n//g;

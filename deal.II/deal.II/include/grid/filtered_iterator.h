@@ -48,7 +48,7 @@ namespace IteratorFilters
 				    *
 				    * @ingroup Iterators
 				    */
-  class Active 
+  class Active
   {
     public:
 				       /**
@@ -59,7 +59,7 @@ namespace IteratorFilters
       template <class Iterator>
       bool operator () (const Iterator &i) const;
   };
-  
+
 				   /**
 				    * Filter that evaluates to true if
 				    * either the iterator points to an
@@ -81,7 +81,7 @@ namespace IteratorFilters
       template <class Iterator>
       bool operator () (const Iterator &i) const;
   };
-  
+
 
 				   /**
 				    * Filter that evaluates to true if
@@ -106,7 +106,7 @@ namespace IteratorFilters
       bool operator () (const Iterator &i) const;
   };
 
-  
+
 				   /**
 				    * Filter for iterators that
 				    * evaluates to true if either the
@@ -117,7 +117,7 @@ namespace IteratorFilters
 				    *
 				    * @ingroup Iterators
 				    */
-  class LevelEqualTo 
+  class LevelEqualTo
   {
     public:
 				       /**
@@ -161,7 +161,7 @@ namespace IteratorFilters
 				    *
 				    * @ingroup Iterators
 				    */
-  class SubdomainEqualTo 
+  class SubdomainEqualTo
   {
     public:
 				       /**
@@ -170,7 +170,7 @@ namespace IteratorFilters
 					* shall have to be evaluated
 					* to true.
 					*/
-      SubdomainEqualTo (const unsigned int subdomain_id);
+      SubdomainEqualTo (const types::subdomain_id_t subdomain_id);
 
 				       /**
 					* Evaluation operator. Returns
@@ -188,7 +188,7 @@ namespace IteratorFilters
 					* Stored value to compare the
 					* subdomain with.
 					*/
-      const unsigned int subdomain_id;
+      const types::subdomain_id_t subdomain_id;
   };
 }
 
@@ -245,7 +245,7 @@ namespace IteratorFilters
  *   {
  *     return (static_cast<unsigned int>(c->level()) == level);
  *   };
- * @endcode 
+ * @endcode
  * then
  * @code
  *   std::bind2nd (std::ptr_fun(&level_equal_to<active_cell_iterator>), 3)
@@ -257,7 +257,7 @@ namespace IteratorFilters
  *
  * Finally, classes can be predicates. The following class is one:
  * @code
- *   class Active 
+ *   class Active
  *   {
  *     public:
  *       template <class Iterator>
@@ -272,7 +272,7 @@ namespace IteratorFilters
  *   class SubdomainEqualTo
  *   {
  *     public:
- *       SubdomainEqualTo (const unsigned int subdomain_id)
+ *       SubdomainEqualTo (const types::subdomain_id_t subdomain_id)
  *                   : subdomain_id (subdomain_id) {};
  *
  *       template <class Iterator>
@@ -281,7 +281,7 @@ namespace IteratorFilters
  *       }
  *
  *     private:
- *       const unsigned int subdomain_id;
+ *       const types::subdomain_id_t subdomain_id;
  *   };
  * @endcode
  * Objects like <code>SubdomainEqualTo(3)</code> can then be used as predicates.
@@ -432,7 +432,7 @@ class FilteredIterator : public BaseIterator
 				      * will automatically be advanced
 				      * to the first cell that has.
 				      */
-    template <typename Predicate>    
+    template <typename Predicate>
     FilteredIterator (Predicate           p,
 		      const BaseIterator &bi);
 
@@ -447,7 +447,7 @@ class FilteredIterator : public BaseIterator
 				      * Destructor.
 				      */
     ~FilteredIterator ();
-    
+
 				     /**
 				      * Assignment operator. Copy the
 				      * iterator value of the
@@ -490,7 +490,7 @@ class FilteredIterator : public BaseIterator
 				      */
     FilteredIterator &
     set_to_next_positive (const BaseIterator &bi);
-    
+
 				     /**
 				      * As above, but search for the
 				      * previous iterator from @p bi
@@ -507,7 +507,7 @@ class FilteredIterator : public BaseIterator
 				      */
     FilteredIterator &
     set_to_previous_positive (const BaseIterator &bi);
-    
+
 				     /**
 				      * Compare for equality of the
 				      * underlying iterator values of
@@ -559,7 +559,7 @@ class FilteredIterator : public BaseIterator
 				      *
 				      * We do not compare the
 				      * predicates.
-				      */    
+				      */
     bool operator <  (const FilteredIterator &fi) const;
 
 				     /**
@@ -618,7 +618,7 @@ class FilteredIterator : public BaseIterator
 		    << "The element " << arg1
 		    << " with which you want to compare or which you want to"
 		    << " assign from is invalid since it does not satisfy the predicate.");
-    
+
   private:
 
 				     /**
@@ -705,7 +705,7 @@ class FilteredIterator : public BaseIterator
 					  * type of this pointer.
 					  */
 	virtual PredicateBase * clone () const;
-	
+
       private:
 					 /**
 					  * Copy of the predicate.
@@ -830,7 +830,7 @@ FilteredIterator<BaseIterator>::
 operator = (const BaseIterator &bi)
 {
   Assert ((bi.state() != IteratorState::valid) || (*predicate)(bi),
-	  ExcInvalidElement(bi));  
+	  ExcInvalidElement(bi));
   BaseIterator::operator = (bi);
   return *this;
 }
@@ -847,7 +847,7 @@ set_to_next_positive (const BaseIterator &bi)
   while ((this->state() == IteratorState::valid) &&
 	 ( ! (*predicate)(*this)))
     BaseIterator::operator++ ();
-  
+
   return *this;
 }
 
@@ -863,7 +863,7 @@ set_to_previous_positive (const BaseIterator &bi)
   while ((this->state() == IteratorState::valid) &&
 	 ( ! (*predicate)(*this)))
     BaseIterator::operator-- ();
-  
+
   return *this;
 }
 
@@ -964,7 +964,7 @@ FilteredIterator<BaseIterator>::
 operator ++ (int)
 {
   const FilteredIterator old_state = *this;
-  
+
   if (this->state() == IteratorState::valid)
     do
       BaseIterator::operator++ ();
@@ -999,7 +999,7 @@ FilteredIterator<BaseIterator>::
 operator -- (int)
 {
   const FilteredIterator old_state = *this;
-  
+
   if (this->state() == IteratorState::valid)
     do
       BaseIterator::operator-- ();
@@ -1043,7 +1043,7 @@ clone () const
 
 
 
-namespace IteratorFilters 
+namespace IteratorFilters
 {
 
 // ---------------- IteratorFilters::Active ---------
@@ -1079,7 +1079,7 @@ namespace IteratorFilters
   }
 
 
-// ---------------- IteratorFilters::LevelEqualTo ---------  
+// ---------------- IteratorFilters::LevelEqualTo ---------
   inline
   LevelEqualTo::LevelEqualTo (const unsigned int level)
 		  :
@@ -1100,7 +1100,7 @@ namespace IteratorFilters
 
 // ---------------- IteratorFilters::SubdomainEqualTo ---------
   inline
-  SubdomainEqualTo::SubdomainEqualTo (const unsigned int subdomain_id)
+  SubdomainEqualTo::SubdomainEqualTo (const types::subdomain_id_t subdomain_id)
 		  :
 		  subdomain_id (subdomain_id)
   {}
@@ -1112,7 +1112,7 @@ namespace IteratorFilters
   bool
   SubdomainEqualTo::operator () (const Iterator &i) const
   {
-    return (static_cast<unsigned int>(i->subdomain_id()) == subdomain_id);
+    return (i->subdomain_id() == subdomain_id);
   }
 }
 

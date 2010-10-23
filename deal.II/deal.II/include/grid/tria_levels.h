@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -75,7 +75,7 @@ namespace internal
                                           * coarsened.
                                           */
         std::vector<bool> coarsen_flags;
-    
+
                                          /**
                                           *  Levels and indices of the neighbors
                                           *  of the cells. Convention is, that the
@@ -137,15 +137,15 @@ namespace internal
                                           * cells with a given subdomain
                                           * number.
                                           */
-        std::vector<unsigned int> subdomain_ids;
-        
+        std::vector<types::subdomain_id_t> subdomain_ids;
+
                                          /**
                                           * One integer for every consecutive
                                           * pair of cells to store which
                                           * index their parent has.
                                           */
         std::vector<int> parents;
-    
+
                                          /**
                                           *  Reserve enough space to accomodate
                                           *  @p total_cells cells on this level.
@@ -180,7 +180,7 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-	
+
 					 /**
 					  * The object containing the data on lines and
 					  * related functions
@@ -204,9 +204,9 @@ namespace internal
                         << "The containers have sizes " << arg1 << " and "
                         << arg2 << ", which is not as expected.");
     };
-    
+
 //TODO: Replace TriaObjectsHex to avoid this specialization
-    
+
 /**
  * Specialization of TriaLevels for 3D. Since we need TriaObjectsHex
  * instead of TriaObjects. Refer to the documentation of the template
@@ -220,7 +220,7 @@ namespace internal
         std::vector<bool> coarsen_flags;
         std::vector<std::pair<int,int> > neighbors;
         std::vector<int> parents;
-        std::vector<unsigned int> subdomain_ids;
+        std::vector<types::subdomain_id_t> subdomain_ids;
         void reserve_space (const unsigned int total_cells,
                             const unsigned int dimension);
         void monitor_memory (const unsigned int true_dimension) const;
@@ -244,8 +244,8 @@ namespace internal
                         << "The containers have sizes " << arg1 << " and "
                         << arg2 << ", which is not as expected.");
     };
-    
-    
+
+
   }
 }
 

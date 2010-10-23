@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,7 @@ namespace hp
  *  since accuracy is not so important here, and since this can save rather
  *  a lot of memory, when using many cells.
  *
- *  
+ *
  *  <h3>Implementation</h3>
  *
  *  In principle, the implementation of the error estimation is simple: let
@@ -102,7 +102,7 @@ namespace hp
  *  $h$ is taken to be the greatest length of the diagonals of the cell. For
  *  more or less uniform cells without deformed angles, this coincides with
  *  the diameter of the cell.
- *  
+ *
  *
  *  <h3>Vector-valued functions</h3>
  *
@@ -127,7 +127,7 @@ namespace hp
  *
  *
  *  <h3>%Boundary values</h3>
- *  
+ *
  *  If the face is at the boundary, i.e. there is no neighboring cell to which
  *  the jump in the gradiend could be computed, there are two possibilities:
  *  <ul>
@@ -163,9 +163,9 @@ namespace hp
  *  Thanks go to Franz-Theo Suttmeier for clarifications about boundary
  *  conditions.
  *
- *  
+ *
  *  <h3>Handling of hanging nodes</h3>
- *  
+ *
  *  The integration along faces with hanging nodes is quite tricky, since one
  *  of the elements has to be shifted one level up or down. See the
  *  documentation for the FESubFaceValues class for more information about
@@ -272,7 +272,7 @@ class KellyErrorEstimator
 				      * afterwards. This is in particular true
 				      * for the case where meshes are very
 				      * large and computing indicators for @em
-				      * every cells is too expensive, while
+				      * every cell is too expensive, while
 				      * computing indicators for only local
 				      * cells is acceptable. Note that if you
 				      * only ask for the indicators of a
@@ -301,6 +301,29 @@ class KellyErrorEstimator
 				      * parameter is retained for
 				      * compatibility with old versions of the
 				      * library.
+				      *
+				      * @note If the DoFHandler object
+				      * given as an argument to this
+				      * function builds on a
+				      * parallel::distributed::Triangulation,
+				      * this function skips
+				      * computations on all cells that
+				      * are not locally owned. In that
+				      * case, the only valid value for
+				      * the subdomain_id argument
+				      * (besides the invalid value) is
+				      * the subdomain id that is
+				      * associated with the currently
+				      * processor, as reported by
+				      * parallel::distributed::Triangulation::locally_owned_subdomain(). Even
+				      * though nothing is computed on
+				      * cells that we don't locally
+				      * own, the error indicator
+				      * vector must still have a
+				      * length equal to the number of
+				      * active cell in the mesh as
+				      * reported by
+				      * parallel::distributed::Triangulation::n_locally_owned_active_cells().
 				      */
     template <typename InputVector, class DH>
     static void estimate (const Mapping<dim, spacedim>      &mapping,
@@ -311,15 +334,15 @@ class KellyErrorEstimator
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
-			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+			  const unsigned int       n_threads = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
-    
+
 				     /**
 				      * Calls the @p estimate
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
-				      */    
+				      */
     template <typename InputVector, class DH>
     static void estimate (const DH                &dof,
 			  const Quadrature<dim-1> &quadrature,
@@ -329,9 +352,9 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
-    
+
 				     /**
 				      * Same function as above, but
 				      * accepts more than one solution
@@ -369,7 +392,7 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 				     /**
@@ -386,7 +409,7 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
@@ -406,7 +429,7 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
@@ -425,7 +448,7 @@ class KellyErrorEstimator
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<dim>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
@@ -445,7 +468,7 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
@@ -464,10 +487,10 @@ class KellyErrorEstimator
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<dim>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
-    
-    
+
+
 				     /**
 				      * Exception
 				      */
@@ -575,14 +598,14 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 				     /**
 				      * Calls the @p estimate
 				      * function, see above, with
 				      * <tt>mapping=MappingQ1<1>()</tt>.
-				      */    
+				      */
     template <typename InputVector, class DH>
     static void estimate (const DH   &dof,
 			  const Quadrature<0> &quadrature,
@@ -592,9 +615,9 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
-    
+
 				     /**
 				      * Same function as above, but
 				      * accepts more than one solution
@@ -632,7 +655,7 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 				     /**
@@ -649,7 +672,7 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
@@ -669,7 +692,7 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
@@ -688,7 +711,7 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
 			  const Function<1>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
-                          const unsigned int       subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
 
 
@@ -708,7 +731,7 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
 
 
@@ -727,9 +750,9 @@ class KellyErrorEstimator<1,spacedim>
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
 			  const Function<1>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
-                          const unsigned int           subdomain_id = numbers::invalid_unsigned_int,
+                          const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
-    
+
 				     /**
 				      * Exception
 				      */

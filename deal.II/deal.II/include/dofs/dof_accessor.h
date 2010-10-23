@@ -40,6 +40,10 @@ namespace internal
   namespace DoFHandler
   {
     struct Implementation;
+    namespace Policy
+    {
+      struct Implementation;
+    }
   }
 
   namespace hp
@@ -50,8 +54,6 @@ namespace internal
     }
   }
 }
-
-
 
 // note: the file dof_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates and thus makes
@@ -288,7 +290,7 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 				      * coordinates of the TriaAccessor.
 				      */
     void copy_from (const TriaAccessorBase<structdim, DH::dimension, DH::space_dimension> &da);
-    
+
 				     /**
 				      * Return an iterator pointing to
 				      * the the parent.
@@ -732,8 +734,10 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
     template <int dim, int spacedim> friend class DoFHandler;
     template <int dim, int spacedim> friend class hp::DoFHandler;
 
+    friend class internal::DoFHandler::Policy::Implementation;
     friend class internal::DoFHandler::Implementation;
     friend class internal::hp::DoFHandler::Implementation;
+    friend class internal::DoFCellAccessor::Implementation;
 };
 
 
@@ -851,7 +855,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      */
     typename internal::DoFHandler::Iterators<DH>::cell_iterator
     parent () const;
-    
+
 				     /**
 				      *  @name Accessing sub-objects and neighbors
 				      */
@@ -1382,7 +1386,15 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * @}
 				      */
 
-  private:
+				     /**
+				      * Set the DoF indices of this
+				      * cell to the given values. This
+				      * function bypasses the DoF
+				      * cache, if one exists for the
+				      * given DoF handler class.
+				      */
+    void set_dof_indices (const std::vector<unsigned int> &dof_indices);
+
 				     /**
 				      * Update the cache in which we
 				      * store the dof indices of this
@@ -1397,7 +1409,6 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * function
 				      */
     template <int dim, int spacedim> friend class DoFHandler;
-
     friend class internal::DoFCellAccessor::Implementation;
 };
 

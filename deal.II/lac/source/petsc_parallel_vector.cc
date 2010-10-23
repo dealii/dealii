@@ -63,7 +63,7 @@ namespace PETScWrappers
       VectorBase::operator = (v);
     }
 
-  
+
 
     Vector::Vector (const MPI_Comm     &communicator,
 		    const IndexSet &  local,
@@ -137,7 +137,7 @@ namespace PETScWrappers
     }
 
 
-
+    
     void
     Vector::reinit (const MPI_Comm     &comm,
 		    const IndexSet &  local,
@@ -271,11 +271,11 @@ namespace PETScWrappers
 #endif
 
       
-  }
+    }
 
     
 
-}
+  }
 
 }
 

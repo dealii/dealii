@@ -1,6 +1,7 @@
 //TODO: - adjust stopping criteria for solvers
 //      - better refinement at the start?
 //      - check solver stability
+//      - Q2 Mapping useful?
 
 
 /* $Id$ */
@@ -31,12 +32,14 @@
 #include <lac/full_matrix.h>
 #include <lac/solver_bicgstab.h>
 #include <lac/solver_cg.h>
+#include <lac/solver_gmres.h>
 #include <lac/constraint_matrix.h>
 #include <lac/block_sparsity_pattern.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/trilinos_sparse_matrix.h>
 #include <lac/trilinos_block_sparse_matrix.h>
 #include <lac/trilinos_precondition.h>
+#include <lac/trilinos_solver.h>
 
 #include <grid/tria.h>
 #include <grid/grid_generator.h>
@@ -74,11 +77,86 @@
 				 // matrices.
 #include <base/index_set.h>
 
+#include <distributed/dof_handler.h>
+#include <distributed/tria.h>
+#include <distributed/solution_transfer.h>
+#include <distributed/grid_refinement.h>
 
-				 // Next, we import all deal.II
-				 // names into global namespace:
+#include "timeblock.h"
+
+
+
+ #include <iostream>
+ #include <sstream>
+ #include <string>
+ #include <stdexcept>
+
+class BadConversion : public std::runtime_error {
+  public:
+    BadConversion(std::string const& s)
+		    : std::runtime_error(s)
+      { }
+};
+
+inline std::string stringify(double x)
+{
+  std::ostringstream o;
+  if (!(o << x))
+    throw BadConversion("stringify(double)");
+  return o.str();
+}
+
+
+
+#define CONF_LOG_SOLVER
+//#define CONF_COMPARE_SOLVER
+//#define CONF_BENCHMARK
+
 using namespace dealii;
 
+void print_it(Utilities::System::MinMaxAvg & result)
+{
+  std::cout// << "sum: " << result.sum
+    << " avg: " << (long)result.avg/1024
+    << " min: " << (long)result.min/1024 << " @" << result.min_index
+    << " max: " << (long)result.max/1024 << " @" << result.max_index
+    << std::endl;
+}
+
+void print_memory_stats()
+{
+  int myid = Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
+  Utilities::System::MemoryStats stats;
+  Utilities::System::get_memory_stats(stats);
+  Utilities::System::MinMaxAvg r;
+  Utilities::System::calculate_collective_mpi_min_max_avg(MPI_COMM_WORLD, stats.VmPeak, r);
+  if (myid==0)
+    {
+      std::cout << "MEM: VmPeak: ";
+      print_it(r);
+    }
+  Utilities::System::calculate_collective_mpi_min_max_avg(MPI_COMM_WORLD, stats.VmSize, r);
+  if (myid==0)
+    {
+      std::cout << "MEM: VmSize: ";
+      print_it(r);
+    }
+  Utilities::System::calculate_collective_mpi_min_max_avg(MPI_COMM_WORLD, stats.VmHWM, r);
+  if (myid==0)
+    {
+      std::cout << "MEM: VmHWM:  ";
+      print_it(r);
+    }
+  Utilities::System::calculate_collective_mpi_min_max_avg(MPI_COMM_WORLD, stats.VmRSS, r);
+  if (myid==0)
+    {
+      std::cout << "MEM: VmRSS:  ";
+      print_it(r);
+    }
+}
+
+
+static int out_index=0;
 				 // @sect3{Equation data}
 
 				 // In the following namespace, we define the
@@ -145,8 +223,17 @@ namespace EquationData
     const double h = R1-R0;
 
     const double s = (r-R0)/h;
+// see http://www.wolframalpha.com/input/?i=plot+(sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))),+x%3D-1+to+1,+y%3D-1+to+1
 
-    return T1+(T0-T1)*((1-s)*(1-s));
+    double s_mod = s*0.95 + 0.05*sin(6.0*atan2(p(0),p(1)));
+//alternative:    http://www.wolframalpha.com/input/?i=plot+atan((sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))-0.5)*10)/pi%2B0.5,+x%3D-1+to+1,+y%3D-1+to+1
+//    s_mod = atan((s_mod-0.5)*10.0)/dealii::numbers::PI+0.5;
+
+    return T1+(T0-T1)*(1.0-s_mod);
+
+				     //old:
+//	return T1+(T0-T1)*((1-s)*(1-s));
+//	return T1+(T0-T1)*((1-s));
   }
 
 
@@ -224,6 +311,103 @@ namespace EquationData
 				 // name.
 namespace LinearSolvers
 {
+  template <class PreconditionerA, class PreconditionerMp>
+  class RightPrecond : public Subscriptor
+  {
+    public:
+      RightPrecond (
+	const TrilinosWrappers::BlockSparseMatrix  &S,
+	const TrilinosWrappers::BlockSparseMatrix  &Spre,
+	const PreconditionerMp                     &Mppreconditioner,
+	const PreconditionerA                      &Apreconditioner)
+		  :
+		  stokes_matrix     (&S),
+		  stokes_preconditioner_matrix     (&Spre),
+		  mp_preconditioner (Mppreconditioner),
+		  a_preconditioner  (Apreconditioner)
+	{}
+
+     void solve_S(TrilinosWrappers::MPI::Vector &dst,
+		  const TrilinosWrappers::MPI::Vector &src) const
+	{
+	  SolverControl cn(5000, 1e-5);//src.l2_norm()*1e-5);
+
+	  TrilinosWrappers::SolverBicgstab solver(cn);
+
+	  solver.solve(stokes_preconditioner_matrix->block(1,1),
+		       dst, src,
+		       mp_preconditioner);
+
+#ifdef CONF_LOG_SOLVER
+	  TrilinosWrappers::MPI::Vector res(src);
+	  double resid =
+	    stokes_preconditioner_matrix->block(1,1).residual(res,dst,src);
+
+	  double srcl2 = src.l2_norm();
+#endif
+	  dst*=-1.0;
+
+#ifdef CONF_LOG_SOLVER
+	  int myid=Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
+	  if (myid==0)
+	    {
+	      std::cout << " solve_S it=" << cn.last_step()
+			<< " startres=" << stringify(srcl2)
+			<< " res=" << stringify(resid)
+			<< " reduction=" << stringify(resid / srcl2)
+			<< std::endl;
+
+	    }
+#endif
+
+	}
+
+      void solve_A(TrilinosWrappers::MPI::Vector &dst,
+		  const TrilinosWrappers::MPI::Vector &src) const
+	{
+	  SolverControl cn(5000, src.l2_norm()*1e-4);
+	  TrilinosWrappers::SolverBicgstab solver(cn);
+	  solver.solve(stokes_matrix->block(0,0), dst, src, a_preconditioner);
+
+#ifdef CONF_LOG_SOLVER
+	  double srcl2 = src.l2_norm();
+	  TrilinosWrappers::MPI::Vector res(src);
+	  double resid = stokes_matrix->block(0,0).residual(res,dst,src);
+
+	  int myid=Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
+	  if (myid==0)
+	    {
+	      std::cout << " solve_A it=" << cn.last_step()
+			<< " startres=" << stringify(srcl2)
+			<< " res=" << stringify(resid)
+			<< " reduction=" << stringify(resid / srcl2)
+			<< std::endl;
+
+	    }
+#endif
+	}
+
+      void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
+		  const TrilinosWrappers::MPI::BlockVector &src) const
+	{
+	  TrilinosWrappers::MPI::Vector utmp(src.block(0));
+
+	  solve_S(dst.block(1), src.block(1));
+
+	  stokes_matrix->block(0,1).vmult(utmp, dst.block(1)); //B^T
+	  utmp*=-1.0;
+	  utmp.add(src.block(0));
+
+	  solve_A(dst.block(0), utmp);
+	}
+
+    private:
+      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
+      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_preconditioner_matrix;
+      const PreconditionerMp &mp_preconditioner;
+      const PreconditionerA  &a_preconditioner;
+  };
+
   template <class PreconditionerA, class PreconditionerMp>
   class BlockSchurPreconditioner : public Subscriptor
   {
@@ -801,7 +985,7 @@ class BoussinesqFlowProblem
 {
   public:
     BoussinesqFlowProblem ();
-    void run ();
+    void run (unsigned int ref);
 
   private:
     void setup_dofs ();
@@ -834,34 +1018,34 @@ class BoussinesqFlowProblem
 
     ConditionalOStream                  pcout;
 
-    Triangulation<dim>                  triangulation;
+    parallel::distributed::Triangulation<dim> triangulation;
     double                              global_Omega_diameter;
 
     const unsigned int                  stokes_degree;
     FESystem<dim>                       stokes_fe;
-    DoFHandler<dim>                     stokes_dof_handler;
+    DoFHandler<dim> stokes_dof_handler;
     ConstraintMatrix                    stokes_constraints;
 
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
-    TrilinosWrappers::BlockVector       stokes_solution;
-    TrilinosWrappers::BlockVector       old_stokes_solution;
+    TrilinosWrappers::MPI::BlockVector  stokes_solution;
+    TrilinosWrappers::MPI::BlockVector  old_stokes_solution;
     TrilinosWrappers::MPI::BlockVector  stokes_rhs;
 
 
     const unsigned int                  temperature_degree;
     FE_Q<dim>                           temperature_fe;
-    DoFHandler<dim>                     temperature_dof_handler;
+    DoFHandler<dim> temperature_dof_handler;
     ConstraintMatrix                    temperature_constraints;
 
     TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
 
-    TrilinosWrappers::Vector            temperature_solution;
-    TrilinosWrappers::Vector            old_temperature_solution;
-    TrilinosWrappers::Vector            old_old_temperature_solution;
+    TrilinosWrappers::MPI::Vector            temperature_solution;
+    TrilinosWrappers::MPI::Vector            old_temperature_solution;
+    TrilinosWrappers::MPI::Vector            old_old_temperature_solution;
     TrilinosWrappers::MPI::Vector       temperature_rhs;
 
 
@@ -977,7 +1161,11 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 			get_this_mpi_process(MPI_COMM_WORLD)
 			== 0)),
 
-		triangulation (Triangulation<dim>::maximum_smoothing),
+		triangulation (MPI_COMM_WORLD,
+			       typename Triangulation<dim>::MeshSmoothing
+			       (Triangulation<dim>::smoothing_on_refinement | Triangulation<dim>::smoothing_on_coarsening
+			       )
+		),
 
                 stokes_degree (1),
                 stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
@@ -1435,8 +1623,9 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 
   cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
-  old_temperature_solution = solution;
-  temperature_constraints.distribute (old_temperature_solution);
+  temperature_constraints.distribute (solution);
+//  old_temperature_solution = solution;
+  old_temperature_solution.reinit(solution, false, true);
 }
 
 
@@ -1537,7 +1726,8 @@ void BoussinesqFlowProblem<dim>::
       else
 	coupling[c][d] = DoFTools::none;
 
-  DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
+  DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+				   coupling, sp,
 				   stokes_constraints, false,
 				   Utilities::System::
 				   get_this_mpi_process(MPI_COMM_WORLD));
@@ -1568,7 +1758,8 @@ void BoussinesqFlowProblem<dim>::
       else
 	coupling[c][d] = DoFTools::none;
 
-  DoFTools::make_sparsity_pattern (stokes_dof_handler, coupling, sp,
+  DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+				   coupling, sp,
 				   stokes_constraints, false,
 				   Utilities::System::
 				   get_this_mpi_process(MPI_COMM_WORLD));
@@ -1589,7 +1780,7 @@ void BoussinesqFlowProblem<dim>::
 
   TrilinosWrappers::SparsityPattern sp (temperature_partitioner,
 					MPI_COMM_WORLD);
-  DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
+  DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(temperature_dof_handler), sp,
 				   temperature_constraints, false,
 				   Utilities::System::
 				   get_this_mpi_process(MPI_COMM_WORLD));
@@ -1684,54 +1875,19 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::setup_dofs ()
 {
   computing_timer.enter_section("Setup dof systems");
+  TimeBlock<ConditionalOStream> t(pcout, "**dof_setup", false);
+
   std::vector<unsigned int> stokes_sub_blocks (dim+1,0);
   stokes_sub_blocks[dim] = 1;
-
-  GridTools::partition_triangulation (Utilities::System::
-				      get_n_mpi_processes(MPI_COMM_WORLD),
-				      triangulation);
-
   {
+    TimeBlock<ConditionalOStream> t(pcout, "***dof_distribute");
+
     stokes_dof_handler.distribute_dofs (stokes_fe);
-    DoFRenumbering::subdomain_wise (stokes_dof_handler);
     DoFRenumbering::component_wise (stokes_dof_handler, stokes_sub_blocks);
 
-    stokes_constraints.clear ();
-    DoFTools::make_hanging_node_constraints (stokes_dof_handler,
-					     stokes_constraints);
-
-    std::vector<bool> velocity_mask (dim+1, true);
-    velocity_mask[dim] = false;
-    VectorTools::interpolate_boundary_values (stokes_dof_handler,
-					      0,
-					      ZeroFunction<dim>(dim+1),
-					      stokes_constraints,
-					      velocity_mask);
-
-    std::set<unsigned char> no_normal_flux_boundaries;
-    no_normal_flux_boundaries.insert (1);
-    VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
-						     no_normal_flux_boundaries,
-						     stokes_constraints);
-    stokes_constraints.close ();
-  }
-  {
     temperature_dof_handler.distribute_dofs (temperature_fe);
-    DoFRenumbering::subdomain_wise (temperature_dof_handler);
-
-    temperature_constraints.clear ();
-    VectorTools::interpolate_boundary_values (temperature_dof_handler,
-					      0,
-					      EquationData::TemperatureInitialValues<dim>(),
-					      temperature_constraints);
-    VectorTools::interpolate_boundary_values (temperature_dof_handler,
-					      1,
-					      EquationData::TemperatureInitialValues<dim>(),
-					      temperature_constraints);
-    DoFTools::make_hanging_node_constraints (temperature_dof_handler,
-					     temperature_constraints);
-    temperature_constraints.close ();
   }
+
 
   std::vector<unsigned int> stokes_dofs_per_block (2);
   DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
@@ -1742,7 +1898,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 		     n_T = temperature_dof_handler.n_dofs();
 
   pcout << "Number of active cells: "
-	<< triangulation.n_active_cells()
+	<< triangulation.n_global_active_cells()
 	<< " (on "
 	<< triangulation.n_levels()
 	<< " levels)"
@@ -1753,20 +1909,80 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	<< std::endl
 	<< std::endl;
 
-  std::vector<IndexSet> stokes_partitioning;
-  IndexSet temperature_partitioning (n_T);
+
+
+  std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
+  IndexSet temperature_partitioning (n_T), temperature_relevant_partitioning (n_T);
+  IndexSet stokes_relevant_set;
   {
+    TimeBlock<ConditionalOStream> t(pcout, "***index_sets");
     const unsigned int my_id =
       Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
-    IndexSet stokes_index_set =
-      DoFTools::dof_indices_with_subdomain_association(stokes_dof_handler,
-						       my_id);
+    IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
     stokes_partitioning.push_back(stokes_index_set.get_view(0,n_u));
     stokes_partitioning.push_back(stokes_index_set.get_view(n_u,n_u+n_p));
 
-    temperature_partitioning =
-      DoFTools::dof_indices_with_subdomain_association(temperature_dof_handler,
-						       my_id);
+    DoFTools::extract_locally_relevant_dofs (stokes_dof_handler,
+					     stokes_relevant_set);
+    stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(0,n_u));
+    stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(n_u,n_u+n_p));
+
+    temperature_partitioning = temperature_dof_handler.locally_owned_dofs();
+    DoFTools::extract_locally_relevant_dofs (temperature_dof_handler,
+					     temperature_relevant_partitioning);
+  }
+
+  {
+
+    stokes_constraints.clear ();
+//    IndexSet stokes_la;
+//    DoFTools::extract_locally_active_dofs (stokes_dof_handler,
+//					   stokes_la);
+    stokes_constraints.reinit(stokes_relevant_set);
+
+    {
+      TimeBlock<ConditionalOStream> t(pcout, "***make_hanging_nodes_vel");
+
+      DoFTools::make_hanging_node_constraints (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+					       stokes_constraints);
+    }
+
+    TimeBlock<ConditionalOStream> t(pcout, "***boundary_values_vel");
+
+    std::vector<bool> velocity_mask (dim+1, true);
+    velocity_mask[dim] = false;
+    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+					      0,
+					      ZeroFunction<dim>(dim+1),
+					      stokes_constraints,
+					      velocity_mask);
+
+    std::set<unsigned char> no_normal_flux_boundaries;
+    no_normal_flux_boundaries.insert (1);
+    VectorTools::compute_no_normal_flux_constraints (static_cast<const DoFHandler<dim>&>(stokes_dof_handler), 0,
+						     no_normal_flux_boundaries,
+						     stokes_constraints);
+    stokes_constraints.close ();
+  }
+  {
+      TimeBlock<ConditionalOStream> t(pcout, "***hanging_nodes_and_bv_temperature");
+    temperature_constraints.clear ();
+//    IndexSet temp_locally_active;
+//    DoFTools::extract_locally_active_dofs (temperature_dof_handler,
+//					   temp_locally_active);
+    temperature_constraints.reinit(temperature_relevant_partitioning);//temp_locally_active);
+
+    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+					      0,
+					      EquationData::TemperatureInitialValues<dim>(),
+					      temperature_constraints);
+    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+					      1,
+					      EquationData::TemperatureInitialValues<dim>(),
+					      temperature_constraints);
+    DoFTools::make_hanging_node_constraints (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+					     temperature_constraints);
+    temperature_constraints.close ();
   }
 
   if (Utilities::System::job_supports_mpi() == false)
@@ -1785,17 +2001,26 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     }
   else
     {
+      TimeBlock<ConditionalOStream> t(pcout, "***setup_stokes_matrix");
       setup_stokes_matrix (stokes_partitioning);
+      t.close();
+
+      TimeBlock<ConditionalOStream> t2(pcout, "***setup_stokes_preconditioner");
       setup_stokes_preconditioner (stokes_partitioning);
+      t2.close();
+
+      TimeBlock<ConditionalOStream> t3(pcout, "***setup_temperature_matrix");
       setup_temperature_matrices (temperature_partitioning);
     }
 
+  TimeBlock<ConditionalOStream> t2(pcout, "***init_vectors");
+
   stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
-  stokes_solution.reinit (stokes_rhs);
+  stokes_solution.reinit (stokes_relevant_partitioning, MPI_COMM_WORLD);
   old_stokes_solution.reinit (stokes_solution);
 
   temperature_rhs.reinit (temperature_partitioning, MPI_COMM_WORLD);
-  temperature_solution.reinit (temperature_rhs);
+  temperature_solution.reinit (temperature_relevant_partitioning, MPI_COMM_WORLD);
   old_temperature_solution.reinit (temperature_solution);
   old_old_temperature_solution.reinit (temperature_solution);
 
@@ -1890,7 +2115,7 @@ local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cel
 				     (1./EquationData::eta) *
 				     EquationData::pressure_scaling *
 				     EquationData::pressure_scaling *
-				     scratch.phi_p[i] * scratch.phi_p[j])
+				     (scratch.phi_p[i] * scratch.phi_p[j]))
 				    * scratch.stokes_fe_values.JxW(q);
     }
 }
@@ -2016,11 +2241,13 @@ template <int dim>
 void
 BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 {
+  TimeBlock<ConditionalOStream> t(pcout, "*build_stokes_preconditioner");
+
   if (rebuild_stokes_preconditioner == false)
     return;
 
-  computing_timer.enter_section ("   Build Stokes preconditioner");
-  pcout << "   Rebuilding Stokes preconditioner..." << std::flush;
+//  computing_timer.enter_section ("   Build Stokes preconditioner");
+//  pcout << "   Rebuilding Stokes preconditioner..." << std::flush;
 
   assemble_stokes_preconditioner ();
 
@@ -2040,7 +2267,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_data.elliptic = true;
   Amg_data.higher_order_elements = true;
   Amg_data.smoother_sweeps = 2;
-  Amg_data.aggregation_threshold = 0.02;
+//  Amg_data.aggregation_threshold = 0.02;
 
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
   Amg_preconditioner->initialize (stokes_preconditioner_matrix.block(0,0),
@@ -2048,8 +2275,8 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
 
   rebuild_stokes_preconditioner = false;
 
-  pcout << std::endl;
-  computing_timer.exit_section();
+//  pcout << std::endl;
+//  computing_timer.exit_section();
 }
 
 				 // @sect5{Stokes system assembly}
@@ -2166,9 +2393,9 @@ copy_local_to_global_stokes_system (const Assembly::CopyData::StokesSystem<dim> 
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 {
-  pcout << "   Assembling..." << std::flush;
+  TimeBlock<ConditionalOStream> t(pcout, "*assemble_stokes");
 
-  computing_timer.enter_section ("   Assemble Stokes system");
+//  computing_timer.enter_section ("   Assemble Stokes system");
 
   if (rebuild_stokes_matrix == true)
     stokes_matrix=0;
@@ -2218,8 +2445,8 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   rebuild_stokes_matrix = false;
 
-  pcout << std::endl;
-  computing_timer.exit_section();
+//  pcout << std::endl;
+//  computing_timer.exit_section();
 }
 
 
@@ -2295,10 +2522,11 @@ copy_local_to_global_temperature_matrix (const Assembly::CopyData::TemperatureMa
 template <int dim>
 void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 {
+  TimeBlock<ConditionalOStream> t(pcout, "*assemble_temp_matrix");
   if (rebuild_temperature_matrices == false)
     return;
 
-  computing_timer.enter_section ("   Assemble temperature matrices");
+//  computing_timer.enter_section ("   Assemble temperature matrices");
   temperature_mass_matrix = 0;
   temperature_stiffness_matrix = 0;
 
@@ -2336,7 +2564,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   rebuild_temperature_matrices = false;
   rebuild_temperature_preconditioner = true;
 
-  computing_timer.exit_section();
+//  computing_timer.exit_section();
 }
 
 
@@ -2658,17 +2886,26 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 template <int dim>
 void BoussinesqFlowProblem<dim>::solve ()
 {
-  computing_timer.enter_section ("   Solve Stokes system");
-  pcout << "   Solving..." << std::endl;
+//  computing_timer.enter_section ("   Solve Stokes system");
 
   {
+    TimeBlock<ConditionalOStream> t(pcout, "*solve_stokes", false);
+
     const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
                                                   TrilinosWrappers::PreconditionILU>
       preconditioner (stokes_matrix, *Mp_preconditioner, *Amg_preconditioner);
 
+    const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
+      TrilinosWrappers::PreconditionILU>
+      preconditioner_right (stokes_matrix, stokes_preconditioner_matrix,
+			    *Mp_preconditioner, *Amg_preconditioner);
+
     TrilinosWrappers::MPI::BlockVector
       distributed_stokes_solution (stokes_rhs);
-    distributed_stokes_solution = stokes_solution;
+//    distributed_stokes_solution = stokes_solution;
+    distributed_stokes_solution.block(0).reinit(stokes_solution.block(0),false,true);
+    distributed_stokes_solution.block(1).reinit(stokes_solution.block(1),false,true);
+
 
     const unsigned int
       start = (distributed_stokes_solution.block(0).size() +
@@ -2679,39 +2916,94 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-22*stokes_rhs.l2_norm());
-    SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
-      bicgstab (solver_control, false);
+#ifdef CONF_COMPARE_SOLVER
+      {
+	TrilinosWrappers::MPI::BlockVector x(distributed_stokes_solution);
+	{
+	TimeBlock<ConditionalOStream> t(pcout, "*TMP: solve bicg", false);
 
-    bicgstab.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
-		   preconditioner);
+	PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
+	SolverControl solver_control (stokes_matrix.m(), 1e-24*stokes_rhs.l2_norm());
+	SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
+	  solver (solver_control, mem, false);
+	solver.solve(stokes_matrix, x, stokes_rhs,
+		     preconditioner);
 
-    stokes_solution = distributed_stokes_solution;
+	pcout << "  xx  BICG: "
+	      << solver_control.last_step()
+	      << " iterations,"
+	      << " reduced res by " << stringify(solver_control.last_value()/solver_control.initial_value())
+	      << std::endl;
+	}
+	{
+	  TrilinosWrappers::MPI::BlockVector
+	    res (stokes_rhs);
+	  double residual = stokes_matrix.residual(res, x, stokes_rhs);
+
+	  pcout << "     x  BICG: real reduced res by " << stringify(residual
+								  /stokes_rhs.l2_norm())
+		<< std::endl;
+	}
+      }
+#endif
+
+    SolverControl solver_control (stokes_matrix.m(), 1e-7*stokes_rhs.l2_norm());
+    {
+#ifdef CONF_COMPARE_SOLVER
+      TimeBlock<ConditionalOStream> t(pcout, "*TMP: solve fgmres", false);
+#endif
+      PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
+      SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+	solver(solver_control, mem,
+	       SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(50, true));
+      solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
+		   preconditioner_right);
+
+      pcout << "  xx  FGMRES: "
+	    << solver_control.last_step()
+	    << " iterations,"
+	    << " reduced res by " << stringify(solver_control.last_value()/solver_control.initial_value())
+	    << std::endl;
+    }
+    {
+      TrilinosWrappers::MPI::BlockVector
+	res (stokes_rhs);
+      double residual = stokes_matrix.residual(res, distributed_stokes_solution, stokes_rhs);
+
+      pcout << "     x  FGMRES: real reduced res by " << stringify(residual
+								   /stokes_rhs.l2_norm())
+	    << std::endl;
+    }
+
+    stokes_constraints.distribute (distributed_stokes_solution);
+				     //stokes_solution = distributed_stokes_solution;
+    stokes_solution.block(0).reinit(distributed_stokes_solution.block(0), false, true);
+    stokes_solution.block(1).reinit(distributed_stokes_solution.block(1), false, true);
+
 
     pcout << "   "
 	  << solver_control.last_step()
-	  << " BiCGStab iterations for Stokes subsystem."
+	  << " iterations for Stokes subsystem."
+          << " reduced res by " << stringify(solver_control.last_value()/solver_control.initial_value())
 	  << std::endl;
 
-    stokes_constraints.distribute (stokes_solution);
+
   }
-  computing_timer.exit_section();
+//  computing_timer.exit_section();
 
 
-  computing_timer.enter_section ("   Assemble temperature rhs");
+//  computing_timer.enter_section ("   Assemble temperature rhs");
 
   old_time_step = time_step;
   const double maximal_velocity = get_maximal_velocity();
-  if (maximal_velocity > 1e-10)
-    time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
-		temperature_degree *
-		GridTools::minimal_cell_diameter(triangulation) /
-		maximal_velocity;
-  else
-    time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
-		temperature_degree *
-		GridTools::minimal_cell_diameter(triangulation) /
-		1e-10;
+  double local_time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+			   temperature_degree *
+			   GridTools::minimal_cell_diameter(triangulation) /
+			   std::max(1e-10,maximal_velocity);
+
+				   // calculate the minimum allowed time step
+				   // size
+  MPI_Allreduce (&local_time_step, &time_step, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 
   pcout << "   Maximal velocity: "
 	<< maximal_velocity * EquationData::year_in_seconds * 100
@@ -2723,48 +3015,66 @@ void BoussinesqFlowProblem<dim>::solve ()
 	<< std::endl;
 
   temperature_solution = old_temperature_solution;
+  {
+    TimeBlock<ConditionalOStream> t(pcout, "*assemble_temp");
 
-  assemble_temperature_system (maximal_velocity);
+    assemble_temperature_system (maximal_velocity);
+  }
 
-  computing_timer.exit_section ();
 
-  computing_timer.enter_section ("   Solve temperature system");
+//  computing_timer.exit_section ();
+
+//  computing_timer.enter_section ("   Solve temperature system");
 
   {
+    TimeBlock<ConditionalOStream> t(pcout, "*solve_temp", false);
     SolverControl solver_control (temperature_matrix.m(),
 				  1e-12*temperature_rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
     TrilinosWrappers::MPI::Vector
       distributed_temperature_solution (temperature_rhs);
-    distributed_temperature_solution = temperature_solution;
+//    distributed_temperature_solution = temperature_solution;
+    distributed_temperature_solution.reinit(temperature_solution, false, true);
 
     cg.solve (temperature_matrix, distributed_temperature_solution,
 	      temperature_rhs, *T_preconditioner);
 
-    temperature_solution = distributed_temperature_solution;
-    temperature_constraints.distribute (temperature_solution);
+    temperature_constraints.distribute (distributed_temperature_solution);
+//    temperature_solution = distributed_temperature_solution;
+    temperature_solution.reinit(distributed_temperature_solution, false, true);
 
     pcout << "   "
 	  << solver_control.last_step()
 	  << " CG iterations for temperature" << std::endl;
-    computing_timer.exit_section();
+//    computing_timer.exit_section();
 
-    double min_temperature = temperature_solution(0),
-	   max_temperature = temperature_solution(0);
-    for (unsigned int i=1; i<temperature_solution.size(); ++i)
+				// extract temperature range
+    std::vector<double> temperature (2), global_temperature (2);
+    temperature[0] = distributed_temperature_solution.trilinos_vector()[0][0],
+      temperature[1] = temperature[0];
+    for (unsigned int i=1; i<distributed_temperature_solution.local_size(); ++i)
       {
-	min_temperature = std::min<double> (min_temperature,
-					    temperature_solution(i));
-	max_temperature = std::max<double> (max_temperature,
-					    temperature_solution(i));
+	temperature[0] = std::min<double> (temperature[0],
+					   distributed_temperature_solution.trilinos_vector()[0][i]);
+	temperature[1] = std::max<double> (temperature[1],
+					   distributed_temperature_solution.trilinos_vector()[0][i]);
       }
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    temperature[0] *= -1.0;
+    MPI_Allreduce (&temperature[0], &global_temperature[0],
+		   2, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    global_temperature[0] *= -1.0;
+#else
+    global_temperature = local_temperature;
+#endif
 
     pcout << "   Temperature range: "
-	  << min_temperature << ' ' << max_temperature
+	  << global_temperature[0] << ' ' << global_temperature[1]
 	  << std::endl;
   }
 }
+
 
 
 
@@ -2839,49 +3149,61 @@ void BoussinesqFlowProblem<dim>::solve ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
-  if (timestep_number % 25 != 0)
-    return;
+  pcout << "outputting " << out_index << std::endl;
 
   computing_timer.enter_section ("Postprocessing");
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  if (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD) == 0)
-    {
+  KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+                                      QGauss<dim-1>(temperature_degree+1),
+                                      typename FunctionMap<dim>::type(),
+                                      temperature_solution,
+                                      estimated_error_per_cell);
 
-      const FESystem<dim> joint_fe (stokes_fe, 1,
-				    temperature_fe, 1,
-				    FE_DGQ<dim>(0), 1);
-      DoFHandler<dim> joint_dof_handler (triangulation);
-      joint_dof_handler.distribute_dofs (joint_fe);
-      Assert (joint_dof_handler.n_dofs() ==
-	      stokes_dof_handler.n_dofs() +
-	      temperature_dof_handler.n_dofs() +
-	      triangulation.n_active_cells(),
-	      ExcInternalError());
+  const FESystem<dim> joint_fe (stokes_fe, 1,
+                                temperature_fe, 1,
+                                FE_DGQ<dim>(0), 1,
+                                FE_DGQ<dim>(0), 1,
+				temperature_fe, 1);
 
-      Vector<double> joint_solution (joint_dof_handler.n_dofs());
+  DoFHandler<dim> joint_dof_handler (triangulation);
+  joint_dof_handler.distribute_dofs (joint_fe);
+  Assert (joint_dof_handler.n_global_dofs() ==
+	  stokes_dof_handler.n_global_dofs() +
+	  temperature_dof_handler.n_global_dofs() +
+	  2*triangulation.n_global_active_cells() +
+	  temperature_dof_handler.n_global_dofs(),
+	  ExcInternalError());
 
-      {
-	double minimal_pressure = stokes_solution.block(1)(0);
-	for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
-	  minimal_pressure = std::min<double> (stokes_solution.block(1)(i),
-					       minimal_pressure);
+  TrilinosWrappers::MPI::Vector joint_solution;
+  IndexSet locally_relevant_dofs(joint_dof_handler.n_dofs());
+  DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_dofs);
+  joint_solution.reinit (locally_relevant_dofs, MPI_COMM_WORLD);
 
-	std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
-	std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
-	std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
+  {
+    //double minimal_pressure = stokes_solution.block(1)(0);
+    //for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
+    //  minimal_pressure = std::min<double> (stokes_solution.block(1)(i),
+    //					   minimal_pressure);
 
-	typename DoFHandler<dim>::active_cell_iterator
-	  joint_cell       = joint_dof_handler.begin_active(),
-	  joint_endc       = joint_dof_handler.end(),
-	  stokes_cell      = stokes_dof_handler.begin_active(),
-	  temperature_cell = temperature_dof_handler.begin_active();
-	for (; joint_cell!=joint_endc; ++joint_cell, ++stokes_cell, ++temperature_cell)
-	  {
-	    joint_cell->get_dof_indices (local_joint_dof_indices);
-	    stokes_cell->get_dof_indices (local_stokes_dof_indices);
-	    temperature_cell->get_dof_indices (local_temperature_dof_indices);
+    std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
+    std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
+    std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
 
-	    for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
+    typename DoFHandler<dim>::active_cell_iterator
+      joint_cell       = joint_dof_handler.begin_active(),
+      joint_endc       = joint_dof_handler.end(),
+      stokes_cell      = stokes_dof_handler.begin_active(),
+      temperature_cell = temperature_dof_handler.begin_active();
+    for (unsigned int cell_index=0; joint_cell!=joint_endc; ++joint_cell, ++stokes_cell, ++temperature_cell, ++cell_index)
+      if (!joint_cell->is_artificial() && !joint_cell->is_ghost())
+	{
+	  joint_cell->get_dof_indices (local_joint_dof_indices);
+	  stokes_cell->get_dof_indices (local_stokes_dof_indices);
+	  temperature_cell->get_dof_indices (local_temperature_dof_indices);
+
+	  for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
+	    {
 	      if (joint_fe.system_to_base_index(i).first.first == 0)
 		{
 		  Assert (joint_fe.system_to_base_index(i).second
@@ -2913,65 +3235,105 @@ void BoussinesqFlowProblem<dim>::output_results ()
 		      joint_solution(local_joint_dof_indices[i])
 			= ((stokes_solution(local_stokes_dof_indices
 					    [joint_fe.system_to_base_index(i).second])
-			    -
-			    minimal_pressure)
+			    )
 			   *
 			   EquationData::pressure_scaling);
 		    }
 		}
-	      else if (joint_fe.system_to_base_index(i).first.first == 1)
-		{
-		  Assert (joint_fe.system_to_base_index(i).second
-			  <
-			  local_temperature_dof_indices.size(),
-			  ExcInternalError());
-		  joint_solution(local_joint_dof_indices[i])
-		    = temperature_solution(local_temperature_dof_indices
-					   [joint_fe.system_to_base_index(i).second]);
-		}
+             else if (joint_fe.system_to_base_index(i).first.first == 1)
+               {
+                 Assert (joint_fe.system_to_base_index(i).second
+                         <
+                         local_temperature_dof_indices.size(),
+                         ExcInternalError());
+                 joint_solution(local_joint_dof_indices[i])
+                   = temperature_solution(local_temperature_dof_indices
+                                          [joint_fe.system_to_base_index(i).second]);
+               }
+              else if (joint_fe.system_to_base_index(i).first.first == 2)
+                {
+                  Assert (joint_fe.system_to_base_index(i).second
+                          == 0,
+                          ExcInternalError());
+                  joint_solution(local_joint_dof_indices[i])
+                    = joint_cell->subdomain_id();
+                }
+              else if (joint_fe.system_to_base_index(i).first.first == 3)
+                {
+                  Assert (joint_fe.system_to_base_index(i).first.first == 3,
+                          ExcInternalError());
+                  Assert (joint_fe.system_to_base_index(i).second
+                          == 0,
+                          ExcInternalError());
+                  joint_solution(local_joint_dof_indices[i])
+                    = estimated_error_per_cell (cell_index);
+                }
 	      else
 		{
-		  Assert (joint_fe.system_to_base_index(i).first.first == 2,
-			  ExcInternalError());
-		  Assert (joint_fe.system_to_base_index(i).second
-			  == 0,
-			  ExcInternalError());
-		  joint_solution(local_joint_dof_indices[i])
-		    = joint_cell->subdomain_id();
+                  Assert (joint_fe.system_to_base_index(i).first.first == 4,
+                          ExcInternalError());
+
+                  joint_solution(local_joint_dof_indices[i])
+		    = local_temperature_dof_indices
+		    [joint_fe.system_to_base_index(i).second];
+
 		}
-	  }
-      }
 
-      std::vector<std::string> joint_solution_names (dim, "velocity");
-      joint_solution_names.push_back ("p");
-      joint_solution_names.push_back ("T");
-      joint_solution_names.push_back ("partition");
+	    }
+	}
+  }
 
-      DataOut<dim> data_out;
+  std::vector<std::string> joint_solution_names (dim, "velocity");
+  joint_solution_names.push_back ("p");
+  joint_solution_names.push_back ("T");
+  joint_solution_names.push_back ("partition");
+  joint_solution_names.push_back ("error");
+  joint_solution_names.push_back ("TDofIndex");
 
-      data_out.attach_dof_handler (joint_dof_handler);
+  DataOut<dim> data_out;
 
-      std::vector<DataComponentInterpretation::DataComponentInterpretation>
-	data_component_interpretation
-	(dim+3, DataComponentInterpretation::component_is_scalar);
-      for (unsigned int i=0; i<dim; ++i)
-	data_component_interpretation[i]
-	  = DataComponentInterpretation::component_is_part_of_vector;
+  data_out.attach_dof_handler (joint_dof_handler);
 
-      data_out.add_data_vector (joint_solution, joint_solution_names,
-				DataOut<dim>::type_dof_data,
-				data_component_interpretation);
-      data_out.build_patches (std::min(stokes_degree, temperature_degree));
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation
+    (dim+5, DataComponentInterpretation::component_is_scalar);
+  for (unsigned int i=0; i<dim; ++i)
+    data_component_interpretation[i]
+      = DataComponentInterpretation::component_is_part_of_vector;
 
-      std::ostringstream filename;
-      filename << "solution-" << Utilities::int_to_string(timestep_number, 5)
-	       << ".vtk";
+  data_out.add_data_vector (joint_solution, joint_solution_names,
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.build_patches (1+std::min(stokes_degree, temperature_degree));
 
-      std::ofstream output (filename.str().c_str());
-      data_out.write_vtk (output);
+  const std::string filename = ("out/solution-" +
+				Utilities::int_to_string (out_index, 5) +
+				"." +
+				Utilities::int_to_string
+				(triangulation.locally_owned_subdomain(), 4) +
+				".vtu");
+  std::ofstream output (filename.c_str());
+  data_out.write_vtu (output);
+
+  if (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD) == 0)
+    {
+      std::vector<std::string> filenames;
+      for (unsigned int i=0; i<Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD); ++i)
+	filenames.push_back (std::string("solution-") +
+			     Utilities::int_to_string (out_index, 5) +
+			     "." +
+			     Utilities::int_to_string(i, 4) +
+			     ".vtu");
+      const std::string
+	master_filename = ("out/solution-" +
+			   Utilities::int_to_string (out_index, 5) +
+			   ".pvtu");
+      std::ofstream master (master_filename.c_str());
+      data_out.write_pvtu_record (master, filenames);
     }
 
   computing_timer.exit_section ();
+  out_index++;
 }
 
 
@@ -3069,73 +3431,116 @@ void BoussinesqFlowProblem<dim>::output_results ()
 template <int dim>
 void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 {
-  computing_timer.enter_section ("Refine mesh structure, part 1");
-  Vector<float> local_estimated_error_per_cell (triangulation.n_active_cells());
+  TimeBlock<ConditionalOStream> t(pcout, "*refine_mesh", false);
 
-  KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
+  computing_timer.enter_section ("Refine mesh structure, part 1");
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+  {
+    TimeBlock<ConditionalOStream> t(pcout, "**kelly");
+
+  KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
 				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
 				      temperature_solution,
- 				      local_estimated_error_per_cell,
+ 				      estimated_error_per_cell,
 				      std::vector<bool>(),
 				      0,
 				      0,
-				      Utilities::System::get_this_mpi_process(MPI_COMM_WORLD));
+				      triangulation.locally_owned_subdomain());
 
-  Vector<double> x_local_estimated_error_per_cell (triangulation.n_active_cells());
-  x_local_estimated_error_per_cell = local_estimated_error_per_cell;
-  Vector<double> estimated_error_per_cell (triangulation.n_active_cells());
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Allreduce (&x_local_estimated_error_per_cell(0),
-		 &estimated_error_per_cell(0),
-		 triangulation.n_active_cells(), MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  }
+
+
+#ifdef CONF_BENCHMARK
+				   /* pure refinement to double the number of
+				      cells in benchmark mode if this is
+				      prerefinement. Keep the number of cells
+				      constant later on. */
+  if (timestep_number==0)
+    {
+      pcout << "refine_mesh: prerefine, factor 2." << std::endl;
+      parallel::distributed::GridRefinement::
+	refine_and_coarsen_fixed_number (triangulation,
+					   estimated_error_per_cell,
+					   0.3333, 0.0);
+    }
+  else
+    {
+      pcout << "refine_mesh: keeping mesh constant." << std::endl;
+      TimeBlock<ConditionalOStream> t(pcout, "**refine&coarsen_fixed_nb");
+
+      parallel::distributed::GridRefinement::
+	refine_and_coarsen_fixed_number (triangulation,
+					   estimated_error_per_cell,
+					   0.3333, 0.0);//0.1, 0.4 ?
+    }
+
 #else
-  estimated_error_per_cell = x_local_estimated_error_per_cell;
-#endif
+  parallel::distributed::GridRefinement::
+    refine_and_coarsen_fixed_fraction (triangulation,
+				       estimated_error_per_cell,
+				       0.6, 0.2);
 
-  GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-						     estimated_error_per_cell,
-						     0.6, 0.2);
+				   // limit maximum refinement level
   if (triangulation.n_levels() > max_grid_level)
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active(max_grid_level);
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
+#endif
 
-  std::vector<TrilinosWrappers::Vector> x_temperature (2);
-  x_temperature[0] = temperature_solution;
-  x_temperature[1] = old_temperature_solution;
-  TrilinosWrappers::BlockVector x_stokes = stokes_solution;
+  TimeBlock<ConditionalOStream> t_a(pcout, "**prepare_solution_transfer", false);
+  std::vector<const TrilinosWrappers::MPI::Vector*> x_temperature (2);
+  x_temperature[0] = &temperature_solution;
+  x_temperature[1] = &old_temperature_solution;
+  TrilinosWrappers::MPI::BlockVector x_stokes = stokes_solution;
 
-  SolutionTransfer<dim,TrilinosWrappers::Vector>
+  parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
     temperature_trans(temperature_dof_handler);
-  SolutionTransfer<dim,TrilinosWrappers::BlockVector>
+  parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::BlockVector>
     stokes_trans(stokes_dof_handler);
 
   triangulation.prepare_coarsening_and_refinement();
   temperature_trans.prepare_for_coarsening_and_refinement(x_temperature);
   stokes_trans.prepare_for_coarsening_and_refinement(x_stokes);
 
+  t_a.close();
+  TimeBlock<ConditionalOStream> t_c(pcout, "**execute_c&r", false);
+
   triangulation.execute_coarsening_and_refinement ();
   computing_timer.exit_section();
 
+  t_c.close();
+
   setup_dofs ();
+  TimeBlock<ConditionalOStream> t_b(pcout, "**do_solution_transfer");
 
   computing_timer.enter_section ("Refine mesh structure, part 2");
 
-  std::vector<TrilinosWrappers::Vector> tmp (2);
-  tmp[0].reinit (temperature_solution);
-  tmp[1].reinit (temperature_solution);
-  temperature_trans.interpolate(x_temperature, tmp);
+  TrilinosWrappers::MPI::Vector
+    distributed_temp1 (temperature_rhs);
+  TrilinosWrappers::MPI::Vector
+    distributed_temp2 (temperature_rhs);
 
-  temperature_solution = tmp[0];
-  old_temperature_solution = tmp[1];
-  temperature_constraints.distribute(temperature_solution);
-  temperature_constraints.distribute(old_temperature_solution);
+  std::vector<TrilinosWrappers::MPI::Vector*> tmp (2);
+  tmp[0] = &(distributed_temp1);
+  tmp[1] = &(distributed_temp2);
+  temperature_trans.interpolate(tmp);
 
-  TrilinosWrappers::BlockVector x_stokes_new = stokes_solution;
-  stokes_trans.interpolate (x_stokes, x_stokes_new);
-  stokes_solution = x_stokes_new;
+//  temperature_solution = distributed_temp1;
+  temperature_solution.reinit(distributed_temp1, false, true);
+//  old_temperature_solution = distributed_temp2;
+  old_temperature_solution.reinit(distributed_temp2, false, true);
+
+  TrilinosWrappers::MPI::BlockVector
+    distributed_stokes (stokes_rhs);
+
+  stokes_trans.interpolate (distributed_stokes);
+//  stokes_solution = distributed_stokes;
+  stokes_solution.block(0).reinit(distributed_stokes.block(0), false, true);
+  stokes_solution.block(1).reinit(distributed_stokes.block(1), false, true);
+
 
   rebuild_stokes_matrix              = true;
   rebuild_stokes_preconditioner      = true;
@@ -3159,10 +3564,17 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				 // <code>VectorTools::project</code>, the
 				 // rest is as before.
 template <int dim>
-void BoussinesqFlowProblem<dim>::run ()
+void BoussinesqFlowProblem<dim>::run (unsigned int ref)
 {
-  const unsigned int initial_refinement = (dim == 2 ? 5 : 2);
-  const unsigned int n_pre_refinement_steps = (dim == 2 ? 2 : 2);
+  pcout << "this is step-32. ref=" << ref << std::endl;
+  #ifdef CONF_BENCHMARK
+				   // create approximately 12*4^(ref/2) cells:
+  const unsigned int initial_refinement = (ref-1)/2;
+  const unsigned int n_pre_refinement_steps = 2+(ref-1)%2;
+#else
+  const unsigned int initial_refinement = ref;//(dim == 2 ? 5 : 2);
+  const unsigned int n_pre_refinement_steps = 2;//(dim == 2 ? 4 : 2);
+#endif
 
   GridGenerator::hyper_shell (triangulation,
 			      Point<dim>(),
@@ -3170,10 +3582,11 @@ void BoussinesqFlowProblem<dim>::run ()
 			      EquationData::R1,
 			      12,
 			      true);
-
   static HyperShellBoundary<dim> boundary;
   triangulation.set_boundary (0, boundary);
   triangulation.set_boundary (1, boundary);
+
+				   //GridGenerator::hyper_cube (triangulation, EquationData::R0, EquationData::R1);
 
   global_Omega_diameter = GridTools::diameter (triangulation);
 
@@ -3207,6 +3620,18 @@ void BoussinesqFlowProblem<dim>::run ()
 
       pcout << std::endl;
 
+#ifdef CONF_BENCHMARK
+      static int bench_step=0;
+      if (time>=1e5*EquationData::year_in_seconds)
+	{
+	  ++bench_step;
+	  if (bench_step>1)
+	    break;
+	  pcout << "***BEGIN BENCHSTEP" << std::endl;
+	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+	}
+	else
+#endif
       if ((timestep_number == 0) &&
 	  (pre_refinement_step < n_pre_refinement_steps))
 	{
@@ -3214,11 +3639,19 @@ void BoussinesqFlowProblem<dim>::run ()
 	  ++pre_refinement_step;
 	  goto start_time_iteration;
 	}
+#ifndef CONF_BENCHMARK
       else
 	if ((timestep_number > 0) && (timestep_number % 10 == 0))
 	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+#endif
 
-      output_results ();
+#ifdef CONF_BENCHMARK
+      if (false)//bench_step)
+#else
+	if (timestep_number % 10 == 0 &&
+	  Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD) <= 10)
+#endif
+	  output_results ();
 
       time += time_step;
       ++timestep_number;
@@ -3244,7 +3677,15 @@ int main (int argc, char *argv[])
       Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
       BoussinesqFlowProblem<2> flow_problem;
-      flow_problem.run ();
+
+      unsigned int ref=5;
+      if (argc>=2)
+	{
+	  ref = (unsigned int)Utilities::string_to_int(argv[1]);
+	}
+
+      flow_problem.run (ref);
+      print_memory_stats();
     }
   catch (std::exception &exc)
     {

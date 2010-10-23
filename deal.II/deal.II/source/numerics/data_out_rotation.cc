@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,6 +103,10 @@ build_one_patch (const cell_iterator *cell,
 		 internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension> &data,
 		 std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> > &patches)
 {
+  Assert (!(*cell)->is_ghost() &&
+	  !(*cell)->is_artificial(),
+	  ExcNotImplemented());
+
   const unsigned int n_patches_per_circle = data.n_patches_per_circle;
 
 				   // another abbreviation denoting

@@ -279,6 +279,8 @@ CompressedSimpleSparsityPattern::reinit (const unsigned int m,
   cols = n;
   rowset=rowset_;
 
+  Assert(rowset.size()==0 || rowset.size() == m, ExcInvalidConstructorCall());
+  
   std::vector<Line> new_lines (rowset.size()==0 ? rows : rowset.n_elements());
   lines.swap (new_lines);
 }

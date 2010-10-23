@@ -14,6 +14,7 @@
 
 #include <base/memory_consumption.h>
 #include <dofs/dof_handler.h>
+#include <dofs/dof_handler_policy.h>
 #include <dofs/dof_levels.h>
 #include <dofs/dof_faces.h>
 #include <dofs/dof_accessor.h>
@@ -71,343 +72,13 @@ namespace internal
 				     // namespace internal::DoFHandler
     using dealii::DoFHandler;
 
+
 /**
  * A class with the same purpose as the similarly named class of the
  * Triangulation class. See there for more information.
  */
     struct Implementation
     {
-					 /**
-					  * Distribute dofs on the given cell,
-					  * with new dofs starting with index
-					  * @p next_free_dof. Return the next
-					  * unused index number. The finite
-					  * element used is the one given to
-					  * @p distribute_dofs, which is copied
-					  * to @p selected_fe.
-					  *
-					  * This function is excluded from the
-					  * @p distribute_dofs function since
-					  * it can not be implemented dimension
-					  * independent.
-					  */
-	template <int spacedim>
-	static
-	unsigned int
-	distribute_dofs_on_cell (const DoFHandler<1,spacedim> &dof_handler,
-				 typename DoFHandler<1,spacedim>::active_cell_iterator &cell,
-				 unsigned int          next_free_dof)
-	  {
-
-					     // distribute dofs of vertices
-	    for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
-	      {
-		typename DoFHandler<1,spacedim>::cell_iterator
-		  neighbor = cell->neighbor(v);
-
-		if (neighbor.state() == IteratorState::valid)
-		  {
-						     // find true neighbor; may be its
-						     // a child of @p{neighbor}
-		    while (neighbor->has_children())
-		      neighbor = neighbor->child(v==0 ? 1 : 0);
-
-						     // has neighbor already been processed?
-		    if (neighbor->user_flag_set())
-						       // copy dofs
-		      {
-			if (v==0)
-			  for (unsigned int d=0;
-			       d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-			    cell->set_vertex_dof_index (0, d,
-							neighbor->vertex_dof_index (1, d));
-			else
-			  for (unsigned int d=0;
-			       d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-			    cell->set_vertex_dof_index (1, d,
-							neighbor->vertex_dof_index (0, d));
-
-							 // next neighbor
-			continue;
-		      }
-		  }
-
-						 // otherwise: create dofs newly
-		for (unsigned int d=0;
-		     d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-		  cell->set_vertex_dof_index (v, d, next_free_dof++);
-	      }
-
-					     // dofs of line
-	    for (unsigned int d=0;
-		 d<dof_handler.selected_fe->dofs_per_line; ++d)
-	      cell->set_dof_index (d, next_free_dof++);
-
-					     // note that this cell has been
-					     // processed
-	    cell->set_user_flag ();
-
-	    return next_free_dof;
-	  }
-
-
-
-	template <int spacedim>
-	static
-	unsigned int
-	distribute_dofs_on_cell (const DoFHandler<2,spacedim> &dof_handler,
-				 typename DoFHandler<2,spacedim>::active_cell_iterator &cell,
-				 unsigned int          next_free_dof)
-	  {
-	    if (dof_handler.selected_fe->dofs_per_vertex > 0)
-					       // number dofs on vertices
-	      for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
-						 // check whether dofs for this
-						 // vertex have been distributed
-						 // (only check the first dof)
-		if (cell->vertex_dof_index(vertex, 0) == DoFHandler<2,spacedim>::invalid_dof_index)
-		  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-		    cell->set_vertex_dof_index (vertex, d, next_free_dof++);
-
-					     // for the four sides
-	    if (dof_handler.selected_fe->dofs_per_line > 0)
-	      for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
-		{
-		  typename DoFHandler<2,spacedim>::line_iterator
-		    line = cell->line(side);
-
-						   // distribute dofs if necessary:
-						   // check whether line dof is already
-						   // numbered (check only first dof)
-		  if (line->dof_index(0) == DoFHandler<2,spacedim>::invalid_dof_index)
-						     // if not: distribute dofs
-		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
-		      line->set_dof_index (d, next_free_dof++);
-		}
-
-
-					     // dofs of quad
-	    if (dof_handler.selected_fe->dofs_per_quad > 0)
-	      for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
-		cell->set_dof_index (d, next_free_dof++);
-
-
-					     // note that this cell has been processed
-	    cell->set_user_flag ();
-
-	    return next_free_dof;
-	  }
-
-
-	template <int spacedim>
-	static
-	unsigned int
-	distribute_dofs_on_cell (const DoFHandler<3,spacedim> &dof_handler,
-				 typename DoFHandler<3,spacedim>::active_cell_iterator &cell,
-				 unsigned int          next_free_dof)
-	  {
-	    if (dof_handler.selected_fe->dofs_per_vertex > 0)
-					       // number dofs on vertices
-	      for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
-						 // check whether dofs for this
-						 // vertex have been distributed
-						 // (only check the first dof)
-		if (cell->vertex_dof_index(vertex, 0) == DoFHandler<3,spacedim>::invalid_dof_index)
-		  for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_vertex; ++d)
-		    cell->set_vertex_dof_index (vertex, d, next_free_dof++);
-
-					     // for the lines
-	    if (dof_handler.selected_fe->dofs_per_line > 0)
-	      for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
-		{
-		  typename DoFHandler<3,spacedim>::line_iterator
-		    line = cell->line(l);
-
-						   // distribute dofs if necessary:
-						   // check whether line dof is already
-						   // numbered (check only first dof)
-		  if (line->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
-						     // if not: distribute dofs
-		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_line; ++d)
-		      line->set_dof_index (d, next_free_dof++);
-		}
-
-					     // for the quads
-	    if (dof_handler.selected_fe->dofs_per_quad > 0)
-	      for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
-		{
-		  typename DoFHandler<3,spacedim>::quad_iterator
-		    quad = cell->quad(q);
-
-						   // distribute dofs if necessary:
-						   // check whether quad dof is already
-						   // numbered (check only first dof)
-		  if (quad->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
-						     // if not: distribute dofs
-		    for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_quad; ++d)
-		      quad->set_dof_index (d, next_free_dof++);
-		}
-
-
-					     // dofs of hex
-	    if (dof_handler.selected_fe->dofs_per_hex > 0)
-	      for (unsigned int d=0; d<dof_handler.selected_fe->dofs_per_hex; ++d)
-		cell->set_dof_index (d, next_free_dof++);
-
-
-					     // note that this cell has been
-					     // processed
-	    cell->set_user_flag ();
-
-	    return next_free_dof;
-	  }
-
-
-					 /**
-					  * Implementation of the general template
-					  * of same name.
-					  */
-	template <int spacedim>
-	static
-	void renumber_dofs (const std::vector<unsigned int> &new_numbers,
-			    DoFHandler<1,spacedim>          &dof_handler)
-	  {
-					     // note that we can not use cell
-					     // iterators in this function since
-					     // then we would renumber the dofs on
-					     // the interface of two cells more
-					     // than once. Anyway, this way it's
-					     // not only more correct but also
-					     // faster; note, however, that dof
-					     // numbers may be invalid_dof_index,
-					     // namely when the appropriate
-					     // vertex/line/etc is unused
-	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.vertex_dofs.begin();
-		 i!=dof_handler.vertex_dofs.end(); ++i)
-	      if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
-		*i = new_numbers[*i];
-	      else
-						 // if index is
-						 // invalid_dof_index:
-						 // check if this one
-						 // really is unused
-		Assert (dof_handler.tria
-			->vertex_used((i-dof_handler.vertex_dofs.begin()) /
-				      dof_handler.selected_fe->dofs_per_vertex)
-			== false,
-			ExcInternalError ());
-
-	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
-	      for (std::vector<unsigned int>::iterator
-		     i=dof_handler.levels[level]->lines.dofs.begin();
-		   i!=dof_handler.levels[level]->lines.dofs.end(); ++i)
-		if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
-		  *i = new_numbers[*i];
-	  }
-
-
-
-	template <int spacedim>
-	static
-	void renumber_dofs (const std::vector<unsigned int> &new_numbers,
-			    DoFHandler<2,spacedim>          &dof_handler)
-	  {
-					     // note that we can not use cell
-					     // iterators in this function since
-					     // then we would renumber the dofs on
-					     // the interface of two cells more
-					     // than once. Anyway, this way it's
-					     // not only more correct but also
-					     // faster; note, however, that dof
-					     // numbers may be invalid_dof_index,
-					     // namely when the appropriate
-					     // vertex/line/etc is unused
-	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.vertex_dofs.begin();
-		 i!=dof_handler.vertex_dofs.end(); ++i)
-	      if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
-		*i = new_numbers[*i];
-	      else
-						 // if index is invalid_dof_index:
-						 // check if this one really is
-						 // unused
-		Assert (dof_handler.tria
-			->vertex_used((i-dof_handler.vertex_dofs.begin()) /
-				      dof_handler.selected_fe->dofs_per_vertex)
-			== false,
-			ExcInternalError ());
-
-	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.faces->lines.dofs.begin();
-		 i!=dof_handler.faces->lines.dofs.end(); ++i)
-	      if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
-		*i = new_numbers[*i];
-
-	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
-	      {
-		for (std::vector<unsigned int>::iterator
-		       i=dof_handler.levels[level]->quads.dofs.begin();
-		     i!=dof_handler.levels[level]->quads.dofs.end(); ++i)
-		  if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
-		    *i = new_numbers[*i];
-	      }
-	  }
-
-
-	template <int spacedim>
-	static
-	void renumber_dofs (const std::vector<unsigned int> &new_numbers,
-			    DoFHandler<3,spacedim>          &dof_handler)
-	  {
-					     // note that we can not use cell
-					     // iterators in this function since
-					     // then we would renumber the dofs on
-					     // the interface of two cells more
-					     // than once. Anyway, this way it's
-					     // not only more correct but also
-					     // faster; note, however, that dof
-					     // numbers may be invalid_dof_index,
-					     // namely when the appropriate
-					     // vertex/line/etc is unused
-	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.vertex_dofs.begin();
-		 i!=dof_handler.vertex_dofs.end(); ++i)
-	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
-		*i = new_numbers[*i];
-	      else
-						 // if index is invalid_dof_index:
-						 // check if this one really is
-						 // unused
-		Assert (dof_handler.tria
-			->vertex_used((i-dof_handler.vertex_dofs.begin()) /
-				      dof_handler.selected_fe->dofs_per_vertex)
-			== false,
-			ExcInternalError ());
-
-	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.faces->lines.dofs.begin();
-		 i!=dof_handler.faces->lines.dofs.end(); ++i)
-	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
-		*i = new_numbers[*i];
-	    for (std::vector<unsigned int>::iterator
-		   i=dof_handler.faces->quads.dofs.begin();
-		 i!=dof_handler.faces->quads.dofs.end(); ++i)
-	      if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
-		*i = new_numbers[*i];
-
-	    for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
-	      {
-		for (std::vector<unsigned int>::iterator
-		       i=dof_handler.levels[level]->hexes.dofs.begin();
-		     i!=dof_handler.levels[level]->hexes.dofs.end(); ++i)
-		  if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
-		    *i = new_numbers[*i];
-	      }
-	  }
-
-
-
 					 /**
 					  * Implement the function of same name in
 					  * the mother class.
@@ -692,9 +363,18 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
 		:
 		tria(&tria, typeid(*this).name()),
 		selected_fe(0, typeid(*this).name()),
-		faces(NULL),
-		used_dofs (0)
-{}
+		faces(NULL)
+{
+				   // decide whether we need a
+				   // sequential or a parallel
+				   // distributed policy
+  if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+      (&tria)
+      == 0)
+    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
+  else
+    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
+}
 
 
 template<int dim, int spacedim>
@@ -702,8 +382,7 @@ DoFHandler<dim,spacedim>::DoFHandler ()
 		:
 		tria(0, typeid(*this).name()),
 		selected_fe(0, typeid(*this).name()),
-		faces(NULL),
-		used_dofs (0)
+		faces(NULL)
 {}
 
 
@@ -722,8 +401,19 @@ DoFHandler<dim,spacedim>::initialize(
   const FiniteElement<dim,spacedim>& fe)
 {
   tria = &t;
-  faces = NULL;
-  used_dofs = 0;
+  faces = 0;
+  number_cache.n_global_dofs = 0;
+
+				   // decide whether we need a
+				   // sequential or a parallel
+				   // distributed policy
+  if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+      (&t)
+      == 0)
+    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
+  else
+    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
+
   distribute_dofs(fe);
 }
 
@@ -1954,7 +1644,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 		      MemoryConsumption::memory_consumption (levels) +
 		      MemoryConsumption::memory_consumption (*faces) +
 		      MemoryConsumption::memory_consumption (faces) +
-		      MemoryConsumption::memory_consumption (used_dofs) +
+		      sizeof (number_cache) +
 		      MemoryConsumption::memory_consumption (vertex_dofs));
   for (unsigned int i=0; i<levels.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*levels[i]);
@@ -1966,53 +1656,42 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 
 template<int dim, int spacedim>
 void DoFHandler<dim,spacedim>::
-  distribute_dofs (const FiniteElement<dim,spacedim> &ff,
-		   const unsigned int                 offset)
+distribute_dofs (const FiniteElement<dim,spacedim> &ff,
+		 const unsigned int                 offset)
 {
-  Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
-
   selected_fe = &ff;
 
-                                   // delete all levels and set them up
-                                   // newly, since vectors are
-                                   // troublesome if you want to change
-                                   // their size
+                                   // delete all levels and set them
+                                   // up newly. note that we still
+                                   // have to allocate space for all
+                                   // degrees of freedom on this mesh
+                                   // (including ghost and cells that
+                                   // are entirely stored on different
+                                   // processors), though we may not
+                                   // assign numbers to some of them
+                                   // (i.e. they will remain at
+                                   // invalid_dof_index). We need to
+                                   // allocate the space because we
+                                   // will want to be able to query
+                                   // the dof_indices on each cell,
+                                   // and simply be told that we don't
+                                   // know them on some cell (i.e. get
+                                   // back invalid_dof_index)
   clear_space ();
   internal::DoFHandler::Implementation::reserve_space (*this);
 
-				   // Clear user flags because we will
-				   // need them. But first we save
-				   // them and make sure that we
-				   // restore them later such that at
-				   // the end of this function the
-				   // Triangulation will be in the
-				   // same state as it was at the
-				   // beginning of this function.
-  std::vector<bool> user_flags;
-  tria->save_user_flags(user_flags);
-  const_cast<Triangulation<dim,spacedim> &>(*tria).clear_user_flags ();
+				   // hand things off to the policy
+  number_cache = policy->distribute_dofs (offset,
+					  *this);
 
-  unsigned int next_free_dof = offset;
-  active_cell_iterator cell = begin_active(),
-		       endc = end();
-
-  for (; cell != endc; ++cell)
-    next_free_dof
-      = internal::DoFHandler::Implementation::
-        distribute_dofs_on_cell (*this, cell, next_free_dof);
-
-  used_dofs = next_free_dof;
-
-				   // update the cache used
-				   // for cell dof indices
-  for (cell_iterator cell = begin(); cell != end(); ++cell)
-    cell->update_cell_dof_indices_cache ();
-
-				   // finally restore the user flags
-  const_cast<Triangulation<dim,spacedim> &>(*tria).load_user_flags(user_flags);
-
-  block_info_object.initialize(*this);
+				   // initialize the block info object
+				   // only if this is a sequential
+				   // triangulation. it doesn't work
+				   // correctly yet if it is parallel
+  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == 0)
+    block_info_object.initialize(*this);
 }
+
 
 
 template<int dim, int spacedim>
@@ -2020,6 +1699,7 @@ void DoFHandler<dim,spacedim>::initialize_local_block_info ()
 {
   block_info_object.initialize_local(*this);
 }
+
 
 
 template<int dim, int spacedim>
@@ -2039,12 +1719,20 @@ void
 DoFHandler<dim,spacedim>::
 renumber_dofs (const std::vector<unsigned int> &new_numbers)
 {
-  Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+  Assert (new_numbers.size() == n_locally_owned_dofs(),
+	  ExcRenumberingIncomplete());
 
 #ifdef DEBUG
 				   // assert that the new indices are
-				   // consecutively numbered
-  if (true)
+				   // consecutively numbered if we are
+				   // working on a single
+				   // processor. this doesn't need to
+				   // hold in the case of a parallel
+				   // mesh since we map the interval
+				   // [0...n_dofs()) into itself but
+				   // only globally, not on each
+				   // processor
+  if (n_locally_owned_dofs() == n_dofs())
     {
       std::vector<unsigned int> tmp(new_numbers);
       std::sort (tmp.begin(), tmp.end());
@@ -2053,16 +1741,13 @@ renumber_dofs (const std::vector<unsigned int> &new_numbers)
       for (; p!=tmp.end(); ++p, ++i)
 	Assert (*p == i, ExcNewNumbersNotConsecutive(i));
     }
+  else
+    for (unsigned int i=0; i<new_numbers.size(); ++i)
+      Assert (new_numbers[i] < n_dofs(),
+	      ExcMessage ("New DoF index is not less than the total number of dofs."));
 #endif
 
-
-  internal::DoFHandler::Implementation::renumber_dofs (new_numbers, *this);
-
-				   // update the cache used for cell dof
-				   // indices
-  for (cell_iterator cell = begin(); cell != end(); ++cell)
-    cell->update_cell_dof_indices_cache ();
-
+  number_cache = policy->renumber_dofs (new_numbers, *this);
 }
 
 

@@ -22,12 +22,14 @@ hsl-clean:
 endif
 
 
+
 ifeq ($(USE_CONTRIB_UMFPACK),yes)
 umfpack:
 	@cd umfpack ; $(MAKE)
 else
 umfpack:
 endif
+
 
 
 ifeq ($(enable-parser),yes)
@@ -54,3 +56,4 @@ clean: hsl-clean tbb-clean
 	@-rm -f ../lib/contrib/*/*.o
 
 .PHONY: default hsl clean hsl-clean umfpack tbb tbb-clean functionparser
+

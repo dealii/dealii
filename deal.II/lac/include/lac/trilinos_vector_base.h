@@ -18,6 +18,7 @@
 
 #ifdef DEAL_II_USE_TRILINOS
 
+#include <base/utilities.h>
 #  include <base/std_cxx1x/shared_ptr.h>
 #  include <base/subscriptor.h>
 #  include <lac/exceptions.h>
@@ -896,8 +897,7 @@ namespace TrilinosWrappers
 
 				       /**
 					* Estimate for the memory
-					* consumption (not implemented
-					* for this class).
+					* consumption in bytes.
 					*/
       unsigned int memory_consumption () const;
 				       //@}
@@ -1132,11 +1132,29 @@ namespace TrilinosWrappers
   void
   VectorBase::compress (const Epetra_CombineMode given_last_action)
   {
+    Epetra_CombineMode mode = (last_action != Zero) ?
+			      last_action : given_last_action;
+    #ifdef DEBUG
+    #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				     // check that every process has decided
+				     // to use the same mode. This will
+				     // otherwise result in undefined
+				     // behaviour in the call to
+				     // GlobalAssemble().
+    double double_mode = mode;
+    struct Utilities::System::MinMaxAvg result;
+    Utilities::System::calculate_collective_mpi_min_max_avg(
+      dynamic_cast<const Epetra_MpiComm*>(&vector_partitioner().Comm())->GetMpiComm(),
+      double_mode,
+      result);
+    Assert(result.max-result.min<1e-5,  ExcTrilinosError(0));
+    
+    #endif
+    #endif
+    
 				 // Now pass over the information about
 				 // what we did last to the vector.
-    const int ierr = vector->GlobalAssemble(last_action != Zero ?
-					    last_action :
-					    given_last_action);
+    const int ierr = vector->GlobalAssemble(mode);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
     last_action = Zero;
 
@@ -1193,6 +1211,11 @@ namespace TrilinosWrappers
 		   const unsigned int   *indices,
 		   const TrilinosScalar *values)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());    
+    
     if (last_action == Add)
       vector->GlobalAssemble(Add);
 
@@ -1250,6 +1273,11 @@ namespace TrilinosWrappers
 		   const unsigned int   *indices,
 		   const TrilinosScalar *values)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (vector->Map().UniqueGIDs()==true,
+	    ExcGhostsPresent());    
+
     if (last_action != Add)
       {
 	if (last_action == Insert)

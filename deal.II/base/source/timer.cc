@@ -96,33 +96,6 @@ void Timer::start ()
 }
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-
-void Timer::TimeMinMaxAvg::max_reduce ( const void * in_lhs_,
-					void * inout_rhs_,
-					int * len,
-					MPI_Datatype * )
-{
-  const Timer::TimeMinMaxAvg * in_lhs = static_cast<const Timer::TimeMinMaxAvg*>(in_lhs_);
-  Timer::TimeMinMaxAvg * inout_rhs = static_cast<Timer::TimeMinMaxAvg*>(inout_rhs_);
-
-  Assert(*len==1, ExcInternalError());
-
-  inout_rhs->sum += in_lhs->sum;
-  if (inout_rhs->min>in_lhs->min)
-    {
-      inout_rhs->min = in_lhs->min;
-      inout_rhs->min_index = in_lhs->min_index;
-    }
-  if (inout_rhs->max<in_lhs->max)
-    {
-      inout_rhs->max = in_lhs->max;
-      inout_rhs->max_index = in_lhs->max_index;
-    }
-}
-
-
-#endif
 
 double Timer::stop ()
 {
@@ -148,36 +121,9 @@ double Timer::stop ()
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       if (sync_wall_time)
 	{
-	  unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
-
-	  MPI_Op op;
-	  int ierr = MPI_Op_create((MPI_User_function *)&Timer::TimeMinMaxAvg::max_reduce,
-				   false, &op);
-	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-	  TimeMinMaxAvg in;
-	  in.set(time, my_id);
-
-	  MPI_Datatype type;
-	  int lengths[]={3,2};
-	  MPI_Aint displacements[]={0,offsetof(TimeMinMaxAvg, min_index)};
-	  MPI_Datatype types[]={MPI_DOUBLE, MPI_INT};
-
-	  ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
-	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-	  ierr = MPI_Type_commit(&type);
-
-	  ierr = MPI_Reduce ( &in, &this->mpi_data, 1, type, op, 0, mpi_communicator );
-	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-	  ierr = MPI_Type_free (&type);
-	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-	  ierr = MPI_Op_free(&op);
-	  AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-	  this->mpi_data.avg = this->mpi_data.sum / dealii::Utilities::System::get_n_mpi_processes(mpi_communicator);
+	  Utilities::System
+	    ::calculate_collective_mpi_min_max_avg(mpi_communicator, time,
+						   this->mpi_data);
 
 	  cumulative_wall_time += this->mpi_data.max;
 	}

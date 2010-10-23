@@ -11,18 +11,18 @@ use strict;
 my @steps = (1,2,3,4,5,6,7,8,9,
 	     10,11,12,13,14,15,16,17,18,19,
 	     20,21,22,23,24,25,   27,28,29,
-	     30,31,   33,34,35,36,      39,
-             45);
+	     30,31,32,33,34,35,36,      39,
+             40,45);
 ;
 
 # List of additional node attributes to highlight purpose and state of the example
 my %style = (
- "basic" => ',height=.7,width=.7,shape="octagon",fillcolor="green"',
- "techniques" => ',fillcolor="orange"',
- "fluids" => ',fillcolor="yellow"',
- "solids" => ',fillcolor="lightblue"',
- "time dependent" => ',fillcolor="blue"',
- "unfinished" => ',style="dashed"'
+ "basic"          => ',height=.8,width=.8,shape="octagon",fillcolor="green"',
+ "techniques"     => ',height=.35,width=.35,fillcolor="orange"',
+ "fluids"         => ',height=.25,width=.25,fillcolor="yellow"',
+ "solids"         => ',height=.25,width=.25,fillcolor="lightblue"',
+ "time dependent" => ',height=.25,width=.25,fillcolor="blue"',
+ "unfinished"     => ',height=.25,width=.25,style="dashed"'
     );
 
 

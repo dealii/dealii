@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -79,7 +79,7 @@ namespace internal
 			  const unsigned int n_q_points,
 			  const std::vector<unsigned int> &n_postprocessor_outputs,
 			  const FE &finite_elements);
-			  
+
 	const unsigned int n_components;
 	const unsigned int n_datasets;
 	const unsigned int n_subdivisions;
@@ -92,7 +92,7 @@ namespace internal
 	std::vector<std::vector<Tensor<2,spacedim> > >     patch_hessians_system;
 	std::vector<std::vector<dealii::Vector<double> > > postprocessed_values;
 
-	const dealii::hp::FECollection<dim,spacedim>      fe_collection;	
+	const dealii::hp::FECollection<dim,spacedim>      fe_collection;
     };
 
 
@@ -223,7 +223,7 @@ namespace internal
  * <tt>if () ... else ...</tt> clauses yourself), and also functions
  * and classes offering ways to control the appearance of the output
  * by setting flags for each output format.
- * 
+ *
  *
  * <h3>Information for derived classes</h3>
  *
@@ -316,19 +316,19 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					    * associated to degrees of freedom
 					    */
 	  type_dof_data,
-	  
+
 					   /**
 					    * Data vector entries are one per
 					    * grid cell
 					    */
 	  type_cell_data,
-	  
+
 					   /**
 					    * Find out automatically
 					    */
 	  type_automatic
     };
-    
+
 				     /**
 				      * Constructor
 				      */
@@ -620,7 +620,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     template <class DH2>
     void merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
 			const Point<patch_space_dim> &shift = Point<patch_space_dim>());
-    
+
 				     /**
 				      * Release the pointers to the
 				      * data vectors and the DoF
@@ -706,7 +706,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 		    << "components. However, the vector component at\n"
 		    << "position " << arg1 << " with name <" << arg2
 		    << "> does not satisfy these conditions.");
-    
+
   protected:
     				     /**
                                       * For each vector that has been added
@@ -753,12 +753,12 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * be aquired from the postprocessor.
 					  */
 	DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor);
-	
+
                                          /**
                                           * Destructor made virtual.
                                           */
         virtual ~DataEntryBase ();
-        
+
                                          /**
                                           * Assuming that the stored vector is
                                           * a cell vector, extract the given
@@ -778,7 +778,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         void
         get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                              std::vector<double>             &patch_values) const = 0;
-        
+
                                          /**
                                           * Given a FEValuesBase object,
                                           * extract the values on the present
@@ -802,7 +802,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         void
         get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
 				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const = 0;
-        
+
                                          /**
                                           * Given a FEValuesBase object,
                                           * extract the gradients on the present
@@ -826,7 +826,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         void
         get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
 			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const = 0;
-        
+
                                          /**
                                           * Given a FEValuesBase object, extract
                                           * the second derivatives on the
@@ -845,7 +845,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           * vectors.
                                           */
         virtual void clear () = 0;
-        
+
 					 /**
 					  * Determine an estimate for
 					  * the memory consumption (in
@@ -869,7 +869,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  */
 	const std::vector<DataComponentInterpretation::DataComponentInterpretation>
 	data_component_interpretation;
-	
+
 					 /**
 					  * Pointer to a DataPostprocessing
 					  * object which shall be applied to
@@ -945,7 +945,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         void
         get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                              std::vector<double>             &patch_values) const;
-        
+
                                          /**
                                           * Given a FEValuesBase object,
                                           * extract the values on the present
@@ -969,7 +969,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         void
         get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
 				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const;
-        
+
                                          /**
                                           * Given a FEValuesBase object,
                                           * extract the gradients on the present
@@ -993,7 +993,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
         void
         get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
 			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const;
-        
+
                                          /**
                                           * Given a FEValuesBase object, extract
                                           * the second derivatives on the
@@ -1012,7 +1012,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
                                           * vectors.
                                           */
         virtual void clear ();
-        
+
 					 /**
 					  * Determine an estimate for
 					  * the memory consumption (in
@@ -1063,7 +1063,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * classes.
 				      */
     std::vector<Patch> patches;
-    
+
 				     /**
 				      * Function by which the base
 				      * class's functions get to know
@@ -1091,7 +1091,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
     virtual
     std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> >
     get_vector_data_ranges () const;
-    
+
 				     /**
 				      * Make all template siblings
 				      * friends. Needed for the
@@ -1139,20 +1139,21 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  *
  * The only thing this class offers is the function build_patches() which
  * loops over all cells of the triangulation stored by the
- * attach_dof_handler() function of the base class and convert the data on
- * these to actual patches which are the objects that are later output by the
- * functions of the base classes. You can give a parameter to the function
- * which determines how many subdivisions in each coordinate direction are to
- * be performed, i.e. of how many subcells each patch shall consist. Default
- * is one, but you may want to choose a higher number for higher order
- * elements, so as two for quadratic elements, three for cubic elements three,
- * and so on. The purpose of this parameter is because most graphics programs
- * do not allow to specify higher order shape functions in the file formats:
- * only data at vertices can be plotted and is then shown as a bilinear
- * interpolation within the interior of cells. This may be insufficient if you
- * have higher order finite elements, and the only way to achieve better
- * output is to subdivide each cell of the mesh into several cells for
- * graphical output.
+ * attach_dof_handler() function of the base class (with the exception of
+ * cells of parallel::distributed::Triangulation objects that are not owned by
+ * the current processor) and converts the data on these to actual patches
+ * which are the objects that are later output by the functions of the base
+ * classes. You can give a parameter to the function which determines how many
+ * subdivisions in each coordinate direction are to be performed, i.e. of how
+ * many subcells each patch shall consist. Default is one, but you may want to
+ * choose a higher number for higher order elements, so as two for quadratic
+ * elements, three for cubic elements three, and so on. The purpose of this
+ * parameter is because most graphics programs do not allow to specify higher
+ * order shape functions in the file formats: only data at vertices can be
+ * plotted and is then shown as a bilinear interpolation within the interior
+ * of cells. This may be insufficient if you have higher order finite
+ * elements, and the only way to achieve better output is to subdivide each
+ * cell of the mesh into several cells for graphical output.
  *
  * Note that after having called build_patches() once, you can call one or
  * more of the write() functions of DataOutInterface. You can therefore
@@ -1200,12 +1201,12 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
  * cannot be interpolated to a coarser cell. If you do have cell data and use
  * this pair of functions and they return a non-active cell, then an exception
  * will be thrown.
- * 
+ *
  * @ingroup output
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim, class DH=DoFHandler<dim> >
-class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension> 
+class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
 {
   public:
 				     /**
@@ -1227,7 +1228,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
 	  curved_boundary,
 	  curved_inner_cells
     };
-    
+
     				     /**
 				      * This is the central function
 				      * of this class since it builds
@@ -1300,7 +1301,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
     virtual void build_patches (const Mapping<DH::dimension,DH::space_dimension> &mapping,
 				const unsigned int n_subdivisions = 0,
 				const CurvedCellRegion curved_region = curved_boundary);
-    
+
 				     /**
 				      * Return the first cell which we
 				      * want output for. The default
@@ -1310,7 +1311,7 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
 				      * cells in a derived class.
 				      */
     virtual cell_iterator first_cell ();
-    
+
 				     /**
 				      * Return the next cell after
 				      * @p cell which we want output
@@ -1341,12 +1342,40 @@ class DataOut : public DataOut_DoFData<DH, DH::dimension, DH::space_dimension>
 		    int,
 		    << "The number of subdivisions per patch, " << arg1
 		    << ", is not valid.");
-    
+
   private:
+
+				     /**
+				      * Return the first cell produced
+				      * by the
+				      * first_cell()/next_cell()
+				      * function pair that is locally
+				      * owned. If this object operates
+				      * on a non-distributed
+				      * triangulation, the result
+				      * equals what first_cell()
+				      * returns.
+				      */
+    cell_iterator first_locally_owned_cell ();
+
+    				     /**
+				      * Return the next cell produced
+				      * by the next_cell() function
+				      * that is locally owned. If this
+				      * object operates on a
+				      * non-distributed triangulation,
+				      * the result equals what
+				      * first_cell() returns.
+				      */
+    cell_iterator next_locally_owned_cell (const cell_iterator &cell);
+
 				     /**
 				      * Build one patch. This function
 				      * is called in a WorkStream
 				      * context.
+				      *
+				      * The result is written into the patch
+				      * variable.
 				      */
     void build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 			  internal::DataOut::ParallelData<DH::dimension, DH::space_dimension> &data,
@@ -1448,7 +1477,7 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
     }
-  
+
                                    // merge patches. store old number
                                    // of elements, since we need to
                                    // adjust patch numbers, etc
@@ -1463,11 +1492,11 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
     for (unsigned int i=old_n_patches; i<patches.size(); ++i)
       for (unsigned int v=0; v<GeometryInfo<patch_dim>::vertices_per_cell; ++v)
 	patches[i].vertices[v] += shift;
-  
+
                                    // adjust patch numbers
   for (unsigned int i=old_n_patches; i<patches.size(); ++i)
     patches[i].patch_index += old_n_patches;
-  
+
                                    // adjust patch neighbors
   for (unsigned int i=old_n_patches; i<patches.size(); ++i)
     for (unsigned int n=0; n<GeometryInfo<patch_dim>::faces_per_cell; ++n)

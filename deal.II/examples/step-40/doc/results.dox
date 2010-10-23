@@ -1,0 +1,117 @@
+<h1>Results</h1>
+
+DOCUMENT HOW TO RUN THE PROGRAM
+
+When run on a sufficiently large number of machines (say a few
+thousand), this program can relatively easily solve problems with well
+over one billion unknowns in less than a minute. On the other hand,
+such big problems can no longer be visualized, so we also ran the
+program on only 16 processors. Here are a mesh, along with its
+partitioning onto the 16 processors, and the corresponding solution:
+
+<TABLE WIDTH="100%">
+<tr>
+<td>
+  @image html step-40.mesh.png
+</td>
+<td>
+  @image html step-40.solution.png
+</td>
+</tr>
+</table>
+
+The mesh on the left has a mere 7,069 cells. This is of course a
+problem we would easily have been able to solve already on a single
+processor using step-6, but the point of the program was to show how
+to write a program that scales to many more machines. For example,
+here are two graphs that show how the run time of a large number of parts
+of the program scales on problems with around 52 and 375 million degrees of
+freedom if we take more and more processors (these and the next couple of
+graphs are taken from the @ref distributed_paper "Distributed Computing paper"):
+
+<TABLE WIDTH="100%">
+<tr>
+<td>
+  @image html step-40.strong2.png
+</td>
+<td>
+  @image html step-40.strong.png
+</td>
+</tr>
+</table>
+
+As can clearly be seen, the program scales nicely to very large
+numbers of processors. The curves, in particular the linear solver, become a
+bit wobble at the right end of the graphs since each processor has too little
+to do to offset the cost of communication (the part of the whole problem each
+processor has to solve in the above two examples is only 13,000 and 90,000
+degrees of freedom when 4,096 processors are used).
+
+While the strong scaling graphs above show that we can solve a problem of
+fixed size faster and faster if we take more and more processors, the more
+interesting question may be how big problems can become so that they can still
+be solved within a reasonable time on a machine of a particular size. We show
+this in the following two graphs for 256 and 4096 processors:
+
+<TABLE WIDTH="100%">
+<tr>
+<td>
+  @image html step-40.256.png
+</td>
+<td>
+  @image html step-40.4096.png
+</td>
+</tr>
+</table>
+
+What these graphs show is that all parts of the program scale linearly with
+the number of degrees of freedom. This time, lines are wobbly at the left as
+the size of local problems is too small. For more discussions of these results
+we refer to the @ref distributed_paper "Distributed Computing paper".
+
+So how large are the largest problems one can solve? At the time of writing
+this problem, the 
+limiting factor is that the program uses the BoomerAMG algebraic
+multigrid method from the <a
+href="http://acts.nersc.gov/hypre/" target="_top">hypre package</a> as
+a preconditioner, which unfortunately uses signed 32-bit integers to
+index the elements of a %distributed matrix. This limits the size of
+problems to $2^31-1=2,147,483,647$ degrees of freedom. From the graphs
+above it is obvious that the scalability would extend beyond this
+number, and one could expect that given more than the 4,096 machines
+shown above would also further reduce the compute time. That said, one
+can certainly expect that this limit will eventually be lifted by the
+hypre developers.
+
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+In a sense, this program is the ultimate solver for the Laplace
+equation: it can essentially solve the equation to whatever accuracy
+you want, if only you have enough processors available. Since the
+Laplace equation by itself is not terribly interesting at this level
+of accuracy, the more interesting possibilities for extension
+therefore concern not so much this program but what comes beyond
+it. For example, several of the other programs in this tutorial have
+significant run times, especially in 3d. It would therefore be
+interesting to use the techniques explained here to extend other
+programs to support parallel distributed computations. We have done
+this for step-31 in the step-32 tutorial program, but the same would
+apply to, for example, step-23 and step-25 for hyperbolic time
+dependent problems, step-33 for gas dynamics, or step-35 for the
+Navier-Stokes equations.
+
+Maybe equally interesting is the problem of postprocessing. As
+mentioned above, we only show pictures of the solution and the mesh
+for 16 processors because 4,096 processors solving 1 billion unknowns
+would produce graphical output on the order of several 10
+gigabyte. Currently, no program is able to visualize this amount of
+data in any reasonable way unless it also runs on at least several
+hundred processors. There are, however, approaches where visualization
+program directly communicate with solvers on each processor with each
+visualization process rendering the part of the scene computed by the
+solver on this processor. Implementing such an interface would allow
+to quickly visualize things that are otherwise not amenable to
+graphical display.

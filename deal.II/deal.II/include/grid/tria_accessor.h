@@ -70,7 +70,7 @@ namespace internal
 					      */
 	    type ()
 	      {}
-	    
+
 					     /**
 					      * Dummy
 					      * constructor. Only
@@ -298,6 +298,7 @@ class TriaAccessorBase
 				      */
     static const unsigned int structure_dimension = structdim;
 
+  protected:
 				     /**
 				      * Declare the data type that
 				      * this accessor class expects to
@@ -708,7 +709,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      *  returned.
 				      */
     int parent_index () const;
-    
+
 
 				     /**
 				      *  @name Accessing sub-objects
@@ -1317,7 +1318,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     double diameter () const;
 
-				     /** 
+				     /**
 				      * Length of an object in the direction
 				      * of the given axis, specified in the
 				      * local coordinate system. See the
@@ -1513,7 +1514,7 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * in the library.
 				      */
     void clear_refinement_case () const;
-    
+
                      /**
                       * Set the parent of a cell.
                       */
@@ -2187,22 +2188,54 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				     /**
 				      * Return the subdomain id of
 				      * this cell.
+				      *
+				      * See the @ref GlossSubdomainId
+				      * "glossary" for more
+				      * information. This function
+				      * should not be called if you
+				      * use a
+				      * parallel::distributed::Triangulation
+				      * object.
 				      */
-    unsigned int subdomain_id () const;
+    types::subdomain_id_t subdomain_id () const;
 
 				     /**
 				      * Set the subdomain id of this
 				      * cell.
+				      *
+				      * See the @ref GlossSubdomainId
+				      * "glossary" for more
+				      * information. This function
+				      * should not be called if you
+				      * use a
+				      * parallel::distributed::Triangulation
+				      * object.
 				      */
-    void set_subdomain_id (const unsigned int new_subdomain_id) const;
-    
+    void set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+
+				     /**
+				      * Set the subdomain id of this
+				      * cell and all its children (and
+				      * grand-children, and so on) to
+				      * the given value.
+				      *
+				      * See the @ref GlossSubdomainId
+				      * "glossary" for more
+				      * information. This function
+				      * should not be called if you
+				      * use a
+				      * parallel::distributed::Triangulation
+				      * object.
+				      */
+    void recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+
 				     /**
 				      *  Return an iterator to the
 				      *  parent.
 				      */
     TriaIterator<CellAccessor<dim,spacedim> >
     parent () const;
-    
+
 				     /**
 				      * @}
 				      */
@@ -2218,8 +2251,70 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * Test whether the cell has children
 				      * (this is the criterion for activity
 				      * of a cell).
+				      *
+				      * See the @ref GlossActive "glossary"
+				      * for more information.
 				      */
     bool active () const;
+
+				     /**
+				      * Return whether this cell
+				      * exists in the global mesh but
+				      * (i) is owned by another
+				      * processor, i.e. has a
+				      * subdomain_id different from
+				      * the one the current processor
+				      * owns and (ii) is adjacent to a
+				      * cell owned by the current
+				      * processor.
+				      *
+				      * This function only makes sense
+				      * if the triangulation used is
+				      * of kind
+				      * parallel::distributed::Triangulation. In
+				      * all other cases, the returned
+				      * value is always false.
+				      *
+				      * See the @ref GlossGhostCell
+				      * "glossary" and the @ref
+				      * distributed module for more
+				      * information.
+				      */
+    bool is_ghost () const;
+
+				     /**
+				      * Return whether this cell is
+				      * artificial, i.e. it isn't one
+				      * of the cells owned by the
+				      * current processor, and it also
+				      * doesn't border on one. As a
+				      * consequence, it exists in the
+				      * mesh to ensure that each
+				      * processor has all coarse mesh
+				      * cells and that the 2:1 ratio
+				      * of neighboring cells is
+				      * maintained, but it is not one
+				      * of the cells we should work on
+				      * on the current processor. In
+				      * particular, there is no
+				      * guarantee that this cell
+				      * isn't, in fact, further
+				      * refined on one of the other
+				      * processors.
+				      *
+				      * This function only makes sense
+				      * if the triangulation used is
+				      * of kind
+				      * parallel::distributed::Triangulation. In
+				      * all other cases, the returned
+				      * value is always false.
+				      *
+				      * See the @ref
+				      * GlossArtificialCell "glossary"
+				      * and the @ref distributed
+				      * module for more information.
+				      */
+    bool is_artificial () const;
 
 				     /**
 				      * Test whether the point @p p

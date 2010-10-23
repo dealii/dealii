@@ -743,7 +743,6 @@ namespace DoFRenumbering
   component_wise (hp::DoFHandler<dim>             &dof_handler,
 		  const std::vector<unsigned int> &target_component = std::vector<unsigned int> ());
 
-
 				   /**
 				    * Sort the degrees of freedom by
 				    * component. It does the same
@@ -786,9 +785,9 @@ namespace DoFRenumbering
 				    * the renumbering vector.
 				    */
   template <int dim, class ITERATOR, class ENDITERATOR>
-  static unsigned int
+  unsigned int
   compute_component_wise (std::vector<unsigned int>& new_dof_indices,
-			  ITERATOR& start,
+			  const ITERATOR& start,
 			  const ENDITERATOR& end,
 			  const std::vector<unsigned int> &target_component);
 

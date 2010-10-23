@@ -310,8 +310,8 @@ namespace PETScWrappers
 				       //see below)
 
       const unsigned int
-        local_col_end = local_col_start + local_columns_per_process[this_process];
-
+        local_col_end = local_col_start + local_columns_per_process[this_process];      
+	  
                                        // then count the elements in- and
                                        // out-of-window for the rows we own
 #ifdef PETSC_USE_64BIT_INDICES
@@ -351,7 +351,7 @@ namespace PETScWrappers
                           0, &row_lengths_out_of_window[0],
                           &matrix);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
-
+      
 #else //PETSC_VERSION>=2.3.3
 				       // new version to create the matrix. We
 				       // do not set row length but set the
@@ -449,7 +449,7 @@ namespace PETScWrappers
 
                                            // now copy over the information
                                            // from the sparsity pattern.
-          {
+	  {
 #ifdef PETSC_USE_64BIT_INDICES
 	    PetscInt
 #else
@@ -465,9 +465,9 @@ namespace PETScWrappers
 
 		std::copy(row_start, row_end, ptr);
 		ptr += row_end - row_start;
-          }
+	      }
 	  }
-
+	  
 
                                            // then call the petsc function
                                            // that summarily allocates these
@@ -481,7 +481,7 @@ namespace PETScWrappers
 					   // this is only needed for old
 					   // PETSc versions:
 	  
-                                           // for some reason, it does not
+					   // for some reason, it does not
                                            // seem to be possible to force
                                            // actual allocation of actual
                                            // entries by using the last
@@ -539,7 +539,7 @@ namespace PETScWrappers
 #else
 	  ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
-#endif
+#endif  
 #else
           int ierr;
 #ifdef DEBUG

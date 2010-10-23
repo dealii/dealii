@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -87,6 +87,10 @@ build_one_patch (const FaceDescriptor *cell_and_face,
 		 internal::DataOutFaces::ParallelData<DH::dimension, DH::dimension> &data,
 		 DataOutBase::Patch<DH::dimension-1,DH::space_dimension>  &patch)
 {
+  Assert (!cell_and_face->first->is_ghost() &&
+	  !cell_and_face->first->is_artificial(),
+	  ExcNotImplemented());
+  
 				   // we use the mapping to transform the
 				   // vertices. However, the mapping works on
 				   // cells, not faces, so transform the face

@@ -64,7 +64,8 @@ makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefile
 	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
 	@echo '<li><code>CXXFLAGS.o=$(CXXFLAGS.o)</code>' >> $@
-	@echo '<li><code>CFLAGS=$(CFLAGS)</code>' >> $@
+	@echo '<li><code>CFLAGS.g=$(CFLAGS.g)</code>' >> $@
+	@echo '<li><code>CFLAGS.o=$(CFLAGS.o)</code>' >> $@
 	@echo '<li><code>F77FLAGS.g=$(F77FLAGS.g)</code>' >> $@
 	@echo '<li><code>F77FLAGS.o=$(F77FLAGS.o)</code>' >> $@
 	@echo '<li><code>LDFLAGS=$(LDFLAGS)</code>' >> $@

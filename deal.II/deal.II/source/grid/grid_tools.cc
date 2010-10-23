@@ -989,7 +989,7 @@ template <int dim, int spacedim>
 void
 GridTools::
 get_subdomain_association (const Triangulation<dim, spacedim>  &triangulation,
-                           std::vector<unsigned int> &subdomain)
+                           std::vector<types::subdomain_id_t> &subdomain)
 {
   Assert (subdomain.size() == triangulation.n_active_cells(),
           ExcDimensionMismatch (subdomain.size(),
@@ -1009,7 +1009,7 @@ template <int dim, int spacedim>
 unsigned int
 GridTools::
 count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
-                                        const unsigned int        subdomain)
+                                        const types::subdomain_id_t       subdomain)
 {
   unsigned int count = 0;
   for (typename Triangulation<dim, spacedim>::active_cell_iterator
@@ -1017,8 +1017,6 @@ count_cells_with_subdomain_association (const Triangulation<dim, spacedim> &tria
        cell!=triangulation.end(); ++cell)
     if (cell->subdomain_id() == subdomain)
       ++count;
-
-  Assert (count != 0, ExcNonExistentSubdomain(subdomain));
 
   return count;
 }
@@ -1863,6 +1861,14 @@ GridTools::
 get_face_connectivity_of_cells (const Triangulation<deal_II_dimension> &triangulation,
 				SparsityPattern          &cell_connectivity);
 
+#if deal_II_dimension < 3
+template
+void
+GridTools::
+get_face_connectivity_of_cells (const Triangulation<deal_II_dimension,deal_II_dimension+1> &triangulation,
+				SparsityPattern          &cell_connectivity);
+#endif
+
 template
 void
 GridTools::partition_triangulation (const unsigned int,
@@ -1878,13 +1884,13 @@ template
 void
 GridTools::
 get_subdomain_association (const Triangulation<deal_II_dimension>  &,
-                           std::vector<unsigned int> &);
+                           std::vector<types::subdomain_id_t> &);
 
 template
 unsigned int
 GridTools::
 count_cells_with_subdomain_association (const Triangulation<deal_II_dimension> &,
-                                        const unsigned int        );
+                                        const types::subdomain_id_t);
 
 
 template

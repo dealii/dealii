@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $id$
+//    $Id$
 //    Version: $name$
 //
 //    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
@@ -78,6 +78,8 @@ namespace DoFRenumbering
     class WrapDoFIterator : private T
     {
       public:
+	typedef typename T::AccessorType AccessorType;
+
 	WrapDoFIterator (const T& t) : T(t) {}
 
 	void get_dof_indices (std::vector<unsigned int>& v) const
@@ -102,6 +104,8 @@ namespace DoFRenumbering
     class WrapMGDoFIterator : private T
     {
       public:
+	typedef typename T::AccessorType AccessorType;
+
 	WrapMGDoFIterator (const T& t) : T(t) {}
 
 	void get_dof_indices (std::vector<unsigned int>& v) const
@@ -505,6 +509,7 @@ namespace DoFRenumbering
   }
 
 
+
   template <int dim>
   void Cuthill_McKee (MGDoFHandler<dim>               &dof_handler,
 		      const unsigned int               level,
@@ -532,12 +537,13 @@ namespace DoFRenumbering
   }
 
 
+
   template <int dim>
   void
   component_wise (DoFHandler<dim>                 &dof_handler,
 		  const std::vector<unsigned int> &component_order_arg)
   {
-    std::vector<unsigned int> renumbering (dof_handler.n_dofs(),
+    std::vector<unsigned int> renumbering (dof_handler.n_locally_owned_dofs(),
 					   DoFHandler<dim>::invalid_dof_index);
 
     typedef
@@ -554,10 +560,21 @@ namespace DoFRenumbering
       typename DoFHandler<dim>::cell_iterator>(renumbering,
 					       start, end,
 					       component_order_arg);
+    if (result == 0)
+      return;
 
-    if (result == 0) return;
-
-    Assert (result == dof_handler.n_dofs(),
+				     // verify that the last numbered
+				     // degree of freedom is either
+				     // equal to the number of degrees
+				     // of freedom in total (the
+				     // sequential case) or in the
+				     // distributed case at least
+				     // makes sense
+    Assert ((result == dof_handler.n_locally_owned_dofs())
+	    ||
+	    ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
+	     &&
+	     (result <= dof_handler.n_dofs())),
 	    ExcRenumberingIncomplete());
 
     dof_handler.renumber_dofs (renumbering);
@@ -597,6 +614,7 @@ namespace DoFRenumbering
   }
 
 
+
   template <int dim>
   void
   component_wise (MGDoFHandler<dim> &dof_handler,
@@ -630,6 +648,7 @@ namespace DoFRenumbering
   }
 
 
+
   template <int dim>
   void
   component_wise (MGDoFHandler<dim> &dof_handler,
@@ -656,11 +675,10 @@ namespace DoFRenumbering
 
 
 
-
   template <int dim, class ITERATOR, class ENDITERATOR>
   unsigned int
   compute_component_wise (std::vector<unsigned int>& new_indices,
-			  ITERATOR& start,
+			  const ITERATOR   & start,
 			  const ENDITERATOR& end,
 			  const std::vector<unsigned int> &component_order_arg)
   {
@@ -673,10 +691,6 @@ namespace DoFRenumbering
 	new_indices.resize(0);
 	return 0;
       }
-
-//    Assert (new_indices.size() ==  start->dof_handler().n_dofs(),
-//  	  ExcDimensionMismatch(new_indices.size(),
-//  			       start->dof_handler.n_dofs()));
 
 				     // Copy last argument into a
 				     // writable vector.
@@ -692,7 +706,7 @@ namespace DoFRenumbering
     Assert (component_order.size() == fe_collection.n_components(),
 	    ExcDimensionMismatch(component_order.size(), fe_collection.n_components()));
 
-    for (unsigned int i=0; i< component_order.size(); ++i)
+    for (unsigned int i=0; i<component_order.size(); ++i)
       Assert(component_order[i] < fe_collection.n_components(),
 	     ExcIndexRange(component_order[i], 0, fe_collection.n_components()));
 
@@ -731,7 +745,7 @@ namespace DoFRenumbering
 					   // of freedom with this
 					   // component
 	      component_list[f][i] = component_order[comp];
-	    };
+	    }
       }
 
 				     // set up a map where for each
@@ -747,19 +761,21 @@ namespace DoFRenumbering
 				     // take care of that
     std::vector<std::vector<unsigned int> >
       component_to_dof_map (fe_collection.n_components());
-    for (;start!=end;++start)
-      {
+    for (ITERATOR cell=start; cell!=end; ++cell)
+      if (!cell->is_artificial() && !cell->is_ghost())
+	{
 					 // on each cell: get dof indices
 					 // and insert them into the global
 					 // list using their component
-	const unsigned int fe_index = start->active_fe_index();
-	const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
-	local_dof_indices.resize (dofs_per_cell);
-	start.get_dof_indices (local_dof_indices);
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  component_to_dof_map[component_list[fe_index][i]].
-	    push_back (local_dof_indices[i]);
-      };
+	  const unsigned int fe_index = cell->active_fe_index();
+	  const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
+	  local_dof_indices.resize (dofs_per_cell);
+	  cell.get_dof_indices (local_dof_indices);
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
+	    if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
+	      component_to_dof_map[component_list[fe_index][i]].
+		push_back (local_dof_indices[i]);
+	}
 
 				     // now we've got all indices sorted
 				     // into buckets labelled with their
@@ -793,25 +809,88 @@ namespace DoFRenumbering
 	  .erase (std::unique (component_to_dof_map[component].begin(),
 			       component_to_dof_map[component].end()),
 		  component_to_dof_map[component].end());
-      };
+      }
+
+				     // calculate the number of locally owned
+				     // DoFs per bucket
+    const unsigned int n_buckets = fe_collection.n_components();
+    std::vector<unsigned int> shifts(n_buckets);
+
+    if (const parallel::distributed::Triangulation<dim> * tria
+	= (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+	   (&start->get_dof_handler().get_tria())))
+      {
+#ifdef DEAL_II_USE_P4EST
+	std::vector<unsigned int> local_dof_count(n_buckets);
+
+	for (unsigned int c=0; c<n_buckets; ++c)
+	  local_dof_count[c] = component_to_dof_map[c].size();
+
+
+					 // gather information from all CPUs
+	std::vector<unsigned int>
+	  all_dof_counts(fe_collection.n_components() *
+			 Utilities::System::get_n_mpi_processes (tria->get_communicator()));
+
+	MPI_Allgather ( &local_dof_count[0], n_buckets, MPI_INT, &all_dof_counts[0],
+			n_buckets, MPI_INT, tria->get_communicator());
+
+	for (unsigned int i=0; i<n_buckets; ++i)
+	  Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]
+		  ==
+		  local_dof_count[i],
+		  ExcInternalError());
+
+					 //calculate shifts
+	unsigned int cumulated = 0;
+	for (unsigned int c=0; c<n_buckets; ++c)
+	  {
+	    shifts[c]=cumulated;
+	    for (unsigned int i=0; i<tria->locally_owned_subdomain(); ++i)
+	      shifts[c] += all_dof_counts[c+n_buckets*i];
+	    for (unsigned int i=0; i<Utilities::System::get_n_mpi_processes (tria->get_communicator()); ++i)
+	      cumulated += all_dof_counts[c+n_buckets*i];
+	  }
+#else
+	Assert (false, ExcInternalError());
+#endif
+      }
+    else
+      {
+	shifts[0] = 0;
+	for (unsigned int c=1; c<fe_collection.n_components(); ++c)
+	  shifts[c] = shifts[c-1] + component_to_dof_map[c-1].size();
+      }
+
+
+
 
 				     // now concatenate all the
 				     // components in the order the user
 				     // desired to see
     unsigned int next_free_index = 0;
-    for (unsigned int c=0; c<fe_collection.n_components(); ++c)
+    for (unsigned int component=0; component<fe_collection.n_components(); ++component)
       {
-	const unsigned int component = c;
-
 	const typename std::vector<unsigned int>::const_iterator
 	  begin_of_component = component_to_dof_map[component].begin(),
 	  end_of_component   = component_to_dof_map[component].end();
 
+	next_free_index = shifts[component];
+
 	for (typename std::vector<unsigned int>::const_iterator
 	       dof_index = begin_of_component;
 	     dof_index != end_of_component; ++dof_index)
-	  new_indices[*dof_index] = next_free_index++;
-      };
+	  {
+	    Assert (start->get_dof_handler().locally_owned_dofs()
+		    .index_within_set(*dof_index)
+		    <
+		    new_indices.size(),
+		    ExcInternalError());
+	    new_indices[start->get_dof_handler().locally_owned_dofs()
+			.index_within_set(*dof_index)]
+	      = next_free_index++;
+	  }
+      }
 
     return next_free_index;
   }
@@ -1609,7 +1688,7 @@ namespace DoFRenumbering
 				     // first get the association of each dof
 				     // with a subdomain and determine the total
 				     // number of subdomain ids used
-    std::vector<unsigned int> subdomain_association (n_dofs);
+    std::vector<types::subdomain_id_t> subdomain_association (n_dofs);
     DoFTools::get_subdomain_association (dof_handler,
 					 subdomain_association);
     const unsigned int n_subdomains

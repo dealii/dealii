@@ -45,12 +45,30 @@ DoFCellAccessor<DH>::update_cell_dof_indices_cache () const
 {
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
-  
+
   Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
   Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
 
-  internal::DoFCellAccessor::Implementation::update_cell_dof_indices_cache (*this);
+  internal::DoFCellAccessor::Implementation::
+    update_cell_dof_indices_cache (*this);
 }
+
+
+
+template <class DH>
+void
+DoFCellAccessor<DH>::set_dof_indices (const std::vector<unsigned int> &local_dof_indices)
+{
+  Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
+          ExcMessage ("DoFHandler not initialized"));
+
+  Assert (this->dof_handler != 0, typename BaseClass::ExcInvalidObject());
+  Assert (&this->get_fe() != 0, typename BaseClass::ExcInvalidObject());
+
+  internal::DoFCellAccessor::Implementation::
+    set_dof_indices (*this, local_dof_indices);
+}
+
 
 
 
@@ -79,7 +97,7 @@ get_interpolated_dof_values (const InputVector &values,
 {
   const FiniteElement<dim,spacedim> &fe            = this->get_fe();
   const unsigned int        dofs_per_cell = fe.dofs_per_cell;
-  
+
   Assert (this->dof_handler != 0,
 	  typename BaseClass::ExcInvalidObject());
   Assert (&fe != 0,
@@ -98,7 +116,7 @@ get_interpolated_dof_values (const InputVector &values,
     {
       Vector<number> tmp1(dofs_per_cell);
       Vector<number> tmp2(dofs_per_cell);
-      
+
       interpolated_values = 0;
 
                                        // later on we will have to
@@ -161,7 +179,7 @@ get_interpolated_dof_values (const InputVector &values,
       std::vector<bool> restriction_is_additive (dofs_per_cell);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         restriction_is_additive[i] = fe.restriction_is_additive(i);
-      
+
       for (unsigned int child=0; child<this->n_children(); ++child)
 	{
 					   // get the values from the present
@@ -176,7 +194,7 @@ get_interpolated_dof_values (const InputVector &values,
                                            // and add up or set them
                                            // in the output vector
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-            if (restriction_is_additive[i]) 
+            if (restriction_is_additive[i])
               interpolated_values(i) += tmp2(i);
             else
               if (tmp2(i) != number())
@@ -213,14 +231,14 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 				     // otherwise distribute them to the children
     {
       Vector<number> tmp(dofs_per_cell);
-      
+
       for (unsigned int child=0; child<this->n_children(); ++child)
 	{
 					   // prolong the given data
 					   // to the present cell
 	  this->get_fe().get_prolongation_matrix(child, this->refinement_case())
             .vmult (tmp, local_values);
-	    
+
 	  this->child(child)->set_dof_values_by_interpolation (tmp, values);
 	}
     }
@@ -324,11 +342,11 @@ template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2,3> > >;
 #if deal_II_dimension != 3
 template class DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
 
-template class 
+template class
 TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class 
+template class
 TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class 
+template class
 TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
 #endif
 
@@ -351,11 +369,11 @@ template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2,3> > >;
 #if deal_II_dimension != 3
 template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
 
-template class 
+template class
 TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class 
+template class
 TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class 
+template class
 TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
 #endif
 
