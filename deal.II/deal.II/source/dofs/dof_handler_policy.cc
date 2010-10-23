@@ -1070,7 +1070,7 @@ namespace internal
 	NumberCache number_cache;
 
 #ifndef DEAL_II_USE_P4EST
-	(void)fe;
+	(void)dof_handler;
 	Assert (false, ExcNotImplemented());
 #else
 
