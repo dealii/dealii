@@ -646,7 +646,7 @@ namespace Polynomials
 
 
   std::vector<Polynomial<double> >
-  Lagrange::generate_complete_basis (const std::vector<Point<1> >& points)
+  generate_complete_Lagrange_basis (const std::vector<Point<1> >& points)
   {
     std::vector<Polynomial<double> > p(points.size());
                                      // polynomials are built as

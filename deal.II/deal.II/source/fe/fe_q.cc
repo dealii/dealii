@@ -300,7 +300,7 @@ struct FE_Q<xdim,xspacedim>::Implementation
 					 // destination (child) and source (mother)
 					 // dofs.
 	const std::vector<Polynomials::Polynomial<double> > polynomials=
-	  Polynomials::Lagrange::generate_complete_basis(points.get_points());
+	  Polynomials::generate_complete_Lagrange_basis(points.get_points());
 
 	fe.interface_constraints
 	  .TableBase<2,double>::reinit (fe.interface_constraints_size());
@@ -429,7 +429,7 @@ struct FE_Q<xdim,xspacedim>::Implementation
 					 // dofs.
 	const unsigned int pnts=(fe.degree+1)*(fe.degree+1);
 	const std::vector<Polynomials::Polynomial<double> > polynomial_basis=
-	  Polynomials::Lagrange::generate_complete_basis(points.get_points());
+	  Polynomials::generate_complete_Lagrange_basis(points.get_points());
 
 	const TensorProductPolynomials<dim-1> face_polynomials(polynomial_basis);
 
@@ -587,7 +587,7 @@ template <int dim, int spacedim>
 FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
-		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
+		  TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
 		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),
 					 1, points.n_quadrature_points-1,
 					 FiniteElementData<dim>::H1),

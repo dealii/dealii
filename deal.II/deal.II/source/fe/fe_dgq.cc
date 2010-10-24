@@ -196,7 +196,7 @@ template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ (const Quadrature<1>& points)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
-		  TensorProductPolynomials<dim>(Polynomials::Lagrange::generate_complete_basis(points.get_points())),
+		  TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
 		  FiniteElementData<dim>(get_dpo_vector(points.size()-1), 1, points.size()-1, FiniteElementData<dim>::L2),
 		  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(points.size()-1),1, points.size()-1).dofs_per_cell, true),
 		  std::vector<std::vector<bool> >(FiniteElementData<dim>(

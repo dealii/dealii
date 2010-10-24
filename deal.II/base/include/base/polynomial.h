@@ -80,7 +80,7 @@ namespace Polynomials
                                         * an illegal object.
                                         */
       Polynomial ();
-     
+
                                        /**
                                         * Return the value of this
                                         * polynomial at the given point.
@@ -90,7 +90,7 @@ namespace Polynomials
                                         * of the evaluation.
                                         */
       number value (const number x) const;
-   
+
                                        /**
                                         * Return the values and the
                                         * derivatives of the
@@ -194,12 +194,12 @@ namespace Polynomials
                                         * Add a second polynomial.
                                         */
       Polynomial<number>& operator += (const Polynomial<number>& p);
-     
+
                                        /**
                                         * Subtract a second polynomial.
                                         */
       Polynomial<number>& operator -= (const Polynomial<number>& p);
-     
+
                                        /**
                                         * Print coefficients.
                                         */
@@ -227,7 +227,7 @@ namespace Polynomials
                                         */
       static void multiply (std::vector<number>& coefficients,
                             const number factor);
-   
+
                                        /**
                                         * Coefficients of the polynomial
                                         * $\sum_i a_i x^i$. This vector
@@ -251,8 +251,7 @@ namespace Polynomials
  * @author Guido Kanschat, 2004
  */
   template <typename number>
-  class Monomial :
-       public Polynomial<number>
+  class Monomial : public Polynomial<number>
   {
     public:
                                        /**
@@ -279,7 +278,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<number> >
       generate_complete_basis (const unsigned int degree);
-   
+
     private:
                                        /**
                                         * Needed by constructor.
@@ -287,7 +286,7 @@ namespace Polynomials
       static std::vector<number> make_vector(unsigned int n,
                                              const double coefficient);
   };
- 
+
 
 /**
  * Lagrange polynomials with equidistant interpolation points in
@@ -341,7 +340,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
-   
+
     private:
 
                                        /**
@@ -359,31 +358,22 @@ namespace Polynomials
                             std::vector<double>& a);
   };
 
-/**
- * Lagrange polynomials for an arbistrary set of interpolation points.
- *
- * @author Guido Kanschat, 2005
- */
-  class Lagrange
-  {
-    public:
-                                       /**
-                                        * Given a set of points, this
-                                        * function returns all
-                                        * Lagrange polynomials for
-                                        * interpolation of these
-                                        * points. The number of
-                                        * polynomials is equal to the
-                                        * number of points and the
-                                        * maximum degree is one less.
-                                        */
-      static
-      std::vector<Polynomial<double> >
-      generate_complete_basis (const std::vector<Point<1> >& points);
-  };
- 
- 
- 
+
+				   /**
+				    * Given a set of points along the
+				    * real axis, this function returns
+				    * all Lagrange polynomials for
+				    * interpolation of these
+				    * points. The number of
+				    * polynomials is equal to the
+				    * number of points and the maximum
+				    * degree is one less.
+				    */
+  std::vector<Polynomial<double> >
+  generate_complete_Lagrange_basis (const std::vector<Point<1> >& points);
+
+
+
 /**
  * Legendre polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
@@ -420,7 +410,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
-   
+
     private:
                                        /**
                                         * Coefficients for the interval $[0,1]$.
@@ -441,12 +431,12 @@ namespace Polynomials
                                         * the global destructor is called.
                                         */
       static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > recursive_coefficients;
-   
+
                                        /**
                                         * Compute coefficients recursively.
                                         */
       static void compute_coefficients (const unsigned int p);
-   
+
                                        /**
                                         * Get coefficients for
                                         * constructor.  This way, it can
@@ -507,7 +497,7 @@ namespace Polynomials
       std::vector<double> compute_coefficients (const unsigned int p);
   };
 
- 
+
 /**
  * Hierarchical polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
@@ -581,7 +571,7 @@ namespace Polynomials
       static
       std::vector<Polynomial<double> >
       generate_complete_basis (const unsigned int degree);
-   
+
     private:
                                      /**
                                       * Compute coefficients recursively.
@@ -597,9 +587,9 @@ namespace Polynomials
                                       */
      static const std::vector<double> &
      get_coefficients (const unsigned int p);
- 
+
      static std::vector<const std::vector<double> *> recursive_coefficients;
-   };  
+   };
 }
 
 /** @} */
@@ -612,7 +602,7 @@ namespace Polynomials
   inline
   Polynomial<number>::Polynomial ()
   {}
- 
+
   template <typename number>
   inline
   unsigned int
