@@ -435,7 +435,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	      break;
 	    }
 	  
-	  case mapping_nedelec: {
+	  case mapping_nedelec:
+	  {
 	     std::vector<Tensor<1,dim> > shape_values (n_q_points);
 	     mapping.transform (fe_data.shape_values[i], shape_values,
 	       mapping_data, mapping_covariant);

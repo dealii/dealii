@@ -39,6 +39,9 @@ FE_BDM<dim>::FE_BDM (const unsigned int deg)
 						  std::vector<bool>(dim,true)))
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
+  Assert (dim<3, ExcNotImplemented());
+  Assert (deg > 0, ExcMessage("Lowest order BDM element are degree 1, but you asked for degree 0"));
+  
   const unsigned int n_dofs = this->dofs_per_cell;
   
   this->mapping_type = mapping_piola;
