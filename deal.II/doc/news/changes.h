@@ -60,6 +60,16 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
   <li>
+  <p>New: After more than 2 years of work, we have merged a branch on which
+  we have implemented the functionality necessary to distribute meshes on
+  hundreds, thousands, or more processors. An overview of the framework
+  in which this is implemented is presented in the @ref distributed module
+  as well as in step-40.
+  <br>
+  (Timo Heister, Martin Kronbichler, Wolfgang Bangerth 2010/10/23)
+  </p>
+
+  <li>
   <p>New: Documentation of how to handle constraints on degrees of freedom
   has been centralized in a new documentation module on @ref constraints.
   <br>
