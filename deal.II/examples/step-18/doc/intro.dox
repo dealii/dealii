@@ -7,12 +7,14 @@ that we have already started with step-8 and step-17. It extends it into two
 different directions: first, it solves the quasistatic but time dependent
 elasticity problem for large deformations with a Lagrangian mesh movement
 approach. Secondly, it shows some more techniques for solving such problems
-using %parallel processing with PETSc's linear algebra. In addition to this, we
-show how to work around the main bottleneck of step-17, namely that we
-generated graphical output from only one process, and that this scaled very
-badly with larger numbers of processes and on large problems. Finally, a good
-number of assorted improvements and techniques are demonstrated that have not
-been shown yet in previous programs.
+using %parallel processing with PETSc's linear algebra. In addition to this,
+we show how to work around one of the two major bottlenecks of step-17, namely
+that we generated graphical output from only one process, and that this scaled
+very badly with larger numbers of processes and on large problems. (The other
+bottleneck, namely that every processor has to hold the entire mesh and
+DoFHandler, is addressed in step-40.) Finally, a
+good number of assorted improvements and techniques are demonstrated that have
+not been shown yet in previous programs.
 
 As before in step-17, the program runs just as fine on a single sequential
 machine as long as you have PETSc installed. Information on how to tell
