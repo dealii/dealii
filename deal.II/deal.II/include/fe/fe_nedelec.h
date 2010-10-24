@@ -33,6 +33,11 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
+ * @warning Several aspects of the implementation are
+ * experimental. For the moment, it is safe to use the element on
+ * globally refined meshes with consistent orientation of faces. See
+ * the todo entries below for more detailed caveats.
+ *
  * Implementation of N&eacute;d&eacute;lec elements, conforming with the
  * space H<sup>curl</sup>. These elements generate vector fields with
  * tangential components continuous between mesh cells.
@@ -58,6 +63,11 @@ template <int dim, int spacedim> class MappingQ;
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
+ *
+ * @todo The constraint matrices for hanging nodes are only
+ * implemented in 2D. Currently, the 3D version will run without an
+ * exception being triggered, but results at refinement edges will be
+ * wrong.
  *
  * @todo Even if this element is implemented for two and three space
  * dimensions, the definition of the node values relies on

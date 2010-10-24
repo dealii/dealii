@@ -62,28 +62,48 @@ deg (p)
 				   // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
   initialize_restriction ();
+  
+  switch (dim)
+    {
+      case 2:
+	    this->interface_constraints.reinit (
+	      GeometryInfo<dim>::max_children_per_face * this->dofs_per_face,
+	      this->dofs_per_face);
+	    break;
+      case 3:
+	    this->interface_constraints.reinit (
+	      GeometryInfo<dim>::max_children_per_face * this->dofs_per_face
+	      - 4 * this->dofs_per_line,
+	      this->dofs_per_face);
+	    break;
+      default:
+	    Assert(false, ExcNotImplemented());
+	    break;
+    }
 
-  FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
-
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-     face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
-
-  FETools::compute_face_embedding_matrices<dim,double>
-    (*this, face_embeddings, 0, 0);
-  this->interface_constraints.reinit ((1 << (dim - 1)) * this->dofs_per_face,
-                                      this->dofs_per_face);
-
-  unsigned int target_row = 0;
-
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    for (unsigned int j = 0; j < face_embeddings[i].m (); ++j)
-      {
-        for (unsigned int k = 0; k < face_embeddings[i].n (); ++k)
-          this->interface_constraints (target_row, k)
-            = face_embeddings[i] (j, k);
-
-        ++target_row;
-      }
+  if (dim==2)
+    {
+      FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
+      
+      for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
+	face_embeddings[i].reinit (this->dofs_per_face, this->dofs_per_face);
+      
+      FETools::compute_face_embedding_matrices<dim,double>
+	(*this, face_embeddings, 0, 0);
+      unsigned int target_row = 0;
+      
+      for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
+	for (unsigned int j = 0; j < face_embeddings[i].m (); ++j)
+	  {
+	    for (unsigned int k = 0; k < face_embeddings[i].n (); ++k)
+	      this->interface_constraints (target_row, k)
+		= face_embeddings[i] (j, k);
+	    
+	    ++target_row;
+	  }
+    }
+  else
+    this->interface_constraints.reinit(0,0);
 }
 
 
@@ -100,7 +120,7 @@ FE_Nedelec<dim>::get_name () const
 				   // have to be kept in synch
 
   std::ostringstream namebuf;
-  namebuf << "FE_Nedelec<" << dim << ">(" << deg << ")";
+  namebuf << "FE_Nedelec<" << dim << ">(" << this->tensor_degree()-1 << ")";
 
   return namebuf.str();
 }
@@ -1304,7 +1324,7 @@ template <int dim>
 bool
 FE_Nedelec<dim>::hp_constraints_are_implemented () const
 {
-  return true;
+  return dim != 2;
 }
 
 template <int dim>
