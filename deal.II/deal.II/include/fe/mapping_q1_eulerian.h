@@ -130,20 +130,6 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      */
     bool preserves_vertex_locations () const;
 
-
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcWrongNoOfComponents);
-
-				     /**
-				      * Exception.
-				      */
-    DeclException2 (ExcWrongVectorSize,
-		    int, int,
-		    << "Vector has wrong size " << arg1
-		    << ", expected size " << arg2);
-
 				     /**
 				      * Exception.
 				      */
@@ -174,14 +160,14 @@ class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 				      * Reference to the vector of
 				      * shifts.
 				      */
-    const VECTOR &euler_transform_vectors;
+    SmartPointer<const VECTOR, MappingQ1Eulerian<dim,VECTOR,spacedim> > euler_transform_vectors;
 
                                      /**
 				      * Pointer to the DoFHandler to
 				      * which the mapping vector is
 				      * associated.
 				      */
-    const SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
+    SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
 
 
   private:

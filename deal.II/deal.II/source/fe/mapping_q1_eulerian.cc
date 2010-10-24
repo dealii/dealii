@@ -28,8 +28,8 @@ MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
 MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
 		   const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
                    :
-		   euler_transform_vectors(euler_transform_vectors),
-		   shiftmap_dof_handler(&shiftmap_dof_handler, typeid(*this).name())
+		   euler_transform_vectors(&euler_transform_vectors),
+		   shiftmap_dof_handler(&shiftmap_dof_handler)
 {}
 
 
@@ -48,14 +48,12 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 				   // *before* the mapping object is
 				   // constructed, which is not
 				   // necessarily what we want.
-  Assert (spacedim == shiftmap_dof_handler->get_fe().n_dofs_per_vertex(),
-          ExcWrongNoOfComponents());
-  Assert (shiftmap_dof_handler->get_fe().n_components() == spacedim,
-	  ExcWrongNoOfComponents());
 
-  Assert (shiftmap_dof_handler->n_dofs() == euler_transform_vectors.size(),
-          ExcWrongVectorSize(euler_transform_vectors.size(),
-			     shiftmap_dof_handler->n_dofs()));
+//TODO: Only one of these two assertions should be relevant
+  AssertDimension (spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
+  AssertDimension(shiftmap_dof_handler->get_fe().n_components(), spacedim);
+
+  AssertDimension (shiftmap_dof_handler->n_dofs(), euler_transform_vectors->size());
 
 				   // cast the
 				   // Triangulation<dim>::cell_iterator
@@ -82,7 +80,7 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 				   // now get the values of the shift
 				   // vectors at the vertices
   Vector<double> mapping_values (shiftmap_dof_handler->get_fe().dofs_per_cell);
-  dof_cell->get_dof_values (euler_transform_vectors, mapping_values);
+  dof_cell->get_dof_values (*euler_transform_vectors, mapping_values);
 
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
@@ -143,6 +141,7 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
 
 // explicit instantiation
 template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
+template class MappingQ1Eulerian<deal_II_dimension, Vector<float> >;
 #ifdef DEAL_II_USE_PETSC
 template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
 #endif

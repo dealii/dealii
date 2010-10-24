@@ -133,27 +133,12 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
 				      * locations).
 				      */
     bool preserves_vertex_locations () const;
-
-                                     /**
-                                      * Exception
-                                      */
-
-    DeclException0 (ExcWrongNoOfComponents);
-
+    
 				     /**
                                       * Exception
                                       */
-
     DeclException0 (ExcInactiveCell);
-
-				     /**
-                                      * Exception
-                                      */
-
-    DeclException2 (ExcWrongVectorSize, int, int,
-		    << "Vector has wrong size " << arg1
-		    << "-- expected size " << arg2);
-
+    
   protected:
 				     /**
 				      * Implementation of the interface in
@@ -178,7 +163,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       * shifts.
                                       */
 
-    const VECTOR &euler_vector;
+    SmartPointer<const VECTOR, MappingQEulerian<dim,VECTOR,spacedim> > euler_vector;
 
                                      /**
                                       * Pointer to the DoFHandler to
@@ -186,7 +171,7 @@ class MappingQEulerian : public MappingQ<dim, spacedim>
                                       * associated.
                                       */
 
-    const SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
+    SmartPointer<const DoFHandler<dim,spacedim>,MappingQEulerian<dim,VECTOR,spacedim> > euler_dof_handler;
 
 
   private:

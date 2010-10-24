@@ -36,8 +36,8 @@ MappingQEulerian (const unsigned int degree,
 		  const DoFHandler<dim,spacedim> &euler_dof_handler)
 		:
 		MappingQ<dim,spacedim>(degree, true),
-		euler_vector(euler_vector),
-		euler_dof_handler(&euler_dof_handler, typeid(*this).name()),
+		euler_vector(&euler_vector),
+		euler_dof_handler(&euler_dof_handler),
 		support_quadrature(degree),
 		fe_values(euler_dof_handler.get_fe(),
 			  support_quadrature,
@@ -51,7 +51,7 @@ Mapping<dim,spacedim> *
 MappingQEulerian<dim, EulerVectorType, spacedim>::clone () const
 {
   return new MappingQEulerian<dim,EulerVectorType,spacedim>(this->get_degree(),
-						   euler_vector,
+						   *euler_vector,
 						   *euler_dof_handler);
 }
 
@@ -111,9 +111,9 @@ compute_mapping_support_points
 				   // with respect to vector size,
 
   const unsigned int n_dofs      = euler_dof_handler->n_dofs();
-  const unsigned int vector_size = euler_vector.size();
+  const unsigned int vector_size = euler_vector->size();
 
-  Assert (n_dofs == vector_size,ExcWrongVectorSize(vector_size,n_dofs));
+  AssertDimension(vector_size,n_dofs);
 
 				   // we then transform our tria iterator
 				   // into a dof iterator so we can
@@ -153,7 +153,7 @@ compute_mapping_support_points
   const unsigned int n_support_pts = support_quadrature.n_quadrature_points;
   const unsigned int n_components  = euler_dof_handler->get_fe().n_components();
 
-  Assert (n_components >= spacedim, ExcWrongNoOfComponents() );
+  Assert (n_components >= spacedim, ExcDimensionMismatch(n_components, spacedim) );
 
   std::vector<Vector<double> > shift_vector(n_support_pts,Vector<double>(n_components));
 
@@ -165,7 +165,7 @@ compute_mapping_support_points
 				   // threads
   Threads::ThreadMutex::ScopedLock lock(fe_values_mutex);
   fe_values.reinit(dof_cell);
-  fe_values.get_function_values(euler_vector,shift_vector);
+  fe_values.get_function_values(*euler_vector, shift_vector);
 
 				   // and finally compute the positions of the
 				   // support points in the deformed
