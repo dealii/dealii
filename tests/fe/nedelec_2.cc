@@ -19,6 +19,7 @@
 #include <fe/fe_nedelec.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_cartesian.h>
+#include <numerics/data_out.h>
 
 #include <vector>
 #include <fstream>
@@ -38,18 +39,33 @@ plot (const Triangulation<dim> &tr, const unsigned int p)
   
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe_ned);
-
+  
                                    // generate some numbers for the
                                    // degrees of freedom on this mesh
   Vector<double> values (dof.n_dofs());
   for (unsigned int i=0; i<values.size(); ++i)
     values(i) = i;
+
+  std::vector<unsigned int> face_dofs(fe_ned.dofs_per_face);
+
+				   // Uncomment this to isolate
+				   // boundary degrees of freedom
+//   if (p==1)
+//     for (typename DoFHandler<dim>::active_cell_iterator
+// 	   c = dof.begin_active();
+// 	 c!=dof.end(); ++c)
+//       for(unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+// 	{
+// 	  c->face(f)->get_dof_indices(face_dofs);
+// 	  values(face_dofs[0]) = 0;
+// 	  values(face_dofs[1]) = 1;
+// 	}
                                    // then make sure that hanging node
                                    // constraints are taken care of
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints (dof, cm);
   cm.close ();
-  cm.distribute (values);
+   cm.distribute (values);
 
                                    // now take these values, and print
                                    // the values of this so defined
@@ -83,6 +99,17 @@ plot (const Triangulation<dim> &tr, const unsigned int p)
                 
       deallog << std::endl;
     }
+
+				   // Uncomment this to plost solutions
+//   if (dim==2 && p==1)
+//     {
+//       std::ofstream gnuplot_output("test.gpl");
+//       DataOut<dim> data_out;
+//       data_out.attach_dof_handler (dof);
+//       data_out.add_data_vector (values, "u");
+//       data_out.build_patches (mapping, 4);
+//       data_out.write_gnuplot(gnuplot_output);
+//     }
 }
 
 

@@ -97,9 +97,9 @@ transform_grid (Triangulation<2> &tria,
 
 template<int dim>
 inline void
-plot_shape_functions(const unsigned int p)
+plot_shape_functions(const unsigned int degree)
 {
-  FE_Nedelec<dim> fe_ned(p);
+  FE_Nedelec<dim> element(degree);
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr, 0., 1.);
 
@@ -109,19 +109,19 @@ plot_shape_functions(const unsigned int p)
   for (unsigned int transform=0; transform<4; ++transform)
     {
       std::ostringstream ost;
-      ost << "Nedelec" << p << "-Transform" << transform;
+      ost << "Nedelec" << degree << "-Transform" << transform;
       deallog.push(ost.str());
       
       transform_grid (tr, transform);
 
       DoFHandler<dim> dof(tr);
       typename DoFHandler<dim>::cell_iterator c = dof.begin();
-      dof.distribute_dofs(fe_ned);
+      dof.distribute_dofs(element);
       
       QTrapez<1> q_trapez;
       const unsigned int div=2;
       QIterated<dim> q(q_trapez, div);
-      FEValues<dim> fe(fe_ned, q, update_values|update_gradients|update_q_points);
+      FEValues<dim> fe(element, q, update_values|update_gradients|update_q_points);
       fe.reinit(c);
       
       for (unsigned int q_point=0;q_point< q.size();++q_point)
@@ -131,7 +131,7 @@ plot_shape_functions(const unsigned int p)
 					   // namely x y z u0x u0y u0z u1x...
 	  deallog << "value    " << q_point << '\t' << fe.quadrature_point(q_point);
 	  
-	  for (unsigned int i=0;i<fe_ned.dofs_per_cell;++i)
+	  for (unsigned int i=0;i<element.dofs_per_cell;++i)
 	    {
 	      for (unsigned int c=0; c<dim; ++c)
 		deallog << '\t' << fe.shape_value_component(i,q_point,c);
@@ -141,7 +141,7 @@ plot_shape_functions(const unsigned int p)
 					   // similar fashion
 	  deallog << std::endl << "gradient " << q_point << '\t' << fe.quadrature_point(q_point);
 	  
-	  for (unsigned int i=0;i<fe_ned.dofs_per_cell;++i)
+	  for (unsigned int i=0;i<element.dofs_per_cell;++i)
 	    {
 	      for (unsigned int c=0; c<dim; ++c)
 		{
@@ -173,9 +173,7 @@ main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  deallog << "Degree 0: " << std::endl;
   plot_shape_functions<2> (0);
-  deallog << "Degree 1: " << std::endl;
   plot_shape_functions<2> (1);
   
   return 0;

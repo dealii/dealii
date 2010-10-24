@@ -17,6 +17,8 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_dgp.h>
 #include <fe/fe_nedelec.h>
+#include <fe/fe_bdm.h>
+#include <fe/fe_raviart_thomas.h>
 #include <fe/fe_system.h>
 #include <vector>
 #include <fstream>
@@ -161,9 +163,17 @@ main()
   CHECK_ALL(Q_Hierarchical,2,3);
 
   CHECK_ALL(Nedelec, 0, 2);
-  CHECK_ALL(Nedelec, 0, 3);
+//  CHECK_ALL(Nedelec, 0, 3);
   CHECK_ALL(Nedelec, 1, 2);
-  CHECK_ALL(Nedelec, 1, 3);
+//  CHECK_ALL(Nedelec, 1, 3);
+  
+  CHECK_ALL(RaviartThomas, 0, 2);
+  CHECK_ALL(RaviartThomas, 0, 3);
+  CHECK_ALL(RaviartThomas, 1, 2);
+  CHECK_ALL(RaviartThomas, 1, 3);
+  
+  CHECK_ALL(BDM, 1, 2);
+  CHECK_ALL(BDM, 2, 2);
   
   CHECK_SYS1(FE_Q<2>(1),3,2);
   CHECK_SYS1(FE_DGQ<2>(2),2,2);
