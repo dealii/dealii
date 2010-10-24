@@ -92,6 +92,8 @@ USE_CONTRIB_UMFPACK  = @USE_CONTRIB_UMFPACK@
 USE_CONTRIB_P4EST    = @USE_CONTRIB_P4EST@
 DEAL_II_P4EST_DIR    = @DEAL_II_P4EST_DIR@
 
+DEAL_II_USE_MPI      = @DEAL_II_USE_MPI@
+
 TARGET               = @target@
 
 ######################################################

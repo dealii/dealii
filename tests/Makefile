@@ -17,7 +17,7 @@ nofail-dirs = a-framework       \
               aniso     \
               codim_one \
               serialization \
-	      mpi               \
+	      $(shell if test "$(DEAL_II_USE_MPI)" = yes ; then echo mpi ; fi) \
 	      $(shell if test "$(USE_CONTRIB_P4EST)" = yes ; then echo distributed_grids ; fi) \
 	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
 	      $(shell if test "$(USE_CONTRIB_TRILINOS)" = yes ; then echo trilinos ; fi) \
