@@ -2469,6 +2469,16 @@ namespace parallel
 	    cell->clear_refine_flag ();
 	    cell->clear_coarsen_flag ();
 	  }
+	else
+					   // if this is a cell we do
+					   // own, make sure they are
+					   // not refined
+					   // anisotropically since we
+					   // don't support this
+	  if (cell->refine_flag_set())
+	    Assert (cell->refine_flag_set() ==
+		    RefinementPossibilities<dim>::isotropic_refinement,
+		    ExcMessage ("This class does not support anisotropic refinement"));
 
 
 
