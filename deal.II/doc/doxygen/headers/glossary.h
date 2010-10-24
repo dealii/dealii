@@ -433,7 +433,9 @@
  * namespace.
  *
  * The paper is submitted to the ACM Transactions on Mathematical Software
- * (ACM TOMS).
+ * (ACM TOMS). It is also available as
+ * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
+ * preprint 2011-187</a>.
  * </dd>
  *
  *
