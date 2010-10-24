@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,7 +48,7 @@ namespace GridOutFlags
     param.declare_entry("Write all faces", "true", Patterns::Bool(),
 			"Write all faces, not only boundary");
   }
-  
+
   void DX::parse_parameters (ParameterHandler& param)
   {
     write_cells = param.get_bool("Write cells");
@@ -57,14 +57,14 @@ namespace GridOutFlags
     write_measure = param.get_bool("Write measure");
     write_all_faces = param.get_bool("Write all faces");
   }
-  
-  
-  Msh::Msh (const bool write_faces, 
+
+
+  Msh::Msh (const bool write_faces,
 	    const bool write_lines) :
     write_faces (write_faces),
     write_lines (write_lines)
   {}
-  
+
   void Msh::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Write faces", "false", Patterns::Bool());
@@ -78,7 +78,7 @@ namespace GridOutFlags
     write_lines = param.get_bool("Write lines");
   }
 
-  
+
   Ucd::Ucd (const bool write_preamble,
 	    const bool write_faces,
 	    const bool write_lines) :
@@ -87,8 +87,8 @@ namespace GridOutFlags
 		  write_lines (write_lines)
   {}
 
-  
-  
+
+
   void Ucd::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Write preamble", "true", Patterns::Bool());
@@ -104,7 +104,7 @@ namespace GridOutFlags
     write_lines = param.get_bool("Write lines");
   }
 
-  
+
   Gnuplot::Gnuplot (const bool write_cell_numbers,
 		    const unsigned int n_boundary_face_points,
 		    const bool         curved_inner_cells) :
@@ -113,8 +113,8 @@ namespace GridOutFlags
 		  curved_inner_cells(curved_inner_cells)
   {}
 
-  
-  
+
+
   void Gnuplot::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Cell number", "false", Patterns::Bool());
@@ -128,7 +128,7 @@ namespace GridOutFlags
     n_boundary_face_points = param.get_integer("Boundary points");
   }
 
-  
+
   EpsFlagsBase::EpsFlagsBase (const SizeType     size_type,
 			      const unsigned int size,
 			      const double       line_width,
@@ -142,7 +142,7 @@ namespace GridOutFlags
 		  n_boundary_face_points(n_boundary_face_points),
 		  color_lines_level(color_lines_level)
   {}
-  
+
 
   void EpsFlagsBase::declare_parameters (ParameterHandler& param)
   {
@@ -178,8 +178,8 @@ namespace GridOutFlags
     color_lines_level = param.get_bool("Color by level");
   }
 
-  
-  
+
+
   Eps<1>::Eps (const SizeType     size_type,
 	       const unsigned int size,
 	       const double       line_width,
@@ -191,7 +191,7 @@ namespace GridOutFlags
 			       n_boundary_face_points)
   {}
 
-  
+
   void Eps<1>::declare_parameters (ParameterHandler&)
   {}
 
@@ -201,8 +201,8 @@ namespace GridOutFlags
     EpsFlagsBase::parse_parameters(param);
   }
 
-  
-  
+
+
   Eps<2>::Eps (const SizeType     size_type,
 	       const unsigned int size,
 	       const double       line_width,
@@ -222,8 +222,8 @@ namespace GridOutFlags
 		  write_cell_number_level (write_cell_number_level),
 		  write_vertex_numbers (write_vertex_numbers)
   {}
-  
-  
+
+
   void Eps<2>::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Cell number", "false", Patterns::Bool(),
@@ -245,8 +245,8 @@ namespace GridOutFlags
     write_vertex_numbers = param.get_bool("Vertex number");
   }
 
-  
-  
+
+
   Eps<3>::Eps (const SizeType     size_type,
 	       const unsigned int size,
 	       const double       line_width,
@@ -261,15 +261,15 @@ namespace GridOutFlags
 		  azimut_angle (azimut_angle),
 		  turn_angle (turn_angle)
   {}
-  
-  
+
+
   void Eps<3>::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Azimuth", "30", Patterns::Double(),
 			"Azimuth of the viw point, that is, the angle "
 			"in the plane from the x-axis.");
     param.declare_entry("Elevation", "30", Patterns::Double(),
-			"Elevation of the view point above the xy-plane.");    
+			"Elevation of the view point above the xy-plane.");
   }
 
 
@@ -280,8 +280,8 @@ namespace GridOutFlags
     turn_angle = param.get_double("Azimuth");
   }
 
-  
-  
+
+
   XFig::XFig ()
 		  :
     draw_boundary(true),
@@ -296,7 +296,7 @@ namespace GridOutFlags
     boundary_thickness(3)
   {}
 
-  
+
   void XFig::declare_parameters (ParameterHandler& param)
   {
     param.declare_entry("Boundary", "true", Patterns::Bool());
@@ -325,60 +325,66 @@ namespace GridOutFlags
     boundary_thickness = param.get_integer("Boundary width");
   }
 
-  
+
 }  // end namespace GridOutFlags
 
 
 
-void GridOut::set_flags (const GridOutFlags::DX &flags) 
+GridOut::GridOut ()
+		:
+		default_format (none)
+{}
+
+
+void GridOut::set_flags (const GridOutFlags::DX &flags)
 {
   dx_flags = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Msh &flags) 
+void GridOut::set_flags (const GridOutFlags::Msh &flags)
 {
   msh_flags = flags;
 }
 
 
-void GridOut::set_flags (const GridOutFlags::Ucd &flags) 
+void GridOut::set_flags (const GridOutFlags::Ucd &flags)
 {
   ucd_flags = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Gnuplot &flags) 
+void GridOut::set_flags (const GridOutFlags::Gnuplot &flags)
 {
   gnuplot_flags = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Eps<1> &flags) 
+void GridOut::set_flags (const GridOutFlags::Eps<1> &flags)
 {
   eps_flags_1 = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Eps<2> &flags) 
+void GridOut::set_flags (const GridOutFlags::Eps<2> &flags)
 {
   eps_flags_2 = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::Eps<3> &flags) 
+void GridOut::set_flags (const GridOutFlags::Eps<3> &flags)
 {
   eps_flags_3 = flags;
 }
 
 
 
-void GridOut::set_flags (const GridOutFlags::XFig &flags) 
+void GridOut::set_flags (const GridOutFlags::XFig &flags)
 {
   xfig_flags = flags;
 }
@@ -386,26 +392,26 @@ void GridOut::set_flags (const GridOutFlags::XFig &flags)
 
 
 std::string
-GridOut::default_suffix (const OutputFormat output_format) 
+GridOut::default_suffix (const OutputFormat output_format)
 {
-  switch (output_format) 
+  switch (output_format)
     {
       case none:
 	return "";
       case dx:
         return ".dx";
-      case gnuplot: 
+      case gnuplot:
 	return ".gnuplot";
-      case ucd: 
+      case ucd:
 	return ".inp";
-      case eps: 
+      case eps:
 	return ".eps";
       case xfig:
 	return ".fig";
       case msh:
 	return ".msh";
-      default: 
-	    Assert (false, ExcNotImplemented()); 
+      default:
+	    Assert (false, ExcNotImplemented());
 	    return "";
     };
 }
@@ -437,13 +443,13 @@ GridOut::parse_output_format (const std::string &format_name)
 
   if (format_name == "eps")
     return eps;
-  
+
   if (format_name == "xfig")
     return xfig;
-  
+
   if (format_name == "msh")
     return msh;
-  
+
   AssertThrow (false, ExcInvalidState ());
 				   // return something weird
   return OutputFormat(-1);
@@ -451,7 +457,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 
 
-std::string GridOut::get_output_format_names () 
+std::string GridOut::get_output_format_names ()
 {
   return "none|dx|gnuplot|eps|ucd|xfig|msh";
 }
@@ -466,26 +472,26 @@ GridOut::declare_parameters(ParameterHandler& param)
   param.enter_subsection("DX");
   GridOutFlags::DX::declare_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Msh");
   GridOutFlags::Msh::declare_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Ucd");
   GridOutFlags::Ucd::declare_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Gnuplot");
   GridOutFlags::Gnuplot::declare_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Eps");
   GridOutFlags::EpsFlagsBase::declare_parameters(param);
   GridOutFlags::Eps<1>::declare_parameters(param);
   GridOutFlags::Eps<2>::declare_parameters(param);
   GridOutFlags::Eps<3>::declare_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("XFig");
   GridOutFlags::XFig::declare_parameters(param);
   param.leave_subsection();
@@ -497,29 +503,29 @@ void
 GridOut::parse_parameters(ParameterHandler& param)
 {
   default_format = parse_output_format(param.get("Format"));
-  
+
   param.enter_subsection("DX");
   dx_flags.parse_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Msh");
   msh_flags.parse_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Ucd");
   ucd_flags.parse_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Gnuplot");
   gnuplot_flags.parse_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("Eps");
   eps_flags_1.parse_parameters(param);
   eps_flags_2.parse_parameters(param);
   eps_flags_3.parse_parameters(param);
   param.leave_subsection();
-  
+
   param.enter_subsection("XFig");
   xfig_flags.parse_parameters(param);
   param.leave_subsection();

@@ -32,12 +32,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-GridOut::GridOut ()
-		:
-		default_format (none)
-{}
-
-
 #if deal_II_dimension == 1
 
 
