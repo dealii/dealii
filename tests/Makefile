@@ -17,13 +17,13 @@ nofail-dirs = a-framework       \
               aniso     \
               codim_one \
               serialization \
-	      $(shell if test "$(DEAL_II_USE_MPI)" = yes ; then echo mpi ; fi) \
-	      $(shell if test "$(USE_CONTRIB_P4EST)" = yes ; then echo distributed_grids ; fi) \
-	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
-	      $(shell if test "$(USE_CONTRIB_TRILINOS)" = yes ; then echo trilinos ; fi) \
-	      $(shell if test "$(USE_CONTRIB_UMFPACK)" = yes ; then echo umfpack ; fi) \
-	      $(shell if test "$(USE_CONTRIB_METIS)" = yes ; then echo metis ; fi) \
-	      $(shell if test "$(USE_CONTRIB_HSL)" = yes ; then echo hsl ; fi) \
+	      $(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
+	      $(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
+	      $(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
+	      $(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
+	      $(if $(USE_CONTRIB_UMFPACK:no=),  umfpack,) \
+	      $(if $(USE_CONTRIB_METIS:no=),    metis,) \
+	      $(if $(USE_CONTRIB_HSL:no=),      hsl,) \
 	      $(shell if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ;\
                 then echo lapack ; fi)
 
