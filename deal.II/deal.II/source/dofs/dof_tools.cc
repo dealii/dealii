@@ -2240,15 +2240,12 @@ namespace internal
 		const FiniteElement<dim> &fe       = cell->get_fe();
 		const unsigned int        fe_index = cell->active_fe_index();
 
-		const unsigned int
-		  n_dofs_on_mother   = (4*fe.dofs_per_vertex+
-					4*fe.dofs_per_line+
-					fe.dofs_per_quad),
-		  n_dofs_on_children = (5*fe.dofs_per_vertex+
-					12*fe.dofs_per_line+
-					4*fe.dofs_per_quad);
-						 //TODO[TL]: think about this and the following in case of anisotropic refinement
-
+	      const unsigned int n_dofs_on_mother = fe.dofs_per_face;
+	      const unsigned int n_dofs_on_children = (5*fe.dofs_per_vertex+
+				      12*fe.dofs_per_line+
+				      4*fe.dofs_per_quad);
+//TODO[TL]: think about this and the following in case of anisotropic refinement
+	      
 		dofs_on_mother.resize (n_dofs_on_mother);
 		dofs_on_children.resize (n_dofs_on_children);
 
