@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,7 +56,7 @@ void
 check_poly (const Quadrature<1>& q)
 {
   deallog << "Points: " << q.n_quadrature_points << std::endl;
-  std::vector<Polynomial<double> > p = Lagrange::generate_complete_basis(q.get_points());
+  std::vector<Polynomial<double> > p = generate_complete_Lagrange_basis(q.get_points());
   check_interpolation(p, q.get_points());
 }
 
