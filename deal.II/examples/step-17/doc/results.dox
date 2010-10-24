@@ -218,4 +218,6 @@ parallelization goes. Internally, within deal.II, parallelizing the data
 structures used in hierarchic and unstructured triangulations is a very hard
 problem, and it took us a few more years to make this happen. The step-40
 tutorial program and the @ref distributed documentation module talk about how
-to do these steps and what it takes from an application perspective.
+to do these steps and what it takes from an application perspective. An
+obvious extension of the current program would be to use this functionality to
+completely distribute computations to many more processors than used here.
