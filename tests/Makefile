@@ -14,11 +14,11 @@ nofail-dirs = a-framework       \
               multigrid         \
               bits              \
               hp                \
-	      distributed_grids \
-	      mpi               \
               aniso     \
               codim_one \
               serialization \
+	      mpi               \
+	      $(shell if test "$(USE_CONTRIB_P4EST)" = yes ; then echo distributed_grids ; fi) \
 	      $(shell if test "$(USE_CONTRIB_PETSC)" = yes ; then echo petsc ; fi) \
 	      $(shell if test "$(USE_CONTRIB_TRILINOS)" = yes ; then echo trilinos ; fi) \
 	      $(shell if test "$(USE_CONTRIB_UMFPACK)" = yes ; then echo umfpack ; fi) \
