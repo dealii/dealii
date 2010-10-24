@@ -167,6 +167,10 @@ namespace parallel
  * module, as well as the @ref distributed_paper . See there for more
  * information.
  *
+ * @note This class does not support anisotropic refinement, because
+ * it relies on the p4est library that does not support this. Attempts
+ * to refine cells anisotropically will result in errors.
+ *
  * @author Wolfgang Bangerth, Timo Heister 2008, 2009, 2010
  * @ingroup distributed
  */
