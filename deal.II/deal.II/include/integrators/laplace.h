@@ -101,7 +101,7 @@ namespace LocalIntegrators
 	    for (unsigned j=0;j<n_dofs;++j)
 	      for (unsigned int d=0;d<n_comp;++d)
 		M(i,j) += dx *
-			  (fe.shape_value_component(i,k,d) * penalty * fe.shape_value_component(j,k,d)
+			  (2. * fe.shape_value_component(i,k,d) * penalty * fe.shape_value_component(j,k,d)
 			   - (n * fe.shape_grad_component(i,k,d)) * fe.shape_value_component(j,k,d)
 			   - (n * fe.shape_grad_component(j,k,d)) * fe.shape_value_component(i,k,d));
 	}
