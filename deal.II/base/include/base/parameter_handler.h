@@ -789,6 +789,149 @@ namespace Patterns
 					*/
       static const char* description_init;
   };
+
+
+				   /**
+				    * A pattern that can be used to indicate
+				    * when a parameter is intended to be the
+				    * name of a file. By itself, this class
+				    * does not check whether the string that
+				    * is given in a parameter file actually
+				    * corresponds to an existing file (it
+				    * could, for example, be the name of a
+				    * file to which you want to write
+				    * output). Functionally, the class is
+				    * therefore equivalent to the Anything
+				    * class. However, it allows to specify the
+				    * <i>intent</i> of a parameter. The flag
+				    * given to the constructor also allows to
+				    * specify whether the file is supposed to
+				    * be an input or output file.
+				    *
+				    * The reason for the existence of this
+				    * class is to support graphical user
+				    * interfaces for editing parameter
+				    * files. These may open a file selection
+				    * dialog if the filename is supposed to
+				    * represent an input file.
+                                    */
+  class FileName : public PatternBase
+  {
+    public:
+				       /**
+					* Files can be used for input
+					* or output. This can be
+					* specified in the constructor
+					* by choosing the flag <tt>type</tt<.
+					*/
+      enum FileType {input = 0, output = 1};
+
+				       /**
+					* Constructor.  The type of the file
+					* can be specified by choosing the
+					* flag.
+					*/
+      FileName (const FileType type = input);
+
+				       /**
+					* Return <tt>true</tt> if the
+					* string matches its
+					* constraints, i.e. always.
+					*/
+      virtual bool match (const std::string &test_string) const;
+
+				       /**
+					* Return a description of
+					* the pattern that valid
+					* strings are expected to
+					* match. Here, this is the
+					* string <tt>"[Filename]"</tt>.
+					*/
+      virtual std::string description () const;
+
+				       /**
+					* Return a copy of the
+					* present object, which is
+					* newly allocated on the
+					* heap. Ownership of that
+					* object is transferred to
+					* the caller of this
+					* function.
+					*/
+      virtual PatternBase * clone () const;
+
+				       /**
+					* file type flag
+					*/
+      FileType  file_type;
+      
+    private:
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
+  };
+
+
+				   /**
+				    * A pattern that can be used to indicate
+				    * when a parameter is intended to be the
+				    * name of a directory. By itself, this
+				    * class does not check whether the string
+				    * that is given in a parameter file
+				    * actually corresponds to an existing
+				    * directory. Functionally, the class is
+				    * therefore equivalent to the Anything
+				    * class. However, it allows to specify the
+				    * <i>intent</i> of a parameter.
+				    *
+				    * The reason for the existence of this
+				    * class is to support graphical user
+				    * interfaces for editing parameter
+				    * files. These may open a file selection
+				    * dialog to select or create a directory.
+                                    */
+  class DirectoryName : public PatternBase
+  {
+    public:
+				       /**
+					* Constructor.
+					*/
+      DirectoryName ();
+
+				       /**
+					* Return <tt>true</tt> if the
+					* string matches its
+					* constraints, i.e. always.
+					*/
+      virtual bool match (const std::string &test_string) const;
+
+				       /**
+					* Return a description of
+					* the pattern that valid
+					* strings are expected to
+					* match. Here, this is the
+					* string <tt>"[Filename]"</tt>.
+					*/
+      virtual std::string description () const;
+
+				       /**
+					* Return a copy of the
+					* present object, which is
+					* newly allocated on the
+					* heap. Ownership of that
+					* object is transferred to
+					* the caller of this
+					* function.
+					*/
+      virtual PatternBase * clone () const;
+      
+    private:
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
+  };
 }
 
 

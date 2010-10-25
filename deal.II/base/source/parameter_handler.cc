@@ -587,8 +587,81 @@ namespace Patterns
     return new Anything();
   }
 
-}   // end namespace Patterns
 
+
+  const char* FileName::description_init = "[FileName";
+
+
+  FileName::FileName (const FileType type)
+          : file_type (type)
+  {}
+
+
+
+  bool FileName::match (const std::string &) const
+  {
+    return true;
+  }
+
+
+
+  std::string FileName::description () const
+  {
+    std::ostringstream description;
+
+    description << description_init;
+
+    if (file_type == input)
+      description << " (Type: input)]";
+    else
+      description << " (Type: output)]";
+
+    return description.str();
+  }
+
+
+
+  PatternBase *
+  FileName::clone () const
+  {
+    return new FileName(file_type);
+  }
+
+
+
+  const char* DirectoryName::description_init = "[DirectoryName";
+
+
+  DirectoryName::DirectoryName ()
+  {}
+
+
+
+  bool DirectoryName::match (const std::string &) const
+  {
+    return true;
+  }
+
+
+
+  std::string DirectoryName::description () const
+  {
+    std::ostringstream description;
+
+    description << description_init << "]";
+
+    return description.str();
+  }
+
+
+
+  PatternBase *
+  DirectoryName::clone () const
+  {
+    return new DirectoryName();
+  }
+
+}   // end namespace Patterns
 
 
 

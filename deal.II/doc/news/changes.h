@@ -202,6 +202,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 
 <ol>
+  <li><p> There are now Patterns::FileName and Patterns::DirectoryName classes
+  that can be used to indicate that a given parameter is supposed to be
+  a file or directory name.
+  <br>
+  (Martin Steigemann 2010/10/25)
+  </p>
+
   <li><p> New: The ParameterHandler class is now built on the
   <a href="http://www.boost.org" target="_top">boost</a>
   <code>property_tree</code> library which provides a much better
@@ -214,7 +221,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   (WB 2010/09/09)
   </p>
 
-  <li><p> Fixed: The ParameterHandler::set functions allowed to set values that
+  <li><p> Fixed: The ParameterHandler::set() functions allowed to set values that
   did not satisfy the pattern given during declaration of the parameter. This
   is now fixed: the functions now throw an exception.
   <br>
