@@ -29,11 +29,12 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * This is a very simple class which provides information about both the
- * CPU time and the wallclock time elapsed since the timer was started
- * last time. Information is retrieved from the system on the basis of
- * clock cycles since last time the computer was booted for the CPU
- * time.
+ * This is a very simple class which provides information about both the CPU
+ * time and the wallclock time elapsed since the timer was started last
+ * time. Information is retrieved from the system on the basis of clock cycles
+ * since last time the computer was booted for the CPU time. The wall time is
+ * based on the system clock accessed by @p gettimeofday, with a typical
+ * accuracy of 0.01 ms on linux systems.
  *
  *
  * <h3>Usage</h3>
@@ -41,7 +42,7 @@ DEAL_II_NAMESPACE_OPEN
  * Use of this class is as you might expect by looking at the member
  * functions:
  * @code
- *   Time timer;
+ *   Timer timer;
  *   timer.start ();
  *
  *   // do some complicated computations here
@@ -57,19 +58,17 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * Alternatively, you can also restart the timer instead of resetting
- * it. The times between successive calls to start()/ stop() will then be
+ * it. The times between successive calls to start() / stop() will then be
  * accumulated. The usage of this class is also explained in the
  * step-12 and step-29 tutorial programs.
  *
- * @note Implementation of this class is system
- * dependent. Unfortunately, it does not work with multithreading
- * right now. In this case, we would like to sum up the time needed by
- * all children.
+ * @note Implementation of this class is system dependent. In case
+ * multithreaded routines (matrix-vector products, error estimators, etc.) are
+ * used, the CPU time is accumulated from all the children.
  *
  * @ingroup utilities
- * @author G. Kanschat, W. Bangerth
+ * @author G. Kanschat, W. Bangerth, M. Kronbichler
  */
-//TODO:[?] make class work with multithreading as well. better docs.
 class Timer
 {
   public:
@@ -142,6 +141,14 @@ class Timer
 				      * the elapsed time to zero.
 				      */
     void reset ();
+
+				     /**
+				      * Resets the elapsed time to zero and
+				      * starts the timer. This corresponds to
+				      * calling @p reset() and @p start() on
+				      * the Timer object.
+				      */
+    void restart();
 
 				     /**
 				      * Access to the current CPU time
@@ -234,6 +241,15 @@ class Timer
 				      */
     bool sync_wall_time;
 
+				     /**
+				      * A structure for parallel wall time
+				      * measurement that includes the minimum
+				      * time recorded among all processes, the
+				      * maximum time as well as the average
+				      * time defined as the sum of all
+				      * individual times divided by the number
+				      * of MPI processes in the MPI_Comm.
+				      */
     Utilities::System::MinMaxAvg mpi_data;
 #endif
 };
@@ -510,6 +526,15 @@ class TimerOutput
 
 
 /* ---------------- inline functions ----------------- */
+
+
+inline
+void Timer::restart ()
+{
+  reset();
+  start();
+}
+
 
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
