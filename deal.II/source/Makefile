@@ -26,7 +26,7 @@ all-dirs       := $(dim-dep-dirs) $(dim-indep-dirs)
 # create lists of file names.
 dim-indep-cc-files := $(shell for i in $(dim-indep-dirs) ; do echo $D/source/$$i/*.cc ; done) \
                       $(shell for i in $(dim-dep-dirs) ; do for j in $D/source/$$i/*.cc ; do \
-							(echo $$j | grep all_dimensions); done ; done)
+							echo $$j; done ; done  | grep all_dimensions)
 dim-dep-cc-files   := $(filter-out \
 			 %.all_dimensions.cc, \
 			 $(shell for i in $(dim-dep-dirs) ; do echo $D/source/$$i/*.cc ; done))
@@ -90,13 +90,13 @@ $(LIBDIR)/optimized/%.$(OBJEXT) :
 # there are extra .o file for the function parser and umfpack that we
 # need to link into out library
 ifeq ($(enable-parser),yes)
-  extra-o-files  = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
-  extra-g.o-files = $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+  extra-o-files   := $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
+  extra-g.o-files := $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT)
 endif
 
 ifeq ($(USE_CONTRIB_UMFPACK),yes)
-  umfpack-files = $(sort $(shell echo $(LIBDIR)/contrib/umfpack/*.$(OBJEXT)))
-  extra-o-files  += $(umfpack-files)
+  umfpack-files   := $(sort $(shell echo $(LIBDIR)/contrib/umfpack/*.$(OBJEXT)))
+  extra-o-files   += $(umfpack-files)
   extra-g.o-files += $(umfpack-files)
 endif
 
@@ -198,7 +198,7 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 # to remake this file upon inclusion below.
 #
 # If the command fails, then remove Makefile.dep again and fail
-%/Makefile.dep: $(cc-files) $(h-files) \
+%/Makefile.dep: $(dim-indep-cc-files) $(dim-dep-cc-files) $(h-files) \
 		$(inst-files) \
 		../include/deal.II/lac/lapack_templates.h \
 		Makefile $D/common/Make.global_options
