@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,6 +30,10 @@
 // given by the -B parameter to this script). if no path is given, no
 // path is printed. if one is given, a slash is appended if necessary
 
+// If the -n (for "new-style") flag is passed, then the output format
+//   $basepath/optimized/.o-file $basepath/debug/.o-file: file included_files
+// is used.
+
 // Author: Wolfgang Bangerth, 2003 (and based on a previous perl
 // script written 1998, 1999, 2000, 2001, 2002)
 
@@ -56,13 +60,19 @@ std::vector<std::string> include_directories;
                                  // includes directly
 std::map<std::string,std::set<std::string> > direct_includes;
 
+                                 // A variable that stores whether
+                                 // we want old-style or new-style format
+enum Format
+  {
+    old_style, new_style
+  } format;
 
 
                                  // for the given file, fill a
                                  // respective entry in the "direct_includes"
                                  // map listing the names of those
                                  // files that are directly included
-void determine_direct_includes (const std::string &file) 
+void determine_direct_includes (const std::string &file)
 {
                                    // if this file has already been
                                    // treated, then leave it at this
@@ -84,7 +94,7 @@ void determine_direct_includes (const std::string &file)
   assert ((bool)in);
 
   std::string line;
-  while (in) 
+  while (in)
     {
                                        // get one line, eat whitespace
                                        // at the beginning and see
@@ -153,7 +163,7 @@ void determine_direct_includes (const std::string &file)
 		    << line << std::endl;
 	  std::abort();
 	}
-      
+
                                        // next try to locate the file
                                        // in absolute paths. this is
                                        // easy if it was included via
@@ -173,7 +183,7 @@ void determine_direct_includes (const std::string &file)
                   break;
                 }
         }
-      
+
                                        // make sure the file
                                        // exists, otherwise just
                                        // ignore the line
@@ -285,7 +295,7 @@ void determine_direct_includes (const std::string &file)
                                  // files in the function above is a
                                  // much bigger time-hit.
 std::set<std::string>
-get_all_includes (const std::string &name) 
+get_all_includes (const std::string &name)
 {
                                    // start with direct includes
   std::set<std::string> all_includes = direct_includes[name];
@@ -320,7 +330,7 @@ get_all_includes (const std::string &name)
                                        // more, then quit
       if (next_level_includes.size() == 0)
         return all_includes;
-      
+
                                        // otherwise, copy over and
                                        // start over on the next level
                                        // of the tree
@@ -331,7 +341,7 @@ get_all_includes (const std::string &name)
 
 
 
-int main (int argc, char **argv) 
+int main (int argc, char **argv)
 {
   std::vector<std::string> filenames;
 
@@ -356,7 +366,7 @@ int main (int argc, char **argv)
                                            // is there
           if ((dir[0]=='.') && (dir[1]=='/'))
             dir = std::string(dir.begin()+2, dir.end());
-          
+
           include_directories.push_back (dir);
         }
                                        // if string starts with -B,
@@ -368,6 +378,10 @@ int main (int argc, char **argv)
           if (basepath[basepath.size()-1] != '/')
             basepath += '/';
         }
+                                       // if string is -n,
+                                       // then use new-style format
+      else if ((arg.length()==2) && (arg[0]=='-') && (arg[1]=='n'))
+	format = new_style;
 
                                        // otherwise assume that this
                                        // is one of the files for
@@ -376,7 +390,7 @@ int main (int argc, char **argv)
         {
           assert (arg.size()>=1);
           assert (arg[0] != '-');
-          
+
           filenames.push_back (arg);
         }
     }
@@ -424,19 +438,29 @@ int main (int argc, char **argv)
 
                                        // ...write the rule for the .o
                                        // file...
-      std::cout << basepath << basename << ".o: \\"
-                << std::endl
-                << "\t\t" << *file;      
+      if (format == old_style)
+	std::cout << basepath << basename << ".o: \\"
+		  << std::endl
+		  << "\t\t" << *file;
+      else
+	std::cout << basepath << "optimized/" << basename << ".o: \\"
+		  << std::endl
+		  << "\t\t" << *file;
       for (std::set<std::string>::const_iterator i=includes.begin();
            i!=includes.end(); ++i)
         std::cout << "\\\n\t\t" << *i;
       std::cout << std::endl;
 
                                        // ...and a similar rule for
-                                       // the .g.o file
-      std::cout << basepath << basename << ".g.o: \\"
-                << std::endl
-                << "\t\t" << *file;
+                                       // the .o file in debug mode
+      if (format == old_style)
+	std::cout << basepath << basename << ".g.o: \\"
+		  << std::endl
+		  << "\t\t" << *file;
+      else
+	std::cout << basepath << "debug/" << basename << ".o: \\"
+		  << std::endl
+		  << "\t\t" << *file;
       for (std::set<std::string>::const_iterator i=includes.begin();
            i!=includes.end(); ++i)
         std::cout << "\\\n\t\t" << *i;

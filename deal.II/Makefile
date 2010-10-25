@@ -18,18 +18,11 @@ help:
 	@echo "========================================================================"
 	@echo "=                                                                      ="
 	@echo "= The following targets exist:                                         ="
-	@echo "=    baseg lacg : debug libraries \"base\" and \"lac\"                     ="
-	@echo "=    baseo laco : optimized libraries \"base\" and \"lac\"                 ="
-	@echo "=    base lac   : debug and optimized libraries \"base\" and \"lac\"       ="
-	@echo "=    1dg 2dg 3dg: deal.II debug version for specified dimension        ="
-	@echo "=    1do 2do 3do: deal.II optimized version for specified dimension    ="
-	@echo "=    1d 2d 3d   : deal.II debug and optimized for specified dimension  ="
-	@echo "=                                                                      ="
 	@echo "=    contrib    : additional libraries in contrib, if there are any    ="
 	@echo "=                                                                      ="
-	@echo "=    all        : base, lac, 1d, 2d and 3d, contrib                    ="
-	@echo "=    debug      : baseg, lacg, 1dg, 2dg and 3dg, contrib               ="
-	@echo "=    optimized  : baseo, laco, 1do, 2do and 3do, contrib               ="
+	@echo "=    all        : debug and optimized libraries                        ="
+	@echo "=    debug      : the debug version of the deal.II library             ="
+	@echo "=    optimized  : the optimized version of the deal.II library         ="
 	@echo "=                                                                      ="
 	@echo "=    online-doc : generate the documentation in HTML format            ="
 	@echo "=    TODO       : create a \"TODO\" file from the source files           ="
@@ -41,96 +34,18 @@ help:
 
 deps:
 	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) Makefile.dep
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) Makefile.dep
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd $D/source && $(MAKE) $(MAKEOPTIONS) Makefile.dep
 	cd $D/lib && $(MAKE) $(MAKEOPTIONS) external-links
 
-# Targets for object files of sublibraries
-baseog: deps
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) objg
-baseoo: deps
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) objo
-
-lacog: deps
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) objg
-lacoo: deps
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) objo
-
-1dog: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj1dg
-2dog: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj2dg
-3dog: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj3dg
-
-1doo: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj1do
-2doo: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj2do
-3doo: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) obj3do
-
-adog: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) objg
-adoo: deps
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) objo
-
-baseg: baseog contrib
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) libg
-
-baseo: baseoo contrib
-	cd $D/base && $(MAKE) $(MAKEOPTIONS) libo
-
-	
-lacg: lacog baseg
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libg
-
-laco: lacoo baseo
-	cd $D/lac && $(MAKE) $(MAKEOPTIONS) libo
-
-1dg:  1dog lacg baseg
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1dg
-
-2dg:  2dog lacg baseg
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2dg
-
-3dg:  3dog lacg baseg
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3dg
-
-1do:  1doo laco baseo
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 1d
-
-2do:  2doo baseo laco
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 2d
-
-3do:  3doo baseo laco
-	cd $D/deal.II && $(MAKE) $(MAKEOPTIONS) 3d
-
-
-base: baseg baseo
-lac: lacg laco
-1d: 1dg 1do
-2d: 2dg 2do
-3d: 3dg 3do
-
-$(LIBDIR):
-	@mkdir $@
-
-baseg baseo base lacg laco lac 1dg 1do 1d 2dg 2do 2d 3dg 3do 3d all debug contrib functionparser : $(LIBDIR) deps
 
 all: debug optimized
-debug: contrib baseg lacg 2dg 1dg 3dg
-optimized: contrib baseo laco 2do 1do 3do
 
+debug: deps contrib
+	@cd source && $(MAKE) debug
 
-# when HSL functions are used, we also compile the detached_ma27
-# program which itself uses the optimized base library; so add this to
-# the dependencies if necessary
-#
-# make sure the function parser is also built (it isn't in the default
-# build list of the subdirectory, since it needs to be built before
-# libbase
+optimized: deps contrib
+	@cd source && $(MAKE) optimized
+
 contrib: contrib-functionparser
 	cd $D/contrib && $(MAKE)
 
@@ -160,28 +75,20 @@ TODO:
 
 TAGS:
 	@cd $D/common ; etags --language=c++ \
-	$D/base/include/*/*.h $D/lac/include/*/*.h $D/deal.II/include/*/*.h \
-	$D/base/source/*.cc $D/lac/source/*.cc \
-	$D/deal.II/source/*/*.cc $D/deal.II/source/*/*.h \
+	$D/include/*/*.h $D/source/*/*.cc \
 	$D/examples/*/*.cc ; \
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
-clean: clean-contrib clean-base clean-lac clean-dealII \
+clean: clean-contrib clean-source \
        clean-doc clean-examples clean-lib clean-tests
 	-rm -f TODO common/TAGS
 
 clean-contrib:
 	cd $D/contrib && $(MAKE) clean
 
-clean-base:
-	cd $D/base && $(MAKE) CLEAN=yes clean
-
-clean-lac:
-	cd $D/lac && $(MAKE) CLEAN=yes clean
-
-clean-dealII:
-	cd $D/deal.II && $(MAKE) CLEAN=yes clean
+clean-source:
+	cd $D/source && $(MAKE) CLEAN=yes clean
 
 clean-doc:
 	cd $D/doc && $(MAKE) CLEAN=yes clean
@@ -202,7 +109,7 @@ clean-common-scripts:
 distclean: clean
 	cd lib && $(MAKE) distclean
 	-cd tests && $(MAKE) distclean
-	-rm base/source/*.inst lac/source/*.inst deal.II/source/*/*.inst
+	-rm source/*/*.inst
 	$(MAKE)	clean-common-scripts
 
 
@@ -265,7 +172,7 @@ build-test-do:
 	@echo BUILD TEST SUCCESSFUL `date -u '+%Y-%m-%d %T'`
 
 
-.PHONY: base baseg lac lacg 1d 2d 3d 1dg 2dg 3dg all \
+.PHONY: all \
         online-doc doc printable-doc tex-doc contrib \
 	contrib-functionparser \
         clean clean-contrib clean-base clean-lac clean-dealII \

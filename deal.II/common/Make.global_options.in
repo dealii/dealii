@@ -261,36 +261,22 @@ ifeq ($(enable-threads),yes)
 endif
 
 # set paths to all the libraries we need:
-lib-base.o     = $(LIBDIR)/libbase$(lib-suffix) \
-		 $(lib-contrib-trilinos) \
-		 $(lib-contrib-tbb.o)
-lib-base.g     = $(LIBDIR)/libbase.g$(lib-suffix) \
-		 $(lib-contrib-trilinos) \
-		 $(lib-contrib-tbb.g)
-
-lib-lac.o      = $(LIBDIR)/liblac$(lib-suffix) \
-		 $(lib-hsl) \
-		 $(lib-contrib-petsc.o) $(DEAL_II_PETSC_MPIUNI_LIB) \
-                 $(lib-contrib-slepc) \
-                 $(lib-contrib-mumps) \
-                 $(lib-contrib-arpack) \
-		 $(lib-contrib-metis)
-lib-lac.g      = $(LIBDIR)/liblac.g$(lib-suffix) \
-		 $(lib-hsl) \
-		 $(lib-contrib-petsc.g) $(DEAL_II_PETSC_MPIUNI_LIB) \
-                 $(lib-contrib-slepc) \
-                 $(lib-contrib-mumps) \
-                 $(lib-contrib-arpack) \
-		 $(lib-contrib-metis)
-
-lib-deal2-1d.o = $(LIBDIR)/libdeal_II_1d$(lib-suffix)
-lib-deal2-2d.o = $(LIBDIR)/libdeal_II_2d$(lib-suffix)
-lib-deal2-3d.o = $(LIBDIR)/libdeal_II_3d$(lib-suffix)
-
-lib-deal2-1d.g = $(LIBDIR)/libdeal_II_1d.g$(lib-suffix)
-lib-deal2-2d.g = $(LIBDIR)/libdeal_II_2d.g$(lib-suffix)
-lib-deal2-3d.g = $(LIBDIR)/libdeal_II_3d.g$(lib-suffix)
-
+lib-deal2.o     = $(LIBDIR)/libdeal_II$(lib-suffix) \
+		  $(lib-contrib-trilinos) \
+		  $(lib-hsl) \
+		  $(lib-contrib-petsc.o) $(DEAL_II_PETSC_MPIUNI_LIB) \
+                  $(lib-contrib-slepc) \
+                  $(lib-contrib-mumps) \
+		  $(lib-contrib-metis) \
+		  $(lib-contrib-tbb.o)
+lib-deal2.g     = $(LIBDIR)/libdeal_II.g$(lib-suffix) \
+		  $(lib-contrib-trilinos) \
+		  $(lib-hsl) \
+		  $(lib-contrib-petsc.g) $(DEAL_II_PETSC_MPIUNI_LIB) \
+                  $(lib-contrib-slepc) \
+                  $(lib-contrib-mumps) \
+		  $(lib-contrib-metis) \
+		  $(lib-contrib-tbb.g)
 
 # include paths. do not take into account a possibly existing
 # environment variable, since the compiler will evaluate the value of
@@ -309,7 +295,7 @@ include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the
 # make_dependencies program that doesn't support the extra space.
-INCLUDE = -I$D/base/include -I$D/lac/include -I$D/deal.II/include \
+INCLUDE = -I$D/include -I$D/include/deal.II \
 	  @CPPFLAGS@ @TECPLOT_INCLUDE_DIR@ \
           @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
 	  -I$D/contrib

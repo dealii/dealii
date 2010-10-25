@@ -57,12 +57,8 @@ include $D/common/Make.global_options
 #
 # You may need to augment the lists of libraries when compiling your
 # program for other dimensions, or when using third party libraries
-libs.g   = $(lib-deal2-2d.g) \
-	   $(lib-lac.g)      \
-           $(lib-base.g)
-libs.o   = $(lib-deal2-2d.o) \
-	   $(lib-lac.o)      \
-           $(lib-base.o)
+libs.g   = $(lib-deal2.g)
+libs.o   = $(lib-deal2.o)
 
 
 # We now use the variable defined above which switch between debug and
@@ -114,7 +110,7 @@ clean:
 # command line using the `at' sign in the first column of the rules
 # and write the string indicating what we do instead.
 ./%.g.$(OBJEXT) :
-	@echo ==============debug========= $(<F)
+	@echo ==============debug========= $(<F) $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ./%.$(OBJEXT) :
 	@echo ==============optimized===== $(<F)
@@ -139,7 +135,7 @@ clean:
 #
 # If the creation of Makefile.dep fails, blow it away and fail
 Makefile.dep: $(target).cc Makefile \
-              $(shell echo $D/*/include/*/*.h)
+              $(shell echo $D/include/deal.II/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> $@ \

@@ -30,7 +30,7 @@ AC_PREREQ(2.61)
 
 
 dnl Where the output config file is located
-AC_CONFIG_HEADER(base/include/base/config.h)
+AC_CONFIG_HEADER(include/deal.II/base/config.h)
 
 dnl Have the auxiliary tools like config.guess etc in contrib/config
 AC_CONFIG_AUX_DIR(contrib/config)
@@ -835,7 +835,7 @@ $PERL -pi -e 's/PACKAGE_NAME/DEAL_II_PACKAGE_NAME/g;
               s/PACKAGE_STRING/DEAL_II_PACKAGE_STRING/g;
               s/PACKAGE_BUGREPORT/DEAL_II_PACKAGE_BUGREPORT/g;
               s/PACKAGE_VERSION/DEAL_II_PACKAGE_VERSION/g;' \
-	$process_files base/include/base/config.h
+	$process_files include/deal.II/base/config.h
 
 echo
 echo

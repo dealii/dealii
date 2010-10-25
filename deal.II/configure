@@ -2050,7 +2050,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers base/include/base/config.h"
+ac_config_headers="$ac_config_headers include/deal.II/base/config.h"
 
 
 ac_aux_dir=
@@ -18637,7 +18637,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "base/include/base/config.h") CONFIG_HEADERS="$CONFIG_HEADERS base/include/base/config.h" ;;
+    "include/deal.II/base/config.h") CONFIG_HEADERS="$CONFIG_HEADERS include/deal.II/base/config.h" ;;
     "$process_files") CONFIG_FILES="$CONFIG_FILES $process_files" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -19475,7 +19475,7 @@ $PERL -pi -e 's/PACKAGE_NAME/DEAL_II_PACKAGE_NAME/g;
               s/PACKAGE_STRING/DEAL_II_PACKAGE_STRING/g;
               s/PACKAGE_BUGREPORT/DEAL_II_PACKAGE_BUGREPORT/g;
               s/PACKAGE_VERSION/DEAL_II_PACKAGE_VERSION/g;' \
-	$process_files base/include/base/config.h
+	$process_files include/deal.II/base/config.h
 
 echo
 echo

@@ -44,19 +44,19 @@ run: $(ok)
 # Specific targets
 ######################################################################
 
-block_matrix_array$(EXEEXT): block_matrix_array.g.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+block_matrix_array$(EXEEXT): block_matrix_array.g.$(OBJEXT) $(lib-deal2.g)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
-product_matrix$(EXEEXT): product_matrix.g.$(OBJEXT) $(lib-lac.g) $(lib-base.g)
+product_matrix$(EXEEXT): product_matrix.g.$(OBJEXT) $(lib-deal2.g)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
-compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.g.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
+compressed_block_sparsity_pattern$(EXEEXT): compressed_block_sparsity_pattern.g.$(OBJEXT) $(lib-deal2.g)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
-theta_timestepping$(EXEEXT): theta_timestepping.g.$(OBJEXT) $(lib-deal2-2d.g) $(lib-lac.g) $(lib-base.g)
+theta_timestepping$(EXEEXT): theta_timestepping.g.$(OBJEXT) $(lib-deal2.g)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
@@ -83,7 +83,7 @@ clean:
 #
 # If the creation of Makefile.dep fails, blow it away and fail
 Makefile.dep: *.cc Makefile \
-              $(shell echo $D/*/include/*/*.h)
+              $(shell echo $D/include/deal.II/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. *.cc \
 		> $@ \
