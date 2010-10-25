@@ -198,7 +198,9 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 # to remake this file upon inclusion below.
 #
 # If the command fails, then remove Makefile.dep again and fail
-%/Makefile.dep: $(dim-indep-cc-files) $(dim-dep-cc-files) $(h-files) \
+%/Makefile.dep: $(filter $D/source/$(dir $@)%, $(dim-indep-cc-files)) \
+		$(filter $D/source/$(dir $@)%, $(dim-dep-cc-files)) \
+		$(h-files) \
 		$(inst-files) \
 		../include/deal.II/lac/lapack_templates.h \
 		Makefile $D/common/Make.global_options
