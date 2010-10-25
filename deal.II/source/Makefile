@@ -19,42 +19,42 @@ default all: debug optimized
 
 
 # list the dimension dependent and dimension independent directories
-dim-dep-dirs   = dofs fe grid hp multigrid numerics distributed
-dim-indep-dirs = base lac
-all-dirs       = $(dim-dep-dirs) $(dim-indep-dirs)
+dim-dep-dirs   := dofs fe grid hp multigrid numerics distributed
+dim-indep-dirs := base lac
+all-dirs       := $(dim-dep-dirs) $(dim-indep-dirs)
 
 # create lists of file names.
-dim-indep-cc-files = $(shell for i in $(dim-indep-dirs) ; do echo $D/source/$$i/*.cc ; done) \
-                     $(shell for i in $(dim-dep-dirs) ; do for j in $D/source/$$i/*.cc ; do \
+dim-indep-cc-files := $(shell for i in $(dim-indep-dirs) ; do echo $D/source/$$i/*.cc ; done) \
+                      $(shell for i in $(dim-dep-dirs) ; do for j in $D/source/$$i/*.cc ; do \
 							(echo $$j | grep all_dimensions); done ; done)
-dim-dep-cc-files   = $(filter-out \
+dim-dep-cc-files   := $(filter-out \
 			 %.all_dimensions.cc, \
 			 $(shell for i in $(dim-dep-dirs) ; do echo $D/source/$$i/*.cc ; done))
-h-files      = $(sort $(shell echo $D/include/deal.II/*/*.h))
+h-files      := $(sort $(shell echo $D/include/deal.II/*/*.h))
 
-inst-in-files= $(shell echo */*.inst.in)
-inst-files   = $(inst-in-files:%.in=%)
+inst-in-files := $(shell echo */*.inst.in)
+inst-files    := $(inst-in-files:%.in=%)
 
 
 # for the dimension independent files, build unique object file names
-tmp1        = $(shell echo $(dim-indep-cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
-tmp-o-files-indep  = $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
-tmp-go-files-indep = $(addprefix $(LIBDIR)/debug/, $(tmp1:.cc=.$(OBJEXT)))
+tmp1        := $(shell echo $(dim-indep-cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
+tmp-o-files-indep  := $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
+tmp-go-files-indep := $(addprefix $(LIBDIR)/debug/, $(tmp1:.cc=.$(OBJEXT)))
 
 # for the dimension dependent files, build unique object file names for each
 # dimension
-tmp2        = $(shell echo $(dim-dep-cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
-tmp-o-files-1d  = $(addprefix $(LIBDIR)/optimized/1d_, $(tmp2:.cc=.$(OBJEXT)) )
-tmp-go-files-1d = $(addprefix $(LIBDIR)/debug/1d_, $(tmp2:.cc=.$(OBJEXT)))
-tmp-o-files-2d  = $(addprefix $(LIBDIR)/optimized/2d_, $(tmp2:.cc=.$(OBJEXT)) )
-tmp-go-files-2d = $(addprefix $(LIBDIR)/debug/2d_, $(tmp2:.cc=.$(OBJEXT)))
-tmp-o-files-3d  = $(addprefix $(LIBDIR)/optimized/3d_, $(tmp2:.cc=.$(OBJEXT)) )
-tmp-go-files-3d = $(addprefix $(LIBDIR)/debug/3d_, $(tmp2:.cc=.$(OBJEXT)))
+tmp2        := $(shell echo $(dim-dep-cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
+tmp-o-files-1d  := $(addprefix $(LIBDIR)/optimized/1d_, $(tmp2:.cc=.$(OBJEXT)) )
+tmp-go-files-1d := $(addprefix $(LIBDIR)/debug/1d_, $(tmp2:.cc=.$(OBJEXT)))
+tmp-o-files-2d  := $(addprefix $(LIBDIR)/optimized/2d_, $(tmp2:.cc=.$(OBJEXT)) )
+tmp-go-files-2d := $(addprefix $(LIBDIR)/debug/2d_, $(tmp2:.cc=.$(OBJEXT)))
+tmp-o-files-3d  := $(addprefix $(LIBDIR)/optimized/3d_, $(tmp2:.cc=.$(OBJEXT)) )
+tmp-go-files-3d := $(addprefix $(LIBDIR)/debug/3d_, $(tmp2:.cc=.$(OBJEXT)))
 
-o-files  = $(tmp-o-files-indep) \
-	   $(tmp-o-files-1d)  $(tmp-o-files-2d)  $(tmp-o-files-3d)
-go-files = $(tmp-go-files-indep) \
-	   $(tmp-go-files-1d) $(tmp-go-files-2d) $(tmp-go-files-3d)
+o-files  := $(tmp-o-files-indep) \
+	    $(tmp-o-files-1d)  $(tmp-o-files-2d)  $(tmp-o-files-3d)
+go-files := $(tmp-go-files-indep) \
+	    $(tmp-go-files-1d) $(tmp-go-files-2d) $(tmp-go-files-3d)
 
 
 debug: $(LIBDIR)/libdeal_II.g$(lib-suffix)
