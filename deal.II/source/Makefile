@@ -149,6 +149,16 @@ ifneq ($(GXX-VERSION),compaq_cxx)
     deplibs.o += $D/lib/libtbb$(shared-lib-suffix)
   endif
 
+  # and p4est
+  ifeq ($(USE_CONTRIB_P4EST),yes)
+    deplibs.g += $(DEAL_II_P4EST_DIR)/DEBUG/lib/libp4est.so \
+                 $(DEAL_II_P4EST_DIR)/DEBUG/lib/libsc.so \
+		 -Wl,-rpath,$(DEAL_II_P4EST_DIR)/DEBUG/lib
+    deplibs.o += $(DEAL_II_P4EST_DIR)/FAST/lib/libp4est.so \
+                 $(DEAL_II_P4EST_DIR)/FAST/lib/libsc.so \
+		 -Wl,-rpath,$(DEAL_II_P4EST_DIR)/FAST/lib
+  endif
+
   # for cygwin and darwin, also llapack and such are necessary
   # we better link all libraries mentioned in $(LIBS)
   ifneq ($(findstring cygwin,$(TARGET))$(findstring darwin,$(TARGET)),)
