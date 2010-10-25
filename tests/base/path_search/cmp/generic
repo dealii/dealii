@@ -1,36 +1,36 @@
 
 DEAL::PathSearch[CC] 3 directories 3 suffixes
 DEAL::PathSearch[CC] 3 directories 
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/include/lac/block_vector.cc
+DEAL::PathSearch[CC] trying DEAL_II_PATH/include/deal.II/lac/block_vector.cc
 DEAL::PathSearch[CC] trying block_vector.cc
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/source/block_vector.cc
-DEAL::PathSearch[CC] opened DEAL_II_PATH/lac/source/block_vector.cc
-DEAL::DEAL_II_PATH/lac/source/block_vector.cc
+DEAL::PathSearch[CC] trying DEAL_II_PATH/source/lac/block_vector.cc
+DEAL::PathSearch[CC] opened DEAL_II_PATH/source/lac/block_vector.cc
+DEAL::DEAL_II_PATH/source/lac/block_vector.cc
 DEAL::PathSearch[CC] 3 directories 3 suffixes
 DEAL::PathSearch[CC] 3 directories 
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/include/lac/block_vector
+DEAL::PathSearch[CC] trying DEAL_II_PATH/include/deal.II/lac/block_vector
 DEAL::PathSearch[CC] trying block_vector
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/source/block_vector
+DEAL::PathSearch[CC] trying DEAL_II_PATH/source/lac/block_vector
 DEAL::PathSearch[CC] 3 directories 
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/include/lac/block_vector.c
+DEAL::PathSearch[CC] trying DEAL_II_PATH/include/deal.II/lac/block_vector.c
 DEAL::PathSearch[CC] trying block_vector.c
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/source/block_vector.c
+DEAL::PathSearch[CC] trying DEAL_II_PATH/source/lac/block_vector.c
 DEAL::PathSearch[CC] 3 directories 
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/include/lac/block_vector.cc
+DEAL::PathSearch[CC] trying DEAL_II_PATH/include/deal.II/lac/block_vector.cc
 DEAL::PathSearch[CC] trying block_vector.cc
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/source/block_vector.cc
-DEAL::PathSearch[CC] opened DEAL_II_PATH/lac/source/block_vector.cc
-DEAL::DEAL_II_PATH/lac/source/block_vector.cc
+DEAL::PathSearch[CC] trying DEAL_II_PATH/source/lac/block_vector.cc
+DEAL::PathSearch[CC] opened DEAL_II_PATH/source/lac/block_vector.cc
+DEAL::DEAL_II_PATH/source/lac/block_vector.cc
 DEAL::PathSearch[CC] 3 directories 4 suffixes
 DEAL::PathSearch[CC] 3 directories 
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/include/lac/block_vector
+DEAL::PathSearch[CC] trying DEAL_II_PATH/include/deal.II/lac/block_vector
 DEAL::PathSearch[CC] trying block_vector
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/source/block_vector
+DEAL::PathSearch[CC] trying DEAL_II_PATH/source/lac/block_vector
 DEAL::PathSearch[CC] 3 directories 
-DEAL::PathSearch[CC] trying DEAL_II_PATH/lac/include/lac/block_vector.h
-DEAL::PathSearch[CC] opened DEAL_II_PATH/lac/include/lac/block_vector.h
-DEAL::DEAL_II_PATH/lac/include/lac/block_vector.h
-DEAL::DEAL_II_CCPATH="DEAL_II_PATH/lac/include/lac/::DEAL_II_PATH/lac/source/"
+DEAL::PathSearch[CC] trying DEAL_II_PATH/include/deal.II/lac/block_vector.h
+DEAL::PathSearch[CC] opened DEAL_II_PATH/include/deal.II/lac/block_vector.h
+DEAL::DEAL_II_PATH/include/deal.II/lac/block_vector.h
+DEAL::DEAL_II_CCPATH="DEAL_II_PATH/include/deal.II/lac/::DEAL_II_PATH/source/lac/"
 DEAL:: Suffixes "" ".h" ".c" ".cc"
 DEAL::DEAL_II_MESHPATH=":DEAL_II_PATH/lib/meshes/"
 DEAL:: Suffixes "" ".inp" ".xda" ".dbmesh" ".dat" ".plt" ".nc" ".msh"
