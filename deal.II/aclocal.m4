@@ -1060,8 +1060,8 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   AC_MSG_CHECKING(whether std::thread actually works)
   AC_TRY_RUN(
        [#include <thread>
-        void f(int); ],
-       [ std::thread t(f,1); t.join();],
+        void f(int) {}
+        int main() { std::thread t(f,1); t.join(); } ],
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
