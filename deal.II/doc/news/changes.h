@@ -30,6 +30,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> The <code>Polynomials::Lagrange::generate_complete_basis</code>
+function has been renamed to Polynomials::generate_complete_Lagrange_basis .
+The function was previously the only member of a class, and a static
+one on top of that, which did not make much sense.
+<br>
+(WB 2010/10/22)</li>
+
 <li> The <code>QGauss2, QGauss3, ..., QGauss7</code> classes &mdash; deprecated
 for more than 6 years already &mdash; have finally been removed.
 You should use code like <code>QGauss@<dim@>(4)</code> instead.
