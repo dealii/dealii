@@ -193,6 +193,7 @@ namespace internal
 	size_t (&connectivity_memory_used) (types<2>::connectivity * p4est);
     };
 
+#if deal_II_dimension == 2
     int (&functions<2>::quadrant_compare) (const void *v1, const void *v2)
     = p4est_quadrant_compare;
 
@@ -315,6 +316,9 @@ namespace internal
     size_t (&functions<2>::connectivity_memory_used) (types<2>::connectivity * p4est)
     = p4est_connectivity_memory_used;
 
+#endif
+
+    
     template <> struct functions<3>
     {
 	static
@@ -440,6 +444,8 @@ namespace internal
 	size_t (&connectivity_memory_used) (types<3>::connectivity * p4est);
     };
 
+#if deal_II_dimension == 3
+    
     int (&functions<3>::quadrant_compare) (const void *v1, const void *v2)
     = p8est_quadrant_compare;
 
@@ -564,7 +570,7 @@ namespace internal
     size_t (&functions<3>::connectivity_memory_used) (types<3>::connectivity * p4est)
     = p8est_connectivity_memory_used;
 
-
+#endif
 
 
     template <int dim>
