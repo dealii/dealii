@@ -588,13 +588,17 @@ namespace Utilities
 	  }
       }
     }
+
+
     
     void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
 					      double my_value,
 					      MinMaxAvg & result)
     {
-      unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
-      unsigned int numproc = dealii::Utilities::System::get_n_mpi_processes(mpi_communicator);
+      const unsigned int my_id
+	= dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
+      const unsigned int numproc
+	= dealii::Utilities::System::get_n_mpi_processes(mpi_communicator);
       
       MPI_Op op;
       int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
@@ -715,7 +719,8 @@ namespace Utilities
       return 0;
     }
 
-    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
+    
+    void calculate_collective_mpi_min_max_avg(const MPI_Comm &,
 					      double my_value,
 					      MinMaxAvg & result)
     {
