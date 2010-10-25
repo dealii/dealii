@@ -36,21 +36,7 @@ void test(std::ostream& /*out*/)
   GridGenerator::hyper_cube(tr);
   tr.begin_active()->set_refine_flag(RefinementCase<dim>::cut_x);
 
-  bool caught = false;
-  try
-    {
-      tr.execute_coarsening_and_refinement ();
-    }
-  catch (const ExcMessage &e)
-    {
-      deallog << "Caught exception:" << std::endl;
-      deallog << e.what() << std::endl;
-
-      caught = true;
-    }
-
-  if (caught != true)
-    deallog << "FAIL" << std::endl;
+  tr.execute_coarsening_and_refinement ();
 }
 
 
