@@ -24,7 +24,7 @@ nofail-dirs = a-framework       \
 	      $(if $(USE_CONTRIB_UMFPACK:no=),  umfpack,) \
 	      $(if $(USE_CONTRIB_METIS:no=),    metis,) \
 	      $(if $(USE_CONTRIB_HSL:no=),      hsl,) \
-	      $(shell if grep -q 'define HAVE_LIBLAPACK' $D/base/include/base/config.h ;\
+	      $(shell if grep -q 'define HAVE_LIBLAPACK' $D/include/deal.II/base/config.h ;\
                 then echo lapack ; fi)
 
 # now define the targets that actually do something

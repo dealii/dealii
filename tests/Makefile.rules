@@ -216,16 +216,8 @@ endif
 
 ############################################################
 # link with all libraries:
-libraries = $(lib-deal2-1d.g) \
-            $(lib-deal2-2d.g) \
-            $(lib-deal2-3d.g) \
-            $(lib-lac.g)  \
-            $(lib-base.g)
-libraries_o = $(lib-deal2-1d.o) \
-            $(lib-deal2-2d.o) \
-            $(lib-deal2-3d.o) \
-            $(lib-lac.o)  \
-            $(lib-base.o)
+libraries = $(lib-deal2.g)
+libraries_o = $(lib-deal2.o)
 
 ############################################################
 # After all these general rules, here is the target to be
