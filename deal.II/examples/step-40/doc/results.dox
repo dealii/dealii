@@ -70,7 +70,7 @@ the size of local problems is too small. For more discussions of these results
 we refer to the @ref distributed_paper "Distributed Computing paper".
 
 So how large are the largest problems one can solve? At the time of writing
-this problem, the 
+this problem, the
 limiting factor is that the program uses the BoomerAMG algebraic
 multigrid method from the <a
 href="http://acts.nersc.gov/hypre/" target="_top">hypre package</a> as
@@ -110,7 +110,7 @@ would produce graphical output on the order of several 10
 gigabyte. Currently, no program is able to visualize this amount of
 data in any reasonable way unless it also runs on at least several
 hundred processors. There are, however, approaches where visualization
-program directly communicate with solvers on each processor with each
+programs directly communicate with solvers on each processor with each
 visualization process rendering the part of the scene computed by the
 solver on this processor. Implementing such an interface would allow
 to quickly visualize things that are otherwise not amenable to
