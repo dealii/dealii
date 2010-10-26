@@ -177,7 +177,7 @@ $(LIBDIR)/libdeal_II.g$(static-lib-suffix): $(go-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files) $(extra-g.o-files)
 	@$(RANLIB) $@
-$(LIBDIR)/libdeal_IId$(static-lib-suffix): $(o-files)
+$(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files) $(extra-o-files)
 	@$(RANLIB) $@
