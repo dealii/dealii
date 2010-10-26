@@ -12,7 +12,7 @@
 //-------------------------------------------------------------------------
 
 /**
- * @defgroup Integrators
+ * @defgroup Integrators Integrators
  *
  * A collection of namespaces and functions which simplify the coding
  * of forms and bilinear forms on finite element spaces.
