@@ -71,7 +71,7 @@ class RelaxationBlock :
 					  * Default constructor
 					  */
 	AdditionalData ();
-	
+
 					 /**
 					  * Constructor.
 					  */
@@ -79,13 +79,13 @@ class RelaxationBlock :
 			const double relaxation = 1.,
 			const bool invert_diagonal = true,
 			const bool same_diagonal = false);
-	
+
 					 /**
 					  * Pointer to the DoFHandler
 					  * providing the cells.
 					  */
 	SmartPointer<const BlockList, typename RelaxationBlock<MATRIX, inverse_type>::AdditionalData> block_list;
-	
+
 					 /**
 					  * Relaxation parameter.
 					  */
@@ -102,7 +102,7 @@ class RelaxationBlock :
 					  */
 	bool same_diagonal;
     };
-    
+
 				     /**
 				      * Initialize matrix and block
 				      * size.  We store the matrix and
@@ -225,7 +225,7 @@ class RelaxationBlock :
  * preconditioner interface expected by Solver objects.
  *
  * @author Guido Kanschat
- * @data 2010
+ * @date 2010
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class RelaxationBlockSOR : public virtual Subscriptor,
@@ -236,7 +236,7 @@ class RelaxationBlockSOR : public virtual Subscriptor,
 				      * Default constructor.
 				      */
 //    RelaxationBlockSOR();
-    
+
 				     /**
 				      * Define number type of matrix.
 				      */
@@ -298,13 +298,13 @@ class RelaxationBlockSOR : public virtual Subscriptor,
  * objects.
  *
  * @author Guido Kanschat
- * @data 2010
+ * @date 2010
  */
 template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
 class RelaxationBlockSSOR : public virtual Subscriptor,
 			    protected RelaxationBlock<MATRIX, inverse_type>
 {
-  public:    
+  public:
 				     /**
 				      * Define number type of matrix.
 				      */
