@@ -2,15 +2,6 @@
 #
 # Makefile for the whole library
 
-# include global options and paths. there's one exception where we don't want
-# that, namely for build tests: in that case, the makefile is called before we
-# have even run ./configure, so we can't include this file, but the target
-# then called doesn't need the variables defined in there doesn't need them
-# anyway and calls ./configure first
-ifneq ($(BUILDTEST),yes)
-  include common/Make.global_options
-endif
-
 
 help:
 	@echo "========================================================================"
@@ -33,9 +24,9 @@ help:
 	@echo "========================================================================"
 
 deps:
-	cd $D/common/scripts && $(MAKE) $(MAKEOPTIONS)
-	cd $D/source && $(MAKE) $(MAKEOPTIONS) Makefile.dep
-	cd $D/lib && $(MAKE) $(MAKEOPTIONS) external-links
+	cd common/scripts && $(MAKE) $(MAKEOPTIONS)
+	cd source && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	cd lib && $(MAKE) $(MAKEOPTIONS) external-links
 
 
 all: debug optimized
@@ -47,36 +38,31 @@ optimized: deps contrib
 	@cd source && $(MAKE) optimized
 
 contrib: contrib-functionparser
-	cd $D/contrib && $(MAKE)
+	cd contrib && $(MAKE)
 
 contrib-functionparser:
-	@cd $D/contrib && $(MAKE) functionparser
+	@cd contrib && $(MAKE) functionparser
 
 online-doc doc:
-	cd $D/doc && $(MAKE)
+	cd doc && $(MAKE)
 	@echo
 	@echo
 	@echo =======================================================
 	@echo "The online documentation can now be accessed through"
-	@echo "  $D/doc/index.html"
+	@echo "  doc/index.html"
 	@echo =======================================================
 	@echo
 	@echo
 
 TODO:
-	@egrep -i '// *todo' $D/base/include/*/*.h $D/base/source/*.cc \
-                     $D/lac/include/*/*.h $D/lac/source/*.cc   \
-                     $D/deal.II/include/*/*.h $D/deal.II/source/*/*.cc \
-	| perl -pi -e 's#$D/?#\n#;' \
-	| perl -pi -e 's#(.*)(TODO:?)(\[[^\]]+\])?#\3 \1\2\3#i;' \
-	| perl -pi -e 's#\s*//\s*TODO:?\s*(\[[^\]]+\])?:?\s*#\n\1     #i;' \
-             > $@
+	@egrep -i '// *todo' include/deal.II/*/*.h source/*/*.cc \
+	| perl common/scripts/make_todo.pl > $@
 
 
 TAGS:
-	@cd $D/common ; etags --language=c++ \
-	$D/include/*/*.h $D/source/*/*.cc \
-	$D/examples/*/*.cc ; \
+	@cd common ; etags --language=c++ \
+	../include/*/*.h ../source/*/*.cc \
+	../examples/*/*.cc ; \
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
 
@@ -85,26 +71,26 @@ clean: clean-contrib clean-source \
 	-rm -f TODO common/TAGS
 
 clean-contrib:
-	cd $D/contrib && $(MAKE) clean
+	cd contrib && $(MAKE) clean
 
 clean-source:
-	cd $D/source && $(MAKE) CLEAN=yes clean
+	cd source && $(MAKE) CLEAN=yes clean
 
 clean-doc:
-	cd $D/doc && $(MAKE) CLEAN=yes clean
+	cd doc && $(MAKE) CLEAN=yes clean
 
 clean-examples:
-	cd $D/examples && $(MAKE) CLEAN=yes clean
+	cd examples && $(MAKE) CLEAN=yes clean
 
 clean-lib:
-	cd $D/lib && $(MAKE) CLEAN=yes clean
+	cd lib && $(MAKE) CLEAN=yes clean
 
 # if that directory exists, go into 'tests' and clean up there as well
 clean-tests:
 	-cd tests && $(MAKE) clean
 
 clean-common-scripts:
-	cd $D/common/scripts && $(MAKE) clean
+	cd common/scripts && $(MAKE) clean
 
 distclean: clean
 	cd lib && $(MAKE) distclean

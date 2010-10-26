@@ -810,6 +810,7 @@ dnl that need some information
 process_files="common/Make.global_options
                common/Makefile.template
                common/scripts/make_dependencies.pl
+	       common/scripts/make_todo.pl
 	       Version
                doc/Makefile
 	       doc/title.html
