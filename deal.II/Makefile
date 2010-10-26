@@ -61,7 +61,7 @@ TODO:
 
 TAGS:
 	@cd common ; etags --language=c++ \
-	../include/*/*.h ../source/*/*.cc \
+	../include/deal.II/*/*.h ../source/*/*.cc \
 	../examples/*/*.cc ; \
 	perl -pi -e 's/ \* .*//g; s&[\t]*/\*.*&&g; s&[\t]*\*/.*&&g;' TAGS
 
