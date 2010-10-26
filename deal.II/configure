@@ -3981,9 +3981,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 
-          	  	  DEAL_II_COMPILER_SUPPORTS_MPI=1
-	  export DEAL_II_COMPILER_SUPPORTS_MPI
-
+	  DEAL_II_COMPILER_SUPPORTS_MPI=1
           DEAL_II_USE_MPI=yes
 
 else
@@ -14603,6 +14601,14 @@ $as_echo "yes" >&6; }
     echo "${use_p4est}/DEBUG"
       { { $as_echo "$as_me:$LINENO: error: p4est directories $use_p4est/DEBUG or $use_p4est/FAST not found" >&5
 $as_echo "$as_me: error: p4est directories $use_p4est/DEBUG or $use_p4est/FAST not found" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+
+            if test "x$enableshared" != "xyes" ; then
+      { { $as_echo "$as_me:$LINENO: error: When using p4est with shared libraries, you need to build
+		    deal.II with shared libraries as well." >&5
+$as_echo "$as_me: error: When using p4est with shared libraries, you need to build
+		    deal.II with shared libraries as well." >&2;}
    { (exit 1); exit 1; }; }
     fi
 
