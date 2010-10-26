@@ -340,11 +340,7 @@ AC_DEFUN(DEAL_II_DETERMINE_IF_SUPPORTS_MPI, dnl
 	  AC_DEFINE(DEAL_II_COMPILER_SUPPORTS_MPI, 1,
                     [Defined if the compiler supports including <mpi.h>])
 
-          dnl Export this variable so that we can refer to it
-	  dnl from contrib/configure.in when configuring p4est
 	  DEAL_II_COMPILER_SUPPORTS_MPI=1
-	  export DEAL_II_COMPILER_SUPPORTS_MPI
-
           DEAL_II_USE_MPI=yes
         ],
         [
@@ -7067,6 +7063,13 @@ AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
     if test ! -d "${use_p4est}/DEBUG" -o ! -d "${use_p4est}/FAST" ; then
     echo "${use_p4est}/DEBUG"
       AC_MSG_ERROR([p4est directories $use_p4est/DEBUG or $use_p4est/FAST not found])
+    fi
+
+    dnl Right now, we always build p4est as shared lib, so make sure we
+    dnl have built deal.II as a shared lib as well
+    if test "x$enableshared" != "xyes" ; then
+      AC_MSG_ERROR([When using p4est with shared libraries, you need to build
+		    deal.II with shared libraries as well.])
     fi
 
     AC_DEFINE(DEAL_II_USE_P4EST, 1,
