@@ -130,7 +130,18 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 	}
       if (this->store_diagonals())
  	this->diagonal(0) = M_cell;
-      this->inverse(0).invert(M_cell);
+      switch (this->inversion)
+	{
+	  case PreconditionBlockBase<inverse_type>::gauss_jordan:
+		this->inverse(0).invert(M_cell);
+		break;
+	  case PreconditionBlockBase<inverse_type>::householder:
+		this->inverse_householder(0).initialize(M_cell);
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+
+	}
     }
   else
     {
@@ -170,7 +181,18 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 	  
  	  if (this->store_diagonals())
  	    this->diagonal(cell) = M_cell;
-	  this->inverse(cell).invert(M_cell);
+	  switch (this->inversion)
+	    {
+	      case PreconditionBlockBase<inverse_type>::gauss_jordan:
+		    this->inverse(cell).invert(M_cell);
+		    break;
+	      case PreconditionBlockBase<inverse_type>::householder:
+		    this->inverse_householder(cell).initialize(M_cell);
+		    break;
+	      default:
+		    Assert(false, ExcNotImplemented());
+		    
+	    }
 	}
     }
   this->inverses_computed(true);
@@ -250,9 +272,9 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
       if (this->inverses_ready())
 	{
 	  if (transpose_diagonal)
-	    this->inverse(cell).Tvmult(x_cell, b_cell);
+	    this->inverse_Tvmult(cell, x_cell, b_cell);
 	  else
-	    this->inverse(cell).vmult(x_cell, b_cell);
+	    this->inverse_vmult(cell, x_cell, b_cell);
 	}
       else
 	{
@@ -347,9 +369,9 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
       if (this->inverses_ready())
 	{
 	  if (transpose_diagonal)
-	    this->inverse(cell).Tvmult(x_cell, b_cell);
+	    this->inverse_Tvmult(cell, x_cell, b_cell);
 	  else
-	    this->inverse(cell).vmult(x_cell, b_cell);
+	    this->inverse_vmult(cell, x_cell, b_cell);
 	}
       else
 	{
@@ -547,7 +569,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 	  {
 	    b_cell(row_cell)=src(row);
 	  }
-	this->inverse(cell).vmult(x_cell, b_cell);
+	this->inverse_vmult(cell, x_cell, b_cell);
 					 // distribute x_cell to dst
 	for (row=cell*this->blocksize, row_cell=0;
 	     row_cell<this->blocksize;
@@ -737,9 +759,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
       if (this->inverses_ready())
 	{
 	  if (transpose_diagonal)
-	    this->inverse(cell).Tvmult(x_cell, b_cell);
+	    this->inverse_Tvmult(cell, x_cell, b_cell);
 	  else
-	    this->inverse(cell).vmult(x_cell, b_cell);
+	    this->inverse_vmult(cell, x_cell, b_cell);
 	}
       else
 	{
@@ -851,9 +873,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
       if (this->inverses_ready())
 	{
 	  if (transpose_diagonal)
-	    this->inverse(cell).Tvmult(x_cell, b_cell);
+	    this->inverse_Tvmult(cell, x_cell, b_cell);
 	  else
-	    this->inverse(cell).vmult(x_cell, b_cell);
+	    this->inverse_vmult(cell, x_cell, b_cell);
 	}
       else
 	{

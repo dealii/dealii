@@ -101,6 +101,11 @@ class RelaxationBlock :
 					  * are equal to save memory.
 					  */
 	bool same_diagonal;
+					 /**
+					  * Choose the inversion
+					  * method for the blocks.
+					  */
+	typename PreconditionBlockBase<inverse_type>::Inversion inversion;
     };
 
 				     /**

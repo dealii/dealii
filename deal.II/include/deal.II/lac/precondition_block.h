@@ -325,7 +325,11 @@ class PreconditionBlock
 				      * @{ */
 
 				     /**
-				      * Exception
+				      * For non-overlapping block
+				      * preconditioners, the block
+				      * size must divide the matrix
+				      * size. If not, this exception
+				      * gets thrown.
 				      */
     DeclException2 (ExcWrongBlockSize,
 		    int, int,

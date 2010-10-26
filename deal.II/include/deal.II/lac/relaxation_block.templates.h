@@ -24,7 +24,8 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData ()
 		:
 		relaxation(1.),
 		invert_diagonal(true),
-		same_diagonal(false)
+		same_diagonal(false),
+		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan)
 {}
 
 
@@ -39,7 +40,8 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
 		block_list(&bl),
 		relaxation(relaxation),
 		invert_diagonal(invert_diagonal),
-		same_diagonal(same_diagonal)
+		same_diagonal(same_diagonal),
+		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan)
 {}
 
 
@@ -57,7 +59,8 @@ RelaxationBlock<MATRIX,inverse_type>::initialize (
   A = &M;
   additional_data = parameters;
   
-  this->reinit(additional_data.block_list->size(), 0, additional_data.same_diagonal);
+  this->reinit(additional_data.block_list->size(), 0, additional_data.same_diagonal,
+	       additional_data.inversion);
   
   if (parameters.invert_diagonal)
     invert_diagblocks();
@@ -120,8 +123,18 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
 	      this->diagonal(block).reinit(bs, bs);
 	      this->diagonal(block) = M_cell;
 	    }
-	  this->inverse(block).reinit(bs, bs);
-	  this->inverse(block).invert(M_cell);
+	  switch(this->inversion)
+	    {
+	      case PreconditionBlockBase<inverse_type>::gauss_jordan:
+		    this->inverse(block).reinit(bs, bs);
+		    this->inverse(block).invert(M_cell);
+		    break;
+	      case PreconditionBlockBase<inverse_type>::householder:
+		    this->inverse_householder(block).initialize(M_cell);
+		    break;
+	      default:
+		    Assert(false, ExcNotImplemented());
+	    }
 	}
     }
   this->inverses_computed(true);
@@ -162,7 +175,7 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
 	    b_cell(row_cell) -= entry->value() * prev(entry->column());
 	}
 				       // Apply inverse diagonal
-      this->inverse(block).vmult(x_cell, b_cell);
+      this->inverse_vmult(block, x_cell, b_cell);
 				       // Store in result vector
       row=additional_data.block_list->begin(block);
       for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)

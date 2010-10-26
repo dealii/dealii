@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,6 +101,18 @@ class Householder : private FullMatrix<number>
     double least_squares (BlockVector<number2> &dst,
 			  const BlockVector<number2> &src) const;
 
+				     /**
+				      * A wrapper to least_squares(),
+				      * implementing the standard
+				      * MATRIX interface.
+				      */
+    template<class VECTOR>
+    void vmult (VECTOR &dst, const VECTOR &src) const;
+
+    template<class VECTOR>
+    void Tvmult (VECTOR &dst, const VECTOR &src) const;
+
+    
   private:
 				     /**
 				      * Storage for the diagonal
@@ -278,6 +290,25 @@ Householder<number>::least_squares (BlockVector<number2>& dst,
   
   return std::sqrt(sum);
 }
+
+
+template <typename number>
+template <class VECTOR>
+void
+Householder<number>::vmult (VECTOR &dst, const VECTOR &src) const
+{
+  least_squares (dst, src);
+}
+
+
+template <typename number>
+template <class VECTOR>
+void
+Householder<number>::Tvmult (VECTOR &, const VECTOR &) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
 
 
 #endif // DOXYGEN
