@@ -14,11 +14,7 @@
 
 #include <lac/vector.h>
 #include <lac/block_vector.h>
-#include <fe/fe.h>
-#include <multigrid/mg_dof_handler.h>
 #include <multigrid/mg_base.h>
-#include <base/mg_level_object.h>
-#include <multigrid/mg_tools.h>
 
 
 DEAL_II_NAMESPACE_OPEN
