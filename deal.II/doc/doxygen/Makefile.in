@@ -1,7 +1,7 @@
 # $Id$
 # $Name$
 #
-# Copyright (c) the deal.II authors 2003
+# Copyright (c) the deal.II authors 2003, 2010
 
 SHELL=/bin/bash
 ###############################
@@ -34,9 +34,7 @@ private:
 # equal file).
 deal.II deal.tag: tutorial \
           deal.dox \
-	  $D/base/include/*/*.h \
-	  $D/lac/include/*/*.h \
-	  $D/deal.II/include/*/*.h \
+	  $D/include/deal.II/*/*.h \
 	  headers/*.h \
 	  $(addprefix tutorial/doxygen/, $(shell ls tutorial/doxygen/))
 	@echo "=== Generating reference documentation. " \
@@ -56,7 +54,7 @@ tutorial:
 
 deal.dox: Makefile $(shell echo images ../../examples/*/doc ../news/*.h)
 	@echo "=== Making $@"
-	@echo "INPUT=`echo headers ../../base/include/* ../../lac/include/* ../../deal.II/include/* tutorial/doxygen ../news/*.h`" > $@
+	@echo "INPUT=`echo headers $D/include/deal.II/* tutorial/doxygen ../news/*.h`" > $@
 	@echo "IMAGE_PATH=`echo images ../../examples/*/doc`" >> $@
 
 
