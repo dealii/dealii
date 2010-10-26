@@ -822,7 +822,7 @@ namespace Patterns
 					* Files can be used for input
 					* or output. This can be
 					* specified in the constructor
-					* by choosing the flag <tt>type</tt<.
+					* by choosing the flag <tt>type</tt>.
 					*/
       enum FileType {input = 0, output = 1};
 
@@ -864,7 +864,7 @@ namespace Patterns
 					* file type flag
 					*/
       FileType  file_type;
-      
+
     private:
 				       /**
 					* Initial part of description
@@ -925,7 +925,7 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
     private:
 				       /**
 					* Initial part of description
