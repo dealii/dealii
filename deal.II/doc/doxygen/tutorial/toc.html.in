@@ -40,7 +40,7 @@ You can browse the available tutorial programs as
 tutorial programs build upon each other</a> (below);
 as <a href="toc-list.html">a list that provides a short
     synopsis of each program</a>; and
-<a href="toc-topics.html">grouped by topics</a>. 
+<a href="toc-topics.html">grouped by topics</a>.
 Some of the programs also jointly form
 the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
   demonstration suite</a>.
@@ -48,8 +48,8 @@ the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
 
 <p>
 The programs are in the <code>examples/</code> directory of your local deal.II
-installation. After compiling the library itself, if you go into one of the 
-tutorial directories, you can compile 
+installation. After compiling the library itself, if you go into one of the
+tutorial directories, you can compile
 the program by typing <strong>make</strong>, and run it
 using <strong>make run</strong>. The latter command also compiles the program
 if that has not already been done. The Makefiles in the different
@@ -73,10 +73,12 @@ should appear.
 </p>
 
 <p>
-In the graph above, green octagons indicate programs that show basic
-techniques. Orange boxes indicate advanced techniques, while the programs
-shown as yellow, light blue, and dark blue boxes are applications in fluid
-dynamics, solid mechanics, and time dependent problems, respectively.
+Legend:
+<b>Green octagons:</b> programs that show basic techniques;
+<b>Orange boxes:</b> advanced techniques;
+<b>Yellow:</b> applications in fluid dynamics;
+<b>Light blue:</b> applications in solid mechanics;
+<b>Dark blue boxes:</b> time dependent problems.
 </p>
 
 <!-- Page Foot -->
