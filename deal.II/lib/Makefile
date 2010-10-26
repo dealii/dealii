@@ -57,7 +57,7 @@ ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
            $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
 else
   # which is the same for PETSc 3.0.0:
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30) 
+  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
     xlib.g = $(lib-contrib-petsc-path.g)/libpetscksp$(lib-suffix) \
              $(lib-contrib-petsc-path.g)/libpetscdm$(lib-suffix)  \
              $(lib-contrib-petsc-path.g)/libpetscmat$(lib-suffix) \
@@ -68,7 +68,7 @@ else
              $(lib-contrib-petsc-path.o)/libpetscmat$(lib-suffix) \
              $(lib-contrib-petsc-path.o)/libpetscvec$(lib-suffix) \
              $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
-  else 
+  else
     # but after that (petsc-3.1++), we can use the simpler PETSc
     # default "--with-single-library=1" like this:
     xlib.g = $(lib-contrib-petsc-path.o)/libpetsc$(lib-suffix)
@@ -94,7 +94,7 @@ else
 
   # make static libraries. ensure that they are built one after the other because
   # both create temporary files with the same name
-  external-links-petsc: 
+  external-links-petsc:
 	@$(MAKE) libpetscall.g$(static-lib-suffix)
 	@$(MAKE) libpetscall$(static-lib-suffix)
 
@@ -142,16 +142,15 @@ endif
 clean: clean-objects clean-bin
 
 # only clean object files, not libraries and executables
-clean-objects:  clean-base clean-lac \
-		clean-1d clean-2d clean-3d \
+clean-objects:  clean-debug clean-optimized \
 		clean-contrib
 
 
 # clean targets for the individual subdirectories. remove
 # object files and template instantiation files.
 # extract dir name from target
-clean-base clean-lac clean-1d clean-2d clean-3d:
-	-cd $(@:clean-%=%) ; rm *.$(OBJEXT) *.ti *.ii
+clean-debug clean-optimized:
+	-cd $(@:clean-%=%) ; rm -f *.$(OBJEXT) *.ti *.ii
 
 clean-contrib:
 	-rm contrib/*/*.$(OBJEXT)
@@ -165,7 +164,7 @@ clean-bin:
 distclean: clean
 	-rm -f lib* bin/*
 
-.PHONY: clean clean-objects 
+.PHONY: clean clean-objects
 .PHONY: clean-base clean-lac clean-1d clean-2d clean-3d
 .PHONY: clean-contrib
 .PHONY: external-links external-links-petsc
