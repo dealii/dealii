@@ -115,7 +115,7 @@ deg (p)
       // right edge of lower left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[0] (j, k);
@@ -124,7 +124,7 @@ deg (p)
       // right edge of upper left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[2] (j, k);
@@ -133,7 +133,7 @@ deg (p)
       // upper edge of lower left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + 3*this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + 3*this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[0] (j, k);
@@ -142,7 +142,7 @@ deg (p)
       // upper edge of lower right child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + 3*this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + 3*this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[1] (j, k);
@@ -151,7 +151,7 @@ deg (p)
       // left edge of lower left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + jj;
+	  const unsigned int j = this->first_face_line_index + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[0] (j, k);
@@ -160,7 +160,7 @@ deg (p)
       // left edge of upper left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + jj;
+	  const unsigned int j = this->first_face_line_index + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[2] (j, k);
@@ -169,7 +169,7 @@ deg (p)
       // right edge of lower right child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[1] (j, k);
@@ -178,7 +178,7 @@ deg (p)
       // right edge of upper right child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[3] (j, k);
@@ -187,7 +187,7 @@ deg (p)
       // lower edge of lower left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + 2*this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + 2*this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[0] (j, k);
@@ -196,7 +196,7 @@ deg (p)
       // lower edge of lower right child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + 2*this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + 2*this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[1] (j, k);
@@ -205,7 +205,7 @@ deg (p)
       // upper edge of upper left child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + 3*this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + 3*this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[2] (j, k);
@@ -214,7 +214,7 @@ deg (p)
       // upper edge of upper right child
       for (unsigned int jj = 0; jj < this->dofs_per_line; ++jj)
 	{
-	  const unsigned int j = this->fist_face_line_index + 3*this->dofs_per_line + jj;
+	  const unsigned int j = this->first_face_line_index + 3*this->dofs_per_line + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[3] (j, k);
@@ -223,7 +223,7 @@ deg (p)
       // Now the interior dofs of each subface
       for (unsigned int jj = 0; jj < this->dofs_per_quad; ++jj)
 	{
-	  const unsigned int j = this->fist_face_quad_index + jj;
+	  const unsigned int j = this->first_face_quad_index + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[0] (j, k);
@@ -231,7 +231,7 @@ deg (p)
 	}
       for (unsigned int jj = 0; jj < this->dofs_per_quad; ++jj)
 	{
-	  const unsigned int j = this->fist_face_quad_index + jj;
+	  const unsigned int j = this->first_face_quad_index + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[1] (j, k);
@@ -239,7 +239,7 @@ deg (p)
 	}
       for (unsigned int jj = 0; jj < this->dofs_per_quad; ++jj)
 	{
-	  const unsigned int j = this->fist_face_quad_index + jj;
+	  const unsigned int j = this->first_face_quad_index + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[2] (j, k);
@@ -247,7 +247,7 @@ deg (p)
 	}
       for (unsigned int jj = 0; jj < this->dofs_per_quad; ++jj)
 	{
-	  const unsigned int j = this->fist_face_quad_index + jj;
+	  const unsigned int j = this->first_face_quad_index + jj;
 	  for (unsigned int k = 0; k < face_embeddings[0].n (); ++k)
 	    this->interface_constraints (target_row, k)
 	      = face_embeddings[3] (j, k);
