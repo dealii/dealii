@@ -1475,7 +1475,7 @@ template <int dim>
 bool
 FE_Nedelec<dim>::hp_constraints_are_implemented () const
 {
-  return dim != 2;
+  return false;//dim != 2;
 }
 
 template <int dim>
