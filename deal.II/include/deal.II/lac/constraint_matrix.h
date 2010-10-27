@@ -1834,7 +1834,7 @@ ConstraintMatrix::add_entry (const unsigned int line,
        p != line_ptr->entries.end(); ++p)
     if (p->first == column)
       {
-	Assert (p->second == value,
+	Assert (std::fabs(p->second - value) < 1.e-14,
 		ExcEntryAlreadyExists(line, column, p->second, value));
 	return;
       }
