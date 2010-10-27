@@ -217,33 +217,4 @@ GrowingVectorMemory<VECTOR>::memory_consumption () const
 
 #include "vector_memory.inst"
 
-//TODO: Fold this into the list of vectors to be instantiated
-#ifdef DEAL_II_USE_PETSC
-    template class VectorMemory<PETScWrappers::Vector>;
-    template class GrowingVectorMemory<PETScWrappers::Vector>;
-
-    template class VectorMemory<PETScWrappers::BlockVector>;
-    template class GrowingVectorMemory<PETScWrappers::BlockVector>;
-
-    template class VectorMemory<PETScWrappers::MPI::Vector>;
-    template class GrowingVectorMemory<PETScWrappers::MPI::Vector>;
-
-    template class VectorMemory<PETScWrappers::MPI::BlockVector>;
-    template class GrowingVectorMemory<PETScWrappers::MPI::BlockVector>;
-#endif
-
-#ifdef DEAL_II_USE_TRILINOS
-    template class VectorMemory<TrilinosWrappers::Vector>;
-    template class GrowingVectorMemory<TrilinosWrappers::Vector>;
-
-    template class VectorMemory<TrilinosWrappers::BlockVector>;
-    template class GrowingVectorMemory<TrilinosWrappers::BlockVector>;
-
-    template class VectorMemory<TrilinosWrappers::MPI::Vector>;
-    template class GrowingVectorMemory<TrilinosWrappers::MPI::Vector>;
-
-    template class VectorMemory<TrilinosWrappers::MPI::BlockVector>;
-    template class GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>;
-#endif
-
 DEAL_II_NAMESPACE_CLOSE
