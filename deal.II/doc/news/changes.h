@@ -30,6 +30,23 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li>
+        deal.II has had a somewhat quirky directory and library structure for
+        historical reasons, but this has now changed: All include and source
+        files are now under the top-level <code>include/</code>
+        and <code>source</code> directories. Furthermore, we no longer build a
+        plethora of libraries but only <code>libdeal_II.g.so</code> (debug
+        version) and <code>libdeal_II.so</code> (optimized version). In
+	particular, we no longer build different versions of the library for
+	different space dimensions.
+	<br>
+	As a consequence, if your makefile makes any assumption on the
+	location of deal.II include files or the name of the deal.II library
+	it will need to be changed.
+	<br>
+	(WB 2010/10/25)
+	</li>
+
 <li> The <code>Polynomials::Lagrange::generate_complete_basis</code>
 function has been renamed to Polynomials::generate_complete_Lagrange_basis .
 The function was previously the only member of a class, and a static
