@@ -21,7 +21,7 @@ debug-mode = on
 
 # And so does the following variable. You will have to set it to
 # something more reasonable, of course.
-clean-up-files = 
+clean-up-files =
 
 # Finally, here is a variable which tells the `run' rule which
 # parameters to pass to the executable. Usually, this will be the name
@@ -47,29 +47,23 @@ include $D/common/Make.global_options
 # are expected in `include/', while implementation files are expected
 # in `source/'. Object files are placed into `lib/[123]d', using the
 # same base name as the `.cc' file.
-cc-files    = $(shell echo source/*.cc)
-o-files     = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.$(OBJEXT))
-go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.$(OBJEXT))
-h-files     = $(wildcard include/*.h)
-lib-h-files = $(shell echo $D/base/include/base/*.h \
-		 $D/lac/include/lac/*.h             \
-		 $D/deal.II/include/*/*.h)
+cc-files    := $(shell echo source/*.cc)
+o-files     := $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.$(OBJEXT))
+go-files    := $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.$(OBJEXT))
+h-files     := $(wildcard include/*.h)
+lib-h-files := $(shell echo $D/include/deal.II/*/*.h)
 
-# As before, define a list of libraries. This, of course depends on
-# the dimension in which we are working:
-libs.g   = $(lib-deal2-$(deal_II_dimension)d.g) \
-	   $(lib-lac.g)                         \
-           $(lib-base.g)
-libs.o   = $(lib-deal2-$(deal_II_dimension)d.o) \
-	   $(lib-lac.o)                         \
-           $(lib-base.o)
+# As before, define two variables that denote the debug and optimized
+# versions of the deal.II libraries:
+libs.g   := $(lib-deal2.g)
+libs.o   := $(lib-deal2.o)
 
 
 
 # Now use the information from above to define the set of libraries to
 # link with and the flags to be passed to the compiler:
 ifeq ($(debug-mode),on)
-  libraries = $(go-files) $(libs.g) 
+  libraries = $(go-files) $(libs.g)
   flags     = $(CXXFLAGS.g)
 else
   libraries = $(o-files) $(libs.o)

@@ -48,21 +48,11 @@ include $D/common/Make.global_options
 
 # Since the whole project consists of only one file, we need not
 # consider difficult dependencies. We only have to declare the
-# libraries which we want to link to the object file, and there need
-# to be two sets of libraries: one for the debug mode version of the
-# application and one for the optimized mode. Here we have selected
-# the versions for 2d. Note that the order in which the libraries are
-# given here is important and that your applications won't link
-# properly if they are given in another order.
-#
-# You may need to augment the lists of libraries when compiling your
-# program for other dimensions, or when using third party libraries
-libs.g   = $(lib-deal2-2d.g) \
-	   $(lib-lac.g)      \
-           $(lib-base.g)
-libs.o   = $(lib-deal2-2d.o) \
-	   $(lib-lac.o)      \
-           $(lib-base.o)
+# libraries which we want to link to the object file. deal.II has two
+# libraries: one for the debug mode version of the
+# application and one for optimized mode.
+libs.g   := $(lib-deal2.g)
+libs.o   := $(lib-deal2.o)
 
 
 # We now use the variable defined above which switch between debug and
@@ -137,9 +127,7 @@ clean:
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
 Makefile.dep: $(target).cc Makefile \
-              $(shell echo $(include-path-base)/base/*.h    \
-                           $(include-path-lac)/lac/*.h      \
-                           $(include-path-deal2)/*/*.h)
+              $(shell echo $D/include/deal.II/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> Makefile.dep
