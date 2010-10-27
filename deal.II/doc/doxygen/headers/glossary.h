@@ -437,7 +437,7 @@
  * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
  * preprint 2011-187</a>.
  * For massively parallel
- * computations, <acronym>deal.II</acronym> builds on the
+ * computations, deal.II builds on the
  * <a href="http://www.p4est.org/" target="_top">p4est</a>
  * library. If you use this functionality, please also cite the
  * p4est paper listed at their website.
