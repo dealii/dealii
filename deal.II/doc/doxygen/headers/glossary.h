@@ -422,7 +422,7 @@
  *
  * <dt class="glossary">@anchor distributed_paper
  *                           <b>Distributed computing paper</b></dt>
-
+ *
  * <dd>The "distributed computing paper" is a paper by W. Bangerth,
  * C. Burstedde, T. Heister and M. Kronbichler titled "Algorithms and Data
  * Structures for Massively Parallel Generic Finite Element Codes" that
@@ -430,12 +430,17 @@
  * i.e. computations where not only the linear system is split onto different
  * machines as in, for example, step-18, but also the Triangulation and
  * DoFHandler objects. In essence, it is a guide to the parallel::distributed
- * namespace.
+ * namespace and the techniques used in step-40.
  *
  * The paper is submitted to the ACM Transactions on Mathematical Software
  * (ACM TOMS). It is also available as
  * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
  * preprint 2011-187</a>.
+ * For massively parallel
+ * computations, <acronym>deal.II</acronym> builds on the
+ * <a href="http://www.p4est.org/" target="_top">p4est</a>
+ * library. If you use this functionality, please also cite the
+ * p4est paper listed at their website.
  * </dd>
  *
  *
