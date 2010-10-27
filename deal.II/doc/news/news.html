@@ -33,6 +33,18 @@
 
     <dl>
       <dt>
+          <strong>2010/10/25: New directory and library structure</strong>
+      </dt>
+      <dd>
+        deal.II has had a somewhat quirky directory and library structure for
+        historical reasons, but this has now changed: All include and source
+        files are now under the top-level <code>include/</code>
+        and <code>source</code> directories. Furthermore, we no longer build a
+        plethora of libraries but only <code>libdeal_II.g.so</code> (debug
+        version) and <code>libdeal_II.so</code> (optimized version).
+      </dd>
+
+      <dt>
           <strong>2010/10/23: Distributed mesh functionality available</strong>
       </dt>
       <dd>
