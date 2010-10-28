@@ -164,7 +164,7 @@ clean:
 #
 # If the creation of Makefile.dep fails, blow it away and fail
 Makefile.dep: $(target).cc Makefile \
-              $(shell echo $D/*/include/*/*.h)
+              $(shell echo $D/include/deal.II/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
 		> $@ \
