@@ -122,7 +122,7 @@ namespace internal
 	const dealii::hp::QCollection<dim> q_collection;
 	const dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
 	dealii::hp::FEValues<dim,spacedim> x_fe_values;
-	
+
 	std::vector<Point<spacedim> > patch_evaluation_points;
 
 	const std::vector<std::vector<unsigned int> > *cell_to_patch_index_map;
@@ -377,26 +377,39 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * and of cells is usually not
 				      * equal, the function can
 				      * determine itself which type of
-				      * vector it is given; however,
-				      * there is one corner case,
-				      * namely if you compute with
-				      * piecewise constant elements
-				      * and have one scalar quantity,
-				      * then there are as many cells
-				      * as there are degrees of
-				      * freedom, but they may be
-				      * ordered differently. In that
-				      * case, you can change the last
-				      * argument of the function from
-				      * its default value
-				      * #type_automatic to either
-				      * #type_dof_data or #type_cell_data,
-				      * depending on what the vector
-				      * represents. Apart from this
-				      * corner case, you can leave the
-				      * argument at its default value
-				      * and let the function determine
-				      * the type of the vector itself.
+				      * vector it is given. However,
+				      * there are corner cases where
+				      * this automatic determination
+				      * does not work.  One example is
+				      * if you compute with piecewise
+				      * constant elements and have a
+				      * scalar solution, then there
+				      * are as many cells as there are
+				      * degrees of freedom (though
+				      * they may be numbered
+				      * differently). Another
+				      * possibility is if you have a
+				      * 1d mesh embedded in 2d space
+				      * and the mesh consists of a
+				      * closed curve of cells; in this
+				      * case, there are as many nodes
+				      * as there are cells, and when
+				      * using a Q1 element you will
+				      * have as many degrees of
+				      * freedom as there are cells.
+				      * In these cases, you can change
+				      * the last argument of the
+				      * function from its default
+				      * value #type_automatic to
+				      * either #type_dof_data or
+				      * #type_cell_data, depending on
+				      * what the vector
+				      * represents. Apart from such
+				      * corner cases, you can leave
+				      * the argument at its default
+				      * value and let the function
+				      * determine the type of the
+				      * vector itself.
 				      *
 				      * If it is a vector holding DoF
 				      * data, the names given shall be
