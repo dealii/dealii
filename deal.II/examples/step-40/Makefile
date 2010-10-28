@@ -52,26 +52,18 @@ include $D/common/Make.global_options
 #
 # The same holds true if we use threads: PETSc and threads doesn't
 # seem to work well together...
-ifneq ($(USE_CONTRIB_PETSC)$(enable-threads),yesno)
-  ifneq ($(USE_CONTRIB_PETSC),yes)
+ifneq ($(USE_CONTRIB_PETSC)$(enable-threads)$(USE_CONTRIB_P4EST),yesnoyes)
 default run clean:
 	@echo
 	@echo "==========================================================="
-	@echo "=   This program cannot be compiled without PETSc. Make   ="
-	@echo "=   sure you have PETSc installed and detected during     ="
-	@echo "=   configuration of deal.II                              ="
+	@echo "=   This program can only be run with the following       ="
+	@echo "=   configuration:                                        ="
+	@echo "=   - with PETSc                                          ="
+	@echo "=   - without threads                                     ="
+	@echo "=   - with P4EST                                          ="
+	@echo "=   At least one of these conditions is not satisfied.    ="
 	@echo "==========================================================="
 	@echo
-  else
-default run clean:
-	@echo
-	@echo "==========================================================="
-	@echo "=   PETSc can not be used when running programs on        ="
-	@echo "=   multiple threads. Make sure you have specified the    ="
-	@echo "=   --disable-threads flag upon configuration of deal.II  ="
-	@echo "==========================================================="
-	@echo
-  endif
 else
 #
 ################################################################
