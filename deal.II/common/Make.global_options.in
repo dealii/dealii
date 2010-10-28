@@ -295,10 +295,11 @@ include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
 # include paths as command line flags. while compilers allow a space between
 # the '-I' and the actual path, we also send these flags to the
 # make_dependencies program that doesn't support the extra space.
-INCLUDE = -I$D/include -I$D/include/deal.II \
+INCLUDE = -I$D/include/deal.II \
 	  @CPPFLAGS@ @TECPLOT_INCLUDE_DIR@ \
           @UMFPACK_INCLUDE_DIR@ @HSL_INCLUDE_DIR@ \
-	  -I$D/contrib
+	  -I$D/contrib \
+	  -I$D/include
 
 # add PETSc, SLEPSc, and Trilinos include paths if necessary. this rule
 # (and the one further down below to get correct flags) should eventually
