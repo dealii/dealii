@@ -21,7 +21,7 @@ debug-mode = on
 
 # And so does the following variable. You will have to set it to
 # something more reasonable, of course.
-clean-up-files = 
+clean-up-files =
 
 # Finally, here is a variable which tells the `run' rule which
 # parameters to pass to the executable. Usually, this will be the name
@@ -41,13 +41,13 @@ D = ../../
 include $D/common/Make.global_options
 
 
-################################################################ 
+################################################################
 # This example program will only work if Trilinos is installed. If this
 # is not the case, then simply redefine the main targets to do nothing
 ifneq ($(USE_CONTRIB_TRILINOS),yes)
 default run clean:
 	@echo
-	@echo "===========================================================" 
+	@echo "==========================================================="
 	@echo "=   This program cannot be compiled without Trilinos. Make="
 	@echo "=   sure you have Trilinos installed and detected during  ="
 	@echo "=   configuration of deal.II                              ="
@@ -67,25 +67,22 @@ cc-files    = $(shell echo source/*.cc)
 o-files     = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.$(OBJEXT))
 go-files    = $(cc-files:source/%.cc=lib/$(deal_II_dimension)d/%.g.$(OBJEXT))
 h-files     = $(wildcard include/*.h)
-lib-h-files = $(shell echo $D/base/include/base/*.h \
-		 $D/lac/include/lac/*.h             \
-		 $D/deal.II/include/*/*.h)
+lib-h-files = $(shell echo $D/include/deal.II/*/*.h)
 
-# As before, define a list of libraries. This, of course depends on
-# the dimension in which we are working:
-libs.g   = $(lib-deal2-$(deal_II_dimension)d.g) \
-	   $(lib-lac.g)                         \
-           $(lib-base.g)
-libs.o   = $(lib-deal2-$(deal_II_dimension)d.o) \
-	   $(lib-lac.o)                         \
-           $(lib-base.o)
+# Since the whole project consists of only one file, we need not
+# consider difficult dependencies. We only have to declare the
+# libraries which we want to link to the object file. deal.II has two
+# libraries: one for the debug mode version of the
+# application and one for optimized mode.
+libs.g   := $(lib-deal2.g)
+libs.o   := $(lib-deal2.o)
 
 
 
 # Now use the information from above to define the set of libraries to
 # link with and the flags to be passed to the compiler:
 ifeq ($(debug-mode),on)
-  libraries = $(go-files) $(libs.g) 
+  libraries = $(go-files) $(libs.g)
   flags     = $(CXXFLAGS.g)
 else
   libraries = $(o-files) $(libs.o)
@@ -135,7 +132,6 @@ clean-data:
 
 # Again tell `make' which rules are not meant to produce files:
 .PHONY: clean clean-data clean-lib run
-
 
 
 # Finally produce the list of dependencies. Note that this time, the
