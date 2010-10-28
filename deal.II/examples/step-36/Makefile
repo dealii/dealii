@@ -77,17 +77,11 @@ else
 
 # Since the whole project consists of only one file, we need not
 # consider difficult dependencies. We only have to declare the
-# libraries which we want to link to the object file, and there need
-# to be two sets of libraries: one for the debug mode version of the
-# application and one for the optimized mode. Here we have selected
-# the versions for 2d. Note that the order in which the libraries are
-# given here is important and that your applications won't link
-# properly if they are given in another order.
-#
-# You may need to augment the lists of libraries when compiling your
-# program for other dimensions, or when using third party libraries
-libs.g   = $(lib-deal2.g)
-libs.o   = $(lib-deal2.o)
+# libraries which we want to link to the object file. deal.II has two
+# libraries: one for the debug mode version of the
+# application and one for optimized mode.
+libs.g   := $(lib-deal2.g)
+libs.o   := $(lib-deal2.o)
 
 
 # We now use the variable defined above which switch between debug and
@@ -95,8 +89,8 @@ libs.o   = $(lib-deal2.o)
 # in the list of libraries is the name of the object file which we
 # will produce from the single C++ file. Note that by default we use
 # the extension .g.o for object files compiled in debug mode and .o for
-# object files in optimized mode (or whatever the local default on your
-# system is instead of .o).
+# object files in optimized mode (or whatever local default on your
+# system is instead of .o)
 ifeq ($(debug-mode),on)
   libraries = $(target).g.$(OBJEXT) $(libs.g)
 else
@@ -108,9 +102,9 @@ endif
 # file produced from the single C++ file into the executable. Since
 # this is the first rule in the Makefile, it is the one `make' selects
 # if you call it without arguments.
-$(target) : $(libraries)
+$(target)$(EXEEXT) : $(libraries)
 	@echo ============================ Linking $@
-	@$(CXX) -o $@$(EXEEXT) $^ $(LIBS) $(LDFLAGS)
+	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
 
 
 # To make running the application somewhat independent of the actual
@@ -119,7 +113,7 @@ $(target) : $(libraries)
 # useful if you want to call the executable with arguments which do
 # not change frequently. You may then want to add them to the
 # following rule:
-run: $(target)
+run: $(target)$(EXEEXT)
 	@echo ============================ Running $<
 	@./$(target)$(EXEEXT)
 
@@ -142,7 +136,7 @@ clean:
 	@echo ==============debug========= $(<F)
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ./%.$(OBJEXT) :
-	@echo ==============optimized===== $(<F)
+	@echo ==============optimized===== $(<F) $@
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
@@ -170,7 +164,6 @@ Makefile.dep: $(target).cc Makefile \
 		> $@ \
 	  || (rm -f $@ ; false)
 	@if test -s $@ ; then : else rm $@ ; fi
-
 
 # To make the dependencies known to `make', we finally have to include
 # them:
