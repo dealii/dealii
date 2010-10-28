@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2006/02/10 17:53:05 wolf Exp $
+# $Id$
 
 
 # For the small projects Makefile, you basically need to fill in only
@@ -14,7 +14,7 @@ target = $(basename $(shell echo step-*.cc))
 # run-time checking of parameters and internal states is performed, so
 # you should set this value to `on' while you develop your program,
 # and to `off' when running production computations.
-debug-mode = off
+debug-mode = on
 
 
 # As third field, we need to give the path to the top-level deal.II
@@ -48,16 +48,17 @@ include $D/common/Make.global_options
 ################################################################
 # This example program will only work if Trilinos is installed. If this
 # is not the case, then simply redefine the main targets to do nothing
-ifneq ($(USE_CONTRIB_TRILINOS),yes)
+ifneq ($(USE_CONTRIB_TRILINOS)$(USE_CONTRIB_P4EST),yesyes)
 default run clean:
 	@echo
 	@echo "==========================================================="
-	@echo "=   This program cannot be compiled without Trilinos. Make="
-	@echo "=   sure you have Trilinos installed and detected during  ="
-	@echo "=   configuration of deal.II                              ="
+	@echo "=   This program can only be run with the following       ="
+	@echo "=   configuration:                                        ="
+	@echo "=   - with PETSc                                          ="
+	@echo "=   - with P4EST                                          ="
+	@echo "=   At least one of these conditions is not satisfied.    ="
 	@echo "==========================================================="
 	@echo
-
 else
 #
 ################################################################
