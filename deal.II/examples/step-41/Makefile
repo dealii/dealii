@@ -1,4 +1,4 @@
-# $Id: Makefile.large 18849 2009-05-15 17:59:46Z bangerth $
+# $Id$
 
 # The large projects Makefile looks much like the one for small
 # projects. Basically, only the following seven parameters need to be
