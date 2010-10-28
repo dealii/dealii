@@ -136,10 +136,10 @@ clean:
 # command line using the `at' sign in the first column of the rules
 # and write the string indicating what we do instead.
 ./%.g.$(OBJEXT) :
-	@echo ==============debug========= $(<F)
+	@echo "==============debug========= $(<F)  ->  $@"
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ./%.$(OBJEXT) :
-	@echo ==============optimized===== $(<F) $@
+	@echo "==============optimized===== $(<F)  ->  $@"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
