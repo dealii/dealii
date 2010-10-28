@@ -7,7 +7,7 @@
 # The first is the name of the application. It is assumed that the
 # application name is the same as the base file name of the single C++
 # file from which the application is generated.
-target   = application-name
+target = step-1
 
 # The second field determines whether you want to run your program in
 # debug or optimized mode. The latter is significantly faster, but no
@@ -23,7 +23,7 @@ debug-mode = on
 # designated by a single-character variable, since that can be
 # reference using $D only, i.e. without the parentheses that are
 # required for most other parameters, as e.g. in $(target).
-D = ../../deal.II
+D = ../../
 
 
 # The last field specifies the names of data and other files that
@@ -60,8 +60,8 @@ libs.o   := $(lib-deal2.o)
 # in the list of libraries is the name of the object file which we
 # will produce from the single C++ file. Note that by default we use
 # the extension .g.o for object files compiled in debug mode and .o for
-# object files in optimized mode (or whatever the extension is on your
-# system, if .o is not appropriate)
+# object files in optimized mode (or whatever local default on your
+# system is instead of .o)
 ifeq ($(debug-mode),on)
   libraries = $(target).g.$(OBJEXT) $(libs.g)
 else
@@ -95,7 +95,7 @@ run: $(target)$(EXEEXT)
 # backup files, and data files. Since the latter are not usually quite
 # diverse, you needed to declare them at the top of this file.
 clean:
-	-rm -f *.$(OBJEXT) *~ Makefile.dep $(target) $(clean-up-files)
+	-rm -f *.$(OBJEXT) *~ Makefile.dep $(target)$(EXEEXT) $(clean-up-files)
 
 
 # Since we have not yet stated how to make an object file from a C++
@@ -104,10 +104,10 @@ clean:
 # command line using the `at' sign in the first column of the rules
 # and write the string indicating what we do instead.
 ./%.g.$(OBJEXT) :
-	@echo ==============debug========= $(<F)
+	@echo ==============debug========= $(<F) $@
 	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 ./%.$(OBJEXT) :
-	@echo ==============optimized===== $(<F)
+	@echo ==============optimized===== $(<F) $@
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
@@ -126,11 +126,15 @@ clean:
 # the executable. This file is automagically remade whenever needed,
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion at the bottom of this file.
+#
+# If the creation of Makefile.dep fails, blow it away and fail
 Makefile.dep: $(target).cc Makefile \
               $(shell echo $D/include/deal.II/*/*.h)
 	@echo ============================ Remaking $@
 	@$D/common/scripts/make_dependencies  $(INCLUDE) -B. $(target).cc \
-		> Makefile.dep
+		> $@ \
+	  || (rm -f $@ ; false)
+	@if test -s $@ ; then : else rm $@ ; fi
 
 # To make the dependencies known to `make', we finally have to include
 # them:
