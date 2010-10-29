@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,7 +16,9 @@
 
 #include <base/config.h>
 #include <base/std_cxx1x/shared_ptr.h>
+
 #include <string>
+#include <complex>
 #include <vector>
 #include <utility>
 
@@ -166,6 +168,23 @@ namespace MemoryConsumption
 				    */
   inline
   unsigned int memory_consumption (const double);
+
+				   /**
+				    * Determine the amount of memory
+				    * in bytes consumed by a <tt>long double</tt>
+				    * variable.
+				    */
+  inline
+  unsigned int memory_consumption (const long double);
+
+				   /**
+				    * Determine the amount of memory
+				    * in bytes consumed by a <tt>std::complex</tt>
+				    * variable.
+				    */
+  template <typename T>
+  inline
+  unsigned int memory_consumption (const std::complex<T> &);
 
 				   /**
 				    * Determine an estimate of the
@@ -464,6 +483,22 @@ namespace MemoryConsumption
   unsigned int memory_consumption (const double)
   {
     return sizeof(double);
+  }
+
+
+
+  inline
+  unsigned int memory_consumption (const long double)
+  {
+    return sizeof(long double);
+  }
+
+
+  template <typename T>
+  inline
+  unsigned int memory_consumption (const std::complex<T> &)
+  {
+    return sizeof(std::complex<T>);
   }
 
 
