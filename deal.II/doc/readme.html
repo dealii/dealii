@@ -141,35 +141,27 @@
       <li> <p>
            For debugging programs, we have found that the
 	   <a href="http://www.gnu.org" target="_top">GNU
-	   debugger gdb</a> is a valuable tool.
+	   debugger gdb</a> is a valuable tool. Other options
+	   are <a href="http://www.gnu.org/software/ddd/" target="_top">DDD</a>
+	   and <a href="http://www.kdbg.org/" target="_top">kdbg</a>, both of
+	   which have graphical user interfaces. Most integrated development
+	   environments like <a href="http://www.kdevelop.org/"
+				target="_top">kdevelop</a> or
+	   <a href="http://eclipse.org/" target="_top">Eclipse</a> have built
+	   in debuggers as well.
 	   </p>
 
       <li> <p>
-           In case you want to generate the documentation from the
-           header files, you need a copy of <a href="http://www.doxygen.org/"
-           target="_top">doxygen</a> on your machine. Versions 1.4.6
-           and later are known to work. If you
-           have this program, you can generate all the documentation on
-	   your local machine. If not, you can still work with the library and
+           In case you want to generate the documentation locally on your
+	   machine from the header <acronym>deal.II</acronym> files, you need a
+	   copy of <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+	   on your machine. If not, you can still work with the library and 
 	   use the documentation provided on our homepage for reference. Note
            that in order to generate inheritance graphs for classes, doxygen
            can use the <code>dot</code> program, which is part of the <a
            href="http://www.graphviz.org" target="_top">GraphViz</a>
            package. If this program is not available, then doxygen attempts to
            generate text-mode graphs; these are much less nice, though.
-	   </p>
-
-      <li> <p>
-           Doxygen also generates printable API documentation. It is located
-           in the directories <code>doc/doxygen/LaTeX</code> and
-           subdirectories. To generate printable versions, you need a latex
-           installation. However, the present size of this API information is
-           about 4000 pages, so you may not want to print it, and rather rely
-           on the online version. The more interesting part of the
-           documentation to print would probably be the example programs, but
-           we don't presently have a way to do that apart from printing it
-           directly from the browser or by using the <code>html2ps</code>
-           program.
 	   </p>
 
       <li> <p>
@@ -186,34 +178,27 @@
            and directly to Encapsulated Postscript. GNUPLOT and a
            postscript viewer (for EPS) should be available almost
            everywhere. In the last few years, most new visualization
-           programs have moved to support VTK format, so there are a
+           programs have moved to support VTK format. There are a
            number of excellent programs that can read VTK, such as <a
            href="http://www.llnl.gov/visit/" target="_top">Visit</a>,
 	   <a href="http://www.paraview.org/HTML/Index.html"
-           target="_top">ParaView</a>, as well as many others.
-	   GMV and Open DX are freely available for most Unix
-           platforms. Povray is freely available for almost all
+           target="_top">ParaView</a>, as well as others.
+	   Povray is freely available for almost all
            platforms. AVS is a commercial program available for most
            Unix flavors. Tecplot is a commercial program available for
-           Windows and most Unix platforms. HiVision is available for free after
-           registration.
+           Windows and most Unix platforms.
 	   </p>
+
+       <p>
+       In case you didn't find your favorite graphics format above, adding a new
+       writer to <acronym>deal.II</acronym> is not too difficult as only a
+       simple
+       intermediate format needs to be 
+       converted into output (without references to cells,
+       nodes, types of finite elements, and the like).
+       </p>
     </ul>
 
-    <p>
-    In case you didn't find your favorite graphics format above it
-    might be of interest that it is quite simple to add it to the list
-    of supported ones (take a look at
-    base/include/base/data_out_base.h and
-    base/source/data_out_base.cc to see how output formats are
-    implemented), as only a simple intermediate format needs to be
-    converted into a graphics format, without references to cells,
-    nodes, types of finite elements, and the like. Since your
-    preferred output format is likely to be similar to one for which
-    we already have a backend, adaptation is usually simple. In case
-    you write such a function, we would be happy to integrate it into
-    the library.
-    </p>
 
 
 
@@ -237,22 +222,14 @@
     <p>
     The most important result of <code>./configure</code> is the
     creation of the files <code>common/Make.global_options</code> and
-    <code>base/include/base/config.h</code>. The first
+    <code>include/deal.II/base/config.h</code>. The first
     file contains compiler options, paths, etc which you may want to
     use in the <a href="development/index.html" target="_top">Makefiles
-    of your own projects</a>. It is definitely a good
-    idea to include it into your Makefile, to allow using the same
-    flags for compilation between library files and the files of your
-    project, and to access the paths of the library files. To find
-    out about the supported flags, take a look at the file. Also,
-    information about Makefiles can be found in the section on
+    of your own projects</a>. More
+    information about Makefiles can also be found in the section on
     <a href="development/index.html" target="_top">development</a>.
-    </p>
-
-    <p>
-    The second generated file contains a number of preprocessor
-    definitions, that are mostly used to indicate the features and
-    bugs of the compiler in use.
+    The second generated file contains preprocessor
+    definitions that can be used to conditionalize pieces of the source code.
     </p>
 
     <p>
@@ -265,59 +242,65 @@
     ========================================================================
     =                                                                      =
     = The following targets exist:                                         =
-    =    baseg lacg : debug libraries "base" and "lac"                     =
-    =    base lac   : debug and optimized libraries "base" and "lac"       =
-    =    1dg 2dg 3dg: deal.II debug version for specified dimension        =
-    =    1d 2d 3d   : deal.II debug and optimized for specified dimension  =
+    =    all        : debug and optimized libraries                        =
+    =    debug      : the debug version of the deal.II library             =
+    =    optimized  : the optimized version of the deal.II library         =
     =                                                                      =
     =    contrib    : additional libraries in contrib, if there are any    =
-    =                                                                      =
-    =    all        : base, lac, 1d, 2d and 3d, contrib                    =
-    =    debug      : baseg, lacg, 1dg, 2dg and 3dg, contrib               =
-    =    optimized  : base, lac, 1d, 2d, and 3d optimized libraries only   =
     =                                                                      =
     =    online-doc : generate the documentation in HTML format            =
     =    TODO       : create a "TODO" file from the source files           =
     =    TAGS       : create a TAGS file from include and source files     =
     =                                                                      =
-    =    clean      : removes all object files, libraries, etc in subdirs  =
+    =    clean      : removes all object files in subdirs                  =
+    =    distclean  : removes all object files, libraries, etc in subdirs  =
     ========================================================================
     </code></pre>
 
     <p>
-    To execute one of the commands, type for example `make all'. Building
-    all libraries takes somewhere between 10 minutes and 1 hour,
-    depending on your machine and requires about 1.1 GB of free disk
-    space. If you have a multi-processor machine, you can call `make -j4
-    target-name' to let `make' call multiple instances of the compiler
-    (in this case four). This speeds up compilation by about
-    the factor given after `-j', at least if you have as many
-    processors.
+      To execute one of the commands, type for example <code>make
+	all</code>. Building all libraries takes somewhere between 4 minutes
+      and several hours, depending on the number of processors your machine
+      has, and requires about 2 GB of free disk space. If you have a
+      multi-processor machine, you can call <code>make -j4 target-name</code>
+      to let <code>make</code> call multiple instances of the compiler 
+      (in this case four). This speeds up compilation by about
+      the factor given after <code>-j</code>, at least if you have as many
+      processors.
     </p>
 
     <p>
-    After `make' has finished, you will have two sets of
-    libraries. The first consists of the files
-    <ul>
-      <li> <p><code>lib/libbase</code>: The library containing the
-      code of the classes in the <code>/base</code> directory. These
-      are mostly helper classes (such as output of various data in
-      different data formats), and classes of general numerical
-      interest (functions, tensors, etc.).
-      </p>
+      The <acronym>deal.II</acronym> libraries come in two versions
+      corresponding to their respective targets:
+      <ul>
+	<li> 
+	  <p><code>lib/libdeal_II.g</code>: This is the
+	    debug version of the library. It is compiled with compiler flags so
+	    that the library contains information that can be used by debuggers. (The
+	    infix <code>.g</code> was historically chosen because gcc uses the
+	    flag <code>-g</code> to request debugging information).
+	  </p>
 
-      <li> <p><code>lib/liblac</code>: <code>lac</code> is the
-      acronym for <i>L</i>inear <i>A</i>lgebra <i>C</i>lasses. This
-      library contains classes representing vectors, matrices, sparse
-      matrices, linear solvers, and the like.
-      </p>
+	  <p>
+	    In addition, this library contains a great number of safety
+	    checks on most arguments of all functions you could possibly call.
+	    These assertions have proven to be an
+	    invaluable means to finding programming bugs since they will
+	    almost always abort your program if something goes wrong. In our
+	    experience, more than ninety per cent of all errors are invalid
+	    parameters (such as vectors having the wrong size, etc) and they
+	    are usually found almost instantaneously displaying the file
+	    name and line number of where the problem occurred.
+	  </p>
 
-      <li> <p><code>lib/libdeal_II_2d</code>: This is the
-      library containing all the classes representing finite element
-      methods, grid handling, different finite elements,
-      etc. There will also be libraries
-      for one and three spatial dimensions.
-      </p>
+	<li> <p><code>lib/libdeal_II</code>: This is the
+	    optimized version of the library. You will want to link with it
+	    once you know that your program is working as expected. This
+	    version of the library does not contain the safety checks any more
+	    and is compiled with aggressive compiler optimizations. The
+	    resulting executables are smaller and will run between 2 and 10
+	    times faster than the debug executables.
+	  </p>
     </ul>
     Each library file will have a suffix that depends on the system.
     If static libraries were requested during
@@ -328,62 +311,11 @@
     </p>
 
     <p>
-    For each library, there will also be another one with an
-    infix <code>.g</code> between library name and suffix. The
-    difference between the two sets of libraries is the following:
-    <ul>
-      <li>
-      <p>
-      The <code>.g</code> versions contain debugging
-      information (the infix <code>.g</code> was historically chosen
-      because gcc uses the flag <code>-g</code> to request
-      debugging information).
-      </p>
-
-      <p>
-      In addition, the <code>.g</code> libraries
-      contain a large number of assertions (presently
-      about 5000) checking the validity of parameters to functions and
-      internal states. These assertions have proven to be an
-      invaluable means to finding programming bugs since they will
-      almost always abort your program if something goes wrong. In our
-      experience, more than ninety per cent of all errors are invalid
-      parameters (such as vectors having the wrong size, etc) and they
-      are usually found almost instantaneously displaying the file
-      name and line number of where the problem occurred.
-      </p>
-
-      <p>
-      You will want to link your programs against the
-      <code>.g.a</code> versions of the libraries while developing
-      your programs.
-      </p>
-
-      <li>
-      <p>
-      The libraries without the <code>.g</code> infix do not contain
-      neither debugging information nor assertions. They are therefore much
-      smaller and your program will run significantly faster (the
-      performance penalty of the <code>.g</code> libraries is
-      between a factor of two and ten, depending on which parts of
-      the libraries you use). Furthermore, these libraries are
-      compiled with optimization options of the compiler.
-      </p>
-
-      <p>
-      You will want to link your programs against these libraries when
-      they run stable and are used in production mode.
-      </p>
-    </ul>
-
-    </p>
-
-    <p>
     Apart from the libraries, you should generate the full set of
-    documentation files, by typing `make online-doc'; this takes some
-    minutes but you will
+    documentation files, by typing <code>make online-doc</code>; this takes
+    some minutes but you will
     have (almost) all the documentation locally on your computer. You
-    can access all documentation through <a
+    will then be able to access it through <a
     href="documentation.html" target="body">this page</a>.
     </p>
 
@@ -402,10 +334,10 @@
     <a name="choose-compiler"></a></a>
     <h4>Changing the compiler or compiler flags</h4>
 
-    If <code>configure</code> uses a wrong compiler, there are two
+    To instruct <code>configure</code> to use a particular compiler, there are two
     options: first, you can prepend your search path by the directory
     of the desired compiler. Alternatively, if your full compiler paths are
-    <tt>mycc</tt> and <tt>myc++</tt> for your C and C++ compilers,
+    <tt>mycc</tt> and <tt>myc++</tt> (for example) for your C and C++ compilers,
     respectively, type into your <tt>csh</tt>:
     <pre>
       setenv CC  mycc
@@ -423,7 +355,7 @@
     The paths to these compilers are stored in the
     <code>common/Make.global_options</code> files, so the compilers
     are always used when compiling the library even if the environment
-    variables are no more set later (for example if you are working
+    variables are not set later on any more (for example if you are working
     within another window, or have unset the variables for other
     purposes).
     </p>
@@ -437,7 +369,7 @@
     <pre>
       setenv CXXFLAGS -pg
       setenv LDFLAGS -pg
-      configure &lt;configure-options&gt;
+      ./configure &lt;configure-options&gt;
     </pre>
     The flags so set are used for both optimized and debug mode. If you want to
     set flags for only one of these two cases, you should
@@ -486,7 +418,7 @@
       <p>
       <code>--with-cpu=...</code>: Enable specific optimization
       flags for a particular processor. Programs compiled with these options
-      might not execute on an other system, but may be faster on the
+      might not execute on another system, but may be faster on the
       particular CPU selected.
       </p>
 
@@ -509,19 +441,18 @@
     </ul>
 
     <p>
-    Please note that running ./configure stores the paths to some
+    <code>./configure</code> stores the paths to some
     programs, such as the compilers or the Perl interpreter. The
     compiler which will be used when compiling the library (or your
     own application) is therefore selected at the time of
     configuration and independent of the setting of your $PATH
     environment value at the time when you run <code>make</code>. If
     you want to change the compiler used, you will therefore have
-    to re-run ./configure with the new compiler being in the $PATH
-    environment variable.
+    to re-run ./configure.
     </p>
 
     <p>
-    It is in general a good idea to run `make clean'
+    It is in general a good idea to run <code>make clean</code>
     before re-configuring.
     </p>
 
@@ -532,13 +463,11 @@
     <h4>Optional interfaces to other software packages</h4>
 
     <p> <acronym>deal.II</acronym> comes with built-in support for a
-    number of external software packages. These packages are
-    sometimes detected automatically, sometimes they must be enabled explicitly
-    during configuration by adding the option <tt>--with-package</tt>.
-    </p>
-
-    <p>These supported software packages comprise (the following list contains
-    trademarks belonging to their owners):
+      number of external software packages. These packages are
+      sometimes detected automatically, sometimes they must be enabled explicitly
+      during configuration by adding the option <tt>--with-package</tt>.
+      Supported software packages are (the following list contains
+      trademarks belonging to their owners):
     </p>
 
     <dl>
@@ -551,7 +480,7 @@
     <a name="umfpack"></a>
     <dt>UMFPACK</dt>
     <dd>Enabled by <tt>--with-umfpack</tt>. If no argument is given,
-    use the version of UMFPACK that comes bundled with deal.II. If you
+    use the version of UMFPACK that comes bundled with <acronym>deal.II</acronym>. If you
     want a different version of UMFPACK, provide the path to that
     version as an argument. Enabling UMFPACK adds the
     class <tt>SparseDirectUMFPACK</tt> to the library. The default is to not
@@ -658,6 +587,11 @@
 	  object; recompile with -fPIC</code> when linking. This can be
 	avoided by recompiling METIS with <code>-fPIC</code> as a compiler
 	flag.
+      </p>
+
+      <p>
+	METIS is not needed when using <code>p4est</code> to parallelize
+	programs, see below.
       </p>
     </dd>
 
@@ -773,7 +707,7 @@
     <a name="ARPACK"></a>
     <dt>ARPACK</dt>
     <dd>
-      There is a wrapper for the
+      There is a wrapper for the eigenvalue solver
       <a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a>
       library, which has its own license; if you want to use it with deal.II,
       please read it and make sure that you agree with it.
@@ -797,26 +731,9 @@
     <a href="http://www.dealii.org" target="_top">homepage of
     <acronym>deal.II</acronym></a>, or in the
     <a href="http://dealii.sourceforge.net/index.php?title=Deal.II_Questions_and_Answers" target="_top">Frequently Asked Questions</a> section.
-    If you don't find anything there,
-    feel free to ask if you have any problems with deal.II. If a
-    question is of general interest, you may want to use our mailing list,
-    which can be reached at
-    <a href="mail.html" target="body"><b>dealii (at) dealii.org</b></a>
-    and of which
-    <a href="http://www.dealii.org/mail/maillist.html" target="body">
-    previous mails</a> are also archived online. Before writing to the
-    list, you will have to subscribe to it.
-    </p>
-
-    <p>
-    You can <B>subscribe</B> to this list by writing email to <b>list-server
-    (at) dealii.org</b></a>
-    with the text (not in the subject!)
-    <pre>
-      subscribe deal
-    </pre>
-    The list server also understands the command <TT>help</TT> given
-    on a line by itself.
+    If you don't find what you're looking for,
+    feel free to ask on our
+    <a href="http://www.dealii.org/mailman/listinfo/dealii" target="body">Mailing list</a>.
     </p>
 
     <p>
@@ -834,6 +751,14 @@
     you will be credited for this on our home page.
     </p>
 
+    <p>
+    Our institutes are evaluated at regular intervals. Consequently,
+    we are interested in documenting the use of the programs and
+    libraries we create. To this end, we collect
+    publications with results obtained using <acronym>deal.II</acronym>. Please
+    let us know if you have publications that we can add
+    <a href="publications/toc.html">to this page</a>.
+    </p>
 
     <a name="license"></a>
     <h2>License</h2>
@@ -863,28 +788,17 @@
         commercially.
 
       <li>
-        Scientific publications presenting results obtained with these
-        libraries should acknowledge the use of the library and name
-        its principal authors (at present Wolfgang Bangerth, Ralf
-        Hartmann and Guido Kanschat). Citation of the reports named on
-        the homepage is appreciated.
+        We ask that scientific publications presenting results obtained with this
+        libraries acknowledge its use. Please cite one of the papers referenced
+	<a href="publications/toc.html">here</a>.
     </ul>
 
-    Note that since our institutes are evaluated at regular intervals,
-    we are interested in documenting the use of the programs and
-    libraries we create. We are therefore interested in collecting
-    publications with results obtained with the aid of these libraries
-    and would therefore like to ask you to drop us a note about every
-    such publication. Your publication will then be listed on the
-    project homepage.
-
     <p>
-
     <acronym>deal.II</acronym> can interface with a number of <a
     href="#external-libs">other packages</a> that you have to install
     yourself. They are, of course, covered by their own licenses. In addition,
-    deal.II comes with a copy of <a
-    href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a> and one of
+    deal.II comes with copies of <a
+    href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a> and
     <a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>,
     courtesy of their authors. UMFPACK and FunctionParser are covered by their
     own licenses; please refer to their webpages to read them.
