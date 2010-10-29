@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 {
   try
     {
-      PetscInitialize(&argc, &argv);
+      PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
       deallog.depth_console (0);
 
       int refine=5;
