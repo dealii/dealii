@@ -20,41 +20,41 @@
 
   The root of the deal.II archive is located
   at <a href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>.
-  There, we can find three subdirectories:
+  There are three subdirectories:
   <ul>
-    <li> The current version is found
-    in <a href="http://www.dealii.org/svn/dealii/trunk/">trunk</a>,
-    which contains the
-    directories <a href="http://www.dealii.org/svn/dealii/trunk/deal.II">deal.II</a>
-    with the library
+    <li> <a href="http://www.dealii.org/svn/dealii/trunk/">trunk</a>:
+      This is the location of the current development version; it contains the
+    directories <a href="http://www.dealii.org/svn/dealii/trunk/deal.II">deal.II</a> 
+    with the library proper
     and <a href="http://www.dealii.org/svn/dealii/trunk/tests">tests</a>
-    with the test suite.
+    with the testsuite.
 
-    <li> The
-    subdirectory <a href="http://www.dealii.org/svn/dealii/tags/">tags</a>
-    contains the released versions. They have the same
+    <li> <a href="http://www.dealii.org/svn/dealii/tags/">tags</a>:
+    contains released versions. They have the same
     structure as the trunk.
 
-    <li> The
-    subdirectory <a href="http://www.dealii.org/svn/dealii/branches/">branches</a>
-    has currently active branches with developments, that are not yet
-    scheduled to be incorporated into the library. Additionally, it has subdirectories
+    <li> <a href="http://www.dealii.org/svn/dealii/branches/">branches</a>:
+    currently active branches; it also has subdirectories:
       <ul>
-	<li> <a href="http://www.dealii.org/svn/dealii/branches/releases">releases</a>
-	with the branches on which the releases are,
-	  <li> <a href="http://www.dealii.org/svn/dealii/branches/retired">retired</a>
-	  with development branches which have been merged into the
-	  trunk and are therefore not used anymore.
+	<li> <a href="http://www.dealii.org/svn/dealii/branches/releases">releases</a>:
+	branches for releases of deal.II
+	  <li> <a href="http://www.dealii.org/svn/dealii/branches/retired">retired</a>:
+	  development branches that have been merged into the
+	  trunk and are no longer used.
 	    </ul>
       </ul>
 
   <h2>Creating a development branch</h2>
 
-  When starting new developments which cannot be checked in in a
-  single sweep, it is advised to create a development branch. In order
-  to keep this branch up-to-date with the trunk, the
-  program <tt>svnmerge</tt> can be used. Such a branch is created in
-  the following steps:
+  Significant new functionality can often not be developed all at once. In a
+  case like this, one can create a development branch in the subversion
+  repository into which one can check in all necessary changes and from which
+  one can merge the final set of changes into the main development line once
+  ready. The <tt>svnmerge</tt> program can be used
+  to keep your branch up-to-date with the trunk.
+
+  <p>
+    Creating a branch works through the following steps:
 
   <ol>
     <li> Create the branch using
