@@ -27,8 +27,11 @@
     <h3>Available flags</h3>
 
     <p>
-    Following is a list of all available flags which are exported to
-    other Makefiles, sorted into different categories:
+    Following is a partial list of available flags which are exported to
+    other Makefiles. There are additional flags, in particular ones that
+    determine the interaction with other libraries such as PETSc, Trilinos,
+    METIS, etc; for details on these variables, take a look
+    at <code>common/Make.global_options</code>.
     </p>
 
     <ul>
@@ -60,12 +63,9 @@
       <dt> <code>GXX-VERSION</code> </dt>
       <dd> <p>
            Name and version of the C++ compiler. Possible
-	   names presently include <code>egcs1.1</code>,
-	   <code>gcc2.95</code>, <code>gcc2.96</code>,
-           <code>gcc2.97</code>, <code>gcc3.0</code>,
-           <code>gcc3.1</code>, <code>gcc3.2</code>,
+	   names presently include 
            <code>gcc3.3</code>, <code>gcc3.4</code>,
-           <code>gcc4.0</code>,
+           <code>gcc4.0</code>, <code>gcc4.1</code>, etc,
            <code>ibm_xlc</code>, <code>MIPSpro</code>,
 	   <code>sun_workshop</code>, <code>sun_forte</code>,
            <code>intel_icc5</code>, <code>intel_icc6</code>, 
@@ -124,32 +124,22 @@
       <dd> <p>
            Executable name of compiler that is used to link object
            files to shared libraries. This will usually be the C++
-           compiler, but as this does not work for gcc 2.95, it is the
-           C compiler in that case.
+           compiler.
            </p>
       </dd>
 
-
-      <dt> <code>OBJEXT</code> </dt>
-      <dd> <p>
-           Extension of object files. On unix, this is usually simply
-           <code>o</code>, on Windows systems it is <code>obj</code>.
-           </p>
-      </dd>
-
-
-      <dt> <code>EXEEXT</code> </dt>
-      <dd> <p>
-           Extension of executables. On unix, this is usually the
-           empty strign, on Windows systems it is <code>.exe</code>.
-           </p>
-      </dd>
 
       <dt> <code>enable-shared</code> </dt>
       <dd> <p>
            Determines whether shared or static libraries are used.
-           Set to <code>yes</code> if you want to use shared
-           libraries.
+           In the former case it is set to <code>yes</code>.
+           </p>
+      </dd>
+
+      <dt> <code>enable-threads</code> </dt>
+      <dd> <p>
+           Determines whether multiple threads should be used or not.
+           In the former case it is set to <code>yes</code>.
            </p>
       </dd>
 
@@ -190,73 +180,6 @@
 	   your system.
            </p>
       </dd>    
-
-
-      <dt> <code>USE_CONTRIB_HSL</code> </dt>
-      <dd> <p>
-           <code>yes</code> indicates whether some subroutines from
-           the HSL have been explicitely installed and shall be used
-           by the library. <code>no</code> otherwise.
-	   (See the
-	   <a href="../readme.html#hsl" target="body">ReadMe</a>
-	   file for more information on installation of HSL subroutines.)
-           </p>
-      </dd>    
-
-
-      <dt> <code>USE_CONTRIB_PETSC</code> </dt>
-      <dd> <p>
-           <code>yes</code> indicates whether the interfaces to the PETSc
-           library shall be compiled. <code>no</code> otherwise.
-	   (See the
-	   <a href="../readme.html#petsc" target="body">ReadMe</a>
-	   file for more information on installation of PETSc.)
-           </p>
-      </dd>    
-
-
-      <dt> <code>DEAL_II_PETSC_DIR</code> </dt>
-      <dd> <p>
-           If <code>USE_CONTRIB_PETSC</code> is <code>yes</code>, then this
-           variable has the path to the PETSc library, as either given by the
-           <code>PETSC_DIR</code> environment variable, or the
-           <code>--with-petsc</code> switch on the command line upon 
-	   configuration of the deal.II library.
-           </p>
-      </dd>    
-
-
-      <dt> <code>DEAL_II_PETSC_ARCH</code> </dt>
-      <dd> <p>
-           If <code>USE_CONTRIB_PETSC</code> is <code>yes</code>, then this
-           variable stores the architecture for which PETSc was compiled, as
-           either given by the <code>PETSC_ARCH</code> environment variable,
-           or the <code>--with-petsc-arch</code> switch on the command line
-           upon configuration of the deal.II library.
-           </p>
-      </dd>    
-
-
-      <dt> <code>USE_CONTRIB_METIS</code> </dt>
-      <dd> <p>
-           <code>yes</code> indicates whether the METIS library has been
-           detected upon configuration, and whether we shall interface with
-           it. <code>no</code> otherwise. (See the
-	   <a href="../readme.html#metis" target="body">ReadMe</a>
-	   file for more information on installation of METIS.)
-           </p>
-      </dd>    
-
-
-      <dt> <code>DEAL_II_METIS_DIR</code> </dt>
-      <dd> <p>
-           If <code>USE_CONTRIB_METIS</code> is <code>yes</code>, then this
-           variable has the path to the METIS library, as either given by the
-           <code>METIS_DIR</code> environment variable, or the
-           <code>--with-metis</code> switch on the command line upon 
-	   configuration of the deal.II library.
-           </p>
-      </dd>
     </dl>
 
 
@@ -264,33 +187,19 @@
     <li><h4>Paths to libraries</h4>
 
     <dl>
-      <dt> <code>lib-path-base</code> </dt>
+      <dt> <code>LIBDIR</code> </dt>
       <dd> <p>
-           Path to the library files of the /base library
-           </p>
-      </dd>
-
-
-      <dt> <code>lib-path-lac</code> </dt>
-      <dd> <p>
-           Same for the /lac library
-           </p>
-      </dd>
-
-
-      <dt> <code>lib-path-deal2</code> </dt>
-      <dd> <p>
-           Same for the /deal.II library
+           Path to the deal.II libraries.
            </p>
       </dd>
 
 
       <dt> <code>LIBPATH</code> </dt>
       <dd> <p>
-           All the library pathes prefixed by -L, i.e. the
+           All the library paths (the deal.II libraries as well as other
+	   libraries we need to link with) prefixed by -L, i.e. the
            flags needed by the compiler to find the libraries
-           when they are linked in using -lbase -llac -ldeal_II_2d
-           (for example). These -L paths are appended to what
+           when they are linked in. These -L paths are appended to what
            was in $(LIBPATH) before.
            </p>
       </dd>
@@ -317,19 +226,36 @@
     <li><h4>Paths and filenames of libraries</h4>
 
     <dl>
+      <dt> <code>OBJEXT</code> </dt>
+      <dd> <p>
+           Extension of object files. On unix, this is usually simply
+           <code>o</code>, on Windows systems it is <code>obj</code>.
+           </p>
+      </dd>
+
+
+      <dt> <code>EXEEXT</code> </dt>
+      <dd> <p>
+           Extension of executables. On unix, this is usually the
+           empty string, on Windows systems it is <code>.exe</code>.
+           </p>
+      </dd>
+
       <dt> <code>static-lib-suffix</code> </dt>
       <dd> <p>
            File extension of static libraries. Usually set to .a
            </p>
       </dd>
+
       <dt> <code>shared-lib-suffix</code> </dt>
       <dd> <p>
            File extension of shared libraries. If shared libraries
-           are supported, this suffix is usually .so, if shared
-           libraries are not supported, it is set to the same value
-           as <code>static-lib-suffix</code>.
+           are supported, this suffix is usually <code>.so</code> on unix-like
+	   systems, but is <code>.dylib</code> on Mac OS X
+	   and <code>.dll</code> on windows.
            </p>
       </dd>
+
       <dt> <code>lib-suffix</code> </dt>
       <dd> <p>
            File extension of libraries. Depending on the value of
@@ -338,65 +264,10 @@
            <code>shared-lib-suffix</code>.
            </p>
       </dd>
-      <dt> <code>lib-base.o</code> </dt>
+
+      <dt> <code>lib-deal2.o lib-deal2.g</code> </dt>
       <dd> <p>
-           Path and filename of the base library in optimized
-           mode. depending on whether shared libraries were
-           or were not enabled, the suffix of the value of this
-           variable is either .so or .a
-           </p>
-      </dd>
-
-
-      <dt> <code>lib-base.g</code> </dt>
-      <dd> <p>
-           Same, for the library in debug mode
-           </p>
-      </dd>
-
-
-      <dt> <code>lib-lac.o lib-lac.g</code> </dt>
-      <dd> <p>
-           Same for the lac libraries 
-           </p>
-      </dd>
-
-      <dt> <code>lib-deal2-1d.o lib-deal2-1d.g
-                 lib-deal2-2d.o lib-deal2-2d.g
-                 lib-deal2-3d.o lib-deal2-3d.g</code> </dt>
-      <dd> <p>
-           Same for the deal.II libraries in the various dimensions
-           </p>
-      </dd>
-
-      <dt> <code>lib-contrib-hsl</code> </dt>
-      <dd> <p>
-           Path and name of the library that contains the HSL
-           subroutines explicitely installed.
-	   (See the
-	   <a href="../readme.html#hsl" target="body">ReadMe</a>
-	   file for more information on installation of HSL
-           subroutines.)
-           </p>
-      </dd>
-
-      <dt> <code>lib-contrib-petsc.g lib-contrib-petsc.o</code> </dt>
-      <dd> <p>
-           Paths and names of the component libraries of the PETSc package, if
-           found and used at configuration time.
-	   (See the
-	   <a href="../readme.html#petsc" target="body">ReadMe</a>
-	   file for more information on installation of PETSc.)
-           </p>
-      </dd>
-
-      <dt> <code>lib-contrib-metis</code> </dt>
-      <dd> <p>
-           Path and name of the METIS libraries, if
-           found and used at configuration time.
-	   (See the
-	   <a href="../readme.html#metis" target="body">ReadMe</a>
-	   file for more information on installation of METIS.)
+           Path and filename of the deal.II libraries.
            </p>
       </dd>
     </dl>
@@ -443,13 +314,6 @@
            include files. (See the
 	   <a href="../readme.html#metis" target="body">ReadMe</a>
 	   file for more information on installation of METIS.)
-           </p>
-      </dd>
-
-
-      <dt> <code>INCLUDE</code> </dt>
-      <dd> <p>
-           All the include pathes prefixed by -I
            </p>
       </dd>
     </dl>
@@ -510,50 +374,6 @@
            </p>
       </dd>
     </dl>
-
-
-    <li><h4>Variables in multithreading mode</h4>
- 
-    <dl>
-      <dt> <code>enable-threads</code> </dt>
-      <dd> <p>
-           This symbol is 'no' if the flag was not given
-           to ./configure and 'posix' otherwise
-           </p>
-      </dd>
-    </dl>
-
-    <p>
-    Note that in multithread mode, the compiler flags are augmented by
-    the definition of the preprocessor variable
-    <code>DEAL_II_USE_MT</code>, which you can use to find out whether
-    your program shall use multithreading or not. 
-    </p>
-
-
-    <li><h4>Variables associated with Tecplot binary support</h4>
- 
-    <p>
-    If ./configure, detects a valid Tecplot API installation $(INCLUDE) and
-    $(LIBS) are augmented by the Tecplot API include and library paths, and
-    the following symbols are meaningful:
-
-    <dl>
-      <dt> <code>TECIO_INCLUDE</code> </dt>
-      <dd> <p>
-           Path to the Tecplot API header files as found by ./configure
-           </p>
-      </dd>
-
-
-      <dt> <code>TECIO_LIBRARY</code> </dt>
-      <dd> <p>
-           Path to the Tecplot API library
-           </p>
-      </dd>
-    </dl>
-
-    </ul>
 
 
     <a name="values"></a>
