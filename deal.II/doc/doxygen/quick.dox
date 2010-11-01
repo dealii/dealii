@@ -1,8 +1,0 @@
-# $Id$
-
-# Wrapper around options.dox in order to produce online doc fast by
-# not makeing graphical inheritance
-
-@INCLUDE = deal.dox
-
-HAVE_DOT = NO
