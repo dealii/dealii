@@ -1940,7 +1940,7 @@ void
 TableBase<N,T>::fill (const T& value)
 {
   if (n_elements() != 0)
-    std::fill (values.begin(), values.end(), T());
+    std::fill (values.begin(), values.end(), value);
 }
 
 
