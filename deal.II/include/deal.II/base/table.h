@@ -1850,7 +1850,7 @@ namespace internal
     {
       Assert (i < table.size()[N-1],
               ExcIndexRange (i, 0, table.size()[N-1]));
-      return data[i];
+      return *(data+i);
     }
 
 
