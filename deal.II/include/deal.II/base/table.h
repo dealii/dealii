@@ -912,8 +912,9 @@ class Table<2,T> : public TableBase<2,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
-                           const unsigned int j) const;
+    typename std::vector<T>::const_reference
+    operator () (const unsigned int i,
+		 const unsigned int j) const;
 
 
                                      /**
@@ -925,8 +926,9 @@ class Table<2,T> : public TableBase<2,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
-                     const unsigned int j);
+    typename std::vector<T>::reference
+    operator () (const unsigned int i,
+		 const unsigned int j);
 
                                      /**
                                       * Make the corresponding
@@ -980,7 +982,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * then called <tt>vector2d</tt>.
                                       */
     typename std::vector<T>::reference el (const unsigned int i,
-            const unsigned int j);
+					   const unsigned int j);
 
                                      /**
                                       * Return the value of the
@@ -1007,7 +1009,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * then called <tt>vector2d</tt>.
                                       */
     typename std::vector<T>::const_reference el (const unsigned int i,
-                  const unsigned int j) const;
+						 const unsigned int j) const;
 };
 
 
