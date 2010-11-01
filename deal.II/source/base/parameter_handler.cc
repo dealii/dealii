@@ -71,6 +71,53 @@ namespace Patterns
 
 
 
+  PatternBase* pattern_factory (const std::string& description)
+  {
+    PatternBase* p;
+    
+    p = Integer::create(description);
+    if (p != 0)
+      return p;
+    
+    p = Double::create(description);
+    if (p !=0 )
+      return p;
+    
+    p = Selection::create(description);
+    if (p !=0 )
+      return p;
+      
+    p = List::create(description);
+    if (p !=0 )  
+      return p;
+  
+    p = MultipleSelection::create(description);
+    if (p !=0 )  
+      return p;
+  
+    p = Bool::create(description);
+    if (p!=0 )
+      return p;
+  
+    p = Anything::create(description);
+    if (p !=0 )
+      return p;
+      
+    p = FileName::create(description);
+    if (p !=0 )
+      return p;
+      
+    p = DirectoryName::create(description);
+    if (p!=0 )
+      return p;
+      
+    Assert(false, ExcNotImplemented());
+    
+    return 0;
+  }
+  
+
+
   PatternBase::~PatternBase ()
   {}
 
@@ -90,7 +137,7 @@ namespace Patterns
       return sizeof(*this) + 32;
   }
 
-
+  
 
   const int Integer::min_int_value =
 #ifdef HAVE_STD_NUMERIC_LIMITS
@@ -169,6 +216,38 @@ namespace Patterns
     return new Integer(lower_bound, upper_bound);
   }
 
+
+
+  Integer* Integer::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      std::istringstream is(description);
+      
+      if(is.str().size() > strlen(description_init) + 1)
+      { 
+//TODO: verify that description matches the pattern "^\[Integer range \d+\.\.\.\d+\]$"
+        int lower_bound, upper_bound;
+        
+        is.ignore(strlen(description_init) + strlen(" range "));
+        
+        if(!(is >> lower_bound))
+          return new Integer();
+          
+        is.ignore(strlen("..."));
+        
+        if(!(is >> upper_bound))
+          return new Integer();
+        
+        return new Integer(lower_bound, upper_bound);
+      }
+      else
+        return new Integer();
+    }
+    else
+      return 0;
+  }
+  
 
 
   const double Double::min_double_value =
@@ -252,6 +331,37 @@ namespace Patterns
 
 
 
+  Double* Double::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      std::istringstream is(description);
+      
+      if(is.str().size() > strlen(description_init) + 1)
+      { 
+        double lower_bound, upper_bound;
+        
+        is.ignore(strlen(description_init) + strlen(" range "));
+        
+        if(!(is >> lower_bound))
+          return new Double();
+          
+        is.ignore(strlen("..."));
+        
+        if(!(is >> upper_bound))
+          return new Double();
+        
+        return new Double(lower_bound, upper_bound);
+      }
+      else
+        return new Double();
+    }
+    else
+      return 0;
+  }
+  
+
+
   const char* Selection::description_init = "[Selection";
 
 
@@ -317,6 +427,23 @@ namespace Patterns
 	    MemoryConsumption::memory_consumption(sequence));
   }
 
+
+
+  Selection* Selection::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      std::string sequence(description);
+      
+      sequence.erase(0, std::strlen(description_init) + 1);
+      sequence.erase(sequence.length()-2, 2);
+      
+      return new Selection(sequence);
+    }
+    else
+      return 0;
+  }
+  
 
 
   const unsigned int List::max_int_value =
@@ -425,6 +552,37 @@ namespace Patterns
   {
     return (sizeof(PatternBase) +
 	    MemoryConsumption::memory_consumption(*pattern));
+  }
+
+
+
+  List* List::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      int min_elements, max_elements;
+      
+      std::istringstream is(description);
+      is.ignore(strlen(description_init) + strlen(" list of <"));
+      
+      std::auto_ptr<char> new_description (new char[is.str().size() + 1]);
+      is.getline(&(*new_description), is.str().size(), '>');
+      std::string str(&(*new_description));
+      
+      std::auto_ptr<PatternBase> base_pattern (pattern_factory(str));
+      
+      is.ignore(strlen(" of length "));
+      if(!(is >> min_elements))
+        return new List(*base_pattern);
+        
+      is.ignore(strlen("..."));
+      if(!(is >> max_elements))
+        return new List(*base_pattern);
+      
+      return new List(*base_pattern, min_elements, max_elements);
+    }  
+    else
+      return 0;
   }
 
 
@@ -539,10 +697,42 @@ namespace Patterns
 
 
 
+  MultipleSelection* MultipleSelection::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      std::string sequence(description);
+      
+      sequence.erase(0, std::strlen(description_init) + 1);
+      sequence.erase(sequence.length()-2, 2);
+      
+      return new MultipleSelection(sequence);
+    }
+    else
+      return 0;
+  }
+  
+
+
+  const char* Bool::description_init = "[Bool";
+
+  
   Bool::Bool ()
                   :
 		  Selection ("true|false")
   {}
+
+
+
+  std::string Bool::description () const
+  {
+    std::ostringstream description;
+
+    description << description_init
+                << "]";
+
+    return description.str();
+  }
 
 
 
@@ -551,6 +741,16 @@ namespace Patterns
   {
     return new Bool();
   }
+
+
+
+  Bool* Bool::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+      return new Bool();
+    else
+      return 0;
+  } 
 
 
 
@@ -586,6 +786,16 @@ namespace Patterns
   {
     return new Anything();
   }
+
+
+
+  Anything* Anything::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+      return new Anything();
+    else
+      return 0;
+  } 
 
 
 
@@ -629,6 +839,31 @@ namespace Patterns
 
 
 
+  FileName* FileName::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+    {
+      std::istringstream is(description);
+      std::string file_type;
+      FileType type;
+      
+      is.ignore(strlen(description_init) + strlen(" (Type:"));
+      
+      is >> file_type;
+      
+      if (file_type == "input)]")
+        type = input;
+      else 
+        type = output;
+      
+      return new FileName(type);
+    }  
+    else
+      return 0;
+  } 
+
+
+
   const char* DirectoryName::description_init = "[DirectoryName";
 
 
@@ -660,6 +895,16 @@ namespace Patterns
   {
     return new DirectoryName();
   }
+
+
+
+  DirectoryName* DirectoryName::create (const std::string& description)
+  {
+    if(description.compare(0, std::strlen(description_init), description_init) == 0)
+      return new DirectoryName();
+    else
+      return 0;
+  } 
 
 }   // end namespace Patterns
 

@@ -53,6 +53,7 @@ class LogStream;
  */
 namespace Patterns
 {
+
 				   /**
 				    * Base class to declare common
 				    * interface. The purpose of this
@@ -145,6 +146,12 @@ namespace Patterns
       virtual unsigned int memory_consumption () const;
   };
 
+                       /**
+                    * Returns pointer to the correct 
+                    * derived class based on description.
+                    */
+  PatternBase * pattern_factory (const std::string& description);
+  
 				   /**
                                     * Test for the string being an
                                     * integer. If bounds are given
@@ -251,6 +258,15 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
+      
+                       /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static Integer* create (const std::string& description);
 
     private:
 				       /**
@@ -390,6 +406,15 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
+      
+                       /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static Double* create (const std::string& description);
 
     private:
 				       /**
@@ -482,6 +507,15 @@ namespace Patterns
 					* bytes) of this object.
 					*/
       unsigned int memory_consumption () const;
+      
+                       /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static Selection* create (const std::string& description);
 
     private:
 				       /**
@@ -573,6 +607,15 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
+      
+                       /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static List* create (const std::string& description);
 
 				       /**
 					* Determine an estimate for
@@ -679,6 +722,15 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
+      
+                       /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static MultipleSelection* create (const std::string& description);
 
 				       /**
 					* Determine an estimate for
@@ -730,6 +782,14 @@ namespace Patterns
       Bool ();
 
 				       /**
+					* Return a description of
+					* the pattern that valid
+					* strings are expected to
+					* match.
+					*/
+      virtual std::string description () const;
+      
+				       /**
 					* Return a copy of the
 					* present object, which is
 					* newly allocated on the
@@ -739,6 +799,21 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
+      
+                             /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static Bool* create (const std::string& description);      
+      
+    private:
+				       /**
+					* Initial part of description
+					*/
+      static const char* description_init;
   };
 
 				   /**
@@ -783,7 +858,17 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-
+      
+                             /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static Anything* create (const std::string& description);
+      
+    private:
 				       /**
 					* Initial part of description
 					*/
@@ -864,6 +949,15 @@ namespace Patterns
 					* file type flag
 					*/
       FileType  file_type;
+      
+                             /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static FileName* create (const std::string& description);      
 
     private:
 				       /**
@@ -925,6 +1019,15 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
+      
+                             /**
+                    * Creates new object if the start
+                    * of description matches description_init.
+                    * Ownership of that object is 
+                    * transferred to the caller of this
+					* function.
+                    */      
+      static DirectoryName* create (const std::string& description);      
 
     private:
 				       /**
