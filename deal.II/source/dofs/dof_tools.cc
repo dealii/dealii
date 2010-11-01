@@ -142,7 +142,7 @@ DoFTools::make_sparsity_pattern (const DH                &dof,
   bool need_dof_mask = false;
   for (unsigned int i=0; i<couplings.n_rows(); ++i)
     for (unsigned int j=0; j<couplings.n_cols(); ++j)
-      if (couplings[i][j] == none)
+      if (couplings(i,j) == none)
 	need_dof_mask = true;
 
   if (need_dof_mask == true)
@@ -156,7 +156,7 @@ DoFTools::make_sparsity_pattern (const DH                &dof,
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    if (fe_collection[f].is_primitive(i) &&
 		fe_collection[f].is_primitive(j))
-	      dof_mask[f][i][j]
+	      dof_mask[f](i,j)
 		= (couplings(fe_collection[f].system_to_component_index(i).first,
 			     fe_collection[f].system_to_component_index(j).first) != none);
 	    else
@@ -178,7 +178,7 @@ DoFTools::make_sparsity_pattern (const DH                &dof,
 		Assert (first_nonzero_comp_j < fe_collection[f].n_components(),
 			ExcInternalError());
 
-		dof_mask[f][i][j]
+		dof_mask[f](i,j)
 		  = (couplings(first_nonzero_comp_i,first_nonzero_comp_j) != none);
 	      }
       }
