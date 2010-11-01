@@ -1833,7 +1833,7 @@ namespace internals
 	    const unsigned int loc_col = global_rows.local_row(j);
 	    Assert(loc_col < dof_mask.n_cols(), ExcInternalError());
 
-	    if (dof_mask[loc_row][loc_col] == true)
+	    if (dof_mask(loc_row,loc_col) == true)
 	      *col_ptr++ = global_rows.global_row(j);
 	  }
       }
@@ -1852,12 +1852,12 @@ namespace internals
 		if (loc_col != numbers::invalid_unsigned_int)
 		  {
 		    Assert (loc_col < dof_mask.n_cols(), ExcInternalError());
-		    if (dof_mask[loc_row][loc_col] == true)
+		    if (dof_mask(loc_row,loc_col) == true)
 		      goto add_this_index;
 		  }
 
 		for (unsigned int p=0; p<global_rows.size(j); ++p)
-		  if (dof_mask[loc_row][global_rows.local_row(j,p)] == true)
+		  if (dof_mask(loc_row,global_rows.local_row(j,p)) == true)
 		    goto add_this_index;
 	      }
 
@@ -1866,13 +1866,13 @@ namespace internals
 		if (loc_col != numbers::invalid_unsigned_int)
 		  {
 		    Assert (loc_col < dof_mask.n_cols(), ExcInternalError());
-		    if (dof_mask[global_rows.local_row(i,q)][loc_col] == true)
+		    if (dof_mask(global_rows.local_row(i,q),loc_col) == true)
 		      goto add_this_index;
 		  }
 
 		for (unsigned int p=0; p<global_rows.size(j); ++p)
-		  if (dof_mask[global_rows.local_row(i,q)]
-		      [global_rows.local_row(j,p)] == true)
+		  if (dof_mask(global_rows.local_row(i,q),
+			       global_rows.local_row(j,p)) == true)
 		    goto add_this_index;
 	      }
 
@@ -1973,10 +1973,10 @@ namespace internals
 	      {
 		for (unsigned int j=0; j<local_dof_indices.size(); ++j)
 		  {
-		    if (dof_mask[local_row][j] == true)
+		    if (dof_mask(local_row,j) == true)
 		      sparsity_pattern.add(global_row,
 					   local_dof_indices[j]);
-		    if (dof_mask[j][local_row] == true)
+		    if (dof_mask(j,local_row) == true)
 		      sparsity_pattern.add(local_dof_indices[j],
 					   global_row);
 		  }
