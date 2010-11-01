@@ -90,9 +90,9 @@ class FullMatrix : public Table<2,number>
 				      */
     typedef typename numbers::NumberTraits<number>::real_type real_type;
 
-
+    
     class const_iterator;
-
+    
 				     /**
 				      * Accessor class for iterators
 				      */
@@ -127,7 +127,7 @@ class FullMatrix : public Table<2,number>
 					  * Value of this matrix entry.
 					  */
 	number value() const;
-
+	
       protected:
 					 /**
 					  * The matrix accessed.
@@ -159,11 +159,11 @@ class FullMatrix : public Table<2,number>
       public:
                                          /**
                                           * Constructor.
-                                          */
+                                          */ 
 	const_iterator(const FullMatrix<number> *matrix,
 		       const unsigned int row,
 		       const unsigned int col);
-
+	  
                                          /**
                                           * Prefix increment.
                                           */
@@ -211,7 +211,7 @@ class FullMatrix : public Table<2,number>
                                           * operator above.
                                           */
 	bool operator > (const const_iterator&) const;
-
+        
       private:
                                          /**
                                           * Store an object of the
@@ -224,7 +224,7 @@ class FullMatrix : public Table<2,number>
  * See also the base class Table.
  */
 //@{
-
+    
 				     /**
 				      * Constructor. Initialize the
 				      * matrix as a square matrix with
@@ -240,7 +240,7 @@ class FullMatrix : public Table<2,number>
 				      * allocated.
 				      */
     explicit FullMatrix (const unsigned int n = 0);
-
+    
 				     /**
 				      * Constructor. Initialize the
 				      * matrix as a rectangular
@@ -248,8 +248,8 @@ class FullMatrix : public Table<2,number>
 				      */
     FullMatrix (const unsigned int rows,
                 const unsigned int cols);
-
-				     /**
+    
+				     /** 
 				      * Copy constructor. This
 				      * constructor does a deep copy
 				      * of the matrix. Therefore, it
@@ -293,14 +293,14 @@ class FullMatrix : public Table<2,number>
 				      * @endverbatim
 				      */
     explicit FullMatrix (const IdentityMatrix &id);
-
+    
 
 				     /**
 				      * Assignment operator.
 				      */
     FullMatrix<number> &
     operator = (const FullMatrix<number>&);
-
+    
 				     /**
 				      * Variable assignment operator.
 				      */
@@ -334,7 +334,7 @@ class FullMatrix : public Table<2,number>
 				      */
     FullMatrix<number> &
     operator = (const IdentityMatrix &id);
-
+    
 				     /**
 				      * Assignment operator for a
 				      * LapackFullMatrix. The calling matrix
@@ -344,7 +344,7 @@ class FullMatrix : public Table<2,number>
     template <typename number2>
     FullMatrix<number> &
     operator = (const LAPACKFullMatrix<number2>&);
-
+    
                                      /**
 				      * Assignment from different
 				      * matrix classes. This
@@ -355,7 +355,7 @@ class FullMatrix : public Table<2,number>
 				      */
     template <class MATRIX>
     void copy_from (const MATRIX&);
-
+    
 				     /**
 				      * Fill rectangular block.
 				      *
@@ -380,7 +380,7 @@ class FullMatrix : public Table<2,number>
 	       const unsigned int dst_offset_j = 0,
 	       const unsigned int src_offset_i = 0,
 	       const unsigned int src_offset_j = 0);
-
+    
 
 				     /**
 				      * Make function of base class
@@ -388,7 +388,7 @@ class FullMatrix : public Table<2,number>
 				      */
     template<typename number2>
     void fill (const number2*);
-
+    
 				     /**
 				      * Fill with permutation of
 				      * another matrix.
@@ -415,7 +415,7 @@ class FullMatrix : public Table<2,number>
 //@}
 ///@name Non-modifying operators
 //@{
-
+    
 				     /**
 				      * Comparison operator. Be
 				      * careful with this thing, it
@@ -433,7 +433,7 @@ class FullMatrix : public Table<2,number>
 				      * <i>m x n</i>-matrix.
 				      */
     unsigned int m () const;
-
+    
 				     /**
 				      * Number of columns of this matrix.
 				      * To remember: this matrix is an
@@ -520,7 +520,7 @@ class FullMatrix : public Table<2,number>
 				      * over rows).
 				      */
     real_type linfty_norm () const;
-
+    
 				     /**
 				      * Compute the Frobenius norm of
 				      * the matrix.  Return value is
@@ -534,7 +534,7 @@ class FullMatrix : public Table<2,number>
 				      * the vector space.
 				      */
     real_type frobenius_norm () const;
-
+    
 				     /**
 				      * Compute the relative norm of
 				      * the skew-symmetric part. The
@@ -549,7 +549,7 @@ class FullMatrix : public Table<2,number>
 				      * accuracy, or not.
 				      */
     real_type relative_symmetry_norm2 () const;
-
+    
 				     /**
                                       * Computes the determinant of a
                                       * matrix.  This is only
@@ -571,7 +571,7 @@ class FullMatrix : public Table<2,number>
                                       * be quadratic for this function.
                                       */
     number trace () const;
-
+    
 				     /**
 				      * Output of the matrix in
 				      * user-defined format.
@@ -629,7 +629,7 @@ class FullMatrix : public Table<2,number>
 			  const char         *zero_string = " ",
 			  const double        denominator = 1.,
 			  const double        threshold   = 0.) const;
-
+    
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -640,7 +640,7 @@ class FullMatrix : public Table<2,number>
 //@}
 ///@name Iterator functions
 //@{
-
+    
 				     /**
 				      * STL-like iterator with the
 				      * first entry.
@@ -651,7 +651,7 @@ class FullMatrix : public Table<2,number>
 				      * Final iterator.
 				      */
     const_iterator end () const;
-
+    
 				     /**
 				      * STL-like iterator with the
 				      * first entry of row <tt>r</tt>.
@@ -666,7 +666,7 @@ class FullMatrix : public Table<2,number>
 //@}
 ///@name Modifying operators
 //@{
-
+    
 				     /**
 				      * Scale the entire matrix by a
 				      * fixed factor.
@@ -888,7 +888,7 @@ class FullMatrix : public Table<2,number>
 	      const number               b,
 	      const FullMatrix<number2> &B,
 	      const number               c,
-	      const FullMatrix<number2> &C);
+	      const FullMatrix<number2> &C);    
 
 				     /**
 				      * Symmetrize the matrix by
@@ -903,15 +903,15 @@ class FullMatrix : public Table<2,number>
     void symmetrize ();
 
     				     /**
-				      * A=Inverse(A). A must be a square matrix.
-                                      * Inversion of
+				      * A=Inverse(A). A must be a square matrix. 
+                                      * Inversion of 
 				      * this matrix by Gauss-Jordan
 				      * algorithm with partial
 				      * pivoting.  This process is
 				      * well-behaved for positive
 				      * definite matrices, but be
 				      * aware of round-off errors in
-				      * the indefinite case.
+				      * the indefinite case. 
 				      *
 				      * In case deal.II was configured with
 				      * LAPACK, the functions Xgetrf and
@@ -942,7 +942,7 @@ class FullMatrix : public Table<2,number>
 
 				     /**
 				      * Assign the Cholesky decomposition
-				      * of the given matrix to <tt>*this</tt>.
+				      * of the given matrix to <tt>*this</tt>. 
 				      * The given matrix must be symmetric
 				      * positive definite.
 				      *
@@ -954,33 +954,33 @@ class FullMatrix : public Table<2,number>
     void cholesky (const FullMatrix<number2> &A);
 
 				     /**
-				      * <tt>*this(i,j)</tt> = $V(i) W(j)$
+				      * <tt>*this(i,j)</tt> = $V(i) W(j)$ 
 				      * where $V,W$
 				      * are vectors of the same length.
 				      */
     template <typename number2>
     void outer_product (const Vector<number2> &V,
 			const Vector<number2> &W);
-
+    
 				     /**
 				      * Assign the left_inverse of the given matrix
-				      * to <tt>*this</tt>. The calculation being
+				      * to <tt>*this</tt>. The calculation being 
 				      * performed is <i>(A<sup>T</sup>*A)<sup>-1</sup>
 				      * *A<sup>T</sup></i>.
-				      */
+				      */   
     template <typename number2>
     void left_invert (const FullMatrix<number2> &M);
 
 				     /**
 				      * Assign the right_inverse of the given matrix
-				      * to <tt>*this</tt>. The calculation being
+				      * to <tt>*this</tt>. The calculation being 
 				      * performed is <i>A<sup>T</sup>*(A*A<sup>T</sup>)
 				      * <sup>-1</sup></i>.
 				      */
     template <typename number2>
     void right_invert (const FullMatrix<number2> &M);
 
-                                     /**
+                                     /** 
 				      * Fill matrix with elements
 				      * extracted from a tensor,
 				      * taking rows included between
@@ -1017,7 +1017,7 @@ class FullMatrix : public Table<2,number>
 				      * that of the matrix coincide.
                                       */
     template <int dim>
-    void
+    void 
     copy_to(Tensor<2,dim> &T,
 	    const unsigned int src_r_i=0,
 	    const unsigned int src_r_j=dim-1,
@@ -1061,7 +1061,7 @@ class FullMatrix : public Table<2,number>
     void mmult (FullMatrix<number2>       &C,
 		const FullMatrix<number2> &B,
 		const bool                 adding=false) const;
-
+    
 				     /**
 				      * Matrix-matrix-multiplication using
 				      * transpose of <tt>this</tt>.
@@ -1125,7 +1125,7 @@ class FullMatrix : public Table<2,number>
     void mTmult (FullMatrix<number2>       &C,
 		 const FullMatrix<number2> &B,
 		 const bool                 adding=false) const;
-
+    
 				     /**
 				      * Matrix-matrix-multiplication using
 				      * transpose of <tt>this</tt> and
@@ -1158,7 +1158,7 @@ class FullMatrix : public Table<2,number>
     void TmTmult (FullMatrix<number2>       &C,
 		  const FullMatrix<number2> &B,
 		  const bool                 adding=false) const;
-
+    
 				     /**
 				      * Matrix-vector-multiplication.
 				      *
@@ -1180,7 +1180,7 @@ class FullMatrix : public Table<2,number>
     void vmult (Vector<number2>       &w,
 		const Vector<number2> &v,
 		const bool             adding=false) const;
-
+    
 				     /**
 				      * Adding Matrix-vector-multiplication.
 				      *  <i>w += A*v</i>
@@ -1191,7 +1191,7 @@ class FullMatrix : public Table<2,number>
     template<typename number2>
     void vmult_add (Vector<number2>       &w,
 		    const Vector<number2> &v) const;
-
+    
 				     /**
 				      * Transpose
 				      * matrix-vector-multiplication.
@@ -1242,7 +1242,7 @@ class FullMatrix : public Table<2,number>
     void precondition_Jacobi (Vector<somenumber>       &dst,
 			      const Vector<somenumber> &src,
 			      const number              omega = 1.) const;
-
+    
 				     /**
 				      * <i>dst=b-A*x</i>. Residual calculation,
 				      * returns the <i>l<sub>2</sub></i>-norm
@@ -1326,7 +1326,7 @@ class FullMatrix : public Table<2,number>
 				      */
     DeclException0 (ExcMatrixNotPositiveDefinite);
 				     //@}
-
+    
     friend class Accessor;
 };
 
@@ -1365,7 +1365,7 @@ FullMatrix<number>::operator = (const number d)
   Assert (d==number(0), ExcScalarAssignmentOnlyForZeroValue());
 
   if (this->n_elements() != 0)
-    memset (&this->values[0], 0, this->n_elements()*sizeof(number));
+    memset (this->val, 0, this->n_elements()*sizeof(number));
 
   return *this;
 }
@@ -1476,7 +1476,7 @@ typename FullMatrix<number>::const_iterator &
 FullMatrix<number>::const_iterator::operator++ ()
 {
   Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
-
+  
   ++accessor.a_col;
   if (accessor.a_col >= accessor.matrix->n())
     {
@@ -1597,7 +1597,7 @@ FullMatrix<number>::print (STREAM             &s,
 			   const unsigned int  p) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
-
+  
   for (unsigned int i=0; i<this->m(); ++i)
     {
       for (unsigned int j=0; j<this->n(); ++j)

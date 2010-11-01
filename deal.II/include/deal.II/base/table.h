@@ -17,7 +17,6 @@
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
 #include <base/table_indices.h>
-#include <base/memory_consumption.h>
 
 #include <cstddef>
 #include <algorithm>
@@ -77,16 +76,10 @@ namespace internal
  * template parameters. Specialization for accessors to constant
  * objects.
  */
-    template <int N, typename T> struct Types<N,T,true>
+    template <int N, typename T> struct Types<N,T,true> 
     {
         typedef const T value_type;
         typedef const TableBase<N,T> TableType;
-
-        typedef typename std::vector<T>::const_iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-
-        typedef typename std::vector<T>::const_reference reference;
-        typedef typename std::vector<T>::const_reference const_reference;
     };
 
 /**
@@ -95,18 +88,12 @@ namespace internal
  * template parameters. Specialization for accessors to non-constant
  * objects.
  */
-    template <int N, typename T> struct Types<N,T,false>
+    template <int N, typename T> struct Types<N,T,false> 
     {
         typedef T value_type;
         typedef TableBase<N,T> TableType;
-
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-
-        typedef typename std::vector<T>::reference reference;
-        typedef typename std::vector<T>::const_reference const_reference;
     };
-
+  
 
 /**
  * @internal
@@ -144,17 +131,19 @@ namespace internal
  * generate objects of this class, as they are only thought as
  * temporaries for access to elements of the table class, not for
  * passing them around as arguments of functions, etc.
- *
+ * 
  * @author Wolfgang Bangerth, 2002
  */
     template <int N, typename T, bool C, unsigned int P>
     class Accessor
     {
       public:
-        typedef typename Types<N,T,C>::TableType TableType;
-
-        typedef typename Types<N,T,C>::iterator iterator;
-        typedef typename Types<N,T,C>::const_iterator const_iterator;
+                                         /**
+                                          * Import two typedefs from the
+                                          * switch class above.
+                                          */
+        typedef typename Types<N,T,C>::value_type * pointer;      
+        typedef typename Types<N,T,C>::TableType    TableType;
 
       private:
                                          /**
@@ -166,7 +155,7 @@ namespace internal
                                           * data we may access.
                                           */
         Accessor (const TableType &table,
-                  const iterator    data);
+                  const pointer    data);
 
                                          /**
                                           * Default constructor. Not
@@ -174,9 +163,9 @@ namespace internal
                                           * private.
                                           */
         Accessor ();
-
+        
       public:
-
+      
                                          /**
                                           * Copy constructor. This constructor
                                           * is public so that one can pass
@@ -218,13 +207,13 @@ namespace internal
                                           * elements constant.
                                           */
         const TableType &table;
-        const iterator   data;
+        const pointer   data;
 
                                          // declare some other classes
                                          // as friends. make sure to
                                          // work around bugs in some
                                          // compilers
-#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG
+#ifndef DEAL_II_NAMESP_TEMPL_FRIEND_BUG      
         template <int N1, typename T1> friend class dealii::Table;
         template <int N1, typename T1, bool C1, unsigned int P1>
         friend class Accessor;
@@ -239,7 +228,7 @@ namespace internal
     };
 
 
-
+  
 /**
  * @internal
  * Accessor class for tables. This is the specialization for the last
@@ -264,13 +253,12 @@ namespace internal
                                           * library algorithms.
                                           */
         typedef typename Types<N,T,C>::value_type value_type;
-
-        typedef typename Types<N,T,C>::iterator iterator;
-        typedef typename Types<N,T,C>::const_iterator const_iterator;
-
-        typedef typename Types<N,T,C>::reference reference;
-        typedef typename Types<N,T,C>::const_reference const_reference;
-
+        typedef value_type* pointer;
+        typedef const value_type* const_pointer;
+        typedef value_type* iterator;
+        typedef const value_type* const_iterator;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
         typedef size_t size_type;
         typedef ptrdiff_t difference_type;
 
@@ -281,13 +269,13 @@ namespace internal
         typedef typename Types<N,T,C>::TableType    TableType;
 
       private:
-
+      
                                          /**
-                                          * Constructor. Take an iterator
+                                          * Constructor. Take a pointer
                                           * to the table object to know
                                           * about the sizes of the
                                           * various dimensions, and a
-                                          * iterator to the subset of
+                                          * pointer to the subset of
                                           * data we may access (which in
                                           * this particular case is only
                                           * one row).
@@ -307,7 +295,7 @@ namespace internal
                                           * data consistency.
                                           */
         Accessor (const TableType &table,
-                  const iterator    data);
+                  const pointer    data);
 
                                          /**
                                           * Default constructor. Not needed,
@@ -315,7 +303,7 @@ namespace internal
                                           */
         Accessor ();
 
-      public:
+      public:	
                                          /**
                                           * Copy constructor. This constructor
                                           * is public so that one can pass
@@ -330,13 +318,13 @@ namespace internal
                                           */
         Accessor (const Accessor &a);
 
-
+      
                                          /**
                                           * Index operator. Performs a
                                           * range check.
                                           */
         reference operator [] (const unsigned int) const;
-
+      
                                          /**
                                           * Return the length of one row,
                                           * i.e. the number of elements
@@ -344,21 +332,21 @@ namespace internal
                                           * index of the table object.
                                           */
         unsigned int size () const;
-
+        
                                          /**
                                           * Return an iterator to the
                                           * first element of this
                                           * row.
                                           */
         iterator begin () const;
-
+      
                                          /**
                                           * Return an interator to the
                                           * element past the end of
                                           * this row.
                                           */
         iterator end () const;
-
+      
       private:
                                          /**
                                           * Store the data given to the
@@ -369,7 +357,7 @@ namespace internal
                                           * elements constant.
                                           */
         const TableType &table;
-        const iterator   data;
+        const pointer   data;
 
                                          // declare some other classes
                                          // as friends. make sure to
@@ -389,7 +377,7 @@ namespace internal
 #endif
     };
   }
-
+  
 } // namespace internal
 
 
@@ -478,7 +466,7 @@ class TableBase : public Subscriptor
                                       * dimensions to zero.
                                       */
     TableBase ();
-
+    
                                      /**
                                       * Constructor. Initialize the
                                       * array with the given
@@ -500,12 +488,12 @@ class TableBase : public Subscriptor
                                       */
     template <typename T2>
     TableBase (const TableBase<N,T2> &src);
-
+    
                                      /**
                                       * Destructor. Free allocated memory.
                                       */
     ~TableBase ();
-
+    
                                      /**
                                       * Assignment operator.
                                       * Copy all elements of <tt>src</tt>
@@ -519,7 +507,7 @@ class TableBase : public Subscriptor
                                       * operator which is not what we want.
                                       */
     TableBase<N,T>& operator = (const TableBase<N,T>& src);
-
+    
                                      /**
                                       * Copy operator.
                                       * Copy all elements of <tt>src</tt>
@@ -532,7 +520,7 @@ class TableBase : public Subscriptor
                                       */
     template<typename T2>
     TableBase<N,T>& operator = (const TableBase<N,T2> &src);
-
+    
                                      /**
                                       * Set all entries to their
                                       * default value (i.e. copy them
@@ -541,7 +529,7 @@ class TableBase : public Subscriptor
                                       * size of the table, though.
                                       */
     void reset_values ();
-
+    
                                      /**
                                       * Set the dimensions of this object to
                                       * the sizes given in the argument, and
@@ -559,13 +547,13 @@ class TableBase : public Subscriptor
 				      * <tt>i</tt>.
 				      */
     unsigned int size (const unsigned int i) const;
-
+    
                                      /**
                                       * Return the sizes of this
                                       * object in each direction.
                                       */
     const TableIndices<N> & size () const;
-
+    
                                      /**
                                       * Return the number of elements
                                       * stored in this object, which
@@ -582,7 +570,7 @@ class TableBase : public Subscriptor
                                       * <tt>n_elements()==0</tt>.
                                       */
     bool empty () const;
-
+    
                                      /**
                                       * Fill array with an array of
                                       * elements. The input array must
@@ -615,14 +603,13 @@ class TableBase : public Subscriptor
 				      * the same value.
 				      */
     void fill (const T& value);
-
+    
                                      /**
                                       * Return a read-write reference
                                       * to the indicated element.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<N> &indices);
-
+    T & operator() (const TableIndices<N> &indices);
+  
                                      /**
                                       * Return the value of the
                                       * indicated element as a
@@ -636,8 +623,7 @@ class TableBase : public Subscriptor
                                       * don't know here whether
                                       * copying is expensive or not.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<N> &indices) const;
+    const T & operator() (const TableIndices<N> &indices) const;
 
                                      /**
                                       * Determine an estimate for the
@@ -655,7 +641,7 @@ class TableBase : public Subscriptor
                                       * does no index checking.
                                       */
     unsigned int position (const TableIndices<N> &indices) const;
-
+    
                                      /**
                                       * Return a read-write reference
                                       * to the indicated element.
@@ -665,8 +651,8 @@ class TableBase : public Subscriptor
                                       * used internally and in
                                       * functions already checked.
                                       */
-    typename std::vector<T>::reference el (const TableIndices<N> &indices);
-
+    T & el (const TableIndices<N> &indices);
+  
                                      /**
                                       * Return the value of the
                                       * indicated element as a
@@ -685,8 +671,8 @@ class TableBase : public Subscriptor
                                       * don't know here whether
                                       * copying is expensive or not.
                                       */
-    typename std::vector<T>::const_reference el (const TableIndices<N> &indices) const;
-
+    const T & el (const TableIndices<N> &indices) const;
+  
                                      /**
 				      * @deprecated This function
 				      * accesses data directly and
@@ -699,13 +685,23 @@ class TableBase : public Subscriptor
                                       * cast from const), otherwise,
                                       * keep away!
                                       */
-    typename std::vector<T>::const_pointer data () const;
-
+    const T* data () const;
+    
   protected:
                                      /**
                                       * Component-array.
                                       */
-    std::vector<T> values;
+    T* val;
+    
+                                     /**
+                                      * Size of array. This may be
+                                      * larger than the number of
+                                      * actually used elements, since
+                                      * we don't shrink the array upon
+                                      * calls to <tt>reinit</tt> unless the
+                                      * new size is zero.
+                                      */
+    unsigned int val_size;    
 
                                      /**
                                       * Size in each direction of the
@@ -731,7 +727,7 @@ class TableBase : public Subscriptor
  * in partial specializations of this class, with fixed numbers of
  * dimensions. See there, and in the documentation of the base class
  * for more information.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
@@ -750,7 +746,7 @@ class Table : public TableBase<N,T>
  *
  * For the rationale of this class, and a description of the
  * interface, see the base class.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
@@ -763,7 +759,7 @@ class Table<1,T> : public TableBase<1,T>
                                       * dimensions to zero.
                                       */
     Table ();
-
+    
                                      /**
                                       * Constructor. Pass down the
                                       * given dimension to the base
@@ -778,7 +774,7 @@ class Table<1,T> : public TableBase<1,T>
                                       * data element. Returns a
                                       * read-only reference.
                                       */
-    typename std::vector<T>::const_reference
+    const T &
     operator [] (const unsigned int i) const;
 
                                      /**
@@ -788,7 +784,7 @@ class Table<1,T> : public TableBase<1,T>
                                       * data element. Returns a
                                       * read-write reference.
                                       */
-    typename std::vector<T>::reference
+    T &
     operator [] (const unsigned int i);
 
                                      /**
@@ -798,7 +794,7 @@ class Table<1,T> : public TableBase<1,T>
                                       * data element. Returns a
                                       * read-only reference.
                                       */
-    typename std::vector<T>::const_reference
+    const T &
     operator () (const unsigned int i) const;
 
                                      /**
@@ -808,26 +804,26 @@ class Table<1,T> : public TableBase<1,T>
                                       * data element. Returns a
                                       * read-write reference.
                                       */
-    typename std::vector<T>::reference
+    T &
     operator () (const unsigned int i);
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<1> &indices);
-
+    T &
+    operator() (const TableIndices<1> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<1> &indices) const;
+    const T &
+    operator() (const TableIndices<1> &indices) const;
 };
 
 
@@ -841,7 +837,7 @@ class Table<1,T> : public TableBase<1,T>
  * of the full matrix classes in this library, and to keep a minimal
  * compatibility with a predecessor class (<tt>vector2d</tt>), some
  * additional functions are provided.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
@@ -912,9 +908,9 @@ class Table<2,T> : public TableBase<2,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j) const;
-
+    
 
                                      /**
                                       * Direct access to one element
@@ -925,28 +921,28 @@ class Table<2,T> : public TableBase<2,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j);
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<2> &indices);
-
+    T &
+    operator() (const TableIndices<2> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<2> &indices) const;
+    const T &
+    operator() (const TableIndices<2> &indices) const;
 
-
+    
                                      /**
                                       * Number of rows. This function
                                       * really makes only sense since
@@ -954,7 +950,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * object here.
                                       */
     unsigned int n_rows () const;
-
+    
                                      /**
                                       * Number of columns. This function
                                       * really makes only sense since
@@ -979,9 +975,9 @@ class Table<2,T> : public TableBase<2,T>
                                       * table classes for 2d arrays,
                                       * then called <tt>vector2d</tt>.
                                       */
-    typename std::vector<T>::reference el (const unsigned int i,
+    T & el (const unsigned int i,
             const unsigned int j);
-
+  
                                      /**
                                       * Return the value of the
                                       * element <tt>(i,j)</tt> as a
@@ -1006,7 +1002,7 @@ class Table<2,T> : public TableBase<2,T>
                                       * table classes for 2d arrays,
                                       * then called <tt>vector2d</tt>.
                                       */
-    typename std::vector<T>::const_reference el (const unsigned int i,
+    const T & el (const unsigned int i,
                   const unsigned int j) const;
 };
 
@@ -1018,7 +1014,7 @@ class Table<2,T> : public TableBase<2,T>
  *
  * For the rationale of this class, and a description of the
  * interface, see the base class.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, 2002
  */
@@ -1078,10 +1074,10 @@ class Table<3,T> : public TableBase<3,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j,
                            const unsigned int k) const;
-
+    
 
                                      /**
                                       * Direct access to one element
@@ -1092,25 +1088,25 @@ class Table<3,T> : public TableBase<3,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j,
                      const unsigned int k);
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference operator () (const TableIndices<3> &indices);
-
+    T & operator() (const TableIndices<3> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference operator () (const TableIndices<3> &indices) const;
+    const T & operator() (const TableIndices<3> &indices) const;
 };
 
 
@@ -1121,7 +1117,7 @@ class Table<3,T> : public TableBase<3,T>
  *
  * For the rationale of this class, and a description of the
  * interface, see the base class.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
@@ -1144,7 +1140,7 @@ class Table<4,T> : public TableBase<4,T>
            const unsigned int size2,
            const unsigned int size3,
 	   const unsigned int size4);
-
+    
                                      /**
                                       * Access operator. Generate an
                                       * object that accesses the
@@ -1182,11 +1178,11 @@ class Table<4,T> : public TableBase<4,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j,
                            const unsigned int k,
 			   const unsigned int l) const;
-
+    
 
                                      /**
                                       * Direct access to one element
@@ -1197,28 +1193,28 @@ class Table<4,T> : public TableBase<4,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j,
                      const unsigned int k,
 		     const unsigned int l);
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<4> &indices);
-
+    T &
+    operator() (const TableIndices<4> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<4> &indices) const;
+    const T &
+    operator() (const TableIndices<4> &indices) const;
 };
 
 
@@ -1229,7 +1225,7 @@ class Table<4,T> : public TableBase<4,T>
  *
  * For the rationale of this class, and a description of the
  * interface, see the base class.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
@@ -1291,12 +1287,12 @@ class Table<5,T> : public TableBase<5,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j,
                            const unsigned int k,
 			   const unsigned int l,
 			   const unsigned int m) const;
-
+    
                                      /**
                                       * Direct access to one element
                                       * of the table by specifying all
@@ -1306,7 +1302,7 @@ class Table<5,T> : public TableBase<5,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j,
                      const unsigned int k,
 		     const unsigned int l,
@@ -1314,21 +1310,21 @@ class Table<5,T> : public TableBase<5,T>
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<5> &indices);
-
+    T &
+    operator() (const TableIndices<5> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<5> &indices) const;
+    const T &
+    operator() (const TableIndices<5> &indices) const;
 };
 
 
@@ -1339,7 +1335,7 @@ class Table<5,T> : public TableBase<5,T>
  *
  * For the rationale of this class, and a description of the
  * interface, see the base class.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, Ralf Hartmann 2002
  */
@@ -1402,12 +1398,12 @@ class Table<6,T> : public TableBase<6,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j,
                            const unsigned int k,
 			   const unsigned int l,
 			   const unsigned int m,
-			   const unsigned int n) const;
+			   const unsigned int n) const;    
 
                                      /**
                                       * Direct access to one element
@@ -1418,7 +1414,7 @@ class Table<6,T> : public TableBase<6,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j,
                      const unsigned int k,
 		     const unsigned int l,
@@ -1427,21 +1423,21 @@ class Table<6,T> : public TableBase<6,T>
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<6> &indices);
-
+    T &
+    operator() (const TableIndices<6> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<6> &indices) const;
+    const T &
+    operator() (const TableIndices<6> &indices) const;
 };
 
 
@@ -1451,7 +1447,7 @@ class Table<6,T> : public TableBase<6,T>
  *
  * For the rationale of this class, and a description of the
  * interface, see the base class.
- *
+ * 
  * @ingroup data
  * @author Wolfgang Bangerth, 2002, Ralf Hartmann 2004
  */
@@ -1515,13 +1511,13 @@ class Table<7,T> : public TableBase<7,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j,
                            const unsigned int k,
 			   const unsigned int l,
 			   const unsigned int m,
 			   const unsigned int n,
-			   const unsigned int o) const;
+			   const unsigned int o) const;    
 
                                      /**
                                       * Direct access to one element
@@ -1532,7 +1528,7 @@ class Table<7,T> : public TableBase<7,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j,
                      const unsigned int k,
 		     const unsigned int l,
@@ -1542,21 +1538,21 @@ class Table<7,T> : public TableBase<7,T>
 
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::reference
-    operator () (const TableIndices<7> &indices);
-
+    T &
+    operator() (const TableIndices<7> &indices);
+  
                                      /**
                                       * Make the corresponding
-                                      * operator () from the TableBase
+                                      * operator() from the TableBase
                                       * base class available also in
                                       * this class.
                                       */
-    typename std::vector<T>::const_reference
-    operator () (const TableIndices<7> &indices) const;
+    const T &
+    operator() (const TableIndices<7> &indices) const;
 };
 
 
@@ -1615,7 +1611,7 @@ class TransposeTable : public TableBase<2,T>
                                       * This version of the function
                                       * only allows read access.
                                       */
-    typename std::vector<T>::const_reference operator () (const unsigned int i,
+    const T & operator () (const unsigned int i,
                            const unsigned int j) const;
 
                                      /**
@@ -1627,9 +1623,9 @@ class TransposeTable : public TableBase<2,T>
                                       * This version of the function
                                       * allows read-write access.
                                       */
-    typename std::vector<T>::reference operator () (const unsigned int i,
+    T & operator () (const unsigned int i,
                      const unsigned int j);
-
+    
                                      /**
                                       * Number of rows. This function
                                       * really makes only sense since
@@ -1637,7 +1633,7 @@ class TransposeTable : public TableBase<2,T>
                                       * object here.
                                       */
     unsigned int n_rows () const;
-
+    
                                      /**
                                       * Number of columns. This function
                                       * really makes only sense since
@@ -1662,9 +1658,9 @@ class TransposeTable : public TableBase<2,T>
                                       * table classes for 2d arrays,
                                       * then called <tt>vector2d</tt>.
                                       */
-    typename std::vector<T>::reference el (const unsigned int i,
+    T & el (const unsigned int i,
             const unsigned int j);
-
+  
                                      /**
                                       * Return the value of the
                                       * element <tt>(i,j)</tt> as a
@@ -1689,7 +1685,7 @@ class TransposeTable : public TableBase<2,T>
                                       * table classes for 2d arrays,
                                       * then called <tt>vector2d</tt>.
                                       */
-    typename std::vector<T>::const_reference el (const unsigned int i,
+    const T & el (const unsigned int i,
                   const unsigned int j) const;
 };
 
@@ -1702,12 +1698,18 @@ class TransposeTable : public TableBase<2,T>
 
 template <int N, typename T>
 TableBase<N,T>::TableBase ()
+                :
+                val (0),
+                val_size (0)
 {}
 
 
 
 template <int N, typename T>
 TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
+                :
+                val (0),
+                val_size (0)
 {
   reinit (sizes);
 }
@@ -1717,11 +1719,13 @@ TableBase<N,T>::TableBase (const TableIndices<N> &sizes)
 template <int N, typename T>
 TableBase<N,T>::TableBase (const TableBase<N,T> &src)
                 :
-                Subscriptor ()
+                Subscriptor (),
+                val (0),
+                val_size (0)
 {
   reinit (src.table_size);
   if (src.n_elements() != 0)
-    std::copy (src.values.begin(), src.values.end(), values.begin());
+    fill (src.data());
 }
 
 
@@ -1729,22 +1733,25 @@ TableBase<N,T>::TableBase (const TableBase<N,T> &src)
 template <int N, typename T>
 template <typename T2>
 TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
+                :
+                val (0),
+                val_size (0)
 {
   reinit (src.table_size);
   if (src.n_elements() != 0)
-    std::copy (src.values.begin(), src.values.end(), values.begin());
+    fill (src.data());
 }
 
 
 
 namespace internal
 {
-  namespace TableBaseAccessors
+  namespace TableBaseAccessors 
   {
     template <int N, typename T, bool C, unsigned int P>
     inline
     Accessor<N,T,C,P>::Accessor (const TableType &table,
-                                 const iterator    data)
+                                 const pointer    data)
                     :
                     table (table),
                     data (data)
@@ -1759,9 +1766,9 @@ namespace internal
                     table (a.table),
                     data (a.data)
     {}
+  
 
-
-
+  
     template <int N, typename T, bool C, unsigned int P>
     inline
     Accessor<N,T,C,P>::Accessor ()
@@ -1774,9 +1781,9 @@ namespace internal
                                        // not need to be copied around
       Assert (false, ExcInternalError());
     }
+  
 
-
-
+  
     template <int N, typename T, bool C, unsigned int P>
     inline
     Accessor<N,T,C,P-1>
@@ -1790,7 +1797,7 @@ namespace internal
                                        // case i==0
       if (i==0)
         return Accessor<N,T,C,P-1> (table, data);
-      else
+      else 
         {
                                            // note: P>1, otherwise the
                                            // specialization would have
@@ -1798,7 +1805,7 @@ namespace internal
           unsigned int subobject_size = table.size()[N-1];
           for (int p=P-1; p>1; --p)
             subobject_size *= table.size()[N-p];
-          const iterator new_data = data + i*subobject_size;
+          const pointer new_data = data + i*subobject_size;
           return Accessor<N,T,C,P-1> (table, new_data);
         }
     }
@@ -1808,7 +1815,7 @@ namespace internal
     template <int N, typename T, bool C>
     inline
     Accessor<N,T,C,1>::Accessor (const TableType &table,
-                                 const iterator    data)
+                                 const pointer    data)
                     :
                     table (table),
                     data (data)
@@ -1828,7 +1835,7 @@ namespace internal
                                        // not need to be copied around
       Assert (false, ExcInternalError());
     }
-
+  
 
 
     template <int N, typename T, bool C>
@@ -1840,7 +1847,7 @@ namespace internal
     {}
 
 
-
+  
     template <int N, typename T, bool C>
     inline
     typename Accessor<N,T,C,1>::reference
@@ -1852,7 +1859,7 @@ namespace internal
     }
 
 
-
+  
     template <int N, typename T, bool C>
     inline
     unsigned int
@@ -1888,7 +1895,10 @@ namespace internal
 template <int N, typename T>
 inline
 TableBase<N,T>::~TableBase ()
-{}
+{
+  if (val != 0)
+    delete[] val;
+}
 
 
 
@@ -1899,8 +1909,8 @@ TableBase<N,T>::operator = (const TableBase<N,T>& m)
 {
   reinit (m.size());
   if (!empty())
-    std::copy (&m.values[0], &m.values[n_elements()], &values[0]);
-
+    std::copy (&m.val[0], &m.val[n_elements()], &val[0]);
+  
   return *this;
 }
 
@@ -1914,8 +1924,8 @@ TableBase<N,T>::operator = (const TableBase<N,T2>& m)
 {
   reinit (m.size());
   if (!empty())
-    std::copy (&m.values[0], &m.values[n_elements()], &values[0]);
-
+    std::copy (&m.val[0], &m.val[n_elements()], &val[0]);
+  
   return *this;
 }
 
@@ -1927,7 +1937,7 @@ void
 TableBase<N,T>::reset_values ()
 {
   if (n_elements() != 0)
-    std::fill (values.begin(), values.end(), T());
+    std::fill_n (val, n_elements(), T());
 }
 
 
@@ -1938,7 +1948,7 @@ void
 TableBase<N,T>::fill (const T& value)
 {
   if (n_elements() != 0)
-    std::fill (values.begin(), values.end(), T());
+    std::fill_n (val, n_elements(), value);
 }
 
 
@@ -1951,14 +1961,19 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
 			const bool             fast)
 {
   table_size = new_sizes;
-
+  
   const unsigned int new_size = n_elements();
-
+  
                                    // if zero size was given: free all
                                    // memory
   if (new_size == 0)
     {
-      values.resize (0);
+      if (val != 0)
+        delete[] val;
+
+      val      = 0;
+      val_size = 0;
+
                                        // set all sizes to zero, even
                                        // if one was previously
                                        // nonzero. This simplifies
@@ -1967,11 +1982,18 @@ TableBase<N,T>::reinit (const TableIndices<N> &new_sizes,
 
       return;
     }
-
+  
                                    // if new size is nonzero:
                                    // if necessary allocate
                                    // additional memory
-  values.resize (new_size);
+  if (val_size<new_size)
+    {
+      if (val != 0)
+        delete[] val;
+
+      val_size = new_size;
+      val      = new T[val_size];
+    }
 
                                    // reinitialize contents of old or
                                    // new memory. note that we
@@ -2046,7 +2068,7 @@ TableBase<N,T>::fill (const T2* entries)
   Assert (n_elements() != 0,
           ExcMessage("Trying to fill an empty matrix."));
 
-  std::copy (entries, entries+n_elements(), values.begin());
+  std::copy (entries, entries+n_elements(), val);
 }
 
 
@@ -2056,7 +2078,7 @@ inline
 unsigned int
 TableBase<N,T>::memory_consumption () const
 {
-  return sizeof(*this) + MemoryConsumption::memory_consumption(values);
+  return sizeof(*this) + val_size*sizeof(T);
 }
 
 
@@ -2094,8 +2116,8 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
 
 template <int N, typename T>
 inline
-typename std::vector<T>::const_reference
-TableBase<N,T>::operator () (const TableIndices<N> &indices) const
+const T &
+TableBase<N,T>::operator() (const TableIndices<N> &indices) const
 {
   for (unsigned int n=0; n<N; ++n)
     Assert (indices[n] < table_size[n],
@@ -2107,8 +2129,8 @@ TableBase<N,T>::operator () (const TableIndices<N> &indices) const
 
 template <int N, typename T>
 inline
-typename std::vector<T>::reference
-TableBase<N,T>::operator () (const TableIndices<N> &indices)
+T &
+TableBase<N,T>::operator() (const TableIndices<N> &indices)
 {
   for (unsigned int n=0; n<N; ++n)
     Assert (indices[n] < table_size[n],
@@ -2120,30 +2142,30 @@ TableBase<N,T>::operator () (const TableIndices<N> &indices)
 
 template <int N, typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 TableBase<N,T>::el (const TableIndices<N> &indices) const
-{
-  return values[position(indices)];
+{  
+  return val[position(indices)];
 }
 
 
 
 template <int N, typename T>
 inline
-typename std::vector<T>::reference
+T &
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
-  return values[position(indices)];
+  return val[position(indices)];
 }
 
 
 
 template <int N, typename T>
 inline
-typename std::vector<T>::const_pointer
+const T *
 TableBase<N,T>::data () const
 {
-  return &values[0];
+  return val;
 }
 
 
@@ -2167,68 +2189,68 @@ Table<1,T>::Table (const unsigned int size)
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<1,T>::operator [] (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  return this->values[i];
+  return this->val[i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<1,T>::operator [] (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  return this->values[i];
+  return this->val[i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<1,T>::operator () (const unsigned int i) const
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  return this->values[i];
+  return this->val[i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<1,T>::operator () (const unsigned int i)
 {
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
-  return this->values[i];
+  return this->val[i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<1,T>::operator () (const TableIndices<1> &indices) const
 {
-  return TableBase<1,T>::operator () (indices);
+  return TableBase<1,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<1,T>::operator () (const TableIndices<1> &indices)
 {
-  return TableBase<1,T>::operator () (indices);
+  return TableBase<1,T>::operator() (indices);
 }
 
 
@@ -2271,7 +2293,7 @@ Table<2,T>::operator [] (const unsigned int i) const
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return internal::TableBaseAccessors::Accessor<2,T,true,1>(*this,
-                                                            this->values.begin()+i*n_cols());
+                                                            this->val+i*n_cols());
 }
 
 
@@ -2284,14 +2306,14 @@ Table<2,T>::operator [] (const unsigned int i)
   Assert (i < this->table_size[0],
           ExcIndexRange (i, 0, this->table_size[0]));
   return internal::TableBaseAccessors::Accessor<2,T,false,1>(*this,
-                                                             this->values.begin()+i*n_cols());
+                                                             this->val+i*n_cols());
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<2,T>::operator () (const unsigned int i,
                          const unsigned int j) const
 {
@@ -2299,14 +2321,14 @@ Table<2,T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[0]));
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
-  return this->values[i*this->table_size[1]+j];
+  return this->val[i*this->table_size[1]+j];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<2,T>::operator () (const unsigned int i,
                          const unsigned int j)
 {
@@ -2314,49 +2336,49 @@ Table<2,T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[0]));
   Assert (j < this->table_size[1],
           ExcIndexRange (j, 0, this->table_size[1]));
-  return this->values[i*this->table_size[1]+j];
+  return this->val[i*this->table_size[1]+j];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<2,T>::operator () (const TableIndices<2> &indices) const
 {
-  return TableBase<2,T>::operator () (indices);
+  return TableBase<2,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<2,T>::operator () (const TableIndices<2> &indices)
 {
-  return TableBase<2,T>::operator () (indices);
+  return TableBase<2,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j) const
 {
-  return this->values[i*this->table_size[1]+j];
+  return this->val[i*this->table_size[1]+j];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<2,T>::el (const unsigned int i,
                 const unsigned int j)
 {
-  return this->values[i*this->table_size[1]+j];
+  return this->val[i*this->table_size[1]+j];
 }
 
 
@@ -2414,7 +2436,7 @@ TransposeTable<T>::reinit (const unsigned int size1,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 TransposeTable<T>::operator () (const unsigned int i,
 				const unsigned int j) const
 {
@@ -2422,14 +2444,14 @@ TransposeTable<T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[1]));
   Assert (j < this->table_size[0],
           ExcIndexRange (j, 0, this->table_size[0]));
-  return this->values[j*this->table_size[1]+i];
+  return this->val[j*this->table_size[1]+i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 TransposeTable<T>::operator () (const unsigned int i,
 				const unsigned int j)
 {
@@ -2437,29 +2459,29 @@ TransposeTable<T>::operator () (const unsigned int i,
           ExcIndexRange (i, 0, this->table_size[1]));
   Assert (j < this->table_size[0],
           ExcIndexRange (j, 0, this->table_size[0]));
-  return this->values[j*this->table_size[1]+i];
+  return this->val[j*this->table_size[1]+i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 TransposeTable<T>::el (const unsigned int i,
 		       const unsigned int j) const
 {
-  return this->values[j*this->table_size[1]+i];
+  return this->val[j*this->table_size[1]+i];
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 TransposeTable<T>::el (const unsigned int i,
 		       const unsigned int j)
 {
-  return this->values[j*this->table_size[1]+i];
+  return this->val[j*this->table_size[1]+i];
 }
 
 
@@ -2516,7 +2538,7 @@ Table<3,T>::operator [] (const unsigned int i) const
                                       this->table_size[2];
   return (internal::TableBaseAccessors::Accessor<3,T,true,2>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
@@ -2532,14 +2554,14 @@ Table<3,T>::operator [] (const unsigned int i)
                                       this->table_size[2];
   return (internal::TableBaseAccessors::Accessor<3,T,false,2>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<3,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k) const
@@ -2550,7 +2572,7 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->values[(i*this->table_size[1]+j)
+  return this->val[(i*this->table_size[1]+j)
                    *this->table_size[2] + k];
 }
 
@@ -2558,7 +2580,7 @@ Table<3,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<3,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k)
@@ -2569,7 +2591,7 @@ Table<3,T>::operator () (const unsigned int i,
           ExcIndexRange (j, 0, this->table_size[1]));
   Assert (k < this->table_size[2],
           ExcIndexRange (k, 0, this->table_size[2]));
-  return this->values[(i*this->table_size[1]+j)
+  return this->val[(i*this->table_size[1]+j)
                    *this->table_size[2] + k];
 }
 
@@ -2577,20 +2599,20 @@ Table<3,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<3,T>::operator () (const TableIndices<3> &indices) const
 {
-  return TableBase<3,T>::operator () (indices);
+  return TableBase<3,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<3,T>::operator () (const TableIndices<3> &indices)
 {
-  return TableBase<3,T>::operator () (indices);
+  return TableBase<3,T>::operator() (indices);
 }
 
 
@@ -2626,7 +2648,7 @@ Table<4,T>::operator [] (const unsigned int i) const
 				      this->table_size[3];
   return (internal::TableBaseAccessors::Accessor<4,T,true,3>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
@@ -2643,14 +2665,14 @@ Table<4,T>::operator [] (const unsigned int i)
 				      this->table_size[3];
   return (internal::TableBaseAccessors::Accessor<4,T,false,3>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<4,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -2664,7 +2686,7 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   Assert (l < this->table_size[3],
           ExcIndexRange (l, 0, this->table_size[3]));
-  return this->values[((i*this->table_size[1]+j)
+  return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
                    *this->table_size[3] + l];
 }
@@ -2673,7 +2695,7 @@ Table<4,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<4,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -2687,7 +2709,7 @@ Table<4,T>::operator () (const unsigned int i,
           ExcIndexRange (k, 0, this->table_size[2]));
   Assert (l < this->table_size[3],
           ExcIndexRange (l, 0, this->table_size[3]));
-  return this->values[((i*this->table_size[1]+j)
+  return this->val[((i*this->table_size[1]+j)
 		    *this->table_size[2] + k)
                    *this->table_size[3] + l];
 }
@@ -2696,20 +2718,20 @@ Table<4,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<4,T>::operator () (const TableIndices<4> &indices) const
 {
-  return TableBase<4,T>::operator () (indices);
+  return TableBase<4,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<4,T>::operator () (const TableIndices<4> &indices)
 {
-  return TableBase<4,T>::operator () (indices);
+  return TableBase<4,T>::operator() (indices);
 }
 
 
@@ -2748,7 +2770,7 @@ Table<5,T>::operator [] (const unsigned int i) const
 				      this->table_size[4];
   return (internal::TableBaseAccessors::Accessor<5,T,true,4>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
@@ -2766,14 +2788,14 @@ Table<5,T>::operator [] (const unsigned int i)
 				      this->table_size[4];
   return (internal::TableBaseAccessors::Accessor<5,T,false,4>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<5,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -2790,7 +2812,7 @@ Table<5,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   Assert (m < this->table_size[4],
           ExcIndexRange (m, 0, this->table_size[4]));
-  return this->values[(((i*this->table_size[1]+j)
+  return this->val[(((i*this->table_size[1]+j)
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
                    *this->table_size[4] + m];
@@ -2800,7 +2822,7 @@ Table<5,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<5,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -2817,7 +2839,7 @@ Table<5,T>::operator () (const unsigned int i,
           ExcIndexRange (l, 0, this->table_size[3]));
   Assert (m < this->table_size[4],
           ExcIndexRange (m, 0, this->table_size[4]));
-  return this->values[(((i*this->table_size[1]+j)
+  return this->val[(((i*this->table_size[1]+j)
 		     *this->table_size[2] + k)
 		    *this->table_size[3] + l)
                    *this->table_size[4] + m];
@@ -2827,20 +2849,20 @@ Table<5,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<5,T>::operator () (const TableIndices<5> &indices) const
 {
-  return TableBase<5,T>::operator () (indices);
+  return TableBase<5,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<5,T>::operator () (const TableIndices<5> &indices)
 {
-  return TableBase<5,T>::operator () (indices);
+  return TableBase<5,T>::operator() (indices);
 }
 
 
@@ -2880,7 +2902,7 @@ Table<6,T>::operator [] (const unsigned int i) const
 				      this->table_size[5];
   return (internal::TableBaseAccessors::Accessor<6,T,true,5>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
@@ -2899,14 +2921,14 @@ Table<6,T>::operator [] (const unsigned int i)
 				      this->table_size[5];
   return (internal::TableBaseAccessors::Accessor<6,T,false,5>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<6,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -2926,7 +2948,7 @@ Table<6,T>::operator () (const unsigned int i,
           ExcIndexRange (m, 0, this->table_size[4]));
   Assert (n < this->table_size[5],
           ExcIndexRange (n, 0, this->table_size[5]));
-  return this->values[((((i*this->table_size[1]+j)
+  return this->val[((((i*this->table_size[1]+j)
 		      *this->table_size[2] + k)
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
@@ -2937,7 +2959,7 @@ Table<6,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<6,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -2957,7 +2979,7 @@ Table<6,T>::operator () (const unsigned int i,
           ExcIndexRange (m, 0, this->table_size[4]));
   Assert (n < this->table_size[5],
           ExcIndexRange (n, 0, this->table_size[5]));
-  return this->values[((((i*this->table_size[1]+j)
+  return this->val[((((i*this->table_size[1]+j)
 		      *this->table_size[2] + k)
 		     *this->table_size[3] + l)
 		    *this->table_size[4] + m)
@@ -2968,20 +2990,20 @@ Table<6,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<6,T>::operator () (const TableIndices<6> &indices) const
 {
-  return TableBase<6,T>::operator () (indices);
+  return TableBase<6,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<6,T>::operator () (const TableIndices<6> &indices)
 {
-  return TableBase<6,T>::operator () (indices);
+  return TableBase<6,T>::operator() (indices);
 }
 
 
@@ -3023,7 +3045,7 @@ Table<7,T>::operator [] (const unsigned int i) const
 				      this->table_size[6];
   return (internal::TableBaseAccessors::Accessor<7,T,true,6>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
@@ -3043,14 +3065,14 @@ Table<7,T>::operator [] (const unsigned int i)
 				      this->table_size[6];
   return (internal::TableBaseAccessors::Accessor<7,T,false,6>
           (*this,
-           this->values.begin() + i*subobject_size));
+           this->val+i*subobject_size));
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<7,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3073,7 +3095,7 @@ Table<7,T>::operator () (const unsigned int i,
           ExcIndexRange (n, 0, this->table_size[5]));
   Assert (o < this->table_size[6],
           ExcIndexRange (o, 0, this->table_size[6]));
-  return this->values[(((((i*this->table_size[1]+j)
+  return this->val[(((((i*this->table_size[1]+j)
 		       *this->table_size[2] + k)
 		      *this->table_size[3] + l)
 		     *this->table_size[4] + m)
@@ -3085,7 +3107,7 @@ Table<7,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<7,T>::operator () (const unsigned int i,
                          const unsigned int j,
                          const unsigned int k,
@@ -3108,7 +3130,7 @@ Table<7,T>::operator () (const unsigned int i,
           ExcIndexRange (n, 0, this->table_size[5]));
   Assert (o < this->table_size[5],
           ExcIndexRange (o, 0, this->table_size[6]));
-  return this->values[(((((i*this->table_size[1]+j)
+  return this->val[(((((i*this->table_size[1]+j)
 		       *this->table_size[2] + k)
 		      *this->table_size[3] + l)
 		     *this->table_size[4] + m)
@@ -3120,20 +3142,20 @@ Table<7,T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-typename std::vector<T>::const_reference
+const T &
 Table<7,T>::operator () (const TableIndices<7> &indices) const
 {
-  return TableBase<7,T>::operator () (indices);
+  return TableBase<7,T>::operator() (indices);
 }
 
 
 
 template <typename T>
 inline
-typename std::vector<T>::reference
+T &
 Table<7,T>::operator () (const TableIndices<7> &indices)
 {
-  return TableBase<7,T>::operator () (indices);
+  return TableBase<7,T>::operator() (indices);
 }
 
 

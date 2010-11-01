@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,7 +71,7 @@ LAPACKFullMatrix<number>::operator = (const FullMatrix<number2>& M)
   for (unsigned int i=0;i<this->n_rows();++i)
     for (unsigned int j=0;j<this->n_cols();++j)
       (*this)(i,j) = M(i,j);
-
+  
   state = LAPACKSupport::matrix;
   return *this;
 }
@@ -82,10 +82,10 @@ LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const double d)
 {
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
-
+  
   if (this->n_elements() != 0)
-    std::fill (this->values.begin(), this->values.end(), number());
-
+    std::fill_n (this->val, this->n_elements(), number());  
+  
   state = LAPACKSupport::matrix;
   return *this;
 }
@@ -101,12 +101,12 @@ LAPACKFullMatrix<number>::vmult (
 {
   Assert ((state == matrix) || (state == inverse_matrix),
           ExcState(state));
-
+  
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-
+  
   gemv("N", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
 }
 
@@ -119,12 +119,12 @@ LAPACKFullMatrix<number>::Tvmult (
   const bool            adding) const
 {
   Assert (state == matrix, ExcState(state));
-
+  
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-
+  
   gemv("T", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
 }
 
@@ -171,7 +171,7 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
 
   Assert(info >= 0, ExcInternalError());
   Assert(info == 0, LACExceptions::ExcSingular());
-
+  
   state = lu;
 }
 
@@ -180,7 +180,7 @@ template <typename number>
 void
 LAPACKFullMatrix<number>::invert()
 {
-  Assert(state == matrix || state == lu,
+  Assert(state == matrix || state == lu, 
 	 ExcState(state));
   const int mm = this->n_rows();
   const int nn = this->n_cols();
@@ -203,7 +203,7 @@ LAPACKFullMatrix<number>::invert()
 
   Assert(info >= 0, ExcInternalError());
   Assert(info == 0, LACExceptions::ExcSingular());
-
+  
   state = inverse_matrix;
 }
 
@@ -216,7 +216,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>& v,
   Assert(state == lu, ExcState(state));
   Assert(this->n_rows() == this->n_cols(),
 	 LACExceptions::ExcNotQuadratic());
-
+  
   const char* trans = transposed ? &T : &N;
   const int nn = this->n_cols();
   const number* values = this->data();
@@ -241,14 +241,14 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
   wi.resize(nn);
   if (right) vr.resize(nn*nn);
   if (left)  vl.resize(nn*nn);
-
+  
   number* values = const_cast<number*> (this->data());
-
+  
   int info  = 0;
   int lwork = 1;
   const char * const jobvr = (right) ? (&V) : (&N);
   const char * const jobvl = (left)  ? (&V) : (&N);
-
+  
 				   // Optimal workspace query:
 
 				   // The LAPACK routine DGEEV requires
@@ -257,7 +257,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 				   //    work.size>=4*nn.
 				   // However, to improve performance, a
 				   // somewhat larger workspace may be needed.
-
+  
 				   // SOME implementations of the LAPACK routine
 				   // provide a workspace query call,
 				   //   info:=0, lwork:=-1
@@ -271,7 +271,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 #ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
   lwork = -1;
   work.resize(1);
-
+      
   geev(jobvl, jobvr, &nn, values, &nn,
        &wr[0], &wi[0],
        &vl[0], &nn, &vr[0], &nn,
@@ -320,23 +320,23 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   const int nn = this->n_cols();
   Assert(static_cast<unsigned int>(nn) == this->n_rows(), ExcNotQuadratic());
   Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
-  Assert(static_cast<unsigned int>(nn) == B.n_cols(),
+  Assert(static_cast<unsigned int>(nn) == B.n_cols(), 
 	 ExcDimensionMismatch (nn, B.n_cols()));
-  Assert(eigenvectors.size() <= static_cast<unsigned int>(nn),
+  Assert(eigenvectors.size() <= static_cast<unsigned int>(nn), 
 	 ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
-
+  
   wr.resize(nn);
-  wi.resize(nn); //This is set purley for consistency reasons with the
+  wi.resize(nn); //This is set purley for consistency reasons with the 
                  //eigenvalues() function.
-
+  
   number* values_A = const_cast<number*> (this->data());
   number* values_B = const_cast<number*> (B.data());
-
+  
   int info  = 0;
   int lwork = 1;
   const char * const jobz = (eigenvectors.size() > 0) ? (&V) : (&N);
   const char * const uplo = (&U);
-
+  
 				   // Optimal workspace query:
 
 				   // The LAPACK routine DSYGV requires
@@ -345,7 +345,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
 				   //    work.size>=3*nn-1.
 				   // However, to improve performance, a
 				   // somewhat larger workspace may be needed.
-
+  
 				   // SOME implementations of the LAPACK routine
 				   // provide a workspace query call,
 				   //   info:=0, lwork:=-1
@@ -359,7 +359,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
 #ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
   lwork = -1;
   work.resize(1);
-
+  
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
         values_B, &nn,
         &wr[0], &work[0], &lwork, &info);
@@ -410,7 +410,7 @@ void
 LAPACKFullMatrix<number>::compute_lu_factorization()
 {
 Assert(false, ExcNeedsLAPACK());
-
+  
 }
 
 
@@ -475,10 +475,10 @@ LAPACKFullMatrix<number>::print_formatted (
   const double        threshold) const
 {
   unsigned int width = width_;
-
+  
   Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
 	  ExcInternalError());
-
+  
 				   // set output format, but store old
 				   // state
   std::ios::fmtflags old_flags = out.flags();
@@ -494,8 +494,8 @@ LAPACKFullMatrix<number>::print_formatted (
       if (!width)
 	width = precision+2;
     }
-
-  for (unsigned int i=0; i<this->n_rows(); ++i)
+  
+  for (unsigned int i=0; i<this->n_rows(); ++i) 
     {
       for (unsigned int j=0; j<this->n_cols(); ++j)
 	if (std::fabs(this->el(i,j)) > threshold)
