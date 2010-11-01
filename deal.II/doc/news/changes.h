@@ -303,7 +303,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   <br>
   (GK 2010/10/19)
   </p></li>
-  
+
   <li><p>Improved: The ConstraintMatrix::merge function now takes a second
   argument that indicates what should happen if the two objects to be
   merged have constraints on the very same degree of freedom.
@@ -332,6 +332,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>Fixed: The FEValuesExtractors::Vector class did not work when the dimension
+  of the domain was not equal to the dimension of the space in which it is
+  embedded. This is now fixed.
+  <br>
+  (Sebastian Pauletti, WB, 2010/11/01)
+  </p></li>
+
   <li><p>Fixed: The methods VectorTools::project_boundary_values_curl_conforming
   set the boundary values now also H(curl)-conforming, when hanging node
   constraints are present.
