@@ -8,73 +8,119 @@ include $D/common/Make.global_options
 default: makefiles.html makefile.small.html makefile.large.html makefile.rules.html
 
 
+# Have a list of variables defined in common/Make.global_options and expand them into
+# something that looks decent in HTML. The special text "--break--" draws a horizontal
+# line to separate different blocks of variables
+VARIABLES =     D DEAL_II_VERSION DEAL_II_MAJOR DEAL_II_MINOR \
+	--break-- \
+		CXX GXX-VERSION GXX-VERSION-DETAILED \
+		CC CC-VERSION \
+		F77 F77-VERSION \
+		SHLIBLD \
+		AR \
+		RANLIB \
+		PERL \
+		TARGET \
+	--break-- \
+		LIBPATH \
+		LIBDIR \
+		LIBS \
+		OBJEXT EXEEXT static-lib-suffix shared-lib-suffix \
+		lib-suffix \
+	--break-- \
+		lib-deal2.o \
+		lib-deal2.g \
+	--break-- \
+		INCLUDE \
+		CXXFLAGS.g \
+		CXXFLAGS.o \
+		CFLAGS.g \
+		CFLAGS.o \
+		F77FLAGS.g \
+		F77FLAGS.o \
+		SHLIBFLAGS \
+		LDFLAGS \
+		F77LIBS \
+	--break-- \
+		enable-shared \
+		enable-parser \
+		DEAL_II_USE_MPI \
+	--break-- \
+		enable-threads \
+		lib-contrib-tbb.g \
+		lib-contrib-tbb.o \
+	--break-- \
+		USE_CONTRIB_UMFPACK \
+	--break-- \
+		USE_CONTRIB_HSL \
+		lib-contrib-hsl \
+	--break-- \
+		USE_CONTRIB_PETSC \
+		DEAL_II_PETSC_DIR \
+		DEAL_II_PETSC_ARCH \
+		DEAL_II_PETSC_VERSION_MAJOR    \
+		DEAL_II_PETSC_VERSION_MINOR    \
+		DEAL_II_PETSC_VERSION_SUBMINOR \
+		DEAL_II_PETSC_MPIUNI_LIB \
+		lib-contrib-petsc.g \
+		lib-contrib-petsc.o \
+		include-path-petsc \
+		include-path-petsc-bmake \
+	--break-- \
+		USE_CONTRIB_SLEPC \
+		DEAL_II_SLEPC_DIR \
+		DEAL_II_SLEPC_VERSION_MAJOR    \
+		DEAL_II_SLEPC_VERSION_MINOR    \
+		DEAL_II_SLEPC_VERSION_SUBMINOR \
+		lib-contrib-slepc \
+		include-path-slepc \
+	--break-- \
+		USE_CONTRIB_TRILINOS \
+		DEAL_II_TRILINOS_INCDIR \
+		DEAL_II_TRILINOS_LIBDIR \
+		DEAL_II_TRILINOS_SHARED \
+		DEAL_II_TRILINOS_STATIC \
+		DEAL_II_TRILINOS_VERSION_MAJOR    \
+		DEAL_II_TRILINOS_VERSION_MINOR    \
+		DEAL_II_TRILINOS_VERSION_SUBMINOR \
+		lib-contrib-trilinos \
+		include-path-trilinos \
+	--break-- \
+		USE_CONTRIB_MUMPS  \
+		DEAL_II_MUMPS_DIR  \
+		DEAL_II_SCALAPACK_DIR \
+		DEAL_II_BLACS_DIR  \
+		DEAL_II_BLACS_ARCH \
+		lib-contrib-mumps \
+		include-path-mumps \
+	--break-- \
+		USE_CONTRIB_ARPACK  \
+		DEAL_II_ARPACK_DIR  \
+		DEAL_II_ARPACK_ARCH \
+		lib-contrib-arpack \
+	--break-- \
+		USE_CONTRIB_METIS \
+		DEAL_II_METIS_DIR \
+		lib-contrib-metis \
+		include-path-contrib-metis \
+	--break-- \
+		USE_CONTRIB_P4EST \
+		DEAL_II_P4EST_DIR \
+	--break-- \
+		TECIO_INCLUDE \
+		TECIO_LIBRARY
+
+expand_variable = $(if $(1:--break--=), \
+			'<tr><td><code>$$($1)</td> <td>$($1)</code></td></tr>',\
+			'<tr><th colspan="2"><hr></th></tr>')
+
+VARIABLE_VALUES = $(foreach v,$(VARIABLES),$(call expand_variable,$v))
+
 makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefiles.2.html
 	@cat makefiles.1.html > $@
-	@echo '<li><code>D=$D</code>' >> $@
-	@echo '<li><code>CXX=$(CXX)</code>' >> $@
-	@echo '<li><code>CC=$(CC)</code>' >> $@
-	@echo '<li><code>F77=$(F77)</code>' >> $@
-	@echo '<li><code>GXX-VERSION=$(GXX-VERSION)</code>' >> $@
-	@echo '<li><code>GXX-VERSION-DETAILED=$(GXX-VERSION-DETAILED)</code>' >> $@
-	@echo '<li><code>CC-VERSION=$(CC-VERSION)</code>' >> $@
-	@echo '<li><code>F77-VERSION=$(F77-VERSION)</code>' >> $@
-	@echo '<li><code>SHLIBLD=$(SHLIBLD)</code>' >> $@
-	@echo '<li><code>OBJEXT=$(OBJEXT)</code>' >> $@
-	@echo '<li><code>EXEEXT=$(EXEEXT)</code>' >> $@
-	@echo '<li><code>enable-shared=$(enable-shared)</code>' >> $@
-	@echo '<li><code>PERL=$(PERL)</code>' >> $@
-	@echo '<li><code>DEAL_II_MAJOR=$(DEAL_II_MAJOR)</code>' >> $@
-	@echo '<li><code>DEAL_II_MINOR=$(DEAL_II_MINOR)</code>' >> $@
-	@echo '<li><code>TARGET=$(TARGET)</code>' >> $@
-	@echo '<li><code>USE_CONTRIB_HSL=$(USE_CONTRIB_HSL)</code>' >> $@
-	@echo '<li><code>USE_CONTRIB_PETSC=$(USE_CONTRIB_PETSC)</code>' >> $@
-	@echo '<li><code>DEAL_II_PETSC_DIR=$(DEAL_II_PETSC_DIR)</code>' >> $@
-	@echo '<li><code>DEAL_II_PETSC_ARCH=$(DEAL_II_PETSC_ARCH)</code>' >> $@
-	@echo '<li><code>USE_CONTRIB_METIS=$(USE_CONTRIB_METIS)</code>' >> $@
-	@echo '<li><code>DEAL_II_METIS_DIR=$(DEAL_II_METIS_DIR)</code>' >> $@
-	@echo '<li><code>lib-path-base=$(lib-path-base)</code>' >> $@
-	@echo '<li><code>lib-path-lac=$(lib-path-lac)</code>' >> $@
-	@echo '<li><code>lib-path-deal2=$(lib-path-deal2)</code>' >> $@
-	@echo '<li><code>LIBPATH=$(LIBPATH)</code>' >> $@
-	@echo '<li><code>LIBS=$(LIBS)</code>' >> $@
-	@echo '<li><code>static-lib-suffix=$(static-lib-suffix)</code>' >> $@
-	@echo '<li><code>shared-lib-suffix=$(shared-lib-suffix)</code>' >> $@
-	@echo '<li><code>lib-suffix=$(lib-suffix)</code>' >> $@
-	@echo '<li><code>lib-base.o=$(lib-base.o)</code>' >> $@
-	@echo '<li><code>lib-base.g=$(lib-base.g)</code>' >> $@
-	@echo '<li><code>lib-lac.o=$(lib-lac.o)</code>' >> $@
-	@echo '<li><code>lib-lac.g=$(lib-lac.g)</code>' >> $@
-	@echo '<li><code>lib-deal2-1d.o=$(lib-deal2-1d.o)</code>' >> $@
-	@echo '<li><code>lib-deal2-1d.g=$(lib-deal2-1d.g)</code>' >> $@
-	@echo '<li><code>lib-deal2-2d.o=$(lib-deal2-2d.o)</code>' >> $@
-	@echo '<li><code>lib-deal2-2d.g=$(lib-deal2-2d.g)</code>' >> $@
-	@echo '<li><code>lib-deal2-3d.o=$(lib-deal2-3d.o)</code>' >> $@
-	@echo '<li><code>lib-deal2-3d.g=$(lib-deal2-3d.g)</code>' >> $@
-	@echo '<li><code>lib-contrib-hsl=$(lib-contrib-hsl)</code>' >> $@
-	@echo '<li><code>lib-contrib-petsc.g=$(lib-contrib-petsc.g)</code>' >> $@
-	@echo '<li><code>lib-contrib-petsc.o=$(lib-contrib-petsc.o)</code>' >> $@
-	@echo '<li><code>lib-contrib-metis=$(lib-contrib-metis)</code>' >> $@
-	@echo '<li><code>include-path-base=$(include-path-base)</code>' >> $@
-	@echo '<li><code>include-path-lac=$(include-path-lac)</code>' >> $@
-	@echo '<li><code>include-path-deal2=$(include-path-deal2)</code>' >> $@
-	@echo '<li><code>include-path-contrib-hsl=$(include-path-contrib-hsl)</code>' >> $@
-	@echo '<li><code>include-path-contrib-petsc=$(include-path-contrib-petsc)</code>' >> $@
-	@echo '<li><code>include-path-contrib-petsc-bmake=$(include-path-contrib-petsc-bmake)</code>' >> $@
-	@echo '<li><code>include-path-contrib-metis=$(include-path-contrib-metis)</code>' >> $@
-	@echo '<li><code>INCLUDE=$(INCLUDE)</code>' >> $@
-	@echo '<li><code>CXXFLAGS.g=$(CXXFLAGS.g)</code>' >> $@
-	@echo '<li><code>CXXFLAGS.o=$(CXXFLAGS.o)</code>' >> $@
-	@echo '<li><code>CFLAGS.g=$(CFLAGS.g)</code>' >> $@
-	@echo '<li><code>CFLAGS.o=$(CFLAGS.o)</code>' >> $@
-	@echo '<li><code>F77FLAGS.g=$(F77FLAGS.g)</code>' >> $@
-	@echo '<li><code>F77FLAGS.o=$(F77FLAGS.o)</code>' >> $@
-	@echo '<li><code>LDFLAGS=$(LDFLAGS)</code>' >> $@
-	@echo '<li><code>F77LIBS=$(F77LIBS)</code>' >> $@
-	@echo '<li><code>ACE_ROOT=$(ACE_ROOT)</code>' >> $@
-	@echo '<li><code>lib-ACE=$(lib-ACE)</code>' >> $@
-	@echo '<li><code>enable-threads=$(enable-threads)</code>' >> $@
-	@echo '<li><code>TECIO_INCLUDE=$(TECIO_INCLUDE)</code>' >> $@
-	@echo '<li><code>TECIO_LIBRARY=$(TECIO_LIBRARY)</code>' >> $@
+	@echo "<p align=\"center\"><table class=\"tutorial\" width=\"60%\">" >> $@
+	@echo $(VARIABLE_VALUES) >> $@
+	@echo "</table></p>" >> $@
 	@cat makefiles.2.html >> $@
 
 
