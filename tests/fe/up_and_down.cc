@@ -172,6 +172,7 @@ void test ()
 
                                            // a non-primitive FE
           (dim != 1 ? new FE_Nedelec<dim>(0) : 0),
+          (dim != 1 ? new FE_Nedelec<dim>(1) : 0),
 
                                            // some composed elements
                                            // of increasing

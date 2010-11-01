@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006, 2010 by the deal.II authors
+//    Copyright (C) 2006 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,6 @@ void test ()
 {
   if (dim > 1)
 				     // only p=1 implemented at present
-    for (unsigned int p=1; p<2; ++p)
-      test_with_hanging_nodes (FE_Nedelec<dim>(p-1), p, 1);
+    for (unsigned int p=0; p<2; ++p)
+      test_with_hanging_nodes (FE_Nedelec<dim>(p), p, 1);
 }

@@ -2,8 +2,16 @@
 DEAL::n_dofs=72
 DEAL::FE_Nedelec<2>(0), P_0, rel. error=0
 DEAL::FE_Nedelec<2>(0), P_1, rel. error=0.0217
-DEAL::FE_Nedelec<2>(0), P_2, rel. error=0.0391
+DEAL::Projection failed with relative error 0.0217
+DEAL::n_dofs=256
+DEAL::FE_Nedelec<2>(1), P_0, rel. error=0
+DEAL::FE_Nedelec<2>(1), P_1, rel. error=0
+DEAL::FE_Nedelec<2>(1), P_2, rel. error=0.00131
 DEAL::n_dofs=576
 DEAL::FE_Nedelec<3>(0), P_0, rel. error=0
 DEAL::FE_Nedelec<3>(0), P_1, rel. error=0.00599
-DEAL::FE_Nedelec<3>(0), P_2, rel. error=0.0106
+DEAL::Projection failed with relative error 0.00599
+DEAL::n_dofs=3696
+DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
+DEAL::FE_Nedelec<3>(1), P_1, rel. error=0
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.000374

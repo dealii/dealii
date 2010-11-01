@@ -1,14 +1,3 @@
-//---------------------------------------------------------------------------
-//    $Id$
-//
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
-//
-//    This file is subject to QPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
-//
-//---------------------------------------------------------------------------
 #ifndef __deal2__fe_nedelec_h
 #define __deal2__fe_nedelec_h
 
@@ -33,41 +22,17 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
- * @warning Several aspects of the implementation are
- * experimental. For the moment, it is safe to use the element on
- * globally refined meshes with consistent orientation of faces. See
- * the todo entries below for more detailed caveats.
- *
- * Implementation of N&eacute;d&eacute;lec elements, conforming with the
+ * Implementation of Nédélec elements, conforming with the
  * space H<sup>curl</sup>. These elements generate vector fields with
  * tangential components continuous between mesh cells.
  *
- * We follow the convention that the degree of N&eacute;d&eacute;lec elements
- * denotes the polynomial degree of the largest complete polynomial subspace
- * contained in the N&eacute;d&eacute;lec space. This leads to the
- * consistently numbered sequence of spaces
- * @f[
- *   Q_{k+1}
- *   \stackrel{\text{grad}}{\rightarrow}
- *   \text{Nedelec}_k
- *   \stackrel{\text{curl}}{\rightarrow}
- *   \text{RaviartThomas}_k
- *   \stackrel{\text{div}}{\rightarrow}
- *   DGQ_{k}
- * @f]
- * Consequently, approximation order of
- * the Nedelec space equals the value <i>degree</i> given to the constructor.
- * In this scheme, the lowest order element would be created by the call
- * FE_Nedelec<dim>(0). Note that this follows the convention of Brezzi and
- * Raviart, though not the one used in the original paper by Nedelec.
+ * We follow the usual definition of the degree of Nédélec elements,
+ * which denotes the polynomial degree of the lowest complete polynomial
+ * subspace contained in the Nédélec space. Then, approximation order of
+ * the function itself is <i>degree</i>.
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
- *
- * @todo The constraint matrices for hanging nodes are only
- * implemented in 2D. Currently, the 3D version will run without an
- * exception being triggered, but results at refinement edges will be
- * wrong.
  *
  * @todo Even if this element is implemented for two and three space
  * dimensions, the definition of the node values relies on
@@ -77,7 +42,7 @@ template <int dim, int spacedim> class MappingQ;
  * <h3>Interpolation</h3>
  *
  * The @ref GlossInterpolation "interpolation" operators associated
- * with the N&eacute;d&eacute;lec element are constructed such that interpolation and
+ * with the Nédélec element are constructed such that interpolation and
  * computing the curl are commuting operations. We require this
  * from interpolating arbitrary functions as well as the #restriction
  * matrices.
@@ -86,7 +51,7 @@ template <int dim, int spacedim> class MappingQ;
  *
  * The @ref GlossNodes "node values" on edges are the moments of the
  * tangential component of the interpolated function with respect to
- * the traces of the N&eacute;d&eacute;lec polynomials. Higher-order N&eacute;d&eacute;lec spaces
+ * the traces of the Nédélec polynomials. Higher-order Nédélec spaces
  * also have face and interior nodes.
  *
  * <h4>Generalized support points</h4>
@@ -99,13 +64,13 @@ template <int dim, int spacedim> class MappingQ;
  * the interior of the cell (or none for N<sub>1</sub>).
  *
  *
- * @author Markus B&uuml;rg, 2009
+ * @author Markus Bürg, 2009
  */
 template <int dim>
 class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
    public:
 				     /**
-				      * Constructor for the N&eacute;d&eacute;lec
+				      * Constructor for the Nédélec
 				      * element of degree @p p.
 				      */
       FE_Nedelec (const unsigned int p);
@@ -126,7 +91,8 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * Check whether a shape function
 				      * may be non-zero on a face.
 				      */
-    virtual bool has_support_on_face (const unsigned int shape_index, const unsigned int face_index) const;
+    virtual bool has_support_on_face (const unsigned int shape_index,
+                                      const unsigned int face_index) const;
 
 				     /**
 				      * Return whether this element implements its
@@ -140,6 +106,12 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      */
     virtual bool hp_constraints_are_implemented () const;
 
+                     /**
+                      * Return whether this element dominates the one,
+                      * which is given as argument.
+                      */
+    virtual FiniteElementDomination::Domination
+    compare_for_face_domination (const FiniteElement<dim>& fe_other) const;
 				     /**
 				      * If, on a vertex, several finite elements are
 				      * active, the hp code first assigns the degrees
@@ -161,19 +133,22 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * second is the corresponding index of the other
 				      * finite element.
 				      */
-    virtual std::vector<std::pair<unsigned int, unsigned int> > hp_vertex_dof_identities (const FiniteElement<dim>& fe_other) const;
+    virtual std::vector<std::pair<unsigned int, unsigned int> >
+    hp_vertex_dof_identities (const FiniteElement<dim>& fe_other) const;
 
 				     /**
 				      * Same as hp_vertex_dof_indices(), except that
 				      * the function treats degrees of freedom on lines.
 				      */
-    virtual std::vector<std::pair<unsigned int, unsigned int> > hp_line_dof_identities (const FiniteElement<dim>& fe_other) const;
+    virtual std::vector<std::pair<unsigned int, unsigned int> >
+    hp_line_dof_identities (const FiniteElement<dim>& fe_other) const;
 
 				     /**
 				      * Same as hp_vertex_dof_indices(), except that
 				      * the function treats degrees of freedom on lines.
 				      */
-    virtual std::vector<std::pair<unsigned int, unsigned int> > hp_quad_dof_identities (const FiniteElement<dim>& fe_other) const;
+    virtual std::vector<std::pair<unsigned int, unsigned int> >
+    hp_quad_dof_identities (const FiniteElement<dim>& fe_other) const;
 
 				     /**
 				      * Return the matrix interpolating from a face of one
@@ -188,8 +163,9 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * element, then they must throw an exception of type
 				      * <tt>FiniteElement<dim>::ExcInterpolationNotImplemented</tt>.
 				      */
-    virtual void get_face_interpolation_matrix (const FiniteElement<dim>& source,
-						FullMatrix<double>& matrix) const;
+    virtual void
+    get_face_interpolation_matrix (const FiniteElement<dim>& source,
+                                   FullMatrix<double>& matrix) const;
 
 				     /**
 				      * Return the matrix interpolating from a face of one element
@@ -204,14 +180,20 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * element, then they must throw an exception of type
 				      * <tt>ExcInterpolationNotImplemented</tt>.
 				      */
-    virtual void get_subface_interpolation_matrix (const FiniteElement<dim>& source,
-						   const unsigned int subface,
-						   FullMatrix<double>& matrix) const;
+    virtual void
+    get_subface_interpolation_matrix (const FiniteElement<dim>& source,
+                                      const unsigned int subface,
+                                      FullMatrix<double>& matrix) const;
 
-    virtual void interpolate (std::vector<double>& local_dofs, const std::vector<double>& values) const;
+    virtual void interpolate (std::vector<double>& local_dofs,
+                              const std::vector<double>& values) const;
 
-    virtual void interpolate (std::vector<double>& local_dofs, const std::vector<Vector<double> >& values, unsigned int offset = 0) const;
-    virtual void interpolate (std::vector<double>& local_dofs, const VectorSlice<const std::vector<std::vector<double> > >& values) const;
+    virtual void interpolate (std::vector<double>& local_dofs,
+                              const std::vector<Vector<double> >& values,
+                              unsigned int offset = 0) const;
+    virtual void interpolate (std::vector<double>& local_dofs,
+                              const VectorSlice<const std::vector<std::vector<double> > >& values)
+    const;
     virtual unsigned int memory_consumption () const;
     virtual FiniteElement<dim> * clone() const;
     
@@ -226,14 +208,17 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
 				      */
-    static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
+    static std::vector<unsigned int>
+    get_dpo_vector (const unsigned int degree);
 
 				     /**
 				      * Initialize the @p
 				      * generalized_support_points
 				      * field of the FiniteElement
 				      * class and fill the tables with
-				      * interpolation weights. Called
+				      * interpolation weights
+				      * (#boundary_weights and
+				      * #interior_weights). Called
 				      * from the constructor.
 				      */
     void initialize_support_points (const unsigned int degree);
@@ -244,7 +229,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * cells onto the father
 				      * cell. According to the
 				      * philosophy of the
-				      * N&eacute;d&eacute;lec element, this
+				      * Nédélec element, this
 				      * restriction operator preserves
 				      * the curl of a function
 				      * weakly.
@@ -336,21 +321,7 @@ template <>
 void
 FE_Nedelec<1>::initialize_restriction();
 
-template <>
-void
-FE_Nedelec<1>::initialize_support_points (const unsigned int degree);
-
-template <>
-void
-FE_Nedelec<2>::initialize_support_points (const unsigned int degree);
-
-template <>
-void
-FE_Nedelec<3>::initialize_support_points (const unsigned int degree);
-
 #endif // DOXYGEN
-
-/*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 
