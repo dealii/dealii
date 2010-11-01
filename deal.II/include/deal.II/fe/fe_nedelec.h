@@ -1,3 +1,14 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 #ifndef __deal2__fe_nedelec_h
 #define __deal2__fe_nedelec_h
 
@@ -22,14 +33,33 @@ template <int dim, int spacedim> class MappingQ;
 /*@{*/
 
 /**
- * Implementation of Nédélec elements, conforming with the
+ * @warning Several aspects of the implementation are
+ * experimental. For the moment, it is safe to use the element on
+ * globally refined meshes with consistent orientation of faces. See
+ * the todo entries below for more detailed caveats.
+ *
+ * Implementation of N&eacute;d&eacute;lec elements, conforming with the
  * space H<sup>curl</sup>. These elements generate vector fields with
  * tangential components continuous between mesh cells.
  *
- * We follow the usual definition of the degree of Nédélec elements,
- * which denotes the polynomial degree of the lowest complete polynomial
- * subspace contained in the Nédélec space. Then, approximation order of
- * the function itself is <i>degree</i>.
+ * We follow the convention that the degree of N&eacute;d&eacute;lec elements
+ * denotes the polynomial degree of the largest complete polynomial subspace
+ * contained in the N&eacute;d&eacute;lec space. This leads to the
+ * consistently numbered sequence of spaces
+ * @f[
+ *   Q_{k+1}
+ *   \stackrel{\text{grad}}{\rightarrow}
+ *   \text{Nedelec}_k
+ *   \stackrel{\text{curl}}{\rightarrow}
+ *   \text{RaviartThomas}_k
+ *   \stackrel{\text{div}}{\rightarrow}
+ *   DGQ_{k}
+ * @f]
+ * Consequently, approximation order of
+ * the Nedelec space equals the value <i>degree</i> given to the constructor.
+ * In this scheme, the lowest order element would be created by the call
+ * FE_Nedelec<dim>(0). Note that this follows the convention of Brezzi and
+ * Raviart, though not the one used in the original paper by Nedelec.
  *
  * This class is not implemented for the codimension one case
  * (<tt>spacedim != dim</tt>).
@@ -42,7 +72,7 @@ template <int dim, int spacedim> class MappingQ;
  * <h3>Interpolation</h3>
  *
  * The @ref GlossInterpolation "interpolation" operators associated
- * with the Nédélec element are constructed such that interpolation and
+ * with the N&eacute;d&eacute;lec element are constructed such that interpolation and
  * computing the curl are commuting operations. We require this
  * from interpolating arbitrary functions as well as the #restriction
  * matrices.
@@ -51,7 +81,7 @@ template <int dim, int spacedim> class MappingQ;
  *
  * The @ref GlossNodes "node values" on edges are the moments of the
  * tangential component of the interpolated function with respect to
- * the traces of the Nédélec polynomials. Higher-order Nédélec spaces
+ * the traces of the N&eacute;d&eacute;lec polynomials. Higher-order N&eacute;d&eacute;lec spaces
  * also have face and interior nodes.
  *
  * <h4>Generalized support points</h4>
@@ -64,13 +94,13 @@ template <int dim, int spacedim> class MappingQ;
  * the interior of the cell (or none for N<sub>1</sub>).
  *
  *
- * @author Markus Bürg, 2009
+ * @author Markus B&uuml;rg, 2009
  */
 template <int dim>
 class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
    public:
 				     /**
-				      * Constructor for the Nédélec
+				      * Constructor for the N&eacute;d&eacute;lec
 				      * element of degree @p p.
 				      */
       FE_Nedelec (const unsigned int p);
