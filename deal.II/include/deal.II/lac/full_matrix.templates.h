@@ -616,7 +616,7 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 				       // calculating the matrix-matrix
 				       // product.
       internal::gemm_switch::gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
-				  this->val, &k, &beta, &dst(0,0), &m);
+				  &this->val[0], &k, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -704,7 +704,7 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 				       // calculating the matrix-matrix
 				       // product.
       internal::gemm_switch::gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
-				  this->val, &n, &beta, &dst(0,0), &m);
+				  &this->val[0], &n, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -795,7 +795,7 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
 				       // calculating the matrix-matrix
 				       // product.
       internal::gemm_switch::gemm(trans, notrans, &m, &n, &k, &alpha, &src(0,0), &k,
-				  this->val, &k, &beta, &dst(0,0), &m);
+				  &this->val[0], &k, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -880,7 +880,7 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
 				       // calculating the matrix-matrix
 				       // product.
       internal::gemm_switch::gemm(trans, trans, &m, &n, &k, &alpha, &src(0,0), &k,
-				  this->val, &n, &beta, &dst(0,0), &m);
+				  &this->val[0], &n, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -1797,7 +1797,7 @@ FullMatrix<number>::gauss_jordan ()
 
 				       // Use the LAPACK function getrf for 
 				       // calculating the LU factorization.
-      internal::getrf_switch::getrf(&nn, &nn, this->val, &nn, &ipiv[0], &info);
+      internal::getrf_switch::getrf(&nn, &nn, &this->val[0], &nn, &ipiv[0], &info);
 
       Assert(info >= 0, ExcInternalError());
       Assert(info == 0, LACExceptions::ExcSingular());
@@ -1808,7 +1808,7 @@ FullMatrix<number>::gauss_jordan ()
 				       // Use the LAPACK function getri for
 				       // calculating the actual inverse using
 				       // the LU factorization.
-      internal::getrf_switch::getri(&nn, this->val, &nn, &ipiv[0], &inv_work[0], &nn, &info);
+      internal::getrf_switch::getri(&nn, &this->val[0], &nn, &ipiv[0], &inv_work[0], &nn, &info);
 
       Assert(info >= 0, ExcInternalError());
       Assert(info == 0, LACExceptions::ExcSingular());
