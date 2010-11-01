@@ -131,14 +131,14 @@ namespace FEValuesViews
 		  first_vector_component (first_vector_component),
 		  shape_function_data (fe_values.fe->dofs_per_cell)
   {
-    Assert (first_vector_component+dim-1 < fe_values.fe->n_components(),
-	    ExcIndexRange(first_vector_component+dim-1, 0,
+    Assert (first_vector_component+spacedim-1 < fe_values.fe->n_components(),
+	    ExcIndexRange(first_vector_component+spacedim-1, 0,
 			  fe_values.fe->n_components()));
 
     const std::vector<unsigned int> shape_function_to_row_table
       = make_shape_function_to_row_table (*fe_values.fe);
 
-    for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int d=0; d<spacedim; ++d)
       {
 	const unsigned int component = first_vector_component + d;
 
@@ -180,7 +180,7 @@ namespace FEValuesViews
     for (unsigned int i=0; i<fe_values.fe->dofs_per_cell; ++i)
       {
 	unsigned int n_nonzero_components = 0;
-	for (unsigned int d=0; d<dim; ++d)
+	for (unsigned int d=0; d<spacedim; ++d)
 	  if (shape_function_data[i].is_nonzero_shape_function_component[d]
 	      == true)
 	    ++n_nonzero_components;
@@ -191,7 +191,7 @@ namespace FEValuesViews
 	  shape_function_data[i].single_nonzero_component = -1;
 	else
 	  {
-	    for (unsigned int d=0; d<dim; ++d)
+	    for (unsigned int d=0; d<spacedim; ++d)
 	      if (shape_function_data[i].is_nonzero_shape_function_component[d]
 		  == true)
 		{
@@ -1250,8 +1250,8 @@ namespace internal
 				       // dimensionality 'dim' of the
 				       // manifold, not 'spacedim' of
 				       // the output vector
-      const unsigned int n_vectors = (fe.n_components() >= dim ?
-				      fe.n_components()-dim+1 :
+      const unsigned int n_vectors = (fe.n_components() >= spacedim ?
+				      fe.n_components()-spacedim+1 :
 				      0);
       vectors.resize (n_vectors);
       for (unsigned int component=0; component<n_vectors; ++component)
