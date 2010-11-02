@@ -1,5 +1,5 @@
 REAL_SCALARS    := { double; float; long double }
-COMPLEX_SCALARS := { std::complex<double>; 
+COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<float>;
                      std::complex<long double> }
 
@@ -55,3 +55,5 @@ SPARSITY_PATTERNS := { SparsityPattern;
                        BlockCompressedSetSparsityPattern;
                        BlockCompressedSimpleSparsityPattern;
                        @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
+
+DIMENSIONS := { 1; 2; 3 }
