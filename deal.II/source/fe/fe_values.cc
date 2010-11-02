@@ -3607,7 +3607,7 @@ FEFaceValues<dim,spacedim>::FEFaceValues (const FiniteElement<dim,spacedim> &fe,
 		FEFaceValuesBase<dim,spacedim> (quadrature.size(),
 						fe.dofs_per_cell,
 						update_flags,
-						StaticMappingQ1<dim>::mapping,
+						StaticMappingQ1<dim,spacedim>::mapping,
 						fe, quadrature)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -4158,14 +4158,14 @@ template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>;
 template class FEValues<deal_II_dimension,deal_II_dimension+1>;
 template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
 CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
-//template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
-//  CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
+template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
+ CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
 
-// #if deal_II_dimension == 2
-// template class FEFaceValuesBase<deal_II_dimension,deal_II_dimension+1>;
-// template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
-// template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
-// #endif
+#if deal_II_dimension == 2
+template class FEFaceValuesBase<deal_II_dimension,deal_II_dimension+1>;
+template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
+template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
+#endif
 #endif
 
 
