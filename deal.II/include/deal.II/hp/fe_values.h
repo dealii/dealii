@@ -546,8 +546,8 @@ namespace hp
  * @ingroup hp hpcollection
  * @author Wolfgang Bangerth, 2003
  */
-  template <int dim, int spacedim=dim>
-  class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> >
+  template <int dim>
+  class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> >
   {
     public:
                                        /**
@@ -570,8 +570,8 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
-                    const hp::FECollection<dim,spacedim>  &fe_collection,
+      FEFaceValues (const hp::MappingCollection<dim> &mapping_collection,
+                    const hp::FECollection<dim>  &fe_collection,
                     const hp::QCollection<dim-1>     &q_collection,
                     const UpdateFlags             update_flags);
 
@@ -598,7 +598,7 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
+      FEFaceValues (const hp::FECollection<dim>  &fe_collection,
                     const hp::QCollection<dim-1> &q_collection,
                     const UpdateFlags             update_flags);
 
@@ -702,7 +702,7 @@ namespace hp
                                         * this argument is specified.
                                         */
       void
-      reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
@@ -738,7 +738,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
@@ -774,7 +774,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
@@ -811,7 +811,7 @@ namespace hp
                                         * three arguments.
                                         */
       void
-      reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename Triangulation<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
@@ -827,8 +827,8 @@ namespace hp
  * @ingroup hp hpcollection
  * @author Wolfgang Bangerth, 2003
  */
-  template <int dim, int spacedim=dim>
-  class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> >
+  template <int dim>
+  class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> >
   {
     public:
                                        /**
@@ -851,8 +851,8 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
-                       const hp::FECollection<dim,spacedim>  &fe_collection,
+      FESubfaceValues (const hp::MappingCollection<dim> &mapping_collection,
+                       const hp::FECollection<dim>  &fe_collection,
                        const hp::QCollection<dim-1>     &q_collection,
                        const UpdateFlags             update_flags);
 
@@ -879,7 +879,7 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-      FESubfaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
+      FESubfaceValues (const hp::FECollection<dim> &fe_collection,
                        const hp::QCollection<dim-1>    &q_collection,
                        const UpdateFlags            update_flags);
 
@@ -962,7 +962,7 @@ namespace hp
                                         * this argument is specified.
                                         */
       void
-      reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
@@ -999,7 +999,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
@@ -1036,7 +1036,7 @@ namespace hp
                                         * these last three arguments.
                                         */
       void
-      reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,
@@ -1074,7 +1074,7 @@ namespace hp
                                         * three arguments.
                                         */
       void
-      reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+      reinit (const typename Triangulation<dim>::cell_iterator &cell,
               const unsigned int face_no,
               const unsigned int subface_no,
               const unsigned int q_index = numbers::invalid_unsigned_int,

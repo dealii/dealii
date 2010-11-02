@@ -206,101 +206,6 @@ void VectorTools::interpolate_boundary_values (
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
 
-#if deal_II_dimension < 3
-template
-void VectorTools::interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
-  const Function<deal_II_dimension+1>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
-  const Function<deal_II_dimension+1>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
-  const Function<deal_II_dimension+1>   &,
-  std::map<unsigned int,double>       &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
-  const Function<deal_II_dimension+1>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
-  const Function<deal_II_dimension+1>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
-  const Function<deal_II_dimension+1>   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const FunctionMap<deal_II_dimension+1>::type   &,
-  ConstraintMatrix                    &,
-  const std::vector<bool>    &);
-#endif
-
 template
 void VectorTools::project_boundary_values<deal_II_dimension>
 (const Mapping<deal_II_dimension>     &,
@@ -361,6 +266,22 @@ VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimens
 
 
 
+// // Due to introducing the DoFHandler as a template parameter,
+// // the following instantiations are required in 1d
+// #if deal_II_dimension == 1
+// template
+// void VectorTools::interpolate_boundary_values<deal_II_dimension>
+// (const Mapping<1>         &,
+//  const DoFHandler<1>      &,
+//  const unsigned char,
+//  const Function<1>        &,
+//  std::map<unsigned int,double> &,
+//  const std::vector<bool>       &);
+// #endif
+
+// the following two functions are not derived from a template in 1d
+// and thus need no explicit instantiation
+//#if deal_II_dimension > 1
 template
 void VectorTools::interpolate_boundary_values
 (const Mapping<deal_II_dimension>    &,
@@ -378,24 +299,7 @@ void VectorTools::interpolate_boundary_values
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);
 
-#if deal_II_dimension < 3
-template
-void VectorTools::interpolate_boundary_values
-(const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
- const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const FunctionMap<deal_II_dimension+1>::type &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-
-template
-void VectorTools::interpolate_boundary_values
-(const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
- const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const unsigned char,
- const Function<deal_II_dimension+1>   &,
- std::map<unsigned int,double>       &,
- const std::vector<bool>    &);
-#endif
+//#endif
 
 
 template

@@ -126,7 +126,7 @@ enum MappingType
  *
  * A hint to implementators: no function except the two functions
  * @p update_once and @p update_each may add any flags.
- *
+ * 
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
@@ -138,12 +138,12 @@ template <int dim, int spacedim=dim>
 class Mapping : public Subscriptor
 {
   public:
-
+    
 				     /**
 				      * Virtual destructor.
 				      */
     virtual ~Mapping ();
-
+    
 				     /**
 				      * Transforms the point @p p on
 				      * the unit cell to the point
@@ -154,7 +154,7 @@ class Mapping : public Subscriptor
     transform_unit_to_real_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<dim>                                 &p) const = 0;
-
+    
 				     /**
 				      * Transforms the point @p p on
 				      * the real cell to the point
@@ -165,7 +165,7 @@ class Mapping : public Subscriptor
     transform_real_to_unit_cell (
       const typename Triangulation<dim,spacedim>::cell_iterator &cell,
       const Point<spacedim>                            &p) const = 0;
-
+    
 				     /**
 				      * Base class for internal data
 				      * of finite element and mapping
@@ -219,7 +219,7 @@ class Mapping : public Subscriptor
 					  * @p first_cell to @p true.
 					  */
         InternalDataBase ();
-
+	
 					 /**
 					  * Virtual destructor for
 					  * derived classes
@@ -231,7 +231,7 @@ class Mapping : public Subscriptor
 					  * by reinit.
 					  */
 	UpdateFlags          update_flags;
-
+	
 					 /**
 					  * Values computed by
 					  * constructor.
@@ -286,7 +286,7 @@ class Mapping : public Subscriptor
                                           * the first cell.
                                           */
         virtual void clear_first_cell ();
-
+        
 					 /**
 					  * Return an estimate (in
 					  * bytes) or the memory
@@ -302,14 +302,14 @@ class Mapping : public Subscriptor
 					  * if #update_volume_elements.
 					  */
 	std::vector<double> volume_elements;
-
+	
 					 /**
 					  * The positions of the
 					  * mapped (generalized)
 					  * support points.
 					  */
 	std::vector<Point<spacedim> > support_point_values;
-
+	
 					 /*
 					  * The Jacobian of the
 					  * transformation in the
@@ -317,7 +317,7 @@ class Mapping : public Subscriptor
 					  * points.
 					  */
 	std::vector<Tensor<2,spacedim> > support_point_gradients;
-
+	
 					 /*
 					  * The inverse of the
 					  * Jacobian of the
@@ -326,8 +326,8 @@ class Mapping : public Subscriptor
 					  * points.
 					  */
 	std::vector<Tensor<2,spacedim> > support_point_inverse_gradients;
-
-
+	
+	
       private:
                                          /**
                                           * The value returned by
@@ -335,7 +335,7 @@ class Mapping : public Subscriptor
                                           */
         bool first_cell;
     };
-
+    
                                      /**
                                       * Transform a field of
                                       * vectors accorsing to
@@ -360,7 +360,7 @@ class Mapping : public Subscriptor
                VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
                const InternalDataBase &internal,
                const MappingType type) const = 0;
-
+    
 				     /**
 				      * @deprecated Use transform() instead.
 				      */
@@ -391,7 +391,7 @@ class Mapping : public Subscriptor
                                      /**
 				      * @deprecated Use transform() instead.
                                       */
-
+    
     void
     transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > intput,
                              const unsigned int                 offset,
@@ -405,7 +405,7 @@ class Mapping : public Subscriptor
     const Point<spacedim>& support_point_value(
       const unsigned int index,
       const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-
+    
 				     /**
 				      * The Jacobian
 				      * matrix of the transformation
@@ -415,7 +415,7 @@ class Mapping : public Subscriptor
     const Tensor<2,spacedim>& support_point_gradient(
       const unsigned int index,
       const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-
+    
 				     /**
 				      * The inverse Jacobian
 				      * matrix of the transformation
@@ -425,7 +425,7 @@ class Mapping : public Subscriptor
     const Tensor<2,spacedim>& support_point_inverse_gradient(
       const unsigned int index,
       const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
-
+    
                                      /**
                                       * Return a pointer to a copy of the
                                       * present object. The caller of this
@@ -441,7 +441,7 @@ class Mapping : public Subscriptor
                                       */
     virtual
     Mapping<dim,spacedim> * clone () const = 0;
-
+    
 				     /**
 				      * Returns whether the mapping preserves
 				      * vertex locations, i.e. whether the
@@ -466,7 +466,7 @@ class Mapping : public Subscriptor
     DeclException0 (ExcInvalidData);
 
   private:
-
+    
 				     /**
 				      * Indicate fields to be updated
 				      * in the constructor of
@@ -479,7 +479,7 @@ class Mapping : public Subscriptor
 				      * See @ref UpdateFlagsEssay.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags) const = 0;
-
+    
 				     /**
 				      * The same as update_once(),
 				      * but for the flags to be updated for
@@ -507,7 +507,7 @@ class Mapping : public Subscriptor
     virtual InternalDataBase*
     get_face_data (const UpdateFlags flags,
 		   const Quadrature<dim-1>& quadrature) const = 0;
-
+    
 				     /**
 				      * Prepare internal data
 				      * structure for transformation
@@ -601,7 +601,7 @@ class Mapping : public Subscriptor
 			 const unsigned int                                        face_no,
 			 const Quadrature<dim-1>                                   &quadrature,
 			 InternalDataBase                                          &internal,
-			 std::vector<Point<spacedim> >                             &quadrature_points,
+			 std::vector<Point<dim> >                                  &quadrature_points,
 			 std::vector<double>                                       &JxW_values,
 			 std::vector<Tensor<1,dim> >                               &boundary_form,
 			 std::vector<Point<spacedim> >                             &normal_vectors) const = 0;
@@ -615,7 +615,7 @@ class Mapping : public Subscriptor
 			    const unsigned int                        sub_no,
 			    const Quadrature<dim-1>                  &quadrature,
 			    InternalDataBase                         &internal,
-			    std::vector<Point<spacedim> >        &quadrature_points,
+			    std::vector<Point<dim> >        &quadrature_points,
 			    std::vector<double>                      &JxW_values,
 			    std::vector<Tensor<1,dim> >     &boundary_form,
 			    std::vector<Point<spacedim> >        &normal_vectors) const = 0;
@@ -682,7 +682,7 @@ Mapping<dim,spacedim>::support_point_value(
   const typename Mapping<dim,spacedim>::InternalDataBase& internal) const
 {
   AssertIndexRange(index, internal.support_point_values.size());
-  return internal.support_point_values[index];
+  return internal.support_point_values[index];  
 }
 
 
