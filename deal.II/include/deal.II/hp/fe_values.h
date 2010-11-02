@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -50,23 +50,23 @@ namespace internal
  * indicates the type of underlying non-hp FE*Values base type,
  * i.e. it could either be dealii::FEValues, dealii::FEFaceValues, or
  * dealii::FESubfaceValues.
- * 
+ *
  * @ingroup hp
  *
  * @author Wolfgang Bangerth, 2003
  */
     template <int dim, int q_dim, class FEValues>
-    class FEValuesBase 
+    class FEValuesBase
     {
-      public:        
+      public:
                                          /**
                                           * Constructor. Set the fields
                                           * of this class to the values
                                           * indicated by the parameters
                                           * to the constructor.
                                           */
-      FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
-		    const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
+	FEValuesBase (const dealii::hp::MappingCollection<dim,FEValues::space_dimension> &mapping_collection,
+		      const dealii::hp::FECollection<dim,FEValues::space_dimension>      &fe_collection,
                       const dealii::hp::QCollection<q_dim>     &q_collection,
                       const UpdateFlags             update_flags);
                                          /**
@@ -78,7 +78,7 @@ namespace internal
                                           * object for the mapping
                                           * object.
                                           */
-      FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
+	FEValuesBase (const dealii::hp::FECollection<dim,FEValues::space_dimension> &fe_collection,
                       const dealii::hp::QCollection<q_dim> &q_collection,
                       const UpdateFlags         update_flags);
 
@@ -89,7 +89,7 @@ namespace internal
 					  */
 	const dealii::hp::FECollection<dim,FEValues::space_dimension> &
 	get_fe_collection () const;
-	
+
                                          /**
                                           * Return a reference to the @p
                                           * FEValues object selected by the
@@ -131,74 +131,74 @@ namespace internal
                                           */
         const SmartPointer<const dealii::hp::FECollection<dim,FEValues::space_dimension>,
 			   FEValuesBase<dim,q_dim,FEValues> > fe_collection;
-        
-                                         /**
-                                          * A pointer to the
-                                          * collection of mappings to
-                                          * be used.
-                                          */
-        const SmartPointer<const dealii::hp::MappingCollection<dim, FEValues::space_dimension>,
-			   FEValuesBase<dim,q_dim,FEValues> > mapping_collection;
-    
-                                         /**
-                                          * Copy of the quadrature
-                                          * collection object
-                                          * provided to the
-                                          * constructor.
-                                          */
-        const dealii::hp::QCollection<q_dim> q_collection;
 
-      private:
-                                         /**
-                                          * A table in which we store
-                                          * pointers to fe_values
-                                          * objects for different
-                                          * finite element, mapping,
-                                          * and quadrature objects
-                                          * from our collection. The
-                                          * first index indicates the
-                                          * index of the finite
-                                          * element within the
-                                          * fe_collection, the second
-                                          * the index of the mapping
-                                          * within the mapping
-                                          * collection, and the last
-                                          * one the index of the
-                                          * quadrature formula within
-                                          * the q_collection.
-                                          *
-                                          * Initially, all entries
-                                          * have zero pointers, and we
-                                          * will allocate them lazily
-                                          * as needed in
-                                          * select_fe_values().
-                                          */
-        Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
+				     /**
+				      * A pointer to the
+				      * collection of mappings to
+				      * be used.
+				      */
+    const SmartPointer<const dealii::hp::MappingCollection<dim, FEValues::space_dimension>,
+		       FEValuesBase<dim,q_dim,FEValues> > mapping_collection;
 
-                                         /**
-                                          * Set of indices pointing at
-                                          * the fe_values object
-                                          * selected last time the
-                                          * select_fe_value() function
-                                          * was called.
-                                          */
-        TableIndices<3> present_fe_values_index;
-        
-                                         /**
-                                          * Values of the update flags as
-                                          * given to the constructor.
-                                          */
-        const UpdateFlags update_flags;
-    };
+				   /**
+				    * Copy of the quadrature
+				    * collection object
+				    * provided to the
+				    * constructor.
+				    */
+  const dealii::hp::QCollection<q_dim> q_collection;
 
-  }
-  
+  private:
+				   /**
+				    * A table in which we store
+				    * pointers to fe_values
+				    * objects for different
+				    * finite element, mapping,
+				    * and quadrature objects
+				    * from our collection. The
+				    * first index indicates the
+				    * index of the finite
+				    * element within the
+				    * fe_collection, the second
+				    * the index of the mapping
+				    * within the mapping
+				    * collection, and the last
+				    * one the index of the
+				    * quadrature formula within
+				    * the q_collection.
+				    *
+				    * Initially, all entries
+				    * have zero pointers, and we
+				    * will allocate them lazily
+				    * as needed in
+				    * select_fe_values().
+				    */
+  Table<3,std_cxx1x::shared_ptr<FEValues> > fe_values_table;
+
+				   /**
+				    * Set of indices pointing at
+				    * the fe_values object
+				    * selected last time the
+				    * select_fe_value() function
+				    * was called.
+				    */
+  TableIndices<3> present_fe_values_index;
+
+				   /**
+				    * Values of the update flags as
+				    * given to the constructor.
+				    */
+  const UpdateFlags update_flags;
+};
+
+}
+
 }
 
 
 namespace hp
 {
-  
+
 /**
  * An hp equivalent of the ::FEValues class. See the step-27
  * tutorial program for examples of use.
@@ -244,15 +244,15 @@ namespace hp
  *
  * @ingroup hp hpcollection
  * @author Wolfgang Bangerth, 2003
- */  
+ */
   template <int dim, int spacedim=dim>
-    class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> >
+  class FEValues : public internal::hp::FEValuesBase<dim,dim,dealii::FEValues<dim,spacedim> >
   {
     public:
- 
-    static const unsigned int dimension = dim;
 
-    static const unsigned int space_dimension = spacedim;
+      static const unsigned int dimension = dim;
+
+      static const unsigned int space_dimension = spacedim;
 
                                        /**
                                         * Constructor. Initialize this
@@ -274,8 +274,8 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-    FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
-	      const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
+      FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
+		const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
                 const dealii::hp::QCollection<dim>       &q_collection,
                 const UpdateFlags             update_flags);
 
@@ -302,7 +302,7 @@ namespace hp
                                         * <tt>DoFHandler::get_fe()</tt>
                                         * function.
                                         */
-    FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
+      FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
                 const hp::QCollection<dim>      &q_collection,
                 const UpdateFlags            update_flags);
 
@@ -481,7 +481,7 @@ namespace hp
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
-      
+
                                        /**
                                         * Like the previous function,
                                         * but for non-hp
@@ -545,7 +545,7 @@ namespace hp
  *
  * @ingroup hp hpcollection
  * @author Wolfgang Bangerth, 2003
- */  
+ */
   template <int dim>
   class FEFaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> >
   {
@@ -779,7 +779,7 @@ namespace hp
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
-      
+
                                        /**
                                         * Like the previous function,
                                         * but for non-hp
@@ -826,7 +826,7 @@ namespace hp
  *
  * @ingroup hp hpcollection
  * @author Wolfgang Bangerth, 2003
- */  
+ */
   template <int dim>
   class FESubfaceValues : public internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> >
   {
@@ -1042,7 +1042,7 @@ namespace hp
               const unsigned int q_index = numbers::invalid_unsigned_int,
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
-      
+
                                        /**
                                         * Like the previous function,
                                         * but for non-hp
@@ -1081,13 +1081,13 @@ namespace hp
               const unsigned int mapping_index = numbers::invalid_unsigned_int,
               const unsigned int fe_index = numbers::invalid_unsigned_int);
   };
-  
+
 }
 
 
 // -------------- inline and template functions --------------
 
-namespace internal 
+namespace internal
 {
   namespace hp
   {
@@ -1109,7 +1109,7 @@ namespace internal
       return *fe_collection;
     }
   }
-  
+
 }
 
 DEAL_II_NAMESPACE_CLOSE
