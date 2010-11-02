@@ -746,13 +746,12 @@ namespace internal
   {
     template class FEValuesBase<deal_II_dimension,deal_II_dimension,
                                 dealii::FEValues<deal_II_dimension,deal_II_dimension+1> >;
-// not yet implemented:
-// #if deal_II_dimension == 2
-//     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-//                                 dealii::FEFaceValues<deal_II_dimension> >;
-//     template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-//                                 dealii::FESubfaceValues<deal_II_dimension> >;
-// #endif
+#if deal_II_dimension == 2
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
+                                dealii::FEFaceValues<deal_II_dimension,deal_II_dimension+1> >;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
+                                dealii::FESubfaceValues<deal_II_dimension,deal_II_dimension+1> >;
+#endif
   }
 }
 
@@ -760,11 +759,10 @@ namespace hp
 {
   template class FEValues<deal_II_dimension, deal_II_dimension+1>;
 
-// not yet implemented:
-//#if deal_II_dimension == 2
-//   template class FEFaceValues<deal_II_dimension, deal_II_dimension+1>;
-//   template class FESubfaceValues<deal_II_dimension, deal_II_dimension+1>;
-//#endif
+#if deal_II_dimension == 2
+  template class FEFaceValues<deal_II_dimension, deal_II_dimension+1>;
+  template class FESubfaceValues<deal_II_dimension, deal_II_dimension+1>;
+#endif
 }
 #endif
 
