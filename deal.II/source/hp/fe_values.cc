@@ -309,33 +309,33 @@ namespace hp
 // -------------------------- FEFaceValues -------------------------
 
 
-  template <int dim>
-  FEFaceValues<dim>::FEFaceValues (const hp::MappingCollection<dim> &mapping,
-                                   const hp::FECollection<dim>  &fe_collection,
+  template <int dim, int spacedim>
+  FEFaceValues<dim,spacedim>::FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping,
+                                   const hp::FECollection<dim,spacedim>  &fe_collection,
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> > (mapping,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (mapping,
 									      fe_collection,
 									      q_collection,
 									      update_flags)
   {}
 
 
-  template <int dim>
-  FEFaceValues<dim>::FEFaceValues (const hp::FECollection<dim>  &fe_collection,
+  template <int dim, int spacedim>
+  FEFaceValues<dim,spacedim>::FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
                                    const hp::QCollection<dim-1> &q_collection,
                                    const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim> > (fe_collection,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FEFaceValues<dim,spacedim> > (fe_collection,
 									      q_collection,
 									      update_flags)
   {}
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEFaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+  FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
                              const unsigned int face_no,
                              const unsigned int q_index,
                              const unsigned int mapping_index,
@@ -384,9 +384,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEFaceValues<dim>::reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
+  FEFaceValues<dim,spacedim>::reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
                              const unsigned int face_no,
                              const unsigned int q_index,
                              const unsigned int mapping_index,
@@ -425,9 +425,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEFaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+  FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
                              const unsigned int face_no,
                              const unsigned int q_index,
                              const unsigned int mapping_index,
@@ -466,9 +466,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FEFaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+  FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                              const unsigned int face_no,
                              const unsigned int q_index,
                              const unsigned int mapping_index,
@@ -509,33 +509,33 @@ namespace hp
 // -------------------------- FESubfaceValues -------------------------
 
 
-  template <int dim>
-  FESubfaceValues<dim>::FESubfaceValues (const hp::MappingCollection<dim> &mapping,
-                                         const hp::FECollection<dim>  &fe_collection,
+  template <int dim, int spacedim>
+  FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping,
+                                         const hp::FECollection<dim,spacedim>  &fe_collection,
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> > (mapping,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (mapping,
 										 fe_collection,
 										 q_collection,
 										 update_flags)
   {}
 
 
-  template <int dim>
-  FESubfaceValues<dim>::FESubfaceValues (const hp::FECollection<dim>  &fe_collection,
+  template <int dim, int spacedim>
+  FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
                                          const hp::QCollection<dim-1> &q_collection,
                                          const UpdateFlags         update_flags)
                   :
-                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim> > (fe_collection,
+                  internal::hp::FEValuesBase<dim,dim-1,dealii::FESubfaceValues<dim,spacedim> > (fe_collection,
 										 q_collection,
 										 update_flags)
   {}
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FESubfaceValues<dim>::reinit (const typename hp::DoFHandler<dim>::cell_iterator &cell,
+  FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
                                 const unsigned int q_index,
@@ -585,9 +585,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FESubfaceValues<dim>::reinit (const typename dealii::DoFHandler<dim>::cell_iterator &cell,
+  FESubfaceValues<dim,spacedim>::reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
                                 const unsigned int q_index,
@@ -627,9 +627,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FESubfaceValues<dim>::reinit (const typename MGDoFHandler<dim>::cell_iterator &cell,
+  FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
                                 const unsigned int q_index,
@@ -669,9 +669,9 @@ namespace hp
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  FESubfaceValues<dim>::reinit (const typename Triangulation<dim>::cell_iterator &cell,
+  FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                                 const unsigned int face_no,
                                 const unsigned int subface_no,
                                 const unsigned int q_index,
