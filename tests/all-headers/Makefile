@@ -1,8 +1,8 @@
 # collect all header files, and for each try to do the following:
 # generate a file tmp.cc that contains nothing but "#include <xxx>"
-# with this particular header file. then try to compile it. this 
+# with this particular header file. then try to compile it. this
 # sometimes fails since this header does not include all other headers
-# it actually needs. we don't usually see this since we may be 
+# it actually needs. we don't usually see this since we may be
 # including these missing headers into our files before, so that nobody
 # notices the problem. expose it this way.
 
@@ -43,7 +43,7 @@ endif
 default: all
 
 # collect all headers
-HEADERS = $(shell cd $D; echo */include/*/*.h)
+HEADERS = $(shell cd $D; echo include/deal.II/*/*.h)
 TESTS   = $(shell for i in $(HEADERS) ; do echo test-$$i | $(PERL) -pi -e 's/.h$$/.OK/g; s/\//-/g;' ; done)
 
 ID = `id -un`"@"`hostname`
