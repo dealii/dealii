@@ -222,9 +222,9 @@ class MappingQ : public MappingQ1<dim,spacedim>
 			 const unsigned int face_no,
 			 const Quadrature<dim-1>& quadrature,
 			 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-			 typename std::vector<Point<dim> >        &quadrature_points,
+			 typename std::vector<Point<spacedim> >        &quadrature_points,
 			 std::vector<double>             &JxW_values,
-			 typename std::vector<Tensor<1,dim> >        &exterior_form,
+			 typename std::vector<Tensor<1,spacedim> >        &exterior_form,
 			 typename std::vector<Point<spacedim> >        &normal_vectors) const ;
 
 				     /**
@@ -237,9 +237,9 @@ class MappingQ : public MappingQ1<dim,spacedim>
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
 			    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-			    typename std::vector<Point<dim> >        &quadrature_points,
+			    typename std::vector<Point<spacedim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
-			    typename std::vector<Tensor<1,dim> >        &exterior_form,
+			    typename std::vector<Tensor<1,spacedim> >        &exterior_form,
 			    typename std::vector<Point<spacedim> >        &normal_vectors) const ;
 
 				     /**

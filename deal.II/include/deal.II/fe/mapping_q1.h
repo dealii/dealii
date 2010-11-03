@@ -312,9 +312,9 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			 const unsigned int                               face_no,
 			 const Quadrature<dim-1>                          &quadrature,
 			 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-			 typename std::vector<Point<dim> >                &quadrature_points,
+			 typename std::vector<Point<spacedim> >                &quadrature_points,
 			 std::vector<double>                              &JxW_values,
-			 typename std::vector<Tensor<1,dim> >             &boundary_form,
+			 typename std::vector<Tensor<1,spacedim> >             &boundary_form,
 			 typename std::vector<Point<spacedim> >           &normal_vectors) const ;
 
 				     /**
@@ -327,9 +327,9 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    const unsigned int sub_no,
 			    const Quadrature<dim-1>& quadrature,
 			    typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-			    typename std::vector<Point<dim> >        &quadrature_points,
+			    typename std::vector<Point<spacedim> >        &quadrature_points,
 			    std::vector<double>             &JxW_values,
-			    typename std::vector<Tensor<1,dim> >        &boundary_form,
+			    typename std::vector<Tensor<1,spacedim> >        &boundary_form,
 			    typename std::vector<Point<spacedim> >        &normal_vectors) const ;
 
 				     /**
@@ -399,9 +399,9 @@ class MappingQ1 : public Mapping<dim,spacedim>
 			    const DataSetDescriptor data_set,
 			    const std::vector<double>   &weights,
 			    InternalData           &mapping_data,
-			    std::vector<Point<dim> >    &quadrature_points,
+			    std::vector<Point<spacedim> >    &quadrature_points,
 			    std::vector<double>         &JxW_values,
-			    std::vector<Tensor<1,dim> > &boundary_form,
+			    std::vector<Tensor<1,spacedim> > &boundary_form,
 			    std::vector<Point<spacedim> > &normal_vectors) const;
 
 				     /**

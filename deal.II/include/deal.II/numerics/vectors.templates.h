@@ -1353,6 +1353,7 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
                              const std::vector<bool>       &component_mask_)
 {
   const unsigned int dim=DH::dimension;
+  const unsigned int spacedim=DH::space_dimension;
 
   Assert ((component_mask_.size() == 0) ||
 	  (component_mask_.size() == dof.get_fe().n_components()),
@@ -1373,7 +1374,7 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
   const unsigned int        n_components = DoFTools::n_components(dof);
   const bool                fe_is_system = (n_components != 1);
 
-  for (typename FunctionMap<DH::space_dimension>::type::const_iterator i=function_map.begin();
+  for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
        i!=function_map.end(); ++i)
     Assert (n_components == i->second->n_components,
 	    ExcDimensionMismatch(n_components, i->second->n_components));
@@ -1391,7 +1392,7 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
   std::vector<unsigned int> face_dofs;
   face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
 
-  std::vector<Point<DH::space_dimension> >  dof_locations;
+  std::vector<Point<spacedim> >  dof_locations;
   dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
 
 				   // array to store the values of
@@ -1411,11 +1412,11 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 				   // the interpolation points of all
 				   // finite elements that may ever be
 				   // in use
-  hp::FECollection<dim> finite_elements (dof.get_fe());
+  hp::FECollection<dim,spacedim> finite_elements (dof.get_fe());
   hp::QCollection<dim-1>  q_collection;
   for (unsigned int f=0; f<finite_elements.size(); ++f)
     {
-      const FiniteElement<dim> &fe = finite_elements[f];
+      const FiniteElement<dim,spacedim> &fe = finite_elements[f];
 
 				       // generate a quadrature rule
 				       // on the face from the unit
@@ -1483,9 +1484,9 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 				   // hp::FEFaceValues object that we
 				   // can use to evaluate the boundary
 				   // values at
-  hp::MappingCollection<dim> mapping_collection (mapping);
-  hp::FEFaceValues<dim> x_fe_values (mapping_collection, finite_elements, q_collection,
-				     update_quadrature_points);
+  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+  hp::FEFaceValues<dim,spacedim> x_fe_values (mapping_collection, finite_elements, q_collection,
+					      update_quadrature_points);
 
   typename DH::active_cell_iterator cell = dof.begin_active(),
 				    endc = dof.end();
@@ -1494,7 +1495,7 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
       for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
 	   ++face_no)
 	{
-	  const FiniteElement<dim,DH::space_dimension> &fe = cell->get_fe();
+	  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
 					   // we can presently deal only with
 					   // primitive elements for boundary
@@ -1526,14 +1527,14 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 	    {
 					       // face is of the right component
 	      x_fe_values.reinit(cell, face_no);
-	      const FEFaceValues<dim> &fe_values = x_fe_values.get_present_fe_values();
+	      const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values();
 
 					       // get indices, physical location and
 					       // boundary values of dofs on this
 					       // face
 	      face_dofs.resize (fe.dofs_per_face);
 	      face->get_dof_indices (face_dofs, cell->active_fe_index());
-	      const std::vector<Point<DH::space_dimension> > &dof_locations
+	      const std::vector<Point<spacedim> > &dof_locations
 		= fe_values.get_quadrature_points ();
 
 	      if (fe_is_system)
@@ -1997,7 +1998,7 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
     && ! excluded_dofs[dof_to_boundary_mapping[i]])
       {
 	Assert(numbers::is_finite(boundary_projection(dof_to_boundary_mapping[i])), ExcNumberNotFinite());
-	
+
 				       // this dof is on one of the
 				       // interesting boundary parts
 				       //

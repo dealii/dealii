@@ -332,6 +332,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: The class hp::FEFaceValues and hp::FESubfaceValues were not
+  previously available for meshes that were embedded in a higher
+  dimensional space (i.e. if the codimension was greater than 1). This is
+  now fixed. As a consequence, the VectorTools::interpolate_boundary_values
+  function is now also available for such meshes.
+  <br>
+  (WB, 2010/11/02)
+  </p></li>
+
   <li><p>Fixed: The FEValuesExtractors::Vector class did not work when the dimension
   of the domain was not equal to the dimension of the space in which it is
   embedded. This is now fixed.

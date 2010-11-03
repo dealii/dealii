@@ -93,13 +93,13 @@ namespace internal
     void
     compute_shapes_virtual (const unsigned int            n_shape_functions,
 			    const std::vector<Point<1> > &unit_points,
-			    typename dealii::MappingQ1<1,spacedim>::InternalData& data) 
+			    typename dealii::MappingQ1<1,spacedim>::InternalData& data)
     {
       const unsigned int n_points=unit_points.size();
       for (unsigned int k = 0 ; k < n_points ; ++k)
 	{
 	  double x = unit_points[k](0);
-      
+
 	  if (data.shape_values.size()!=0)
 	    {
 	      Assert(data.shape_values.size()==n_shape_functions*n_points,
@@ -119,7 +119,7 @@ namespace internal
 					       // the following may or may not
 					       // work if dim != spacedim
 	      Assert (spacedim == 1, ExcNotImplemented());
-	      
+
 	      Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
 		     ExcInternalError());
 	      data.second_derivative(k,0)[0][0] = 0;
@@ -133,14 +133,14 @@ namespace internal
     void
     compute_shapes_virtual (const unsigned int            n_shape_functions,
 			    const std::vector<Point<2> > &unit_points,
-			    typename dealii::MappingQ1<2,spacedim>::InternalData& data) 
+			    typename dealii::MappingQ1<2,spacedim>::InternalData& data)
     {
       const unsigned int n_points=unit_points.size();
       for (unsigned int k = 0 ; k < n_points ; ++k)
 	{
 	  double x = unit_points[k](0);
 	  double y = unit_points[k](1);
-      
+
 	  if (data.shape_values.size()!=0)
 	    {
 	      Assert(data.shape_values.size()==n_shape_functions*n_points,
@@ -168,7 +168,7 @@ namespace internal
 					       // the following may or may not
 					       // work if dim != spacedim
 	      Assert (spacedim == 2, ExcNotImplemented());
-	      
+
 	      Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
 		     ExcInternalError());
 	      data.second_derivative(k,0)[0][0] = 0;
@@ -197,7 +197,7 @@ namespace internal
     void
     compute_shapes_virtual (const unsigned int            n_shape_functions,
 			    const std::vector<Point<3> > &unit_points,
-			    typename dealii::MappingQ1<3,spacedim>::InternalData& data) 
+			    typename dealii::MappingQ1<3,spacedim>::InternalData& data)
     {
       const unsigned int n_points=unit_points.size();
       for (unsigned int k = 0 ; k < n_points ; ++k)
@@ -205,7 +205,7 @@ namespace internal
 	  double x = unit_points[k](0);
 	  double y = unit_points[k](1);
 	  double z = unit_points[k](2);
-      
+
 	  if (data.shape_values.size()!=0)
 	    {
 	      Assert(data.shape_values.size()==n_shape_functions*n_points,
@@ -253,7 +253,7 @@ namespace internal
 					       // the following may or may not
 					       // work if dim != spacedim
 	      Assert (spacedim == 3, ExcNotImplemented());
-	      
+
 	      Assert(data.shape_second_derivatives.size()==n_shape_functions*n_points,
 		     ExcInternalError());
 	      data.second_derivative(k,0)[0][0] = 0;
@@ -314,7 +314,7 @@ namespace internal
 	      data.second_derivative(k,5)[2][0] = (1.-y);
 	      data.second_derivative(k,6)[2][0] = -y;
 	      data.second_derivative(k,7)[2][0] = y;
-	  
+
 	      data.second_derivative(k,0)[1][2] = (1.-x);
 	      data.second_derivative(k,1)[1][2] = x;
 	      data.second_derivative(k,2)[1][2] = -(1.-x);
@@ -418,7 +418,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
       if (out & (update_JxW_values
 		 | update_normal_vectors))
 	out |= update_boundary_forms;
-  
+
       if (out & (update_covariant_transformation
 		 | update_JxW_values
 		 | update_jacobians
@@ -426,7 +426,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 		 | update_boundary_forms
 		 | update_normal_vectors))
 	out |= update_contravariant_transformation;
-      
+
       if (out & (update_inverse_jacobians))
 	out |= update_covariant_transformation;
 
@@ -443,7 +443,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 	out |= update_JxW_values;
 
     }
-  
+
   return out;
 }
 
@@ -462,7 +462,7 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
   data.update_flags = data.update_once | data.update_each;
 
   const UpdateFlags flags(data.update_flags);
-  
+
   if (flags & update_transformation_values)
     data.shape_values.resize(data.n_shape_functions * n_q_points);
 
@@ -480,7 +480,7 @@ MappingQ1<dim,spacedim>::compute_data (const UpdateFlags      update_flags,
 
   if (flags & update_jacobian_grads)
     data.shape_second_derivatives.resize(data.n_shape_functions * n_q_points);
-  
+
   compute_shapes (q.get_points(), data);
 }
 
@@ -512,7 +512,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
       if (data.update_flags & update_boundary_forms)
 	{
 	  data.aux.resize (dim-1, std::vector<Tensor<1,spacedim> > (n_original_q_points));
-      
+
 					   // Compute tangentials to the
 					   // unit cell.
 	  const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
@@ -525,7 +525,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
 	      static const int tangential_orientation[4]={-1,1,1,-1};
 	      for (unsigned int i=0; i<nfaces; ++i)
 		{
-		  Tensor<1,spacedim> tang;	      
+		  Tensor<1,spacedim> tang;
 		  tang[1-i/2]=tangential_orientation[i];
 		  std::fill (data.unit_tangentials[i].begin(),
 			     data.unit_tangentials[i].end(), tang);
@@ -539,7 +539,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
 
 		  const unsigned int nd=
 		    GeometryInfo<dim>::unit_normal_direction[i];
-	      
+
 						   // first tangential
 						   // vector in direction
 						   // of the (nd+1)%3 axis
@@ -564,7 +564,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
     }
 }
 
-  
+
 
 template<int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
@@ -607,7 +607,6 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 	      	                       InternalData  &data,
 		                       std::vector<Point<spacedim> > &quadrature_points) const
 {
-
   const UpdateFlags update_flags(data.current_update_flags());
 
 				   // if necessary, recompute the
@@ -640,7 +639,7 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 
       for (unsigned int point=0; point<n_q_points; ++point)
 	for (unsigned int k=0; k<data.n_shape_functions; ++k)
-	  quadrature_points[point] 
+	  quadrature_points[point]
 	    += data.shape(point+data_set,k) * data.mapping_support_points[k];
     }
 
@@ -690,7 +689,7 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 
 	  else if (dim == spacedim - 1)
 	    {
-				    // CODIMENSION 1 
+				    // CODIMENSION 1
 				    // calculate left-inversion of the
 				    // contravariant matrices to obtain
 				    // covariant ones (auxiliary
@@ -701,7 +700,7 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		{
 		  contravariant_matrix.
-		    copy_from(data.contravariant[point],0,spacedim-1,0,dim-1);  
+		    copy_from(data.contravariant[point],0,spacedim-1,0,dim-1);
 		  covariant_matrix.
 		    left_invert(contravariant_matrix);
 		  covariant_matrix.
@@ -745,7 +744,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   CellSimilarity::Similarity                           &cell_similarity) const
 {
   // ensure that the following cast is really correct:
-  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
+  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   InternalData &data = static_cast<InternalData&>(mapping_data);
 
@@ -754,7 +753,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   compute_fill (cell, n_q_points, DataSetDescriptor::cell (), cell_similarity,
                 data, quadrature_points);
 
-  
+
   const UpdateFlags update_flags(data.current_update_flags());
   const std::vector<double> &weights=q.get_weights();
 
@@ -766,7 +765,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 				   // the case <2,3>
   if (update_flags & (update_normal_vectors
 		      | update_JxW_values))
-    {      
+    {
       Assert (JxW_values.size() == n_q_points,
 	       ExcDimensionMismatch(JxW_values.size(), n_q_points));
 
@@ -776,7 +775,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 
       if (cell_similarity != CellSimilarity::translation)
 	for (unsigned int point=0; point<n_q_points; ++point)
-	  { 
+	  {
 
 	    if (dim==spacedim)
 	      JxW_values[point]
@@ -787,7 +786,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
    	        data.contravariant[point]=transpose(data.contravariant[point]);
 		JxW_values[point]
 		  = data.contravariant[point][0].norm()*weights[point];
-		if(update_flags & update_normal_vectors) 
+		if(update_flags & update_normal_vectors)
 		{
 		  normal_vectors[point][0]=-data.contravariant[point][0][1]
 		      /data.contravariant[point][0].norm();
@@ -798,7 +797,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 	    if ( (dim==2) && (spacedim==3) )
 	      {
 		data.contravariant[point]=transpose(data.contravariant[point]);
-		cross_product(data.contravariant[point][2], 
+		cross_product(data.contravariant[point][2],
 			      data.contravariant[point][0],
 			      data.contravariant[point][1]
 			      );
@@ -809,17 +808,17 @@ MappingQ1<dim,spacedim>::fill_fe_values (
                                           //is stored in the 3d
 		                          //subtensor of the contravariant tensor
 		data.contravariant[point][2]/=data.contravariant[point][2].norm();
-		if(update_flags & update_normal_vectors) 
+		if(update_flags & update_normal_vectors)
 		  normal_vectors[point]=data.contravariant[point][2];
 	      }
-	    
+
 	  }
     }
 
 				   // copy values from InternalData to vector
 				   // given by reference
   if (update_flags & update_jacobians)
-    {      
+    {
       Assert (jacobians.size() == n_q_points,
 	      ExcDimensionMismatch(jacobians.size(), n_q_points));
       if (cell_similarity != CellSimilarity::translation)
@@ -854,7 +853,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 				   // copy values from InternalData to vector
 				   // given by reference
   if (update_flags & update_inverse_jacobians)
-    {      
+    {
       Assert (inverse_jacobians.size() == n_q_points,
 	      ExcDimensionMismatch(inverse_jacobians.size(), n_q_points));
       if (cell_similarity != CellSimilarity::translation)
@@ -875,10 +874,10 @@ MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
 				   const DataSetDescriptor,
 				   const std::vector<double>&,
 				   InternalData &,
-				   std::vector<Point<2> >&,
+				   std::vector<Point<3> >&,
 				   std::vector<double>&,
-				   std::vector<Tensor<1,2> > &,
-				   std::vector<Point<3> > &) const 
+				   std::vector<Tensor<1,3> > &,
+				   std::vector<Point<3> > &) const
 {
 	Assert(false, ExcNotImplemented());
 }
@@ -897,9 +896,9 @@ MappingQ1<dim,spacedim>::compute_fill_face (
   const DataSetDescriptor,
   const std::vector<double> &,
   InternalData &,
-  std::vector<Point<dim> > &,
+  std::vector<Point<spacedim> > &,
   std::vector<double> &,
-  std::vector<Tensor<1,dim> > &,
+  std::vector<Tensor<1,spacedim> > &,
   std::vector<Point<spacedim> > &) const
 {
   Assert(false, ExcNotImplemented());
@@ -913,9 +912,9 @@ MappingQ1<dim,spacedim>::fill_fe_face_values (
   const unsigned,
   const Quadrature<dim-1>&,
   typename Mapping<dim,spacedim>::InternalDataBase&,
-  std::vector<Point<dim> >&,
+  std::vector<Point<spacedim> >&,
   std::vector<double>&,
-  std::vector<Tensor<1,dim> >&,
+  std::vector<Tensor<1,spacedim> >&,
   std::vector<Point<spacedim> >&) const
 {
   Assert(false, ExcNotImplemented());
@@ -930,9 +929,9 @@ MappingQ1<dim,spacedim>::fill_fe_subface_values (
   const unsigned,
   const Quadrature<dim-1>&,
   typename Mapping<dim,spacedim>::InternalDataBase&,
-  std::vector<Point<dim> >&,
+  std::vector<Point<spacedim> >&,
   std::vector<double>&,
-  std::vector<Tensor<1,dim> >&,
+  std::vector<Tensor<1,spacedim> >&,
   std::vector<Point<spacedim> >&) const
 {
   Assert(false, ExcNotImplemented());
@@ -952,16 +951,16 @@ MappingQ1<dim,spacedim>::compute_fill_face (
   const DataSetDescriptor          data_set,
   const std::vector<double>        &weights,
   InternalData                     &data,
-  std::vector<Point<dim> >         &quadrature_points,
+  std::vector<Point<spacedim> >         &quadrature_points,
   std::vector<double>              &JxW_values,
-  std::vector<Tensor<1,dim> > &boundary_forms,
+  std::vector<Tensor<1,spacedim> > &boundary_forms,
   std::vector<Point<spacedim> >    &normal_vectors) const
 {
   compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
 		data, quadrature_points);
 
   const UpdateFlags update_flags(data.current_update_flags());
-  
+
   if (update_flags & update_boundary_forms)
     {
       Assert (boundary_forms.size()==n_q_points,
@@ -971,16 +970,16 @@ MappingQ1<dim,spacedim>::compute_fill_face (
 		ExcDimensionMismatch(normal_vectors.size(), n_q_points));
       if (update_flags & update_JxW_values)
 	Assert (JxW_values.size() == n_q_points,
-		ExcDimensionMismatch(JxW_values.size(), n_q_points));      
-      
+		ExcDimensionMismatch(JxW_values.size(), n_q_points));
+
       transform(data.unit_tangentials[face_no], data.aux[0],
 		data, mapping_contravariant);
 
-      typename std::vector<Tensor<1,dim> >::iterator
+      typename std::vector<Tensor<1,spacedim> >::iterator
 	result = boundary_forms.begin();
-      const typename std::vector<Tensor<1,dim> >::iterator
+      const typename std::vector<Tensor<1,spacedim> >::iterator
 	end = boundary_forms.end();
-      
+
       switch (dim)
 	{
 	  case 2:
@@ -1009,7 +1008,7 @@ MappingQ1<dim,spacedim>::compute_fill_face (
 	  default:
                 Assert(false, ExcNotImplemented());
 	}
-      
+
       if (update_flags & (update_normal_vectors
 			  | update_JxW_values))
 	for (unsigned int i=0;i<boundary_forms.size();++i)
@@ -1039,18 +1038,18 @@ MappingQ1<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,s
 				     const unsigned int                               face_no,
 				     const Quadrature<dim-1>                          &q,
 				     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-				     std::vector<Point<dim> >                         &quadrature_points,
+				     std::vector<Point<spacedim> >                         &quadrature_points,
 				     std::vector<double>                              &JxW_values,
-				     std::vector<Tensor<1,dim> >                      &boundary_forms,
+				     std::vector<Tensor<1,spacedim> >                      &boundary_forms,
 				     std::vector<Point<spacedim> >                    &normal_vectors) const
 {
   // ensure that the following cast is really correct:
-  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
+  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   InternalData &data = static_cast<InternalData&>(mapping_data);
 
   const unsigned int n_q_points = q.size();
-  
+
   compute_fill_face (cell, face_no, deal_II_numbers::invalid_unsigned_int,
 		     n_q_points,
 		     DataSetDescriptor::face (face_no,
@@ -1074,18 +1073,18 @@ MappingQ1<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<di
 					const unsigned int       sub_no,
 					const Quadrature<dim-1> &q,
 					typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-					std::vector<Point<dim> >     &quadrature_points,
+					std::vector<Point<spacedim> >     &quadrature_points,
 					std::vector<double>          &JxW_values,
-					std::vector<Tensor<1,dim> >  &boundary_forms,
+					std::vector<Tensor<1,spacedim> >  &boundary_forms,
 					std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // ensure that the following cast is really correct:
-  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0, 
+  Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   InternalData &data = static_cast<InternalData&>(mapping_data);
 
   const unsigned int n_q_points = q.size();
-  
+
   compute_fill_face (cell, face_no, sub_no,
 		     n_q_points,
 		     DataSetDescriptor::subface (face_no, sub_no,
@@ -1115,19 +1114,19 @@ MappingQ1<dim,spacedim>::transform (
   const MappingType mapping_type) const
 {
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
-  Tensor<1, spacedim> auxiliary;  
-  
+  Tensor<1, spacedim> auxiliary;
+
   switch (mapping_type)
     {
       case mapping_covariant:
       {
 	Assert (data.update_flags & update_covariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d=0;d<dim;++d)
@@ -1136,12 +1135,12 @@ MappingQ1<dim,spacedim>::transform (
 	  }
 	return;
       }
-      
+
       case mapping_contravariant:
       {
 	Assert (data.update_flags & update_contravariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d=0;d<dim;++d)
@@ -1150,14 +1149,14 @@ MappingQ1<dim,spacedim>::transform (
 	  }
 	return;
       }
-      
+
       case mapping_piola:
       {
 	Assert (data.update_flags & update_contravariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 	Assert (data.update_flags & update_volume_elements,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d=0;d<dim;++d)
@@ -1166,7 +1165,7 @@ MappingQ1<dim,spacedim>::transform (
 	  }
 	return;
       }
-      
+
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -1182,20 +1181,20 @@ MappingQ1<dim,spacedim>::transform (
   const MappingType mapping_type) const
 {
   AssertDimension (input.size(), output.size());
-  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0, 
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   const InternalData &data = static_cast<const InternalData&>(mapping_data);
 
   Tensor<2, spacedim> aux1;
   Tensor<2, spacedim> aux2;
-  
+
   switch (mapping_type)
     {
       case mapping_covariant:
       {
 	Assert (data.update_flags & update_covariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d1=0;d1<dim;++d1)
@@ -1205,12 +1204,12 @@ MappingQ1<dim,spacedim>::transform (
 	  }
 	return;
       }
-      
+
       case mapping_contravariant:
       {
 	Assert (data.update_flags & update_contravariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d1=0;d1<dim;++d1)
@@ -1220,45 +1219,45 @@ MappingQ1<dim,spacedim>::transform (
 	  }
 	return;
       }
-      
+
       case mapping_covariant_gradient:
       {
 	Assert (data.update_flags & update_contravariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d1=0;d1<dim;++d1)
 	      for (unsigned int d2=0;d2<dim;++d2)
 		aux1[d1][d2] = input[i][d1][d2];
-	    
+
 	    contract(aux2, aux1, data.covariant[i]);
 	    contract(output[i], data.covariant[i], aux2);
 	  }
-	
+
 	return;
       }
-      
+
       case mapping_contravariant_gradient:
       {
 	Assert (data.update_flags & update_covariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 	Assert (data.update_flags & update_contravariant_transformation,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d1=0;d1<dim;++d1)
 	      for (unsigned int d2=0;d2<dim;++d2)
 		aux1[d1][d2] = input[i][d1][d2];
-	    
+
 	    contract(aux2, aux1, data.covariant[i]);
 	    contract(output[i], data.contravariant[i], aux2);
 	  }
-	
+
 	return;
       }
-      
+
       case mapping_piola:
       {
 	Assert (data.update_flags & update_covariant_transformation,
@@ -1267,13 +1266,13 @@ MappingQ1<dim,spacedim>::transform (
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
 	Assert (data.update_flags & update_volume_elements,
 		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
-	
+
 	for (unsigned int i=0; i<output.size(); ++i)
 	  {
 	    for (unsigned int d1=0;d1<dim;++d1)
 	      for (unsigned int d2=0;d2<dim;++d2)
 		aux1[d1][d2] = input[i][d1][d2] / data.volume_elements[i];
-	    
+
 	    contract (aux2, aux1, data.covariant[i]);
 	    contract (output[i], data.contravariant[i], aux2);
 	  }
@@ -1319,7 +1318,7 @@ transform_unit_to_real_cell_internal (const InternalData &data) const
 {
   const unsigned int n_mapping_points=data.mapping_support_points.size();
   Assert(data.shape_values.size()==n_mapping_points, ExcInternalError());
-  
+
 				   // use now the InternalData to
 				   // compute the point in real space.
   Point<spacedim> p_real;
@@ -1365,7 +1364,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 				   // perform the newton iteration.
   transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
-  
+
   return p_unit;
 }
 
@@ -1415,22 +1414,22 @@ transform_real_to_unit_cell_internal
   const unsigned int n_shapes=mdata.shape_values.size();
   Assert(n_shapes!=0, ExcInternalError());
   Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
-  
+
   std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
   Assert(points.size()==n_shapes, ExcInternalError());
-  
+
 				   // Newton iteration to solve
 				   // f(x)=p(x)-p=0
 				   // x_{n+1}=x_n-[f'(x)]^{-1}f(x)
-  
+
 				   // The start value is set to be the
 				   // center of the unit cell.
-  
+
 				   // The shape values and derivatives
 				   // of the mapping at this point are
 				   // previously computed.
 
-  
+
 				   // f(x)
   Point<spacedim> p_real(transform_unit_to_real_cell_internal(mdata));
   Point<spacedim> f = p_real-p;
@@ -1438,19 +1437,19 @@ transform_real_to_unit_cell_internal
   const double eps=1e-15*cell->diameter();
   unsigned int loop=0;
   while (f.square()>eps*eps && loop++<10)
-    {      
+    {
 				       // f'(x)
       Tensor<2,dim> df;
       for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
 	{
 	  const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
 	  const Point<spacedim> &point=points[k];
-	  
+
 	  for (unsigned int i=0; i<dim; ++i)
 	    for (unsigned int j=0; j<dim; ++j)
 	      df[i][j]+=point[i]*grad_transform[j];
 	}
-      
+
 				       // Solve  [f'(x)]d=f(x)
       Tensor<1,dim> d;
       Tensor<2,dim> df_1;
@@ -1463,7 +1462,7 @@ transform_real_to_unit_cell_internal
 				       // shape values and derivatives
 				       // at new p_unit point
       compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
-      
+
 				       // f(x)
       p_real = transform_unit_to_real_cell_internal(mdata);
       f = p_real-p;
