@@ -198,6 +198,14 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossBoundaryForm <b>Boundary form</b></dt>
+ *
+ * <dd>The boundary form is the vector product of the image of
+ * coordinate vectors on the surface of the unit cell. It is a vector
+ * normal to the surface, pointing outwards and having the length of
+ * the surface element.</dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
  *
  * <dd> When considering systems of equations in which the solution is not
