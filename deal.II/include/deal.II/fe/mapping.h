@@ -576,25 +576,21 @@ class Mapping : public Subscriptor
 
 
 				     /**
-				      * Performs the same as @p fill_fe_values
-				      * on a face.
-				      * Additionally, @p boundary_form and
-				      * @p normal_vectors can be
-				      * computed on surfaces. The
-				      * boundary form is the vector
-				      * product of the image of
-				      * coordinate vectors on the
-				      * surface of the unit
-				      * cell. It is a
-				      * vector normal to the surface,
-				      * pointing outwards and having
-				      * the length of the surface
-				      * element.
-				      * Therefore, it is more economic
-				      * to use the boundary form
-				      * instead of the product of the
-				      * unit normal and the
-				      * transformed quadrature weight.
+				      * Performs the same as @p
+				      * fill_fe_values on a face.
+				      * Additionally, @p boundary_form
+				      * (see @ref GlossBoundaryForm)
+				      * and @p normal_vectors can be
+				      * computed on surfaces. Since
+				      * the boundary form already
+				      * contains the determinant of
+				      * the Jacobian of the
+				      * transformation, it is
+				      * sometimes more economic to use
+				      * the boundary form instead of
+				      * the product of the unit normal
+				      * and the transformed quadrature
+				      * weight.
 				      */
     virtual void
     fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,

@@ -3180,17 +3180,6 @@ class FEValues : public FEValuesBase<dim,spacedim>
  * when evaluating something on the surface of a cell. All the data
  * that is available in the interior of cells is also available here.
  *
- * On surfaces of mesh cells, boundary forms are
- * additional values that can be computed. This class provides the
- * interface to access those. Implementations are in derived classes
- * FEFaceValues and FESubfaceValues.
- *
- * The boundary form is the cross product of the images of the unit
- * tangential vectors. Therefore, it is the unit normal vector
- * multiplied with the surface element. Since it may be cheaper to
- * compute the boundary form immediately, use this value to integrate
- * <tt>n.ds</tt>.
- *
  * See FEValuesBase
  *
  *  @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
@@ -3236,18 +3225,7 @@ class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 				      * Boundary form of the
 				      * transformation of the cell at
 				      * the <tt>i</tt>th quadrature point.
-				      *
-				      * The boundary form is the cross
-				      * product of the images of the
-				      * unit tangential
-				      * vectors. Therefore, it is the
-				      * unit normal vector multiplied
-				      * with the surface
-				      * element. Since it may be
-				      * cheaper to compute the
-				      * boundary form immediately, use
-				      * this value to integrate
-				      * <tt>n.ds</tt>.
+				      * See @ref GlossBoundaryForm .
 				      */
     const Tensor<1,spacedim> & boundary_form (const unsigned int i) const;
 
