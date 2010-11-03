@@ -1,9 +1,9 @@
 
 //----------------------------  template.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2005, 2008 by the deal.II authors 
+//    Copyright (C) 2005, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,14 +13,11 @@
 //----------------------------  template.cc  ---------------------------
 
 
-// a short (a few lines) description of what the program does
+// read a couple meshes with a codimension and write them out again
 
 #include "../tests.h"
 #include <fstream>
 #include <base/logstream.h>
-
-// all include files you need here
-
 #include <grid/tria.h>
 #include <grid/grid_in.h>
 #include <grid/grid_out.h>
@@ -36,22 +33,22 @@ void test(std::string filename) {
     gi.attach_triangulation (tria);
     std::ifstream in (filename.c_str());
     gi.read_ucd (in);
-    
+
     GridOut grid_out;
     grid_out.set_flags (GridOutFlags::Ucd(true));
     grid_out.write_ucd (tria, logfile);
     grid_out.write_msh (tria, logfile);
 }
 
-int main () 
+int main ()
 {
   deallog.attach(logfile);
   deallog.depth_console(0);
-  
+
   test<1,2>("grids/circle_1.inp");
   test<2,3>("grids/square.inp");
   test<2,3>("grids/sphere_1.inp");
 
   return 0;
 }
-                  
+
