@@ -397,13 +397,13 @@ const
                                   values[i + (j + (2 * (k + 2 * l) + 1)
                                               * my_degree
                                               + GeometryInfo<dim>::lines_per_cell)
-                                         * (my_degree + 1)][m] = 0.0;
+                                         * (my_degree + 1)][m + l] = 0.0;
                                   values[(i + 2 * (k + 2 * (l + 1)) * (my_degree
                                                                        + 1)
                                           + GeometryInfo<dim>::lines_per_cell)
                                          * my_degree + j
                                          + GeometryInfo<dim>::lines_per_cell]
-                                        [m + 1] = 0.0;
+                                        [m + l] = 0.0;
                                 }
 
                               values[(i + 2 * k * (my_degree + 1)
@@ -430,14 +430,14 @@ const
                           values[(i + 2 * (k + 2) * (my_degree + 1)
                                   + GeometryInfo<dim>::lines_per_cell)
                                  * my_degree + j
-                                 + GeometryInfo<dim>::lines_per_cell][0]
-                            = unit_point_values[i + ((j + 2) * (my_degree + 2)
-                                                     + k) * (my_degree + 1)];
-                          values[i + (j + (2 * k + 5) * my_degree
-                                      + GeometryInfo<dim>::lines_per_cell)
-                                 * (my_degree + 1)][2]
+                                 + GeometryInfo<dim>::lines_per_cell][2]
                             = p2_values[i + (j + k * (my_degree + 2) + 2)
                                         * (my_degree + 1)];
+                          values[i + (j + (2 * k + 5) * my_degree
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                 * (my_degree + 1)][0]
+                            = unit_point_values[i + ((j + 2) * (my_degree + 2)
+                                                     + k) * (my_degree + 1)];
                           values[(i + 2 * (k + 4) * (my_degree + 1)
                                   + GeometryInfo<dim>::lines_per_cell)
                                  * my_degree + j
@@ -612,13 +612,13 @@ const
                                     grads[i + (j + (2 * (k + 2 * l) + 1)
                                                * my_degree
                                                + GeometryInfo<dim>::lines_per_cell)
-                                          * (my_degree + 1)][n][m] = 0.0;
+                                          * (my_degree + 1)][n + l][m] = 0.0;
                                     grads[(i + 2 * (k + 2 * (l + 1))
                                            * (my_degree + 1)
                                            + GeometryInfo<dim>::lines_per_cell)
                                           * my_degree + j
                                           + GeometryInfo<dim>::lines_per_cell]
-                                         [n + 1][m] = 0.0;
+                                         [n + l][m] = 0.0;
                                   }
 
                                 grads[(i + 2 * k * (my_degree + 1)
@@ -633,10 +633,9 @@ const
 
                           for (unsigned int l = 0; l < dim; ++l)
                             {
-                              grads[(i + 2 * (k + 2) * (my_degree + 1)
-                                     + GeometryInfo<dim>::lines_per_cell)
-                                    * my_degree + j
-                                    + GeometryInfo<dim>::lines_per_cell][0][l]
+                              grads[i + (j + (2 * k + 5) * my_degree
+                                         + GeometryInfo<dim>::lines_per_cell)
+                                      * (my_degree + 1)][0][l]
                                 = unit_point_grads[i + ((j + 2) * (my_degree
                                                                    + 2) + k)
                                                    * (my_degree + 1)][l];
@@ -682,19 +681,22 @@ const
                                 * (my_degree + 1)][2][2]
                             = p2_grads[i + ((j + 2) * (my_degree + 2) + k)
                                        * (my_degree + 1)][0];
-                          grads[i + (j + (2 * k + 5) * my_degree
-                                     + GeometryInfo<dim>::lines_per_cell)
-                                * (my_degree + 1)][2][0]
+                          grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                 + GeometryInfo<dim>::lines_per_cell)
+                                * my_degree + j
+                                + GeometryInfo<dim>::lines_per_cell][2][0]
                             = p2_grads[i + (j + k * (my_degree + 2) + 2)
                                        * (my_degree + 1)][1];
-                          grads[i + (j + (2 * k + 5) * my_degree
-                                     + GeometryInfo<dim>::lines_per_cell)
-                                * (my_degree + 1)][2][1]
+                          grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                 + GeometryInfo<dim>::lines_per_cell)
+                                * my_degree + j
+                                + GeometryInfo<dim>::lines_per_cell][2][1]
                             = p2_grads[i + (j + k * (my_degree + 2) + 2)
                                        * (my_degree + 1)][2];
-                          grads[i + (j + (2 * k + 5) * my_degree
-                                     + GeometryInfo<dim>::lines_per_cell)
-                                * (my_degree + 1)][2][2]
+                          grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                 + GeometryInfo<dim>::lines_per_cell)
+                                * my_degree + j
+                                + GeometryInfo<dim>::lines_per_cell][2][2]
                             = p2_grads[i + (j + k * (my_degree + 2) + 2)
                                        * (my_degree + 1)][0];
                           grads[i + (j + (2 * k + 9) * my_degree
@@ -1076,14 +1078,14 @@ const
                                         grad_grads[i + (j + (2 * (k + 2 * n)
                                                              + 1) * my_degree
                                                         + GeometryInfo<dim>::lines_per_cell)
-                                                   * (my_degree + 1)][o][l][m]
+                                                   * (my_degree + 1)][o + n][l][m]
                                           = 0.0;
                                         grad_grads[(i + 2 * (k + 2 * (n + 1))
                                                     * (my_degree + 1)
                                                     + GeometryInfo<dim>::lines_per_cell)
                                                    * my_degree + j
                                                    + GeometryInfo<dim>::lines_per_cell]
-                                                  [o + 1][l][m] = 0.0;
+                                                  [o + n][l][m] = 0.0;
                                       }
 
                                     grad_grads[(i + 2 * k * (my_degree + 1)
@@ -1098,10 +1100,9 @@ const
                                       = 0.0;
                                   }
                               
-                                grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
-                                            + GeometryInfo<dim>::lines_per_cell)
-                                           * my_degree + j
-                                           + GeometryInfo<dim>::lines_per_cell]
+                                grad_grads[i + (j + (2 * k + 5) * my_degree
+                                                + GeometryInfo<dim>::lines_per_cell)
+                                             * (my_degree + 1)]
                                           [0][l][m]
                                   = unit_point_grad_grads[i + ((j + 2)
                                                                * (my_degree
@@ -1228,49 +1229,58 @@ const
                                      * (my_degree + 1)][2][2][2]
                             = p2_grad_grads[i + ((j + 2) * (my_degree + 2) + k)
                                             * (my_degree + 1)][0][0];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][0][0]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][0][0]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][1][1];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][0][1]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][0][1]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][1][2];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][0][2]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][0][2]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][1][0];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][1][0]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][1][0]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][2][1];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][1][1]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][1][1]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][2][2];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][1][2]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][1][2]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][2][0];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][2][0]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][2][0]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][0][1];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][2][1]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][2][1]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][0][2];
-                          grad_grads[i + (j + (2 * k + 5) * my_degree
-                                          + GeometryInfo<dim>::lines_per_cell)
-                                     * (my_degree + 1)][2][2][2]
+                          grad_grads[(i + 2 * (k + 2) * (my_degree + 1)
+                                      + GeometryInfo<dim>::lines_per_cell)
+                                     * my_degree + j
+                                     + GeometryInfo<dim>::lines_per_cell][2][2][2]
                             = p2_grad_grads[i + (j + k * (my_degree + 2) + 2)
                                             * (my_degree + 1)][0][0];
                           grad_grads[i + (j + (2 * k + 9) * my_degree
