@@ -332,6 +332,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: The GridOut::write_gnuplot function now also works for meshes
+  that are embedded in a higher
+  dimensional space (i.e. if the codimension was greater than 1).
+  <br>
+  (WB, 2010/11/03)
+  </p></li>
+
   <li><p>New: The class hp::FEFaceValues and hp::FESubfaceValues were not
   previously available for meshes that were embedded in a higher
   dimensional space (i.e. if the codimension was greater than 1). This is

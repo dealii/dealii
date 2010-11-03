@@ -999,16 +999,16 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
 
 #if deal_II_dimension==1
 
-template <int dim>
+template <int dim, int spacedim>
 void GridOut::write_gnuplot (
-  const Triangulation<dim> &tria,
+  const Triangulation<dim,spacedim> &tria,
   std::ostream             &out,
-  const Mapping<dim>       *) const
+  const Mapping<dim,spacedim>       *) const
 {
   AssertThrow (out, ExcIO());
 
-  typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
-  const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
+  typename Triangulation<dim,spacedim>::active_cell_iterator        cell=tria.begin_active();
+  const typename Triangulation<dim,spacedim>::active_cell_iterator  endc=tria.end();
   for (; cell!=endc; ++cell)
     {
       if (gnuplot_flags.write_cell_numbers)
@@ -1035,11 +1035,11 @@ void GridOut::write_gnuplot (
 
 #if deal_II_dimension==2
 
-template <int dim>
+template <int dim, int spacedim>
 void GridOut::write_gnuplot (
-  const Triangulation<dim> &tria,
+  const Triangulation<dim,spacedim> &tria,
   std::ostream           &out,
-  const Mapping<dim>       *mapping) const
+  const Mapping<dim,spacedim>       *mapping) const
 {
   AssertThrow (out, ExcIO());
 
@@ -1047,8 +1047,8 @@ void GridOut::write_gnuplot (
     gnuplot_flags.n_boundary_face_points;
   const unsigned int n_points=2+n_additional_points;
 
-  typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
-  const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
+  typename Triangulation<dim,spacedim>::active_cell_iterator        cell=tria.begin_active();
+  const typename Triangulation<dim,spacedim>::active_cell_iterator  endc=tria.end();
 
 				   // if we are to treat curved
 				   // boundaries, then generate a
@@ -1106,7 +1106,7 @@ void GridOut::write_gnuplot (
 	  for (unsigned int face_no=0;
 	       face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	    {
-	      const typename Triangulation<dim>::face_iterator
+	      const typename Triangulation<dim,spacedim>::face_iterator
 		face = cell->face(face_no);
 	      if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
 		{
@@ -1163,10 +1163,10 @@ void GridOut::write_gnuplot (
 
 #if deal_II_dimension==3
 
-template <int dim>
-void GridOut::write_gnuplot (const Triangulation<dim> &tria,
+template <int dim, int spacedim>
+void GridOut::write_gnuplot (const Triangulation<dim,spacedim> &tria,
 			     std::ostream           &out,
-			     const Mapping<dim>       *mapping) const
+			     const Mapping<dim,spacedim>       *mapping) const
 {
   AssertThrow (out, ExcIO());
 
@@ -1174,8 +1174,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
     gnuplot_flags.n_boundary_face_points;
   const unsigned int n_points=2+n_additional_points;
 
-  typename Triangulation<dim>::active_cell_iterator        cell=tria.begin_active();
-  const typename Triangulation<dim>::active_cell_iterator  endc=tria.end();
+  typename Triangulation<dim,spacedim>::active_cell_iterator        cell=tria.begin_active();
+  const typename Triangulation<dim,spacedim>::active_cell_iterator  endc=tria.end();
 
 				   // if we are to treat curved
 				   // boundaries, then generate a
@@ -1278,7 +1278,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 	{
 	  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
 	    {
-	      const typename Triangulation<dim>::face_iterator
+	      const typename Triangulation<dim,spacedim>::face_iterator
 		face = cell->face(face_no);
 
 	      if (face->at_boundary())
@@ -1287,7 +1287,7 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 		  for (unsigned int i=0; i<n_points-1; ++i)
 		    for (unsigned int j=0; j<n_points-1; ++j)
 		      {
-			const Point<dim> p0=mapping->transform_unit_to_real_cell(
+			const Point<spacedim> p0=mapping->transform_unit_to_real_cell(
 			  cell, q_projector->point(offset+i*n_points+j));
 			out << p0
 			    << ' ' << cell->level()
@@ -1318,11 +1318,11 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 		{
 		  for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
 		    {
-		      const typename Triangulation<dim>::line_iterator
+		      const typename Triangulation<dim,spacedim>::line_iterator
 			line=face->line(l);
 
-		      const Point<dim> &v0=line->vertex(0),
-				       &v1=line->vertex(1);
+		      const Point<spacedim> &v0=line->vertex(0),
+					    &v1=line->vertex(1);
 		      if (line->at_boundary() || gnuplot_flags.curved_inner_cells)
 			{
 							   // transform_real_to_unit_cell
@@ -1333,8 +1333,8 @@ void GridOut::write_gnuplot (const Triangulation<dim> &tria,
 							   // which is
 							   // not yet
 							   // implemented
-			  const Point<dim> u0=mapping->transform_real_to_unit_cell(cell, v0),
-					   u1=mapping->transform_real_to_unit_cell(cell, v1);
+			  const Point<spacedim> u0=mapping->transform_real_to_unit_cell(cell, v0),
+						u1=mapping->transform_real_to_unit_cell(cell, v1);
 
 			  for (unsigned int i=0; i<n_points; ++i)
 			    out << (mapping->transform_unit_to_real_cell
@@ -1948,6 +1948,10 @@ template void GridOut::write_msh
 template void GridOut::write_ucd
 (const Triangulation<deal_II_dimension, deal_II_dimension+1> &,
  std::ostream &) const;
+template void GridOut::write_gnuplot
+(const Triangulation<deal_II_dimension,deal_II_dimension+1>&,
+ std::ostream&,
+ const Mapping<deal_II_dimension,deal_II_dimension+1>*) const;
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -901,10 +901,10 @@ class GridOut
 				      * Not implemented for the
 				      * codimension one case.
 				      */
-    template <int dim>
-    void write_gnuplot (const Triangulation<dim> &tria,
+    template <int dim, int spacedim>
+    void write_gnuplot (const Triangulation<dim,spacedim> &tria,
 			std::ostream           &out,
-			const Mapping<dim>       *mapping=0) const;
+			const Mapping<dim,spacedim> *mapping=0) const;
 
 				     /**
 				      * Write the triangulation in the
