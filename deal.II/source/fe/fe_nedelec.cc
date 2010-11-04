@@ -2784,7 +2784,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                     
                     for (unsigned int i = 0; i <= deg; ++i)
                       {
-                        const unsigned L_i = weight
+                        const double L_i = weight
                                            * legendre_polynomials[i].value
                                              (quadrature_points[q_point] (0));
                         
