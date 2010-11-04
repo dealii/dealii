@@ -30,7 +30,7 @@ D = ../../
 # shall be deleted when calling `make clean'. Object and backup files,
 # executables and the like are removed anyway. Here, we give a list of
 # files in the various output formats that deal.II supports.
-clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk
+clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 
 
 
@@ -47,7 +47,7 @@ run-parameters = input.prm
 # Usually, you will not need to change anything beyond this point.
 #
 #
-# The next statement tell the `make' program where to find the
+# The next statement tells the `make' program where to find the
 # deal.II top level directory and to include the file with the global
 # settings
 include $D/common/Make.global_options
@@ -81,7 +81,7 @@ libs.g   := $(lib-deal2.g)
 libs.o   := $(lib-deal2.o)
 
 
-# We now use the variable defined above which switch between debug and
+# We now use the variable defined above to switch between debug and
 # optimized mode to select the set of libraries to link with. Included
 # in the list of libraries is the name of the object file which we
 # will produce from the single C++ file. Note that by default we use

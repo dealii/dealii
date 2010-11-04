@@ -21,7 +21,7 @@ debug-mode = on
 
 # And so does the following variable. You will have to set it to
 # something more reasonable, of course.
-clean-up-files =
+clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 
 # Finally, here is a variable which tells the `run' rule which
 # parameters to pass to the executable. Usually, this will be the name
