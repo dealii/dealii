@@ -18109,7 +18109,6 @@ LDFLAGS="-L$DEAL_II_PATH/lib $LDFLAGS"
 
 
 process_files="common/Make.global_options
-               common/Makefile.template
                common/scripts/make_dependencies.pl
 	       common/scripts/make_todo.pl
 	       Version

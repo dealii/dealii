@@ -808,7 +808,6 @@ AC_SUBST(LDFLAGSPIC)
 dnl Write output to the global options file and modify other files as well
 dnl that need some information
 process_files="common/Make.global_options
-               common/Makefile.template
                common/scripts/make_dependencies.pl
 	       common/scripts/make_todo.pl
 	       Version
