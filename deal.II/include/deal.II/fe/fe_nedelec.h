@@ -248,7 +248,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * class and fill the tables with
 				      * interpolation weights
 				      * (#boundary_weights and
-				      * #interior_weights). Called
+				      * interior_weights). Called
 				      * from the constructor.
 				      */
     void initialize_support_points (const unsigned int degree);
@@ -352,6 +352,8 @@ void
 FE_Nedelec<1>::initialize_restriction();
 
 #endif // DOXYGEN
+
+/*@{*/
 
 DEAL_II_NAMESPACE_CLOSE
 
