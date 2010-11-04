@@ -14,4 +14,4 @@ DEAL::Projection failed with relative error 0.00599
 DEAL::n_dofs=3696
 DEAL::FE_Nedelec<3>(1), P_0, rel. error=0
 DEAL::FE_Nedelec<3>(1), P_1, rel. error=0
-DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.000374
+DEAL::FE_Nedelec<3>(1), P_2, rel. error=0.000376
