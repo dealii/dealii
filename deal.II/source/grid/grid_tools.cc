@@ -915,6 +915,12 @@ GridTools::
 partition_triangulation (const unsigned int           n_partitions,
                          Triangulation<dim,spacedim> &triangulation)
 {
+  Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
+	   (&triangulation)
+	   == 0),
+	  ExcMessage ("Objects of type parallel::distributed::Triangulation "
+		      "are already partitioned implicitly and can not be "
+		      "partitioned again explicitly."));
   Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
 
                                    // check for an easy return
@@ -950,6 +956,12 @@ partition_triangulation (const unsigned int           n_partitions,
 			 const SparsityPattern        &cell_connection_graph,
                          Triangulation<dim,spacedim>  &triangulation)
 {
+  Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
+	   (&triangulation)
+	   == 0),
+	  ExcMessage ("Objects of type parallel::distributed::Triangulation "
+		      "are already partitioned implicitly and can not be "
+		      "partitioned again explicitly."));
   Assert (n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
   Assert (cell_connection_graph.n_rows() == triangulation.n_active_cells(),
 	  ExcMessage ("Connectivity graph has wrong size"));
