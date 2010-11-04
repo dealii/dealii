@@ -27,7 +27,10 @@ to write a program that scales to many more machines. For example,
 here are two graphs that show how the run time of a large number of parts
 of the program scales on problems with around 52 and 375 million degrees of
 freedom if we take more and more processors (these and the next couple of
-graphs are taken from the @ref distributed_paper "Distributed Computing paper"):
+graphs are taken from an earlier version of the
+@ref distributed_paper "Distributed Computing paper"; updated graphs showing
+data of runs on even larger numbers of processors, and a lot
+more interpretation can be found in the final version of the paper):
 
 <TABLE WIDTH="100%">
 <tr>
