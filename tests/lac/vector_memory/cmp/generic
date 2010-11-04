@@ -1,7 +1,7 @@
 
 DEAL::GrowingVectorMemory:Overall allocated vectors: 10
 DEAL::GrowingVectorMemory:Maximum allocated vectors: 6
-An error occurred in file <vector_memory.h> in function
+An error occurred in file <vector_memory.cc> in function
     dealii::GrowingVectorMemory<VECTOR>::~GrowingVectorMemory() [with VECTOR = dealii::Vector<double>]
 The violated condition was: 
     current_alloc == 0
