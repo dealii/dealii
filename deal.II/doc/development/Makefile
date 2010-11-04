@@ -119,6 +119,8 @@ VARIABLE_VALUES = $(foreach v,$(VARIABLES),$(call expand_variable,$v))
 makefiles.html: Makefile makefiles.1.html $D/common/Make.global_options makefiles.2.html
 	@cat makefiles.1.html > $@
 	@echo "<p align=\"center\"><table class=\"tutorial\" width=\"60%\">" >> $@
+	@echo "<tr><th>Makefile variable</th><th>Value in <code>common/Make.global_options</code></th></tr>" >> $@
+	@echo "<tr><th colspan=\"2\"><hr></th></tr>" >> $@
 	@echo $(VARIABLE_VALUES) >> $@
 	@echo "</table></p>" >> $@
 	@cat makefiles.2.html >> $@

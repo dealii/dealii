@@ -3,37 +3,25 @@
     <h3>Generic Makefiles</h3>
 
     <p>
-    In this section, we provide templates for Makefiles for
-    applications based on the <acronym>deal.II</acronym>
-    libraries. They show how to use the information provided by the
-    variables explained above.
+    <acronym>deal.II</acronym> comes with sample Makefiles for
+    applications that use this library. They show how to use the information
+    provided by the variables explained above.
     </p>
 
     <p>
-    At present, we have three Makefiles, one for <a
-    href="makefile.small.html" target="body">small projects</a>
-    consisting of only one C++ file, and one for <a
-    href="makefile.large.html" target="body">large projects</a>.
-    Furthermore, there is a Makefile in a <a
-    href="makefile.rules.html" target="body">different style</a>. Have
-    a look at them and see what seem convenient to you.  All Makefiles
+    At present, there are two such Makefile templates. All Makefiles
     need slight modifications before they will work in your
-    project. The places for modifications are marked.
+    project; the places for modifications are marked and easy to find. The
+    templates are:
 
     <ul>
       <li> <p>
            <a href="makefile.small.html" target="body">Small
-           projects</a>: This Makefile is targeted at applications which
-           are written to simply try something, or prove an
-           assumption. Such applications are the 
+           project Makefile</a>: This Makefile is targeted at small
+           applications consisting of only a single <code>.cc</code>
+           file. Examples of this kind are the
            <a href="../doxygen/tutorial/index.html" target="_top">step-by-step
-           examples</a>. These small problems are probably not the
-           usual case in real life, but you may want to take a look at
-           this file in order to get an idea on how it works, or you
-           go directly to the large projects file.
-	   </p>
-
-	   <p>
+           tutorial programs</a>.
 	   You can find this Makefile
 	   <a href="Makefile.small" target="_top">here</a>.
 	   </p>
@@ -48,54 +36,42 @@
            directory in which the whole project is located):
 	   </p>
 	   <ul>
-	   <li> <code>project/source</code>
-	   <li> <code>project/include</code>
-	   <li> <code>project/lib</code>
+	   <li> <code>project/source</code>: The location of all
+	   your <code>.h</code> files.
+	   <li> <code>project/include</code>: The location of all
+	   your <code>.cc</code> files.
+	   <li> <code>project/lib</code>: Where the Makefile will
+		  put the final executable.
                 <ul>
-		  <li> <code>project/lib/1d</code>
-		  <li> <code>project/lib/2d</code>
-		  <li> <code>project/lib/3d</code>
+		  <li> <code>project/lib/1d</code>: Where the Makefile will
+		  put your object files if you compile for 1d.
+		  <li> <code>project/lib/2d</code>: Same for 2d.
+		  <li> <code>project/lib/3d</code>: Same for 3d.
                 </ul>
 	   </ul>
 	   <p>
-	   Include files need to be placed into
-           <code>project/include</code>, while implementation files
-           are to be in <code>project/source</code>. The executable
-           will be in <code>project/lib</code> and the compiled object
-           files will be in <code>project/lib/?d</code>, depending on
-           the dimension for which the project is compiled. Using this
-           directory structure, it is possible to quickly switch
-           between dimensions in which a program shall run in,
-           enabling us to develop applications which run in 1d, 2d, or
-           3d without long compilation times. Furthermore, placing
-           object files in different directories prevents cluttering
-           directories with unnecessarily many files.
+	     Using this
+             directory structure, it is possible to quickly switch
+             between dimensions in which a program shall run in,
+             enabling us to develop applications which run in 1d, 2d, or
+             3d without long compilation times. Furthermore, placing
+             object files in different directories prevents cluttering
+             directories with unnecessarily many files.
 	   </p>
 
 	   <p>
-	   The dimension for which the project shall be compiled is
-	   not stated in the source code, as in the small projects
-	   Makefile, but is determined by a flag which is given in the
-	   Makefile. To determine the dimension for which a project is
-	   compiled in your source file, use the preprocessor constant
-	   `deal_II_dimension' which is set by the Makefile and passed
-	   through the compiler.
+	     The dimension for which the project shall be compiled is
+	     not stated in the source code, as in the small projects
+	     Makefile, but is determined by a flag set in the
+	     Makefile. The Makefile then makes sure that the preprocessor
+	     constant <code>deal_II_dimension</code> is set appropriately and
+	     passed through to the compiler when creating object files.
 	   </p>
 
 	   <p>
 	   You can find this Makefile
 	   <a href="Makefile.large" target="_top">here</a>.
 	   </p>
-      <li> <p>
-
-           The <a href="makefile.rules.html" target="body">third
-           Makefile</a> is <code>common/Makefile.template</code> in
-           the <acronym>deal.II</acronym> directory tree.
-
-	   It was designed for several targets in one directory and
-	   makes use of the compilation rules in
-	   <code>common/Make.rules</code>. All object files and
-	   executables will be in the same directory.
     </ul>
 
     <hr>

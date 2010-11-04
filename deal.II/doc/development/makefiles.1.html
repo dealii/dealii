@@ -17,18 +17,18 @@
     include it. You will want to include this file into the Makefiles of
     your project to use the same compiler flags and to access the paths
     to libraries. This page documents <a href="#flags">available
-    flags</a>, documents the <a href="#values">values which are used
+    variables</a>, documents the <a href="#values">values which are used
     in your local installation</a>, and shows 
     <a href="#generic">generic Makefiles</a> which you may want to use
     in your own projects.
     </p>
 
     <a name="flags"></a>
-    <h3>Available flags</h3>
+    <h3>Available variables</h3>
 
     <p>
-    Following is a partial list of available flags which are exported to
-    other Makefiles. There are additional flags, in particular ones that
+    Following is a partial list of available variables which are exported to
+    other Makefiles. There are additional variables, in particular ones that
     determine the interaction with other libraries such as PETSc, Trilinos,
     METIS, etc; for details on these variables, take a look
     at <code>common/Make.global_options</code>.
@@ -377,7 +377,7 @@
 
 
     <a name="values"></a>
-    <h3>Values of available flags</h3>
+    <h3>Values of available variables</h3>
     
     In the copy of the library to which the file which you
     are presently viewing belongs (i.e., your local one, or the one on the

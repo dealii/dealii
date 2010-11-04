@@ -4,13 +4,10 @@
 # projects. Basically, only the following seven parameters need to be
 # set by you:
 
-application-name = waves
-
-# The first denotes the dimension for which the program is to be
-# compiled:
+application-name  = waves
 deal_II_dimension = 2
 
-# The second tells us the name of the executable. It is prefixed by
+# The next variable tells us the name of the executable. It is prefixed by
 # `lib/' to designate its destination directory. Note that the program
 # name depends on the dimension, so you can keep copies for the
 # different dimensions around:
@@ -20,7 +17,8 @@ target   = lib/$(application-name)-$(deal_II_dimension)d
 debug-mode = on
 
 # And so does the following variable. You will have to set it to
-# something more reasonable, of course.
+# something reasonable that, for example, includes the location where you
+# put output files that you want the `make clean' rule to delete
 clean-up-files =
 
 # Finally, here is a variable which tells the `run' rule which
