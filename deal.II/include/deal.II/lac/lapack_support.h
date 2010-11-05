@@ -40,6 +40,8 @@ namespace LAPACKSupport
 	lu,
 					 /// Eigenvalue vector is filled
 	eigenvalues,
+	                                 /// Matrix contains singular value decomposition,
+	svd,
 					 /// Contents is something useless.
 	unusable = 0x8000
   };

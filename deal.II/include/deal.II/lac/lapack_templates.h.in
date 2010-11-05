@@ -77,6 +77,7 @@ void dsygv_ (const int* itype, const char* jobz, const char* uplo,
              const int* n, double* A, const int* lda, double* B,
              const int* ldb, double* w, double* work,
              const int* lwork, int* info);
+
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
 	      const int* n, const int* m, double* A, const int* lda,
@@ -86,6 +87,14 @@ void dgesvd_ (int* jobu, int* jobvt,
 	      double* work, const int* lwork,
 	      int* info);
 
+// Solve a least squares problem using SVD
+void dgelsd_ (const int* m, const int* n, const int* nrhs,
+	      const double* A, const int* lda,
+	      double* B, const int* ldb,
+	      double* s, const double* rcond,
+	      int* rank,
+	      double* work, const int* lwork, int* iwork,
+	      int* info);
 
 // Symmetric tridiagonal matrix
 void dstev_ (const char* jobz, const int* n,

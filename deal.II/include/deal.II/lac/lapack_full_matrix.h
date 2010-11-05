@@ -20,6 +20,7 @@
 #include <lac/lapack_support.h>
 #include <lac/vector_memory.h>
 
+#include <base/std_cxx1x/shared_ptr.h>
 #include <vector>
 #include <complex>
 
@@ -436,9 +437,9 @@ class LAPACKFullMatrix : public TransposeTable<number>
     std::vector<number> inv_work;
 
 				     /**
-				      * Real parts of
-				      * eigenvalues. Filled by
-				      * compute_eigenvalues.
+				      * Real parts of eigenvalues or
+				      * the singular values. Filled by
+				      * compute_eigenvalues() or compute_svd().
 				      */
     std::vector<number> wr;
 
@@ -460,6 +461,17 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * can be stored.
 				      */
     std::vector<number> vr;
+    
+    /**
+     * The matrix <i>U</i> in the singular value decomposition
+     * <i>USV<sup>T</sup></i>.
+     */
+    boost::shared_ptr<LAPACKFullMatrix<number> > svd_u;
+    /**
+     * The matrix <i>V<sup>T</sup></i> in the singular value decomposition
+     * <i>USV<sup>T</sup></i>.
+     */
+    boost::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
 };
 
 

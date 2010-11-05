@@ -621,7 +621,7 @@ dnl exception.
 AC_CHECK_FUNCS([daxpy_ saxpy_ dgemv_ sgemv_ dgeev_ sgeev_ dgeevx_ sgeevx_])
 AC_CHECK_FUNCS([dgesvd_ sgesvd_ dgemm_ sgemm_ dgetrf_ sgetrf_ dgetri_ sgetri_])
 AC_CHECK_FUNCS([dgeqrf_ sgeqrf_ dormqr_ sormqr_ dorgqr_ sorgqr_ dtrtrs_ strtrs_])
-AC_CHECK_FUNCS([dgetrs_ sgetrs_ dstev_ sstev_ dsygv_ ssygv_])
+AC_CHECK_FUNCS([dgetrs_ sgetrs_ dstev_ sstev_ dsygv_ ssygv_ dgelsd_ sgelsd_])
 
 dnl -------------------------------------------------------------
 dnl       set include paths of several libraries
