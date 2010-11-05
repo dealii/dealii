@@ -6153,6 +6153,21 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
   OLD_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS="$CXXFLAGS -I$DEAL_II_TRILINOS_INCDIR"
 
+  dnl Trilinos Epetra's Epetra_config.h might provide
+  dnl   #define PACKAGE_BUGREPORT
+  dnl   #define PACKAGE_NAME
+  dnl   #define PACKAGE_STRING
+  dnl   #define PACKAGE_TARNAME
+  dnl   #define PACKAGE_VERSION
+  dnl which is already set for the deal.II package. So undefine them for
+  dnl this test.
+  cp confdefs.h confdefs.h.bak
+  echo "#undef PACKAGE_BUGREPORT" >> confdefs.h
+  echo "#undef PACKAGE_NAME" >> confdefs.h
+  echo "#undef PACKAGE_STRING" >> confdefs.h
+  echo "#undef PACKAGE_TARNAME" >> confdefs.h
+  echo "#undef PACKAGE_VERSION" >> confdefs.h
+
   if test "x$DEAL_II_USE_MPI" = "xyes" ; then
     dnl So we support MPI. Check that our Trilinos installation
     dnl does too. Epetra sets the variable HAVE_MPI to 1 in case
@@ -6194,6 +6209,8 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
 	exit 1;
       ])
   fi
+
+  mv confdefs.h.bak confdefs.h
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
 
