@@ -202,18 +202,28 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 	@$(PERL) $D/common/scripts/lapack_templates.pl ../include/deal.II/lac/lapack_templates.h.in > $@
 
 
+# A rule to make sure the various */Makefile.dep files have the right
+# dependencies on their source files
+Makefile.dep:
+	@for i in $(all-dirs) ; do \
+		echo $$i/Makefile.dep: $$i/*.cc  \
+					$(h-files) \
+					Makefile \
+					$D/common/Make.global_options ; \
+	 done >> $@
+	@echo "lac/Makefile.dep: $D/include/deal.II/lac/lapack_templates.h.in \
+				 $D/include/deal.II/lac/lapack_templates.h.in" \
+	 >> $@
+include Makefile.dep
+
+
 # Rule to generate the dependency files, one for each source
 # directory. These file are automagically remade whenever needed,
 # i.e. whenever one of the cc-/h-files changed. Make detects whether
 # to remake this file upon inclusion below.
 #
 # If the command fails, then remove Makefile.dep again and fail
-%/Makefile.dep: $(filter $D/source/$(dir $@)%, $(dim-indep-cc-files)) \
-		$(filter $D/source/$(dir $@)%, $(dim-dep-cc-files)) \
-		$(h-files) \
-		$(inst-files) \
-		../include/deal.II/lac/lapack_templates.h \
-		Makefile $D/common/Make.global_options
+%/Makefile.dep:
 	@echo "===================================== Remaking $@"
 	@((($D/common/scripts/make_dependencies -n $(INCLUDE) "-B\$$(LIBDIR)" \
 			$(filter $D/source/$(dir $@)%, $(dim-indep-cc-files)) \
@@ -228,7 +238,6 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 	  ) > $@) \
 	 || (rm -f $@ ; false)
 
-Makefile.dep: $(addsuffix /Makefile.dep, $(all-dirs))
 
 # include all the dependencies
 include $(addsuffix /Makefile.dep, $(all-dirs))
@@ -247,4 +256,4 @@ clean:
 ###################
 
 .PHONY: default all debug optimized TAGS
-.PHONY: clean Makefile.dep
+.PHONY: clean
