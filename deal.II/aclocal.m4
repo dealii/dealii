@@ -7049,13 +7049,13 @@ dnl
 dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
 [
-  AC_MSG_CHECKING(whether p4est shall be used)
+  AC_MSG_CHECKING(whether p4est will be used)
 
   AC_ARG_WITH(p4est,
-    [ --with-p4est=/path/to/p4est makes deal.II use p4est to distribute meshes
-                     on a cluster computer],
-    use_p4est=$withval,
-    use_p4est=no)
+             [AS_HELP_STRING([--with-p4est=/path/to/p4est],
+             [Specify the path to the p4est installation; use this to distribute meshes on a cluster computer.])],
+              use_p4est=$withval,
+              use_p4est=no)
 
   if test "x$use_p4est" != "xno" ; then
     AC_MSG_RESULT(yes)
