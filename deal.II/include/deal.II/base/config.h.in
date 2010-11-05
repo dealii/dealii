@@ -1,4 +1,4 @@
-/* base/include/base/config.h.in.  Generated from configure.in by autoheader.  */
+/* include/deal.II/base/config.h.in.  Generated from configure.in by autoheader.  */
 
 
 //----------------------------  config.h  ---------------------------
@@ -297,6 +297,9 @@
 /* Define to 1 if you have the `dgeev_' function. */
 #undef HAVE_DGEEV_
 
+/* Define to 1 if you have the `dgelsd_' function. */
+#undef HAVE_DGELSD_
+
 /* Define to 1 if you have the `dgemm_' function. */
 #undef HAVE_DGEMM_
 
@@ -422,6 +425,9 @@
 /* Define to 1 if you have the `sgeev_' function. */
 #undef HAVE_SGEEV_
 
+/* Define to 1 if you have the `sgelsd_' function. */
+#undef HAVE_SGELSD_
+
 /* Define to 1 if you have the `sgemm_' function. */
 #undef HAVE_SGEMM_
 
@@ -530,6 +536,9 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
