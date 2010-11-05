@@ -204,7 +204,7 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 
 # A rule to make sure the various */Makefile.dep files have the right
 # dependencies on their source files
-Makefile.dep:
+Makefile.dep: $(inst-files)
 	@for i in $(all-dirs) ; do \
 		echo $$i/Makefile.dep: $$i/*.cc  \
 					$(h-files) \
