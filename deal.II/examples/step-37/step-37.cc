@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2009 by the deal.II authors                   */
+/*    Copyright (C) 2009, 2010 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -432,16 +432,16 @@ set_derivative_data (const unsigned int cell_no,
 				 // local contributions of a set of cells. As
 				 // mentioned in the introduction, if we were
 				 // to deal with a single cell, this would
-				 // amount to performing the product 
+				 // amount to performing the product
 				 // @f{eqnarray*}
-				 // P^T_\mathrm{cell,local-global} A_\mathrm{cell} 
+				 // P^T_\mathrm{cell,local-global} A_\mathrm{cell}
 				 // P_\mathrm{cell,local-global} x
 				 // @f}
-				 // where 
+				 // where
 				 // @f{eqnarray*}
-				 // A_\mathrm{cell} = 
-				 // B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T 
-				 // D_\mathrm{cell} 
+				 // A_\mathrm{cell} =
+				 // B_\mathrm{ref\_cell}^T J_\mathrm{cell}^T
+				 // D_\mathrm{cell}
 				 // J_\mathrm{cell} B_\mathrm{ref\_cell}
 				 // @f}
 				 // and <i>P</i><sub>cell,local-global</sub>
@@ -990,6 +990,8 @@ class LaplaceOperator
     LaplaceOperator<dim,number>&
     operator = (const Tensor<2,dim> &tensor);
 
+    unsigned int memory_consumption () const;
+
   private:
     number transformation[dim*(dim+1)/2];
 };
@@ -1100,6 +1102,14 @@ LaplaceOperator<dim,number>::operator=(const Tensor<2,dim> &tensor)
   else
     ExcNotImplemented();
   return *this;
+}
+
+
+template<int dim,typename number>
+unsigned int
+LaplaceOperator<dim,number>::memory_consumption () const
+{
+  return sizeof(*this);
 }
 
 
