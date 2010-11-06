@@ -1,6 +1,3 @@
-#todo: extra-libs, extra-o-files
-
-
 # $Id$
 # Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002, 2010
 
