@@ -385,7 +385,10 @@ namespace internal
 		  ExcInternalError());
 
 	  for (unsigned int i=0; i<p->second.size(); ++i)
-	    Assert (p->second[i] >= 0, ExcInternalError());
+	    {
+	      Assert (numbers::is_finite(p->second[i]), ExcInternalError());
+	      Assert (p->second[i] >= 0, ExcInternalError());
+	    }
 
 	  face_integrals[p->first] = p->second;
 	}
