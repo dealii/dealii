@@ -90,7 +90,6 @@ LAPACKFullMatrix<number>::operator = (const double d)
   return *this;
 }
 
-#ifdef HAVE_LIBBLAS
 
 template <typename number>
 void
@@ -98,16 +97,55 @@ LAPACKFullMatrix<number>::vmult (
   Vector<number>       &w,
   const Vector<number> &v,
   const bool            adding) const
-{
-  Assert ((state == matrix) || (state == inverse_matrix),
-          ExcState(state));
-
+{  
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-
-  gemv("N", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
+  const number null = 0.;
+  
+  switch (state)
+    {
+      case matrix:
+      case inverse_matrix:
+      {	
+	AssertDimension(v.size(), this->n_cols());
+	AssertDimension(w.size(), this->n_rows());
+	
+	gemv("N", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
+	break;
+      }
+      case svd:
+      {
+	AssertDimension(v.size(), this->n_cols());
+	AssertDimension(w.size(), this->n_rows());
+					 // Compute V^T v
+	work.resize(std::max(mm,nn));
+	gemv("N", &nn, &nn, &alpha, svd_vt->data(), &nn, v.val, &one, &null, &work[0], &one);
+					 // Multiply by singular values
+	for (unsigned int i=0;i<wr.size();++i)
+	  work[i] *= wr[i];
+					 // Multiply with U
+	gemv("N", &mm, &mm, &alpha, svd_u->data(), &mm, &work[0], &one, &beta, w.val, &one);
+	break;
+      }
+      case inverse_svd:
+      {
+	AssertDimension(w.size(), this->n_cols());
+	AssertDimension(v.size(), this->n_rows());
+					 // Compute U^T v
+	work.resize(std::max(mm,nn));
+	gemv("T", &mm, &mm, &alpha, svd_u->data(), &mm, v.val, &one, &null, &work[0], &one);
+					 // Multiply by singular values
+	for (unsigned int i=0;i<wr.size();++i)
+	  work[i] *= wr[i];
+					 // Multiply with V
+	gemv("T", &nn, &nn, &alpha, svd_vt->data(), &nn, &work[0], &one, &beta, w.val, &one);
+	break;
+      }
+      default:
+	    Assert (false, ExcState(state));
+    }
 }
 
 
@@ -118,44 +156,58 @@ LAPACKFullMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  Assert (state == matrix, ExcState(state));
-
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
-
-  gemv("T", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
+  const number null = 0.;
+  
+  switch (state)
+    {
+      case matrix:
+      case inverse_matrix:
+      {	
+	AssertDimension(w.size(), this->n_cols());
+	AssertDimension(v.size(), this->n_rows());
+	
+	gemv("T", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
+	break;
+      }
+      case svd:
+      {
+	AssertDimension(w.size(), this->n_cols());
+	AssertDimension(v.size(), this->n_rows());
+	
+					 // Compute U^T v
+	work.resize(std::max(mm,nn));
+	gemv("T", &mm, &mm, &alpha, svd_u->data(), &mm, v.val, &one, &null, &work[0], &one);
+					 // Multiply by singular values
+	for (unsigned int i=0;i<wr.size();++i)
+	  work[i] *= wr[i];
+					 // Multiply with V
+	gemv("T", &nn, &nn, &alpha, svd_vt->data(), &nn, &work[0], &one, &beta, w.val, &one);
+	break;
+      case inverse_svd:
+      {
+	AssertDimension(v.size(), this->n_cols());
+	AssertDimension(w.size(), this->n_rows());
+  
+					 // Compute V^T v
+	work.resize(std::max(mm,nn));
+	gemv("N", &nn, &nn, &alpha, svd_vt->data(), &nn, v.val, &one, &null, &work[0], &one);
+					 // Multiply by singular values
+	for (unsigned int i=0;i<wr.size();++i)
+	  work[i] *= wr[i];
+					 // Multiply with U
+	gemv("N", &mm, &mm, &alpha, svd_u->data(), &mm, &work[0], &one, &beta, w.val, &one);
+	break;
+      }
+      }
+      default:
+	    Assert (false, ExcState(state));
+    }
 }
 
-#else
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::vmult (
-  Vector<number>       &,
-  const Vector<number> &,
-  const bool            ) const
-{
-  Assert(false, ExcNeedsBLAS());
-}
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::Tvmult (
-  Vector<number>       &,
-  const Vector<number> &,
-  const bool            ) const
-{
-  Assert(false, ExcNeedsBLAS());
-}
-
-
-#endif
-
-#ifdef HAVE_LIBLAPACK
 
 template <typename number>
 void
@@ -173,6 +225,79 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   Assert(info == 0, LACExceptions::ExcSingular());
 
   state = lu;
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_svd()
+{
+  Assert(state == matrix, ExcState(state));
+  state = LAPACKSupport::unusable;
+  
+  const int mm = this->n_rows();
+  const int nn = this->n_cols();
+  number* values = const_cast<number*> (this->data());
+  wr.resize(std::max(mm,nn));
+  std::fill(wr.begin(), wr.end(), 0.);
+  ipiv.resize(8*mm);
+  
+  svd_u  = boost::shared_ptr<LAPACKFullMatrix<number> >(new LAPACKFullMatrix<number>(mm,mm));
+  svd_vt = boost::shared_ptr<LAPACKFullMatrix<number> >(new LAPACKFullMatrix<number>(nn,nn));
+  number* mu  = const_cast<number*> (svd_u->data());
+  number* mvt = const_cast<number*> (svd_vt->data());
+  int info;
+
+				   // see comment on this #if
+				   // below. Another reason to love Petsc
+#ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
+
+				   // First determine optimal
+				   // workspace size
+  work.resize(1);
+  int lwork = -1;
+  gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
+	&wr[0], mu, &mm, mvt, &nn,
+	&work[0], &lwork, &ipiv[0], &info);
+  Assert (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
+				   // Now resize work array and
+  lwork = work[0] + .5;
+#else
+  int lwork = 3*std::min(mm,nn) +
+	      std::max(std::max(mm,nn),4*std::min(mm,nn)*std::min(mm,nn)+4*std::min(mm,nn));
+#endif
+  work.resize(lwork);
+				   // Do the actual SVD.
+  gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
+	&wr[0], mu, &mm, mvt, &nn,
+	&work[0], &lwork, &ipiv[0], &info);
+  Assert (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
+
+  work.resize(0);
+  ipiv.resize(0);
+  
+  state = LAPACKSupport::svd;
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
+{
+  if (state == LAPACKSupport::matrix)
+    compute_svd();
+  
+  Assert (state==LAPACKSupport::svd, ExcState(state));
+  
+  const double lim = wr[0]*threshold;
+  for (unsigned int i=0;i<wr.size();++i)
+    {
+      if (wr[i] > lim)
+	wr[i] = 1./wr[i];
+      else
+	wr[i] = 0.;
+    }
+  state = LAPACKSupport::inverse_svd;
 }
 
 
@@ -402,41 +527,6 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   }
   state = LAPACKSupport::State(eigenvalues | unusable);
 }
-
-#else
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::compute_lu_factorization()
-{
-Assert(false, ExcNeedsLAPACK());
-
-}
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>&, bool) const
-{
-  Assert(false, ExcNeedsLAPACK());
-}
-
-
-template <typename number>
-void
-LAPACKFullMatrix<number>::compute_eigenvalues(const bool /*right*/,
-					      const bool /*left*/)
-{
-  Assert(false, ExcNeedsLAPACK());
-}
-
-
-#endif
-
-
-// template <typename number>
-// LAPACKFullMatrix<number>::()
-// {}
 
 
 // template <typename number>

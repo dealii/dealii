@@ -78,6 +78,16 @@ void dsygv_ (const int* itype, const char* jobz, const char* uplo,
              const int* ldb, double* w, double* work,
              const int* lwork, int* info);
 
+// Compute singular value decomposition using divide and conquer
+void dgesdd_ (const char* jobz,
+	      const int* m, const int* n, double* A, const int* lda,
+	      double* s,
+	      double* u, const int* ldu,
+	      double* vt, const int* ldvt,
+	      double* work, const int* lwork,
+	      int* iwork,
+	      int* info);
+
 // Compute singular value decomposition
 void dgesvd_ (int* jobu, int* jobvt,
 	      const int* n, const int* m, double* A, const int* lda,

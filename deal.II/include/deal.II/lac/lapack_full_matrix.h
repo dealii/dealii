@@ -342,6 +342,60 @@ class LAPACKFullMatrix : public TransposeTable<number>
 			      const int itype = 1);
 
 				     /**
+				      * Compute the singular value
+				      * decomposition of the
+				      * matrix using LAPACK function
+				      * Xgesdd.
+				      *
+				      * Requires that the #state is
+				      * LAPACKSupport::matrix, fills
+				      * the data members #wr, #svd_u,
+				      * and #svd_vt, and leaves the
+				      * object in the #state
+				      * LAPACKSupport::svd.
+				      */
+    void compute_svd();
+				     /**
+				      * Compute the inverse of the
+				      * matrix by singular value
+				      * decomposition.
+				      *
+				      * Requires that #state is either
+				      * LAPACKSupport::matrix or
+				      * LAPACKSupport::svd. In the
+				      * first case, this function
+				      * calls compute_svd(). After
+				      * this function, the object will
+				      * have the #state
+				      * LAPACKSupport::inverse_svd.
+				      *
+				      * For a singular value
+				      * decomposition, the inverse is
+				      * simply computed by replacing
+				      * all singular values by their
+				      * reciprocal values. If the
+				      * matrix does not have maximal
+				      * rank, singular values 0 are
+				      * not touched, thus computing
+				      * the minimal norm right inverse
+				      * of the matrix.
+				      *
+				      * The parameter
+				      * <tt>threshold</tt> determines,
+				      * when a singular value should
+				      * be considered zero. It is the
+				      * ratio of the smallest to the
+				      * largest nonzero singular
+				      * value
+				      * <i>s</i><sub>max</sub>. Thus,
+				      * the inverses of all singular
+				      * values less than
+				      * <i>s</i><sub>max</sub>/<tt>threshold</tt>
+				      * will be set to zero.
+				      */
+    void compute_inverse_svd (const double threshold = 0.);
+    
+				     /**
 				      * Retrieve eigenvalue after
 				      * compute_eigenvalues() was
 				      * called.
@@ -349,6 +403,15 @@ class LAPACKFullMatrix : public TransposeTable<number>
     std::complex<number>
     eigenvalue (const unsigned int i) const;
 
+				     /**
+				      * Retrieve singular values after
+				      * compute_svd() or
+				      * compute_inverse_svd() was
+				      * called.
+				      */
+    number
+    singular_value (const unsigned int i) const;
+    
 				     /**
 				      * Print the matrix and allow
 				      * formatting of entries.
@@ -426,6 +489,10 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * permutations applied for
 				      * pivoting in the
 				      * LU-factorization.
+				      *
+				      * Also used as the scratch array
+				      * IWORK for LAPACK functions
+				      * needing it.
 				      */
     std::vector<int> ipiv;
 
@@ -462,15 +529,18 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      */
     std::vector<number> vr;
     
-    /**
-     * The matrix <i>U</i> in the singular value decomposition
-     * <i>USV<sup>T</sup></i>.
-     */
+				     /**
+				      * The matrix <i>U</i> in the
+				      * singular value decomposition
+				      * <i>USV<sup>T</sup></i>.
+				      */
     boost::shared_ptr<LAPACKFullMatrix<number> > svd_u;
-    /**
-     * The matrix <i>V<sup>T</sup></i> in the singular value decomposition
-     * <i>USV<sup>T</sup></i>.
-     */
+				     /**
+				      * The matrix
+				      * <i>V<sup>T</sup></i> in the
+				      * singular value decomposition
+				      * <i>USV<sup>T</sup></i>.
+				      */
     boost::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
 };
 
@@ -559,6 +629,17 @@ LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
   Assert (i<this->n_rows(), ExcIndexRange(i,0,this->n_rows()));
 
   return std::complex<number>(wr[i], wi[i]);
+}
+
+
+template <typename number>
+number
+LAPACKFullMatrix<number>::singular_value (const unsigned int i) const
+{
+  Assert (state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd, LAPACKSupport::ExcState(state));
+  AssertIndexRange(i,wr.size());
+
+  return wr[i];
 }
 
 

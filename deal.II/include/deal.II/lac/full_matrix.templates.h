@@ -20,6 +20,7 @@
 #include <base/template_constraints.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
+#include <lac/lapack_full_matrix.h>
 #include <lac/lapack_templates.h>
 
 #include <vector>

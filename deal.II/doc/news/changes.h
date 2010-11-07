@@ -296,6 +296,12 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
 
+  <li><p>New: The class LAPACKFullMatrix now has functions to compute the
+  singular value decomposition of a matrix and its inverse.
+  <br>
+  (GK 2010/11/7)
+  </p></li>
+  
   <li><p>New: The classes RelaxationBlockSOR and RelaxationBlockSSOR
   implement overlapping Schwarz relaxation methods. Additionally,
   their base class RelaxationBlock and the helper class BlockList have

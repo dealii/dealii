@@ -19,18 +19,17 @@
 #include <base/table.h>
 #include <lac/exceptions.h>
 #include <lac/identity_matrix.h>
-#include <lac/lapack_full_matrix.h>
-
 
 #include <vector>
 #include <iomanip>
+#include <cstring>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
 template <typename number> class Vector;
-
+template <typename number> class LAPACKFullMatrix;
 template <int rank, int dim> class Tensor;
 
 

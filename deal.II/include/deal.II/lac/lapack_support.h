@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -42,6 +42,8 @@ namespace LAPACKSupport
 	eigenvalues,
 	                                 /// Matrix contains singular value decomposition,
 	svd,
+					 /// Matrix is the inverse of a singular value decomposition
+	inverse_svd,
 					 /// Contents is something useless.
 	unusable = 0x8000
   };
@@ -61,6 +63,10 @@ namespace LAPACKSupport
 	      return "lu decomposition";
 	case eigenvalues:
 	      return "eigenvalues";
+	case svd:
+	      return "svd";
+	case inverse_svd:
+	      return "inverse_svd";	      
 	case unusable:
 	      return "unusable";
 	default:
@@ -92,11 +98,7 @@ namespace LAPACKSupport
 				   /**
 				    * Character constant.
 				    */
-  static const char V = 'V';
-				   /**
-				    * Character constant.
-				    */
-  static const char T = 'T';
+  static const char A = 'A';
 				   /**
 				    * Character constant.
 				    */
@@ -104,7 +106,15 @@ namespace LAPACKSupport
 				   /**
 				    * Character constant.
 				    */
+  static const char T = 'T';
+				   /**
+				    * Character constant.
+				    */
   static const char U = 'U';
+				   /**
+				    * Character constant.
+				    */
+  static const char V = 'V';
 				   /**
 				    * Integer constant.
 				    */
@@ -114,6 +124,13 @@ namespace LAPACKSupport
 				    */
   static const int one = 1;
 
+				   /**
+				    * A LAPACK function returned an
+				    * error code.
+				    */
+  DeclException2(ExcErrorCode, char*, int,
+		 << "The function " << arg1 << " returned with an error code " << arg2);
+  
 				   /**
 				    * Exception thrown when a matrix
 				    * is not in a suitable state for

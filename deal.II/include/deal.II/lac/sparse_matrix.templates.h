@@ -24,7 +24,7 @@
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
-
+#include <lac/vector_memory.h>
 
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
