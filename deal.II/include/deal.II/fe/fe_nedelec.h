@@ -353,7 +353,7 @@ FE_Nedelec<1>::initialize_restriction();
 
 #endif // DOXYGEN
 
-/*@{*/
+/*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 
