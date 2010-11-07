@@ -309,6 +309,9 @@
 /* Define to 1 if you have the `dgeqrf_' function. */
 #undef HAVE_DGEQRF_
 
+/* Define to 1 if you have the `dgesdd_' function. */
+#undef HAVE_DGESDD_
+
 /* Define to 1 if you have the `dgesvd_' function. */
 #undef HAVE_DGESVD_
 
@@ -437,6 +440,9 @@
 /* Define to 1 if you have the `sgeqrf_' function. */
 #undef HAVE_SGEQRF_
 
+/* Define to 1 if you have the `sgesdd_' function. */
+#undef HAVE_SGESDD_
+
 /* Define to 1 if you have the `sgesvd_' function. */
 #undef HAVE_SGESVD_
 
@@ -536,9 +542,6 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
