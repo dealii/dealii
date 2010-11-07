@@ -137,6 +137,8 @@ endif
 		false ; \
 	  fi
 
+default: run-tests
+
 ############################################################
 # Generate a report for the present date, in which the
 # results (indicated by a "+" for a successful test, and a
