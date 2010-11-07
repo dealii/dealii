@@ -5,7 +5,7 @@ D = ../..
 include $D/common/Make.global_options
 
 
-default: makefiles.html makefile.small.html makefile.large.html makefile.rules.html
+default: makefiles.html makefile.small.html makefile.large.html
 
 
 # Have a list of variables defined in common/Make.global_options and expand them into
@@ -130,9 +130,6 @@ makefile.small.html: Makefile.small
 	@$(PERL) makefile2html < $< > $@
 
 makefile.large.html: Makefile.large
-	@$(PERL) makefile2html < $< > $@
-
-makefile.rules.html: $D/common/Makefile.template
 	@$(PERL) makefile2html < $< > $@
 
 validate-xrefs:
