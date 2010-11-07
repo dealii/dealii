@@ -49,34 +49,31 @@ namespace parallel
 					* but for parallel distributed
 					* triangulation.
 					*
-					* The vector of criteria needs
-					* to be a vector of refinement
-					* criteria for all cells
-					* active on the current
+					* The vector of criteria needs to be a
+					* vector of refinement criteria for
+					* all cells active on the current
 					* triangulation,
-					* i.e. tria.dealii::Triangulation::n_active_cells(). However,
-					* the function will only look
-					* at the indicators that
-					* correspond to those cells
-					* that are actually locally
-					* owned, and ignore the
-					* indicators for all other
-					* cells. The function will
-					* then coordinate among all
-					* processors that store part
-					* of the triangulation so that
-					* at the end @p
-					* top_fraction_of_cells are
-					* refined, where the fraction
-					* is enforced as a fraction of
+					* i.e. <code>tria.n_active_cells()</code>
+					* (and not
+					* <code>tria.n_locally_owned_active_cells()</code>). However,
+					* the function will only look at the
+					* indicators that correspond to those
+					* cells that are actually locally
+					* owned, and ignore the indicators for
+					* all other cells. The function will
+					* then coordinate among all processors
+					* that store part of the triangulation
+					* so that at the end @p
+					* top_fraction_of_cells are refined,
+					* where the fraction is enforced as a
+					* fraction of
 					* Triangulation::n_global_active_cells,
 					* not
 					* Triangulation::n_locally_active_cells
-					* on each processor
-					* individually. In other
-					* words, it may be that on
-					* some processors, no cells
-					* are refined at all.
+					* on each processor individually. In
+					* other words, it may be that on some
+					* processors, no cells are refined at
+					* all.
 					*
 					* The same is true for the fraction of
 					* cells that is coarsened.
@@ -99,7 +96,9 @@ namespace parallel
 					* vector of refinement criteria for
 					* all cells active on the current
 					* triangulation,
-					* i.e. tria.dealii::Triangulation::n_active_cells(). However,
+					* <code>tria.n_active_cells()</code>
+					* (and not
+					* <code>tria.n_locally_owned_active_cells()</code>). However,
 					* the function will only look at the
 					* indicators that correspond to those
 					* cells that are actually locally
