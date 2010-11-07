@@ -12,6 +12,17 @@ California Institute of Technology.
 </i>
 
 
+@note As a prerequisite of this program, you need to have both PETSc and the
+p4est library installed. The installation of deal.II
+together with these two additional libraries is described in the <a
+href="../../readme.html" target="body">README</a> file. Note also that
+PETSc appears not to co-operate well when using
+threads and the program crashes when deal.II is compiled in its usual mode
+supporting multithreading. The program can therefore only be compiled and run
+if multithreading is disabled upon configuration of deal.II using the
+<code>--disable-threads</code> switch to <code>./configure</code>.
+
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
@@ -80,7 +91,7 @@ things work internally in this program.
 
 <h3>The testcase</h3>
 
-This program solves essentially re-solves what we already do in
+This program essentially re-solves what we already do in
 step-6, i.e. it solves the Laplace equation
 @f{align*}
   -\Delta u &= f \qquad &&\text{in}\ \Omega=[0,1]^2, \\
@@ -112,4 +123,10 @@ picture shown below in the results section.
 Rather than continuing here and giving a long introduction, let us go
 straight to the program code. If you have read through step-6 and the
 @ref distributed documentation module, most of things that are going
-to happen should be familiar to you already.
+to happen should be familiar to you already. In fact, comparing the two
+programs you will notice that the additional effort necessary to make things
+work in %parallel is almost insignificant: the two programs have about the
+same number of lines of code (though step-6 spends more space on dealing with
+coefficients and output). In either case, the comments below will only be on
+the things that set step-40 apart from step-6 and that aren't already covered
+in the @ref distributed documentation module.

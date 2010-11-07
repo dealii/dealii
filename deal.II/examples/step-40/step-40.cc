@@ -11,18 +11,21 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+
+                                 // @sect3{Include files}
+				 //
+				 // Most of the include files we need for this
+				 // program have already been discussed in
+				 // previous programs. In particular, all of
+				 // the following should already be familiar
+				 // friends:
 #include <base/quadrature_lib.h>
 #include <base/function.h>
-#include <base/utilities.h>
-#include <base/conditional_ostream.h>
-#include <base/index_set.h>
-#include <base/timer.h>
 #include <lac/vector.h>
 #include <lac/full_matrix.h>
 #include <lac/solver_cg.h>
 #include <lac/constraint_matrix.h>
 #include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/sparsity_tools.h>
 
 #include <lac/petsc_parallel_sparse_matrix.h>
 #include <lac/petsc_parallel_vector.h>
@@ -32,6 +35,7 @@
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe_values.h>
@@ -40,6 +44,81 @@
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 
+				 // The following, however, will be new or be
+				 // used in new roles. Let's walk through
+				 // them. The first of these will provide the
+				 // tools of the Utilities::System namespace
+				 // that we will use to query things like the
+				 // number of processors associated with the
+				 // current MPI universe, or the number within
+				 // this universe the processor this job runs
+				 // on is:
+#include <base/utilities.h>
+				 // The next one provides a class,
+				 // ConditionOStream that allows us to write
+				 // code that would output things to a stream
+				 // (such as <code>std::cout</code> on every
+				 // processor but throws the text away on all
+				 // but one of them. We could achieve the same
+				 // by simply putting an <code>if</code>
+				 // statement in front of each place where we
+				 // may generate output, but this doesn't make
+				 // the code any prettier. In addition, the
+				 // condition whether this processor should or
+				 // should not produce output to the screen is
+				 // the same every time -- and consequently it
+				 // should be simple enough to put it into the
+				 // statements that generate output itself.
+#include <base/conditional_ostream.h>
+				 // After these preliminaries, here is where
+				 // it becomes more interesting. As mentioned
+				 // in the @ref distributed module, one of the
+				 // fundamental truths of solving problems on
+				 // large numbers of processors is that there
+				 // is no way for any processor to store
+				 // everything (e.g. information about all
+				 // cells in the mesh, all degrees of freedom,
+				 // or the values of all elements of the
+				 // solution vector). Rather, every processor
+				 // will <i>own</i> a few of each of these
+				 // and, if necessary, may <i>know</i> about a
+				 // few more, for example the ones that are
+				 // located on cells adjacent to the ones this
+				 // processor owns itself. We typically call
+				 // the latter <i>ghost cells</i>, <i>ghost
+				 // nodes</i> or <i>ghost elements of a
+				 // vector</i>. The point of this discussion
+				 // here is that we need to have a way to
+				 // indicate which elements a particular
+				 // processor owns or need to know of. This is
+				 // the realm of the IndexSet class: if there
+				 // are a total of $N$ cells, degrees of
+				 // freedom, or vector elements, associated
+				 // with (non-negative) integral indices
+				 // $[0,N)$, then both the set of elements the
+				 // current processor owns as well as the
+				 // (possibly larger) set of indices it needs
+				 // to know about are subsets of the set
+				 // $[0,N)$. IndexSet is a class that stores
+				 // subsets of this set in an efficient
+				 // format:
+#include <base/index_set.h>
+				 // The next header file is necessary for a
+				 // single function,
+				 // SparsityTools::distribute_sparsity_pattern. The
+				 // role of this function will be explained
+				 // below.
+#include <lac/sparsity_tools.h>
+				 // The final two, new header files provide
+				 // the class
+				 // parallel::distributed::Triangulation that
+				 // provides meshes distributed across a
+				 // potentially very large number of
+				 // processors, while the second provides the
+				 // namespace
+				 // parallel::distributed::GridRefinement that
+				 // offers functions that can adaptively
+				 // refine such distributed meshes:
 #include <distributed/tria.h>
 #include <distributed/grid_refinement.h>
 
@@ -48,7 +127,36 @@
 
 using namespace dealii;
 
+                                 // @sect3{The <code>LaplaceProblem</code> class template}
 
+				 // Next let's declare the main class of this
+				 // program. Its structure is almost exactly
+				 // that of the step-6 tutorial program. The
+				 // only significant differences are:
+				 // - The <code>mpi_communicator</code>
+				 //   variable that describes the set of
+				 //   processors we want this code to run
+				 //   on. In practice, this will be
+				 //   MPI_COMM_WORLD, i.e. all processors the
+				 //   batch scheduling system has assigned to
+				 //   this particular job.
+				 // - The presence of the <code>pcout</code>
+				 //   variable of type ConditionOStream.
+				 // - The obvious use of
+				 //   parallel::distributed::Triangulation
+				 //   instead of Triangulation.
+				 // - The fact that all matrices and vectors
+				 //   are now distributed. We use their
+				 //   PETScWrapper versions for this since
+				 //   deal.II's own classes do not provide
+				 //   %parallel functionality.
+				 // - The presence of two IndexSet objects
+				 //   that denote which sets of degrees of
+				 //   freedom (and associated elements of
+				 //   solution and right hand side vectors) we
+				 //   own on the current processor and which
+				 //   we need (as ghost elements) for the
+				 //   algorithms in this program to work.
 template <int dim>
 class LaplaceProblem
 {
@@ -85,7 +193,20 @@ class LaplaceProblem
 };
 
 
+                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
 
+                                 // @sect4{Constructors and destructors}
+
+				 // Constructors and destructors are rather
+				 // trivial. In addition to what we do in
+				 // step-6, we set the set of processors we
+				 // want to work on to all machines available
+				 // (MPI_COMM_WORLD); ask the triangulation to
+				 // ensure that the mesh remains smooth and
+				 // free to refined islands, for example; and
+				 // initialize the <code>pcout</code> variable
+				 // to only allow processor zero to output
+				 // anything:
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem ()
 		:
@@ -111,10 +232,24 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 }
 
 
+                                 // @sect4{LaplaceProblem::setup_system}
 
+				 // The following function is, arguably, the
+				 // most interesting one in the entire program
+				 // since it goes to the heart of what
+				 // distinguishes %parallel step-40 from
+				 // sequential step-6.
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
+  dof_handler.distribute_dofs (fe);
+
+				   // eliminate
+  locally_owned_dofs = dof_handler.locally_owned_dofs ();
+  DoFTools::extract_locally_relevant_dofs (dof_handler,
+					   locally_relevant_dofs);
+
+				   // note in class doc!
   locally_relevant_solution.reinit (mpi_communicator,
 				    locally_owned_dofs,
 				    locally_relevant_dofs);
@@ -328,23 +463,15 @@ void LaplaceProblem<dim>::run (const unsigned int initial_global_refine)
       else
 	refine_grid ();
 
-      pcout << "   Number of active cells:       "
-	    << triangulation.n_global_active_cells()
-	    << std::endl;
-
-      dof_handler.distribute_dofs (fe);
-
-				       // eliminate
-      locally_owned_dofs = dof_handler.locally_owned_dofs ();
-      DoFTools::extract_locally_relevant_dofs (dof_handler,
-					       locally_relevant_dofs);
-
-      pcout << "   Number of degrees of freedom: "
-	    << dof_handler.n_dofs()
-	    << std::endl;
-
       setup_system ();
 
+      pcout << "   Number of active cells:       "
+	    << triangulation.n_global_active_cells()
+	    << std::endl
+	    << "   Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+	    << std::endl;
+      
       assemble_system ();
       solve ();
 
