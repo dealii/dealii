@@ -239,12 +239,30 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 // since it goes to the heart of what
 				 // distinguishes %parallel step-40 from
 				 // sequential step-6.
+				 //
+				 // At the top we do what we always do: tell
+				 // the DoFHandler object to distribute
+				 // degrees of freedom. Since the
+				 // triangulation we use here is distributed,
+				 // the DoFHandler object is smart enough to
+				 // recognize that on each processor it can
+				 // only distribute degrees of freedom on
+				 // cells it owns; this is followed by an
+				 // exchange step in which processors tell
+				 // each other about degrees of freedom on
+				 // ghost cell. The result is a DoFHandler
+				 // that knows about the degrees of freedom on
+				 // locally owned cells and ghost cells
+				 // (i.e. cells adjacent to locally owned
+				 // cells) but nothing about cells that are
+				 // further away, consistent with the basic
+				 // philosophy of distributed computing that
+				 // no processor can know everything.
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
-				   // eliminate
   locally_owned_dofs = dof_handler.locally_owned_dofs ();
   DoFTools::extract_locally_relevant_dofs (dof_handler,
 					   locally_relevant_dofs);
