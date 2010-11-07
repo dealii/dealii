@@ -1,9 +1,19 @@
 
-DEAL:Rect::operator= (const FullMatrix<number>&) ok
-DEAL:Rect::vmult ok
-DEAL:Rect::vmult_add ok
-DEAL:Rect::Tvmult ok
-DEAL:Rect::Tvmult_add ok
+DEAL:3x4::operator= (const FullMatrix<number>&) ok
+DEAL:3x4::vmult ok
+DEAL:3x4::vmult_add ok
+DEAL:3x4::Tvmult ok
+DEAL:3x4::Tvmult_add ok
+DEAL:4x3::operator= (const FullMatrix<number>&) ok
+DEAL:4x3::vmult ok
+DEAL:4x3::vmult_add ok
+DEAL:4x3::Tvmult ok
+DEAL:4x3::Tvmult_add ok
+DEAL:4x4::operator= (const FullMatrix<number>&) ok
+DEAL:4x4::vmult ok
+DEAL:4x4::vmult_add ok
+DEAL:4x4::Tvmult ok
+DEAL:4x4::Tvmult_add ok
 DEAL::Eigenvalues 5	0
 DEAL::Eigenvalues 1	0
 DEAL::Eigenvalues 5	0

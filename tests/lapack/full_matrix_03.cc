@@ -11,7 +11,7 @@
 //
 //--------------------------------------------------------------------
 
-// Tests vector multiplication and eigenvalues of LAPACKFullMatrix
+// Tests SVD of LAPACKFullMatrix by comparing to vmult of FullMatrix
 
 #include "../tests.h"
 #include <base/logstream.h>
@@ -54,6 +54,12 @@ void test_rect(unsigned int m, unsigned int n, const double* values)
   FullMatrix<double> A(m,n,values);
   LAPACKFullMatrix<double> LA(m,n);
   LA = A;
+  LA.compute_svd();
+  
+  deallog << "Singular values";
+  for (unsigned int i=0;i<LA.n_rows();++i)
+    deallog << ' ' << LA.singular_value(i);
+  deallog << std::endl;
   
   Vector<double> u(n);
   Vector<double> v1(m);
@@ -62,32 +68,42 @@ void test_rect(unsigned int m, unsigned int n, const double* values)
   for (unsigned int i=0;i<u.size();++i)
     u(i) = i*i;
   
-  deallog << "operator= (const FullMatrix<number>&) ok" << std::endl;
+				   // Test rectangular vmult. All
+				   // results compare with same
+				   // operation for FullMatrix.
   
   A.vmult(v1,u);
   LA.vmult(v2,u);
   v1 -= v2;
-  if (v1.l2_norm() < 1.e-14)
+  if (v1.l2_norm() < 1.e-12)
     deallog << "vmult ok" << std::endl;
+  else
+    deallog << "vmult error " << v1.l2_norm() << std::endl;
   v1 = v2;
   
   A.vmult_add(v1,u);
   LA.vmult_add(v2,u);
   v1 -= v2;
-  if (v1.l2_norm() < 1.e-14)
+  if (v1.l2_norm() < 1.e-12)
     deallog << "vmult_add ok" << std::endl;
+  else
+    deallog << "vmult_add error " << v1.l2_norm() << std::endl;
   
   LA.Tvmult(u, v2);
   u *= -1;
   A.Tvmult_add(u, v2);
-  if (u.l2_norm() < 1.e-14)
+  if (u.l2_norm() < 1.e-12)
     deallog << "Tvmult ok" << std::endl;
+  else
+    deallog << "Tvmult error " << u.l2_norm() << std::endl;
   
   A.Tvmult(u, v2);
   u *= -1;
   LA.Tvmult_add(u, v2);
-  if (u.l2_norm() < 1.e-14)
+  if (u.l2_norm() < 1.e-12)
     deallog << "Tvmult_add ok" << std::endl;
+  else
+    deallog << "Tvmult_add error " << u.l2_norm() << std::endl;
   
   deallog.pop();
 }
@@ -99,12 +115,11 @@ int main()
   logfile.precision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
 
-  test_rect(3,4,rect);
-  test_rect(4,3,rect);
   test_rect(4,4,symm);
-
+  test_rect(4,3,rect);
+  test_rect(3,4,rect);
+  
 				   // Test symmetric system
   FullMatrix<double> A(4,4,symm);
   LAPACKFullMatrix<double> LA(4,4);

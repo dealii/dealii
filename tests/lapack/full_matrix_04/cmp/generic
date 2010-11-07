@@ -1,0 +1,16 @@
+
+DEAL:4x4::Singular values 0.200000 0.200000 0.200000 1.00000
+DEAL:4x4::vmult ok
+DEAL:4x4::vmult ok
+DEAL:4x4::Tvmult ok
+DEAL:4x4::Tvmult ok
+DEAL:4x3::Singular values 0.0623770 0.0789748 0.162959 0
+DEAL:4x3::vmult ok
+DEAL:4x3::vmult error 1.75406
+DEAL:4x3::Tvmult error 1.75406
+DEAL:4x3::Tvmult ok
+DEAL:3x4::Singular values 0.0480845 0.232173 0.503464
+DEAL:3x4::vmult error 5.58692
+DEAL:3x4::vmult ok
+DEAL:3x4::Tvmult ok
+DEAL:3x4::Tvmult error 5.58692
