@@ -18,6 +18,14 @@ WORKDIR = $(notdir $(shell pwd))
 
 verbose = off
 
+# The mail program. Override this by something like
+#
+# MAIL=mymailprog
+#
+# on the command line to use a different mail agent or to tunnel through ssh.
+# The mail program takes a single argument, which is the mail address for tests
+# The contents of the mail will be provided on STDIN
+MAIL=mail
 
 PLATFORM = $(TARGET)+$(GXX-VERSION:intel_%=%)
 PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
@@ -179,8 +187,7 @@ report:
 
 report+mail:
 	@$(MAKE) report | tee testresults
-	@cat testresults | \
-	 mail -s "Regression results from `id -un` on `hostname`" regression-tests@dealii.org
+	@cat testresults | $(MAIL) regression-tests@dealii.org
 	@rm testresults
 
 ######################################################################
