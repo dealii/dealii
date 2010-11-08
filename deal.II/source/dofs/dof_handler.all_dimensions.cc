@@ -57,8 +57,6 @@ namespace internal
   {
     return &dealii::DoFHandler<dim,spacedim>::invalid_dof_index;
   }
-
-  template const unsigned int * dummy<deal_II_dimension,deal_II_dimension> ();
 }
 
 
@@ -1466,8 +1464,6 @@ DoFHandler<dim, spacedim>::last_active_hex () const
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 unsigned int DoFHandler<1>::n_boundary_dofs () const
 {
@@ -1545,7 +1541,6 @@ unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<unsigned char> &bo
   return boundary_indicators.size()*get_fe().dofs_per_vertex;
 }
 
-#endif
 
 
 template<int dim, int spacedim>
@@ -1816,11 +1811,7 @@ void DoFHandler<dim,spacedim>::clear_space ()
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-template class DoFHandler<deal_II_dimension>;
-
-#if deal_II_dimension==1 || deal_II_dimension==2
-template class DoFHandler<deal_II_dimension,deal_II_dimension+1>;
-#endif
+#include "dof_handler.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE
