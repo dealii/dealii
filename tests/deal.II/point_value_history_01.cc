@@ -22,7 +22,7 @@
 
 
 
-
+#include "../tests.h"
 #include <base/quadrature_lib.h>
 
 #include <dofs/dof_handler.h>
