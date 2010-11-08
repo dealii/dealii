@@ -44,8 +44,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-#if deal_II_dimension == 3
-
 				   // Corner points of the cube [-1,1]^3
   const Point<3> hexahedron[8] =
   {
@@ -70,8 +68,6 @@ namespace
 	Point<3>( 0, 0,-1),
 	Point<3>( 0, 0, 1)
   };
-
-#endif
 }
 
 
@@ -139,18 +135,15 @@ GridGenerator::hyper_rectangle (Triangulation<dim,spacedim> &tria,
 
 
 
-#if deal_II_dimension == 1
-
-// Implementation for 1D only
-template <int dim, int spacedim>
+template <int spacedim>
 void
-GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &)
+GridGenerator::colorize_hyper_rectangle (Triangulation<1,spacedim> &)
 {
 				   // Nothing to do in 1D
 }
 
 
-#else
+
 
 // Implementation for dimensions except 1
 template <int dim, int spacedim>
@@ -164,7 +157,6 @@ GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria)
     cell->face(f)->set_boundary_indicator (f);
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -190,7 +182,6 @@ void GridGenerator::hyper_cube (Triangulation<dim,spacedim> &tria,
 }
 
 
-#if deal_II_dimension == 3
 
 void
 GridGenerator::moebius (
@@ -244,29 +235,25 @@ GridGenerator::moebius (
   tria.create_triangulation_compatibility (vertices, cells, SubCellData());
 }
 
-#endif
 
 
 
 // Implementation for 2D only
-template<int dim>
+template<>
 void
 GridGenerator::parallelogram (
-  Triangulation<dim>&  tria,
-  const Tensor<2,dim>& corners,
+  Triangulation<2>&  tria,
+  const Tensor<2,2>& corners,
   const bool      colorize)
 {
-  Assert (dim==2, ExcNotImplemented());
-
-  std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<2> > vertices (GeometryInfo<2>::vertices_per_cell);
 
   vertices[1] = corners[0];
   vertices[2] = corners[1];
-  vertices[3] = vertices[1];
-  vertices[3] += vertices[2];
+  vertices[3] = vertices[1] + vertices[2];
 				   // Prepare cell data
-  std::vector<CellData<dim> > cells (1);
-  for (unsigned int i=0;i<GeometryInfo<dim>::vertices_per_cell;++i)
+  std::vector<CellData<2> > cells (1);
+  for (unsigned int i=0;i<GeometryInfo<2>::vertices_per_cell;++i)
     cells[0].vertices[i] = i;
   cells[0].material_id = 0;
 
@@ -276,6 +263,7 @@ GridGenerator::parallelogram (
   if (colorize)
     colorize_hyper_rectangle (tria);
 }
+
 
 
 template <int dim>
@@ -767,8 +755,6 @@ subdivided_hyper_rectangle(Triangulation<dim>              &tria,
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 void
 GridGenerator::
@@ -827,9 +813,6 @@ subdivided_hyper_rectangle (Triangulation<1>&                             tria,
     Assert (false, ExcNotImplemented());
 }
 
-#endif
-
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -928,9 +911,6 @@ subdivided_hyper_rectangle (Triangulation<2>&                         tria,
     }
 }
 
-#endif
-
-#if deal_II_dimension == 3
 
 template <>
 void
@@ -1045,21 +1025,17 @@ subdivided_hyper_rectangle (Triangulation<3>&                           tria,
     }
 }
 
-#endif
 
 
-#if deal_II_dimension == 1
-
-// Implementation for 1D only
-template <int dim>
+template <>
 void
 GridGenerator::colorize_subdivided_hyper_rectangle (
-  Triangulation<dim>& tria,
-  const Point<dim>&,
-  const Point<dim>&,
+  Triangulation<1>& tria,
+  const Point<1>&,
+  const Point<1>&,
   const double)
 {
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
+  for (Triangulation<1>::cell_iterator cell = tria.begin();
        cell != tria.end(); ++cell)
     if (cell->center()(0) > 0)
       cell->set_material_id(1);
@@ -1067,9 +1043,8 @@ GridGenerator::colorize_subdivided_hyper_rectangle (
 				   // 0 (left) and 1 (right) by default.
 }
 
-#else
 
-// Implementation for dimensions except 1
+
 template <int dim>
 void
 GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<dim> &tria,
@@ -1123,16 +1098,9 @@ GridGenerator::colorize_subdivided_hyper_rectangle (Triangulation<dim> &tria,
     }
 }
 
-#endif
 
-
-
-#if deal_II_dimension == 1
-
-// The following implementations are for 1D only. See below for other
-// dimensions.
-template <int dim>
-void GridGenerator::hyper_cube_slit (Triangulation<dim> &,
+template <>
+void GridGenerator::hyper_cube_slit (Triangulation<1> &,
 				     const double,
 				     const double,
 				     const bool)
@@ -1142,9 +1110,8 @@ void GridGenerator::hyper_cube_slit (Triangulation<dim> &,
 
 
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::enclosed_hyper_cube (Triangulation<dim>&,
+template <>
+void GridGenerator::enclosed_hyper_cube (Triangulation<1>&,
 					 const double,
 					 const double,
 					 const double,
@@ -1155,9 +1122,8 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim>&,
 
 
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::hyper_L (Triangulation<dim> &,
+template <>
+void GridGenerator::hyper_L (Triangulation<1> &,
 			     const double,
 			     const double)
 {
@@ -1166,10 +1132,9 @@ void GridGenerator::hyper_L (Triangulation<dim> &,
 
 
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::hyper_ball (Triangulation<dim> &,
-				const Point<dim> &,
+template <>
+void GridGenerator::hyper_ball (Triangulation<1> &,
+				const Point<1> &,
 				const double)
 {
   Assert (false, ExcNotImplemented());
@@ -1177,9 +1142,8 @@ void GridGenerator::hyper_ball (Triangulation<dim> &,
 
 
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::cylinder (Triangulation<dim> &,
+template <>
+void GridGenerator::cylinder (Triangulation<1> &,
 			      const double,
 			      const double)
 {
@@ -1188,9 +1152,8 @@ void GridGenerator::cylinder (Triangulation<dim> &,
 
 
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::truncated_cone (Triangulation<dim> &,
+template <>
+void GridGenerator::truncated_cone (Triangulation<1> &,
 				    const double,
 				    const double,
 				    const double)
@@ -1200,10 +1163,9 @@ void GridGenerator::truncated_cone (Triangulation<dim> &,
 
 
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::hyper_shell (Triangulation<dim> &,
-				 const Point<dim> &,
+template <>
+void GridGenerator::hyper_shell (Triangulation<1> &,
+				 const Point<1> &,
 				 const double,
 				 const double,
 				 const unsigned int,
@@ -1212,19 +1174,19 @@ void GridGenerator::hyper_shell (Triangulation<dim> &,
   Assert (false, ExcNotImplemented());
 }
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::colorize_hyper_shell (Triangulation<dim> &,
-					  const Point<dim> &,
+
+template <>
+void GridGenerator::colorize_hyper_shell (Triangulation<1> &,
+					  const Point<1> &,
 					  const double,
 					  const double)
 {
   Assert (false, ExcNotImplemented());
 }
 
-// Implementation for 1D only
-template <int dim>
-void GridGenerator::cylinder_shell (Triangulation<dim>&,
+
+template <>
+void GridGenerator::cylinder_shell (Triangulation<1>&,
                                     const double,
                                     const double,
                                     const double,
@@ -1235,22 +1197,20 @@ void GridGenerator::cylinder_shell (Triangulation<dim>&,
 }
 
 
-// Implementation for 1D only
-template <int dim>
+template <>
 void
-GridGenerator::half_hyper_ball (Triangulation<dim>&,
-				const Point<dim>&,
+GridGenerator::half_hyper_ball (Triangulation<1>&,
+				const Point<1>&,
 				const double)
 {
   Assert (false, ExcNotImplemented());
 }
 
 
-// Implementation for 1D only
-template <int dim>
+template <>
 void
-GridGenerator::half_hyper_shell (Triangulation<dim>&,
-				 const Point<dim>&,
+GridGenerator::half_hyper_shell (Triangulation<1>&,
+				 const Point<1>&,
 				 const double,
 				 const double,
 				 const unsigned int)
@@ -1258,15 +1218,10 @@ GridGenerator::half_hyper_shell (Triangulation<dim>&,
   Assert (false, ExcNotImplemented());
 }
 
-#endif
 
 
-
-#if deal_II_dimension == 2
-
-// Implementation for 2D only
-template <int dim>
-void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
+template <>
+void GridGenerator::enclosed_hyper_cube (Triangulation<2> &tria,
 					 const double        left,
 					 const double        right,
 					 const double        thickness,
@@ -1275,7 +1230,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
   Assert(left<right,
 	 ExcMessage ("Invalid left-to-right bounds of enclosed hypercube"));
 
-  std::vector<Point<dim> > vertices(16);
+  std::vector<Point<2> > vertices(16);
   double coords[4];
   coords[0] = left-thickness;
   coords[1] = left;
@@ -1285,14 +1240,14 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
   unsigned int k=0;
   for (unsigned int i0=0;i0<4;++i0)
     for (unsigned int i1=0;i1<4;++i1)
-      vertices[k++] = Point<dim>(coords[i1], coords[i0]);
+      vertices[k++] = Point<2>(coords[i1], coords[i0]);
 
   const unsigned char materials[9] = { 5, 4, 6,
 				       1, 0, 2,
 				       9, 8,10
   };
 
-  std::vector<CellData<dim> > cells(9);
+  std::vector<CellData<2> > cells(9);
   k = 0;
   for (unsigned int i0=0;i0<3;++i0)
     for (unsigned int i1=0;i1<3;++i1)
@@ -1313,29 +1268,29 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
 
 
 // Implementation for 2D only
-template <int dim>
+template <>
 void
-GridGenerator::hyper_cube_slit (Triangulation<dim> &tria,
+GridGenerator::hyper_cube_slit (Triangulation<2> &tria,
 				const double left,
 				const double right,
 				const bool colorize)
 {
   const double rl2=(right+left)/2;
-  const Point<dim> vertices[10] = { Point<dim>(left, left ),
-				  Point<dim>(rl2,  left ),
-				  Point<dim>(rl2,  rl2  ),
-				  Point<dim>(left, rl2  ),
-				  Point<dim>(right,left ),
-				  Point<dim>(right,rl2  ),
-				  Point<dim>(rl2,  right),
-				  Point<dim>(left, right),
-				  Point<dim>(right,right),
-				  Point<dim>(rl2,  left ) };
+  const Point<2> vertices[10] = { Point<2>(left, left ),
+				  Point<2>(rl2,  left ),
+				  Point<2>(rl2,  rl2  ),
+				  Point<2>(left, rl2  ),
+				  Point<2>(right,left ),
+				  Point<2>(right,rl2  ),
+				  Point<2>(rl2,  right),
+				  Point<2>(left, right),
+				  Point<2>(right,right),
+				  Point<2>(rl2,  left ) };
   const int cell_vertices[4][4] = { { 0,1,3,2 },
 				    { 9,4,2,5 },
 				    { 3,2,7,6 },
 				    { 2,5,6,8 } };
-  std::vector<CellData<dim> > cells (4, CellData<dim>());
+  std::vector<CellData<2> > cells (4, CellData<2>());
   for (unsigned int i=0; i<4; ++i)
     {
       for (unsigned int j=0; j<4; ++j)
@@ -1343,13 +1298,13 @@ GridGenerator::hyper_cube_slit (Triangulation<dim> &tria,
       cells[i].material_id = 0;
     };
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[10]),
+    std::vector<Point<2> >(&vertices[0], &vertices[10]),
     cells,
     SubCellData());       // no boundary information
 
   if (colorize)
     {
-      typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      Triangulation<2>::cell_iterator cell = tria.begin();
       cell->face(1)->set_boundary_indicator(1);
       ++cell;
       cell->face(3)->set_boundary_indicator(2);
@@ -1358,34 +1313,34 @@ GridGenerator::hyper_cube_slit (Triangulation<dim> &tria,
 
 
 
-template <int dim>
-void GridGenerator::truncated_cone (Triangulation<dim> &triangulation,
+template <>
+void GridGenerator::truncated_cone (Triangulation<2> &triangulation,
 				    const double radius_0,
 				    const double radius_1,
 				    const double half_length)
 {
-  Point<dim> vertices_tmp[4];
+  Point<2> vertices_tmp[4];
 
-  vertices_tmp[0] = Point<dim> (-half_length, -radius_0);
-  vertices_tmp[1] = Point<dim> (half_length, -radius_1);
-  vertices_tmp[2] = Point<dim> (-half_length, radius_0);
-  vertices_tmp[3] = Point<dim> (half_length, radius_1);
+  vertices_tmp[0] = Point<2> (-half_length, -radius_0);
+  vertices_tmp[1] = Point<2> (half_length, -radius_1);
+  vertices_tmp[2] = Point<2> (-half_length, radius_0);
+  vertices_tmp[3] = Point<2> (half_length, radius_1);
 
-  const std::vector<Point<dim> > vertices (&vertices_tmp[0], &vertices_tmp[4]);
-  unsigned int cell_vertices[1][GeometryInfo<dim>::vertices_per_cell];
+  const std::vector<Point<2> > vertices (&vertices_tmp[0], &vertices_tmp[4]);
+  unsigned int cell_vertices[1][GeometryInfo<2>::vertices_per_cell];
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
     cell_vertices[0][i] = i;
 
-  std::vector<CellData<dim> > cells (1, CellData<dim> ());
+  std::vector<CellData<2> > cells (1, CellData<2> ());
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
     cells[0].vertices[i] = cell_vertices[0][i];
 
   cells[0].material_id = 0;
   triangulation.create_triangulation (vertices, cells, SubCellData ());
 
-  typename Triangulation<dim>::cell_iterator cell = triangulation.begin ();
+  Triangulation<2>::cell_iterator cell = triangulation.begin ();
 
   cell->face (0)->set_boundary_indicator (1);
   cell->face (1)->set_boundary_indicator (2);
@@ -1398,25 +1353,25 @@ void GridGenerator::truncated_cone (Triangulation<dim> &triangulation,
 
 //TODO: Colorize edges as circumference, left and right radius
 // Implementation for 2D only
-template <int dim>
+template <>
 void
-GridGenerator::hyper_L (Triangulation<dim> &tria,
+GridGenerator::hyper_L (Triangulation<2> &tria,
 			const double a,
 			const double b)
 {
-  const Point<dim> vertices[8] = { Point<dim> (a,a),
-				   Point<dim> ((a+b)/2,a),
-				   Point<dim> (b,a),
-				   Point<dim> (a,(a+b)/2),
-				   Point<dim> ((a+b)/2,(a+b)/2),
-				   Point<dim> (b,(a+b)/2),
-				   Point<dim> (a,b),
-				   Point<dim> ((a+b)/2,b)  };
+  const Point<2> vertices[8] = { Point<2> (a,a),
+				   Point<2> ((a+b)/2,a),
+				   Point<2> (b,a),
+				   Point<2> (a,(a+b)/2),
+				   Point<2> ((a+b)/2,(a+b)/2),
+				   Point<2> (b,(a+b)/2),
+				   Point<2> (a,b),
+				   Point<2> ((a+b)/2,b)  };
   const int cell_vertices[3][4] = {{0, 1, 3, 4},
 				   {1, 2, 4, 5},
 				   {3, 4, 6, 7}};
 
-  std::vector<CellData<dim> > cells (3, CellData<dim>());
+  std::vector<CellData<2> > cells (3, CellData<2>());
 
   for (unsigned int i=0; i<3; ++i)
     {
@@ -1426,7 +1381,7 @@ GridGenerator::hyper_L (Triangulation<dim> &tria,
     };
 
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[8]),
+    std::vector<Point<2> >(&vertices[0], &vertices[8]),
     cells,
     SubCellData());       // no boundary information
 }
@@ -1434,24 +1389,24 @@ GridGenerator::hyper_L (Triangulation<dim> &tria,
 
 
 // Implementation for 2D only
-template <int dim>
+template <>
 void
-GridGenerator::hyper_ball (Triangulation<dim> &tria,
-			   const Point<dim>   &p,
+GridGenerator::hyper_ball (Triangulation<2> &tria,
+			   const Point<2>   &p,
 			   const double      radius)
 {
 				   // equilibrate cell sizes at
 				   // transition from the inner part
 				   // to the radial cells
   const double a = 1./(1+std::sqrt(2.0));
-  const Point<dim> vertices[8] = { p+Point<dim>(-1,-1)*(radius/std::sqrt(2.0)),
-				 p+Point<dim>(+1,-1)*(radius/std::sqrt(2.0)),
-				 p+Point<dim>(-1,-1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(+1,-1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(-1,+1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(+1,+1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(-1,+1)*(radius/std::sqrt(2.0)),
-				 p+Point<dim>(+1,+1)*(radius/std::sqrt(2.0)) };
+  const Point<2> vertices[8] = { p+Point<2>(-1,-1)*(radius/std::sqrt(2.0)),
+				 p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)),
+				 p+Point<2>(-1,-1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(-1,+1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(-1,+1)*(radius/std::sqrt(2.0)),
+				 p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)) };
 
   const int cell_vertices[5][4] = {{0, 1, 2, 3},
 				   {0, 2, 6, 4},
@@ -1459,7 +1414,7 @@ GridGenerator::hyper_ball (Triangulation<dim> &tria,
 				   {1, 7, 3, 5},
 				   {6, 4, 7, 5}};
 
-  std::vector<CellData<dim> > cells (5, CellData<dim>());
+  std::vector<CellData<2> > cells (5, CellData<2>());
 
   for (unsigned int i=0; i<5; ++i)
     {
@@ -1469,7 +1424,7 @@ GridGenerator::hyper_ball (Triangulation<dim> &tria,
     };
 
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[8]),
+    std::vector<Point<2> >(&vertices[0], &vertices[8]),
     cells,
     SubCellData());       // no boundary information
 }
@@ -1477,9 +1432,29 @@ GridGenerator::hyper_ball (Triangulation<dim> &tria,
 
 
 // Implementation for 2D only
-template <int dim>
-void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
-				 const Point<dim>     &center,
+template<>
+void
+GridGenerator::colorize_hyper_shell (
+  Triangulation<2>& tria,
+  const Point<2>&, const double, const double)
+{
+				   // Inspite of receiving geometrical
+				   // data, we do this only based on
+				   // topology.
+
+				   // For the mesh based on  cube,
+				   // this is highly irregular
+  for (Triangulation<2>::cell_iterator cell = tria.begin();
+       cell != tria.end(); ++cell)
+    {
+      cell->face(2)->set_boundary_indicator(1);
+    }
+}
+
+
+template <>
+void GridGenerator::hyper_shell (Triangulation<2>   &tria,
+				 const Point<2>     &center,
 				 const double        inner_radius,
 				 const double        outer_radius,
 				 const unsigned int  n_cells,
@@ -1511,10 +1486,10 @@ void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
 				   // first N ones are on the
 				   // outer one, and all are
 				   // numbered counter-clockwise
-  std::vector<Point<dim> > vertices(2*N);
+  std::vector<Point<2> > vertices(2*N);
   for (unsigned int i=0; i<N; ++i)
     {
-      vertices[i] = Point<dim>( std::cos(2*pi * i/N),
+      vertices[i] = Point<2>( std::cos(2*pi * i/N),
 			      std::sin(2*pi * i/N)) * outer_radius;
       vertices[i+N] = vertices[i] * (inner_radius/outer_radius);
 
@@ -1522,7 +1497,7 @@ void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
       vertices[i+N] += center;
     };
 
-  std::vector<CellData<dim> > cells (N, CellData<dim>());
+  std::vector<CellData<2> > cells (N, CellData<2>());
 
   for (unsigned int i=0; i<N; ++i)
     {
@@ -1542,41 +1517,20 @@ void GridGenerator::hyper_shell (Triangulation<dim>   &tria,
 }
 
 
-template<int dim>
-void
-GridGenerator::colorize_hyper_shell (
-  Triangulation<dim>& tria,
-  const Point<dim>&, const double, const double)
-{
-				   // Inspite of receiving geometrical
-				   // data, we do this only based on
-				   // topology.
-
-				   // For the mesh based on  cube,
-				   // this is highly irregular
-  for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-       cell != tria.end(); ++cell)
-    {
-      cell->face(2)->set_boundary_indicator(1);
-    }
-}
-
-
-
 // Implementation for 2D only
-template <int dim>
+template <>
 void
-GridGenerator::cylinder (Triangulation<dim> &tria,
+GridGenerator::cylinder (Triangulation<2> &tria,
 			 const double radius,
 			 const double half_length)
 {
-  Point<dim> p1 (-half_length, -radius);
-  Point<dim> p2 (half_length, radius);
+  Point<2> p1 (-half_length, -radius);
+  Point<2> p2 (half_length, radius);
 
   hyper_rectangle(tria, p1, p2, true);
 
-  typename Triangulation<dim>::face_iterator f = tria.begin_face();
-  typename Triangulation<dim>::face_iterator end = tria.end_face();
+  Triangulation<2>::face_iterator f = tria.begin_face();
+  Triangulation<2>::face_iterator end = tria.end_face();
   while (f != end)
     {
       switch (f->boundary_indicator())
@@ -1598,8 +1552,8 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
 
 
 // Implementation for 2D only
-template <int dim>
-void GridGenerator::cylinder_shell (Triangulation<dim>&,
+template <>
+void GridGenerator::cylinder_shell (Triangulation<2>&,
                                     const double,
                                     const double,
                                     const double,
@@ -1610,31 +1564,31 @@ void GridGenerator::cylinder_shell (Triangulation<dim>&,
 }
 
 
-template <int dim>
+template <>
 void
-GridGenerator::half_hyper_ball (Triangulation<dim> &tria,
-				const Point<dim>   &p,
+GridGenerator::half_hyper_ball (Triangulation<2> &tria,
+				const Point<2>   &p,
 				const double      radius)
 {
 				   // equilibrate cell sizes at
 				   // transition from the inner part
 				   // to the radial cells
   const double a = 1./(1+std::sqrt(2.0));
-  const Point<dim> vertices[8] = { p+Point<dim>(0,-1)*radius,
-				 p+Point<dim>(+1,-1)*(radius/std::sqrt(2.0)),
-				 p+Point<dim>(0,-1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(+1,-1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(0,+1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(+1,+1)*(radius/std::sqrt(2.0)*a),
-				 p+Point<dim>(0,+1)*radius,
-				 p+Point<dim>(+1,+1)*(radius/std::sqrt(2.0)) };
+  const Point<2> vertices[8] = { p+Point<2>(0,-1)*radius,
+				 p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)),
+				 p+Point<2>(0,-1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(+1,-1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(0,+1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)*a),
+				 p+Point<2>(0,+1)*radius,
+				 p+Point<2>(+1,+1)*(radius/std::sqrt(2.0)) };
 
   const int cell_vertices[5][4] = {{0, 1, 2, 3},
 				   {2, 3, 4, 5},
 				   {1, 7, 3, 5},
 				   {6, 4, 7, 5}};
 
-  std::vector<CellData<dim> > cells (4, CellData<dim>());
+  std::vector<CellData<2> > cells (4, CellData<2>());
 
   for (unsigned int i=0; i<4; ++i)
     {
@@ -1644,17 +1598,17 @@ GridGenerator::half_hyper_ball (Triangulation<dim> &tria,
     };
 
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[8]),
+    std::vector<Point<2> >(&vertices[0], &vertices[8]),
     cells,
     SubCellData());       // no boundary information
 
-    typename Triangulation<dim>::cell_iterator cell = tria.begin();
-    typename Triangulation<dim>::cell_iterator end = tria.end();
+    Triangulation<2>::cell_iterator cell = tria.begin();
+    Triangulation<2>::cell_iterator end = tria.end();
 
 
     while (cell != end)
     {
-	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	for (unsigned int i=0;i<GeometryInfo<2>::faces_per_cell;++i)
 	{
 	    if (cell->face(i)->boundary_indicator() == 255)
 		continue;
@@ -1670,10 +1624,10 @@ GridGenerator::half_hyper_ball (Triangulation<dim> &tria,
 
 
 // Implementation for 2D only
-template <int dim>
+template <>
 void
-GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
-				 const Point<dim>     &center,
+GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
+				 const Point<2>     &center,
 				 const double        inner_radius,
 				 const double        outer_radius,
 				 const unsigned int  n_cells)
@@ -1703,7 +1657,7 @@ GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
 				   // first N+1 ones are on the
 				   // outer one, and all are
 				   // numbered counter-clockwise
-  std::vector<Point<dim> > vertices(2*(N+1));
+  std::vector<Point<2> > vertices(2*(N+1));
   for (unsigned int i=0; i<=N; ++i)
     {
 				       // enforce that the x-coordinates
@@ -1712,7 +1666,7 @@ GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
 				       // zero (contrary to what we may
 				       // compute using the imprecise
 				       // value of pi)
-      vertices[i] =  Point<dim>( ( (i==0) || (i==N) ?
+      vertices[i] =  Point<2>( ( (i==0) || (i==N) ?
 				 0 :
 				 std::cos(pi * i/N - pi/2) ),
 			       std::sin(pi * i/N - pi/2)) * outer_radius;
@@ -1723,7 +1677,7 @@ GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
     };
 
 
-  std::vector<CellData<dim> > cells (N, CellData<dim>());
+  std::vector<CellData<2> > cells (N, CellData<2>());
 
   for (unsigned int i=0; i<N; ++i)
     {
@@ -1740,15 +1694,10 @@ GridGenerator::half_hyper_shell (Triangulation<dim>   &tria,
 
 
 
-#endif
-
-
-#if deal_II_dimension == 3
-
 
 // Implementation for 3D only
-template <int dim>
-void GridGenerator::hyper_cube_slit (Triangulation<dim>& tria,
+template <>
+void GridGenerator::hyper_cube_slit (Triangulation<3>& tria,
 				     const double left,
 				     const double right,
 				     const bool colorize)
@@ -1756,33 +1705,33 @@ void GridGenerator::hyper_cube_slit (Triangulation<dim>& tria,
   const double rl2=(right+left)/2;
   const double len = (right-left)/2.;
 
-  const Point<dim> vertices[20] = {
-	Point<dim>(left, left , -len/2.),
-	Point<dim>(rl2,  left , -len/2.),
-	Point<dim>(rl2,  rl2  , -len/2.),
-	Point<dim>(left, rl2  , -len/2.),
-	Point<dim>(right,left , -len/2.),
-	Point<dim>(right,rl2  , -len/2.),
-	Point<dim>(rl2,  right, -len/2.),
-	Point<dim>(left, right, -len/2.),
-	Point<dim>(right,right, -len/2.),
-	Point<dim>(rl2,  left , -len/2.),
-	Point<dim>(left, left , len/2.),
-	Point<dim>(rl2,  left , len/2.),
-	Point<dim>(rl2,  rl2  , len/2.),
-	Point<dim>(left, rl2  , len/2.),
-	Point<dim>(right,left , len/2.),
-	Point<dim>(right,rl2  , len/2.),
-	Point<dim>(rl2,  right, len/2.),
-	Point<dim>(left, right, len/2.),
-	Point<dim>(right,right, len/2.),
-	Point<dim>(rl2,  left , len/2.)
+  const Point<3> vertices[20] = {
+	Point<3>(left, left , -len/2.),
+	Point<3>(rl2,  left , -len/2.),
+	Point<3>(rl2,  rl2  , -len/2.),
+	Point<3>(left, rl2  , -len/2.),
+	Point<3>(right,left , -len/2.),
+	Point<3>(right,rl2  , -len/2.),
+	Point<3>(rl2,  right, -len/2.),
+	Point<3>(left, right, -len/2.),
+	Point<3>(right,right, -len/2.),
+	Point<3>(rl2,  left , -len/2.),
+	Point<3>(left, left , len/2.),
+	Point<3>(rl2,  left , len/2.),
+	Point<3>(rl2,  rl2  , len/2.),
+	Point<3>(left, rl2  , len/2.),
+	Point<3>(right,left , len/2.),
+	Point<3>(right,rl2  , len/2.),
+	Point<3>(rl2,  right, len/2.),
+	Point<3>(left, right, len/2.),
+	Point<3>(right,right, len/2.),
+	Point<3>(rl2,  left , len/2.)
   };
   const int cell_vertices[4][8] = { { 0,1,3,2, 10, 11, 13, 12 },
 				    { 9,4,2,5, 19,14, 12, 15 },
 				    { 3,2,7,6,13,12,17,16 },
 				    { 2,5,6,8,12,15,16,18 } };
-  std::vector<CellData<dim> > cells (4, CellData<dim>());
+  std::vector<CellData<3> > cells (4, CellData<3>());
   for (unsigned int i=0; i<4; ++i)
     {
       for (unsigned int j=0; j<8; ++j)
@@ -1790,14 +1739,14 @@ void GridGenerator::hyper_cube_slit (Triangulation<dim>& tria,
       cells[i].material_id = 0;
     };
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[20]),
+    std::vector<Point<3> >(&vertices[0], &vertices[20]),
     cells,
     SubCellData());       // no boundary information
 
   if (colorize)
     {
       Assert(false, ExcNotImplemented());
-      typename Triangulation<dim>::cell_iterator cell = tria.begin();
+      Triangulation<3>::cell_iterator cell = tria.begin();
       cell->face(1)->set_boundary_indicator(1);
       ++cell;
       cell->face(3)->set_boundary_indicator(2);
@@ -1807,8 +1756,8 @@ void GridGenerator::hyper_cube_slit (Triangulation<dim>& tria,
 
 
 // Implementation for 3D only
-template <int dim>
-void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
+template <>
+void GridGenerator::enclosed_hyper_cube (Triangulation<3> &tria,
 					 const double        left,
 					 const double        right,
 					 const double        thickness,
@@ -1817,7 +1766,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
   Assert(left<right,
 	 ExcMessage ("Invalid left-to-right bounds of enclosed hypercube"));
 
-  std::vector<Point<dim> > vertices(64);
+  std::vector<Point<3> > vertices(64);
   double coords[4];
   coords[0] = left-thickness;
   coords[1] = left;
@@ -1828,7 +1777,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
   for (unsigned int z=0;z<4;++z)
     for (unsigned int y=0;y<4;++y)
       for (unsigned int x=0;x<4;++x)
-	vertices[k++] = Point<dim>(coords[x], coords[y], coords[z]);
+	vertices[k++] = Point<3>(coords[x], coords[y], coords[z]);
 
   const unsigned char materials[27] = {
 	21,20,22,
@@ -1842,7 +1791,7 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
 	41,40,42
   };
 
-  std::vector<CellData<dim> > cells(27);
+  std::vector<CellData<3> > cells(27);
   k = 0;
   for (unsigned int z=0;z<3;++z)
     for (unsigned int y=0;y<3;++y)
@@ -1868,54 +1817,53 @@ void GridGenerator::enclosed_hyper_cube (Triangulation<dim> &tria,
 
 
 
-template <int dim>
-void GridGenerator::truncated_cone (Triangulation<dim> &triangulation,
+template <>
+void GridGenerator::truncated_cone (Triangulation<3> &triangulation,
 				    const double radius_0,
 				    const double radius_1,
 				    const double half_length)
 {
-  Assert (dim <= 3, ExcNotImplemented());
 				   // Determine number of cells and vertices
   const unsigned int n_cells = static_cast<unsigned int>(std::floor (half_length /
 								     std::max (radius_0,
 									       radius_1) +
 								     0.5));
   const unsigned int n_vertices = 4 * (n_cells + 1);
-  std::vector<Point<dim> > vertices_tmp(n_vertices);
+  std::vector<Point<3> > vertices_tmp(n_vertices);
 
-  vertices_tmp[0] = Point<dim> (-half_length, 0, -radius_0);
-  vertices_tmp[1] = Point<dim> (-half_length, radius_0, 0);
-  vertices_tmp[2] = Point<dim> (-half_length, -radius_0, 0);
-  vertices_tmp[3] = Point<dim> (-half_length, 0, radius_0);
+  vertices_tmp[0] = Point<3> (-half_length, 0, -radius_0);
+  vertices_tmp[1] = Point<3> (-half_length, radius_0, 0);
+  vertices_tmp[2] = Point<3> (-half_length, -radius_0, 0);
+  vertices_tmp[3] = Point<3> (-half_length, 0, radius_0);
 
   const double dx = 2 * half_length / n_cells;
 
   for (unsigned int i = 0; i < n_cells; ++i) {
     vertices_tmp[4 * (i + 1)]
       = vertices_tmp[4 * i] +
-      Point<dim> (dx, 0, 0.5 * (radius_0 - radius_1) * dx / half_length);
+      Point<3> (dx, 0, 0.5 * (radius_0 - radius_1) * dx / half_length);
     vertices_tmp[4 * i + 5]
       = vertices_tmp[4 * i + 1] +
-      Point<dim> (dx, 0.5 * (radius_1 - radius_0) * dx / half_length, 0);
+      Point<3> (dx, 0.5 * (radius_1 - radius_0) * dx / half_length, 0);
     vertices_tmp[4 * i + 6]
       = vertices_tmp[4 * i + 2] +
-      Point<dim> (dx, 0.5 * (radius_0 - radius_1) * dx / half_length, 0);
+      Point<3> (dx, 0.5 * (radius_0 - radius_1) * dx / half_length, 0);
     vertices_tmp[4 * i + 7]
       = vertices_tmp[4 * i + 3] +
-      Point<dim> (dx, 0, 0.5 * (radius_1 - radius_0) * dx / half_length);
+      Point<3> (dx, 0, 0.5 * (radius_1 - radius_0) * dx / half_length);
   }
 
-  const std::vector<Point<dim> > vertices (&vertices_tmp[0], &vertices_tmp[n_vertices]);
-  Table<2,unsigned int> cell_vertices(n_cells,GeometryInfo<dim>::vertices_per_cell);
+  const std::vector<Point<3> > vertices (&vertices_tmp[0], &vertices_tmp[n_vertices]);
+  Table<2,unsigned int> cell_vertices(n_cells,GeometryInfo<3>::vertices_per_cell);
 
   for (unsigned int i = 0; i < n_cells; ++i)
-    for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+    for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
       cell_vertices[i][j] = 4 * i + j;
 
-  std::vector<CellData<dim> > cells (n_cells, CellData<dim> ());
+  std::vector<CellData<3> > cells (n_cells, CellData<3> ());
 
   for (unsigned int i = 0; i < n_cells; ++i) {
-    for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_cell; ++j)
+    for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
       cells[i].vertices[j] = cell_vertices[i][j];
 
     cells[i].material_id = 0;
@@ -1923,7 +1871,7 @@ void GridGenerator::truncated_cone (Triangulation<dim> &triangulation,
 
   triangulation.create_triangulation (vertices, cells, SubCellData ());
 
-  for (typename Triangulation<dim>::cell_iterator cell = triangulation.begin ();
+  for (Triangulation<3>::cell_iterator cell = triangulation.begin ();
        cell != triangulation.end (); ++cell) {
     if (cell->vertex (0) (0) == -half_length) {
       cell->face (4)->set_boundary_indicator (1);
@@ -1946,46 +1894,46 @@ void GridGenerator::truncated_cone (Triangulation<dim> &triangulation,
 
 
 // Implementation for 3D only
-template <int dim>
+template <>
 void
-GridGenerator::hyper_L (Triangulation<dim> &tria,
+GridGenerator::hyper_L (Triangulation<3> &tria,
 			const double      a,
 			const double      b)
 {
 				   // we slice out the top back right
 				   // part of the cube
-  const Point<dim> vertices[26]
+  const Point<3> vertices[26]
     = {
 					   // front face of the big cube
-	  Point<dim> (a,      a,a),
-	  Point<dim> ((a+b)/2,a,a),
-	  Point<dim> (b,      a,a),
-	  Point<dim> (a,      a,(a+b)/2),
-	  Point<dim> ((a+b)/2,a,(a+b)/2),
-	  Point<dim> (b,      a,(a+b)/2),
-	  Point<dim> (a,      a,b),
-	  Point<dim> ((a+b)/2,a,b),
-	  Point<dim> (b,      a,b),
+	  Point<3> (a,      a,a),
+	  Point<3> ((a+b)/2,a,a),
+	  Point<3> (b,      a,a),
+	  Point<3> (a,      a,(a+b)/2),
+	  Point<3> ((a+b)/2,a,(a+b)/2),
+	  Point<3> (b,      a,(a+b)/2),
+	  Point<3> (a,      a,b),
+	  Point<3> ((a+b)/2,a,b),
+	  Point<3> (b,      a,b),
 					   // middle face of the big cube
-	  Point<dim> (a,      (a+b)/2,a),
-	  Point<dim> ((a+b)/2,(a+b)/2,a),
-	  Point<dim> (b,      (a+b)/2,a),
-	  Point<dim> (a,      (a+b)/2,(a+b)/2),
-	  Point<dim> ((a+b)/2,(a+b)/2,(a+b)/2),
-	  Point<dim> (b,      (a+b)/2,(a+b)/2),
-	  Point<dim> (a,      (a+b)/2,b),
-	  Point<dim> ((a+b)/2,(a+b)/2,b),
-	  Point<dim> (b,      (a+b)/2,b),
+	  Point<3> (a,      (a+b)/2,a),
+	  Point<3> ((a+b)/2,(a+b)/2,a),
+	  Point<3> (b,      (a+b)/2,a),
+	  Point<3> (a,      (a+b)/2,(a+b)/2),
+	  Point<3> ((a+b)/2,(a+b)/2,(a+b)/2),
+	  Point<3> (b,      (a+b)/2,(a+b)/2),
+	  Point<3> (a,      (a+b)/2,b),
+	  Point<3> ((a+b)/2,(a+b)/2,b),
+	  Point<3> (b,      (a+b)/2,b),
 					   // back face of the big cube
 					   // last (top right) point is missing
-	  Point<dim> (a,      b,a),
-	  Point<dim> ((a+b)/2,b,a),
-	  Point<dim> (b,      b,a),
-	  Point<dim> (a,      b,(a+b)/2),
-	  Point<dim> ((a+b)/2,b,(a+b)/2),
-	  Point<dim> (b,      b,(a+b)/2),
-	  Point<dim> (a,      b,b),
-	  Point<dim> ((a+b)/2,b,b)
+	  Point<3> (a,      b,a),
+	  Point<3> ((a+b)/2,b,a),
+	  Point<3> (b,      b,a),
+	  Point<3> (a,      b,(a+b)/2),
+	  Point<3> ((a+b)/2,b,(a+b)/2),
+	  Point<3> (b,      b,(a+b)/2),
+	  Point<3> (a,      b,b),
+	  Point<3> ((a+b)/2,b,b)
     };
   const int cell_vertices[7][8] = {{0, 1, 9, 10, 3, 4, 12, 13},
 				   {1, 2, 10, 11, 4, 5, 13, 14},
@@ -1995,7 +1943,7 @@ GridGenerator::hyper_L (Triangulation<dim> &tria,
 				   {10, 11, 19, 20, 13, 14, 22, 23},
 				   {12, 13, 21, 22, 15, 16, 24, 25}};
 
-  std::vector<CellData<dim> > cells (7, CellData<dim>());
+  std::vector<CellData<3> > cells (7, CellData<3>());
 
   for (unsigned int i=0; i<7; ++i)
     {
@@ -2005,7 +1953,7 @@ GridGenerator::hyper_L (Triangulation<dim> &tria,
     };
 
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[26]),
+    std::vector<Point<3> >(&vertices[0], &vertices[26]),
     cells,
     SubCellData());       // no boundary information
 }
@@ -2013,38 +1961,38 @@ GridGenerator::hyper_L (Triangulation<dim> &tria,
 
 
 // Implementation for 3D only
-template <int dim>
+template <>
 void
-GridGenerator::hyper_ball (Triangulation<dim> &tria,
-			   const Point<dim>   &p,
+GridGenerator::hyper_ball (Triangulation<3> &tria,
+			   const Point<3>   &p,
 			   const double radius)
 {
   const double a = 1./(1+std::sqrt(3.0)); // equilibrate cell sizes at transition
 				          // from the inner part to the radial
 				          // cells
   const unsigned int n_vertices = 16;
-  const Point<dim> vertices[n_vertices]
+  const Point<3> vertices[n_vertices]
     = {
 					   // first the vertices of the inner
 					   // cell
-	  p+Point<dim>(-1,-1,-1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(+1,-1,-1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(+1,-1,+1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(-1,-1,+1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(-1,+1,-1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(+1,+1,-1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(+1,+1,+1)*(radius/std::sqrt(3.0)*a),
-	  p+Point<dim>(-1,+1,+1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(-1,-1,-1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(+1,-1,-1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(+1,-1,+1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(+1,+1,+1)*(radius/std::sqrt(3.0)*a),
+	  p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0)*a),
 					   // now the eight vertices at
 					   // the outer sphere
-	  p+Point<dim>(-1,-1,-1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(+1,-1,-1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(+1,-1,+1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(-1,-1,+1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(-1,+1,-1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(+1,+1,-1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(+1,+1,+1)*(radius/std::sqrt(3.0)),
-	  p+Point<dim>(-1,+1,+1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(-1,-1,-1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(+1,-1,-1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(+1,-1,+1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(-1,-1,+1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(-1,+1,-1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(+1,+1,-1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(+1,+1,+1)*(radius/std::sqrt(3.0)),
+	  p+Point<3>(-1,+1,+1)*(radius/std::sqrt(3.0)),
     };
 
 				   // one needs to draw the seven cubes to
@@ -2058,17 +2006,17 @@ GridGenerator::hyper_ball (Triangulation<dim> &tria,
 					 {8, 9, 0, 1, 11, 10, 3, 2}, // front
 					 {12, 4, 13, 5, 15, 7, 14, 6}}; // back
 
-  std::vector<CellData<dim> > cells (n_cells, CellData<dim>());
+  std::vector<CellData<3> > cells (n_cells, CellData<3>());
 
   for (unsigned int i=0; i<n_cells; ++i)
     {
-      for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
+      for (unsigned int j=0; j<GeometryInfo<3>::vertices_per_cell; ++j)
 	cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     };
 
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[n_vertices]),
+    std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
     cells,
     SubCellData());       // no boundary information
 }
@@ -2076,43 +2024,41 @@ GridGenerator::hyper_ball (Triangulation<dim> &tria,
 
 
 // Implementation for 3D only
-template <int dim>
+template <>
 void
-GridGenerator::cylinder (Triangulation<dim> &tria,
+GridGenerator::cylinder (Triangulation<3> &tria,
 			 const double radius,
 			 const double half_length)
 {
-  Assert (dim <= 3, ExcNotImplemented());
-
-				   // Copy the base from hyper_ball<dim>
+				   // Copy the base from hyper_ball<3>
 				   // and transform it to yz
   const double d = radius/std::sqrt(2.0);
   const double a = d/(1+std::sqrt(2.0));
-  Point<dim> vertices[24] = {
-	Point<dim>(-d, -half_length,-d),
-	Point<dim>( d, -half_length,-d),
-	Point<dim>(-a, -half_length,-a),
-	Point<dim>( a, -half_length,-a),
-	Point<dim>(-a, -half_length, a),
-	Point<dim>( a, -half_length, a),
-	Point<dim>(-d, -half_length, d),
-	Point<dim>( d, -half_length, d),
-	Point<dim>(-d, 0,-d),
-	Point<dim>( d, 0,-d),
-	Point<dim>(-a, 0,-a),
-	Point<dim>( a, 0,-a),
-	Point<dim>(-a, 0, a),
-	Point<dim>( a, 0, a),
-	Point<dim>(-d, 0, d),
-	Point<dim>( d, 0, d),
-	Point<dim>(-d, half_length,-d),
-	Point<dim>( d, half_length,-d),
-	Point<dim>(-a, half_length,-a),
-	Point<dim>( a, half_length,-a),
-	Point<dim>(-a, half_length, a),
-	Point<dim>( a, half_length, a),
-	Point<dim>(-d, half_length, d),
-	Point<dim>( d, half_length, d),
+  Point<3> vertices[24] = {
+	Point<3>(-d, -half_length,-d),
+	Point<3>( d, -half_length,-d),
+	Point<3>(-a, -half_length,-a),
+	Point<3>( a, -half_length,-a),
+	Point<3>(-a, -half_length, a),
+	Point<3>( a, -half_length, a),
+	Point<3>(-d, -half_length, d),
+	Point<3>( d, -half_length, d),
+	Point<3>(-d, 0,-d),
+	Point<3>( d, 0,-d),
+	Point<3>(-a, 0,-a),
+	Point<3>( a, 0,-a),
+	Point<3>(-a, 0, a),
+	Point<3>( a, 0, a),
+	Point<3>(-d, 0, d),
+	Point<3>( d, 0, d),
+	Point<3>(-d, half_length,-d),
+	Point<3>( d, half_length,-d),
+	Point<3>(-a, half_length,-a),
+	Point<3>( a, half_length,-a),
+	Point<3>(-a, half_length, a),
+	Point<3>( a, half_length, a),
+	Point<3>(-d, half_length, d),
+	Point<3>( d, half_length, d),
   };
 				   // Turn cylinder such that y->x
   for (unsigned int i=0;i<24;++i)
@@ -2133,7 +2079,7 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
     for (unsigned int j=0;j<8;++j)
       cell_vertices[i+5][j] = cell_vertices[i][j]+8;
 
-  std::vector<CellData<dim> > cells (10, CellData<dim>());
+  std::vector<CellData<3> > cells (10, CellData<3>());
 
   for (unsigned int i=0; i<10; ++i)
     {
@@ -2143,7 +2089,7 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
     };
 
   tria.create_triangulation (
-    std::vector<Point<dim> >(&vertices[0], &vertices[24]),
+    std::vector<Point<3> >(&vertices[0], &vertices[24]),
     cells,
     SubCellData());       // no boundary information
 
@@ -2157,18 +2103,18 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
 				   // interior if one of its vertices
 				   // is at coordinates '+-a' as set
 				   // above
-  typename Triangulation<dim>::cell_iterator cell = tria.begin();
-  typename Triangulation<dim>::cell_iterator end = tria.end();
+  Triangulation<3>::cell_iterator cell = tria.begin();
+  Triangulation<3>::cell_iterator end = tria.end();
 
   for (; cell != end; ++cell)
-    for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
+    for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
       if (cell->at_boundary(i))
 	{
 	  if (cell->face(i)->center()(0) > half_length-1.e-5)
 	    {
 	      cell->face(i)->set_boundary_indicator(2);
 
-	      for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+	      for (unsigned int e=0; e<GeometryInfo<3>::lines_per_face; ++e)
 		if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
 		    (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
 		    (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
@@ -2179,7 +2125,7 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
 	    {
 	      cell->face(i)->set_boundary_indicator(1);
 
-	      for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
+	      for (unsigned int e=0; e<GeometryInfo<3>::lines_per_face; ++e)
 		if ((std::fabs(cell->face(i)->line(e)->vertex(0)[1]) == a) ||
 		    (std::fabs(cell->face(i)->line(e)->vertex(0)[2]) == a) ||
 		    (std::fabs(cell->face(i)->line(e)->vertex(1)[1]) == a) ||
@@ -2192,10 +2138,10 @@ GridGenerator::cylinder (Triangulation<dim> &tria,
 
 
 // Implementation for 3D only
-template <int dim>
+template <>
 void
-GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
-				const Point<dim>& center,
+GridGenerator::half_hyper_ball (Triangulation<3>& tria,
+				const Point<3>& center,
 				const double radius)
 {
     // These are for the two lower squares
@@ -2208,24 +2154,24 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
     const double hb = radius*std::sqrt(3.0)/4.0;
     const double hc = radius*std::sqrt(3.0)/2.0;
 
-    Point<dim> vertices[16] = {
-	center+Point<dim>( 0,  d, -d),
-	center+Point<dim>( 0, -d, -d),
-	center+Point<dim>( 0,  a, -a),
-	center+Point<dim>( 0, -a, -a),
-	center+Point<dim>( 0,  a,  a),
-	center+Point<dim>( 0, -a,  a),
-	center+Point<dim>( 0,  d,  d),
-	center+Point<dim>( 0, -d,  d),
+    Point<3> vertices[16] = {
+	center+Point<3>( 0,  d, -d),
+	center+Point<3>( 0, -d, -d),
+	center+Point<3>( 0,  a, -a),
+	center+Point<3>( 0, -a, -a),
+	center+Point<3>( 0,  a,  a),
+	center+Point<3>( 0, -a,  a),
+	center+Point<3>( 0,  d,  d),
+	center+Point<3>( 0, -d,  d),
 
-	center+Point<dim>(hc,  c, -c),
-	center+Point<dim>(hc, -c, -c),
-	center+Point<dim>(hb,  b, -b),
-	center+Point<dim>(hb, -b, -b),
-	center+Point<dim>(hb,  b,  b),
-	center+Point<dim>(hb, -b,  b),
-	center+Point<dim>(hc,  c,  c),
-	center+Point<dim>(hc, -c,  c),
+	center+Point<3>(hc,  c, -c),
+	center+Point<3>(hc, -c, -c),
+	center+Point<3>(hb,  b, -b),
+	center+Point<3>(hb, -b, -b),
+	center+Point<3>(hb,  b,  b),
+	center+Point<3>(hb, -b,  b),
+	center+Point<3>(hc,  c,  c),
+	center+Point<3>(hc, -c,  c),
     };
 
     int cell_vertices[6][8] = {
@@ -2237,7 +2183,7 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 	{8, 10, 9, 11, 14, 12, 15, 13}
     };
 
-    std::vector<CellData<dim> > cells (6, CellData<dim>());
+    std::vector<CellData<3> > cells (6, CellData<3>());
 
     for (unsigned int i=0; i<6; ++i)
     {
@@ -2247,16 +2193,16 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
     };
 
     tria.create_triangulation (
-	    std::vector<Point<dim> >(&vertices[0], &vertices[16]),
+	    std::vector<Point<3> >(&vertices[0], &vertices[16]),
 	    cells,
 	    SubCellData());       // no boundary information
 
-    typename Triangulation<dim>::cell_iterator cell = tria.begin();
-    typename Triangulation<dim>::cell_iterator end = tria.end();
+    Triangulation<3>::cell_iterator cell = tria.begin();
+    Triangulation<3>::cell_iterator end = tria.end();
 
     while (cell != end)
     {
-	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	for (unsigned int i=0;i<GeometryInfo<3>::faces_per_cell;++i)
 	{
 	    if (!cell->at_boundary(i))
 		continue;
@@ -2265,12 +2211,12 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 	    // element
 	    if (cell->face(i)->center()(0) < center(0)+1.e-5) {
 		cell->face(i)->set_boundary_indicator(1);
-		for (unsigned int j=0;j<GeometryInfo<dim>::lines_per_face;++j)
+		for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
 		    cell->face(i)->line(j)->set_boundary_indicator(1);
 	    }
 	}
 	// With this loop we restore back the indicator of the outer lines
-	for (unsigned int i=0;i<GeometryInfo<dim>::faces_per_cell;++i)
+	for (unsigned int i=0;i<GeometryInfo<3>::faces_per_cell;++i)
 	{
 	    if (!cell->at_boundary(i))
 		continue;
@@ -2278,7 +2224,7 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 	    // If the center is not on the plane x=0, this is a curvilinear
 	    // element
 	    if (cell->face(i)->center()(0) > center(0)+1.e-5) {
-		for (unsigned int j=0;j<GeometryInfo<dim>::lines_per_face;++j)
+		for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
 		    cell->face(i)->line(j)->set_boundary_indicator(0);
 	    }
 	}
@@ -2287,9 +2233,42 @@ GridGenerator::half_hyper_ball (Triangulation<dim>& tria,
 }
 
 // Implementation for 3D only
-template <int dim>
-void GridGenerator::hyper_shell (Triangulation<dim>& tria,
-				 const Point<dim>& p,
+template<>
+void
+GridGenerator::colorize_hyper_shell (
+  Triangulation<3>& tria,
+  const Point<3>&, const double, const double)
+{
+				   // Inspite of receiving geometrical
+				   // data, we do this only based on
+				   // topology.
+
+				   // For the mesh based on  cube,
+				   // this is highly irregular
+  if (tria.n_cells() == 6)
+    {
+      Triangulation<3>::cell_iterator cell = tria.begin();
+      cell->face(4)->set_boundary_indicator(1);
+      (++cell)->face(2)->set_boundary_indicator(1);
+      (++cell)->face(2)->set_boundary_indicator(1);
+      (++cell)->face(0)->set_boundary_indicator(1);
+      (++cell)->face(2)->set_boundary_indicator(1);
+      (++cell)->face(0)->set_boundary_indicator(1);
+    }
+  else
+				     // For higher polyhedra, this is regular.
+    {
+      for (Triangulation<3>::cell_iterator cell = tria.begin();
+	   cell != tria.end(); ++cell)
+	cell->face(5)->set_boundary_indicator(1);
+    }
+}
+
+
+
+template <>
+void GridGenerator::hyper_shell (Triangulation<3>& tria,
+				 const Point<3>& p,
 				 const double inner_radius,
 				 const double outer_radius,
 				 const unsigned int n,
@@ -2300,8 +2279,8 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
 
   const double irad = inner_radius/std::sqrt(3.0);
   const double orad = outer_radius/std::sqrt(3.0);
-  std::vector<Point<dim> > vertices;
-  std::vector<CellData<dim> > cells;
+  std::vector<Point<3> > vertices;
+  std::vector<CellData<3> > cells;
 
 				   // Start with the shell bounded by
 				   // two nested cubes
@@ -2321,11 +2300,11 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
 	 {8, 9, 0, 1, 12, 13, 4, 5}, // front
 	 {10, 2, 11, 3, 14, 6, 15, 7}}; // back
 
-      cells.resize(n_cells, CellData<dim>());
+      cells.resize(n_cells, CellData<3>());
 
       for (unsigned int i=0; i<n_cells; ++i)
 	{
-	  for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
+	  for (unsigned int j=0; j<GeometryInfo<3>::vertices_per_cell; ++j)
 	    cells[i].vertices[j] = cell_vertices[i][j];
 	  cells[i].material_id = 0;
 	}
@@ -2359,7 +2338,7 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
 	 { 12,  0,  2,  8},
 	 {  1, 10, 12,  0}};
 
-      cells.resize(n_cells, CellData<dim>());
+      cells.resize(n_cells, CellData<3>());
 
       for (unsigned int i=0; i<n_cells; ++i)
 	{
@@ -2385,43 +2364,13 @@ void GridGenerator::hyper_shell (Triangulation<dim>& tria,
 }
 
 
-template<int dim>
-void
-GridGenerator::colorize_hyper_shell (
-  Triangulation<dim>& tria,
-  const Point<dim>&, const double, const double)
-{
-				   // Inspite of receiving geometrical
-				   // data, we do this only based on
-				   // topology.
-
-				   // For the mesh based on  cube,
-				   // this is highly irregular
-  if (tria.n_cells() == 6)
-    {
-      typename Triangulation<dim>::cell_iterator cell = tria.begin();
-      cell->face(4)->set_boundary_indicator(1);
-      (++cell)->face(2)->set_boundary_indicator(1);
-      (++cell)->face(2)->set_boundary_indicator(1);
-      (++cell)->face(0)->set_boundary_indicator(1);
-      (++cell)->face(2)->set_boundary_indicator(1);
-      (++cell)->face(0)->set_boundary_indicator(1);
-    }
-  else
-				     // For higher polyhedra, this is regular.
-    {
-      for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
-	   cell != tria.end(); ++cell)
-	cell->face(5)->set_boundary_indicator(1);
-    }
-}
 
 
 // Implementation for 3D only
-template <int dim>
+template <>
 void
-GridGenerator::half_hyper_shell (Triangulation<dim>& tria,
-				 const Point<dim>& center,
+GridGenerator::half_hyper_shell (Triangulation<3>& tria,
+				 const Point<3>& center,
 				 const double inner_radius,
 				 const double outer_radius,
 				 const unsigned int n)
@@ -2441,24 +2390,24 @@ GridGenerator::half_hyper_shell (Triangulation<dim>& tria,
       const double hb = inner_radius*std::sqrt(3.0)/2.0;
       const double hc = outer_radius*std::sqrt(3.0)/2.0;
 
-      Point<dim> vertices[16] = {
-	center+Point<dim>( 0,  d, -d),
-	center+Point<dim>( 0, -d, -d),
-	center+Point<dim>( 0,  a, -a),
-	center+Point<dim>( 0, -a, -a),
-	center+Point<dim>( 0,  a,  a),
-	center+Point<dim>( 0, -a,  a),
-	center+Point<dim>( 0,  d,  d),
-	center+Point<dim>( 0, -d,  d),
+      Point<3> vertices[16] = {
+	center+Point<3>( 0,  d, -d),
+	center+Point<3>( 0, -d, -d),
+	center+Point<3>( 0,  a, -a),
+	center+Point<3>( 0, -a, -a),
+	center+Point<3>( 0,  a,  a),
+	center+Point<3>( 0, -a,  a),
+	center+Point<3>( 0,  d,  d),
+	center+Point<3>( 0, -d,  d),
 
-	center+Point<dim>(hc,  c, -c),
-	center+Point<dim>(hc, -c, -c),
-	center+Point<dim>(hb,  b, -b),
-	center+Point<dim>(hb, -b, -b),
-	center+Point<dim>(hb,  b,  b),
-	center+Point<dim>(hb, -b,  b),
-	center+Point<dim>(hc,  c,  c),
-	center+Point<dim>(hc, -c,  c),
+	center+Point<3>(hc,  c, -c),
+	center+Point<3>(hc, -c, -c),
+	center+Point<3>(hb,  b, -b),
+	center+Point<3>(hb, -b, -b),
+	center+Point<3>(hb,  b,  b),
+	center+Point<3>(hb, -b,  b),
+	center+Point<3>(hc,  c,  c),
+	center+Point<3>(hc, -c,  c),
       };
 
       int cell_vertices[5][8] = {
@@ -2469,7 +2418,7 @@ GridGenerator::half_hyper_shell (Triangulation<dim>& tria,
 	{8, 10, 9, 11, 14, 12, 15, 13}
       };
 
-      std::vector<CellData<dim> > cells (5, CellData<dim>());
+      std::vector<CellData<3> > cells (5, CellData<3>());
 
       for (unsigned int i=0; i<5; ++i)
 	{
@@ -2479,7 +2428,7 @@ GridGenerator::half_hyper_shell (Triangulation<dim>& tria,
 	};
 
       tria.create_triangulation (
-	     std::vector<Point<dim> >(&vertices[0], &vertices[16]),
+	     std::vector<Point<3> >(&vertices[0], &vertices[16]),
 	     cells,
 	     SubCellData());       // no boundary information
     }
@@ -2493,8 +2442,8 @@ GridGenerator::half_hyper_shell (Triangulation<dim>& tria,
 
 
 // Implementation for 3D only
-template <int dim>
-void GridGenerator::cylinder_shell (Triangulation<dim>   &tria,
+template <>
+void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
                                     const double        length,
                                     const double        inner_radius,
                                     const double        outer_radius,
@@ -2551,7 +2500,7 @@ void GridGenerator::cylinder_shell (Triangulation<dim>   &tria,
         vertices_3d.push_back (v);
       }
 
-  std::vector<CellData<dim> > cells (N_r*N_z, CellData<dim>());
+  std::vector<CellData<3> > cells (N_r*N_z, CellData<3>());
 
   for (unsigned int j=0; j<N_z; ++j)
     for (unsigned int i=0; i<N_r; ++i)
@@ -2574,8 +2523,6 @@ void GridGenerator::cylinder_shell (Triangulation<dim>   &tria,
 }
 
 
-
-#endif
 
 
 // make the following function inline. this is so that it becomes marked
@@ -2606,17 +2553,14 @@ void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 }
 
 
-#if deal_II_dimension == 1
-
 // Implementation for 1D only
-template <int dim>
-void GridGenerator::laplace_transformation (Triangulation<dim> &,
-					    const std::map<unsigned int,Point<dim> > &)
+template <>
+void GridGenerator::laplace_transformation (Triangulation<1> &,
+					    const std::map<unsigned int,Point<1> > &)
 {
   Assert(false, ExcNotImplemented());
 }
 
-#else
 
 // Implementation for dimensions except 1
 template <int dim>
@@ -2702,13 +2646,9 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 }
 
 
-#endif
 
-
-#if deal_II_dimension == 1
-
-template<int dim>
-void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &,
+template <>
+void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<1> &,
 				   const double,
 				   const double,
 				   const double,
@@ -2717,19 +2657,19 @@ void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &,
   Assert(false, ExcNotImplemented());
 }
 
-#endif
 
 
-#if deal_II_dimension == 2
-
-template<int dim>
-void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &triangulation,
+template <>
+void
+GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<2> &triangulation,
 				   const double inner_radius,
 				   const double outer_radius,
 				   const double, // width,
 				   const unsigned int, // width_repetition,
 				   bool colorize)
 {
+  const int dim = 2;
+
   Assert(inner_radius < outer_radius,
 	 ExcMessage("outer_radius has to be bigger than inner_radius."));
 
@@ -2738,7 +2678,7 @@ void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &triang
   GridGenerator::hyper_shell (triangulation,
 			      center, inner_radius, outer_radius,
                               8);
-  typename Triangulation<dim>::active_cell_iterator
+  Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
   std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
@@ -2797,18 +2737,16 @@ void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<dim> &triang
    }
 }
 
-#endif
-
-#if deal_II_dimension == 3
-
-template<int dim>
-void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangulation,
+template <>
+void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<3> &triangulation,
 						 const double inner_radius,
 						 const double outer_radius,
 						 const double L,
 						 const unsigned int Nz,
 						 bool colorize)
 {
+  const int dim = 3;
+
   Assert(inner_radius < outer_radius,
 	 ExcMessage("outer_radius has to be bigger than inner_radius."));
   Assert(L > 0,
@@ -2820,7 +2758,7 @@ void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangu
 				 8,
 				 Nz);
 
-  typename Triangulation<dim>::active_cell_iterator
+  Triangulation<dim>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
   std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
@@ -2903,120 +2841,8 @@ void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<dim> &triangu
    }
 }
 
-#endif
-
 
 // explicit instantiations
-template void
-GridGenerator::hyper_cube<deal_II_dimension> (
-  Triangulation<deal_II_dimension> &, const double, const double);
-
-template void
-GridGenerator::subdivided_hyper_cube<deal_II_dimension> (
-  Triangulation<deal_II_dimension> &,
-  const unsigned int, const double, const double);
-
-template void
-GridGenerator::hyper_rectangle<deal_II_dimension> (
-  Triangulation<deal_II_dimension> &,
-  const Point<deal_II_dimension>&, const Point<deal_II_dimension>&,
-  const bool);
-
-template void
-GridGenerator::subdivided_hyper_rectangle<deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const std::vector<unsigned int>&,
- const Point<deal_II_dimension>&,
- const Point<deal_II_dimension>&, bool);
-
-template void
-GridGenerator::subdivided_hyper_rectangle<deal_II_dimension>
-(Triangulation<deal_II_dimension> &,
- const std::vector<std::vector<double> >&,
- const Point<deal_II_dimension>&,
- const Point<deal_II_dimension>&, bool);
-
-template void
-GridGenerator::parallelogram<deal_II_dimension> (
-  Triangulation<deal_II_dimension> &,
-  const Tensor<2,deal_II_dimension>&,
-  const bool);
-
-template void
-GridGenerator::enclosed_hyper_cube (
-  Triangulation<deal_II_dimension>&, double, double, double, bool);
-
-template void
-GridGenerator::hyper_ball (
-  Triangulation<deal_II_dimension>&,
-  const Point<deal_II_dimension>&, double);
-
-template void
-GridGenerator::cylinder (
-  Triangulation<deal_II_dimension>&, double, double);
-
-
-template void
-GridGenerator::truncated_cone (
-  Triangulation<deal_II_dimension>&, double, double, double);
-
-template void
-GridGenerator::hyper_L (
-  Triangulation<deal_II_dimension>&, double, double);
-
-template void
-GridGenerator::hyper_cube_slit (
-  Triangulation<deal_II_dimension>&, double, double, bool);
-
-template void
-GridGenerator::hyper_shell (
-  Triangulation<deal_II_dimension>&,
-  const Point<deal_II_dimension>&, double, double, unsigned int, bool);
-
-
-template void
-GridGenerator::cylinder_shell (
-  Triangulation<deal_II_dimension>&,
-  double, double, double, unsigned int, unsigned int);
-
-template void
-GridGenerator::half_hyper_ball (
-  Triangulation<deal_II_dimension>&, const Point<deal_II_dimension>&, double);
-
-template void
-GridGenerator::half_hyper_shell (
-  Triangulation<deal_II_dimension>&,
-  const Point<deal_II_dimension>&, double, double, unsigned int);
-
-
-template void
-GridGenerator::hyper_cube_with_cylindrical_hole (
-  Triangulation<deal_II_dimension> &,
-  const double, const double, const double, const unsigned int, bool);
-
-template void
-GridGenerator::colorize_hyper_shell(
-  Triangulation<deal_II_dimension>& tria,
-  const Point<deal_II_dimension>& center,
-  const double inner_radius, const double outer_radius);
-
-template void
-GridGenerator::
-laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
-					   const std::map<unsigned int,Point<deal_II_dimension> > &);
-
-#if deal_II_dimension != 3
-
-template void
-GridGenerator::hyper_cube<deal_II_dimension, deal_II_dimension+1> (
-  Triangulation<deal_II_dimension,deal_II_dimension+1> &, const double, const double);
-template void
-GridGenerator::hyper_rectangle<deal_II_dimension,deal_II_dimension+1> (
-  Triangulation<deal_II_dimension,deal_II_dimension+1> &,
-  const Point<deal_II_dimension+1>&, const Point<deal_II_dimension+1>&,
-  const bool);
-
-#endif
-
+#include "grid_generator.inst"
 
 DEAL_II_NAMESPACE_CLOSE
