@@ -914,11 +914,22 @@ INCLUDE_FILE_PATTERNS  =
 # or name=definition (no spaces). If the definition and the = are
 # omitted =1 is assumed.
 
-# [WB] Set MT flags so that the corresponding documentation will always be visible,
-# [WB] irrespective of whether MT is actually switched on or not.
-# [GK] Define a variable doxygen in order to mask out inline functions
-PREDEFINED             = DOXYGEN=1 DEBUG=1 DEAL_II_USE_PETSC=1 DEAL_II_USE_TRILINOS=1 \
-                         DEAL_II_USE_MT=1 DEAL_II_USE_MT_POSIX=1
+# [deal.II] Set MT flags so that the corresponding documentation will always
+# be visible, irrespective of whether MT is actually switched on or not. Do
+# the same for a bunch of other external packages as well. Also, define a
+# variable DOXYGEN in order to mask out inline functions
+
+PREDEFINED             = DOXYGEN=1 \
+                         DEBUG=1 \
+                         DEAL_II_USE_PETSC=1 \
+                         DEAL_II_USE_SLEPC=1 \
+                         DEAL_II_USE_TRILINOS=1 \
+                         DEAL_II_USE_MT=1 \
+                         DEAL_II_USE_MT_POSIX=1 \
+			 DEAL_II_USE_ARPACK=1 \
+			 DEAL_II_USE_METIS=1 \
+			 DEAL_II_USE_MUMPS=1 \
+			 DEAL_II_USE_P4EST=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.
