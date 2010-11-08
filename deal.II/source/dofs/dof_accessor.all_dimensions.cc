@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -247,137 +247,7 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
 
 
 // --------------------------------------------------------------------------
-// explicit instantiations (for DoFHandler)
-
-#if deal_II_dimension == 1
-template class DoFAccessor<1, DoFHandler<1> >;
-#endif
-
-#if deal_II_dimension == 2
-template class DoFAccessor<1, DoFHandler<2> >;
-template class DoFAccessor<2, DoFHandler<2> >;
-
-template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2> > >;
-template class TriaIterator      <DoFAccessor<1, DoFHandler<2> > >;
-template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2> > >;
-#endif
-
-#if deal_II_dimension == 3
-template class DoFAccessor<1, DoFHandler<3> >;
-template class DoFAccessor<2, DoFHandler<3> >;
-template class DoFAccessor<3, DoFHandler<3> >;
-
-template class TriaRawIterator   <DoFAccessor<1, DoFHandler<3> > >;
-template class TriaIterator      <DoFAccessor<1, DoFHandler<3> > >;
-template class TriaActiveIterator<DoFAccessor<1, DoFHandler<3> > >;
-template class TriaRawIterator   <DoFAccessor<2, DoFHandler<3> > >;
-template class TriaIterator      <DoFAccessor<2, DoFHandler<3> > >;
-template class TriaActiveIterator<DoFAccessor<2, DoFHandler<3> > >;
-#endif
-
-
-template class DoFCellAccessor<DoFHandler<deal_II_dimension> >;
-
-template class TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-template class TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-template class TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-
-
-// --------------------------------------------------------------------------
-// explicit instantiations (for hp::DoFHandler)
-
-#if deal_II_dimension == 1
-template class DoFAccessor<1, hp::DoFHandler<1> >;
-#endif
-
-#if deal_II_dimension == 2
-template class DoFAccessor<1, hp::DoFHandler<2> >;
-template class DoFAccessor<2, hp::DoFHandler<2> >;
-
-template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2> > >;
-template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2> > >;
-template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2> > >;
-#endif
-
-
-#if deal_II_dimension == 3
-template class DoFAccessor<1, hp::DoFHandler<3> >;
-template class DoFAccessor<2, hp::DoFHandler<3> >;
-template class DoFAccessor<3, hp::DoFHandler<3> >;
-
-template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<3> > >;
-template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<3> > >;
-template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<3> > >;
-template class TriaRawIterator   <DoFAccessor<2, hp::DoFHandler<3> > >;
-template class TriaIterator      <DoFAccessor<2, hp::DoFHandler<3> > >;
-template class TriaActiveIterator<DoFAccessor<2, hp::DoFHandler<3> > >;
-#endif
-
-
-template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >;
-
-template class TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-template class TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-template class TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-
-
-
-// // --------------------------------------------------------------------------
-// // explicit instantiations (for DoFHandler)
-
-#if deal_II_dimension == 1
-template class DoFAccessor<1, DoFHandler<1,2> >;
-#endif
-
-#if deal_II_dimension == 2
-template class DoFAccessor<1, DoFHandler<2,3> >;
-template class DoFAccessor<2, DoFHandler<2,3> >;
-
-template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2,3> > >;
-template class TriaIterator      <DoFAccessor<1, DoFHandler<2,3> > >;
-template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2,3> > >;
-#endif
-
-
-#if deal_II_dimension != 3
-template class DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
-
-template class
-TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class
-TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class
-TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-#endif
-
-// --------------------------------------------------------------------------
-// explicit instantiations (for hp::DoFHandler)
-
-#if deal_II_dimension == 1
-template class DoFAccessor<1, hp::DoFHandler<1,2> >;
-#endif
-
-#if deal_II_dimension == 2
-template class DoFAccessor<1, hp::DoFHandler<2,3> >;
-template class DoFAccessor<2, hp::DoFHandler<2,3> >;
-
-template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2,3> > >;
-template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2,3> > >;
-template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2,3> > >;
-#endif
-
-#if deal_II_dimension != 3
-template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
-
-template class
-TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class
-TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-template class
-TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
-#endif
-
-
+// explicit instantiations
 #include "dof_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE

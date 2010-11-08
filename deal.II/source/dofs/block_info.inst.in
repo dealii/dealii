@@ -1,0 +1,26 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2009, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
+    template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension>&, bool);
+    template void BlockInfo::initialize_local(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
+
+#if deal_II_dimension < 3
+    template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&);
+    template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&, bool);
+    template void BlockInfo::initialize_local(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&);
+#endif
+  }
+

@@ -1,0 +1,60 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2006, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class DoFObjects<deal_II_dimension>;
+  }
+
+
+for (deal_II_dimension, structdim : DIMENSIONS)
+  {
+    template
+    unsigned int
+    DoFObjects<structdim>::
+    get_dof_index (const dealii::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       obj_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index) const;
+
+    template
+    void
+    DoFObjects<structdim>::
+    set_dof_index (const dealii::DoFHandler<deal_II_dimension> &dof_handler,
+		   const unsigned int       obj_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index);
+
+#if (deal_II_dimension < 3) && (structdim < 3)
+
+    template
+    unsigned int
+    DoFObjects<structdim>::
+    get_dof_index (const dealii::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
+		   const unsigned int       obj_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index) const;
+
+    template
+    void
+    DoFObjects<structdim>::
+    set_dof_index (const dealii::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
+		   const unsigned int       obj_index,
+		   const unsigned int       fe_index,
+		   const unsigned int       local_index,
+		   const unsigned int       global_index);
+#endif
+  }
+

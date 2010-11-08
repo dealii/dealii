@@ -72,15 +72,7 @@ BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof, bool levels_only)
 }
 
 
-template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
-template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension>&, bool);
-template void BlockInfo::initialize_local(const DoFHandler<deal_II_dimension,deal_II_dimension>&);
-
-#if deal_II_dimension==1 || deal_II_dimension==2
-template void BlockInfo::initialize(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&);
-template void BlockInfo::initialize(const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&, bool);
-template void BlockInfo::initialize_local(const DoFHandler<deal_II_dimension,deal_II_dimension+1>&);
-#endif
-
+// explicit instantiations
+#include "block_info.inst"
 
 DEAL_II_NAMESPACE_CLOSE
