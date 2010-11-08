@@ -392,9 +392,6 @@ void GridIn<dim, spacedim>::read_xda (std::istream &)
 
 
 
-// 2D XDA meshes
-#if deal_II_dimension == 2
-
 template <>
 void GridIn<2>::read_xda (std::istream &in)
 {
@@ -464,12 +461,7 @@ void GridIn<2>::read_xda (std::istream &in)
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
-#endif // #if deal_II_dimension == 2
 
-
-
-// 3-D XDA meshes
-#if deal_II_dimension == 3
 
 template <>
 void GridIn<3>::read_xda (std::istream &in)
@@ -547,7 +539,6 @@ void GridIn<3>::read_xda (std::istream &in)
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
-#endif // #if deal_II_dimension == 3
 
 
 
@@ -874,8 +865,6 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
 }
 
 
-#if deal_II_dimension == 1
-
 template <>
 void GridIn<1>::read_netcdf (const std::string &)
 {
@@ -888,11 +877,6 @@ void GridIn<1,2>::read_netcdf (const std::string &)
   AssertThrow(false, ExcImpossibleInDim(1));
 }
 
-#endif
-
-
-
-#if deal_II_dimension == 2
 
 template <>
 void GridIn<2, 3>::read_netcdf (const std::string &) {
@@ -1170,9 +1154,6 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 #endif
 }
 
-#endif
-
-#if deal_II_dimension == 3
 
 template <>
 void GridIn<3>::read_netcdf (const std::string &filename)
@@ -1380,7 +1361,6 @@ void GridIn<3>::read_netcdf (const std::string &filename)
 #endif
 }
 
-#endif
 
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
@@ -1581,7 +1561,6 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
 
 
 
-#if deal_II_dimension == 2
 
 template <>
 void GridIn<2>::read_tecplot (std::istream &in)
@@ -1813,7 +1792,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
   tria->create_triangulation_compatibility (vertices, cells, subcelldata);
 }
 
-#endif
+
 
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_tecplot(std::istream &)
@@ -1884,7 +1863,6 @@ void GridIn<dim, spacedim>::debug_output_grid (const std::vector<CellData<dim> >
 }
 
 
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -1954,10 +1932,7 @@ GridIn<2>::debug_output_grid (const std::vector<CellData<2> > &cells,
       << "pause -1" << std::endl;
 }
 
-#endif
 
-
-#if deal_II_dimension == 3
 
 template <>
 void
@@ -2030,7 +2005,7 @@ GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
     };
 }
 
-#endif
+
 
 template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read (const std::string& filename,
@@ -2193,10 +2168,6 @@ std::string GridIn<dim, spacedim>::get_format_names ()
 
 
 //explicit instantiations
-template class GridIn<deal_II_dimension>;
-
-#if deal_II_dimension != 3
-template class GridIn<deal_II_dimension, deal_II_dimension+1>;
-#endif
+#include "grid_in.inst"
 
 DEAL_II_NAMESPACE_CLOSE
