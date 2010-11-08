@@ -132,6 +132,11 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
 	      case PreconditionBlockBase<inverse_type>::householder:
 		    this->inverse_householder(block).initialize(M_cell);
 		    break;
+	      case PreconditionBlockBase<inverse_type>::svd:
+		    this->inverse_svd(block).reinit(bs, bs);
+		    this->inverse_svd(block) = M_cell;
+		    this->inverse_svd(block).compute_inverse_svd(0.);
+		    break;
 	      default:
 		    Assert(false, ExcNotImplemented());
 	    }

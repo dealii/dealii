@@ -105,7 +105,29 @@ while(<>)
 	$args0 = $args;
 	$args0 =~ s/\*[^,]*,/\*,/g;
 	$args0 =~ s/\*[^,]*$/\*/g;
+	# First, do the general template None of these functions is
+	# implemented, but they allow us to link for instance with
+	# long double lapack support
+	my $numbers = 1;
+	my $argst = $args0;
+	my $typet = $type;
+	while ($argst =~ s/double/number$numbers/)
+	{
+	    $numbers++;
+	}
+	$typet =~ s/double/number1/g;
 	
+	$templates .= "\n\n//--------------------------------------------------------------------------------//\ntemplate<typename number1";
+	for (my $i=2;$i<$numbers;++$i)
+	{
+	    $templates .= ", typename number$i";
+	}
+	$templates .= ">\ninline $typet\n$name ($argst)\n";
+	$templates .= "{\n  Assert (false, ExcNotImplemented());\n}";
+
+	# The specialization for double. Note that we always have two
+	# versions, one implemented and calling LAPACK, the other not
+	# implemented
 	$templates .= "\n\n#ifdef HAVE_D$capname\_";
 	$templates .= "\ninline $type\n$name ($args)\n{\n  d$name\_ ($args2);\n}\n";
 	$templates .= "#else\ninline $type\n$name ($args0)\n";

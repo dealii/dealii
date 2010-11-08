@@ -20,6 +20,7 @@
 #include <base/smartpointer.h>
 #include <base/memory_consumption.h>
 #include <lac/householder.h>
+#include <lac/lapack_full_matrix.h>
 
 #include <vector>
 
@@ -68,7 +69,12 @@ class PreconditionBlockBase
 					    * Use QR decomposition of
 					    * the Householder class.
 					    */
-	  householder
+	  householder,
+					   /**
+					    * Use the singular value
+					    * decomposition of LAPACKFullMatrix.
+					    */
+	  svd
     };
     
 				     /**
@@ -189,6 +195,12 @@ class PreconditionBlockBase
     
 				     /**
 				      * Access to the inverse diagonal
+				      * blocks if Inversion is #householder.
+				      */
+    LAPACKFullMatrix<number>& inverse_svd (unsigned int i);
+    
+				     /**
+				      * Access to the inverse diagonal
 				      * blocks.
 				      */
     const FullMatrix<number>& inverse (unsigned int i) const;
@@ -243,7 +255,8 @@ class PreconditionBlockBase
 				      * #gauss_jordan is used. Using
 				      * <tt>number=float</tt> saves
 				      * memory in comparison with
-				      * <tt>number=double</tt>.
+				      * <tt>number=double</tt>, but
+				      * may introduce numerical instability.
 				      */
     std::vector<FullMatrix<number> > var_inverse_full;
 
@@ -251,15 +264,30 @@ class PreconditionBlockBase
 				      * Storage of the inverse
 				      * matrices of the diagonal
 				      * blocks matrices as
-				      * <tt>Householder<number></tt>
+				      * <tt>Householder</tt>
 				      * matrices if Inversion
 				      * #householder is used. Using
 				      * <tt>number=float</tt> saves
 				      * memory in comparison with
-				      * <tt>number=double</tt>.
+				      * <tt>number=double</tt>, but
+				      * may introduce numerical instability.
 				      */
     std::vector<Householder<number> > var_inverse_householder;
 
+				     /**
+				      * Storage of the inverse
+				      * matrices of the diagonal
+				      * blocks matrices as
+				      * <tt>LAPACKFullMatrix</tt>
+				      * matrices if Inversion
+				      * #svd is used. Using
+				      * <tt>number=float</tt> saves
+				      * memory in comparison with
+				      * <tt>number=double</tt>, but
+				      * may introduce numerical instability.
+				      */
+    std::vector<LAPACKFullMatrix<number> > var_inverse_svd;
+    
 				     /**
 				      * Storage of the original diagonal blocks.
 				      *
@@ -310,8 +338,10 @@ PreconditionBlockBase<number>::clear()
 {
   if (var_inverse_full.size()!=0)
     var_inverse_full.erase(var_inverse_full.begin(), var_inverse_full.end());
-  if (var_inverse_full.size()!=0)
+  if (var_inverse_householder.size()!=0)
     var_inverse_householder.erase(var_inverse_householder.begin(), var_inverse_householder.end());
+  if (var_inverse_svd.size()!=0)
+    var_inverse_svd.erase(var_inverse_svd.begin(), var_inverse_svd.end());
   if (var_diagonal.size()!=0)
     var_diagonal.erase(var_diagonal.begin(), var_diagonal.end());
   var_same_diagonal = false;
@@ -340,6 +370,10 @@ Inversion method)
 		break;
 	  case householder:
 		var_inverse_householder.resize(1);
+		break;
+	  case svd:
+		var_inverse_svd.resize(1);
+		var_inverse_svd[0].reinit(b,b);
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());
@@ -380,6 +414,13 @@ Inversion method)
 	  case householder:
 		var_inverse_householder.resize(n);
 		break;
+	  case svd:
+	  {
+	    std::vector<LAPACKFullMatrix<number> >
+	      tmp(n, LAPACKFullMatrix<number>(b));
+	    var_inverse_svd.swap (tmp);
+	    break;
+	  }
 	  default:	
 		Assert(false, ExcNotImplemented());	
 	}
@@ -414,6 +455,10 @@ PreconditionBlockBase<number>::inverse_vmult(
 	    AssertIndexRange (ii, var_inverse_householder.size());
 	    var_inverse_householder[ii].vmult(dst, src);
 	    break;
+      case svd:
+	    AssertIndexRange (ii, var_inverse_svd.size());
+	    var_inverse_svd[ii].vmult(dst, src);
+	    break;
       default:
 	    Assert(false, ExcNotImplemented());
     }
@@ -438,6 +483,10 @@ PreconditionBlockBase<number>::inverse_Tvmult(
       case householder:
 	    AssertIndexRange (ii, var_inverse_householder.size());
 	    var_inverse_householder[ii].Tvmult(dst, src);
+	    break;
+      case svd:
+	    AssertIndexRange (ii, var_inverse_svd.size());
+	    var_inverse_svd[ii].Tvmult(dst, src);
 	    break;
       default:
 	    Assert(false, ExcNotImplemented());
@@ -496,6 +545,19 @@ PreconditionBlockBase<number>::inverse_householder(unsigned int i)
   
   AssertIndexRange (i, var_inverse_householder.size());
   return var_inverse_householder[i];
+}
+
+
+template <typename number>
+inline
+LAPACKFullMatrix<number>&
+PreconditionBlockBase<number>::inverse_svd(unsigned int i)
+{
+  if (same_diagonal())
+    return var_inverse_svd[0];
+  
+  AssertIndexRange (i, var_inverse_svd.size());
+  return var_inverse_svd[i];
 }
 
 

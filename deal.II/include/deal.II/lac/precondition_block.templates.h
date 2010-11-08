@@ -138,6 +138,10 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 	  case PreconditionBlockBase<inverse_type>::householder:
 		this->inverse_householder(0).initialize(M_cell);
 		break;
+	  case PreconditionBlockBase<inverse_type>::svd:
+		this->inverse_svd(0) = M_cell;
+		this->inverse_svd(0).compute_inverse_svd(0.);
+		break;
 	  default:
 		Assert(false, ExcNotImplemented());
 
@@ -189,6 +193,10 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 	      case PreconditionBlockBase<inverse_type>::householder:
 		    this->inverse_householder(cell).initialize(M_cell);
 		    break;
+	  case PreconditionBlockBase<inverse_type>::svd:
+		this->inverse_svd(cell) = M_cell;
+		this->inverse_svd(cell).compute_inverse_svd(0.);
+		break;
 	      default:
 		    Assert(false, ExcNotImplemented());
 		    

@@ -161,6 +161,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 	       const number factor = 1.,
 	       const bool transpose = false);
 
+
 				     /**
 				      * Matrix-vector-multiplication.
 				      *
@@ -177,19 +178,30 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
+				      *
+				      * @note This template only
+				      * exists for compile-time
+				      * compatibility with
+				      * FullMatrix. Implementation is
+				      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
 				      */
-    void vmult (Vector<number>   &w,
-		const Vector<number> &v,
-		const bool            adding=false) const;
+    template <class VECTOR>
+    void vmult(VECTOR& dst, const VECTOR& src, const bool adding = false) const;
 				     /**
 				      * Adding Matrix-vector-multiplication.
 				      *  <i>w += A*v</i>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
+				      *
+				      * @note This template only
+				      * exists for compile-time
+				      * compatibility with
+				      * FullMatrix. Implementation is
+				      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
 				      */
-    void vmult_add (Vector<number>       &w,
-		    const Vector<number> &v) const;
+    template <class VECTOR>
+    void vmult_add (VECTOR& w, const VECTOR& v) const;
 
 				     /**
 				      * Transpose
@@ -209,9 +221,15 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
+				      *
+				      * @note This template only
+				      * exists for compile-time
+				      * compatibility with
+				      * FullMatrix. Implementation is
+				      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
 				      */
-    void Tvmult (Vector<number>       &w,
-		 const Vector<number> &v,
+    template <class VECTOR>
+    void Tvmult (VECTOR& w, const VECTOR& v,
 		 const bool            adding=false) const;
 
 				     /**
@@ -221,10 +239,26 @@ class LAPACKFullMatrix : public TransposeTable<number>
                                       *
                                       * Source and destination must
                                       * not be the same vector.
+				      *
+				      * @note This template only
+				      * exists for compile-time
+				      * compatibility with
+				      * FullMatrix. Implementation is
+				      * only available for <tt>VECTOR=Vector&lt;number&gt;</tt>
 				      */
+    template <class VECTOR>
+    void Tvmult_add (VECTOR& w, const VECTOR& v) const;
+    
+    void vmult (Vector<number>   &w,
+		const Vector<number> &v,
+		const bool            adding=false) const;
+    void vmult_add (Vector<number>       &w,
+		    const Vector<number> &v) const;
+    void Tvmult (Vector<number>       &w,
+		 const Vector<number> &v,
+		 const bool            adding=false) const;
     void Tvmult_add (Vector<number>       &w,
 		     const Vector<number> &v) const;
-
 				     /**
 				      * Compute the LU factorization
 				      * of the matrix using LAPACK
@@ -576,7 +610,7 @@ class PreconditionLU
 
 template <typename number>
 template <class MATRIX>
-void
+inline void
 LAPACKFullMatrix<number>::copy_from (const MATRIX& M)
 {
   this->reinit (M.m(), M.n());
@@ -592,7 +626,7 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX& M)
 
 template <typename number>
 template <class MATRIX>
-void
+inline void
 LAPACKFullMatrix<number>::fill (
   const MATRIX& M,
   const unsigned int dst_offset_i,
@@ -620,7 +654,43 @@ LAPACKFullMatrix<number>::fill (
 
 
 template <typename number>
-std::complex<number>
+template <class VECTOR>
+inline void
+LAPACKFullMatrix<number>::vmult(VECTOR&, const VECTOR&, bool) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <typename number>
+template <class VECTOR>
+inline void
+LAPACKFullMatrix<number>::vmult_add(VECTOR&, const VECTOR&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <typename number>
+template <class VECTOR>
+inline void
+LAPACKFullMatrix<number>::Tvmult(VECTOR&, const VECTOR&, bool) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <typename number>
+template <class VECTOR>
+inline void
+LAPACKFullMatrix<number>::Tvmult_add(VECTOR&, const VECTOR&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <typename number>
+inline std::complex<number>
 LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
 {
   Assert (state & LAPACKSupport::eigenvalues, ExcInvalidState());
@@ -633,7 +703,7 @@ LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
 
 
 template <typename number>
-number
+inline number
 LAPACKFullMatrix<number>::singular_value (const unsigned int i) const
 {
   Assert (state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd, LAPACKSupport::ExcState(state));

@@ -527,37 +527,6 @@ FullMatrix<number>::equ (const number               a,
 
 
 
-namespace internal
-{
-				   // a namespace into which we import
-				   // the global definitions of the
-				   // LAPACK functions getrf for
-				   // various data types and add
-				   // general templates for all other
-				   // types. this allows to call the
-				   // getrf function for all data
-				   // types but generated an exception
-				   // if something is called for a
-				   // data type not supported by
-				   // LAPACK.
-  namespace gemm_switch
-  {
-    using ::dealii::gemm;
-
-    template <typename T, typename T2>
-    void
-    gemm (const char*, const char*,  const int*, const int*, const int*,
-	  const T*, const T2*, const int*, const T*, const int*,
-	  const T*, T2*, const int*)
-    {
-      Assert (false, LAPACKSupport::ExcMissing("dgemm for this data type"));
-    }
-    
-  }
-}
-
-
-
 template <typename number>
 template <typename number2>
 void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
@@ -616,8 +585,8 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
 				       // Use the BLAS function gemm for
 				       // calculating the matrix-matrix
 				       // product.
-      internal::gemm_switch::gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
-				  &this->values[0], &k, &beta, &dst(0,0), &m);
+      gemm(notrans, notrans, &m, &n, &k, &alpha, &src(0,0), &m,
+	   &this->values[0], &k, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -704,8 +673,8 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
 				       // Use the BLAS function gemm for
 				       // calculating the matrix-matrix
 				       // product.
-      internal::gemm_switch::gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
-				  &this->values[0], &n, &beta, &dst(0,0), &m);
+      gemm(notrans, trans, &m, &n, &k, &alpha, &src(0,0), &m,
+	   &this->values[0], &n, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -795,8 +764,8 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
 				       // Use the BLAS function gemm for
 				       // calculating the matrix-matrix
 				       // product.
-      internal::gemm_switch::gemm(trans, notrans, &m, &n, &k, &alpha, &src(0,0), &k,
-				  &this->values[0], &k, &beta, &dst(0,0), &m);
+      gemm(trans, notrans, &m, &n, &k, &alpha, &src(0,0), &k,
+	   &this->values[0], &k, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -880,8 +849,8 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
 				       // Use the BLAS function gemm for
 				       // calculating the matrix-matrix
 				       // product.
-      internal::gemm_switch::gemm(trans, trans, &m, &n, &k, &alpha, &src(0,0), &k,
-				  &this->values[0], &n, &beta, &dst(0,0), &m);
+      gemm(trans, trans, &m, &n, &k, &alpha, &src(0,0), &k,
+	   &this->values[0], &n, &beta, &dst(0,0), &m);
 
       return;
     }
@@ -1714,44 +1683,6 @@ FullMatrix<number>::print_formatted (
 }
 
 
-namespace internal
-{
-				   // a namespace into which we import
-				   // the global definitions of the
-				   // LAPACK functions getrf for
-				   // various data types and add
-				   // general templates for all other
-				   // types. this allows to call the
-				   // getrf function for all data
-				   // types but generated an exception
-				   // if something is called for a
-				   // data type not supported by
-				   // LAPACK.
-  namespace getrf_switch
-  {
-    using ::dealii::getrf;
-
-    template <typename T>
-    void
-    getrf (const int*, const int*, T*, const int*, int*, int*)
-    {
-      Assert (false, LAPACKSupport::ExcMissing("dgetrf for this data type"));
-    }
-    
-
-    using ::dealii::getri;
-
-    template <typename T>
-    void
-    getri (const int*, T*, const int*, int*, T*, const int*, int*)
-    {
-      Assert (false, LAPACKSupport::ExcMissing("dgetri for this data type"));
-    }    
-  }
-}
-
-
-
 template <typename number>
 void
 FullMatrix<number>::gauss_jordan ()
@@ -1798,7 +1729,7 @@ FullMatrix<number>::gauss_jordan ()
 
 				       // Use the LAPACK function getrf for 
 				       // calculating the LU factorization.
-      internal::getrf_switch::getrf(&nn, &nn, &this->values[0], &nn, &ipiv[0], &info);
+      getrf(&nn, &nn, &this->values[0], &nn, &ipiv[0], &info);
 
       Assert(info >= 0, ExcInternalError());
       Assert(info == 0, LACExceptions::ExcSingular());
@@ -1809,7 +1740,7 @@ FullMatrix<number>::gauss_jordan ()
 				       // Use the LAPACK function getri for
 				       // calculating the actual inverse using
 				       // the LU factorization.
-      internal::getrf_switch::getri(&nn, &this->values[0], &nn, &ipiv[0], &inv_work[0], &nn, &info);
+      getri(&nn, &this->values[0], &nn, &ipiv[0], &inv_work[0], &nn, &info);
 
       Assert(info >= 0, ExcInternalError());
       Assert(info == 0, LACExceptions::ExcSingular());
