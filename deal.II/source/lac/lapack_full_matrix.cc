@@ -261,7 +261,7 @@ LAPACKFullMatrix<number>::compute_svd()
 	&work[0], &lwork, &ipiv[0], &info);
   Assert (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
 				   // Now resize work array and
-  lwork = work[0] + .5;
+  lwork = static_cast<int>(work[0] + .5);
 #else
   int lwork = 3*std::min(mm,nn) +
 	      std::max(std::max(mm,nn),4*std::min(mm,nn)*std::min(mm,nn)+4*std::min(mm,nn));
