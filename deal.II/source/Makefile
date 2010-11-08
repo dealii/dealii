@@ -202,7 +202,8 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 # A rule to make sure the various */Makefile.dep files have the right
 # dependencies on their source files. Use the opportunity to also ensure that
 # .inst and the lapack file are built before everything else
-Makefile.dep: $(inst-files) ../include/deal.II/lac/lapack_templates.h
+Makefile.dep: $(inst-files) ../include/deal.II/lac/lapack_templates.h \
+		$(dim-indep-cc-files) $(dim-dep-cc-files)
 	@for i in $(all-dirs) ; do \
 		echo $$i/Makefile.dep: $$i/*.cc  \
 					$(h-files) \
