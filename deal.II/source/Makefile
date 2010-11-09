@@ -204,6 +204,7 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 # .inst and the lapack file are built before everything else
 Makefile.dep: $(inst-files) ../include/deal.II/lac/lapack_templates.h \
 		$(dim-indep-cc-files) $(dim-dep-cc-files)
+	@echo "===================================== Remaking $@"
 	@for i in $(all-dirs) ; do \
 		echo $$i/Makefile.dep: $$i/*.cc  \
 					$(h-files) \
