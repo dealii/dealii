@@ -59,7 +59,7 @@ namespace TestGrids
 		 unsigned int refinement = 0,
 		 bool local = false)
   {
-    GridGenerator::hyper_cube(tr);
+    GridGenerator::hyper_cube(tr, -1., 1.);
     if (refinement && !local)
       tr.refine_global(refinement);
     if (refinement && local)
@@ -74,6 +74,8 @@ namespace TestGrids
 		bool negative = true;
 		for (unsigned int d=0;d<dim;++d)
 		  if (p(d) >= 0.)negative = false;
+		if (negative)
+		  cell->set_refine_flag();
 	      }
 	    tr.execute_coarsening_and_refinement();
 	  }

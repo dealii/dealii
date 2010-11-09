@@ -211,7 +211,7 @@ test_cochain(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
     }
 }
 
-void run (const Triangulation<2>& tr, unsigned int degree)
+void run2d (unsigned int degree)
 {
   std::ostringstream prefix;
   prefix << "d2-p" << degree;
@@ -224,12 +224,32 @@ void run (const Triangulation<2>& tr, unsigned int degree)
 
   FESystem<2> fe(h1,1,hdiv,1,l2,1);
 
-  test_cochain(tr, fe);
+  if (true)
+    {
+      Triangulation<2> tr;
+      TestGrids::hypercube(tr, 1);
+      test_cochain(tr, fe);
+    }
+  
+  if (true)
+    {
+      Triangulation<2> tr;
+      TestGrids::hypercube(tr, 2, true);
+      test_cochain(tr, fe);
+    }
+  
+  if (true)
+    {
+      Triangulation<2> tr;
+      TestGrids::hypercube(tr, 3, true);
+      test_cochain(tr, fe);
+    }
+  
   deallog.pop();
 }
 
 
-void run (const Triangulation<3>& tr, unsigned int degree)
+void run3d (unsigned int degree)
 {
   std::ostringstream prefix;
   prefix << "d3-p" << degree;
@@ -247,8 +267,20 @@ void run (const Triangulation<3>& tr, unsigned int degree)
 
   FESystem<3> fe(h1,1,hcurl,1,hdiv,1,l2,1);
 
-  test_cochain(tr, fe);
-  deallog.pop();
+    if (true)
+    {
+      Triangulation<3> tr;
+      TestGrids::hypercube(tr, 1);
+      test_cochain(tr, fe);
+    }
+    
+  if (true)
+    {
+      Triangulation<3> tr(Triangulation<3>::limit_level_difference_at_vertices);
+      TestGrids::hypercube(tr, 2, true);
+      test_cochain(tr, fe);
+    }
+deallog.pop();
 }
 
 
@@ -257,17 +289,16 @@ int main()
   const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-//  deallog.depth_console(0);
-//  deallog.threshold_double(1.e-10);
-
-  Triangulation<2> tr2;
-  TestGrids::hypercube(tr2, 1);
-  run(tr2, 0);
-  run(tr2, 1);
-  run(tr2, 2);
+  if (!debugging)
+    {
+      deallog.depth_console(0);
+      deallog.threshold_double(1.e-10);
+    }
   
-  Triangulation<3> tr3;
-  TestGrids::hypercube(tr3, 1);
-  run(tr3, 0);
-  run(tr3, 1);
+  run2d(0);
+  run2d(1);
+  run2d(2);
+  
+  run3d(0);
+  run3d(1);
 }
