@@ -106,6 +106,17 @@ class RelaxationBlock :
 					  * method for the blocks.
 					  */
 	typename PreconditionBlockBase<inverse_type>::Inversion inversion;
+
+					 /**
+					  * The if #inversion is SVD,
+					  * the threshold below which
+					  * a singular value will be
+					  * considered zero and thus
+					  * not inverted. This
+					  * parameter is used in the
+					  * call to LAPACKFullMatrix::compute_inverse_svd().
+					  */
+	double threshold;
     };
 
 				     /**
@@ -268,6 +279,22 @@ class RelaxationBlockSOR : public virtual Subscriptor,
 				      */
     using RelaxationBlock<MATRIX, inverse_type>::empty;
 				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::size;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse_householder;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse_svd;
+				     /**
 				      * Perform one step of the SOR
 				      * iteration.
 				      */
@@ -335,6 +362,23 @@ class RelaxationBlockSSOR : public virtual Subscriptor,
 				      * Make function of base class public again.
 				      */
     using RelaxationBlock<MATRIX, inverse_type>::empty;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::size;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse_householder;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse_svd;
 				     /**
 				      * Perform one step of the SOR
 				      * iteration.

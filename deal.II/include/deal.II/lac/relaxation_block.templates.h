@@ -25,7 +25,8 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData ()
 		relaxation(1.),
 		invert_diagonal(true),
 		same_diagonal(false),
-		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan)
+		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
+		threshold(0.)
 {}
 
 
@@ -41,7 +42,8 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
 		relaxation(relaxation),
 		invert_diagonal(invert_diagonal),
 		same_diagonal(same_diagonal),
-		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan)
+		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
+		threshold(0.)
 {}
 
 
@@ -135,7 +137,7 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
 	      case PreconditionBlockBase<inverse_type>::svd:
 		    this->inverse_svd(block).reinit(bs, bs);
 		    this->inverse_svd(block) = M_cell;
-		    this->inverse_svd(block).compute_inverse_svd(0.);
+		    this->inverse_svd(block).compute_inverse_svd(additional_data.threshold);
 		    break;
 	      default:
 		    Assert(false, ExcNotImplemented());

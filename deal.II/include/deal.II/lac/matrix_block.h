@@ -465,6 +465,7 @@ class MatrixBlockVector
     NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
     NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
     NamedData<std_cxx1x::shared_ptr<value_type> >::size;
+    NamedData<std_cxx1x::shared_ptr<value_type> >::name;
 };
 
 

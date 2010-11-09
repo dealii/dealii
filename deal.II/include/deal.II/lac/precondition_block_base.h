@@ -206,6 +206,18 @@ class PreconditionBlockBase
     const FullMatrix<number>& inverse (unsigned int i) const;
     
 				     /**
+				      * Access to the inverse diagonal
+				      * blocks if Inversion is #householder.
+				      */
+    const Householder<number>& inverse_householder (unsigned int i) const;
+    
+				     /**
+				      * Access to the inverse diagonal
+				      * blocks if Inversion is #householder.
+				      */
+    const LAPACKFullMatrix<number>& inverse_svd (unsigned int i) const;
+    
+				     /**
 				      * Access to the diagonal
 				      * blocks.
 				      */
@@ -504,6 +516,32 @@ PreconditionBlockBase<number>::inverse(unsigned int i) const
   
   Assert (i < var_inverse_full.size(), ExcIndexRange(i,0,var_inverse_full.size()));
   return var_inverse_full[i];
+}
+
+
+template <typename number>
+inline
+const Householder<number>&
+PreconditionBlockBase<number>::inverse_householder(unsigned int i) const
+{
+  if (same_diagonal())
+    return var_inverse_householder[0];
+  
+  AssertIndexRange (i, var_inverse_householder.size());
+  return var_inverse_householder[i];
+}
+
+
+template <typename number>
+inline
+const LAPACKFullMatrix<number>&
+PreconditionBlockBase<number>::inverse_svd(unsigned int i) const
+{
+  if (same_diagonal())
+    return var_inverse_svd[0];
+  
+  AssertIndexRange (i, var_inverse_svd.size());
+  return var_inverse_svd[i];
 }
 
 
