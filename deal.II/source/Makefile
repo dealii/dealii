@@ -248,7 +248,7 @@ endif
 ################### some clean-up rules
 
 clean:
-	-rm -f *~ */*~ */*/*~ */Makefile.dep source/*/*.inst \
+	-rm -f Makefile.dep *~ */*~ */*/*~ */Makefile.dep source/*/*.inst \
 		$D/{debug.optimized}*.o
 
 
