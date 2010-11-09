@@ -64,15 +64,25 @@ namespace TestGrids
       tr.refine_global(refinement);
     if (refinement && local)
       {
-	for (typename Triangulation<dim>::active_cell_iterator
-	       cell = tr.begin_active(); cell != tr.end(); ++cell)
+	tr.refine_global(1);
+	for (unsigned int i=1;i<refinement;++i)
 	  {
-	    const Point<dim>& p = cell->center();
-	    bool negative = true;
-	    for (unsigned int d=0;d<dim;++d)
-	      if (p(d) >= 0.)negative = false;
+	    for (typename Triangulation<dim>::active_cell_iterator
+		   cell = tr.begin_active(); cell != tr.end(); ++cell)
+	      {
+		const Point<dim>& p = cell->center();
+		bool negative = true;
+		for (unsigned int d=0;d<dim;++d)
+		  if (p(d) >= 0.)negative = false;
+	      }
+	    tr.execute_coarsening_and_refinement();
 	  }
       }
+    deallog << "Triangulation hypercube " << dim << "D refinement " << refinement;
+    if (local)
+      deallog << " local ";
+    deallog << " steps " << tr.n_active_cells() << " active cells "
+	    << tr.n_cells() << " total cells " << std::endl;
   }
   
 				   /**
