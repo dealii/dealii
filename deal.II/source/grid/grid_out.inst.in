@@ -1,0 +1,60 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template void GridOut::write_dx
+      (const Triangulation<deal_II_dimension>&,
+       std::ostream&) const;
+    template void GridOut::write_msh
+      (const Triangulation<deal_II_dimension>&,
+       std::ostream&) const;
+    template void GridOut::write_xfig
+      (const Triangulation<deal_II_dimension>&,
+       std::ostream&,
+       const Mapping<deal_II_dimension,deal_II_dimension>*) const;
+    template void GridOut::write_gnuplot
+      (const Triangulation<deal_II_dimension>&,
+       std::ostream&,
+       const Mapping<deal_II_dimension,deal_II_dimension>*) const;
+    template void GridOut::write_ucd<deal_II_dimension>
+      (const Triangulation<deal_II_dimension> &,
+       std::ostream &) const;
+    template void GridOut::write_eps<deal_II_dimension>
+      (const Triangulation<deal_II_dimension> &,
+       std::ostream &,
+       const Mapping<deal_II_dimension,deal_II_dimension> *) const;
+    template void GridOut::write<deal_II_dimension>
+      (const Triangulation<deal_II_dimension> &,
+       std::ostream &, const OutputFormat,
+       const Mapping<deal_II_dimension,deal_II_dimension> *) const;
+    template void GridOut::write<deal_II_dimension>
+      (const Triangulation<deal_II_dimension> &,
+       std::ostream &, const Mapping<deal_II_dimension,deal_II_dimension> *) const;
+
+#if deal_II_dimension == 1 || deal_II_dimension ==2
+// explicit instantiations for codimension one
+    template void GridOut::write_msh
+      (const Triangulation<deal_II_dimension, deal_II_dimension+1>&,
+       std::ostream&) const;
+    template void GridOut::write_ucd
+      (const Triangulation<deal_II_dimension, deal_II_dimension+1> &,
+       std::ostream &) const;
+    template void GridOut::write_gnuplot
+      (const Triangulation<deal_II_dimension,deal_II_dimension+1>&,
+       std::ostream&,
+       const Mapping<deal_II_dimension,deal_II_dimension+1>*) const;
+#endif
+  }
+
