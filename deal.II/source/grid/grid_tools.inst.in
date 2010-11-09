@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 
 
-for (X : TRIANGULATION_AND_DOFHANDLERS)
+for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 {
   template
     unsigned int
@@ -46,5 +46,164 @@ for (X : TRIANGULATION_AND_DOFHANDLERS)
   template
     bool
     GridTools::have_same_coarse_mesh (const X &mesh_1,
-				      const X &mesh_2);  
+				      const X &mesh_2);
 }
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+
+#if deal_II_dimension != 1
+    template
+      double
+      GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &);
+#endif
+
+#if deal_II_dimension == 2
+    template
+      double
+      GridTools::diameter<deal_II_dimension, deal_II_dimension+1> (const Triangulation<deal_II_dimension, deal_II_dimension+1> &);
+#endif
+
+    template
+      void GridTools::delete_unused_vertices (std::vector<Point<deal_II_dimension> > &,
+					      std::vector<CellData<deal_II_dimension> > &,
+					      SubCellData &);
+
+    template
+      void GridTools::delete_duplicated_vertices (std::vector<Point<deal_II_dimension> > &,
+						  std::vector<CellData<deal_II_dimension> > &,
+						  SubCellData &,
+						  std::vector<unsigned int> &,
+						  double);
+
+    template
+      void GridTools::shift<deal_II_dimension> (const Point<deal_II_dimension> &,
+						Triangulation<deal_II_dimension> &);
+
+    template
+      void GridTools::scale<deal_II_dimension> (const double,
+						Triangulation<deal_II_dimension> &);
+
+    template
+      std::pair<hp::DoFHandler<deal_II_dimension>::active_cell_iterator, Point<deal_II_dimension> >
+      GridTools::find_active_cell_around_point (const hp::MappingCollection<deal_II_dimension> &,
+						const hp::DoFHandler<deal_II_dimension> &,
+						const Point<deal_II_dimension> &);
+
+    template
+      void
+      GridTools::
+      get_face_connectivity_of_cells (const Triangulation<deal_II_dimension> &triangulation,
+				      SparsityPattern          &cell_connectivity);
+
+#if deal_II_dimension < 3
+    template
+      void
+      GridTools::
+      get_face_connectivity_of_cells (const Triangulation<deal_II_dimension,deal_II_dimension+1> &triangulation,
+				      SparsityPattern          &cell_connectivity);
+#endif
+
+    template
+      void
+      GridTools::partition_triangulation (const unsigned int,
+					  Triangulation<deal_II_dimension> &);
+
+    template
+      void
+      GridTools::partition_triangulation (const unsigned int,
+					  const SparsityPattern &,
+					  Triangulation<deal_II_dimension> &);
+
+    template
+      void
+      GridTools::
+      get_subdomain_association (const Triangulation<deal_II_dimension>  &,
+				 std::vector<types::subdomain_id_t> &);
+
+    template
+      unsigned int
+      GridTools::
+      count_cells_with_subdomain_association (const Triangulation<deal_II_dimension> &,
+					      const types::subdomain_id_t);
+
+
+    template
+      double
+      GridTools::minimal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
+
+    template
+      double
+      GridTools::maximal_cell_diameter (const Triangulation<deal_II_dimension> &triangulation);
+
+    template
+      void
+      GridTools::create_union_triangulation (const Triangulation<deal_II_dimension> &triangulation_1,
+					     const Triangulation<deal_II_dimension> &triangulation_2,
+					     Triangulation<deal_II_dimension>       &result);
+
+    template
+      Triangulation<deal_II_dimension,deal_II_dimension>::DistortedCellList
+      GridTools::
+      fix_up_distorted_child_cells (const Triangulation<deal_II_dimension,deal_II_dimension>::DistortedCellList &distorted_cells,
+				    Triangulation<deal_II_dimension,deal_II_dimension> &triangulation);
+
+
+
+#if deal_II_dimension != 3
+
+    template
+      void GridTools::delete_unused_vertices (std::vector<Point<deal_II_dimension+1> > &,
+					      std::vector<CellData<deal_II_dimension> > &,
+					      SubCellData &);
+
+    template
+      void GridTools::delete_duplicated_vertices (std::vector<Point<deal_II_dimension+1> > &,
+						  std::vector<CellData<deal_II_dimension> > &,
+						  SubCellData &,
+						  std::vector<unsigned int> &,
+						  double);
+
+    template
+      void GridTools::shift<deal_II_dimension, deal_II_dimension+1> (const Point<deal_II_dimension+1> &,
+								     Triangulation<deal_II_dimension, deal_II_dimension+1> &);
+
+    template
+      void GridTools::scale<deal_II_dimension, deal_II_dimension+1> (const double,
+								     Triangulation<deal_II_dimension, deal_II_dimension+1> &);
+
+
+#endif
+
+
+
+#if deal_II_dimension < 3
+
+    template
+      std::list<std::pair<Triangulation<deal_II_dimension,deal_II_dimension+1>::cell_iterator, Triangulation<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+      GridTools::
+      get_finest_common_cells (const Triangulation<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			       const Triangulation<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+    template
+      std::list<std::pair<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator, DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+      GridTools::
+      get_finest_common_cells (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			       const DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+    template
+      std::list<std::pair<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator, hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+      GridTools::
+      get_finest_common_cells (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			       const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+    template
+      std::list<std::pair<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator, MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator> >
+      GridTools::
+      get_finest_common_cells (const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
+			       const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
+
+#endif
+  }
+

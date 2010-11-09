@@ -13,7 +13,7 @@
 
 
 
-for (S : REAL_SCALARS)
+for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
 {
   template
   void

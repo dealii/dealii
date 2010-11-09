@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
 //   grid_reordering.cc,v 1.27 2002/05/28 07:43:22 wolf Exp
-//   Version: 
+//   Version:
 //
-//   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //   This file is subject to QPL and may not be  distributed
 //   without copyright and license information. Please refer
@@ -23,8 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-#if deal_II_dimension == 1
 
 template<>
 void
@@ -60,24 +58,19 @@ GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2
 				   // nothing to be done in 1d
 }
 
-#endif
-
-
-
-#if deal_II_dimension == 2
 
 namespace internal
 {
   namespace GridReordering2d
   {
 // -- Definition of connectivity information --
-    const int ConnectGlobals::EdgeToNode[4][2] = 
+    const int ConnectGlobals::EdgeToNode[4][2] =
     { {0,1},{1,2},{2,3},{3,0} };
 
-    const int ConnectGlobals::NodeToEdge[4][2] = 
+    const int ConnectGlobals::NodeToEdge[4][2] =
     { {3,0},{0,1},{1,2},{2,3} };
 
-    const int ConnectGlobals::DefaultOrientation[4][2] = 
+    const int ConnectGlobals::DefaultOrientation[4][2] =
     {{0,1},{1,2},{3,2},{0,3}};
 
 
@@ -95,7 +88,7 @@ namespace internal
                         :
                         v0(v0), v1(v1)
           {}
-        
+
         const unsigned int v0, v1;
         bool operator < (const Edge &e) const
           {
@@ -103,7 +96,7 @@ namespace internal
           }
     };
 
-    
+
     bool
     is_consistent  (const std::vector<CellData<2> > &cells)
     {
@@ -147,7 +140,7 @@ namespace internal
                                        // return true
       return true;
     }
-    
+
 
 
     struct MSide::SideRectify : public std::unary_function<MSide,void>
@@ -156,7 +149,7 @@ namespace internal
 	  {
 	    if (s.v0>s.v1)
 	      std::swap (s.v0, s.v1);
-	  }	    
+	  }
     };
 
 
@@ -194,7 +187,7 @@ namespace internal
 	    return s1vmax<s2vmax;
 	  }
     };
-    
+
 
 /**
  * Returns an MSide corresponding to the
@@ -218,8 +211,8 @@ namespace internal
 	    return quadside(q,i);
 	  }
     };
- 
-    
+
+
 
     MQuad::MQuad (const unsigned int v0,
 		  const unsigned int v1,
@@ -255,8 +248,8 @@ namespace internal
 		    Oriented(false)
     {}
 
-    
-    
+
+
     bool
     MSide::operator == (const MSide& s2) const
     {
@@ -271,8 +264,8 @@ namespace internal
     {
       return !(*this == s2);
     }
-    
-    
+
+
     struct MQuad::MakeQuad : public std::binary_function<CellData<2>,
 		  std::vector<MSide>,
 		  MQuad>
@@ -303,11 +296,11 @@ namespace internal
 							MSide::SideSortLess() )),
 			 q);
 	  }
-	    
+
     };
 
 
-    
+
     void
     GridReordering::reorient(std::vector<CellData<2> > &quads)
     {
@@ -320,38 +313,38 @@ namespace internal
     void
     GridReordering::build_graph (const std::vector<CellData<2> > &inquads)
     {
-				       //Reserve some space 
+				       //Reserve some space
       sides.reserve(4*inquads.size());
       mquads.reserve(inquads.size());
-  
+
 				       //Insert all the sides into the side vector
       for (int i = 0;i<4;++i)
 	{
 	  std::transform(inquads.begin(),inquads.end(),
 			 std::back_inserter(sides), std::bind2nd(QuadSide(),i));
 	}
-  
+
 				       //Change each edge so that v0<v1
       std::for_each(sides.begin(),sides.end(),
 		    MSide::SideRectify() );
-  
+
 				       //Sort them by Sidevertices.
       std::sort(sides.begin(),sides.end(),
 		MSide::SideSortLess());
-  
-				       //Remove duplicates 
+
+				       //Remove duplicates
       sides.erase(std::unique(sides.begin(),sides.end()),
 		  sides.end());
 
 				       // Swap trick to shrink the
 				       // side vector
       std::vector<MSide>(sides).swap(sides);
-  
+
 				       //Assigns the correct sides to
 				       //each quads
       std::transform(inquads.begin(),inquads.end(), std::back_inserter(mquads),
 		     std::bind2nd(MQuad::MakeQuad(),sides) );
-  
+
 				       // Assign the quads to their sides also.
       int qctr = 0;
       for (std::vector<MQuad>::iterator it = mquads.begin(); it != mquads.end(); ++it)
@@ -414,9 +407,9 @@ namespace internal
       MQuad &quad = mquads[quadnum];
       int op_side_l = (localsidenum+2)%4;
       MSide &side = sides[mquads[quadnum].side[localsidenum]];
-      const MSide &op_side = sides[mquads[quadnum].side[op_side_l]]; 
-  
-				       //is the opposite side oriented?    
+      const MSide &op_side = sides[mquads[quadnum].side[op_side_l]];
+
+				       //is the opposite side oriented?
       if (op_side.Oriented)
 	{
 					   //YES - Make the orientations match
@@ -437,11 +430,11 @@ namespace internal
       else
 	{
 					   //NO
-					   //Just use the default orientation      
+					   //Just use the default orientation
 	  side.v0 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][0]];
 	  side.v1 = quad.v[ConnectGlobals::DefaultOrientation[localsidenum][1]];
 	}
-      side.Oriented = true;  
+      side.Oriented = true;
     }
 
 
@@ -453,7 +446,7 @@ namespace internal
 	(sides[mquads[quadnum].side[0]].Oriented)&&
 	(sides[mquads[quadnum].side[1]].Oriented)&&
 	(sides[mquads[quadnum].side[2]].Oriented)&&
-	(sides[mquads[quadnum].side[3]].Oriented) 
+	(sides[mquads[quadnum].side[3]].Oriented)
       );
     }
 
@@ -525,13 +518,13 @@ namespace internal
 	  opquad = s.Q0;
 	  lsn = s.lsn0;
 	}
-  
+
       if (opquad != numbers::invalid_unsigned_int)
 	{
 	  qnum = opquad;
 	  return true;
 	}
-  
+
       return false;
     }
 
@@ -549,8 +542,8 @@ namespace internal
 					   // might have changed in the
 					   // process of rotating things
 	  CellData<2> q = mquads[qn].original_cell_data;
-	  
-					   // Are the sides oriented? 
+
+					   // Are the sides oriented?
 	  Assert (is_fully_oriented_quad(qn), ExcInternalError());
 	  bool s[4]; //whether side 1 ,2, 3, 4 are in the default orientation
 	  for (int sn = 0;sn<4;sn++)
@@ -576,7 +569,7 @@ namespace internal
     GridReordering::is_side_default_oriented (const unsigned int qnum,
 					      const unsigned int lsn) const
     {
-      return (sides[mquads[qnum].side[lsn]].v0 == 
+      return (sides[mquads[qnum].side[lsn]].v0 ==
 	      mquads[qnum].v[ConnectGlobals::DefaultOrientation[lsn][0]]);
     }
   } // namespace GridReordering2d
@@ -595,7 +588,7 @@ GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
                                    // reordering
   if (internal::GridReordering2d::is_consistent (original_cells))
     return;
-  
+
   internal::GridReordering2d::GridReordering().reorient(original_cells);
 }
 
@@ -605,6 +598,8 @@ void
 GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells) {
     GridReordering<2>::reorder_cells(original_cells);
 }
+
+
 
 template<>
 void
@@ -624,7 +619,7 @@ GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> 
 	{
 	  ++n_negative_cells;
 	  std::swap(cells[cell_no].vertices[1], cells[cell_no].vertices[3]);
-	  
+
 					   // check whether the
 					   // resulting cell is now ok.
 					   // if not, then the grid is
@@ -637,7 +632,7 @@ GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> 
 		      ExcInternalError());
 	}
     }
-  
+
 				   // We assume that all cells of a grid have
 				   // either positive or negative volumes but
 				   // not both mixed. Although above reordering
@@ -648,6 +643,7 @@ GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> 
 }
 
 
+
 template<>
 void
 GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
@@ -656,10 +652,7 @@ GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3
   Assert(false, ExcNotImplemented());
 }
 
-#endif
 
-
-#if deal_II_dimension == 3
 
 namespace internal
 {
@@ -673,7 +666,7 @@ namespace internal
     const EdgeOrientation forward_edge    = {'f'};
     const EdgeOrientation backward_edge   = {'b'};
 
-    
+
     inline
     bool
     EdgeOrientation::
@@ -694,7 +687,7 @@ namespace internal
       return ! (*this == edge_orientation);
     }
 
-    
+
 
     namespace ElementInfo
     {
@@ -704,9 +697,9 @@ namespace internal
 					* given by
 					* edge_to_node[i][k] where
 					* k=0,1,2.
-					*/    
-      static const unsigned int edge_to_node[8][3] = 
-      { 
+					*/
+      static const unsigned int edge_to_node[8][3] =
+      {
 	    {0,4,8},
 	    {0,5,9},
 	    {3,5,10},
@@ -728,7 +721,7 @@ namespace internal
 					* the edge -1 means the end
 					* of the edge.
 					*/
-      static const EdgeOrientation edge_to_node_orient[8][3] = 
+      static const EdgeOrientation edge_to_node_orient[8][3] =
       {
 	    {forward_edge,  forward_edge,  forward_edge},
 	    {backward_edge, forward_edge,  forward_edge},
@@ -736,17 +729,17 @@ namespace internal
 	    {forward_edge,  backward_edge, forward_edge},
 	    {forward_edge,  forward_edge,  backward_edge},
 	    {backward_edge, forward_edge,  backward_edge},
-	    {backward_edge, backward_edge, backward_edge}, 
+	    {backward_edge, backward_edge, backward_edge},
 	    {forward_edge,  backward_edge, backward_edge}
-      };	    
-    
+      };
+
 				       /**
 					* nodesonedge[i][0] is the
 					* start node for edge i.
 					* nodesonedge[i][1] is the
 					* end node for edge i.
 					*/
-      static const unsigned int nodes_on_edge[12][2] = 
+      static const unsigned int nodes_on_edge[12][2] =
       {
 	    {0,1},
 	    {4,5},
@@ -760,10 +753,10 @@ namespace internal
 	    {1,5},
 	    {2,6},
 	    {3,7}
-      };	  
+      };
     }
-    
-    
+
+
     CheapEdge::CheapEdge (const unsigned int n0,
 			  const unsigned int n1)
 		    :
@@ -776,7 +769,7 @@ namespace internal
     {}
 
 
-    
+
     bool CheapEdge::operator< (const CheapEdge & e2) const
     {
       if (node0 < e2.node0) return true;
@@ -785,7 +778,7 @@ namespace internal
       return false;
     }
 
-  
+
     Edge::Edge (const unsigned int n0,
 		const unsigned int n1)
 		    :
@@ -798,17 +791,17 @@ namespace internal
 
 
 
-    Cell::Cell () 
+    Cell::Cell ()
     {
       for (unsigned int i=0; i<GeometryInfo<3>::lines_per_cell; ++i)
 	{
 	  edges[i] = numbers::invalid_unsigned_int;
 	  local_orientation_flags[i] = forward_edge;
 	}
-      
+
       for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_cell; ++i)
 	nodes[i] = numbers::invalid_unsigned_int;
-      
+
       waiting_to_be_processed = false;
     }
 
@@ -825,7 +818,7 @@ namespace internal
           std::copy (&incubes[i].vertices[0],
                      &incubes[i].vertices[GeometryInfo<3>::vertices_per_cell],
                      &the_cell.nodes[0]);
-	
+
           cell_list.push_back(the_cell);
         }
 
@@ -833,9 +826,9 @@ namespace internal
                                        // connectivity
       build_connectivity ();
     }
-    
 
-    
+
+
     void
     Mesh::sanity_check () const
     {
@@ -857,7 +850,7 @@ namespace internal
                                        // Get the Local Node Numbers
 				       // of the incoming edges
       const unsigned int e0 = ElementInfo::edge_to_node[local_node_num][0];
-      const unsigned int e1 = ElementInfo::edge_to_node[local_node_num][1]; 
+      const unsigned int e1 = ElementInfo::edge_to_node[local_node_num][1];
       const unsigned int e2 = ElementInfo::edge_to_node[local_node_num][2];
 
 				       // Global Edge Numbers
@@ -885,7 +878,7 @@ namespace internal
 	       edge_list[ge2].nodes[or2 == forward_edge ? 0 : 1]),
 	      ExcMessage ("This message does not satisfy the internal "
 			  "consistency check"));
-    }    
+    }
 
 
 
@@ -893,7 +886,7 @@ namespace internal
     void Mesh::build_connectivity ()
     {
       const unsigned int n_cells = cell_list.size();
-      
+
       unsigned int n_edges = 0;
 				       // Correctly build the edge
 				       // list
@@ -903,8 +896,8 @@ namespace internal
 					 // with a given CheapEdge
 	std::map<CheapEdge,unsigned int> edge_map;
 	unsigned int ctr = 0;
-	for (unsigned int cur_cell_id = 0; 
-	     cur_cell_id<n_cells; 
+	for (unsigned int cur_cell_id = 0;
+	     cur_cell_id<n_cells;
 	     ++cur_cell_id)
 	  {
 					     // Get the local node
@@ -912,20 +905,20 @@ namespace internal
 					     // edge_num
 	    const Cell & cur_cell = cell_list[cur_cell_id];
 
-	    for (unsigned short int edge_num = 0; 
-		 edge_num<12; 
+	    for (unsigned short int edge_num = 0;
+		 edge_num<12;
 		 ++edge_num)
 	      {
 		unsigned int gl_edge_num = 0;
 		EdgeOrientation l_edge_orient = forward_edge;
-		
+
 						 // Construct the
 						 // CheapEdge
 		const unsigned int
 		  node0 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][0]],
 		  node1 = cur_cell.nodes[ElementInfo::nodes_on_edge[edge_num][1]];
 		const CheapEdge cur_edge (node0, node1);
-		
+
 		if (edge_map.count(cur_edge) == 0)
 						   // Edge not in map
 		  {
@@ -946,13 +939,13 @@ namespace internal
 		  {
 						     // get edge_num
 						     // from hash_map
-		    gl_edge_num = edge_map[cur_edge]; 
+		    gl_edge_num = edge_map[cur_edge];
 		    if (edge_list[gl_edge_num].nodes[0] != node0)
 		      l_edge_orient = backward_edge;
 		  }
 						 // set edge number to
 						 // edgenum
-		cell_list[cur_cell_id].edges[edge_num] = gl_edge_num; 
+		cell_list[cur_cell_id].edges[edge_num] = gl_edge_num;
 		cell_list[cur_cell_id].local_orientation_flags[edge_num]
 		  = l_edge_orient;
 	      }
@@ -963,7 +956,7 @@ namespace internal
 				       // Count each of the edges.
       {
 	std::vector<int> edge_count(n_edges,0);
-      
+
 
 					 // Count every time an edge
 					 // occurs in a cube.
@@ -982,7 +975,7 @@ namespace internal
 	for (unsigned int cur_edge_id=0; cur_edge_id<n_edges; ++cur_edge_id)
           edge_list[cur_edge_id].neighboring_cubes
             .resize (edge_count[cur_edge_id]);
-      
+
 					 // Store the position of the
 					 // current neighbor in the
 					 // edge's neighbor list
@@ -1003,7 +996,7 @@ namespace internal
 
 
     void
-    Mesh::export_to_deal_format (std::vector<CellData<3> > &outcubes) const 
+    Mesh::export_to_deal_format (std::vector<CellData<3> > &outcubes) const
     {
       Assert (outcubes.size() == cell_list.size(),
               ExcInternalError());
@@ -1016,26 +1009,26 @@ namespace internal
                    &cell_list[i].nodes[GeometryInfo<3>::vertices_per_cell],
                    &outcubes[i].vertices[0]);
     }
-    
 
-    
+
+
     Orienter::Orienter (const std::vector<CellData<3> > &incubes)
                     :
                     mesh (incubes),
                     cur_posn (0),
                     marker_cube (0),
                     cur_edge_group  (0)
-    {  
+    {
       for (unsigned int i = 0; i<12; ++i)
 	edge_orient_array[i] = false;
     }
 
 
-    
+
     bool Orienter::orient_mesh (std::vector<CellData<3> > &incubes)
     {
       Orienter orienter (incubes);
-      
+
 				       // First check that the mesh is
 				       // sensible
       orienter.mesh.sanity_check ();
@@ -1052,7 +1045,7 @@ namespace internal
                                        // have to turn the cubes so they
                                        // match the edge orientation.
       orienter.orient_cubes ();
-        
+
                                        // Copy the elements from our
                                        // internal structure back into
                                        // their original location.
@@ -1095,7 +1088,7 @@ namespace internal
                                                  // contradiction
                 if (!cell_is_consistent(cur_posn))
 		  return false;
-		
+
                                                  // If we needed to
                                                  // orient any edges
                                                  // in the current
@@ -1115,7 +1108,7 @@ namespace internal
     }
 
 
-    
+
     bool Orienter::get_next_unoriented_cube ()
     {
 				       // The last cube in the list
@@ -1134,7 +1127,7 @@ namespace internal
     }
 
 
-    
+
     bool Orienter::is_oriented (const unsigned int cell_num) const
     {
       for (unsigned int i=0; i<12; ++i)
@@ -1145,13 +1138,13 @@ namespace internal
     }
 
 
-    
+
     bool
     Orienter::cell_is_consistent(const unsigned int cell_num) const
     {
 
       const Cell& c = mesh.cell_list[cell_num];
-  
+
 				       // Checks that all oriented
 				       // edges in the group are
 				       // oriented consistently.
@@ -1175,7 +1168,7 @@ namespace internal
 		   unoriented_edge))
 		{
 		  const EdgeOrientation this_edge_direction
-		    = (c.local_orientation_flags[i] 
+		    = (c.local_orientation_flags[i]
 		       == mesh.edge_list[c.edges[i]].orientation_flag  ?
 		       forward_edge : backward_edge);
 
@@ -1184,7 +1177,7 @@ namespace internal
 						   // edge before,
 						   // then store its
 						   // value:
-		  if (value == unoriented_edge) 
+		  if (value == unoriented_edge)
 		    value = this_edge_direction;
 		  else
 						     // If we have
@@ -1203,25 +1196,25 @@ namespace internal
     }
 
 
-    
+
     bool Orienter::orient_next_unoriented_edge ()
     {
       cur_posn = marker_cube;
       const Cell& c = mesh.cell_list[cur_posn];
       unsigned int edge = 0;
- 
+
 				       // search for the unoriented
 				       // side
       while ((edge<12) &&
 	     (mesh.edge_list[c.edges[edge]].orientation_flag !=
 	     unoriented_edge))
 	++edge;
-  
+
 				       // if we found none then return
 				       // false
       if (edge == 12)
 	return false;
-  
+
 				       // Which edge group we're in.
       const unsigned int edge_group = edge/4;
 
@@ -1243,7 +1236,7 @@ namespace internal
 	= c.local_orientation_flags[edge];
       mesh.edge_list[c.edges[edge]].group = cur_edge_group;
 
-                                       // Remember that we have oriented 
+                                       // Remember that we have oriented
                                        // this edge in the current cell.
       edge_orient_array[edge] = true;
 
@@ -1251,23 +1244,23 @@ namespace internal
     }
 
 
-    
+
     bool Orienter::orient_edges_in_current_cube ()
     {
       for (unsigned int edge_group=0; edge_group<3; ++edge_group)
 	if (orient_edge_set_in_current_cube(edge_group) == true)
 	  return true;
-      
+
       return false;
     }
 
 
-    
+
     bool
     Orienter::orient_edge_set_in_current_cube (const unsigned int n)
     {
       const Cell& c = mesh.cell_list[cur_posn];
-  
+
 				       // Check if any edge is
 				       // oriented
       unsigned int n_oriented = 0;
@@ -1311,42 +1304,42 @@ namespace internal
       for (unsigned int i=4*n; i<4*(n+1); ++i, cur_flag<<=1)
 	if ((edge_flags & cur_flag) != 0)
 	  {
-	    mesh.edge_list[c.edges[i]].orientation_flag 
+	    mesh.edge_list[c.edges[i]].orientation_flag
 	      = (c.local_orientation_flags[i] == glorient ?
 		 forward_edge : backward_edge);
-	    
+
 	    mesh.edge_list[c.edges[i]].group = cur_edge_group;
-                                       // Remember that we have oriented 
+                                       // Remember that we have oriented
                                        // this edge in the current cell.
 	    edge_orient_array[i] = true;
 	  }
-	
+
       return true;
     }
 
 
-    
+
     void Orienter::get_adjacent_cubes ()
     {
       const Cell &c = mesh.cell_list[cur_posn];
       for (unsigned int e=0; e<12; ++e)
-                               	       // Only need to add the adjacent 
-	                               // cubes for edges we recently 
+                               	       // Only need to add the adjacent
+	                               // cubes for edges we recently
 	                               // oriented
 	if (edge_orient_array[e] == true)
 	  {
 	    const Edge & the_edge = mesh.edge_list[c.edges[e]];
-	    for (unsigned int local_cube_num = 0; 
+	    for (unsigned int local_cube_num = 0;
 		 local_cube_num < the_edge.neighboring_cubes.size();
 		 ++local_cube_num)
 	      {
 		const unsigned int
 		  global_cell_num = the_edge.neighboring_cubes[local_cube_num];
 		Cell &ncell = mesh.cell_list[global_cell_num];
-	
- 	                               // If the cell is waiting to be 
-		                       // processed we dont want to add 
-		                       // it to the list a second time.	
+
+ 	                               // If the cell is waiting to be
+		                       // processed we dont want to add
+		                       // it to the list a second time.
 		if (!ncell.waiting_to_be_processed)
 		  {
 		    sheet_to_process.push_back(global_cell_num);
@@ -1354,15 +1347,15 @@ namespace internal
 		  }
 	      }
 	  }
-                                       // we're done with this cube so 
+                                       // we're done with this cube so
                                        // clear its processing flags.
       for (unsigned int e=0; e<12; ++e)
 	edge_orient_array[e] = false;
-	    
+
     }
 
 
-    
+
     bool Orienter::get_next_active_cube ()
     {
 				       // Mark the curent Cube as
@@ -1378,12 +1371,12 @@ namespace internal
       return false;
     }
 
-    
+
     void Orienter::orient_cubes ()
     {
 				       // We assume that the mesh has
 				       // all edges oriented already.
-  
+
 				       // This is a list of
 				       // permutations that take node
 				       // 0 to node i but only rotate
@@ -1402,7 +1395,7 @@ namespace internal
 	    {6,5,4,7,2,1,0,3},
 	    {7,6,5,4,3,2,1,0}
       };
-  
+
 				       // So now we need to work out
 				       // which node needs to be
 				       // mapped to the zero node.
@@ -1413,7 +1406,7 @@ namespace internal
       for (unsigned int i=0; i<mesh.cell_list.size(); ++i)
 	{
 	  Cell& the_cell = mesh.cell_list[i];
-    
+
 					   // This stores whether the
 					   // global oriented edge
 					   // points in the same
@@ -1469,24 +1462,24 @@ namespace internal
 		      ExcInternalError());
 	      Assert (local_edge_orientation[e2] != unoriented_edge,
 		      ExcInternalError());
-	      
+
 	      const unsigned int
 		total  = (((local_edge_orientation[e0] == sign0) ? 1 : 0)
 			  +((local_edge_orientation[e1] == sign1) ? 1 : 0)
 			  +((local_edge_orientation[e2] == sign2) ? 1 : 0));
-      
-	      if (total == 3) 
+
+	      if (total == 3)
 		{
 		  Assert (perm_num == numbers::invalid_unsigned_int,
 			  ExcGridOrientError("More than one node with 3 incoming "
-					     "edges found in curent hex.")); 
+					     "edges found in curent hex."));
 		  perm_num = node_num;
 		}
 	    }
 					   // We should now have a
 					   // valid permutation number
 	  Assert (perm_num != numbers::invalid_unsigned_int,
-		  ExcGridOrientError("No node having 3 incoming edges found in curent hex.")); 
+		  ExcGridOrientError("No node having 3 incoming edges found in curent hex."));
 
 					   // So use the apropriate
 					   // rotation to get the new
@@ -1502,6 +1495,7 @@ namespace internal
 } // namespace internal
 
 
+
 template<>
 void
 GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
@@ -1513,7 +1507,7 @@ GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
 				   // create a backup to use if GridReordering
 				   // was not successful
   std::vector<CellData<3> > backup=incubes;
-  
+
 				   // This does the real work
   bool success=
     internal::GridReordering3d::Orienter::orient_mesh (incubes);
@@ -1525,6 +1519,7 @@ GridReordering<3>::reorder_cells (std::vector<CellData<3> > &incubes)
   if (!success)
     incubes=backup;
 }
+
 
 
 template<>
@@ -1548,7 +1543,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
 	  // reorder vertices: swap front and back face
 	  for (unsigned int i=0; i<4; ++i)
 	    std::swap(cells[cell_no].vertices[i], cells[cell_no].vertices[i+4]);
-	  
+
 					   // check whether the
 					   // resulting cell is now ok.
 					   // if not, then the grid is
@@ -1561,7 +1556,7 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
 		      ExcInternalError());
 	}
     }
-  
+
 				   // We assume that all cells of a
 				   // grid have either positive or
 				   // negative volumes but not both
@@ -1573,11 +1568,6 @@ GridReordering<3>::invert_all_cells_of_negative_grid(
   AssertThrow(n_negative_cells==0 || n_negative_cells==cells.size(), ExcInternalError());
 }
 
-
-
-	
-
-#endif // deal_II_dimension == 3
 
 DEAL_II_NAMESPACE_CLOSE
 
