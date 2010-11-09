@@ -794,17 +794,7 @@ class GridGenerator
     static
     void
     colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria);
-
-				     /**
-				      * Same function as above for
-				      * 1d. This function is not
-				      * implemented.
-				      */
-    template <int spacedim>
-    static
-    void
-    colorize_hyper_rectangle (Triangulation<1,spacedim> &tria);
-
+    
 				     /**
 				      * Perform the action specified
 				      * by the @p colorize flag of

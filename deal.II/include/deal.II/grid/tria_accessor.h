@@ -1602,7 +1602,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
                     :
 		    TriaAccessorBase<0,dim, spacedim> (parent, level, index, local_data)
       {
-	Assert (false, ExcInternalError());
+	Assert(false, ExcImpossibleInDim(0));
       }
 
 				     /**
@@ -1613,7 +1613,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
     template <int structdim2, int dim2, int spacedim2>
     TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
       {
-	Assert (false, ExcInternalError());
+	Assert(false, ExcImpossibleInDim(0));
       }
 
 				     /**
@@ -1624,37 +1624,284 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
     template <int structdim2, int dim2, int spacedim2>
     TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
       {
-	Assert (false, ExcInternalError());
+	Assert(false, ExcImpossibleInDim(0));
       }
 
 				     /**
-    				      * Boundary indicator of this
-				      * object.
+				      *  Index of the parent. Always -1
 				      */
-    unsigned char boundary_indicator () const
+    int parent_index () const
       {
-	Assert (false, ExcInternalError());
+	return -1;
+      }
+    
+
+
+				     /**
+				      *  @name Accessing sub-objects
+				      */
+				     /**
+				      * @{
+				      */
+
+				     /**
+				      *  Return the global index of i-th
+				      *  vertex of the current object. The
+				      *  convention regarding the numbering of
+				      *  vertices is laid down in the
+				      *  documentation of the GeometryInfo
+				      *  class.
+				      *
+				      *  Note that the returned value is only
+				      *  the index of the geometrical
+				      *  vertex. It has nothing to do with
+				      *  possible degrees of freedom
+				      *  associated with it. For this, see the
+				      *  @p DoFAccessor::vertex_dof_index
+				      *  functions.
+				      */
+    unsigned int vertex_index (const unsigned int i) const
+      {
+	Assert(false, ExcNotImplemented());
+	return numbers::invalid_unsigned_int;
+      }
+
+				     /**
+				      *  Return a reference to the
+				      *  @p ith vertex.
+				      */
+    Point<spacedim> & vertex (const unsigned int i) const
+      {
+	Assert(false, ExcNotImplemented());
+	static Point<spacedim> p;
+	return p;
+      }
+    
+
+				     /**
+				      * Pointer to the @p ith line
+				      * bounding this object. Will
+				      * point to an invalid object.
+				      */
+//     typename internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+//     line (const unsigned int i) const
+//       {
+// 	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
+//       }
+    
+
+				     /**
+				      * Line index of the @p ith
+				      * line bounding this object.
+				      *
+				      * Implemented only for
+				      * <tt>structdim>1</tt>,
+				      * otherwise an exception
+				      * generated.
+				      */
+    unsigned int line_index (const unsigned int i) const
+      {
+	Assert(false, ExcImpossibleInDim(0));
+	return numbers::invalid_unsigned_int;
+      }
+    
+
+    				     /**
+				      * Pointer to the @p ith quad
+				      * bounding this object.
+				      */
+//     typename internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+//     quad (const unsigned int i) const;
+
+				     /**
+				      * Quad index of the @p ith
+				      * quad bounding this object.
+				      *
+				      * Implemented only for
+				      * <tt>structdim>2</tt>,
+				      * otherwise an exception
+				      * generated.
+				      */
+    unsigned int quad_index (const unsigned int i) const
+      {
+	Assert(false, ExcImpossibleInDim(0));
+	return numbers::invalid_unsigned_int;
+      }
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Orientation of sub-objects
+				      */
+				     /**
+				      * @{
+				      */
+
+                                     /**
+				      * @brief Always return false
+                                      */
+    bool face_orientation (const unsigned int face) const
+      {
+	return false;
+      }
+    
+                                     /**
+				      * @brief Always return false
+                                      */
+    bool face_flip (const unsigned int face) const
+      {
+	return false;
+      }    
+
+                                     /**
+				      * @brief Always return false
+                                      */
+    bool face_rotation (const unsigned int face) const
+      {
+	return false;
+      }
+    
+
+                                     /**
+				      * @brief Always return false
+                                      */
+    bool line_orientation (const unsigned int line) const
+      {
+	return false;
+      }
+    
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  @name Accessing children
+				      */
+				     /**
+				      * @{
+				      */
+
+				     /**
+				      *  Test whether the object has
+				      *  children. Always false.
+				      */
+    bool has_children () const
+      {
+	return false;
+      }
+    
+
+				     /**
+				      * Return the number of immediate
+				      * children of this object.This
+				      * is always zero in dimension 0.
+				      */
+    unsigned int n_children() const
+      {
+	return 0;
+      }
+    
+				     /**
+				      * Compute and return the number
+				      * of active descendants of this
+				      * objects. Always zero.
+				      */
+    unsigned int number_of_children () const
+      {
+	return 0;
+      }
+
+    				     /**
+				      * Return the number of times
+				      * that this object is
+				      * refined. Always 0.
+				      */
+    unsigned int max_refinement_depth () const
+      {
 	return 0;
       }
 
 				     /**
-				      * Whether this object is used.
-				      */
-    bool used () const
-      {
-	Assert (false, ExcInternalError());
-	return false;
-      }
-
-				     /**
-				      * Produce a dummy child object.
+				      * @brief Return an invalid object
 				      */
     TriaIterator<InvalidAccessor<0,dim,spacedim> >
     child (const unsigned int) const
       {
-	Assert (false, ExcInternalError());
 	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
       }
+
+				     /**
+				      * @brief Return an invalid object
+				      */
+    TriaIterator<InvalidAccessor<0,dim,spacedim> >
+    isotropic_child (const unsigned int) const
+      {
+	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
+      }
+
+				     /**
+				      * Always return no refinement.
+				      */
+    RefinementCase<0> refinement_case () const
+      {
+	return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
+      }
+    
+
+				     /**
+				      * @brief Returns -1
+				      */
+    int child_index (const unsigned int i) const
+      {
+	return -1;
+      }
+    
+
+				     /**
+				      * @brief Returns -1
+				      */
+    int isotropic_child_index (const unsigned int i) const
+      {
+	return -1;
+      }
+				     /**
+				      * @brief Do nothing and throw and error
+				      */
+    inline
+    unsigned char boundary_indicator () const
+      {
+	Assert(false, ExcImpossibleInDim(0));
+	return 0;
+      }
+
+				     /**
+				      * @brief Do nothing and throw and error
+				      */
+    inline
+    void
+    set_boundary_indicator (const unsigned char) const
+      {
+	Assert(false, ExcImpossibleInDim(0));
+      }
+    
+				     /**
+				      * @brief Do nothing and throw and error
+				      */
+    void set_all_boundary_indicators (const unsigned char) const
+      {
+	Assert(false, ExcImpossibleInDim(0));
+      }
+
+				     /**
+				      * @brief Do nothing and throw and error
+				      */
+    bool used () const
+      {
+	Assert(false, ExcImpossibleInDim(0));
+	return false;
+      }
+
 };
 
 

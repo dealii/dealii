@@ -135,17 +135,6 @@ GridGenerator::hyper_rectangle (Triangulation<dim,spacedim> &tria,
 
 
 
-template <int spacedim>
-void
-GridGenerator::colorize_hyper_rectangle (Triangulation<1,spacedim> &)
-{
-				   // Nothing to do in 1D
-}
-
-
-
-
-// Implementation for dimensions except 1
 template <int dim, int spacedim>
 void
 GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria)
@@ -535,12 +524,12 @@ GridGenerator::subdivided_hyper_rectangle (
 
 template <int dim>
 void
-GridGenerator::
-subdivided_hyper_rectangle(Triangulation<dim>              &tria,
-                           const std::vector<std::vector<double> > &step_sz,
-                           const Point<dim>                &p_1,
-                           const Point<dim>                &p_2,
-                           const bool                       colorize)
+GridGenerator::subdivided_hyper_rectangle(
+  Triangulation<dim>              &tria,
+  const std::vector<std::vector<double> > &step_sz,
+  const Point<dim>                &p_1,
+  const Point<dim>                &p_2,
+  const bool                       colorize)
 {
 				   // contributed by Joerg R. Weimar
 				   // (j.weimar@jweimar.de) 2003
@@ -757,12 +746,12 @@ subdivided_hyper_rectangle(Triangulation<dim>              &tria,
 
 template <>
 void
-GridGenerator::
-subdivided_hyper_rectangle (Triangulation<1>&                             tria,
-                            const std::vector< std::vector<double> >&     spacing,
-                            const Point<1>&                               p,
-			    const Table<1,unsigned char>&                 material_id,
-                            const bool                                    colorize)
+GridGenerator::subdivided_hyper_rectangle (
+  Triangulation<1>&                             tria,
+  const std::vector< std::vector<double> >&     spacing,
+  const Point<1>&                               p,
+  const Table<1,unsigned char>&                 material_id,
+  const bool                                    colorize)
 {
 				   // contributed by Yaqi Wang 2006
   Assert(spacing.size() == 1,
@@ -816,12 +805,12 @@ subdivided_hyper_rectangle (Triangulation<1>&                             tria,
 
 template <>
 void
-GridGenerator::
-subdivided_hyper_rectangle (Triangulation<2>&                         tria,
-                            const std::vector< std::vector<double> >&     spacing,
-                            const Point<2>&                               p,
-			    const Table<2,unsigned char>&                 material_id,
-                            const bool                                    colorize)
+GridGenerator::subdivided_hyper_rectangle (
+  Triangulation<2>&                         tria,
+  const std::vector< std::vector<double> >&     spacing,
+  const Point<2>&                               p,
+  const Table<2,unsigned char>&                 material_id,
+  const bool                                    colorize)
 {
 				   // contributed by Yaqi Wang 2006
   Assert(spacing.size() == 2,
@@ -914,12 +903,12 @@ subdivided_hyper_rectangle (Triangulation<2>&                         tria,
 
 template <>
 void
-GridGenerator::
-subdivided_hyper_rectangle (Triangulation<3>&                           tria,
-                            const std::vector< std::vector<double> >&     spacing,
-                            const Point<3>&                             p,
-			    const Table<3,unsigned char>&               material_id,
-                            const bool                                    colorize)
+GridGenerator::subdivided_hyper_rectangle (
+  Triangulation<3>&                           tria,
+  const std::vector< std::vector<double> >&     spacing,
+  const Point<3>&                             p,
+  const Table<3,unsigned char>&               material_id,
+  const bool                                    colorize)
 {
 				   // contributed by Yaqi Wang 2006
   const unsigned int dim = 3;
