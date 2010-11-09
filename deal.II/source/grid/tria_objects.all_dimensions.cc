@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,14 +21,14 @@
 #include <algorithm>
 #include <functional>
 
-    
+
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
   namespace Triangulation
-  {    
+  {
     template<>
     void
     TriaObjects<TriaObject<1> >::reserve_space (const unsigned int new_lines_in_pairs,
@@ -39,7 +39,7 @@ namespace internal
       next_free_single=0;
       next_free_pair=0;
       reverse_order_next_free_single=false;
-      
+
 				       // count the number of lines, of
 				       // unused single lines and of
 				       // unused pairs of lines
@@ -83,23 +83,23 @@ namespace internal
 	new_size+=additional_single_lines;
 
                                        // only allocate space if necessary
-      if (new_size>cells.size()) 
+      if (new_size>cells.size())
         {
           cells.reserve (new_size);
           cells.insert (cells.end(),
 			new_size-cells.size(),
 			TriaObject<1> ());
-  
+
           used.reserve (new_size);
           used.insert (used.end(),
 		       new_size-used.size(),
 		       false);
-  
+
           user_flags.reserve (new_size);
           user_flags.insert (user_flags.end(),
 			     new_size-user_flags.size(),
 			     false);
-      
+
           children.reserve (new_size);
           children.insert (children.end(),
 			   new_size-children.size(),
@@ -124,13 +124,114 @@ namespace internal
     }
 
 
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<1> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_single,
+	 last=used.size()-1;
+      if (!reverse_order_next_free_single)
+	{
+					   // first sweep forward, only use
+					   // really single slots, do not use
+					   // pair slots
+	  for (; pos<last; ++pos)
+	    if (!used[pos])
+	      if (used[++pos])
+		{
+						   // this was a single slot
+		  pos-=1;
+		  break;
+		}
+	  if (pos>=last)
+	    {
+	      reverse_order_next_free_single=true;
+	      next_free_single=used.size()-1;
+	      pos=used.size()-1;
+	    }
+	  else
+	    next_free_single=pos+1;
+	}
+
+      if(reverse_order_next_free_single)
+	{
+					   // second sweep, use all slots, even
+					   // in pairs
+	  for(;pos>=0;--pos)
+	    if (!used[pos])
+	      break;
+	  if (pos>0)
+	    next_free_single=pos-1;
+	  else
+					     // no valid single line anymore
+	    return tria.end_line();
+	}
+
+      return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
+    }
+
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<1> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_pair,
+	 last=used.size()-1;
+      for (; pos<last; ++pos)
+	if (!used[pos])
+	  if (!used[++pos])
+	    {
+					       // this was a pair slot
+	      pos-=1;
+	      break;
+	    }
+      if (pos>=last)
+					 // no free slot
+	return tria.end_line();
+      else
+	next_free_pair=pos+2;
+
+      return typename dealii::Triangulation<dim,spacedim>::raw_line_iterator(&tria,0,pos);
+    }
+
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<1> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+      Assert(false, ExcWrongIterator("quad","line"));
+      return tria.end_quad();
+    }
+
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<1> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+      Assert(false, ExcWrongIterator("quad","line"));
+      return tria.end_quad();
+    }
+
+
+
     template<>
     void
     TriaObjects<TriaObject<2> >::reserve_space (const unsigned int new_quads_in_pairs,
 				      const unsigned int new_quads_single)
     {
       Assert(new_quads_in_pairs%2==0, ExcInternalError());
-      
+
       next_free_single=0;
       next_free_pair=0;
       reverse_order_next_free_single=false;
@@ -184,17 +285,17 @@ namespace internal
           cells.insert (cells.end(),
 			new_size-cells.size(),
 			TriaObject<2> ());
-      
+
           used.reserve (new_size);
           used.insert (used.end(),
 		       new_size-used.size(),
 		       false);
-  
+
           user_flags.reserve (new_size);
           user_flags.insert (user_flags.end(),
 			     new_size-user_flags.size(),
 			     false);
-  
+
           children.reserve (2*new_size);
           children.insert (children.end(),
 			   2*new_size-children.size(),
@@ -204,7 +305,7 @@ namespace internal
 	  refinement_cases.insert (refinement_cases.end(),
 			       new_size - refinement_cases.size(),
 			       RefinementCase<2>::no_refinement);
-	  
+
 
           material_id.reserve (new_size);
           material_id.insert (material_id.end(),
@@ -225,6 +326,139 @@ namespace internal
     }
 
 
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<2> >::next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_single,
+	 last=used.size()-1;
+      if (!reverse_order_next_free_single)
+	{
+					   // first sweep forward, only use
+					   // really single slots, do not use
+					   // pair slots
+	  for (; pos<last; ++pos)
+	    if (!used[pos])
+	      if (used[++pos])
+		{
+						   // this was a single slot
+		  pos-=1;
+		  break;
+		}
+	  if (pos>=last)
+	    {
+	      reverse_order_next_free_single=true;
+	      next_free_single=used.size()-1;
+	      pos=used.size()-1;
+	    }
+	  else
+	    next_free_single=pos+1;
+	}
+
+      if(reverse_order_next_free_single)
+	{
+					   // second sweep, use all slots, even
+					   // in pairs
+	  for(;pos>=0;--pos)
+	    if (!used[pos])
+	      break;
+	  if (pos>0)
+	    next_free_single=pos-1;
+	  else
+					     // no valid single quad anymore
+	    return tria.end_quad();
+	}
+
+      return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
+    }
+
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator
+    TriaObjects<TriaObject<2> >::next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_pair,
+	 last=used.size()-1;
+      for (; pos<last; ++pos)
+	if (!used[pos])
+	  if (!used[++pos])
+	    {
+					       // this was a pair slot
+	      pos-=1;
+	      break;
+	    }
+      if (pos>=last)
+					 // no free slot
+	return tria.end_quad();
+      else
+	next_free_pair=pos+2;
+
+      return typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator(&tria,0,pos);
+    }
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<2> >::next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+      Assert(false, ExcWrongIterator("line","quad"));
+      return tria.end_line();
+    }
+
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_line_iterator
+    TriaObjects<TriaObject<2> >::next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria)
+    {
+      Assert(false, ExcWrongIterator("line","quad"));
+      return tria.end_line();
+    }
+
+
+
+
+    template <>
+    template <int dim, int spacedim>
+    typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator
+    TriaObjects<TriaObject<3> >::next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
+					    const unsigned int               level)
+    {
+				       // TODO: Think of a way to ensure that we are using the correct triangulation, i.e. the one containing *this.
+
+      int pos=next_free_pair,
+	 last=used.size()-1;
+      for (; pos<last; ++pos)
+	if (!used[pos])
+	  {
+					     // this should be a pair slot
+	      Assert(!used[pos+1], ExcInternalError());
+	      break;
+	    }
+      if (pos>=last)
+					 // no free slot
+	return tria.end_hex();
+      else
+	next_free_pair=pos+2;
+
+      return typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator(&tria,level,pos);
+    }
+
+
+
+
+
     void
     TriaObjectsHex::reserve_space (const unsigned int new_hexes)
     {
@@ -240,17 +474,17 @@ namespace internal
           cells.insert (cells.end(),
 			new_size-cells.size(),
 			TriaObject<3> ());
-      
+
           used.reserve (new_size);
           used.insert (used.end(),
 		       new_size-used.size(),
 		       false);
-  
+
           user_flags.reserve (new_size);
           user_flags.insert (user_flags.end(),
 			     new_size-user_flags.size(),
 			     false);
-  
+
           children.reserve (4*new_size);
           children.insert (children.end(),
 			   4*new_size-children.size(),
@@ -343,7 +577,7 @@ namespace internal
 	used.size() + new_quads_in_pairs - 2*n_unused_pairs;
       if (additional_single_quads>0)
 	new_size+=additional_single_quads;
-      
+
                                        // see above...
       if (new_size>cells.size())
         {
@@ -364,7 +598,7 @@ namespace internal
 	  reverse_order_next_free_single=true;
 	}
     }
-    
+
 
     template<>
     void
@@ -514,7 +748,7 @@ namespace internal
               ExcMemoryInexact (cells.size() * GeometryInfo<2>::lines_per_cell,
                                 line_orientations.size()));
       TriaObjects<TriaObject<2> >::monitor_memory (3);
-      
+
     }
 
 
@@ -531,7 +765,7 @@ namespace internal
       user_data.clear();
       user_data_type = data_unknown;
     }
-    
+
 
     void
     TriaObjectsHex::clear()
@@ -549,8 +783,8 @@ namespace internal
       TriaObjects<TriaObject<2> >::clear();
       line_orientations.clear();
     }
-    
-    
+
+
     template<typename G>
     unsigned int
     TriaObjects<G>::memory_consumption () const
@@ -563,7 +797,7 @@ namespace internal
               MemoryConsumption::memory_consumption (refinement_cases) +
 	      user_data.capacity() * sizeof(UserData) + sizeof(user_data));
     }
-  
+
 
     unsigned int
     TriaObjectsHex::memory_consumption () const
@@ -582,12 +816,13 @@ namespace internal
 	      this->TriaObjects<TriaObject<2> >::memory_consumption() );
     }
 
-    
 
-				     // explicit instantiations
 
+// explicit instantiations
     template class TriaObjects<TriaObject<1> >;
     template class TriaObjects<TriaObject<2> >;
+
+    #include "tria_objects.inst"
   }
 }
 

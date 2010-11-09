@@ -1,0 +1,39 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+#if deal_II_dimension > 1
+    template dealii::Triangulation<deal_II_dimension>::raw_line_iterator
+    TriaObjects<TriaObject<1> >::next_free_single_line(const dealii::Triangulation<deal_II_dimension> &);
+    template dealii::Triangulation<deal_II_dimension>::raw_line_iterator
+    TriaObjects<TriaObject<1> >::next_free_pair_line(const dealii::Triangulation<deal_II_dimension> &);
+    template dealii::Triangulation<deal_II_dimension>::raw_quad_iterator
+    TriaObjects<TriaObject<1> >::next_free_single_quad(const dealii::Triangulation<deal_II_dimension> &);
+    template dealii::Triangulation<deal_II_dimension>::raw_quad_iterator
+    TriaObjects<TriaObject<1> >::next_free_pair_quad(const dealii::Triangulation<deal_II_dimension> &);
+
+    template dealii::Triangulation<deal_II_dimension>::raw_line_iterator
+    TriaObjects<TriaObject<2> >::next_free_single_line(const dealii::Triangulation<deal_II_dimension> &);
+    template dealii::Triangulation<deal_II_dimension>::raw_line_iterator
+    TriaObjects<TriaObject<2> >::next_free_pair_line(const dealii::Triangulation<deal_II_dimension> &);
+    template dealii::Triangulation<deal_II_dimension>::raw_quad_iterator
+    TriaObjects<TriaObject<2> >::next_free_single_quad(const dealii::Triangulation<deal_II_dimension> &);
+    template dealii::Triangulation<deal_II_dimension>::raw_quad_iterator
+    TriaObjects<TriaObject<2> >::next_free_pair_quad(const dealii::Triangulation<deal_II_dimension> &);
+#endif
+#if deal_II_dimension == 3
+    template dealii::Triangulation<deal_II_dimension>::raw_hex_iterator
+    TriaObjects<TriaObject<3> >::next_free_hex(const dealii::Triangulation<deal_II_dimension> &, const unsigned int);
+#endif
+  }

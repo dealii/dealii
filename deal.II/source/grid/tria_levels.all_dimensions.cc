@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,28 +34,28 @@ namespace internal
                                        //
                                        // note that all arrays should have equal
                                        // sizes (checked by @p{monitor_memory}
-      if (total_cells > refine_flags.size()) 
+      if (total_cells > refine_flags.size())
         {
           refine_flags.reserve (total_cells);
           refine_flags.insert (refine_flags.end(),
                                total_cells - refine_flags.size(),
                                RefinementCase<dim>::no_refinement);
-      
+
           coarsen_flags.reserve (total_cells);
           coarsen_flags.insert (coarsen_flags.end(),
                                 total_cells - coarsen_flags.size(),
                                 false);
-      
+
           subdomain_ids.reserve (total_cells);
           subdomain_ids.insert (subdomain_ids.end(),
                                 total_cells - subdomain_ids.size(),
                                 0);
-          
+
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
                           (total_cells + 1) / 2 - parents.size (),
                           -1);
-      
+
           neighbors.reserve (total_cells*(2*dimension));
           neighbors.insert (neighbors.end(),
                             total_cells*(2*dimension) - neighbors.size(),
@@ -110,8 +110,7 @@ namespace internal
 
 // This specialization should be only temporary, until the TriaObjects
 // classes are straightened out.
-    
-#if deal_II_dimension == 3
+
     void
     TriaLevel<3>::reserve_space (const unsigned int total_cells,
 				 const unsigned int dimension)
@@ -123,28 +122,28 @@ namespace internal
                                        //
                                        // note that all arrays should have equal
                                        // sizes (checked by @p{monitor_memory}
-      if (total_cells > refine_flags.size()) 
+      if (total_cells > refine_flags.size())
         {
           refine_flags.reserve (total_cells);
           refine_flags.insert (refine_flags.end(),
                                total_cells - refine_flags.size(),
                                RefinementCase<3>::no_refinement);
-      
+
           coarsen_flags.reserve (total_cells);
           coarsen_flags.insert (coarsen_flags.end(),
                                 total_cells - coarsen_flags.size(),
                                 false);
-      
+
           subdomain_ids.reserve (total_cells);
           subdomain_ids.insert (subdomain_ids.end(),
                                 total_cells - subdomain_ids.size(),
                                 0);
-          
+
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
                           (total_cells + 1) / 2 - parents.size (),
                           -1);
-      
+
           neighbors.reserve (total_cells*(2*dimension));
           neighbors.insert (neighbors.end(),
                             total_cells*(2*dimension) - neighbors.size(),
@@ -194,16 +193,12 @@ namespace internal
               MemoryConsumption::memory_consumption (cells) +
               MemoryConsumption::memory_consumption (refine_flags));
     }
-
-#endif
-    
   }
 }
 
-#if deal_II_dimension != 3
-template class internal::Triangulation::TriaLevel<deal_II_dimension>;
-#endif
 
+template class internal::Triangulation::TriaLevel<1>;
+template class internal::Triangulation::TriaLevel<2>;
 
 DEAL_II_NAMESPACE_CLOSE
 

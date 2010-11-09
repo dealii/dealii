@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,7 +29,7 @@ template <int dim>
 PersistentTriangulation<dim>::
 PersistentTriangulation (const Triangulation<dim> &coarse_grid)
                 :
-		coarse_grid (&coarse_grid, typeid(*this).name()) 
+		coarse_grid (&coarse_grid, typeid(*this).name())
 {}
 
 
@@ -52,14 +52,14 @@ PersistentTriangulation (const PersistentTriangulation<dim> &old_tria)
 
 
 template <int dim>
-PersistentTriangulation<dim>::~PersistentTriangulation () 
+PersistentTriangulation<dim>::~PersistentTriangulation ()
 {}
 
 
 
 template <int dim>
 void
-PersistentTriangulation<dim>::execute_coarsening_and_refinement () 
+PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 {
 				   // first save flags
   refine_flags.push_back (std::vector<bool>());
@@ -79,10 +79,10 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 template <int dim>
 void
 PersistentTriangulation<dim>::restore ()
-{  
+{
 				   // for each of the previous
 				   // refinement sweeps
-  for (unsigned int i=0; i<refine_flags.size()+1; ++i) 
+  for (unsigned int i=0; i<refine_flags.size()+1; ++i)
     restore(i);
 }
 
@@ -105,7 +105,7 @@ PersistentTriangulation<dim>::restore (const unsigned int step)
     {
       Assert(step<refine_flags.size()+1,
 	     ExcDimensionMismatch(step, refine_flags.size()+1));
-      
+
       this->load_refine_flags  (refine_flags[step-1]);
       this->load_coarsen_flags (coarsen_flags[step-1]);
 
@@ -126,7 +126,7 @@ PersistentTriangulation<dim>::n_refinement_steps() const
 
 template <int dim>
 void
-PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_grid) 
+PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_grid)
 {
   this->clear ();
   coarse_grid  = &old_grid;
@@ -164,7 +164,7 @@ void
 PersistentTriangulation<dim>::write_flags(std::ostream &out) const
 {
   const unsigned int n_flag_levels=refine_flags.size();
-  
+
   AssertThrow (out, ExcIO());
 
   out << mn_persistent_tria_flags_begin << ' ' << n_flag_levels << std::endl;
@@ -176,7 +176,7 @@ PersistentTriangulation<dim>::write_flags(std::ostream &out) const
       this->write_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags[i],
                                mn_tria_coarsen_flags_end, out);
     }
-  
+
   out << mn_persistent_tria_flags_end << std::endl;
 
   AssertThrow (out, ExcIO());
@@ -191,7 +191,7 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
   Assert(refine_flags.size()==0 && coarsen_flags.size()==0,
 	 ExcFlagsNotCleared());
   AssertThrow (in, ExcIO());
-  
+
   unsigned int magic_number;
   in >> magic_number;
   AssertThrow(magic_number==mn_persistent_tria_flags_begin,
@@ -208,7 +208,7 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
       this->read_bool_vector (mn_tria_coarsen_flags_begin, coarsen_flags.back(),
                               mn_tria_coarsen_flags_end, in);
     }
-  
+
   in >> magic_number;
   AssertThrow(magic_number==mn_persistent_tria_flags_end,
 	      typename Triangulation<dim>::ExcGridReadError());
@@ -240,7 +240,9 @@ PersistentTriangulation<dim>::memory_consumption () const
 
 
 // explicit instantiations
-template class PersistentTriangulation<deal_II_dimension>;
+template class PersistentTriangulation<1>;
+template class PersistentTriangulation<2>;
+template class PersistentTriangulation<3>;
 
 DEAL_II_NAMESPACE_CLOSE
 
