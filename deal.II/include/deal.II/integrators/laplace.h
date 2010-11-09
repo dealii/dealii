@@ -44,6 +44,7 @@ namespace LocalIntegrators
  * the latter case, the Laplacian is applied to each component
  * separately.
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2008, 2009, 2010
  */

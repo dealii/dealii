@@ -167,7 +167,9 @@ template<int,int> class MGDoFHandler;
  * we may need more than the default update flags.
  *
  * @ingroup MeshWorker
- * @author Guido Kanschat, 2009
+ * @ingroup Integrators
+ * @author Guido Kanschat
+ * @date 2009
  */
 namespace MeshWorker
 {

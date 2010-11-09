@@ -29,6 +29,7 @@ namespace LocalIntegrators
 /**
  * @brief Local integrators related to <i>L<sup>2</sup></i>-inner products.
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2010
  */

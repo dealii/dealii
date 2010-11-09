@@ -29,6 +29,7 @@ namespace LocalIntegrators
 /**
  * @brief Local integrators related to first order differential operators and their traces.
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2010
  */
@@ -52,6 +53,7 @@ namespace LocalIntegrators
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
       AssertDimension(fecomp, dim);
+      AssertDimension(fetest.get_fe().n_components(), 1);
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
 	

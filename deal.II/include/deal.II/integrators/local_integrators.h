@@ -118,6 +118,8 @@ void MatrixIntegrator<dim>::cell(
 }
  * @endcode
  * See step-42 for a worked out example of this code.
+ *
+ * @ingroup Integrators
  */
 namespace LocalIntegrators
 {
