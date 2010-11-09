@@ -477,7 +477,7 @@ class GridGenerator
 				      * class, with which you probably want to
 				      * associate boundary indicator 0 (the
 				      * hull of the cone).
-				      * 
+				      *
                                       * @note The triangulation needs to be
                                       * void upon calling this
                                       * function.
@@ -791,13 +791,19 @@ class GridGenerator
 				      * function of this class.
 				      */
     template <int dim, int spacedim>
-    static void colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria);
+    static
+    void
+    colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria);
 
-				     // No doxygen comment here
+				     /**
+				      * Same function as above for
+				      * 1d. This function is not
+				      * implemented.
+				      */
     template <int spacedim>
-    static void
-    colorize_hyper_rectangle(Triangulation<1,spacedim>&);
-
+    static
+    void
+    colorize_hyper_rectangle (Triangulation<1,spacedim> &tria);
 
 				     /**
 				      * Perform the action specified
