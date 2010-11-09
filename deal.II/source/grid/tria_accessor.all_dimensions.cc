@@ -895,7 +895,6 @@ namespace
   }
 
 
-#if deal_II_dimension == 2
 
   double
   measure (const TriaAccessor<2,2,2> &accessor)
@@ -945,9 +944,6 @@ namespace
     return (-x[1]*y[0]+x[1]*y[3]+y[0]*x[2]+x[0]*y[1]-x[0]*y[2]-y[1]*x[3]-x[2]*y[3]+x[3]*y[2])/2;
   }
 
-#endif
-
-#if deal_II_dimension == 3
 
   double
   measure (const TriaAccessor<3, 3, 3> &accessor)
@@ -960,7 +956,6 @@ namespace
 				      vertex_indices);
   }
 
-#endif
 
 
   template <int structdim, int dim, int spacedim>
@@ -1013,7 +1008,6 @@ measure () const
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
@@ -1023,7 +1017,6 @@ double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
   return this->diameter();
 }
 
-#elif deal_II_dimension == 2
 
 template <>
 double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
@@ -1037,7 +1030,6 @@ double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
 		  this->line(lines[axis][1])->diameter());
 }
 
-#elif deal_II_dimension == 3
 
 template <>
 double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
@@ -1057,17 +1049,11 @@ double TriaAccessor<3,3,3>::extent_in_direction(const unsigned int axis) const
 		  std::max(lengths[2], lengths[3]));
 }
 
-#else
-
-// Not implemented for higher dimensions
-
-#endif
 
 
 /*------------------------ Functions: CellAccessor<1> -----------------------*/
 
 
-#if deal_II_dimension == 1
 
 template <>
 bool CellAccessor<1>::point_inside (const Point<1> &p) const
@@ -1086,13 +1072,10 @@ bool CellAccessor<1,2>::point_inside (const Point<2> &) const
 
 
 
-#endif
-
 
 /*------------------------ Functions: CellAccessor<2> -----------------------*/
 
 
-#if deal_II_dimension == 2
 
 template <>
 bool CellAccessor<2>::point_inside (const Point<2> &p) const
@@ -1157,13 +1140,11 @@ bool CellAccessor<2,3>::point_inside (const Point<3> &) const
 }
 
 
-#endif
 
 
 /*------------------------ Functions: CellAccessor<3> -----------------------*/
 
 
-#if deal_II_dimension == 3
 
 template <>
 bool CellAccessor<3>::point_inside (const Point<3> &p) const
@@ -1204,7 +1185,6 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 }
 
 
-#endif
 
 
 /*------------------------ Functions: CellAccessor<dim,spacedim> -----------------------*/
@@ -1290,7 +1270,7 @@ CellAccessor<dim, spacedim>::parent () const
   Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
   TriaIterator<CellAccessor<dim,spacedim> >
     q (this->tria, this->present_level-1, this->parent_index ());
-  
+
   return q;
 }
 
@@ -1984,76 +1964,7 @@ neighbor_child_on_subface (const unsigned int face,
 // For more information, see http://gcc.gnu.org/bugzilla/show_bug.cgi?id=24331
 
 // explicit instantiations
-template class TriaAccessorBase<1,deal_II_dimension>;
-#if deal_II_dimension >= 2
-template class TriaAccessorBase<2,deal_II_dimension>;
-#endif
-#if deal_II_dimension >= 3
-template class TriaAccessorBase<3,deal_II_dimension>;
-#endif
-
-template class TriaAccessor<1,deal_II_dimension,deal_II_dimension>;
-#if deal_II_dimension >= 2
-template class TriaAccessor<2,deal_II_dimension,deal_II_dimension>;
-#endif
-#if deal_II_dimension >= 3
-template class TriaAccessor<3,deal_II_dimension,deal_II_dimension>;
-#endif
-
-
-template class CellAccessor<deal_II_dimension>;
-template class TriaRawIterator<TriaAccessor<1, deal_II_dimension, deal_II_dimension> >;
-template class TriaRawIterator<CellAccessor<deal_II_dimension> >;
-template class TriaIterator<TriaAccessor<1, deal_II_dimension, deal_II_dimension> >;
-template class TriaIterator<CellAccessor<deal_II_dimension> >;
-template class TriaActiveIterator<TriaAccessor<1, deal_II_dimension, deal_II_dimension> >;
-template class TriaActiveIterator<CellAccessor<deal_II_dimension> >;
-
-
-#if deal_II_dimension >= 2
-template class TriaRawIterator<TriaAccessor<2, deal_II_dimension, deal_II_dimension> >;
-template class TriaIterator<TriaAccessor<2, deal_II_dimension, deal_II_dimension> >;
-template class TriaActiveIterator<TriaAccessor<2, deal_II_dimension, deal_II_dimension> >;
-#endif
-
-#if deal_II_dimension >= 3
-template class TriaRawIterator<TriaAccessor<3, deal_II_dimension, deal_II_dimension> >;
-template class TriaIterator<TriaAccessor<3, deal_II_dimension, deal_II_dimension> >;
-template class TriaActiveIterator<TriaAccessor<3, deal_II_dimension, deal_II_dimension> >;
-#endif
-
-#if deal_II_dimension == 1
-template class TriaAccessorBase<1,deal_II_dimension,2>;
-template class TriaAccessorBase<1,deal_II_dimension,3>;
-
-template class TriaAccessor<1,deal_II_dimension,2>;
-template class TriaAccessor<1,deal_II_dimension,3>;
-#endif
-#if deal_II_dimension == 2
-template class TriaAccessorBase<1,deal_II_dimension,3>;
-template class TriaAccessorBase<2,deal_II_dimension,3>;
-
-template class TriaAccessor<1,deal_II_dimension,3>;
-template class TriaAccessor<2,deal_II_dimension,3>;
-#endif
-
-#if deal_II_dimension != 3
-template class CellAccessor<deal_II_dimension, deal_II_dimension+1>;
-template class TriaRawIterator<TriaAccessor<1, deal_II_dimension, deal_II_dimension+1> >;
-template class TriaRawIterator<CellAccessor<deal_II_dimension, deal_II_dimension+1> >;
-template class TriaIterator<TriaAccessor<1, deal_II_dimension, deal_II_dimension+1> >;
-template class TriaIterator<CellAccessor<deal_II_dimension, deal_II_dimension+1> >;
-template class TriaActiveIterator<TriaAccessor<1, deal_II_dimension, deal_II_dimension+1> >;
-template class TriaActiveIterator<CellAccessor<deal_II_dimension, deal_II_dimension+1> >;
-
-
-#if deal_II_dimension == 2
-template class TriaRawIterator<TriaAccessor<2, deal_II_dimension, deal_II_dimension+1> >;
-template class TriaIterator<TriaAccessor<2, deal_II_dimension, deal_II_dimension+1> >;
-template class TriaActiveIterator<TriaAccessor<2, deal_II_dimension, deal_II_dimension+1> >;
-#endif
-
-#endif
+#include "tria_accessor.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -64,7 +64,6 @@ get_intermediate_points_on_quad (const typename Triangulation<dim, spacedim>::qu
 }
 
 
-#if deal_II_dimension > 1
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -106,7 +105,7 @@ get_intermediate_points_on_face (const typename Triangulation<dim,spacedim>::fac
     }
 }
 
-#else
+
 
 template <>
 Point<1>
@@ -150,7 +149,6 @@ get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
 
 
 
-#endif
 
 template <int dim, int spacedim>
 void
@@ -310,7 +308,6 @@ namespace
 }
 
 
-#if deal_II_dimension < 3
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -321,7 +318,7 @@ get_new_point_on_quad (const typename Triangulation<dim, spacedim>::quad_iterato
   return Point<spacedim>();
 }
 
-#if deal_II_dimension == 2
+
 template <>
 Point<3>
 StraightBoundary<2,3>::
@@ -330,8 +327,7 @@ get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
   return compute_new_point_on_quad<2> (quad);
 }
 
-#endif
-#else
+
 
 template <>
 Point<3>
@@ -341,10 +337,7 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   return compute_new_point_on_quad<3> (quad);
 }
 
-#endif
 
-
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -375,7 +368,7 @@ get_intermediate_points_on_line (const Triangulation<1, 2>::line_iterator &line,
     points[i] = (1-x)*vertices[0] + x*vertices[1];
 }
 
-#else
+
 
 
 template <int dim, int spacedim>
@@ -397,11 +390,8 @@ get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::li
     points[i] = (1-x)*vertices[0] + x*vertices[1];
 }
 
-#endif
 
 
-
-#if deal_II_dimension < 3
 
 template <int dim, int spacedim>
 void
@@ -412,7 +402,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim, spacedim>::qu
   Assert(false, ExcImpossibleInDim(dim));
 }
 
-#else
+
 
 template <>
 void
@@ -446,9 +436,7 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
     }
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -481,11 +469,8 @@ get_intermediate_points_on_quad (const Triangulation<2,3>::quad_iterator &quad,
 		       x     * vertices[3]) * y;
     }
 }
-#endif
 
 
-
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -505,10 +490,7 @@ get_normals_at_vertices (const Triangulation<1,2>::face_iterator &,
   Assert (false, ExcNotImplemented());
 }
 
-#endif
 
-
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -537,11 +519,8 @@ get_normals_at_vertices (const Triangulation<2,3>::face_iterator &face,
   Assert(false, ExcNotImplemented());
 }
 
-#endif
 
 
-
-#if deal_II_dimension == 3
 
 template <>
 void
@@ -576,7 +555,6 @@ get_normals_at_vertices (const Triangulation<3>::face_iterator &face,
     };
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -765,13 +743,7 @@ project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
 
 
 // explicit instantiations
-template class Boundary<deal_II_dimension>;
-template class StraightBoundary<deal_II_dimension>;
-
-#if deal_II_dimension == 1 || deal_II_dimension == 2
-template class Boundary<deal_II_dimension, deal_II_dimension+1>;
-template class StraightBoundary<deal_II_dimension, deal_II_dimension+1>;
-#endif
+#include "tria_boundary.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

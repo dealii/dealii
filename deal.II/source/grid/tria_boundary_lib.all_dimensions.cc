@@ -19,9 +19,9 @@
 #include <base/tensor.h>
 #include <cmath>
 
+
+
 DEAL_II_NAMESPACE_OPEN
-
-
 
 
 
@@ -88,7 +88,6 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 }
 
 
-#if deal_II_dimension >=3
 
 template<>
 Point<3>
@@ -109,7 +108,6 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 	    point_on_axis);
 }
 
-#endif
 
 
 template <int dim>
@@ -167,7 +165,6 @@ CylinderBoundary<dim>::get_intermediate_points_between_points (
 }
 
 
-#if deal_II_dimension == 3
 
 template <>
 void
@@ -199,7 +196,6 @@ CylinderBoundary<3>::get_intermediate_points_on_quad (
     }
 }
 
-#endif
 
 
 template <int dim>
@@ -213,7 +209,6 @@ CylinderBoundary<dim>::get_intermediate_points_on_quad (
 
 
 
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -224,7 +219,6 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
 
 
 template <int dim>
@@ -335,13 +329,14 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 }
 
 
-#if deal_II_dimension == 3
 
-template<int dim>
-Point<dim>
-ConeBoundary<dim>::
-get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
+template <>
+Point<3>
+ConeBoundary<3>::
+get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 {
+  const int dim = 3;
+
   const Point<dim> axis = x_1 - x_0;
 				   // Compute the middle point of the
 				   // quad.
@@ -360,7 +355,7 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) c
   return middle_p + get_radius (middle_p) * (middle - middle_p) / (middle - middle_p).norm ();
 }
 
-#else
+
 
 template<int dim>
 Point<dim>
@@ -372,7 +367,7 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
   return Point<dim>();
 }
 
-#endif
+
 
 template<int dim>
 void
@@ -387,7 +382,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 }
 
 
-#if deal_II_dimension == 3
+
 
 template<>
 void
@@ -423,7 +418,7 @@ get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
     }
 }
 
-#endif
+
 
 template <int dim>
 void
@@ -435,7 +430,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 }
 
 
-#if deal_II_dimension == 1
+
 
 template<>
 void
@@ -446,7 +441,7 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
   Assert (false, ExcImpossibleInDim (1));
 }
 
-#endif
+
 
 template<int dim>
 void
@@ -509,8 +504,6 @@ HyperBallBoundary<dim,spacedim>::get_new_point_on_line (const typename Triangula
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 Point<1>
 HyperBallBoundary<1,1>::
@@ -528,8 +521,6 @@ get_new_point_on_quad (const Triangulation<1,2>::quad_iterator &) const
   Assert (false, ExcInternalError());
   return Point<2>();
 }
-
-#endif
 
 
 
@@ -558,7 +549,6 @@ get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -569,7 +559,6 @@ HyperBallBoundary<1>::get_intermediate_points_on_line (
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -664,7 +653,7 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_between_points (
     }
 }
 
-#if deal_II_dimension == 3
+
 
 template <>
 void
@@ -696,10 +685,7 @@ HyperBallBoundary<3>::get_intermediate_points_on_quad (
     }
 }
 
-#endif
 
-
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -731,7 +717,7 @@ HyperBallBoundary<2,3>::get_intermediate_points_on_quad (
     }
 }
 
-#endif
+
 
 template <int dim, int spacedim>
 void
@@ -743,8 +729,6 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_on_quad (
 }
 
 
-
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -764,7 +748,6 @@ get_normals_at_vertices (const Triangulation<1,2>::face_iterator &,
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -826,8 +809,6 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 Point<1>
 HalfHyperBallBoundary<1>::
@@ -836,8 +817,6 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
   Assert (false, ExcInternalError());
   return Point<1>();
 }
-
-#endif
 
 
 
@@ -897,7 +876,6 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -908,10 +886,7 @@ get_intermediate_points_on_quad (const Triangulation<1>::quad_iterator &,
   Assert (false, ExcInternalError());
 }
 
-#endif
 
-
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -922,7 +897,6 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
 
 
 template <int dim>
@@ -1043,8 +1017,6 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 Point<1>
 HalfHyperShellBoundary<1>::
@@ -1054,7 +1026,6 @@ get_new_point_on_quad (const Triangulation<1>::quad_iterator &) const
   return Point<1>();
 }
 
-#endif
 
 
 
@@ -1195,8 +1166,6 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 void
 HalfHyperShellBoundary<1>::
@@ -1206,11 +1175,7 @@ get_intermediate_points_on_quad (const Triangulation<1>::quad_iterator &,
   Assert (false, ExcInternalError());
 }
 
-#endif
 
-
-
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -1221,7 +1186,7 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
+
 
 
 
@@ -1240,16 +1205,7 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 
 // explicit instantiations
-template class CylinderBoundary<deal_II_dimension>;
-template class ConeBoundary<deal_II_dimension>;
-template class HyperBallBoundary<deal_II_dimension>;
-template class HalfHyperBallBoundary<deal_II_dimension>;
-template class HyperShellBoundary<deal_II_dimension>;
-template class HalfHyperShellBoundary<deal_II_dimension>;
-
-#if deal_II_dimension != 3
-template class HyperBallBoundary<deal_II_dimension,deal_II_dimension+1>;
-#endif
+#include "tria_boundary_lib.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 
