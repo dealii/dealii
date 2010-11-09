@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,6 +12,7 @@
 //----------------------------------------------------------------------
 
 #include <grid/tria.h>
+#include <grid/grid_generator.h>
 
 /**
  * A set of test meshes for the deal.II test suite.
@@ -34,7 +35,8 @@
  * level</td></tr>
  * </table>
  *
- * @author Guido Kanschat, 2006
+ * @author Guido Kanschat
+ * @date 2006, 2010
  */
 namespace TestGrids
 {
@@ -55,7 +57,24 @@ namespace TestGrids
   template <int dim>
   void hypercube(Triangulation<dim>& tr,
 		 unsigned int refinement = 0,
-		 bool local = false);
+		 bool local = false)
+  {
+    GridGenerator::hyper_cube(tr);
+    if (refinement && !local)
+      tr.refine_global(refinement);
+    if (refinement && local)
+      {
+	for (typename Triangulation<dim>::active_cell_iterator
+	       cell = tr.begin_active(); cell != tr.end(); ++cell)
+	  {
+	    const Point<dim>& p = cell->center();
+	    bool negative = true;
+	    for (unsigned int d=0;d<dim;++d)
+	      if (p(d) >= 0.)negative = false;
+	  }
+      }
+  }
+  
 				   /**
 				    * Create a star-shaped mesh,
 				    * having more than the average
@@ -91,26 +110,4 @@ namespace TestGrids
 				    */
   template <int dim>
   void laguna(Triangulation<dim>& tr);
-
-
-  template <int dim>
-  void hypercube(Triangulation<dim>& tr,
-		 unsigned int refinement,
-		 bool local)
-  {
-    GridGenerator::hyper_cube(tr);
-    if (!local)
-      {
-	if (refinement > 0)
-	  tr.refine_global(refinement);
-      }
-    else
-      {
-	for (unsigned int i=0;i<refinement;++i)
-	  {
-	    tr.begin_active()->set_refine_flag();
-	    tr.execute_coarsening_and_refinement();
-	  }
-      }
-  }
 }

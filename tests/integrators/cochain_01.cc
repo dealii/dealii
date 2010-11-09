@@ -1,0 +1,273 @@
+//--------------------------------------------------------------------
+//    $Id$
+//
+//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//--------------------------------------------------------------------
+
+// Test, whether differential operators produce a cochain complex on
+// the standard Hilbert space sequence
+
+#include "../tests.h"
+#include "../lib/test_grids.h"
+
+#include <base/logstream.h>
+
+#include <lac/matrix_block.h>
+#include <lac/sparse_matrix.h>
+#include <lac/block_sparsity_pattern.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/solver_cg.h>
+#include <lac/precondition.h>
+
+#include <dofs/dof_handler.h>
+#include <dofs/dof_renumbering.h>
+#include <dofs/dof_tools.h>
+
+#include <fe/fe_q.h>
+#include <fe/fe_nedelec.h>
+#include <fe/fe_raviart_thomas.h>
+#include <fe/fe_dgq.h>
+#include <fe/fe_system.h>
+#include <fe/fe_values.h>
+#include <fe/mapping_q1.h>
+
+#include <numerics/mesh_worker_info.h>
+#include <numerics/mesh_worker_assembler.h>
+#include <numerics/mesh_worker_loop.h>
+
+#include <integrators/l2.h>
+#include <integrators/differential.h>
+#include <integrators/laplace.h>
+#include <integrators/maxwell.h>
+#include <integrators/elasticity.h>
+
+using namespace LocalIntegrators;
+
+const bool debugging = false;
+
+template <int dim>
+void cell_matrix(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  typename MeshWorker::IntegrationInfo<dim,dim>& info)
+{
+  unsigned int dm=0; // Matrix index
+  unsigned int de=0; // Element index
+  
+  L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+  Laplace::cell_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+  Differential::gradient_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
+
+  
+  ++de;
+  L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+  Maxwell::curl_curl_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+  Maxwell::curl_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
+
+  if (dim>2)
+    {
+      ++de;
+      L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+      Elasticity::grad_div_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+      Differential::divergence_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
+    }
+  
+  ++de;
+  L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+}
+
+
+
+template <int dim>
+void
+test_cochain(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
+{
+  MappingQ1<dim> mapping;
+				   // Initialize DofHandler for a
+				   // block system with local blocks
+  DoFHandler<dim> dof(tr);
+  dof.distribute_dofs(fe);
+  DoFRenumbering::component_wise(dof);
+  dof.initialize_local_block_info();
+
+				   // Initialize hanging node constraints
+  ConstraintMatrix constraints;
+//  DoFTools::make_zero_boundary_constraints(dof, constraints);
+  DoFTools::make_hanging_node_constraints (dof, constraints);
+  constraints.close();
+				   // Setup sparsity pattern for the
+				   // whole system
+  BlockSparsityPattern sparsity;
+  sparsity.reinit(dof.block_info().global().size(),
+		  dof.block_info().global().size());
+  BlockCompressedSparsityPattern c_sparsity(dof.block_info().global(),
+					    dof.block_info().global());
+  DoFTools::make_flux_sparsity_pattern(dof, c_sparsity, constraints, false);
+  sparsity.copy_from(c_sparsity);
+
+				   // Setup matrices
+  MatrixBlockVector<SparseMatrix<double> > matrices;
+
+  unsigned int d=0;
+  matrices.add(d,d,"mass-H1");
+  matrices.add(d,d,"Laplacian");
+  matrices.add(d+1,d,"grad");
+  
+  ++d;
+  matrices.add(d,d,"mass-Hcurl");
+  matrices.add(d,d,"curl-curl");
+  matrices.add(d+1,d,"curl");
+  
+  if (dim>2)
+    {
+      ++d;
+      matrices.add(d,d,"mass-Hdiv");
+      matrices.add(d,d,"grad-div");
+      matrices.add(d+1,d,"div");
+    }
+
+  ++d;
+  matrices.add(d,d,"mass-L2");
+
+  matrices.reinit(sparsity);
+
+  if (debugging)
+    for (unsigned int i=0;i<matrices.size();++i)
+      deallog << "Block " << '(' << matrices.block(i).row
+	      << ',' << matrices.block(i).column << ") "
+	      << std::setw(3) << std::right << matrices.matrix(i).m() << std::left
+	      << 'x' << std::setw(3) << matrices.matrix(i).n()
+	      << ' ' << matrices.name(i) << std::endl;
+  
+				   // Build matrices
+  
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  UpdateFlags update_flags = update_values | update_gradients;
+  info_box.add_update_flags(update_flags, true, true, true, true);
+  info_box.initialize(fe, mapping, &dof.block_info());
+  
+  MeshWorker::DoFInfo<dim> dof_info(dof.block_info());
+  
+  MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks<SparseMatrix<double> > assembler;
+  assembler.initialize(&dof.block_info(), matrices);
+  assembler.initialize(constraints);
+  
+  MeshWorker::integration_loop<dim, dim>(
+    dof.begin_active(), dof.end(), dof_info, info_box,
+    cell_matrix<dim>, 0, 0, assembler);
+  
+  for (unsigned int b=0;b<matrices.size();++b)
+    if (b%3 == 0)
+      for (unsigned int i=0;i<matrices.block(b).matrix.m();++i)
+	if (matrices.block(b).matrix.diag_element(i) == 0.)
+	  matrices.block(b).matrix.diag_element(i) = 1.;
+
+				   // Set up vectors
+  BlockVector<double> source(dof.block_info().global());
+  BlockVector<double> result1(dof.block_info().global());
+  BlockVector<double> result2(dof.block_info().global());
+  BlockVector<double> aux(dof.block_info().global());
+  for (unsigned int i=0;i<source.size();++i)
+    source(i) = i%5;
+
+				   // now check, whether d*d =
+				   // D^TM^{-1}D
+  SolverControl control(100, 1.e-13, false, false);
+  SolverCG<Vector<double> > solver(control);
+  
+  for (unsigned int d=0;d<dim;++d)
+    {
+      deallog << "Form " << d << std::endl;
+      const unsigned int m=3*d;
+
+      if (d>0)
+	{
+	  matrices.matrix(m+2).vmult(result2.block(d+1), aux.block(d));
+	  deallog << "d^2            " << result2.block(d+1).l2_norm() << std::endl;  
+	  matrices.matrix(m+1).vmult(result2.block(d), aux.block(d));
+	  deallog << "d*d^2          " << result2.block(d).l2_norm() << std::endl;  
+	}
+      
+      matrices.matrix(m+2).vmult(result1.block(d+1), source.block(d));      
+
+      solver.solve(matrices.matrix(m+3), aux.block(d+1), result1.block(d+1), PreconditionIdentity());
+      
+      matrices.matrix(m+2).Tvmult(result1.block(d), aux.block(d+1));
+      matrices.matrix(m+1).vmult(result2.block(d), source.block(d));
+
+      if (debugging)
+	deallog << "u " << source.block(d).l2_norm() << ' '
+		<< matrices.name(m+2) << ' ' << result1.block(d+1).l2_norm()
+		<< ' ' << matrices.name(m+3) << ' ' << aux.block(d+1).l2_norm()
+		<< ' ' << matrices.name(m+2) << "^T " << result1.block(d).l2_norm()
+		<< ' ' << matrices.name(m+1) << ' ' << result2.block(d).l2_norm() << std::endl;
+      result2.block(d) -= result1.block(d);
+      deallog << "Difference d*d " << result2.block(d).l2_norm() << std::endl;
+    }
+}
+
+void run (const Triangulation<2>& tr, unsigned int degree)
+{
+  std::ostringstream prefix;
+  prefix << "d2-p" << degree;
+  deallog.push(prefix.str());
+  deallog << "Setup" << std::endl;
+  
+  FE_Q<2> h1(degree+1);
+  FE_Nedelec<2> hdiv(degree);
+  FE_DGQ<2> l2(degree);
+
+  FESystem<2> fe(h1,1,hdiv,1,l2,1);
+
+  test_cochain(tr, fe);
+  deallog.pop();
+}
+
+
+void run (const Triangulation<3>& tr, unsigned int degree)
+{
+  std::ostringstream prefix;
+  prefix << "d3-p" << degree;
+  deallog.push(prefix.str());
+  deallog << "Setup" << std::endl;
+  
+  FE_Q<3> h1(degree+1);
+  if (debugging) deallog << "H1" << std::endl;
+  FE_Nedelec<3> hcurl(degree);
+  if (debugging) deallog << "Hcurl" << std::endl;
+  FE_RaviartThomas<3> hdiv(degree);
+  if (debugging) deallog << "Hdiv" << std::endl;
+  FE_DGQ<3> l2(degree);
+  if (debugging) deallog << "L2" << std::endl;
+
+  FESystem<3> fe(h1,1,hcurl,1,hdiv,1,l2,1);
+
+  test_cochain(tr, fe);
+  deallog.pop();
+}
+
+
+int main()
+{
+  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
+  deallog.attach(logfile);
+//  deallog.depth_console(0);
+//  deallog.threshold_double(1.e-10);
+
+  Triangulation<2> tr2;
+  TestGrids::hypercube(tr2, 1);
+  run(tr2, 0);
+  run(tr2, 1);
+  run(tr2, 2);
+  
+  Triangulation<3> tr3;
+  TestGrids::hypercube(tr3, 1);
+  run(tr3, 0);
+  run(tr3, 1);
+}
