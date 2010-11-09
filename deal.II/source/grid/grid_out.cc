@@ -1108,8 +1108,8 @@ void GridOut::write_xfig (
 				   // on finer levels. Level 0
 				   // corresponds to a depth of 900,
 				   // each level subtracting 1
-  typename Triangulation<dim>::cell_iterator cell = tria.begin();
-  const typename Triangulation<dim>::cell_iterator end = tria.end();
+  Triangulation<dim>::cell_iterator cell = tria.begin();
+  const Triangulation<dim>::cell_iterator end = tria.end();
 
   for (;cell != end; ++cell)
     {
@@ -1160,7 +1160,7 @@ void GridOut::write_xfig (
       if (xfig_flags.draw_boundary)
 	for (unsigned int f=0;f<nf;++f)
 	  {
-	    typename Triangulation<dim>::face_iterator
+	    Triangulation<dim>::face_iterator
 	      face = cell->face(face_reorder[f]);
 	    const unsigned char bi = face->boundary_indicator();
 	    if (bi != 255)
