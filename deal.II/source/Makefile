@@ -16,8 +16,8 @@ default all: debug optimized
 
 
 # list the dimension dependent and dimension independent directories
-dim-dep-dirs   := dofs fe grid hp multigrid numerics distributed
-dim-indep-dirs := base lac
+dim-dep-dirs   := dofs fe hp multigrid numerics distributed
+dim-indep-dirs := base lac grid
 all-dirs       := $(dim-dep-dirs) $(dim-indep-dirs)
 
 # create lists of file names.

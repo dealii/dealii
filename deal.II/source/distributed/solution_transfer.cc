@@ -252,7 +252,6 @@ namespace parallel
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::Vector, DoFHandler<deal_II_dimension> >;
 
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension> >;
-
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
