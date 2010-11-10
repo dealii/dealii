@@ -1995,7 +1995,7 @@ namespace parallel
       std::vector<unsigned int> vertex_touch_count;
       std::vector<
       std::list<
-      std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator,
+      std::pair<Triangulation<dim,spacedim>::active_cell_iterator,
 	unsigned int> > >
 	vertex_to_cell;
       get_vertex_to_cell_mappings (*this,
@@ -2073,7 +2073,7 @@ namespace parallel
       std::vector<unsigned int> vertex_touch_count;
       std::vector<
       std::list<
-      std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator,
+      std::pair<Triangulation<dim,spacedim>::active_cell_iterator,
 	unsigned int> > >
 	vertex_to_cell;
       get_vertex_to_cell_mappings (*this,
@@ -2227,7 +2227,7 @@ namespace parallel
       const unsigned int deal_to_p4est_line_index[12]
 	= { 4, 5, 0, 1,  6, 7, 2, 3, 8, 9, 10, 11 } ;
 
-      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+      for (Triangulation<dim,spacedim>::active_cell_iterator
 	     cell = this->begin_active();
 	   cell != this->end(); ++cell)
 	{
@@ -2255,8 +2255,8 @@ namespace parallel
 	  Assert (edge_to_cell[v].size() == edge_touch_count[v],
 		  ExcInternalError());
 
-	  typename std::list<std::pair
-	    <typename Triangulation<dim,spacedim>::active_cell_iterator,
+	  std::list<std::pair
+	    <Triangulation<dim,spacedim>::active_cell_iterator,
 	    unsigned int> >::const_iterator
 	  p = edge_to_cell[v].begin();
 	  for (unsigned int c=0; c<edge_touch_count[v]; ++c, ++p)
