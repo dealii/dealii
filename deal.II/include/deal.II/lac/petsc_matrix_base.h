@@ -25,7 +25,6 @@
 #  include <petscmat.h>
 #  include <base/std_cxx1x/shared_ptr.h>
 
-#  include <iostream>
 #  include <vector>
 #  include <cmath>
 

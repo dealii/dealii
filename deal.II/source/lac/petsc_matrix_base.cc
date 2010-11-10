@@ -622,12 +622,6 @@ namespace PETScWrappers
       MatInfo info;
       MatGetInfo(matrix, MAT_LOCAL, &info);
 
-				       // report if sparsity pattern was not
-				       // sufficient
-      if (info.mallocs)
-	std::cout << "*** PETSC-Matrix: num-allocs = "
-		  << info.mallocs << " ***" << std::endl;
-
       return sizeof(*this) + static_cast<unsigned int>(info.memory);
   }
 
