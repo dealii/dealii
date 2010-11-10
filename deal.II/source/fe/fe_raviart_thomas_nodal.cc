@@ -42,7 +42,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
-  
+
   this->mapping_type = mapping_raviart_thomas;
 				   // First, initialize the
 				   // generalized support points and
@@ -53,7 +53,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 				   //matrix, generating the correct
 				   //basis functions from the raw
 				   //ones.
-  
+
 				   // We use an auxiliary matrix in
 				   // this function. Therefore,
 				   // inverse_node_matrix is still
@@ -66,7 +66,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal (const unsigned int deg)
 				   // From now on, the shape functions
 				   // will be the correct ones, not
 				   // the raw shape functions anymore.
-  
+
 				   // Reinit the vectors of
 				   // prolongation matrices to the
 				   // right sizes. There are no
@@ -115,7 +115,7 @@ FE_RaviartThomasNodal<dim>::get_name () const
 				   // polynomial degree and is thus one higher
 				   // than the argument given to the
 				   // constructor
-  std::ostringstream namebuf;  
+  std::ostringstream namebuf;
   namebuf << "FE_RaviartThomasNodal<" << dim << ">(" << this->degree-1 << ")";
 
   return namebuf.str();
@@ -172,7 +172,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 
       current = this->dofs_per_face*GeometryInfo<dim>::faces_per_cell;
     }
-  
+
   if (deg==0) return;
 				   // In the interior, we need
 				   // anisotropic Gauss quadratures,
@@ -190,7 +190,7 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 						       ((d==1) ? low : high),
 						       ((d==2) ? low : high));
       Assert(dim<=3, ExcNotImplemented());
-      
+
       for (unsigned int k=0;k<quadrature->size();++k)
 	this->generalized_support_points[current++] = quadrature->point(k);
       delete quadrature;
@@ -198,20 +198,6 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
   Assert (current == this->dofs_per_cell, ExcInternalError());
 }
 
-
-#if deal_II_dimension == 1
-
-template <>
-std::vector<unsigned int>
-FE_RaviartThomasNodal<1>::get_dpo_vector (const unsigned int deg)
-{
-  std::vector<unsigned int> dpo(2);
-  dpo[0] = 1;
-  dpo[1] = deg;
-  return dpo;
-}
-
-#endif
 
 
 template <int dim>
@@ -227,17 +213,15 @@ FE_RaviartThomasNodal<dim>::get_dpo_vector (const unsigned int deg)
                                    // and then there are interior dofs
   const unsigned int
     interior_dofs = dim*deg*dofs_per_face;
-  
+
   std::vector<unsigned int> dpo(dim+1);
   dpo[dim-1] = dofs_per_face;
   dpo[dim]   = interior_dofs;
-  
+
   return dpo;
 }
 
 
-
-#if deal_II_dimension == 1
 
 template <>
 std::vector<bool>
@@ -247,7 +231,6 @@ FE_RaviartThomasNodal<1>::get_ria_vector (const unsigned int)
   return std::vector<bool>();
 }
 
-#endif
 
 
 template <int dim>
@@ -287,14 +270,14 @@ FE_RaviartThomasNodal<dim>::has_support_on_face (
 				   // on the faces and each face has
 				   // degree degrees.
   const unsigned int support_face = shape_index / this->degree;
-  
+
 				   // The only thing we know for sure
 				   // is that shape functions with
 				   // support on one face are zero on
 				   // the opposite face.
   if (support_face < GeometryInfo<dim>::faces_per_cell)
     return (face_index != GeometryInfo<dim>::opposite_face[support_face]);
-  
+
 				   // In all other cases, return true,
 				   // which is safe
   return true;
@@ -429,7 +412,7 @@ FE_RaviartThomasNodal<dim>::hp_vertex_dof_identities (
   else
     {
       Assert(false, ExcNotImplemented());
-      return std::vector<std::pair<unsigned int, unsigned int> > (); 
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
     }
 }
 
@@ -450,7 +433,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 				       // only lines in 2d
       if (dim != 2)
 	return std::vector<std::pair<unsigned int, unsigned int> >();
-      
+
 				       // dofs are located along lines, so two
 				       // dofs are identical only if in the
 				       // following two cases (remember that
@@ -472,7 +455,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 				       // the constructor
       const unsigned int p = this->degree-1;
       const unsigned int q = fe_q_other->degree-1;
-      
+
       std::vector<std::pair<unsigned int, unsigned int> > identities;
 
       if (p==q)
@@ -482,7 +465,7 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
       else
 	if (p%2==0 && q%2==0)
 	  identities.push_back(std::make_pair(p/2,q/2));
-      
+
       return identities;
     }
   else
@@ -513,7 +496,7 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities (
 				       // case above
       const unsigned int p = this->dofs_per_quad;
       const unsigned int q = fe_q_other->dofs_per_quad;
-      
+
       std::vector<std::pair<unsigned int, unsigned int> > identities;
 
       if (p==q)
@@ -549,13 +532,12 @@ FE_RaviartThomasNodal<dim>::compare_for_face_domination (
       else
 	return FiniteElementDomination::other_element_dominates;
     }
-  
+
   Assert (false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -577,10 +559,7 @@ FE_RaviartThomasNodal<1>::get_subface_interpolation_matrix (
   Assert (false, ExcImpossibleInDim(1));
 }
 
-#endif
 
-
-#if deal_II_dimension > 1
 
 template <int dim>
 void
@@ -596,7 +575,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix (
 	       (dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&x_source_fe) != 0),
 	       typename FiniteElement<dim>::
 	       ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.n() == this->dofs_per_face,
 	  ExcDimensionMismatch (interpolation_matrix.n(),
 				this->dofs_per_face));
@@ -623,7 +602,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix (
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
 	  typename FiniteElement<dim>::
 	  ExcInterpolationNotImplemented ());
-  
+
 				   // generate a quadrature
 				   // with the generalized support points.
 				   // This is later based as a
@@ -631,26 +610,26 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix (
 				   // which returns the support
 				   // points on the face.
   Quadrature<dim-1> quad_face_support (source_fe.get_generalized_face_support_points ());
-  
+
 				   // Rule of thumb for FP accuracy,
 				   // that can be expected for a
 				   // given polynomial degree.
 				   // This value is used to cut
 				   // off values close to zero.
   double eps = 2e-13*this->degree*(dim-1);
-  
+
 				   // compute the interpolation
 				   // matrix by simply taking the
 				   // value at the support points.
   const Quadrature<dim> face_projection
     = QProjector<dim>::project_to_face (quad_face_support, 0);
-  
+
   for (unsigned int i=0; i<source_fe.dofs_per_face; ++i)
     {
       const Point<dim> &p = face_projection.point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
-	{ 
+	{
 	  double matrix_entry
 	    = this->shape_value_component (this->face_to_cell_index(j, 0),
 					   p, 0);
@@ -667,7 +646,7 @@ FE_RaviartThomasNodal<dim>::get_face_interpolation_matrix (
 	    matrix_entry = 0.0;
 
 	  interpolation_matrix(i,j) = matrix_entry;
-	}  
+	}
     }
 
 				   // make sure that the row sum of
@@ -703,7 +682,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
 	       (dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&x_source_fe) != 0),
 	       typename FiniteElement<dim>::
 	       ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.n() == this->dofs_per_face,
 	  ExcDimensionMismatch (interpolation_matrix.n(),
 				this->dofs_per_face));
@@ -730,7 +709,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
 	  typename FiniteElement<dim>::
 	  ExcInterpolationNotImplemented ());
-  
+
 				   // generate a quadrature
 				   // with the generalized support points.
 				   // This is later based as a
@@ -738,14 +717,14 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
 				   // which returns the support
 				   // points on the face.
   Quadrature<dim-1> quad_face_support (source_fe.get_generalized_face_support_points ());
-  
+
 				   // Rule of thumb for FP accuracy,
 				   // that can be expected for a
 				   // given polynomial degree.
 				   // This value is used to cut
 				   // off values close to zero.
   double eps = 2e-13*this->degree*(dim-1);
-  
+
 				   // compute the interpolation
 				   // matrix by simply taking the
 				   // value at the support points.
@@ -758,7 +737,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
       const Point<dim> &p = subface_projection.point (i);
 
       for (unsigned int j=0; j<this->dofs_per_face; ++j)
-	{ 
+	{
 	  double matrix_entry
 	    = this->shape_value_component (this->face_to_cell_index(j, 0), p, 0);
 
@@ -774,7 +753,7 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
 	    matrix_entry = 0.0;
 
 	  interpolation_matrix(i,j) = matrix_entry;
-	}  
+	}
     }
 
 				   // make sure that the row sum of
@@ -794,10 +773,10 @@ FE_RaviartThomasNodal<dim>::get_subface_interpolation_matrix (
     }
 }
 
-#endif
 
 
+// explicit instantiations
+#include "fe_raviart_thomas_nodal.inst"
 
-template class FE_RaviartThomasNodal<deal_II_dimension>;
 
 DEAL_II_NAMESPACE_CLOSE

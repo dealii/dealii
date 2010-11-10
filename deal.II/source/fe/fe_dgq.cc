@@ -752,14 +752,8 @@ FE_DGQArbitraryNodes<dim>::clone() const
 
 
 
-template class FE_DGQ<deal_II_dimension>;
+// explicit instantiations
+#include "fe_dgq.inst"
 
-//codimension 1
-
-#if deal_II_dimension != 3
-template class FE_DGQ<deal_II_dimension, deal_II_dimension+1>;
-#endif
-
-template class FE_DGQArbitraryNodes<deal_II_dimension>;
 
 DEAL_II_NAMESPACE_CLOSE

@@ -380,14 +380,6 @@ class FE_ABF : public FE_PolyTensor<PolynomialsABF<dim>, dim>
 
 /*@}*/
 
-/* -------------- declaration of explicit specializations ------------- */
-
-#ifndef DOXYGEN
-
-template <>
-std::vector<unsigned int> FE_ABF<1>::get_dpo_vector (const unsigned int);
-
-#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 

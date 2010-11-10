@@ -33,11 +33,11 @@ DEAL_II_NAMESPACE_OPEN
 /*------------------------------- FiniteElement ----------------------*/
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const double FiniteElement<dim,spacedim>::fd_step_length = 1.0e-6;
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
@@ -59,7 +59,7 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
 				   // FEValues objects with slightly
 				   // shifted positions
   std::vector<Point<dim> > diff_points (quadrature.size());
-  
+
   differences.resize(2*dim);
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -82,14 +82,14 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
 	diff_points[i] = quadrature.point(i) - shift;
       const Quadrature<dim> minus_quad (diff_points, quadrature.get_weights());
       differences[d+dim] = new FEValues<dim,spacedim> (mapping, *element,
-					      minus_quad, update_gradients); 
+					      minus_quad, update_gradients);
     }
 }
 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
 {
   for (unsigned int i=0; i<differences.size (); ++i)
@@ -106,7 +106,7 @@ FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 FiniteElement<dim,spacedim>::FiniteElement (
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &r_i_a_f,
@@ -119,7 +119,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
 		adjust_line_dof_index_for_line_orientation_table (dim == 3 ?
 								  this->dofs_per_line : 0),
                 system_to_base_table(this->dofs_per_cell),
-                face_system_to_base_table(this->dofs_per_face),		
+                face_system_to_base_table(this->dofs_per_face),
                 component_to_base_table (this->components,
                                          std::make_pair(std::make_pair(0U, 0U), 0U)),
                 restriction_is_additive_flags(r_i_a_f),
@@ -141,7 +141,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
 	 = const_cast<std::vector<bool>&> (restriction_is_additive_flags);
        aux.resize(ndofs, restriction_is_additive_flags[0]);
      }
-   
+
    if (nonzero_components.size() == 1 && ndofs > 1)
      {
        std::vector<std::vector<bool> >& aux
@@ -160,8 +160,8 @@ FiniteElement<dim,spacedim>::FiniteElement (
 				       std::bind2nd(std::not_equal_to<unsigned int>(),
 						    1U))
 			 == n_nonzero_components_table.end());
-   
-   
+
+
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
 	  ExcDimensionMismatch(restriction_is_additive_flags.size(),
 			       this->dofs_per_cell));
@@ -179,9 +179,9 @@ FiniteElement<dim,spacedim>::FiniteElement (
       Assert (n_nonzero_components_table[i] >= 1,
 	      ExcInternalError());
       Assert (n_nonzero_components_table[i] <= this->n_components(),
-	      ExcInternalError());      
+	      ExcInternalError());
     };
-  
+
                                    // initialize some tables in the
 				   // default way, i.e. if there is
 				   // only one (vector-)component; if
@@ -194,12 +194,12 @@ FiniteElement<dim,spacedim>::FiniteElement (
       for (unsigned int j=0 ; j<this->dofs_per_cell ; ++j)
 	{
 	  system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
-	  system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
+	  system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);
 	}
       for (unsigned int j=0 ; j<this->dofs_per_face ; ++j)
 	{
 	  face_system_to_component_table[j] = std::pair<unsigned,unsigned>(0,j);
-	  face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);      
+	  face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);
 	}
     }
 				   // Fill with default value; may be
@@ -229,14 +229,14 @@ FiniteElement<dim,spacedim>::FiniteElement (
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 FiniteElement<dim,spacedim>::~FiniteElement ()
 {}
 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 double
 FiniteElement<dim,spacedim>::shape_value (const unsigned int,
 				     const Point<dim> &) const
@@ -247,7 +247,7 @@ FiniteElement<dim,spacedim>::shape_value (const unsigned int,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 double
 FiniteElement<dim,spacedim>::shape_value_component (const unsigned int,
 					       const Point<dim> &,
@@ -259,7 +259,7 @@ FiniteElement<dim,spacedim>::shape_value_component (const unsigned int,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 Tensor<1,dim>
 FiniteElement<dim,spacedim>::shape_grad (const unsigned int,
 				    const Point<dim> &) const
@@ -270,7 +270,7 @@ FiniteElement<dim,spacedim>::shape_grad (const unsigned int,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 Tensor<1,dim>
 FiniteElement<dim,spacedim>::shape_grad_component (const unsigned int,
 					      const Point<dim> &,
@@ -282,7 +282,7 @@ FiniteElement<dim,spacedim>::shape_grad_component (const unsigned int,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 Tensor<2,dim>
 FiniteElement<dim,spacedim>::shape_grad_grad (const unsigned int,
 					 const Point<dim> &) const
@@ -293,7 +293,7 @@ FiniteElement<dim,spacedim>::shape_grad_grad (const unsigned int,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 Tensor<2,dim>
 FiniteElement<dim,spacedim>::shape_grad_grad_component (const unsigned int,
 						   const Point<dim> &,
@@ -304,7 +304,7 @@ FiniteElement<dim,spacedim>::shape_grad_grad_component (const unsigned int,
 }
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::reinit_restriction_and_prolongation_matrices (
   const bool isotropic_restriction_only,
@@ -314,7 +314,7 @@ FiniteElement<dim,spacedim>::reinit_restriction_and_prolongation_matrices (
        ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
     {
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-      
+
       for (unsigned int i=0; i<nc; ++i)
 	{
 	  if (!isotropic_restriction_only || ref_case==RefinementCase<dim>::isotropic_refinement)
@@ -350,7 +350,7 @@ FiniteElement<dim,spacedim>::get_restriction_matrix (const unsigned int child,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const FullMatrix<double> &
 FiniteElement<dim,spacedim>::get_prolongation_matrix (const unsigned int child,
 	 				              const RefinementCase<dim> &refinement_case) const
@@ -372,7 +372,7 @@ FiniteElement<dim,spacedim>::get_prolongation_matrix (const unsigned int child,
 
 
 //TODO:[GK] This is probably not the most efficient way of doing this.
-template <int dim, int spacedim>    
+template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::component_to_block_index (const unsigned int index) const
 {
@@ -384,30 +384,21 @@ FiniteElement<dim,spacedim>::component_to_block_index (const unsigned int index)
 }
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
-								const bool,
-								const bool,
-								const bool) const
+									 const bool face_orientation,
+									 const bool face_flip,
+									 const bool face_rotation) const
 {
 				   // general template for 1D and 2D: not
 				   // implemented. in fact, the function
 				   // shouldn't even be called unless we are
 				   // in 3d, so throw an internal error
-  Assert (false, ExcInternalError());
-  return index;
-}
+  Assert (dim==3, ExcInternalError());
+  if (dim < 3)
+    return index;
 
-#if deal_II_dimension == 3
-
-template <>
-unsigned int
-FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
-							      const bool face_orientation,
-							      const bool face_flip,
-							      const bool face_rotation) const
-{
 				   // adjust dofs on 3d faces if the face is
 				   // flipped. note that we query a table that
 				   // derived elements need to have set up
@@ -423,29 +414,20 @@ FiniteElement<3>::adjust_quad_dof_index_for_face_orientation (const unsigned int
   return index+adjust_quad_dof_index_for_face_orientation_table(index,4*face_orientation+2*face_flip+face_rotation);
 }
 
-#endif
 
 
-
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::adjust_line_dof_index_for_line_orientation (const unsigned int index,
-								const bool) const
+									 const bool line_orientation) const
 {
 				   // general template for 1D and 2D: do
 				   // nothing. Do not throw an Assertion,
 				   // however, in order to allow to call this
 				   // function in 2D as well
-  return index;
-}
+  if (dim<3)
+    return index;
 
-#if deal_II_dimension == 3
-
-template <>
-unsigned int
-FiniteElement<3>::adjust_line_dof_index_for_line_orientation (const unsigned int index,
-							      const bool line_orientation) const
-{
   Assert (index<this->dofs_per_line, ExcIndexRange(index,0,this->dofs_per_line));
   Assert (adjust_line_dof_index_for_line_orientation_table.size()==this->dofs_per_line,
 	  ExcInternalError());
@@ -455,11 +437,9 @@ FiniteElement<3>::adjust_line_dof_index_for_line_orientation (const unsigned int
     return index+adjust_line_dof_index_for_line_orientation_table[index];
 }
 
-#endif
 
 
-
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::prolongation_is_implemented () const
 {
@@ -512,7 +492,7 @@ bool
 FiniteElement<dim,spacedim>::isotropic_prolongation_is_implemented () const
 {
   const RefinementCase<dim> ref_case=RefinementCase<dim>::isotropic_refinement;
-  
+
   for (unsigned int c=0;
        c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
     {
@@ -531,7 +511,7 @@ FiniteElement<dim,spacedim>::isotropic_prolongation_is_implemented () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::isotropic_restriction_is_implemented () const
 {
@@ -555,7 +535,7 @@ FiniteElement<dim,spacedim>::isotropic_restriction_is_implemented () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::constraints_are_implemented (const internal::SubfaceCase<dim> &subface_case) const
 {
@@ -567,7 +547,7 @@ FiniteElement<dim,spacedim>::constraints_are_implemented (const internal::Subfac
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::hp_constraints_are_implemented () const
 {
@@ -576,27 +556,27 @@ FiniteElement<dim,spacedim>::hp_constraints_are_implemented () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const FullMatrix<double> &
 FiniteElement<dim,spacedim>::constraints (const internal::SubfaceCase<dim> &subface_case) const
 {
   Assert (subface_case==internal::SubfaceCase<dim>::case_isotropic, ExcConstraintsVoid());
   Assert ((this->dofs_per_face  == 0) || (interface_constraints.m() != 0),
           ExcConstraintsVoid());
-  
+
   if (dim==1)
     Assert ((interface_constraints.m()==0) && (interface_constraints.n()==0),
 	    ExcWrongInterfaceMatrixSize(interface_constraints.m(),
 					interface_constraints.n()));
-  
+
   return interface_constraints;
 }
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 TableIndices<2>
-FiniteElement<dim,spacedim>::interface_constraints_size () const 
+FiniteElement<dim,spacedim>::interface_constraints_size () const
 {
   switch (dim)
     {
@@ -620,7 +600,7 @@ FiniteElement<dim,spacedim>::interface_constraints_size () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 get_interpolation_matrix (const FiniteElement<dim,spacedim> &,
@@ -637,7 +617,7 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &,
@@ -651,10 +631,10 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &,
                typename FEE::
                ExcInterpolationNotImplemented());
 }
-                                   
 
-                                   
-template <int dim, int spacedim>  
+
+
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &,
@@ -668,10 +648,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &,
   AssertThrow (false,
                typename FEE::ExcInterpolationNotImplemented());
 }
-                                   
 
 
-template <int dim, int spacedim>  
+
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FiniteElement<dim,spacedim>::
 hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &) const
@@ -682,7 +662,7 @@ hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FiniteElement<dim,spacedim>::
 hp_line_dof_identities (const FiniteElement<dim,spacedim> &) const
@@ -693,7 +673,7 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FiniteElement<dim,spacedim>::
 hp_quad_dof_identities (const FiniteElement<dim,spacedim> &) const
@@ -704,7 +684,7 @@ hp_quad_dof_identities (const FiniteElement<dim,spacedim> &) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FiniteElement<dim,spacedim>::
 compare_for_face_domination (const FiniteElement<dim,spacedim> &) const
@@ -715,7 +695,7 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::operator == (const FiniteElement<dim,spacedim> &f) const
 {
@@ -726,7 +706,7 @@ FiniteElement<dim,spacedim>::operator == (const FiniteElement<dim,spacedim> &f) 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const std::vector<Point<dim> > &
 FiniteElement<dim,spacedim>::get_unit_support_points () const
 {
@@ -742,7 +722,7 @@ FiniteElement<dim,spacedim>::get_unit_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::has_support_points () const
 {
@@ -751,7 +731,7 @@ FiniteElement<dim,spacedim>::has_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const std::vector<Point<dim> > &
 FiniteElement<dim,spacedim>::get_generalized_support_points () const
 {
@@ -766,7 +746,7 @@ FiniteElement<dim,spacedim>::get_generalized_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::has_generalized_support_points () const
 {
@@ -775,7 +755,7 @@ FiniteElement<dim,spacedim>::has_generalized_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 Point<dim>
 FiniteElement<dim,spacedim>::unit_support_point (const unsigned index) const
 {
@@ -788,7 +768,7 @@ FiniteElement<dim,spacedim>::unit_support_point (const unsigned index) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const std::vector<Point<dim-1> > &
 FiniteElement<dim,spacedim>::get_unit_face_support_points () const
 {
@@ -804,7 +784,7 @@ FiniteElement<dim,spacedim>::get_unit_face_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::has_face_support_points () const
 {
@@ -813,7 +793,7 @@ FiniteElement<dim,spacedim>::has_face_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const std::vector<Point<dim-1> > &
 FiniteElement<dim,spacedim>::get_generalized_face_support_points () const
 {
@@ -828,7 +808,7 @@ FiniteElement<dim,spacedim>::get_generalized_face_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::has_generalized_face_support_points () const
 {
@@ -837,7 +817,7 @@ FiniteElement<dim,spacedim>::has_generalized_face_support_points () const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 Point<dim-1>
 FiniteElement<dim,spacedim>::unit_face_support_point (const unsigned index) const
 {
@@ -849,7 +829,7 @@ FiniteElement<dim,spacedim>::unit_face_support_point (const unsigned index) cons
 }
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 bool
 FiniteElement<dim,spacedim>::has_support_on_face (
   const unsigned int,
@@ -859,7 +839,7 @@ FiniteElement<dim,spacedim>::has_support_on_face (
 }
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
   std::vector<double>&       local_dofs,
@@ -872,14 +852,14 @@ FiniteElement<dim,spacedim>::interpolate(
 	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
   Assert (this->n_components() == 1,
 	  ExcDimensionMismatch(this->n_components(), 1));
-  
+
   std::copy(values.begin(), values.end(), local_dofs.begin());
 }
 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
   std::vector<double>&    local_dofs,
@@ -893,7 +873,7 @@ FiniteElement<dim,spacedim>::interpolate(
 	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
   Assert (values[0].size() >= offset+this->n_components(),
 	  ExcDimensionMismatch(values[0].size(),offset+this->n_components()));
-  
+
   for (unsigned int i=0;i<this->dofs_per_cell;++i)
     {
       const std::pair<unsigned int, unsigned int> index
@@ -905,7 +885,7 @@ FiniteElement<dim,spacedim>::interpolate(
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
   std::vector<double>& local_dofs,
@@ -918,7 +898,7 @@ FiniteElement<dim,spacedim>::interpolate(
 	  ExcDimensionMismatch(local_dofs.size(),this->dofs_per_cell));
   Assert (values.size() == this->n_components(),
 	  ExcDimensionMismatch(values.size(), this->n_components()));
-  
+
   for (unsigned int i=0;i<this->dofs_per_cell;++i)
     {
       const std::pair<unsigned int, unsigned int> index
@@ -929,8 +909,7 @@ FiniteElement<dim,spacedim>::interpolate(
 
 
 
-
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::memory_consumption () const
 {
@@ -941,15 +920,13 @@ FiniteElement<dim,spacedim>::memory_consumption () const
 	  MemoryConsumption::memory_consumption (system_to_component_table) +
 	  MemoryConsumption::memory_consumption (face_system_to_component_table) +
 	  MemoryConsumption::memory_consumption (system_to_base_table) +
-	  MemoryConsumption::memory_consumption (face_system_to_base_table) +	  
+	  MemoryConsumption::memory_consumption (face_system_to_base_table) +
 	  MemoryConsumption::memory_consumption (component_to_base_table) +
 	  MemoryConsumption::memory_consumption (restriction_is_additive_flags) +
 	  MemoryConsumption::memory_consumption (nonzero_components) +
 	  MemoryConsumption::memory_consumption (n_nonzero_components_table));
 }
 
-
-#if deal_II_dimension == 1
 
 template<>
 void
@@ -965,9 +942,7 @@ FiniteElement<1,2>::compute_2nd (
 	Assert(false, ExcNotImplemented());
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template<>
 void
@@ -983,9 +958,9 @@ FiniteElement<2,3>::compute_2nd (
 	Assert(false, ExcNotImplemented());
 }
 
-#endif
 
-template <int dim, int spacedim>  
+
+template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::compute_2nd (
   const Mapping<dim,spacedim>                   &mapping,
@@ -999,7 +974,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
 	  & update_hessians,
 	  ExcInternalError());
 
-// make sure we have as many entries as there are nonzero components  
+// make sure we have as many entries as there are nonzero components
 //  Assert (data.shape_hessians.size() ==
 //	    std::accumulate (n_nonzero_components_table.begin(),
 //                        n_nonzero_components_table.end(),
@@ -1098,7 +1073,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
                   left  = fe_internal.differences[d1+dim]
                           ->shape_grad_component(shape_index, q+offset, component);
                 };
-              
+
                                                // compute the second
                                                // derivative from a
                                                // symmetric difference
@@ -1106,7 +1081,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
               for (unsigned int d=0; d<dim; ++d)
                 diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
             }
-        
+
                                          // up to now we still have
                                          // difference quotients on the
                                          // unit cell, so transform it
@@ -1119,7 +1094,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
                     ExcInternalError());
             mapping.transform (diff_quot[d], diff_quot2,
 			       mapping_internal, mapping_covariant);
-            
+
             for (unsigned int q=0; q<n_q_points; ++q)
               for (unsigned int d1=0; d1<dim; ++d1)
                 data.shape_hessians[total_index][q][d][d1]
@@ -1130,7 +1105,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 std::vector<unsigned int>
 FiniteElement<dim,spacedim>::compute_n_nonzero_components (
   const std::vector<std::vector<bool> > &nonzero_components)
@@ -1147,7 +1122,7 @@ FiniteElement<dim,spacedim>::compute_n_nonzero_components (
 
 /*------------------------------- FiniteElement ----------------------*/
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
 				   const Mapping<dim,spacedim>      &mapping,
@@ -1159,7 +1134,7 @@ FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
 				      const Mapping<dim,spacedim>      &mapping,
@@ -1171,7 +1146,7 @@ FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 const FiniteElement<dim,spacedim>&
 FiniteElement<dim,spacedim>::base_element(const unsigned index) const
 {
@@ -1179,16 +1154,10 @@ FiniteElement<dim,spacedim>::base_element(const unsigned index) const
   return *this;
 }
 
+
+
 /*------------------------------- Explicit Instantiations -------------*/
-
-template class FiniteElement<deal_II_dimension>;
-
-
-#if deal_II_dimension != 3
-template class FiniteElement<deal_II_dimension,deal_II_dimension+1>;
-#endif
-
-
+#include "fe.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

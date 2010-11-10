@@ -185,8 +185,8 @@ compare_for_face_domination (const FiniteElement<dim> & fe_other) const
   else
     return FiniteElementDomination::this_element_dominates;
 }
-   
-   
+
+
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
@@ -212,7 +212,7 @@ hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
       return std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
-   
+
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
@@ -225,7 +225,7 @@ hp_quad_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
       return std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
-    
+
 template <int dim>
 bool
 FE_Nothing<dim> ::
@@ -233,8 +233,8 @@ hp_constraints_are_implemented () const
 {
   return true;
 }
-  
-        
+
+
 template <int dim>
 void
 FE_Nothing<dim>::
@@ -243,7 +243,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &/*source_fe*/,
 {
                                    // since this element has no face dofs, the
                                    // interpolation matrix is necessarily empty
-                                   
+
   Assert (interpolation_matrix.m() == 0,
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 0));
@@ -271,9 +271,11 @@ get_subface_interpolation_matrix (const FiniteElement<dim> & /*source_fe*/,
                                 0));
 }
 
-       
 
-template class FE_Nothing<deal_II_dimension>;
+
+// explicit instantiations
+#include "fe_nothing.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE
 

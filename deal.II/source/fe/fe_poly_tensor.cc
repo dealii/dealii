@@ -35,7 +35,6 @@ namespace
  * algorithm, which determines the DoFs, which need this sign change for a
  * given cell.
  */
-#if deal_II_dimension == 1
   void
   get_face_sign_change (const Triangulation<1>::cell_iterator &,
 			const unsigned int                     ,
@@ -44,9 +43,9 @@ namespace
 				     // nothing to do in 1d
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
   }
-#endif  
 
-#if deal_II_dimension == 2
+
+
   void
   get_face_sign_change (const Triangulation<2>::cell_iterator &cell,
 			const unsigned int                     dofs_per_face,
@@ -54,19 +53,19 @@ namespace
   {
     const unsigned int dim = 2;
     const unsigned int spacedim = 2;
-    
+
 				     // Default is no sign
 				     // change. I.e. multiply by one.
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
-    
-    for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2; 
+
+    for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2;
 	 f < GeometryInfo<dim>::faces_per_cell; ++f)
       {
 	Triangulation<dim,spacedim>::face_iterator face = cell->face (f);
 	if (!face->at_boundary ())
 	  {
 	    const unsigned int nn = cell->neighbor_face_no(f);
-	      
+
 	    if (nn < GeometryInfo<dim>::faces_per_cell / 2)
 	      for (unsigned int j = 0; j < dofs_per_face; ++j)
 		{
@@ -79,19 +78,17 @@ namespace
 	  }
       }
   }
-#endif
 
 
-#if deal_II_dimension == 3
+
   void
   get_face_sign_change (const Triangulation<3>::cell_iterator &/*cell*/,
 			const unsigned int                     /*dofs_per_face*/,
 			std::vector<double>                   &face_sign)
   {
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
-//TODO: think about what it would take here    
+//TODO: think about what it would take here
   }
-#endif
 }
 
 
@@ -141,14 +138,14 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_value_component (const unsigned int i,
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
-  
+
   if (cached_point != p || cached_values.size() == 0)
     {
       cached_point = p;
       cached_values.resize(poly_space.n());
       poly_space.compute(p, cached_values, cached_grads, cached_grad_grads);
     }
-  
+
   double s = 0;
   if (inverse_node_matrix.n_cols() == 0)
     return cached_values[i][component];
@@ -180,21 +177,21 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_grad_component (const unsigned int i,
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
-  
+
   if (cached_point != p || cached_grads.size() == 0)
     {
       cached_point = p;
       cached_grads.resize(poly_space.n());
       poly_space.compute(p, cached_values, cached_grads, cached_grad_grads);
     }
-  
+
   Tensor<1,dim> s;
   if (inverse_node_matrix.n_cols() == 0)
     return cached_grads[i][component];
   else
     for (unsigned int j=0;j<inverse_node_matrix.n_cols();++j)
       s += inverse_node_matrix(j,i) * cached_grads[j][component];
-  
+
   return s;
 }
 
@@ -219,21 +216,21 @@ FE_PolyTensor<POLY,dim,spacedim>::shape_grad_grad_component (const unsigned int 
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i,0,this->dofs_per_cell));
   Assert (component < dim, ExcIndexRange (component, 0, dim));
-  
+
   if (cached_point != p || cached_grad_grads.size() == 0)
     {
       cached_point = p;
       cached_grad_grads.resize(poly_space.n());
       poly_space.compute(p, cached_values, cached_grads, cached_grad_grads);
     }
-  
+
   Tensor<2,dim> s;
   if (inverse_node_matrix.n_cols() == 0)
     return cached_grad_grads[i][component];
   else
     for (unsigned int j=0;j<inverse_node_matrix.n_cols();++j)
       s += inverse_node_matrix(i,j) * cached_grad_grads[j][component];
-  
+
   return s;
 }
 
@@ -264,7 +261,7 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
 
   const UpdateFlags flags(data->update_flags);
   const unsigned int n_q_points = quadrature.size();
-  
+
 				   // some scratch arrays
   std::vector<Tensor<1,dim> > values(0);
   std::vector<Tensor<2,dim> > grads(0);
@@ -295,7 +292,7 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
 				   // that
   if (flags & update_hessians)
     {
-//      grad_grads.resize (this->dofs_per_cell);      
+//      grad_grads.resize (this->dofs_per_cell);
       data->initialize_2nd (this, mapping, quadrature);
     }
 
@@ -310,7 +307,7 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
       {
 	poly_space.compute(quadrature.point(k),
 			   values, grads, grad_grads);
-	
+
 	if (flags & update_values)
 	  {
 	    if (inverse_node_matrix.n_cols() == 0)
@@ -325,7 +322,7 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
 		  data->shape_values[i][k] = add_values;
 		}
 	  }
-	
+
 	if (flags & update_gradients)
 	  {
 	    if (inverse_node_matrix.n_cols() == 0)
@@ -340,7 +337,7 @@ FE_PolyTensor<POLY,dim,spacedim>::get_data (
 		  data->shape_grads[i][k] = add_grads;
 		}
 	  }
-	
+
       }
   return data;
 }
@@ -373,7 +370,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
   const unsigned int n_q_points = quadrature.size();
   const UpdateFlags flags(fe_data.current_update_flags());
-  
+
   Assert(!(flags & update_values) || fe_data.shape_values.size() == this->dofs_per_cell,
 	 ExcDimensionMismatch(fe_data.shape_values.size(), this->dofs_per_cell));
   Assert(!(flags & update_values) || fe_data.shape_values[0].size() == n_q_points,
@@ -394,11 +391,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
   if (mapping_type == mapping_piola)
     if (cell_similarity == CellSimilarity::translation)
       cell_similarity = CellSimilarity::none;
-  
+
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
-      
+
       if (flags & update_values && cell_similarity != CellSimilarity::translation)
 	switch (mapping_type)
 	  {
@@ -409,7 +406,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		  data.shape_values(first+d,k) = fe_data.shape_values[i][k][d];
 	      break;
 	    }
- 
+
 	  case mapping_covariant:
 	  case mapping_contravariant:
 	    {
@@ -434,24 +431,24 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 		    = sign_change[i] * shape_values[k][d];
 	      break;
 	    }
-	  
+
 	  case mapping_nedelec:
 	  {
 	     std::vector<Tensor<1,dim> > shape_values (n_q_points);
 	     mapping.transform (fe_data.shape_values[i], shape_values,
 	       mapping_data, mapping_covariant);
-	         
+
 	     for (unsigned int k = 0; k < n_q_points; ++k)
 	        for (unsigned int d = 0; d < dim; ++d)
 	           data.shape_values(first+d,k) = shape_values[k][d];
-	      
+
 	     break;
 	  }
 
 	  default:
 	    Assert(false, ExcNotImplemented());
 	  }
-      
+
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
@@ -472,36 +469,36 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
 				  mapping_data, mapping_covariant_gradient);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
-		
+
 		break;
 	      }
 	      case mapping_contravariant:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
 				  mapping_data, mapping_contravariant_gradient);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads2[k][d];
-		
+
 		break;
 	      }
 	      case mapping_piola:
 	      {
 		mapping.transform(fe_data.shape_grads[i], shape_grads1,
 				  mapping_data, mapping_piola);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
-		
+
 		break;
 	      }
-	      
+
 	      case mapping_nedelec: {
                                            // treat the gradients of
                                            // this particular shape
@@ -521,33 +518,33 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
                                            // (J^-1) from the right,
                                            // we have to trick a
                                            // little in between
-                                           
+
                                            // do first transformation
 	      	 mapping.transform (fe_data.shape_grads[i], shape_grads1,
 	      	   mapping_data, mapping_covariant);
-                                           // transpose matrix	      	 
+                                           // transpose matrix
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-                                           // do second transformation	      	 
+                                           // do second transformation
 	      	 mapping.transform (shape_grads2, shape_grads1,
 	      	   mapping_data, mapping_covariant);
-                                           // transpose back	      	 
+                                           // transpose back
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-	      	    
+
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    for (unsigned int d = 0; d < dim; ++d)
-	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];	      	 
+	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];
 					   // then copy over to target:
 	         break;
 	      }
-		    
+
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
 	}
     }
-  
+
   if (flags & update_hessians && cell_similarity != CellSimilarity::translation)
     this->compute_2nd (mapping, cell,
 		       typename QProjector<dim>::DataSetDescriptor().cell(),
@@ -579,7 +576,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 				   // offset determines which data set
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
-  
+
   const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
     = dsd.face (face,
@@ -587,7 +584,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		cell->face_flip(face),
 		cell->face_rotation(face),
 		n_q_points);
-  
+
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
 //TODO: Size assertions
@@ -599,11 +596,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 				   // on the neighborhood between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
   get_face_sign_change (cell, this->dofs_per_face, sign_change);
-  
+
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
-      
+
       if (flags & update_values)
 	{
 	  switch (mapping_type)
@@ -615,7 +612,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
 		break;
 	      }
-	      
+
 	      case mapping_covariant:
 	      case mapping_contravariant:
 	      {
@@ -624,11 +621,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
 				  shape_values, mapping_data, mapping_type);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_values(first+d,k) = shape_values[k][d];
-		
+
 		break;
 	      }
 	      case mapping_piola:
@@ -642,24 +639,24 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		      = sign_change[i] * shape_values[k][d];
 		break;
 	      }
-	      
+
 	      case mapping_nedelec: {
 	         std::vector<Tensor<1,dim> > shape_values (n_q_points);
 	           mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
 	         shape_values, mapping_data, mapping_covariant);
-	         
+
    	         for (unsigned int k = 0; k < n_q_points; ++k)
 	            for (unsigned int d = 0; d < dim; ++d)
 	               data.shape_values(first+d,k) = shape_values[k][d];
-	      
+
 	         break;
 	      }
-	  
+
 	      default:
 		Assert(false, ExcNotImplemented());
-	    }	  
+	    }
 	}
-      
+
       if (flags & update_gradients)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
@@ -676,12 +673,12 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
-	      
+
 	      case mapping_covariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_covariant_gradient);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
@@ -695,21 +692,21 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
-		
+
 		break;
 	      }
 	      case mapping_piola:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_piola);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
-		
+
 		break;
 	      }
-	      
+
 	      case mapping_nedelec: {
                                            // treat the gradients of
                                            // this particular shape
@@ -729,33 +726,33 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
                                            // (J^-1) from the right,
                                            // we have to trick a
                                            // little in between
-                                           
+
                                            // do first transformation
 	      	 mapping.transform (make_slice (fe_data.shape_grads[i], offset, n_q_points),
 	      	   shape_grads1, mapping_data, mapping_covariant);
-                                           // transpose matrix	      	 
+                                           // transpose matrix
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-                                           // do second transformation	      	 
+                                           // do second transformation
 	      	 mapping.transform (shape_grads2, shape_grads1,
 	      	   mapping_data, mapping_covariant);
-                                           // transpose back	      	 
+                                           // transpose back
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-	      	    
+
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    for (unsigned int d = 0; d < dim; ++d)
-	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];	      	 
+	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];
 					   // then copy over to target:
 	         break;
 	      }
-	      
+
 	      default:
 		Assert(false, ExcNotImplemented());
 	    }
 	}
     }
-  
+
   if (flags & update_hessians)
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
@@ -810,11 +807,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 				   // on the neighborhood between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
   get_face_sign_change (cell, this->dofs_per_face, sign_change);
-  
+
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const unsigned int first = data.shape_function_to_row_table[i];
-      
+
       if (flags & update_values)
 	{
 	  switch (mapping_type)
@@ -826,7 +823,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		    data.shape_values(first+d,k) = fe_data.shape_values[i][k+offset][d];
 		break;
 	      }
-	      
+
 	      case mapping_covariant:
 	      case mapping_contravariant:
 	      {
@@ -835,11 +832,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
 		mapping.transform(make_slice(fe_data.shape_values[i], offset, n_q_points),
 				  shape_values, mapping_data, mapping_type);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		    for (unsigned int d=0; d<dim; ++d)
 		      data.shape_values(first+d,k) = shape_values[k][d];
-		
+
 		break;
 	      }
 	      case mapping_piola:
@@ -857,18 +854,18 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	         std::vector<Tensor<1,dim> > shape_values (n_q_points);
 	           mapping.transform (make_slice (fe_data.shape_values[i], offset, n_q_points),
 	         shape_values, mapping_data, mapping_covariant);
-	         
+
    	         for (unsigned int k = 0; k < n_q_points; ++k)
 	            for (unsigned int d = 0; d < dim; ++d)
 	               data.shape_values(first+d,k) = shape_values[k][d];
-	      
+
 	         break;
 	      }
 	      default:
 		    Assert(false, ExcNotImplemented());
 	    }
 	}
-      
+
       if (flags & update_gradients)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
@@ -885,7 +882,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 		break;
 	      }
-	      
+
 	      case mapping_covariant:
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
@@ -901,11 +898,11 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 	      {
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1, mapping_data, mapping_contravariant_gradient);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
-		
+
 		break;
 	      }
 
@@ -914,14 +911,14 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
 				  shape_grads1,
 				  mapping_data, mapping_piola);
-		
+
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
-		
+
 		break;
 	      }
-	      
+
 	      case mapping_nedelec: {
                                            // treat the gradients of
                                            // this particular shape
@@ -941,33 +938,33 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
                                            // (J^-1) from the right,
                                            // we have to trick a
                                            // little in between
-                                           
+
                                            // do first transformation
 	      	 mapping.transform (make_slice (fe_data.shape_grads[i], offset, n_q_points),
 	      	   shape_grads1, mapping_data, mapping_covariant);
-                                           // transpose matrix	      	 
+                                           // transpose matrix
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-                                           // do second transformation	      	 
+                                           // do second transformation
 	      	 mapping.transform (shape_grads2, shape_grads1,
 	      	   mapping_data, mapping_covariant);
-                                           // transpose back	      	 
+                                           // transpose back
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-	      	    
+
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    for (unsigned int d = 0; d < dim; ++d)
-	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];	      	 
+	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];
 					   // then copy over to target:
 	         break;
 	      }
-	      
+
 	      default:
 		    Assert(false, ExcNotImplemented());
 	    }
 	}
     }
-  
+
   if (flags & update_hessians)
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
@@ -1007,7 +1004,7 @@ UpdateFlags
 FE_PolyTensor<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const
 {
   const bool values_once = (mapping_type == mapping_none);
-  
+
   UpdateFlags out = update_default;
 
   if (values_once && (flags & update_values))
@@ -1029,26 +1026,26 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
       {
 	if (flags & update_values)
 	  out |= update_values | update_piola;
-	
+
 	if (flags & update_gradients)
 	  out |= update_gradients | update_piola | update_covariant_transformation;
-	
+
 	if (flags & update_hessians)
 	  out |= update_hessians | update_piola | update_covariant_transformation;
-	
+
 	break;
       }
-      
+
       case mapping_nedelec: {
       	 if (flags & update_values)
       	    out |= update_values | update_covariant_transformation;
-      	 
+
       	 if (flags & update_gradients)
       	    out |= update_gradients | update_covariant_transformation;
-      	 
+
       	 if (flags & update_hessians)
       	    out |= update_hessians | update_covariant_transformation;
-      	
+
          break;
       }
 
@@ -1057,16 +1054,14 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 	Assert (false, ExcNotImplemented());
       }
     }
-  
+
   return out;
 }
 
 
 
-template class FE_PolyTensor<PolynomialsRaviartThomas<deal_II_dimension>,deal_II_dimension>;
-template class FE_PolyTensor<PolynomialsABF<deal_II_dimension>,deal_II_dimension>;
-template class FE_PolyTensor<PolynomialsBDM<deal_II_dimension>,deal_II_dimension>;
-template class FE_PolyTensor<PolynomialsNedelec<deal_II_dimension>, deal_II_dimension>;
+// explicit instantiations
+#include "fe_poly_tensor.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

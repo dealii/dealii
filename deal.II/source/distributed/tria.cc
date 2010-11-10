@@ -193,7 +193,6 @@ namespace internal
 	size_t (&connectivity_memory_used) (types<2>::connectivity * p4est);
     };
 
-#if deal_II_dimension == 2
     int (&functions<2>::quadrant_compare) (const void *v1, const void *v2)
     = p4est_quadrant_compare;
 
@@ -316,9 +315,7 @@ namespace internal
     size_t (&functions<2>::connectivity_memory_used) (types<2>::connectivity * p4est)
     = p4est_connectivity_memory_used;
 
-#endif
 
-    
     template <> struct functions<3>
     {
 	static
@@ -444,8 +441,7 @@ namespace internal
 	size_t (&connectivity_memory_used) (types<3>::connectivity * p4est);
     };
 
-#if deal_II_dimension == 3
-    
+
     int (&functions<3>::quadrant_compare) (const void *v1, const void *v2)
     = p8est_quadrant_compare;
 
@@ -570,7 +566,6 @@ namespace internal
     size_t (&functions<3>::connectivity_memory_used) (types<3>::connectivity * p4est)
     = p8est_connectivity_memory_used;
 
-#endif
 
 
     template <int dim>
@@ -1983,12 +1978,11 @@ namespace parallel
 
 
 
-#if deal_II_dimension == 2
-
-    template <int dim, int spacedim>
+    template <>
     void
-    Triangulation<dim,spacedim>::copy_new_triangulation_to_p4est (internal::int2type<2>)
+    Triangulation<2,2>::copy_new_triangulation_to_p4est (internal::int2type<2>)
     {
+      const unsigned int dim = 2, spacedim = 2;
       Assert (this->n_cells(0) > 0, ExcInternalError());
       Assert (this->n_levels() == 1, ExcInternalError());
 
@@ -2057,14 +2051,91 @@ namespace parallel
 		    /* user_pointer */ this);
     }
 
-#endif
 
-#if deal_II_dimension == 3
 
-    template <int dim, int spacedim>
+				// TODO: This is a verbatim copy of the 2,2
+				// case. However, we can't just specialize the
+				// dim template argument, but let spacedim open 
+    template <>
     void
-    Triangulation<dim,spacedim>::copy_new_triangulation_to_p4est (internal::int2type<3>)
+    Triangulation<2,3>::copy_new_triangulation_to_p4est (internal::int2type<2>)
     {
+      const unsigned int dim = 2, spacedim = 3;
+      Assert (this->n_cells(0) > 0, ExcInternalError());
+      Assert (this->n_levels() == 1, ExcInternalError());
+
+				       // data structures that counts how many
+				       // cells touch each vertex
+				       // (vertex_touch_count), and which cells
+				       // touch a given vertex (together with
+				       // the local numbering of that vertex
+				       // within the cells that touch it)
+      std::vector<unsigned int> vertex_touch_count;
+      std::vector<
+      std::list<
+      std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator,
+	unsigned int> > >
+	vertex_to_cell;
+      get_vertex_to_cell_mappings (*this,
+				   vertex_touch_count,
+				   vertex_to_cell);
+      const internal::p4est::types<2>::locidx
+	num_vtt = std::accumulate (vertex_touch_count.begin(),
+				   vertex_touch_count.end(),
+				   0);
+
+				       // now create a connectivity
+				       // object with the right sizes
+				       // for all arrays. set vertex
+				       // information only in debug
+				       // mode (saves a few bytes in
+				       // optimized mode)
+      const bool set_vertex_info
+#ifdef DEBUG
+	= true
+#else
+	= false
+#endif
+	;
+
+      connectivity
+	= internal::p4est::functions<2>::
+	connectivity_new ((set_vertex_info == true ? this->n_vertices() : 0),
+			  this->n_cells(0),
+			  this->n_vertices(),
+			  num_vtt);
+
+      set_vertex_and_cell_info (*this,
+				vertex_touch_count,
+				vertex_to_cell,
+				coarse_cell_to_p4est_tree_permutation,
+				set_vertex_info,
+				connectivity);
+
+      Assert (p4est_connectivity_is_valid (connectivity) == 1,
+	      ExcInternalError());
+
+				       // now create a forest out of the
+				       // connectivity data structure
+      parallel_forest
+	= internal::p4est::functions<2>::
+	new_forest (mpi_communicator,
+		    connectivity,
+		    /* minimum initial number of quadrants per tree */ 0,
+                    /* minimum level of upfront refinement */ 0,
+                    /* use uniform upfront refinement */ 1,
+		    /* user_data_size = */ 0,
+		    /* user_data_constructor = */ NULL,
+		    /* user_pointer */ this);
+    }
+
+
+
+    template <>
+    void
+    Triangulation<3,3>::copy_new_triangulation_to_p4est (internal::int2type<3>)
+    {
+      const int dim = 3, spacedim = 3;
       Assert (this->n_cells(0) > 0, ExcInternalError());
       Assert (this->n_levels() == 1, ExcInternalError());
 
@@ -2214,7 +2285,6 @@ namespace parallel
 		    /* user_pointer */ this);
     }
 
-#endif
 
 
     template <int dim, int spacedim>
@@ -2686,6 +2756,7 @@ namespace parallel
     types::subdomain_id_t
     Triangulation<dim,spacedim>::locally_owned_subdomain () const
     {
+      Assert (dim > 1, ExcNotImplemented());
       return my_subdomain;
     }
 
@@ -2802,7 +2873,7 @@ namespace parallel
     MPI_Comm
     Triangulation<dim,spacedim>::get_communicator () const
     {
-      return mpi_communicator;
+	return mpi_communicator;
     }
 
 
@@ -2902,48 +2973,75 @@ namespace parallel
 						     p4est_coarse_cell,
 						     attached_data_pack_callbacks);
 	}
-
-
-
-
     }
 
 
 
-
-#if deal_II_dimension == 1
-    template <int spacedim>
-    Triangulation<1,spacedim>::Triangulation (MPI_Comm)
+				// TODO: again problems with specialization in
+				// only one template argument
+    template <>
+    Triangulation<1,1>::Triangulation (MPI_Comm)
     {
       Assert (false, ExcNotImplemented());
     }
 
 
-    template <int spacedim>
-    Triangulation<1,spacedim>::~Triangulation ()
+    template <>
+    Triangulation<1,1>::~Triangulation ()
     {
       Assert (false, ExcNotImplemented());
     }
 
 
 
-    template <int spacedim>
+    template <>
     types::subdomain_id_t
-    Triangulation<1,spacedim>::locally_owned_subdomain () const
+    Triangulation<1,1>::locally_owned_subdomain () const
     {
       Assert (false, ExcNotImplemented());
       return 0;
     }
 
 
-    template <int spacedim>
+    template <>
     MPI_Comm
-    Triangulation<1,spacedim>::get_communicator () const
+    Triangulation<1,1>::get_communicator () const
     {
       return MPI_COMM_WORLD;
     }
-#endif
 
+
+
+    template <>
+    Triangulation<1,2>::Triangulation (MPI_Comm)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+
+    template <>
+    Triangulation<1,2>::~Triangulation ()
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+
+
+    template <>
+    types::subdomain_id_t
+    Triangulation<1,2>::locally_owned_subdomain () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
+    MPI_Comm
+    Triangulation<1,2>::get_communicator () const
+    {
+      return MPI_COMM_WORLD;
+    }
   }
 }
 
@@ -2983,51 +3081,9 @@ namespace parallel
 
 
 
-#ifdef DEAL_II_USE_P4EST
 
-// explicit instantiations
-namespace internal
-{
-  namespace p4est
-  {
-#  if deal_II_dimension > 1
-    template
-    void
-    init_quadrant_children<deal_II_dimension>
-    (const types<deal_II_dimension>::quadrant & p4est_cell,
-     types<deal_II_dimension>::quadrant (&p4est_children)[GeometryInfo<deal_II_dimension>::max_children_per_cell]);
-
-    template
-    void
-    init_coarse_quadrant<deal_II_dimension>
-    (types<deal_II_dimension>::quadrant & quad);
-
-    template
-    bool
-    quadrant_is_equal<deal_II_dimension>
-    (const types<deal_II_dimension>::quadrant & q1,
-     const types<deal_II_dimension>::quadrant & q2);
-
-    template
-    bool
-    quadrant_is_ancestor<deal_II_dimension>
-    (const types<deal_II_dimension>::quadrant & q1,
-     const types<deal_II_dimension>::quadrant & q2);
-#endif
-  }
-}
-namespace parallel
-{
-  namespace distributed
-  {
-    template class Triangulation<deal_II_dimension>;
-#  if deal_II_dimension < 3
-    template class Triangulation<deal_II_dimension, deal_II_dimension+1>;
-#  endif
-  }
-}
-
-#endif // DEAL_II_USE_P4EST
+/*-------------- Explicit Instantiations -------------------------------*/
+#include "tria.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -49,7 +49,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
-  
+
   this->mapping_type = mapping_raviart_thomas;
 				   // First, initialize the
 				   // generalized support points and
@@ -60,7 +60,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 				   //matrix, generating the correct
 				   //basis functions from the raw
 				   //ones.
-  
+
 				   // We use an auxiliary matrix in
 				   // this function. Therefore,
 				   // inverse_node_matrix is still
@@ -73,7 +73,7 @@ FE_RaviartThomas<dim>::FE_RaviartThomas (const unsigned int deg)
 				   // From now on, the shape functions
 				   // will be the correct ones, not
 				   // the raw shape functions anymore.
-  
+
 				   // Reinit the vectors of
 				   // restriction and prolongation
 				   // matrices to the right sizes.
@@ -118,7 +118,7 @@ FE_RaviartThomas<dim>::get_name () const
 				   // polynomial degree and is thus one higher
 				   // than the argument given to the
 				   // constructor
-  std::ostringstream namebuf;  
+  std::ostringstream namebuf;
   namebuf << "FE_RaviartThomas<" << dim << ">(" << this->degree-1 << ")";
 
   return namebuf.str();
@@ -138,40 +138,6 @@ FE_RaviartThomas<dim>::clone() const
 //---------------------------------------------------------------------------
 
 
-#if deal_II_dimension == 1
-
-template <int dim>
-void
-FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
-{
-  return;
-  
-  Assert (false, ExcNotImplemented());
-  
-  QGauss<dim> cell_quadrature(deg+1);
-  const unsigned int n_interior_points
-    = (deg>0) ? cell_quadrature.size() : 0;
-  
-  this->generalized_support_points.resize (2 + n_interior_points);
-  
-				   // Number of the point being entered
-  unsigned int current = 0;
-
-  
-  if (deg==0) return;
-
-  interior_weights.reinit(TableIndices<3>(2+n_interior_points, 0, dim));
-  
-  for (unsigned int k=0;k<cell_quadrature.size();++k)
-    this->generalized_support_points[current++] = cell_quadrature.point(k);
-  
-  Assert (current == this->generalized_support_points.size(),
-	  ExcInternalError());
-}
-
-#else
-
-// Version for 2d and higher. See above for 1d version
 template <int dim>
 void
 FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
@@ -179,17 +145,17 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
   QGauss<dim> cell_quadrature(deg+1);
   const unsigned int n_interior_points
     = (deg>0) ? cell_quadrature.size() : 0;
-  
+
   unsigned int n_face_points = (dim>1) ? 1 : 0;
 				   // compute (deg+1)^(dim-1)
   for (unsigned int d=1;d<dim;++d)
     n_face_points *= deg+1;
 
-  
+
   this->generalized_support_points.resize (GeometryInfo<dim>::faces_per_cell*n_face_points
 					   + n_interior_points);
   this->generalized_face_support_points.resize (n_face_points);
-  
+
 				   // Number of the point being entered
   unsigned int current = 0;
 
@@ -200,10 +166,10 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 	= Polynomials::Legendre::generate_complete_basis(deg);
 
       boundary_weights.reinit(n_face_points, legendre.n());
-      
+
 //       Assert (face_points.size() == this->dofs_per_face,
 // 	      ExcInternalError());
-      
+
       for (unsigned int k=0;k<n_face_points;++k)
 	{
 	  this->generalized_face_support_points[k] = face_points.point(k);
@@ -227,9 +193,9 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 	  this->generalized_support_points[current] = faces.point(current+QProjector<dim>::DataSetDescriptor::face(0,true,false,false,n_face_points));
 	}
     }
-  
+
   if (deg==0) return;
-  
+
 				   // Create Legendre basis for the
 				   // space D_xi Q_k
   std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
@@ -242,9 +208,9 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
       polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
     }
-  
+
   interior_weights.reinit(TableIndices<3>(n_interior_points, polynomials[0]->n(), dim));
-  
+
   for (unsigned int k=0;k<cell_quadrature.size();++k)
     {
       this->generalized_support_points[current++] = cell_quadrature.point(k);
@@ -256,15 +222,12 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
   for (unsigned int d=0;d<dim;++d)
     delete polynomials[d];
-  
+
   Assert (current == this->generalized_support_points.size(),
 	  ExcInternalError());
 }
 
-#endif
 
-
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -277,7 +240,7 @@ FE_RaviartThomas<1>::initialize_restriction()
     this->restriction[0][i].reinit(0,0);
 }
 
-#endif
+
 
 // This function is the same Raviart-Thomas interpolation performed by
 // interpolate. Still, we cannot use interpolate, since it was written
@@ -328,7 +291,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 	  const unsigned int child
 	    = GeometryInfo<dim>::child_cell_on_face(
 	      RefinementCase<dim>::isotropic_refinement, face, sub);
-	  
+
 					   // On a certain face, we must
 					   // compute the moments of ALL
 					   // fine level functions with
@@ -360,9 +323,9 @@ FE_RaviartThomas<dim>::initialize_restriction()
 		}
 	}
     }
-  
+
   if (this->degree == 1) return;
-  
+
 				   // Create Legendre basis for the
 				   // space D_xi Q_k. Here, we cannot
 				   // use the shape functions
@@ -376,7 +339,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
 
       polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
     }
-  
+
   QGauss<dim> q_cell(this->degree);
   const unsigned int start_cell_dofs
     = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
@@ -389,11 +352,11 @@ FE_RaviartThomas<dim>::initialize_restriction()
     for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
       for (unsigned int d=0;d<dim;++d)
 	cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
-  
+
   for (unsigned int child=0;child<GeometryInfo<dim>::max_children_per_cell;++child)
     {
       Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
-      
+
       for (unsigned int k=0;k<q_sub.size();++k)
 	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
 	  for (unsigned int d=0;d<dim;++d)
@@ -406,25 +369,11 @@ FE_RaviartThomas<dim>::initialize_restriction()
 		  * polynomials[d]->compute_value(i_weight, q_sub.point(k));
 	      }
     }
-  
+
   for (unsigned int d=0;d<dim;++d)
     delete polynomials[d];
 }
 
-
-#if deal_II_dimension == 1
-
-template <>
-std::vector<unsigned int>
-FE_RaviartThomas<1>::get_dpo_vector (const unsigned int deg)
-{
-  std::vector<unsigned int> dpo(2);
-  dpo[0] = 1;
-  dpo[1] = deg;
-  return dpo;
-}
-
-#endif
 
 
 template <int dim>
@@ -440,11 +389,11 @@ FE_RaviartThomas<dim>::get_dpo_vector (const unsigned int deg)
                                    // and then there are interior dofs
   const unsigned int
     interior_dofs = dim*deg*dofs_per_face;
-  
+
   std::vector<unsigned int> dpo(dim+1);
   dpo[dim-1] = dofs_per_face;
   dpo[dim]   = interior_dofs;
-  
+
   return dpo;
 }
 
@@ -484,16 +433,16 @@ FE_RaviartThomas<dim>::has_support_on_face (
                                                // these in a table
               return (face_index != GeometryInfo<dim>::opposite_face[shape_index]);
             }
-            
+
             default:
 	      return true;
           };
       };
-      
+
       default:  // other rt_order
 	return true;
     };
-  
+
   return true;
 }
 
@@ -534,10 +483,10 @@ FE_RaviartThomas<dim>::interpolate(
 	local_dofs[i+face*this->dofs_per_face] += boundary_weights(k,i)
 			 * values[face*n_face_points+k](GeometryInfo<dim>::unit_normal_direction[face]+offset);
       }
-  
+
   const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
   const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
-  
+
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)
       for (unsigned int d=0;d<dim;++d)
@@ -568,10 +517,10 @@ FE_RaviartThomas<dim>::interpolate(
 	local_dofs[i+face*this->dofs_per_face] += boundary_weights(k,i)
 			 * values[GeometryInfo<dim>::unit_normal_direction[face]][face*n_face_points+k];
       }
-  
+
   const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
   const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
-  
+
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)
       for (unsigned int d=0;d<dim;++d)
@@ -588,6 +537,9 @@ FE_RaviartThomas<dim>::memory_consumption () const
 }
 
 
-template class FE_RaviartThomas<deal_II_dimension>;
+
+// explicit instantiations
+#include "fe_raviart_thomas.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

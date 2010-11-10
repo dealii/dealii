@@ -31,7 +31,6 @@ MappingC1<dim,spacedim>::MappingC1 ()
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -42,10 +41,7 @@ MappingC1<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
 
-#endif
 
-
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -54,7 +50,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 {
   const unsigned int dim = 2;
   std::vector<Point<dim> > line_points (2);
-      
+
 				       // loop over each of the lines,
 				       // and if it is at the
 				       // boundary, then first get the
@@ -152,7 +148,7 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
 			     (face_vertex_normals[1][1] * std::cos(alpha)
 			      -face_vertex_normals[1][0] * std::sin(alpha)))
 			   -2*c;
-		       
+
 
 					   // next evaluate the so
 					   // determined cubic
@@ -186,8 +182,6 @@ MappingC1<2>::add_line_support_points (const Triangulation<2>::cell_iterator &ce
     };
 }
 
-#endif
-
 
 
 template<int dim, int spacedim>
@@ -200,9 +194,6 @@ MappingC1<dim,spacedim>::add_line_support_points (const typename Triangulation<d
 
 
 
-
-#if deal_II_dimension == 1
-
 template <>
 void
 MappingC1<1>::add_quad_support_points (const Triangulation<1>::cell_iterator &,
@@ -212,11 +203,7 @@ MappingC1<1>::add_quad_support_points (const Triangulation<1>::cell_iterator &,
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
 
-#endif
 
-
-
-#if deal_II_dimension == 2
 
 template <>
 void
@@ -226,9 +213,6 @@ MappingC1<2>::add_quad_support_points (const Triangulation<2>::cell_iterator &,
   const unsigned int dim = 2;
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
-
-#endif
-
 
 
 
@@ -253,6 +237,7 @@ MappingC1<dim,spacedim>::clone () const
 
 
 // explicit instantiations
-template class MappingC1<deal_II_dimension>;
+#include "mapping_c1.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

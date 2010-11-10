@@ -226,7 +226,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
     const;
     virtual unsigned int memory_consumption () const;
     virtual FiniteElement<dim> * clone() const;
-    
+
   private:
     				 /**
 				      * Only for internal use. Its
@@ -333,7 +333,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * integration.
 				      */
     Table<2, double> boundary_weights;
-    
+
 				     /**
 				      * Allow access from other
 				      * dimensions.
@@ -345,8 +345,6 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 
 #ifndef DOXYGEN
 
-template <>
-std::vector<unsigned int> FE_Nedelec<1>::get_dpo_vector (const unsigned int);
 template <>
 void
 FE_Nedelec<1>::initialize_restriction();

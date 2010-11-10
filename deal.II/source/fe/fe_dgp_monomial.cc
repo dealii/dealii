@@ -19,19 +19,18 @@
 DEAL_II_NAMESPACE_OPEN
 
 // namespace for some functions that are used in this file.
-namespace 
+namespace
 {
 				   // storage of hand-chosen support
 				   // points
 				   //
-#if deal_II_dimension == 2
 				   // For dim=2, dofs_per_cell of
 				   // FE_DGPMonomial(k) is given by
 				   // 0.5(k+1)(k+2), i.e.
-				   // 
+				   //
 				   // k    0  1  2  3  4  5  6  7
 				   // dofs 1  3  6 10 15 21 28 36
-				   // 
+				   //
 				   // indirect access of unit points:
 				   // the points for degree k are
 				   // located at
@@ -45,13 +44,11 @@ namespace
    {0,0},{1,0},{0,1},{1,1},{1./3.,0},{2./3.,0},{0,1./3.},{0,2./3.},{0.5,1},{1,0.5},
    {0,0},{1,0},{0,1},{1,1},{0.25,0},{0.5,0},{0.75,0},{0,0.25},{0,0.5},{0,0.75},{1./3.,1},{2./3.,1},{1,1./3.},{1,2./3.},{0.5,0.5}
   };
-#endif
 
-#if deal_II_dimension == 3
 				   // For dim=3, dofs_per_cell of
 				   // FE_DGPMonomial(k) is given by
 				   // 1./6.(k+1)(k+2)(k+3), i.e.
-				   // 
+				   //
 				   // k    0  1  2  3  4  5  6   7
 				   // dofs 1  4 10 20 35 56 84 120
   const unsigned int start_index3d[6]={0,1,5,15/*,35*/};
@@ -60,14 +57,12 @@ namespace
    {0,0,0},{1,0,0},{0,1,0},{0,0,1},
    {0,0,0},{1,0,0},{0,1,0},{0,0,1},{0.5,0,0},{0,0.5,0},{0,0,0.5},{1,1,0},{1,0,1},{0,1,1}
   };
-#endif
 
-  
+
   template<int dim>
   void generate_unit_points (const unsigned int,
 			     std::vector<Point<dim> > &);
 
-#if deal_II_dimension == 1
   template <>
   void generate_unit_points (const unsigned int k,
 			     std::vector<Point<1> > &p)
@@ -77,9 +72,7 @@ namespace
     for (unsigned int i=0; i<p.size(); ++i)
       p[i](0)=i*h;
   }
-#endif
-  
-#if deal_II_dimension == 2
+
   template <>
   void generate_unit_points (const unsigned int k,
 			     std::vector<Point<2> > &p)
@@ -92,9 +85,7 @@ namespace
 	p[i](1)=points2d[start_index2d[k]+i][1];
       }
   }
-#endif
-  
-#if deal_II_dimension == 3
+
   template <>
   void generate_unit_points (const unsigned int k,
 			     std::vector<Point<3> > &p)
@@ -108,7 +99,6 @@ namespace
 	p[i](2)=points3d[start_index3d[k]+i][2];
       }
   }
-#endif
 }
 
 
@@ -125,7 +115,7 @@ FE_DGPMonomial<dim>::FE_DGPMonomial (const unsigned int degree)
 {
   Assert(this->poly_space.n()==this->dofs_per_cell, ExcInternalError());
   Assert(this->poly_space.degree()==this->degree, ExcInternalError());
-  
+
 				   // DG doesn't have constraints, so
 				   // leave them empty
 
@@ -175,7 +165,7 @@ void
 FE_DGPMonomial<dim>::
 get_interpolation_matrix (const FiniteElement<dim> &source_fe,
 			  FullMatrix<double>           &interpolation_matrix) const
-{  
+{
   const FE_DGPMonomial<dim> *source_dgp_monomial
     = dynamic_cast<const FE_DGPMonomial<dim> *>(&source_fe);
 
@@ -189,11 +179,11 @@ get_interpolation_matrix (const FiniteElement<dim> &source_fe,
       Assert (m == this->dofs_per_cell, ExcDimensionMismatch (m, this->dofs_per_cell));
       Assert (n == source_dgp_monomial->dofs_per_cell,
 	      ExcDimensionMismatch (n, source_dgp_monomial->dofs_per_cell));
-      
+
       const unsigned int min_mn=
 	interpolation_matrix.m()<interpolation_matrix.n() ?
 	interpolation_matrix.m() : interpolation_matrix.n();
-      
+
       for (unsigned int i=0; i<min_mn; ++i)
 	interpolation_matrix(i,i)=1.;
     }
@@ -213,7 +203,7 @@ get_interpolation_matrix (const FiniteElement<dim> &source_fe,
 	  this_matrix(k,j)=this->poly_space.compute_value (j, unit_points[k]);
 
       this_matrix.gauss_jordan();
-      
+
       this_matrix.mmult(interpolation_matrix, source_fe_matrix);
     }
 }
@@ -265,7 +255,7 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
@@ -294,7 +284,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
                (dynamic_cast<const FE_DGPMonomial<dim>*>(&x_source_fe) != 0),
                typename FiniteElement<dim>::
                ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
@@ -389,8 +379,6 @@ compare_for_face_domination (const FiniteElement<dim> &fe_other) const
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 bool
 FE_DGPMonomial<1>::has_support_on_face (const unsigned int,
@@ -399,9 +387,7 @@ FE_DGPMonomial<1>::has_support_on_face (const unsigned int,
   return face_index==1 || (face_index==0 && this->degree==0);
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template <>
 bool
@@ -422,9 +408,7 @@ FE_DGPMonomial<2>::has_support_on_face (const unsigned int shape_index,
   return support_on_face;
 }
 
-#endif
 
-#if deal_II_dimension == 3
 
 template <>
 bool
@@ -446,7 +430,6 @@ FE_DGPMonomial<3>::has_support_on_face (const unsigned int shape_index,
   return support_on_face;
 }
 
-#endif
 
 
 template <int dim>
@@ -459,6 +442,8 @@ FE_DGPMonomial<dim>::memory_consumption () const
 
 
 
-template class FE_DGPMonomial<deal_II_dimension>;
+// explicit instantiations
+#include "fe_dgp_monomial.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

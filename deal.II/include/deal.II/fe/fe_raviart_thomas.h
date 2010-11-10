@@ -425,8 +425,6 @@ class FE_RaviartThomasNodal
 #ifndef DOXYGEN
 
 template <>
-std::vector<unsigned int> FE_RaviartThomas<1>::get_dpo_vector (const unsigned int);
-template <>
 void
 FE_RaviartThomas<1>::initialize_restriction();
 

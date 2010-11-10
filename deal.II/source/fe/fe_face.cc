@@ -46,7 +46,7 @@ FE_FaceQ<dim,spacedim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-  std::ostringstream namebuf;  
+  std::ostringstream namebuf;
   namebuf << "FE_FaceQ<" << dim << ">(" << this->degree << ")";
 
   return namebuf.str();
@@ -62,8 +62,8 @@ FE_FaceQ<dim,spacedim>::has_support_on_face (
 {
   return (face_index == (shape_index/this->dofs_per_face));
 }
-		  
-		  
+
+
 template <int dim, int spacedim>
 std::vector<unsigned int>
 FE_FaceQ<dim,spacedim>::get_dpo_vector (const unsigned int deg)
@@ -76,13 +76,9 @@ FE_FaceQ<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 }
 
 
-		  
 
-#if deal_II_dimension > 1
-		  template class FE_PolyFace<TensorProductPolynomials<deal_II_dimension-1> >;
-//template class FE_PolyFace<PolynomialSpace<deal_II_dimension>, deal_II_dimension>;
-//template class FE_PolyFace<PolynomialsP<deal_II_dimension>, deal_II_dimension>;
-		  template class FE_FaceQ<deal_II_dimension>;
-#endif
-		  
+// explicit instantiations
+#include "fe_face.inst"
+
+
 DEAL_II_NAMESPACE_CLOSE

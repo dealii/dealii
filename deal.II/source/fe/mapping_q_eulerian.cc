@@ -208,22 +208,8 @@ MappingQEulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
 
 
 
-// explicit instantiation
-template class MappingQEulerian<deal_II_dimension, Vector<double> >;
-#ifdef DEAL_II_USE_PETSC
-template class MappingQEulerian<deal_II_dimension, PETScWrappers::Vector>;
-#endif
-
-#if deal_II_dimension != 3
-template class MappingQEulerian<deal_II_dimension, Vector<double>,
-				deal_II_dimension+1>;
-
-#  ifdef DEAL_II_USE_PETSC
-template class MappingQEulerian<deal_II_dimension,
-				PETScWrappers::Vector, deal_II_dimension+1>;
-#  endif
-
-#endif
+// explicit instantiations
+#include "mapping_q_eulerian.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

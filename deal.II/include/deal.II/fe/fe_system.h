@@ -143,7 +143,7 @@ DEAL_II_NAMESPACE_OPEN
  * see the documentation of Triangulation.
  *
  * @ingroup febase fe vector_valued
- * 
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2003, 2006, Ralf Hartmann 2001.
  */
 template <int dim, int spacedim=dim>
@@ -174,7 +174,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     FESystem (const FiniteElement<dim,spacedim> &fe,
 	      const unsigned int n_elements);
 
-				     /** 
+				     /**
 				      * Constructor for mixed
 				      * discretizations with two
 				      * base elements.
@@ -184,7 +184,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     FESystem (const FiniteElement<dim,spacedim> &fe1, const unsigned int n1,
 	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2);
 
-				     /** 
+				     /**
 				      * Constructor for mixed
 				      * discretizations with three
 				      * base elements.
@@ -195,7 +195,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 	      const FiniteElement<dim,spacedim> &fe2, const unsigned int n2,
 	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3);
 
-				     /** 
+				     /**
 				      * Constructor for mixed
 				      * discretizations with four
 				      * base elements.
@@ -207,7 +207,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 	      const FiniteElement<dim,spacedim> &fe3, const unsigned int n3,
 	      const FiniteElement<dim,spacedim> &fe4, const unsigned int n4);
 
-				     /** 
+				     /**
 				      * Constructor for mixed
 				      * discretizations with five
 				      * base elements.
@@ -291,7 +291,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual double shape_value_component (const unsigned int i,
 					  const Point<dim> &p,
 					  const unsigned int component) const;
-    
+
 				     /**
 				      * Return the gradient of the
 				      * @p ith shape function at the
@@ -398,7 +398,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     shape_grad_grad_component (const unsigned int i,
                                const Point<dim> &p,
                                const unsigned int component) const;
-    
+
 				     /**
 				      * Return the matrix
 				      * interpolating from the given
@@ -425,7 +425,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>           &matrix) const;
 
-                                     /** 
+                                     /**
 				      * Number of different base
 				      * elements of this object.
 				      *
@@ -458,7 +458,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      */
     virtual const FiniteElement<dim,spacedim> &
     base_element (const unsigned int index) const;
-    
+
 				     /**
 				      * Check for non-zero values on a
 				      * face.
@@ -484,7 +484,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual
     Point<dim>
     unit_support_point (const unsigned int index) const;
-    
+
                                      /**
                                       * Implementation of the
                                       * respective function in the
@@ -495,10 +495,10 @@ class FESystem : public FiniteElement<dim,spacedim>
     unit_face_support_point (const unsigned int index) const;
 
 				     /**
-				      * @name Functions to support hp 
+				      * @name Functions to support hp
 				      * @{
 				      */
-    
+
                                      /**
                                       * Return whether this element
                                       * implements its hanging node
@@ -511,12 +511,12 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * this function.
                                       */
     virtual bool hp_constraints_are_implemented () const;
-    
+
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.dofs_per_face</tt> times
 				      * <tt>this->dofs_per_face</tt>.
@@ -537,13 +537,13 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;
-    
+
 
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the subface of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.dofs_per_face</tt> times
 				      * <tt>this->dofs_per_face</tt>.
@@ -625,7 +625,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-    
+
 				     /**
 				      * Return whether this element dominates
 				      * the one given as argument when they
@@ -642,7 +642,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
 				     //@}
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -654,15 +654,15 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * pointers to their base class,
 				      * rather than the class itself.
 				      */
-    virtual unsigned int memory_consumption () const;    
-  
+    virtual unsigned int memory_consumption () const;
+
   protected:
 				     /**
 				      * Compute flags for initial
 				      * update only.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const;
-  
+
 				     /**
 				      * Compute flags for update on
 				      * each cell.
@@ -677,7 +677,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * constructors of @p FESystem.
 				      */
     virtual FiniteElement<dim,spacedim> * clone() const;
-  
+
 				     /**
 				      * Prepare internal data
 				      * structures and fill in values
@@ -717,7 +717,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * @p compute_fill that does the
 				      * work for all three
 				      * <tt>fill_fe*_values</tt> functions.
-				      */    
+				      */
     virtual void
     fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
 			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -746,12 +746,12 @@ class FESystem : public FiniteElement<dim,spacedim>
 			    typename Mapping<dim,spacedim>::InternalDataBase      &mapping_data,
 			    typename Mapping<dim,spacedim>::InternalDataBase      &fe_data,
 			    FEValuesData<dim,spacedim>                    &data) const ;
-    
+
 
 				     /**
 				      * Do the work for the three
 				      * <tt>fill_fe*_values</tt> functions.
-				      * 
+				      *
 				      * Calls (among other things)
 				      * <tt>fill_fe_([sub]face)_values</tt>
 				      * of the base elements. Calls
@@ -789,13 +789,13 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * invalid.
 				      */
     static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
-    
+
 				     /**
 				      * Pairs of multiplicity and
 				      * element type.
 				      */
     typedef std::pair<const FiniteElement<dim,spacedim> *, unsigned int> ElementPair;
-    
+
 				     /**
 				      * Pointer to underlying finite
 				      * element classes.
@@ -836,7 +836,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * constructor.
 				      */
     void initialize_quad_dof_index_permutation ();
-    
+
 				     /**
 				      * Helper function used in the constructor:
 				      * take a @p FiniteElementData object
@@ -851,7 +851,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     static FiniteElementData<dim>
     multiply_dof_numbers (const FiniteElementData<dim> &fe_data,
 			  const unsigned int            N);
-    
+
 				     /**
 				      * Same as above for mixed elements
 				      * with two different sub-elements.
@@ -918,7 +918,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     compute_restriction_is_additive_flags (
       const FiniteElement<dim,spacedim> &fe,
       const unsigned int        N);
-    
+
 				     /**
 				      * Same as above for mixed elements
 				      * with two different sub-elements.
@@ -985,8 +985,8 @@ class FESystem : public FiniteElement<dim,spacedim>
     compute_restriction_is_additive_flags (
       const std::vector<const FiniteElement<dim,spacedim>*> &fes,
       const std::vector<unsigned int>              &multiplicities);
-    
-    
+
+
 				     /**
 				      * Compute the non-zero vector
 				      * components of a composed
@@ -1061,7 +1061,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     static std::vector<std::vector<bool> >
     compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
 				const std::vector<unsigned int>              &multiplicities);
-    
+
 				     /**
 				      * This function is simply
 				      * singled out of the
@@ -1078,7 +1078,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      * Used by @p initialize.
 				      */
     void build_cell_tables();
-    
+
 				     /**
 				      * Used by @p initialize.
 				      */
@@ -1099,7 +1099,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     template <int structdim>
     std::vector<std::pair<unsigned int, unsigned int> >
     hp_object_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-    
+
 				     /**
 				      * Usually: Fields of
 				      * cell-independent data.
@@ -1122,7 +1122,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 					  * @p n_base_elements.
 					  */
 	InternalData (const unsigned int n_base_elements);
-	
+
 					 /**
 					  * Destructor. Deletes all
 					  * @p InternalDatas whose
@@ -1138,7 +1138,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 					  * be computed.
 					  */
 	bool compute_hessians;
-	
+
 					 /**
 					  * Gives write-access to the
 					  * pointer to a
@@ -1154,7 +1154,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 					  * pointer to a
 					  * @p InternalData of the
 					  * @p base_noth base element.
-					  */	
+					  */
 	typename FiniteElement<dim,spacedim>::InternalDataBase &
 	get_fe_data (const unsigned int base_no) const;
 
@@ -1174,7 +1174,7 @@ class FESystem : public FiniteElement<dim,spacedim>
 					  * pointer to a
 					  * @p FEValuesData for the
 					  * @p base_noth base element.
-					  */	
+					  */
 	FEValuesData<dim,spacedim> & get_fe_values_data (const unsigned int base_no) const;
 
 					 /**
@@ -1213,9 +1213,9 @@ class FESystem : public FiniteElement<dim,spacedim>
                                           * of the sub-data objects.
                                           */
         virtual void clear_first_cell ();
-	
+
       private:
-	
+
 					 /**
 					  * Pointers to
 					  * @p InternalData objects
@@ -1262,12 +1262,6 @@ class FESystem : public FiniteElement<dim,spacedim>
     };
 };
 
-
-/* -------------- declaration of explicit specializations ------------- */
-
-
-template <> void FESystem<1>::initialize_unit_face_support_points ();
-template <> void FESystem<1,2>::initialize_unit_face_support_points ();
 
 
 DEAL_II_NAMESPACE_CLOSE

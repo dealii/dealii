@@ -1950,33 +1950,16 @@ initialize_unit_support_points ()
 }
 
 
-#if deal_II_dimension == 1
-
-template <>
-void
-FESystem<1>::
-initialize_unit_face_support_points ()
-{
-				   // no faces no work
-}
-
-
-template <>
-void
-FESystem<1,2>::
-initialize_unit_face_support_points ()
-{
-				   // no faces no work
-}
-
-#endif
-
 
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
 initialize_unit_face_support_points ()
 {
+				// Nothing to do in 1D
+  if (dim == 1)
+    return;
+
 				   // if one of the base elements has
 				   // no support points, then it makes
 				   // no sense to define support
@@ -2018,21 +2001,15 @@ template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::initialize_quad_dof_index_permutation ()
 {
-				   // general template for 1D and 2D, do nothing
-}
+				// nothing to do in other dimensions than 3
+  if (dim < 3)
+    return;
 
-
-
-#if deal_II_dimension == 3
-
-template <>
-void
-FESystem<3>::initialize_quad_dof_index_permutation ()
-{
 				   // the array into which we want to write
 				   // should have the correct size already.
-  Assert (adjust_quad_dof_index_for_face_orientation_table.n_elements()==8*this->dofs_per_quad,
-	  ExcInternalError());
+  Assert (this->adjust_quad_dof_index_for_face_orientation_table.n_elements()==
+	  8*this->dofs_per_quad, ExcInternalError());
+
 				   // to obtain the shifts for this composed
 				   // element, copy the shift information of
 				   // the base elements
@@ -2045,7 +2022,8 @@ FESystem<3>::initialize_quad_dof_index_permutation ()
 	{
 	  for (unsigned int i=0; i<temp.size(0); ++i)
 	    for (unsigned int j=0; j<8; ++j)
-	      adjust_quad_dof_index_for_face_orientation_table(index+i,j)=temp(i,j);
+	      this->adjust_quad_dof_index_for_face_orientation_table(index+i,j)=
+		temp(i,j);
 	  index += temp.size(0);
 	}
     }
@@ -2054,8 +2032,8 @@ FESystem<3>::initialize_quad_dof_index_permutation ()
 
 				   // aditionally compose the permutation
 				   // information for lines
-  Assert (adjust_line_dof_index_for_line_orientation_table.size()==this->dofs_per_line,
-	  ExcInternalError());
+  Assert (this->adjust_line_dof_index_for_line_orientation_table.size()==
+	  this->dofs_per_line, ExcInternalError());
   index = 0;
   for (unsigned int b=0; b<n_base_elements();++b)
     {
@@ -2064,15 +2042,14 @@ FESystem<3>::initialize_quad_dof_index_permutation ()
       for (unsigned int c=0; c<element_multiplicity(b); ++c)
 	{
 	  std::copy(temp2.begin(), temp2.end(),
-		    adjust_line_dof_index_for_line_orientation_table.begin()+index);
+		    this->adjust_line_dof_index_for_line_orientation_table.begin()
+		    +index);
 	  index += temp2.size();
 	}
     }
   Assert (index == this->dofs_per_line,
 	  ExcInternalError());
 }
-
-#endif
 
 
 
@@ -3407,9 +3384,6 @@ FESystem<dim,spacedim>::memory_consumption () const
 
 
 // explicit instantiations
-template class FESystem<deal_II_dimension>;
-#if deal_II_dimension != 3
-template class FESystem<deal_II_dimension, deal_II_dimension+1>;
-#endif
+#include "fe_system.inst"
 
 DEAL_II_NAMESPACE_CLOSE

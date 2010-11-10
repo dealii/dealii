@@ -48,8 +48,8 @@ Mapping<dim, spacedim>::transform_covariant (
     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
 {
   Assert (offset == 0, ExcInternalError());
-  
-  transform(input, output, mapping_data, mapping_covariant);  
+
+  transform(input, output, mapping_data, mapping_covariant);
 }
 
 
@@ -116,10 +116,8 @@ Mapping<dim, spacedim>::InternalDataBase::memory_consumption () const
 
 
 
-template class Mapping<deal_II_dimension>;
+// explicit instantiations
+#include "mapping.inst"
 
-#if deal_II_dimension != 3
-template class Mapping<deal_II_dimension,deal_II_dimension+1>;
-#endif
 
 DEAL_II_NAMESPACE_CLOSE

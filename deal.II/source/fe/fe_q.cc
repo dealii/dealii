@@ -627,7 +627,7 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 				   // embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation);
 
-				   // Fill restriction matrices 
+				   // Fill restriction matrices
   initialize_restriction();
 
   initialize_quad_dof_index_permutation();
@@ -802,7 +802,6 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 void
@@ -856,10 +855,7 @@ get_subface_interpolation_matrix (const FiniteElement<1,2> &/*x_source_fe*/,
 	  ExcInterpolationNotImplemented ());
 }
 
-#endif
 
-
-#if deal_II_dimension > 1
 
 template <int dim, int spacedim>
 void
@@ -1076,7 +1072,6 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
     }
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -1329,7 +1324,6 @@ void FE_Q<dim,spacedim>::initialize_unit_support_points (const Quadrature<1> &po
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 void FE_Q<1>::initialize_unit_face_support_points ()
@@ -1355,7 +1349,6 @@ void FE_Q<1,2>::initialize_unit_face_support_points (const Quadrature<1> &/*poin
 				   // no faces in 1d, so nothing to do
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -1437,7 +1430,6 @@ FE_Q<dim,spacedim>::initialize_quad_dof_index_permutation ()
 }
 
 
-#if deal_II_dimension == 3
 
 template <>
 void
@@ -1505,7 +1497,6 @@ FE_Q<3>::initialize_quad_dof_index_permutation ()
     this->adjust_line_dof_index_for_line_orientation_table[i]=this->dofs_per_line-1-i - i;
 }
 
-#endif
 
 
 
@@ -1531,7 +1522,6 @@ FE_Q<dim,spacedim>::face_lexicographic_to_hierarchic_numbering (const unsigned i
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 std::vector<unsigned int>
@@ -1547,7 +1537,7 @@ FE_Q<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
   return std::vector<unsigned int>();
 }
 
-#endif
+
 
 template <int dim, int spacedim>
 void
@@ -1811,7 +1801,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 						 // value per row. Still, the
 						 // values should sum up to 1
 		double sum_check = 0;
-		for (unsigned int child_dof = 0; child_dof<this->dofs_per_cell; 
+		for (unsigned int child_dof = 0; child_dof<this->dofs_per_cell;
 		     ++child_dof)
 		  {
 		    const double val
@@ -1823,7 +1813,7 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 
 		    sum_check += val;
 		  }
-		Assert (std::fabs(sum_check-1) < this->degree*eps, 
+		Assert (std::fabs(sum_check-1) < this->degree*eps,
 			ExcInternalError());
 	      }
 	  }
@@ -1831,11 +1821,11 @@ FE_Q<dim,spacedim>::initialize_restriction ()
 }
 
 
+
 //---------------------------------------------------------------------------
 // Data field initialization
 //---------------------------------------------------------------------------
 
-#if deal_II_dimension == 1
 
 template <>
 bool
@@ -1880,10 +1870,6 @@ FE_Q<1,2>::has_support_on_face (const unsigned int shape_index,
           ((shape_index == 1) && (face_index == 1)));
 }
 
-
-
-
-#else
 
 
 template <int dim, int spacedim>
@@ -1992,7 +1978,6 @@ FE_Q<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
   return false;
 }
 
-#endif
 
 
 template <int dim, int spacedim>
@@ -2005,12 +1990,7 @@ FE_Q<dim,spacedim>::memory_consumption () const
 
 
 
-template class FE_Q<deal_II_dimension>;
-
-#if deal_II_dimension !=3
-template class FE_Q<deal_II_dimension,deal_II_dimension+1>;
-#endif
-
-
+// explicit instantiations
+#include "fe_q.inst"
 
 DEAL_II_NAMESPACE_CLOSE

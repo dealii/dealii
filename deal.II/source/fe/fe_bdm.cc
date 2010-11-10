@@ -27,6 +27,9 @@
 #include <iostream>
 #include <sstream>
 
+
+DEAL_II_NAMESPACE_OPEN
+
 template <int dim>
 FE_BDM<dim>::FE_BDM (const unsigned int deg)
 		:
@@ -206,21 +209,6 @@ FE_BDM<dim>::interpolate(
 
 
 
-#if deal_II_dimension == 1
-
-template <>
-std::vector<unsigned int>
-FE_BDM<1>::get_dpo_vector (const unsigned int deg)
-{
-  std::vector<unsigned int> dpo(2);
-  dpo[0] = 1;
-  dpo[1] = deg;
-  return dpo;
-}
-
-#endif
-
-
 template <int dim>
 std::vector<unsigned int>
 FE_BDM<dim>::get_dpo_vector (const unsigned int deg)
@@ -233,7 +221,7 @@ FE_BDM<dim>::get_dpo_vector (const unsigned int deg)
 
                                    // and then there are interior dofs
   unsigned int
-    interior_dofs = dim*deg*(deg-1)/2;
+    interior_dofs = dim==1?deg:dim*deg*(deg-1)/2;
   if (dim>2)
     {
       interior_dofs *= deg-2;
@@ -249,23 +237,16 @@ FE_BDM<dim>::get_dpo_vector (const unsigned int deg)
 
 
 
-#if deal_II_dimension == 1
-
-template <>
-std::vector<bool>
-FE_BDM<1>::get_ria_vector (const unsigned int)
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return std::vector<bool>();
-}
-
-#endif
-
-
 template <int dim>
 std::vector<bool>
 FE_BDM<dim>::get_ria_vector (const unsigned int deg)
 {
+  if (dim==1)
+    {
+      Assert (false, ExcImpossibleInDim(1));
+      return std::vector<bool>();
+    }
+
   Assert(dim==2, ExcNotImplemented());
   const unsigned int dofs_per_cell = PolynomialsBDM<dim>::compute_n_pols(deg);
   const unsigned int dofs_per_face = deg+1;
@@ -374,5 +355,8 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
 }
 
 
-template class FE_BDM<deal_II_dimension>;
 
+/*-------------- Explicit Instantiations -------------------------------*/
+#include "fe_bdm.inst"
+
+DEAL_II_NAMESPACE_CLOSE

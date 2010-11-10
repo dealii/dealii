@@ -53,7 +53,7 @@ FE_DGP<dim,spacedim>::get_name () const
 				   // this function returns, so they
 				   // have to be kept in synch
 
-  std::ostringstream namebuf;  
+  std::ostringstream namebuf;
   namebuf << "FE_DGP<" << dim << ">(" << this->degree << ")";
 
   return namebuf.str();
@@ -110,7 +110,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                (dynamic_cast<const FEDGP*>(&x_source_fe) != 0),
                typename FE::
                ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
@@ -141,7 +141,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
                (dynamic_cast<const FEDGP*>(&x_source_fe) != 0),
                typename FE::
                ExcInterpolationNotImplemented());
-  
+
   Assert (interpolation_matrix.m() == 0,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
 				0));
@@ -257,10 +257,8 @@ FE_DGP<dim,spacedim>::memory_consumption () const
 
 
 
-template class FE_DGP<deal_II_dimension>;
+// explicit instantiations
+#include "fe_dgp.inst"
 
-#if deal_II_dimension != 3
-template class FE_DGP<deal_II_dimension, deal_II_dimension+1>;
-#endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -863,7 +863,6 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 }
 
 
-#if deal_II_dimension == 2
 
 template<>
 void
@@ -882,64 +881,117 @@ MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
 	Assert(false, ExcNotImplemented());
 }
 
-#endif
 
-#if (deal_II_dimension == 1)
 
-template <int dim, int spacedim>
+template <>
 void
-MappingQ1<dim,spacedim>::compute_fill_face (
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
+MappingQ1<1,1>::compute_fill_face (
+  const typename Triangulation<1,1>::cell_iterator &,
   const unsigned int,
   const unsigned int,
   const unsigned int,
   const DataSetDescriptor,
   const std::vector<double> &,
   InternalData &,
-  std::vector<Point<spacedim> > &,
+  std::vector<Point<1> > &,
   std::vector<double> &,
-  std::vector<Tensor<1,spacedim> > &,
-  std::vector<Point<spacedim> > &) const
+  std::vector<Tensor<1,1> > &,
+  std::vector<Point<1> > &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-template <int dim,int spacedim>
+
+template <>
 void
-MappingQ1<dim,spacedim>::fill_fe_face_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
-  const unsigned,
-  const Quadrature<dim-1>&,
-  typename Mapping<dim,spacedim>::InternalDataBase&,
-  std::vector<Point<spacedim> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,spacedim> >&,
-  std::vector<Point<spacedim> >&) const
+MappingQ1<1,2>::compute_fill_face (
+  const typename Triangulation<1,2>::cell_iterator &,
+  const unsigned int,
+  const unsigned int,
+  const unsigned int,
+  const DataSetDescriptor,
+  const std::vector<double> &,
+  InternalData &,
+  std::vector<Point<2> > &,
+  std::vector<double> &,
+  std::vector<Tensor<1,2> > &,
+  std::vector<Point<2> > &) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-template <int dim,int spacedim>
+
+template <>
 void
-MappingQ1<dim,spacedim>::fill_fe_subface_values (
-  const typename Triangulation<dim,spacedim>::cell_iterator &,
+MappingQ1<1,1>::fill_fe_face_values (
+  const typename Triangulation<1,1>::cell_iterator &,
   const unsigned,
-  const unsigned,
-  const Quadrature<dim-1>&,
-  typename Mapping<dim,spacedim>::InternalDataBase&,
-  std::vector<Point<spacedim> >&,
+  const Quadrature<0>&,
+  typename Mapping<1,1>::InternalDataBase&,
+  std::vector<Point<1> >&,
   std::vector<double>&,
-  std::vector<Tensor<1,spacedim> >&,
-  std::vector<Point<spacedim> >&) const
+  std::vector<Tensor<1,1> >&,
+  std::vector<Point<1> >&) const
 {
   Assert(false, ExcNotImplemented());
 }
 
 
-#else
-// Implementation for 2D and 3D
+
+template <>
+void
+MappingQ1<1,2>::fill_fe_face_values (
+  const typename Triangulation<1,2>::cell_iterator &,
+  const unsigned,
+  const Quadrature<0>&,
+  typename Mapping<1,2>::InternalDataBase&,
+  std::vector<Point<2> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,2> >&,
+  std::vector<Point<2> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <>
+void
+MappingQ1<1,1>::fill_fe_subface_values (
+  const typename Triangulation<1,1>::cell_iterator &,
+  const unsigned,
+  const unsigned,
+  const Quadrature<0>&,
+  typename Mapping<1,1>::InternalDataBase&,
+  std::vector<Point<1> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,1> >&,
+  std::vector<Point<1> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+
+template <>
+void
+MappingQ1<1,2>::fill_fe_subface_values (
+  const typename Triangulation<1,2>::cell_iterator &,
+  const unsigned,
+  const unsigned,
+  const Quadrature<0>&,
+  typename Mapping<1,2>::InternalDataBase&,
+  std::vector<Point<2> >&,
+  std::vector<double>&,
+  std::vector<Tensor<1,2> >&,
+  std::vector<Point<2> >&) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
 
 template<int dim, int spacedim>
 void
@@ -1101,8 +1153,6 @@ MappingQ1<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<di
 		     normal_vectors);
 }
 
-
-#endif
 
 
 template<int dim, int spacedim>
@@ -1369,7 +1419,6 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-#if deal_II_dimension == 1
 
 template<>
 void
@@ -1383,9 +1432,7 @@ transform_real_to_unit_cell_internal
 	Assert(false, ExcNotImplemented());
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template<>
 void
@@ -1399,7 +1446,6 @@ transform_real_to_unit_cell_internal
 	Assert(false, ExcNotImplemented());
 }
 
-#endif
 
 
 template<int dim, int spacedim>
@@ -1486,13 +1532,8 @@ MappingQ1<dim,spacedim> StaticMappingQ1<dim,spacedim>::mapping;
 
 
 
-//---------------------------------------------------------------------------
+//--------------------------- Explicit instantiations -----------------------
+#include "mapping_q1.inst"
 
-template class MappingQ1<deal_II_dimension>;
-template struct StaticMappingQ1<deal_II_dimension>;
 
-#if deal_II_dimension != 3
-template class MappingQ1<deal_II_dimension,deal_II_dimension+1>;
-template struct StaticMappingQ1<deal_II_dimension,deal_II_dimension+1>;
-#endif
 DEAL_II_NAMESPACE_CLOSE

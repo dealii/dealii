@@ -53,51 +53,52 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-                                   // a shared pointer to factory
+                                   // use a shared pointer to factory
                                    // objects, to ensure that they get
                                    // deleted at the end of the
                                    // program run and don't end up as
                                    // apparent memory leaks to
-                                   // programs like valgrind
-  typedef
-  std_cxx1x::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> >
-  FEFactoryPointer;
-
+                                   // programs like valgrind.
                                    // a function that returns the
                                    // default set of finite element
                                    // names and factory objects for
                                    // them. used to initialize
                                    // fe_name_map below
+  template <int dim>
 #ifdef DEAL_II_ANON_NAMESPACE_BUG
     static
 #endif
-  std::map<std::string,FEFactoryPointer>
+  std::map<std::string,std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > >
   get_default_fe_names ()
   {
-    std::map<std::string,FEFactoryPointer> default_map;
+    std::map<std::string,
+             std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > > default_map;
+
+    typedef std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> >
+      FEFactoryPointer;
 
     default_map["FE_Q_Hierarchical"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
     default_map["FE_ABF"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
     default_map["FE_RaviartThomas"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
     default_map["FE_RaviartThomasNodal"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomasNodal<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomasNodal<dim> >);
     default_map["FE_Nedelec"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Nedelec<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_Nedelec<dim> >);
     default_map["FE_DGPNonparametric"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGPNonparametric<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGPNonparametric<dim> >);
     default_map["FE_DGP"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGP<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim> >);
     default_map["FE_DGPMonomial"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGPMonomial<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGPMonomial<dim> >);
     default_map["FE_DGQ"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     default_map["FE_DGQArbitraryNodes"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     default_map["FE_Q"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q<deal_II_dimension> >);
+      = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
 
     return default_map;
   }
@@ -134,17 +135,29 @@ namespace
                                    // static so that we can link
                                    // several dimensions together.
                                    //
-                                   // it is initialized at program
-                                   // start time using the function
-                                   // above. because at this time
-                                   // there are no threads running,
-                                   // there are no thread-safety
-                                   // issues here
+                                   // it is initialized at program start time
+                                   // using the function above. because at
+                                   // this time there are no threads running,
+                                   // there are no thread-safety issues
+                                   // here. since this is compiled for all
+                                   // dimensions at once, need to create
+                                   // objects for each dimension and then
+                                   // separate between them further down
   static
   std::map<std::string,
-	   std_cxx1x::shared_ptr<const FETools::FEFactoryBase<deal_II_dimension> > >
-  fe_name_map
-  = get_default_fe_names ();
+	   std_cxx1x::shared_ptr<const FETools::FEFactoryBase<1> > >
+  fe_name_map_1d
+  = get_default_fe_names<1> ();
+  static
+  std::map<std::string,
+	   std_cxx1x::shared_ptr<const FETools::FEFactoryBase<2> > >
+  fe_name_map_2d
+  = get_default_fe_names<2> ();
+  static
+  std::map<std::string,
+	   std_cxx1x::shared_ptr<const FETools::FEFactoryBase<3> > >
+  fe_name_map_3d
+  = get_default_fe_names<3> ();
 }
 
 
@@ -577,7 +590,8 @@ namespace FETools
       }
   }
 
-#if deal_II_dimension == 1
+
+
   template<>
   void
   compute_embedding_matrices(const FiniteElement<1,2> &,
@@ -587,7 +601,8 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
-#elif deal_II_dimension == 2
+
+
   template<>
   void
   compute_embedding_matrices(const FiniteElement<2,3>&,
@@ -597,7 +612,6 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
-#endif
 
 
   namespace {
@@ -763,7 +777,7 @@ namespace FETools
   }
 
 
-// This function is tested by tests/fe/internals, since it produces the matrices printed there  
+// This function is tested by tests/fe/internals, since it produces the matrices printed there
   template <int dim, typename number, int spacedim>
   void
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
@@ -773,21 +787,21 @@ namespace FETools
   {
     Assert(face_coarse==0, ExcNotImplemented());
     Assert(face_fine==0, ExcNotImplemented());
-    
+
     const unsigned int nc = GeometryInfo<dim>::max_children_per_face;
     const unsigned int n  = fe.dofs_per_face;
     const unsigned int nd = fe.n_components();
     const unsigned int degree = fe.degree;
-    
+
     const bool normal = fe.conforms(FiniteElementData<dim>::Hdiv);
     const bool tangential = fe.conforms(FiniteElementData<dim>::Hcurl);
-    
+
     for (unsigned int i=0;i<nc;++i)
       {
 	Assert(matrices[i].n() == n, ExcDimensionMismatch(matrices[i].n(),n));
 	Assert(matrices[i].m() == n, ExcDimensionMismatch(matrices[i].m(),n));
       }
-    
+
 				     // In order to make the loops below
 				     // simpler, we introduce vectors
 				     // containing for indices 0-n the
@@ -891,9 +905,9 @@ namespace FETools
 	      for (unsigned int d=1;d<dim;++d)
 		A(k*nd+d,j) = fine.shape_value_component(face_f_dofs[j],k,d);
 	  }
-    
+
     Householder<double> H(A);
-    
+
     Vector<number> v_coarse(nq*nd);
     Vector<number> v_fine(n);
 
@@ -959,7 +973,8 @@ namespace FETools
       }
   }
 
-#if deal_II_dimension == 1
+
+
   template <>
   void
   compute_projection_matrices(const FiniteElement<1,2>&,
@@ -968,7 +983,8 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
-#elif deal_II_dimension == 2
+
+
   template <>
   void
   compute_projection_matrices(const FiniteElement<2,3>&,
@@ -977,7 +993,6 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
-#endif
 
 
   template <int dim, typename number, int spacedim>
@@ -1635,10 +1650,10 @@ for (; cell!=endc; ++cell)
   }
 
 
-  template <int dim, int spacedim>
+  template <>
   void
   add_fe_name(const std::string& parameter_name,
-	      const FEFactoryBase<dim,spacedim>* factory)
+	      const FEFactoryBase<1,1>* factory)
   {
 				     // Erase everything after the
 				     // actual class name
@@ -1654,12 +1669,72 @@ for (; cell!=endc; ++cell)
 				     // until we quit this function
     Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
 
-    Assert(fe_name_map.find(name) == fe_name_map.end(),
+    Assert(fe_name_map_1d.find(name) == fe_name_map_1d.end(),
 	   ExcMessage("Cannot change existing element in finite element name list"));
 
 				     // Insert the normalized name into
 				     // the map
-    fe_name_map[name] = FEFactoryPointer(factory);
+    fe_name_map_1d[name] = 
+      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<1> > (factory);
+  }
+
+
+
+  template <>
+  void
+  add_fe_name(const std::string& parameter_name,
+	      const FEFactoryBase<2,2>* factory)
+  {
+				     // Erase everything after the
+				     // actual class name
+    std::string name = parameter_name;
+    unsigned int name_end =
+      name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+    if (name_end < name.size())
+      name.erase(name_end);
+				     // first make sure that no other
+				     // thread intercepts the
+				     // operation of this function;
+				     // for this, acquire the lock
+				     // until we quit this function
+    Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
+
+    Assert(fe_name_map_2d.find(name) == fe_name_map_2d.end(),
+	   ExcMessage("Cannot change existing element in finite element name list"));
+
+				     // Insert the normalized name into
+				     // the map
+    fe_name_map_2d[name] = 
+      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<2> > (factory);
+  }
+
+
+  template <>
+  void
+  add_fe_name(const std::string& parameter_name,
+	      const FEFactoryBase<3,3>* factory)
+  {
+				     // Erase everything after the
+				     // actual class name
+    std::string name = parameter_name;
+    unsigned int name_end =
+      name.find_first_not_of(std::string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+    if (name_end < name.size())
+      name.erase(name_end);
+				     // first make sure that no other
+				     // thread intercepts the
+				     // operation of this function;
+				     // for this, acquire the lock
+				     // until we quit this function
+    Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
+
+    Assert(fe_name_map_3d.find(name) == fe_name_map_3d.end(),
+	   ExcMessage("Cannot change existing element in finite element name list"));
+
+				     // Insert the normalized name into
+				     // the map
+    fe_name_map_3d[name] = 
+      std_cxx1x::shared_ptr<const FETools::FEFactoryBase<3> > (factory);
   }
 
 
@@ -1667,9 +1742,16 @@ for (; cell!=endc; ++cell)
   {
     namespace
     {
+				// TODO: this encapsulates the call to the
+				// dimension-dependent fe_name_map so that we
+				// have a unique interface. could be done
+				// smarter?
       template <int dim, int spacedim>
       FiniteElement<dim,spacedim>*
-      get_fe_from_name (std::string &name)
+      get_fe_from_name_ext (std::string &name,
+			    const std::map<std::string,
+			    std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > > 
+			    &fe_name_map)
       {
 					 // Extract the name of the
 					 // finite element class, which only
@@ -1713,7 +1795,8 @@ for (; cell!=endc; ++cell)
 						     // Now, the name of the
 						     // first base element is
 						     // first... Let's get it
-		    base_fes.push_back (get_fe_from_name<dim,spacedim> (name));
+		    base_fes.push_back (get_fe_from_name_ext<dim,spacedim> (name,
+									    fe_name_map));
 						     // next check whether
 						     // FESystem placed a
 						     // multiplicity after
@@ -1891,6 +1974,35 @@ for (; cell!=endc; ++cell)
 					 // do not realize that we can't get
 					 // here after throwing
 	return 0;
+      }
+
+
+
+				// need to work around problem with different
+				// name map names for different dimensions
+				// TODO: should be possible to do nicer!
+      template <int dim,int spacedim>
+      FiniteElement<dim,spacedim>* get_fe_from_name (std::string &name);
+
+      template <>
+      FiniteElement<1,1>*
+      get_fe_from_name<1> (std::string &name)
+      {
+	return get_fe_from_name_ext<1,1> (name, fe_name_map_1d);
+      }
+
+      template <>
+      FiniteElement<2,2>*
+      get_fe_from_name<2> (std::string &name)
+      {
+	return get_fe_from_name_ext<2,2> (name, fe_name_map_2d);
+      }
+
+      template <>
+      FiniteElement<3,3>*
+      get_fe_from_name<3> (std::string &name)
+      {
+	return get_fe_from_name_ext<3,3> (name, fe_name_map_3d);
       }
     }
   }
@@ -2220,495 +2332,222 @@ for (; cell!=endc; ++cell)
     Assert (X.n() == rhs_quadrature.size(), ExcInternalError());
   }
 
+
+
+  template <int dim>
+  void
+  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe,
+					 std::vector<unsigned int> &h2l)
+  {
+    Assert (h2l.size() == fe.dofs_per_cell,
+	    ExcDimensionMismatch (h2l.size(), fe.dofs_per_cell));
+    h2l = hierarchic_to_lexicographic_numbering (fe);
+  }
+
+
+
+  template <int dim>
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering (const FiniteElementData<dim> &fe)
+  {
+    Assert (fe.n_components() == 1, ExcInvalidFE());
+
+    std::vector<unsigned int> h2l (fe.dofs_per_cell);
+
+    const unsigned int dofs_per_cell = fe.dofs_per_cell;
+				     // polynomial degree
+    const unsigned int degree = fe.dofs_per_line+1;
+				     // number of grid points in each
+				     // direction
+    const unsigned int n = degree+1;
+
+				     // the following lines of code are
+				     // somewhat odd, due to the way the
+				     // hierarchic numbering is
+				     // organized. if someone would
+				     // really want to understand these
+				     // lines, you better draw some
+				     // pictures where you indicate the
+				     // indices and orders of vertices,
+				     // lines, etc, along with the
+				     // numbers of the degrees of
+				     // freedom in hierarchical and
+				     // lexicographical order
+    switch (dim)
+      {
+	case 1:
+	{
+	  h2l[0] = 0;
+	  h2l[1] = dofs_per_cell-1;
+	  for (unsigned int i=2; i<dofs_per_cell; ++i)
+	    h2l[i] = i-1;
+
+	  break;
+	}
+
+	case 2:
+	{
+	  unsigned int next_index = 0;
+					   // first the four vertices
+	  h2l[next_index++] = 0;
+	  h2l[next_index++] = n-1;
+	  h2l[next_index++] = n*(n-1);
+	  h2l[next_index++] = n*n-1;
+
+					   // left   line
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (1+i)*n;
+
+					   // right  line
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (2+i)*n-1;
+
+					   // bottom line
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = 1+i;
+
+					   // top    line
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = n*(n-1)+i+1;
+
+					   // inside quad
+	  Assert (fe.dofs_per_quad == fe.dofs_per_line*fe.dofs_per_line,
+		  ExcInternalError());
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = n*(i+1)+j+1;
+
+	  Assert (next_index == fe.dofs_per_cell, ExcInternalError());
+
+	  break;
+	}
+
+	case 3:
+	{
+	  unsigned int next_index = 0;
+					   // first the eight vertices
+	  h2l[next_index++] = 0;                 // 0
+	  h2l[next_index++] = (      1)*degree;  // 1
+	  h2l[next_index++] = (    n  )*degree;  // 2
+	  h2l[next_index++] = (    n+1)*degree;  // 3
+	  h2l[next_index++] = (n*n    )*degree;  // 4
+	  h2l[next_index++] = (n*n  +1)*degree;  // 5
+	  h2l[next_index++] = (n*n+n  )*degree;  // 6
+	  h2l[next_index++] = (n*n+n+1)*degree;  // 7
+
+					   // line 0
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (i+1)*n;
+					   // line 1
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = n-1+(i+1)*n;
+					   // line 2
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = 1+i;
+					   // line 3
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = 1+i+n*(n-1);
+
+					   // line 4
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (n-1)*n*n+(i+1)*n;
+					   // line 5
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (n-1)*(n*n+1)+(i+1)*n;
+					   // line 6
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = n*n*(n-1)+i+1;
+					   // line 7
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = n*n*(n-1)+i+1+n*(n-1);
+
+					   // line 8
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (i+1)*n*n;
+					   // line 9
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = n-1+(i+1)*n*n;
+					   // line 10
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = (i+1)*n*n+n*(n-1);
+					   // line 11
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    h2l[next_index++] = n-1+(i+1)*n*n+n*(n-1);
+
+
+					   // inside quads
+	  Assert (fe.dofs_per_quad == fe.dofs_per_line*fe.dofs_per_line,
+		  ExcInternalError());
+					   // face 0
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = (i+1)*n*n+n*(j+1);
+					   // face 1
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = (i+1)*n*n+n-1+n*(j+1);
+					   // face 2, note the orientation!
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = (j+1)*n*n+i+1;
+					   // face 3, note the orientation!
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = (j+1)*n*n+n*(n-1)+i+1;
+					   // face 4
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = n*(i+1)+j+1;
+					   // face 5
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      h2l[next_index++] = (n-1)*n*n+n*(i+1)+j+1;
+
+					   // inside hex
+	  Assert (fe.dofs_per_hex == fe.dofs_per_quad*fe.dofs_per_line,
+		  ExcInternalError());
+	  for (unsigned int i=0; i<fe.dofs_per_line; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_line; ++j)
+	      for (unsigned int k=0; k<fe.dofs_per_line; ++k)
+		h2l[next_index++]	= n*n*(i+1)+n*(j+1)+k+1;
+
+	  Assert (next_index == fe.dofs_per_cell, ExcInternalError());
+
+	  break;
+	}
+
+	default:
+	      Assert (false, ExcNotImplemented());
+      }
+
+    return h2l;
+  }
+
+
+
+  template <int dim>
+  void
+  lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe,
+					 std::vector<unsigned int>    &l2h)
+  {
+    l2h = lexicographic_to_hierarchic_numbering (fe);
+  }
+
+
+
+  template <int dim>
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering (const FiniteElementData<dim> &fe)
+  {
+    return Utilities::invert_permutation(hierarchic_to_lexicographic_numbering (fe));
+  }
+
 }
 
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-
-namespace FETools
-{
-  template class FEFactoryBase<deal_II_dimension>;
-
-  template
-  void compute_node_matrix(
-    FullMatrix<double>&,
-    const FiniteElement<deal_II_dimension>&);
-
-  template
-  void compute_component_wise(
-    const FiniteElement<deal_II_dimension>& element,
-    std::vector<unsigned int>&, std::vector<std::vector<unsigned int> >&);
-  template
-  void compute_block_renumbering (
-    const FiniteElement<deal_II_dimension>& element,
-    std::vector<unsigned int>&, std::vector<unsigned int>&_indices, bool);
-  template
-  void get_interpolation_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<double> &);
-  template
-  void get_back_interpolation_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<double> &);
-  template
-  void get_interpolation_difference_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<double> &);
-  template
-  void get_interpolation_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<float> &);
-  template
-  void get_back_interpolation_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<float> &);
-  template
-  void get_interpolation_difference_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<float> &);
-
-  template
-  void get_projection_matrix<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &,
-   const FiniteElement<deal_II_dimension> &,
-   FullMatrix<double> &);
-
-  template
-  void compute_embedding_matrices<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&,bool);
-
-  template
-  void compute_face_embedding_matrices<deal_II_dimension,double>
-  (const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&matrices)[GeometryInfo<deal_II_dimension>::max_children_per_face],
-   unsigned int, unsigned int);
-
-  template
-  void compute_projection_matrices<deal_II_dimension>
-  (const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&, bool);
-
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, Vector<double> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<double> &);
-
-#if deal_II_dimension != 3
-  template
-  void compute_block_renumbering (
-    const FiniteElement<deal_II_dimension,deal_II_dimension+1>& element,
-    std::vector<unsigned int>&, std::vector<unsigned int>&_indices, bool);
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<double> &);
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
-   Vector<double> &);
-#endif
-
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const FiniteElement<deal_II_dimension> &, Vector<double> &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<double> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const FiniteElement<deal_II_dimension> &, Vector<double> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<double> &);
-  template
-  void project_dg<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, Vector<double> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, Vector<double> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<double> &);
-
-
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, Vector<float> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<float> &);
-
-#if deal_II_dimension != 3
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<float> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
-   Vector<float> &);
-#endif
-
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const FiniteElement<deal_II_dimension> &, Vector<float> &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<float> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const FiniteElement<deal_II_dimension> &, Vector<float> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<float> &);
-  template
-  void project_dg<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, Vector<float> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, Vector<float> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<float> &);
-
-
-#ifdef DEAL_II_USE_TRILINOS
-
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &,  TrilinosWrappers::Vector &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::Vector &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const FiniteElement<deal_II_dimension> &,  TrilinosWrappers::Vector &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::Vector &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const FiniteElement<deal_II_dimension> &, TrilinosWrappers::Vector &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::Vector &);
-  template
-  void project_dg<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::Vector &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::Vector &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::Vector &);
-
-#endif
-
-
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<double> &);
-
-#if deal_II_dimension != 3
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, BlockVector<double> &);
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
-   BlockVector<double> &);
-#endif
-
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const FiniteElement<deal_II_dimension> &, BlockVector<double> &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<double> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const FiniteElement<deal_II_dimension> &, BlockVector<double> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<double> &);
-  template
-  void project_dg<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<double> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, Vector<double> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<double> &);
-
-
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<float> &);
-
-#if deal_II_dimension != 3
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, BlockVector<float> &);
-  template
-  void interpolate<deal_II_dimension,deal_II_dimension+1>
-  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
-   BlockVector<float> &);
-#endif
-
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<float> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<float> &);
-  template
-  void project_dg<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   BlockVector<float> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, Vector<float> &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<float> &);
-
-
-#ifdef DEAL_II_USE_TRILINOS
-
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &,  TrilinosWrappers::BlockVector &);
-  template
-  void interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::BlockVector &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const FiniteElement<deal_II_dimension> &,  TrilinosWrappers::BlockVector &);
-  template
-  void back_interpolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::BlockVector &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const FiniteElement<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
-  template
-  void interpolation_difference<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::BlockVector &);
-  template
-  void project_dg<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
-  template
-  void extrapolate<deal_II_dimension>
-  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
-   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   TrilinosWrappers::BlockVector &);
-
-#endif
-
-
-  template
-  void interpolate<deal_II_dimension>
-  (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const hp::DoFHandler<deal_II_dimension> &, Vector<double> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
-   const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<double> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const hp::DoFHandler<deal_II_dimension> &, Vector<float> &);
-  template
-  void interpolate<deal_II_dimension>
-  (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
-   const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
-   Vector<float> &);
-
-
-  template FiniteElement<deal_II_dimension,deal_II_dimension> *
-  get_fe_from_name<deal_II_dimension> (const std::string &);
-
-
-  template
-  void add_fe_name<deal_II_dimension>(
-    const std::string& name,
-    const FEFactoryBase<deal_II_dimension>* factory);
-
-  template
-  void
-  compute_projection_from_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
-						    const Quadrature<deal_II_dimension>    &lhs_quadrature,
-						    const Quadrature<deal_II_dimension>    &rhs_quadrature,
-						    FullMatrix<double>       &X);
-
-  template
-  void
-  compute_projection_from_quadrature_points(
-    const FullMatrix<double>                &projection_matrix,
-    const std::vector< Tensor<1, deal_II_dimension > >    &vector_of_tensors_at_qp,
-    std::vector< Tensor<1, deal_II_dimension > >          &vector_of_tensors_at_nodes);
-
-  template
-  void
-  compute_projection_from_quadrature_points(
-    const FullMatrix<double>                      &projection_matrix,
-    const std::vector<SymmetricTensor<2, deal_II_dimension> > &vector_of_tensors_at_qp,
-    std::vector<SymmetricTensor<2, deal_II_dimension> >       &vector_of_tensors_at_nodes);
-
-
-  template
-  void
-  compute_interpolation_to_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
-						     const Quadrature<deal_II_dimension>    &quadrature,
-						     FullMatrix<double>       &I_q);
-
-#if deal_II_dimension != 1
-  template
-  void
-  compute_projection_from_face_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &fe,
-							 const Quadrature<deal_II_dimension-1>    &lhs_quadrature,
-							 const Quadrature<deal_II_dimension-1>    &rhs_quadrature,
-							 const DoFHandler<deal_II_dimension>::active_cell_iterator & cell,
-							 unsigned int face,
-							 FullMatrix<double>       &X);
-#endif
-
-}
-
+#include "fe_tools.inst"
 
 
 /*----------------------------   fe_tools.cc     ---------------------------*/

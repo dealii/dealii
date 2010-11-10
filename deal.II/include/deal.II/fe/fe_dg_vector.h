@@ -190,7 +190,6 @@ class FE_DGVector
 };
 
 
-/* -------------- declaration of explicit specializations ------------- */
 
 DEAL_II_NAMESPACE_CLOSE
 

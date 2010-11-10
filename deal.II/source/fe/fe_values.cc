@@ -3412,32 +3412,16 @@ FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cel
 }
 
 
-#if deal_II_dimension == 1
-
-template <>
-void
-FEValues<1,2>::reinit (const MGDoFHandler<1,2>::cell_iterator &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-#endif
-
-#if deal_II_dimension == 2
-
-template <>
-void
-FEValues<2,3>::reinit (const MGDoFHandler<2,3>::cell_iterator &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-#endif
-
 template <int dim, int spacedim>
 void
 FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell)
 {
+  if (spacedim > dim)
+    {
+      Assert(false, ExcNotImplemented());
+      return;
+    }
+
 				   // assert that the finite elements
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
@@ -3704,32 +3688,16 @@ void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,space
 }
 
 
-#if deal_II_dimension == 1
-
-template <>
-void FEFaceValues<1,2>::reinit (const MGDoFHandler<1,2>::cell_iterator &,
-				const unsigned int)
-{
-  Assert(false,ExcNotImplemented());
-}
-
-#endif
-
-#if deal_II_dimension == 2
-
-template <>
-void FEFaceValues<2,3>::reinit (const MGDoFHandler<2,3>::cell_iterator &,
-				const unsigned int)
-{
-  Assert(false,ExcNotImplemented());
-}
-
-#endif
 
 template <int dim, int spacedim>
 void FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
 					 const unsigned int              face_no)
 {
+  if (spacedim > dim)
+    {
+      Assert(false,ExcNotImplemented());
+      return;
+    }
 				   // assert that the finite elements
 				   // passed to the constructor and
 				   // used by the DoFHandler used by
@@ -4137,56 +4105,6 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 
 
 /*------------------------------- Explicit Instantiations -------------*/
-
-template class FEValuesData<deal_II_dimension>;
-template class FEValuesBase<deal_II_dimension>;
-template class FEValues<deal_II_dimension>;
-template class FEValuesBase<deal_II_dimension>::
-CellIterator<DoFHandler<deal_II_dimension>::cell_iterator>;
-template class FEValuesBase<deal_II_dimension>::
-CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
-
-#if deal_II_dimension >= 2
-template class FEFaceValuesBase<deal_II_dimension>;
-template class FEFaceValues<deal_II_dimension>;
-template class FESubfaceValues<deal_II_dimension>;
-#endif
-
-#if deal_II_dimension != 3
-template class FEValuesData<deal_II_dimension,deal_II_dimension+1>;
-template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>;
-template class FEValues<deal_II_dimension,deal_II_dimension+1>;
-template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
-CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
-template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
- CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
-
-#if deal_II_dimension == 2
-template class FEFaceValuesBase<deal_II_dimension,deal_II_dimension+1>;
-template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
-template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
-#endif
-#endif
-
-
-namespace FEValuesViews
-{
-  template class Scalar<deal_II_dimension, deal_II_dimension>;
-  template class Vector<deal_II_dimension, deal_II_dimension>;
-  template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension>;
-
-#if deal_II_dimension != 3
-  template class Scalar<deal_II_dimension, deal_II_dimension+1>;
-  template class Vector<deal_II_dimension, deal_II_dimension+1>;
-  template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>;
-#endif
-}
-
-
-//---------------------------------------------------------------------------
-// Instantiations are in a different file using the macro IN for the vector type.
-// This way, we avoid code reduplication
-
 #include "fe_values.inst"
 
 DEAL_II_NAMESPACE_CLOSE

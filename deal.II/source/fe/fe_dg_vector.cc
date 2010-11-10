@@ -18,10 +18,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template class FE_DGVector<PolynomialsABF<deal_II_dimension>, deal_II_dimension>;
-template class FE_DGVector<PolynomialsBDM<deal_II_dimension>, deal_II_dimension>;
-template class FE_DGVector<PolynomialsNedelec<deal_II_dimension>, deal_II_dimension>;
-template class FE_DGVector<PolynomialsRaviartThomas<deal_II_dimension>, deal_II_dimension>;
+#include "fe_dg_vector.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

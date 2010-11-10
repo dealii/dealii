@@ -1,0 +1,522 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+
+  namespace FETools
+  \{
+  template class FEFactoryBase<deal_II_dimension>;
+
+  template
+  void compute_node_matrix(
+    FullMatrix<double>&,
+    const FiniteElement<deal_II_dimension>&);
+
+  template
+  void compute_component_wise(
+    const FiniteElement<deal_II_dimension>& ,
+    std::vector<unsigned int>&, std::vector<std::vector<unsigned int> >&);
+  template
+  void compute_block_renumbering (
+    const FiniteElement<deal_II_dimension>& ,
+    std::vector<unsigned int>&, std::vector<unsigned int>&, bool);
+  template
+  void get_interpolation_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<double> &);
+  template
+  void get_back_interpolation_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<double> &);
+  template
+  void get_interpolation_difference_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<double> &);
+  template
+  void get_interpolation_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<float> &);
+  template
+  void get_back_interpolation_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<float> &);
+  template
+  void get_interpolation_difference_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<float> &);
+
+  template
+  void get_projection_matrix<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &,
+   const FiniteElement<deal_II_dimension> &,
+   FullMatrix<double> &);
+
+  template
+  void compute_embedding_matrices<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&,bool);
+
+  template
+  void compute_face_embedding_matrices<deal_II_dimension,double>
+  (const FiniteElement<deal_II_dimension> &, FullMatrix<double> (&)[GeometryInfo<deal_II_dimension>::max_children_per_face],
+   unsigned int, unsigned int);
+
+  template
+  void compute_projection_matrices<deal_II_dimension>
+  (const FiniteElement<deal_II_dimension> &, std::vector<std::vector<FullMatrix<double> > >&, bool);
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, Vector<double> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<double> &);
+
+#if deal_II_dimension != 3
+  template
+  void compute_block_renumbering (
+    const FiniteElement<deal_II_dimension,deal_II_dimension+1>& ,
+    std::vector<unsigned int>&, std::vector<unsigned int>&, bool);
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<double> &);
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+   Vector<double> &);
+#endif
+
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const FiniteElement<deal_II_dimension> &, Vector<double> &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<double> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const FiniteElement<deal_II_dimension> &, Vector<double> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<double> &);
+  template
+  void project_dg<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, Vector<double> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, Vector<double> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<double> &);
+
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, Vector<float> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<float> &);
+
+#if deal_II_dimension != 3
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, Vector<float> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+   Vector<float> &);
+#endif
+
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const FiniteElement<deal_II_dimension> &, Vector<float> &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<float> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const FiniteElement<deal_II_dimension> &, Vector<float> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<float> &);
+  template
+  void project_dg<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, Vector<float> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, Vector<float> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<float> &);
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &,  TrilinosWrappers::Vector &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::Vector &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const FiniteElement<deal_II_dimension> &,  TrilinosWrappers::Vector &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::Vector &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const FiniteElement<deal_II_dimension> &, TrilinosWrappers::Vector &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::Vector &);
+  template
+  void project_dg<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::Vector &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::Vector &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::Vector &);
+
+#endif
+
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<double> &);
+
+#if deal_II_dimension != 3
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, BlockVector<double> &);
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+   BlockVector<double> &);
+#endif
+
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const FiniteElement<deal_II_dimension> &, BlockVector<double> &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<double> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const FiniteElement<deal_II_dimension> &, BlockVector<double> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<double> &);
+  template
+  void project_dg<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, BlockVector<double> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<double> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, Vector<double> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<double> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<double> &);
+
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<float> &);
+
+#if deal_II_dimension != 3
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, BlockVector<float> &);
+  template
+  void interpolate<deal_II_dimension,deal_II_dimension+1>
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &, const ConstraintMatrix &,
+   BlockVector<float> &);
+#endif
+
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<float> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const FiniteElement<deal_II_dimension> &, BlockVector<float> &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<float> &);
+  template
+  void project_dg<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, BlockVector<float> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   BlockVector<float> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, Vector<float> &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const BlockVector<float> &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<float> &);
+
+
+#ifdef DEAL_II_USE_TRILINOS
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &,  TrilinosWrappers::BlockVector &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::BlockVector &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const FiniteElement<deal_II_dimension> &,  TrilinosWrappers::BlockVector &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::BlockVector &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const FiniteElement<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::BlockVector &);
+  template
+  void project_dg<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &, TrilinosWrappers::BlockVector &);
+  template
+  void extrapolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const TrilinosWrappers::BlockVector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   TrilinosWrappers::BlockVector &);
+
+#endif
+
+
+  template
+  void interpolate<deal_II_dimension>
+  (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const hp::DoFHandler<deal_II_dimension> &, Vector<double> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const hp::DoFHandler<deal_II_dimension> &, const Vector<double> &,
+   const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<double> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const hp::DoFHandler<deal_II_dimension> &, Vector<float> &);
+  template
+  void interpolate<deal_II_dimension>
+  (const hp::DoFHandler<deal_II_dimension> &, const Vector<float> &,
+   const hp::DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   Vector<float> &);
+
+
+  template FiniteElement<deal_II_dimension,deal_II_dimension> *
+  get_fe_from_name<deal_II_dimension> (const std::string &);
+
+
+  template
+  void add_fe_name<deal_II_dimension>(
+    const std::string& ,
+    const FEFactoryBase<deal_II_dimension>* );
+
+  template
+  void
+  compute_projection_from_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &,
+						    const Quadrature<deal_II_dimension>    &,
+						    const Quadrature<deal_II_dimension>    &,
+						    FullMatrix<double>       &);
+
+  template
+  void
+  compute_projection_from_quadrature_points(
+    const FullMatrix<double>                &,
+    const std::vector< Tensor<1, deal_II_dimension > >    &,
+    std::vector< Tensor<1, deal_II_dimension > >          &);
+
+  template
+  void
+  compute_projection_from_quadrature_points(
+    const FullMatrix<double>                      &,
+    const std::vector<SymmetricTensor<2, deal_II_dimension> > &,
+    std::vector<SymmetricTensor<2, deal_II_dimension> >       &);
+
+
+  template
+  void
+  compute_interpolation_to_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &,
+						     const Quadrature<deal_II_dimension>    &,
+						     FullMatrix<double>       &);
+
+#if deal_II_dimension != 1
+  template
+  void
+  compute_projection_from_face_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &,
+							 const Quadrature<deal_II_dimension-1>    &,
+							 const Quadrature<deal_II_dimension-1>    &,
+							 const DoFHandler<deal_II_dimension>::active_cell_iterator & ,
+							 unsigned int,
+							 FullMatrix<double>       &);
+#endif
+
+  template
+  void
+  hierarchic_to_lexicographic_numbering<deal_II_dimension>
+  (const FiniteElementData<deal_II_dimension> &,
+   std::vector<unsigned int> &);
+
+  template
+  void
+  lexicographic_to_hierarchic_numbering<deal_II_dimension>
+  (const FiniteElementData<deal_II_dimension> &,
+   std::vector<unsigned int> &);
+
+  template
+  std::vector<unsigned int>
+  hierarchic_to_lexicographic_numbering<deal_II_dimension>
+  (const FiniteElementData<deal_II_dimension> &);
+
+  template
+  std::vector<unsigned int>
+  lexicographic_to_hierarchic_numbering<deal_II_dimension>
+  (const FiniteElementData<deal_II_dimension> &);
+  \}
+  }
+

@@ -139,19 +139,8 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
 
 
 
-// explicit instantiation
-template class MappingQ1Eulerian<deal_II_dimension, Vector<double> >;
-template class MappingQ1Eulerian<deal_II_dimension, Vector<float> >;
-#ifdef DEAL_II_USE_PETSC
-template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector>;
-#endif
+// explicit instantiations
+#include "mapping_q1_eulerian.inst"
 
-// Explicit instantiation for codimension one problems.
-#if deal_II_dimension != 3
-template class MappingQ1Eulerian<deal_II_dimension, Vector<double>, deal_II_dimension+1 >;
-#	ifdef DEAL_II_USE_PETSC
-template class MappingQ1Eulerian<deal_II_dimension, PETScWrappers::Vector, deal_II_dimension+1>;
-#	endif
-#endif
 
 DEAL_II_NAMESPACE_CLOSE

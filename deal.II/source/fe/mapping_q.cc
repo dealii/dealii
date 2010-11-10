@@ -56,8 +56,6 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 
 
 
-#if deal_II_dimension == 1
-
 // in 1d, it is irrelevant which polynomial degree to use, since all
 // cells are scaled linearly. Unless codimension is equal to two
 template<>
@@ -91,8 +89,6 @@ MappingQ<1>::MappingQ (const MappingQ<1> &m):
 template<>
 MappingQ<1>::~MappingQ ()
 {}
-
-#endif
 
 
 
@@ -182,8 +178,6 @@ MappingQ<dim,spacedim>::~MappingQ ()
 
 
 
-#if deal_II_dimension == 1
-
 template<>
 void
 MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
@@ -191,8 +185,6 @@ MappingQ<1>::compute_shapes_virtual (const std::vector<Point<1> > &unit_points,
 {
   MappingQ1<1>::compute_shapes_virtual(unit_points, data);
 }
-
-#endif
 
 
 
@@ -489,7 +481,6 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
 }
 
 
-#if deal_II_dimension==1
 
 template <>
 void
@@ -498,7 +489,7 @@ MappingQ<1>::set_laplace_on_quad_vector(Table<2,double> &) const
   Assert(false, ExcInternalError());
 }
 
-#else
+
 
 template<int dim, int spacedim>
 void
@@ -704,10 +695,7 @@ MappingQ<dim,spacedim>::set_laplace_on_quad_vector(Table<2,double> &loqvs) const
 	   ExcInternalError());
 }
 
-#endif
 
-
-#if deal_II_dimension==3
 
 template <>
 void
@@ -752,7 +740,6 @@ MappingQ<3>::set_laplace_on_hex_vector(Table<2,double> &lohvs) const
 	   ExcInternalError());
 }
 
-#endif
 
 
 template<int dim, int spacedim>
@@ -764,9 +751,6 @@ MappingQ<dim,spacedim>::set_laplace_on_hex_vector(Table<2,double> &) const
 
 
 
-
-#if deal_II_dimension==1
-
 template <>
 void
 MappingQ<1>::compute_laplace_vector(Table<2,double> &) const
@@ -774,7 +758,6 @@ MappingQ<1>::compute_laplace_vector(Table<2,double> &) const
   Assert(false, ExcInternalError());
 }
 
-#else
 
 
 template<int dim, int spacedim>
@@ -835,8 +818,6 @@ MappingQ<dim,spacedim>::compute_laplace_vector(Table<2,double> &lvs) const
     for (unsigned int k=0; k<n_outer; ++k)
       lvs(i,k) = -S_1_T(i,k);
 }
-
-#endif
 
 
 
@@ -959,10 +940,6 @@ MappingQ<dim,spacedim>::compute_support_points_laplace(const typename Triangulat
 
 
 
-
-
-#if deal_II_dimension==1
-
 template <>
 void
 MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
@@ -973,6 +950,7 @@ MappingQ<1>::add_line_support_points (const Triangulation<1>::cell_iterator &,
   const unsigned int dim=1;
   Assert (dim > 1, ExcImpossibleInDim(dim));
 }
+
 
 
 template <>
@@ -1006,7 +984,6 @@ MappingQ<1,2>::add_line_support_points (const Triangulation<1,2>::cell_iterator 
     }
 }
 
-#endif
 
 
 template<int dim, int spacedim>
@@ -1078,10 +1055,6 @@ MappingQ<dim,spacedim>::add_line_support_points (const typename Triangulation<di
     }
 }
 
-
-
-
-#if deal_II_dimension==3
 
 
 template<>
@@ -1250,9 +1223,7 @@ add_quad_support_points(const Triangulation<3>::cell_iterator &cell,
     }
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template<>
 void
@@ -1268,7 +1239,6 @@ add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
     a.push_back(quad_points[i]);
 }
 
-#endif
 
 
 template<int dim, int spacedim>
@@ -1279,6 +1249,7 @@ add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterato
 {
   Assert (dim > 2, ExcImpossibleInDim(dim));
 }
+
 
 
 template<int dim, int spacedim>
@@ -1317,6 +1288,7 @@ MappingQ<dim,spacedim>::transform (
 				   // function
   MappingQ1<dim,spacedim>::transform(input, output, *q1_data, mapping_type);
 }
+
 
 
 template<int dim, int spacedim>
@@ -1443,11 +1415,9 @@ MappingQ<dim,spacedim>::clone () const
 }
 
 
-// explicit instantiation
-template class MappingQ<deal_II_dimension>;
 
-#if deal_II_dimension < 3
-template class MappingQ<deal_II_dimension, deal_II_dimension+1>;
-#endif
+// explicit instantiations
+#include "mapping_q.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

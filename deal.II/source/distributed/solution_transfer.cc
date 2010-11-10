@@ -235,37 +235,7 @@ namespace parallel
 
 
 // explicit instantiations
-
-namespace parallel
-{
-  namespace distributed
-  {
-#if deal_II_dimension > 1
-    template class SolutionTransfer<deal_II_dimension,Vector<double>, DoFHandler<deal_II_dimension> >;
-
-
-#ifdef DEAL_II_USE_PETSC
-    template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, DoFHandler<deal_II_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::Vector, DoFHandler<deal_II_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension> >;
-#endif
-
-#ifdef DEAL_II_USE_TRILINOS
-    template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, DoFHandler<deal_II_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::Vector, DoFHandler<deal_II_dimension> >;
-
-    template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension> >;
-#endif
-#endif
-  }
-}
+#include "solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE
 

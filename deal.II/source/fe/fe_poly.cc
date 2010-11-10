@@ -21,15 +21,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template class FE_Poly<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension>;
-template class FE_Poly<PolynomialSpace<deal_II_dimension>, deal_II_dimension>;
-template class FE_Poly<PolynomialsP<deal_II_dimension>, deal_II_dimension>;
+#include "fe_poly.inst"
 
-#if deal_II_dimension != 3
-
-template class FE_Poly<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension, deal_II_dimension+1>;
-template class FE_Poly<PolynomialSpace<deal_II_dimension>, deal_II_dimension, deal_II_dimension+1>;
-//template class FE_Poly<PolynomialsP<deal_II_dimension>, deal_II_dimension, deal_II_dimension+1>;
-
-#endif
 DEAL_II_NAMESPACE_CLOSE

@@ -55,7 +55,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
 {
   Assert (dim >= 2, ExcImpossibleInDim(dim));
   const unsigned int n_dofs = this->dofs_per_cell;
-  
+
   this->mapping_type = mapping_piola;
 				   // First, initialize the
 				   // generalized support points and
@@ -74,7 +74,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
 				   // From now on, the shape functions
 				   // will be the correct ones, not
 				   // the raw shape functions anymore.
-  
+
 				   // Reinit the vectors of
 				   // restriction and prolongation
 				   // matrices to the right sizes.
@@ -123,7 +123,7 @@ FE_ABF<dim>::get_name () const
 #else
   std::ostrstream namebuf;
 #endif
-  
+
   namebuf << "FE_ABF<" << dim << ">(" << rt_order << ")";
 
 #ifndef HAVE_STD_STRINGSTREAM
@@ -147,38 +147,6 @@ FE_ABF<dim>::clone() const
 //---------------------------------------------------------------------------
 
 
-#if deal_II_dimension == 1
-
-template <int dim>
-void
-FE_ABF<dim>::initialize_support_points (const unsigned int deg)
-{
-  return;
-  
-  Assert (false, ExcNotImplemented());
-  
-  QGauss<dim> cell_quadrature(deg+1);
-  const unsigned int n_interior_points
-    = (deg>0) ? cell_quadrature.size() : 0;
-  
-  this->generalized_support_points.resize (2 + n_interior_points);
-  
-				   // Number of the point being entered
-  unsigned int current = 0;
-
-  
-  if (deg==0) return;
-
-  interior_weights.reinit(TableIndices<3>(2+n_interior_points, 0, dim));
-  
-  for (unsigned int k=0;k<cell_quadrature.size();++k)
-    this->generalized_support_points[current++] = cell_quadrature.point(k);
-  
-  Assert (current == this->generalized_support_points.size(),
-	  ExcInternalError());
-}
-
-#else
 
 // Version for 2d and higher. See above for 1d version
 template <int dim>
@@ -219,14 +187,14 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
   if (dim>1)
     {
       QGauss<dim-1> face_points (deg+1);
-      TensorProductPolynomials<dim-1> legendre
-	= Polynomials::Legendre::generate_complete_basis(deg);
+      TensorProductPolynomials<dim-1> legendre =
+	Polynomials::Legendre::generate_complete_basis(deg);
 
       boundary_weights.reinit(n_face_points, legendre.n());
-      
+
 //       Assert (face_points.size() == this->dofs_per_face,
 // 	      ExcInternalError());
-      
+
       for (unsigned int k=0;k<n_face_points;++k)
 	{
 	  this->generalized_face_support_points[k] = face_points.point(k);
@@ -266,13 +234,13 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 	    }
 	}
     }
-  
+
   // Create Legendre basis for the
   // space D_xi Q_k
   if (deg>0)
     {
       std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
-      
+
       for (unsigned int dd=0;dd<dim;++dd)
 	{
 	  std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
@@ -282,9 +250,9 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 
 	  polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
 	}
-      
+
       interior_weights.reinit(TableIndices<3>(n_interior_points, polynomials[0]->n(), dim));
-      
+
       for (unsigned int k=0;k<cell_quadrature.size();++k)
 	{
 	  for (unsigned int i=0;i<polynomials[0]->n();++i)
@@ -292,13 +260,13 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 	      interior_weights(k,i,d) = cell_quadrature.weight(k)
 		* polynomials[d]->compute_value(i,cell_quadrature.point(k));
 	}
-      
+
       for (unsigned int d=0;d<dim;++d)
 	delete polynomials[d];
     }
-  
 
-  // Decouple the creation of the generalized support points 
+
+  // Decouple the creation of the generalized support points
   // from computation of interior weights.
   for (unsigned int k=0;k<cell_quadrature.size();++k)
     this->generalized_support_points[current++] = cell_quadrature.point(k);
@@ -307,7 +275,7 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
   // TODO: Here the canonical extension of the principle
   // behind the ABF elements is implemented. It is unclear,
   // if this really leads to the ABF spaces in 3D!
-  interior_weights_abf.reinit(TableIndices<3>(cell_quadrature.size(), 
+  interior_weights_abf.reinit(TableIndices<3>(cell_quadrature.size(),
 					      polynomials_abf[0]->n() * dim, dim));
   Tensor<1, dim> poly_grad;
 
@@ -330,21 +298,7 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 	  ExcInternalError());
 }
 
-#endif
 
-
-#if deal_II_dimension == 1
-
-template <int dim>
-void
-FE_ABF<dim>::initialize_restriction()
-{
-  unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
-  for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
-    this->restriction[iso][i].reinit(0,0);
-}
-
-#else
 
 // This function is the same Raviart-Thomas interpolation performed by
 // interpolate. Still, we cannot use interpolate, since it was written
@@ -360,6 +314,13 @@ template <int dim>
 void
 FE_ABF<dim>::initialize_restriction()
 {
+  if (dim==1)
+    {
+      unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
+      for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
+	this->restriction[iso][i].reinit(0,0);
+      return;
+    }
   unsigned int iso=RefinementCase<dim>::isotropic_refinement-1;
   QGauss<dim-1> q_base (rt_order+1);
   const unsigned int n_face_points = q_base.size();
@@ -394,7 +355,7 @@ FE_ABF<dim>::initialize_restriction()
 	  const unsigned int child
 	    = GeometryInfo<dim>::child_cell_on_face(
 	      RefinementCase<dim>::isotropic_refinement, face, sub);
-	  
+
 					   // On a certain face, we must
 					   // compute the moments of ALL
 					   // fine level functions with
@@ -426,9 +387,9 @@ FE_ABF<dim>::initialize_restriction()
 		}
 	}
     }
-  
+
   if (rt_order==0) return;
-  
+
 				   // Create Legendre basis for the
 				   // space D_xi Q_k. Here, we cannot
 				   // use the shape functions
@@ -442,7 +403,7 @@ FE_ABF<dim>::initialize_restriction()
 
       polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
     }
-  
+
   QGauss<dim> q_cell(rt_order+1);
   const unsigned int start_cell_dofs
     = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
@@ -455,11 +416,11 @@ FE_ABF<dim>::initialize_restriction()
     for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
       for (unsigned int d=0;d<dim;++d)
 	cached_values(i,k,d) = this->shape_value_component(i, q_cell.point(k), d);
-  
+
   for (unsigned int child=0;child<GeometryInfo<dim>::max_children_per_cell;++child)
     {
       Quadrature<dim> q_sub = QProjector<dim>::project_to_child(q_cell, child);
-      
+
       for (unsigned int k=0;k<q_sub.size();++k)
 	for (unsigned int i_child = 0; i_child < this->dofs_per_cell; ++i_child)
 	  for (unsigned int d=0;d<dim;++d)
@@ -472,30 +433,23 @@ FE_ABF<dim>::initialize_restriction()
 		  * polynomials[d]->compute_value(i_weight, q_sub.point(k));
 	      }
     }
-  
+
   for (unsigned int d=0;d<dim;++d)
     delete polynomials[d];
 }
 
-#endif
-
-#if deal_II_dimension == 1
-
-template <>
-std::vector<unsigned int>
-FE_ABF<1>::get_dpo_vector (const unsigned int)
-{
-  Assert (false, ExcImpossibleInDim(1));
-  return std::vector<unsigned int>();
-}
-
-#endif
 
 
 template <int dim>
 std::vector<unsigned int>
 FE_ABF<dim>::get_dpo_vector (const unsigned int rt_order)
 {
+  if (dim == 1)
+    {
+      Assert (false, ExcImpossibleInDim(1));
+      return std::vector<unsigned int>();
+    }
+
                                    // the element is face-based (not
                                    // to be confused with George
                                    // W. Bush's Faith Based
@@ -508,11 +462,11 @@ FE_ABF<dim>::get_dpo_vector (const unsigned int rt_order)
                                    // and then there are interior dofs
   const unsigned int
     interior_dofs = dim*(rt_order+1)*dofs_per_face;
-  
+
   std::vector<unsigned int> dpo(dim+1);
   dpo[dim-1] = dofs_per_face;
   dpo[dim]   = interior_dofs;
-  
+
   return dpo;
 }
 
@@ -542,7 +496,7 @@ FE_ABF<dim>::update_each (const UpdateFlags flags) const
                                      | update_piola
                                      | update_JxW_values;
   if (flags & update_gradients)
-    out |= update_gradients          | update_covariant_transformation 
+    out |= update_gradients          | update_covariant_transformation
                                      | update_piola
                                      | update_JxW_values;
   //TODO: Set update flags appropriately and figure out, how the second
@@ -617,16 +571,16 @@ FE_ABF<dim>::has_support_on_face (const unsigned int shape_index,
                                                // these in a table
               return (face_index != GeometryInfo<dim>::opposite_face[shape_index]);
             }
-            
+
             default:
 	      return true;
           };
       };
-      
+
       default:  // other rt_order
 	return true;
     };
-  
+
   return true;
 }
 
@@ -667,10 +621,10 @@ FE_ABF<dim>::interpolate(
 	local_dofs[i+face*this->dofs_per_face] += boundary_weights(k,i)
 			 * values[face*n_face_points+k](GeometryInfo<dim>::unit_normal_direction[face]+offset);
       }
-  
+
   const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
   const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
-  
+
   for (unsigned int k=0;k<interior_weights.size(0);++k)
     for (unsigned int i=0;i<interior_weights.size(1);++i)
       for (unsigned int d=0;d<dim;++d)
@@ -693,7 +647,7 @@ FE_ABF<dim>::interpolate(
 	  // TODO: Check what the face_orientation, face_flip and face_rotation  have to be in 3D
 	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
 	  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
-	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i) 
+	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i)
 	      * values[k + fp](GeometryInfo<dim>::unit_normal_direction[face]+offset);
 	}
     }
@@ -727,7 +681,7 @@ FE_ABF<dim>::interpolate(
 	local_dofs[i+face*this->dofs_per_face] += boundary_weights(k,i)
 			 * values[GeometryInfo<dim>::unit_normal_direction[face]][face*n_face_points+k];
       }
-  
+
   const unsigned start_cell_dofs = GeometryInfo<dim>::faces_per_cell*this->dofs_per_face;
   const unsigned start_cell_points = GeometryInfo<dim>::faces_per_cell*n_face_points;
 
@@ -753,7 +707,7 @@ FE_ABF<dim>::interpolate(
 	  // TODO: Check what the face_orientation, face_flip and face_rotation have to be in 3D
 	  unsigned int k = QProjector<dim>::DataSetDescriptor::face (face, false, false, false, n_face_points);
 	  for (unsigned int i=0; i<boundary_weights_abf.size(1); ++i)
-	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i) 
+	    local_dofs[start_abf_dofs+i] += n_orient * boundary_weights_abf(k + fp, i)
 	      * values[GeometryInfo<dim>::unit_normal_direction[face]][k + fp];
 	}
     }
@@ -774,6 +728,8 @@ FE_ABF<dim>::memory_consumption () const
 }
 
 
-template class FE_ABF<deal_II_dimension>;
+
+/*-------------- Explicit Instantiations -------------------------------*/
+#include "fe_abf.inst"
 
 DEAL_II_NAMESPACE_CLOSE

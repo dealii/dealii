@@ -23,7 +23,8 @@
 
 #include <vector>
 
-using namespace dealii;
+
+DEAL_II_NAMESPACE_OPEN
 
 /**
  * The Brezzi-Douglas-Marini element.
@@ -122,5 +123,7 @@ class FE_BDM
 				      */
     std::vector<std::vector<double> > test_values;
 };
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
