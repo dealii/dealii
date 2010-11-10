@@ -27,7 +27,6 @@
 #  include <memory>
 
 #  include <base/std_cxx1x/shared_ptr.h>
-#  include <boost/scoped_ptr.hpp>
 
 #  include <Epetra_FECrsGraph.h>
 #  include <Epetra_Map.h>
