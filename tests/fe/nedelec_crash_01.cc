@@ -52,4 +52,6 @@ int main()
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof, constraints);
   constraints.close();
+
+  constraints.print (deallog.get_file_stream ());
 }
