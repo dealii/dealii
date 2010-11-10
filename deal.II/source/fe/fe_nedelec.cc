@@ -101,37 +101,45 @@ deg (p)
           
           unsigned int target_row = 0;
           
-          for (unsigned int i = 0; i < this->dofs_per_face; ++i, ++target_row)
-            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
-              this->interface_constraints (target_row, j)
-                = face_embeddings[0] (i, j);
-          
-          for (unsigned int i = this->degree; i < this->dofs_per_face;
-               ++i, ++target_row)
-            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
-              this->interface_constraints (target_row, j)
-                = face_embeddings[1] (i, j);
-          
           for (unsigned int i = 0; i < 2; ++i)
-            for (unsigned int j = i * this->degree; j < (i + 1) * this->degree;
+            for (unsigned int j = this->degree; j < 2 * this->degree;
                  ++j, ++target_row)
               for (unsigned int k = 0; k < this->dofs_per_face; ++k)
                 this->interface_constraints (target_row, k)
-                  = face_embeddings[2] (j, k);
-          
-          for (unsigned int i = 3 * this->degree;
-               i < GeometryInfo<3>::lines_per_face * this->degree;
-               ++i, ++target_row)
-            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
-              this->interface_constraints (target_row, j)
-                = face_embeddings[2] (i, j);
+                  = face_embeddings[2 * i] (j, k);
           
           for (unsigned int i = 0; i < 2; ++i)
-            for (unsigned int j = (2 * i + 1) * this->degree;
-                 j < 2 * (i + 1) * this->degree; ++j, ++target_row)
+            for (unsigned int j = 3 * this->degree;
+                 j < GeometryInfo<3>::lines_per_face * this->degree;
+                 ++j, ++target_row)
               for (unsigned int k = 0; k < this->dofs_per_face; ++k)
                 this->interface_constraints (target_row, k)
-                  = face_embeddings[3] (j, k);
+                  = face_embeddings[i] (j, k);
+          
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = i * this->degree;
+                   k < (i + 1) * this->degree; ++k, ++target_row)
+                for (unsigned int l = 0; l < this->dofs_per_face; ++l)
+                  this->interface_constraints (target_row, l)
+                    = face_embeddings[i + 2 * j] (k, l);
+          
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = 0; j < 2; ++j)
+              for (unsigned int k = (i + 2) * this->degree;
+                   k < (i + 3) * this->degree; ++k, ++target_row)
+                for (unsigned int l = 0; l < this->dofs_per_face; ++l)
+                  this->interface_constraints (target_row, l)
+                    = face_embeddings[2 * i + j] (k, l);
+          
+          for (unsigned int i = 0; i < GeometryInfo<3>::max_children_per_face;
+               ++i)
+            for (unsigned int
+                   j = GeometryInfo<3>::lines_per_face * this->degree;
+                 j < this->dofs_per_face; ++j, ++target_row)
+              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+                this->interface_constraints (target_row, k)
+                  = face_embeddings[i] (j, k);
           
           break;
         }
