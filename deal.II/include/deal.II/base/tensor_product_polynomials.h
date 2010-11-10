@@ -529,7 +529,7 @@ TensorProductPolynomials<dim>::
 x_to_the_dim (const unsigned int x)
 {
   unsigned int y = 1;
-  for (unsigned int d=0; d<dim; ++d)
+  for (int d=0; d<dim; ++d)
     y *= x;
   return y;
 }
