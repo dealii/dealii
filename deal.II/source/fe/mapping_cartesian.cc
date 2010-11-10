@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -372,72 +372,72 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 
 
 
-template <>
-void
-MappingCartesian<1,1>::fill_fe_face_values (
-  const typename Triangulation<1,1>::cell_iterator &,
-  const unsigned int,
-  const Quadrature<0>&,
-  typename Mapping<1,1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
+// template <>
+// void
+// MappingCartesian<1,1>::fill_fe_face_values (
+//   const typename Triangulation<1,1>::cell_iterator &,
+//   const unsigned int,
+//   const Quadrature<0>&,
+//   typename Mapping<1,1>::InternalDataBase&,
+//   std::vector<Point<1> >&,
+//   std::vector<double>&,
+//   std::vector<Tensor<1,1> >&,
+//   std::vector<Point<1> >&) const
+// {
+//   Assert(false, ExcNotImplemented());
+// }
 
 
-template <>
-void
-MappingCartesian<1,2>::fill_fe_face_values (
-  const typename Triangulation<1,2>::cell_iterator &,
-  const unsigned int,
-  const Quadrature<0>&,
-  typename Mapping<1,2>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<2> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-MappingCartesian<1,1>::fill_fe_subface_values (
-  const typename Triangulation<1,1>::cell_iterator &,
-  const unsigned int,
-  const unsigned int,
-  const Quadrature<0>&,
-  typename Mapping<1,1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
+// template <>
+// void
+// MappingCartesian<1,2>::fill_fe_face_values (
+//   const typename Triangulation<1,2>::cell_iterator &,
+//   const unsigned int,
+//   const Quadrature<0>&,
+//   typename Mapping<1,2>::InternalDataBase&,
+//   std::vector<Point<1> >&,
+//   std::vector<double>&,
+//   std::vector<Tensor<1,1> >&,
+//   std::vector<Point<2> >&) const
+// {
+//   Assert(false, ExcNotImplemented());
+// }
 
 
 
-template <>
-void
-MappingCartesian<1,2>::fill_fe_subface_values (
-  const typename Triangulation<1,2>::cell_iterator &,
-  const unsigned int,
-  const unsigned int,
-  const Quadrature<0>&,
-  typename Mapping<1,2>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<2> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
+// template <>
+// void
+// MappingCartesian<1,1>::fill_fe_subface_values (
+//   const typename Triangulation<1,1>::cell_iterator &,
+//   const unsigned int,
+//   const unsigned int,
+//   const Quadrature<0>&,
+//   typename Mapping<1,1>::InternalDataBase&,
+//   std::vector<Point<1> >&,
+//   std::vector<double>&,
+//   std::vector<Tensor<1,1> >&,
+//   std::vector<Point<1> >&) const
+// {
+//   Assert(false, ExcNotImplemented());
+// }
+
+
+
+// template <>
+// void
+// MappingCartesian<1,2>::fill_fe_subface_values (
+//   const typename Triangulation<1,2>::cell_iterator &,
+//   const unsigned int,
+//   const unsigned int,
+//   const Quadrature<0>&,
+//   typename Mapping<1,2>::InternalDataBase&,
+//   std::vector<Point<1> >&,
+//   std::vector<double>&,
+//   std::vector<Tensor<1,1> >&,
+//   std::vector<Point<2> >&) const
+// {
+//   Assert(false, ExcNotImplemented());
+// }
 
 
 

@@ -886,7 +886,7 @@ MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
 template <>
 void
 MappingQ1<1,1>::compute_fill_face (
-  const typename Triangulation<1,1>::cell_iterator &,
+  const Triangulation<1,1>::cell_iterator &,
   const unsigned int,
   const unsigned int,
   const unsigned int,
@@ -906,7 +906,7 @@ MappingQ1<1,1>::compute_fill_face (
 template <>
 void
 MappingQ1<1,2>::compute_fill_face (
-  const typename Triangulation<1,2>::cell_iterator &,
+  const Triangulation<1,2>::cell_iterator &,
   const unsigned int,
   const unsigned int,
   const unsigned int,
@@ -926,10 +926,10 @@ MappingQ1<1,2>::compute_fill_face (
 template <>
 void
 MappingQ1<1,1>::fill_fe_face_values (
-  const typename Triangulation<1,1>::cell_iterator &,
+  const Triangulation<1,1>::cell_iterator &,
   const unsigned,
   const Quadrature<0>&,
-  typename Mapping<1,1>::InternalDataBase&,
+  Mapping<1,1>::InternalDataBase&,
   std::vector<Point<1> >&,
   std::vector<double>&,
   std::vector<Tensor<1,1> >&,
@@ -943,10 +943,10 @@ MappingQ1<1,1>::fill_fe_face_values (
 template <>
 void
 MappingQ1<1,2>::fill_fe_face_values (
-  const typename Triangulation<1,2>::cell_iterator &,
+  const Triangulation<1,2>::cell_iterator &,
   const unsigned,
   const Quadrature<0>&,
-  typename Mapping<1,2>::InternalDataBase&,
+  Mapping<1,2>::InternalDataBase&,
   std::vector<Point<2> >&,
   std::vector<double>&,
   std::vector<Tensor<1,2> >&,
@@ -960,11 +960,11 @@ MappingQ1<1,2>::fill_fe_face_values (
 template <>
 void
 MappingQ1<1,1>::fill_fe_subface_values (
-  const typename Triangulation<1,1>::cell_iterator &,
+  const Triangulation<1,1>::cell_iterator &,
   const unsigned,
   const unsigned,
   const Quadrature<0>&,
-  typename Mapping<1,1>::InternalDataBase&,
+  Mapping<1,1>::InternalDataBase&,
   std::vector<Point<1> >&,
   std::vector<double>&,
   std::vector<Tensor<1,1> >&,
@@ -978,11 +978,11 @@ MappingQ1<1,1>::fill_fe_subface_values (
 template <>
 void
 MappingQ1<1,2>::fill_fe_subface_values (
-  const typename Triangulation<1,2>::cell_iterator &,
+  const Triangulation<1,2>::cell_iterator &,
   const unsigned,
   const unsigned,
   const Quadrature<0>&,
-  typename Mapping<1,2>::InternalDataBase&,
+  Mapping<1,2>::InternalDataBase&,
   std::vector<Point<2> >&,
   std::vector<double>&,
   std::vector<Tensor<1,2> >&,
