@@ -568,14 +568,14 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * singular value decomposition
 				      * <i>USV<sup>T</sup></i>.
 				      */
-    boost::shared_ptr<LAPACKFullMatrix<number> > svd_u;
+    std_cxx1x::shared_ptr<LAPACKFullMatrix<number> > svd_u;
 				     /**
 				      * The matrix
 				      * <i>V<sup>T</sup></i> in the
 				      * singular value decomposition
 				      * <i>USV<sup>T</sup></i>.
 				      */
-    boost::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
+    std_cxx1x::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
 };
 
 

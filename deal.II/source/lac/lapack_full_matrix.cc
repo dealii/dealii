@@ -242,8 +242,8 @@ LAPACKFullMatrix<number>::compute_svd()
   std::fill(wr.begin(), wr.end(), 0.);
   ipiv.resize(8*mm);
   
-  svd_u  = boost::shared_ptr<LAPACKFullMatrix<number> >(new LAPACKFullMatrix<number>(mm,mm));
-  svd_vt = boost::shared_ptr<LAPACKFullMatrix<number> >(new LAPACKFullMatrix<number>(nn,nn));
+  svd_u  = std_cxx1x::shared_ptr<LAPACKFullMatrix<number> >(new LAPACKFullMatrix<number>(mm,mm));
+  svd_vt = std_cxx1x::shared_ptr<LAPACKFullMatrix<number> >(new LAPACKFullMatrix<number>(nn,nn));
   number* mu  = const_cast<number*> (svd_u->data());
   number* mvt = const_cast<number*> (svd_vt->data());
   int info;
