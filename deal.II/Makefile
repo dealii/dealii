@@ -27,7 +27,7 @@ help:
 deps:
 	cd common/scripts && $(MAKE) $(MAKEOPTIONS)
 	@cd source && if $(MAKE) $(MAKEOPTIONS) Makefile.dep;\
-	  then echo > /dev/null ;\
+	  then : ;\
 	  else rm Makefile.dep && $(MAKE) $(MAKEOPTIONS) Makefile.dep; fi
 	cd lib && $(MAKE) $(MAKEOPTIONS) external-links
 
