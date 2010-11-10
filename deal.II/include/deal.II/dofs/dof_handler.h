@@ -1051,7 +1051,7 @@ class DoFHandler  :  public Subscriptor
 				      * dof handler.
 				      *
 				      * If an FESystem is used in
-				      * distribute_dofs(), degrees ofd
+				      * distribute_dofs(), degrees of
 				      * freedom naturally split into
 				      * several @ref GlossBlock
 				      * "blocks". For each base element
