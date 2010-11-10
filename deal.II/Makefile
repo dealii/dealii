@@ -2,6 +2,7 @@
 #
 # Makefile for the whole library
 
+SHELL=/bin/bash
 
 help:
 	@echo "========================================================================"
@@ -25,7 +26,9 @@ help:
 
 deps:
 	cd common/scripts && $(MAKE) $(MAKEOPTIONS)
-	cd source && $(MAKE) $(MAKEOPTIONS) Makefile.dep
+	@cd source && if $(MAKE) $(MAKEOPTIONS) Makefile.dep;\
+	  then echo > /dev/null ;\
+	  else rm Makefile.dep && $(MAKE) $(MAKEOPTIONS) Makefile.dep; fi
 	cd lib && $(MAKE) $(MAKEOPTIONS) external-links
 
 
