@@ -70,20 +70,75 @@ deg (p)
 
   FETools::compute_face_embedding_matrices<dim,double>
     (*this, face_embeddings, 0, 0);
-  this->interface_constraints.reinit ((1 << (dim - 1)) * this->dofs_per_face,
-                                      this->dofs_per_face);
-
-  unsigned int target_row = 0;
-
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)
-    for (unsigned int j = 0; j < face_embeddings[i].m (); ++j)
-      {
-        for (unsigned int k = 0; k < face_embeddings[i].n (); ++k)
-          this->interface_constraints (target_row, k)
-            = face_embeddings[i] (j, k);
-
-        ++target_row;
-      }
+  
+  switch (dim)
+    {
+      case 1:
+        { 
+          this->interface_constraints.reinit (0, 0);
+          break;
+        }
+      
+      case 2:
+        { 
+          this->interface_constraints.reinit (2 * this->dofs_per_face,
+                                              this->dofs_per_face);
+          
+          for (unsigned int i = 0; i < GeometryInfo<2>::max_children_per_face;
+               ++i)
+            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+                this->interface_constraints (i * this->dofs_per_face + j, k)
+                  = face_embeddings[i] (j, k);
+          
+          break;
+        }
+      
+      case 3:
+        {
+          this->interface_constraints.reinit
+          (4 * (this->dofs_per_face - this->degree), this->dofs_per_face);
+          
+          unsigned int target_row = 0;
+          
+          for (unsigned int i = 0; i < this->dofs_per_face; ++i, ++target_row)
+            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+              this->interface_constraints (target_row, j)
+                = face_embeddings[0] (i, j);
+          
+          for (unsigned int i = this->degree; i < this->dofs_per_face;
+               ++i, ++target_row)
+            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+              this->interface_constraints (target_row, j)
+                = face_embeddings[1] (i, j);
+          
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = i * this->degree; j < (i + 1) * this->degree;
+                 ++j, ++target_row)
+              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+                this->interface_constraints (target_row, k)
+                  = face_embeddings[2] (j, k);
+          
+          for (unsigned int i = 3 * this->degree;
+               i < GeometryInfo<3>::lines_per_face * this->degree;
+               ++i, ++target_row)
+            for (unsigned int j = 0; j < this->dofs_per_face; ++j)
+              this->interface_constraints (target_row, j)
+                = face_embeddings[2] (i, j);
+          
+          for (unsigned int i = 0; i < 2; ++i)
+            for (unsigned int j = (2 * i + 1) * this->degree;
+                 j < 2 * (i + 1) * this->degree; ++j, ++target_row)
+              for (unsigned int k = 0; k < this->dofs_per_face; ++k)
+                this->interface_constraints (target_row, k)
+                  = face_embeddings[3] (j, k);
+          
+          break;
+        }
+      
+      default:
+        Assert (false, ExcNotImplemented ());
+    }
 }
 
 
