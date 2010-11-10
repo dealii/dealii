@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2006, 2010 by the deal.II authors
 //
@@ -12,6 +12,8 @@
 //----------------------------------------------------------------------
 
 #include <grid/tria.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_accessor.h>
 #include <grid/grid_generator.h>
 
 /**
@@ -86,7 +88,7 @@ namespace TestGrids
     deallog << " steps " << tr.n_active_cells() << " active cells "
 	    << tr.n_cells() << " total cells " << std::endl;
   }
-  
+
 				   /**
 				    * Create a star-shaped mesh,
 				    * having more than the average
