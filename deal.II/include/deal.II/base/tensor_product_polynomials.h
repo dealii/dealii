@@ -54,8 +54,8 @@ DEAL_II_NAMESPACE_OPEN
  * polynomial space it gives the indices i,j,k of the one-dimensional
  * polynomials in x,y and z direction. The ordering of the
  * dim-dimensional polynomials can be changed by using the
- * set_numbering() function. 
- * 
+ * set_numbering() function.
+ *
  * @author Ralf Hartmann, 2000, 2004, Guido Kanschat, 2000, Wolfgang Bangerth 2003
  */
 template <int dim>
@@ -69,7 +69,7 @@ class TensorProductPolynomials
 				      * in other classes.
 				      */
     static const unsigned int dimension = dim;
-    
+
 				     /**
 				      * Constructor. <tt>pols</tt> is
 				      * a vector of objects that
@@ -81,7 +81,7 @@ class TensorProductPolynomials
 				      */
     template <class Pol>
     TensorProductPolynomials (const std::vector<Pol> &pols);
-    
+
 				     /**
 				      * Prints the list of the indices
 				      * to <tt>out</tt>.
@@ -137,7 +137,7 @@ class TensorProductPolynomials
                   std::vector<double>         &values,
                   std::vector<Tensor<1,dim> > &grads,
                   std::vector<Tensor<2,dim> > &grad_grads) const;
-    
+
 				     /**
 				      * Computes the value of the
 				      * <tt>i</tt>th tensor product
@@ -226,7 +226,7 @@ class TensorProductPolynomials
 				      */
     unsigned int n () const;
 
-	    
+
   private:
 				     /**
 				      * Copy of the vector <tt>pols</tt> of
@@ -263,9 +263,11 @@ class TensorProductPolynomials
                                       * for each space direction,
                                       * given the index <i>i</i>.
                                       */
+				// fix to avoid compiler warnings about zero
+				// length arrays
     void compute_index (const unsigned int i,
-                        unsigned int       (&indices)[dim]) const;
-    
+                        unsigned int       (&indices)[(dim>0?dim:1)]) const;
+
 				     /**
 				      * Computes
 				      * <i>x<sup>dim</sup></i> for
@@ -315,7 +317,7 @@ TensorProductPolynomials<dim>::get_numbering_inverse() const
  * few polynomials are thus <tt>Px1(x)Py1(y)</tt>, <tt>Px2(x)Py1(y)</tt>,
  * <tt>Px3(x)Py1(y)</tt>, ..., <tt>Px1(x)Py2(y)</tt>, <tt>Px2(x)Py2(y)</tt>,
  * <tt>Px3(x)Py2(y)</tt>, ..., and likewise in 3d.
- * 
+ *
  * @author Wolfgang Bangerth 2003
  */
 template <int dim>
@@ -366,7 +368,7 @@ class AnisotropicPolynomials
                   std::vector<double>         &values,
                   std::vector<Tensor<1,dim> > &grads,
                   std::vector<Tensor<2,dim> > &grad_grads) const;
-    
+
 				     /**
 				      * Computes the value of the
 				      * <tt>i</tt>th tensor product
@@ -487,7 +489,7 @@ class AnisotropicPolynomials
                                       */
     void compute_index (const unsigned int i,
                         unsigned int       (&indices)[dim]) const;
-    
+
 				     /**
 				      * Given the input to the
 				      * constructor, compute
@@ -552,7 +554,7 @@ TensorProductPolynomials(const std::vector<Pol> &pols)
     {
       index_map[i]=i;
       index_map_inverse[i]=i;
-    }  
+    }
 }
 
 
