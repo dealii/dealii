@@ -122,19 +122,15 @@ ConstraintMatrix::add_lines (const IndexSet &lines)
 
 
 void
-ConstraintMatrix::add_entries (const unsigned int                        line,
-                               const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
+ConstraintMatrix::add_entries
+  (const unsigned int                                  line,
+   const std::vector<std::pair<unsigned int,double> > &col_val_pairs)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
   Assert (is_constrained(line), ExcLineInexistant(line));
 
   ConstraintLine * line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
-
-				   // if the loop didn't break, then
-				   // line_ptr must be begin().
-				   // we have an error if that doesn't
-				   // point to 'line' then
 
 				   // if in debug mode, check whether an
 				   // entry for this column already
@@ -152,7 +148,7 @@ ConstraintMatrix::add_entries (const unsigned int                        line,
       Assert (line != col_val_pair->first,
 	      ExcMessage ("Can't constrain a degree of freedom to itself"));
 
-      for (std::vector<std::pair<unsigned int,double> >::const_iterator
+      for (ConstraintLine::Entries::const_iterator
              p=line_ptr->entries.begin();
 	   p != line_ptr->entries.end(); ++p)
 	if (p->first == col_val_pair->first)
@@ -355,17 +351,16 @@ void ConstraintMatrix::close ()
 		else
 						   // the DoF that we
 						   // encountered is not
-						   // constrained by a
-						   // linear combination of
-						   // other dofs but is
-						   // equal to zero
+						   // constrained by a linear
+						   // combination of other
+						   // dofs but is equal to
+						   // just the inhomogeneity
 						   // (i.e. its chain of
 						   // entries is empty). in
-						   // that case, we can't
-						   // just overwrite the
-						   // current entry, but we
-						   // have to actually
-						   // eliminate it
+						   // that case, we can't just
+						   // overwrite the current
+						   // entry, but we have to
+						   // actually eliminate it
 		  {
 		    line->entries.erase (line->entries.begin()+entry);
 		  }
@@ -405,14 +400,15 @@ void ConstraintMatrix::close ()
 				       // bound on the length of constraint
 				       // chains
       ++iteration;
-      Assert (iteration <= lines.size(),
-	      ExcInternalError());
+      Assert (iteration <= lines.size(), ExcInternalError());
     }
 
 				   // finally sort the entries and re-scale
-				   // them if necessary. in this step, we
-				   // also throw out duplicates as mentioned
-				   // above
+				   // them if necessary. in this step, we also
+				   // throw out duplicates as mentioned
+				   // above. moreover, as some entries might
+				   // have had zero weights, we replace them
+				   // by a vector with sharp sizes.
   for (std::vector<ConstraintLine>::iterator line = lines.begin();
        line!=lines.end(); ++line)
     {
@@ -421,68 +417,64 @@ void ConstraintMatrix::close ()
                                        // loop over the now sorted list and
                                        // see whether any of the entries
                                        // references the same dofs more than
-                                       // once
+                                       // once in order to find how many
+                                       // non-duplicate entries we have. This
+                                       // lets us allocate the correct amount
+                                       // of memory for the constraint
+                                       // entries.
+      unsigned int duplicates = 0;
       for (unsigned int i=1; i<line->entries.size(); ++i)
-        if (line->entries[i].first == line->entries[i-1].first)
-          {
-                                             // ok, we've found a
-                                             // duplicate. go on to count
-                                             // how many duplicates there
-                                             // are so that we can allocate
-                                             // the right amount of memory
-            unsigned int duplicates = 1;
-            for (unsigned int j=i+1; j<line->entries.size(); ++j)
-              if (line->entries[j].first == line->entries[j-1].first)
-                ++duplicates;
+	if (line->entries[i].first == line->entries[i-1].first)
+	  duplicates++;
 
-            std::vector<std::pair<unsigned int, double> > new_entries;
-            new_entries.reserve (line->entries.size() - duplicates);
+      if (duplicates > 0 || line->entries.size() < line->entries.capacity())
+	{
+	  ConstraintLine::Entries new_entries;
 
-                                             // now copy all entries
-                                             // with unique keys. copy
-                                             // verbatim the entries
-                                             // at the front for which
-                                             // we have already
-                                             // determined that they
-                                             // have no duplicate
-                                             // copies
-            new_entries.insert (new_entries.begin(),
-                                line->entries.begin(),
-                                line->entries.begin()+i);
-                                             // now for the rest
-            for (unsigned int j=i; j<line->entries.size(); ++j)
-              if (line->entries[j].first == line->entries[j-1].first)
-                {
-                  Assert (new_entries.back().first == line->entries[j].first,
-                          ExcInternalError());
-                  new_entries.back().second += line->entries[j].second;
-                }
-              else
-                new_entries.push_back (line->entries[j]);
+                                             // if we have no duplicates, copy
+                                             // verbatim the entries. this
+                                             // way, the final size is of the
+                                             // vector is correct.
+	  if (duplicates == 0)
+	    new_entries = line->entries;
+	  else
+	    {
+                                             // otherwise, we need to go
+                                             // through the list by and and
+                                             // resolve the duplicates
+	      new_entries.reserve (line->entries.size() - duplicates);
+	      new_entries.push_back(line->entries[0]);
+	      for (unsigned int j=1; j<line->entries.size(); ++j)
+		if (line->entries[j].first == line->entries[j-1].first)
+		  {
+		    Assert (new_entries.back().first == line->entries[j].first,
+			    ExcInternalError());
+		    new_entries.back().second += line->entries[j].second;
+		  }
+		else
+		  new_entries.push_back (line->entries[j]);
 
-            Assert (new_entries.size() == line->entries.size() - duplicates,
-                    ExcInternalError());
+	      Assert (new_entries.size() == line->entries.size() - duplicates,
+		      ExcInternalError());
 
                                              // make sure there are
                                              // really no duplicates
                                              // left and that the list
                                              // is still sorted
-            for (unsigned int j=1; j<new_entries.size(); ++j)
-              {
-                Assert (new_entries[j].first != new_entries[j-1].first,
-                        ExcInternalError());
-                Assert (new_entries[j].first > new_entries[j-1].first,
-                        ExcInternalError());
-              }
-
+	      for (unsigned int j=1; j<new_entries.size(); ++j)
+		{
+		  Assert (new_entries[j].first != new_entries[j-1].first,
+			  ExcInternalError());
+		  Assert (new_entries[j].first > new_entries[j-1].first,
+			  ExcInternalError());
+		}
+	    }
 
                                              // replace old list of
-                                             // constraints for this
-                                             // dof by the new one and
-                                             // quit loop
-            line->entries.swap (new_entries);
-            break;
-          }
+                                             // constraints for this dof by
+                                             // the new one
+	  line->entries.swap (new_entries);
+	}
 
 				       // finally do the following
 				       // check: if the sum of
@@ -519,28 +511,25 @@ void ConstraintMatrix::close ()
 	    line->entries[i].second /= sum;
 	  line->inhomogeneity /= sum;
 	}
-    }
+    } // end of loop over all constraint lines
 
 #ifdef DEBUG
-				   // if in debug mode: check that no
-				   // dof is constraint to another dof
-				   // that is also
-				   // constrained. exclude dofs from
-				   // this check whose constraint
-				   // lines would not be store on the
-				   // local processor
+				   // if in debug mode: check that no dof is
+				   // constrained to another dof that is also
+				   // constrained. exclude dofs from this
+				   // check whose constraint lines are not
+				   // stored on the local processor
   for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
        line!=lines.end(); ++line)
-    for (std::vector<std::pair<unsigned int,double> >::const_iterator
+    for (ConstraintLine::Entries::const_iterator
 	   entry=line->entries.begin();
 	 entry!=line->entries.end(); ++entry)
       if ((local_lines.size() == 0)
 	  ||
 	  (local_lines.is_element(entry->first)))
 	{
-					   // make sure that
-					   // entry->first is not the
-					   // index of a line itself
+					   // make sure that entry->first is
+					   // not the index of a line itself
 	  const bool is_circle = is_constrained(entry->first);
 	  Assert (is_circle == false,
 		  ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
@@ -584,7 +573,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 				   // constraint lines with a new one
 				   // where constraints are replaced
 				   // if necessary.
-  std::vector<std::pair<unsigned int,double> > tmp;
+  ConstraintLine::Entries tmp;
   for (std::vector<ConstraintLine>::iterator line=lines.begin();
        line!=lines.end(); ++line)
     {
@@ -613,18 +602,17 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 					     // with multiplied
 					     // weights
 	    {
-	      const std::vector<std::pair<unsigned int,double> >*
-		other_line
+	      const ConstraintLine::Entries* other_line
 		= other_constraints.get_constraint_entries (line->entries[i].first);
 	      Assert (other_line != 0,
 		      ExcInternalError());
-	      
+
 	      const double weight = line->entries[i].second;
-	      
-	      for (std::vector<std::pair<unsigned int, double> >::const_iterator
-		     j=other_line->begin();
+
+	      for (ConstraintLine::Entries::const_iterator j=other_line->begin();
 		   j!=other_line->end(); ++j)
-		tmp.push_back (std::make_pair(j->first, j->second*weight));
+		tmp.push_back (std::pair<unsigned int,double>(j->first,
+							      j->second*weight));
 
 	      line->inhomogeneity += other_constraints.get_inhomogeneity(line->entries[i].first) *
 				     line->entries[i].second;
@@ -656,11 +644,11 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 		  AssertThrow (false,
 			       ExcDoFIsConstrainedFromBothObjects (line->line));
 		  break;
-		  
+
 	    case left_object_wins:
 						   // ignore this constraint
 		  break;
-		  
+
 	    case right_object_wins:
 						   // we need to replace the
 						   // existing constraint by
@@ -676,7 +664,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 		  Assert (false, ExcNotImplemented());
 	  }
       }
-  
+
 				   // if the object was sorted before,
 				   // then make sure it is so
 				   // afterwards as well. otherwise
@@ -704,7 +692,7 @@ void ConstraintMatrix::shift (const unsigned int offset)
        i != lines.end(); ++i)
     {
       i->line += offset;
-      for (std::vector<std::pair<unsigned int,double> >::iterator
+      for (ConstraintLine::Entries::iterator
 	     j = i->entries.begin();
 	   j != i->entries.end(); ++j)
 	j->first += offset;
