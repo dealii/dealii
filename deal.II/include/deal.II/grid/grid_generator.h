@@ -794,7 +794,7 @@ class GridGenerator
     static
     void
     colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria);
-    
+
 				     /**
 				      * Perform the action specified
 				      * by the @p colorize flag of
