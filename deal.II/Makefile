@@ -25,11 +25,11 @@ help:
 	@echo "========================================================================"
 
 deps:
-	cd common/scripts && $(MAKE) $(MAKEOPTIONS)
+	@cd common/scripts && $(MAKE) $(MAKEOPTIONS)
 	@cd source && if $(MAKE) $(MAKEOPTIONS) Makefile.dep;\
 	  then : ;\
 	  else rm Makefile.dep && $(MAKE) $(MAKEOPTIONS) Makefile.dep; fi
-	cd lib && $(MAKE) $(MAKEOPTIONS) external-links
+	@cd lib && $(MAKE) $(MAKEOPTIONS) external-links
 
 
 all: debug optimized
@@ -41,7 +41,7 @@ optimized: deps contrib
 	@cd source && $(MAKE) optimized
 
 contrib:
-	cd contrib && $(MAKE)
+	@cd contrib && $(MAKE)
 
 online-doc doc:
 	cd doc && $(MAKE)
@@ -71,32 +71,32 @@ clean: clean-contrib clean-source \
 	-rm -f TODO common/TAGS
 
 clean-contrib:
-	cd contrib && $(MAKE) clean
+	@cd contrib && $(MAKE) clean
 
 clean-source:
-	cd source && $(MAKE) CLEAN=yes clean
+	@cd source && $(MAKE) CLEAN=yes clean
 
 clean-doc:
-	cd doc && $(MAKE) CLEAN=yes clean
+	@cd doc && $(MAKE) CLEAN=yes clean
 
 clean-examples:
-	cd examples && $(MAKE) CLEAN=yes clean
+	@cd examples && $(MAKE) CLEAN=yes clean
 
 clean-lib:
-	cd lib && $(MAKE) CLEAN=yes clean
+	@cd lib && $(MAKE) CLEAN=yes clean
 
 # if that directory exists, go into 'tests' and clean up there as well
 clean-tests:
-	-cd tests && $(MAKE) clean
+	@-cd tests && $(MAKE) clean
 
 clean-common-scripts:
-	cd common/scripts && $(MAKE) clean
+	@cd common/scripts && $(MAKE) clean
 
 distclean: clean
-	cd lib && $(MAKE) distclean
-	-cd tests && $(MAKE) distclean
-	-rm source/*/*.inst
-	$(MAKE)	clean-common-scripts
+	@cd lib && $(MAKE) distclean
+	@-cd tests && $(MAKE) distclean
+	@-rm source/*/*.inst
+	@$(MAKE) clean-common-scripts
 
 
 
