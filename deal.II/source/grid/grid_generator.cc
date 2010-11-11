@@ -129,7 +129,7 @@ GridGenerator::hyper_rectangle (Triangulation<dim,spacedim> &tria,
   tria.create_triangulation (vertices, cells, SubCellData());
 
 				   // Assign boundary indicators
-  if (colorize && (spacedim == dim))
+  if (colorize)
     colorize_hyper_rectangle (tria);
 }
 
@@ -995,7 +995,7 @@ GridGenerator::subdivided_hyper_rectangle (
   tria.create_triangulation (points, cells, t);
 
                                   // set boundary indicator
-  if (colorize)
+  if (colorize && dim>1)
     {
       double eps = 0.01 * delta;
       Triangulation<dim>::cell_iterator cell = tria.begin_raw(),
