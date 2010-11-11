@@ -72,7 +72,7 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
 	  quadrature_int=0;
 					   // Check the polynomial x^i*y^i
 
-	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	  for (unsigned int x=0; x<quadrature.size(); ++x)
 	    {
 	      double f=1.;
 	      switch (dim)
@@ -101,13 +101,13 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
 					   // check the ordering of
 					   // the quadrature points
 	  bool in_order=true;
-	  for (unsigned int x=1; x<quadrature.n_quadrature_points; ++x)
+	  for (unsigned int x=1; x<quadrature.size(); ++x)
 	    {
 	      if (points[x](0)<=points[x-1](0))
 		in_order=false;
 	    }
 	  if (!in_order)
-	    for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	    for (unsigned int x=0; x<quadrature.size(); ++x)
 	      deallog << points[x] << std::endl;
 	}
     }
@@ -146,7 +146,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 					   // Check the polynomial
 	                                   // x^i*y^i*z^i
 
-	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	  for (unsigned int x=0; x<quadrature.size(); ++x)
 	    {
 	      long double f=1.;
 	      switch (dim)
@@ -200,21 +200,21 @@ int main()
       deallog << "QGaussLobatto(" << n << ")" << std::endl;
 
       QGaussLobatto<1> q(n);
-      for (unsigned int i=0; i<q.n_quadrature_points; ++i)
+      for (unsigned int i=0; i<q.size(); ++i)
 	deallog << q.point(i) << ' ' << q.weight(i) << std::endl;
 
 				       // the points must be
 				       // symmetrically located around
 				       // 0.5
       double p = 0;
-      for (unsigned int i=0; i<q.n_quadrature_points; ++i)
+      for (unsigned int i=0; i<q.size(); ++i)
 	p += (q.point(i)[0] - 0.5);
       Assert (std::fabs(p) < 1e-12, ExcInternalError());
 
 				       // the sum of weights must be
 				       // one
       double w = 0;
-      for (unsigned int i=0; i<q.n_quadrature_points; ++i)
+      for (unsigned int i=0; i<q.size(); ++i)
 	w += q.weight(i);
       Assert (std::fabs(w-1) < 1e-12, ExcInternalError());
     }

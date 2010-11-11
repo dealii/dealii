@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2008 by the deal.II authors 
+//    Copyright (C) 2005, 2008, 2010 by the deal.II authors 
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -566,8 +566,8 @@ BEM<spacedim>::solve()
 	                                          update_gradients |
 	                                          update_cell_normal_vectors );
    
-    std::vector< Point<spacedim> > cell_normals(q_iterated.n_quadrature_points);
-    std::vector< Point<spacedim> > cell_tangentials(q_iterated.n_quadrature_points);
+    std::vector< Point<spacedim> > cell_normals(q_iterated.size());
+    std::vector< Point<spacedim> > cell_tangentials(q_iterated.size());
     std::vector<unsigned int> local_dof_indices (fe_q.dofs_per_cell);
 
     typename DoFHandler<spacedim-1, spacedim>::active_cell_iterator
@@ -593,7 +593,7 @@ BEM<spacedim>::solve()
 
 	
 	cell_normals = fe_values_q.get_cell_normal_vectors();
-	for(unsigned int i=0; i<q_iterated.n_quadrature_points; ++i)
+	for(unsigned int i=0; i<q_iterated.size(); ++i)
 	{
 	    cell_tangentials[i][0] = cell_normals[i][1]; 
 	    cell_tangentials[i][1] = -cell_normals[i][0];
@@ -605,8 +605,8 @@ BEM<spacedim>::solve()
 				// factor (smooth_solution..) is taken
 				// so that it is the coefficient of
 				// the fun_th shape function of the cell.
-	std::vector< Tensor<1,spacedim> > gradient(q_iterated.n_quadrature_points);
-	for(unsigned int pnt=0; pnt<q_iterated.n_quadrature_points; ++pnt)
+	std::vector< Tensor<1,spacedim> > gradient(q_iterated.size());
+	for(unsigned int pnt=0; pnt<q_iterated.size(); ++pnt)
 	    for(unsigned int fun=0; fun<fe_q.dofs_per_cell; ++fun)
 	    {
 	    gradient[pnt]+=
@@ -635,7 +635,7 @@ BEM<spacedim>::solve()
 
 // 	std::cout
 // 	    << "gradienti "<<std::endl;
-// 	for(unsigned int pnt=0; pnt<q_iterated.n_quadrature_points; ++pnt)
+// 	for(unsigned int pnt=0; pnt<q_iterated.size(); ++pnt)
 // 	    std::cout
 // 		<< pnt << " - "
 // 		<< gradient[pnt]
@@ -647,7 +647,7 @@ BEM<spacedim>::solve()
 // 	    << std::endl;
 
 
-	for(unsigned int pnt=0; pnt<q_iterated.n_quadrature_points; ++pnt)
+	for(unsigned int pnt=0; pnt<q_iterated.size(); ++pnt)
 	{
 	    tangential_derivative(cell->index())=
 		contract(
@@ -670,7 +670,7 @@ BEM<spacedim>::solve()
 		
 	}
 
-// // 	for(unsigned int pnt=0; pnt<q_iterated.n_quadrature_points; ++pnt)
+// // 	for(unsigned int pnt=0; pnt<q_iterated.size(); ++pnt)
 // 	    std::cout
 // // 		<< pnt <<" - "
 // 		<< tangential_derivative(cell->index())

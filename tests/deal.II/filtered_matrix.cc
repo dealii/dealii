@@ -122,7 +122,7 @@ check ()
 		    | update_q_points | update_JxW_values);
 
   std::vector <unsigned int> global_dofs (element.dofs_per_cell);
-  std::vector <double> function (quadrature.n_quadrature_points);
+  std::vector <double> function (quadrature.size());
 
   Vector<double> f (dof.n_dofs ());
 
@@ -142,7 +142,7 @@ check ()
       cell->get_dof_indices (global_dofs);
       cosine.value_list (fe.get_quadrature_points(), function);
 
-      for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+      for (unsigned int k=0;k<quadrature.size();++k)
 	{
 	  double dx = fe.JxW (k);
 	  

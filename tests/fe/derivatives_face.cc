@@ -43,7 +43,7 @@ plot_derivatives(Mapping<dim>& mapping,
     {
       fe.reinit(c, face);
       
-      for (unsigned int k=0; k<q.n_quadrature_points;++k)
+      for (unsigned int k=0; k<q.size();++k)
 	{
 	  deallog << "Face " << face
 		  << " Point " << q.point(k) << std::endl;

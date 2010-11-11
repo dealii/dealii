@@ -69,7 +69,7 @@ check (const unsigned int p)
                                    // quadrature points of all cells
                                    // of the finer grid
   QTrapez<dim> quadrature;
-  std::vector<Vector<double> > shape_values (quadrature.n_quadrature_points,
+  std::vector<Vector<double> > shape_values (quadrature.size(),
                                              Vector<double>(dim));
   FEValues<dim> fe(fe_ned, quadrature,
                    update_values|update_q_points);
@@ -82,7 +82,7 @@ check (const unsigned int p)
       fe.reinit(c);
       fe.get_function_values (values, shape_values);
 
-      for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+      for (unsigned int q=0; q<quadrature.size(); ++q)
         {
           deallog << ", xq=" << fe.quadrature_point(q)
                   << ", f=[";

@@ -79,7 +79,7 @@ plot_faces(Mapping<dim> &mapping,
   deallog.push(name);
 
   QGauss<dim-1> q(4);
-  const unsigned int nq = (unsigned int) (.01 + std::pow(q.n_quadrature_points, 1./(dim-1)));
+  const unsigned int nq = (unsigned int) (.01 + std::pow(q.size(), 1./(dim-1)));
 
   FEFaceValues<dim> fe_values(mapping, fe, q,
 			      UpdateFlags(update_q_points
@@ -123,7 +123,7 @@ plot_subfaces(Mapping<dim> &mapping,
   deallog.push(name);
 
   QGauss<dim-1> q(4);
-  const unsigned int nq = (unsigned int) (.01 + std::pow(q.n_quadrature_points, 1./(dim-1)));
+  const unsigned int nq = (unsigned int) (.01 + std::pow(q.size(), 1./(dim-1)));
 
   FESubfaceValues<dim> fe_values(mapping, fe, q,
 				 UpdateFlags(update_q_points

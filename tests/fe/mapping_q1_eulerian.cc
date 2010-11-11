@@ -57,7 +57,7 @@ show_values(FiniteElement<dim>& fe,
   typename DoFHandler<dim>::cell_iterator c = dof.begin();
   fe_values.reinit(c);
 
-  for (unsigned int k=0; k<quadrature_formula.n_quadrature_points; ++k)
+  for (unsigned int k=0; k<quadrature_formula.size(); ++k)
     {
       deallog << quadrature_formula.point(k) << std::endl;
       deallog << "JxW: " << fe_values.JxW(k) << std::endl;

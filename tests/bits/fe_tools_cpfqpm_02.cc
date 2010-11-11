@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,15 +60,15 @@ check_this (const FiniteElement<dim> &fe,
                                    // at least as many degrees of freedom in
                                    // the finite element as there are
                                    // quadrature points
-  if (fe.dofs_per_cell < q_rhs.n_quadrature_points)
+  if (fe.dofs_per_cell < q_rhs.size())
     return;
 
   deallog << "dofs_per_cell=" << fe.dofs_per_cell
-          << ", n_q_points=" << q_rhs.n_quadrature_points
+          << ", n_q_points=" << q_rhs.size()
           << std::endl;
   
   FullMatrix<double> X (fe.dofs_per_cell,
-                        q_rhs.n_quadrature_points);
+                        q_rhs.size());
 
   FETools::compute_projection_from_quadrature_points_matrix (fe,
                                                              q_lhs, q_rhs,
@@ -77,12 +77,12 @@ check_this (const FiniteElement<dim> &fe,
                                    // then compute the matrix that
                                    // interpolates back to the quadrature
                                    // points
-  FullMatrix<double> I_q (q_rhs.n_quadrature_points, fe.dofs_per_cell);
+  FullMatrix<double> I_q (q_rhs.size(), fe.dofs_per_cell);
   FETools::compute_interpolation_to_quadrature_points_matrix (fe, q_rhs,
                                                               I_q);
 
-  FullMatrix<double> product (q_rhs.n_quadrature_points,
-                              q_rhs.n_quadrature_points);
+  FullMatrix<double> product (q_rhs.size(),
+                              q_rhs.size());
   I_q.mmult (product, X);
 
                                    // the product should be the identity

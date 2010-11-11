@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,7 +72,7 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
 	  quadrature_int=0;
 					   // Check the polynomial x^i*y^i
 
-	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	  for (unsigned int x=0; x<quadrature.size(); ++x)
 	    {
 	      double f=1.;
 	      switch (dim)
@@ -101,13 +101,13 @@ check_cells (std::vector<Quadrature<dim>*>& quadratures)
 					   // check the ordering of
 					   // the quadrature points
 	  bool in_order=true;
-	  for (unsigned int x=1; x<quadrature.n_quadrature_points; ++x)
+	  for (unsigned int x=1; x<quadrature.size(); ++x)
 	    {
 	      if (points[x](0)<=points[x-1](0))
 		in_order=false;
 	    }
 	  if (!in_order)
-	    for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	    for (unsigned int x=0; x<quadrature.size(); ++x)
 	      deallog << points[x] << std::endl;
 	}
     }  
@@ -146,7 +146,7 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 					   // Check the polynomial
 	                                   // x^i*y^i*z^i
 
-	  for (unsigned int x=0; x<quadrature.n_quadrature_points; ++x)
+	  for (unsigned int x=0; x<quadrature.size(); ++x)
 	    {
 	      long double f=1.;
 	      switch (dim)

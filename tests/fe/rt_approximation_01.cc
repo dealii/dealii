@@ -372,7 +372,7 @@ double TestProjection (Mapping<2> &mapping,
 					 update_JxW_values|
 					 update_contravariant_transformation));
 
-      const unsigned int   n_q_points    = quad.n_quadrature_points;
+      const unsigned int   n_q_points    = quad.size();
       const unsigned int   n_components   = dof_handler->get_fe().n_components();
       
 				       // Cell iterators
@@ -459,7 +459,7 @@ int main ()
 	  << ", dofs per line: " << fe.dofs_per_line
 	  << ", dofs per vertex: " <<  fe.dofs_per_vertex
 	  << std::endl;
-  deallog << "n_q_points=" << quad_temp.n_quadrature_points
+  deallog << "n_q_points=" << quad_temp.size()
 	  << std::endl;
 
 				   // Create an deformation object for

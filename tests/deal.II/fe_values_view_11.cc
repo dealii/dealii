@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,8 +52,8 @@ void test (const Triangulation<dim>& tr,
 			   update_values | update_gradients | update_hessians);
   fe_values.reinit (dof.begin_active());
 
-  std::vector<Tensor<1,dim> > selected_vector_values (quadrature.n_quadrature_points);
-  std::vector<Vector<double> > vector_values (quadrature.n_quadrature_points,
+  std::vector<Tensor<1,dim> > selected_vector_values (quadrature.size());
+  std::vector<Vector<double> > vector_values (quadrature.size(),
 					      Vector<double>(fe.n_components()));
 
   fe_values.get_function_values (fe_function, vector_values);

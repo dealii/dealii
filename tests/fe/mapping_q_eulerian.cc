@@ -2,7 +2,7 @@
 //    mapping_q_eulerian.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2008 by the deal.II authors and Joshua White
+//    Copyright (C) 2008, 2010 by the deal.II authors and Joshua White
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -125,7 +125,7 @@ double MappingTest<dim>::compute_area ()
   FEValues<dim> fe_values (mapping, fe, quadrature_formula, 
 			   update_JxW_values);
 
-  const unsigned int   n_q_points = quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points = quadrature_formula.size();
 
   long double area = 0.;
 

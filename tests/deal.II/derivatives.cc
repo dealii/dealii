@@ -75,7 +75,7 @@ check (const unsigned int level,
 		    | update_q_points | update_JxW_values);
 
   std::vector <unsigned int> global_dofs (element.dofs_per_cell);
-  std::vector <double> function (quadrature.n_quadrature_points);
+  std::vector <double> function (quadrature.size());
 
   Vector<double> u (dof.n_dofs ());
   Vector<double> f (dof.n_dofs ());
@@ -96,7 +96,7 @@ check (const unsigned int level,
       cell->get_dof_indices (global_dofs);
       cosine.value_list (fe.get_quadrature_points(), function);
 
-      for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+      for (unsigned int k=0;k<quadrature.size();++k)
 	{
 	  double dx = fe.JxW (k);
 
@@ -132,11 +132,11 @@ check (const unsigned int level,
   double h1 = 0.;
   double h2 = 0.;
 
-  std::vector<double> u_local (quadrature.n_quadrature_points);
-  std::vector<Tensor<1,dim> > Du (quadrature.n_quadrature_points);
-  std::vector<Tensor<1,dim> > Df (quadrature.n_quadrature_points);
-  std::vector<Tensor<2,dim> > DDu (quadrature.n_quadrature_points);
-  std::vector<Tensor<2,dim> > DDf (quadrature.n_quadrature_points);
+  std::vector<double> u_local (quadrature.size());
+  std::vector<Tensor<1,dim> > Du (quadrature.size());
+  std::vector<Tensor<1,dim> > Df (quadrature.size());
+  std::vector<Tensor<2,dim> > DDu (quadrature.size());
+  std::vector<Tensor<2,dim> > DDf (quadrature.size());
   
   for (cell = dof.begin_active(); cell != end;++cell)
     {
@@ -149,7 +149,7 @@ check (const unsigned int level,
       fe2.get_function_grads (u, Du);
       fe2.get_function_2nd_derivatives (u,DDu);
       
-      for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+      for (unsigned int k=0;k<quadrature.size();++k)
 	{
 	  const double dx = fe.JxW (k);
 	  double e =  u_local[k];

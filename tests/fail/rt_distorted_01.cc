@@ -2,7 +2,7 @@
 //    rt_distorted_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -273,7 +273,7 @@ double EvaluateArea (Mapping<2> &mapping,
 				     update_q_points  |
 				     update_JxW_values));
 
-  const unsigned int   n_q_points    = quad.n_quadrature_points;
+  const unsigned int   n_q_points    = quad.size();
   const unsigned int   n_components   = dof_handler->get_fe().n_components();
 
 				   // Cell iterators

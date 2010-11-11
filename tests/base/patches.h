@@ -99,7 +99,7 @@ create_continuous_patches(
 	{
 	  DataOutBase::Patch<dim, dim> patch;
 	  patch.n_subdivisions = n_sub;
-	  for (unsigned int k=0;k<trapez.n_quadrature_points;++k)
+	  for (unsigned int k=0;k<trapez.size();++k)
 	    {
 	      Point<dim> p = trapez.point(k);
 	      if (dim>=1) p(0) += i1;

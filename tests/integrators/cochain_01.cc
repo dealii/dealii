@@ -148,8 +148,10 @@ test_cochain(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
   
   MeshWorker::IntegrationInfoBox<dim> info_box;
   UpdateFlags update_flags = update_values | update_gradients;
-  info_box.add_update_flags(update_flags, true, true, true, true);
+  info_box.add_update_flags_cell(update_flags);
   info_box.initialize(fe, mapping, &dof.block_info());
+  if (debugging)
+    deallog << "Infobox ready" << std::endl;
   
   MeshWorker::DoFInfo<dim> dof_info(dof.block_info());
   
@@ -166,7 +168,8 @@ test_cochain(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
       for (unsigned int i=0;i<matrices.block(b).matrix.m();++i)
 	if (matrices.block(b).matrix.diag_element(i) == 0.)
 	  matrices.block(b).matrix.diag_element(i) = 1.;
-
+  if (debugging)
+    deallog << "Matrices ready" << std::endl;
 				   // Set up vectors
   BlockVector<double> source(dof.block_info().global());
   BlockVector<double> result1(dof.block_info().global());
@@ -195,7 +198,10 @@ test_cochain(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
       
       matrices.matrix(m+2).vmult(result1.block(d+1), source.block(d));      
 
-      solver.solve(matrices.matrix(m+3), aux.block(d+1), result1.block(d+1), PreconditionIdentity());
+      PreconditionSSOR<SparseMatrix<double> > precondition;
+      precondition.initialize(matrices.matrix(m+3), 1.2);
+      
+      solver.solve(matrices.matrix(m+3), aux.block(d+1), result1.block(d+1), precondition);
       
       matrices.matrix(m+2).Tvmult(result1.block(d), aux.block(d+1));
       matrices.matrix(m+1).vmult(result2.block(d), source.block(d));
@@ -289,6 +295,7 @@ int main()
   const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
+  deallog.log_execution_time(true);
   if (!debugging)
     {
       deallog.depth_console(0);

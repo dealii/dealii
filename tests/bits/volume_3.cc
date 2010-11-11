@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,7 +69,7 @@ void check (const Triangulation<dim> &tria)
         if (cell->at_boundary(f))
           {
             fe_face_values.reinit (cell, f);
-            for (unsigned int q=0; q<q_face.n_quadrature_points; ++q)
+            for (unsigned int q=0; q<q_face.size(); ++q)
               v1 += (fe_face_values.normal_vector(q) *
                      fe_face_values.quadrature_point(q)) *
                     fe_face_values.JxW(q);
@@ -82,7 +82,7 @@ void check (const Triangulation<dim> &tria)
           for (unsigned int sf=0; sf<GeometryInfo<dim>::max_children_per_face; ++sf)
             {
               fe_subface_values.reinit (cell, f, sf);
-              for (unsigned int q=0; q<q_face.n_quadrature_points; ++q)
+              for (unsigned int q=0; q<q_face.size(); ++q)
                 v2 += (fe_subface_values.normal_vector(q) *
                        fe_subface_values.quadrature_point(q)) *
                       fe_subface_values.JxW(q);

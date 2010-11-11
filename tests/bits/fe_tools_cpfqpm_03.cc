@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,7 +56,7 @@ check_this (const FiniteElement<dim> &fe,
   QGauss<dim> q_rhs(fe.degree+3);
       
   FullMatrix<double> X (fe.dofs_per_cell,
-                        q_rhs.n_quadrature_points);
+                        q_rhs.size());
 
   FETools::compute_projection_from_quadrature_points_matrix (fe,
                                                              q_lhs, q_rhs,

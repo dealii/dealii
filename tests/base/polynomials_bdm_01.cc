@@ -36,7 +36,7 @@ void plot(const PolynomialsBDM<dim>& poly)
   std::vector<Tensor<3,dim> > grads2;
 
   
-  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<quadrature.size();++k)
     {
       if (k%(poly.degree()+4) == 0)
 	deallog << "BDM" << poly.degree() << '<' << dim << '>' << std::endl;

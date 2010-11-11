@@ -105,7 +105,7 @@ void check (Triangulation<3> &tria)
           deallog << "Cell " << cell << ", face " << f
                   << std::endl;
 
-          for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+          for (unsigned int q=0; q<quadrature.size(); ++q)
             {
               deallog << "  " << fe_face_values1.quadrature_point(q)
                       << std::endl;

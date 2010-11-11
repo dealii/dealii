@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -121,8 +121,8 @@ void test(std::string filename)
 
   FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
 
-  std::vector< Point<spacedim> > cell_normals(q_midpoint.n_quadrature_points);
-  std::vector< Point<spacedim> > cell_tangentials(q_midpoint.n_quadrature_points);
+  std::vector< Point<spacedim> > cell_normals(q_midpoint.size());
+  std::vector< Point<spacedim> > cell_tangentials(q_midpoint.size());
   std::vector<double> shape_directional_derivative(dofs_per_cell);
   Vector<double> projected_directional_derivative(triangulation.n_cells());
 

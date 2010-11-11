@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -192,7 +192,7 @@ void MinimizationProblem<dim>::assemble_step ()
                            update_q_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe[0].dofs_per_cell;
-  const unsigned int n_q_points    = quadrature_formula[0].n_quadrature_points;
+  const unsigned int n_q_points    = quadrature_formula[0].size();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
@@ -402,9 +402,9 @@ void MinimizationProblem<1>::refine_grid ()
   hp::FEValues<dim> neighbor_fe_values (fe, quadrature,
                                     update_gradients);
 
-  std::vector<double> local_values (quadrature[0].n_quadrature_points);
-  std::vector<Tensor<1,dim> > local_gradients (quadrature[0].n_quadrature_points);
-  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature[0].n_quadrature_points);
+  std::vector<double> local_values (quadrature[0].size());
+  std::vector<Tensor<1,dim> > local_gradients (quadrature[0].size());
+  std::vector<Tensor<2,dim> > local_2nd_derivs (quadrature[0].size());
 
   hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active (),
@@ -417,7 +417,7 @@ void MinimizationProblem<1>::refine_grid ()
       fe_values.get_present_fe_values().get_function_2nd_derivatives (present_solution, local_2nd_derivs);
 
       double cell_residual_norm = 0;
-      for (unsigned int q=0; q<quadrature[0].n_quadrature_points; ++q)
+      for (unsigned int q=0; q<quadrature[0].size(); ++q)
         {
           const double x             = fe_values.get_present_fe_values().quadrature_point(q)[0];
           const double u             = local_values[q];
@@ -520,7 +520,7 @@ MinimizationProblem<dim>::energy (const hp::DoFHandler<dim> &dof_handler,
 			   update_values   | update_gradients |
                            update_q_points | update_JxW_values);
 
-  const unsigned int   n_q_points    = quadrature_formula[0].n_quadrature_points;
+  const unsigned int   n_q_points    = quadrature_formula[0].size();
 
   std::vector<double>         local_solution_values (n_q_points);
   std::vector<Tensor<1,dim> > local_solution_grads (n_q_points);

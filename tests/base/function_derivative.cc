@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,8 +35,8 @@ check_derivative_order(const std::vector<Tensor<1,dim> >& gradients,
 		       const unsigned int direction,
 		       const double order)
 {
-  std::vector<double> derivatives(quadrature.n_quadrature_points);
-  std::vector<double> differences(quadrature.n_quadrature_points);
+  std::vector<double> derivatives(quadrature.size());
+  std::vector<double> differences(quadrature.size());
 
 				   // Compute derivatives with one
 				   // step size and store errors
@@ -73,8 +73,8 @@ check_hessian_order(const std::vector<double>& values,
 		    const unsigned int direction,
 		    const double order)
 {
-  std::vector<Tensor<1,dim> > derivatives(quadrature.n_quadrature_points);
-  std::vector<Tensor<1,dim> > differences(quadrature.n_quadrature_points);
+  std::vector<Tensor<1,dim> > derivatives(quadrature.size());
+  std::vector<Tensor<1,dim> > differences(quadrature.size());
 
   const double h = (order < 3) ? 1.e-2 : 1.e-1 ;
 				   // Compute derivatives with one
@@ -122,8 +122,8 @@ check_sine(unsigned int nquad)
   
   Functions::FourierSineFunction<dim> f(wave_vector);
   
-  std::vector<double> values(quadrature.n_quadrature_points);
-  std::vector<Tensor<1,dim> > gradients(quadrature.n_quadrature_points);
+  std::vector<double> values(quadrature.size());
+  std::vector<Tensor<1,dim> > gradients(quadrature.size());
   
   f.value_list(quadrature.get_points(), values);
   f.gradient_list(quadrature.get_points(), gradients);

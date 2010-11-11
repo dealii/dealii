@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by Andrew McBride and the deal.II authors
+//    Copyright (C) 2009, 2010 by Andrew McBride and the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -165,8 +165,7 @@ void MixedElastoPlasticity<dim>::assemble_system()
 
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   deallog << "dofs_per_cell: " << fe.dofs_per_cell << std::endl;
-  const unsigned int n_q_points = quadrature_formula.size();
-
+  
   FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> local_rhs(dofs_per_cell);
 

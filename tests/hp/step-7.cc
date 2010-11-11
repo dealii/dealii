@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -265,8 +265,8 @@ void HelmholtzProblem<dim>::assemble_system ()
   hp::QCollection<dim>   quadrature_formula(QGauss<dim>(3));
   hp::QCollection<dim-1> face_quadrature_formula(QGauss<dim-1>(3));
 
-  const unsigned int n_q_points    = quadrature_formula[0].n_quadrature_points;
-  const unsigned int n_face_q_points = face_quadrature_formula[0].n_quadrature_points;
+  const unsigned int n_q_points    = quadrature_formula[0].size();
+  const unsigned int n_face_q_points = face_quadrature_formula[0].size();
 
   const unsigned int dofs_per_cell = (*fe)[0].dofs_per_cell;
 

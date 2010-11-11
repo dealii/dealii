@@ -2,7 +2,7 @@
 //    rt_7.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -53,9 +53,9 @@ plot_shape_functions(const unsigned int degree)
 
   Assert (fe.get_fe().n_components() == dim, ExcInternalError());
   
-  for (unsigned int q_point=0; q_point<q.n_quadrature_points; ++q_point)
+  for (unsigned int q_point=0; q_point<q.size(); ++q_point)
     {
-      if (q_point % QIterated<1>(q_trapez,div).n_quadrature_points == 0)
+      if (q_point % QIterated<1>(q_trapez,div).size() == 0)
         deallog << std::endl;
       
       deallog << fe.quadrature_point(q_point) << " ";

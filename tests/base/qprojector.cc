@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,7 +43,7 @@ void check_line(Quadrature<1>& quadrature)
   Quadrature<dim> q = QProjector<dim>::project_to_line(quadrature, p1, p2);
   double s = 0.;
   
-  for (unsigned int k=0;k<q.n_quadrature_points;++k)
+  for (unsigned int k=0;k<q.size();++k)
     {
       deallog << k << '\t' << q.point(k) << std::endl;
       s += q.weight(k);
@@ -55,7 +55,7 @@ template<int dim>
 void check_face(Quadrature<1>& q1)
 {
   deallog << "Checking dim " << dim
-	  << " 1d-points " << q1.n_quadrature_points
+	  << " 1d-points " << q1.size()
 	  << std::endl;
   
   Quadrature<dim-1> subquadrature(q1);
@@ -66,7 +66,7 @@ void check_face(Quadrature<1>& q1)
       
       Quadrature<dim> quadrature
 	= QProjector<dim>::project_to_face(subquadrature, f);
-      for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+      for (unsigned int k=0;k<quadrature.size();++k)
 	deallog << quadrature.point(k) << std::endl;
     }
 
@@ -78,7 +78,7 @@ void check_face(Quadrature<1>& q1)
 	
 	Quadrature<dim> quadrature
 	  = QProjector<dim>::project_to_face(subquadrature, f);
-	for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+	for (unsigned int k=0;k<quadrature.size();++k)
 	  deallog << quadrature.point(k) << std::endl;
       }
 }
@@ -86,7 +86,7 @@ void check_face(Quadrature<1>& q1)
 template<int dim>
 void check_faces (Quadrature<1>& q1)
 {
-  const unsigned int nq = q1.n_quadrature_points;
+  const unsigned int nq = q1.size();
   
   deallog << "Checking dim " << dim
 	  << " 1d-points " << nq
@@ -94,7 +94,7 @@ void check_faces (Quadrature<1>& q1)
 
 
   Quadrature<dim-1> subquadrature(q1);
-  const unsigned int nqs = subquadrature.n_quadrature_points;
+  const unsigned int nqs = subquadrature.size();
   
   Quadrature<dim> faces = QProjector<dim>::project_to_all_faces(subquadrature);
 

@@ -3,7 +3,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors 
+//    Copyright (C) 2005, 2010 by the deal.II authors 
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,7 +54,7 @@ void test(std::string filename) {
   for(;cell!=endc;++cell)
     {
       deallog<<cell<< std::endl;	
-      for(unsigned int q=0; q<quad.n_quadrature_points; ++q)
+      for(unsigned int q=0; q<quad.size(); ++q)
 	{
 	  real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
 	  // unit = mapping.transform_real_to_unit_cell(cell, real);

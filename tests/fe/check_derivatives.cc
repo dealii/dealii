@@ -41,7 +41,7 @@ void test (const FiniteElement<dim> &fe,
   deallog << fe.get_name() << ' ' << fe.dofs_per_cell << ' ';
   
   for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-    for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+    for (unsigned int q=0; q<quadrature.size(); ++q)
       for (unsigned int c=0; c<fe.n_components(); ++c)
         {
           const Point<dim> point = quadrature.point(q);

@@ -2,7 +2,7 @@
 //    rt_normal_02.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,8 +80,8 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
 				    update_gradients |
 				    update_JxW_values));
 
-    const unsigned int   n_q_face    = quad.n_quadrature_points;
-    const unsigned int   n_q_proj    = qproject.n_quadrature_points;
+    const unsigned int   n_q_face    = quad.size();
+    const unsigned int   n_q_proj    = qproject.size();
     const unsigned int   n_components   = dof_handler->get_fe().n_components();
     const unsigned int   dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
 
@@ -110,7 +110,7 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
 			     cell->face_orientation(f),
 			     cell->face_flip(f),
 			     cell->face_rotation(f),
-			     quad.n_quadrature_points));
+			     quad.size()));
 		fe_v_face.reinit (cell, f);
 		
 		DoFHandler<2>::active_cell_iterator cell_n = cell->neighbor (f);
@@ -123,7 +123,7 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
 			     cell_n->face_orientation(neighbor),
 			     cell_n->face_flip(neighbor),
 			     cell_n->face_rotation(neighbor),
-			     quad.n_quadrature_points));
+			     quad.size()));
 
 		// Get values from solution vector (For Trap.Rule)
 		std::vector<Vector<double> > this_value
@@ -191,7 +191,7 @@ void EvaluateNormal (DoFHandler<2> *dof_handler,
 					     update_normal_vectors |
 					     update_JxW_values));
 
-    const unsigned int   n_q_face    = quad.n_quadrature_points;
+    const unsigned int   n_q_face    = quad.size();
     const unsigned int   n_components   = dof_handler->get_fe().n_components();
     const unsigned int   dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
 

@@ -287,7 +287,7 @@ double EvaluateDiver (Mapping<2> &mapping,
 				     update_JxW_values|
 				     update_contravariant_transformation));
 
-  const unsigned int   n_q_points    = quad.n_quadrature_points;
+  const unsigned int   n_q_points    = quad.size();
   const unsigned int   n_components   = dof_handler.get_fe().n_components();
 
 				   // Cell iterators
@@ -347,7 +347,7 @@ int main ()
   sprintf (buf,"DoFs per Quad: %i per Line %i per Vert %i\n", fe.dofs_per_quad, fe.dofs_per_line, fe.dofs_per_vertex);
   deallog << buf;
   
-  sprintf (buf,"QPoints %i\n", quad_temp.n_quadrature_points);
+  sprintf (buf,"QPoints %i\n", quad_temp.size());
   deallog << buf;
 
 				   // Create an deformation object for the Eulerian mapping

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,10 +32,10 @@ double difference(
   double result = 0.;
   QGauss<dim> quadrature(fe.degree+1);
   
-  std::vector<double> f(quadrature.n_quadrature_points);
+  std::vector<double> f(quadrature.size());
   function.value_list(quadrature.get_points(), f);
   
-  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<quadrature.size();++k)
     {
       double diff = f[k];
       for (unsigned int i=0;i<dofs.size();++i)
@@ -56,12 +56,12 @@ double vector_difference(
   double result = 0.;
   QGauss<dim> quadrature(fe.degree+1);
   
-  std::vector<Vector<double> > f(quadrature.n_quadrature_points,
+  std::vector<Vector<double> > f(quadrature.size(),
 				 Vector<double>(function.n_components));
 
   function.vector_value_list(quadrature.get_points(), f);
   
-  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<quadrature.size();++k)
     for (unsigned int comp=0;comp<fe.n_components();++comp)
       {
 	double diff = f[k](comp+offset);

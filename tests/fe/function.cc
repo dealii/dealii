@@ -48,7 +48,7 @@ void vector_values(const FiniteElement<dim>& fe)
     v(i) = i;
   
   FEValues<dim> feval(fe, quadrature, update_values);
-  std::vector<Vector<double> > local(quadrature.n_quadrature_points,
+  std::vector<Vector<double> > local(quadrature.size(),
 				     Vector<double>(fe.n_components()));
   
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
@@ -63,7 +63,7 @@ void vector_values(const FiniteElement<dim>& fe)
       for (unsigned int c=0;c<fe.n_components();++c)
 	{
 	  deallog << "Component " << c;
-	  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+	  for (unsigned int k=0;k<quadrature.size();++k)
 	    deallog << '\t' << (int) local[k](c);
 	  deallog << std::endl;
 	}

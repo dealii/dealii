@@ -59,9 +59,9 @@ void test (const Triangulation<dim>& tr,
 			   update_values | update_gradients | update_hessians);
   fe_values.reinit (dof.begin_active());
 
-  std::vector<double> scalar_values (quadrature.n_quadrature_points);
+  std::vector<double> scalar_values (quadrature.size());
   std::vector<Vector<double> >
-    vector_values (quadrature.n_quadrature_points,
+    vector_values (quadrature.size(),
 		   Vector<double>(fe.n_components()));
 
   fe_values.get_function_values (fe_function, vector_values);

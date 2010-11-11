@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -173,7 +173,7 @@ void LaplaceProblem::assemble_system ()
       cell_rhs = 0;
 
       const unsigned int dofs_per_cell = cell->get_fe ().dofs_per_cell;
-      const unsigned int   n_q_points    = quadrature_formula[cell->active_fe_index ()].n_quadrature_points;
+      const unsigned int   n_q_points    = quadrature_formula[cell->active_fe_index ()].size();
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)

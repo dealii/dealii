@@ -11,12 +11,13 @@ nofail-dirs = a-framework       \
               lac               \
               fe                \
               deal.II           \
+              integrators       \
               multigrid         \
               bits              \
               hp                \
-              aniso     \
-              codim_one \
-              serialization \
+              aniso             \
+              codim_one         \
+              serialization     \
 	      $(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
 	      $(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
 	      $(if $(USE_CONTRIB_PETSC:no=),    petsc,) \

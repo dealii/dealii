@@ -117,7 +117,7 @@ void EvaluateDerivative (DoFHandler<2> *dof_handler,
 				     update_gradients |
 				     update_JxW_values));
 
-  const unsigned int   n_q_points    = quad.n_quadrature_points;
+  const unsigned int   n_q_points    = quad.size();
   const unsigned int   n_components   = dof_handler->get_fe().n_components();
   const unsigned int dofs_per_cell = dof_handler->get_fe().dofs_per_cell;
 

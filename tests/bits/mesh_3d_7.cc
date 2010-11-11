@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,7 @@ void check_this (Triangulation<3> &tria)
           deallog << "Cell " << cell << ", face " << f
                   << std::endl;
 
-          for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+          for (unsigned int q=0; q<quadrature.size(); ++q)
             {
                                                // in order to reduce
                                                // output file size,

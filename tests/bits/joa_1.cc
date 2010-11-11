@@ -2,7 +2,7 @@
 //    joa_1.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2004, 2005, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -555,7 +555,7 @@ void LaplaceProblem<dim>::assemble_system ()
 			   update_q_points  |  update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.n_quadrature_points;
+  const unsigned int   n_q_points    = quadrature_formula.size();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);

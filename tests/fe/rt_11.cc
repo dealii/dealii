@@ -2,7 +2,7 @@
 //    rt_11.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -70,7 +70,7 @@ test (const unsigned int degree)
 
       FEFaceValues<dim> fe_values (fe_rt, quadrature, update_values);
       fe_values.reinit (dof.begin_active(), 0);
-      for (unsigned int q=0; q<quadrature.n_quadrature_points; ++q)
+      for (unsigned int q=0; q<quadrature.size(); ++q)
 	{
 	  deallog << "    Quadrature point " << q << ": ";
 	  for (unsigned int i=0; i<fe_rt.dofs_per_cell; ++i)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors and Oliver Kayser-Herold
+//    Copyright (C) 2005, 2006, 2010 by the deal.II authors and Oliver Kayser-Herold
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,7 +67,7 @@ void evaluate_normal (DoFHandler<2>  &dof_handler,
 					   update_normal_vectors |
 					   update_JxW_values));
 
-  const unsigned int   n_q_face    = quad.n_quadrature_points;
+  const unsigned int   n_q_face    = quad.size();
   const unsigned int   n_components   = dof_handler.get_fe().n_components();
 
 				   // Cell iterators

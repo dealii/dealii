@@ -259,7 +259,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
                               const Quadrature<dim>    &q)
 {
                                    // check values
-  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+  for (unsigned int x=0; x<q.size(); ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
         for (unsigned int c=0; c<fe.n_components(); ++c)
@@ -288,7 +288,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
       };
         
                                    // check gradients
-  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+  for (unsigned int x=0; x<q.size(); ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
         for (unsigned int c=0; c<fe.n_components(); ++c)
@@ -310,7 +310,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
 
                                    // check second derivatives
   double max_diff=0.;
-  for (unsigned int x=0; x<q.n_quadrature_points; ++x)
+  for (unsigned int x=0; x<q.size(); ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
         for (unsigned int c=0; c<fe.n_components(); ++c)

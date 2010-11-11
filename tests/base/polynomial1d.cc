@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,7 +36,7 @@ double scalar_product (const Polynomial<double>& p1,
   QGauss<1> gauss(degree);
 
   double sum = 0.;
-  for (unsigned int i=0;i<gauss.n_quadrature_points;++i)
+  for (unsigned int i=0;i<gauss.size();++i)
     {
       double x = gauss.point(i)(0);
       double P1 = p1.value(x);

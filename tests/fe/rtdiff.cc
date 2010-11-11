@@ -2,7 +2,7 @@
 //    rt_1.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -86,11 +86,11 @@ compare_shapes (const FiniteElement<dim>& other,
 		FullMatrix<double>& M)
 {
   QGauss<dim> quadrature(other.degree+1);
-  Table<3,double> other_values(quadrature.n_quadrature_points, other.dofs_per_cell, dim);
-  Table<3,double> nodes_values(quadrature.n_quadrature_points, other.dofs_per_cell, dim);
-  Table<3,Tensor<1,dim> > other_grads(quadrature.n_quadrature_points, other.dofs_per_cell, dim);
-  Table<3,Tensor<1,dim> > nodes_grads(quadrature.n_quadrature_points, other.dofs_per_cell, dim);
-  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+  Table<3,double> other_values(quadrature.size(), other.dofs_per_cell, dim);
+  Table<3,double> nodes_values(quadrature.size(), other.dofs_per_cell, dim);
+  Table<3,Tensor<1,dim> > other_grads(quadrature.size(), other.dofs_per_cell, dim);
+  Table<3,Tensor<1,dim> > nodes_grads(quadrature.size(), other.dofs_per_cell, dim);
+  for (unsigned int k=0;k<quadrature.size();++k)
     for (unsigned int i=0;i<other.dofs_per_cell;++i)
       for (unsigned int d=0;d<dim;++d)
 	{
@@ -100,7 +100,7 @@ compare_shapes (const FiniteElement<dim>& other,
 	  nodes_grads[k][i][d] = nodes.shape_grad_component(i,quadrature.point(k),d);
 	}
 
-  for (unsigned int k=0;k<quadrature.n_quadrature_points;++k)
+  for (unsigned int k=0;k<quadrature.size();++k)
     {
       for (unsigned int i=0;i<other.dofs_per_cell;++i)
 	for (unsigned int d=0;d<dim;++d)

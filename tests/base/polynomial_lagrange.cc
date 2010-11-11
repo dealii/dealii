@@ -55,7 +55,7 @@ void check_interpolation (const std::vector<Polynomial<double> >& p,
 void
 check_poly (const Quadrature<1>& q)
 {
-  deallog << "Points: " << q.n_quadrature_points << std::endl;
+  deallog << "Points: " << q.size() << std::endl;
   std::vector<Polynomial<double> > p = generate_complete_Lagrange_basis(q.get_points());
   check_interpolation(p, q.get_points());
 }

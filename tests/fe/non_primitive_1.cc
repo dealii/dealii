@@ -2,7 +2,7 @@
 //    non_primitive_1.cc,v 1.6 2003/04/21 07:31:15 guido Exp
 //    Version: 
 //
-//    Copyright (C) 2001, 2002, 2003, 2005 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,7 +58,7 @@ create_stokes_matrix_1 (const DoFHandler<dim> &dof_handler,
   FullMatrix<double> local_matrix (dofs_per_cell, dofs_per_cell);
 
   QGauss<dim> quadrature (3);
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
   
   FEValues<dim> fe_values (fe, quadrature,
 			   update_values | update_gradients |
@@ -131,7 +131,7 @@ create_stokes_matrix_2 (const DoFHandler<dim> &dof_handler,
   FullMatrix<double> local_matrix (dofs_per_cell, dofs_per_cell);
 
   QGauss<dim> quadrature (3);
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
   
   FEValues<dim> fe_values (fe, quadrature,
 			   update_values | update_gradients |
@@ -207,7 +207,7 @@ create_stokes_matrix_3 (const DoFHandler<dim> &dof_handler,
   FullMatrix<double> local_matrix (dofs_per_cell, dofs_per_cell);
 
   QGauss<dim> quadrature (3);
-  const unsigned int n_q_points = quadrature.n_quadrature_points;
+  const unsigned int n_q_points = quadrature.size();
   
   FEValues<dim> fe_values (fe, quadrature,
 			   update_values | update_gradients |

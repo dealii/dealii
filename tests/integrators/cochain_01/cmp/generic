@@ -1,91 +1,113 @@
 
-DEAL:d2-p0::Setup
-DEAL:d2-p0::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
-DEAL:d2-p0::Form 0
-DEAL:d2-p0::Difference d*d 0
-DEAL:d2-p0::Form 1
-DEAL:d2-p0::d^2            0
-DEAL:d2-p0::d*d^2          0
-DEAL:d2-p0::Difference d*d 0
-DEAL:d2-p0::Triangulation hypercube 2D refinement 2 local  steps 7 active cells 9 total cells 
-DEAL:d2-p0::Form 0
-DEAL:d2-p0::Difference d*d 0
-DEAL:d2-p0::Form 1
-DEAL:d2-p0::d^2            0
-DEAL:d2-p0::d*d^2          0
-DEAL:d2-p0::Difference d*d 0
-DEAL:d2-p0::Triangulation hypercube 2D refinement 3 local  steps 25 active cells 33 total cells 
-DEAL:d2-p0::Form 0
-DEAL:d2-p0::Difference d*d 0
-DEAL:d2-p0::Form 1
-DEAL:d2-p0::d^2            0
-DEAL:d2-p0::d*d^2          0
-DEAL:d2-p0::Difference d*d 0
-DEAL:d2-p1::Setup
-DEAL:d2-p1::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
-DEAL:d2-p1::Form 0
-DEAL:d2-p1::Difference d*d 0
-DEAL:d2-p1::Form 1
-DEAL:d2-p1::d^2            0
-DEAL:d2-p1::d*d^2          0
-DEAL:d2-p1::Difference d*d 0
-DEAL:d2-p1::Triangulation hypercube 2D refinement 2 local  steps 7 active cells 9 total cells 
-DEAL:d2-p1::Form 0
-DEAL:d2-p1::Difference d*d 0
-DEAL:d2-p1::Form 1
-DEAL:d2-p1::d^2            0
-DEAL:d2-p1::d*d^2          0
-DEAL:d2-p1::Difference d*d 0
-DEAL:d2-p1::Triangulation hypercube 2D refinement 3 local  steps 25 active cells 33 total cells 
-DEAL:d2-p1::Form 0
-DEAL:d2-p1::Difference d*d 0
-DEAL:d2-p1::Form 1
-DEAL:d2-p1::d^2            0
-DEAL:d2-p1::d*d^2          0
-DEAL:d2-p1::Difference d*d 0
-DEAL:d2-p2::Setup
-DEAL:d2-p2::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
-DEAL:d2-p2::Form 0
-DEAL:d2-p2::Difference d*d 0
-DEAL:d2-p2::Form 1
-DEAL:d2-p2::d^2            0
-DEAL:d2-p2::d*d^2          0
-DEAL:d2-p2::Difference d*d 0
-DEAL:d2-p2::Triangulation hypercube 2D refinement 2 local  steps 7 active cells 9 total cells 
-DEAL:d2-p2::Form 0
-DEAL:d2-p2::Difference d*d 0
-DEAL:d2-p2::Form 1
-DEAL:d2-p2::d^2            0
-DEAL:d2-p2::d*d^2          0
-DEAL:d2-p2::Difference d*d 0
-DEAL:d2-p2::Triangulation hypercube 2D refinement 3 local  steps 25 active cells 33 total cells 
-DEAL:d2-p2::Form 0
-DEAL:d2-p2::Difference d*d 0
-DEAL:d2-p2::Form 1
-DEAL:d2-p2::d^2            0
-DEAL:d2-p2::d*d^2          0
-DEAL:d2-p2::Difference d*d 0
-DEAL:d3-p0::Setup
-DEAL:d3-p0::Triangulation hypercube 3D refinement 1 steps 8 active cells 9 total cells 
-DEAL:d3-p0::Form 0
-DEAL:d3-p0::Difference d*d 0
-DEAL:d3-p0::Form 1
-DEAL:d3-p0::d^2            0
-DEAL:d3-p0::d*d^2          0
-DEAL:d3-p0::Difference d*d 0
-DEAL:d3-p0::Form 2
-DEAL:d3-p0::d^2            0
-DEAL:d3-p0::d*d^2          0
-DEAL:d3-p0::Difference d*d 0
-DEAL:d3-p1::Setup
-DEAL:d3-p1::Triangulation hypercube 3D refinement 1 steps 8 active cells 9 total cells 
-DEAL:d3-p1::Form 0
-DEAL:d3-p1::Difference d*d 0
-DEAL:d3-p1::Form 1
-DEAL:d3-p1::d^2            0
-DEAL:d3-p1::d*d^2          0
-DEAL:d3-p1::Difference d*d 0
-DEAL:d3-p1::Form 2
-DEAL:d3-p1::d^2            0
-DEAL:d3-p1::d*d^2          0
-DEAL:d3-p1::Difference d*d 0
+0.0200000:DEAL:d2-p0::Setup
+0.0600000:DEAL:d2-p0::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
+0.460000:DEAL:d2-p0::Form 0
+0.480000:DEAL:d2-p0::Difference d*d 0
+0.480000:DEAL:d2-p0::Form 1
+0.480000:DEAL:d2-p0::d^2            0
+0.480000:DEAL:d2-p0::d*d^2          0
+0.480000:DEAL:d2-p0::Difference d*d 0
+0.480000:DEAL:d2-p0::Triangulation hypercube 2D refinement 2 local  steps 7 active cells 9 total cells 
+0.940000:DEAL:d2-p0::Form 0
+0.940000:DEAL:d2-p0::Difference d*d 0
+0.940000:DEAL:d2-p0::Form 1
+0.940000:DEAL:d2-p0::d^2            0
+0.940000:DEAL:d2-p0::d*d^2          0
+0.950000:DEAL:d2-p0::Difference d*d 0
+0.950000:DEAL:d2-p0::Triangulation hypercube 2D refinement 3 local  steps 25 active cells 33 total cells 
+1.37000:DEAL:d2-p0::Form 0
+1.41000:DEAL:d2-p0::Difference d*d 0
+1.41000:DEAL:d2-p0::Form 1
+1.41000:DEAL:d2-p0::d^2            0
+1.41000:DEAL:d2-p0::d*d^2          0
+1.41000:DEAL:d2-p0::Difference d*d 0
+1.41000:DEAL:d2-p1::Setup
+1.49000:DEAL:d2-p1::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
+1.95000:DEAL:d2-p1::Form 0
+1.95000:DEAL:d2-p1::Difference d*d 0
+1.95000:DEAL:d2-p1::Form 1
+1.95000:DEAL:d2-p1::d^2            0
+1.95000:DEAL:d2-p1::d*d^2          0
+1.95000:DEAL:d2-p1::Difference d*d 0
+1.95000:DEAL:d2-p1::Triangulation hypercube 2D refinement 2 local  steps 7 active cells 9 total cells 
+2.46000:DEAL:d2-p1::Form 0
+2.48000:DEAL:d2-p1::Difference d*d 0
+2.49000:DEAL:d2-p1::Form 1
+2.49000:DEAL:d2-p1::d^2            0
+2.49000:DEAL:d2-p1::d*d^2          0
+2.49000:DEAL:d2-p1::Difference d*d 0
+2.50000:DEAL:d2-p1::Triangulation hypercube 2D refinement 3 local  steps 25 active cells 33 total cells 
+3.07000:DEAL:d2-p1::Form 0
+3.12000:DEAL:d2-p1::Difference d*d 0
+3.12000:DEAL:d2-p1::Form 1
+3.12000:DEAL:d2-p1::d^2            0
+3.12000:DEAL:d2-p1::d*d^2          0
+3.12000:DEAL:d2-p1::Difference d*d 0
+3.12000:DEAL:d2-p2::Setup
+3.36000:DEAL:d2-p2::Triangulation hypercube 2D refinement 1 steps 4 active cells 5 total cells 
+4.30000:DEAL:d2-p2::Form 0
+4.30000:DEAL:d2-p2::Difference d*d 0
+4.31000:DEAL:d2-p2::Form 1
+4.31000:DEAL:d2-p2::d^2            0
+4.31000:DEAL:d2-p2::d*d^2          0
+4.31000:DEAL:d2-p2::Difference d*d 0
+4.31000:DEAL:d2-p2::Triangulation hypercube 2D refinement 2 local  steps 7 active cells 9 total cells 
+5.27000:DEAL:d2-p2::Form 0
+5.29000:DEAL:d2-p2::Difference d*d 0
+5.29000:DEAL:d2-p2::Form 1
+5.29000:DEAL:d2-p2::d^2            0
+5.29000:DEAL:d2-p2::d*d^2          0
+5.32000:DEAL:d2-p2::Difference d*d 0
+5.32000:DEAL:d2-p2::Triangulation hypercube 2D refinement 3 local  steps 25 active cells 33 total cells 
+6.77000:DEAL:d2-p2::Form 0
+6.90000:DEAL:d2-p2::Difference d*d 0
+6.90000:DEAL:d2-p2::Form 1
+6.90000:DEAL:d2-p2::d^2            0
+6.91000:DEAL:d2-p2::d*d^2          0
+6.95000:DEAL:d2-p2::Difference d*d 0
+6.95000:DEAL:d3-p0::Setup
+7.06000:DEAL:d3-p0::Triangulation hypercube 3D refinement 1 steps 8 active cells 9 total cells 
+8.44000:DEAL:d3-p0::Form 0
+8.44000:DEAL:d3-p0::Difference d*d 0
+8.44000:DEAL:d3-p0::Form 1
+8.45000:DEAL:d3-p0::d^2            0
+8.45000:DEAL:d3-p0::d*d^2          0
+8.46000:DEAL:d3-p0::Difference d*d 0
+8.46000:DEAL:d3-p0::Form 2
+8.46000:DEAL:d3-p0::d^2            0
+8.46000:DEAL:d3-p0::d*d^2          0
+8.46000:DEAL:d3-p0::Difference d*d 0
+8.47000:DEAL:d3-p0::Triangulation hypercube 3D refinement 2 local  steps 15 active cells 17 total cells 
+9.94000:DEAL:d3-p0::Form 0
+9.98000:DEAL:d3-p0::Difference d*d 0
+9.98000:DEAL:d3-p0::Form 1
+9.98000:DEAL:d3-p0::d^2            0
+9.98000:DEAL:d3-p0::d*d^2          0
+9.99000:DEAL:d3-p0::Difference d*d 0
+9.99000:DEAL:d3-p0::Form 2
+9.99000:DEAL:d3-p0::d^2            0
+9.99000:DEAL:d3-p0::d*d^2          0
+9.99000:DEAL:d3-p0::Difference d*d 0
+9.99000:DEAL:d3-p1::Setup
+16.8400:DEAL:d3-p1::Triangulation hypercube 3D refinement 1 steps 8 active cells 9 total cells 
+29.4100:DEAL:d3-p1::Form 0
+29.5100:DEAL:d3-p1::Difference d*d 0
+29.5100:DEAL:d3-p1::Form 1
+29.5100:DEAL:d3-p1::d^2            0
+29.5100:DEAL:d3-p1::d*d^2          0
+29.5500:DEAL:d3-p1::Difference d*d 0
+29.5500:DEAL:d3-p1::Form 2
+29.5500:DEAL:d3-p1::d^2            0
+29.5500:DEAL:d3-p1::d*d^2          0
+29.5500:DEAL:d3-p1::Difference d*d 0
+29.5700:DEAL:d3-p1::Triangulation hypercube 3D refinement 2 local  steps 15 active cells 17 total cells 
+47.7600:DEAL:d3-p1::Form 0
+48.3300:DEAL:d3-p1::Difference d*d 0
+48.3300:DEAL:d3-p1::Form 1
+48.3300:DEAL:d3-p1::d^2            0
+48.3300:DEAL:d3-p1::d*d^2          0
+48.4100:DEAL:d3-p1::Difference d*d 0
+48.4100:DEAL:d3-p1::Form 2
+48.4100:DEAL:d3-p1::d^2            0
+48.4200:DEAL:d3-p1::d*d^2          0
+48.4200:DEAL:d3-p1::Difference d*d 0
