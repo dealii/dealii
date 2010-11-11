@@ -30,6 +30,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+
+<li> The public member variable Quadrature::n_quadrature_points has
+been removed after being deprecated for nearly three
+years. Quadrature.size() replaces its function, and the new version
+more naturally preserves consistency.
+<br>
+(GK 2010/11/11)
+</li>
+
 <li>
         deal.II has had a somewhat quirky directory and library structure for
         historical reasons, but this has now changed: All include and source
