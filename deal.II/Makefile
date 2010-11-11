@@ -40,7 +40,7 @@ debug: deps contrib
 optimized: deps contrib
 	@cd source && $(MAKE) optimized
 
-contrib: contrib-functionparser
+contrib:
 	cd contrib && $(MAKE)
 
 online-doc doc:
