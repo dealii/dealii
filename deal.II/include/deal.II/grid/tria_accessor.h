@@ -1348,8 +1348,6 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      * object if higher order mappings are
 				      * used.
 				      */
-
-
     Point<spacedim> center () const;
 
 				     /**
@@ -1515,9 +1513,9 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     void clear_refinement_case () const;
 
-                     /**
-                      * Set the parent of a cell.
-                      */
+				     /**
+				      * Set the parent of a cell.
+				      */
     void set_parent (const unsigned int parent_index);
 
 				     /**
@@ -1628,14 +1626,116 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       }
 
 				     /**
-				      *  Index of the parent. Always -1
+				      * @brief Return an invalid object
+				      */
+    TriaIterator<InvalidAccessor<0,dim,spacedim> >
+    child (const unsigned int) const
+      {
+	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
+      }
+};
+
+
+
+/**
+ * A class that represents an access to a face in 1d -- i.e. to a
+ * point. This is not a full fledged access from which you can build
+ * an iterator: for example, you can't iterate from one such point to
+ * the next. Point also don't have children, and they don't have
+ * neighbors.
+ *
+ * @author Wolfgang Bangerth, 2010
+ */
+template <int spacedim>
+class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
+{
+  public:
+				     /**
+				      * Propagate typedef from
+				      * base class to this class.
+				      */
+    typedef typename TriaAccessorBase<0,1,spacedim>::AccessorData AccessorData;
+
+				     /**
+				      * Constructor. Should never be
+				      * called and thus produces an
+				      * error.
+				      */
+    TriaAccessor (const Triangulation<1,spacedim> *parent     =  0,
+		  const int                 level      = -1,
+		  const int                 index      = -1,
+		  const AccessorData       *local_data =  0)
+                    :
+		    TriaAccessorBase<0,1, spacedim> (parent, level, index, local_data)
+      {}
+
+				     /**
+				      * Constructor. Should never be
+				      * called and thus produces an
+				      * error.
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
+      {
+	Assert(false, ExcImpossibleInDim(0));
+      }
+
+				     /**
+				      * Constructor. Should never be
+				      * called and thus produces an
+				      * error.
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+      {
+	Assert(false, ExcImpossibleInDim(0));
+      }
+
+				     /**
+				      * @name Advancement of iterators
+				      */
+				     /**
+				      * @{
+				      */
+				     /**
+				      *  This operator advances the
+				      *  iterator to the next
+				      *  element. For points, this
+				      *  operation is not defined, so
+				      *  you can't iterate over point
+				      *  iterators.
+				      */
+    void operator ++ ()
+      {
+	Assert (false, ExcNotImplemented());
+      }
+
+
+    				     /**
+				      *  This operator moves the
+				      *  iterator to the previous
+				      *  element. For points, this
+				      *  operation is not defined, so
+				      *  you can't iterate over point
+				      *  iterators.
+				      */
+    void operator -- ()
+      {
+	Assert (false, ExcNotImplemented());
+      }
+				     /**
+				      * @}
+				      */
+
+				     /**
+				      *  Index of the parent. You
+				      *  can't do this for points.
 				      */
     int parent_index () const
       {
+	Assert (false, ExcNotImplemented());
 	return -1;
       }
-    
-
 
 				     /**
 				      *  @name Accessing sub-objects
@@ -1645,12 +1745,13 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
 				      */
 
 				     /**
-				      *  Return the global index of i-th
-				      *  vertex of the current object. The
-				      *  convention regarding the numbering of
-				      *  vertices is laid down in the
-				      *  documentation of the GeometryInfo
-				      *  class.
+				      *  Return the global index of
+				      *  i-th vertex of the current
+				      *  object. If i is zero, this
+				      *  returns the index of the
+				      *  current point to which this
+				      *  object refers. Otherwise, it
+				      *  throws an exception.
 				      *
 				      *  Note that the returned value is only
 				      *  the index of the geometrical
@@ -1668,27 +1769,31 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
 
 				     /**
 				      *  Return a reference to the
-				      *  @p ith vertex.
+				      *  @p ith vertex. If i is zero, this
+				      *  returns a reference to the
+				      *  current point to which this
+				      *  object refers. Otherwise, it
+				      *  throws an exception.
 				      */
     Point<spacedim> & vertex (const unsigned int i) const
       {
 	Assert(false, ExcNotImplemented());
-	static Point<spacedim> p;
+	static const Point<spacedim> p;
 	return p;
       }
-    
+
 
 				     /**
 				      * Pointer to the @p ith line
 				      * bounding this object. Will
 				      * point to an invalid object.
 				      */
-//     typename internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+//     typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
 //     line (const unsigned int i) const
 //       {
-// 	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
+// 	return TriaIterator<InvalidAccessor<0,1,spacedim> >();
 //       }
-    
+
 
 				     /**
 				      * Line index of the @p ith
@@ -1704,13 +1809,13 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
 	Assert(false, ExcImpossibleInDim(0));
 	return numbers::invalid_unsigned_int;
       }
-    
+
 
     				     /**
 				      * Pointer to the @p ith quad
 				      * bounding this object.
 				      */
-//     typename internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+//     typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
 //     quad (const unsigned int i) const;
 
 				     /**
@@ -1745,14 +1850,14 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return false;
       }
-    
+
                                      /**
 				      * @brief Always return false
                                       */
     bool face_flip (const unsigned int face) const
       {
 	return false;
-      }    
+      }
 
                                      /**
 				      * @brief Always return false
@@ -1761,7 +1866,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return false;
       }
-    
+
 
                                      /**
 				      * @brief Always return false
@@ -1770,7 +1875,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return false;
       }
-    
+
 				     /**
 				      * @}
 				      */
@@ -1790,7 +1895,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return false;
       }
-    
+
 
 				     /**
 				      * Return the number of immediate
@@ -1801,7 +1906,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return 0;
       }
-    
+
 				     /**
 				      * Compute and return the number
 				      * of active descendants of this
@@ -1825,19 +1930,19 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
 				     /**
 				      * @brief Return an invalid object
 				      */
-    TriaIterator<InvalidAccessor<0,dim,spacedim> >
+    TriaIterator<InvalidAccessor<0,1,spacedim> >
     child (const unsigned int) const
       {
-	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
+	return TriaIterator<InvalidAccessor<0,1,spacedim> >();
       }
 
 				     /**
 				      * @brief Return an invalid object
 				      */
-    TriaIterator<InvalidAccessor<0,dim,spacedim> >
+    TriaIterator<InvalidAccessor<0,1,spacedim> >
     isotropic_child (const unsigned int) const
       {
-	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
+	return TriaIterator<InvalidAccessor<0,1,spacedim> >();
       }
 
 				     /**
@@ -1847,7 +1952,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
       }
-    
+
 
 				     /**
 				      * @brief Returns -1
@@ -1856,7 +1961,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	return -1;
       }
-    
+
 
 				     /**
 				      * @brief Returns -1
@@ -1884,7 +1989,7 @@ class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
       {
 	Assert(false, ExcImpossibleInDim(0));
       }
-    
+
 				     /**
 				      * @brief Do nothing and throw and error
 				      */
