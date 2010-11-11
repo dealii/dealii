@@ -1579,60 +1579,15 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
  * @ingroup grid
  */
 template<int dim, int spacedim>
-class TriaAccessor<0, dim, spacedim> : public TriaAccessorBase<0,dim, spacedim>
+class TriaAccessor<0, dim, spacedim>
 {
-  public:
+  private:
 				     /**
-				      * Propagate typedef from
-				      * base class to this class.
+				      * Constructor. Made private to
+				      * make sure that this class
+				      * can't be used.
 				      */
-    typedef typename TriaAccessorBase<0,dim,spacedim>::AccessorData AccessorData;
-
-				     /**
-				      * Constructor. Should never be
-				      * called and thus produces an
-				      * error.
-				      */
-    TriaAccessor (const Triangulation<dim,spacedim> *parent     =  0,
-		  const int                 level      = -1,
-		  const int                 index      = -1,
-		  const AccessorData       *local_data =  0)
-                    :
-		    TriaAccessorBase<0,dim, spacedim> (parent, level, index, local_data)
-      {
-	Assert(false, ExcImpossibleInDim(0));
-      }
-
-				     /**
-				      * Constructor. Should never be
-				      * called and thus produces an
-				      * error.
-				      */
-    template <int structdim2, int dim2, int spacedim2>
-    TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
-      {
-	Assert(false, ExcImpossibleInDim(0));
-      }
-
-				     /**
-				      * Constructor. Should never be
-				      * called and thus produces an
-				      * error.
-				      */
-    template <int structdim2, int dim2, int spacedim2>
-    TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
-      {
-	Assert(false, ExcImpossibleInDim(0));
-      }
-
-				     /**
-				      * @brief Return an invalid object
-				      */
-    TriaIterator<InvalidAccessor<0,dim,spacedim> >
-    child (const unsigned int) const
-      {
-	return TriaIterator<InvalidAccessor<0,dim,spacedim> >();
-      }
+    TriaAccessor ();
 };
 
 
