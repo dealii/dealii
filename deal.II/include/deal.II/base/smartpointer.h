@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -158,6 +157,12 @@ class SmartPointer
     SmartPointer<T,P> & operator= (const SmartPointer<T,P> &tt);
 
 				     /**
+				      * Delete the object pointed to
+				      * and set the pointer to zero.
+				      */
+    void clear ();
+    
+				     /**
 				      * Conversion to normal pointer.
 				      */
     operator T* () const;
@@ -311,6 +316,21 @@ SmartPointer<T,P>::~SmartPointer ()
 {
   if (t != 0)
     t->unsubscribe(id);
+}
+
+
+
+template <typename T, typename P>
+inline
+void
+SmartPointer<T,P>::clear ()
+{
+  if (t != 0)
+    {
+      t->unsubscribe(id);
+      delete t;
+      t = 0;
+    }
 }
 
 
