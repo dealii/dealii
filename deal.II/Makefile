@@ -43,9 +43,6 @@ optimized: deps contrib
 contrib: contrib-functionparser
 	cd contrib && $(MAKE)
 
-contrib-functionparser:
-	@cd contrib && $(MAKE) functionparser
-
 online-doc doc:
 	cd doc && $(MAKE)
 	@echo
@@ -157,7 +154,6 @@ build-test-do:
 
 .PHONY: all \
         online-doc doc printable-doc tex-doc contrib \
-	contrib-functionparser \
         clean clean-contrib clean-base clean-lac clean-dealII \
 	clean-doc clean-examples clean-lib clean-tests clean-common-scripts \
 	distclean \
