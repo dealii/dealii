@@ -617,9 +617,74 @@ namespace FETools
   namespace {
     template<int dim, typename number, int spacedim>
     void
-    compute_embedding_matrices_for_refinement_case (const FiniteElement<dim, spacedim>& fe,
-						    std::vector<FullMatrix<number> >& matrices,
-						    const unsigned int ref_case)
+    compute_embedding_for_shape_function (
+      const unsigned int i,
+      const FiniteElement<dim, spacedim>& fe,
+      const FEValues<dim>& coarse,
+      const Householder<double>& H,
+      FullMatrix<number>& this_matrix,
+      Threads::Mutex& /*mutex*/)
+    {
+      const unsigned int n  = fe.dofs_per_cell;
+      const unsigned int nd = fe.n_components ();
+      const unsigned int nq = coarse.n_quadrature_points;
+      
+      Vector<number> v_coarse(nq*nd);
+      Vector<number> v_fine(n);
+      
+				       // The right hand side of
+				       // the least squares
+				       // problem consists of the
+				       // function values of the
+				       // coarse grid function in
+				       // each quadrature point.
+      if (fe.is_primitive ())
+	{
+	  const unsigned int
+	    d = fe.system_to_component_index (i).first;
+	  const double* phi_i = &coarse.shape_value (i, 0);
+	  
+	  for (unsigned int k = 0; k < nq; ++k)
+	    v_coarse (k * nd + d) = phi_i[k];
+	}
+      
+      else
+	for (unsigned int d = 0; d < nd; ++d)
+	  for (unsigned int k = 0; k < nq; ++k)
+	    v_coarse (k * nd + d) = coarse.shape_value_component (i, k, d);
+      
+				       // solve the least squares
+				       // problem.
+      const double result = H.least_squares (v_fine, v_coarse);
+      Assert (result < 1.e-12, ExcLeastSquaresError (result));
+      
+				       // Copy into the result
+				       // matrix. Since the matrix
+				       // maps a coarse grid
+				       // function to a fine grid
+				       // function, the columns
+				       // are fine grid.
+
+//TODO: This function is called in parallel for different sets of
+//matrices, thus there should be no overlap and the mutex should not
+//be necessary. Remove this TODO and the mutex if everybody agrees.
+
+
+//      mutex.acquire ();
+      
+      for (unsigned int j = 0; j < n; ++j)
+	this_matrix(j, i) = v_fine(j);
+      
+//      mutex.release ();
+    }
+    
+    
+    template<int dim, typename number, int spacedim>
+    void
+    compute_embedding_matrices_for_refinement_case (
+      const FiniteElement<dim, spacedim>& fe,
+      std::vector<FullMatrix<number> >& matrices,
+      const unsigned int ref_case)
     {
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nc = GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
@@ -668,12 +733,12 @@ namespace FETools
 	  for (unsigned int k = 0; k < nq; ++k)
 	    A (k * nd + d, j) = fine.shape_value_component (j, k, d);
 
-      Householder<double> H (A);
       static Threads::Mutex mutex;
-      Vector<number> v_coarse (nq * nd);
-      Vector<number> v_fine (n);
+      Householder<double> H (A);
       unsigned int cell_number = 0;
-
+      
+      Threads::TaskGroup<void> task_group;
+      
       for (typename Triangulation<dim>::active_cell_iterator
 	     fine_cell = tria.begin_active (); fine_cell != tria.end ();
 	   ++fine_cell, ++cell_number)
@@ -692,53 +757,22 @@ namespace FETools
 
 	  FullMatrix<double> &this_matrix = matrices[cell_number];
 
-	  v_coarse = 0;
-
 					   // Compute this once for each
 					   // coarse grid basis function
 	  for (unsigned int i = 0;i < n; ++i)
 	    {
-					       // The right hand side of
-					       // the least squares
-					       // problem consists of the
-					       // function values of the
-					       // coarse grid function in
-					       // each quadrature point.
-	      if (fe.is_primitive ())
-		{
-		  const unsigned int
-		    d = fe.system_to_component_index (i).first;
-		  const double* phi_i = &coarse.shape_value (i, 0);
-
-		  for (unsigned int k = 0; k < nq; ++k)
-		    v_coarse (k * nd + d) = phi_i[k];
-		}
-
-	      else
-		for (unsigned int d = 0; d < nd; ++d)
-		  for (unsigned int k = 0; k < nq; ++k)
-		    v_coarse (k * nd + d) = coarse.shape_value_component (i, k, d);
-
-					       // solve the least squares
-					       // problem.
-	      const double result = H.least_squares (v_fine, v_coarse);
-	      Assert (result < 1.e-12, ExcLeastSquaresError (result));
-
-					       // Copy into the result
-					       // matrix. Since the matrix
-					       // maps a coarse grid
-					       // function to a fine grid
-					       // function, the columns
-					       // are fine grid.
-	      mutex.acquire ();
-
-	      for (unsigned int j = 0; j < n; ++j)
-		this_matrix(j, i) = v_fine(j);
-
-	      mutex.release ();
+	      task_group += 
+		Threads::new_task (&compute_embedding_for_shape_function<dim, number, spacedim>,
+				   i, fe, coarse, H, this_matrix, mutex);
 	    }
+	  task_group.join_all();
 
-	  mutex.acquire ();
+//TODO: This function is called in parallel for different sets of
+//matrices, thus there should be no overlap and the mutex should not
+//be necessary. Remove this TODO and the mutex if everybody agrees.
+
+	  
+//	  mutex.acquire ();
 					   // Remove small entries from
 					   // the matrix
 	  for (unsigned int i = 0; i < this_matrix.m (); ++i)
@@ -746,7 +780,7 @@ namespace FETools
 	      if (std::fabs (this_matrix (i, j)) < 1e-12)
 		this_matrix (i, j) = 0.;
 
-	  mutex.release ();
+//	  mutex.release ();
 	}
 
       Assert (cell_number == GeometryInfo<dim>::n_children (RefinementCase<dim> (ref_case)),
