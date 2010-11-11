@@ -40,11 +40,12 @@ namespace
 }
 
 
-
+//TODO: It would be desirable to have a Tensor<rank,0>
 template <>
 Quadrature<0>::Quadrature (const unsigned int)
-		: n_quadrature_points(1),
-		  weights (1, 1.)
+		:
+//		quadrature_points(1),
+		weights (1, 1.)
 {}
 
 
@@ -57,7 +58,6 @@ Quadrature<0>::~Quadrature ()
 
 template <int dim>
 Quadrature<dim>::Quadrature (const unsigned int n_q) :
-		n_quadrature_points(n_q),
 		quadrature_points (n_q, Point<dim>()),
 		weights (n_q, 0)
 {}
@@ -68,7 +68,6 @@ template <int dim>
 Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points,
 			     const std::vector<double>      &weights)
 		:
-		n_quadrature_points(points.size()),
 		quadrature_points(points),
 		weights(weights)
 {
@@ -81,7 +80,6 @@ Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points,
 template <int dim>
 Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points)
 		:
-		n_quadrature_points(points.size()),
 		quadrature_points(points),
 		weights(points.size(), std::atof("Inf"))
 {
@@ -94,19 +92,17 @@ Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points)
 template <int dim>
 Quadrature<dim>::Quadrature (const Point<dim> &point)
                 :
-		n_quadrature_points(1),
 		quadrature_points(std::vector<Point<dim> > (1, point)),
 		weights(std::vector<double> (1, 1.))
 {}
 
 
 template <>
-Quadrature<0>::Quadrature (const Quadrature<-1> &,
-			   const Quadrature<1> &)
-		:
-                n_quadrature_points (1),
-		weights(1, 1.)
-{}
+Quadrature<0>::Quadrature (const SubQuadrature&,
+			   const Quadrature<1>&)
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
 
 
 
@@ -114,10 +110,8 @@ template <int dim>
 Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 			     const Quadrature<1> &q2)
 		:
-		n_quadrature_points (q1.size() *
-				     q2.size()),
-		quadrature_points (n_quadrature_points),
-		weights (n_quadrature_points, 0)
+		quadrature_points (q1.size() * q2.size()),
+		weights (q1.size() * q2.size())
 {
   unsigned int present_index = 0;
   for (unsigned int i2=0; i2<q2.size(); ++i2)
@@ -157,9 +151,8 @@ template <>
 Quadrature<1>::Quadrature (const SubQuadrature&,
 			   const Quadrature<1>& q2)
 		:
-		n_quadrature_points (q2.size()),
-		quadrature_points (n_quadrature_points),
-		weights (n_quadrature_points, 0)
+		quadrature_points (q2.size()),
+		weights (q2.size())
 {
   unsigned int present_index = 0;
   for (unsigned int i2=0; i2<q2.size(); ++i2)
@@ -194,22 +187,21 @@ Quadrature<1>::Quadrature (const SubQuadrature&,
 template <>
 Quadrature<0>::Quadrature (const Quadrature<1> &)
 		:
-		n_quadrature_points (1),
-		weights (1, 1.)
+		Subscriptor(),
+//		quadrature_points(1),
+		weights(1,1.)
 {}
 
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &)
 		:
-		n_quadrature_points (numbers::invalid_unsigned_int),
-		quadrature_points (),
-		weights ()
+		Subscriptor()
 {
                                    // this function should never be
                                    // called -- this should be the
                                    // copy constructor in 1d...
-  Assert (false, ExcInternalError());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
@@ -218,9 +210,8 @@ template <int dim>
 Quadrature<dim>::Quadrature (const Quadrature<dim != 1 ? 1 : 0> &q)
 		:
 		Subscriptor(),
-		n_quadrature_points (dimpow<dim>(q.size())),
-		quadrature_points (n_quadrature_points),
-		weights (n_quadrature_points, 0.)
+		quadrature_points (dimpow<dim>(q.size())),
+		weights (dimpow<dim>(q.size()))
 {
   Assert (dim <= 3, ExcNotImplemented());
   
@@ -253,7 +244,6 @@ template <int dim>
 Quadrature<dim>::Quadrature (const Quadrature<dim> &q)
 		:
 		Subscriptor(),
-		n_quadrature_points (q.size()),
 		quadrature_points (q.quadrature_points),
 		weights (q.weights)
 {}
@@ -265,7 +255,6 @@ Quadrature<dim>::operator= (const Quadrature<dim>& q)
 {
   weights = q.weights;
   quadrature_points = q.quadrature_points;
-  n_quadrature_points = q.size();
   return *this;
 }
 

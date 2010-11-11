@@ -588,14 +588,14 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 		:
 		FE_Poly<TensorProductPolynomials<dim>, dim, spacedim> (
 		  TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(points.get_points())),
-		  FiniteElementData<dim>(get_dpo_vector(points.n_quadrature_points-1),
-					 1, points.n_quadrature_points-1,
+		  FiniteElementData<dim>(get_dpo_vector(points.size()-1),
+					 1, points.size()-1,
 					 FiniteElementData<dim>::H1),
 		  std::vector<bool> (1, false),
 		  std::vector<std::vector<bool> >(1, std::vector<bool>(1,true))),
-		face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (points.n_quadrature_points-1)))
+		face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (points.size()-1)))
 {
-  const unsigned int degree = points.n_quadrature_points-1;
+  const unsigned int degree = points.size()-1;
 
   Assert (degree > 0,
           ExcMessage ("This element can only be used for polynomial degrees "

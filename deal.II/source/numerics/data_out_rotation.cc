@@ -62,7 +62,7 @@ namespace internal
 		    ParallelDataBase<dim,spacedim> (n_components,
 						    n_datasets,
 						    n_subdivisions,
-						    quadrature.n_quadrature_points,
+						    quadrature.size(),
 						    n_postprocessor_outputs,
 						    finite_elements),
 		    n_patches_per_circle (n_patches_per_circle),
@@ -507,7 +507,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
     {
       new_patches[i].n_subdivisions = n_subdivisions;
       new_patches[i].data.reinit (n_datasets,
-				  patch_points.n_quadrature_points
+				  patch_points.size()
 				  * (n_subdivisions+1));
     }
 

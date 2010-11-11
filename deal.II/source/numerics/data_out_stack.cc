@@ -279,7 +279,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
   hp::FEValues<dim> x_fe_patch_values (fe_collection, q_collection,
                                        update_values);
 
-  const unsigned int n_q_points = patch_points.n_quadrature_points;
+  const unsigned int n_q_points = patch_points.size();
   std::vector<double>          patch_values (n_q_points);
   std::vector<Vector<double> > patch_values_system (n_q_points,
 						    Vector<double>(n_components));

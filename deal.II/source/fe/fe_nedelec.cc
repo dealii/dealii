@@ -23,6 +23,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+//#define DEBUG_NEDELEC
 
 template <int dim>
 FE_Nedelec<dim>::FE_Nedelec (const unsigned int p) :
@@ -36,6 +37,10 @@ FE_PolyTensor<PolynomialsNedelec<dim>, dim>
   std::vector<bool> (dim, true))),
 deg (p)
 {
+#ifdef DEBUG_NEDELEC
+  deallog << get_name() << std::endl;
+#endif
+  
   Assert (dim >= 2, ExcImpossibleInDim(dim));
 
   const unsigned int n_dofs = this->dofs_per_cell;
@@ -58,11 +63,20 @@ deg (p)
 				   // matrices to the right sizes.
 				   // Restriction only for isotropic
 				   // refinement
+#ifdef DEBUG_NEDELEC
+  deallog << "Embedding" << std::endl;
+#endif
   this->reinit_restriction_and_prolongation_matrices ();
 				   // Fill prolongation matrices with embedding operators
   FETools::compute_embedding_matrices (*this, this->prolongation, true);
+#ifdef DEBUG_NEDELEC
+  deallog << "Restriction" << std::endl;
+#endif
   initialize_restriction ();
-
+  
+#ifdef DEBUG_NEDELEC
+  deallog << "Face Embedding" << std::endl;
+#endif
   FullMatrix<double> face_embeddings[GeometryInfo<dim>::max_children_per_face];
 
   for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_face; ++i)

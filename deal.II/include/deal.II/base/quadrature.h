@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -89,26 +89,6 @@ class Quadrature : public Subscriptor
 				      * then be a face quadrature.
 				      */
     typedef Quadrature<dim-1> SubQuadrature;
-
-				     /**
-				      * @deprecated Use size()
-				      * instead.
-				      *
-				      * Number of quadrature points.
-				      *
-				      * @warning After introduction of
-				      * the assignment operator, this
-				      * number is not constant anymore
-				      * and erroneous assignment can
-				      * compromise integrity of the
-				      * Quadrature object. Since
-				      * direct data access should be
-				      * considered a design flaw
-				      * anyway, it is strongly
-				      * suggested to use size()
-				      * instead.
-				      */
-    unsigned int n_quadrature_points;
 
 				     /**
 				      * Constructor.

@@ -72,7 +72,7 @@ SupportQuadrature (const unsigned int map_degree)
 				   // trapezoidal quadrature rule.
   const QTrapez<1> q1d;
   const QIterated<dim> q_iterated(q1d,map_degree);
-  const unsigned int n_q_points = q_iterated.n_quadrature_points;
+  const unsigned int n_q_points = q_iterated.size();
 
 				   // we then need to define a renumbering
 				   // vector that allows us to go from a
@@ -150,7 +150,7 @@ compute_mapping_support_points
 				   // components appropriately, or create a
 				   // separate dof handler for the displacements.
 
-  const unsigned int n_support_pts = support_quadrature.n_quadrature_points;
+  const unsigned int n_support_pts = support_quadrature.size();
   const unsigned int n_components  = euler_dof_handler->get_fe().n_components();
 
   Assert (n_components >= spacedim, ExcDimensionMismatch(n_components, spacedim) );

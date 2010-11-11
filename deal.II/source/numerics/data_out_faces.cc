@@ -49,7 +49,7 @@ namespace internal
 		  ParallelDataBase<dim,spacedim> (n_components,
 						  n_datasets,
 						  n_subdivisions,
-						  quadrature.n_quadrature_points,
+						  quadrature.size(),
 						  n_postprocessor_outputs,
 						  finite_elements),
 		  q_collection (quadrature),
@@ -357,7 +357,7 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   DataOutBase::Patch<DH::dimension-1,DH::space_dimension> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;
   sample_patch.data.reinit (n_datasets,
-			    patch_points.n_quadrature_points);
+			    patch_points.size());
 
 				   // now build the patches in parallel
   WorkStream::run (&all_faces[0],

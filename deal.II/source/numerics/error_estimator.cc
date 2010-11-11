@@ -330,7 +330,7 @@ namespace internal
     void
     ParallelData<DH>::resize (const unsigned int active_fe_index)
     {
-      const unsigned int n_q_points   = face_quadratures[active_fe_index].n_quadrature_points;
+      const unsigned int n_q_points   = face_quadratures[active_fe_index].size();
       const unsigned int n_components = finite_element.n_components();
 
       normal_vectors.resize(n_q_points);
@@ -420,8 +420,7 @@ namespace internal
       const unsigned int dim = DH::dimension;
 
       const typename DH::face_iterator face = cell->face(face_no);
-      const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()]
-					      .n_quadrature_points,
+      const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()].size(),
 			 n_components       = parallel_data.finite_element.n_components(),
 			 n_solution_vectors = solutions.size();
 
@@ -632,8 +631,7 @@ namespace internal
       const unsigned int dim = DH::dimension;
 
       const typename DH::cell_iterator neighbor = cell->neighbor(face_no);
-      const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()]
-					      .n_quadrature_points,
+      const unsigned int n_q_points         = parallel_data.face_quadratures[cell->active_fe_index()].size(),
 			 n_components       = parallel_data.finite_element.n_components(),
 			 n_solution_vectors = solutions.size();
       const typename DH::face_iterator
