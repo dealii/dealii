@@ -1602,27 +1602,97 @@ class TriaAccessor<0, dim, spacedim>
  * @author Wolfgang Bangerth, 2010
  */
 template <int spacedim>
-class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
+class TriaAccessor<0, 1, spacedim>
 {
   public:
 				     /**
-				      * Propagate typedef from
-				      * base class to this class.
+				      *  Dimension of the space the
+				      *  object represented by this
+				      *  accessor lives in. For
+				      *  example, if this accessor
+				      *  represents a quad that is
+				      *  part of a two-dimensional
+				      *  surface in four-dimensional
+				      *  space, then this value is
+				      *  four.
 				      */
-    typedef typename TriaAccessorBase<0,1,spacedim>::AccessorData AccessorData;
+    static const unsigned int space_dimension = spacedim;
+
+				     /**
+				      * Dimensionality of the object
+				      * that the thing represented by
+				      * this accessopr is part of. For
+				      * example, if this accessor
+				      * represents a line that is part
+				      * of a hexahedron, then this
+				      * value will be three.
+				      */
+    static const unsigned int dimension = 1;
+
+				     /**
+				      * Dimensionality of the current
+				      * object represented by this
+				      * accessor. For example, if it
+				      * is line (irrespective of
+				      * whether it is part of a quad
+				      * or hex, and what dimension we
+				      * are in), then this value
+				      * equals 1.
+				      */
+    static const unsigned int structure_dimension = 0;
+
+				     /**
+				      * Pointer to internal data.
+				      */
+    typedef void AccessorData;
+
+				     /**
+				      * Whether the vertex represented
+				      * here is at the left end of the
+				      * domain, the right end, or in
+				      * the interior.
+				      */
+    enum VertexKind
+    {
+	  left_vertex,
+	  interior_vertex,
+	  right_vertex
+    };
 
 				     /**
 				      * Constructor. Should never be
 				      * called and thus produces an
 				      * error.
 				      */
-    TriaAccessor (const Triangulation<1,spacedim> *parent     =  0,
-		  const int                 level      = -1,
-		  const int                 index      = -1,
-		  const AccessorData       *local_data =  0)
-                    :
-		    TriaAccessorBase<0,1, spacedim> (parent, level, index, local_data)
+    TriaAccessor (const Triangulation<1,spacedim> * tria,
+		  const VertexKind      vertex_kind,
+		  const unsigned int    vertex_index)
+		    :
+		    tria (tria),
+		    vertex_kind (vertex_kind),
+		    global_vertex_index (vertex_index)
       {}
+
+				     /**
+				      * Constructor. This constructor
+				      * exists in order to maintain
+				      * interface compatibility with
+				      * the other accessor
+				      * classes. However, it doesn't
+				      * do anything useful here and so
+				      * may not actually be called.
+				      */
+    TriaAccessor (const Triangulation<1,spacedim> * =  0,
+		  const int = 0,
+		  const int = 0,
+		  const AccessorData * = 0)
+		    :
+		    tria (0),
+		    vertex_kind (interior_vertex),
+		    global_vertex_index (numbers::invalid_unsigned_int)
+      {
+	Assert (false, ExcInternalError());
+      }
 
 				     /**
 				      * Constructor. Should never be
@@ -1631,6 +1701,10 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      */
     template <int structdim2, int dim2, int spacedim2>
     TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
+		    :
+		    tria (0),
+		    vertex_kind (interior_vertex),
+		    global_vertex_index (numbers::invalid_unsigned_int)
       {
 	Assert(false, ExcImpossibleInDim(0));
       }
@@ -1642,8 +1716,46 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      */
     template <int structdim2, int dim2, int spacedim2>
     TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+		    :
+		    tria (0),
+		    vertex_kind (interior_vertex),
+		    global_vertex_index (numbers::invalid_unsigned_int)
       {
 	Assert(false, ExcImpossibleInDim(0));
+      }
+
+				     /**
+				      *  Return the state of the
+				      *  iterator. Since an iterator
+				      *  to points can not be
+				      *  incremented or decremented,
+				      *  its state remains constant,
+				      *  and in particular equal to
+				      *  IteratorState::valid.
+				      */
+    static IteratorState::IteratorStates state ()
+      {
+	return IteratorState::valid;
+      }
+
+				     /**
+				      * Level of this object. Vertices
+				      * have no level, so this
+				      * function always returns zero.
+				      */
+    static int level ()
+      {
+	return 0;
+      }
+
+				     /**
+				      * Index of this object. Vertices
+				      * have no index, so this
+				      * function always returns -1.
+				      */
+    static int index ()
+      {
+	return -1;
       }
 
 				     /**
@@ -1716,10 +1828,10 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */
-    unsigned int vertex_index (const unsigned int i) const
+    unsigned int vertex_index (const unsigned int i = 0) const
       {
-	Assert(false, ExcNotImplemented());
-	return numbers::invalid_unsigned_int;
+	Assert(i==0, ExcIndexRange(i, 0, 1));
+	return global_vertex_index;
       }
 
 				     /**
@@ -1730,11 +1842,10 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      *  object refers. Otherwise, it
 				      *  throws an exception.
 				      */
-    Point<spacedim> & vertex (const unsigned int i) const
+    Point<spacedim> & vertex (const unsigned int i = 0) const
       {
-	Assert(false, ExcNotImplemented());
-	static const Point<spacedim> p;
-	return p;
+	Assert(i==0, ExcIndexRange(i, 0, 1));
+	return const_cast<Point<spacedim> &> (this->tria->vertices[global_vertex_index]);
       }
 
 
@@ -1743,11 +1854,51 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      * bounding this object. Will
 				      * point to an invalid object.
 				      */
-//     typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
-//     line (const unsigned int i) const
-//       {
-// 	return TriaIterator<InvalidAccessor<0,1,spacedim> >();
-//       }
+    typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
+    line (const unsigned int i) const
+      {
+	return typename internal::Triangulation::Iterators<1,spacedim>::line_iterator();
+      }
+
+				     /**
+				      * Return whether this point is
+				      * at the boundary of the
+				      * one-dimensional triangulation
+				      * we deal with here.
+				      */
+    bool at_boundary () const
+      {
+	return vertex_kind != interior_vertex;
+      }
+
+
+				     /**
+				      * Boundary indicator of this
+				      * object. The convention for one
+				      * dimensional triangulations is
+				      * that left end vertices have
+				      * boundary indicator zero, and
+				      * right end vertices have
+				      * boundary indicator one.
+				      *
+				      * If the return value is the special
+				      * value 255, then this object is in the
+				      * interior of the domain.
+				      */
+    unsigned char boundary_indicator () const
+      {
+	switch (vertex_kind)
+	  {
+	    case left_vertex:
+		  return 0;
+	    case right_vertex:
+		  return 1;
+	    default:
+		  return 255;
+	  }
+      }
+
+
 
 
 				     /**
@@ -1770,8 +1921,12 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      * Pointer to the @p ith quad
 				      * bounding this object.
 				      */
-//     typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
-//     quad (const unsigned int i) const;
+    typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+    quad (const unsigned int i) const
+      {
+	return typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator();
+      }
+
 
 				     /**
 				      * Quad index of the @p ith
@@ -1925,15 +2080,6 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
       {
 	return -1;
       }
-				     /**
-				      * @brief Do nothing and throw and error
-				      */
-    inline
-    unsigned char boundary_indicator () const
-      {
-	Assert(false, ExcImpossibleInDim(0));
-	return 0;
-      }
 
 				     /**
 				      * @brief Do nothing and throw and error
@@ -1942,7 +2088,9 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
     void
     set_boundary_indicator (const unsigned char) const
       {
-	Assert(false, ExcImpossibleInDim(0));
+	Assert(false,
+	       ExcMessage ("The boundary indicator of vertices is determined by their "
+			   "location within a triangulation and can not be set explicitly"));
       }
 
 				     /**
@@ -1950,18 +2098,24 @@ class TriaAccessor<0, 1, spacedim> : public TriaAccessorBase<0,1, spacedim>
 				      */
     void set_all_boundary_indicators (const unsigned char) const
       {
-	Assert(false, ExcImpossibleInDim(0));
+	Assert(false,
+	       ExcMessage ("The boundary indicator of vertices is determined by their "
+			   "location within a triangulation and can not be set explicitly"));
       }
 
 				     /**
-				      * @brief Do nothing and throw and error
+				      * Return whether the vertex
+				      * pointed to here is used.
 				      */
     bool used () const
       {
-	Assert(false, ExcImpossibleInDim(0));
-	return false;
+	return tria->vertex_used(global_vertex_index);
       }
 
+  protected:
+    const Triangulation<1,spacedim> * tria;
+    const VertexKind      vertex_kind;
+    const unsigned int    global_vertex_index;
 };
 
 

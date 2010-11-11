@@ -1313,7 +1313,7 @@ TriaAccessor<structdim, dim, spacedim>::
 parent_index () const
 {
   Assert (this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent ());
-  
+
   					// the parent of two consecutive cells
   					// is stored only once, since it is
   					// the same
@@ -1987,28 +1987,61 @@ CellAccessor (const CellAccessor &cell_accessor)
 
 
 
+namespace internal
+{
+  namespace CellAccessor
+  {
+    template <int spacedim>
+    inline
+    dealii::TriaIterator<dealii::TriaAccessor<0, 1, spacedim> >
+    get_face (const dealii::CellAccessor<1,spacedim> &cell,
+	      const unsigned int i)
+    {
+      dealii::TriaAccessor<0, 1, spacedim>
+	a (&cell.get_triangulation(),
+	   ((i == 0) && cell.at_boundary(0)
+	    ?
+	    dealii::TriaAccessor<0, 1, spacedim>::left_vertex
+	    :
+	    ((i == 1) && cell.at_boundary(1)
+	     ?
+	     dealii::TriaAccessor<0, 1, spacedim>::right_vertex
+	     :
+	     dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
+	   cell.vertex_index(i));
+      return dealii::TriaIterator<dealii::TriaAccessor<0, 1, spacedim> >(a);
+    }
+
+
+    template <int spacedim>
+    inline
+    dealii::TriaIterator<dealii::TriaAccessor<1, 2, spacedim> >
+    get_face (const dealii::CellAccessor<2,spacedim> &cell,
+	      const unsigned int i)
+    {
+      return cell.line(i);
+    }
+
+
+    template <int spacedim>
+    inline
+    dealii::TriaIterator<dealii::TriaAccessor<1, 2, spacedim> >
+    get_face (const dealii::CellAccessor<3,spacedim> &cell,
+	      const unsigned int i)
+    {
+      return cell.quad(i);
+    }
+  }
+}
+
+
+
 template <int dim, int spacedim>
 inline
 TriaIterator<TriaAccessor<dim-1, dim, spacedim> >
 CellAccessor<dim,spacedim>::face (const unsigned int i) const
 {
-  switch (dim)
-    {
-      case 1:
-      {
-	Assert (false, ExcImpossibleInDim(1));
-	return TriaIterator<InvalidAccessor<dim-1,dim,spacedim> >();
-      }
-
-      case 2:
-	    return this->line(i);
-
-      case 3:
-	    return this->quad(i);
-
-      default:
-	    return TriaIterator<TriaAccessor<dim-1,dim,dim> >();
-    }
+  return internal::CellAccessor::get_face (*this, i);
 }
 
 

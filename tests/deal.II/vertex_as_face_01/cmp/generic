@@ -1,0 +1,31 @@
+
+DEAL::Coarse mesh:
+DEAL::Left vertex=0.00000
+DEAL::Right vertex=1.00000
+DEAL::Cell: 2.0
+DEAL::Left vertex=0.00000
+DEAL::Right vertex=0.250000
+DEAL::Cell: 2.1
+DEAL::Left vertex=0.250000
+DEAL::Right vertex=0.500000
+DEAL::Cell: 2.2
+DEAL::Left vertex=0.500000
+DEAL::Right vertex=0.750000
+DEAL::Cell: 2.3
+DEAL::Left vertex=0.750000
+DEAL::Right vertex=1.00000
+DEAL::Coarse mesh:
+DEAL::Left vertex=0.00000 0.00000
+DEAL::Right vertex=1.00000 0.00000
+DEAL::Cell: 2.0
+DEAL::Left vertex=0.00000 0.00000
+DEAL::Right vertex=0.250000 0.00000
+DEAL::Cell: 2.1
+DEAL::Left vertex=0.250000 0.00000
+DEAL::Right vertex=0.500000 0.00000
+DEAL::Cell: 2.2
+DEAL::Left vertex=0.500000 0.00000
+DEAL::Right vertex=0.750000 0.00000
+DEAL::Cell: 2.3
+DEAL::Left vertex=0.750000 0.00000
+DEAL::Right vertex=1.00000 0.00000

@@ -107,7 +107,7 @@ namespace internal
 					  * See the full documentation for
 					  * more information.
 					  */
-	typedef CellAccessor<dim,spacedim> BaseClass;
+	typedef dealii::CellAccessor<dim,spacedim> BaseClass;
     };
   }
 }
