@@ -139,11 +139,16 @@ template <int dim, int spacedim>
 void
 GridGenerator::colorize_hyper_rectangle (Triangulation<dim,spacedim> &tria)
 {
-				   // there is only one cell, so
-				   // simple task
-  const typename Triangulation<dim,spacedim>::cell_iterator cell = tria.begin();
-  for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-    cell->face(f)->set_boundary_indicator (f);
+				   // there is nothing to do in 1d
+  if (dim > 1)
+    {
+				       // there is only one cell, so
+				       // simple task
+      const typename Triangulation<dim,spacedim>::cell_iterator
+	cell = tria.begin();
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	cell->face(f)->set_boundary_indicator (f);
+    }
 }
 
 
