@@ -310,7 +310,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   <br>
   (GK 2010/11/7)
   </p></li>
-  
+
   <li><p>New: The classes RelaxationBlockSOR and RelaxationBlockSSOR
   implement overlapping Schwarz relaxation methods. Additionally,
   their base class RelaxationBlock and the helper class BlockList have
@@ -347,6 +347,18 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: There is now a class TriaAccessor<0,1,spacedim> that allows
+  to write things like
+  @code
+    cell->face(0)->boundary_indicator();
+    cell->face(1)->at_boundary();
+  @endcode
+  even if the cell corresponds to a one-dimensional triangulation where
+  this was not previously possible.
+  <br>
+  (WB, 2010/11/11)
+  </p></li>
+
   <li><p>New: The GridOut::write_gnuplot function now also works for meshes
   that are embedded in a higher
   dimensional space (i.e. if the codimension was greater than 1).
