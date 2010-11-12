@@ -1960,6 +1960,354 @@ is_translation_of (const TriaIterator<TriaAccessor<structdim,dim,spacedim> > &o)
 }
 
 
+/*------------------------ Functions: TriaAccessor<0,1,spacedim> -----------------------*/
+
+template <int spacedim>
+inline
+TriaAccessor<0, 1, spacedim>::
+TriaAccessor (const Triangulation<1,spacedim> * tria,
+	      const VertexKind      vertex_kind,
+	      const unsigned int    vertex_index)
+		:
+		tria (tria),
+		vertex_kind (vertex_kind),
+		global_vertex_index (vertex_index)
+{}
+
+
+
+template <int spacedim>
+inline
+TriaAccessor<0, 1, spacedim>::
+TriaAccessor (const Triangulation<1,spacedim> *,
+	      const int,
+	      const int,
+	      const AccessorData *)
+		:
+		tria (0),
+		vertex_kind (interior_vertex),
+		global_vertex_index (numbers::invalid_unsigned_int)
+{
+  Assert (false, ExcInternalError());
+}
+
+
+
+template <int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+TriaAccessor<0, 1, spacedim>::
+TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
+		:
+		tria (0),
+		vertex_kind (interior_vertex),
+		global_vertex_index (numbers::invalid_unsigned_int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+TriaAccessor<0, 1, spacedim>::
+TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+		:
+		tria (0),
+		vertex_kind (interior_vertex),
+		global_vertex_index (numbers::invalid_unsigned_int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+}
+
+
+
+template <int spacedim>
+inline
+IteratorState::IteratorStates
+TriaAccessor<0, 1, spacedim>::state ()
+{
+  return IteratorState::valid;
+}
+
+
+template <int spacedim>
+inline
+int
+TriaAccessor<0, 1, spacedim>::level ()
+{
+  return 0;
+}
+
+
+
+template <int spacedim>
+inline
+int
+TriaAccessor<0, 1, spacedim>::index ()
+{
+  return -1;
+}
+
+
+
+template <int spacedim>
+inline
+void
+TriaAccessor<0, 1, spacedim>::operator ++ () const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <int spacedim>
+inline
+void
+TriaAccessor<0, 1, spacedim>::operator -- () const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <int spacedim>
+inline
+int
+TriaAccessor<0, 1, spacedim>::parent_index ()
+{
+  return -1;
+}
+
+
+template <int spacedim>
+inline
+unsigned int
+TriaAccessor<0, 1, spacedim>::vertex_index (const unsigned int i) const
+{
+  Assert(i==0, ExcIndexRange(i, 0, 1));
+  return global_vertex_index;
+}
+
+
+
+template <int spacedim>
+inline
+Point<spacedim> &
+TriaAccessor<0, 1, spacedim>::vertex (const unsigned int i) const
+{
+  Assert(i==0, ExcIndexRange(i, 0, 1));
+  return const_cast<Point<spacedim> &> (this->tria->vertices[global_vertex_index]);
+}
+
+
+template <int spacedim>
+inline
+typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
+TriaAccessor<0, 1, spacedim>::line (const unsigned int)
+{
+  return typename internal::Triangulation::Iterators<1,spacedim>::line_iterator();
+}
+
+
+template <int spacedim>
+inline
+unsigned int
+TriaAccessor<0, 1, spacedim>::line_index (const unsigned int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+  return numbers::invalid_unsigned_int;
+}
+
+
+template <int spacedim>
+inline
+typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+TriaAccessor<0, 1, spacedim>::quad (const unsigned int)
+{
+  return typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator();
+}
+
+
+
+template <int spacedim>
+inline
+unsigned int
+TriaAccessor<0, 1, spacedim>::quad_index (const unsigned int)
+{
+  Assert(false, ExcImpossibleInDim(0));
+  return numbers::invalid_unsigned_int;
+}
+
+
+template <int spacedim>
+inline
+bool
+TriaAccessor<0, 1, spacedim>::at_boundary () const
+{
+  return vertex_kind != interior_vertex;
+}
+
+
+template <int spacedim>
+inline
+unsigned char
+TriaAccessor<0, 1, spacedim>::boundary_indicator () const
+{
+  switch (vertex_kind)
+    {
+      case left_vertex:
+	    return 0;
+      case right_vertex:
+	    return 1;
+      default:
+	    return 255;
+    }
+
+}
+
+
+template <int spacedim>
+inline
+bool TriaAccessor<0, 1, spacedim>::face_orientation (const unsigned int face)
+{
+  return false;
+}
+
+
+
+template <int spacedim>
+inline
+bool TriaAccessor<0, 1, spacedim>::face_flip (const unsigned int face)
+{
+  return false;
+}
+
+
+
+template <int spacedim>
+inline
+bool TriaAccessor<0, 1, spacedim>::face_rotation (const unsigned int face)
+{
+  return false;
+}
+
+
+
+template <int spacedim>
+inline
+bool TriaAccessor<0, 1, spacedim>::line_orientation (const unsigned int line)
+{
+  return false;
+}
+
+
+
+template <int spacedim>
+inline
+bool TriaAccessor<0, 1, spacedim>::has_children ()
+{
+  return false;
+}
+
+
+
+template <int spacedim>
+inline
+unsigned int TriaAccessor<0, 1, spacedim>::n_children()
+{
+  return 0;
+}
+
+
+
+template <int spacedim>
+inline
+unsigned int TriaAccessor<0, 1, spacedim>::number_of_children ()
+{
+  return 0;
+}
+
+
+
+template <int spacedim>
+inline
+unsigned int TriaAccessor<0, 1, spacedim>::max_refinement_depth ()
+{
+  return 0;
+}
+
+
+template <int spacedim>
+inline
+TriaIterator<InvalidAccessor<0,1,spacedim> >
+TriaAccessor<0, 1, spacedim>::child (const unsigned int)
+{
+  return TriaIterator<InvalidAccessor<0,1,spacedim> >();
+}
+
+
+template <int spacedim>
+inline
+TriaIterator<InvalidAccessor<0,1,spacedim> >
+TriaAccessor<0, 1, spacedim>::isotropic_child (const unsigned int)
+{
+  return TriaIterator<InvalidAccessor<0,1,spacedim> >();
+}
+
+
+template <int spacedim>
+inline
+RefinementCase<0> TriaAccessor<0, 1, spacedim>::refinement_case ()
+{
+  return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
+}
+
+template <int spacedim>
+inline
+int TriaAccessor<0, 1, spacedim>::child_index (const unsigned int i)
+{
+  return -1;
+}
+
+
+template <int spacedim>
+inline
+int TriaAccessor<0, 1, spacedim>::isotropic_child_index (const unsigned int)
+{
+  return -1;
+}
+
+
+template <int spacedim>
+inline
+void
+TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const unsigned char)
+{
+  Assert(false,
+	 ExcMessage ("The boundary indicator of vertices is determined by their "
+		     "location within a triangulation and can not be set explicitly"));
+}
+
+
+
+template <int spacedim>
+inline
+void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const unsigned char)
+{
+  Assert(false,
+	 ExcMessage ("The boundary indicator of vertices is determined by their "
+		     "location within a triangulation and can not be set explicitly"));
+}
+
+
+
+template <int spacedim>
+inline
+bool TriaAccessor<0, 1, spacedim>::used () const
+{
+  return tria->vertex_used(global_vertex_index);
+}
 
 /*------------------------ Functions: CellAccessor<dim,spacedim> -----------------------*/
 

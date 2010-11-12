@@ -1660,18 +1660,28 @@ class TriaAccessor<0, 1, spacedim>
     };
 
 				     /**
-				      * Constructor. Should never be
-				      * called and thus produces an
-				      * error.
+				      * Constructor.
+				      *
+				      * Since there is no mapping from
+				      * vertices to cells, an accessor
+				      * object for a point has no way
+				      * to figure out whether it is at
+				      * the boundary of the domain or
+				      * not. Consequently, the second
+				      * argument must be passed by the
+				      * object that generates this
+				      * accessor -- e.g. a 1d cell
+				      * that can figure out whether
+				      * its left or right vertex are
+				      * at the boundary.
+				      *
+				      * The third argument is the
+				      * global index of the vertex we
+				      * point to.
 				      */
     TriaAccessor (const Triangulation<1,spacedim> * tria,
 		  const VertexKind      vertex_kind,
-		  const unsigned int    vertex_index)
-		    :
-		    tria (tria),
-		    vertex_kind (vertex_kind),
-		    global_vertex_index (vertex_index)
-      {}
+		  const unsigned int    vertex_index);
 
 				     /**
 				      * Constructor. This constructor
@@ -1685,14 +1695,7 @@ class TriaAccessor<0, 1, spacedim>
     TriaAccessor (const Triangulation<1,spacedim> * =  0,
 		  const int = 0,
 		  const int = 0,
-		  const AccessorData * = 0)
-		    :
-		    tria (0),
-		    vertex_kind (interior_vertex),
-		    global_vertex_index (numbers::invalid_unsigned_int)
-      {
-	Assert (false, ExcInternalError());
-      }
+		  const AccessorData * = 0);
 
 				     /**
 				      * Constructor. Should never be
@@ -1700,14 +1703,7 @@ class TriaAccessor<0, 1, spacedim>
 				      * error.
 				      */
     template <int structdim2, int dim2, int spacedim2>
-    TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
-		    :
-		    tria (0),
-		    vertex_kind (interior_vertex),
-		    global_vertex_index (numbers::invalid_unsigned_int)
-      {
-	Assert(false, ExcImpossibleInDim(0));
-      }
+    TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &);
 
 				     /**
 				      * Constructor. Should never be
@@ -1715,14 +1711,7 @@ class TriaAccessor<0, 1, spacedim>
 				      * error.
 				      */
     template <int structdim2, int dim2, int spacedim2>
-    TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
-		    :
-		    tria (0),
-		    vertex_kind (interior_vertex),
-		    global_vertex_index (numbers::invalid_unsigned_int)
-      {
-	Assert(false, ExcImpossibleInDim(0));
-      }
+    TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
 
 				     /**
 				      *  Return the state of the
@@ -1733,30 +1722,21 @@ class TriaAccessor<0, 1, spacedim>
 				      *  and in particular equal to
 				      *  IteratorState::valid.
 				      */
-    static IteratorState::IteratorStates state ()
-      {
-	return IteratorState::valid;
-      }
+    static IteratorState::IteratorStates state ();
 
 				     /**
 				      * Level of this object. Vertices
 				      * have no level, so this
 				      * function always returns zero.
 				      */
-    static int level ()
-      {
-	return 0;
-      }
+    static int level ();
 
 				     /**
 				      * Index of this object. Vertices
 				      * have no index, so this
 				      * function always returns -1.
 				      */
-    static int index ()
-      {
-	return -1;
-      }
+    static int index ();
 
 				     /**
 				      * @name Advancement of iterators
@@ -1772,11 +1752,7 @@ class TriaAccessor<0, 1, spacedim>
 				      *  you can't iterate over point
 				      *  iterators.
 				      */
-    void operator ++ ()
-      {
-	Assert (false, ExcNotImplemented());
-      }
-
+    void operator ++ () const;
 
     				     /**
 				      *  This operator moves the
@@ -1786,10 +1762,7 @@ class TriaAccessor<0, 1, spacedim>
 				      *  you can't iterate over point
 				      *  iterators.
 				      */
-    void operator -- ()
-      {
-	Assert (false, ExcNotImplemented());
-      }
+    void operator -- () const;
 				     /**
 				      * @}
 				      */
@@ -1798,11 +1771,7 @@ class TriaAccessor<0, 1, spacedim>
 				      *  Index of the parent. You
 				      *  can't do this for points.
 				      */
-    int parent_index () const
-      {
-	Assert (false, ExcNotImplemented());
-	return -1;
-      }
+    static int parent_index ();
 
 				     /**
 				      *  @name Accessing sub-objects
@@ -1828,11 +1797,7 @@ class TriaAccessor<0, 1, spacedim>
 				      *  @p DoFAccessor::vertex_dof_index
 				      *  functions.
 				      */
-    unsigned int vertex_index (const unsigned int i = 0) const
-      {
-	Assert(i==0, ExcIndexRange(i, 0, 1));
-	return global_vertex_index;
-      }
+    unsigned int vertex_index (const unsigned int i = 0) const;
 
 				     /**
 				      *  Return a reference to the
@@ -1842,12 +1807,7 @@ class TriaAccessor<0, 1, spacedim>
 				      *  object refers. Otherwise, it
 				      *  throws an exception.
 				      */
-    Point<spacedim> & vertex (const unsigned int i = 0) const
-      {
-	Assert(i==0, ExcIndexRange(i, 0, 1));
-	return const_cast<Point<spacedim> &> (this->tria->vertices[global_vertex_index]);
-      }
-
+    Point<spacedim> & vertex (const unsigned int i = 0) const;
 
 				     /**
 				      * Pointer to the @p ith line
@@ -1855,10 +1815,42 @@ class TriaAccessor<0, 1, spacedim>
 				      * point to an invalid object.
 				      */
     typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
-    line (const unsigned int i) const
-      {
-	return typename internal::Triangulation::Iterators<1,spacedim>::line_iterator();
-      }
+    static line (const unsigned int);
+
+				     /**
+				      * Line index of the @p ith
+				      * line bounding this object.
+				      *
+				      * Implemented only for
+				      * <tt>structdim>1</tt>,
+				      * otherwise an exception
+				      * generated.
+				      */
+    static unsigned int line_index (const unsigned int i);
+
+    				     /**
+				      * Pointer to the @p ith quad
+				      * bounding this object.
+				      */
+    static
+    typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+    quad (const unsigned int i);
+
+				     /**
+				      * Quad index of the @p ith
+				      * quad bounding this object.
+				      *
+				      * Implemented only for
+				      * <tt>structdim>2</tt>,
+				      * otherwise an exception
+				      * generated.
+				      */
+    static unsigned int quad_index (const unsigned int i);
+
+				     /**
+				      * @}
+				      */
+
 
 				     /**
 				      * Return whether this point is
@@ -1866,11 +1858,7 @@ class TriaAccessor<0, 1, spacedim>
 				      * one-dimensional triangulation
 				      * we deal with here.
 				      */
-    bool at_boundary () const
-      {
-	return vertex_kind != interior_vertex;
-      }
-
+    bool at_boundary () const;
 
 				     /**
 				      * Boundary indicator of this
@@ -1885,66 +1873,7 @@ class TriaAccessor<0, 1, spacedim>
 				      * value 255, then this object is in the
 				      * interior of the domain.
 				      */
-    unsigned char boundary_indicator () const
-      {
-	switch (vertex_kind)
-	  {
-	    case left_vertex:
-		  return 0;
-	    case right_vertex:
-		  return 1;
-	    default:
-		  return 255;
-	  }
-      }
-
-
-
-
-				     /**
-				      * Line index of the @p ith
-				      * line bounding this object.
-				      *
-				      * Implemented only for
-				      * <tt>structdim>1</tt>,
-				      * otherwise an exception
-				      * generated.
-				      */
-    unsigned int line_index (const unsigned int i) const
-      {
-	Assert(false, ExcImpossibleInDim(0));
-	return numbers::invalid_unsigned_int;
-      }
-
-
-    				     /**
-				      * Pointer to the @p ith quad
-				      * bounding this object.
-				      */
-    typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator
-    quad (const unsigned int i) const
-      {
-	return typename internal::Triangulation::Iterators<1,spacedim>::quad_iterator();
-      }
-
-
-				     /**
-				      * Quad index of the @p ith
-				      * quad bounding this object.
-				      *
-				      * Implemented only for
-				      * <tt>structdim>2</tt>,
-				      * otherwise an exception
-				      * generated.
-				      */
-    unsigned int quad_index (const unsigned int i) const
-      {
-	Assert(false, ExcImpossibleInDim(0));
-	return numbers::invalid_unsigned_int;
-      }
-				     /**
-				      * @}
-				      */
+    unsigned char boundary_indicator () const;
 
 				     /**
 				      *  @name Orientation of sub-objects
@@ -1956,35 +1885,22 @@ class TriaAccessor<0, 1, spacedim>
                                      /**
 				      * @brief Always return false
                                       */
-    bool face_orientation (const unsigned int face) const
-      {
-	return false;
-      }
+    static bool face_orientation (const unsigned int face);
 
                                      /**
 				      * @brief Always return false
                                       */
-    bool face_flip (const unsigned int face) const
-      {
-	return false;
-      }
+    static bool face_flip (const unsigned int face);
 
                                      /**
 				      * @brief Always return false
                                       */
-    bool face_rotation (const unsigned int face) const
-      {
-	return false;
-      }
-
+    static bool face_rotation (const unsigned int face);
 
                                      /**
 				      * @brief Always return false
                                       */
-    bool line_orientation (const unsigned int line) const
-      {
-	return false;
-      }
+    static bool line_orientation (const unsigned int line);
 
 				     /**
 				      * @}
@@ -2001,120 +1917,101 @@ class TriaAccessor<0, 1, spacedim>
 				      *  Test whether the object has
 				      *  children. Always false.
 				      */
-    bool has_children () const
-      {
-	return false;
-      }
-
+    static bool has_children ();
 
 				     /**
 				      * Return the number of immediate
 				      * children of this object.This
 				      * is always zero in dimension 0.
 				      */
-    unsigned int n_children() const
-      {
-	return 0;
-      }
+    static unsigned int n_children();
 
 				     /**
 				      * Compute and return the number
 				      * of active descendants of this
 				      * objects. Always zero.
 				      */
-    unsigned int number_of_children () const
-      {
-	return 0;
-      }
+    static unsigned int number_of_children ();
 
     				     /**
 				      * Return the number of times
 				      * that this object is
 				      * refined. Always 0.
 				      */
-    unsigned int max_refinement_depth () const
-      {
-	return 0;
-      }
+    static unsigned int max_refinement_depth ();
 
 				     /**
 				      * @brief Return an invalid object
 				      */
+    static
     TriaIterator<InvalidAccessor<0,1,spacedim> >
-    child (const unsigned int) const
-      {
-	return TriaIterator<InvalidAccessor<0,1,spacedim> >();
-      }
+    child (const unsigned int);
 
 				     /**
 				      * @brief Return an invalid object
 				      */
+    static
     TriaIterator<InvalidAccessor<0,1,spacedim> >
-    isotropic_child (const unsigned int) const
-      {
-	return TriaIterator<InvalidAccessor<0,1,spacedim> >();
-      }
+    isotropic_child (const unsigned int);
 
 				     /**
 				      * Always return no refinement.
 				      */
-    RefinementCase<0> refinement_case () const
-      {
-	return RefinementCase<0>(RefinementPossibilities<0>::no_refinement);
-      }
-
+    static
+    RefinementCase<0> refinement_case ();
 
 				     /**
 				      * @brief Returns -1
 				      */
-    int child_index (const unsigned int i) const
-      {
-	return -1;
-      }
-
+    static
+    int child_index (const unsigned int i);
 
 				     /**
 				      * @brief Returns -1
 				      */
-    int isotropic_child_index (const unsigned int i) const
-      {
-	return -1;
-      }
+    static
+    int isotropic_child_index (const unsigned int i);
 
 				     /**
 				      * @brief Do nothing and throw and error
 				      */
-    inline
+    static
     void
-    set_boundary_indicator (const unsigned char) const
-      {
-	Assert(false,
-	       ExcMessage ("The boundary indicator of vertices is determined by their "
-			   "location within a triangulation and can not be set explicitly"));
-      }
+    set_boundary_indicator (const unsigned char);
 
 				     /**
 				      * @brief Do nothing and throw and error
 				      */
-    void set_all_boundary_indicators (const unsigned char) const
-      {
-	Assert(false,
-	       ExcMessage ("The boundary indicator of vertices is determined by their "
-			   "location within a triangulation and can not be set explicitly"));
-      }
+    static
+    void set_all_boundary_indicators (const unsigned char);
 
 				     /**
 				      * Return whether the vertex
 				      * pointed to here is used.
 				      */
-    bool used () const
-      {
-	return tria->vertex_used(global_vertex_index);
-      }
+    bool used () const;
 
   protected:
+				     /**
+				      * Pointer to the triangulation
+				      * we operate on.
+				      */
     const Triangulation<1,spacedim> * tria;
+
+				     /**
+				      * Whether this is a left end,
+				      * right end, or interior
+				      * vertex. This information is
+				      * provided by the cell at the
+				      * time of creation.
+				      */
     const VertexKind      vertex_kind;
+
+				     /**
+				      * The global vertex index of the
+				      * vertex this object corresponds
+				      * to.
+				      */
     const unsigned int    global_vertex_index;
 };
 
