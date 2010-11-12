@@ -1023,7 +1023,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 				      * as last argument.
 				      */
     void get_dof_indices (std::vector<unsigned int> &dof_indices,
-			  const unsigned int fe_index = DH<1,spacedim>::default_fe_index) const;
+			  const unsigned int fe_index = AccessorData::default_fe_index) const;
 
 				     /**
 				      * Global DoF index of the <i>i</i>
@@ -1063,7 +1063,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 				      */
     unsigned int vertex_dof_index (const unsigned int vertex,
 				   const unsigned int i,
-				   const unsigned int fe_index = DH<1,spacedim>::default_fe_index) const;
+				   const unsigned int fe_index = AccessorData::default_fe_index) const;
 
 				     /**
 				      * Index of the <i>i</i>th degree
@@ -1101,7 +1101,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 				      * active_fe_index().
 				      */
     unsigned int dof_index (const unsigned int i,
-			    const unsigned int fe_index = DH<1,spacedim>::default_fe_index) const;
+			    const unsigned int fe_index = AccessorData::default_fe_index) const;
 
 				     /**
 				      * @}
@@ -1289,7 +1289,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 				      */
     void set_dof_index (const unsigned int i,
 			const unsigned int index,
-			const unsigned int fe_index = DH<1,spacedim>::default_fe_index) const;
+			const unsigned int fe_index = AccessorData::default_fe_index) const;
 
 				     /**
 				      * Set the global index of the <i>i</i>
@@ -1330,7 +1330,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
     void set_vertex_dof_index (const unsigned int vertex,
 			       const unsigned int i,
 			       const unsigned int index,
-			       const unsigned int fe_index = DH<1,spacedim>::default_fe_index) const;
+			       const unsigned int fe_index = AccessorData::default_fe_index) const;
 
                                      /**
                                       * Iterator classes need to be friends
