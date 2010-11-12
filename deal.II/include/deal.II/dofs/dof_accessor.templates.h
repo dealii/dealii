@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -197,10 +197,10 @@ DoFAccessor<structdim,DH>::parent () const
           ExcMessage ("Cell is at coarsest level."));
 
   int previous_level;
-  
+
   if (DH::dimension==structdim)
     previous_level = this->level () - 1;
-  
+
   else
     previous_level = 0;
 
@@ -1828,6 +1828,87 @@ DoFAccessor<structdim,DH>::quad (const unsigned int i) const
 }
 
 
+/*------------------------- Functions: DoFAccessor<0,1,spacedim> ---------------------------*/
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+DoFAccessor<0,DH<1,spacedim> >::DoFAccessor ()
+{
+  Assert (false, ExcInvalidObject());
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+DoFAccessor<0,DH<1,spacedim> >::
+DoFAccessor (const Triangulation<1,spacedim> *tria,
+	     const typename TriaAccessor<0,1,spacedim>::VertexKind vertex_kind,
+	     const unsigned int    vertex_index,
+	     const DH<1,spacedim> * dof_handler)
+		:
+		BaseClass (tria,
+			   vertex_kind,
+			   vertex_index),
+                dof_handler(const_cast<DH<1,spacedim>*>(dof_handler))
+{}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+DoFAccessor<0,DH<1,spacedim> >::
+DoFAccessor (const Triangulation<1,spacedim> *tria,
+	     const int                 level,
+	     const int                 index,
+	     const DH<1,spacedim>     *dof_handler)
+		:
+                dof_handler(0)
+{
+  Assert (false,
+	  ExcMessage ("This constructor can not be called for face iterators in 1d."));
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+DoFAccessor<0,DH<1,spacedim> >::DoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+{
+  Assert (false, ExcInvalidObject());
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+template <int dim2, class DH2>
+inline
+DoFAccessor<0,DH<1,spacedim> >::DoFAccessor (const DoFAccessor<dim2, DH2> &)
+{
+  Assert (false, ExcInvalidObject());
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+void
+DoFAccessor<0,DH<1,spacedim> >::set_dof_handler (DH<1,spacedim> *dh)
+{
+  Assert (dh != 0, ExcInvalidObject());
+  this->dof_handler = dh;
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+const DH<1,spacedim> &
+DoFAccessor<0,DH<1,spacedim> >::get_dof_handler () const
+{
+  return *this->dof_handler;
+}
 
 
 
@@ -2948,6 +3029,58 @@ DoFCellAccessor<DH>::parent () const
 }
 
 
+namespace internal
+{
+  namespace DoFCellAccessor
+  {
+    template <class DH>
+    inline
+    typename internal::DoFHandler::Iterators<DH>::face_iterator
+    get_face (const dealii::DoFCellAccessor<DH> &cell,
+	      const unsigned int i,
+	      const internal::int2type<1>)
+    {
+      dealii::DoFAccessor<0, DH>
+	a (&cell.get_triangulation(),
+      	   ((i == 0) && cell.at_boundary(0)
+      	    ?
+      	    dealii::TriaAccessor<0, 1, DH::space_dimension>::left_vertex
+      	    :
+      	    ((i == 1) && cell.at_boundary(1)
+      	     ?
+      	     dealii::TriaAccessor<0, 1, DH::space_dimension>::right_vertex
+      	     :
+      	     dealii::TriaAccessor<0, 1, DH::space_dimension>::interior_vertex)),
+      	   cell.vertex_index(i),
+	   &cell.get_dof_handler());
+      return typename internal::DoFHandler::Iterators<DH>::face_iterator(a);
+    }
+
+
+    template <class DH>
+    inline
+    typename internal::DoFHandler::Iterators<DH>::face_iterator
+    get_face (const dealii::DoFCellAccessor<DH> &cell,
+	      const unsigned int i,
+	      const internal::int2type<2>)
+    {
+      return cell.line(i);
+    }
+
+
+    template <class DH>
+    inline
+    typename internal::DoFHandler::Iterators<DH>::face_iterator
+    get_face (const dealii::DoFCellAccessor<DH> &cell,
+	      const unsigned int i,
+	      const internal::int2type<3>)
+    {
+      return cell.quad(i);
+    }
+  }
+}
+
+
 template <class DH>
 typename internal::DoFHandler::Iterators<DH>::face_iterator
 DoFCellAccessor<DH>::face (const unsigned int i) const
@@ -2957,28 +3090,7 @@ DoFCellAccessor<DH>::face (const unsigned int i) const
           ExcMessage ("DoFHandler not initialized"));
 
   const unsigned int dim = DH::dimension;
-  Assert (dim > 1, ExcImpossibleInDim(1));
-
-  switch (dim)
-    {
-      case 2:
-	    return typename internal::DoFHandler::Iterators<DH>::face_iterator
-	      (this->tria,
-	       0,
-	       this->line_index (i),
-	       this->dof_handler);
-
-      case 3:
-	    return typename internal::DoFHandler::Iterators<DH>::face_iterator
-	      (this->tria,
-	       0,
-	       this->quad_index (i),
-	       this->dof_handler);
-
-      default:
-	    Assert (false, ExcNotImplemented());
-	    return typename internal::DoFHandler::Iterators<DH>::face_iterator();
-    }
+  return internal::DoFCellAccessor::get_face (*this, i, internal::int2type<dim>());
 }
 
 
