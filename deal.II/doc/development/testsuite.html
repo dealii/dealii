@@ -15,11 +15,11 @@
 
 
     <h1>The deal.II Testsuite</h1>
-    
-    <p>The deal.II testsuite consists of two parts, the 
+
+    <p>The deal.II testsuite consists of two parts, the
     <a href="#build_tests">build tests</a> and the
     <a href="#regression_tests">regression tests</a>. While the build tests
-    just check if the 
+    just check if the
     library can be compiled on different systems and with different (versions
     of) compilers, the regression tests are actually run and their output
     compared with previously stored. These two testsuites are
@@ -61,9 +61,9 @@
     after some time (results are collected and processed by a program that is
     run periodically, but not immediately after a mail has been received).
     </p>
-    
+
     <h3>Configuring for a special compiler</h3>
-    
+
     <p>If your compiler is not in the standard path or has a strange
     name (like <code>mycc</code> for C and <code>myCC</code> for C++),
     your template would be something like this (assuming you work with the
@@ -110,7 +110,7 @@
     rm -rf deal.II
 
     </pre>
-    
+
     The only difference is that one has to give the option
     <code>BUILDTEST=yes</code> to the call to <code>make</code>. This is so
     because for the make file to work it depends on a file that is created by
@@ -213,7 +213,7 @@
     as well. The usual way we use the testsuite is to run all tests
     like this
     (the same applies as above: <code>make -jN</code> can be used on multicore
-    machines): 
+    machines):
     <pre>
       deal.II/tests> make report | tee report
     </pre>
@@ -252,8 +252,8 @@
     <pre>
       grep -v + report
     </pre>
-    </p>    
-    
+    </p>
+
     <p>
     If you want to do a little more than just that, you should
     consider running
@@ -335,7 +335,7 @@
     As mentioned above, we add a new test every
     time we add new functionality to the library or fix a bug. If you
     want to contribute code to the library, you should do this
-    as well. Here's how: you need a testcase, 
+    as well. Here's how: you need a testcase,
     a subdirectory with the same name as the test, an entry in the
     Makefile, and an expected output.
     </p>
@@ -347,7 +347,7 @@
 //----------------------------  my_new_test.cc  ---------------------------
 //    $Id$
 //
-//    Copyright (C) 2005 by the deal.II authors 
+//    Copyright (C) 2005 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -366,7 +366,7 @@
 // all include files you need here
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("my_new_test/output");
   deallog.attach(logfile);
@@ -382,7 +382,7 @@ int main ()
 
     <p>You open an output file in a directory with the same
     name as your test, and then write
-    all output you generate to it, 
+    all output you generate to it,
     through the <code>deallog</code> stream.   The <code>deallog</code>
     stream works like any
     other <code>std::ostream</code> except that it does a few more
@@ -397,7 +397,7 @@ int main ()
     There are a number of directories where you can put a new test.
     Extensive tests of individual classes or groups of classes
     have traditionally been into the <code>base/</code>,
-    <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>, 
+    <code>lac/</code>, <code>deal.II/</code>, <code>fe/</code>,
     <code>hp/</code>, or <code>multigrid/</code> directories, depending on
     where the classes that are tested are located.
     </p>
@@ -423,24 +423,8 @@ int main ()
     svn copy existing_test_directory my_new_test
     </pre>
 
-    <h4>An entry in the Makefile</h4>
-
     <p>
-    In order for the Makefiles to pick up your new test, you have to
-    add it there. In all the directories under <code>tests/</code>
-    where tests reside, there is a separate Makefile that contains a
-    list of the tests to be run in a variable called
-    <code>tests_x</code>. You should add your test to the bottom of
-    this list, by adding the base name of your testfile, i.e., without
-    the extension <code>.cc</code>.  The entries can contain
-    wildcards: for example, in the <code>tests/bits/</code> directory,
-    the <code>tests_x</code> variable contains the entry
-    <code>petsc_*</code> which at the time of this writing tests 120
-    different tests that all match this pattern.
-    </p>
-
-    <p>
-    If you have done this, you can try to run
+    Once you have done this, you can try to run
     <pre>
       make my_new_test/output
     </pre>
@@ -455,7 +439,7 @@ int main ()
     <p>
     If you run your new test executable, you will get an output file
     <code>mytestname/output</code> that should be used to compare all future
-    runs with. If the test 
+    runs with. If the test
     is relatively simple, it is often a good idea to look at the
     output and make sure that the output is actually what you had
     expected. However, if you do complex operations, this may
@@ -471,7 +455,7 @@ int main ()
     following way: for each test, we have subdirectories
     <code>testname/cmp</code> where we store the expected results in a file
     <code>testname/cmp/generic</code>. If you create a new test, you should
-    therefore create this directory, and copy the output of your program, 
+    therefore create this directory, and copy the output of your program,
     <code>testname/output</code> to <code>testname/cmp/generic</code>.
     </p>
 
@@ -495,10 +479,10 @@ int main ()
     first file it found in this process. To make things a bit clearer, if you
     are, for example, on a <code>i686-pc-linux-gnu</code> box and use
     <code>gcc4.0</code> as your compiler, then the following files will be
-    sought (in this order): 
+    sought (in this order):
     <pre>
-testname/cmp/i686-pc-linux-gnu+gcc4.0 
-testname/cmp/i686-pc-linux-gnu+gcc3.4 
+testname/cmp/i686-pc-linux-gnu+gcc4.0
+testname/cmp/i686-pc-linux-gnu+gcc3.4
 testname/cmp/i686-pc-linux-gnu+gcc3.3
 testname/cmp/generic
     </pre>
@@ -516,7 +500,7 @@ testname/cmp/generic
     for your own platform and compiler, and that's alright: someone
     else will create the output files for other platforms
     eventually. You only have to copy your output file to
-    <code>testname/cmp/generic</code>. 
+    <code>testname/cmp/generic</code>.
     </p>
 
     <p>
@@ -547,7 +531,7 @@ testname/cmp/generic
 
 
     <h4>Checking in</h4>
-    
+
     <p>
     Tests are a way to make sure everything keeps working. If they
     aren't automated, they are no good. We are therefore very
@@ -556,7 +540,7 @@ testname/cmp/generic
     file, and to commit them together with the changed Makefile, like
     so:
     <pre>
-      svn add bits/my_new_test.cc 
+      svn add bits/my_new_test.cc
       svn add bits/my_new_test
       svn add bits/my_new_test/cmp
       svn add bits/my_new_test/cmp/generic
@@ -584,7 +568,7 @@ testname/cmp/generic
     contribute!
     </p>
 
-    
+
     <address>
       <a href="../mail.html">The deal.II mailing list</a></address>
 <div class="right">
