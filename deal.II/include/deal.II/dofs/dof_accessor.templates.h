@@ -1859,10 +1859,10 @@ DoFAccessor (const Triangulation<1,spacedim> *tria,
 template <template <int, int> class DH, int spacedim>
 inline
 DoFAccessor<0,DH<1,spacedim> >::
-DoFAccessor (const Triangulation<1,spacedim> *tria,
-	     const int                 level,
-	     const int                 index,
-	     const DH<1,spacedim>     *dof_handler)
+DoFAccessor (const Triangulation<1,spacedim> *,
+	     const int                 ,
+	     const int                 ,
+	     const DH<1,spacedim>     *)
 		:
                 dof_handler(0)
 {
