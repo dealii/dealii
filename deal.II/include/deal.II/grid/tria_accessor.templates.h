@@ -2373,7 +2373,7 @@ namespace internal
 
     template <int spacedim>
     inline
-    dealii::TriaIterator<dealii::TriaAccessor<1, 2, spacedim> >
+    dealii::TriaIterator<dealii::TriaAccessor<2, 3, spacedim> >
     get_face (const dealii::CellAccessor<3,spacedim> &cell,
 	      const unsigned int i)
     {
