@@ -1912,6 +1912,24 @@ DoFAccessor<0,DH<1,spacedim> >::get_dof_handler () const
 
 
 
+template <template <int, int> class DH, int spacedim>
+inline
+void
+DoFAccessor<0,DH<1,spacedim> >::
+get_dof_indices (std::vector<unsigned int> &dof_indices,
+		 const unsigned int fe_index) const
+{
+  for (unsigned int i=0; i<dof_indices.size(); ++i)
+    dof_indices[i]
+      = internal::DoFAccessor::Implementation::
+      get_vertex_dof_index (*dof_handler,
+			    this->global_vertex_index,
+			    fe_index,
+			    i);
+}
+
+
+
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
 

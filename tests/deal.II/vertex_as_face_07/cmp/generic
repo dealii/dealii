@@ -1,0 +1,39 @@
+
+DEAL::Coarse mesh:
+DEAL::0 1 
+DEAL::2 3 
+DEAL::Cell: 2.0, active_fe_index=0
+DEAL::0 1 2 3 4 
+DEAL::0 1 
+DEAL::2 3 
+DEAL::Cell: 2.1, active_fe_index=1
+DEAL::2 3 8 9 5 6 7 
+DEAL::2 3 
+DEAL::8 9 
+DEAL::Cell: 2.2, active_fe_index=0
+DEAL::8 9 10 11 12 
+DEAL::8 9 
+DEAL::10 11 
+DEAL::Cell: 2.3, active_fe_index=1
+DEAL::10 11 13 14 15 16 17 
+DEAL::10 11 
+DEAL::13 14 
+DEAL::Coarse mesh:
+DEAL::0 1 
+DEAL::2 3 
+DEAL::Cell: 2.0, active_fe_index=0
+DEAL::0 1 2 3 4 
+DEAL::0 1 
+DEAL::2 3 
+DEAL::Cell: 2.1, active_fe_index=1
+DEAL::2 3 8 9 5 6 7 
+DEAL::2 3 
+DEAL::8 9 
+DEAL::Cell: 2.2, active_fe_index=0
+DEAL::8 9 10 11 12 
+DEAL::8 9 
+DEAL::10 11 
+DEAL::Cell: 2.3, active_fe_index=1
+DEAL::10 11 13 14 15 16 17 
+DEAL::10 11 
+DEAL::13 14 
