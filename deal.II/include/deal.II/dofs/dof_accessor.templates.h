@@ -97,18 +97,6 @@ DoFAccessor<structdim,DH>::get_dof_handler () const
 }
 
 
-//TODO: This seems to set only the DH, not the other data.
-
-template <int structdim, class DH>
-inline
-DoFAccessor<structdim,DH> &
-DoFAccessor<structdim,DH>::operator = (const DoFAccessor<structdim,DH> &da)
-{
-  this->set_dof_handler (da.dof_handler);
-  return *this;
-}
-
-
 
 template <int structdim, class DH>
 inline

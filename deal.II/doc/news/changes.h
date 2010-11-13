@@ -347,6 +347,16 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>Fixed: For DoF iterators, it was previously possible to write
+  code like <code>*it1 = *it2</code>, presumably with the intent to
+  copy the entire cell pointed to on the right hand side onto the cell
+  pointed to at the left. However, this is not what happens since
+  iterators are not pointers but only point to accessor classes. The
+  assignment operator has therefore been removed.
+  <br>
+  (WB, 2010/11/12)
+  </p></li>
+
   <li><p>New: There is now a class TriaAccessor<0,1,spacedim> that allows
   to write things like
   @code

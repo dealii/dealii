@@ -271,12 +271,6 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
     get_dof_handler () const;
 
 				     /**
-				      * Copy operator.
-				      */
-    DoFAccessor<structdim,DH> &
-    operator = (const DoFAccessor<structdim,DH> &da);
-
-				     /**
 				      * Implement the copy operator needed
 				      * for the iterator classes.
 				      */
@@ -725,6 +719,27 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
                                       */
     template <typename> friend class TriaRawIterator;
 
+
+  private:
+    				     /**
+				      *  Copy operator. This is normally used
+				      *  in a context like <tt>iterator a,b;
+				      *  *a=*b;</tt>. Presumably, the intent
+				      *  here is to copy the object pointed to
+				      *  by @p b to the object pointed to by
+				      *  @p a. However, the result of
+				      *  dereferencing an iterator is not an
+				      *  object but an accessor; consequently,
+				      *  this operation is not useful for
+				      *  iterators on triangulations. We
+				      *  declare this function here private,
+				      *  thus it may not be used from outside.
+				      *  Furthermore it is not implemented and
+				      *  will give a linker error if used
+				      *  anyway.
+				      */
+    DoFAccessor<structdim,DH> &
+    operator = (const DoFAccessor<structdim,DH> &da);
 
 				     /**
 				      * Make the DoFHandler class a friend so
