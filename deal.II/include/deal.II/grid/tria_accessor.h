@@ -346,7 +346,6 @@ class TriaAccessorBase
     TriaAccessorBase & operator = (const TriaAccessorBase &);
 
   protected:
-//TODO: Wolfgang, is this constructor EVER even asked for?
 				     /**
 				      *  Copy operator. This is normally
 				      *  used in a context like
