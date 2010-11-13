@@ -65,18 +65,6 @@ MGDoFAccessor<structdim, dim, spacedim>::set_mg_dof_handler (MGDoFHandler<dim,sp
 
 
 
-template <int structdim, int dim, int spacedim>
-MGDoFAccessor<structdim, dim, spacedim> &
-MGDoFAccessor<structdim, dim, spacedim>::operator = (const MGDoFAccessor &da)
-{
-  BaseClass::operator= (*this);
-
-  set_dof_handler (da.mg_dof_handler);
-  return *this;
-}
-
-
-
 template <int structdim,int dim, int spacedim>
 unsigned int
 MGDoFAccessor<structdim, dim, spacedim>::mg_vertex_dof_index (const int level,
@@ -181,7 +169,7 @@ MGDoFAccessor<structdim, dim, spacedim>::parent () const
 {
   Assert (this->level () > 0,
           ExcMessage ("Cell is at coarsest level."));
-  
+
   const TriaIterator<MGDoFAccessor<structdim,dim,spacedim> >
     q (this->tria,
        (structdim == dim ?

@@ -387,10 +387,26 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 			   const unsigned int i,
 			   const unsigned int index) const;
 
-				     /**
-				      * Copy operator.
+  private:
+    				     /**
+				      *  Copy operator. This is normally used
+				      *  in a context like <tt>iterator a,b;
+				      *  *a=*b;</tt>. Presumably, the intent
+				      *  here is to copy the object pointed to
+				      *  by @p b to the object pointed to by
+				      *  @p a. However, the result of
+				      *  dereferencing an iterator is not an
+				      *  object but an accessor; consequently,
+				      *  this operation is not useful for
+				      *  iterators on triangulations. We
+				      *  declare this function here private,
+				      *  thus it may not be used from outside.
+				      *  Furthermore it is not implemented and
+				      *  will give a linker error if used
+				      *  anyway.
 				      */
-    MGDoFAccessor & operator = (const MGDoFAccessor &da);
+    MGDoFAccessor &
+    operator = (const MGDoFAccessor &da);
 
     template <int, int> friend class MGDoFHandler;
     friend class internal::MGDoFHandler::Implementation;
@@ -585,7 +601,7 @@ class MGDoFCellAccessor :  public MGDoFAccessor<dim,dim,spacedim>
 				     /**
 				      * @}
 				      */
-				      
+
     				 /**
 				      * Return the parent as a MGDoF cell
 				      * iterator. This function is needed since

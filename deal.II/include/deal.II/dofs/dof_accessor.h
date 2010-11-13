@@ -2031,6 +2031,27 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      */
     void update_cell_dof_indices_cache () const;
 
+  private:
+    				     /**
+				      *  Copy operator. This is normally used
+				      *  in a context like <tt>iterator a,b;
+				      *  *a=*b;</tt>. Presumably, the intent
+				      *  here is to copy the object pointed to
+				      *  by @p b to the object pointed to by
+				      *  @p a. However, the result of
+				      *  dereferencing an iterator is not an
+				      *  object but an accessor; consequently,
+				      *  this operation is not useful for
+				      *  iterators on triangulations. We
+				      *  declare this function here private,
+				      *  thus it may not be used from outside.
+				      *  Furthermore it is not implemented and
+				      *  will give a linker error if used
+				      *  anyway.
+				      */
+    DoFCellAccessor<DH> &
+    operator = (const DoFCellAccessor<DH> &da);
+
 				     /**
 				      * Make the DoFHandler class a
 				      * friend so that it can call the
