@@ -94,6 +94,23 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>New: While 2d and 3d could mostly be handled with the
+  same code, dimension-independent programming was always a bit
+  different because the faces of 1d cells (i.e. vertices) did not
+  have appropriate iterators defined. This has now been changed:
+  there is now a class TriaAccessor<0,1,spacedim> (and corresponding
+  DoFAccessor<0,DH>) that allows to write things like
+  @code
+    cell->face(0)->boundary_indicator();
+    cell->face(1)->at_boundary();
+    cell->face(1)->get_dof_indices(...);
+  @endcode
+  even if the cell corresponds to a one-dimensional triangulation where
+  this was not previously possible.
+  <br>
+  (WB, 2010/11/11)
+  </p></li>
+
   <li>
   <p>New: After more than 2 years of work, we have merged a branch on which
   we have implemented the functionality necessary to distribute meshes on
@@ -355,18 +372,6 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   assignment operator has therefore been removed.
   <br>
   (WB, 2010/11/12)
-  </p></li>
-
-  <li><p>New: There is now a class TriaAccessor<0,1,spacedim> that allows
-  to write things like
-  @code
-    cell->face(0)->boundary_indicator();
-    cell->face(1)->at_boundary();
-  @endcode
-  even if the cell corresponds to a one-dimensional triangulation where
-  this was not previously possible.
-  <br>
-  (WB, 2010/11/11)
   </p></li>
 
   <li><p>New: The GridOut::write_gnuplot function now also works for meshes
