@@ -2057,9 +2057,9 @@ TriaAccessor<0, 1, spacedim>::level ()
 template <int spacedim>
 inline
 int
-TriaAccessor<0, 1, spacedim>::index ()
+TriaAccessor<0, 1, spacedim>::index () const
 {
-  return -1;
+  return global_vertex_index;
 }
 
 

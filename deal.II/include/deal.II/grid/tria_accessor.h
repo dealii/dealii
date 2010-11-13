@@ -122,6 +122,7 @@ namespace internal
 }
 template <int structdim, int dim, int spacedim>	class TriaAccessor;
 template <int dim, int spacedim>		class TriaAccessor<0, dim, spacedim>;
+template <int spacedim>		                class TriaAccessor<0, 1, spacedim>;
 
 // note: the file tria_accessor.templates.h is included at the end of
 // this file.  this includes a lot of templates. originally, this was
@@ -1744,11 +1745,11 @@ class TriaAccessor<0, 1, spacedim>
     static int level ();
 
 				     /**
-				      * Index of this object. Vertices
-				      * have no index, so this
-				      * function always returns -1.
+				      * Index of this object. Returns
+				      * the global index of the vertex
+				      * this object points to.
 				      */
-    static int index ();
+    int index () const;
 
 				     /**
 				      * @name Advancement of iterators
