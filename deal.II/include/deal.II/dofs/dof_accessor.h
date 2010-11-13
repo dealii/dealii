@@ -903,7 +903,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 				      * but sets the object
 				      * coordinates of the TriaAccessor.
 				      */
-    void copy_from (const TriaAccessorBase<0, DH<1,spacedim>::dimension, DH<1,spacedim>::space_dimension> &da);
+    void copy_from (const TriaAccessorBase<0, 1, spacedim> &da);
 
 				     /**
 				      * Return an iterator pointing to

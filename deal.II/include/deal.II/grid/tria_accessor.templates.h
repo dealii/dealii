@@ -2025,6 +2025,18 @@ TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
 
 template <int spacedim>
 inline
+void
+TriaAccessor<0, 1, spacedim>::copy_from (const TriaAccessor &t)
+{
+  tria = t.tria;
+  vertex_kind = t.vertex_kind;
+  global_vertex_index = t.global_vertex_index;
+}
+
+
+
+template <int spacedim>
+inline
 IteratorState::IteratorStates
 TriaAccessor<0, 1, spacedim>::state ()
 {

@@ -1930,6 +1930,51 @@ get_dof_indices (std::vector<unsigned int> &dof_indices,
 
 
 
+template <template <int, int> class DH, int spacedim>
+inline
+void
+DoFAccessor<0,DH<1,spacedim> >::copy_from (
+  const TriaAccessorBase<0,1,spacedim> &da)
+{
+  Assert (this->dof_handler != 0, ExcInvalidObject());
+  BaseClass::copy_from(da);
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+void
+DoFAccessor<0,DH<1,spacedim> >::copy_from (const DoFAccessor<0,DH<1,spacedim> > &a)
+{
+  BaseClass::copy_from (a);
+  set_dof_handler (a.dof_handler);
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+bool
+DoFAccessor<0,DH<1,spacedim> >::operator == (const DoFAccessor<0,DH<1,spacedim> > &a) const
+{
+  Assert (this->dof_handler == a.dof_handler, ExcCantCompareIterators());
+  return (BaseClass::operator == (a));
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
+bool
+DoFAccessor<0,DH<1,spacedim> >::operator != (const DoFAccessor<0,DH<1,spacedim> > &a) const
+{
+  Assert (this->dof_handler == a.dof_handler, ExcCantCompareIterators());
+  return (BaseClass::operator != (a));
+}
+
+
+
 /*------------------------- Functions: DoFCellAccessor -----------------------*/
 
 

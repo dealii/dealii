@@ -1714,6 +1714,19 @@ class TriaAccessor<0, 1, spacedim>
     TriaAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
 
 				     /**
+				      *  Copy operator. Since this is
+				      *  only called from iterators,
+				      *  do not return anything, since
+				      *  the iterator will return
+				      *  itself.
+				      *
+				      *  This method is protected,
+				      *  since it is only to be called
+				      *  from the iterator class.
+				      */
+    void copy_from (const TriaAccessor &);
+
+				     /**
 				      *  Return the state of the
 				      *  iterator. Since an iterator
 				      *  to points can not be
@@ -2005,14 +2018,14 @@ class TriaAccessor<0, 1, spacedim>
 				      * provided by the cell at the
 				      * time of creation.
 				      */
-    const VertexKind      vertex_kind;
+    VertexKind      vertex_kind;
 
 				     /**
 				      * The global vertex index of the
 				      * vertex this object corresponds
 				      * to.
 				      */
-    const unsigned int    global_vertex_index;
+    unsigned int    global_vertex_index;
 };
 
 
