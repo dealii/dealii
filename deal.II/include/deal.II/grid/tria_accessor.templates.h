@@ -2085,6 +2085,36 @@ TriaAccessor<0, 1, spacedim>::operator -- () const
 
 template <int spacedim>
 inline
+bool
+TriaAccessor<0, 1, spacedim>::operator == (const TriaAccessor &t) const
+{
+  const bool result = ((tria == t.tria)
+		       &&
+		       (global_vertex_index == t.global_vertex_index));
+				   // if we point to the same vertex,
+				   // make sure we know the same about
+				   // it
+  if (result == true)
+    Assert (vertex_kind == t.vertex_kind, ExcInternalError());
+
+  return result;
+}
+
+
+
+template <int spacedim>
+inline
+bool
+TriaAccessor<0, 1, spacedim>::operator != (const TriaAccessor &t) const
+{
+  return !(*this==t);
+}
+
+
+
+
+template <int spacedim>
+inline
 int
 TriaAccessor<0, 1, spacedim>::parent_index ()
 {

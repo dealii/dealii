@@ -1777,6 +1777,16 @@ class TriaAccessor<0, 1, spacedim>
 				      */
     void operator -- () const;
 				     /**
+				      *  Compare for equality.
+				      */
+    bool operator == (const TriaAccessor &) const;
+
+				     /**
+				      * Compare for inequality.
+				      */
+    bool operator != (const TriaAccessor &) const;
+
+				     /**
 				      * @}
 				      */
 
