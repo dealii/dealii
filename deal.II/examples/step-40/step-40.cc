@@ -380,7 +380,14 @@ void LaplaceProblem<dim>::solve ()
   SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
   PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
-  PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
+
+				   // Ask for a symmetric preconditioner by
+				   // setting the first parameter in
+				   // AdditionalData to true.
+  PETScWrappers::PreconditionBoomerAMG preconditioner(
+    system_matrix,
+    PETScWrappers::PreconditionBoomerAMG::AdditionalData(true)
+  );
 
   solver.solve (system_matrix, completely_distributed_solution, system_rhs,
 		preconditioner);
