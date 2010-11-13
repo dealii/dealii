@@ -594,7 +594,141 @@ namespace PETScWrappers
       virtual void set_preconditioner_type (PC &pc) const;      
   };
 
+
+
+
+/**
+ * A class that implements the interface to use the BoomerAMG algebraic
+ * multigrid preconditioner from the HYPRE suite. Note that PETSc has to be
+ * configured with HYPRE (e.g. with --download-hypre=1).
+ *
+ * The preconditioner does support parallel distributed computations. See @ref
+ * step-40 for an example.
+ *
+ * @ingroup PETScWrappers
+ * @author Timo Heister, 2010
+ */
+  class PreconditionBoomerAMG : public PreconditionerBase
+  {
+    public:
+                                       /**
+                                        * Standardized data struct to
+                                        * pipe additional flags to the
+                                        * preconditioner.
+                                        */      
+      struct AdditionalData
+      {
+                                           /**
+                                            * Constructor. Note that BoomerAMG
+                                            * offers a lot more options to set
+                                            * than what is exposed here.
+                                            */
+          AdditionalData (
+	    const bool symmetric_operator = false,
+	    const double strong_threshold = 0.25,
+	    const double max_row_sum = 0.9,
+	    const unsigned int aggressive_coarsening_num_levels = 0,
+	    const bool output_details = false
+	  );
+
+					   /**
+					    * Set this flag to true if you
+					    * have a symmetric system matrix
+					    * and you want to use a solver
+					    * which asumes a symmetric
+					    * preconditioner like CG. The
+					    * relaxation is done with
+					    * SSOR/Jacobi when set to true and
+					    * with SOR/Jacobi otherwise.
+					    */
+	  bool symmetric_operator;
+
+					   /**
+					    * Threshold of when nodes are
+					    * considered strongly
+					    * connected. See
+					    * HYPRE_BoomerAMGSetStrongThreshold(). Recommended
+					    * values are 0.25 for 2d and 0.5
+					    * for 3d problems, but it is
+					    * problem dependent.
+					    */
+	  double strong_threshold;
+
+					   /**
+					    * If set to a value smaller than
+					    * 1.0 then diagonally dominant
+					    * parts of the matrix are treated
+					    * as having no strongly connected
+					    * nodes. If the row sum weighted
+					    * by the diagonal entry is bigger
+					    * than the given value, it is
+					    * considered diagonally
+					    * dominant. This feature is turned
+					    * of by setting the value to
+					    * 1.0. This is the default as some
+					    * matrices can result in having
+					    * only diagonally dominant entries
+					    * and thus no multigrid levels are
+					    * constructed. The default in
+					    * BoomerAMG for this is 0.9. When
+					    * you try this, check for a
+					    * reasonable number of levels
+					    * created.
+					    */
+	  double max_row_sum;
+	  
+					     /**
+					    * Number of levels of aggressive
+					    * coarsening. Increasing this
+					    * value reduces the construction
+					    * time and memory requirements but
+					    * may decrease effectiveness.*/
+	  unsigned int aggressive_coarsening_num_levels;
+	  
+       					   /**
+					    * Setting this flag to true
+					    * produces debug output from
+					    * HYPRE, when the preconditioner
+					    * is constructed.
+					    */
+	  bool output_details;
+	  
+	  
+	  
+
+      };
+
+
+      
+                                       /**
+                                        * Constructor. Take the matrix which
+                                        * is used to form the preconditioner,
+                                        * and additional flags if there are
+                                        * any.
+                                        */
+      PreconditionBoomerAMG (const MatrixBase     &matrix,
+			     const AdditionalData &additional_data = AdditionalData());
+      
+    protected:
+                                       /**
+                                        * Store a copy of the flags for this
+                                        * particular preconditioner.
+                                        */
+      const AdditionalData additional_data;
+
+                                       /**
+                                        * Function that takes a Krylov
+                                        * Subspace Preconditioner context
+                                        * object, and sets the type of
+                                        * preconditioner that is appropriate
+                                        * for the present class.
+                                        */
+      virtual void set_preconditioner_type (PC &pc) const;      
+  };
+
+  
 }
+
 
 
 DEAL_II_NAMESPACE_CLOSE

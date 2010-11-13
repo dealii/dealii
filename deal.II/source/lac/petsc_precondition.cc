@@ -16,6 +16,7 @@
 
 #ifdef DEAL_II_USE_PETSC
 
+#  include <base/utilities.h>
 #  include <lac/petsc_matrix_base.h>
 #  include <lac/petsc_vector_base.h>
 #  include <cmath>
@@ -285,6 +286,78 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
   
+
+/* ----------------- PreconditionBoomerAMG -------------------- */
+
+  PreconditionBoomerAMG::AdditionalData::
+  AdditionalData(const bool symmetric_operator,
+		 const double strong_threshold,
+		 const double max_row_sum,
+		 const unsigned int aggressive_coarsening_num_levels,
+		 const bool output_details
+  )
+		  :
+		  symmetric_operator(symmetric_operator),
+		  strong_threshold(strong_threshold),
+		  max_row_sum(max_row_sum),
+		  aggressive_coarsening_num_levels(aggressive_coarsening_num_levels),
+		  output_details(output_details)
+  {}
+
+  
+  PreconditionBoomerAMG::PreconditionBoomerAMG (const MatrixBase     &matrix,
+						const AdditionalData &additional_data)
+                  :
+                  PreconditionerBase (matrix),
+                  additional_data (additional_data)
+  {}
+
+  
+  void
+  PreconditionBoomerAMG::set_preconditioner_type (PC &pc) const
+  {
+                                     // set the right type for the
+                                     // preconditioner
+    int ierr;
+    ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    ierr = PCHYPRESetType(pc, "boomeramg");
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    if (additional_data.output_details)
+      PetscOptionsSetValue("-pc_hypre_boomeramg_print_statistics","1");
+    
+    PetscOptionsSetValue("-pc_hypre_boomeramg_agg_nl",
+			 Utilities::int_to_string(
+			   additional_data.aggressive_coarsening_num_levels
+			 ).c_str());
+
+    std::stringstream ssStream;
+    ssStream << additional_data.max_row_sum;
+    PetscOptionsSetValue("-pc_hypre_boomeramg_max_row_sum", ssStream.str().c_str());
+    
+    ssStream.str(""); // empty the stringstream
+    ssStream << additional_data.strong_threshold;    
+    PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", ssStream.str().c_str());
+
+    if (additional_data.symmetric_operator)
+      {
+	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "symmetric-SOR/Jacobi");
+	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "symmetric-SOR/Jacobi");
+	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+      }
+    else
+      {
+	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_up", "SOR/Jacobi");
+	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_down", "SOR/Jacobi");
+	PetscOptionsSetValue("-pc_hypre_boomeramg_relax_type_coarse", "Gaussian-elimination");
+      }
+    
+    ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
 
 /* ----------------- PreconditionLU -------------------- */
 
