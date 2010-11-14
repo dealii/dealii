@@ -42,6 +42,11 @@
 #include <numerics/mesh_worker_assembler.h>
 #include <numerics/mesh_worker_loop.h>
 
+				 // The include file for local
+				 // integrators associated with the
+				 // Laplacian
+#include <integrators/laplace.h>
+
 				 // Support for multigrid methods
 #include <multigrid/mg_tools.h>
 #include <multigrid/multigrid.h>
@@ -116,47 +121,40 @@ class MatrixIntegrator : public Subscriptor
 
 
 				 // On each cell, we integrate the
-				 // Dirichlet form. All local
-				 // integrations consist of nested
-				 // loops, first over all quadrature
-				 // points and the iner loops over the
-				 // degrees of freedom associated
-				 // with the shape functions.
+				 // Dirichlet form. We use the library
+				 // of ready made integrals in
+				 // LocalIntegrators to avoid writing
+				 // these loops ourselves. Similarly,
+				 // we implement Nitsche boundary
+				 // conditions and the interior
+				 // penalty fluxes between cells.
+				 //
+				 // The boundary und flux terms need a
+				 // penalty parameter, which should be
+				 // adjusted to the cell size and the
+				 // polynomial degree. A safe choice
+				 // of this parameter for constant
+				 // coefficients can be found in
+				 // LocalIntegrators::Laplace::compute_penalty()
+				 // and we use this below.
 template <int dim>
 void MatrixIntegrator<dim>::cell(
   MeshWorker::DoFInfo<dim>& dinfo,
   typename MeshWorker::IntegrationInfo<dim>& info)
 {
-  const FEValuesBase<dim>& fe = info.fe_values();
-  FullMatrix<double>& local_matrix = dinfo.matrix(0,false).matrix;
-  
-  for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-	local_matrix(i,j) += (fe.shape_grad(i,k) * fe.shape_grad(j,k))
-			     * fe.JxW(k);
+  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values());
 }
 
-				 // On boundary faces, we use the
-				 // Nitsche boundary condition
+
 template <int dim>
 void MatrixIntegrator<dim>::bdry(
   MeshWorker::DoFInfo<dim>& dinfo,
   typename MeshWorker::IntegrationInfo<dim>& info)
 {
-  const FEValuesBase<dim>& fe = info.fe_values();
-  FullMatrix<double>& local_matrix = dinfo.matrix(0,false).matrix;
-  
-  const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
-  
-  for (unsigned k=0;k<fe.n_quadrature_points;++k)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-	local_matrix(i,j) += (fe.shape_value(i,k) * penalty * fe.shape_value(j,k)
-			      - (fe.normal_vector(k) * fe.shape_grad(i,k)) * fe.shape_value(j,k)
-			      - (fe.normal_vector(k) * fe.shape_grad(j,k)) * fe.shape_value(i,k))
-			     * fe.JxW(k);
+  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
+  LocalIntegrators::Laplace::nitsche_matrix(
+    dinfo.matrix(0,false).matrix, info.fe_values(0),
+    LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, deg, deg));
 }
 
 				 // Interior faces use the interior
@@ -168,46 +166,12 @@ void MatrixIntegrator<dim>::face(
   typename MeshWorker::IntegrationInfo<dim>& info1,
   typename MeshWorker::IntegrationInfo<dim>& info2)
 {
-  const FEValuesBase<dim>& fe1 = info1.fe_values();
-  const FEValuesBase<dim>& fe2 = info2.fe_values();
-  FullMatrix<double>& matrix_v1u1 = dinfo1.matrix(0,false).matrix;
-  FullMatrix<double>& matrix_v1u2 = dinfo1.matrix(0,true).matrix;
-  FullMatrix<double>& matrix_v2u1 = dinfo2.matrix(0,true).matrix;
-  FullMatrix<double>& matrix_v2u2 = dinfo2.matrix(0,false).matrix;
-  
-  const unsigned int deg = fe1.get_fe().tensor_degree();
-  double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
-  double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
-  if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
-    {
-      Assert (dinfo1.face == dinfo2.face, ExcInternalError());
-      Assert (dinfo1.face->has_children(), ExcInternalError());
-//      Assert (dinfo1.cell->has_children(), ExcInternalError());
-      penalty1 *= 2;
-    }
-const double penalty = penalty1 + penalty2;
-  
-  for (unsigned k=0;k<fe1.n_quadrature_points;++k)
-    for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
-	{
-	  matrix_v1u1(i,j) += (fe1.shape_value(i,k) * penalty * fe1.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe1.shape_grad(i,k)) * fe1.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe1.shape_grad(j,k)) * fe1.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	  matrix_v1u2(i,j) += (-fe1.shape_value(i,k) * penalty * fe2.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe1.shape_grad(i,k)) * fe2.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe2.shape_grad(j,k)) * fe1.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	  matrix_v2u1(i,j) += (-fe2.shape_value(i,k) * penalty * fe1.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe2.shape_grad(i,k)) * fe1.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe1.shape_grad(j,k)) * fe2.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	  matrix_v2u2(i,j) += (fe2.shape_value(i,k) * penalty * fe2.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe2.shape_grad(i,k)) * fe2.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe2.shape_grad(j,k)) * fe2.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	}
+  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
+  LocalIntegrators::Laplace::ip_matrix(
+    dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix, 
+    dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
+    info1.fe_values(0), info2.fe_values(0),
+    LocalIntegrators::Laplace::compute_penalty(dinfo1, dinfo2, deg, deg));
 }
 
 				 // The second local integrator builds
