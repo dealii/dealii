@@ -686,7 +686,7 @@ Step39<dim>::solve()
 				   // The solver of choice is
 				   // conjugate gradient.
   SolverControl control(1000, 1.e-12);
-  SolverCG<Vector<double> > cg(control);
+  SolverCG<Vector<double> > solver(control);
 
 				   // Now we are setting up the
 				   // components of the multilevel
@@ -762,7 +762,7 @@ Step39<dim>::solve()
     MGTransferPrebuilt<Vector<double> > >
     preconditioner(mg_dof_handler, mg, mg_transfer);
 				   // and use it to solve the system.
-  cg.solve(matrix, solution, right_hand_side, preconditioner);
+  solver.solve(matrix, solution, right_hand_side, preconditioner);
 }
 
 				 // Here we compare our finite element
