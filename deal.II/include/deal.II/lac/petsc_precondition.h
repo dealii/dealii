@@ -31,8 +31,8 @@ namespace PETScWrappers
   class MatrixBase;
   class VectorBase;
   class SolverBase;
-  
-  
+
+
 /**
  * Base class for preconditioner classes using the PETSc functionality. The
  * classes in this hierarchy don't do a whole lot, except for providing a
@@ -58,7 +58,7 @@ namespace PETScWrappers
                                         * shall be constructed.
                                         */
       PreconditionerBase (const MatrixBase &matrix);
-      
+
                                        /**
                                         * Destructor.
                                         */
@@ -71,7 +71,7 @@ namespace PETScWrappers
                                         * a preconditioner.
                                         */
       const Mat matrix;
-      
+
                                        /**
                                         * Conversion operator to get a
                                         * representation of the matrix that
@@ -118,7 +118,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {};
 
@@ -130,7 +130,7 @@ namespace PETScWrappers
                                         */
       PreconditionJacobi (const MatrixBase     &matrix,
                           const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -145,10 +145,10 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
 
-      
+
 
 /**
  * A class that implements the interface to use the PETSc Block Jacobi
@@ -174,7 +174,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {};
 
@@ -186,7 +186,7 @@ namespace PETScWrappers
                                         */
       PreconditionBlockJacobi (const MatrixBase     &matrix,
                                const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -201,10 +201,10 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
 
-      
+
 
 /**
  * A class that implements the interface to use the PETSc SOR
@@ -223,7 +223,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -232,7 +232,7 @@ namespace PETScWrappers
                                             * to one.
                                             */
           AdditionalData (const double omega = 1);
-	
+
                                            /**
                                             * Relaxation parameter.
                                             */
@@ -247,7 +247,7 @@ namespace PETScWrappers
                                         */
       PreconditionSOR (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -262,9 +262,9 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
-      
+
 
 
 /**
@@ -284,7 +284,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -293,7 +293,7 @@ namespace PETScWrappers
                                             * to one.
                                             */
           AdditionalData (const double omega = 1);
-	
+
                                            /**
                                             * Relaxation parameter.
                                             */
@@ -308,7 +308,7 @@ namespace PETScWrappers
                                         */
       PreconditionSSOR (const MatrixBase     &matrix,
                         const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -323,9 +323,9 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
-      
+
 
 
 /**
@@ -345,7 +345,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -354,7 +354,7 @@ namespace PETScWrappers
                                             * to one.
                                             */
           AdditionalData (const double omega = 1);
-	
+
                                            /**
                                             * Relaxation parameter.
                                             */
@@ -369,7 +369,7 @@ namespace PETScWrappers
                                         */
       PreconditionEisenstat (const MatrixBase     &matrix,
                              const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -384,9 +384,9 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
-      
+
 
 
 /**
@@ -406,7 +406,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -415,7 +415,7 @@ namespace PETScWrappers
                                             * to zero.
                                             */
           AdditionalData (const unsigned int levels = 0);
-	
+
                                            /**
                                             * Fill-in parameter.
                                             */
@@ -430,7 +430,7 @@ namespace PETScWrappers
                                         */
       PreconditionICC (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -445,11 +445,11 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
 
 
-  
+
 /**
  * A class that implements the interface to use the PETSc ILU
  * preconditioner.
@@ -467,7 +467,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -476,7 +476,7 @@ namespace PETScWrappers
                                             * to zero.
                                             */
           AdditionalData (const unsigned int levels = 0);
-	
+
                                            /**
                                             * Fill-in parameter.
                                             */
@@ -491,7 +491,7 @@ namespace PETScWrappers
                                         */
       PreconditionILU (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -506,7 +506,7 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
 
 
@@ -530,7 +530,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -558,7 +558,7 @@ namespace PETScWrappers
 					    * Confer PetSC manual for more
 					    * details.
 					    */
-	  double zero_pivot;					    
+	  double zero_pivot;
 
                                            /**
                                             * This quantity is added to the
@@ -576,7 +576,7 @@ namespace PETScWrappers
                                         */
       PreconditionLU (const MatrixBase     &matrix,
 		      const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -591,7 +591,7 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
 
 
@@ -615,7 +615,7 @@ namespace PETScWrappers
                                         * Standardized data struct to
                                         * pipe additional flags to the
                                         * preconditioner.
-                                        */      
+                                        */
       struct AdditionalData
       {
                                            /**
@@ -676,7 +676,7 @@ namespace PETScWrappers
 					    * created.
 					    */
 	  double max_row_sum;
-	  
+
 					     /**
 					    * Number of levels of aggressive
 					    * coarsening. Increasing this
@@ -684,7 +684,7 @@ namespace PETScWrappers
 					    * time and memory requirements but
 					    * may decrease effectiveness.*/
 	  unsigned int aggressive_coarsening_num_levels;
-	  
+
        					   /**
 					    * Setting this flag to true
 					    * produces debug output from
@@ -692,14 +692,10 @@ namespace PETScWrappers
 					    * is constructed.
 					    */
 	  bool output_details;
-	  
-	  
-	  
-
       };
 
 
-      
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -708,7 +704,7 @@ namespace PETScWrappers
                                         */
       PreconditionBoomerAMG (const MatrixBase     &matrix,
 			     const AdditionalData &additional_data = AdditionalData());
-      
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
@@ -723,10 +719,8 @@ namespace PETScWrappers
                                         * preconditioner that is appropriate
                                         * for the present class.
                                         */
-      virtual void set_preconditioner_type (PC &pc) const;      
+      virtual void set_preconditioner_type (PC &pc) const;
   };
-
-  
 }
 
 
