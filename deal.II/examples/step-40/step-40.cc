@@ -392,7 +392,7 @@ void LaplaceProblem<dim>::solve ()
   solver.solve (system_matrix, completely_distributed_solution, system_rhs,
 		preconditioner);
 
-  pcout << "  Solved in " << solver_control.last_step()
+  pcout << "   Solved in " << solver_control.last_step()
 	<< " iterations." << std::endl;
 
   constraints.distribute (completely_distributed_solution);
@@ -496,7 +496,7 @@ void LaplaceProblem<dim>::run (const unsigned int initial_global_refine)
 	    << "   Number of degrees of freedom: "
 	    << dof_handler.n_dofs()
 	    << std::endl;
-      
+
       assemble_system ();
       solve ();
 
