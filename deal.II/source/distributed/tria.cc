@@ -36,10 +36,7 @@
 
 #include <algorithm>
 #include <numeric>
-
-#include <base/timer.h>
-
-#  include <iostream>
+#include <iostream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -2055,7 +2052,7 @@ namespace parallel
 
 				// TODO: This is a verbatim copy of the 2,2
 				// case. However, we can't just specialize the
-				// dim template argument, but let spacedim open 
+				// dim template argument, but let spacedim open
     template <>
     void
     Triangulation<2,3>::copy_new_triangulation_to_p4est (internal::int2type<2>)
@@ -2521,11 +2518,6 @@ namespace parallel
 	  return;
 	}
 
-      Timer t(MPI_COMM_WORLD, true);
-      t.start();
-
-
-
 				       // now do the work we're
 				       // supposed to do when we are
 				       // in charge
@@ -2587,19 +2579,6 @@ namespace parallel
 		 &RefineAndCoarsenList<dim,spacedim>::coarsen_callback,
 		 /*init_callback=*/NULL);
 
-      t.stop();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      if (my_subdomain==0)
-	{
-	  deallog << "_p4est::ref&coarsen ";
-	  t.print_data(deallog);
-	}
-#endif
-
-      t.reset();
-      t.start();
-
-
 				       // make sure all cells in the lists have
 				       // been consumed
       Assert (refine_and_coarsen_list.pointers_are_at_end(),
@@ -2622,35 +2601,11 @@ namespace parallel
 		 /*init_callback=*/NULL);
 
 
-      t.stop();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      if (my_subdomain==0)
-	{
-	  deallog << "_p4est::balance ";
-	  t.print_data(deallog);
-	}
-#endif
-      t.reset();
-      t.start();
-
-
 				       // before repartitioning the mesh let
 				       // others attach mesh related info
 				       // (such as SolutionTransfer data) to
 				       // the p4est
       attach_mesh_data();
-
-
-      t.stop();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      if (my_subdomain==0)
-	{
-	  deallog << "_attach_mesh_data ";
-	  t.print_data(deallog);
-	}
-#endif
-      t.reset();
-      t.start();
 
 				       // partition the new mesh between
 				       // all processors
@@ -2658,17 +2613,6 @@ namespace parallel
 	partition (parallel_forest,
                    /* prepare coarsening */ 1,
 		   /* weight_callback */ NULL);
-
-      t.stop();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      if (my_subdomain==0)
-	{
-	  deallog << "_p4est::partition ";
-	  t.print_data(deallog);
-	}
-#endif
-      t.reset();
-      t.start();
 
 				       // finally copy back from local
 				       // part of tree to deal.II
@@ -2701,16 +2645,6 @@ namespace parallel
       refinement_in_progress = false;
 
       update_number_cache ();
-
-      t.stop();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      if (my_subdomain==0)
-	{
-	  deallog << "_copy_to_deal ";
-	  t.print_data(deallog);
-	}
-#endif
-      t.reset();
     }
 
 
