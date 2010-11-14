@@ -109,7 +109,8 @@ namespace LocalIntegrators
     }
 
 /**
- * Weak boundary condition for the Laplace operator by Nitsche, namely on the face <i>F</i>
+ * Weak boundary condition for the Laplace operator by Nitsche, vector
+ * valued version, namely on the face <i>F</i>
  * the vector
  * @f[
  * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
@@ -153,6 +154,51 @@ namespace LocalIntegrators
 
 		  result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
 		}
+	  }
+      }
+
+/**
+ * Weak boundary condition for the Laplace operator by Nitsche, scalar
+ * version, namely on the face <i>F</i> the vector
+ * @f[
+ * \int_F \Bigl(\gamma (u-g) v - \partial_n u v - (u-g) \partial_n v\Bigr)\;ds.
+ * @f]
+ *
+ * Here, <i>u</i> is the finite element function whose values and
+ * gradient are given in the arguments <tt>input</tt> and
+ * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
+ * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
+ * penalty parameter.
+ */
+      template <int dim>
+      void nitsche_residual (
+	Vector<double>& result,
+	const FEValuesBase<dim>& fe,
+	const std::vector<double>& input,
+	const std::vector<Tensor<1,dim> >& Dinput,
+	const std::vector<double>& data,
+	double penalty,
+	double factor = 1.)
+      {
+	const unsigned int n_dofs = fe.dofs_per_cell;
+	AssertDimension(input.size(), fe.n_quadrature_points);
+	AssertDimension(Dinput.size(), fe.n_quadrature_points);
+	AssertDimension(data.size(), fe.n_quadrature_points);
+
+	for (unsigned k=0;k<fe.n_quadrature_points;++k)
+	  {
+	    const double dx = factor * fe.JxW(k);
+	    const Point<dim>& n = fe.normal_vector(k);
+	    for (unsigned i=0;i<n_dofs;++i)
+	      {
+		const double dnv = fe.shape_grad(i,k) * n;
+		const double dnu = Dinput[k] * n;
+		const double v= fe.shape_value(i,k);
+		const double u= input[k];
+		const double g= data[k];
+
+		result(i) += dx*(2.*penalty*(u-g)*v - dnv*(u-g) - dnu*v);
+	      }
 	  }
       }
 
