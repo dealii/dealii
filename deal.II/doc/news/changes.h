@@ -321,6 +321,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>lac</h3>
 
 <ol>
+  <li><p>New: When Hypre is available as a sub-package of PETSc, the new class
+  PETScWrappers::PreconditionBoomerAMG provides the BoomerAMG implementation
+  of the algebraic multigrid method of the Hypre package as a preconditioner.
+  This functionality is used, for example, in step-40.
+  <br>
+  (Timo Heister 2010/11/13)
+  </p></li>
 
   <li><p>New: The class LAPACKFullMatrix now has functions to compute the
   singular value decomposition of a matrix and its inverse.
