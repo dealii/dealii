@@ -4725,6 +4725,7 @@ FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
 
 
 template <int dim, int spacedim>
+inline
 const Point<spacedim> &
 FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
 {
