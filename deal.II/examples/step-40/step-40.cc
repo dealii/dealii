@@ -502,7 +502,73 @@ void LaplaceProblem<dim>::refine_grid ()
 
 
 
+                                 // @sect4{LaplaceProblem::output_results}
 
+				 // Compared to the corresponding
+				 // function in step-6, the one here
+				 // is a tad more complicated. There
+				 // are two reasons: the first one is
+				 // that we do not just want to output
+				 // the solution but also for each
+				 // cell which processor owns it
+				 // (i.e. which "subdomain" it is
+				 // in). Secondly, as discussed at
+				 // length in step-17 and step-18,
+				 // generating graphical data can be a
+				 // bottleneck in parallelizing. In
+				 // step-18, we have moved this step
+				 // out of the actual computation but
+				 // shifted it into a separate program
+				 // that later combined the output
+				 // from various processors into a
+				 // single file. But this doesn't
+				 // scale: if the number of processors
+				 // is large, this may mean that the
+				 // step of combining data on a single
+				 // processor later becomes the
+				 // longest running part of the
+				 // program, or it may produce a file
+				 // that's so large that it can't be
+				 // visualized any more. We here
+				 // follow a more sensible approach,
+				 // namely creating individual files
+				 // for each MPI process and leaving
+				 // it to the visualization program to
+				 // make sense of that.
+				 //
+				 // To start, the top of the function
+				 // looks like always. In addition to
+				 // attaching the solution vector (the
+				 // one that has entries for all
+				 // locally relevant, not only the
+				 // locally owned, elements), we
+				 // attach a data vector that stores,
+				 // for each cell, the subdomain the
+				 // cell belongs to. This is slightly
+				 // tricky, because of course not
+				 // every processor knows about every
+				 // cell. The vector we attach
+				 // therefore has an entry for every
+				 // cell that the current processor
+				 // has in its mesh (locally owned
+				 // onces, ghost cells, and artificial
+				 // cells), but the DataOut class will
+				 // ignore all entries that correspond
+				 // to cells that are not owned by the
+				 // current processor. As a
+				 // consequence, it doesn't actually
+				 // matter what values we write into
+				 // these vector entries: we simply
+				 // fill the entire vector with the
+				 // number of the current MPI process
+				 // (i.e. the subdomain_id of the
+				 // current process); this correctly
+				 // sets the values we care for,
+				 // i.e. the entries that correspond
+				 // to locally owned cells, while
+				 // providing the wrong value for all
+				 // other elements -- but these are
+				 // then ignored anyway.
 template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
@@ -511,30 +577,51 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   data_out.add_data_vector (locally_relevant_solution, "u");
 
   Vector<float> subdomain (triangulation.n_active_cells());
-				   // could just fill entire vector with subdomain_id()
-  {
-    unsigned int index = 0;
-    for (typename Triangulation<dim>::active_cell_iterator
-	   cell = triangulation.begin_active();
-	 cell != triangulation.end(); ++cell, ++index)
-      subdomain(index) = (cell->is_ghost() || cell->is_artificial()
-			  ?
-			  -1
-			  :
-			  cell->subdomain_id());
-  }
+  for (unsigned int i=0; i<subdomain.size(); ++i)
+    subdomain(i) = triangulation.locally_owned_subdomain();
   data_out.add_data_vector (subdomain, "subdomain");
+
   data_out.build_patches ();
 
+				   // The next step is to write this
+				   // data to disk. We choose file
+				   // names of the form
+				   // <code>solution-XX-PPPP.vtu</code>
+				   // where <code>XX</code> indicates
+				   // the refinement cycle,
+				   // <code>PPPP</code> refers to the
+				   // processor number (enough for up
+				   // to 10,000 processors, though we
+				   // hope that nobody ever tries to
+				   // generate this much data -- you
+				   // would likely overflow all file
+				   // system quotas), and
+				   // <code>.vtu</code> indicates the
+				   // XML-based Visualization Toolkit
+				   // (VTK) file format.
   const std::string filename = ("solution-" +
 				Utilities::int_to_string (cycle, 2) +
 				"." +
 				Utilities::int_to_string
 				(triangulation.locally_owned_subdomain(), 4));
-
   std::ofstream output ((filename + ".vtu").c_str());
   data_out.write_vtu (output);
 
+				   // The last step is to write a
+				   // "master record" that lists for
+				   // the visualization program the
+				   // names of the various files that
+				   // combined represents the
+				   // graphical data for the entire
+				   // domain. The
+				   // DataOutBase::write_pvtu_record
+				   // does this, and it needs a list
+				   // of filenames that we create
+				   // first. Note that only one
+				   // processor needs to generate this
+				   // file; we arbitrarily choose
+				   // processor zero to take over this
+				   // job.
   if (Utilities::System::get_this_mpi_process(mpi_communicator) == 0)
     {
       std::vector<std::string> filenames;
