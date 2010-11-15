@@ -795,6 +795,28 @@ class GridTools
     fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
 				  Triangulation<dim,spacedim> &triangulation);
 
+  /** 
+      This function implements a boundary subgrid extraction.
+      Given a <dim,spacedim>-Triangulation (the "volume mesh")
+      the function extracts a subset of its boundary (the "surface mesh").
+      The boundary to be extracted is specified by a list of boundary_ids.
+      If none is specified the whole boundary will be extracted.
+      
+      It also builds a mapping linking the cells on the surface mesh
+      to the corresponding faces on the volume one.
+      
+      
+  */
+  template <int dim, int spacedim>
+  static void 
+  extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh,
+			 Triangulation<dim-1,spacedim>     &surface_mesh,
+			 std::map<typename Triangulation<dim-1,spacedim>::cell_iterator,
+				  typename Triangulation<dim,spacedim>::face_iterator> 
+			 &surface_to_volume_mapping,
+			 const std::set<unsigned char> &boundary_ids
+			 = std::set<unsigned char>());
+  
                                      /**
                                       * Exception
                                       */
@@ -842,6 +864,8 @@ class GridTools
 		    unsigned int,
 		    << "The given vertex " << arg1
 		    << " is not used in the given triangulation");
+
+
 };
 
 
@@ -984,6 +1008,11 @@ GridTools::cell_measure<2>(const std::vector<Point<2> > &all_vertices,
 // double
 // GridTools::cell_measure<2,3>(const std::vector<Point<3> > &all_vertices,
 // 			const unsigned int (&vertex_indices) [GeometryInfo<2>::vertices_per_cell]);
+
+
+
+
+
 
 
 DEAL_II_NAMESPACE_CLOSE

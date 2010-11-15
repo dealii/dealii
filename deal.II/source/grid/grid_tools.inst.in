@@ -57,6 +57,15 @@ for (deal_II_dimension : DIMENSIONS)
     template
       double
       GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &);
+    template 
+      void
+      GridTools::extract_boundary_mesh (const Triangulation<deal_II_dimension> &volume_mesh,
+					Triangulation<deal_II_dimension-1,deal_II_dimension>  &surface_mesh,
+					std::map<  Triangulation<deal_II_dimension-1,deal_II_dimension>::cell_iterator,
+						   Triangulation<deal_II_dimension>::face_iterator> 
+      &surface_to_volume_mapping,
+					const std::set<unsigned char> &boundary_ids
+					= std::set<unsigned char>());
 #endif
 
 #if deal_II_dimension == 2
@@ -204,6 +213,7 @@ for (deal_II_dimension : DIMENSIONS)
       get_finest_common_cells (const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_1,
 			       const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &mesh_2);
 
+    
 #endif
   }
 
