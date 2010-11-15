@@ -145,11 +145,6 @@ using namespace dealii;
 				 // - The obvious use of
 				 //   parallel::distributed::Triangulation
 				 //   instead of Triangulation.
-				 // - The fact that all matrices and vectors
-				 //   are now distributed. We use their
-				 //   PETScWrapper versions for this since
-				 //   deal.II's own classes do not provide
-				 //   %parallel functionality.
 				 // - The presence of two IndexSet objects
 				 //   that denote which sets of degrees of
 				 //   freedom (and associated elements of
@@ -157,6 +152,24 @@ using namespace dealii;
 				 //   own on the current processor and which
 				 //   we need (as ghost elements) for the
 				 //   algorithms in this program to work.
+				 // - The fact that all matrices and
+				 //   vectors are now distributed. We
+				 //   use their PETScWrapper versions
+				 //   for this since deal.II's own
+				 //   classes do not provide %parallel
+				 //   functionality. Note that as part
+				 //   of this class, we store a
+				 //   solution vector that does not
+				 //   only contain the degrees of
+				 //   freedom the current processor
+				 //   owns, but also (as ghost
+				 //   elements) all those vector
+				 //   elements that correspond to
+				 //   "locally relevant" degrees of
+				 //   freedom (i.e. all those that
+				 //   live on locally owned cells or
+				 //   the layer of ghost cells that
+				 //   surround it).
 template <int dim>
 class LaplaceProblem
 {
@@ -263,24 +276,61 @@ void LaplaceProblem<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
+				   // The next two lines extract some
+				   // informatino we will need later
+				   // on, namely two index sets that
+				   // provide information about which
+				   // degrees of freedom are owned by
+				   // the current processor (this
+				   // information will be used to
+				   // initialize solution and right
+				   // hand side vectors, and the
+				   // system matrix, indicating which
+				   // elements to store on the current
+				   // processor and which to expect to
+				   // be stored somewhere else); and
+				   // an index set that indicates
+				   // which degrees of freedom are
+				   // locally relevant (i.e. live on
+				   // cells that the current processor
+				   // owns or on the layer of ghost
+				   // cells around the locally owned
+				   // cells; we need all of these
+				   // degrees of freedom, for example,
+				   // to estimate the error on the
+				   // local cells).
   locally_owned_dofs = dof_handler.locally_owned_dofs ();
   DoFTools::extract_locally_relevant_dofs (dof_handler,
 					   locally_relevant_dofs);
 
-				   // note in class doc!
+				   // Next, let us initialize the
+				   // solution and right hand side
+				   // vectors. As mentioned above, the
+				   // solution vector we seek does not
+				   // only store elements we own, but
+				   // also ghost entries; on the other
+				   // hand, the right hand side vector
+				   // only needs to have the entries
+				   // the current processor owns since
+				   // all we will ever do is write
+				   // into it, never read from it on
+				   // locally owned cells (of course
+				   // the linear solvers will read
+				   // from it, but they do not care
+				   // about the geometric location of
+				   // degrees of freedom).
   locally_relevant_solution.reinit (mpi_communicator,
 				    locally_owned_dofs,
 				    locally_relevant_dofs);
+  locally_relevant_solution = 0;
   system_rhs.reinit (mpi_communicator,
 		     dof_handler.n_dofs(),
 		     dof_handler.n_locally_owned_dofs());
-
-  locally_relevant_solution = 0;
   system_rhs = 0;
 
+				   // xxx
   constraints.clear ();
   constraints.reinit (locally_relevant_dofs);
-
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
