@@ -328,7 +328,35 @@ void LaplaceProblem<dim>::setup_system ()
 		     dof_handler.n_locally_owned_dofs());
   system_rhs = 0;
 
-				   // xxx
+				   // The next step is to compute hanging node
+				   // and boundary value constraints, which we
+				   // combine into a single object storing all
+				   // constraints.
+				   //
+				   // As with all other things in %parallel,
+				   // the mantra must be that no processor can
+				   // store all information about the entire
+				   // universe. As a consequence, we need to
+				   // tell the constraints object for which
+				   // degrees of freedom it can store
+				   // constraints and for which it may not
+				   // expect any information to store. In our
+				   // case, as explained in the @ref
+				   // distributed module, the degrees of
+				   // freedom we need to care about on each
+				   // processor are the locally relevant ones,
+				   // so we pass this to the
+				   // ConstraintMatrix::reinit function. As a
+				   // side note, if you forget to pass this
+				   // argument, the ConstraintMatrix class
+				   // will allocate an array with length equal
+				   // to the largest DoF index it has seen so
+				   // far. For processors with high MPI
+				   // process number, this may be very large
+				   // -- maybe on the order of billions. The
+				   // program would then allocate more memory
+				   // than for likely all other operations
+				   // combined for this single array.
   constraints.clear ();
   constraints.reinit (locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints (dof_handler, constraints);
@@ -338,7 +366,7 @@ void LaplaceProblem<dim>::setup_system ()
 					    constraints);
   constraints.close ();
 
-
+				   // xxx
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
 				       dof_handler.n_dofs(),
 				       locally_relevant_dofs);
@@ -439,7 +467,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 //   PETSc functionality. It is
 				 //   relatively well known that the
 				 //   primary bottleneck of massively
-				 //   parallel linear solvers is not
+				 //   %parallel linear solvers is not
 				 //   actually the communication
 				 //   between processors, but the fact
 				 //   that it is difficult to produce
@@ -722,7 +750,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				 // finer mesh (5 global refinement
 				 // cycles) -- there just isn't much
 				 // of a point showing a massively
-				 // parallel program starting on 4
+				 // %parallel program starting on 4
 				 // cells (although admittedly the
 				 // point is only slightly stronger
 				 // starting on 1024).
