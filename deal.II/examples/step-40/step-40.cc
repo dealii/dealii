@@ -382,7 +382,8 @@ void LaplaceProblem<dim>::setup_system ()
 				   // each locally relevant degree of freedom,
 				   // i.e. all those that we may ever touch in
 				   // the process of assembling the matrix
-				   // (the @ref distributed_paper has a long
+				   // (the @ref distributed_paper  
+				   // "distributed computing paper" has a long
 				   // discussion why one really needs the
 				   // locally relevant, and not the small set
 				   // of locally active degrees of freedom in
@@ -422,6 +423,42 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 
+                                 // @sect4{LaplaceProblem::assemble_system}
+
+				 // The function that then assembles the
+				 // linear system is comparatively boring,
+				 // being almost exactly what we've seen
+				 // before. The points to watch out for are:
+				 // - Assembly must only loop over locally
+				 //   owned cells. We test this by comparing
+				 //   a cell's subdomain_id against
+				 //   information from the triangulation
+				 //   but an equally valid condition would
+				 //   have been to skip all cells for which
+				 //   the condition <code>cell->is_ghost()
+				 //   || cell->is_artificial()</code> is
+				 //   true.
+				 // - Copying local contributions into the
+				 //   global matrix must include distributing
+				 //   constraints and boundary values. In
+				 //   other words, we can now (as we did in
+				 //   step-6) first copy every local
+				 //   contribution into the global matrix and
+				 //   only in a later step take care of
+				 //   hanging node constraints and boundary
+				 //   values. The reason is, as discussed in
+				 //   step-17, that PETSc does not provide
+				 //   access to arbitrary elements of the
+				 //   matrix once they have been assembled
+				 //   into it -- in parts because they may
+				 //   simple no longer reside on the current
+				 //   processor but have instead been shipped
+				 //   to a different machine.
+				 // - The way we compute the right hand side
+				 //   (given the formula stated in the
+				 //   introduction) may not be the most
+				 //   elegant but will do for a program whose
+				 //   focus lies somewhere entirely different.
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
@@ -457,7 +494,8 @@ void LaplaceProblem<dim>::assemble_system ()
 	      rhs_value
 	      = (fe_values.quadrature_point(q_point)[1]
 		 >
-		 0.5+0.25*sin(4.0*numbers::PI*fe_values.quadrature_point(q_point)[0])
+		 0.5+0.25*std::sin(4.0 * numbers::PI *
+				   fe_values.quadrature_point(q_point)[0])
 		 ? 1 : -1);
 
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
