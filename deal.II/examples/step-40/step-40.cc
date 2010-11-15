@@ -177,7 +177,7 @@ class LaplaceProblem
     LaplaceProblem ();
     ~LaplaceProblem ();
 
-    void run (const unsigned int initial_global_refine);
+    void run ();
 
   private:
     void setup_system ();
@@ -554,10 +554,39 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 
+                                 // @sect4{LaplaceProblem::run}
+
+				 // The function that controls the
+				 // overall behavior of the program is
+				 // again like the one in step-6. The
+				 // minor difference are the use of
+				 // <code>pcout</code> instead of
+				 // <code>std::cout</code> for output
+				 // to the console (see also step-17)
+				 // and that we only generate
+				 // graphical output if at most 32
+				 // processors are involved. Without
+				 // this limit, it would be just too
+				 // easy for people carelessly running
+				 // this program without reading it
+				 // first to bring down the cluster
+				 // interconnect and fill any file
+				 // system available :-)
+				 //
+				 // A functional difference to step-6
+				 // is the use of a square domain and
+				 // that we start with a slightly
+				 // finer mesh (5 global refinement
+				 // cycles) -- there just isn't much
+				 // of a point showing a massively
+				 // parallel program starting on 4
+				 // cells (although admittedly the
+				 // point is only slightly stronger
+				 // starting on 1024).
 template <int dim>
-void LaplaceProblem<dim>::run (const unsigned int initial_global_refine)
+void LaplaceProblem<dim>::run ()
 {
-  const unsigned int n_cycles = 12;
+  const unsigned int n_cycles = 8;
   for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
     {
       pcout << "Cycle " << cycle << ':' << std::endl;
@@ -565,7 +594,7 @@ void LaplaceProblem<dim>::run (const unsigned int initial_global_refine)
       if (cycle == 0)
 	{
 	  GridGenerator::hyper_cube (triangulation);
-	  triangulation.refine_global (initial_global_refine);
+	  triangulation.refine_global (5);
 	}
       else
 	refine_grid ();
@@ -582,7 +611,7 @@ void LaplaceProblem<dim>::run (const unsigned int initial_global_refine)
       assemble_system ();
       solve ();
 
-      if (Utilities::System::get_n_mpi_processes(mpi_communicator) <= 100)
+      if (Utilities::System::get_n_mpi_processes(mpi_communicator) <= 32)
 	output_results (cycle);
 
       pcout << std::endl;
@@ -591,6 +620,17 @@ void LaplaceProblem<dim>::run (const unsigned int initial_global_refine)
 
 
 
+                                 // @sect4{main()}
+
+				 // The final function,
+				 // <code>main()</code>, again has the
+				 // same structure as in all other
+				 // programs, in particular
+				 // step-6. Like in the other programs
+				 // that use PETSc, we have to
+				 // inialize and finalize PETSc, which
+				 // also initializes and finalizes the
+				 // MPI subsystem.
 int main(int argc, char *argv[])
 {
   try
@@ -598,16 +638,8 @@ int main(int argc, char *argv[])
       PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
       deallog.depth_console (0);
 
-      int refine=5;
-      if (argc>1)
-	{
-	  refine = (unsigned int)Utilities::string_to_int(argv[1]);
-	}
-
-      {
-	LaplaceProblem<2> laplace_problem_2d;
-	laplace_problem_2d.run (refine);
-      }
+      LaplaceProblem<2> laplace_problem_2d;
+      laplace_problem_2d.run ();
 
       PetscFinalize();
     }
