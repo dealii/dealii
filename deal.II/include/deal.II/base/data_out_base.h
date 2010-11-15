@@ -1708,10 +1708,13 @@ class DataOutBase
  * name rather than having to group several scalar fields into a
  * vector later on in the visualization program.
  *
- * Some visualization programs, such as ParaView, can read several separate
- * VTU files to parallelize visualization. In that case, you need a
- * <code>.pvtu</code> file that describes which VTU files form a group. The
- * DataOutInterface::write_pvtu_record() function can generate such a master record.
+ * Some visualization programs, such as ParaView, can read several
+ * separate VTU files to parallelize visualization. In that case, you
+ * need a <code>.pvtu</code> file that describes which VTU files form
+ * a group. The DataOutInterface::write_pvtu_record() function can
+ * generate such a master record.
+ *
+ * The use of this function is explained in step-40.
  */
     template <int dim, int spacedim>
     static void write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
@@ -2275,6 +2278,9 @@ class DataOutInterface : private DataOutBase
 				      * call the current function, listing the
 				      * names of the files written by all
 				      * parallel processes.
+				      *
+				      * @note The use of this function is
+				      * explained in step-40.
 				      */
     void write_pvtu_record (std::ostream &out,
 			    const std::vector<std::string> &piece_names) const;
