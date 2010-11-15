@@ -366,7 +366,43 @@ void LaplaceProblem<dim>::setup_system ()
 					    constraints);
   constraints.close ();
 
-				   // xxx
+				   // The last part of this function deals
+				   // with initializing the matrix with
+				   // accompanying sparsity pattern. As in
+				   // previous tutorial programs, we use the
+				   // CompressedSimpleSparsityPattern as an
+				   // intermediate with which we then
+				   // initialize the PETSc matrix. To do so we
+				   // have to tell the sparsity pattern its
+				   // size but as above there is no way the
+				   // resulting object will be able to store
+				   // even a single pointer for each global
+				   // degree of freedom; the best we can hope
+				   // for is that it stores information about
+				   // each locally relevant degree of freedom,
+				   // i.e. all those that we may ever touch in
+				   // the process of assembling the matrix
+				   // (the @ref distributed_paper has a long
+				   // discussion why one really needs the
+				   // locally relevant, and not the small set
+				   // of locally active degrees of freedom in
+				   // this context).
+				   //
+				   // So we tell the sparsity pattern its size
+				   // and what DoFs to store anything for and
+				   // then ask DoFTools::make_sparsity_pattern
+				   // to fill it (this function ignores all
+				   // cells that are not locally owned,
+				   // mimicking what we will do below in the
+				   // assembly process). After this, we call a
+				   // function that exchanges entries in these
+				   // sparsity pattern between processors so
+				   // that in the end each processor really
+				   // knows about all the entries that will
+				   // exist in that part of the finite element
+				   // matrix that it will own. The final step
+				   // is to initialize the matrix with the
+				   // sparsity pattern.
   CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
 				       dof_handler.n_dofs(),
 				       locally_relevant_dofs);
