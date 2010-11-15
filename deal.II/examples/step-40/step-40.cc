@@ -388,20 +388,26 @@ void LaplaceProblem<dim>::assemble_system ()
 	fe_values.reinit (cell);
 
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
-				     fe_values.shape_grad(j,q_point) *
-				     fe_values.JxW(q_point));
+	  {
+	    const double
+	      rhs_value
+	      = (fe_values.quadrature_point(q_point)[1]
+		 >
+		 0.5+0.25*sin(4.0*numbers::PI*fe_values.quadrature_point(q_point)[0])
+		 ? 1 : -1);
 
-	      cell_rhs(i) += (fe_values.shape_value(i,q_point) *
-			      (fe_values.quadrature_point(q_point)[1]
-			       >
-			       0.5+0.25*sin(4.0*numbers::PI*fe_values.quadrature_point(q_point)[0])
-			       ? 1 : -1) *
-			      fe_values.JxW(q_point));
-	    }
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      {
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  cell_matrix(i,j) += (fe_values.shape_grad(i,q_point) *
+				       fe_values.shape_grad(j,q_point) *
+				       fe_values.JxW(q_point));
+
+		cell_rhs(i) += (rhs_value *
+				fe_values.shape_value(i,q_point) *
+				fe_values.JxW(q_point));
+	      }
+	  }
 
 	cell->get_dof_indices (local_dof_indices);
 	constraints.distribute_local_to_global (cell_matrix,
