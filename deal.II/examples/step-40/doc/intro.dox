@@ -16,6 +16,11 @@ California Institute of Technology.
 p4est library installed. The installation of deal.II
 together with these two additional libraries is described in the <a
 href="../../readme.html" target="body">README</a> file. Note also that
+to work properly, this program needs access to the Hypre
+preconditioner package implementing algebraic multigrid; it can be
+installed as part of PETSc but has to be explicitly enabled during
+PETSc configuration; see the page linked to from the installation
+instructions for PETSc. Finally, note that
 PETSc appears not to co-operate well when using
 threads and the program crashes when deal.II is compiled in its usual mode
 supporting multithreading. The program can therefore only be compiled and run
