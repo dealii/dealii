@@ -32,7 +32,7 @@ deal.II webpage</a>.
 In general, time-dependent small elastic deformations are described by the
 elastic wave equation
 @f[
-  \rho \frac{\partial^2 \mathbf{u}}{\partial t^2} 
+  \rho \frac{\partial^2 \mathbf{u}}{\partial t^2}
   + c \frac{\partial \mathbf{u}}{\partial t}
   - \textrm{div}\  ( C \varepsilon(\mathbf{u})) = \mathbf{f}
   \qquad
@@ -146,7 +146,7 @@ where
   \sigma^n = \sigma^{n-1} + C \varepsilon (\Delta \mathbf{u}^n),
 @f]
 and $\Delta \mathbf{u}^n$ the incremental displacement for time step
-$n$. In addition, we have to specify initial data $\mathbf{u}(\cdot,0)=\mathbf{u}_0$. 
+$n$. In addition, we have to specify initial data $\mathbf{u}(\cdot,0)=\mathbf{u}_0$.
 This way, if we want to solve for the displacement increment, we
 have to solve the following system:
 @f{eqnarray*}
@@ -169,13 +169,13 @@ such that
 <a name="step-18.linear-system"></a>
 @f{eqnarray*}
   (C \varepsilon(\Delta\mathbf{u}^n), \varepsilon(\varphi) )_{\Omega(t_{n-1})}
-  = 
+  =
   (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
   -(\sigma^{n-1},\varepsilon(\varphi))_{\Omega(t_{n-1})}
   \\
   +(\mathbf{b}(\mathbf{x},t_n)-\mathbf{b}(\mathbf{x},t_{n-1}), \varphi)_{\Gamma_N}
   \\
-  \forall \varphi \in \{\mathbf{v}\in H^1(\Omega(t_{n-1}))^d: \mathbf{v}|_{\Gamma_D}=0\}.     
+  \forall \varphi \in \{\mathbf{v}\in H^1(\Omega(t_{n-1}))^d: \mathbf{v}|_{\Gamma_D}=0\}.
   \qquad
   \qquad
   \textrm{[linear-system]}
@@ -200,7 +200,7 @@ continuous finite elements.
 
 There are differences, however:
 <ol>
-  <li> We have to move (update) the mesh after each time step, in order to be 
+  <li> We have to move (update) the mesh after each time step, in order to be
   able to solve the next time step on a new domain;
 
   <li> We need to know $\sigma^{n-1}$ to compute the next incremental
@@ -221,7 +221,7 @@ As indicated above, we need to have the stress variable $\sigma^n$ available
 when computing time step $n+1$, and we can compute it using
 <a name="step-18.stress-update"></a>
 @f[
-  \sigma^n = \sigma^{n-1} + C \varepsilon (\Delta \mathbf{u}^n).  
+  \sigma^n = \sigma^{n-1} + C \varepsilon (\Delta \mathbf{u}^n).
   \qquad
   \qquad
   \textrm{[stress-update]}
@@ -271,7 +271,7 @@ that is defined with respect to the coordinate system of the material in the
 old domain, and has to be transferred to the new domain. The reason for this
 can be understood as follows: locally, the incremental deformation $\Delta\mathbf{u}$ can be decomposed into three parts, a linear translation (the constant part
 of the displacement increment field in the neighborhood of a point), a
-dilational 
+dilational
 component (that part of the gradient of the displacement field that has a
 nonzero divergence), and a rotation. A linear translation of the material does
 not affect the stresses that are frozen into it -- the stress values are
@@ -293,8 +293,8 @@ for the stress variable is then
 <a name="step-18.stress-update+rot"></a>
 @f[
   \sigma^n
-  = 
-  R(\Delta \mathbf{u}^n)^T 
+  =
+  R(\Delta \mathbf{u}^n)^T
   [\sigma^{n-1} + C \varepsilon (\Delta \mathbf{u}^n)]
   R(\Delta \mathbf{u}^n).
   \qquad
@@ -368,6 +368,13 @@ to merge all the intermediate format files into a single file in GMV
 format. More details on the parameters of this program and what it can do for
 you can be found in the documentation of the step-19 tutorial program.
 
+@note In the years since the paragraphs above were written, it has
+also become possible to not only compute solutions in parallel, but
+also to visualize them with some programs (for example with the
+Paraview viewer). To make this efficient, one can not store the entire
+solution in a single file, but instead needs to have a single data
+file for each processor to visualize individually. We discuss this
+concept and how to use it in step-40.
 
 
 <h3>Overall structure of the program</h3>
@@ -437,7 +444,7 @@ sequence of operations on the present mesh:
   previously been initialized with the result of the first function above):
   @verbatim
 for (unsigned int i=0; i<dofs_per_cell; ++i)
-  for (unsigned int j=0; j<dofs_per_cell; ++j) 
+  for (unsigned int j=0; j<dofs_per_cell; ++j)
     for (unsigned int q_point=0; q_point<n_q_points;
          ++q_point)
       {
@@ -445,7 +452,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
           eps_phi_i = get_strain (fe_values, i, q_point),
           eps_phi_j = get_strain (fe_values, j, q_point);
 
-        cell_matrix(i,j) 
+        cell_matrix(i,j)
           += (eps_phi_i * stress_strain_tensor * eps_phi_j
               *
               fe_values.JxW (q_point));
@@ -458,9 +465,9 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
   simplicity, <code>operator*</code> provides for the (double summation) product
   between symmetric tensors of even rank here.
 
-  Assembling the local contributions 
+  Assembling the local contributions
   @f{eqnarray*}
-      f^K_i &=& 
+      f^K_i &=&
       (\mathbf{f}, \varphi_i)_K -(\sigma^{n-1},\varepsilon(\varphi_i))_K
       \\
       &\approx&
@@ -479,14 +486,14 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
   @verbatim
 for (unsigned int i=0; i<dofs_per_cell; ++i)
   {
-    const unsigned int 
+    const unsigned int
       component_i = fe.system_to_component_index(i).first;
 
     for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
       {
         const SymmetricTensor<2,dim> &old_stress
           = local_quadrature_points_data[q_point].old_stress;
-        
+
         cell_rhs(i) += (body_force_values[q_point](component_i) *
                         fe_values.shape_value (i,q_point)
                         -
@@ -545,7 +552,7 @@ addition, gravity acts on the body.
 
 The program text will reveal more about how to implement this situation, and
 the results section will show what displacement pattern comes out of this
-simulation. 
+simulation.
 
 <h3>Possible directions for extensions</h3>
 
@@ -567,7 +574,7 @@ to withstand only a maximal stress (the yield stress) after which it starts to
 variational inequality, which alternatively can be treated as minimizing the
 elastic energy
 @f[
-  E(\mathbf{u}) = 
+  E(\mathbf{u}) =
   (\varepsilon(\mathbf{u}), C\varepsilon(\mathbf{u}))_{\Omega}
   - (\mathbf{f}, \mathbf{u})_{\Omega} - (\mathbf{b}, \mathbf{u})_{\Gamma_N},
 @f]
@@ -583,7 +590,7 @@ book by Simo and Hughes on &ldquo;Computational Inelasticity&rdquo; for a
 comprehensive overview of computational strategies for solving plastic
 models. Alternatively, a brief but concise description of an algorithm for
 plasticity is given in an article by S. Commend, A. Truty, and Th. Zimmermann,
-titled &ldquo;Stabilized finite elements applied to 
+titled &ldquo;Stabilized finite elements applied to
 elastoplasticity: I. Mixed displacement-pressure formulation&rdquo;
 (Computer Methods in Applied Mechanics and Engineering, vol. 193,
 pp. 3559-3586, 2004).
