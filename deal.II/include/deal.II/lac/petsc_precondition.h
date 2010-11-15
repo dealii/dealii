@@ -602,7 +602,7 @@ namespace PETScWrappers
  * multigrid preconditioner from the HYPRE suite. Note that PETSc has to be
  * configured with HYPRE (e.g. with --download-hypre=1).
  *
- * The preconditioner does support parallel distributed computations. See @ref
+ * The preconditioner does support parallel distributed computations. See
  * step-40 for an example.
  *
  * @ingroup PETScWrappers
