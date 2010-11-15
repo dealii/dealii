@@ -440,10 +440,9 @@ void LaplaceProblem<dim>::solve ()
 				   // Ask for a symmetric preconditioner by
 				   // setting the first parameter in
 				   // AdditionalData to true.
-  PETScWrappers::PreconditionBoomerAMG preconditioner(
-    system_matrix,
-    PETScWrappers::PreconditionBoomerAMG::AdditionalData(true)
-  );
+  PETScWrappers::PreconditionBoomerAMG
+    preconditioner(system_matrix,
+		   PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
 
   solver.solve (system_matrix, completely_distributed_solution, system_rhs,
 		preconditioner);
@@ -458,6 +457,33 @@ void LaplaceProblem<dim>::solve ()
 
 
 
+                                 // @sect4{LaplaceProblem::refine_grid}
+
+				 // The function that estimates the
+				 // error and refines the grid is
+				 // again almost exactly like the one
+				 // in step-6. The only difference is
+				 // that the function that flags cells
+				 // to be refined is now in namespace
+				 // parallel::distributed::GridRefinement
+				 // -- a namespace that has functions
+				 // that can communicate between all
+				 // involved processors and determine
+				 // global thresholds to use in
+				 // deciding which cells to refine and
+				 // which to coarsen.
+				 //
+				 // Note that we didn't have to do
+				 // anything special about the
+				 // KellyErrorEstimator class: we just
+				 // give it a vector with as many
+				 // elements as the local
+				 // triangulation has cells (locally
+				 // owned cells, ghost cells, and
+				 // artificial ones), but it only
+				 // fills those entries that
+				 // correspond to cells that are
+				 // locally owned.
 template <int dim>
 void LaplaceProblem<dim>::refine_grid ()
 {
