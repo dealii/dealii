@@ -436,14 +436,27 @@
  * Structures for Massively Parallel Generic Finite Element Codes" that
  * describes the implementation of parallel distributed computing in deal.II,
  * i.e. computations where not only the linear system is split onto different
- * machines as in, for example, step-18, but also the Triangulation and
+ * machines as in, for example, step-17, but also the Triangulation and
  * DoFHandler objects. In essence, it is a guide to the parallel::distributed
  * namespace and the techniques used in step-40.
  *
  * The paper is submitted to the ACM Transactions on Mathematical Software
  * (ACM TOMS). It is also available as
  * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
- * preprint 2011-187</a>.
+ * preprint 2011-187</a>. Its current BiBTex entry is
+ * @code
+TechReport{BBHK11,
+  author = 	 {Wolfgang Bangerth and Carsten Burstedde and Timo Heister 
+                  and Martin Kronbichler},
+  title = 	 {Algorithms and data structures for massively parallel generic
+                  adaptive finite element codes},
+  institution =  {Institute for Applied Mathematics and Computational Science,
+                  Texas A&M University},
+  year = 	 2010,
+  number = 	 {2011-187, submitted}
+} 
+ * @endcode
+ *
  * For massively parallel
  * computations, deal.II builds on the
  * <a href="http://www.p4est.org/" target="_top">p4est</a>
