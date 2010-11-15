@@ -423,8 +423,64 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 
+                                 // @sect4{LaplaceProblem::solve}
 
-
+				 // Even though solving linear systems
+				 // on potentially tens of thousands
+				 // of processors is by far not a
+				 // trivial job, the function that
+				 // does this is -- at least at the
+				 // outside -- relatively simple. Most
+				 // of the parts you've seen
+				 // before. There are really only two
+				 // things worth mentioning:
+				 // - Solvers and preconditioners are
+				 //   built on the deal.II wrappers of
+				 //   PETSc functionality. It is
+				 //   relatively well known that the
+				 //   primary bottleneck of massively
+				 //   parallel linear solvers is not
+				 //   actually the communication
+				 //   between processors, but the fact
+				 //   that it is difficult to produce
+				 //   preconditioners that scale well
+				 //   to large numbers of
+				 //   processors. Over the second half
+				 //   of the first decade of the 21st
+				 //   century, it has become clear
+				 //   that algebraic multigrid (AMG)
+				 //   methods turn out to be extremely
+				 //   efficient in this context, and
+				 //   we will use one of them -- the
+				 //   BoomerAMG implementation of the
+				 //   Hypre package that can be
+				 //   interfaced to through PETSc --
+				 //   for the current program. The
+				 //   rest of the solver itself is
+				 //   boilerplate and has been shown
+				 //   before. Since the linear system
+				 //   is symmetric and positive
+				 //   definite, we can use the CG
+				 //   method as the outer solver.
+				 // - Ultimately, we want a vector
+				 //   that stores not only the
+				 //   elements of the solution for
+				 //   degrees of freedom the current
+				 //   processor owns, but also all
+				 //   other locally relevant degrees
+				 //   of freedom. On the other hand,
+				 //   the solver itself needs a vector
+				 //   that is uniquely split between
+				 //   processors, without any
+				 //   overlap. We therefore create a
+				 //   vector at the beginning of this
+				 //   function that has these
+				 //   properties, use it to solve the
+				 //   linear system, and only assign
+				 //   it to the vector we want at the
+				 //   very end. This last step ensures
+				 //   that all ghost elements are also
+				 //   copied as necessary.
 template <int dim>
 void LaplaceProblem<dim>::solve ()
 {
