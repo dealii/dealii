@@ -1,4 +1,4 @@
-//----------------------------  extract_boundary_mesh_01.cc  ---------------------------
+//----------------------------  extract_boundary_mesh_02.cc  ---------------------------
 //    $Id: bem.cc 22693 2010-11-11 20:11:47Z kanschat $
 //    Version: $Name$
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  extract_boundary_mesh_01.cc  ---------------------------
+//----------------------------  extract_boundary_mesh_02.cc  ---------------------------
 
 /*
  Code for testing the function
@@ -17,8 +17,8 @@
  We test that the order of cells and the orientation
  of the vertices is consistent between the two meshes.
 
- It's faling when boundary object is attached and refinement
- for a ball in 3D
+ Test the same as in the _01 test but with a surface object attached.
+ This used to fail at one point.
 */
 
 #include "../tests.h"
@@ -33,59 +33,49 @@ using namespace std;
 
 
 template <int s_dim, int spacedim>
-bool test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
+void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mesh,
 			       map< typename Triangulation<s_dim,spacedim>::cell_iterator,
 				    typename Triangulation<s_dim+1,spacedim>::face_iterator >
-			       &surface_to_volume_mapping,
-			       const int verbosity = 1)
+			       &surface_to_volume_mapping)
 {
   typename Triangulation<s_dim,spacedim>::active_cell_iterator
     cell = boundary_mesh.begin_active(),
     endc = boundary_mesh.end();
   typename Triangulation<s_dim+1,spacedim>::face_iterator face;
 
-  bool success = true;
-
-  if (verbosity>1){
-    deallog << "The last column should be 0" <<endl;
-    deallog << "Vol faces" << "\t\t" << "Surf cell" <<
-      "\t\t" << "Distance" <<endl<<endl;
-  }
-
   for (; cell!=endc; ++cell){
 
     face = surface_to_volume_mapping [cell];
+
+    deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
+    for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      deallog << "  " << cell->vertex(k) << std::endl;
+
+    deallog << "Volume face: " << face << " with vertices:" << std::endl;
+    for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
+      deallog << "  " << face->vertex(k) << std::endl;
 
     for (unsigned int k=0; k<GeometryInfo<s_dim>::vertices_per_cell; ++k)
       {
 	Point<spacedim> diff(face->vertex(k));
 	diff -= cell->vertex(k);
-	if (verbosity>1){
-	  deallog << face->vertex(k) << "\t\t";
-	  deallog << cell->vertex(k) << "\t\t\t" << diff.square() << endl;
-	}
-	if (diff.square()>0){
-	  success = false;
-	  break;
-	}
+	Assert (diff.square() == 0, ExcInternalError());
       }
-    if (verbosity>1) deallog << endl;
   }
-  return success;
 }
 
 template <int dim, int spacedim>
 void save_mesh(const Triangulation<dim,spacedim>& tria)
 {
   GridOut grid_out;
-  grid_out.write_ucd (tria, deallog.get_file_stream());
+  grid_out.write_gnuplot (tria, deallog.get_file_stream());
 }
 
 
 int main ()
 {
 
-  ofstream logfile("extract_boundary_mesh_01/output");
+  ofstream logfile("extract_boundary_mesh_02/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
@@ -102,18 +92,20 @@ int main ()
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
     volume_mesh.set_boundary (0, boundary_description);
-
     volume_mesh.refine_global (1);
 
-    // save_mesh(volume_mesh);
-
+    const HyperBallBoundary<dim-1,dim> surface_description;
     Triangulation<dim-1,dim> boundary_mesh;
+    boundary_mesh.set_boundary (0, surface_description);
 
     GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
 				      surface_to_volume_mapping);
+    deallog << volume_mesh.n_active_cells () << std::endl;
+    deallog << boundary_mesh.n_active_cells () << std::endl;
+    save_mesh(boundary_mesh);
 
-    Assert (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping,2),
-	    ExcInternalError());
+
+    test_vertices_orientation(boundary_mesh, surface_to_volume_mapping);
     save_mesh(boundary_mesh);
   }
 
