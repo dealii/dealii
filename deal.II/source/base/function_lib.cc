@@ -14,6 +14,7 @@
 #include <base/tensor.h>
 #include <base/point.h>
 #include <base/function_lib.h>
+#include <base/function_bessel.h>
 #include <lac/vector.h>
 
 #include <cmath>
@@ -2155,9 +2156,112 @@ namespace Functions
     for (unsigned int i=0; i<points.size(); ++i)
       values[i] = Monomial<dim>::value (points[i], component);
   }
+  
+  
+  template <int dim>
+  Bessel1<dim>::Bessel1(
+    const unsigned int order,
+    const double wave_number,
+    const Point<dim> center)
+		  :
+		  order(order),
+		  wave_number(wave_number),
+		  center(center)
+  {}
+  
+  template <int dim>
+  double
+  Bessel1<dim>::value(const Point<dim>& p, const unsigned int) const
+  {
+    Assert(dim==2, ExcNotImplemented());
+    const double r = p.distance(center);
+#ifdef HAVE_JN_
+    return jn(order, r*wave_number);
+#else
+    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+    return r;
+#endif
+  }
+  
+  
+  template <int dim>
+  void
+  Bessel1<dim>::value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<double>            &values,
+    const unsigned int) const
+  {
+    Assert(dim==2, ExcNotImplemented());
+    AssertDimension(points.size(), values.size());
+    for (unsigned int k=0;k<points.size();++k)
+      {
+#ifdef HAVE_JN_
+	const double r = points[k].distance(center);
+	values[k] = jn(order, r*wave_number);
+#else
+    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+#endif    
+      }
+  }
 
   
+  template <int dim>
+  Tensor<1,dim>
+  Bessel1<dim>::gradient (const Point<dim>   &p,
+			  const unsigned int) const
+  {
+    Assert(dim==2, ExcNotImplemented());
+    const double r = p.distance(center);
+    const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
+    const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
+    
+    const double dJn = (order==0)
+		       ? (-jn(1, r*wave_number))
+		       : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
+    Tensor<1,dim> result;
+    result[0] = wave_number * co * dJn;
+    result[1] = wave_number * si * dJn;
+#ifdef HAVE_JN_
+    return result;
+#else
+    Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+    return Tensor<1,dim>();
+#endif
+  }
   
+
+  
+  template <int dim>
+  void
+  Bessel1<dim>::gradient_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<Tensor<1,dim> >    &gradients,
+    const unsigned int) const
+  {
+    Assert(dim==2, ExcNotImplemented());
+    AssertDimension(points.size(), gradients.size());
+    for (unsigned int k=0;k<points.size();++k)
+      {
+	const Point<dim>& p = points[k];
+	const double r = p.distance(center);
+	const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
+	const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
+	
+#ifdef HAVE_JN_
+	const double dJn = (order==0)
+			   ? (-jn(1, r*wave_number))
+			   : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));
+#else
+	const double dJn = 0.;
+	Assert(false, ExcMessage("Bessel function jn was not found by configure"));
+#endif
+	Tensor<1,dim>& result = gradients[k];
+	result[0] = wave_number * co * dJn;
+	result[1] = wave_number * si * dJn;
+      }
+  }
+  
+
 // explicit instantiations  
   template class SquareFunction<1>;
   template class SquareFunction<2>;
@@ -2197,6 +2301,8 @@ namespace Functions
   template class Monomial<1>;
   template class Monomial<2>;
   template class Monomial<3>;
+  template class Bessel1<2>;
+  template class Bessel1<3>;
 }
 
 DEAL_II_NAMESPACE_CLOSE
