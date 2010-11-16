@@ -16,6 +16,8 @@
  GridTools::extract_boundary_mesh (...).
  We test that the order of cells and the orientation
  of the vertices is consistent between the two meshes.
+
+ This test checks the whole thing for a 2d and 3d hypercube.
 */
 
 
