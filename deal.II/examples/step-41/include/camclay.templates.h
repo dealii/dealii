@@ -78,7 +78,7 @@ void CamClay<dim>::initial_conditions(VectorSpace<dim> &vspace)
 		      update_values   | update_gradients |
 		      update_quadrature_points | update_JxW_values);
   
-  const unsigned int n_qp_v = qf_v.n_quadrature_points;
+  const unsigned int n_qp_v = qf_v.size();
   
 
   typename MGDoFHandler<dim>::active_cell_iterator cell = vspace.get_dh().begin_active(),
@@ -114,7 +114,7 @@ void CamClay<dim>::update_internal_variables(VectorSpace<dim> &vspace,
 		      update_values   | update_gradients |
 		      update_quadrature_points | update_JxW_values);
   
-  const unsigned int n_qp_v = qf_v.n_quadrature_points;
+  const unsigned int n_qp_v = qf_v.size();
 
   std::vector<Point<dim> > points(n_qp_v);
   

@@ -236,9 +236,9 @@ void Base<dim>::write_stress_strain (const unsigned int &cc,
   QIterated<dim> qf(QTrapez<1>(),2);
   FEValues<dim> fe_v(vspace.get_fe(), qf,
 		     update_gradients | update_quadrature_points);
-  std::vector< std::vector< Tensor<1,dim> > > total_grads(qf.n_quadrature_points,
+  std::vector< std::vector< Tensor<1,dim> > > total_grads(qf.size(),
 							  std::vector<Tensor<1,dim> >(dim));
-  std::vector< Point<dim> > points(qf.n_quadrature_points);
+  std::vector< Point<dim> > points(qf.size());
 
   output << "SCALARS uyy double 1" << std::endl;
   output << "LOOKUP_TABLE default" << std::endl;
@@ -253,7 +253,7 @@ void Base<dim>::write_stress_strain (const unsigned int &cc,
     points = fe_v.get_quadrature_points();
 
     //loop over the quadrature points---------------------------------
-    for (unsigned int qp = 0; qp<qf.n_quadrature_points; ++qp) {
+    for (unsigned int qp = 0; qp<qf.size(); ++qp) {
 
       output << total_grads[qp][1][1] << " ";
 
@@ -300,12 +300,12 @@ void Base<dim>::write_plot_values(const unsigned int &cc,
   QTrapez<dim> qf;
   FEValues<dim> fe_v(vspace.get_fe(), qf,
 		     update_values | update_gradients | update_quadrature_points);
-  std::vector< std::vector< Tensor<1,dim> > > elastic_grads(qf.n_quadrature_points,
+  std::vector< std::vector< Tensor<1,dim> > > elastic_grads(qf.size(),
 							    std::vector<Tensor<1,dim> >(dim));
-  std::vector< std::vector< Tensor<1,dim> > > plastic_grads(qf.n_quadrature_points,
+  std::vector< std::vector< Tensor<1,dim> > > plastic_grads(qf.size(),
 							    std::vector<Tensor<1,dim> >(dim));
-  std::vector< Vector<double> > hard_values(qf.n_quadrature_points, Vector<double>(dim));
-  std::vector< Point<dim> > points(qf.n_quadrature_points);
+  std::vector< Vector<double> > hard_values(qf.size(), Vector<double>(dim));
+  std::vector< Point<dim> > points(qf.size());
 
   //std::vector< std::vector<double> > strain(dim, std::vector<double>(dim) );
 
