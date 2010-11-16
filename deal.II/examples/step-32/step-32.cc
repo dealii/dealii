@@ -1352,8 +1352,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
     }
   else
     {
-      double min_local_temperature = old_temperature_solution.linfty_norm(),
-	     max_local_temperature = -min_local_temperature;
+      double min_local_temperature = 1e30,
+	     max_local_temperature = -1e30;      
 
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
@@ -1725,7 +1725,7 @@ void BoussinesqFlowProblem<dim>::
       else
 	coupling[c][d] = DoFTools::none;
 
-  DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+  DoFTools::make_sparsity_pattern (stokes_dof_handler,
 				   coupling, sp,
 				   stokes_constraints, false,
 				   Utilities::System::
@@ -1757,7 +1757,7 @@ void BoussinesqFlowProblem<dim>::
       else
 	coupling[c][d] = DoFTools::none;
 
-  DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+  DoFTools::make_sparsity_pattern (stokes_dof_handler,
 				   coupling, sp,
 				   stokes_constraints, false,
 				   Utilities::System::
@@ -1779,7 +1779,7 @@ void BoussinesqFlowProblem<dim>::
 
   TrilinosWrappers::SparsityPattern sp (temperature_partitioner,
 					MPI_COMM_WORLD);
-  DoFTools::make_sparsity_pattern (static_cast<const DoFHandler<dim>&>(temperature_dof_handler), sp,
+  DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
 				   temperature_constraints, false,
 				   Utilities::System::
 				   get_this_mpi_process(MPI_COMM_WORLD));
@@ -1942,7 +1942,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     {
       TimeBlock<ConditionalOStream> t(pcout, "***make_hanging_nodes_vel");
 
-      DoFTools::make_hanging_node_constraints (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+      DoFTools::make_hanging_node_constraints (stokes_dof_handler,
 					       stokes_constraints);
     }
 
@@ -1950,7 +1950,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     std::vector<bool> velocity_mask (dim+1, true);
     velocity_mask[dim] = false;
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(stokes_dof_handler),
+    VectorTools::interpolate_boundary_values (stokes_dof_handler,
 					      0,
 					      ZeroFunction<dim>(dim+1),
 					      stokes_constraints,
@@ -1958,7 +1958,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 
     std::set<unsigned char> no_normal_flux_boundaries;
     no_normal_flux_boundaries.insert (1);
-    VectorTools::compute_no_normal_flux_constraints (static_cast<const DoFHandler<dim>&>(stokes_dof_handler), 0,
+    VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
 						     no_normal_flux_boundaries,
 						     stokes_constraints);
     stokes_constraints.close ();
@@ -1971,15 +1971,15 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 //					   temp_locally_active);
     temperature_constraints.reinit(temperature_relevant_partitioning);//temp_locally_active);
 
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+    VectorTools::interpolate_boundary_values (temperature_dof_handler,
 					      0,
 					      EquationData::TemperatureInitialValues<dim>(),
 					      temperature_constraints);
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+    VectorTools::interpolate_boundary_values (temperature_dof_handler,
 					      1,
 					      EquationData::TemperatureInitialValues<dim>(),
 					      temperature_constraints);
-    DoFTools::make_hanging_node_constraints (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+    DoFTools::make_hanging_node_constraints (temperature_dof_handler,
 					     temperature_constraints);
     temperature_constraints.close ();
   }
@@ -3153,7 +3153,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
   computing_timer.enter_section ("Postprocessing");
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+  KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
                                       QGauss<dim-1>(temperature_degree+1),
                                       typename FunctionMap<dim>::type(),
                                       temperature_solution,
@@ -3438,7 +3438,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   {
     TimeBlock<ConditionalOStream> t(pcout, "**kelly");
 
-  KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(temperature_dof_handler),
+  KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
 				      QGauss<dim-1>(temperature_degree+1),
 				      typename FunctionMap<dim>::type(),
 				      temperature_solution,
