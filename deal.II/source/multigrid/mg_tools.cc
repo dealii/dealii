@@ -1131,7 +1131,7 @@ template <>
 void
 MGTools::make_boundary_list(
   const MGDoFHandler<1,1>&,
-  const typename FunctionMap<1>::type&,
+  const FunctionMap<1>::type&,
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&)
 {
@@ -1144,7 +1144,7 @@ template <>
 void
 MGTools::make_boundary_list(
   const MGDoFHandler<1,2>&,
-  const typename FunctionMap<1>::type&,
+  const FunctionMap<1>::type&,
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&)
 {
