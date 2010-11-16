@@ -54,7 +54,7 @@ default run clean:
 	@echo "==========================================================="
 	@echo "=   This program can only be run with the following       ="
 	@echo "=   configuration:                                        ="
-	@echo "=   - with PETSc                                          ="
+	@echo "=   - with Trilinos                                       ="
 	@echo "=   - with P4EST                                          ="
 	@echo "=   At least one of these conditions is not satisfied.    ="
 	@echo "==========================================================="
