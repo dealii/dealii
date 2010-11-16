@@ -473,8 +473,11 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 template <int dim, int spacedim>
 HyperBallBoundary<dim,spacedim>::HyperBallBoundary (const Point<spacedim> p,
-					   const double     radius) :
-		center(p), radius(radius), compute_radius_automatically(false)
+						    const double     radius)
+		:
+		center(p),
+		radius(radius),
+		compute_radius_automatically(false)
 {}
 
 
@@ -497,7 +500,6 @@ HyperBallBoundary<dim,spacedim>::get_new_point_on_line (const typename Triangula
     r=radius;
 				   // project to boundary
   middle *= r / std::sqrt(middle.square());
-
   middle += center;
   return middle;
 }
