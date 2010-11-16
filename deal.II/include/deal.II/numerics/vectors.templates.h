@@ -1041,12 +1041,12 @@ VectorTools::create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &
 
 template <>
 void
-VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,1>      &mapping,
-					      const hp::DoFHandler<1,1>   &dof_handler,
-					      const hp::QCollection<0> &quadrature,
-					      const Function<1>     &rhs_function,
-					      Vector<double>          &rhs_vector,
-					      const std::set<unsigned char> &boundary_indicators)
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,1>      &,
+					      const hp::DoFHandler<1,1>   &,
+					      const hp::QCollection<0> &,
+					      const Function<1>     &,
+					      Vector<double>          &,
+					      const std::set<unsigned char> &)
 {
   Assert (false, ExcImpossibleInDim(1));
 }
@@ -1055,12 +1055,12 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,1>  
 
 template <>
 void
-VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,2>      &mapping,
-					      const hp::DoFHandler<1,2>   &dof_handler,
-					      const hp::QCollection<0> &quadrature,
-					      const Function<2>     &rhs_function,
-					      Vector<double>          &rhs_vector,
-					      const std::set<unsigned char> &boundary_indicators)
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,2>      &,
+					      const hp::DoFHandler<1,2>   &,
+					      const hp::QCollection<0> &,
+					      const Function<2>     &,
+					      Vector<double>          &,
+					      const std::set<unsigned char> &)
 {
   Assert (false, ExcImpossibleInDim(1));
 }
