@@ -329,7 +329,7 @@ namespace internal
                                        // dof indices. that's easy :-)
       for (unsigned direction=0; direction<2; ++direction)
         {
-          typename dealii::DoFHandler<1>::cell_iterator
+          dealii::DoFHandler<1>::cell_iterator
               cell = dof_handler.begin(0);
           while (!cell->at_boundary(direction))
             cell = cell->neighbor(direction);
