@@ -371,6 +371,12 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: The GridTools::extract_boundary_mesh function can be used to
+  generate a surface mesh from the boundary of a volume mesh.
+  <br>
+  (Sebastian Pauletti, 2010/11/15)
+  </p></li>
+
   <li><p>Fixed: For DoF iterators, it was previously possible to write
   code like <code>*it1 = *it2</code>, presumably with the intent to
   copy the entire cell pointed to on the right hand side onto the cell
