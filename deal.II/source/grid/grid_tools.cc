@@ -1835,11 +1835,6 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
     mapping;  // temporary map for level==0
 
 
-  typename Triangulation<dim,spacedim>::cell_iterator
-    cell = volume_mesh.begin(0),
-    endc = volume_mesh.end(0);
-  typename Triangulation<dim,spacedim>::face_iterator face;
-
   std::vector< bool >                 touched (volume_mesh.n_vertices(), false);
   std::vector< CellData< boundary_dim > > cells;
   std::vector< Point<spacedim> >      vertices;
@@ -1849,10 +1844,14 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
   unsigned int v_index;
   CellData< boundary_dim > c_data;
 
-  for (; cell!=endc; ++cell)
+  for (typename Triangulation<dim,spacedim>::cell_iterator
+	 cell = volume_mesh.begin(0);
+       cell != volume_mesh.end(0);
+       ++cell)
     for (unsigned int i=0; i < GeometryInfo<dim>::faces_per_cell; ++i)
       {
-	face = cell->face(i);
+	const typename Triangulation<dim,spacedim>::face_iterator
+	  face = cell->face(i);
 
 	if ( face->at_boundary()
 	     &&
@@ -1872,7 +1871,7 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
 		  }
 
 		c_data.vertices[j] = map_vert_index[v_index];
-		c_data.material_id = 0;
+		c_data.material_id = face->boundary_indicator();
 	      }
 
 	    cells.push_back(c_data);
