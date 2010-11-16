@@ -15,43 +15,23 @@ include $D/common/Make.global_options
 default all: debug optimized
 
 
-# list the dimension dependent and dimension independent directories
-dim-dep-dirs   := 
-dim-indep-dirs := base lac dofs fe grid hp numerics multigrid distributed
-all-dirs       := $(dim-dep-dirs) $(dim-indep-dirs)
+# list the directories and the various kinds of files
+all-dirs      := base lac dofs fe grid hp numerics multigrid distributed
 
-# create lists of file names.
-dim-indep-cc-files := $(shell for i in $(dim-indep-dirs) ; do echo $D/source/$$i/*.cc ; done) \
-                      $(shell for i in $(dim-dep-dirs) ; do for j in $D/source/$$i/*.cc ; do \
-							echo $$j; done ; done  | grep all_dimensions)
-dim-dep-cc-files   := $(filter-out \
-			 %.all_dimensions.cc, \
-			 $(shell for i in $(dim-dep-dirs) ; do echo $D/source/$$i/*.cc ; done))
-h-files      := $(sort $(shell echo $D/include/deal.II/*/*.h))
+cc-files      := $(shell for i in $(all-dirs) ; do echo $D/source/$$i/*.cc ; done)
+h-files       := $(sort $(shell echo $D/include/deal.II/*/*.h))
 
 inst-in-files := $(shell echo */*.inst.in)
 inst-files    := $(inst-in-files:%.in=%)
 
 
-# for the dimension independent files, build unique object file names
-tmp1        := $(shell echo $(dim-indep-cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
+# build unique object file names
+tmp1               := $(shell echo $(cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
 tmp-o-files-indep  := $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
 tmp-go-files-indep := $(addprefix $(LIBDIR)/debug/, $(tmp1:.cc=.$(OBJEXT)))
 
-# for the dimension dependent files, build unique object file names for each
-# dimension
-tmp2        := $(shell echo $(dim-dep-cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
-tmp-o-files-1d  := $(addprefix $(LIBDIR)/optimized/1d_, $(tmp2:.cc=.$(OBJEXT)) )
-tmp-go-files-1d := $(addprefix $(LIBDIR)/debug/1d_, $(tmp2:.cc=.$(OBJEXT)))
-tmp-o-files-2d  := $(addprefix $(LIBDIR)/optimized/2d_, $(tmp2:.cc=.$(OBJEXT)) )
-tmp-go-files-2d := $(addprefix $(LIBDIR)/debug/2d_, $(tmp2:.cc=.$(OBJEXT)))
-tmp-o-files-3d  := $(addprefix $(LIBDIR)/optimized/3d_, $(tmp2:.cc=.$(OBJEXT)) )
-tmp-go-files-3d := $(addprefix $(LIBDIR)/debug/3d_, $(tmp2:.cc=.$(OBJEXT)))
-
-o-files  := $(tmp-o-files-indep) \
-	    $(tmp-o-files-1d)  $(tmp-o-files-2d)  $(tmp-o-files-3d)
-go-files := $(tmp-go-files-indep) \
-	    $(tmp-go-files-1d) $(tmp-go-files-2d) $(tmp-go-files-3d)
+o-files  := $(tmp-o-files-indep)
+go-files := $(tmp-go-files-indep)
 
 
 debug: $(LIBDIR)/libdeal_II.g$(lib-suffix)
@@ -60,21 +40,12 @@ optimized: $(LIBDIR)/libdeal_II$(lib-suffix)
 
 
 # rules how to generate object files from source files.
-GET_DIM = $(shell echo $(1) \
-		| $(PERL) -pe 's,.*/,,g; \
-			       s/^(\d)?.*/\1d/g; \
-			       s/^d//g;')
-DEFINE_DIM = $(shell echo $(1) \
-		| $(PERL) -pe 's,.*/,,g; \
-			       s/^(\d)?.*/\1/g; \
-			       s/(\d)/-Ddeal_II_dimension=\1/g;')
-
 $(LIBDIR)/debug/%.$(OBJEXT) :
-	@echo "======================debug======$(MT)== $(<:$D/source/%=%) $(call GET_DIM,$@)"
-	@$(CXX) $(CXXFLAGS.g) $(call DEFINE_DIM, $@) -c $< -o $@
+	@echo "======================debug======$(MT)== $(<:$D/source/%=%)"
+	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
 $(LIBDIR)/optimized/%.$(OBJEXT) :
-	@echo "======================optimized==$(MT)== $(<:$D/source/%=%) $(call GET_DIM,$@)"
-	@$(CXX) $(CXXFLAGS.o) $(call DEFINE_DIM, $@) -c $< -o $@
+	@echo "======================optimized==$(MT)== $(<:$D/source/%=%)"
+	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
 
 
 
@@ -203,7 +174,7 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 # dependencies on their source files. Use the opportunity to also ensure that
 # .inst and the lapack file are built before everything else
 Makefile.dep: $(inst-files) ../include/deal.II/lac/lapack_templates.h \
-		$(dim-indep-cc-files) $(dim-dep-cc-files)
+		$(cc-files)
 	@echo "===================================== Remaking $@"
 	@for i in $(all-dirs) ; do \
 		echo $$i/Makefile.dep: $$i/*.cc  \
@@ -225,16 +196,9 @@ include Makefile.dep
 # If the command fails, then remove Makefile.dep again and fail
 %/Makefile.dep:
 	@echo "===================================== Remaking $@"
-	@((($D/common/scripts/make_dependencies -n $(INCLUDE) "-B\$$(LIBDIR)" \
-			$(filter $D/source/$(dir $@)%, $(dim-indep-cc-files)) \
+	@(($D/common/scripts/make_dependencies -n $(INCLUDE) "-B\$$(LIBDIR)" \
+			$(filter $D/source/$(dir $@)%, $(cc-files)) \
 		| $(PERL) -pe 's!LIBDIR\)/(debug|optimized)/(.*):!LIBDIR)/$$1/$(@:%/Makefile.dep=%)_$$2:!g;' \
-	   ) \
-           && \
-	   ($D/common/scripts/make_dependencies -n $(INCLUDE) "-B\$$(LIBDIR)" \
-			$(filter $D/source/$(dir $@)%, $(dim-dep-cc-files)) \
-		| $(PERL) -pe 's!LIBDIR\)/(debug|optimized)/(.*):!LIBDIR)/$$1/DIM_PLACEHOLDER_$$2:!g;' \
-	        | $(PERL) -pe 's!^(.*)/DIM_PLACEHOLDER_(.*):!$$1/1d_$(@:%/Makefile.dep=%)_$$2 $$1/2d_$(@:%/Makefile.dep=%)_$$2 $$1/3d_$(@:%/Makefile.dep=%)_$$2:!g;'\
-	   ) \
 	  ) > $@) \
 	 || (rm -f $@ ; false)
 
@@ -250,7 +214,7 @@ endif
 
 clean:
 	-rm -f Makefile.dep *~ */*~ */*/*~ */Makefile.dep source/*/*.inst \
-		$D/{debug.optimized}*.o
+		$D/lib/{debug,optimized}/*.o
 
 
 ###################
