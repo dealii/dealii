@@ -59,19 +59,23 @@ void test()
     {
       IndexSet dof_set;
       DoFTools::extract_locally_active_dofs (dofh, dof_set);
-				       //if (myid==0)
-      if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+      if (myid==0)
 	dof_set.print(deallog);
     }
 
-    if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
-      deallog << "****" << std::endl;
+    unsigned int n_dofs = dofh.n_dofs();
+    if (myid==0)
+      deallog << "**** n_dofs = " << n_dofs  << std::endl;
+    
     DoFRenumbering::component_wise(dofh);
+				     //check if n_dofs() is still
+				     //correct. This was a bug at some point.
+    Assert(n_dofs == dofh.n_dofs(),ExcInternalError());
     {
       IndexSet dof_set;
       DoFTools::extract_locally_active_dofs (dofh, dof_set);
-				       //if (myid==0)
-      if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+
+      if (myid==0)
 	dof_set.print(deallog);
 
       if (myid==0)
