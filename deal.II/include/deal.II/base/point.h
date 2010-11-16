@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -99,6 +99,12 @@ class Point : public Tensor<1,dim>
 				      */
     Point (const double x, const double y, const double z);
 
+				     /**
+				      * Return a unit vector in
+				      * coordinate direction <tt>i</tt>.
+				      */
+    static Point<dim> e(const unsigned int i);
+    
 				     /**
 				      *  Read access to the <tt>index</tt>th
 				      *  coordinate.
@@ -246,6 +252,16 @@ Point<dim>::Point (const double x, const double y, const double z)
   this->values[2] = z;
 }
 
+
+template <int dim>
+inline
+Point<dim>
+Point<dim>::e(unsigned int i)
+{
+  Point<dim> p;
+  p[i] = 1.;
+  return p;
+}
 
 
 template <int dim>
