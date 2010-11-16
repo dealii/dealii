@@ -32,6 +32,7 @@
 #include <cstring>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1141,6 +1142,22 @@ void Vector<Number>::print (std::ostream      &out,
   out.precision(old_precision);
 }
 
+
+
+template <typename Number>
+void
+Vector<Number>::print (LogStream& out, const unsigned int width, const bool across) const
+{
+  Assert (vec_size!=0, ExcEmptyObject());
+  
+  if (across)
+    for (unsigned int i=0; i<size(); ++i)
+      out << std::setw(width) << val[i] << ' ';
+  else
+    for (unsigned int i=0; i<size(); ++i)
+      out << val[i] << std::endl;
+  out << std::endl;
+}
 
 
 template <typename Number>

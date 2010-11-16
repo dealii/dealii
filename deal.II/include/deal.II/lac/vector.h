@@ -15,12 +15,14 @@
 
 
 #include <base/config.h>
+#include <base/logstream.h>
 #include <base/exceptions.h>
 #include <base/parallel.h>
 #include <base/subscriptor.h>
 #include <boost/lambda/lambda.hpp>
 
 #include <cstdio>
+#include <iostream>
 #include <cstring>
 #include <vector>
 
@@ -877,10 +879,26 @@ class Vector : public Subscriptor
 				      * are printed on a separate line
 				      * each.
 				      */
-    void print (std::ostream       &out,
-		const unsigned int  precision  = 3,
-		const bool          scientific = true,
-		const bool          across     = true) const;
+    void print (std::ostream& out,
+		const unsigned int precision  = 3,
+		const bool scientific = true,
+		const bool across     = true) const;
+
+				     /**
+				      * Print to a
+				      * LogStream. <tt>width</tt> is
+				      * used as argument to the
+				      * std::setw manipulator, if
+				      * printing across.  If @p
+				      * across is @p true then the
+				      * vector is printed in a line,
+				      * while if @p false then the
+				      * elements are printed on a
+				      * separate line each.
+				      */
+    void print (LogStream& out,
+		const unsigned int width = 6,
+		const bool across = true) const;
 
 				     /**
 				      * Write the vector en bloc to a
@@ -1422,7 +1440,6 @@ Vector<Number>::swap (Vector<Number> &v)
 }
 
 
-
 #endif
 
 
@@ -1444,6 +1461,31 @@ inline
 void swap (Vector<Number> &u, Vector<Number> &v)
 {
   u.swap (v);
+}
+
+
+/**
+ * Output operator writing a vector to a stream.
+ */
+template <typename number>
+inline
+std::ostream&
+operator << (std::ostream& os, const Vector<number>& v)
+{
+  v.print(os);  
+  return os;
+}
+
+/**
+ * Output operator writing a vector to a LogStream.
+ */
+template <typename number>
+inline
+LogStream&
+operator << (LogStream& os, const Vector<number>& v)
+{
+  v.print(os);
+  return os;  
 }
 
 /*@}*/
