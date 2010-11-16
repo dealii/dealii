@@ -17,10 +17,8 @@
  We test that the order of cells and the orientation
  of the vertices is consistent between the two meshes.
 
- Compared to the _00 test, we here test things with the surface of a
- 3d sphere. There is no surface object attached, so the surface is
- topologically a sphere but not geometrically. The _02 test checks the
- same with a boundary object attached.
+ It's faling when boundary object is attached and refinement
+ for a ball in 3D
 */
 
 #include "../tests.h"
@@ -80,7 +78,7 @@ template <int dim, int spacedim>
 void save_mesh(const Triangulation<dim,spacedim>& tria)
 {
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, deallog.get_file_stream());
+  grid_out.write_ucd (tria, deallog.get_file_stream());
 }
 
 
@@ -100,10 +98,14 @@ int main ()
     map< Triangulation<dim-1,dim>::cell_iterator,
  	 Triangulation<dim,dim>::face_iterator>
       surface_to_volume_mapping;
+    const HyperBallBoundary<dim> boundary_description;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
+    volume_mesh.set_boundary (0, boundary_description);
 
     volume_mesh.refine_global (1);
+
+    // save_mesh(volume_mesh);
 
     Triangulation<dim-1,dim> boundary_mesh;
 
