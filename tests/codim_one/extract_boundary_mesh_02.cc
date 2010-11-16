@@ -18,7 +18,9 @@
  of the vertices is consistent between the two meshes.
 
  Test the same as in the _01 test but with a surface object attached.
- This used to fail at one point.
+ This used to fail at one point. The reason was trivial though: one
+ needs to attach a surface descriptor object to the surface mesh as
+ well.
 */
 
 #include "../tests.h"
