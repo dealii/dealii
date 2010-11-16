@@ -1,7 +1,8 @@
 //---------------------------------------------------------------------------
-//    $Id: fe_field_function.inst.in 19046 2009-07-08 19:30:23Z bangerth $
+//    $Id$
+//    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -10,20 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-
 for (deal_II_dimension : DIMENSIONS)
 {
-  namespace MeshWorker
-  \{
-    template class VectorDataBase<deal_II_dimension>;
-  \}
-}
-
-for (VECTOR : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
-{
-  namespace MeshWorker
-  \{
-    template class VectorData<VECTOR,deal_II_dimension>;
-    template class MGVectorData<VECTOR,deal_II_dimension>;
-  \}
+  // don't instantiate anything for the 1d
+#if deal_II_dimension >=2
+  template class DataOutFaces<deal_II_dimension, DoFHandler<deal_II_dimension> >;
+  template class DataOutFaces<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
+#endif
 }

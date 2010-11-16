@@ -21,17 +21,17 @@ namespace hp
   template <int dim, int spacedim>
   FECollection<dim,spacedim>::FECollection ()
   {}
-  
 
-  
+
+
   template <int dim, int spacedim>
   FECollection<dim,spacedim>::FECollection (const FiniteElement<dim,spacedim> &fe)
   {
     push_back (fe);
   }
-  
 
-  
+
+
   template <int dim, int spacedim>
   FECollection<dim,spacedim>::
   FECollection (const FECollection<dim,spacedim> &fe_collection)
@@ -65,14 +65,14 @@ namespace hp
       Assert (new_fe.n_components() == finite_elements[0]->n_components(),
               ExcMessage ("All elements inside a collection need to have the "
                           "same number of vector components!"));
-  
+
     finite_elements
       .push_back (std_cxx1x::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
   }
 
 
 
-  template <int dim, int spacedim> 
+  template <int dim, int spacedim>
   unsigned int
   FECollection<dim,spacedim>::memory_consumption () const
   {
@@ -84,15 +84,12 @@ namespace hp
 
     return mem;
   }
+}
+
 
 
 // explicit instantiations
-  template class FECollection<deal_II_dimension>;
+#include "fe_collection.inst"
 
-#if deal_II_dimension != 3
-  template class FECollection<deal_II_dimension, deal_II_dimension+1>;
-#endif
-  
-}
 
 DEAL_II_NAMESPACE_CLOSE

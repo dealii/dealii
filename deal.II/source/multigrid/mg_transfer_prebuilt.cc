@@ -292,7 +292,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				// need to filter away.
 	  constrain_indices.resize (0);
 	  constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-	  std::set<unsigned int>::const_iterator dof 
+	  std::set<unsigned int>::const_iterator dof
             = mg_constrained_dofs->get_boundary_indices()[level].begin(),
 	    endd = mg_constrained_dofs->get_boundary_indices()[level].end();
 	  for (; dof != endd; ++dof)
@@ -384,146 +384,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 }
 
 
-//TODO: Use template expander script
 
-template
-void MGTransferPrebuilt<Vector<float> >::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof);
+// explicit instantiation
+#include "mg_transfer_prebuilt.inst"
 
-template
-void MGTransferPrebuilt<Vector<double> >::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof);
-
-template
-void MGTransferPrebuilt<BlockVector<float> >::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof);
-
-template
-void MGTransferPrebuilt<BlockVector<double> >::build_matrices<deal_II_dimension>
-(const MGDoFHandler<deal_II_dimension> &mg_dof);
-
-template void
-MGTransferPrebuilt<Vector<float> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<float> >&,
-  const Vector<double>&) const;
-template void
-MGTransferPrebuilt<Vector<float> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<float> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferPrebuilt<Vector<float> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-template void
-MGTransferPrebuilt<Vector<float> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-template void
-MGTransferPrebuilt<Vector<float> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-template void
-MGTransferPrebuilt<Vector<float> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-
-template void
-MGTransferPrebuilt<BlockVector<float> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<float> >&,
-  const Vector<double>&) const;
-template void
-MGTransferPrebuilt<BlockVector<float> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<float> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferPrebuilt<BlockVector<float> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<BlockVector<float> >&) const;
-template void
-MGTransferPrebuilt<BlockVector<float> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<float> >&) const;
-template void
-MGTransferPrebuilt<BlockVector<float> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<BlockVector<float> >&) const;
-template void
-MGTransferPrebuilt<BlockVector<float> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<float> >&) const;
-
-template void
-MGTransferPrebuilt<Vector<double> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<double> >&,
-  const Vector<double>&) const;
-template void
-MGTransferPrebuilt<Vector<double> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<double> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferPrebuilt<Vector<double> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-template void
-MGTransferPrebuilt<Vector<double> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-template void
-MGTransferPrebuilt<Vector<double> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-template void
-MGTransferPrebuilt<Vector<double> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-
-template void
-MGTransferPrebuilt<BlockVector<double> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<double> >&,
-  const Vector<double>&) const;
-template void
-MGTransferPrebuilt<BlockVector<double> >::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<BlockVector<double> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferPrebuilt<BlockVector<double> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<BlockVector<double> >&) const;
-template void
-MGTransferPrebuilt<BlockVector<double> >::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<double> >&) const;
-template void
-MGTransferPrebuilt<BlockVector<double> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<BlockVector<double> >&) const;
-template void
-MGTransferPrebuilt<BlockVector<double> >::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<BlockVector<double> >&) const;
 
 DEAL_II_NAMESPACE_CLOSE

@@ -22,13 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace MeshWorker
-{
-  template class VectorDataBase<deal_II_dimension>;
-
 #include "mesh_worker_vector_selector.inst"
-}
-
 
 
 DEAL_II_NAMESPACE_CLOSE

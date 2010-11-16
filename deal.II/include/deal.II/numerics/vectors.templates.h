@@ -30,18 +30,19 @@
 #include <lac/filtered_matrix.h>
 #include <lac/constraint_matrix.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria_accessor.h>
 #include <grid/grid_tools.h>
-#include <dofs/dof_handler.h>
-#include <hp/dof_handler.h>
 #include <dofs/dof_accessor.h>
+#include <dofs/dof_handler.h>
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_tools.h>
 #include <fe/fe_values.h>
 #include <fe/fe_nedelec.h>
-#include <hp/fe_values.h>
 #include <fe/mapping_q1.h>
+#include <hp/dof_handler.h>
+#include <hp/fe_values.h>
 #include <hp/mapping_collection.h>
 #include <hp/q_collection.h>
 #include <numerics/vectors.h>
@@ -318,12 +319,9 @@ namespace internal
 {
   namespace VectorTools
   {
-#if deal_II_dimension == 1
-
-    template <int dim>
     void
-    interpolate_zero_boundary_values (const dealii::DoFHandler<dim>         &dof_handler,
-                                      std::map<unsigned int,double> &boundary_values)
+    interpolate_zero_boundary_values (const dealii::DoFHandler<1>   &dof_handler,
+				      std::map<unsigned int,double> &boundary_values)
     {
                                        // we only need to find the
                                        // left-most and right-most
@@ -331,7 +329,7 @@ namespace internal
                                        // dof indices. that's easy :-)
       for (unsigned direction=0; direction<2; ++direction)
         {
-          typename dealii::DoFHandler<dim>::cell_iterator
+          typename dealii::DoFHandler<1>::cell_iterator
               cell = dof_handler.begin(0);
           while (!cell->at_boundary(direction))
             cell = cell->neighbor(direction);
@@ -342,10 +340,11 @@ namespace internal
     }
 
 
-//codimension 1
+
+				// codimension 1
     void
-      interpolate_zero_boundary_values (const dealii::DoFHandler<1,2>         &dof_handler,
-                                      std::map<unsigned int,double> &boundary_values)
+    interpolate_zero_boundary_values (const dealii::DoFHandler<1,2> &dof_handler,
+				      std::map<unsigned int,double> &boundary_values)
     {
                                        // we only need to find the
                                        // left-most and right-most
@@ -364,7 +363,6 @@ namespace internal
     }
 
 
-#else
 
     template <int dim, int spacedim>
     void
@@ -412,8 +410,6 @@ namespace internal
 	      boundary_values[face_dof_indices[i]] = 0.;
 	  }
     }
-
-#endif
   }
 }
 
@@ -897,7 +893,6 @@ void VectorTools::create_point_source_vector (const hp::DoFHandler<dim,spacedim>
 }
 
 
-#if deal_II_dimension != 1
 
 template <int dim, int spacedim>
 void
@@ -908,6 +903,12 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      
 					      Vector<double>          &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
+  if (dim == 1)
+    {
+      Assert (false, ExcImpossibleInDim(dim));
+      return;
+    }
+
   const FiniteElement<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
 	  ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
@@ -1018,22 +1019,7 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      
     }
 }
 
-#else
 
-// Implementation for 1D
-template <int dim, int spacedim>
-void
-VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>    &,
-					      const DoFHandler<dim,spacedim> &,
-					      const Quadrature<dim-1> &,
-					      const Function<spacedim>   &,
-					      Vector<double>      &,
-					      const std::set<unsigned char> &)
-{
-  Assert (false, ExcImpossibleInDim(dim));
-}
-
-#endif
 
 template <int dim, int spacedim>
 void
@@ -1053,7 +1039,33 @@ VectorTools::create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &
 
 
 
-#if deal_II_dimension != 1
+template <>
+void
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,1>      &mapping,
+					      const hp::DoFHandler<1,1>   &dof_handler,
+					      const hp::QCollection<0> &quadrature,
+					      const Function<1>     &rhs_function,
+					      Vector<double>          &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
+template <>
+void
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,2>      &mapping,
+					      const hp::DoFHandler<1,2>   &dof_handler,
+					      const hp::QCollection<0> &quadrature,
+					      const Function<2>     &rhs_function,
+					      Vector<double>          &rhs_vector,
+					      const std::set<unsigned char> &boundary_indicators)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
 
 template <int dim, int spacedim>
 void
@@ -1185,22 +1197,7 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,sp
     }
 }
 
-#else
 
-// Implementation for 1D
-template <int dim, int spacedim>
-void
-VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>    &,
-					      const hp::DoFHandler<dim,spacedim> &,
-					      const hp::QCollection<dim-1> &,
-					      const Function<spacedim>   &,
-					      Vector<double>      &,
-					      const std::set<unsigned char> &)
-{
-  Assert (false, ExcImpossibleInDim(1));
-}
-
-#endif
 
 template <int dim, int spacedim>
 void
@@ -1221,37 +1218,42 @@ VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>
 
 // ----------- interpolate_boundary_values for std::map --------------------
 
-#if deal_II_dimension == 1
-
-//TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hp::DoFHandler.
-
-//template <int dim, template <int, int> class DH, int spacedim>
-
-template <class DH>
-void
-VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension> &,
-					  const DH              &dof,
-					  const unsigned char    boundary_component,
-					  const Function<DH::space_dimension> &boundary_function,
-					  std::map<unsigned int,double> &boundary_values,
-					  const std::vector<bool>       &component_mask_)
+// TODO: it might be possible to avoid the specialization for 1D if we could
+// have hp::FEFaceValues<1>...
+namespace internal
 {
-  //ConstraintMatrix boundary_constraints();
-  //  interpolate_boundary_values (dof, boundary_component, boundary_function,
-  //			       boundary_constraints, component_mask);
+  namespace VectorTools
+  {
+    template <class DH>
+    static inline
+    void interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>            &mapping,
+				      const DH                 &dof,
+				      const typename FunctionMap<DH::space_dimension>::type &function_map,
+				      std::map<unsigned int,double> &boundary_values,
+				      const std::vector<bool>       &component_mask_,
+				      const internal::int2type<1>)
+    {
+      const unsigned int dim = DH::dimension;
+      const unsigned int spacedim=DH::space_dimension;
 
-  const unsigned int dim=DH::dimension;
-  const unsigned int spacedim=DH::space_dimension;
+      Assert ((component_mask_.size() == 0) ||
+	      (component_mask_.size() == dof.get_fe().n_components()),
+	      ExcMessage ("The number of components in the mask has to be either "
+			  "zero or equal to the number of components in the finite "
+			  "element."));
 
-  Assert (boundary_component != 255,
-	  ExcInvalidBoundaryIndicator());
-  Assert ((component_mask_.size() == 0) ||
-	  (component_mask_.size() == dof.get_fe().n_components()),
-	  ExcMessage ("The number of components in the mask has to be either "
-		      "zero or equal to the number of components in the finite "
-		      "element."));
+				   // if for whatever reason we were
+				   // passed an empty map, return
+				   // immediately
+      if (function_map.size() == 0)
+	return;
 
+      Assert (function_map.find(255) == function_map.end(),
+	      dealii::VectorTools::ExcInvalidBoundaryIndicator());
+
+      for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
+	   i!=function_map.end(); ++i)
+	{
 				   // check whether boundary values at
 				   // the left or right boundary of
 				   // the line are
@@ -1260,34 +1262,37 @@ VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space
 				   // which we seek the boundary,
 				   // i.e. 0 is left boundary and 1 is
 				   // right.
-  const unsigned int direction = boundary_component;
-  Assert (direction < 2, ExcInvalidBoundaryIndicator());
+	  const unsigned int direction = i->first;
+	  Assert (direction < 2,
+		  dealii::VectorTools::ExcInvalidBoundaryIndicator());
+
+	  const Function<DH::space_dimension> & boundary_function = *(i->second);
 
 				   // first find the outermost active
 				   // cell by first traversing the coarse
 				   // grid to its end and then going
 				   // to the children
-  typename DH::cell_iterator outermost_cell = dof.begin(0);
-  while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
-    outermost_cell = outermost_cell->neighbor(direction);
+	  typename DH::cell_iterator outermost_cell = dof.begin(0);
+	  while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
+	    outermost_cell = outermost_cell->neighbor(direction);
 
-  while (outermost_cell->has_children())
-    outermost_cell = outermost_cell->child(direction);
+	  while (outermost_cell->has_children())
+	    outermost_cell = outermost_cell->child(direction);
 
                                    // get the FE corresponding to this
                                    // cell
-  const FiniteElement<dim,spacedim> &fe = outermost_cell->get_fe();
-  Assert (fe.n_components() == boundary_function.n_components,
-	  ExcDimensionMismatch(fe.n_components(), boundary_function.n_components));
+	  const FiniteElement<dim,spacedim> &fe = outermost_cell->get_fe();
+	  Assert (fe.n_components() == boundary_function.n_components,
+		  ExcDimensionMismatch(fe.n_components(), boundary_function.n_components));
 
 				   // set the component mask to either
 				   // the original value or a vector
 				   // of trues
-  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					  std::vector<bool> (fe.n_components(), true) :
-					  component_mask_);
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcNoComponentSelected());
+	  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
+						  std::vector<bool> (fe.n_components(), true) :
+						  component_mask_);
+	  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+		  dealii::VectorTools::ExcNoComponentSelected());
 
 				   // now set the value of the
 				   // outermost degree of
@@ -1300,100 +1305,77 @@ VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space
 				   // values only once for each point,
 				   // irrespective of the number of
 				   // components of the function
-  Vector<double> function_values (fe.n_components());
-  if (fe.n_components() == 1)
-    function_values(0)
-      = boundary_function.value (outermost_cell->vertex(direction));
-  else
-    boundary_function.vector_value (outermost_cell->vertex(direction),
-				    function_values);
+	  dealii::Vector<double> function_values (fe.n_components());
+	  if (fe.n_components() == 1)
+	    function_values(0)
+	      = boundary_function.value (outermost_cell->vertex(direction));
+	  else
+	    boundary_function.vector_value (outermost_cell->vertex(direction),
+					    function_values);
 
-  for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-    if (component_mask[fe.face_system_to_component_index(i).first])
-      boundary_values[outermost_cell->
-		      vertex_dof_index(direction,i,
-				       outermost_cell->active_fe_index())]
-	= function_values(fe.face_system_to_component_index(i).first);
-}
-
-
-//TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hp::DoFHandler.
-
-// Implementation for 1D
-template <class DH>
-void
-VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>              &mapping,
-					  const DH         &dof,
-					  const typename FunctionMap<DH::space_dimension>::type    &function_map,
-					  std::map<unsigned int,double> &boundary_values,
-					  const std::vector<bool>       &component_mask)
-{
-  for (typename FunctionMap<DH::space_dimension>::type::const_iterator i=function_map.begin();
-       i!=function_map.end(); ++i)
-    interpolate_boundary_values (mapping, dof, i->first, *i->second,
-				 boundary_values, component_mask);
-}
+	  for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+	    if (component_mask[fe.face_system_to_component_index(i).first])
+	      boundary_values[outermost_cell->
+			      vertex_dof_index(direction,i,
+					       outermost_cell->active_fe_index())]
+		= function_values(fe.face_system_to_component_index(i).first);
+	}
+    }
 
 
-//TODO[?] Actually the Mapping object should be a MappingCollection object for the
-// hp::DoFHandler.
 
+    template <class DH>
+    static inline
+    void
+    interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension> &mapping,
+				 const DH                 &dof,
+				 const typename FunctionMap<DH::space_dimension>::type &function_map,
+				 std::map<unsigned int,double> &boundary_values,
+				 const std::vector<bool>       &component_mask_,
+				 const internal::int2type<DH::dimension>)
+    {
+      const unsigned int dim = DH::dimension;
+      const unsigned int spacedim=DH::space_dimension;
 
-#else
-
-
-template <class DH>
-void
-VectorTools::
-interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>            &mapping,
-                             const DH                 &dof,
-                             const typename FunctionMap<DH::space_dimension>::type &function_map,
-                             std::map<unsigned int,double> &boundary_values,
-                             const std::vector<bool>       &component_mask_)
-{
-  const unsigned int dim=DH::dimension;
-  const unsigned int spacedim=DH::space_dimension;
-
-  Assert ((component_mask_.size() == 0) ||
-	  (component_mask_.size() == dof.get_fe().n_components()),
-	  ExcMessage ("The number of components in the mask has to be either "
-		      "zero or equal to the number of components in the finite "
-		      "element."));
+      Assert ((component_mask_.size() == 0) ||
+	      (component_mask_.size() == dof.get_fe().n_components()),
+	      ExcMessage ("The number of components in the mask has to be either "
+			  "zero or equal to the number of components in the finite "
+			  "element."));
 
 
 				   // if for whatever reason we were
 				   // passed an empty map, return
 				   // immediately
-  if (function_map.size() == 0)
-    return;
+      if (function_map.size() == 0)
+	return;
 
-  Assert (function_map.find(255) == function_map.end(),
-	  ExcInvalidBoundaryIndicator());
+      Assert (function_map.find(255) == function_map.end(),
+	      dealii::VectorTools::ExcInvalidBoundaryIndicator());
 
-  const unsigned int        n_components = DoFTools::n_components(dof);
-  const bool                fe_is_system = (n_components != 1);
+      const unsigned int        n_components = DoFTools::n_components(dof);
+      const bool                fe_is_system = (n_components != 1);
 
-  for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
-       i!=function_map.end(); ++i)
-    Assert (n_components == i->second->n_components,
-	    ExcDimensionMismatch(n_components, i->second->n_components));
+      for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
+	   i!=function_map.end(); ++i)
+	Assert (n_components == i->second->n_components,
+		ExcDimensionMismatch(n_components, i->second->n_components));
 
 				   // set the component mask to either
 				   // the original value or a vector
 				   // of trues
-  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					  std::vector<bool> (n_components, true) :
-					  component_mask_);
-  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	  ExcNoComponentSelected());
+      const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
+					      std::vector<bool> (n_components, true) :
+					      component_mask_);
+      Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+	      dealii::VectorTools::ExcNoComponentSelected());
 
 				   // field to store the indices
-  std::vector<unsigned int> face_dofs;
-  face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
+      std::vector<unsigned int> face_dofs;
+      face_dofs.reserve (DoFTools::max_dofs_per_face(dof));
 
-  std::vector<Point<spacedim> >  dof_locations;
-  dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
+      std::vector<Point<spacedim> >  dof_locations;
+      dof_locations.reserve (DoFTools::max_dofs_per_face(dof));
 
 				   // array to store the values of
 				   // the boundary function at the
@@ -1401,10 +1383,10 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 				   // for scalar and vector functions
 				   // to use the more efficient one
 				   // respectively
-  std::vector<double>          dof_values_scalar;
-  std::vector<Vector<double> > dof_values_system;
-  dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
-  dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
+      std::vector<double>          dof_values_scalar;
+      std::vector<dealii::Vector<double> > dof_values_system;
+      dof_values_scalar.reserve (DoFTools::max_dofs_per_face (dof));
+      dof_values_system.reserve (DoFTools::max_dofs_per_face (dof));
 
 				   // before we start with the loop
 				   // over all cells create an
@@ -1412,11 +1394,11 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 				   // the interpolation points of all
 				   // finite elements that may ever be
 				   // in use
-  hp::FECollection<dim,spacedim> finite_elements (dof.get_fe());
-  hp::QCollection<dim-1>  q_collection;
-  for (unsigned int f=0; f<finite_elements.size(); ++f)
-    {
-      const FiniteElement<dim,spacedim> &fe = finite_elements[f];
+      dealii::hp::FECollection<dim,spacedim> finite_elements (dof.get_fe());
+      dealii::hp::QCollection<dim-1>  q_collection;
+      for (unsigned int f=0; f<finite_elements.size(); ++f)
+      {
+        const FiniteElement<dim,spacedim> &fe = finite_elements[f];
 
 				       // generate a quadrature rule
 				       // on the face from the unit
@@ -1428,9 +1410,9 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 				       // to do this, we check whether
 				       // the FE has support points on
 				       // the face at all:
-      if (fe.has_face_support_points())
-	q_collection.push_back (Quadrature<dim-1>(fe.get_unit_face_support_points()));
-      else
+	if (fe.has_face_support_points())
+	  q_collection.push_back (Quadrature<dim-1>(fe.get_unit_face_support_points()));
+	else
 	{
 					   // if not, then we should
 					   // try a more clever
@@ -1477,23 +1459,23 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 
 	  q_collection.push_back (Quadrature<dim-1>(unit_support_points));
         }
-    }
+      }
 				   // now that we have a q_collection
 				   // object with all the right
 				   // quadrature points, create an
 				   // hp::FEFaceValues object that we
 				   // can use to evaluate the boundary
 				   // values at
-  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-  hp::FEFaceValues<dim,spacedim> x_fe_values (mapping_collection, finite_elements, q_collection,
-					      update_quadrature_points);
+      dealii::hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+      dealii::hp::FEFaceValues<dim,spacedim> x_fe_values (mapping_collection, finite_elements, q_collection,
+						  update_quadrature_points);
 
-  typename DH::active_cell_iterator cell = dof.begin_active(),
-				    endc = dof.end();
-  for (; cell!=endc; ++cell)
-    if (!cell->is_artificial())
-      for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-	   ++face_no)
+      typename DH::active_cell_iterator cell = dof.begin_active(),
+				        endc = dof.end();
+      for (; cell!=endc; ++cell)
+	if (!cell->is_artificial())
+	for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+	     ++face_no)
 	{
 	  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
@@ -1522,12 +1504,17 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 	    }
 
 	  typename DH::face_iterator face = cell->face(face_no);
+
+				// cast the face iterator to a DoFHandler
+				// iterator so that we can access the boundary
+				// indicators
 	  const unsigned char boundary_component = face->boundary_indicator();
 	  if (function_map.find(boundary_component) != function_map.end())
 	    {
 					       // face is of the right component
 	      x_fe_values.reinit(cell, face_no);
-	      const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values();
+	      const dealii::FEFaceValues<dim,spacedim> &fe_values =
+		x_fe_values.get_present_fe_values();
 
 					       // get indices, physical location and
 					       // boundary values of dofs on this
@@ -1547,7 +1534,7 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 						   // possible
 		  if (dof_values_system.size() < fe.dofs_per_face)
 		    dof_values_system.resize (fe.dofs_per_face,
-					      Vector<double>(fe.n_components()));
+					      dealii::Vector<double>(fe.n_components()));
 		  else
 		    dof_values_system.resize (fe.dofs_per_face);
 
@@ -1683,6 +1670,25 @@ interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>  
 		}
 	    }
 	}
+    } // end of interpolate_boundary_values
+  } // end of namespace VectorTools
+} // end of namespace internal
+
+
+
+template <class DH>
+void
+VectorTools::
+interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>            &mapping,
+                             const DH                 &dof,
+                             const typename FunctionMap<DH::space_dimension>::type &function_map,
+                             std::map<unsigned int,double> &boundary_values,
+                             const std::vector<bool>       &component_mask_)
+{
+  dealii::internal::VectorTools::
+    interpolate_boundary_values (mapping, dof, function_map, boundary_values,
+				 component_mask_,
+				 dealii::internal::int2type<DH::dimension>());
 }
 
 
@@ -1702,7 +1708,6 @@ VectorTools::interpolate_boundary_values (const Mapping<DH::dimension, DH::space
 			       component_mask);
 }
 
-#endif
 
 
 template <class DH>
@@ -1824,28 +1829,6 @@ VectorTools::interpolate_boundary_values
 
 // -------- implementation for project_boundary_values with std::map --------
 
-#if deal_II_dimension == 1
-
-// Implementation for 1D
-template <int dim, int spacedim>
-void
-VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mapping,
-				      const DoFHandler<dim,spacedim>    &dof,
-				      const typename FunctionMap<spacedim>::type &boundary_functions,
-				      const Quadrature<dim-1>  &,
-				      std::map<unsigned int,double> &boundary_values,
-				      std::vector<unsigned int> component_mapping)
-{
-  Assert (component_mapping.size() == 0, ExcNotImplemented());
-				   // projection in 1d is equivalent
-				   // to interpolation
-  interpolate_boundary_values (mapping, dof, boundary_functions,
-			       boundary_values, std::vector<bool>());
-}
-
-#else
-
-
 template <int dim, int spacedim>
 void
 VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mapping,
@@ -1855,6 +1838,16 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
 				      std::map<unsigned int,double> &boundary_values,
 				      std::vector<unsigned int> component_mapping)
 {
+  if (dim == 1)
+    {
+      Assert (component_mapping.size() == 0, ExcNotImplemented());
+				   // projection in 1d is equivalent
+				   // to interpolation
+      interpolate_boundary_values (mapping, dof, boundary_functions,
+				   boundary_values, std::vector<bool>());
+      return;
+    }
+
 //TODO:[?] In VectorTools::project_boundary_values, no condensation of sparsity
 //    structures, matrices and right hand sides or distribution of
 //    solution vectors is performed. This is ok for dim<3 because then
@@ -2010,7 +2003,7 @@ VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mappin
       }
 }
 
-#endif
+
 
 template <int dim, int spacedim>
 void

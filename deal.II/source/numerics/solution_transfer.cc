@@ -441,44 +441,7 @@ SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::memory_consumption () const
 
 
 
-template class SolutionTransfer<deal_II_dimension, Vector<float>, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, Vector<double>, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, Vector<float>, hp::DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, Vector<double>, hp::DoFHandler<deal_II_dimension> >;
-
-template class SolutionTransfer<deal_II_dimension, BlockVector<float>, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, BlockVector<double>, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, BlockVector<float>, hp::DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, BlockVector<double>, hp::DoFHandler<deal_II_dimension> >;
-
-
-#ifdef DEAL_II_USE_PETSC
-template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, hp::DoFHandler<deal_II_dimension> >;
-
-template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, hp::DoFHandler<deal_II_dimension> >;
-#endif
-
-#ifdef DEAL_II_USE_TRILINOS
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, hp::DoFHandler<deal_II_dimension> >;
-
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, hp::DoFHandler<deal_II_dimension> >;
-
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::Vector, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::Vector, hp::DoFHandler<deal_II_dimension> >;
-
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension> >;
-template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::MPI::BlockVector, hp::DoFHandler<deal_II_dimension> >;
-#endif
-
-#if deal_II_dimension < 3
-template class SolutionTransfer<deal_II_dimension, Vector<double>, DoFHandler<deal_II_dimension, deal_II_dimension+1> >;
-template class SolutionTransfer<deal_II_dimension, BlockVector<double>, hp::DoFHandler<deal_II_dimension, deal_II_dimension+1> >;
-
-#endif
-/*----------------------------   solution_transfer.cc     ----------------------*/
+/*-------------- Explicit Instantiations -------------------------------*/
+#include "solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -599,8 +599,6 @@ std::vector<unsigned int>
 FE_Q<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
 
-#if deal_II_dimension != 3
-
 template <>
 void FE_Q<1,2>::initialize_unit_face_support_points ();
 
@@ -608,7 +606,6 @@ template <>
 std::vector<unsigned int>
 FE_Q<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
-#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

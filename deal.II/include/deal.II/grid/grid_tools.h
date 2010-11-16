@@ -930,38 +930,6 @@ GridTools::get_active_child_cells (const typename DH::cell_iterator& cell)
 
 
 
-#if deal_II_dimension == 1
-
-template <class Container>
-void
-GridTools::get_active_neighbors(const typename Container::active_cell_iterator        &cell,
-				std::vector<typename Container::active_cell_iterator> &active_neighbors)
-{
-  active_neighbors.clear ();
-  for (unsigned int n=0; n<GeometryInfo<1>::faces_per_cell; ++n)
-    if (! cell->at_boundary(n))
-      {
-					 // check children of neighbor. note
-					 // that in 1d children of the neighbor
-					 // may be further refined. In 1d the
-					 // case is simple since we know what
-					 // children bound to the present cell
-	typename Container::cell_iterator
-	  neighbor_child = cell->neighbor(n);
-	if (!neighbor_child->active())
-	  {
-	    while (neighbor_child->has_children())
-	      neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
-
-	    Assert (neighbor_child->neighbor(n==0 ? 1 : 0)==cell,
-		    ExcInternalError());
-	  }
-	active_neighbors.push_back (neighbor_child);
-      }
-}
-
-#else
-
 template <class Container>
 void
 GridTools::get_active_neighbors(const typename Container::active_cell_iterator        &cell,
@@ -971,24 +939,43 @@ GridTools::get_active_neighbors(const typename Container::active_cell_iterator  
   for (unsigned int n=0; n<GeometryInfo<Container::dimension>::faces_per_cell; ++n)
     if (! cell->at_boundary(n))
       {
-	if (cell->face(n)->has_children())
+	if (Container::dimension == 1)
+	  {
+					 // check children of neighbor. note
+					 // that in 1d children of the neighbor
+					 // may be further refined. In 1d the
+					 // case is simple since we know what
+					 // children bound to the present cell
+	    typename Container::cell_iterator
+	      neighbor_child = cell->neighbor(n);
+	    if (!neighbor_child->active())
+	      {
+		while (neighbor_child->has_children())
+		  neighbor_child = neighbor_child->child (n==0 ? 1 : 0);
+
+		Assert (neighbor_child->neighbor(n==0 ? 1 : 0)==cell,
+			ExcInternalError());
+	      }
+	    active_neighbors.push_back (neighbor_child);
+	  }
+	else
+	  {
+	    if (cell->face(n)->has_children())
 					   // this neighbor has children. find
 					   // out which border to the present
 					   // cell
-	  for (unsigned int c=0; c<cell->face(n)->number_of_children(); ++c)
-	    active_neighbors.push_back (cell->neighbor_child_on_subface(n,c));
-	else
-	  {
+	      for (unsigned int c=0; c<cell->face(n)->number_of_children(); ++c)
+		active_neighbors.push_back (cell->neighbor_child_on_subface(n,c));
+	    else
+	      {
 					     // the neighbor must be active
 					     // himself
-	    Assert(cell->neighbor(n)->active(), ExcInternalError());
-	    active_neighbors.push_back(cell->neighbor(n));
+		Assert(cell->neighbor(n)->active(), ExcInternalError());
+		active_neighbors.push_back(cell->neighbor(n));
+	      }
 	  }
       }
 }
-
-
-#endif
 
 
 

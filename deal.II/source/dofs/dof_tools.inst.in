@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-for (SP : SPARSITY_PATTERNS)
+for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
   {
     template void
     DoFTools::make_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension>, SP>
@@ -77,6 +77,33 @@ for (SP : SPARSITY_PATTERNS)
      const hp::DoFHandler<deal_II_dimension,deal_II_dimension> &dof_col,
      SP    &sparsity);
 
+    // #if deal_II_dimension > 1
+    template void
+    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
+    (const DoFHandler<deal_II_dimension>& dof,
+     const std::vector<unsigned int>  &,
+     SP    &);
+
+    template void
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
+    (const hp::DoFHandler<deal_II_dimension>& dof,
+     const std::vector<unsigned int>  &,
+     SP    &);
+
+    template void
+    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
+    (const DoFHandler<deal_II_dimension>& dof,
+     const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     SP    &sparsity);
+
+    template void
+    DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
+    (const hp::DoFHandler<deal_II_dimension>& dof,
+     const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
+     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     SP    &sparsity);
+
     template void
     DoFTools::make_flux_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
     (const DoFHandler<deal_II_dimension> &dof,
@@ -111,10 +138,7 @@ for (SP : SPARSITY_PATTERNS)
      const bool, const unsigned int);
 
 #endif
-  }
 
-for (SP : SPARSITY_PATTERNS)
-  {
 #if deal_II_dimension < 3
 
     template void
@@ -162,16 +186,419 @@ for (SP : SPARSITY_PATTERNS)
     (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_row,
      const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_col,
      SP    &sparsity);
+
+    template void
+    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+     const std::vector<unsigned int>  &,
+     SP    &);
+
+    //template void
+    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
+    //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+    // const std::vector<unsigned int>  &,
+    // SP    &);
+
+    template void
+    DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+     const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     SP    &sparsity);
+
+    //template void
+    //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
+    //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
+    // const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
+    // const std::vector<unsigned int>  &dof_to_boundary_mapping,
+    // SP    &sparsity);
+
 #endif
   }
 
 
 
 
-for (DH : DOFHANDLERS)
+for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 {
   template
   void
   DoFTools::make_hanging_node_constraints (const DH &dof_handler,
 			 		   ConstraintMatrix &constraints);
+}
+
+
+for (deal_II_dimension : DIMENSIONS)
+{
+
+#if deal_II_dimension < 3
+template
+void
+DoFTools::
+make_hanging_node_constraints (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
+			       ConstraintMatrix &constraints);
+#endif
+
+
+// TODO: can cleanup a bit more to fit into the scheme used above
+
+template
+void
+DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<float> &cell_data,
+ Vector<double>      &dof_data,
+ const unsigned int   component);
+template
+void
+DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<double> &cell_data,
+ Vector<double>       &dof_data,
+ const unsigned int    component);
+
+template
+void
+DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<float> &cell_data,
+ Vector<double>      &dof_data,
+ const unsigned int   component);
+template
+void
+DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ const Vector<double> &cell_data,
+ Vector<double>       &dof_data,
+ const unsigned int    component);
+
+
+template void DoFTools::extract_dofs<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+
+template void DoFTools::extract_dofs<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+
+template void DoFTools::extract_level_dofs<deal_II_dimension>
+(const unsigned int level, const MGDoFHandler<deal_II_dimension>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+
+template
+void
+DoFTools::extract_boundary_dofs<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
+template
+void
+DoFTools::extract_boundary_dofs<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
+
+template
+void
+DoFTools::extract_dofs_with_support_on_boundary<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
+template
+void
+DoFTools::extract_dofs_with_support_on_boundary<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const std::vector<bool>                  &,
+ std::vector<bool>                        &,
+ const std::set<unsigned char> &);
+
+template
+void
+DoFTools::extract_hanging_node_dofs
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<bool>     &selected_dofs);
+
+template
+void
+DoFTools::extract_subdomain_dofs<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const types::subdomain_id_t  subdomain_id,
+ std::vector<bool>     &selected_dofs);
+template
+void
+DoFTools::extract_subdomain_dofs<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ const types::subdomain_id_t subdomain_id,
+ std::vector<bool>     &selected_dofs);
+
+template
+void
+DoFTools::extract_locally_owned_dofs<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> & dof_handler,
+ IndexSet & dof_set);
+
+template
+void
+DoFTools::extract_locally_active_dofs<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> & dof_handler,
+ IndexSet & dof_set);
+
+
+template
+void
+DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> & dof_handler,
+ IndexSet & dof_set);
+
+template
+void
+DoFTools::extract_constant_modes<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ const std::vector<bool> &selected_components,
+ std::vector<std::vector<bool> > &constant_modes);
+
+template
+void
+DoFTools::get_active_fe_indices<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int> &active_fe_indices);
+
+template
+void
+DoFTools::get_active_fe_indices<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<unsigned int> &active_fe_indices);
+
+template
+void
+DoFTools::get_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<types::subdomain_id_t>           &subdomain_association);
+template
+void
+DoFTools::get_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ std::vector<types::subdomain_id_t>           &subdomain_association);
+
+
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t);
+template
+void
+DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t,
+ std::vector<unsigned int> &);
+
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t);
+template
+void
+DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t,
+ std::vector<unsigned int> &);
+
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
+(const MGDoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
+(const MGDoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t);
+template
+void
+DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
+(const MGDoFHandler<deal_II_dimension> &,
+ const types::subdomain_id_t,
+ std::vector<unsigned int> &);
+
+
+template
+void
+DoFTools::count_dofs_per_component<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+
+#if deal_II_dimension < 3
+template void DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
+(const unsigned int level, const MGDoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+
+template
+void
+DoFTools::count_dofs_per_component<deal_II_dimension, deal_II_dimension+1> (
+  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+#endif
+
+template
+void
+DoFTools::count_dofs_per_block<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
+
+
+template
+void
+DoFTools::count_dofs_per_component<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
+
+template
+void
+DoFTools::compute_intergrid_constraints<deal_II_dimension> (
+  const DoFHandler<deal_II_dimension> &, const unsigned int,
+  const DoFHandler<deal_II_dimension> &, const unsigned int,
+  const InterGridMap<DoFHandler<deal_II_dimension> > &,
+  ConstraintMatrix&);
+
+template
+void
+DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
+(const DoFHandler<deal_II_dimension> &, const unsigned int,
+ const DoFHandler<deal_II_dimension> &, const unsigned int,
+ const InterGridMap<DoFHandler<deal_II_dimension> > &,
+ std::vector<std::map<unsigned int, float> > &);
+
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ const std::set<unsigned char> &,
+ std::vector<unsigned int> &);
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
+(const DoFHandler<deal_II_dimension> &,
+ std::vector<unsigned int> &);
+
+
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ const std::set<unsigned char> &,
+ std::vector<unsigned int> &);
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &,
+ std::vector<unsigned int> &);
+
+
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension>
+(const Mapping<deal_II_dimension,deal_II_dimension>&,
+ const DoFHandler<deal_II_dimension>&,
+ std::vector<Point<deal_II_dimension> >&);
+
+#if deal_II_dimension < 3
+
+template
+void
+DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
+(const Mapping<deal_II_dimension,deal_II_dimension+1>&,
+ const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ std::vector<Point<deal_II_dimension+1> >&);
+
+template
+void
+DoFTools::count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
+  const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
+
+#endif
+
+template
+void
+DoFTools::convert_couplings_to_blocks (
+  const DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
+  std::vector<Table<2,Coupling> >&);
+
+template
+void
+DoFTools::convert_couplings_to_blocks (
+  const hp::DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
+  std::vector<Table<2,Coupling> >&);
+
+template
+void
+DoFTools::make_zero_boundary_constraints
+(const DoFHandler<deal_II_dimension> &,
+ ConstraintMatrix                    &,
+ const std::vector<bool>             &);
+
+template
+void
+DoFTools::make_zero_boundary_constraints
+(const hp::DoFHandler<deal_II_dimension> &,
+ ConstraintMatrix                        &,
+ const std::vector<bool>                 &);
+
+#if deal_II_dimension < 3
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const std::set<unsigned char> &,
+ std::vector<unsigned int> &);
+
+template
+void
+DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ std::vector<unsigned int> &);
+
+
+template
+void
+DoFTools::extract_hanging_node_dofs
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
+ std::vector<bool>     &selected_dofs);
+
+// template
+// void
+// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+//  const std::set<unsigned char> &,
+//  std::vector<unsigned int> &);
+
+// template
+// void
+// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+//  std::vector<unsigned int> &);
+
+#endif
+
 }

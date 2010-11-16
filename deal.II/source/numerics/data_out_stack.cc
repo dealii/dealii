@@ -468,23 +468,9 @@ std::vector<std::string> DataOutStack<dim,spacedim,DH>::get_dataset_names () con
 }
 
 
+
 // explicit instantiations
-template class DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >;
+#include "data_out_stack.inst"
 
-template void DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >::
-add_data_vector<double> (const Vector<double> &vec,
-			 const std::string    &name);
-
-template void DataOutStack<deal_II_dimension,deal_II_dimension,DoFHandler<deal_II_dimension> >::
-add_data_vector<float> (const Vector<float>  &vec,
-			const std::string    &name);
-
-template class DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >;
-template void DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
-add_data_vector<double> (const Vector<double> &vec,
-			 const std::string    &name);
-template void DataOutStack<deal_II_dimension,deal_II_dimension,hp::DoFHandler<deal_II_dimension> >::
-add_data_vector<float> (const Vector<float>  &vec,
-			const std::string    &name);
 
 DEAL_II_NAMESPACE_CLOSE

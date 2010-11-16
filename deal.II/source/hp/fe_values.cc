@@ -230,9 +230,9 @@ namespace hp
   template <int dim, int spacedim>
   void
   FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-                         const unsigned int q_index,
-                         const unsigned int mapping_index,
-                         const unsigned int fe_index)
+				  const unsigned int q_index,
+				  const unsigned int mapping_index,
+				  const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -270,9 +270,9 @@ namespace hp
   template <int dim, int spacedim>
   void
   FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                         const unsigned int q_index,
-                         const unsigned int mapping_index,
-                         const unsigned int fe_index)
+				  const unsigned int q_index,
+				  const unsigned int mapping_index,
+				  const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -336,10 +336,10 @@ namespace hp
   template <int dim, int spacedim>
   void
   FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-                             const unsigned int face_no,
-                             const unsigned int q_index,
-                             const unsigned int mapping_index,
-                             const unsigned int fe_index)
+				      const unsigned int face_no,
+				      const unsigned int q_index,
+				      const unsigned int mapping_index,
+				      const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -387,10 +387,10 @@ namespace hp
   template <int dim, int spacedim>
   void
   FEFaceValues<dim,spacedim>::reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
-                             const unsigned int face_no,
-                             const unsigned int q_index,
-                             const unsigned int mapping_index,
-                             const unsigned int fe_index)
+				      const unsigned int face_no,
+				      const unsigned int q_index,
+				      const unsigned int mapping_index,
+				      const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -428,10 +428,10 @@ namespace hp
   template <int dim, int spacedim>
   void
   FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-                             const unsigned int face_no,
-                             const unsigned int q_index,
-                             const unsigned int mapping_index,
-                             const unsigned int fe_index)
+				      const unsigned int face_no,
+				      const unsigned int q_index,
+				      const unsigned int mapping_index,
+				      const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -469,10 +469,10 @@ namespace hp
   template <int dim, int spacedim>
   void
   FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                             const unsigned int face_no,
-                             const unsigned int q_index,
-                             const unsigned int mapping_index,
-                             const unsigned int fe_index)
+				      const unsigned int face_no,
+				      const unsigned int q_index,
+				      const unsigned int mapping_index,
+				      const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -536,11 +536,11 @@ namespace hp
   template <int dim, int spacedim>
   void
   FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-                                const unsigned int face_no,
-                                const unsigned int subface_no,
-                                const unsigned int q_index,
-                                const unsigned int mapping_index,
-                                const unsigned int fe_index)
+					 const unsigned int face_no,
+					 const unsigned int subface_no,
+					 const unsigned int q_index,
+					 const unsigned int mapping_index,
+					 const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -588,11 +588,11 @@ namespace hp
   template <int dim, int spacedim>
   void
   FESubfaceValues<dim,spacedim>::reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
-                                const unsigned int face_no,
-                                const unsigned int subface_no,
-                                const unsigned int q_index,
-                                const unsigned int mapping_index,
-                                const unsigned int fe_index)
+					 const unsigned int face_no,
+					 const unsigned int subface_no,
+					 const unsigned int q_index,
+					 const unsigned int mapping_index,
+					 const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -630,11 +630,11 @@ namespace hp
   template <int dim, int spacedim>
   void
   FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-                                const unsigned int face_no,
-                                const unsigned int subface_no,
-                                const unsigned int q_index,
-                                const unsigned int mapping_index,
-                                const unsigned int fe_index)
+					 const unsigned int face_no,
+					 const unsigned int subface_no,
+					 const unsigned int q_index,
+					 const unsigned int mapping_index,
+					 const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -672,11 +672,11 @@ namespace hp
   template <int dim, int spacedim>
   void
   FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                                const unsigned int face_no,
-                                const unsigned int subface_no,
-                                const unsigned int q_index,
-                                const unsigned int mapping_index,
-                                const unsigned int fe_index)
+					 const unsigned int face_no,
+					 const unsigned int subface_no,
+					 const unsigned int q_index,
+					 const unsigned int mapping_index,
+					 const unsigned int fe_index)
   {
                                      // determine which indices we
                                      // should actually use
@@ -712,60 +712,7 @@ namespace hp
 
 
 // explicit instantiations
-namespace internal
-{
-  namespace hp
-  {
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension,
-                                dealii::FEValues<deal_II_dimension> >;
-#if deal_II_dimension >= 2
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FEFaceValues<deal_II_dimension> >;
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FESubfaceValues<deal_II_dimension> >;
-#endif
-  }
-}
-
-namespace hp
-{
-  template class FEValues<deal_II_dimension>;
-#if deal_II_dimension >= 2
-  template class FEFaceValues<deal_II_dimension>;
-  template class FESubfaceValues<deal_II_dimension>;
-#endif
-}
-
-
-
-#if deal_II_dimension != 3
-
-namespace internal
-{
-  namespace hp
-  {
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension,
-                                dealii::FEValues<deal_II_dimension,deal_II_dimension+1> >;
-#if deal_II_dimension == 2
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FEFaceValues<deal_II_dimension,deal_II_dimension+1> >;
-    template class FEValuesBase<deal_II_dimension,deal_II_dimension-1,
-                                dealii::FESubfaceValues<deal_II_dimension,deal_II_dimension+1> >;
-#endif
-  }
-}
-
-namespace hp
-{
-  template class FEValues<deal_II_dimension, deal_II_dimension+1>;
-
-#if deal_II_dimension == 2
-  template class FEFaceValues<deal_II_dimension, deal_II_dimension+1>;
-  template class FESubfaceValues<deal_II_dimension, deal_II_dimension+1>;
-#endif
-}
-#endif
-
+#include "fe_values.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

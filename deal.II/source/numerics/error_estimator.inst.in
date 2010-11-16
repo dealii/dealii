@@ -1,0 +1,125 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS)
+{
+#if deal_II_dimension != 1
+template class KellyErrorEstimator<deal_II_dimension, deal_II_dimension>;
+#endif
+
+// instantiate the externally visible functions. define a list of functions
+// for vectors, where the vector/matrix can be replaced using a preprocessor
+// variable VectorType/MatrixType
+#define INSTANTIATE_1(InputVector,DH,Q) \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
+estimate<InputVector,DH > (const Mapping<deal_II_dimension, deal_II_dimension>      &,    \
+          const DH   &,    \
+          const Q<deal_II_dimension-1> &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const InputVector       &,    \
+          Vector<float>           &,    \
+          const std::vector<bool> &,    \
+          const Function<deal_II_dimension>     *,    \
+          const unsigned int       , \
+          const unsigned int       , \
+          const unsigned int);    \
+    \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
+estimate<InputVector,DH > (const DH   &,    \
+          const Q<deal_II_dimension-1> &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const InputVector       &,    \
+          Vector<float>           &,    \
+          const std::vector<bool> &,    \
+          const Function<deal_II_dimension>     *,    \
+          const unsigned int       , \
+          const unsigned int       , \
+          const unsigned int);    \
+        \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
+estimate<InputVector,DH > (const Mapping<deal_II_dimension, deal_II_dimension>          &,    \
+          const DH       &,    \
+          const Q<deal_II_dimension-1>     &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const std::vector<const InputVector *> &,    \
+          std::vector<Vector<float>*> &,    \
+          const std::vector<bool>     &,    \
+          const Function<deal_II_dimension>         *,    \
+          const unsigned int           , \
+          const unsigned int           , \
+          const unsigned int);    \
+    \
+template    \
+void    \
+KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
+estimate<InputVector,DH > (const DH       &,    \
+          const Q<deal_II_dimension-1>     &,    \
+          const FunctionMap<deal_II_dimension>::type &,    \
+          const std::vector<const InputVector *> &,    \
+          std::vector<Vector<float>*> &,    \
+          const std::vector<bool>     &,    \
+          const Function<deal_II_dimension>         *,    \
+          const unsigned int           , \
+          const unsigned int           , \
+          const unsigned int)
+
+#define INSTANTIATE(InputVector,DH) \
+     INSTANTIATE_1(InputVector,DH,Quadrature); \
+     INSTANTIATE_1(InputVector,DH,hp::QCollection)
+
+
+INSTANTIATE(Vector<double>,DoFHandler<deal_II_dimension>);
+INSTANTIATE(Vector<float>,DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<double>,DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<float>,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(Vector<double>,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(Vector<float>,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<double>,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(BlockVector<float>,hp::DoFHandler<deal_II_dimension>);
+
+#ifdef DEAL_II_USE_PETSC
+INSTANTIATE(PETScWrappers::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(PETScWrappers::BlockVector,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(PETScWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(PETScWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(PETScWrappers::MPI::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(PETScWrappers::MPI::BlockVector,DoFHandler<deal_II_dimension>);
+
+#endif
+
+#ifdef DEAL_II_USE_TRILINOS
+INSTANTIATE(TrilinosWrappers::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::BlockVector,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(TrilinosWrappers::Vector,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::BlockVector,hp::DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(TrilinosWrappers::MPI::Vector,DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::MPI::BlockVector,DoFHandler<deal_II_dimension>);
+
+INSTANTIATE(TrilinosWrappers::MPI::Vector,hp::DoFHandler<deal_II_dimension>);
+INSTANTIATE(TrilinosWrappers::MPI::BlockVector,hp::DoFHandler<deal_II_dimension>);
+#endif
+
+#undef INSTANTIATE
+#undef INSTANTIATE_1
+}

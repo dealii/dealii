@@ -132,7 +132,6 @@ get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 inline
@@ -143,9 +142,7 @@ derivative_norm (const Derivative &d)
   return std::fabs (d[0][0]);
 }
 
-#endif
 
-#if deal_II_dimension == 2
 
 template <>
 inline
@@ -166,15 +163,12 @@ derivative_norm (const Derivative &d)
   const double eigenvalues[2]
     = { 0.5*(d[0][0] + d[1][1] + std::sqrt(radicand)),
 	0.5*(d[0][0] + d[1][1] - std::sqrt(radicand))  };
-  
+
   return std::max (std::fabs (eigenvalues[0]),
 		   std::fabs (eigenvalues[1]));
 }
 
-#endif
 
-
-#if deal_II_dimension == 3
 
 template <>
 inline
@@ -186,7 +180,7 @@ derivative_norm (const Derivative &d)
   compute the three eigenvalues of the tensor @p{d} and take the
   largest. one could use the following maple script to generate C
   code:
-  
+
   with(linalg);
   readlib(C);
   A:=matrix(3,3,[[a00,a01,a02],[a01,a11,a12],[a02,a12,a22]]);
@@ -205,7 +199,7 @@ derivative_norm (const Derivative &d)
   augmented by a test for R>0, since R==0 indicates that all three
   eigenvalues are equal.)
 
-  
+
       PROGRAM MAIN
 
 C FIND EIGENVALUES OF REAL SYMMETRIC MATRIX
@@ -232,7 +226,7 @@ C DEFINE A TEST MATRIX
       A22 = -2.D0
       A23 = 0.5D0
       A33 = 4.D0
-      
+
 
       I1 = A11 + A22 + A33
       AM = I1/3.D0
@@ -279,7 +273,7 @@ C DEFINE A TEST MATRIX
       ENDIF
 
       THETA = (ACOS(XX))/3.D0
-      
+
       A1 = AM + R*COS(THETA)
       A2 = AM + R*COS(THETA + 2.D0*PI/3.D0)
       A3 = AM + R*COS(THETA + 4.D0*PI/3.D0)
@@ -288,7 +282,7 @@ C DEFINE A TEST MATRIX
 
       STOP
       END
-  
+
 */
 
   const double am = trace(d) / 3.;
@@ -297,7 +291,7 @@ C DEFINE A TEST MATRIX
   Tensor<2,3> s = d;
   for (unsigned int i=0; i<3; ++i)
     s[i][i] -= am;
-  
+
   const double ss01 = s[0][1] * s[0][1],
 	       ss12 = s[1][2] * s[1][2],
 	       ss02 = s[0][2] * s[0][2];
@@ -309,7 +303,7 @@ C DEFINE A TEST MATRIX
 		     + 3. * s[1][1] * (ss01 + ss12)
 		     + 3. * s[2][2] * (ss02 + ss12)
 		     + 6. * s[0][1] * s[0][2] * s[1][2]) / 3.;
-  
+
   const double R  = std::sqrt (4. * J2 / 3.);
 
   double EE[3] = { 0, 0, 0 };
@@ -330,7 +324,7 @@ C DEFINE A TEST MATRIX
       const double YY = 1. - std::fabs(XX);
 
       Assert (YY > -1e-14, ExcInternalError());
-      
+
       if (YY < 0)
 	{
 					   // two roots are equal
@@ -352,7 +346,6 @@ C DEFINE A TEST MATRIX
 			     std::fabs (EE[2])));
 }
 
-#endif
 
 
 template <int dim>
@@ -420,7 +413,6 @@ get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
 }
 
 
-#if deal_II_dimension == 1
 
 template <>
 inline
@@ -431,7 +423,6 @@ derivative_norm (const Derivative &d)
   return std::fabs (d[0][0][0]);
 }
 
-#endif
 
 
 template <int dim>
@@ -499,13 +490,13 @@ DerivativeApproximation::ThirdDerivative<dim>::symmetrize (Derivative &d)
 	  = d[j][j][i]
 	  = t;
       };
-  
+
 }
 
 
 
 template <int dim, template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::
 approximate_gradient (const Mapping<dim,spacedim>    &mapping,
 		      const DH<dim,spacedim>         &dof_handler,
@@ -522,7 +513,7 @@ approximate_gradient (const Mapping<dim,spacedim>    &mapping,
 
 
 template <int dim, template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::
 approximate_gradient (const DH<dim,spacedim>         &dof_handler,
 		      const InputVector     &solution,
@@ -539,7 +530,7 @@ approximate_gradient (const DH<dim,spacedim>         &dof_handler,
 
 
 template <int dim, template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::
 approximate_second_derivative (const Mapping<dim,spacedim>    &mapping,
 			       const DH<dim,spacedim>         &dof_handler,
@@ -556,7 +547,7 @@ approximate_second_derivative (const Mapping<dim,spacedim>    &mapping,
 
 
 template <int dim, template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::
 approximate_second_derivative (const DH<dim,spacedim>         &dof_handler,
 			       const InputVector     &solution,
@@ -617,7 +608,7 @@ approximate_derivative_tensor (const DH<dim,spacedim>                           
 
 template <class DerivativeDescription, int dim,
           template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::
 approximate_derivative (const Mapping<dim,spacedim>    &mapping,
 			const DH<dim,spacedim>         &dof_handler,
@@ -646,8 +637,8 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
 		   template approximate<DerivativeDescription,dim,
 		   DH,InputVector>;
 
-//TODO: Use WorkStream here  
-  Threads::TaskGroup<> tasks;  
+//TODO: Use WorkStream here
+  Threads::TaskGroup<> tasks;
   for (unsigned int i=0; i<n_threads; ++i)
     tasks += Threads::new_task (fun_ptr,
 				mapping, dof_handler,
@@ -661,7 +652,7 @@ approximate_derivative (const Mapping<dim,spacedim>    &mapping,
 
 template <class DerivativeDescription, int dim,
           template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::approximate (const Mapping<dim,spacedim>    &mapping,
 				      const DH<dim,spacedim>         &dof_handler,
 				      const InputVector     &solution,
@@ -675,7 +666,7 @@ DerivativeApproximation::approximate (const Mapping<dim,spacedim>    &mapping,
   Vector<float>::iterator
     derivative_norm_on_this_cell
     = derivative_norm.begin() + index_interval.first;
-  
+
   typename DH<dim,spacedim>::active_cell_iterator cell, endc;
   cell = endc = dof_handler.begin_active();
 				   // (static_cast to avoid warnings
@@ -705,15 +696,15 @@ DerivativeApproximation::approximate (const Mapping<dim,spacedim>    &mapping,
 
 template <class DerivativeDescription, int dim,
           template <int, int> class DH, class InputVector, int spacedim>
-void 
+void
 DerivativeApproximation::
-approximate_cell (const Mapping<dim,spacedim>                            &mapping,
-		  const DH<dim,spacedim>                                 &dof_handler,
+approximate_cell (const Mapping<dim,spacedim>                   &mapping,
+		  const DH<dim,spacedim>                        &dof_handler,
 		  const InputVector                             &solution,
 		  const unsigned int                             component,
 		  const typename DH<dim,spacedim>::active_cell_iterator  &cell,
-		  typename DerivativeDescription::Derivative    &derivative)    
-{ 
+		  typename DerivativeDescription::Derivative    &derivative)
+{
   QMidpoint<dim> midpoint_rule;
 
 				   // create collection objects from
@@ -726,15 +717,15 @@ approximate_cell (const Mapping<dim,spacedim>                            &mappin
   const hp::QCollection<dim>       q_collection (midpoint_rule);
   const hp::FECollection<dim>      fe_collection(dof_handler.get_fe());
   const hp::MappingCollection<dim> mapping_collection (mapping);
-  
+
   hp::FEValues<dim> x_fe_midpoint_value (mapping_collection, fe_collection,
 					 q_collection,
 					 DerivativeDescription::update_flags |
 					 update_quadrature_points);
-  
+
 				   // matrix Y=sum_i y_i y_i^T
   Tensor<2,dim> Y;
-  
+
 
 				   // vector to hold iterators to all
 				   // active neighbors of a cell
@@ -748,24 +739,24 @@ approximate_cell (const Mapping<dim,spacedim>                            &mappin
 				       // g=sum_i y_i (f(x+y_i)-f(x))/|y_i|
 				       // or related type for higher
 				       // derivatives
-      typename DerivativeDescription::Derivative projected_derivative;
+  typename DerivativeDescription::Derivative projected_derivative;
 
 				       // reinit fe values object...
-      x_fe_midpoint_value.reinit (cell);
-      const FEValues<dim> &fe_midpoint_value
-        = x_fe_midpoint_value.get_present_fe_values();
+  x_fe_midpoint_value.reinit (cell);
+  const FEValues<dim> &fe_midpoint_value
+    = x_fe_midpoint_value.get_present_fe_values();
 
 				       // ...and get the value of the
 				       // projected derivative...
-      const typename DerivativeDescription::ProjectedDerivative
-	this_midpoint_value
-	= DerivativeDescription::get_projected_derivative (fe_midpoint_value,
-							   solution,
-							   component);
+  const typename DerivativeDescription::ProjectedDerivative
+    this_midpoint_value
+    = DerivativeDescription::get_projected_derivative (fe_midpoint_value,
+						       solution,
+						       component);
       				       // ...and the place where it lives
-      const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
+  const Point<dim> this_center = fe_midpoint_value.quadrature_point(0);
 
-      
+
 				       // loop over all neighbors and
 				       // accumulate the difference
 				       // quotients from them. note
@@ -778,44 +769,44 @@ approximate_cell (const Mapping<dim,spacedim>                            &mappin
 				       // first collect all neighbor
 				       // cells in a vector, and then
 				       // collect the data from them
-      GridTools::template get_active_neighbors<DH<dim,spacedim> >(cell, active_neighbors);
-      
+  GridTools::template get_active_neighbors<DH<dim,spacedim> >(cell, active_neighbors);
+
 				       // now loop over all active
 				       // neighbors and collect the
 				       // data we need
-      typename std::vector<typename DH<dim,spacedim>::active_cell_iterator>::const_iterator
-	neighbor_ptr = active_neighbors.begin();
-      for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
-	{
-	  const typename DH<dim,spacedim>::active_cell_iterator
-	    neighbor = *neighbor_ptr;
-	    
+  typename std::vector<typename DH<dim,spacedim>::active_cell_iterator>::const_iterator
+    neighbor_ptr = active_neighbors.begin();
+  for (; neighbor_ptr!=active_neighbors.end(); ++neighbor_ptr)
+    {
+      const typename DH<dim,spacedim>::active_cell_iterator
+	neighbor = *neighbor_ptr;
+
 					   // reinit fe values object...
-          x_fe_midpoint_value.reinit (neighbor);
-          const FEValues<dim> &fe_midpoint_value
-            = x_fe_midpoint_value.get_present_fe_values();
-	  
+      x_fe_midpoint_value.reinit (neighbor);
+      const FEValues<dim> &fe_midpoint_value
+	= x_fe_midpoint_value.get_present_fe_values();
+
 					   // ...and get the value of the
 					   // solution...
-	  const typename DerivativeDescription::ProjectedDerivative
-	    neighbor_midpoint_value
-	    = DerivativeDescription::get_projected_derivative (fe_midpoint_value,
+      const typename DerivativeDescription::ProjectedDerivative
+	neighbor_midpoint_value
+	= DerivativeDescription::get_projected_derivative (fe_midpoint_value,
 							       solution, component);
-	  
+
 					   // ...and the place where it lives
-	  const Point<dim>
-	    neighbor_center = fe_midpoint_value.quadrature_point(0);
-	  
-	  
+      const Point<dim>
+	neighbor_center = fe_midpoint_value.quadrature_point(0);
+
+
 					   // vector for the
 					   // normalized
 					   // direction between
 					   // the centers of two
 					   // cells
-	  Point<dim>   y        = neighbor_center - this_center;
-	  const double distance = std::sqrt(y.square());
+      Point<dim>   y        = neighbor_center - this_center;
+      const double distance = std::sqrt(y.square());
 					   // normalize y
-	  y /= distance;
+      y /= distance;
 					   // *** note that unlike in
 					   // the docs, y denotes the
 					   // normalized vector
@@ -823,29 +814,29 @@ approximate_cell (const Mapping<dim,spacedim>                            &mappin
 					   // of the two cells, rather
 					   // than the normal
 					   // difference! ***
-	  
+
 					   // add up the
 					   // contribution of
 					   // this cell to Y
-	  for (unsigned int i=0; i<dim; ++i)
-	    for (unsigned int j=0; j<dim; ++j)
-	      Y[i][j] += y[i] * y[j];
-	  
+      for (unsigned int i=0; i<dim; ++i)
+	for (unsigned int j=0; j<dim; ++j)
+	  Y[i][j] += y[i] * y[j];
+
 					   // then update the sum
 					   // of difference
 					   // quotients
-	  typename DerivativeDescription::ProjectedDerivative
-	    projected_finite_difference
-	    = (neighbor_midpoint_value -
-	       this_midpoint_value);
-	  projected_finite_difference /= distance;
-	  
-	  typename DerivativeDescription::Derivative projected_derivative_update;
-	  outer_product (projected_derivative_update,
-			 y,
-			 projected_finite_difference);
-	  projected_derivative += projected_derivative_update;
-	};
+      typename DerivativeDescription::ProjectedDerivative
+	projected_finite_difference
+	= (neighbor_midpoint_value -
+	   this_midpoint_value);
+      projected_finite_difference /= distance;
+
+      typename DerivativeDescription::Derivative projected_derivative_update;
+      outer_product (projected_derivative_update,
+		     y,
+		     projected_finite_difference);
+      projected_derivative += projected_derivative_update;
+    };
 
 				       // can we determine an
 				       // approximation of the
@@ -856,16 +847,16 @@ approximate_cell (const Mapping<dim,spacedim>                            &mappin
 				       // otherwise we would not have
 				       // all components of the
 				       // gradient
-      AssertThrow (determinant(Y) != 0,
-		   ExcInsufficientDirections());
-      
+  AssertThrow (determinant(Y) != 0,
+	       ExcInsufficientDirections());
+
                                        // compute Y^-1 g
-      const Tensor<2,dim> Y_inverse = invert(Y);
-      
-      contract (derivative, Y_inverse, projected_derivative);
-      
+  const Tensor<2,dim> Y_inverse = invert(Y);
+
+  contract (derivative, Y_inverse, projected_derivative);
+
 				       // finally symmetrize the derivative
-      DerivativeDescription::symmetrize (derivative);
+  DerivativeDescription::symmetrize (derivative);
 }
 
 
@@ -878,129 +869,9 @@ derivative_norm(const Tensor<order,dim> &derivative)
 }
 
 
-// --------------------------------------------------------------------
 
-// explicit instantiations
-#define INSTANTIATE(InputVector,DH)                      \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_gradient<deal_II_dimension>                  \
-(const Mapping<deal_II_dimension> &mapping,              \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector  &solution,                           \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_gradient<deal_II_dimension>                  \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_second_derivative<deal_II_dimension>         \
-(const Mapping<deal_II_dimension> &mapping,              \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector  &solution,                           \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_second_derivative<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<1,deal_II_dimension> &derivative,                \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<2,deal_II_dimension> &derivative,                \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<3,deal_II_dimension> &derivative,                \
- const unsigned int     component)
+// --------------------------- explicit instantiations ---------------------
+#include "derivative_approximation.inst"
 
-
-INSTANTIATE(Vector<double>, DoFHandler);
-INSTANTIATE(Vector<float>, DoFHandler);
-INSTANTIATE(BlockVector<double>, DoFHandler);
-INSTANTIATE(BlockVector<float>, DoFHandler);
-
-INSTANTIATE(Vector<double>, hp::DoFHandler);
-INSTANTIATE(Vector<float>, hp::DoFHandler);
-INSTANTIATE(BlockVector<double>, hp::DoFHandler);
-INSTANTIATE(BlockVector<float>, hp::DoFHandler);
-
-#ifdef DEAL_II_USE_PETSC
-INSTANTIATE(PETScWrappers::Vector, DoFHandler);
-INSTANTIATE(PETScWrappers::BlockVector, DoFHandler);
-
-INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
-INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
-#endif
-
-#undef INSTANTIATE
-
-template
-double
-DerivativeApproximation::
-derivative_norm(const Tensor<1,deal_II_dimension> &derivative);
-
-template
-double
-DerivativeApproximation::
-derivative_norm(const Tensor<2,deal_II_dimension> &derivative);
-
-template
-double
-DerivativeApproximation::
-derivative_norm(const Tensor<3,deal_II_dimension> &derivative);
-
-
-// static variables
-// 
-// on AIX, the linker is unhappy about some missing symbols. they
-// should really be there, but explicitly instantiating them will also
-// not hurt
-template
-const UpdateFlags
-DerivativeApproximation::Gradient<deal_II_dimension>::update_flags;
-
-template
-const UpdateFlags
-DerivativeApproximation::SecondDerivative<deal_II_dimension>::update_flags;
-template
-const UpdateFlags
-DerivativeApproximation::ThirdDerivative<deal_II_dimension>::update_flags;
 
 DEAL_II_NAMESPACE_CLOSE

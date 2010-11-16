@@ -95,6 +95,7 @@ DataPostprocessor<dim>::get_data_component_interpretation () const
 
 
 // explicit instantiation
-template class DataPostprocessor<deal_II_dimension>;
+#include "data_postprocessor.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

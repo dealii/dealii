@@ -1603,7 +1603,7 @@ namespace hp
 	     == 0),
 	    ExcMessage ("The given triangulation is parallel distributed but "
 			"this class does not currently support this."));
-    
+
     create_active_fe_table ();
     tria.add_refinement_listener (*this);
   }
@@ -2664,8 +2664,6 @@ namespace hp
 //------------------------------------------------------------------
 
 
-#if deal_II_dimension == 1
-
   template <>
   unsigned int DoFHandler<1>::n_boundary_dofs () const
   {
@@ -2791,9 +2789,6 @@ namespace hp
 
 
 
-#endif
-
-
   template<int dim, int spacedim>
   unsigned int DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
@@ -2902,7 +2897,6 @@ namespace hp
   }
 
 
-#if deal_II_dimension == 2
 
   template <>
   unsigned int DoFHandler<2,3>::n_boundary_dofs () const
@@ -2911,6 +2905,8 @@ namespace hp
     return 0;
   }
 
+
+
   template <>
   unsigned int DoFHandler<2,3>::n_boundary_dofs (const FunctionMap &) const
   {
@@ -2918,14 +2914,14 @@ namespace hp
     return 0;
   }
 
+
+
   template <>
   unsigned int DoFHandler<2,3>::n_boundary_dofs (const std::set<unsigned char> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
   }
-
-#endif
 
 
 
@@ -3064,7 +3060,6 @@ namespace hp
   }
 
 
-#if deal_II_dimension == 1
 
   template <>
   void
@@ -3072,13 +3067,15 @@ namespace hp
   compute_line_dof_identities (std::vector<unsigned int> &) const
   {}
 
+
+
   template <>
   void
   DoFHandler<1,2>::
   compute_line_dof_identities (std::vector<unsigned int> &) const
   {}
 
-#endif
+
 
   template<int dim, int spacedim>
   void
@@ -3293,7 +3290,7 @@ namespace hp
       }
   }
 
-#if deal_II_dimension == 1
+
 
   template <>
   void
@@ -3307,10 +3304,7 @@ namespace hp
   compute_quad_dof_identities (std::vector<unsigned int> &) const
   {}
 
-#endif
 
-
-#if deal_II_dimension == 2
 
   template <>
   void
@@ -3319,14 +3313,13 @@ namespace hp
   {}
 
 
+
   template <>
   void
   DoFHandler<2,3>::
   compute_quad_dof_identities (std::vector<unsigned int> &) const
   {}
 
-
-#endif
 
 
   template<int dim, int spacedim>
@@ -3693,11 +3686,11 @@ namespace hp
   }
 
 
-#if deal_II_dimension >= 2
 
-  template<int dim, int spacedim>
+				// TODO: should be simplified a bit
+  template<>
   void
-  DoFHandler<dim,spacedim>::
+  DoFHandler<2,2>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
 			  internal::int2type<2>)
   {
@@ -3723,13 +3716,69 @@ namespace hp
       }
   }
 
-#endif
 
-#if deal_II_dimension >= 3
 
-  template<int dim, int spacedim>
+  template<>
   void
-  DoFHandler<dim,spacedim>::
+  DoFHandler<2,3>::
+  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+			  internal::int2type<2>)
+  {
+    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+
+    renumber_dofs_internal (new_numbers, internal::int2type<1>());
+
+    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+      {
+	const unsigned int n_active_fe_indices
+	  = quad->n_active_fe_indices ();
+
+	for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	  {
+	    const unsigned int fe_index
+	      = quad->nth_active_fe_index (f);
+
+	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
+	      quad->set_dof_index (d,
+				   new_numbers[quad->dof_index(d,fe_index)],
+				   fe_index);
+	  }
+      }
+  }
+
+
+  template<>
+  void
+  DoFHandler<3,3>::
+  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+			  internal::int2type<2>)
+  {
+    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+
+    renumber_dofs_internal (new_numbers, internal::int2type<1>());
+
+    for (quad_iterator quad=begin_quad(); quad!=end_quad(); ++quad)
+      {
+	const unsigned int n_active_fe_indices
+	  = quad->n_active_fe_indices ();
+
+	for (unsigned int f=0; f<n_active_fe_indices; ++f)
+	  {
+	    const unsigned int fe_index
+	      = quad->nth_active_fe_index (f);
+
+	    for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
+	      quad->set_dof_index (d,
+				   new_numbers[quad->dof_index(d,fe_index)],
+				   fe_index);
+	  }
+      }
+  }
+
+
+  template<>
+  void
+  DoFHandler<3,3>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
 			  internal::int2type<3>)
   {
@@ -3755,7 +3804,6 @@ namespace hp
       }
   }
 
-#endif
 
 
   template <int dim, int spacedim>
@@ -3872,7 +3920,6 @@ namespace hp
 
 
 
-#if deal_II_dimension == 1
   template <>
   void DoFHandler<1>::pre_refinement_notification (const Triangulation<1> &tria)
   {
@@ -3931,7 +3978,7 @@ namespace hp
 	has_children.push_back (has_children_level);
       }
   }
-#endif
+
 
 
   template<int dim, int spacedim>
@@ -4038,16 +4085,12 @@ namespace hp
       std::swap (vertex_dofs_offsets, tmp);
     }
   }
+}
+
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-  template class DoFHandler<deal_II_dimension>;
+#include "dof_handler.inst"
 
-#if deal_II_dimension != 3
-  template class DoFHandler<deal_II_dimension, deal_II_dimension+1>;
-#endif
-
-
-}
 
 DEAL_II_NAMESPACE_CLOSE

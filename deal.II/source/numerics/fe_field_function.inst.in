@@ -11,7 +11,7 @@
 //---------------------------------------------------------------------------
 
 
-for (VECTOR : SERIAL_VECTORS)
+for (VECTOR : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {
   template class FEFieldFunction<deal_II_dimension, 
 				 DoFHandler<deal_II_dimension>, 

@@ -11,7 +11,14 @@
 //
 //---------------------------------------------------------------------------
 
-for (VEC : SERIAL_VECTORS)
+
+for (deal_II_dimension : DIMENSIONS)
+{
+  template class PointValueHistory<deal_II_dimension>;
+}
+
+
+for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
 {  
   template
   void PointValueHistory<deal_II_dimension>::evaluate_field 

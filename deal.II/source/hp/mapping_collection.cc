@@ -25,7 +25,7 @@ namespace hp
   {}
 
 
-  
+
   template<int dim, int spacedim>
   MappingCollection<dim,spacedim>::
   MappingCollection (const Mapping<dim,spacedim> &mapping)
@@ -54,8 +54,8 @@ namespace hp
                                                    // mappings
                   mappings (mapping_collection.mappings)
   {}
-  
-  
+
+
 
   template<int dim, int spacedim>
   unsigned int
@@ -65,7 +65,7 @@ namespace hp
 	    MemoryConsumption::memory_consumption (mappings));
   }
 
-  
+
 
   template<int dim, int spacedim>
   void
@@ -82,23 +82,19 @@ namespace hp
   template<int dim, int spacedim>
   MappingQ1<dim,spacedim>
   StaticMappingQ1<dim,spacedim>::mapping_q1;
-  
+
 
   template<int dim, int spacedim>
   MappingCollection<dim,spacedim>
   StaticMappingQ1<dim,spacedim>::mapping_collection
   = MappingCollection<dim,spacedim>(mapping_q1);
 
-// explicit instantiations
-  template class MappingCollection<deal_II_dimension>;
-  template struct StaticMappingQ1<deal_II_dimension>;
-
-#if deal_II_dimension != 3
-  template class MappingCollection<deal_II_dimension,deal_II_dimension+1>;
-  template struct StaticMappingQ1<deal_II_dimension,deal_II_dimension+1>;
-
-#endif
-  
 }
+
+
+
+// explicit instantiations
+#include "mapping_collection.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE

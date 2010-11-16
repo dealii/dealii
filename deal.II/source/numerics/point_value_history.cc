@@ -23,7 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "point_value_history.inst"
 
 namespace internal
 {
@@ -788,8 +787,9 @@ bool PointValueHistory<dim>
 }
 
 
+
 // explicit instantiations
-template class PointValueHistory<deal_II_dimension>;
+#include "point_value_history.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

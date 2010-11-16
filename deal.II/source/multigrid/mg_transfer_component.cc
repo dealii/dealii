@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -674,85 +675,7 @@ void MGTransferSelect<number>::build_matrices (
 
 
 // explicit instantiations
+#include "mg_transfer_component.inst"
 
-template
-void MGTransferSelect<float>::build_matrices<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &d,
- const MGDoFHandler<deal_II_dimension> &,
- unsigned int, unsigned int,
- const std::vector<unsigned int>&,
- const std::vector<unsigned int>&,
- const std::vector<std::set<unsigned int> >&);
-
-template
-void MGTransferSelect<double>::build_matrices<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &d,
- const MGDoFHandler<deal_II_dimension> &,
- unsigned int, unsigned int,
- const std::vector<unsigned int>&,
- const std::vector<unsigned int>&,
- const std::vector<std::set<unsigned int> >&);
-
-template void
-MGTransferSelect<float>::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<float> >&,
-  const Vector<double>&) const;
-template void
-MGTransferSelect<float>::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<float> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferSelect<float>::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-template void
-MGTransferSelect<float>::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-template void
-MGTransferSelect<float>::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-template void
-MGTransferSelect<float>::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<float> >&) const;
-
-template void
-MGTransferSelect<double>::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<double> >&,
-  const Vector<double>&) const;
-template void
-MGTransferSelect<double>::copy_to_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  MGLevelObject<Vector<double> >&,
-  const BlockVector<double>&) const;
-template void
-MGTransferSelect<double>::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-template void
-MGTransferSelect<double>::copy_from_mg (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-template void
-MGTransferSelect<double>::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  Vector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
-template void
-MGTransferSelect<double>::copy_from_mg_add (
-  const MGDoFHandler<deal_II_dimension>&,
-  BlockVector<double>&,
-  const MGLevelObject<Vector<double> >&) const;
 
 DEAL_II_NAMESPACE_CLOSE

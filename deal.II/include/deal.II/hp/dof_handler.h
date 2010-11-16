@@ -1311,14 +1311,7 @@ namespace hp
 
 
 
-
-/* -------------- declaration of explicit specializations ------------- */
-
 #ifndef DOXYGEN
-
-  template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
-  template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
-  template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
 
 
 /* ----------------------- Inline functions ---------------------------------- */

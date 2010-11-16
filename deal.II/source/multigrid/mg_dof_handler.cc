@@ -2034,8 +2034,6 @@ unsigned int MGDoFHandler<dim,spacedim>::n_dofs (const unsigned int level) const
 
 
 
-#if deal_II_dimension == 1
-
 template <>
 void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
 				     const std::vector<unsigned int> &new_numbers) {
@@ -2069,11 +2067,7 @@ void MGDoFHandler<1>::renumber_dofs (const unsigned int level,
     }
 }
 
-#endif
 
-
-
-#if deal_II_dimension == 2
 
 template <>
 void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
@@ -2134,11 +2128,7 @@ void MGDoFHandler<2>::renumber_dofs (const unsigned int  level,
     }
 }
 
-#endif
 
-
-
-#if deal_II_dimension == 3
 
 template <>
 void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
@@ -2235,8 +2225,6 @@ void MGDoFHandler<3>::renumber_dofs (const unsigned int  level,
     }
 }
 
-#endif
-
 
 
 template <int dim, int spacedim>
@@ -2269,112 +2257,7 @@ void MGDoFHandler<dim,spacedim>::clear_space ()
 
 
 // explicit instantiations
-template class MGDoFHandler<deal_II_dimension>;
+#include "mg_dof_handler.inst"
 
-#if deal_II_dimension==1 || deal_II_dimension==2
-template class MGDoFHandler<deal_II_dimension,deal_II_dimension+1>;
-#endif
-
-
-template
-unsigned int
-MGDoFHandler<deal_II_dimension,deal_II_dimension>::
-get_dof_index<1> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index) const;
-
-#if deal_II_dimension < 3
-template
-unsigned int
-MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
-get_dof_index<1> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index) const;
-#endif
-
-#if deal_II_dimension >= 2
-template
-unsigned int
-MGDoFHandler<deal_II_dimension,deal_II_dimension>::
-get_dof_index<2> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index) const;
-
-#if deal_II_dimension < 3
-template
-unsigned int
-MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
-get_dof_index<2> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index) const;
-#endif
-
-#if deal_II_dimension >= 3
-template
-unsigned int
-MGDoFHandler<deal_II_dimension,deal_II_dimension>::
-get_dof_index<3> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index) const;
-#endif
-#endif
-
-template
-void
-MGDoFHandler<deal_II_dimension,deal_II_dimension>::
-set_dof_index<1> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index,
-		  const unsigned int       global_index) const;
-
-#if deal_II_dimension < 3
-template
-void
-MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
-set_dof_index<1> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index,
-		  const unsigned int       global_index) const;
-#endif
-
-#if deal_II_dimension >= 2
-template
-void
-MGDoFHandler<deal_II_dimension,deal_II_dimension>::
-set_dof_index<2> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index,
-		  const unsigned int       global_index) const;
-
-#if deal_II_dimension < 3
-template
-void
-MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::
-set_dof_index<2> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index,
-		  const unsigned int       global_index) const;
-#endif
-
-#if deal_II_dimension >= 3
-template
-void
-MGDoFHandler<deal_II_dimension,deal_II_dimension>::
-set_dof_index<3> (const unsigned int       obj_level,
-		  const unsigned int       obj_index,
-		  const unsigned int       fe_index,
-		  const unsigned int       local_index,
-		  const unsigned int       global_index) const;
-#endif
-#endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -378,7 +378,6 @@ template <>
 const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
 
 //codimension 1
-#if deal_II_dimension != 3
 template <>
 const double * const FE_DGP<1,2>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
 
@@ -390,9 +389,6 @@ const double * const FE_DGP<2,3>::Matrices::projection_matrices[][GeometryInfo<2
 
 template <>
 const unsigned int FE_DGP<2,3>::Matrices::n_projection_matrices;
-
-#endif
-
 
 #endif
 

@@ -449,11 +449,8 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 }
 
 
+
 // explicit instantiations
-// don't instantiate anything for the 1d
-#if deal_II_dimension >=2
-template class DataOutFaces<deal_II_dimension, DoFHandler<deal_II_dimension> >;
-template class DataOutFaces<deal_II_dimension, hp::DoFHandler<deal_II_dimension> >;
-#endif
+#include "data_out_faces.inst"
 
 DEAL_II_NAMESPACE_CLOSE

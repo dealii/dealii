@@ -22,39 +22,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-namespace MeshWorker
-{
-  template class IntegrationInfo<deal_II_dimension, deal_II_dimension>;
-  template class IntegrationInfoBox<deal_II_dimension, deal_II_dimension>;
-
-  template class DoFInfo<deal_II_dimension,deal_II_dimension,float>;
-  template class DoFInfoBox<deal_II_dimension,
-			    DoFInfo<deal_II_dimension,deal_II_dimension,float> >;
-
-  template void IntegrationInfo<deal_II_dimension>::fill_local_data(
-    const DoFInfo<deal_II_dimension, deal_II_dimension, float>&, bool);
-
-  template class DoFInfo<deal_II_dimension,deal_II_dimension,double>;
-  template class DoFInfoBox<deal_II_dimension,
-			    DoFInfo<deal_II_dimension,deal_II_dimension,double> >;
-
-  template void IntegrationInfo<deal_II_dimension>::fill_local_data(
-    const DoFInfo<deal_II_dimension, deal_II_dimension, double>&, bool);
-
-//   template void IntegrationInfo<deal_II_dimension>
-//   ::initialize<FEValues<deal_II_dimension> >(
-//     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
-//     const Quadrature<FEValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
-//   template void IntegrationInfo<deal_II_dimension>
-//   ::initialize<FEFaceValues<deal_II_dimension> >(
-//     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
-//     const Quadrature<FEFaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
-//   template void IntegrationInfo<deal_II_dimension>
-//   ::initialize<FESubfaceValues<deal_II_dimension> >(
-//     const FiniteElement<deal_II_dimension>&, const Mapping<deal_II_dimension>&,
-//     const Quadrature<FESubfaceValues<deal_II_dimension>::integral_dimension>&, const UpdateFlags, const BlockInfo*);
-}
+// explicit instantiations
+#include "mesh_worker_info.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

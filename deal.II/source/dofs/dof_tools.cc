@@ -48,7 +48,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO: convert many more of the instantiations at the bottom of this file to the .inst.in mechanism
 
 //#define WOLFGANG
 
@@ -324,76 +323,6 @@ DoFTools::make_sparsity_pattern (
 
 
 
-#if deal_II_dimension == 1
-
-template <class DH, class SparsityPattern>
-void
-DoFTools::make_boundary_sparsity_pattern (
-  const DH                               &dof_handler,
-  const typename FunctionMap<DH::space_dimension>::type &function_map,
-  const std::vector<unsigned int>        &dof_to_boundary_mapping,
-  SparsityPattern                        &sparsity)
-{
-				   // first check left, the right
-				   // boundary point
-  for (unsigned int direction=0; direction<2; ++direction)
-    {
-				       // if this boundary is not
-				       // requested, then go on with next one
-      if (function_map.find(direction) ==
-	  function_map.end())
-	continue;
-
-				       // find active cell at that
-				       // boundary: first go to
-				       // left/right, then to children
-      typename DH::cell_iterator cell = dof_handler.begin(0);
-      while (!cell->at_boundary(direction))
-	cell = cell->neighbor(direction);
-      while (!cell->active())
-	cell = cell->child(direction);
-
-      const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
-      std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
-
-				       // next get boundary mapped dof
-				       // indices of boundary dofs
-      for (unsigned int i=0; i<dofs_per_vertex; ++i)
-	boundary_dof_boundary_indices[i]
-	  = dof_to_boundary_mapping[cell->vertex_dof_index(direction,i)];
-
-      for (unsigned int i=0; i<dofs_per_vertex; ++i)
-	sparsity.add_entries (boundary_dof_boundary_indices[i],
-			      boundary_dof_boundary_indices.begin(),
-			      boundary_dof_boundary_indices.end());
-    };
-}
-
-
-
-template <class DH, class SparsityPattern>
-void DoFTools::make_boundary_sparsity_pattern (
-  const DH                        &dof_handler,
-  const std::vector<unsigned int> &dof_to_boundary_mapping,
-  SparsityPattern                 &sparsity)
-{
-				   // there are only 2 boundary
-				   // indicators in 1d, so it is no
-				   // performance problem to call the
-				   // other function
-  typename DH::FunctionMap boundary_indicators;
-  boundary_indicators[0] = 0;
-  boundary_indicators[1] = 0;
-  make_boundary_sparsity_pattern<DH, SparsityPattern> (dof_handler,
-						       boundary_indicators,
-						       dof_to_boundary_mapping,
-						       sparsity);
-}
-
-
-#else
-
-
 template <class DH, class SparsityPattern>
 void
 DoFTools::make_boundary_sparsity_pattern (
@@ -401,6 +330,22 @@ DoFTools::make_boundary_sparsity_pattern (
   const std::vector<unsigned int> &dof_to_boundary_mapping,
   SparsityPattern                 &sparsity)
 {
+  if (DH::dimension == 1)
+    {
+				   // there are only 2 boundary
+				   // indicators in 1d, so it is no
+				   // performance problem to call the
+				   // other function
+      typename DH::FunctionMap boundary_indicators;
+      boundary_indicators[0] = 0;
+      boundary_indicators[1] = 0;
+      make_boundary_sparsity_pattern<DH, SparsityPattern> (dof,
+							   boundary_indicators,
+							   dof_to_boundary_mapping,
+							   sparsity);
+      return;
+    }
+
   const unsigned int n_dofs = dof.n_dofs();
 
   AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
@@ -460,6 +405,44 @@ void DoFTools::make_boundary_sparsity_pattern (
   const std::vector<unsigned int>                 &dof_to_boundary_mapping,
   SparsityPattern                                 &sparsity)
 {
+  if (DH::dimension == 1)
+    {
+				   // first check left, then right
+				   // boundary point
+      for (unsigned int direction=0; direction<2; ++direction)
+	{
+				       // if this boundary is not
+				       // requested, then go on with next one
+	  if (boundary_indicators.find(direction) ==
+	      boundary_indicators.end())
+	    continue;
+
+				       // find active cell at that
+				       // boundary: first go to
+				       // left/right, then to children
+	  typename DH::cell_iterator cell = dof.begin(0);
+	  while (!cell->at_boundary(direction))
+	    cell = cell->neighbor(direction);
+	  while (!cell->active())
+	    cell = cell->child(direction);
+
+	  const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
+	  std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
+
+				       // next get boundary mapped dof
+				       // indices of boundary dofs
+	  for (unsigned int i=0; i<dofs_per_vertex; ++i)
+	    boundary_dof_boundary_indices[i]
+	      = dof_to_boundary_mapping[cell->vertex_dof_index(direction,i)];
+
+	  for (unsigned int i=0; i<dofs_per_vertex; ++i)
+	    sparsity.add_entries (boundary_dof_boundary_indices[i],
+				  boundary_dof_boundary_indices.begin(),
+				  boundary_dof_boundary_indices.end());
+	};
+      return;
+    }
+
   const unsigned int n_dofs = dof.n_dofs();
 
   AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
@@ -504,10 +487,8 @@ void DoFTools::make_boundary_sparsity_pattern (
         }
 }
 
-#endif
 
 
-#if deal_II_dimension != 1
 template <class DH, class SparsityPattern>
 void
 DoFTools::make_flux_sparsity_pattern (const DH        &dof,
@@ -528,16 +509,12 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
   typename DH::active_cell_iterator cell = dof.begin_active(),
     endc = dof.end();
 
-				// Clear user flags because we will
-				// need them. But first we save them
-				// and make sure that we restore them
-				// later such that at the end of this
-				// function the Triangulation will be
-				// in the same state as it was at the
-				// beginning of this function.
-  std::vector<bool> user_flags;
-  dof.get_tria().save_user_flags(user_flags);
-  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
+				// TODO: in an old implementation, we used
+				// user flags before to tag faces that were
+				// already touched. this way, we could reduce
+				// the work a little bit. now, we instead add
+				// only data from one side. this should be OK,
+				// but we need to actually verify it.
 
 				// In case we work with a distributed
 				// sparsity pattern of Trilinos type, we
@@ -553,12 +530,6 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
       dofs_on_this_cell.resize (n_dofs_on_this_cell);
       cell->get_dof_indices (dofs_on_this_cell);
 
-				// make sparsity pattern for this cell
-      // for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-      //   for (unsigned int j=0; j<n_dofs_on_this_cell; ++j)
-      //     sparsity.add (dofs_on_this_cell[i],
-      //                   dofs_on_this_cell[j]);
-
 				// make sparsity pattern for this
 				// cell. if no constraints pattern was
 				// given, then the following call acts
@@ -567,20 +538,14 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 					       sparsity,
 					       keep_constrained_dofs);
 
-				// Loop over all interior neighbors
       for (unsigned int face = 0;
 	   face < GeometryInfo<DH::dimension>::faces_per_cell;
 	   ++face)
 	{
 	  typename DH::face_iterator cell_face = cell->face(face);
-	  if (cell_face->user_flag_set ())
-	    continue;
-	  if (! cell_face->at_boundary() )
+	  if (! cell->at_boundary(face) )
 	    {
 	      typename DH::cell_iterator neighbor = cell->neighbor(face);
-
-	      const unsigned int neighbor_face
-		= cell->neighbor_face_no(face);
 
 	      if (cell_face->has_children())
 		{
@@ -603,13 +568,17 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 		      constraints.add_entries_local_to_global
 			(dofs_on_other_cell, dofs_on_this_cell,
 			 sparsity, keep_constrained_dofs);
-		      sub_neighbor->face(neighbor_face)->set_user_flag ();
 		    }
 		}
 	      else
 		{
 				// Refinement edges are taken care of
 				// by coarser cells
+
+				// TODO: in the distributed case, we miss out
+				// the constraints when the neighbor cell is
+				// coarser, but only the current cell is owned
+				// locally!
 		  if (cell->neighbor_is_coarser(face))
 		    continue;
 
@@ -622,17 +591,20 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 		  constraints.add_entries_local_to_global
 		    (dofs_on_this_cell, dofs_on_other_cell,
 		     sparsity, keep_constrained_dofs);
-		  constraints.add_entries_local_to_global
-		    (dofs_on_other_cell, dofs_on_this_cell,
-		     sparsity, keep_constrained_dofs);
-		  neighbor->face(neighbor_face)->set_user_flag ();
+
+				// only need to add these in case the neighbor
+				// cell is not locally owned - otherwise, we
+				// touch each face twice and hence put the
+				// indices the other way around
+		  if (cell->neighbor(face)->subdomain_id() !=
+		      cell->subdomain_id())
+		    constraints.add_entries_local_to_global
+		      (dofs_on_other_cell, dofs_on_this_cell,
+		       sparsity, keep_constrained_dofs);
 		}
 	    }
 	}
     }
-
-				// finally restore the user flags
-  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).load_user_flags(user_flags);
 }
 
 
@@ -642,175 +614,10 @@ DoFTools::make_flux_sparsity_pattern (
   const DH        &dof,
   SparsityPattern &sparsity)
 {
-  const unsigned int n_dofs = dof.n_dofs();
-
-  Assert (sparsity.n_rows() == n_dofs,
-	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
-  Assert (sparsity.n_cols() == n_dofs,
-	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
-
-  std::vector<unsigned int> dofs_on_this_cell;
-  std::vector<unsigned int> dofs_on_other_cell;
-  dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
-  dofs_on_other_cell.reserve (max_dofs_per_cell(dof));
-  typename DH::active_cell_iterator cell = dof.begin_active(),
-				    endc = dof.end();
-
-				   // Clear user flags because we will
-				   // need them. But first we save
-				   // them and make sure that we
-				   // restore them later such that at
-				   // the end of this function the
-				   // Triangulation will be in the
-				   // same state as it was at the
-				   // beginning of this function.
-  std::vector<bool> user_flags;
-  dof.get_tria().save_user_flags(user_flags);
-  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
-
-  for (; cell!=endc; ++cell)
-    {
-      const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
-      dofs_on_this_cell.resize (n_dofs_on_this_cell);
-      cell->get_dof_indices (dofs_on_this_cell);
-				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-	for (unsigned int j=0; j<n_dofs_on_this_cell; ++j)
-	  sparsity.add (dofs_on_this_cell[i],
-			dofs_on_this_cell[j]);
-
-				       // Loop over all interior neighbors
-      for (unsigned int face = 0;
-	   face < GeometryInfo<DH::dimension>::faces_per_cell;
-	   ++face)
-	{
-	  typename DH::face_iterator cell_face = cell->face(face);
-	  if (cell_face->user_flag_set ())
-	    continue;
-
-	  if (! cell_face->at_boundary() )
-	    {
-	      typename DH::cell_iterator neighbor = cell->neighbor(face);
-
-	      const unsigned int neighbor_face
-                = cell->neighbor_face_no(face);
-
-	      if (cell_face->has_children())
-		{
-		  for (unsigned int sub_nr = 0;
-		       sub_nr != cell_face->number_of_children();
-		       ++sub_nr)
-		    {
-		      const typename DH::cell_iterator
-                        sub_neighbor
-			= cell->neighbor_child_on_subface (face, sub_nr);
-
-                      const unsigned int n_dofs_on_neighbor
-                        = sub_neighbor->get_fe().dofs_per_cell;
-                      dofs_on_other_cell.resize (n_dofs_on_neighbor);
-		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
-
-                      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-			sparsity.add_entries (dofs_on_this_cell[i],
-					      dofs_on_other_cell.begin(),
-					      dofs_on_other_cell.end());
-		      for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-			sparsity.add_entries (dofs_on_other_cell[j],
-					      dofs_on_this_cell.begin(),
-					      dofs_on_this_cell.end());
-
-		      sub_neighbor->face(neighbor_face)->set_user_flag ();
-		    }
-		}
-              else
-                {
-						   // Refinement edges are
-						   // taken care of by
-						   // coarser cells
-		  if (cell->neighbor_is_coarser(face))
-		    continue;
-
-		  const unsigned int n_dofs_on_neighbor
-                    = neighbor->get_fe().dofs_per_cell;
-                  dofs_on_other_cell.resize (n_dofs_on_neighbor);
-
-                  neighbor->get_dof_indices (dofs_on_other_cell);
-
-		  for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-		    sparsity.add_entries (dofs_on_this_cell[i],
-					  dofs_on_other_cell.begin(),
-					  dofs_on_other_cell.end());
-		  for (unsigned int j=0; j<n_dofs_on_neighbor; ++j)
-		    sparsity.add_entries (dofs_on_other_cell[j],
-					  dofs_on_this_cell.begin(),
-					  dofs_on_this_cell.end());
-		  neighbor->face(neighbor_face)->set_user_flag ();
-		}
-	    }
-	}
-    }
-
-				   // finally restore the user flags
-  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).load_user_flags(user_flags);
+  ConstraintMatrix constraints;
+  make_flux_sparsity_pattern (dof, sparsity, constraints);
 }
 
-#else // deal_II_dimension == 1
-
-
-template <class DH, class SparsityPattern>
-void
-DoFTools::make_flux_sparsity_pattern (
-  const DH        &dof,
-  SparsityPattern &sparsity)
-{
-  typedef typename DH::cell_iterator        cell_iterator;
-  typedef typename DH::active_cell_iterator active_cell_iterator;
-
-  std::vector<unsigned int> local_dof_indices;
-  std::vector<unsigned int> neighbor_dof_indices;
-  local_dof_indices.reserve (max_dofs_per_cell(dof));
-  neighbor_dof_indices.reserve (max_dofs_per_cell(dof));
-
-  active_cell_iterator cell = dof.begin_active(),
-		       endc = dof.end();
-  for (; cell!=endc; ++cell)
-    {
-				       // first do couplings of dofs
-				       // locally on this cell
-      const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
-      local_dof_indices.resize (n_dofs_on_this_cell);
-      cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-	sparsity.add_entries (local_dof_indices[i],
-			      local_dof_indices.begin(),
-			      local_dof_indices.end());
-
-				       // then do the same for the up
-				       // to 2 neighbors
-      for (unsigned int nb=0; nb<2; ++nb)
-	if (! cell->at_boundary(nb))
-	  {
-					     // find active neighbor
-	    cell_iterator neighbor = cell->neighbor(nb);
-	    while (neighbor->has_children())
-	      neighbor = neighbor->child(nb==0 ? 1 : 0);
-
-					     // get dofs on it
-            const unsigned int n_dofs_on_neighbor
-              = neighbor->get_fe().dofs_per_cell;
-            neighbor_dof_indices.resize (n_dofs_on_neighbor);
-	    neighbor->get_dof_indices (neighbor_dof_indices);
-
-					     // compute couplings
-	    for (unsigned int i=0; i<n_dofs_on_this_cell; ++i)
-	      sparsity.add_entries (local_dof_indices[i],
-				    neighbor_dof_indices.begin(),
-				    neighbor_dof_indices.end());
-	  };
-    };
-}
-
-#endif
 
 
 template <int dim, int spacedim>
@@ -1837,7 +1644,7 @@ namespace internal
     }
 
 
-#if deal_II_dimension == 1
+
     static
     void
     make_hp_hanging_node_constraints (const dealii::DoFHandler<1> &,
@@ -1968,11 +1775,10 @@ namespace internal
 // 				       // that a bit more
 // //TODO[WB]: think about what to do here...
 //     }
-#endif
+//#endif
 
 
 
-#if deal_II_dimension == 2
     template <class DH>
     static
     void
@@ -2127,10 +1933,9 @@ namespace internal
 		  }
 	      }
     }
-#endif
 
 
-#if deal_II_dimension == 3
+
     template <class DH>
     static
     void
@@ -2245,7 +2050,7 @@ namespace internal
 				      12*fe.dofs_per_line+
 				      4*fe.dofs_per_quad);
 //TODO[TL]: think about this and the following in case of anisotropic refinement
-	      
+
 		dofs_on_mother.resize (n_dofs_on_mother);
 		dofs_on_children.resize (n_dofs_on_children);
 
@@ -2368,7 +2173,6 @@ namespace internal
 		  }
 	      }
     }
-#endif
 
 
     template <class DH>
@@ -3669,7 +3473,6 @@ DoFTools::extract_level_dofs(
 }
 
 
-#if deal_II_dimension != 1
 
 template <class DH>
 void
@@ -3899,249 +3702,6 @@ DoFTools::extract_dofs_with_support_on_boundary (const DH                      &
 	  }
 }
 
-
-
-
-
-#else  // 1d
-
-
-template <class DH>
-void
-DoFTools::extract_boundary_dofs (const DH                      &dof_handler,
-				 const std::vector<bool>       &component_select,
-				 std::vector<bool>             &selected_dofs,
-				 const std::set<unsigned char> &boundary_indicators)
-{
-  Assert (component_select.size() == n_components(dof_handler),
-	  ExcWrongSize (component_select.size(),
-			n_components(dof_handler)));
-
-				   // clear and reset array by default
-				   // values
-  selected_dofs.clear ();
-  selected_dofs.resize (dof_handler.n_dofs(), false);
-
-				   // let's see whether we have to
-				   // check for certain boundary
-				   // indicators or whether we can
-				   // accept all
-  const bool check_left_vertex  = ((boundary_indicators.size() == 0) ||
-				   (boundary_indicators.find(0) !=
-				    boundary_indicators.end()));
-  const bool check_right_vertex = ((boundary_indicators.size() == 0) ||
-				   (boundary_indicators.find(1) !=
-				    boundary_indicators.end()));
-
-                                   // see whether we have to check
-                                   // whether a certain vector
-                                   // component is selected, or all
-  const bool check_vector_component
-    = (component_select != std::vector<bool>(component_select.size(),
-                                             true));
-
-				   // loop over coarse grid cells
-  for (typename DH::cell_iterator cell=dof_handler.begin(0);
-       cell!=dof_handler.end(0); ++cell)
-    {
-      const FiniteElement<1> &fe = cell->get_fe();
-
-				       // check left-most vertex
-      if (check_left_vertex)
-	if (cell->neighbor(0) == dof_handler.end())
-          {
-					     // In 1D the number of DoFs
-					     // on the faces should be
-					     // equal to the number of DoFs
-					     // on the vertices.
-            AssertDimension (fe.dofs_per_face, fe.dofs_per_vertex);
-
-            for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-              if (!check_vector_component)
-                selected_dofs[cell->vertex_dof_index(0,i)] = true;
-              else
-                                                 // check
-                                                 // component. make sure
-                                                 // we don't ask the
-                                                 // wrong question
-                                                 // (leading to an
-                                                 // exception) in case
-                                                 // the shape function
-                                                 // is non-primitive. note
-                                                 // that the face dof
-                                                 // index i is also the
-                                                 // cell dof index of a
-                                                 // corresponding dof in 1d
-                {
-                  const unsigned int component =
-                    (fe.is_primitive(i) ?
-                     fe.face_system_to_component_index(i).first :
-                     (std::find (fe.get_nonzero_components(i).begin(),
-                                 fe.get_nonzero_components(i).end(),
-                                 true)
-                      -
-                      fe.get_nonzero_components(i).begin()));
-                  Assert (component < fe.n_components(),
-                          ExcInternalError());
-
-                  if (component_select[component] == true)
-                    selected_dofs[cell->vertex_dof_index(0,i)] = true;
-                }
-          }
-
-				       // check right-most
-				       // vertex. same procedure here
-				       // as above
-      if (check_right_vertex)
-	if (cell->neighbor(1) == dof_handler.end())
-          {
-            AssertDimension (fe.dofs_per_face, fe.dofs_per_vertex);
-
-            for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-              if (!check_vector_component)
-                selected_dofs[cell->vertex_dof_index(1,i)] = true;
-              else
-                {
-                  const unsigned int component =
-                    (fe.is_primitive(i) ?
-                     fe.face_system_to_component_index(i).first :
-                     (std::find (fe.get_nonzero_components(i).begin(),
-                                 fe.get_nonzero_components(i).end(),
-                                 true)
-                      -
-                      fe.get_nonzero_components(i).begin()));
-                  Assert (component < fe.n_components(),
-                          ExcInternalError());
-
-                  if (component_select[component] == true)
-                    selected_dofs[cell->vertex_dof_index(1,i)] = true;
-                }
-          }
-    }
-}
-
-
-
-template <class DH>
-void
-DoFTools::extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
-						 const std::vector<bool>       &component_select,
-						 std::vector<bool>             &selected_dofs,
-						 const std::set<unsigned char> &boundary_indicators)
-{
-  Assert (component_select.size() == n_components(dof_handler),
-	  ExcWrongSize (component_select.size(),
-			n_components(dof_handler)));
-
-				   // clear and reset array by default
-				   // values
-  selected_dofs.clear ();
-  selected_dofs.resize (dof_handler.n_dofs(), false);
-
-				   // let's see whether we have to
-				   // check for certain boundary
-				   // indicators or whether we can
-				   // accept all
-  const bool check_left_vertex  = ((boundary_indicators.size() == 0) ||
-				   (boundary_indicators.find(0) !=
-				    boundary_indicators.end()));
-  const bool check_right_vertex = ((boundary_indicators.size() == 0) ||
-				   (boundary_indicators.find(1) !=
-				    boundary_indicators.end()));
-
-                                   // see whether we have to check
-                                   // whether a certain vector
-                                   // component is selected, or all
-  const bool check_vector_component
-    = (component_select != std::vector<bool>(component_select.size(),
-                                             true));
-
-  std::vector<unsigned int> dof_indices;
-
-				   // loop over cells
-  for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
-       cell!=dof_handler.end(); ++cell)
-    {
-      const FiniteElement<1> &fe = cell->get_fe();
-
-				       // check left-most vertex
-      if (check_left_vertex)
-	if (cell->neighbor(0) == dof_handler.end())
-          {
-	    dof_indices.resize (fe.dofs_per_cell);
-	    cell->get_dof_indices(dof_indices);
-            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	      if (cell->get_fe().has_support_on_face (i,0) == true)
-		{
-		  if (!check_vector_component)
-		    selected_dofs[dof_indices[i]] = true;
-		  else
-						     // check
-						     // component. make sure
-						     // we don't ask the
-						     // wrong question
-						     // (leading to an
-						     // exception) in case
-						     // the shape function
-						     // is non-primitive. note
-						     // that the face dof
-						     // index i is also the
-						     // cell dof index of a
-						     // corresponding dof in 1d
-		    {
-		      const unsigned int component =
-			(fe.is_primitive(i) ?
-			 fe.system_to_component_index(i).first :
-			 (std::find (fe.get_nonzero_components(i).begin(),
-				     fe.get_nonzero_components(i).end(),
-				     true)
-			  -
-			  fe.get_nonzero_components(i).begin()));
-		      Assert (component < fe.n_components(),
-			      ExcInternalError());
-
-		      if (component_select[component] == true)
-			selected_dofs[dof_indices[i]] = true;
-		    }
-		}
-          }
-
-				       // check right-most
-				       // vertex. same procedure here
-				       // as above
-      if (check_right_vertex)
-	if (cell->neighbor(1) == dof_handler.end())
-          {
-	    dof_indices.resize (fe.dofs_per_cell);
-	    cell->get_dof_indices (dof_indices);
-            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	      if (cell->get_fe().has_support_on_face (i,1) == true)
-		{
-		  if (!check_vector_component)
-		    selected_dofs[dof_indices[i]] = true;
-		  else
-		    {
-		      const unsigned int component =
-			(fe.is_primitive(i) ?
-			 fe.system_to_component_index(i).first :
-			 (std::find (fe.get_nonzero_components(i).begin(),
-				     fe.get_nonzero_components(i).end(),
-				     true)
-			  -
-			  fe.get_nonzero_components(i).begin()));
-		      Assert (component < fe.n_components(),
-			      ExcInternalError());
-
-		      if (component_select[component] == true)
-			selected_dofs[dof_indices[i]] = true;
-		    }
-		}
-	  }
-    }
-}
-
-
-#endif
 
 
 
@@ -4581,7 +4141,7 @@ DoFTools::dof_indices_with_subdomain_association (const DH           &dof_handle
 		      "associated DoF handler objects, asking for any subdomain other "
 		      "than the locally owned one does not make sense."));
 #endif
-  
+
   IndexSet index_set (dof_handler.n_dofs());
 
   std::vector<unsigned int> local_dof_indices;
@@ -4605,9 +4165,6 @@ DoFTools::dof_indices_with_subdomain_association (const DH           &dof_handle
 
   return index_set;
 }
-
-
-
 
 
 
@@ -5376,6 +4933,7 @@ namespace internal
 }
 
 
+
 template <int dim, int spacedim>
 void
 DoFTools::compute_intergrid_constraints (
@@ -5714,72 +5272,6 @@ compute_intergrid_transfer_representation (
 
 
 
-#if deal_II_dimension == 1
-
-
-template <class DH>
-void DoFTools::map_dof_to_boundary_indices (
-  const DH                      &dof_handler,
-  const std::set<unsigned char> &boundary_indicators,
-  std::vector<unsigned int> &mapping)
-{
-  Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-
-  mapping.clear ();
-  mapping.insert (mapping.end(), dof_handler.n_dofs(),
-		  DH::invalid_dof_index);
-
-  unsigned int next_free_index = 0;
-
-				   // first check left, the right
-				   // boundary point
-  for (unsigned int direction=0; direction<2; ++direction)
-    {
-				       // if this boundary is not
-				       // requested, then go on with next one
-      if (boundary_indicators.find(direction) ==
-	  boundary_indicators.end())
-	continue;
-
-				       // find active cell at that
-				       // boundary: first go to
-				       // left/right, then to children
-      typename DH::cell_iterator cell = dof_handler.begin(0);
-      while (!cell->at_boundary(direction))
-	cell = cell->neighbor(direction);
-      while (!cell->active())
-	cell = cell->child(direction);
-
-				       // next enumerate these degrees
-				       // of freedom
-      for (unsigned int i=0; i<cell->get_fe().dofs_per_vertex; ++i)
-	mapping[cell->vertex_dof_index(direction,i)] = next_free_index++;
-    };
-}
-
-
-
-template <>
-void
-DoFTools::map_dof_to_boundary_indices (const DoFHandler<1>       &dof_handler,
-                                       std::vector<unsigned int> &mapping)
-{
-  Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-
-				   // in 1d, there are only 2 boundary
-				   // indicators, so enumerate them
-				   // and pass on to the other
-				   // function
-  std::set<unsigned char> boundary_indicators;
-  boundary_indicators.insert (0U);
-  boundary_indicators.insert (1U);
-
-  map_dof_to_boundary_indices<DoFHandler<1> > (dof_handler, boundary_indicators, mapping);
-}
-
-#else
-
-
 template <class DH>
 void
 DoFTools::map_dof_to_boundary_indices (const DH                  &dof_handler,
@@ -5867,8 +5359,6 @@ void DoFTools::map_dof_to_boundary_indices (
 
   AssertDimension (next_boundary_index, dof_handler.n_boundary_dofs (boundary_indicators));
 }
-
-#endif
 
 
 
@@ -5974,63 +5464,7 @@ DoFTools::convert_couplings_to_blocks (
     }
 }
 
-#if deal_II_dimension == 1
 
-template <int dim, int spacedim, template <int,int> class DH>
-void
-DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
- 					  ConstraintMatrix        &zero_boundary_constraints,
- 					  const std::vector<bool> &component_mask_)
-{
-  Assert ((component_mask_.size() == 0) ||
- 	  (component_mask_.size() == dof.get_fe().n_components()),
- 	  ExcMessage ("The number of components in the mask has to be either "
- 		      "zero or equal to the number of components in the finite "
- 		      "element."));
-
-                                   // check for boundary cells in both
-                                   // directions to secure indicators
-                                   // for the entire boundary, i.e. 0
-                                   // is left boundary and 1 is right
-                                   // boundary
-  for (unsigned int direction = 0; direction < 2; ++direction)
-    {
-
-                                   // first find the outermost active
-                                   // cell by traversing the coarse
-                                   // grid to its end and then looking
-                                   // for the children
-      typename DH<dim,spacedim>::cell_iterator outermost_cell = dof.begin(0);
-      while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
-	outermost_cell = outermost_cell->neighbor(direction);
-
-      while (outermost_cell->has_children())
-	outermost_cell = outermost_cell->child(direction);
-
-                                   // then get the FE corresponding to
-                                   // this cell
-      const FiniteElement<dim,spacedim> &fe = outermost_cell->get_fe();
-
-				   // set the component mask to either
-				   // the original value or a vector
-				   // of trues
-      const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-					      std::vector<bool> (fe.n_components(), true) :
-					      component_mask_);
-      Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-	      VectorTools::ExcNoComponentSelected());
-
-                                   // cast zero boundary constraints
-                                   // onto a matrix if component_mask
-                                   // == true
-      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-	if (component_mask[fe.face_system_to_component_index(i).first])
-	  zero_boundary_constraints.add_line (outermost_cell->vertex_dof_index (direction, i));
-
-    }
-}
-
-#else
 
 template <int dim, int spacedim, template <int,int> class DH>
 void
@@ -6104,720 +5538,10 @@ DoFTools::make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
       }
 }
 
-#endif
 
 // explicit instantiations
 
 #include "dof_tools.inst"
-
-// #if deal_II_dimension > 1
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- SparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- CompressedSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- CompressedSetSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSimpleSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- CompressedSimpleSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockCompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockCompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSetSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockCompressedSimpleSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSimpleSparsityPattern    &);
-
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- SparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- CompressedSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSetSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- CompressedSetSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSimpleSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- CompressedSimpleSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockCompressedSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockCompressedSetSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSetSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockCompressedSimpleSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSimpleSparsityPattern    &);
-
-
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- SparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSetSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,CompressedSimpleSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSimpleSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockCompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockCompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSetSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,BlockCompressedSimpleSparsityPattern>
-(const DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSimpleSparsityPattern    &sparsity);
-
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- SparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSetSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSetSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,CompressedSimpleSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSimpleSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockCompressedSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockCompressedSetSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSetSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,BlockCompressedSimpleSparsityPattern>
-(const hp::DoFHandler<deal_II_dimension>& dof,
- const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSimpleSparsityPattern    &sparsity);
-
-
-
-template
-void
-DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<float> &cell_data,
- Vector<double>      &dof_data,
- const unsigned int   component);
-template
-void
-DoFTools::distribute_cell_to_dof_vector<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<double> &cell_data,
- Vector<double>       &dof_data,
- const unsigned int    component);
-
-template
-void
-DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<float> &cell_data,
- Vector<double>      &dof_data,
- const unsigned int   component);
-template
-void
-DoFTools::distribute_cell_to_dof_vector<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &dof_handler,
- const Vector<double> &cell_data,
- Vector<double>       &dof_data,
- const unsigned int    component);
-
-
-template void DoFTools::extract_dofs<deal_II_dimension>
-(const DoFHandler<deal_II_dimension>&,
- const std::vector<bool>&, std::vector<bool>&, bool);
-
-template void DoFTools::extract_dofs<deal_II_dimension>
-(const hp::DoFHandler<deal_II_dimension>&,
- const std::vector<bool>&, std::vector<bool>&, bool);
-
-template void DoFTools::extract_level_dofs<deal_II_dimension>
-(const unsigned int level, const MGDoFHandler<deal_II_dimension>&,
- const std::vector<bool>&, std::vector<bool>&, bool);
-
-template
-void
-DoFTools::extract_boundary_dofs<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- const std::vector<bool>                  &,
- std::vector<bool>                        &,
- const std::set<unsigned char> &);
-template
-void
-DoFTools::extract_boundary_dofs<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- const std::vector<bool>                  &,
- std::vector<bool>                        &,
- const std::set<unsigned char> &);
-
-template
-void
-DoFTools::extract_dofs_with_support_on_boundary<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- const std::vector<bool>                  &,
- std::vector<bool>                        &,
- const std::set<unsigned char> &);
-template
-void
-DoFTools::extract_dofs_with_support_on_boundary<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- const std::vector<bool>                  &,
- std::vector<bool>                        &,
- const std::set<unsigned char> &);
-
-template
-void
-DoFTools::extract_hanging_node_dofs
-(const DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<bool>     &selected_dofs);
-
-template
-void
-DoFTools::extract_subdomain_dofs<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const types::subdomain_id_t  subdomain_id,
- std::vector<bool>     &selected_dofs);
-template
-void
-DoFTools::extract_subdomain_dofs<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &dof_handler,
- const types::subdomain_id_t subdomain_id,
- std::vector<bool>     &selected_dofs);
-
-template
-void
-DoFTools::extract_locally_owned_dofs<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> & dof_handler,
- IndexSet & dof_set);
-
-template
-void
-DoFTools::extract_locally_active_dofs<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> & dof_handler,
- IndexSet & dof_set);
-
-
-template
-void
-DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> & dof_handler,
- IndexSet & dof_set);
-
-template
-void
-DoFTools::extract_constant_modes<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
- const std::vector<bool> &selected_components,
- std::vector<std::vector<bool> > &constant_modes);
-
-template
-void
-DoFTools::get_active_fe_indices<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<unsigned int> &active_fe_indices);
-
-template
-void
-DoFTools::get_active_fe_indices<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<unsigned int> &active_fe_indices);
-
-template
-void
-DoFTools::get_subdomain_association<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<types::subdomain_id_t>           &subdomain_association);
-template
-void
-DoFTools::get_subdomain_association<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &dof_handler,
- std::vector<types::subdomain_id_t>           &subdomain_association);
-
-
-template
-unsigned int
-DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t);
-template
-IndexSet
-DoFTools::dof_indices_with_subdomain_association<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t);
-template
-void
-DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t,
- std::vector<unsigned int> &);
-
-template
-unsigned int
-DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t);
-template
-IndexSet
-DoFTools::dof_indices_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t);
-template
-void
-DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t,
- std::vector<unsigned int> &);
-
-template
-unsigned int
-DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
-(const MGDoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t);
-template
-IndexSet
-DoFTools::dof_indices_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
-(const MGDoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t);
-template
-void
-DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> >
-(const MGDoFHandler<deal_II_dimension> &,
- const types::subdomain_id_t,
- std::vector<unsigned int> &);
-
-
-template
-void
-DoFTools::count_dofs_per_component<deal_II_dimension> (
-  const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
-
-#if deal_II_dimension < 3
-template void DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
-(const unsigned int level, const MGDoFHandler<deal_II_dimension, deal_II_dimension+1>&,
- const std::vector<bool>&, std::vector<bool>&, bool);
-
-template
-void
-DoFTools::count_dofs_per_component<deal_II_dimension, deal_II_dimension+1> (
-  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
-#endif
-
-template
-void
-DoFTools::count_dofs_per_block<deal_II_dimension> (
-  const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
-
-
-template
-void
-DoFTools::count_dofs_per_component<deal_II_dimension> (
-  const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
-
-template
-void
-DoFTools::compute_intergrid_constraints<deal_II_dimension> (
-  const DoFHandler<deal_II_dimension> &, const unsigned int,
-  const DoFHandler<deal_II_dimension> &, const unsigned int,
-  const InterGridMap<DoFHandler<deal_II_dimension> > &,
-  ConstraintMatrix&);
-
-template
-void
-DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
-(const DoFHandler<deal_II_dimension> &, const unsigned int,
- const DoFHandler<deal_II_dimension> &, const unsigned int,
- const InterGridMap<DoFHandler<deal_II_dimension> > &,
- std::vector<std::map<unsigned int, float> > &);
-
-
-template
-void
-DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- const std::set<unsigned char> &,
- std::vector<unsigned int> &);
-
-#if deal_II_dimension != 1
-
-template
-void
-DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
-(const DoFHandler<deal_II_dimension> &,
- std::vector<unsigned int> &);
-
-#endif
-
-
-
-template
-void
-DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- const std::set<unsigned char> &,
- std::vector<unsigned int> &);
-
-#if deal_II_dimension != 1
-
-template
-void
-DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
-(const hp::DoFHandler<deal_II_dimension> &,
- std::vector<unsigned int> &);
-
-#endif
-
-
-
-
-template
-void
-DoFTools::map_dofs_to_support_points<deal_II_dimension>
-(const Mapping<deal_II_dimension,deal_II_dimension>&,
- const DoFHandler<deal_II_dimension>&,
- std::vector<Point<deal_II_dimension> >&);
-
-#if deal_II_dimension != 3
-
-template
-void
-DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
-(const Mapping<deal_II_dimension,deal_II_dimension+1>&,
- const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
- std::vector<Point<deal_II_dimension+1> >&);
-
-template
-void
-DoFTools::count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
-  const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
-
-#endif
-
-template
-void
-DoFTools::convert_couplings_to_blocks (
-  const DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
-  std::vector<Table<2,Coupling> >&);
-
-template
-void
-DoFTools::convert_couplings_to_blocks (
-  const hp::DoFHandler<deal_II_dimension>&, const Table<2, Coupling>&,
-  std::vector<Table<2,Coupling> >&);
-
-template
-void
-DoFTools::make_zero_boundary_constraints
-(const DoFHandler<deal_II_dimension> &,
- ConstraintMatrix                    &,
- const std::vector<bool>             &);
-
-template
-void
-DoFTools::make_zero_boundary_constraints
-(const hp::DoFHandler<deal_II_dimension> &,
- ConstraintMatrix                        &,
- const std::vector<bool>                 &);
-
-
-#if deal_II_dimension < 3
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const std::vector<unsigned int>  &,
- SparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const std::vector<unsigned int>  &,
- CompressedSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const std::vector<unsigned int>  &,
- CompressedSetSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const std::vector<unsigned int>  &,
- BlockSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSparsityPattern    &);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const std::vector<unsigned int>  &,
- BlockCompressedSetSparsityPattern    &);
-
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const std::vector<unsigned int>  &,
-//  SparsityPattern    &);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const std::vector<unsigned int>  &,
-//  CompressedSparsityPattern    &);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const std::vector<unsigned int>  &,
-//  CompressedSetSparsityPattern    &);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const std::vector<unsigned int>  &,
-//  BlockSparsityPattern    &);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const std::vector<unsigned int>  &,
-//  BlockCompressedSparsityPattern    &);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const std::vector<unsigned int>  &,
-//  BlockCompressedSetSparsityPattern    &);
-
-
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- SparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- CompressedSetSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSparsityPattern    &sparsity);
-template void
-DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
- const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
- const std::vector<unsigned int>  &dof_to_boundary_mapping,
- BlockCompressedSetSparsityPattern    &sparsity);
-
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-//  SparsityPattern    &sparsity);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-//  CompressedSparsityPattern    &sparsity);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,CompressedSetSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-//  CompressedSetSparsityPattern    &sparsity);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-//  BlockSparsityPattern    &sparsity);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-//  BlockCompressedSparsityPattern    &sparsity);
-// template void
-// DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,BlockCompressedSetSparsityPattern>
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-//  const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-//  const std::vector<unsigned int>  &dof_to_boundary_mapping,
-//  BlockCompressedSetSparsityPattern    &sparsity);
-
-
-template
-void
-DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const std::set<unsigned char> &,
- std::vector<unsigned int> &);
-
-#if deal_II_dimension != 1
-
-template
-void
-DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- std::vector<unsigned int> &);
-
-#endif
-
-
-template
-void
-DoFTools::extract_hanging_node_dofs
-(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
- std::vector<bool>     &selected_dofs);
-
-// template
-// void
-// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-//  const std::set<unsigned char> &,
-//  std::vector<unsigned int> &);
-
-// #if deal_II_dimension != 1
-
-// template
-// void
-// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-//  std::vector<unsigned int> &);
-
-// #endif
-
-
-
-#endif
-
-
-#if deal_II_dimension < 3
-template
-void
-DoFTools::
-make_hanging_node_constraints (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
-			       ConstraintMatrix &constraints);
-#endif
 
 
 

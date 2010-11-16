@@ -1312,7 +1312,7 @@ namespace internal
 	Assert (false, ExcNotImplemented());
 #else
 
-	
+
 					 //calculate new IndexSet. First try
 					 //to find out if the new indices are
 					 //contiguous blocks. This avoids
@@ -1566,25 +1566,7 @@ namespace internal
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
-
-namespace internal
-{
-  namespace DoFHandler
-  {
-    namespace Policy
-    {
-      template class PolicyBase<deal_II_dimension,deal_II_dimension>;
-      template class Sequential<deal_II_dimension,deal_II_dimension>;
-      template class ParallelDistributed<deal_II_dimension,deal_II_dimension>;
-
-#if deal_II_dimension==1 || deal_II_dimension==2
-      template class PolicyBase<deal_II_dimension,deal_II_dimension+1>;
-      template class Sequential<deal_II_dimension,deal_II_dimension+1>;
-      template class ParallelDistributed<deal_II_dimension,deal_II_dimension+1>;
-#endif
-    }
-  }
-}
+#include "dof_handler_policy.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

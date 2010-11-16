@@ -36,6 +36,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // If this function is to be used, its declaration must be added to
 // the class Multigrid again.
+
+// TODO: deal_II_dimension not set any more, so this will not compile!
 #ifdef MG_DEBUG
 template <>
 void

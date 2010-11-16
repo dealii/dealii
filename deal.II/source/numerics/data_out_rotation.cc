@@ -89,13 +89,12 @@ namespace internal
 	  patches.push_back (new_patches[i]);
 	  patches.back().patch_index = patches.size()-1;
 	}
-    }    
+    }
   }
 }
 
-    
 
-#if deal_II_dimension < 3
+
 template <int dim, class DH>
 void
 DataOutRotation<dim,DH>::
@@ -103,6 +102,16 @@ build_one_patch (const cell_iterator *cell,
 		 internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension> &data,
 		 std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> > &patches)
 {
+  if (dim == 3)
+    {
+				   // would this function make any
+				   // sense after all? who would want
+				   // to output/compute in four space
+				   // dimensions?
+      Assert (false, ExcNotImplemented());
+      return;
+    }
+
   Assert (!(*cell)->is_ghost() &&
 	  !(*cell)->is_artificial(),
 	  ExcNotImplemented());
@@ -113,7 +122,7 @@ build_one_patch (const cell_iterator *cell,
 				   // the number of q_points in each
 				   // direction
   const unsigned int n_points = data.n_subdivisions+1;
-  
+
 				   // set up an array that holds the
 				   // directions in the plane of
 				   // rotation in which we will put
@@ -131,7 +140,7 @@ build_one_patch (const cell_iterator *cell,
       angle_directions[i][DH::dimension] = std::sin(2*numbers::PI *
 						    i/n_patches_per_circle);
     }
-  
+
   for (unsigned int angle=0; angle<n_patches_per_circle; ++angle)
     {
 				       // first compute the
@@ -147,9 +156,9 @@ build_one_patch (const cell_iterator *cell,
 	  {
 	    const double r1 = (*cell)->vertex(0)(0),
 			 r2 = (*cell)->vertex(1)(0);
-	    Assert (r1 >= 0, ExcRadialVariableHasNegativeValues(r1));	
+	    Assert (r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
 	    Assert (r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
-		
+
 	    patches[angle].vertices[0] = r1*angle_directions[angle];
 	    patches[angle].vertices[1] = r2*angle_directions[angle];
 	    patches[angle].vertices[2] = r1*angle_directions[angle+1];
@@ -157,7 +166,7 @@ build_one_patch (const cell_iterator *cell,
 
 	    break;
 	  };
-	       
+
 	  case 2:
 	  {
 	    for (unsigned int vertex=0;
@@ -165,33 +174,33 @@ build_one_patch (const cell_iterator *cell,
 		 ++vertex)
 	      {
 		const Point<DH::dimension> v = (*cell)->vertex(vertex);
-		    
+
 						 // make sure that the
 						 // radial variable does
 						 // attain negative
 						 // values
 		Assert (v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
-		    
+
 						 // now set the vertices
 						 // of the patch
 		patches[angle].vertices[vertex] = v(0) * angle_directions[angle];
 		patches[angle].vertices[vertex][0] = v(1);
-		    
+
 		patches[angle].vertices[vertex+GeometryInfo<DH::dimension>::vertices_per_cell]
 		  = v(0) * angle_directions[angle+1];
 		patches[angle].vertices[vertex+GeometryInfo<DH::dimension>::vertices_per_cell][0]
 		  = v(1);
 	      };
-		
+
 	    break;
 	  };
 
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
-	  
+
       unsigned int offset=0;
-	       
+
 				       // then fill in data
       if (data.n_datasets > 0)
 	{
@@ -224,9 +233,9 @@ build_one_patch (const cell_iterator *cell,
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 									data.patch_hessians);
-									
+
 			if (update_flags & update_quadrature_points)
-		      data.patch_evaluation_points = fe_patch_values.get_quadrature_points();						
+		      data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
 
 		      std::vector<Point<DH::space_dimension> > dummy_normals;
 		      postprocessor->
@@ -252,10 +261,10 @@ build_one_patch (const cell_iterator *cell,
 		      if (update_flags & update_hessians)
 			this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 									data.patch_hessians_system);
-									
+
 			if (update_flags & update_quadrature_points)
-		      data.patch_evaluation_points = fe_patch_values.get_quadrature_points();						
-									
+		      data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
+
 		      std::vector<Point<DH::space_dimension> > dummy_normals;
 		      postprocessor->
 			compute_derived_quantities_vector(data.patch_values_system,
@@ -265,7 +274,7 @@ build_one_patch (const cell_iterator *cell,
 							  data.patch_evaluation_points,
 							  data.postprocessed_values[dataset]);
 		    }
-		      
+
 		  for (unsigned int component=0;
 		       component<this->dof_data[dataset]->n_output_variables;
 		       ++component)
@@ -279,7 +288,7 @@ build_one_patch (const cell_iterator *cell,
 						x*n_points + y)
 				      = data.postprocessed_values[dataset][x](component);
 				break;
-				      
+
 			  case 2:
 				for (unsigned int x=0; x<n_points; ++x)
 				  for (unsigned int y=0; y<n_points; ++y)
@@ -290,7 +299,7 @@ build_one_patch (const cell_iterator *cell,
 						  z)
 					= data.postprocessed_values[dataset][x*n_points+z](component);
 				break;
-				      
+
 			  default:
 				Assert (false, ExcNotImplemented());
 			}
@@ -301,7 +310,7 @@ build_one_patch (const cell_iterator *cell,
 		  {
 		    this->dof_data[dataset]->get_function_values (fe_patch_values,
 								  data.patch_values);
-			
+
 		    switch (DH::dimension)
 		      {
 			case 1:
@@ -311,7 +320,7 @@ build_one_patch (const cell_iterator *cell,
 					      x*n_points + y)
 				    = data.patch_values[x];
 			      break;
-				  
+
 			case 2:
 			      for (unsigned int x=0; x<n_points; ++x)
 				for (unsigned int y=0; y<n_points; ++y)
@@ -322,7 +331,7 @@ build_one_patch (const cell_iterator *cell,
 						z*n_points)
 				      = data.patch_values[x*n_points+z];
 			      break;
-				  
+
 			default:
 			      Assert (false, ExcNotImplemented());
 		      }
@@ -332,7 +341,7 @@ build_one_patch (const cell_iterator *cell,
 		  {
 		    this->dof_data[dataset]->get_function_values (fe_patch_values,
 								  data.patch_values_system);
-			
+
 		    for (unsigned int component=0; component<data.n_components;
 			 ++component)
 		      {
@@ -345,7 +354,7 @@ build_one_patch (const cell_iterator *cell,
 						  x*n_points + y)
 					= data.patch_values_system[x](component);
 				  break;
-				      
+
 			    case 2:
 				  for (unsigned int x=0; x<n_points; ++x)
 				    for (unsigned int y=0; y<n_points; ++y)
@@ -356,7 +365,7 @@ build_one_patch (const cell_iterator *cell,
 						    z)
 					  = data.patch_values_system[x*n_points+z](component);
 				  break;
-				      
+
 			    default:
 				  Assert (false, ExcNotImplemented());
 			  }
@@ -364,7 +373,7 @@ build_one_patch (const cell_iterator *cell,
 		  }
 	      offset+=this->dof_data[dataset]->n_output_variables;
 	    }
-		  
+
 					   // then do the cell data
 	  for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
 	    {
@@ -395,7 +404,7 @@ build_one_patch (const cell_iterator *cell,
 					y)
 			      = value;
 			break;
-			    
+
 		  case 2:
 			for (unsigned int x=0; x<n_points; ++x)
 			  for (unsigned int y=0; y<n_points; ++y)
@@ -417,29 +426,9 @@ build_one_patch (const cell_iterator *cell,
 
 
 
-#else
-
-template <int dim, class DH>
-void
-DataOutRotation<dim,DH>::
-build_one_patch (const cell_iterator *,
-		 internal::DataOutRotation::ParallelData<DH::dimension, DH::space_dimension> &,
-		 std::vector<DataOutBase::Patch<DH::dimension+1,DH::space_dimension+1> > &)
-{
-				   // would this function make any
-				   // sense after all? who would want
-				   // to output/compute in four space
-				   // dimensions?
-  Assert (false, ExcNotImplemented());
-}
-
-#endif
-
-
-
 template <int dim, class DH>
 void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_circle,
-					     const unsigned int nnnn_subdivisions) 
+					     const unsigned int nnnn_subdivisions)
 {
 				   // Check consistency of redundant
 				   // template parameter
@@ -449,13 +438,13 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 
   const unsigned int n_subdivisions = (nnnn_subdivisions != 0)
 				      ? nnnn_subdivisions
-				      : this->default_subdivisions;  
+				      : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
 	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   const QTrapez<1>     q_trapez;
   const QIterated<DH::dimension> patch_points (q_trapez, n_subdivisions);
-  
+
   const unsigned int n_components   = this->dofs->get_fe().n_components();
   unsigned int n_datasets=this->cell_data.size();
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
@@ -471,7 +460,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
   Assert (!(update_flags & update_normal_vectors),
 	  ExcMessage("The update of normal vectors may not be requested for "
 		     "evaluation of data on cells via DataPostprocessor."));
-  
+
 				   // first count the cells we want to
 				   // create patches of and make sure
 				   // there is enough memory for that
@@ -479,7 +468,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
   for (cell_iterator cell=first_cell(); cell != this->dofs->end();
        cell = next_cell(cell))
     all_cells.push_back (cell);
-  
+
 				   // then also take into account that
 				   // we want more than one patch to
 				   // come out of every cell, as they
@@ -487,8 +476,8 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 				   // rotation
   this->patches.clear();
   this->patches.reserve (all_cells.size() * n_patches_per_circle);
-  
-  
+
+
   std::vector<unsigned int> n_postprocessor_outputs (this->dof_data.size());
   for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
     if (this->dof_data[dataset]->postprocessor)
@@ -527,7 +516,7 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
 
 template <int dim, class DH>
 typename DataOutRotation<dim,DH>::cell_iterator
-DataOutRotation<dim,DH>::first_cell () 
+DataOutRotation<dim,DH>::first_cell ()
 {
   return this->dofs->begin_active ();
 }
@@ -535,7 +524,7 @@ DataOutRotation<dim,DH>::first_cell ()
 
 template <int dim, class DH>
 typename DataOutRotation<dim,DH>::cell_iterator
-DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell) 
+DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell)
 {
 				   // convert the iterator to an
 				   // active_iterator and advance
@@ -546,7 +535,9 @@ DataOutRotation<dim,DH>::next_cell (const cell_iterator &cell)
 }
 
 
+
 // explicit instantiations
-template class DataOutRotation<deal_II_dimension, DoFHandler<deal_II_dimension> >;
+#include "data_out_rotation.inst"
+
 
 DEAL_II_NAMESPACE_CLOSE
