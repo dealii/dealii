@@ -1813,42 +1813,26 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
 
 
 template <int dim, int spacedim>
-void 
+void
 GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh,
 			      Triangulation<dim-1,spacedim>     &surface_mesh,
 			      std::map<typename Triangulation<dim-1,spacedim>::cell_iterator,
-				       typename Triangulation<dim,spacedim>::face_iterator> 
+				       typename Triangulation<dim,spacedim>::face_iterator>
 				&surface_to_volume_mapping,
 			      const std::set<unsigned char> &boundary_ids)
 {
+// Assumption:
+//    We are relying below on the fact that Triangulation::create_triangulation(...) will keep the order
+//    pass by CellData and that it will not reorder the vertices.
 
-  // <h3>Assumptions</h3>
-  //    We are relying heavily on that 
-  //    Triangulation::create_triangulation(...) will keep the order 
-  //    pass by CellData and that it will not reorder the vertices.
-  
-  //    <h3>TODO</h3>
-  //    <ul>
-  //    <li> std::set<unsigned char> &boundary_ids needs to be set 
-  //         to a default value of {0}, no is set to empty
-  //    <li> Add mapping from volume to surface
-  //    <li> Add some assertions
-  //    <li> Create a function (reconcile?) to reconcile the triangulations
-  //         after refinement/coarsening is performed in one of them
-  //    <li> Create a class that manages the triangulations, as direct
-  //         access to refining the triangulations will most likely lead
-  // 	to inconsitencies
-  //    </ul>
-
-  surface_to_volume_mapping.clear(); // Is this reasonable?
+  surface_to_volume_mapping.clear();
 
   const unsigned int boundary_dim = dim-1; //dimension of the boundary mesh
 
-  // First create surface mesh and mapping from only level(0) cells of volume_mesh 
+				   // First create surface mesh and mapping from only level(0) cells of volume_mesh
 
-  std::vector<typename Triangulation<dim,spacedim>::face_iterator> 
-    mapping;  // temporary map for level==0 
-
+  std::vector<typename Triangulation<dim,spacedim>::face_iterator>
+    mapping;  // temporary map for level==0
 
 
   typename Triangulation<dim,spacedim>::cell_iterator
@@ -1861,87 +1845,81 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
   std::vector< Point<spacedim> >      vertices;
 
   std::map<unsigned int,unsigned int> map_vert_index; //volume vertex indices to surf ones
-  
+
   unsigned int v_index;
   CellData< boundary_dim > c_data;
 
   for (; cell!=endc; ++cell)
-    
-    for (unsigned int i=0; 
-	 i < GeometryInfo<dim>::faces_per_cell; ++i){
+    for (unsigned int i=0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+      {
+	face = cell->face(i);
 
-      face = cell->face(i);
+	if ( face->at_boundary()
+	     &&
+	     (boundary_ids.empty() ||
+	      ( boundary_ids.find(face->boundary_indicator()) != boundary_ids.end())) )
+	  {
+	    for (unsigned int j=0;
+		 j<GeometryInfo<boundary_dim>::vertices_per_cell; ++j)
+	      {
+		v_index = face->vertex_index(j);
 
-      if ( face->at_boundary() 
-	   && 
-	   (boundary_ids.empty() ||
-	    ( boundary_ids.find(face->boundary_indicator()) != boundary_ids.end()))
-	   ) {
-	for (unsigned int j=0; 
-	     j<GeometryInfo<boundary_dim>::vertices_per_cell; ++j) {
-	  
-	  v_index = face->vertex_index(j);
-	  
-	  if ( !touched[v_index] ){
-	    vertices.push_back(face->vertex(j));
-	    map_vert_index[v_index] = vertices.size() - 1;
-	    touched[v_index] = true;
+		if ( !touched[v_index] )
+		  {
+		    vertices.push_back(face->vertex(j));
+		    map_vert_index[v_index] = vertices.size() - 1;
+		    touched[v_index] = true;
+		  }
+
+		c_data.vertices[j] = map_vert_index[v_index];
+		c_data.material_id = 0;
+	      }
+
+	    cells.push_back(c_data);
+	    mapping.push_back(face);
 	  }
-	  
-	  c_data.vertices[j] = map_vert_index[v_index];
-	  c_data.material_id = 0;
-	  
-	}
-	
-	cells.push_back(c_data);
-	mapping.push_back(face);
-	
       }
-    }
 
-  // create level 0 surface triangulation
+				   // create level 0 surface triangulation
   surface_mesh.create_triangulation (vertices, cells, SubCellData());
 
-  { // Make the actual mapping
-    typename Triangulation<dim-1,spacedim>::active_cell_iterator
-      cell = surface_mesh.begin(0),
-      endc = surface_mesh.end(0);
-    for (; cell!=endc; ++cell)
-      surface_to_volume_mapping[cell] = mapping.at(cell->index());
-  }
+				   // Make the actual mapping
+  for (typename Triangulation<dim-1,spacedim>::active_cell_iterator
+	 cell = surface_mesh.begin(0);
+       cell!=surface_mesh.end(0); ++cell)
+    surface_to_volume_mapping[cell] = mapping.at(cell->index());
 
-  do {
-    bool changed = false;
-    typename Triangulation<dim-1,spacedim>::active_cell_iterator
-      cell = surface_mesh.begin_active(),
-      endc = surface_mesh.end();
-  
-    for (; cell!=endc; ++cell)
-      if (surface_to_volume_mapping[cell]->has_children() == true ) {
-	cell->set_refine_flag ();
-	changed = true;
-      }
+  do
+    {
+      bool changed = false;
+      typename Triangulation<dim-1,spacedim>::active_cell_iterator
+	cell = surface_mesh.begin_active(),
+	endc = surface_mesh.end();
 
-    
-
-    if (changed){
-      
-      surface_mesh.execute_coarsening_and_refinement ();
-
-      typename Triangulation<dim-1,spacedim>::cell_iterator
-      cell = surface_mesh.begin(),
-      endc = surface_mesh.end();
       for (; cell!=endc; ++cell)
-	for (unsigned int c=0; c<cell->n_children(); c++)
-	  if (surface_to_volume_mapping.find(cell->child(c)) == surface_to_volume_mapping.end())
-	    surface_to_volume_mapping[cell->child(c)]
-	      = surface_to_volume_mapping[cell]->child(c);
-    }
-    else
-      break;
-  }
-  while (true);
+	if (surface_to_volume_mapping[cell]->has_children() == true )
+	  {
+	    cell->set_refine_flag ();
+	    changed = true;
+	  }
 
+      if (changed)
+	{
+	  surface_mesh.execute_coarsening_and_refinement ();
+
+	  typename Triangulation<dim-1,spacedim>::cell_iterator
+	    cell = surface_mesh.begin(),
+	    endc = surface_mesh.end();
+	  for (; cell!=endc; ++cell)
+	    for (unsigned int c=0; c<cell->n_children(); c++)
+	      if (surface_to_volume_mapping.find(cell->child(c)) == surface_to_volume_mapping.end())
+		surface_to_volume_mapping[cell->child(c)]
+		  = surface_to_volume_mapping[cell]->child(c);
+	}
+      else
+	break;
+    }
+  while (true);
 }
 
 // explicit instantiations
