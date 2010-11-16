@@ -614,7 +614,7 @@ namespace Assembly
 		    phi_u (stokes_fe.dofs_per_cell),
 		    grads_phi_u (stokes_fe.dofs_per_cell),
 		    div_phi_u (stokes_fe.dofs_per_cell),
-		    old_temperature_values (stokes_quadrature.n_quadrature_points)
+		    old_temperature_values (stokes_quadrature.size())
     {}
 
 
@@ -716,17 +716,17 @@ namespace Assembly
 		    phi_T (temperature_fe.dofs_per_cell),
 		    grad_phi_T (temperature_fe.dofs_per_cell),
 
-		    old_velocity_values (quadrature.n_quadrature_points),
-		    old_old_velocity_values (quadrature.n_quadrature_points),
+		    old_velocity_values (quadrature.size()),
+		    old_old_velocity_values (quadrature.size()),
 
-		    old_temperature_values (quadrature.n_quadrature_points),
-		    old_old_temperature_values(quadrature.n_quadrature_points),
-		    old_temperature_grads(quadrature.n_quadrature_points),
-		    old_old_temperature_grads(quadrature.n_quadrature_points),
-		    old_temperature_laplacians(quadrature.n_quadrature_points),
-		    old_old_temperature_laplacians(quadrature.n_quadrature_points),
+		    old_temperature_values (quadrature.size()),
+		    old_old_temperature_values(quadrature.size()),
+		    old_temperature_grads(quadrature.size()),
+		    old_old_temperature_grads(quadrature.size()),
+		    old_temperature_laplacians(quadrature.size()),
+		    old_old_temperature_laplacians(quadrature.size()),
 
-		    gamma_values (quadrature.n_quadrature_points)
+		    gamma_values (quadrature.size())
     {}
 
 
@@ -3167,11 +3167,11 @@ void BoussinesqFlowProblem<dim>::output_results ()
 
   DoFHandler<dim> joint_dof_handler (triangulation);
   joint_dof_handler.distribute_dofs (joint_fe);
-  Assert (joint_dof_handler.n_global_dofs() ==
-	  stokes_dof_handler.n_global_dofs() +
-	  temperature_dof_handler.n_global_dofs() +
+  Assert (joint_dof_handler.n_dofs() ==
+	  stokes_dof_handler.n_dofs() +
+	  temperature_dof_handler.n_dofs() +
 	  2*triangulation.n_global_active_cells() +
-	  temperature_dof_handler.n_global_dofs(),
+	  temperature_dof_handler.n_dofs(),
 	  ExcInternalError());
 
   TrilinosWrappers::MPI::Vector joint_solution;
