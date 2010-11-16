@@ -7041,6 +7041,16 @@ AC_DEFUN(DEAL_II_WITH_BOOST, dnl
 dnl --------------------------------------------------
 dnl Include the libz library
 dnl --------------------------------------------------
+AC_DEFUN(DEAL_II_CONFIGURE_GSL, dnl
+[
+dnl Finde header files
+   AC_CHECK_HEADERS([gsl_sf.h])
+   AC_CHECK_LIB(gsl, gsl_bessel_J0)
+])
+
+dnl --------------------------------------------------
+dnl Include the libz library
+dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
 [
   dnl -- We should check for zlib.h, but I could not make AC_CHECK_HEADERS run (GK)
