@@ -2,4 +2,4 @@
 DEAL::FE_RaviartThomas<2>(1) 12  vector 0 Vector 0
 DEAL::FE_RaviartThomas<2>(2) 21  vector 0 Vector 0
 DEAL::FE_RaviartThomas<2>(2) 21  vector 0 Vector 0
-DEAL::FE_RaviartThomas<2>(3) 32  vector 0 Vector 0
+DEAL::FE_RaviartThomas<2>(3) 32  vector 1.04647e-15 Vector 1.04647e-15
