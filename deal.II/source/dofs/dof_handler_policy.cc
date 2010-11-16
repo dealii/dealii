@@ -1552,6 +1552,13 @@ namespace internal
 		= number_cache.locally_owned_dofs_per_processor[i].n_elements();
 	    }
 
+	  number_cache.n_global_dofs
+	    = std::accumulate( &number_cache
+			       .n_locally_owned_dofs_per_processor[0],
+			       &number_cache
+			       .n_locally_owned_dofs_per_processor[n_cpus],
+			       0 );
+	  
 	  tr->load_user_flags(user_flags);
 	}
 #endif
