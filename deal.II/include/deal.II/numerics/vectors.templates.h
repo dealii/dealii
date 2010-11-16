@@ -1226,7 +1226,7 @@ namespace internal
   {
     template <class DH>
     static inline
-    void interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>            &mapping,
+    void interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension> &,
 				      const DH                 &dof,
 				      const typename FunctionMap<DH::space_dimension>::type &function_map,
 				      std::map<unsigned int,double> &boundary_values,
