@@ -254,7 +254,15 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 
 <ol>
-  <li><p> There are now Patterns::FileName and Patterns::DirectoryName classes
+
+<li> A static member function Point::unit_vector() has been introduced
+to simplify the task of creating a vector in one coordinate direction
+independent of the dimension.
+<br>
+(GK 2010/11/17)
+</li>
+
+<li><p> There are now Patterns::FileName and Patterns::DirectoryName classes
   that can be used to indicate that a given parameter is supposed to be
   a file or directory name.
   <br>
