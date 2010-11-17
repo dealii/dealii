@@ -809,6 +809,29 @@ class GridTools
 				      * It also builds a mapping linking the
 				      * cells on the surface mesh to the
 				      * corresponding faces on the volume one.
+				      *
+				      * @note The function builds the surface
+				      * mesh by creating a coarse mesh from
+				      * the selected faces of the coarse cells
+				      * of the volume mesh. It copies the
+				      * boundary indicators of these faces to
+				      * the cells of the coarse surface
+				      * mesh. The surface mesh is then refined
+				      * in the same way as the faces of the
+				      * volume mesh are. In order to ensure
+				      * that the surface mesh has the same
+				      * vertices as the volume mesh, it is
+				      * therefore important that you assign
+				      * appropriate boundary objects through
+				      * Triangulation::set_boundary to the
+				      * surface mesh object before calling
+				      * this function. If you don't, the
+				      * refinement will happen under the
+				      * assumption that all faces are straight
+				      * (i.e using the StraightBoundary class)
+				      * rather than any curved boundary object
+				      * you may want to use to determine the
+				      * location of new vertices.
 				      */
     template <int dim, int spacedim>
     static void 
