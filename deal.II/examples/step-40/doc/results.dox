@@ -1,6 +1,56 @@
 <h1>Results</h1>
 
-DOCUMENT HOW TO RUN THE PROGRAM
+When you run the program, on a single processor or with your local MPI
+installation on a few, you should get output like this:
+@code
+Cycle 0:
+   Number of active cells:       1024
+   Number of degrees of freedom: 4225
+   Solved in 10 iterations.
+
+Cycle 1:
+   Number of active cells:       1954
+   Number of degrees of freedom: 8399
+   Solved in 11 iterations.
+
+Cycle 2:
+   Number of active cells:       3640
+   Number of degrees of freedom: 16091
+   Solved in 11 iterations.
+
+Cycle 3:
+   Number of active cells:       7018
+   Number of degrees of freedom: 31387
+   Solved in 11 iterations.
+
+Cycle 4:
+   Number of active cells:       13594
+   Number of degrees of freedom: 61531
+   Solved in 13 iterations.
+
+Cycle 5:
+   Number of active cells:       26950
+   Number of degrees of freedom: 122693
+   Solved in 13 iterations.
+
+Cycle 6:
+   Number of active cells:       54373
+   Number of degrees of freedom: 248265
+   Solved in 14 iterations.
+
+Cycle 7:
+   Number of active cells:       111754
+   Number of degrees of freedom: 513153
+   Solved in 14 iterations.
+@endcode
+
+The exact numbers differ, depending on how many processors we use;
+this is due to the fact that the preconditioner depends on the
+partitioning of the problem, the solution then differs in the last few
+digits, and consequently the mesh refinement differs slightly.
+The primary thing to notice here, though, is that the number of
+iterations does not increase with the size of the problem. This
+guarantees that we can efficiently solve even the largest problems.
 
 When run on a sufficiently large number of machines (say a few
 thousand), this program can relatively easily solve problems with well
