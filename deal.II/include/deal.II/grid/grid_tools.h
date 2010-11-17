@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -795,27 +795,30 @@ class GridTools
     fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
 				  Triangulation<dim,spacedim> &triangulation);
 
-  /** 
-      This function implements a boundary subgrid extraction.
-      Given a <dim,spacedim>-Triangulation (the "volume mesh")
-      the function extracts a subset of its boundary (the "surface mesh").
-      The boundary to be extracted is specified by a list of boundary_ids.
-      If none is specified the whole boundary will be extracted.
-      
-      It also builds a mapping linking the cells on the surface mesh
-      to the corresponding faces on the volume one.
-      
-      
-  */
-  template <int dim, int spacedim>
-  static void 
-  extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh,
-			 Triangulation<dim-1,spacedim>     &surface_mesh,
-			 std::map<typename Triangulation<dim-1,spacedim>::cell_iterator,
-				  typename Triangulation<dim,spacedim>::face_iterator> 
-			 &surface_to_volume_mapping,
-			 const std::set<unsigned char> &boundary_ids
-			 = std::set<unsigned char>());
+				     /** 
+				      * This function implements a boundary
+				      * subgrid extraction.  Given a
+				      * <dim,spacedim>-Triangulation (the
+				      * "volume mesh") the function extracts a
+				      * subset of its boundary (the "surface
+				      * mesh").  The boundary to be extracted
+				      * is specified by a list of
+				      * boundary_ids.  If none is specified
+				      * the whole boundary will be extracted.
+				      *  
+				      * It also builds a mapping linking the
+				      * cells on the surface mesh to the
+				      * corresponding faces on the volume one.
+				      */
+    template <int dim, int spacedim>
+    static void 
+    extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh,
+			   Triangulation<dim-1,spacedim>     &surface_mesh,
+			   std::map<typename Triangulation<dim-1,spacedim>::cell_iterator,
+			   typename Triangulation<dim,spacedim>::face_iterator> 
+    &surface_to_volume_mapping,
+			   const std::set<unsigned char> &boundary_ids
+			   = std::set<unsigned char>());
   
                                      /**
                                       * Exception
