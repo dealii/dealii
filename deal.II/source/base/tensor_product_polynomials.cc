@@ -123,7 +123,8 @@ double
 TensorProductPolynomials<0>::compute_value (const unsigned int ,
 					    const Point<0> &) const
 {
-  return 1./0.;
+  Assert (false, ExcNotImplemented());
+  return 0.;
 }
 
 
