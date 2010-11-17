@@ -101,7 +101,7 @@ int main ()
     const HyperBallBoundary<dim> boundary_description;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (Triangulation<dim>::active_cell_iterator
 	   cell = volume_mesh.begin_active();
 	 cell != volume_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
