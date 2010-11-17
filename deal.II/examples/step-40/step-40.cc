@@ -877,16 +877,34 @@ void LaplaceProblem<dim>::run ()
 				 // inialize and finalize PETSc, which
 				 // also initializes and finalizes the
 				 // MPI subsystem.
+				 //
+				 // Note how we enclose the use the
+				 // use of the LaplaceProblem class in
+				 // a pair of braces. This makes sure
+				 // that all member variables of the
+				 // object are destroyed by the time
+				 // we hit the
+				 // <code>PetscFinalize</code>
+				 // call. Not doing this will lead to
+				 // strange and hard to debug errors
+				 // when <code>PetscFinalize</code>
+				 // first deletes all PETSc vectors
+				 // that are still around, and the
+				 // destructor of the LaplaceProblem
+				 // class then tries to delete them
+				 // again.
 int main(int argc, char *argv[])
 {
   try
     {
       PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
       deallog.depth_console (0);
-
-      LaplaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
-
+      
+      {
+	LaplaceProblem<2> laplace_problem_2d;
+	laplace_problem_2d.run ();
+      }
+      
       PetscFinalize();
     }
   catch (std::exception &exc)
