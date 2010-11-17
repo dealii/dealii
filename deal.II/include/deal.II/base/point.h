@@ -103,7 +103,7 @@ class Point : public Tensor<1,dim>
 				      * Return a unit vector in
 				      * coordinate direction <tt>i</tt>.
 				      */
-    static Point<dim> e(const unsigned int i);
+    static Point<dim> unit_vector(const unsigned int i);
     
 				     /**
 				      *  Read access to the <tt>index</tt>th
@@ -256,7 +256,7 @@ Point<dim>::Point (const double x, const double y, const double z)
 template <int dim>
 inline
 Point<dim>
-Point<dim>::e(unsigned int i)
+Point<dim>::unit_vector(unsigned int i)
 {
   Point<dim> p;
   p[i] = 1.;
