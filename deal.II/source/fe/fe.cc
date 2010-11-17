@@ -165,8 +165,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
 	  ExcDimensionMismatch(restriction_is_additive_flags.size(),
 			       this->dofs_per_cell));
-  Assert (nonzero_components.size() == this->dofs_per_cell,
-	  ExcInternalError());
+  AssertDimension (nonzero_components.size(), this->dofs_per_cell);
   for (unsigned int i=0; i<nonzero_components.size(); ++i)
     {
       Assert (nonzero_components[i].size() == this->n_components(),
