@@ -198,12 +198,31 @@
  * </dd>
  *
  *
- * <dt class="glossary">@anchor GlossBoundaryForm <b>Boundary form</b></dt>
+ * <dt class="glossary">@anchor GlossBoundaryForm <b>%Boundary form</b></dt>
  *
- * <dd>The boundary form is the vector product of the image of
- * coordinate vectors on the surface of the unit cell. It is a vector
- * normal to the surface, pointing outwards and having the length of
- * the surface element.</dd>
+ * <dd>For a dim-dimensional triangulation in dim-dimensional space,
+ * the boundary form is a vector defined on faces. It is the vector
+ * product of the image of coordinate vectors on the surface of the
+ * unit cell. It is a vector normal to the surface, pointing outwards
+ * and having the length of the surface element.
+ *
+ * A more general definition would be that (at least up to the length
+ * of this vector) it is exactly that vector that is necessary when
+ * considering integration by parts, i.e. equalities of the form
+ * $\int_\Omega \text{div} \vec \phi = -\int_{\partial\Omega} \vec n
+ * \cdot \vec \phi$. Using this definition then also explains what
+ * this vector should be in the case of domains (and corresponding
+ * triangulations) of dimension <code>dim</code> that are embedded in
+ * a space <code>spacedim</code>: in that case, the boundary form is
+ * still a vector defined on the faces of the triangulation; it is
+ * orthogonal to all tangent directions of the boundary and within the
+ * tangent plane of the domain. Note that this is compatible with case
+ * <code>dim==spacedim</code> since there the tangent plane is the
+ * entire space $\R^\text{dim}$.
+ *
+ * In either case, the length of the vector equals the determinant of
+ * the transformation of reference face to the face of the current
+ * cell.  </dd>
  *
  *
  * <dt class="glossary">@anchor GlossComponent <b>Component</b></dt>
@@ -434,7 +453,7 @@
  * <dd>The "distributed computing paper" is a paper by W. Bangerth,
  * C. Burstedde, T. Heister and M. Kronbichler titled "Algorithms and Data
  * Structures for Massively Parallel Generic Finite Element Codes" that
- * describes the implementation of parallel distributed computing in deal.II,
+ * describes the implementation of %parallel distributed computing in deal.II,
  * i.e. computations where not only the linear system is split onto different
  * machines as in, for example, step-17, but also the Triangulation and
  * DoFHandler objects. In essence, it is a guide to the parallel::distributed
@@ -446,7 +465,7 @@
  * preprint 2011-187</a>. Its current BiBTex entry is
  * @code
 TechReport{BBHK11,
-  author = 	 {Wolfgang Bangerth and Carsten Burstedde and Timo Heister 
+  author = 	 {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
                   and Martin Kronbichler},
   title = 	 {Algorithms and data structures for massively parallel generic
                   adaptive finite element codes},
@@ -454,10 +473,10 @@ TechReport{BBHK11,
                   Texas A&M University},
   year = 	 2010,
   number = 	 {2011-187, submitted}
-} 
+}
  * @endcode
  *
- * For massively parallel
+ * For massively %parallel
  * computations, deal.II builds on the
  * <a href="http://www.p4est.org/" target="_top">p4est</a>
  * library. If you use this functionality, please also cite the
@@ -707,7 +726,7 @@ Article{JK10,
  * querying the subdomain id of a cell tells you if the cell is owned
  * by the current processor (i.e. if <code>cell-@>subdomain_id() ==
  * triangulation.parallel::distributed::Triangulation::locally_owned_subdomain()</code>)
- * or by another processor. In the parallel distributed case,
+ * or by another processor. In the %parallel distributed case,
  * subdomain ids are only assigned to cells that the current processor
  * owns as well as the immediately adjacent @ref GlossGhostCell "ghost cells".
  * Cells further away are held on each processor to ensure
