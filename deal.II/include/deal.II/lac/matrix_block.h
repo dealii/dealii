@@ -133,10 +133,10 @@ class MatrixBlock
 				      * pattern must be equal.
 				      */
     void reinit(const BlockSparsityPattern& sparsity);
-    
+
     operator MATRIX&();
     operator const MATRIX&() const;
-    
+
 				     /**
 				      * Add <tt>value</tt> to the
 				      * element (<i>i,j</i>). Throws
@@ -325,13 +325,13 @@ class MatrixBlock
 				      * matching #matrix.
 				      */
     template<class VECTOR>
-    void Tvmult_add (VECTOR& w, const VECTOR& v) const;    
-    
+    void Tvmult_add (VECTOR& w, const VECTOR& v) const;
+
 				     /**
 				      * The memory used by this object.
 				      */
     unsigned int memory_consumption () const;
-    
+
 				     /**
 				      * The block number computed from
 				      * an index by using
@@ -378,7 +378,7 @@ class MatrixBlock
 				      * block.
 				      */
     BlockIndices column_indices;
-    
+
     friend void internal::reinit<>(MatrixBlock<MATRIX>&, const BlockSparsityPattern&);
 };
 
@@ -402,7 +402,7 @@ class MatrixBlockVector
 				      * The type of object stored.
 				      */
     typedef MatrixBlock<MATRIX> value_type;
-    
+
 				     /**
 				      * Add a new matrix block at the
 				      * position <tt>(row,column)</tt>
@@ -418,7 +418,7 @@ class MatrixBlockVector
 				      * pattern from the block system.
 				      */
     void reinit(const BlockSparsityPattern& sparsity);
-    
+
 				     /**
 				      * Clears the object.
 				      *
@@ -437,7 +437,7 @@ class MatrixBlockVector
 				      * blocks at the end.
 				      */
     void clear (bool really_clean = false);
-    
+
 				     /**
 				      * The memory used by this object.
 				      */
@@ -448,13 +448,13 @@ class MatrixBlockVector
 				      * the block at position <i>i</i>.
 				      */
     const value_type& block(unsigned int i) const;
-    
+
 				     /**
 				      * Access a reference to
 				      * the block at position <i>i</i>.
 				      */
     value_type& block(unsigned int i);
-    
+
 				     /**
 				      * Access the matrix at position
 				      * <i>i</i> for read and write
@@ -509,7 +509,7 @@ class MGMatrixBlockVector
 				      * The number of blocks.
 				      */
     unsigned int size () const;
-    
+
 				     /**
 				      * Add a new matrix block at the
 				      * position <tt>(row,column)</tt>
@@ -520,7 +520,7 @@ class MGMatrixBlockVector
 				      */
     void add(unsigned int row, unsigned int column,
 	     const std::string& name);
-    
+
 				     /**
 				      * For matrices using a
 				      * SparsityPattern, this function
@@ -556,7 +556,7 @@ class MGMatrixBlockVector
 				      * refinement edge.
 				      */
     void reinit_edge_flux(const MGLevelObject<BlockSparsityPattern>& sparsity);
-    
+
 				     /**
 				      * Clears the object.
 				      *
@@ -575,67 +575,67 @@ class MGMatrixBlockVector
 				      * blocks at the end.
 				      */
     void clear (bool really_clean = false);
-    
+
 				     /**
 				      * Access a constant reference to
 				      * the matrix block at position <i>i</i>.
 				      */
     const value_type& block(unsigned int i) const;
-    
+
 				     /**
 				      * Access a reference to
 				      * the matrix block at position <i>i</i>.
 				      */
     value_type& block(unsigned int i);
-    
+
 				     /**
 				      * Access a constant reference to
 				      * the edge matrix block at position <i>i</i>.
 				      */
     const value_type& block_in(unsigned int i) const;
-    
+
 				     /**
 				      * Access a reference to
 				      * the edge matrix block at position <i>i</i>.
 				      */
     value_type& block_in(unsigned int i);
-    
+
 				     /**
 				      * Access a constant reference to
 				      * the edge matrix block at position <i>i</i>.
 				      */
     const value_type& block_out(unsigned int i) const;
-    
+
 				     /**
 				      * Access a reference to
 				      * the edge matrix block at position <i>i</i>.
 				      */
     value_type& block_out(unsigned int i);
-    
+
 				     /**
 				      * Access a constant reference to
 				      * the  edge flux matrix block at position <i>i</i>.
 				      */
     const value_type& block_up(unsigned int i) const;
-    
+
 				     /**
 				      * Access a reference to
 				      * the  edge flux matrix block at position <i>i</i>.
 				      */
     value_type& block_up(unsigned int i);
-    
+
 				     /**
 				      * Access a constant reference to
 				      * the  edge flux matrix block at position <i>i</i>.
 				      */
     const value_type& block_down(unsigned int i) const;
-    
+
 				     /**
 				      * Access a reference to
 				      * the edge flux matrix block at position <i>i</i>.
 				      */
     value_type& block_down(unsigned int i);
-    
+
 				     /**
 				      * The memory used by this object.
 				      */
@@ -643,13 +643,13 @@ class MGMatrixBlockVector
   private:
 				     /// Clear one of the matrix objects
     void clear_object(NamedData<MGLevelObject<MatrixBlock<MATRIX> > >&);
-    
-				     /// Flag for storing #matrices_in and #matrices_out
+
+				     /// Flag for storing matrices_in and matrices_out
     const bool edge_matrices;
 
-				     /// Flag for storing #flux_matrices_up and #flux_matrices_down
+				     /// Flag for storing flux_matrices_up and flux_matrices_down
     const bool edge_flux_matrices;
-    
+
 				     /// The level matrices
     NamedData<MGLevelObject<MatrixBlock<MATRIX> > > matrices;
 	       /// The matrix from the interior of a level to the refinement edge
@@ -675,7 +675,7 @@ namespace internal
     v.column_indices = p.get_column_indices();
   }
 
-  
+
   template <typename number>
   void
   reinit(MatrixBlock<dealii::SparseMatrix<number> >& v, const BlockSparsityPattern& p)
@@ -775,7 +775,7 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int>&         r_indices,
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());
   Assert(column_indices.size() != 0, ExcNotInitialized());
-  
+
   AssertDimension (r_indices.size(), values.m());
   AssertDimension (c_indices.size(), values.n());
 
@@ -798,7 +798,7 @@ MatrixBlock<MATRIX>::add (const unsigned int   b_row,
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());
   Assert(column_indices.size() != 0, ExcNotInitialized());
-  
+
   const std::pair<unsigned int, unsigned int> bi
     = row_indices.global_to_local(b_row);
 
@@ -835,7 +835,7 @@ MatrixBlock<MATRIX>::add (const std::vector<unsigned int> &indices,
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());
   Assert(column_indices.size() != 0, ExcNotInitialized());
-  
+
   AssertDimension (indices.size(), values.m());
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
@@ -857,7 +857,7 @@ MatrixBlock<MATRIX>::add (const unsigned int               row,
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());
   Assert(column_indices.size() != 0, ExcNotInitialized());
-  
+
   AssertDimension (col_indices.size(), values.size());
   add (row, col_indices.size(), &col_indices[0], &values[0],
        elide_zero_values);
@@ -1011,7 +1011,7 @@ MGMatrixBlockVector<MATRIX>::add(
   MGLevelObject<MatrixBlock<MATRIX> > p(0, 1);
   p[0].row = row;
   p[0].column = column;
-  
+
   matrices.add(p, name);
   if (edge_matrices)
     {
@@ -1173,7 +1173,7 @@ MGMatrixBlockVector<MATRIX>::reinit_edge_flux(const MGLevelObject<BlockSparsityP
 	  block_down(i)[level].column = col;
 	  internal::reinit(block_down(i)[level], sparsity[level]);
 	}
-      
+
     }
 }
 
