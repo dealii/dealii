@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -108,15 +108,26 @@ TensorProductPolynomials<dim>::compute_value (const unsigned int i,
 {
   unsigned int indices[dim];
   compute_index (i, indices);
-  
+
   double value=1.;
   for (unsigned int d=0; d<dim; ++d)
     value *= polynomials[indices[d]].value(p(d));
-  
+
   return value;
 }
 
-  
+
+
+template <>
+double
+TensorProductPolynomials<0>::compute_value (const unsigned int ,
+					    const Point<0> &) const
+{
+  return 1./0.;
+}
+
+
+
 template <int dim>
 Tensor<1,dim>
 TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
@@ -132,7 +143,7 @@ TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
   std::vector<std::vector<double> > v(dim, std::vector<double> (2));
   for (unsigned int d=0; d<dim; ++d)
     polynomials[indices[d]].value(p(d), v[d]);
-  
+
   Tensor<1,dim> grad;
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -140,7 +151,7 @@ TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
       for (unsigned int x=0; x<dim; ++x)
         grad[d] *= v[x][d==x];
     }
-  
+
   return grad;
 }
 
@@ -156,7 +167,7 @@ TensorProductPolynomials<dim>::compute_grad_grad (const unsigned int i,
   std::vector<std::vector<double> > v(dim, std::vector<double> (3));
   for (unsigned int d=0; d<dim; ++d)
     polynomials[indices[d]].value(p(d), v[d]);
-  
+
   Tensor<2,dim> grad_grad;
   for (unsigned int d1=0; d1<dim; ++d1)
     for (unsigned int d2=0; d2<dim; ++d2)
@@ -171,7 +182,7 @@ TensorProductPolynomials<dim>::compute_grad_grad (const unsigned int i,
                   derivative=2;
                 else
                   derivative=1;
-              } 
+              }
             grad_grad[d1][d2] *= v[x][derivative];
           }
       }
@@ -224,7 +235,7 @@ compute (const Point<dim>            &p,
         v(d,i).resize (n_values_and_derivatives, 0.);
         polynomials[i].value(p(d), v(d,i));
       };
-  
+
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
                                        // first get the
@@ -233,18 +244,18 @@ compute (const Point<dim>            &p,
                                        // product polynomial
       unsigned int indices[dim];
       compute_index (i, indices);
-      
+
       if (update_values)
         {
           values[i] = 1;
           for (unsigned int x=0; x<dim; ++x)
             values[i] *= v(x,indices[x])[0];
         }
-  
+
       if (update_grads)
         for (unsigned int d=0; d<dim; ++d)
           {
-            grads[i][d] = 1.;            
+            grads[i][d] = 1.;
             for (unsigned int x=0; x<dim; ++x)
               grads[i][d] *= v(x,indices[x])[d==x];
           }
@@ -263,7 +274,7 @@ compute (const Point<dim>            &p,
                         derivative=2;
                       else
                         derivative=1;
-                    } 
+                    }
                   grad_grads[i][d1][d2]
                     *= v(x,indices[x])[derivative];
                 }
@@ -273,11 +284,20 @@ compute (const Point<dim>            &p,
 
 
 
-template<int dim>
+template <int dim>
 unsigned int
 TensorProductPolynomials<dim>::n() const
 {
   return n_tensor_pols;
+}
+
+
+
+template <>
+unsigned int
+TensorProductPolynomials<0>::n() const
+{
+  return numbers::invalid_unsigned_int;
 }
 
 
@@ -353,15 +373,15 @@ AnisotropicPolynomials<dim>::compute_value (const unsigned int i,
 {
   unsigned int indices[dim];
   compute_index (i, indices);
-  
+
   double value=1.;
   for (unsigned int d=0; d<dim; ++d)
     value *= polynomials[d][indices[d]].value(p(d));
-  
+
   return value;
 }
 
-  
+
 template <int dim>
 Tensor<1,dim>
 AnisotropicPolynomials<dim>::compute_grad (const unsigned int i,
@@ -377,7 +397,7 @@ AnisotropicPolynomials<dim>::compute_grad (const unsigned int i,
   std::vector<std::vector<double> > v(dim, std::vector<double> (2));
   for (unsigned int d=0; d<dim; ++d)
     polynomials[d][indices[d]].value(p(d), v[d]);
-  
+
   Tensor<1,dim> grad;
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -385,7 +405,7 @@ AnisotropicPolynomials<dim>::compute_grad (const unsigned int i,
       for (unsigned int x=0; x<dim; ++x)
         grad[d] *= v[x][d==x];
     }
-  
+
   return grad;
 }
 
@@ -401,7 +421,7 @@ AnisotropicPolynomials<dim>::compute_grad_grad (const unsigned int i,
   std::vector<std::vector<double> > v(dim, std::vector<double> (3));
   for (unsigned int d=0; d<dim; ++d)
     polynomials[d][indices[d]].value(p(d), v[d]);
-  
+
   Tensor<2,dim> grad_grad;
   for (unsigned int d1=0; d1<dim; ++d1)
     for (unsigned int d2=0; d2<dim; ++d2)
@@ -416,7 +436,7 @@ AnisotropicPolynomials<dim>::compute_grad_grad (const unsigned int i,
                   derivative=2;
                 else
                   derivative=1;
-              } 
+              }
             grad_grad[d1][d2] *= v[x][derivative];
           }
       }
@@ -472,7 +492,7 @@ compute (const Point<dim>            &p,
           polynomials[d][i].value(p(d), v[d][i]);
         };
     }
-  
+
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
                                        // first get the
@@ -481,18 +501,18 @@ compute (const Point<dim>            &p,
                                        // product polynomial
       unsigned int indices[dim];
       compute_index (i, indices);
-      
+
       if (update_values)
         {
           values[i] = 1;
           for (unsigned int x=0; x<dim; ++x)
             values[i] *= v[x][indices[x]][0];
         }
-  
+
       if (update_grads)
         for (unsigned int d=0; d<dim; ++d)
           {
-            grads[i][d] = 1.;            
+            grads[i][d] = 1.;
             for (unsigned int x=0; x<dim; ++x)
               grads[i][d] *= v[x][indices[x]][d==x ? 1 : 0];
           }
@@ -511,7 +531,7 @@ compute (const Point<dim>            &p,
                         derivative=2;
                       else
                         derivative=1;
-                    } 
+                    }
                   grad_grads[i][d1][d2]
                     *= v[x][indices[x]][derivative];
                 }
