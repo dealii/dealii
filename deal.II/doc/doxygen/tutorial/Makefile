@@ -6,29 +6,28 @@ include ../../../common/Make.global_options
 
 # plain names of those files that we shall treat. simply take all those
 # directories in examples/ that have a /doc subdirectory
-example-names = $(subst /doc,,    \
+example-names := $(subst /doc,,    \
                         $(shell cd $D/examples && echo */doc))
 
 
-
 # prefix names for generated intermediate files
-gen-example-names = $(addprefix generated/, $(example-names))
+gen-example-names  := $(addprefix generated/, $(example-names))
 
 # names of commented program files, plain files, and tocs for the commented
 # and commented and plain versions of the program as well as a combined one
-example-toc-prog   = $(addsuffix _toc.prog,$(gen-example-names))
-example-toc-plain  = $(addsuffix _toc.plain,$(gen-example-names))
-example-toc-intro  = $(addsuffix _toc.intro,$(gen-example-names))
-example-toc-results= $(addsuffix _toc.results,$(gen-example-names))
-example-toc        = $(addsuffix _toc.combined,$(gen-example-names))
+example-toc-prog   := $(addsuffix _toc.prog,$(gen-example-names))
+example-toc-plain  := $(addsuffix _toc.plain,$(gen-example-names))
+example-toc-intro  := $(addsuffix _toc.intro,$(gen-example-names))
+example-toc-results:= $(addsuffix _toc.results,$(gen-example-names))
+example-toc        := $(addsuffix _toc.combined,$(gen-example-names))
 
 # same for intermediate files for doxygen output
-example-dox-prog   = $(addsuffix _prog.dox,$(gen-example-names))
-example-dox-plain  = $(addsuffix _plain.dox,$(gen-example-names))
-example-plain      = $(addprefix plain/,$(addsuffix .cc,$(example-names)))
+example-dox-prog   := $(addsuffix _prog.dox,$(gen-example-names))
+example-dox-plain  := $(addsuffix _plain.dox,$(gen-example-names))
+example-plain      := $(addprefix plain/,$(addsuffix .cc,$(example-names)))
 
 # finally a target for combined Doxygen files
-example-doxygen     = $(addprefix doxygen/,$(addsuffix .h,$(example-names)))
+example-doxygen    := $(addprefix doxygen/,$(addsuffix .h,$(example-names)))
 
 
 # a makefile command that extracts the base name of a program
