@@ -54,28 +54,17 @@ void test ()
 
   deal_II_exceptions::disable_abort_on_exception();
 
-  double l2norm = 0.0;
+  bool exc = false;
   try
     {
-				       // some Versions of Trilinos throw an
-				       // Exception here, some do not...
-//      l2norm =
 	v_tmp.l2_norm();
     }
   catch (TrilinosWrappers::VectorBase::ExcTrilinosError e)
     {
+      exc = true;
     }
   
-  
-  if (myid == 0)
-    {
-      deallog << "l2norm: " << l2norm << std::endl;
-    }
-
-  double value=l2norm*l2norm - 2.0*numproc;
-  
-//  Assert(std::abs(value)<1.0e-10, ExcInternalError());
-  
+  Assert (exc == true, ExcInternalError());
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
