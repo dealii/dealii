@@ -1,4 +1,4 @@
-//----------------------------  trilinos_vector_equality_4.cc  ---------------------------
+//----------------------------  trilinos_ghost_03.cc  ---------------------------
 //    $Id: vector_equality_4.cc 17992 2008-12-18 03:03:20Z bangerth $
 //    Version: $Name$ 
 //
@@ -9,7 +9,7 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  trilinos_vector_equality_4.cc  ---------------------------
+//----------------------------  trilinos_ghost_03.cc  ---------------------------
 
 
 // check correct behaviour of Trilinos ghosted vectors and l2_norm().  The
