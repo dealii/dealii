@@ -1897,6 +1897,7 @@ GridTools::extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
       }
 
 				   // create level 0 surface triangulation
+  Assert (cells.size() > 0, ExcMessage ("No boundary faces selected"));
   const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
     .create_triangulation (vertices, cells, SubCellData());
 
