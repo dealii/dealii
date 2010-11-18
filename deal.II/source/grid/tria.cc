@@ -1407,6 +1407,9 @@ namespace internal
 			      const SubCellData                   &/*subcelldata*/,
 			      Triangulation<1,spacedim>           &triangulation)
 	  {
+	    AssertThrow (v.size() > 0, ExcMessage ("No vertices given"));
+	    AssertThrow (cells.size() > 0, ExcMessage ("No cells given"));
+
 					     // note: since no boundary
 					     // information can be given in one
 					     // dimension, the @p{subcelldata}
@@ -1544,6 +1547,9 @@ namespace internal
 			      const SubCellData                   &subcelldata,
 			      Triangulation<2,spacedim>           &triangulation)
 	  {
+	    AssertThrow (v.size() > 0, ExcMessage ("No vertices given"));
+	    AssertThrow (cells.size() > 0, ExcMessage ("No cells given"));
+
 	    const unsigned int dim=2;
 
 					     // copy vertices
@@ -1847,6 +1853,9 @@ namespace internal
 			      const SubCellData                   &subcelldata,
 			      Triangulation<3,spacedim>           &triangulation)
 	  {
+	    AssertThrow (v.size() > 0, ExcMessage ("No vertices given"));
+	    AssertThrow (cells.size() > 0, ExcMessage ("No cells given"));
+
 	    const unsigned int dim=3;
 
 					     // copy vertices
@@ -3812,11 +3821,25 @@ namespace internal
    .--.--.
 */
 
-					     // collect the indices
-					     // all vertices
+					     // find the next
+					     // unused vertex and
+					     // allocate it for
+					     // the new vertex we
+					     // need here
+	    while (triangulation.vertices_used[next_unused_vertex] == true)
+	      ++next_unused_vertex;
+	    Assert (next_unused_vertex < triangulation.vertices.size(),
+		    ExcTooFewVerticesAllocated());
+	    triangulation.vertices_used[next_unused_vertex] = true;
+
+					     // collect the
+					     // indices of the
+					     // eight
+					     // surrounding
+					     // vertices
 					     //   2--7--3
 					     //   |  |  |
-					     //   4--8--5
+					     //   4--9--5
 					     //   |  |  |
 					     //   0--6--1
 	    int new_vertices[9];
@@ -3825,93 +3848,119 @@ namespace internal
 	    for (unsigned int line_no=0; line_no<4; ++line_no)
 	      if (cell->line(line_no)->has_children())
 		new_vertices[4+line_no]=cell->line(line_no)->child(0)->vertex_index(1);
+	    new_vertices[8] = next_unused_vertex;
 
 	    if (ref_case==RefinementCase<dim>::cut_xy)
 	      {
-						 // find the next
-						 // unused vertex and
-						 // set it
-						 // appropriately
-		while (triangulation.vertices_used[next_unused_vertex] == true)
-		  ++next_unused_vertex;
-		Assert (next_unused_vertex < triangulation.vertices.size(),
-			ExcTooFewVerticesAllocated());
-		triangulation.vertices_used[next_unused_vertex] = true;
-
-		new_vertices[8]=next_unused_vertex;
-
-		Point<spacedim> new_point;
+						 // if this quad lives
+						 // in 2d, then we can
+						 // compute the new
+						 // central vertex
+						 // location just from
+						 // the surrounding
+						 // ones. If this is
+						 // not the case, then
+						 // we need to ask a
+						 // boundary object
 		if (dim == spacedim)
 		  {
+						     // in a first
+						     // step, compute
+						     // the location
+						     // of central
+						     // vertex as the
+						     // average of the
+						     // 8 surrounding
+						     // vertices
+		    Point<spacedim> new_point;
 		    for (unsigned int i=0; i<8; ++i)
 		      new_point += triangulation.vertices[new_vertices[i]];
 		    new_point /= 8.0;
+
+		    triangulation.vertices[next_unused_vertex] = new_point;
+
+						     // if the user_flag is set, i.e. if the
+						     // cell is at the boundary, use a
+						     // different calculation of the middle
+						     // vertex here. this is of advantage, if
+						     // the boundary is strongly curved and
+						     // the cell has a high aspect ratio. this
+						     // can happen for example, if it was
+						     // refined anisotropically before.
+		    if (cell->user_flag_set())
+		      {
+							 // first reset the user_flag
+			cell->clear_user_flag();
+							 // the user flag indicates: at least
+							 // one face is at the boundary. if it
+							 // is only one, set the new middle
+							 // vertex in a different way to avoid
+							 // some mis-shaped elements if the
+							 // new point on the boundary is not
+							 // where we expect it, especially if
+							 // it is to far inside the current
+							 // cell
+			unsigned int boundary_face=GeometryInfo<dim>::faces_per_cell;
+			for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+			  if (cell->face(face)->at_boundary())
+			    {
+			      if (boundary_face == GeometryInfo<dim>::faces_per_cell)
+								 // no boundary face found so
+								 // far, so set it now
+				boundary_face=face;
+			      else
+								 // there is another boundary
+								 // face, so reset boundary_face to
+								 // invalid value as a flag to
+								 // do nothing in the following
+				boundary_face=GeometryInfo<dim>::faces_per_cell+1;
+			    }
+
+			if (boundary_face<GeometryInfo<dim>::faces_per_cell)
+							   // reset the cell's middle vertex
+							   // to the middle of the straight
+							   // connection between the new
+							   // points on this face and on the
+							   // opposite face
+			  triangulation.vertices[next_unused_vertex]
+			    = 0.5*(cell->face(boundary_face)
+				   ->child(0)->vertex(1)+
+				   cell->face(GeometryInfo<dim>
+					      ::opposite_face[boundary_face])
+				   ->child(0)->vertex(1));
+		      }
 		  }
 		else
 		  {
+						     // if this quad
+						     // lives in a
+						     // higher
+						     // dimensional
+						     // space then we
+						     // don't need to
+						     // worry if it is
+						     // at the
+						     // boundary of
+						     // the manifold
+						     // -- we always
+						     // have to use
+						     // the boundary
+						     // object anyway;
+						     // so ignore
+						     // whether the
+						     // user flag is
+						     // set or not
+		    cell->clear_user_flag();
+
 						     // new vertex is
 						     // placed on the
 						     // surface according
 						     // to the information
 						     // stored in the
 						     // boundary class
-		    new_point =
+		    triangulation.vertices[next_unused_vertex] =
 		      triangulation.boundary[cell->material_id()]
 		      ->get_new_point_on_quad (cell);
-		  }
-
-		triangulation.vertices[new_vertices[8]] = new_point;
-
-
-						 // if the user_flag is set, i.e. if the
-						 // cell is at the boundary, use a
-						 // different calculation of the middle
-						 // vertex here. this is of advantage, if
-						 // the boundary is strongly curved and
-						 // the cell has a high aspect ratio. this
-						 // can happen for example, if it was
-						 // refined anisotropically before.
-		if (cell->user_flag_set())
-		  {
-						     // first reset the user_flag
-		    cell->clear_user_flag();
-						     // the user flag indicates: at least
-						     // one face is at the boundary. if it
-						     // is only one, set the new middle
-						     // vertex in a different way to avoid
-						     // some mis-shaped elements if the
-						     // new point on the boundary is not
-						     // where we expect it, especially if
-						     // it is to far inside the current
-						     // cell
-		    unsigned int bound_face=GeometryInfo<dim>::faces_per_cell;
-		    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-		      if (cell->face(face)->at_boundary())
-			{
-			  if (bound_face == GeometryInfo<dim>::faces_per_cell)
-							     // no boundary face found so
-							     // far, so set it now
-			    bound_face=face;
-			  else
-							     // there is another boundary
-							     // face, so reset bound_face to
-							     // invalid value as a flag to
-							     // do nothing in the following
-			    bound_face=GeometryInfo<dim>::faces_per_cell+1;
-			}
-
-		    if (bound_face<GeometryInfo<dim>::faces_per_cell)
-						       // reset the cell's middle vertex
-						       // to the middle of the straight
-						       // connection between the new
-						       // points on this face and on the
-						       // opposite face
-		      triangulation.vertices[new_vertices[8]]
-			= 0.5*(cell->face(bound_face)
-			       ->child(0)->vertex(1)+
-			       cell->face(GeometryInfo<dim>
-					  ::opposite_face[bound_face])
-			       ->child(0)->vertex(1));
 		  }
 	      }
 

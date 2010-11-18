@@ -107,30 +107,29 @@ int main ()
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	if (cell->at_boundary(f) && (cell->center()[dim-1]>0))
 	  cell->face(f)->set_all_boundary_indicators (1);
-    
+
     volume_mesh.set_boundary (1, boundary_description);
     volume_mesh.set_boundary (0, boundary_description);
-    volume_mesh.refine_global (3);
+    volume_mesh.refine_global (1);
 
     const HyperBallBoundary<dim-1,dim> surface_description;
     Triangulation<dim-1,dim> boundary_mesh;
     boundary_mesh.set_boundary (1, surface_description);
     boundary_mesh.set_boundary (0, surface_description);
-   
+
     set<unsigned char> boundary_ids;
     boundary_ids.insert(1);
-    
+
     GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
 				      surface_to_volume_mapping,
 				      boundary_ids);
 
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
-    //save_mesh(boundary_mesh);
-
+    deallog << "Surface mesh:" << std::endl;
+    save_mesh(boundary_mesh);
 
     test_vertices_orientation(boundary_mesh, surface_to_volume_mapping);
-    //save_mesh(boundary_mesh);
   }
 
 

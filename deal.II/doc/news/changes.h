@@ -379,6 +379,14 @@ independent of the dimension.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>Fixed: Triangulation::execute_coarsening_and_refinement misplaced
+  the new central vertex of a quad in a two-dimensional mesh embedded into
+  higher dimensional space if said quad was at the boundary of the surface
+  described by this triangulation. This is now fixed.
+  <br>
+  (WB, 2010/11/18)
+  </p></li>
+
   <li><p>New: The GridTools::extract_boundary_mesh function can be used to
   generate a surface mesh from the boundary of a volume mesh.
   <br>
