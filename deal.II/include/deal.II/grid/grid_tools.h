@@ -795,7 +795,7 @@ class GridTools
     fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
 				  Triangulation<dim,spacedim> &triangulation);
 
-				     /** 
+				     /**
 				      * This function implements a boundary
 				      * subgrid extraction.  Given a
 				      * <dim,spacedim>-Triangulation (the
@@ -805,7 +805,7 @@ class GridTools
 				      * is specified by a list of
 				      * boundary_ids.  If none is specified
 				      * the whole boundary will be extracted.
-				      *  
+				      *
 				      * It also builds a mapping linking the
 				      * cells on the surface mesh to the
 				      * corresponding faces on the volume one.
@@ -832,17 +832,42 @@ class GridTools
 				      * rather than any curved boundary object
 				      * you may want to use to determine the
 				      * location of new vertices.
+				      *
+				      * @note Oftentimes, the
+				      * <code>Container</code>
+				      * template type will be of kind
+				      * Triangulation; in that case,
+				      * the map that is returned will
+				      * be between Triangulation cell
+				      * iterators of the surface mesh
+				      * and Triangulation face
+				      * iterators of the volume
+				      * mesh. However, one often needs
+				      * to have this mapping between
+				      * DoFHandler (or hp::DoFHandler)
+				      * iterators. In that case, you
+				      * can pass DoFHandler arguments
+				      * as first and second parameter;
+				      * the function will in that case
+				      * re-build the triangulation
+				      * underlying the second argument
+				      * and return a map between
+				      * DoFHandler iterators. However,
+				      * the function will not actually
+				      * distribute degrees of freedom
+				      * on this newly created surface
+				      * mesh.
 				      */
-    template <int dim, int spacedim>
-    static void 
-    extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh,
-			   Triangulation<dim-1,spacedim>     &surface_mesh,
-			   std::map<typename Triangulation<dim-1,spacedim>::cell_iterator,
-			   typename Triangulation<dim,spacedim>::face_iterator> 
+    template <template <int,int> class Container, int dim, int spacedim>
+    static void
+    extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
+			   Container<dim-1,spacedim>     &surface_mesh,
+			   std::map<typename Container<dim-1,spacedim>::cell_iterator,
+			   typename Container<dim,spacedim>::face_iterator>
     &surface_to_volume_mapping,
 			   const std::set<unsigned char> &boundary_ids
 			   = std::set<unsigned char>());
-  
+
                                      /**
                                       * Exception
                                       */

@@ -43,17 +43,34 @@ DEAL_II_NAMESPACE_OPEN
 // and the like
 namespace
 {
-    template<int dim, int spacedim>
-    const Triangulation<dim, spacedim> &get_tria(const Triangulation<dim, spacedim> &tria)
-   {
-      return tria;
-   }
+  template<int dim, int spacedim>
+  const Triangulation<dim, spacedim> &
+  get_tria(const Triangulation<dim, spacedim> &tria)
+  {
+    return tria;
+  }
 
-    template<int dim, template<int, int> class Container, int spacedim>
-    const Triangulation<dim> &get_tria(const Container<dim,spacedim> &container)
-   {
-      return container.get_tria();
-   }
+  template<int dim, template<int, int> class Container, int spacedim>
+  const Triangulation<dim,spacedim> &
+  get_tria(const Container<dim,spacedim> &container)
+  {
+    return container.get_tria();
+  }
+
+
+  template<int dim, int spacedim>
+  Triangulation<dim, spacedim> &
+  get_tria(Triangulation<dim, spacedim> &tria)
+  {
+    return tria;
+  }
+
+  template<int dim, template<int, int> class Container, int spacedim>
+  const Triangulation<dim,spacedim> &
+  get_tria(Container<dim,spacedim> &container)
+  {
+    return container.get_tria();
+  }
 }
 
 
@@ -1812,14 +1829,14 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
 
 
 
-template <int dim, int spacedim>
+template <template <int,int> class Container, int dim, int spacedim>
 void
-GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh,
-			      Triangulation<dim-1,spacedim>     &surface_mesh,
-			      std::map<typename Triangulation<dim-1,spacedim>::cell_iterator,
-				       typename Triangulation<dim,spacedim>::face_iterator>
-				&surface_to_volume_mapping,
-			      const std::set<unsigned char> &boundary_ids)
+GridTools::extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
+				  Container<dim-1,spacedim>     &surface_mesh,
+				  std::map<typename Container<dim-1,spacedim>::cell_iterator,
+				  typename Container<dim,spacedim>::face_iterator>
+				    &surface_to_volume_mapping,
+				  const std::set<unsigned char> &boundary_ids)
 {
 // Assumption:
 //    We are relying below on the fact that Triangulation::create_triangulation(...) will keep the order
@@ -1831,11 +1848,11 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
 
 				   // First create surface mesh and mapping from only level(0) cells of volume_mesh
 
-  std::vector<typename Triangulation<dim,spacedim>::face_iterator>
+  std::vector<typename Container<dim,spacedim>::face_iterator>
     mapping;  // temporary map for level==0
 
 
-  std::vector< bool >                 touched (volume_mesh.n_vertices(), false);
+  std::vector< bool > touched (get_tria(volume_mesh).n_vertices(), false);
   std::vector< CellData< boundary_dim > > cells;
   std::vector< Point<spacedim> >      vertices;
 
@@ -1844,13 +1861,13 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
   unsigned int v_index;
   CellData< boundary_dim > c_data;
 
-  for (typename Triangulation<dim,spacedim>::cell_iterator
+  for (typename Container<dim,spacedim>::cell_iterator
 	 cell = volume_mesh.begin(0);
        cell != volume_mesh.end(0);
        ++cell)
     for (unsigned int i=0; i < GeometryInfo<dim>::faces_per_cell; ++i)
       {
-	const typename Triangulation<dim,spacedim>::face_iterator
+	const typename Container<dim,spacedim>::face_iterator
 	  face = cell->face(i);
 
 	if ( face->at_boundary()
@@ -1880,10 +1897,11 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
       }
 
 				   // create level 0 surface triangulation
-  surface_mesh.create_triangulation (vertices, cells, SubCellData());
+  const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+    .create_triangulation (vertices, cells, SubCellData());
 
 				   // Make the actual mapping
-  for (typename Triangulation<dim-1,spacedim>::active_cell_iterator
+  for (typename Container<dim-1,spacedim>::active_cell_iterator
 	 cell = surface_mesh.begin(0);
        cell!=surface_mesh.end(0); ++cell)
     surface_to_volume_mapping[cell] = mapping.at(cell->index());
@@ -1891,7 +1909,7 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
   do
     {
       bool changed = false;
-      typename Triangulation<dim-1,spacedim>::active_cell_iterator
+      typename Container<dim-1,spacedim>::active_cell_iterator
 	cell = surface_mesh.begin_active(),
 	endc = surface_mesh.end();
 
@@ -1904,9 +1922,10 @@ GridTools::extract_boundary_mesh (const Triangulation<dim,spacedim> &volume_mesh
 
       if (changed)
 	{
-	  surface_mesh.execute_coarsening_and_refinement ();
+	  const_cast<Triangulation<dim-1,spacedim>&>(get_tria(surface_mesh))
+	    .execute_coarsening_and_refinement();
 
-	  typename Triangulation<dim-1,spacedim>::cell_iterator
+	  typename Container<dim-1,spacedim>::cell_iterator
 	    cell = surface_mesh.begin(),
 	    endc = surface_mesh.end();
 	  for (; cell!=endc; ++cell)
