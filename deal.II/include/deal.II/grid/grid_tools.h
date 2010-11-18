@@ -857,14 +857,33 @@ class GridTools
 				      * distribute degrees of freedom
 				      * on this newly created surface
 				      * mesh.
+				      *
+				      * @note The algorithm outlined
+				      * above assumes that all faces
+				      * on higher refinement levels
+				      * always have exactly the same
+				      * boundary indicator as their
+				      * parent face. Consequently, we
+				      * can start with coarse level
+				      * faces and build the surface
+				      * mesh based on that. It would
+				      * not be very difficult to
+				      * extend the function to also
+				      * copy boundary indicators from
+				      * finer level faces to their
+				      * corresponding surface mesh
+				      * cells, for example to
+				      * accomodate different geometry
+				      * descriptions in the case of
+				      * curved boundaries.
 				      */
     template <template <int,int> class Container, int dim, int spacedim>
     static void
     extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
 			   Container<dim-1,spacedim>     &surface_mesh,
 			   std::map<typename Container<dim-1,spacedim>::cell_iterator,
-			   typename Container<dim,spacedim>::face_iterator>
-    &surface_to_volume_mapping,
+			            typename Container<dim,spacedim>::face_iterator>
+			   &surface_to_volume_mapping,
 			   const std::set<unsigned char> &boundary_ids
 			   = std::set<unsigned char>());
 
