@@ -1438,9 +1438,11 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::linfty_norm () const
   {
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());
-
+				     // while we disallow the other
+				     // norm operations on ghosted
+				     // vectors, this particular norm
+				     // is safe to run even in the
+				     // presence of ghost elements
     TrilinosScalar d;
     const int ierr = vector->NormInf (&d);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
