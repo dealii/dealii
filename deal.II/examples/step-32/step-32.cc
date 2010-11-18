@@ -3175,10 +3175,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
 	  ExcInternalError());
 
   TrilinosWrappers::MPI::Vector joint_solution;
-  IndexSet locally_relevant_dofs(joint_dof_handler.n_dofs());
-  DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_dofs);
-  joint_solution.reinit (locally_relevant_dofs, MPI_COMM_WORLD);
-
+  joint_solution.reinit (joint_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
+  
   {
     //double minimal_pressure = stokes_solution.block(1)(0);
     //for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
@@ -3300,12 +3298,18 @@ void BoussinesqFlowProblem<dim>::output_results ()
     data_component_interpretation[i]
       = DataComponentInterpretation::component_is_part_of_vector;
 
-  data_out.add_data_vector (joint_solution, joint_solution_names,
+  IndexSet locally_relevant_dofs(joint_dof_handler.n_dofs());
+  DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_dofs);
+  TrilinosWrappers::MPI::Vector locally_relevant_joint_solution;
+  locally_relevant_joint_solution.reinit (locally_relevant_dofs, MPI_COMM_WORLD);
+  locally_relevant_joint_solution = joint_solution;
+  
+  data_out.add_data_vector (locally_relevant_joint_solution, joint_solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
   data_out.build_patches (1+std::min(stokes_degree, temperature_degree));
 
-  const std::string filename = ("out/solution-" +
+  const std::string filename = ("solution-" +
 				Utilities::int_to_string (out_index, 5) +
 				"." +
 				Utilities::int_to_string
@@ -3324,7 +3328,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
 			     Utilities::int_to_string(i, 4) +
 			     ".vtu");
       const std::string
-	master_filename = ("out/solution-" +
+	master_filename = ("solution-" +
 			   Utilities::int_to_string (out_index, 5) +
 			   ".pvtu");
       std::ofstream master (master_filename.c_str());
