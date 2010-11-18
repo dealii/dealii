@@ -894,6 +894,36 @@ void VectorTools::create_point_source_vector (const hp::DoFHandler<dim,spacedim>
 
 
 
+// separate implementation for 1D because otherwise we get linker errors since
+// FEFaceValues<1> is not compiled
+template <>
+void
+VectorTools::create_boundary_right_hand_side (const Mapping<1,1>    &,
+					      const DoFHandler<1,1> &,
+					      const Quadrature<0>   &,
+					      const Function<1>     &,
+					      Vector<double>        &,
+					      const std::set<unsigned char> &)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
+template <>
+void
+VectorTools::create_boundary_right_hand_side (const Mapping<1,2>    &,
+					      const DoFHandler<1,2> &,
+					      const Quadrature<0>   &,
+					      const Function<2>     &,
+					      Vector<double>        &,
+					      const std::set<unsigned char> &)
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
 template <int dim, int spacedim>
 void
 VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      &mapping,
@@ -903,12 +933,6 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      
 					      Vector<double>          &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
-  if (dim == 1)
-    {
-      Assert (false, ExcImpossibleInDim(dim));
-      return;
-    }
-
   const FiniteElement<dim> &fe  = dof_handler.get_fe();
   Assert (fe.n_components() == rhs_function.n_components,
 	  ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
@@ -1039,6 +1063,8 @@ VectorTools::create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &
 
 
 
+// separate implementation for 1D because otherwise we get linker errors since
+// hp::FEFaceValues<1> is not compiled
 template <>
 void
 VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,1>      &,
@@ -1069,11 +1095,11 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<1,2>  
 
 template <int dim, int spacedim>
 void
-VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>      &mapping,
-					      const hp::DoFHandler<dim,spacedim>   &dof_handler,
-					      const hp::QCollection<dim-1> &quadrature,
-					      const Function<spacedim>     &rhs_function,
-					      Vector<double>          &rhs_vector,
+VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim> &mapping,
+					      const hp::DoFHandler<dim,spacedim> &dof_handler,
+					      const hp::QCollection<dim-1>  &quadrature,
+					      const Function<spacedim>      &rhs_function,
+					      Vector<double>                &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
   const hp::FECollection<dim> &fe  = dof_handler.get_fe();
@@ -1201,10 +1227,10 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,sp
 
 template <int dim, int spacedim>
 void
-VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>   &dof_handler,
-					      const hp::QCollection<dim-1> &quadrature,
-					      const Function<spacedim>     &rhs_function,
-					      Vector<double>          &rhs_vector,
+VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim> &dof_handler,
+					      const hp::QCollection<dim-1>  &quadrature,
+					      const Function<spacedim>      &rhs_function,
+					      Vector<double>                &rhs_vector,
 					      const std::set<unsigned char> &boundary_indicators)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
@@ -1829,25 +1855,54 @@ VectorTools::interpolate_boundary_values
 
 // -------- implementation for project_boundary_values with std::map --------
 
-template <int dim, int spacedim>
+// separate implementations for 1D because otherwise we get linking errors
+// because create_boundary_mass_matrix is not compiled for 1D
+template <>
 void
-VectorTools::project_boundary_values (const Mapping<dim, spacedim>       &mapping,
-				      const DoFHandler<dim,spacedim>    &dof,
-				      const typename FunctionMap<spacedim>::type &boundary_functions,
-				      const Quadrature<dim-1>  &q,
+VectorTools::project_boundary_values (const Mapping<1,1>         &mapping,
+				      const DoFHandler<1,1>      &dof,
+				      const FunctionMap<1>::type &boundary_functions,
+				      const Quadrature<0>        &,
 				      std::map<unsigned int,double> &boundary_values,
-				      std::vector<unsigned int> component_mapping)
+				      std::vector<unsigned int>   component_mapping)
 {
-  if (dim == 1)
-    {
-      Assert (component_mapping.size() == 0, ExcNotImplemented());
+  Assert (component_mapping.size() == 0, ExcNotImplemented());
 				   // projection in 1d is equivalent
 				   // to interpolation
-      interpolate_boundary_values (mapping, dof, boundary_functions,
-				   boundary_values, std::vector<bool>());
-      return;
-    }
+  interpolate_boundary_values (mapping, dof, boundary_functions,
+			       boundary_values, std::vector<bool>());
+}
 
+
+
+template <>
+void
+VectorTools::project_boundary_values (const Mapping<1,2>         &mapping,
+				      const DoFHandler<1,2>      &dof,
+				      const FunctionMap<2>::type &boundary_functions,
+				      const Quadrature<0>        &,
+				      std::map<unsigned int,double> &boundary_values,
+				      std::vector<unsigned int>   component_mapping)
+{
+  Assert (component_mapping.size() == 0, ExcNotImplemented());
+				   // projection in 1d is equivalent
+				   // to interpolation
+  interpolate_boundary_values (mapping, dof, boundary_functions,
+			       boundary_values, std::vector<bool>());
+}
+
+
+
+
+template <int dim, int spacedim>
+void
+VectorTools::project_boundary_values (const Mapping<dim, spacedim>   &mapping,
+				      const DoFHandler<dim, spacedim>&dof,
+				      const typename FunctionMap<spacedim>::type &boundary_functions,
+				      const Quadrature<dim-1>        &q,
+				      std::map<unsigned int,double>  &boundary_values,
+				      std::vector<unsigned int>       component_mapping)
+{
 //TODO:[?] In VectorTools::project_boundary_values, no condensation of sparsity
 //    structures, matrices and right hand sides or distribution of
 //    solution vectors is performed. This is ok for dim<3 because then
