@@ -585,7 +585,7 @@ MappingQ1<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
 template<int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingQ1<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
-				  const Quadrature<dim-1>& quadrature) const
+					   const Quadrature<dim-1>& quadrature) const
 {
   InternalData* data = new InternalData(n_shape_functions);
   compute_face_data (update_flags,
@@ -780,34 +780,36 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 	    if (dim==spacedim)
 	      JxW_values[point]
 		= determinant(data.contravariant[point])*weights[point];
-
-	    if ( (dim==1) && (spacedim==2) )
+	    else if ( (dim==1) && (spacedim==2) )
 	      {
    	        data.contravariant[point]=transpose(data.contravariant[point]);
 		JxW_values[point]
 		  = data.contravariant[point][0].norm()*weights[point];
 		if(update_flags & update_normal_vectors)
-		{
-		  normal_vectors[point][0]=-data.contravariant[point][0][1]
-		      /data.contravariant[point][0].norm();
-		  normal_vectors[point][1]=data.contravariant[point][0][0]
-		      /data.contravariant[point][0].norm();
-		}
+		  {
+		    normal_vectors[point][0]
+		      = -(data.contravariant[point][0][1]
+			  /
+			  data.contravariant[point][0].norm());
+		    normal_vectors[point][1]
+		      = (data.contravariant[point][0][0]
+			 /
+			 data.contravariant[point][0].norm());
+		  }
 	      }
-	    if ( (dim==2) && (spacedim==3) )
+	    else if ( (dim==2) && (spacedim==3) )
 	      {
 		data.contravariant[point]=transpose(data.contravariant[point]);
 		cross_product(data.contravariant[point][2],
 			      data.contravariant[point][0],
-			      data.contravariant[point][1]
-			      );
+			      data.contravariant[point][1]);
 		JxW_values[point]
 		  = data.contravariant[point][2].norm()*weights[point];
 		                          //the cell normal vector
 		                          //(normal to the surface)
                                           //is stored in the 3d
 		                          //subtensor of the contravariant tensor
-		data.contravariant[point][2]/=data.contravariant[point][2].norm();
+		data.contravariant[point][2] /= data.contravariant[point][2].norm();
 		if(update_flags & update_normal_vectors)
 		  normal_vectors[point]=data.contravariant[point][2];
 	      }
@@ -1086,16 +1088,18 @@ MappingQ1<dim,spacedim>::compute_fill_face (
 
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-				     const unsigned int                               face_no,
-				     const Quadrature<dim-1>                          &q,
-				     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-				     std::vector<Point<spacedim> >                         &quadrature_points,
-				     std::vector<double>                              &JxW_values,
-				     std::vector<Tensor<1,spacedim> >                      &boundary_forms,
-				     std::vector<Point<spacedim> >                    &normal_vectors) const
+MappingQ1<dim,spacedim>::
+fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+		     const unsigned int                               face_no,
+		     const Quadrature<dim-1>                          &q,
+		     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+		     std::vector<Point<spacedim> >                         &quadrature_points,
+		     std::vector<double>                              &JxW_values,
+		     std::vector<Tensor<1,spacedim> >                      &boundary_forms,
+		     std::vector<Point<spacedim> >                    &normal_vectors) const
 {
-  // ensure that the following cast is really correct:
+				   // ensure that the following cast
+				   // is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   InternalData &data = static_cast<InternalData&>(mapping_data);
@@ -1118,19 +1122,22 @@ MappingQ1<dim,spacedim>::fill_fe_face_values (const typename Triangulation<dim,s
 }
 
 
+
 template<int dim, int spacedim>
 void
-MappingQ1<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-					const unsigned int       face_no,
-					const unsigned int       sub_no,
-					const Quadrature<dim-1> &q,
-					typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-					std::vector<Point<spacedim> >     &quadrature_points,
-					std::vector<double>          &JxW_values,
-					std::vector<Tensor<1,spacedim> >  &boundary_forms,
-					std::vector<Point<spacedim> >     &normal_vectors) const
+MappingQ1<dim,spacedim>::
+fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+			const unsigned int       face_no,
+			const unsigned int       sub_no,
+			const Quadrature<dim-1> &q,
+			typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+			std::vector<Point<spacedim> >     &quadrature_points,
+			std::vector<double>          &JxW_values,
+			std::vector<Tensor<1,spacedim> >  &boundary_forms,
+			std::vector<Point<spacedim> >     &normal_vectors) const
 {
-  // ensure that the following cast is really correct:
+				   // ensure that the following cast
+				   // is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   InternalData &data = static_cast<InternalData&>(mapping_data);
