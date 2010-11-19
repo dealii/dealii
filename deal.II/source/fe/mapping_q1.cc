@@ -517,7 +517,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
 					   // unit cell.
 	  const unsigned int nfaces = GeometryInfo<dim>::faces_per_cell;
 	  data.unit_tangentials.resize (nfaces*(dim-1),
-					std::vector<Tensor<1,spacedim> > (n_original_q_points));
+					std::vector<Tensor<1,dim> > (n_original_q_points));
 	  if (dim==2)
 	    {
 					       // ensure a counterclock wise
@@ -525,7 +525,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
 	      static const int tangential_orientation[4]={-1,1,1,-1};
 	      for (unsigned int i=0; i<nfaces; ++i)
 		{
-		  Tensor<1,spacedim> tang;
+		  Tensor<1,dim> tang;
 		  tang[1-i/2]=tangential_orientation[i];
 		  std::fill (data.unit_tangentials[i].begin(),
 			     data.unit_tangentials[i].end(), tang);
@@ -535,7 +535,7 @@ MappingQ1<dim,spacedim>::compute_face_data (const UpdateFlags update_flags,
 	    {
 	      for (unsigned int i=0; i<nfaces; ++i)
 		{
-		  Tensor<1,spacedim> tang1, tang2;
+		  Tensor<1,dim> tang1, tang2;
 
 		  const unsigned int nd=
 		    GeometryInfo<dim>::unit_normal_direction[i];
@@ -866,65 +866,6 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 
 
 
-template<>
-void
-MappingQ1<2,3>::compute_fill_face (const Triangulation<2,3>::cell_iterator &,
-				   const unsigned int,
-				   const unsigned int,
-				   const unsigned int,
-				   const DataSetDescriptor,
-				   const std::vector<double>&,
-				   InternalData &,
-				   std::vector<Point<3> >&,
-				   std::vector<double>&,
-				   std::vector<Tensor<1,3> > &,
-				   std::vector<Point<3> > &) const
-{
-	Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-MappingQ1<1,1>::compute_fill_face (
-  const Triangulation<1,1>::cell_iterator &,
-  const unsigned int,
-  const unsigned int,
-  const unsigned int,
-  const DataSetDescriptor,
-  const std::vector<double> &,
-  InternalData &,
-  std::vector<Point<1> > &,
-  std::vector<double> &,
-  std::vector<Tensor<1,1> > &,
-  std::vector<Point<1> > &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-MappingQ1<1,2>::compute_fill_face (
-  const Triangulation<1,2>::cell_iterator &,
-  const unsigned int,
-  const unsigned int,
-  const unsigned int,
-  const DataSetDescriptor,
-  const std::vector<double> &,
-  InternalData &,
-  std::vector<Point<2> > &,
-  std::vector<double> &,
-  std::vector<Tensor<1,2> > &,
-  std::vector<Point<2> > &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
 template <>
 void
 MappingQ1<1,1>::fill_fe_face_values (
@@ -995,6 +936,137 @@ MappingQ1<1,2>::fill_fe_subface_values (
 
 
 
+namespace internal
+{
+  namespace
+  {
+    void
+    compute_fill_face (const dealii::MappingQ1<1,1> &,
+		       const dealii::Triangulation<1,1>::cell_iterator &,
+		       const unsigned int,
+		       const unsigned int,
+		       const unsigned int,
+		       const std::vector<double> &,
+		       dealii::MappingQ1<1,1>::InternalData &,
+		       std::vector<double> &,
+		       std::vector<Tensor<1,1> > &,
+		       std::vector<Point<1> > &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+
+
+    void
+    compute_fill_face (const dealii::MappingQ1<1,2> &,
+		       const dealii::Triangulation<1,2>::cell_iterator &,
+		       const unsigned int,
+		       const unsigned int,
+		       const unsigned int,
+		       const std::vector<double> &,
+		       dealii::MappingQ1<1,2>::InternalData &,
+		       std::vector<double> &,
+		       std::vector<Tensor<1,2> > &,
+		       std::vector<Point<2> > &)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    compute_fill_face (const dealii::MappingQ1<dim,spacedim> &mapping,
+		       const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+		       const unsigned int               face_no,
+		       const unsigned int               subface_no,
+		       const unsigned int               n_q_points,
+		       const std::vector<double>        &weights,
+		       typename dealii::MappingQ1<dim,spacedim>::InternalData &data,
+		       std::vector<double>              &JxW_values,
+		       std::vector<Tensor<1,spacedim> > &boundary_forms,
+		       std::vector<Point<spacedim> >    &normal_vectors)
+    {
+      const UpdateFlags update_flags(data.current_update_flags());
+
+      if (update_flags & update_boundary_forms)
+      	{
+      	  Assert (boundary_forms.size()==n_q_points,
+      		  ExcDimensionMismatch(boundary_forms.size(), n_q_points));
+      	  if (update_flags & update_normal_vectors)
+      	    Assert (normal_vectors.size()==n_q_points,
+      		    ExcDimensionMismatch(normal_vectors.size(), n_q_points));
+      	  if (update_flags & update_JxW_values)
+      	    Assert (JxW_values.size() == n_q_points,
+      		    ExcDimensionMismatch(JxW_values.size(), n_q_points));
+
+      	  mapping.transform (data.unit_tangentials[face_no],
+	  		     data.aux[0],
+	  		     data,
+	  		     mapping_contravariant);
+
+      	  typename std::vector<Tensor<1,spacedim> >::iterator
+      	    result = boundary_forms.begin();
+      	  const typename std::vector<Tensor<1,spacedim> >::iterator
+      	    end = boundary_forms.end();
+
+      	  switch (dim)
+      	    {
+      	      case 2:
+      	      {
+      	  	for (unsigned int i=0; result != end; ++result, ++i)
+      	  	  cross_product (*result, data.aux[0][i]);
+      	  	break;
+      	      }
+
+      	      case 3:
+      	      {
+      	  	Assert (face_no+GeometryInfo<dim>::faces_per_cell <
+      	  		data.unit_tangentials.size(),
+      	  		ExcInternalError());
+      	  	Assert (data.aux[1].size() <=
+      	  		data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell].size(),
+      	  		ExcInternalError());
+      	  	mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell],
+				   data.aux[1],
+				   data,
+				   mapping_contravariant);
+      	  	for (unsigned int i=0; result != end; ++result, ++i)
+      	  	  cross_product (*result, data.aux[0][i], data.aux[1][i]);
+
+      	  	break;
+      	      }
+
+      	      default:
+      	  	    Assert(false, ExcNotImplemented());
+      	    }
+
+      	  if (update_flags & (update_normal_vectors
+      	  		      | update_JxW_values))
+      	    for (unsigned int i=0;i<boundary_forms.size();++i)
+      	      {
+      	  	const double f = std::sqrt(contract(boundary_forms[i],
+      	  					    boundary_forms[i]));
+      	  	if (update_flags & update_JxW_values)
+      	  	  {
+      	  	    JxW_values[i] = f * weights[i];
+      	  	    if (subface_no!=deal_II_numbers::invalid_unsigned_int)
+      	  	      {
+      	  		const double area_ratio=GeometryInfo<dim>::subface_ratio(
+      	  		  cell->subface_case(face_no), subface_no);
+      	  		JxW_values[i] *= area_ratio;
+      	  	      }
+      	  	  }
+
+      	  	if (update_flags & update_normal_vectors)
+      	  	  normal_vectors[i] = boundary_forms[i] / f;
+      	      }
+	}
+    }
+  }
+}
+
+
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::compute_fill_face (
@@ -1012,77 +1084,10 @@ MappingQ1<dim,spacedim>::compute_fill_face (
 {
   compute_fill (cell, n_q_points, data_set, CellSimilarity::none,
 		data, quadrature_points);
-
-  const UpdateFlags update_flags(data.current_update_flags());
-
-  if (update_flags & update_boundary_forms)
-    {
-      Assert (boundary_forms.size()==n_q_points,
-	      ExcDimensionMismatch(boundary_forms.size(), n_q_points));
-      if (update_flags & update_normal_vectors)
-	Assert (normal_vectors.size()==n_q_points,
-		ExcDimensionMismatch(normal_vectors.size(), n_q_points));
-      if (update_flags & update_JxW_values)
-	Assert (JxW_values.size() == n_q_points,
-		ExcDimensionMismatch(JxW_values.size(), n_q_points));
-
-      transform(data.unit_tangentials[face_no], data.aux[0],
-		data, mapping_contravariant);
-
-      typename std::vector<Tensor<1,spacedim> >::iterator
-	result = boundary_forms.begin();
-      const typename std::vector<Tensor<1,spacedim> >::iterator
-	end = boundary_forms.end();
-
-      switch (dim)
-	{
-	  case 2:
-          {
-            for (unsigned int i=0; result != end; ++result, ++i)
-              cross_product (*result, data.aux[0][i]);
-            break;
-          };
-
-	  case 3:
-          {
-            Assert (face_no+GeometryInfo<dim>::faces_per_cell <
-                    data.unit_tangentials.size(),
-                    ExcInternalError());
-            Assert (data.aux[1].size() <=
-                    data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell].size(),
-                    ExcInternalError());
-            transform(data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell],
-		      data.aux[1], data, mapping_contravariant);
-            for (unsigned int i=0; result != end; ++result, ++i)
-              cross_product (*result, data.aux[0][i], data.aux[1][i]);
-
-            break;
-          };
-
-	  default:
-                Assert(false, ExcNotImplemented());
-	}
-
-      if (update_flags & (update_normal_vectors
-			  | update_JxW_values))
-	for (unsigned int i=0;i<boundary_forms.size();++i)
-	  {
-	    const double f = std::sqrt(contract(boundary_forms[i],
-                                                boundary_forms[i]));
-	    if (update_flags & update_JxW_values)
-	      {
-		JxW_values[i] = f * weights[i];
-		if (subface_no!=deal_II_numbers::invalid_unsigned_int)
-		  {
-		    const double area_ratio=GeometryInfo<dim>::subface_ratio(
-		      cell->subface_case(face_no), subface_no);
-		    JxW_values[i] *= area_ratio;
-		  }
-	      }
-	    if (update_flags & update_normal_vectors)
-              normal_vectors[i] = boundary_forms[i] / f;
-	  }
-    }
+  internal::compute_fill_face (*this,
+			       cell, face_no, subface_no, n_q_points,
+			       weights, data,
+			       JxW_values, boundary_forms, normal_vectors);
 }
 
 

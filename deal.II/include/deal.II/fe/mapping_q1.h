@@ -230,7 +230,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  *
 					  * Filled once.
 					  */
-        std::vector<std::vector<Tensor<1,spacedim> > > unit_tangentials;
+        std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
 
 					 /**
 					  * Auxiliary vectors for internal use.
