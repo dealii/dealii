@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,11 +17,13 @@
 #include <base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
+
+
 /**
  * Filter a range out of any object having a random access <tt>operator[]
  * (unsigned int)</tt> and a function <tt>size() const</tt>.
  *
- * The use of this object is straightforward. It reduplicates the
+ * The use of this object is straightforward. It duplicates the
  * random access operator of the <tt>VECTOR</tt> and adds an offset to
  * every index.
  *
@@ -79,7 +81,7 @@ class VectorSlice
 				      * <tt>std::vector</tt>.
 				      */
     typename VECTOR::reference operator[] (unsigned int i);
-    
+
 				     /**
 				      * Access an element of a
 				      * constant slice using the same
@@ -92,22 +94,22 @@ class VectorSlice
 				      * STL conforming iterator function.
 				      */
     typename VECTOR::iterator begin();
-    
+
 				     /**
 				      * STL conforming iterator function.
 				      */
     typename VECTOR::const_iterator begin() const;
-    
+
 				     /**
 				      * STL conforming iterator function.
 				      */
     typename VECTOR::iterator end();
-    
+
 				     /**
 				      * STL conforming iterator function.
 				      */
     typename VECTOR::const_iterator end() const;
-    
+
   private:
 				     /**
 				      * The vector we extract from.
@@ -152,7 +154,9 @@ make_slice (VECTOR& v)
 template <class VECTOR>
 inline
 const VectorSlice<const VECTOR>
-make_slice (VECTOR& v, unsigned int start, unsigned int length)
+make_slice (VECTOR& v,
+	    const unsigned int start,
+	    const unsigned int length)
 {
   const VectorSlice<const VECTOR> r(v, start, length);
   return r;
@@ -166,7 +170,8 @@ make_slice (VECTOR& v, unsigned int start, unsigned int length)
 template <class VECTOR>
 inline
 VectorSlice<VECTOR>::VectorSlice(VECTOR& v)
-		: v(v), start(0), length(v.size())
+		:
+		v(v), start(0), length(v.size())
 {}
 
 
@@ -175,7 +180,8 @@ inline
 VectorSlice<VECTOR>::VectorSlice(VECTOR& v,
 			 unsigned int start,
 			 unsigned int length)
-		: v(v), start(start), length(length)
+		:
+		v(v), start(start), length(length)
 {
   Assert((start+length<=v.size()),
 	 ExcIndexRange(length, 0, v.size()-start+1));
@@ -197,7 +203,7 @@ typename VECTOR::reference
 VectorSlice<VECTOR>::operator[](unsigned int i)
 {
   Assert ((i<length), ExcIndexRange(i, 0, length));
-  
+
   return v[start+i];
 }
 
@@ -208,7 +214,7 @@ typename VECTOR::const_reference
 VectorSlice<VECTOR>::operator[](unsigned int i) const
 {
   Assert ((i<length), ExcIndexRange(i, 0, length));
-  
+
   return v[start+i];
 }
 
