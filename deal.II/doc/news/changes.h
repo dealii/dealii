@@ -94,6 +94,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>Updated: The version of the <a href="http://www.threadingbuildingblocks.org">Threading
+  Building Blocks (TBB)</a> shipped with deal.II has been updated
+  to release 3.0 Update 3 (Commercially aligned version).
+  <br>
+  (WB, 2010/11/18)
+  </p></li>
+
   <li><p>New: While 2d and 3d could mostly be handled with the
   same code, dimension-independent programming was always a bit
   different because the faces of 1d cells (i.e. vertices) did not
