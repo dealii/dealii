@@ -1214,12 +1214,6 @@ namespace internal
 
 
 
-
-/*!@addtogroup feaccess */
-/*@{*/
-
-
-
 //TODO: Add access to mapping values to FEValuesBase
 //TODO: Several FEValuesBase of a system should share Mapping
 
@@ -1235,7 +1229,9 @@ namespace internal
  * The purpose of this class is discussed
  * on the page on @ref UpdateFlagsEssay.
  *
- * @author Guido Kanschat, 2000
+ * @ingroup feaccess
+ * @author Guido Kanschat
+ * @date 2000
  */
 template <int dim, int spacedim=dim>
 class FEValuesData
@@ -1552,6 +1548,7 @@ class FEValuesData
  * The mechanisms by which this class works is also discussed
  * on the page on @ref UpdateFlagsEssay.
  *
+ * @ingroup feaccess
  * @author Wolfgang Bangerth, 1998, 2003, Guido Kanschat, 2001
  */
 template <int dim, int spacedim>
@@ -1613,53 +1610,6 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * Destructor.
 				      */
     ~FEValuesBase ();
-
-				     /// @name Extractors Methods to extract individual components
-				     //@{
-
-				     /**
-				      * Create a view of the current FEValues
-				      * object that represents a particular
-				      * scalar component of the possibly
-				      * vector-valued finite element. The
-				      * concept of views is explained in the
-				      * documentation of the namespace
-				      * FEValuesViews and in particular
-				      * in the @ref vector_valued module.
-				      */
-    const FEValuesViews::Scalar<dim,spacedim> &
-    operator[] (const FEValuesExtractors::Scalar &scalar) const;
-
-				     /**
-				      * Create a view of the current FEValues
-				      * object that represents a set of
-				      * <code>dim</code> scalar components
-				      * (i.e. a vector) of the vector-valued
-				      * finite element. The concept of views
-				      * is explained in the documentation of
-				      * the namespace FEValuesViews and in particular
-				      * in the @ref vector_valued module.
-				      */
-    const FEValuesViews::Vector<dim,spacedim> &
-    operator[] (const FEValuesExtractors::Vector &vector) const;
-
-    				     /**
-				      * Create a view of the current FEValues
-				      * object that represents a set of
-				      * <code>(dim*dim + dim)/2</code> scalar components
-				      * (i.e. a symmetric 2nd order tensor)
-                                      * of the vector-valued
-				      * finite element. The concept of views
-				      * is explained in the documentation of
-				      * the namespace FEValuesViews and in particular
-				      * in the @ref vector_valued module.
-				      */
-    const FEValuesViews::SymmetricTensor<2,dim,spacedim> &
-    operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
-
-    				     //@}
-
-
 				     /// @name ShapeAccess Access to shape function values
 				     //@{
 
@@ -2586,6 +2536,9 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
       bool quadrature_points_fastest = false) const;
 				     //@}
 
+				     /// @name Geometry of the cell
+				     //@{
+    
 				     /**
 				      * Position of the <tt>i</tt>th
 				      * quadrature point in real space.
@@ -2673,32 +2626,6 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * inverse_jacobian().
 				      */
     const std::vector<Tensor<2,spacedim> > & get_inverse_jacobians () const;
-
-				     /**
-				      * Constant reference to the
-				      * selected mapping object.
-				      */
-    const Mapping<dim,spacedim> & get_mapping () const;
-
-				     /**
-				      * Constant reference to the
-				      * selected finite element
-				      * object.
-				      */
-    const FiniteElement<dim,spacedim> & get_fe () const;
-
-				     /**
-				      * Return the update flags set
-				      * for this object.
-				      */
-    UpdateFlags get_update_flags () const;
-
-				     /**
-				      * Return a triangulation
-				      * iterator to the current cell.
-				      */
-    const typename Triangulation<dim,spacedim>::cell_iterator get_cell () const;
-
     				     /**
 				      * For a face, return the outward
 				      * normal vector to the cell at
@@ -2727,6 +2654,17 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     const std::vector<Point<spacedim> > & get_normal_vectors () const;
 
+				     /**
+				      * Transform a set of vectors,
+				      * one for each quadrature
+				      * point. The <tt>mapping</tt>
+				      * can be any of the ones defined
+				      * in MappingType.
+				      */
+    void transform (std::vector<Tensor<1,spacedim> >& transformed,
+		    const std::vector<Tensor<1,dim> >& original,
+		    MappingType mapping) const;
+    
     				     /**
 				      * @deprecated Use
 				      * normal_vector() instead.
@@ -2748,6 +2686,81 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     const std::vector<Point<spacedim> > & get_cell_normal_vectors () const;
 
+				     //@}
+
+				     /// @name Extractors Methods to extract individual components
+				     //@{
+
+				     /**
+				      * Create a view of the current FEValues
+				      * object that represents a particular
+				      * scalar component of the possibly
+				      * vector-valued finite element. The
+				      * concept of views is explained in the
+				      * documentation of the namespace
+				      * FEValuesViews and in particular
+				      * in the @ref vector_valued module.
+				      */
+    const FEValuesViews::Scalar<dim,spacedim> &
+    operator[] (const FEValuesExtractors::Scalar &scalar) const;
+
+				     /**
+				      * Create a view of the current FEValues
+				      * object that represents a set of
+				      * <code>dim</code> scalar components
+				      * (i.e. a vector) of the vector-valued
+				      * finite element. The concept of views
+				      * is explained in the documentation of
+				      * the namespace FEValuesViews and in particular
+				      * in the @ref vector_valued module.
+				      */
+    const FEValuesViews::Vector<dim,spacedim> &
+    operator[] (const FEValuesExtractors::Vector &vector) const;
+
+    				     /**
+				      * Create a view of the current FEValues
+				      * object that represents a set of
+				      * <code>(dim*dim + dim)/2</code> scalar components
+				      * (i.e. a symmetric 2nd order tensor)
+                                      * of the vector-valued
+				      * finite element. The concept of views
+				      * is explained in the documentation of
+				      * the namespace FEValuesViews and in particular
+				      * in the @ref vector_valued module.
+				      */
+    const FEValuesViews::SymmetricTensor<2,dim,spacedim> &
+    operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
+
+    				     //@}
+
+				     /// @name Access to the raw data
+				     //@{
+    
+				     /**
+				      * Constant reference to the
+				      * selected mapping object.
+				      */
+    const Mapping<dim,spacedim> & get_mapping () const;
+
+				     /**
+				      * Constant reference to the
+				      * selected finite element
+				      * object.
+				      */
+    const FiniteElement<dim,spacedim> & get_fe () const;
+
+				     /**
+				      * Return the update flags set
+				      * for this object.
+				      */
+    UpdateFlags get_update_flags () const;
+
+				     /**
+				      * Return a triangulation
+				      * iterator to the current cell.
+				      */
+    const typename Triangulation<dim,spacedim>::cell_iterator get_cell () const;
+
 				     /**
 				      * Return the relation of the current
 				      * cell to the previous cell. This
@@ -2765,6 +2778,8 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * of this object.
 				      */
     unsigned int memory_consumption () const;
+				     //@}
+
 
 				     /**
 				      * This exception is thrown if
@@ -3000,6 +3015,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
  * FEValuesBase, if values in quadrature points of a cell are
  * needed. For further documentation see this class.
  *
+ * @ingroup feaccess
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2001
  */
 template <int dim, int spacedim=dim>
@@ -3182,6 +3198,7 @@ class FEValues : public FEValuesBase<dim,spacedim>
  *
  * See FEValuesBase
  *
+ * @ingroup feaccess
  *  @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
 template <int dim, int spacedim=dim>
@@ -3287,6 +3304,7 @@ class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
  * function to a mesh face. But, there are limits of these values
  * approaching the face from either of the neighboring cells.
  *
+ * @ingroup feaccess
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
 template <int dim, int spacedim=dim>
@@ -3463,6 +3481,7 @@ class FEFaceValues : public FEFaceValuesBase<dim,spacedim>
  * the refinement structure of the neighbor: a subface number
  * corresponds to the number of the child of the neighboring face.
  *
+ * @ingroup feaccess
  * @author Wolfgang Bangerth, 1998, Guido Kanschat, 2000, 2001
  */
 template <int dim, int spacedim=dim>
@@ -3653,7 +3672,6 @@ class FESubfaceValues : public FEFaceValuesBase<dim,spacedim>
                     const unsigned int subface_no);
 };
 
-/*@}*/
 
 #ifndef DOXYGEN
 
