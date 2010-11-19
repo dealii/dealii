@@ -2882,19 +2882,11 @@ namespace internals {
               global_face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2]
               = { { 1, 2 },
                   { 1, 2 },
-                  { 0, 2 },
-                  { 0, 2 },
+                  { 2, 0 },
+                  { 2, 0 },
                   { 0, 1 },
                   { 0, 1 } };
-            const unsigned int
-              local_face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2]
-              = { { 1, 0 },
-                  { 1, 0 },
-                  { 0, 1 },
-                  { 0, 1 },
-                  { 1, 0 },
-                  { 1, 0 } };
-
+            
           				                     // The projection is
           				                     // divided into two steps.
           				                     // In the first step we
@@ -2933,10 +2925,10 @@ namespace internals {
 
                 for (unsigned int i = 0; i < 2; ++i)
                   for (unsigned int j = 0; j <= degree; ++j)
-                    tmp -= dof_values[(i + 2 * local_face_coordinate_directions[face][0]) * superdegree + j]
+                    tmp -= dof_values[(i + 2) * superdegree + j]
                            * fe_values[vec].value (cell->get_fe ().face_to_cell_index
-                                                   ((i + 2 * local_face_coordinate_directions[face][0])
-                                                    * superdegree + j, face), q_point);
+                                                   ((i + 2) * superdegree + j,
+                                                    face), q_point);
 
                 const double JxW
                   = std::sqrt (fe_values.JxW (q_point)
@@ -3034,10 +3026,9 @@ namespace internals {
                  for (unsigned int i = 0; i < 2; ++i)
                    for (unsigned int j = 0; j <= degree; ++j)
                      tmp
-                       -= dof_values[(i + 2 * local_face_coordinate_directions[face][1]) * superdegree + j]
+                       -= dof_values[i * superdegree + j]
                        * fe_values[vec].value (cell->get_fe ().face_to_cell_index
-                                               ((i + 2 * local_face_coordinate_directions[face][1])
-                                                * superdegree + j, face), q_point);
+                                               (i * superdegree + j, face), q_point);
 
                  const double JxW
                    = std::sqrt (fe_values.JxW (q_point)
@@ -3556,10 +3547,12 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
               constraints.add_line (dof);
               constraints.set_inhomogeneity (dof, computed_constraints[dof]);
             }
+        
+        break;
       }
 
       default:
-            Assert (false, ExcNotImplemented ());
+        Assert (false, ExcNotImplemented ());
     }
 }
 

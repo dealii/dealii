@@ -2064,16 +2064,16 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                       >= (GeometryInfo<3>::lines_per_cell + 2 * deg)
                          * this->degree) &&
                    (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                      < (GeometryInfo<3>::lines_per_cell + 4 * deg)
                         * this->degree)) ||
                   ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                      >= (GeometryInfo<3>::lines_per_cell + 5 * deg)
                          * this->degree) &&
                    (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 7 * deg)
+                      < (GeometryInfo<3>::lines_per_cell + 6 * deg)
                         * this->degree)) ||
                   ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                      >= (GeometryInfo<3>::lines_per_cell + 7 * deg)
                          * this->degree) &&
                    (shape_index
                       < (GeometryInfo<3>::lines_per_cell + 9 * deg)
@@ -2102,19 +2102,13 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                       >= (GeometryInfo<3>::lines_per_cell + 2 * deg)
                          * this->degree) &&
                    (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
                         * this->degree)) ||
                    ((shape_index
-                       >= (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                       >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
                           * this->degree) &&
                     (shape_index
-                       < (GeometryInfo<3>::lines_per_cell + 6 * deg)
-                         * this->degree)) ||
-                   ((shape_index
-                       >= (GeometryInfo<3>::lines_per_cell + 7 * deg)
-                          * this->degree) &&
-                    (shape_index
-                       < (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                       < (GeometryInfo<3>::lines_per_cell + 7 * deg)
                          * this->degree)) ||
                    ((shape_index
                        >= (GeometryInfo<3>::lines_per_cell + 9 * deg)
@@ -2219,19 +2213,13 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                       < (GeometryInfo<3>::lines_per_cell + 3 * deg)
                         * this->degree)) ||
                   ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                      >= (GeometryInfo<3>::lines_per_cell + 5 * deg)
                          * this->degree) &&
                    (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                      < (GeometryInfo<3>::lines_per_cell + 6 * deg)
                         * this->degree)) ||
                   ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
-                         * this->degree) &&
-                   (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 7 * deg)
-                        * this->degree)) ||
-                  ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 8 * deg)
+                      >= (GeometryInfo<3>::lines_per_cell + 7 * deg)
                          * this->degree) &&
                    (shape_index
                       < (GeometryInfo<3>::lines_per_cell + 10 * deg)
@@ -2253,16 +2241,16 @@ FE_Nedelec<dim>::has_support_on_face (const unsigned int shape_index,
                       < (GeometryInfo<3>::lines_per_cell + 3 * deg)
                         * this->degree)) ||
                   ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 4 * deg)
+                      >= (GeometryInfo<3>::lines_per_cell + 5 * deg)
                          * this->degree) &&
                    (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 5 * deg)
+                      < (GeometryInfo<3>::lines_per_cell + 6 * deg)
                         * this->degree)) ||
                   ((shape_index
-                      >= (GeometryInfo<3>::lines_per_cell + 6 * deg)
+                      >= (GeometryInfo<3>::lines_per_cell + 7 * deg)
                          * this->degree) &&
                    (shape_index
-                      < (GeometryInfo<3>::lines_per_cell + 7 * deg)
+                      < (GeometryInfo<3>::lines_per_cell + 8 * deg)
                         * this->degree)) ||
                   ((shape_index
                       >= (GeometryInfo<3>::lines_per_cell + 10 * deg)
