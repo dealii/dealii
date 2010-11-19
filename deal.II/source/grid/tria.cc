@@ -3820,18 +3820,6 @@ namespace internal
    |0 | 1|
    .--.--.
 */
-
-					     // find the next
-					     // unused vertex and
-					     // allocate it for
-					     // the new vertex we
-					     // need here
-	    while (triangulation.vertices_used[next_unused_vertex] == true)
-	      ++next_unused_vertex;
-	    Assert (next_unused_vertex < triangulation.vertices.size(),
-		    ExcTooFewVerticesAllocated());
-	    triangulation.vertices_used[next_unused_vertex] = true;
-
 					     // collect the
 					     // indices of the
 					     // eight
@@ -3848,10 +3836,23 @@ namespace internal
 	    for (unsigned int line_no=0; line_no<4; ++line_no)
 	      if (cell->line(line_no)->has_children())
 		new_vertices[4+line_no]=cell->line(line_no)->child(0)->vertex_index(1);
-	    new_vertices[8] = next_unused_vertex;
 
 	    if (ref_case==RefinementCase<dim>::cut_xy)
 	      {
+
+						 // find the next
+						 // unused vertex and
+						 // allocate it for
+						 // the new vertex we
+						 // need here
+		while (triangulation.vertices_used[next_unused_vertex] == true)
+		  ++next_unused_vertex;
+		Assert (next_unused_vertex < triangulation.vertices.size(),
+			ExcTooFewVerticesAllocated());
+		triangulation.vertices_used[next_unused_vertex] = true;
+
+		new_vertices[8] = next_unused_vertex;
+
 						 // if this quad lives
 						 // in 2d, then we can
 						 // compute the new
