@@ -27,7 +27,7 @@ class MySolverControl:
    public SolverControl
 {
   public:
-    virtual State check(const unsigned int step,const double check_value)
+    virtual State check(const unsigned int step,const double)
       {
 	deallog << "MySolverControl " << step << std::endl;
 	return SolverControl::check(step, 0);
@@ -51,13 +51,13 @@ check(const MATRIX& A, const VECTOR& f)
   SolverSelector<VECTOR> solver;
   PreconditionSSOR<SparseMatrix<double> > pre;
   pre.initialize(A);
-  
+
   VECTOR u;
   u.reinit(f);
-  
+
   std::vector<std::string>::const_iterator name;
 
-  solver.set_control(mycont);  
+  solver.set_control(mycont);
   for (name = names.begin(); name != names.end();++name)
     {
       solver.select(*name);
@@ -83,9 +83,9 @@ int main()
 
   unsigned int size=37;
   unsigned int dim = (size-1)*(size-1);
-  
+
   deallog << "Size " << size << " Unknowns " << dim << std::endl;
-  
+
 				   // Make matrix
   FDMatrix testproblem(size, size);
   SparsityPattern structure(dim, dim, 5);
@@ -95,6 +95,6 @@ int main()
   testproblem.five_point(A);
   Vector<double>  f(dim);
   f = 1.;
-  
+
   check(A, f);
 }
