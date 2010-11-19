@@ -940,34 +940,18 @@ namespace internal
 {
   namespace
   {
+    template <int spacedim>
     void
-    compute_fill_face (const dealii::MappingQ1<1,1> &,
-		       const dealii::Triangulation<1,1>::cell_iterator &,
+    compute_fill_face (const dealii::MappingQ1<1,spacedim> &,
+		       const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
 		       const unsigned int,
 		       const unsigned int,
 		       const unsigned int,
 		       const std::vector<double> &,
-		       dealii::MappingQ1<1,1>::InternalData &,
+		       typename dealii::MappingQ1<1,spacedim>::InternalData &,
 		       std::vector<double> &,
-		       std::vector<Tensor<1,1> > &,
-		       std::vector<Point<1> > &)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-
-
-    void
-    compute_fill_face (const dealii::MappingQ1<1,2> &,
-		       const dealii::Triangulation<1,2>::cell_iterator &,
-		       const unsigned int,
-		       const unsigned int,
-		       const unsigned int,
-		       const std::vector<double> &,
-		       dealii::MappingQ1<1,2>::InternalData &,
-		       std::vector<double> &,
-		       std::vector<Tensor<1,2> > &,
-		       std::vector<Point<2> > &)
+		       std::vector<Tensor<1,spacedim> > &,
+		       std::vector<Point<spacedim> > &)
     {
       Assert(false, ExcNotImplemented());
     }
