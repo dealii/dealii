@@ -577,13 +577,12 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 				   // to take (all data sets for all
 				   // faces are stored contiguously)
 
-  const typename QProjector<dim>::DataSetDescriptor dsd;
   const typename QProjector<dim>::DataSetDescriptor offset
-    = dsd.face (face,
-		cell->face_orientation(face),
-		cell->face_flip(face),
-		cell->face_rotation(face),
-		n_q_points);
+    = QProjector<dim>::DataSetDescriptor::face (face,
+						cell->face_orientation(face),
+						cell->face_flip(face),
+						cell->face_rotation(face),
+						n_q_points);
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
@@ -780,18 +779,17 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
   InternalData &fe_data = static_cast<InternalData &> (fedata);
 
   const unsigned int n_q_points = quadrature.size();
+
 				   // offset determines which data set
 				   // to take (all data sets for all
-				 // sub-faces are stored contiguously)
-
-  const typename QProjector<dim>::DataSetDescriptor dsd;
+				   // sub-faces are stored contiguously)
   const typename QProjector<dim>::DataSetDescriptor offset
-    = dsd.subface (face, subface,
-		   cell->face_orientation(face),
-		   cell->face_flip(face),
-		   cell->face_rotation(face),
-		   n_q_points,
-		   cell->subface_case(face));
+    = QProjector<dim>::DataSetDescriptor::subface (face, subface,
+						   cell->face_orientation(face),
+						   cell->face_flip(face),
+						   cell->face_rotation(face),
+						   n_q_points,
+						   cell->subface_case(face));
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
