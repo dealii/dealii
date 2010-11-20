@@ -1,0 +1,23 @@
+
+DEAL::4 active cells
+DEAL::25 degrees of freedom
+DEAL::16 boundary degrees of freedom
+DEAL::1 1.00000
+DEAL::2 1.00000
+DEAL::3 0
+DEAL::5 0.250000
+DEAL::7 0.250000
+DEAL::9 5.00000
+DEAL::10 4.00000
+DEAL::11 4.25000
+DEAL::13 2.25000
+DEAL::15 8.00000
+DEAL::16 5.00000
+DEAL::17 6.25000
+DEAL::19 6.25000
+DEAL::21 4.00000
+DEAL::22 2.25000
+DEAL::23 4.25000
+DEAL::106 active cells
+DEAL::426 degrees of freedom
+DEAL::0 boundary degrees of freedom

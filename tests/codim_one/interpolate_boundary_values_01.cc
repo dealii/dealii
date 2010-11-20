@@ -81,8 +81,8 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<2,3>("../codim_one/grids/square.inp");
-  test<2,3>("../codim_one/grids/sphere_1.inp");
+  test<2,3>("grids/square.inp");
+  test<2,3>("grids/sphere_1.inp");
 
   return 0;
 }
