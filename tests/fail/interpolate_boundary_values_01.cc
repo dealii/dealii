@@ -55,6 +55,23 @@ void test(std::string filename) {
     for (std::map<unsigned int, double>::const_iterator i = bv.begin();
 	 i != bv.end(); ++i)
       deallog << i->first << ' ' << i->second << std::endl;
+
+    for (typename DoFHandler<dim,spacedim>::active_cell_iterator
+	   cell = dof_handler.begin_active(); cell != dof_handler.end(); ++cell)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (cell->at_boundary(f))
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
+	    for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+	      {
+		Assert (bv.find(cell->face(f)->vertex_dof_index(v,i))
+			!= bv.end(),
+			ExcInternalError());
+		Assert (bv[cell->face(f)->vertex_dof_index(v,i)]
+			==
+			Functions::SquareFunction<spacedim>()
+			.value(cell->face(f)->vertex(v),i),
+			ExcInternalError());
+	      }
 }
 
 

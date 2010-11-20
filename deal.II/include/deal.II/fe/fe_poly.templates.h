@@ -458,52 +458,6 @@ FE_Poly<TensorProductPolynomials<1>,1,2>::fill_fe_face_values
 
 
 
-template <>
-inline
-void
-FE_Poly<TensorProductPolynomials<2>,2,3>::fill_fe_face_values (const Mapping<2,3> &,
-							       const Triangulation<2,3>::cell_iterator &,
-							       const unsigned int,
-							       const Quadrature<1> &,
-							       Mapping<2,3>::InternalDataBase &,
-							       Mapping<2,3>::InternalDataBase &,
-							       FEValuesData<2,3> &) const
-{
-  AssertThrow(false, ExcNotImplemented());
-}
-
-
-
-template <>
-inline
-void
-FE_Poly<PolynomialSpace<1>,1,2>::fill_fe_face_values (const Mapping<1,2> &,
-						      const Triangulation<1,2>::cell_iterator &,
-						      const unsigned int,
-						      const Quadrature<0> &,
-						      Mapping<1,2>::InternalDataBase &,
-						      Mapping<1,2>::InternalDataBase &,
-						      FEValuesData<1,2> &) const
-{
-  AssertThrow(false, ExcNotImplemented());
-}
-
-
-
-template <>
-inline
-void
-FE_Poly<PolynomialSpace<2>,2,3>::fill_fe_face_values (const Mapping<2,3> &,
-						      const Triangulation<2,3>::cell_iterator &,
-						      const unsigned int,
-						      const Quadrature<1> &,
-						      Mapping<2,3>::InternalDataBase &,
-						      Mapping<2,3>::InternalDataBase &,
-						      FEValuesData<2,3> &) const
-{
-  AssertThrow(false, ExcNotImplemented());
-}
-
 
 template <class POLY, int dim, int spacedim>
 void
