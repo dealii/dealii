@@ -244,6 +244,15 @@ class PreconditionBlockBase
 				      */
     DeclException0 (ExcDiagonalsNotStored);
 
+				     /**
+				      * You are accessing a diagonal
+				      * block, assuming that it has a certain
+				      * type. But, the method used for
+				      * inverting the diagonal blocks
+				      * does not use this type
+				      */
+    DeclException0 (ExcInverseNotAvailable);
+    
   protected:
 				     /**
 				      * The method used for inverting blocks.
@@ -565,6 +574,8 @@ inline
 FullMatrix<number>&
 PreconditionBlockBase<number>::inverse(unsigned int i)
 {
+  Assert(var_inverse_full.size() != 0, ExcInverseNotAvailable());
+  
   if (same_diagonal())
     return var_inverse_full[0];
   
@@ -578,6 +589,8 @@ inline
 Householder<number>&
 PreconditionBlockBase<number>::inverse_householder(unsigned int i)
 {
+  Assert(var_inverse_householder.size() != 0, ExcInverseNotAvailable());
+  
   if (same_diagonal())
     return var_inverse_householder[0];
   
@@ -591,6 +604,8 @@ inline
 LAPACKFullMatrix<number>&
 PreconditionBlockBase<number>::inverse_svd(unsigned int i)
 {
+  Assert(var_inverse_svd.size() != 0, ExcInverseNotAvailable());
+  
   if (same_diagonal())
     return var_inverse_svd[0];
   

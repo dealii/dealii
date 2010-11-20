@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,9 @@
 
 
 /**
- * @defgroup Preconditioners Preconditioners
+ * @defgroup Preconditioners Preconditioners and Relaxation Operators
+ *
+ * <h3>Preconditioners</h3>
  *
  * Preconditioners are used to accelerate the iterative solution of linear
  * systems. Typical preconditioners are Jacobi, Gauss-Seidel, or SSOR, but the
@@ -21,19 +23,72 @@
  * decompositions (ILU). In addition, sparse direct solvers can be used as
  * preconditioners when available.
  *
- * When talking of preconditioners, we usually expect them to be used
- * in Krylov-space methods. In that case, the act as operators: given
- * a vector $x$, produce the result $y=P^{-1}x$ of the multiplication
- * with the preconditioning operator $P^{-1}$.
+ * Broadly speaking, preconditioners are operators, which are
+ * multiplied with a matrix to improve conditioning. The idea is, that
+ * the preconditioned system <i>P<sup>-1</sup>Ax = P<sup>-1</sup>b</i>
+ * is much easier to solve than the original system <i>Ax = b</i>.What
+ * this means exactly depends on the structure of  the matrix and
+ * cannot be discussed here in generality. For symmetric, positive
+ * definite matrices <i>A</i> and <i>P</i>, it means that the spectral
+ * condition number (the quotient of greatest and smallest eigenvalue)
+ * of <i>P<sup>-1</sup>A</i> is much smaller than the one of <i>A</i>.
  *
- * However, some preconditioners can also be used
- * in the standard linear defect correction iteration,
+ * At hand of the simplest example, Richardson iteration, implemented
+ * in SolverRichardson, the preconditioned iteration looks like
  * @f[
- *  x^{k+1} = x^k - P^{-1} \bigl(A x^k - b\bigr),
+ *  x^{k+1} = x^k - P^{-1} \bigl(A x^k - b\bigr).
  * @f]
- * where <i>P<sup>-1</sup></i> is again the preconditioner. Thus,
- * preconditioning amounts to applying a linear operator to the
- * residual.
+ * Accordingly, preconditioning amounts to applying a linear operator to the
+ * residual, and consequently, the action of the preconditioner
+ * <i>P<sup>-1</sup></i> is implemented as <tt>vmult()</tt>. The
+ * generic interface is like for matrices
+ * @code
+ * class PRECONDITIONER
+ * {
+ *   template <class VECTOR>
+ *   void vmult(VECTOR& dst, const VECTOR& src) const;
+ *
+ *   template <class VECTOR>
+ *   void Tvmult(VECTOR& dst, const VECTOR& src) const;
+ * }
+ * @endcode
+ * It is implemented in all the preconditioner classes in this module.
+ * 
+ * When used
+ * in Krylov space methods, it is up to the method, whether it simply
+ * replaces multiplications with <i>A</i> by those with
+ * <i>P<sup>-1</sup>A</i> (for instance SolverBicgstab), or does more
+ * sophisticated things. SolverCG for instance uses
+ * <i>P<sup>-1</sup></i> to define an inner product, which is the
+ * reason why it requires a symmetric, positive definite operator <i>P</i>.
+ *
+ * <h3>Relaxation methods</h3>
+ *
+ * Many preconditioners rely on an additive splitting <i>A = P - N</i>
+ * into two matrices. In this case, the iteration step of the
+ * Richardson method above can be simplified to
+ * @f[
+ *  x^{k+1} = P^{-1} \bigl(N x^k + b\bigr),
+ * @f]
+ * thus avoiding multiplication with <i>A</i> completely. We call
+ * operators mapping the previous iterate <i>x<sup>k</sup></i> to the
+ * next iterate in this way relaxation operators. Their generic
+ * interface is
+ * @code
+ * class RELAXATION
+ * {
+ *   template <class VECTOR>
+ *   void step(VECTOR& newstep, const VECTOR& oldstep, const VECTOR& rhs) const;
+ *
+ *   template <class VECTOR>
+ *   void Tstep(VECTOR& newstep, const VECTOR& oldstep, const VECTOR& rhs) const;
+ * }
+ * @endcode
+ * The classes with names starting with <tt>Relaxation</tt> in this
+ *   module implement this interface, as well as the preconditioners
+ *   PreconditionJacobi, PreconditionSOR, PreconditionSSORP,
+ *   reconditionBlockJacobi, PreconditionBlockSOR, and
+ *   PreconditionBlockSSOR.
  *
  * <h3>The interface</h3>
  *

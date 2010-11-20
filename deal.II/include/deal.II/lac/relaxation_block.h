@@ -41,6 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * preconditioner, since its implementation relies on a straight
  * forward implementation of the Gauss-Seidel process.
  *
+ * @ingroup Preconditioners
  * @author Guido Kanschat
  * @date 2010
  */
@@ -240,6 +241,7 @@ class RelaxationBlock :
  * overlapping. On the other hand, this class does not implement the
  * preconditioner interface expected by Solver objects.
  *
+ * @ingroup Preconditioners
  * @author Guido Kanschat
  * @date 2010
  */
@@ -307,13 +309,6 @@ class RelaxationBlockSOR : public virtual Subscriptor,
 				      */
     template <typename number2>
     void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
-
-  protected:
-				     /**
-				      * Constructor to be used by
-				      * RelaxationBlockSSOR.
-				      */
-//    RelaxationBlockSOR(bool store);
 };
 
 
@@ -329,6 +324,7 @@ class RelaxationBlockSOR : public virtual Subscriptor,
  * not implement the preconditioner interface expected by Solver
  * objects.
  *
+ * @ingroup Preconditioners
  * @author Guido Kanschat
  * @date 2010
  */
