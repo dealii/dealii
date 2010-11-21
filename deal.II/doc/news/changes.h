@@ -386,6 +386,13 @@ independent of the dimension.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: The VectorTools::interpolate_boundary_values function can now
+  also be used to interpolate boundary values on meshes embedded in a higher
+  dimensional space.
+  <br>
+  (WB, 2010/11/20)
+  </p></li>
+
   <li><p>Fixed: Triangulation::execute_coarsening_and_refinement misplaced
   the new central vertex of a quad in a two-dimensional mesh embedded into
   higher dimensional space if said quad was at the boundary of the surface
