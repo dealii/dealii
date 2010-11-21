@@ -1920,6 +1920,24 @@ get_dof_indices (std::vector<unsigned int> &dof_indices,
 
 template <template <int, int> class DH, int spacedim>
 inline
+unsigned int
+DoFAccessor<0,DH<1,spacedim> >::
+vertex_dof_index (const unsigned int vertex,
+		  const unsigned int i,
+		  const unsigned int fe_index) const
+{
+  Assert (vertex == 0, ExcIndexRange (vertex, 0, 1));
+  return internal::DoFAccessor::Implementation::
+    get_vertex_dof_index (*dof_handler,
+			  this->global_vertex_index,
+			  fe_index,
+			  i);
+}
+
+
+
+template <template <int, int> class DH, int spacedim>
+inline
 void
 DoFAccessor<0,DH<1,spacedim> >::copy_from (
   const TriaAccessorBase<0,1,spacedim> &da)
