@@ -42,8 +42,8 @@
     {
         "string_26list":
         {
-            "value": "< & > ; /",
-            "default_value": "< & > ; /",
+            "value": "< & > ; \/",
+            "default_value": "< & > ; \/",
             "documentation": "docs 1",
             "pattern": "4",
             "pattern_description": "[Anything]"
