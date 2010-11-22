@@ -62,10 +62,10 @@ libs.o   := $(lib-deal2.o)
 # link with and the flags to be passed to the compiler:
 ifeq ($(debug-mode),on)
   libraries = $(go-files) $(libs.g)
-  flags     = $(CXXFLAGS.g)
+  flags     = $(CXXFLAGS.g) -Iinclude
 else
   libraries = $(o-files) $(libs.o)
-  flags     = $(CXXFLAGS.o)
+  flags     = $(CXXFLAGS.o) -Iinclude
 endif
 
 
