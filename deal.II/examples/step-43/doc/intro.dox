@@ -71,7 +71,7 @@ Since the flow equations do not contain time derivatives, initial conditions for
 variables are not required. The flow field separates the boundary into inflow or outflow
 parts. Specifically,
 @f[
-   \mathbf{\Gamma}_{in}(t) = \left\{\vec{x} \in \partial \Omega:\vec{n} \cdot \vec{u}_t<0\right\},
+   \mathbf{\Gamma}_{in}(t) = \left\{\mathbf{x} \in \partial \Omega:\mathbf{n} \cdot \mathbf{u}_t<0\right\},
 @f]
 and we arrive at a complete model by also imposing boundary values for the
 saturation variable on the inflow boundary $\mathbf{\Gamma}_{in}$.
@@ -109,7 +109,7 @@ variables, leading to a macro time step of length
 We choose the length of (micro) steps subject to the Courant-Friedrichs-Lewy
 (CFL) restriction according to the criterion
 @f[
-  \Delta t_c = \frac{\textrm{min}_{K}h_{K}}{7 \|\vec{u}_t\|_{L^{\infty}\left(\Omega\right)}},
+  \Delta t_c = \frac{\textrm{min}_{K}h_{K}}{7 \|\mathbf{u}_t\|_{L^{\infty}\left(\Omega\right)}},
 @f]
 which we have confirmed to be stable for the choice of finite element and time
 stepping scheme for the saturation equation discussed below ($h_K$ denotes the
@@ -137,15 +137,15 @@ saturation equation becomes
 
 By multiplying the equations defining the total velocity $\mathbf u_t^{(n)}$ and
 the equation that expresses its divergence in terms of source terms, with test
-functions $\vec{v}$ and $w$ 
+functions $\mathbf{v}$ and $w$ 
 respectively and then integrating terms by parts as necessary, the weak form
-of the problem reads: Find $\vec u, p$ so that for all test functions
-$\vec{v}, w$ there holds
+of the problem reads: Find $\mathbf u, p$ so that for all test functions
+$\mathbf{v}, w$ there holds
 @f{gather*}
-   \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1} \mathbf{u}^{(n)}_t, \vec{v}\right)_{\Omega} - \left(p^{(n)}, \nabla \cdot \vec{v}\right)_{\Omega} = -\left(p^{(n)}, \vec{n} \cdot \vec{v} \right)_{\partial \Omega}, \\
+   \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1} \mathbf{u}^{(n)}_t, \mathbf{v}\right)_{\Omega} - \left(p^{(n)}, \nabla \cdot \mathbf{v}\right)_{\Omega} = -\left(p^{(n)}, \mathbf{n} \cdot \mathbf{v} \right)_{\partial \Omega}, \\
    - \left( \nabla \cdot \mathbf{u}^{(n)}_t,w\right)_{\Omega} = - \big(q,w\big)_{\Omega}.
 @f}
-Here, $\vec{n}$ represents the unit outward normal vector to $\partial \Omega$ and the pressure $p^{(n+1)}$ can be prescribed weakly on the boundary $\partial \Omega$.
+Here, $\mathbf{n}$ represents the unit outward normal vector to $\partial \Omega$ and the pressure $p^{(n+1)}$ can be prescribed weakly on the boundary $\partial \Omega$.
 
 We use continuous finite elements to discretize the velocity and pressure
 equations. Specifically, we use mixed finite elements to ensure high order approximation
@@ -194,19 +194,19 @@ Following [Guermond and Pasquetti 2008], we use
 the parameter as a piecewise
 constant function set on each cell $K$ with the diameter $h_{K}$ as
 @f[
-   \nu(S)|_{K} = \beta \| \mathbf{u}_t \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S)\|_{L^{\infty}(K)}}{c(\vec{u}_t,S)} \right\}
+   \nu(S)|_{K} = \beta \| \mathbf{u}_t \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
 @f]
 where $\alpha$ is a stabilization exponent and $\beta$ is a dimensionless
 user-defined stabilization constant. Following [Guermond and Pasquetti 2008]
 as well as the implementation in step-31, the velocity and saturation global
-normalization constant, $c(\vec{u}_t,S)$, and the residual $\textrm{Res}(S)$
+normalization constant, $c(\mathbf{u}_t,S)$, and the residual $\textrm{Res}(S)$
 are respectively given by
 @f[
-   c(\vec{u}_t,S) = c_R \|\vec{u}_t\|_{L^{\infty}(\Omega)} \textrm{var}(S) | \textrm{diam} (\Omega) |^{\alpha - 2}
+   c(\mathbf{u}_t,S) = c_R \|\mathbf{u}_t\|_{L^{\infty}(\Omega)} \textrm{var}(S) | \textrm{diam} (\Omega) |^{\alpha - 2}
 @f]
 and
 @f[
-   \textrm{Res}(S) = \left( \epsilon \frac{\partial S}{\partial t} + \vec{u}_t \cdot \nabla F(S) + F(S)q \right) \cdot S^{\alpha - 1}
+   \textrm{Res}(S) = \left( \epsilon \frac{\partial S}{\partial t} + \mathbf{u}_t \cdot \nabla F(S) + F(S)q \right) \cdot S^{\alpha - 1}
 @f]
 where $c_R$ is a second dimensionless user-defined constant,
 $\textrm{diam}(\Omega)$ is the diameter of the domain and $\textrm{var}(S) =
@@ -223,12 +223,12 @@ nonlinear since $\nu$ depends on the saturation $S$. We avoid this difficulty
 by treating all nonlinear terms explicitly, which leads to the following
 fully discrete problem at time step $n$:
 @f{align*}
-   &\left( \epsilon S^{(n)},\sigma\right)_{\Omega} - \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\mathbf{u}^{*}_t,\nabla\sigma\Big)_{\Omega} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\left(\vec{n}\cdot\mathbf{u}^{*}_t\right),\sigma\Big)_{\partial\Omega} \nonumber \\
+   &\left( \epsilon S^{(n)},\sigma\right)_{\Omega} - \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\mathbf{u}^{*}_t,\nabla\sigma\Big)_{\Omega} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{*}_t\right),\sigma\Big)_{\partial\Omega} \nonumber \\
    & \quad = \left( \epsilon S^{(n-1)},\sigma\right)_{\Omega} - \Delta t^{(n)}_c \bigg(\nu\left(S^{(n-1)}\right)\nabla S^{(n-1)},\nabla\sigma\bigg)_{\Omega} \nonumber \\
-   & \qquad + \Delta t^{(n)}_c \bigg(\vec{n}\cdot\nu\left(S^{(n-1)}\right)\nabla S^{(n-1)},\sigma\bigg)_{\partial\Omega}
+   & \qquad + \Delta t^{(n)}_c \bigg(\mathbf{n}\cdot\nu\left(S^{(n-1)}\right)\nabla S^{(n-1)},\sigma\bigg)_{\partial\Omega}
 @f}
 where $\mathbf{u}_t^{*}$ is the velocity linearly extrapolated from
-$\vec{u}^{(n_p)}_t$ and $\vec{u}^{(n_{pp})}_t$ to the current time $t^{(n)}$ if $\theta<\theta^*$ while $\mathbf{u}_t^{*}$ is $\vec{u}^{(n_p)}_t$ if $\theta>\theta^*$.
+$\mathbf{u}^{(n_p)}_t$ and $\mathbf{u}^{(n_{pp})}_t$ to the current time $t^{(n)}$ if $\theta<\theta^*$ while $\mathbf{u}_t^{*}$ is $\mathbf{u}^{(n_p)}_t$ if $\theta>\theta^*$.
 Consequently, the equation is linear in $S_h^{(n)}$ and all that is required
 is to solve with a mass matrix on the saturation space.
 
@@ -236,13 +236,13 @@ Since the Dirichlet boundary conditions for saturation are only imposed on the
 inflow boundaries, the third term on the left hand side of the equation above
 needs to be split further into two parts: 
 @f{align*}
-  &\Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\left(\vec{n}\cdot\mathbf{u}^{(n)}_t\right),\sigma\Big)_{\partial\Omega} \nonumber \\
-  &\qquad= \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(+)}\right)\left(\vec{n}\cdot\mathbf{u}^{(n)}_{t(+)}\right),\sigma\Big)_{\partial\Omega_{(+)}} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(-)}\right)\left(\vec{n}\cdot\mathbf{u}^{(n)}_{t(-)}\right),\sigma\Big)_{\partial\Omega_{(-)}}
+  &\Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_t\right),\sigma\Big)_{\partial\Omega} \nonumber \\
+  &\qquad= \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(+)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(+)}\right),\sigma\Big)_{\partial\Omega_{(+)}} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(-)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(-)}\right),\sigma\Big)_{\partial\Omega_{(-)}}
 @f}
-where $\partial\Omega_{(-)} = \left\{\vec{x} \in \partial\Omega : \vec{n}
-  \cdot \vec{u}_t<0\right\}$ and
-$\partial\Omega_{(+)} = \left\{\vec{x} \in \partial\Omega : \vec{n} \cdot
-  \vec{u}_t>0\right\}$ represent inflow and outflow boundaries,
+where $\partial\Omega_{(-)} = \left\{\mathbf{x} \in \partial\Omega : \mathbf{n}
+  \cdot \mathbf{u}_t<0\right\}$ and
+$\partial\Omega_{(+)} = \left\{\mathbf{x} \in \partial\Omega : \mathbf{n} \cdot
+  \mathbf{u}_t>0\right\}$ represent inflow and outflow boundaries,
 respectively. We choose values using an
 upwind formulation, i.e. $S^{(n-1)}_{(+)}$ and $\mathbf{u}^{(n)}_{t(+)}$
 correspond to the values taken from the present cell, while the values of
@@ -257,9 +257,9 @@ algorithm. Here, we use the same shock-type refinement approach used in
 coarsened. The refinement indicator for each cell $K$ of the triangulation is
 computed by
 @f[
-   \eta_{K} = |\nabla S_h(\vec x_K)|
+   \eta_{K} = |\nabla S_h(\mathbf x_K)|
 @f]
-where $S_h(\vec x_K)$ is the discrete saturation variable evaluated at the
+where $S_h(\mathbf x_K)$ is the discrete saturation variable evaluated at the
 center of cell $K$. This approach is analogous to ones frequently used in
 compressible flow problems, where density gradients are used to indicate
 refinement.
@@ -272,7 +272,7 @@ obtain a linear system of equations in time step $(n)$ of the following form:
 @f[
  \left(
   \begin{array}{ccc}
-   \mathbf{M}^{\vec{u}} & \mathbf{B}^{T} & \mathbf{0}  \\
+   \mathbf{M}^{\mathbf{u}} & \mathbf{B}^{T} & \mathbf{0}  \\
    \mathbf{B}           & \mathbf{0}     & \mathbf{0}   \\
    \mathbf{H}           & \mathbf{0}     & \mathbf{M}^{S}
   \end{array}
@@ -295,7 +295,7 @@ obtain a linear system of equations in time step $(n)$ of the following form:
 @f]
 where the individual matrices and vectors are defined as follows using shape functions $\mathbf{v}_i$ for velocity, and $\phi_i$ for both pressure and saturation:
 @f{align*}
-  \mathbf{M}^{\vec{u}}_{ij}
+  \mathbf{M}^{\mathbf{u}}_{ij}
   &= \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1}
   \mathbf{v}_{i},\mathbf{v}_{j}\right)_{\Omega},
   &
@@ -322,7 +322,7 @@ requires us to solve
 @f[
  \left(
   \begin{array}{cc}
-   \mathbf{M}^{\vec{u}} & \mathbf{B}^{T}  \\
+   \mathbf{M}^{\mathbf{u}} & \mathbf{B}^{T}  \\
    \mathbf{B}           & \mathbf{0}
   \end{array}
  \right)
@@ -347,7 +347,7 @@ velocity-pressure system is
 \mathbf{P} =
  \left(
   \begin{array}{cc}
-   \mathbf{M}^{\vec{u}} &  \mathbf{0}  \\
+   \mathbf{M}^{\mathbf{u}} &  \mathbf{0}  \\
    \mathbf{B}           & -\mathbf{S}
   \end{array}
  \right),
@@ -355,27 +355,27 @@ velocity-pressure system is
  \mathbf{P}^{-1} =
  \left(
   \begin{array}{cc}
-   \left(\mathbf{M}^{\vec{u}}\right)^{-1}                              &  \mathbf{0}  \\
-   \mathbf{S}^{-1} \mathbf{B} \left(\mathbf{M}^{\vec{u}}\right)^{-1}   & -\mathbf{S}^{-1}
+   \left(\mathbf{M}^{\mathbf{u}}\right)^{-1}                              &  \mathbf{0}  \\
+   \mathbf{S}^{-1} \mathbf{B} \left(\mathbf{M}^{\mathbf{u}}\right)^{-1}   & -\mathbf{S}^{-1}
   \end{array}
  \right)
  @f}
 where
-$\mathbf{S}=\mathbf{B}\left(\mathbf{M}^{\vec{u}}\right)^{-1}\mathbf{B}^T$ is
+$\mathbf{S}=\mathbf{B}\left(\mathbf{M}^{\mathbf{u}}\right)^{-1}\mathbf{B}^T$ is
 the Schur complement [Zhang 2005] of the system. This preconditioner is
 optimal since
 @f{align*}
  \mathbf{P}^{-1}
  \left(
   \begin{array}{cc}
-   \mathbf{M}^{\vec{u}} & \mathbf{B}^{T}  \\
+   \mathbf{M}^{\mathbf{u}} & \mathbf{B}^{T}  \\
    \mathbf{B}           & \mathbf{0}
   \end{array}
  \right)
  =
   \left(
   \begin{array}{cc}
-   \mathbf{I}         &  \left(\mathbf{M}^{\vec{u}}\right)^{-1} \mathbf{B}^{T}  \\
+   \mathbf{I}         &  \left(\mathbf{M}^{\mathbf{u}}\right)^{-1} \mathbf{B}^{T}  \\
    \mathbf{0}         &  \mathbf{I}
   \end{array}
  \right),
@@ -392,18 +392,18 @@ preconditioner
  \mathbf{\tilde{P}}^{-1} =
  \left(
   \begin{array}{cc}
-   \widetilde{\left(\mathbf{{M}}^{\vec{u}}\right)^{-1}}
+   \widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}
                               &  \mathbf{0}  \\
-   \widetilde{\mathbf{{S}}^{-1}} \mathbf{B} \widetilde{\left(\mathbf{{M}}^{\vec{u}}\right)^{-1}}   & -\widetilde{\mathbf{{S}}^{-1}}
+   \widetilde{\mathbf{{S}}^{-1}} \mathbf{B} \widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}   & -\widetilde{\mathbf{{S}}^{-1}}
   \end{array}
  \right)
 @f}
 where a tilde indicates an approximation of the exact inverse matrix. In
-particular, since $\left(\mathbf{{M}}^{\vec{u}}\right)^{-1}=\left( \left(
+particular, since $\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}=\left( \left(
     \mathbf{K} \lambda_t \right)^{-1}
   \mathbf{v}_{i},\mathbf{v}_{j}\right)_{\Omega}$
 is a sparse symmetric and positive definite matrix, we choose for
-$\widetilde{\left(\mathbf{{M}}^{\vec{u}}\right)^{-1}}$ a single application of
+$\widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}$ a single application of
 a sparse incomplete Cholesky decomposition of this matrix
 [Golub and Van Loan 1996].
 We note that the Schur complement that corresponds to the porous
@@ -445,7 +445,7 @@ Initial conditions are only required for the saturation variable, and we
 choose $S(\mathbf{x},0)=0$, i.e. the porous medium is initially filled by the
 non-wetting phase. We prescribe a linear pressure on the boundaries:
 @f[
-   p(\vec{x},t) = 1 - x \qquad
+   p(\mathbf{x},t) = 1 - x \qquad
    \textrm{on} \quad \partial \Omega \times [0,T].
 @f]
 Pressure and saturation uniquely
@@ -453,8 +453,8 @@ determine a velocity, and the velocity determines whether a boundary segment
 is an inflow or outflow boundary. On the inflow part of the boundary,
 $\mathbf{\Gamma}_{in}(t)$, we impose
 @f{align*}
-   S(\vec{x},t) = 1 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \cap \left\{x = 0\right\}, \\
-   S(\vec{x},t) = 0 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \backslash \left\{x = 0\right\}.
+   S(\mathbf{x},t) = 1 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \cap \left\{x = 0\right\}, \\
+   S(\mathbf{x},t) = 0 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \backslash \left\{x = 0\right\}.
 @f}
 In other words, the domain is flooded by the wetting phase from the left.
 No boundary conditions for the saturation are required for the outflow parts
