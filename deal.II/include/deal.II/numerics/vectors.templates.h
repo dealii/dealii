@@ -1277,27 +1277,65 @@ namespace internal
       Assert (function_map.find(255) == function_map.end(),
 	      dealii::VectorTools::ExcInvalidBoundaryIndicator());
 
+				       // if this 1d mesh is embedded
+				       // in a higher dimensional
+				       // space, it may be that it is
+				       // a circle; in that case,
+				       // there are no boundary nodes
+				       // and we want to catch this
+				       // now before we get into what
+				       // turns out to be an endless
+				       // loop further down below
+				       // where we try to find the
+				       // cell at the left or right
+				       // edge of the domain
+      if (DH::space_dimension > 1)
+	{
+	  typename DH::cell_iterator cell = dof.begin(0);
+	  unsigned int count = 0;
+	  while (cell->neighbor(1).state() == IteratorState::valid)
+	    {
+	      cell = cell->neighbor(1);
+	      ++count;
+
+	      if (count > dof.get_tria().n_cells(0))
+						 // we looped back
+						 // around. there is
+						 // nothing for us to
+						 // do here
+		return;
+	    }
+	}
+
+					   // now do the actual work
       for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
 	   i!=function_map.end(); ++i)
 	{
-				   // check whether boundary values at
-				   // the left or right boundary of
-				   // the line are
-				   // requested. direction denotes
-				   // the neighboring direction in
-				   // which we seek the boundary,
-				   // i.e. 0 is left boundary and 1 is
-				   // right.
+					   // check whether boundary values at
+					   // the left or right boundary of
+					   // the line are
+					   // requested. direction denotes
+					   // the neighboring direction in
+					   // which we seek the boundary,
+					   // i.e. 0 is left boundary and 1 is
+					   // right.
 	  const unsigned int direction = i->first;
 	  Assert (direction < 2,
 		  dealii::VectorTools::ExcInvalidBoundaryIndicator());
 
 	  const Function<DH::space_dimension> & boundary_function = *(i->second);
 
-				   // first find the outermost active
-				   // cell by first traversing the coarse
-				   // grid to its end and then going
-				   // to the children
+					   // first find the outermost active
+					   // cell by first traversing the coarse
+					   // grid to its end and then going
+					   // to the children.
+					   //
+					   // note that we have
+					   // already ruled out the
+					   // case that the mesh is a
+					   // topological circle
+					   // above, so we don't have
+					   // to check here any more
 	  typename DH::cell_iterator outermost_cell = dof.begin(0);
 	  while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
 	    outermost_cell = outermost_cell->neighbor(direction);
@@ -2886,7 +2924,7 @@ namespace internals {
                   { 2, 0 },
                   { 0, 1 },
                   { 0, 1 } };
-            
+
           				                     // The projection is
           				                     // divided into two steps.
           				                     // In the first step we
@@ -3547,7 +3585,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
               constraints.add_line (dof);
               constraints.set_inhomogeneity (dof, computed_constraints[dof]);
             }
-        
+
         break;
       }
 
