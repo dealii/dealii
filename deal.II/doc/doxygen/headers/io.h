@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -76,7 +76,7 @@
  * DataOutBase class in some final format. Almost all example programs,
  * starting with step-3, make use of this method of generating output.
  *
- * The DataOutFaces is another way to create intermediate format from
+ * The DataOutFaces class is another way to create intermediate format from
  * simulation data. However, instead of creating visualization data from each
  * cell of the triangulation, it only creates information for all faces of
  * cells that are located on the surface (though the class has a way to
