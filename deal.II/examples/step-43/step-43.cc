@@ -1850,9 +1850,8 @@ void TwoPhaseFlowProblem<dim>::solve ()
 
 				 // @sect3{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_pressure_velocity_part}
 
-				 // This function is to implement an a
-				 // posteriori criterion in
-				 // \eqref{eq:recompute-criterion} for
+				 // This function is to implement the a
+				 // posteriori criterion for
 				 // adaptive operator splitting. As mentioned
 				 // in step-31, we use two FEValues objects
 				 // initialized with two cell iterators that
@@ -1946,11 +1945,11 @@ TwoPhaseFlowProblem<dim>::determine_whether_to_solve_pressure_velocity_part () c
 				 // @sect3{TwoPhaseFlowProblem<dim>::compute_refinement_indicators}
 
 				 // This function is to to compute the
-				 // refinement indicator in
-				 // \eqref{eq:refinement_indicator} for each
-				 // cell and its implementation is similar to
-				 // that contained in step-33. There is no
-				 // need to repeat descriptions about it.
+				 // refinement indicator discussed in the
+				 // introduction for each cell and its
+				 // implementation is similar to that
+				 // contained in step-33. There is no need to
+				 // repeat descriptions about it.
 template <int dim>
 void
 TwoPhaseFlowProblem<dim>::
