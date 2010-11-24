@@ -445,7 +445,7 @@ namespace Threads
 					* mutex which needs to be
 					* given to this function as an
 					* argument, see the man page
-					* of <tt>posix_cond_wait</tt> for a
+					* of <tt>pthread_cond_wait</tt> for a
 					* description of the
 					* mechanisms.
 					*
