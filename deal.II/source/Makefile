@@ -19,7 +19,7 @@ default all: debug optimized
 # largest compile jobs first so that 'make -j N' saturates many processors
 # also towards the end of compiling (e.g. numerics/vectors.cc takes several
 # minutes to compile...)
-all-dirs      := numerics fe dofs grid hp multigrid lac base distributed
+all-dirs      := numerics fe dofs lac base grid hp multigrid distributed
 
 cc-files      := $(shell for i in $(all-dirs) ; do echo $D/source/$$i/*.cc ; done)
 h-files       := $(sort $(shell echo $D/include/deal.II/*/*.h))
