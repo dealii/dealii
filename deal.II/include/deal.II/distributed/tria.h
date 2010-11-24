@@ -333,7 +333,7 @@ namespace parallel
 					  * of this function is always
 					  * smaller or equal to the
 					  * result of
-					  * ::Triangulation::n_active_cells()
+					  * dealii::Triangulation::n_active_cells()
 					  * which includes the active
 					  * ghost and artificial cells
 					  * (see also @ref
