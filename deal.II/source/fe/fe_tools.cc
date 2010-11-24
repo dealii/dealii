@@ -796,18 +796,19 @@ namespace FETools
 			     std::vector<std::vector<FullMatrix<number> > >& matrices,
 			     const bool isotropic_only)
   {
-    Threads::TaskGroup<void> task_group;
+    //    Threads::TaskGroup<void> task_group;
 
 				     // loop over all possible refinement cases
     unsigned int ref_case = (isotropic_only)
 			    ? RefinementCase<dim>::isotropic_refinement
 			    : RefinementCase<dim>::cut_x;
-
+    
     for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
-      task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
-				       fe, matrices[ref_case-1], ref_case);
+      compute_embedding_matrices_for_refinement_case(fe, matrices[ref_case-1], ref_case);
+      // task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
+      // 				       fe, matrices[ref_case-1], ref_case);
 
-    task_group.join_all ();
+    //    task_group.join_all ();
   }
 
 
