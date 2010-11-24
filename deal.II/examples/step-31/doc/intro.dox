@@ -948,8 +948,9 @@ multigrid have been removed.
 
 In much the same way as we used PETSc to support our linear algebra needs in
 step-17 and step-18, we use interfaces to the <a
-href="http://trilinos.sandia.gov">Trilinos</a> library (see @ref
-SoftwareTrilinos) in this program. Trilinos is a very large collection of
+href="http://trilinos.sandia.gov">Trilinos</a> library (see the
+deal.II README file for installation instructions) in this program. Trilinos
+is a very large collection of 
 everything that has to do with linear and nonlinear algebra, as well as all
 sorts of tools around that (and looks like it will grow in many other
 directions in the future as well).

@@ -38,7 +38,6 @@ template <typename number> class Vector;
  *
  * @ingroup PETScWrappers
  * @ingroup Vectors
- * @see @ref SoftwarePETSc
  * @author Wolfgang Bangerth, 2004
  */
 namespace PETScWrappers

@@ -162,7 +162,6 @@ namespace TrilinosWrappers
  *
  * @ingroup TrilinosWrappers
  * @ingroup Vectors
- * @see @ref SoftwareTrilinos
  * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
  */
     class Vector : public VectorBase
@@ -563,7 +562,6 @@ namespace TrilinosWrappers
  *
  * @ingroup TrilinosWrappers
  * @ingroup Vectors
- * @see @ref SoftwareTrilinos
  * @author Martin Kronbichler, 2008
  */
   class Vector : public VectorBase

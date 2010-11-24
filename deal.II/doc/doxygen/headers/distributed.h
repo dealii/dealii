@@ -39,8 +39,8 @@
  * because most of the things one wants to do in a finite element
  * program still work in essentially the same way, and handling
  * distributed matrices, vectors, and linear solvers is something for
- * which good external libraries such as @ref SoftwareTrilinos or @ref
- * SoftwarePETSc exist that can make things look almost exactly the
+ * which good external libraries such as Trilinos or
+ * PETSc exist that can make things look almost exactly the
  * same as they would if everything was available locally. The use of
  * this mode of parallelization is explained in the tutorial programs
  * step-17, and step-18 and will not be discussed here in more detail.

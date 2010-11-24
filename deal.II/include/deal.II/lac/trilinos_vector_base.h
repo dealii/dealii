@@ -244,7 +244,6 @@ namespace TrilinosWrappers
  *
  * @ingroup TrilinosWrappers
  * @ingroup Vectors
- * @see @ref SoftwareTrilinos
  * @author Martin Kronbichler, 2008
  */
   class VectorBase : public Subscriptor

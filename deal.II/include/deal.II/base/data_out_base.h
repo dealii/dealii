@@ -205,9 +205,9 @@ class ParameterHandler;
  * <li>EPS output based on an earlier implementation by Stefan Nauber
  * for the old DataOut class
  *
- * <li>@ref SoftwarePovray output by Thomas Richter
+ * <li>Povray output by Thomas Richter
  *
- * <li>@ref SoftwareTecplot output by Benjamin Shelton Kirk
+ * <li>Tecplot output by Benjamin Shelton Kirk
  *
  * </ul>
  *
@@ -422,7 +422,7 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details of
-				      * output in @ref SoftwareOpenDX format.
+				      * output in OpenDX format.
 				      *
 				      * @ingroup output
 				      */
@@ -503,7 +503,7 @@ class DataOutBase
 				     /**
 				      * Flags controlling the details
 				      * of output in UCD format for
-				      * @ref SoftwareAVS.
+				      * AVS.
 				      *
 				      * @ingroup output
 				      */
@@ -516,8 +516,8 @@ class DataOutBase
 					  * creation and some other
 					  * data.  While this is
 					  * supported by the UCD
-					  * format and @ref
-					  * SoftwareAVS, some other
+					  * format and
+					  * AVS, some other
 					  * programs get confused by
 					  * this, so the default is to
 					  * not write a
@@ -636,7 +636,7 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details
-				      * of output in @ref SoftwarePovray
+				      * of output in Povray
 				      * format. Several flags are
 				      * implemented, see their
 				      * respective documentation.
@@ -1048,7 +1048,7 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details
-				      * of output in @ref SoftwareGMV
+				      * of output in GMV
 				      * format. At present no flags
 				      * are implemented.
 				      *
@@ -1112,8 +1112,8 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details
-				      * of output in @ref
-				      * SoftwareTecplot format.
+				      * of output in
+				      * Tecplot format.
 				      *
 				      * @ingroup output
 				      */
@@ -1185,7 +1185,7 @@ class DataOutBase
 
     				     /**
 				      * Flags controlling the details
-				      * of output in @ref SoftwareVTK
+				      * of output in VTK
 				      * format. At present no flags
 				      * are implemented.
 				      *
@@ -1342,22 +1342,22 @@ class DataOutBase
 					    */
 	  none,
 					   /**
-					    * Output for @ref SoftwareOpenDX.
+					    * Output for OpenDX.
 					    */
 	  dx,
 					   /**
 					    * Output in the UCD format
-					    * for @ref SoftwareAVS.
+					    * for AVS.
 					    */
 	  ucd,
 					   /**
-					    * Output for the @ref
-					    * SoftwareGnuplot tool.
+					    * Output for the
+					    * Gnuplot tool.
 					    */
 	  gnuplot,
 					   /**
-					    * Output for the @ref
-					    * SoftwarePovray
+					    * Output for the
+					    * Povray
 					    * raytracer.
 					    */
 	  povray,
@@ -1367,19 +1367,19 @@ class DataOutBase
 					    */
 	  eps,
 					   /**
-					    * Output for @ref SoftwareGMV.
+					    * Output for GMV.
 					    */
 	  gmv,
 					   /**
-					    * Output for @ref
-					    * SoftwareTecplot in text
+					    * Output for
+					    * Tecplot in text
 					    * format.
 					    */
 
 	  tecplot,
 					   /**
-					    * Output for @ref
-					    * SoftwareTecplot in
+					    * Output for
+					    * Tecplot in
 					    * binary format. Faster
 					    * and smaller than text
 					    * format.
@@ -1387,14 +1387,14 @@ class DataOutBase
 	  tecplot_binary,
 
 					   /**
-					    * Output in @ref
-					    * SoftwareVTK format.
+					    * Output in
+					    * VTK format.
 					    */
 	  vtk,
 
 					   /**
-					    * Output in @ref
-					    * SoftwareVTK format.
+					    * Output in
+					    * VTK format.
 					    */
 	  vtu,
 
@@ -1407,10 +1407,10 @@ class DataOutBase
 
 
 /**
- * Write the given list of patches to the output stream in @ref
- * SoftwareOpenDX format.
+ * Write the given list of patches to the output stream in
+ * OpenDX format.
  *
- * Since @ref SoftwareOpenDX uses some kind of visual data flow oriented
+ * Since OpenDX uses some kind of visual data flow oriented
  * programming language, some of these programs are provided in
  * <tt>contrib/dx</tt>.
  */
@@ -1474,8 +1474,8 @@ class DataOutBase
 			   std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in @ref
- * SoftwareGMV format.
+ * Write the given list of patches to the output stream in
+ * GMV format.
  *
  * Data is written in the following format: nodes are considered the
  * points of the patches. In spatial dimensions less than three,
@@ -1558,8 +1558,8 @@ class DataOutBase
 			       std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream for the @ref
- * SoftwarePovray raytracer.
+ * Write the given list of patches to the output stream for the
+ * Povray raytracer.
  *
  * Output in this format creates a povray source file, include
  * standard camera and light source definition for rendering with
@@ -1612,8 +1612,8 @@ class DataOutBase
 			      std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in @ref
- * SoftwareTecplot ASCII format (FEBLOCK).
+ * Write the given list of patches to the output stream in
+ * Tecplot ASCII format (FEBLOCK).
  *
  * For more information consult the Tecplot Users and Reference
  * manuals.
@@ -1626,8 +1626,8 @@ class DataOutBase
 			       std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in @ref
- * SoftwareTecplot binary format.
+ * Write the given list of patches to the output stream in
+ * Tecplot binary format.
  *
  * For this to work properly <tt>./configure</tt> checks for the
  * Tecplot API at build time. To write Tecplot binary files directly
@@ -1656,7 +1656,7 @@ class DataOutBase
 
 /**
  * Write the given list of patches to the output stream in UCD format
- * described in the AVS developer's guide (now @ref SoftwareAVS). Due
+ * described in the AVS developer's guide (now AVS). Due
  * to limitations in the present format, only node based data can be
  * output, which in one reason why we invented the patch concept. In
  * order to write higher order elements, you may split them up into
@@ -1677,7 +1677,7 @@ class DataOutBase
 			   std::ostream                            &out);
 
 /**
- * Write the given list of patches to the output stream in @ref SoftwareVTK
+ * Write the given list of patches to the output stream in VTK
  * format. The data is written in the traditional VTK format as opposed to the
  * XML-based format that write_vtu() produces.
  *
@@ -1697,7 +1697,7 @@ class DataOutBase
 
 
 /**
- * Write the given list of patches to the output stream in @ref SoftwareVTK
+ * Write the given list of patches to the output stream in VTK
  * format. The data is written in the XML-based VTK format as opposed to the
  * traditional format that write_vtk() produces.
  *
@@ -2215,7 +2215,7 @@ class DataOutInterface : private DataOutBase
 				      * Obtain data through
 				      * get_patches() and write it to
 				      * <tt>out</tt> in UCD format for
-				      * @ref SoftwareAVS. See
+				      * AVS. See
 				      * DataOutBase::write_ucd.
 				      */
     void write_ucd (std::ostream &out) const;
