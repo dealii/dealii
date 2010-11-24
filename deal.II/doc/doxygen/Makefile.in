@@ -39,6 +39,7 @@ deal.II deal.tag: tutorial \
 	  $(addprefix tutorial/doxygen/, $(shell ls tutorial/doxygen/))
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
+	@if test -n -d deal.II ; mkdir deal.II
 	cat @DOXYGEN_OPTIONS@ deal.dox | @DOXYGEN@ - > doxygen.log
 	@if test -f deal.II/step__1.html ; then \
 	   for i in deal.II/*__*html ; do \
