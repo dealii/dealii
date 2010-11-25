@@ -3620,6 +3620,13 @@ namespace Threads
                                     * need to have the same return
                                     * value for the called function.
                                     *
+				    * @warning On some operating
+				    * systems, ThreadGroup objects
+				    * cannot be nested, that is, A
+				    * ThreadGroup may not be used in a
+				    * function that was called by a
+				    * ThreadGroup.
+				    *
                                     * @author Wolfgang Bangerth, 2003
 				    * @ingroup threads
                                     */
