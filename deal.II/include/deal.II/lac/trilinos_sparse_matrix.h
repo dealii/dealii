@@ -2108,29 +2108,24 @@ namespace TrilinosWrappers
 				       /**
 					* Print the matrix to the given
 					* stream, using the format
-					* <tt>(line,col) value</tt>,
-					* i.e. one nonzero entry of the
-					* matrix per line. The optional flag
-					* outputs the sparsity pattern in
-					* Trilinos style, where even the
-					* according processor number is
-					* printed to the stream, as well as
-					* a summary before actually writing
-					* the entries.
+					* <tt>(line,col) value</tt>, i.e. one
+					* nonzero entry of the matrix per
+					* line. The optional flag outputs the
+					* sparsity pattern in Trilinos style,
+					* where the data is sorted according
+					* to the processor number when printed
+					* to the stream, as well as a summary
+					* of the matrix like the global size.
 					*/
       void print (std::ostream &out,
 		  const bool    write_extended_trilinos_info = false) const;
 
-                                        // TODO: Write an overloading
-                                        // of the operator << for output.
-                                        // Since the underlying Trilinos
-                                        // object supports it, this should
-                                        // be very easy.
-
 //@}
-    				     /** @addtogroup Exceptions
-				      * @{ */
-                                       /**
+/** @addtogroup Exceptions
+ *
+ */
+//@{
+				       /**
                                         * Exception
                                         */
       DeclException1 (ExcTrilinosError,
@@ -2176,7 +2171,7 @@ namespace TrilinosWrappers
 		      << "/" << arg2 << ")"
 		      << " of a sparse matrix, but it appears to not"
 		      << " exist in the Trilinos sparsity pattern.");
-				     //@}
+//@}
 
 
 
@@ -3231,9 +3226,7 @@ namespace TrilinosWrappers
 				   // the content -- this is what we need
 				   // since we're going to overwrite that
 				   // anyway in the vmult operation.
-				   // TODO[TH]: workaround, because fast is
-				   // not reliable with MPI right now.
-    temp_vector.reinit(dst, false);
+    temp_vector.reinit(dst, true);
 
     vmult (temp_vector, src);
     dst += temp_vector;
