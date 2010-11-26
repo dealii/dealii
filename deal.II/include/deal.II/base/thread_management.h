@@ -3619,13 +3619,6 @@ namespace Threads
                                     * all together. The thread objects
                                     * need to have the same return
                                     * value for the called function.
-                                    *
-				    * @warning On some operating
-				    * systems, ThreadGroup objects
-				    * cannot be nested, that is, A
-				    * ThreadGroup may not be used in a
-				    * function that was called by a
-				    * ThreadGroup.
 				    *
                                     * @author Wolfgang Bangerth, 2003
 				    * @ingroup threads
@@ -3699,25 +3692,6 @@ namespace Threads
 					     // and put the return value
 					     // into the proper place
 	    call (task_descriptor.function, task_descriptor.ret_val);
-
-					     // indicate that the task
-					     // has finished, both
-					     // through the flag and
-					     // through the mutex that
-					     // was locked before we
-					     // started and that now
-					     // needs to be
-					     // released. this may
-					     // also wake up all
-					     // threads that may be
-					     // waiting for the task's
-					     // demise by blocking on
-					     // completion_mutex.acquire()
-					     // in
-					     // TaskDescriptor::join().
-	    task_descriptor.task_is_done = true;
-	    task_descriptor.completion_mutex.release ();
-
 	    return 0;
 	  }
 
@@ -3805,19 +3779,6 @@ namespace Threads
 					  */
 	bool task_is_done;
 
-                                         /**
-                                          * Mutex used to indicate
-                                          * when the task is done. It
-                                          * is locked before the task
-                                          * is spawned; the join()
-                                          * function tries to acquire
-                                          * it, but that will fail
-                                          * unless the task has
-                                          * unlocked it, which it does
-                                          * upon completion.
-                                          */
-        mutable ThreadMutex completion_mutex;
-
       public:
 
 					 /**
@@ -3858,7 +3819,7 @@ namespace Threads
 					  * Queue up the task to the
 					  * scheduler. We need to do
 					  * this in a separate
-					  * function since we the new
+					  * function since the new
 					  * tasks needs to access
 					  * objects from the current
 					  * object and that can only
@@ -3901,11 +3862,6 @@ namespace Threads
     void
     TaskDescriptor<RT>::queue_task ()
     {
-				       // lock the mutex. it will
-				       // become unlocked when the
-				       // task is done
-      completion_mutex.acquire ();
-
 				       // use the pattern described in
 				       // the TBB book on pages
 				       // 230/231 ("Start a large task
@@ -3945,27 +3901,25 @@ namespace Threads
       join ();
 
 				       // now destroy the empty task
-				       // structure. the book
-				       // recommends to spawn it as
-				       // well and let the scheduler
-				       // destroy the object when
-				       // done, but this has the
-				       // disadvantage that the
-				       // scheduler may not get to
-				       // actually finishing the task
-				       // before it goes out of scope
-				       // (at the end of the program,
-				       // or if a thread is done on
-				       // which it was run) and then
-				       // we would get a
-				       // hard-to-decipher warning
-				       // about unfinished tasks when
-				       // the scheduler "goes out of
-				       // the arena". rather, let's
-				       // explicitly destroy the empty
-				       // task object
+				       // structure. the book recommends to
+				       // spawn it as well and let the
+				       // scheduler destroy the object when
+				       // done, but this has the disadvantage
+				       // that the scheduler may not get to
+				       // actually finishing the task before
+				       // it goes out of scope (at the end of
+				       // the program, or if a thread is done
+				       // on which it was run) and then we
+				       // would get a hard-to-decipher warning
+				       // about unfinished tasks when the
+				       // scheduler "goes out of the
+				       // arena". rather, let's explicitly
+				       // destroy the empty task
+				       // object. before that, make sure that
+				       // the task has been shut down,
+				       // expressed by a zero reference count
       Assert (task != 0, ExcInternalError());
-      task->wait_for_all ();
+      Assert (task->ref_count()==0, ExcInternalError());
       task->destroy (*task);
     }
 
@@ -3975,23 +3929,26 @@ namespace Threads
     void
     TaskDescriptor<RT>::join ()
     {
-                                       // use Schmidt's double checking
-                                       // pattern: if thread has already
-                                       // indicated that it is done, then
-                                       // return immediately
-      if (task_is_done)
+				       // if the task is already done, just
+				       // return. this makes sure we call
+				       // tbb::Task::wait_for_all() exactly
+				       // once, as required by TBB. we could
+				       // also get the reference count of task
+				       // for doing this, but that is usually
+				       // slower. note that this does not work
+				       // when the thread calling this
+				       // function is not the same as the one
+				       // that initialized the task.
+				       //
+				       // TODO: can we assert that no other
+				       // thread tries to end the task?
+      if (task_is_done == true)
 	return;
 
-				       // acquire the lock; this can
-				       // only succeed when the task
-				       // is done
-      completion_mutex.acquire ();
-
-				       // release it again; at this
-				       // point the task must have
-				       // finished
-      completion_mutex.release ();
-      Assert (task_is_done == true, ExcInternalError());
+				       // let TBB wait for the task to
+				       // complete. 
+      task_is_done = true;
+      task->wait_for_all();
     }
 
 
@@ -4047,6 +4004,20 @@ namespace Threads
   }
 
 
+
+                                   /**
+                                    * Describes one task object based on the
+                                    * Threading Building Blocks' Task. Note
+                                    * that the call to join() must be executed
+                                    * on the same thread as the call to the
+                                    * constructor. Otherwise, there might be a
+                                    * deadlock. In other words, a Task
+                                    * object should never passed on to another
+                                    * task for calling the join() method.
+                                    *
+                                    * @author Wolfgang Bangerth, 2009
+				    * @ingroup threads
+                                    */
   template <typename RT = void>
   class Task
   {
@@ -5088,6 +5059,14 @@ namespace Threads
                                     * need to have the same return
                                     * value for the called function.
                                     *
+				    * Note that the call to join_all() must be
+				    * executed on the same thread as the calls
+				    * that add subtasks. Otherwise, there
+				    * might be a deadlock. In other words, a
+				    * Task object should never passed on to
+				    * another task for calling the join()
+				    * method.
+				    *
                                     * @author Wolfgang Bangerth, 2003
 				    * @ingroup tasks
                                     */
