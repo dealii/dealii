@@ -628,10 +628,10 @@ namespace FETools
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nd = fe.n_components ();
       const unsigned int nq = coarse.n_quadrature_points;
-      
+
       Vector<number> v_coarse(nq*nd);
       Vector<number> v_fine(n);
-      
+
 				       // The right hand side of
 				       // the least squares
 				       // problem consists of the
@@ -643,21 +643,21 @@ namespace FETools
 	  const unsigned int
 	    d = fe.system_to_component_index (i).first;
 	  const double* phi_i = &coarse.shape_value (i, 0);
-	  
+
 	  for (unsigned int k = 0; k < nq; ++k)
 	    v_coarse (k * nd + d) = phi_i[k];
 	}
-      
+
       else
 	for (unsigned int d = 0; d < nd; ++d)
 	  for (unsigned int k = 0; k < nq; ++k)
 	    v_coarse (k * nd + d) = coarse.shape_value_component (i, k, d);
-      
+
 				       // solve the least squares
 				       // problem.
       const double result = H.least_squares (v_fine, v_coarse);
       Assert (result < 1.e-12, ExcLeastSquaresError (result));
-      
+
 				       // Copy into the result
 				       // matrix. Since the matrix
 				       // maps a coarse grid
@@ -671,14 +671,14 @@ namespace FETools
 
 
 //      mutex.acquire ();
-      
+
       for (unsigned int j = 0; j < n; ++j)
 	this_matrix(j, i) = v_fine(j);
-      
+
 //      mutex.release ();
     }
-    
-    
+
+
     template<int dim, typename number, int spacedim>
     void
     compute_embedding_matrices_for_refinement_case (
@@ -736,9 +736,9 @@ namespace FETools
       static Threads::Mutex mutex;
       Householder<double> H (A);
       unsigned int cell_number = 0;
-      
+
       Threads::TaskGroup<void> task_group;
-      
+
       for (typename Triangulation<dim>::active_cell_iterator
 	     fine_cell = tria.begin_active (); fine_cell != tria.end ();
 	   ++fine_cell, ++cell_number)
@@ -758,20 +758,37 @@ namespace FETools
 	  FullMatrix<double> &this_matrix = matrices[cell_number];
 
 					   // Compute this once for each
-					   // coarse grid basis function
-	  for (unsigned int i = 0;i < n; ++i)
+					   // coarse grid basis function. can
+					   // spawn subtasks if n is
+					   // sufficiently large so that there
+					   // are more than about 5000
+					   // operations in the inner loop
+					   // (which is basically const * n^2
+					   // operations).
+	  if (n > 30)
 	    {
-	      task_group += 
-		Threads::new_task (&compute_embedding_for_shape_function<dim, number, spacedim>,
-				   i, fe, coarse, H, this_matrix, mutex);
+	      for (unsigned int i = 0; i < n; ++i)
+		{
+		  task_group +=
+		    Threads::new_task (&compute_embedding_for_shape_function<dim, number, spacedim>,
+				       i, fe, coarse, H, this_matrix, mutex);
+		}
+	      task_group.join_all();
 	    }
-	  task_group.join_all();
+	  else
+	    {
+	      for (unsigned int i = 0; i < n; ++i)
+		{
+		  compute_embedding_for_shape_function<dim, number, spacedim>
+		    (i, fe, coarse, H, this_matrix, mutex);
+		}
+	    }
 
 //TODO: This function is called in parallel for different sets of
 //matrices, thus there should be no overlap and the mutex should not
 //be necessary. Remove this TODO and the mutex if everybody agrees.
 
-	  
+
 //	  mutex.acquire ();
 					   // Remove small entries from
 					   // the matrix
@@ -796,19 +813,18 @@ namespace FETools
 			     std::vector<std::vector<FullMatrix<number> > >& matrices,
 			     const bool isotropic_only)
   {
-    //    Threads::TaskGroup<void> task_group;
+    Threads::TaskGroup<void> task_group;
 
 				     // loop over all possible refinement cases
     unsigned int ref_case = (isotropic_only)
 			    ? RefinementCase<dim>::isotropic_refinement
 			    : RefinementCase<dim>::cut_x;
-    
-    for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
-      compute_embedding_matrices_for_refinement_case(fe, matrices[ref_case-1], ref_case);
-      // task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
-      // 				       fe, matrices[ref_case-1], ref_case);
 
-    //    task_group.join_all ();
+    for (;ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
+      task_group += Threads::new_task (&compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
+				       fe, matrices[ref_case-1], ref_case);
+
+    task_group.join_all ();
   }
 
 
@@ -1709,7 +1725,7 @@ for (; cell!=endc; ++cell)
 
 				     // Insert the normalized name into
 				     // the map
-    fe_name_map_1d[name] = 
+    fe_name_map_1d[name] =
       std_cxx1x::shared_ptr<const FETools::FEFactoryBase<1> > (factory);
   }
 
@@ -1739,7 +1755,7 @@ for (; cell!=endc; ++cell)
 
 				     // Insert the normalized name into
 				     // the map
-    fe_name_map_2d[name] = 
+    fe_name_map_2d[name] =
       std_cxx1x::shared_ptr<const FETools::FEFactoryBase<2> > (factory);
   }
 
@@ -1768,7 +1784,7 @@ for (; cell!=endc; ++cell)
 
 				     // Insert the normalized name into
 				     // the map
-    fe_name_map_3d[name] = 
+    fe_name_map_3d[name] =
       std_cxx1x::shared_ptr<const FETools::FEFactoryBase<3> > (factory);
   }
 
@@ -1785,7 +1801,7 @@ for (; cell!=endc; ++cell)
       FiniteElement<dim,spacedim>*
       get_fe_from_name_ext (std::string &name,
 			    const std::map<std::string,
-			    std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > > 
+			    std_cxx1x::shared_ptr<const FETools::FEFactoryBase<dim> > >
 			    &fe_name_map)
       {
 					 // Extract the name of the
