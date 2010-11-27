@@ -57,6 +57,7 @@
  *  <li> @ref MTSimpleLoops "Abstractions for tasks: Simple loops"
  *  <li> @ref MTComplexLoops "Abstractions for tasks: More complex loops"
  *  <li> @ref MTWorkStream "Abstractions for tasks: Work streams"
+ *  <li> @ref MTTasksSynchronization ""
  *  <li> @ref MTThreads "Thread-based parallelism"
  *  <li> @ref MTTaskThreads "Controlling the number of threads used for tasks"
  * </ol> </td> </tr> </table>
@@ -1047,6 +1048,46 @@
  * tutorial programs.
  *
  *
+ * @anchor MTTasksSynchronization
+ * <h3>Tasks and synchronization</h3>
+ *
+ * Tasks are powerful but they do have their limitation: to make
+ * things efficient, the task scheduler never interrupts tasks by
+ * itself. With the exception of the situation where one calls the
+ * Threads::Task::join function to wait for another task to finish,
+ * the task scheduler always runs a task to completion. The downside
+ * is that the scheduler does not see if a task is actually idling,
+ * for example if it waits for something else to happen (file IO to
+ * finish, input from the keyboard, etc). In cases like this, the task
+ * scheduler could in principle run a different task, but since it
+ * doesn't know what tasks are doing it doesn't. Functions that do
+ * wait for external events to happen are therefore not good
+ * candidates for tasks and should use threads (see below).
+ *
+ * However, there are cases where tasks are not only a bad abstraction
+ * for a job but can actually not be used: As a matter of principle,
+ * tasks can not synchronize with other tasks through the use of a
+ * mutex or a condition variable (see the Threads::Mutex and
+ * Threads::ConditionVariable classes). The reason is that if task A
+ * needs to wait for task B to finish something, then this is only
+ * going to work if there is a guarantee that task B will eventually
+ * be able to run and finish the task. Now imagine that you have 2
+ * processors, and tasks A1 and A2 are currently running; let's assume
+ * that they have queued tasks B1 and B2, and are now waiting with a
+ * mutex for these queued tasks to finish (part of) their work. Since
+ * the machine has only two processors, the task scheduler will only
+ * start B1 or B2 once either A1 or A2 are done -- but this isn't
+ * happening since they are waiting using operating system resources
+ * (a mutex) rather than task scheduler resources. The result is a
+ * deadlock.
+ *
+ * The bottom line is that tasks can not use mutices or condition
+ * variables to synchronize with other tasks. If synchronization is
+ * necessary, you need to use threads because the operating system
+ * makes sure that all threads eventually get to run, independent of
+ * the total number of threads.
+ *
+ *
  * @anchor MTThreads
  * <h3>Thread-based parallelism</h3>
  *
@@ -1056,7 +1097,7 @@
  * section on
  * @ref MTHow "How scheduling tasks works and when task-based programming is not efficient"
  * above. Primarily, jobs that are not able to fully utilize the CPU are bad
- * fits for tasks.
+ * fits for tasks as discussed above.
  *
  * In a case like this, you can resort to explicitly start threads, rather
  * than tasks, using pretty much the same syntax as above. For example, if you
@@ -1120,7 +1161,7 @@
 
    // In the program, before any task-based parallelism is reached.
    // Early in the main method is a good place to call this:
-   tbb::task_scheduler_init init(n_desired_threads + 1); 
+   tbb::task_scheduler_init init(n_desired_threads + 1);
  * @endcode
  * The method of setting the number of threads relies on this call to
  * <code>task_scheduler_init</code> occurring before any other calls to the
