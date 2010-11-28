@@ -838,6 +838,14 @@ const unsigned int MGDoFHandler<dim,spacedim>::dimension;
 
 
 template <int dim, int spacedim>
+MGDoFHandler<dim,spacedim>::MGDoFHandler ()
+		:
+		mg_faces (NULL)
+{}
+
+
+
+template <int dim, int spacedim>
 MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tria)
 		:
 		DoFHandler<dim,spacedim> (tria),
@@ -849,7 +857,6 @@ MGDoFHandler<dim,spacedim>::MGDoFHandler (const Triangulation<dim,spacedim> &tri
 	  ExcMessage ("The given triangulation is parallel distributed but "
 		      "this class does not currently support this."));
 }
-
 
 
 template <int dim, int spacedim>
@@ -1967,7 +1974,7 @@ set_dof_index (const unsigned int obj_level,
 template <int dim, int spacedim>
 void MGDoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &fe,
 					 const unsigned int        offset)
-{
+{  
 				   // first distribute global dofs
   DoFHandler<dim,spacedim>::distribute_dofs (fe);
 

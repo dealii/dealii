@@ -89,6 +89,13 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
     static const unsigned int space_dimension = spacedim;
 
 				     /**
+				      * Default constructor, which
+				      * will require a call to
+				      * initialize() later to set the Triangulation.
+				      */
+    MGDoFHandler ();
+
+				     /**
 				      * Constructor. Take @p tria as
 				      * the triangulation to work on.
 				      */
@@ -98,7 +105,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * Destructor
 				      */
     virtual ~MGDoFHandler ();
-
+    
 				     /**
 				      * Go through the triangulation
 				      * and distribute the degrees of
