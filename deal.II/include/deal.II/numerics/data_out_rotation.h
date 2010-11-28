@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -163,7 +163,7 @@ class DataOutRotation : public DataOut_DoFData<DH,DH::dimension+1>
 				      * Return the first cell which we
 				      * want output for. The default
 				      * implementation returns the
-				      * first \ref GlossActive "active cell",
+				      * first @ref GlossActive "active cell",
 				      * but you might want to
 				      * return other cells in a
 				      * derived class.
