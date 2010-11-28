@@ -39,7 +39,7 @@ namespace LocalIntegrators
  * Cell matrix for divergence. The derivative is on the trial function.
  *
  * \f[
- * \int_Z v\nabla \cdot u \,dx
+ * \int_Z v\nabla \cdot \mathbf u \,dx
  * \f]
  */
     template <int dim>
@@ -76,7 +76,7 @@ namespace LocalIntegrators
  * Cell matrix for divergence. The derivative is on the test function.
  *
  * \f[
- * \int_Z \nabla u \cdot v\,dx
+ * \int_Z \nabla u \cdot \mathbf v\,dx
  * \f]
  */
     template <int dim>

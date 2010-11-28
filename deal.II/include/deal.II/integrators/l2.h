@@ -36,10 +36,10 @@ namespace LocalIntegrators
   namespace L2
   {
 /**
- * The mass matrix.
+ * The mass matrix for scalar or vector values finite elements.
  *
  * \f[
- * (a u,v)
+ * \int_Z uv\,dx \quad \text{or} \int_Z \mathbf u\cdot \mathbf v\,dx
  * \f]
  */
     template <int dim>
@@ -68,7 +68,7 @@ namespace LocalIntegrators
  * <i>L<sup>2</sup></i>-inner product for scalar functions.
  *
  * \f[
- * (f,v)
+ * \int_Z fv\,dx
  * \f]
  */
     template <int dim>
@@ -93,7 +93,7 @@ namespace LocalIntegrators
  * right hand side.
  *
  * \f[
- * \int_Z f\cdot v\,dx
+ * \int_Z \mathbf f\cdot \mathbf v\,dx
  * \f]
  */
     template <int dim>
@@ -116,6 +116,64 @@ namespace LocalIntegrators
 	    result(i) += fe.JxW(k) * factor * fe.shape_value_component(i,k,d) * input[d][k];
     } 
   }
+
+/**
+ * The jump matrix between two cells for scalar or vector values
+ * finite elements. Note that the factor $\gamma$ can be used to
+ * implement weighted jumps.
+ *
+ * \f[
+ * \int_F [\gamma u][\gamma v]\,dx
+ * \quad \text{or}
+ * \int_F [\gamma \mathbf u]\cdot [\gamma \mathbf v]\,dx
+ * \f]
+ */
+    template <int dim>
+    void jump_matrix (
+      FullMatrix<double>& M11,
+      FullMatrix<double>& M12,
+      FullMatrix<double>& M21,
+      FullMatrix<double>& M22,
+      const FEValuesBase<dim>& fe1,
+      const FEValuesBase<dim>& fe2,
+      const double factor1 = 1.,
+      const double factor2 = 1.)
+    {
+      const unsigned int n1_dofs = fe1.dofs_per_cell;
+      const unsigned int n2_dofs = fe2.dofs_per_cell;
+      const unsigned int n_components = fe1.get_fe().n_components();
+      
+      Assert(n1_dofs == n2_dofs, ExcNotImplemented());
+      AssertDimension(n_components, fe2.get_fe().n_components());
+      AssertDimension(M11.m(), n1_dofs);
+      AssertDimension(M12.m(), n1_dofs);
+      AssertDimension(M21.m(), n2_dofs);
+      AssertDimension(M22.m(), n2_dofs);
+      AssertDimension(M11.n(), n1_dofs);
+      AssertDimension(M12.n(), n2_dofs);
+      AssertDimension(M21.n(), n1_dofs);
+      AssertDimension(M22.n(), n2_dofs);
+      
+      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+	{
+	  const double dx = fe1.JxW(k);
+	  
+	  for (unsigned i=0;i<n1_dofs;++i)
+	    for (unsigned j=0;j<n1_dofs;++j)
+	      for (unsigned int d=0;d<n_components;++d)
+		{
+		  const double u1 = factor1*fe1.shape_value_component(j,k,d);
+		  const double u2 =-factor2*fe2.shape_value_component(j,k,d);
+		  const double v1 = factor1*fe1.shape_value_component(i,k,d);
+		  const double v2 =-factor2*fe2.shape_value_component(i,k,d);		  
+		  
+		  M11(i,j) += dx * u1*v1;
+		  M12(i,j) += dx * u1*v2;
+		  M21(i,j) += dx * u2*v1;
+		  M22(i,j) += dx * u2*v2;
+		}
+	}
+    }
 }
 
 DEAL_II_NAMESPACE_CLOSE
