@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -795,7 +795,7 @@ namespace LaplaceSolver
 				   // of freedom of the primal solver,
 				   // we would have to indicate this
 				   // like so:
-				   // <code>PrimalSolver@<dim@>::n_dofs()</code>.
+				   // <code>PrimalSolver::n_dofs()</code>.
 				   // However, the compiler does not
 				   // accept this since the <code>n_dofs</code>
 				   // function is actually from a base
