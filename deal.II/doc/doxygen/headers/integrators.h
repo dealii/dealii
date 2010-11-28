@@ -15,7 +15,11 @@
  * @defgroup Integrators Integrators
  *
  * A collection of namespaces and functions which simplify the coding
- * of forms and bilinear forms on finite element spaces.
+ * of forms and bilinear forms on finite element spaces. Functions for
+ * two different purposes are gathered here: the abstract integration
+ * on finite element meshes in MeshWorker and actual implementations
+ * of the integration of cell and face terms for concrete problems in
+ * LocalIntegrators.
  *
  * <h3>Integration on finite element meshes</h3>
  *
