@@ -42,6 +42,35 @@ DEAL_II_NAMESPACE_OPEN
  * The namespace L2 contains functions for mass matrices and
  * <i>L<sup>2</sup></i>-inner products.
  *
+ * <h3>Notational conventions</h3>
+ *
+ * In most cases, the action of a function in this namespace can be
+ * described by a single integral. We distinguish between integrals
+ * over cells <i>Z</i> and over faces <i>F</i>. If an integral is
+ * denoted as
+ * @f[
+ *   \int_Z u \otimes v \,dx,
+ * @f]
+ * it will yield the following results, depending on the type of
+ * operation
+ * <ul>
+ * <li> If the function returns a matrix, the entry at
+ * position <i>(i,j)</i> will be the integrated product of test function
+ * <i>v<sub>i</sub></i> and trial function <i>u<sub>j</sub></i> (note
+ * the reversion of indices)</li>
+ * <li> If the function returns a vector, then the vector
+ * entry at position <i>i</i> will be the integrated product of the
+ * given function <i>u</i> with the test function <i>v<sub>i</sub></i>.</li>
+ * <li> If the function returns a number, then this number is the
+ * integral of the two given functions <i>u</i> and <i>v</i>.
+ * </ul>
+ *
+ * We will use regular cursive symbols $u$ for scalars and bold
+ * symbols $\mathbf u$ for vectors. Test functions are always <i>v</i>
+ * and trial functions are always <i>u</i>. Parameters are Greek and
+ * the face normal vectors are $\mathbf n = \mathbf n_1 = -\mathbf
+ * n_2$.
+ *
  * <h3>Signature of functions</h3>
  *
  * Functions in this namespace follow a generic signature. In the
