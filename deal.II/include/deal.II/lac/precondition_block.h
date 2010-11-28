@@ -126,6 +126,22 @@ class PreconditionBlock
 					  * are equal to save memory.
 					  */
 	bool same_diagonal;
+					 /**
+					  * Choose the inversion
+					  * method for the blocks.
+					  */
+	typename PreconditionBlockBase<inverse_type>::Inversion inversion;
+
+					 /**
+					  * The if #inversion is SVD,
+					  * the threshold below which
+					  * a singular value will be
+					  * considered zero and thus
+					  * not inverted. This
+					  * parameter is used in the
+					  * call to LAPACKFullMatrix::compute_inverse_svd().
+					  */
+	double threshold;
     };
 
 
@@ -309,6 +325,9 @@ class PreconditionBlock
     unsigned int block_size () const;
 
 				     /**
+				      * @deprecated Use size()
+				      * instead.
+				      *
 				      * The number of blocks of the
 				      * matrix.
 				      */
@@ -371,11 +390,6 @@ class PreconditionBlock
 				      */
     double relaxation;
     
-				     /**
-				      * Number of blocks.
-				      */
-    unsigned int nblocks;
-
 				     /**
 				      * The permutation vector
 				      */
@@ -547,53 +561,21 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
         Accessor accessor;
     };
 
-				     /**
-				      * Make initialization function
-				      * publicly available.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::initialize;
-
-				     /**
-				      * Make function of base class public again.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::clear;
-
-				     /**
-				      * Make function of base class public again.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::empty;
-
-				     /**
-				      * Make function of base class public again.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::el;
-
-				     /**
-				      * Make function of base class public again.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
-
-				     /**
-				      * Make function public.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
-
-				     /**
-				      * Make function public.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::block_size;
-
+    PreconditionBlockBase<inverse_type>::size;
+    PreconditionBlockBase<inverse_type>::inverse;
+    PreconditionBlockBase<inverse_type>::inverse_householder;
+    PreconditionBlockBase<inverse_type>::inverse_svd;
 				     /**
-				      * Make function public.
+				      * @deprecated Use size() instead
 				      */
     PreconditionBlock<MATRIX, inverse_type>::n_blocks;
-				     /**
-				      * Make function accessible to iterator.
-				      */
-    PreconditionBlock<MATRIX, inverse_type>::inverse;
-				     /**
-				      * Make function accessible.
-				      */
     PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
@@ -749,42 +731,18 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				     /**
 				      * Make type publicly available.
 				      */
-    using PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
-
-				     /**
-				      * Make initialization function
-				      * publicly available.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::initialize;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::clear;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::empty;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::el;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
-				     /**
-				      * Make function accessible.
-				      */
-    using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
+    PreconditionBlock<MATRIX, inverse_type>::initialize;
+    PreconditionBlock<MATRIX, inverse_type>::clear;
+    PreconditionBlock<MATRIX, inverse_type>::empty;
+    PreconditionBlockBase<inverse_type>::size;
+    PreconditionBlockBase<inverse_type>::inverse;
+    PreconditionBlockBase<inverse_type>::inverse_householder;
+    PreconditionBlockBase<inverse_type>::inverse_svd;
+    PreconditionBlock<MATRIX, inverse_type>::el;
+    PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
+    PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
+    PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
 				      * Execute block SOR
@@ -957,46 +915,28 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      */
     PreconditionBlockSSOR ();
 
-				     /**
-				      * Make type publicly available.
-				      */
-    using PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
+				     // Keep AdditionalData accessible
+    PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
 
+				     // The following are the
+				     // functions of the base classes
+				     // which we want to keep
+				     // accessible.
 				     /**
 				      * Make initialization function
 				      * publicly available.
 				      */
-    using PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlockSOR<MATRIX,inverse_type>::clear;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlockSOR<MATRIX, inverse_type>::empty;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlockSOR<MATRIX, inverse_type>::el;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
-
-				     /**
-				      * Make function of base class public again.
-				      */
-    using PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
+    PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
+    PreconditionBlockSOR<MATRIX,inverse_type>::clear;
+    PreconditionBlockBase<inverse_type>::size;
+    PreconditionBlockBase<inverse_type>::inverse;
+    PreconditionBlockBase<inverse_type>::inverse_householder;
+    PreconditionBlockBase<inverse_type>::inverse_svd;
+    PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
+    PreconditionBlockSOR<MATRIX, inverse_type>::empty;
+    PreconditionBlockSOR<MATRIX, inverse_type>::el;
+    PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
+    PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Execute block SSOR
@@ -1040,21 +980,6 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 #ifndef DOXYGEN
 
 template<class MATRIX, typename inverse_type>
-inline
-PreconditionBlock<MATRIX, inverse_type>::AdditionalData::
-AdditionalData (const unsigned int block_size,
-		const double relaxation,
-		const bool invert_diagonal,
-		const bool same_diagonal)
-		:
-		relaxation (relaxation),
-		block_size(block_size),
-		invert_diagonal(invert_diagonal),
-		same_diagonal(same_diagonal)
-{}
-
-
-template<class MATRIX, typename inverse_type>
 inline bool
 PreconditionBlock<MATRIX, inverse_type>::empty () const
 {
@@ -1068,7 +993,7 @@ template<class MATRIX, typename inverse_type>
 inline unsigned int
 PreconditionBlock<MATRIX, inverse_type>::n_blocks () const
 {
-  return nblocks;
+  return this->size();
 }
 
 
