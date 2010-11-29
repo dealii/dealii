@@ -42,7 +42,7 @@
 #include <numerics/mesh_worker_loop.h>
 
 #include <integrators/l2.h>
-#include <integrators/differential.h>
+#include <integrators/divergence.h>
 #include <integrators/laplace.h>
 #include <integrators/maxwell.h>
 #include <integrators/elasticity.h>
@@ -61,7 +61,7 @@ void cell_matrix(
   
   L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
   Laplace::cell_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
-  Differential::gradient_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
+  Divergence::gradient_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
 
   
   ++de;
@@ -73,8 +73,8 @@ void cell_matrix(
     {
       ++de;
       L2::mass_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
-      Elasticity::grad_div_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
-      Differential::divergence_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
+      Divergence::grad_div_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de));
+      Divergence::cell_matrix(dinfo.matrix(dm++,false).matrix, info.fe_values(de), info.fe_values(de+1));
     }
   
   ++de;
@@ -295,7 +295,7 @@ int main()
   const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.log_execution_time(true);
+  deallog.log_execution_time(false);
   if (!debugging)
     {
       deallog.depth_console(0);
