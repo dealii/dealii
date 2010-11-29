@@ -9,8 +9,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__integrators_differential_h
-#define __deal2__integrators_differential_h
+#ifndef __deal2__integrators_divergence_h
+#define __deal2__integrators_divergence_h
 
 
 #include <base/config.h>
@@ -26,13 +26,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace LocalIntegrators
 {
 /**
- * @brief Local integrators related to first order differential operators and their traces.
+ * @brief Local integrators related to the divergence operator and its trace.
  *
  * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2010
  */
-  namespace Differential
+  namespace Divergence
   {
 /**
  * Cell matrix for divergence. The derivative is on the trial function.
@@ -42,7 +42,7 @@ namespace LocalIntegrators
  * \f]
  */
     template <int dim>
-    void divergence_matrix (
+    void cell_matrix (
       FullMatrix<double>& M,
       const FEValuesBase<dim>& fe,
       const FEValuesBase<dim>& fetest,
