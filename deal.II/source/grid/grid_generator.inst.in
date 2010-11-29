@@ -15,6 +15,16 @@
 for (deal_II_dimension : DIMENSIONS)
 {
   template void
+    GridGenerator::hyper_rectangle<deal_II_dimension> (
+      Triangulation<deal_II_dimension> &,
+      const Point<deal_II_dimension>&, const Point<deal_II_dimension>&,
+      const bool);
+
+  template void
+    GridGenerator::colorize_hyper_rectangle<deal_II_dimension> (
+      Triangulation<deal_II_dimension> &);
+
+  template void
     GridGenerator::hyper_cube<deal_II_dimension> (
       Triangulation<deal_II_dimension> &, const double, const double);
 
@@ -24,77 +34,14 @@ for (deal_II_dimension : DIMENSIONS)
       const unsigned int, const double, const double);
 
   template void
-    GridGenerator::hyper_rectangle<deal_II_dimension> (
-      Triangulation<deal_II_dimension> &,
-      const Point<deal_II_dimension>&, const Point<deal_II_dimension>&,
-      const bool);
-
-  template void
     GridGenerator::subdivided_hyper_rectangle<deal_II_dimension>
     (Triangulation<deal_II_dimension> &,
      const std::vector<unsigned int>&,
      const Point<deal_II_dimension>&,
-     const Point<deal_II_dimension>&, bool);
-
-  template void
-    GridGenerator::subdivided_hyper_rectangle<deal_II_dimension>
-    (Triangulation<deal_II_dimension> &,
-     const std::vector<std::vector<double> >&,
      const Point<deal_II_dimension>&,
-     const Point<deal_II_dimension>&, bool);
+     bool);
 
 #if deal_II_dimension > 1
-  template void
-    GridGenerator::enclosed_hyper_cube (
-      Triangulation<deal_II_dimension>&, double, double, double, bool);
-
-  template void
-    GridGenerator::hyper_ball (
-      Triangulation<deal_II_dimension>&,
-      const Point<deal_II_dimension>&, double);
-
-  template void
-    GridGenerator::cylinder (
-      Triangulation<deal_II_dimension>&, double, double);
-
-  template void
-    GridGenerator::truncated_cone (
-      Triangulation<deal_II_dimension>&, double, double, double);
-
-  template void
-    GridGenerator::hyper_L (
-      Triangulation<deal_II_dimension>&, double, double);
-
-  template void
-    GridGenerator::hyper_cube_slit (
-      Triangulation<deal_II_dimension>&, double, double, bool);
-
-  template void
-    GridGenerator::hyper_shell (
-      Triangulation<deal_II_dimension>&,
-      const Point<deal_II_dimension>&, double, double, unsigned int, bool);
-
-
-  template void
-    GridGenerator::cylinder_shell (
-      Triangulation<deal_II_dimension>&,
-      double, double, double, unsigned int, unsigned int);
-
-  template void
-    GridGenerator::half_hyper_ball (
-      Triangulation<deal_II_dimension>&, const Point<deal_II_dimension>&, double);
-
-  template void
-    GridGenerator::half_hyper_shell (
-      Triangulation<deal_II_dimension>&,
-      const Point<deal_II_dimension>&, double, double, unsigned int);
-
-
-  template void
-    GridGenerator::hyper_cube_with_cylindrical_hole (
-      Triangulation<deal_II_dimension> &,
-      const double, const double, const double, const unsigned int, bool);
-
   template void
     GridGenerator::
     laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
@@ -102,7 +49,6 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
 #if deal_II_dimension != 3
-
   template void
     GridGenerator::hyper_cube<deal_II_dimension, deal_II_dimension+1> (
       Triangulation<deal_II_dimension,deal_II_dimension+1> &, const double, const double);
