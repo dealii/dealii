@@ -5580,8 +5580,14 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
   if test "$USE_CONTRIB_PETSC" = "yes" ; then
     DEAL_II_CONFIGURE_PETSC_VERSION
     DEAL_II_CONFIGURE_PETSC_ARCH
-    DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
-    DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
+
+    dnl Here is where we check for the MPI consistency, iff, MPI is asked for.
+    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+      DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
+    else
+      DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
+    fi
+
     DEAL_II_CONFIGURE_PETSC_COMPLEX
 
     DEAL_II_EXPAND_PETSC_VECTOR="PETScWrappers::Vector"
@@ -5685,7 +5691,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
   PETSC_RELEASE=`cat $DEAL_II_PETSC_DIR/include/petscversion.h \
                      | grep "#define PETSC_VERSION_RELEASE" \
                      | perl -pi -e 's/.*RELEASE\s+//g;'`
-  if test "$PETSC_VERSION_RELEASE" = "0" ; then
+  if test "$PETSC_RELEASE" = "0" ; then
     PETSC_VERSION+="-dev"
   else
     PETSC_VERSION+=""
@@ -5696,16 +5702,69 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Make sure that if PETSc was built with/without MPI, then
-dnl deal.II was built with the same flags.
+dnl Make sure that if PETSc and deal.II were built with the same 
+dnl compiler. Actually, this only checks if the compilers are the
+dnl if deal.II has MPI enabled. 
 dnl
 dnl Usage: DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
 dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
 [
-dnl TODO: This does nothing yet. Add this functionality asap 
-dnl (Toby D. Young)
+
+  dnl PETSc defines the name of the C/C++ in the same variable, which
+  dnl is contected to PETSc's $PCC flag. Therefore, first we check which
+  dnl language PETSc knows about (CONLY, CXXONLY) and check that against
+  dnl the anological language compiler of deal.II ($CC, $CXX).
+  dnl
+  dnl First, get PETSc's language type
+  AC_MSG_CHECKING([for PETSc library language])
+
+  DEAL_II_PETSC_LANGUAGE=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
+                              | grep "PETSC_LANGUAGE = " \
+                              | perl -pi -e 's/.*LANGUAGE\s=\s+//g;'`
+
+  dnl ...and pretty print that.
+  case "$DEAL_II_PETSC_LANGUAGE" in
+    CONLY) dnl PETSC language is C
+      AC_MSG_RESULT(C)
+      ;;
+    CXXONLY) dnl PETSC language is C++
+      AC_MSG_RESULT(C++)
+      ;;
+    *) dnl This should *never* happen;, but just in case of something/anything...
+      AC_MSG_ERROR([Unrecognized PETSc language $DEAL_II_PETSC_LANGUAGE -- Try to go ahead and get help from dealii@dealii.org])
+      ;;
+  esac
+
+  dnl Then check for MPI consistency.
+  AC_MSG_CHECKING(for consistency of PETSc and deal.II MPI settings)
+
+  dnl Information about the C/C++ compiler (linker) that PETSc knows
+  dnl about is stored in the PCC (PCC_LINKER) flags. So we just check that
+  dnl this valus is the same as the corresponding value for the C/C++
+  dnl compiler that deal.II knows about.
+  DEAL_II_PETSC_PCC=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
+                         | grep "PCC = " \
+                         | perl -pi -e 's/.*PCC\s=\s+//g;'`
+  DEAL_II_PETSC_PCC+=" " dnl Add a trailing whitespace
+
+  case "$DEAL_II_PETSC_LANGUAGE" in
+    CONLY) dnl PETSC language is C, check $CC
+      if test "$DEAL_II_PETSC_PCC" = "$CC" ; then
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_ERROR([PETSc has not been compiled with the same compiler])
+      fi
+    ;;
+    CXXONLY) dnl PETSC language is C++, check $CXX
+      if test "$DEAL_II_PETSC_PCC" = "$CXX" ; then
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_ERROR([PETSc has not been compiled with the same compiler])
+      fi
+    ;;
+  esac
 ])
 
 
@@ -5713,7 +5772,7 @@ dnl ------------------------------------------------------------
 dnl See if there is a library libmpiuni.a/so available. We need
 dnl to link with it on some systems where PETSc is built without
 dnl a real MPI and we need to handle trivial (one process) MPI
-dnl functionality.
+dnl functionality. 
 dnl
 dnl Usage: DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
 dnl
