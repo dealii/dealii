@@ -243,6 +243,7 @@ class Step12
 template <int dim>
 Step12<dim>::Step12 ()
 		:
+                mapping (),
                 fe (1),
 		dof_handler (triangulation)
 {}
