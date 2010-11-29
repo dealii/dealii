@@ -55,6 +55,7 @@ MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (
 
 for (deal_II_dimension : DIMENSIONS)
   {
+#if deal_II_dimension > 1
 template void
 MGTools::compute_row_length_vector(
   const MGDoFHandler<deal_II_dimension>&, unsigned int,
@@ -64,6 +65,7 @@ MGTools::compute_row_length_vector(
   const MGDoFHandler<deal_II_dimension>&, unsigned int,
   std::vector<unsigned int>&,
   const Table<2,DoFTools::Coupling>&, const Table<2,DoFTools::Coupling>&);
+#endif
 
 template void MGTools::count_dofs_per_component<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
@@ -75,11 +77,13 @@ template void MGTools::count_dofs_per_block<deal_II_dimension> (
   const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
   std::vector<unsigned int>);
 
+#if deal_II_dimension > 1
 template void MGTools::make_boundary_list(
   const MGDoFHandler<deal_II_dimension>&,
   const FunctionMap<deal_II_dimension>::type&,
   std::vector<std::set<unsigned int> >&,
   const std::vector<bool>&);
+#endif
 
 template void MGTools::make_boundary_list(
   const MGDoFHandler<deal_II_dimension>&,
@@ -87,6 +91,7 @@ template void MGTools::make_boundary_list(
   std::vector<IndexSet>&,
   const std::vector<bool>&);
 
+#if deal_II_dimension > 1
 template
 void
 MGTools::
@@ -98,6 +103,7 @@ void
 MGTools::
 extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 			      std::vector<std::vector<bool> >  &interface_dofs);
+#endif
 
 #if deal_II_dimension < 3
 

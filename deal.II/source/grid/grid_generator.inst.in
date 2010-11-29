@@ -43,6 +43,7 @@ for (deal_II_dimension : DIMENSIONS)
      const Point<deal_II_dimension>&,
      const Point<deal_II_dimension>&, bool);
 
+#if deal_II_dimension > 1
   template void
     GridGenerator::enclosed_hyper_cube (
       Triangulation<deal_II_dimension>&, double, double, double, bool);
@@ -55,7 +56,6 @@ for (deal_II_dimension : DIMENSIONS)
   template void
     GridGenerator::cylinder (
       Triangulation<deal_II_dimension>&, double, double);
-
 
   template void
     GridGenerator::truncated_cone (
@@ -99,6 +99,7 @@ for (deal_II_dimension : DIMENSIONS)
     GridGenerator::
     laplace_transformation<deal_II_dimension> (Triangulation<deal_II_dimension> &,
 					       const std::map<unsigned int,Point<deal_II_dimension> > &);
+#endif
 
 #if deal_II_dimension != 3
 

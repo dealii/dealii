@@ -453,11 +453,6 @@ for (deal_II_dimension : DIMENSIONS)
 
 
   template
-  void add_fe_name<deal_II_dimension>(
-    const std::string& ,
-    const FEFactoryBase<deal_II_dimension>* );
-
-  template
   void
   compute_projection_from_quadrature_points_matrix (const FiniteElement<deal_II_dimension> &,
 						    const Quadrature<deal_II_dimension>    &,

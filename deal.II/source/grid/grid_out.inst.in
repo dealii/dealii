@@ -14,16 +14,23 @@
 
 for (deal_II_dimension : DIMENSIONS)
   {
+#if deal_II_dimension > 1
     template void GridOut::write_dx
       (const Triangulation<deal_II_dimension>&,
        std::ostream&) const;
+#endif
+
     template void GridOut::write_msh
       (const Triangulation<deal_II_dimension>&,
        std::ostream&) const;
+
+#if deal_II_dimension != 2
     template void GridOut::write_xfig
       (const Triangulation<deal_II_dimension>&,
        std::ostream&,
        const Mapping<deal_II_dimension,deal_II_dimension>*) const;
+#endif
+
     template void GridOut::write_gnuplot
       (const Triangulation<deal_II_dimension>&,
        std::ostream&,
