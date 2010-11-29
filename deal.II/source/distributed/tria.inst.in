@@ -47,6 +47,8 @@ for (deal_II_dimension : DIMENSIONS)
 #      endif
       \}
     \}
+#   endif // DEAL_II_USE_P4EST
+
     namespace parallel
     \{
       namespace distributed
@@ -57,8 +59,6 @@ for (deal_II_dimension : DIMENSIONS)
 #     	endif
       \}
     \}
-
-#   endif // DEAL_II_USE_P4EST
 
   }
 
