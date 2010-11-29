@@ -200,7 +200,7 @@ const
                         {
                           grad_grads[i + j * (my_degree + 1)][0][k][l] = 0.0;
                           grad_grads[i + (j + 2) * (my_degree + 1)][0][k][l]
-                            = unit_point_grad_grads[i + l * (my_degree + 1)][k]
+                            = unit_point_grad_grads[i + j * (my_degree + 1)][k]
                                                    [l];
                           grad_grads[i + (j + 2) * (my_degree + 1)][1][k][l]
                             = 0.0;

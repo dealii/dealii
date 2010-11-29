@@ -1,0 +1,1161 @@
+
+DEAL:Cell1d-QHierarchical1::0.00 2.00 1.00
+DEAL:Cell1d-QHierarchical1::0.25 1.75 1.25
+DEAL:Cell1d-QHierarchical1::0.50 1.50 1.50
+DEAL:Cell1d-QHierarchical1::0.75 1.25 1.75
+DEAL:Cell1d-QHierarchical1::1.00 1.00 2.00
+DEAL:Cell1d-QHierarchical1::
+DEAL:Cell1d-QHierarchical1::
+DEAL:Cell1d-QHierarchical2::0.00 2.00 1.00 1.00
+DEAL:Cell1d-QHierarchical2::0.25 1.75 1.25 0.25
+DEAL:Cell1d-QHierarchical2::0.50 1.50 1.50 0
+DEAL:Cell1d-QHierarchical2::0.75 1.25 1.75 0.25
+DEAL:Cell1d-QHierarchical2::1.00 1.00 2.00 1.00
+DEAL:Cell1d-QHierarchical2::
+DEAL:Cell1d-QHierarchical2::
+DEAL:Cell1d-QHierarchical3::0.00 2.00 1.00 1.00 1.00
+DEAL:Cell1d-QHierarchical3::0.25 1.75 1.25 0.25 1.38
+DEAL:Cell1d-QHierarchical3::0.50 1.50 1.50 0 1.00
+DEAL:Cell1d-QHierarchical3::0.75 1.25 1.75 0.25 0.62
+DEAL:Cell1d-QHierarchical3::1.00 1.00 2.00 1.00 1.00
+DEAL:Cell1d-QHierarchical3::
+DEAL:Cell1d-QHierarchical3::
+DEAL:Cell1d-QHierarchical4::0.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Cell1d-QHierarchical4::0.25 1.75 1.25 0.25 1.38 0.06
+DEAL:Cell1d-QHierarchical4::0.50 1.50 1.50 0 1.00 0
+DEAL:Cell1d-QHierarchical4::0.75 1.25 1.75 0.25 0.62 0.06
+DEAL:Cell1d-QHierarchical4::1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Cell1d-QHierarchical4::
+DEAL:Cell1d-QHierarchical4::
+DEAL:Cell2d-QHierarchical1::0.00 0.00 2.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical1::0.25 0.00 1.75 1.25 1.00 1.00
+DEAL:Cell2d-QHierarchical1::0.50 0.00 1.50 1.50 1.00 1.00
+DEAL:Cell2d-QHierarchical1::0.75 0.00 1.25 1.75 1.00 1.00
+DEAL:Cell2d-QHierarchical1::1.00 0.00 1.00 2.00 1.00 1.00
+DEAL:Cell2d-QHierarchical1::
+DEAL:Cell2d-QHierarchical1::0.00 0.25 1.75 1.00 1.25 1.00
+DEAL:Cell2d-QHierarchical1::0.25 0.25 1.56 1.19 1.19 1.06
+DEAL:Cell2d-QHierarchical1::0.50 0.25 1.38 1.38 1.12 1.12
+DEAL:Cell2d-QHierarchical1::0.75 0.25 1.19 1.56 1.06 1.19
+DEAL:Cell2d-QHierarchical1::1.00 0.25 1.00 1.75 1.00 1.25
+DEAL:Cell2d-QHierarchical1::
+DEAL:Cell2d-QHierarchical1::0.00 0.50 1.50 1.00 1.50 1.00
+DEAL:Cell2d-QHierarchical1::0.25 0.50 1.38 1.12 1.38 1.12
+DEAL:Cell2d-QHierarchical1::0.50 0.50 1.25 1.25 1.25 1.25
+DEAL:Cell2d-QHierarchical1::0.75 0.50 1.12 1.38 1.12 1.38
+DEAL:Cell2d-QHierarchical1::1.00 0.50 1.00 1.50 1.00 1.50
+DEAL:Cell2d-QHierarchical1::
+DEAL:Cell2d-QHierarchical1::0.00 0.75 1.25 1.00 1.75 1.00
+DEAL:Cell2d-QHierarchical1::0.25 0.75 1.19 1.06 1.56 1.19
+DEAL:Cell2d-QHierarchical1::0.50 0.75 1.12 1.12 1.38 1.38
+DEAL:Cell2d-QHierarchical1::0.75 0.75 1.06 1.19 1.19 1.56
+DEAL:Cell2d-QHierarchical1::1.00 0.75 1.00 1.25 1.00 1.75
+DEAL:Cell2d-QHierarchical1::
+DEAL:Cell2d-QHierarchical1::0.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Cell2d-QHierarchical1::0.25 1.00 1.00 1.00 1.75 1.25
+DEAL:Cell2d-QHierarchical1::0.50 1.00 1.00 1.00 1.50 1.50
+DEAL:Cell2d-QHierarchical1::0.75 1.00 1.00 1.00 1.25 1.75
+DEAL:Cell2d-QHierarchical1::1.00 1.00 1.00 1.00 1.00 2.00
+DEAL:Cell2d-QHierarchical1::
+DEAL:Cell2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::0.00 0.00 2.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical1::0.00 0.12 1.75 1.00 1.25 1.00
+DEAL:Face2d-QHierarchical1::0.00 0.25 1.50 1.00 1.50 1.00
+DEAL:Face2d-QHierarchical1::0.00 0.38 1.25 1.00 1.75 1.00
+DEAL:Face2d-QHierarchical1::0.00 0.50 1.00 1.00 2.00 1.00
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::0.50 0.00 1.00 2.00 1.00 1.00
+DEAL:Face2d-QHierarchical1::0.50 0.06 1.00 1.88 1.00 1.12
+DEAL:Face2d-QHierarchical1::0.50 0.12 1.00 1.75 1.00 1.25
+DEAL:Face2d-QHierarchical1::0.50 0.19 1.00 1.62 1.00 1.38
+DEAL:Face2d-QHierarchical1::0.50 0.25 1.00 1.50 1.00 1.50
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::0.50 0.25 1.00 1.50 1.00 1.50
+DEAL:Face2d-QHierarchical1::0.50 0.31 1.00 1.38 1.00 1.62
+DEAL:Face2d-QHierarchical1::0.50 0.38 1.00 1.25 1.00 1.75
+DEAL:Face2d-QHierarchical1::0.50 0.44 1.00 1.12 1.00 1.88
+DEAL:Face2d-QHierarchical1::0.50 0.50 1.00 1.00 1.00 2.00
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::0.00 0.00 2.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical1::0.12 0.00 1.75 1.25 1.00 1.00
+DEAL:Face2d-QHierarchical1::0.25 0.00 1.50 1.50 1.00 1.00
+DEAL:Face2d-QHierarchical1::0.38 0.00 1.25 1.75 1.00 1.00
+DEAL:Face2d-QHierarchical1::0.50 0.00 1.00 2.00 1.00 1.00
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::0.00 0.50 1.00 1.00 2.00 1.00
+DEAL:Face2d-QHierarchical1::0.12 0.50 1.00 1.00 1.75 1.25
+DEAL:Face2d-QHierarchical1::0.25 0.50 1.00 1.00 1.50 1.50
+DEAL:Face2d-QHierarchical1::0.38 0.50 1.00 1.00 1.25 1.75
+DEAL:Face2d-QHierarchical1::0.50 0.50 1.00 1.00 1.00 2.00
+DEAL:Face2d-QHierarchical1::
+DEAL:Face2d-QHierarchical1::
+DEAL:Cell2d-QHierarchical2::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.25 0.00 1.75 1.25 1.00 1.00 1.00 1.00 0.25 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.50 0.00 1.50 1.50 1.00 1.00 1.00 1.00 0 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.75 0.00 1.25 1.75 1.00 1.00 1.00 1.00 0.25 1.00 1.00
+DEAL:Cell2d-QHierarchical2::1.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::
+DEAL:Cell2d-QHierarchical2::0.00 0.25 1.75 1.00 1.25 1.00 0.25 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.25 0.25 1.56 1.19 1.19 1.06 0.44 0.81 0.44 0.81 1.56
+DEAL:Cell2d-QHierarchical2::0.50 0.25 1.38 1.38 1.12 1.12 0.62 0.62 0.25 0.75 1.75
+DEAL:Cell2d-QHierarchical2::0.75 0.25 1.19 1.56 1.06 1.19 0.81 0.44 0.44 0.81 1.56
+DEAL:Cell2d-QHierarchical2::1.00 0.25 1.00 1.75 1.00 1.25 1.00 0.25 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::
+DEAL:Cell2d-QHierarchical2::0.00 0.50 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.25 0.50 1.38 1.12 1.38 1.12 0.25 0.75 0.62 0.62 1.75
+DEAL:Cell2d-QHierarchical2::0.50 0.50 1.25 1.25 1.25 1.25 0.50 0.50 0.50 0.50 2.00
+DEAL:Cell2d-QHierarchical2::0.75 0.50 1.12 1.38 1.12 1.38 0.75 0.25 0.62 0.62 1.75
+DEAL:Cell2d-QHierarchical2::1.00 0.50 1.00 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::
+DEAL:Cell2d-QHierarchical2::0.00 0.75 1.25 1.00 1.75 1.00 0.25 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.25 0.75 1.19 1.06 1.56 1.19 0.44 0.81 0.81 0.44 1.56
+DEAL:Cell2d-QHierarchical2::0.50 0.75 1.12 1.12 1.38 1.38 0.62 0.62 0.75 0.25 1.75
+DEAL:Cell2d-QHierarchical2::0.75 0.75 1.06 1.19 1.19 1.56 0.81 0.44 0.81 0.44 1.56
+DEAL:Cell2d-QHierarchical2::1.00 0.75 1.00 1.25 1.00 1.75 1.00 0.25 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::
+DEAL:Cell2d-QHierarchical2::0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::0.25 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 0.25 1.00
+DEAL:Cell2d-QHierarchical2::0.50 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 0 1.00
+DEAL:Cell2d-QHierarchical2::0.75 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 0.25 1.00
+DEAL:Cell2d-QHierarchical2::1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical2::
+DEAL:Cell2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.00 0.12 1.75 1.00 1.25 1.00 0.25 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.00 0.25 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.00 0.38 1.25 1.00 1.75 1.00 0.25 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.00 0.50 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::0.50 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.06 1.00 1.88 1.00 1.12 1.00 0.56 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.12 1.00 1.75 1.00 1.25 1.00 0.25 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.19 1.00 1.62 1.00 1.38 1.00 0.06 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.25 1.00 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::0.50 0.25 1.00 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.31 1.00 1.38 1.00 1.62 1.00 0.06 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.38 1.00 1.25 1.00 1.75 1.00 0.25 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.44 1.00 1.12 1.00 1.88 1.00 0.56 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.12 0.00 1.75 1.25 1.00 1.00 1.00 1.00 0.25 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.25 0.00 1.50 1.50 1.00 1.00 1.00 1.00 0 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.38 0.00 1.25 1.75 1.00 1.00 1.00 1.00 0.25 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::0.00 0.50 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::0.12 0.50 1.00 1.00 1.75 1.25 1.00 1.00 1.00 0.25 1.00
+DEAL:Face2d-QHierarchical2::0.25 0.50 1.00 1.00 1.50 1.50 1.00 1.00 1.00 0 1.00
+DEAL:Face2d-QHierarchical2::0.38 0.50 1.00 1.00 1.25 1.75 1.00 1.00 1.00 0.25 1.00
+DEAL:Face2d-QHierarchical2::0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical2::
+DEAL:Face2d-QHierarchical2::
+DEAL:Cell2d-QHierarchical3::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.25 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.50 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.75 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::1.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::
+DEAL:Cell2d-QHierarchical3::0.00 0.25 1.75 1.00 1.25 1.00 0.25 1.38 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.25 0.25 1.56 1.19 1.19 1.06 0.44 1.28 0.81 1.09 0.44 1.28 0.81 1.09 1.56 0.72 0.72 1.14
+DEAL:Cell2d-QHierarchical3::0.50 0.25 1.38 1.38 1.12 1.12 0.62 1.19 0.62 1.19 0.25 1.00 0.75 1.00 1.75 1.00 0.62 1.00
+DEAL:Cell2d-QHierarchical3::0.75 0.25 1.19 1.56 1.06 1.19 0.81 1.09 0.44 1.28 0.44 0.72 0.81 0.91 1.56 1.28 0.72 0.86
+DEAL:Cell2d-QHierarchical3::1.00 0.25 1.00 1.75 1.00 1.25 1.00 1.00 0.25 1.38 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::
+DEAL:Cell2d-QHierarchical3::0.00 0.50 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.25 0.50 1.38 1.12 1.38 1.12 0.25 1.00 0.75 1.00 0.62 1.19 0.62 1.19 1.75 0.62 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.50 0.50 1.25 1.25 1.25 1.25 0.50 1.00 0.50 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.75 0.50 1.12 1.38 1.12 1.38 0.75 1.00 0.25 1.00 0.62 0.81 0.62 0.81 1.75 1.38 1.00 1.00
+DEAL:Cell2d-QHierarchical3::1.00 0.50 1.00 1.50 1.00 1.50 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::
+DEAL:Cell2d-QHierarchical3::0.00 0.75 1.25 1.00 1.75 1.00 0.25 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.25 0.75 1.19 1.06 1.56 1.19 0.44 0.72 0.81 0.91 0.81 1.09 0.44 1.28 1.56 0.72 1.28 0.86
+DEAL:Cell2d-QHierarchical3::0.50 0.75 1.12 1.12 1.38 1.38 0.62 0.81 0.62 0.81 0.75 1.00 0.25 1.00 1.75 1.00 1.38 1.00
+DEAL:Cell2d-QHierarchical3::0.75 0.75 1.06 1.19 1.19 1.56 0.81 0.91 0.44 0.72 0.81 0.91 0.44 0.72 1.56 1.28 1.28 1.14
+DEAL:Cell2d-QHierarchical3::1.00 0.75 1.00 1.25 1.00 1.75 1.00 1.00 0.25 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::
+DEAL:Cell2d-QHierarchical3::0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.25 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.50 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::0.75 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical3::
+DEAL:Cell2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.00 0.12 1.75 1.00 1.25 1.00 0.25 1.38 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.00 0.25 1.50 1.00 1.50 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.00 0.38 1.25 1.00 1.75 1.00 0.25 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.00 0.50 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::0.50 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.06 1.00 1.88 1.00 1.12 1.00 1.00 0.56 1.33 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.12 1.00 1.75 1.00 1.25 1.00 1.00 0.25 1.38 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.19 1.00 1.62 1.00 1.38 1.00 1.00 0.06 1.23 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.25 1.00 1.50 1.00 1.50 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::0.50 0.25 1.00 1.50 1.00 1.50 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.31 1.00 1.38 1.00 1.62 1.00 1.00 0.06 0.77 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.38 1.00 1.25 1.00 1.75 1.00 1.00 0.25 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.44 1.00 1.12 1.00 1.88 1.00 1.00 0.56 0.67 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.12 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.25 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.38 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::0.00 0.50 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.12 0.50 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.25 0.50 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.38 0.50 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical3::
+DEAL:Face2d-QHierarchical3::
+DEAL:Cell2d-QHierarchical4::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.25 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.50 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.75 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::1.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::
+DEAL:Cell2d-QHierarchical4::0.00 0.25 1.75 1.00 1.25 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.25 0.25 1.56 1.19 1.19 1.06 0.44 1.28 0.30 0.81 1.09 0.77 0.44 1.28 0.30 0.81 1.09 0.77 1.56 0.72 1.70 0.72 1.14 0.65 1.70 0.65 1.88
+DEAL:Cell2d-QHierarchical4::0.50 0.25 1.38 1.38 1.12 1.12 0.62 1.19 0.53 0.62 1.19 0.53 0.25 1.00 0.25 0.75 1.00 0.75 1.75 1.00 1.75 0.62 1.00 0.62 1.94 1.00 1.94
+DEAL:Cell2d-QHierarchical4::0.75 0.25 1.19 1.56 1.06 1.19 0.81 1.09 0.77 0.44 1.28 0.30 0.44 0.72 0.30 0.81 0.91 0.77 1.56 1.28 1.70 0.72 0.86 0.65 1.70 1.35 1.88
+DEAL:Cell2d-QHierarchical4::1.00 0.25 1.00 1.75 1.00 1.25 1.00 1.00 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::
+DEAL:Cell2d-QHierarchical4::0.00 0.50 1.50 1.00 1.50 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.25 0.50 1.38 1.12 1.38 1.12 0.25 1.00 0.25 0.75 1.00 0.75 0.62 1.19 0.53 0.62 1.19 0.53 1.75 0.62 1.94 1.00 1.00 1.00 1.75 0.62 1.94
+DEAL:Cell2d-QHierarchical4::0.50 0.50 1.25 1.25 1.25 1.25 0.50 1.00 0.50 0.50 1.00 0.50 0.50 1.00 0.50 0.50 1.00 0.50 2.00 1.00 2.00 1.00 1.00 1.00 2.00 1.00 2.00
+DEAL:Cell2d-QHierarchical4::0.75 0.50 1.12 1.38 1.12 1.38 0.75 1.00 0.75 0.25 1.00 0.25 0.62 0.81 0.53 0.62 0.81 0.53 1.75 1.38 1.94 1.00 1.00 1.00 1.75 1.38 1.94
+DEAL:Cell2d-QHierarchical4::1.00 0.50 1.00 1.50 1.00 1.50 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::
+DEAL:Cell2d-QHierarchical4::0.00 0.75 1.25 1.00 1.75 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.25 0.75 1.19 1.06 1.56 1.19 0.44 0.72 0.30 0.81 0.91 0.77 0.81 1.09 0.77 0.44 1.28 0.30 1.56 0.72 1.70 1.28 0.86 1.35 1.70 0.65 1.88
+DEAL:Cell2d-QHierarchical4::0.50 0.75 1.12 1.12 1.38 1.38 0.62 0.81 0.53 0.62 0.81 0.53 0.75 1.00 0.75 0.25 1.00 0.25 1.75 1.00 1.75 1.38 1.00 1.38 1.94 1.00 1.94
+DEAL:Cell2d-QHierarchical4::0.75 0.75 1.06 1.19 1.19 1.56 0.81 0.91 0.77 0.44 0.72 0.30 0.81 0.91 0.77 0.44 0.72 0.30 1.56 1.28 1.70 1.28 1.14 1.35 1.70 1.35 1.88
+DEAL:Cell2d-QHierarchical4::1.00 0.75 1.00 1.25 1.00 1.75 1.00 1.00 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::
+DEAL:Cell2d-QHierarchical4::0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.25 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.50 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::0.75 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell2d-QHierarchical4::
+DEAL:Cell2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.00 0.12 1.75 1.00 1.25 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.00 0.25 1.50 1.00 1.50 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.00 0.38 1.25 1.00 1.75 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.00 0.50 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::0.50 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.06 1.00 1.88 1.00 1.12 1.00 1.00 1.00 0.56 1.33 0.32 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.12 1.00 1.75 1.00 1.25 1.00 1.00 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.19 1.00 1.62 1.00 1.38 1.00 1.00 1.00 0.06 1.23 0.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.25 1.00 1.50 1.00 1.50 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::0.50 0.25 1.00 1.50 1.00 1.50 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.31 1.00 1.38 1.00 1.62 1.00 1.00 1.00 0.06 0.77 0.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.38 1.00 1.25 1.00 1.75 1.00 1.00 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.44 1.00 1.12 1.00 1.88 1.00 1.00 1.00 0.56 0.67 0.32 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.12 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.25 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.38 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::0.00 0.50 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.12 0.50 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.38 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.25 0.50 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.38 0.50 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 0.62 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face2d-QHierarchical4::
+DEAL:Face2d-QHierarchical4::
+DEAL:Cell3d-QHierarchical1::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.00 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.00 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.00 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.25 0.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.25 0.00 1.56 1.19 1.19 1.06 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.25 0.00 1.38 1.38 1.12 1.12 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.25 0.00 1.19 1.56 1.06 1.19 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.25 0.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.50 0.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.50 0.00 1.38 1.12 1.38 1.12 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.50 0.00 1.25 1.25 1.25 1.25 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.50 0.00 1.12 1.38 1.12 1.38 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.50 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.75 0.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.75 0.00 1.19 1.06 1.56 1.19 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.75 0.00 1.12 1.12 1.38 1.38 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.75 0.00 1.06 1.19 1.19 1.56 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.75 0.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 1.00 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 1.00 0.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 1.00 0.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 1.00 0.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 1.00 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.00 0.25 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.00 0.25 1.56 1.19 1.00 1.00 1.19 1.06 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.00 0.25 1.38 1.38 1.00 1.00 1.12 1.12 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.00 0.25 1.19 1.56 1.00 1.00 1.06 1.19 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.00 0.25 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.25 0.25 1.56 1.00 1.19 1.00 1.19 1.00 1.06 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.25 0.25 1.42 1.14 1.14 1.05 1.14 1.05 1.05 1.02
+DEAL:Cell3d-QHierarchical1::0.50 0.25 0.25 1.28 1.28 1.09 1.09 1.09 1.09 1.03 1.03
+DEAL:Cell3d-QHierarchical1::0.75 0.25 0.25 1.14 1.42 1.05 1.14 1.05 1.14 1.02 1.05
+DEAL:Cell3d-QHierarchical1::1.00 0.25 0.25 1.00 1.56 1.00 1.19 1.00 1.19 1.00 1.06
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.50 0.25 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.50 0.25 1.28 1.09 1.28 1.09 1.09 1.03 1.09 1.03
+DEAL:Cell3d-QHierarchical1::0.50 0.50 0.25 1.19 1.19 1.19 1.19 1.06 1.06 1.06 1.06
+DEAL:Cell3d-QHierarchical1::0.75 0.50 0.25 1.09 1.28 1.09 1.28 1.03 1.09 1.03 1.09
+DEAL:Cell3d-QHierarchical1::1.00 0.50 0.25 1.00 1.38 1.00 1.38 1.00 1.12 1.00 1.12
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.75 0.25 1.19 1.00 1.56 1.00 1.06 1.00 1.19 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.75 0.25 1.14 1.05 1.42 1.14 1.05 1.02 1.14 1.05
+DEAL:Cell3d-QHierarchical1::0.50 0.75 0.25 1.09 1.09 1.28 1.28 1.03 1.03 1.09 1.09
+DEAL:Cell3d-QHierarchical1::0.75 0.75 0.25 1.05 1.14 1.14 1.42 1.02 1.05 1.05 1.14
+DEAL:Cell3d-QHierarchical1::1.00 0.75 0.25 1.00 1.19 1.00 1.56 1.00 1.06 1.00 1.19
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 1.00 0.25 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00
+DEAL:Cell3d-QHierarchical1::0.25 1.00 0.25 1.00 1.00 1.56 1.19 1.00 1.00 1.19 1.06
+DEAL:Cell3d-QHierarchical1::0.50 1.00 0.25 1.00 1.00 1.38 1.38 1.00 1.00 1.12 1.12
+DEAL:Cell3d-QHierarchical1::0.75 1.00 0.25 1.00 1.00 1.19 1.56 1.00 1.00 1.06 1.19
+DEAL:Cell3d-QHierarchical1::1.00 1.00 0.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.25
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.00 0.50 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.00 0.50 1.38 1.12 1.00 1.00 1.38 1.12 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.00 0.50 1.25 1.25 1.00 1.00 1.25 1.25 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.00 0.50 1.12 1.38 1.00 1.00 1.12 1.38 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.00 0.50 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.25 0.50 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.25 0.50 1.28 1.09 1.09 1.03 1.28 1.09 1.09 1.03
+DEAL:Cell3d-QHierarchical1::0.50 0.25 0.50 1.19 1.19 1.06 1.06 1.19 1.19 1.06 1.06
+DEAL:Cell3d-QHierarchical1::0.75 0.25 0.50 1.09 1.28 1.03 1.09 1.09 1.28 1.03 1.09
+DEAL:Cell3d-QHierarchical1::1.00 0.25 0.50 1.00 1.38 1.00 1.12 1.00 1.38 1.00 1.12
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.50 0.50 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.50 0.50 1.19 1.06 1.19 1.06 1.19 1.06 1.19 1.06
+DEAL:Cell3d-QHierarchical1::0.50 0.50 0.50 1.12 1.12 1.12 1.12 1.12 1.12 1.12 1.12
+DEAL:Cell3d-QHierarchical1::0.75 0.50 0.50 1.06 1.19 1.06 1.19 1.06 1.19 1.06 1.19
+DEAL:Cell3d-QHierarchical1::1.00 0.50 0.50 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.75 0.50 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.75 0.50 1.09 1.03 1.28 1.09 1.09 1.03 1.28 1.09
+DEAL:Cell3d-QHierarchical1::0.50 0.75 0.50 1.06 1.06 1.19 1.19 1.06 1.06 1.19 1.19
+DEAL:Cell3d-QHierarchical1::0.75 0.75 0.50 1.03 1.09 1.09 1.28 1.03 1.09 1.09 1.28
+DEAL:Cell3d-QHierarchical1::1.00 0.75 0.50 1.00 1.12 1.00 1.38 1.00 1.12 1.00 1.38
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 1.00 0.50 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00
+DEAL:Cell3d-QHierarchical1::0.25 1.00 0.50 1.00 1.00 1.38 1.12 1.00 1.00 1.38 1.12
+DEAL:Cell3d-QHierarchical1::0.50 1.00 0.50 1.00 1.00 1.25 1.25 1.00 1.00 1.25 1.25
+DEAL:Cell3d-QHierarchical1::0.75 1.00 0.50 1.00 1.00 1.12 1.38 1.00 1.00 1.12 1.38
+DEAL:Cell3d-QHierarchical1::1.00 1.00 0.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.00 0.75 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.00 0.75 1.19 1.06 1.00 1.00 1.56 1.19 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.00 0.75 1.12 1.12 1.00 1.00 1.38 1.38 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.00 0.75 1.06 1.19 1.00 1.00 1.19 1.56 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.00 0.75 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.25 0.75 1.19 1.00 1.06 1.00 1.56 1.00 1.19 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.25 0.75 1.14 1.05 1.05 1.02 1.42 1.14 1.14 1.05
+DEAL:Cell3d-QHierarchical1::0.50 0.25 0.75 1.09 1.09 1.03 1.03 1.28 1.28 1.09 1.09
+DEAL:Cell3d-QHierarchical1::0.75 0.25 0.75 1.05 1.14 1.02 1.05 1.14 1.42 1.05 1.14
+DEAL:Cell3d-QHierarchical1::1.00 0.25 0.75 1.00 1.19 1.00 1.06 1.00 1.56 1.00 1.19
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.50 0.75 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.50 0.75 1.09 1.03 1.09 1.03 1.28 1.09 1.28 1.09
+DEAL:Cell3d-QHierarchical1::0.50 0.50 0.75 1.06 1.06 1.06 1.06 1.19 1.19 1.19 1.19
+DEAL:Cell3d-QHierarchical1::0.75 0.50 0.75 1.03 1.09 1.03 1.09 1.09 1.28 1.09 1.28
+DEAL:Cell3d-QHierarchical1::1.00 0.50 0.75 1.00 1.12 1.00 1.12 1.00 1.38 1.00 1.38
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.75 0.75 1.06 1.00 1.19 1.00 1.19 1.00 1.56 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.75 0.75 1.05 1.02 1.14 1.05 1.14 1.05 1.42 1.14
+DEAL:Cell3d-QHierarchical1::0.50 0.75 0.75 1.03 1.03 1.09 1.09 1.09 1.09 1.28 1.28
+DEAL:Cell3d-QHierarchical1::0.75 0.75 0.75 1.02 1.05 1.05 1.14 1.05 1.14 1.14 1.42
+DEAL:Cell3d-QHierarchical1::1.00 0.75 0.75 1.00 1.06 1.00 1.19 1.00 1.19 1.00 1.56
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 1.00 0.75 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00
+DEAL:Cell3d-QHierarchical1::0.25 1.00 0.75 1.00 1.00 1.19 1.06 1.00 1.00 1.56 1.19
+DEAL:Cell3d-QHierarchical1::0.50 1.00 0.75 1.00 1.00 1.12 1.12 1.00 1.00 1.38 1.38
+DEAL:Cell3d-QHierarchical1::0.75 1.00 0.75 1.00 1.00 1.06 1.19 1.00 1.00 1.19 1.56
+DEAL:Cell3d-QHierarchical1::1.00 1.00 0.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.75
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.50 0.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00
+DEAL:Cell3d-QHierarchical1::0.75 0.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00
+DEAL:Cell3d-QHierarchical1::1.00 0.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.25 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.25 1.00 1.00 1.00 1.00 1.00 1.56 1.19 1.19 1.06
+DEAL:Cell3d-QHierarchical1::0.50 0.25 1.00 1.00 1.00 1.00 1.00 1.38 1.38 1.12 1.12
+DEAL:Cell3d-QHierarchical1::0.75 0.25 1.00 1.00 1.00 1.00 1.00 1.19 1.56 1.06 1.19
+DEAL:Cell3d-QHierarchical1::1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.38 1.12 1.38 1.12
+DEAL:Cell3d-QHierarchical1::0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.25 1.25 1.25 1.25
+DEAL:Cell3d-QHierarchical1::0.75 0.50 1.00 1.00 1.00 1.00 1.00 1.12 1.38 1.12 1.38
+DEAL:Cell3d-QHierarchical1::1.00 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 0.75 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00
+DEAL:Cell3d-QHierarchical1::0.25 0.75 1.00 1.00 1.00 1.00 1.00 1.19 1.06 1.56 1.19
+DEAL:Cell3d-QHierarchical1::0.50 0.75 1.00 1.00 1.00 1.00 1.00 1.12 1.12 1.38 1.38
+DEAL:Cell3d-QHierarchical1::0.75 0.75 1.00 1.00 1.00 1.00 1.00 1.06 1.19 1.19 1.56
+DEAL:Cell3d-QHierarchical1::1.00 0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::0.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Cell3d-QHierarchical1::0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25
+DEAL:Cell3d-QHierarchical1::0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50
+DEAL:Cell3d-QHierarchical1::0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75
+DEAL:Cell3d-QHierarchical1::1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00
+DEAL:Cell3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.12 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.12 1.56 1.00 1.19 1.00 1.19 1.00 1.06 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.12 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.12 1.19 1.00 1.56 1.00 1.06 1.00 1.19 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.12 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.25 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.25 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.25 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.25 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.25 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.38 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.38 1.19 1.00 1.06 1.00 1.56 1.00 1.19 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.38 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.38 1.06 1.00 1.19 1.00 1.19 1.00 1.56 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.38 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.50 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.50 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.50 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.00 1.00 1.88 1.00 1.12 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.00 1.00 1.62 1.00 1.38 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.06 1.00 1.88 1.00 1.00 1.00 1.12 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.06 1.00 1.77 1.00 1.11 1.00 1.11 1.00 1.02
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.06 1.00 1.66 1.00 1.22 1.00 1.09 1.00 1.03
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.06 1.00 1.55 1.00 1.33 1.00 1.08 1.00 1.05
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.06 1.00 1.44 1.00 1.44 1.00 1.06 1.00 1.06
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.12 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.12 1.00 1.66 1.00 1.09 1.00 1.22 1.00 1.03
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.12 1.00 1.56 1.00 1.19 1.00 1.19 1.00 1.06
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.12 1.00 1.47 1.00 1.28 1.00 1.16 1.00 1.09
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.12 1.00 1.38 1.00 1.38 1.00 1.12 1.00 1.12
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.19 1.00 1.62 1.00 1.00 1.00 1.38 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.19 1.00 1.55 1.00 1.08 1.00 1.33 1.00 1.05
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.19 1.00 1.47 1.00 1.16 1.00 1.28 1.00 1.09
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.19 1.00 1.39 1.00 1.23 1.00 1.23 1.00 1.14
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.19 1.00 1.31 1.00 1.31 1.00 1.19 1.00 1.19
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.25 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.25 1.00 1.44 1.00 1.06 1.00 1.44 1.00 1.06
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.25 1.00 1.38 1.00 1.12 1.00 1.38 1.00 1.12
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.25 1.00 1.31 1.00 1.19 1.00 1.31 1.00 1.19
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.00 1.00 1.38 1.00 1.62 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.00 1.00 1.12 1.00 1.88 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.06 1.00 1.44 1.00 1.44 1.00 1.06 1.00 1.06
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.06 1.00 1.33 1.00 1.55 1.00 1.05 1.00 1.08
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.06 1.00 1.22 1.00 1.66 1.00 1.03 1.00 1.09
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.06 1.00 1.11 1.00 1.77 1.00 1.02 1.00 1.11
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.06 1.00 1.00 1.00 1.88 1.00 1.00 1.00 1.12
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.12 1.00 1.38 1.00 1.38 1.00 1.12 1.00 1.12
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.12 1.00 1.28 1.00 1.47 1.00 1.09 1.00 1.16
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.13 1.00 1.19 1.00 1.56 1.00 1.06 1.00 1.19
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.13 1.00 1.09 1.00 1.66 1.00 1.03 1.00 1.22
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.13 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.25
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.19 1.00 1.31 1.00 1.31 1.00 1.19 1.00 1.19
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.19 1.00 1.23 1.00 1.39 1.00 1.14 1.00 1.23
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.19 1.00 1.16 1.00 1.47 1.00 1.09 1.00 1.28
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.19 1.00 1.08 1.00 1.55 1.00 1.05 1.00 1.33
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.19 1.00 1.00 1.00 1.62 1.00 1.00 1.00 1.38
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.25 1.00 1.19 1.00 1.31 1.00 1.19 1.00 1.31
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.25 1.00 1.12 1.00 1.38 1.00 1.12 1.00 1.38
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.25 1.00 1.06 1.00 1.44 1.00 1.06 1.00 1.44
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.25 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.25 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.25 1.00 1.44 1.00 1.06 1.00 1.44 1.00 1.06
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.25 1.00 1.38 1.00 1.12 1.00 1.38 1.00 1.12
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.25 1.00 1.31 1.00 1.19 1.00 1.31 1.00 1.19
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.31 1.00 1.38 1.00 1.00 1.00 1.62 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.31 1.00 1.33 1.00 1.05 1.00 1.55 1.00 1.08
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.31 1.00 1.28 1.00 1.09 1.00 1.47 1.00 1.16
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.31 1.00 1.23 1.00 1.14 1.00 1.39 1.00 1.23
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.31 1.00 1.19 1.00 1.19 1.00 1.31 1.00 1.31
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.38 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.38 1.00 1.22 1.00 1.03 1.00 1.66 1.00 1.09
+DEAL:Face3d-QHierarchical1::0.50 0.13 0.38 1.00 1.19 1.00 1.06 1.00 1.56 1.00 1.19
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.38 1.00 1.16 1.00 1.09 1.00 1.47 1.00 1.28
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.38 1.00 1.12 1.00 1.12 1.00 1.38 1.00 1.38
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.44 1.00 1.12 1.00 1.00 1.00 1.88 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.44 1.00 1.11 1.00 1.02 1.00 1.77 1.00 1.11
+DEAL:Face3d-QHierarchical1::0.50 0.13 0.44 1.00 1.09 1.00 1.03 1.00 1.66 1.00 1.22
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.44 1.00 1.08 1.00 1.05 1.00 1.55 1.00 1.33
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.44 1.00 1.06 1.00 1.06 1.00 1.44 1.00 1.44
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.50 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.06 0.50 1.00 1.00 1.00 1.00 1.00 1.88 1.00 1.12
+DEAL:Face3d-QHierarchical1::0.50 0.13 0.50 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25
+DEAL:Face3d-QHierarchical1::0.50 0.19 0.50 1.00 1.00 1.00 1.00 1.00 1.62 1.00 1.38
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.25 1.00 1.19 1.00 1.31 1.00 1.19 1.00 1.31
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.25 1.00 1.12 1.00 1.38 1.00 1.12 1.00 1.38
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.25 1.00 1.06 1.00 1.44 1.00 1.06 1.00 1.44
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.25 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.31 1.00 1.19 1.00 1.19 1.00 1.31 1.00 1.31
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.31 1.00 1.14 1.00 1.23 1.00 1.23 1.00 1.39
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.31 1.00 1.09 1.00 1.28 1.00 1.16 1.00 1.47
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.31 1.00 1.05 1.00 1.33 1.00 1.08 1.00 1.55
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.31 1.00 1.00 1.00 1.38 1.00 1.00 1.00 1.62
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.38 1.00 1.12 1.00 1.12 1.00 1.38 1.00 1.38
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.38 1.00 1.09 1.00 1.16 1.00 1.28 1.00 1.47
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.38 1.00 1.06 1.00 1.19 1.00 1.19 1.00 1.56
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.38 1.00 1.03 1.00 1.22 1.00 1.09 1.00 1.66
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.38 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.75
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.44 1.00 1.06 1.00 1.06 1.00 1.44 1.00 1.44
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.44 1.00 1.05 1.00 1.08 1.00 1.33 1.00 1.55
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.44 1.00 1.03 1.00 1.09 1.00 1.22 1.00 1.66
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.44 1.00 1.02 1.00 1.11 1.00 1.11 1.00 1.77
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.44 1.00 1.00 1.00 1.12 1.00 1.00 1.00 1.88
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50
+DEAL:Face3d-QHierarchical1::0.50 0.31 0.50 1.00 1.00 1.00 1.00 1.00 1.38 1.00 1.62
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.50 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75
+DEAL:Face3d-QHierarchical1::0.50 0.44 0.50 1.00 1.00 1.00 1.00 1.00 1.12 1.00 1.88
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.12 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.25 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.38 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.12 1.56 1.19 1.00 1.00 1.19 1.06 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.25 1.38 1.12 1.00 1.00 1.38 1.12 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.38 1.19 1.06 1.00 1.00 1.56 1.19 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.50 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.12 1.38 1.38 1.00 1.00 1.12 1.12 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.25 1.25 1.25 1.00 1.00 1.25 1.25 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.38 1.12 1.12 1.00 1.00 1.38 1.38 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.50 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.12 1.19 1.56 1.00 1.00 1.06 1.19 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.25 1.12 1.38 1.00 1.00 1.12 1.38 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.38 1.06 1.19 1.00 1.00 1.19 1.56 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.50 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.12 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.25 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.38 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.50 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.12 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.25 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.38 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.12 1.00 1.00 1.56 1.19 1.00 1.00 1.19 1.06
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.25 1.00 1.00 1.38 1.12 1.00 1.00 1.38 1.12
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.38 1.00 1.00 1.19 1.06 1.00 1.00 1.56 1.19
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.12 1.00 1.00 1.38 1.38 1.00 1.00 1.12 1.12
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.25 1.00 1.00 1.25 1.25 1.00 1.00 1.25 1.25
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.38 1.00 1.00 1.12 1.12 1.00 1.00 1.38 1.38
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.13 1.00 1.00 1.19 1.56 1.00 1.00 1.06 1.19
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.25 1.00 1.00 1.12 1.38 1.00 1.00 1.12 1.38
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.38 1.00 1.00 1.06 1.19 1.00 1.00 1.19 1.56
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.13 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.25
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.25 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.38 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.75
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.12 0.00 1.56 1.19 1.19 1.06 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.12 0.00 1.38 1.38 1.12 1.12 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.12 0.00 1.19 1.56 1.06 1.19 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.12 0.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.25 0.00 1.38 1.12 1.38 1.12 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.25 0.00 1.25 1.25 1.25 1.25 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.25 0.00 1.12 1.38 1.12 1.38 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.38 0.00 1.19 1.06 1.56 1.19 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.38 0.00 1.12 1.12 1.38 1.38 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.38 0.00 1.06 1.19 1.19 1.56 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.00 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.00 0.50 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.25 0.00 0.50 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.38 0.00 0.50 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical1::0.50 0.00 0.50 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.12 0.50 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.12 0.50 1.00 1.00 1.00 1.00 1.56 1.19 1.19 1.06
+DEAL:Face3d-QHierarchical1::0.25 0.12 0.50 1.00 1.00 1.00 1.00 1.38 1.38 1.12 1.12
+DEAL:Face3d-QHierarchical1::0.38 0.13 0.50 1.00 1.00 1.00 1.00 1.19 1.56 1.06 1.19
+DEAL:Face3d-QHierarchical1::0.50 0.13 0.50 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.25 0.50 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.25 0.50 1.00 1.00 1.00 1.00 1.38 1.12 1.38 1.12
+DEAL:Face3d-QHierarchical1::0.25 0.25 0.50 1.00 1.00 1.00 1.00 1.25 1.25 1.25 1.25
+DEAL:Face3d-QHierarchical1::0.38 0.25 0.50 1.00 1.00 1.00 1.00 1.12 1.38 1.12 1.38
+DEAL:Face3d-QHierarchical1::0.50 0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.38 0.50 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.38 0.50 1.00 1.00 1.00 1.00 1.19 1.06 1.56 1.19
+DEAL:Face3d-QHierarchical1::0.25 0.38 0.50 1.00 1.00 1.00 1.00 1.12 1.12 1.38 1.38
+DEAL:Face3d-QHierarchical1::0.38 0.38 0.50 1.00 1.00 1.00 1.00 1.06 1.19 1.19 1.56
+DEAL:Face3d-QHierarchical1::0.50 0.38 0.50 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::0.00 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Face3d-QHierarchical1::0.12 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25
+DEAL:Face3d-QHierarchical1::0.25 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50
+DEAL:Face3d-QHierarchical1::0.38 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75
+DEAL:Face3d-QHierarchical1::0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00
+DEAL:Face3d-QHierarchical1::
+DEAL:Face3d-QHierarchical1::
+DEAL:Cell3d-QHierarchical2::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.00 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.00 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.00 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.25 0.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.25 0.00 1.56 1.19 1.19 1.06 1.00 1.00 1.00 1.00 0.44 0.81 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.25 0.00 1.38 1.38 1.12 1.12 1.00 1.00 1.00 1.00 0.62 0.62 0.25 0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.25 0.00 1.19 1.56 1.06 1.19 1.00 1.00 1.00 1.00 0.81 0.44 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.25 0.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.50 0.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.50 0.00 1.38 1.12 1.38 1.12 1.00 1.00 1.00 1.00 0.25 0.75 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.50 0.00 1.25 1.25 1.25 1.25 1.00 1.00 1.00 1.00 0.50 0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.50 0.00 1.12 1.38 1.12 1.38 1.00 1.00 1.00 1.00 0.75 0.25 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.50 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.75 0.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.75 0.00 1.19 1.06 1.56 1.19 1.00 1.00 1.00 1.00 0.44 0.81 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.75 0.00 1.12 1.12 1.38 1.38 1.00 1.00 1.00 1.00 0.62 0.62 0.75 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.75 0.00 1.06 1.19 1.19 1.56 1.00 1.00 1.00 1.00 0.81 0.44 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.75 0.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 1.00 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 1.00 0.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 1.00 0.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 1.00 0.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 1.00 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.00 0.25 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.00 0.25 1.56 1.19 1.00 1.00 1.19 1.06 1.00 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.44 0.81 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.00 0.25 1.38 1.38 1.00 1.00 1.12 1.12 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.75 1.00 0.62 0.62 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.00 0.25 1.19 1.56 1.00 1.00 1.06 1.19 1.00 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.81 0.44 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.00 0.25 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.25 0.25 1.56 1.00 1.19 1.00 1.19 1.00 1.06 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.25 0.25 1.42 1.14 1.14 1.05 1.14 1.05 1.05 1.02 0.58 0.86 0.58 0.86 0.86 0.95 0.86 0.95 0.58 0.86 0.86 0.95 1.42 1.14 1.42 1.14 1.42 1.14 0.58
+DEAL:Cell3d-QHierarchical2::0.50 0.25 0.25 1.28 1.28 1.09 1.09 1.09 1.09 1.03 1.03 0.72 0.72 0.44 0.81 0.91 0.91 0.81 0.94 0.72 0.72 0.91 0.91 1.28 1.28 1.56 1.19 1.56 1.19 0.44
+DEAL:Cell3d-QHierarchical2::0.75 0.25 0.25 1.14 1.42 1.05 1.14 1.05 1.14 1.02 1.05 0.86 0.58 0.58 0.86 0.95 0.86 0.86 0.95 0.86 0.58 0.95 0.86 1.14 1.42 1.42 1.14 1.42 1.14 0.58
+DEAL:Cell3d-QHierarchical2::1.00 0.25 0.25 1.00 1.56 1.00 1.19 1.00 1.19 1.00 1.06 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.50 0.25 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.50 0.25 1.28 1.09 1.28 1.09 1.09 1.03 1.09 1.03 0.44 0.81 0.72 0.72 0.81 0.94 0.91 0.91 0.72 0.91 0.72 0.91 1.56 1.19 1.28 1.28 1.56 1.19 0.44
+DEAL:Cell3d-QHierarchical2::0.50 0.50 0.25 1.19 1.19 1.19 1.19 1.06 1.06 1.06 1.06 0.62 0.62 0.62 0.62 0.88 0.88 0.88 0.88 0.81 0.81 0.81 0.81 1.38 1.38 1.38 1.38 1.75 1.25 0.25
+DEAL:Cell3d-QHierarchical2::0.75 0.50 0.25 1.09 1.28 1.09 1.28 1.03 1.09 1.03 1.09 0.81 0.44 0.72 0.72 0.94 0.81 0.91 0.91 0.91 0.72 0.91 0.72 1.19 1.56 1.28 1.28 1.56 1.19 0.44
+DEAL:Cell3d-QHierarchical2::1.00 0.50 0.25 1.00 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.75 0.25 1.19 1.00 1.56 1.00 1.06 1.00 1.19 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.75 0.25 1.14 1.05 1.42 1.14 1.05 1.02 1.14 1.05 0.58 0.86 0.86 0.58 0.86 0.95 0.95 0.86 0.86 0.95 0.58 0.86 1.42 1.14 1.14 1.42 1.42 1.14 0.58
+DEAL:Cell3d-QHierarchical2::0.50 0.75 0.25 1.09 1.09 1.28 1.28 1.03 1.03 1.09 1.09 0.72 0.72 0.81 0.44 0.91 0.91 0.94 0.81 0.91 0.91 0.72 0.72 1.28 1.28 1.19 1.56 1.56 1.19 0.44
+DEAL:Cell3d-QHierarchical2::0.75 0.75 0.25 1.05 1.14 1.14 1.42 1.02 1.05 1.05 1.14 0.86 0.58 0.86 0.58 0.95 0.86 0.95 0.86 0.95 0.86 0.86 0.58 1.14 1.42 1.14 1.42 1.42 1.14 0.58
+DEAL:Cell3d-QHierarchical2::1.00 0.75 0.25 1.00 1.19 1.00 1.56 1.00 1.06 1.00 1.19 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 1.00 0.25 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 1.00 0.25 1.00 1.00 1.56 1.19 1.00 1.00 1.19 1.06 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 0.44 0.81 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 1.00 0.25 1.00 1.00 1.38 1.38 1.00 1.00 1.12 1.12 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 0.62 0.62 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 1.00 0.25 1.00 1.00 1.19 1.56 1.00 1.00 1.06 1.19 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 0.81 0.44 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 1.00 0.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.00 0.50 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.00 0.50 1.38 1.12 1.00 1.00 1.38 1.12 1.00 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 0.25 0.75 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.00 0.50 1.25 1.25 1.00 1.00 1.25 1.25 1.00 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.00 0.50 1.12 1.38 1.00 1.00 1.12 1.38 1.00 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 0.75 0.25 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.00 0.50 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.25 0.50 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.25 1.00 0.75 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.25 0.50 1.28 1.09 1.09 1.03 1.28 1.09 1.09 1.03 0.72 0.91 0.72 0.91 0.72 0.91 0.72 0.91 0.44 0.81 0.81 0.94 1.56 1.19 1.56 1.19 1.28 1.28 0.44
+DEAL:Cell3d-QHierarchical2::0.50 0.25 0.50 1.19 1.19 1.06 1.06 1.19 1.19 1.06 1.06 0.81 0.81 0.62 0.88 0.81 0.81 0.62 0.88 0.62 0.62 0.88 0.88 1.38 1.38 1.75 1.25 1.38 1.38 0.25
+DEAL:Cell3d-QHierarchical2::0.75 0.25 0.50 1.09 1.28 1.03 1.09 1.09 1.28 1.03 1.09 0.91 0.72 0.72 0.91 0.91 0.72 0.72 0.91 0.81 0.44 0.94 0.81 1.19 1.56 1.56 1.19 1.28 1.28 0.44
+DEAL:Cell3d-QHierarchical2::1.00 0.25 0.50 1.00 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.25 1.00 0.75 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.50 0.50 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.50 0.50 1.19 1.06 1.19 1.06 1.19 1.06 1.19 1.06 0.62 0.88 0.81 0.81 0.62 0.88 0.81 0.81 0.62 0.88 0.62 0.88 1.75 1.25 1.38 1.38 1.38 1.38 0.25
+DEAL:Cell3d-QHierarchical2::0.50 0.50 0.50 1.12 1.12 1.12 1.12 1.12 1.12 1.12 1.12 0.75 0.75 0.75 0.75 0.75 0.75 0.75 0.75 0.75 0.75 0.75 0.75 1.50 1.50 1.50 1.50 1.50 1.50 0
+DEAL:Cell3d-QHierarchical2::0.75 0.50 0.50 1.06 1.19 1.06 1.19 1.06 1.19 1.06 1.19 0.88 0.62 0.81 0.81 0.88 0.62 0.81 0.81 0.88 0.62 0.88 0.62 1.25 1.75 1.38 1.38 1.38 1.38 0.25
+DEAL:Cell3d-QHierarchical2::1.00 0.50 0.50 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.75 0.50 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.75 1.00 0.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.75 0.50 1.09 1.03 1.28 1.09 1.09 1.03 1.28 1.09 0.72 0.91 0.91 0.72 0.72 0.91 0.91 0.72 0.81 0.94 0.44 0.81 1.56 1.19 1.19 1.56 1.28 1.28 0.44
+DEAL:Cell3d-QHierarchical2::0.50 0.75 0.50 1.06 1.06 1.19 1.19 1.06 1.06 1.19 1.19 0.81 0.81 0.88 0.62 0.81 0.81 0.88 0.62 0.88 0.88 0.62 0.62 1.38 1.38 1.25 1.75 1.38 1.38 0.25
+DEAL:Cell3d-QHierarchical2::0.75 0.75 0.50 1.03 1.09 1.09 1.28 1.03 1.09 1.09 1.28 0.91 0.72 0.91 0.72 0.91 0.72 0.91 0.72 0.94 0.81 0.81 0.44 1.19 1.56 1.19 1.56 1.28 1.28 0.44
+DEAL:Cell3d-QHierarchical2::1.00 0.75 0.50 1.00 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.75 1.00 0.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 1.00 0.50 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 1.00 0.50 1.00 1.00 1.38 1.12 1.00 1.00 1.38 1.12 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 0.25 0.75 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 1.00 0.50 1.00 1.00 1.25 1.25 1.00 1.00 1.25 1.25 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 1.00 0.50 1.00 1.00 1.12 1.38 1.00 1.00 1.12 1.38 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 0.75 0.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 1.00 0.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.00 0.75 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.00 0.75 1.19 1.06 1.00 1.00 1.56 1.19 1.00 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.44 0.81 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.00 0.75 1.12 1.12 1.00 1.00 1.38 1.38 1.00 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.25 1.00 0.62 0.62 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.00 0.75 1.06 1.19 1.00 1.00 1.19 1.56 1.00 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.81 0.44 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.00 0.75 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.25 0.75 1.19 1.00 1.06 1.00 1.56 1.00 1.19 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.25 0.75 1.14 1.05 1.05 1.02 1.42 1.14 1.14 1.05 0.86 0.95 0.86 0.95 0.58 0.86 0.58 0.86 0.58 0.86 0.86 0.95 1.42 1.14 1.42 1.14 1.14 1.42 0.58
+DEAL:Cell3d-QHierarchical2::0.50 0.25 0.75 1.09 1.09 1.03 1.03 1.28 1.28 1.09 1.09 0.91 0.91 0.81 0.94 0.72 0.72 0.44 0.81 0.72 0.72 0.91 0.91 1.28 1.28 1.56 1.19 1.19 1.56 0.44
+DEAL:Cell3d-QHierarchical2::0.75 0.25 0.75 1.05 1.14 1.02 1.05 1.14 1.42 1.05 1.14 0.95 0.86 0.86 0.95 0.86 0.58 0.58 0.86 0.86 0.58 0.95 0.86 1.14 1.42 1.42 1.14 1.14 1.42 0.58
+DEAL:Cell3d-QHierarchical2::1.00 0.25 0.75 1.00 1.19 1.00 1.06 1.00 1.56 1.00 1.19 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.50 0.75 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.50 0.75 1.09 1.03 1.09 1.03 1.28 1.09 1.28 1.09 0.81 0.94 0.91 0.91 0.44 0.81 0.72 0.72 0.72 0.91 0.72 0.91 1.56 1.19 1.28 1.28 1.19 1.56 0.44
+DEAL:Cell3d-QHierarchical2::0.50 0.50 0.75 1.06 1.06 1.06 1.06 1.19 1.19 1.19 1.19 0.88 0.88 0.88 0.88 0.62 0.62 0.62 0.62 0.81 0.81 0.81 0.81 1.38 1.38 1.38 1.38 1.25 1.75 0.25
+DEAL:Cell3d-QHierarchical2::0.75 0.50 0.75 1.03 1.09 1.03 1.09 1.09 1.28 1.09 1.28 0.94 0.81 0.91 0.91 0.81 0.44 0.72 0.72 0.91 0.72 0.91 0.72 1.19 1.56 1.28 1.28 1.19 1.56 0.44
+DEAL:Cell3d-QHierarchical2::1.00 0.50 0.75 1.00 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.75 0.75 1.06 1.00 1.19 1.00 1.19 1.00 1.56 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.75 0.75 1.05 1.02 1.14 1.05 1.14 1.05 1.42 1.14 0.86 0.95 0.95 0.86 0.58 0.86 0.86 0.58 0.86 0.95 0.58 0.86 1.42 1.14 1.14 1.42 1.14 1.42 0.58
+DEAL:Cell3d-QHierarchical2::0.50 0.75 0.75 1.03 1.03 1.09 1.09 1.09 1.09 1.28 1.28 0.91 0.91 0.94 0.81 0.72 0.72 0.81 0.44 0.91 0.91 0.72 0.72 1.28 1.28 1.19 1.56 1.19 1.56 0.44
+DEAL:Cell3d-QHierarchical2::0.75 0.75 0.75 1.02 1.05 1.05 1.14 1.05 1.14 1.14 1.42 0.95 0.86 0.95 0.86 0.86 0.58 0.86 0.58 0.95 0.86 0.86 0.58 1.14 1.42 1.14 1.42 1.14 1.42 0.58
+DEAL:Cell3d-QHierarchical2::1.00 0.75 0.75 1.00 1.06 1.00 1.19 1.00 1.19 1.00 1.56 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 1.00 0.75 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 1.00 0.75 1.00 1.00 1.19 1.06 1.00 1.00 1.56 1.19 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 0.44 0.81 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 1.00 0.75 1.00 1.00 1.12 1.12 1.00 1.00 1.38 1.38 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 0.62 0.62 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 1.00 0.75 1.00 1.00 1.06 1.19 1.00 1.00 1.19 1.56 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 0.81 0.44 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 1.00 0.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.25 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.25 1.00 1.00 1.00 1.00 1.00 1.56 1.19 1.19 1.06 1.00 1.00 1.00 1.00 0.44 0.81 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.25 1.00 1.00 1.00 1.00 1.00 1.38 1.38 1.12 1.12 1.00 1.00 1.00 1.00 0.62 0.62 0.25 0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.25 1.00 1.00 1.00 1.00 1.00 1.19 1.56 1.06 1.19 1.00 1.00 1.00 1.00 0.81 0.44 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.38 1.12 1.38 1.12 1.00 1.00 1.00 1.00 0.25 0.75 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.25 1.25 1.25 1.25 1.00 1.00 1.00 1.00 0.50 0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.50 1.00 1.00 1.00 1.00 1.00 1.12 1.38 1.12 1.38 1.00 1.00 1.00 1.00 0.75 0.25 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 0.75 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 0.75 1.00 1.00 1.00 1.00 1.00 1.19 1.06 1.56 1.19 1.00 1.00 1.00 1.00 0.44 0.81 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Cell3d-QHierarchical2::0.50 0.75 1.00 1.00 1.00 1.00 1.00 1.12 1.12 1.38 1.38 1.00 1.00 1.00 1.00 0.62 0.62 0.75 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Cell3d-QHierarchical2::0.75 0.75 1.00 1.00 1.00 1.00 1.00 1.06 1.19 1.19 1.56 1.00 1.00 1.00 1.00 0.81 0.44 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Cell3d-QHierarchical2::1.00 0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::0.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Cell3d-QHierarchical2::
+DEAL:Cell3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.12 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.12 1.56 1.00 1.19 1.00 1.19 1.00 1.06 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.12 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.12 1.19 1.00 1.56 1.00 1.06 1.00 1.19 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.12 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.25 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.25 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.25 1.00 0.75 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.25 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.25 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.75 1.00 0.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.25 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.38 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.38 1.19 1.00 1.06 1.00 1.56 1.00 1.19 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.38 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.38 1.06 1.00 1.19 1.00 1.19 1.00 1.56 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.38 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.50 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.50 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.50 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.00 1.00 1.88 1.00 1.12 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.00 1.00 1.62 1.00 1.38 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.06 1.00 1.88 1.00 1.00 1.00 1.12 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.06 1.00 1.77 1.00 1.11 1.00 1.11 1.00 1.02 1.00 0.62 1.00 1.00 1.00 0.95 1.00 1.00 1.00 0.62 1.00 0.95 1.00 1.19 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.06 1.00 1.66 1.00 1.22 1.00 1.09 1.00 1.03 1.00 0.34 1.00 1.00 1.00 0.91 1.00 1.00 1.00 0.67 1.00 0.89 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.06 1.00 1.55 1.00 1.33 1.00 1.08 1.00 1.05 1.00 0.18 1.00 1.00 1.00 0.88 1.00 1.00 1.00 0.73 1.00 0.84 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.06 1.00 1.44 1.00 1.44 1.00 1.06 1.00 1.06 1.00 0.12 1.00 1.00 1.00 0.88 1.00 1.00 1.00 0.78 1.00 0.78 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.12 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.12 1.00 1.66 1.00 1.09 1.00 1.22 1.00 1.03 1.00 0.67 1.00 1.00 1.00 0.89 1.00 1.00 1.00 0.34 1.00 0.91 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.12 1.00 1.56 1.00 1.19 1.00 1.19 1.00 1.06 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.12 1.00 1.47 1.00 1.28 1.00 1.16 1.00 1.09 1.00 0.30 1.00 1.00 1.00 0.77 1.00 1.00 1.00 0.53 1.00 0.72 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.12 1.00 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.19 1.00 1.62 1.00 1.00 1.00 1.38 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.19 1.00 1.55 1.00 1.08 1.00 1.33 1.00 1.05 1.00 0.73 1.00 1.00 1.00 0.84 1.00 1.00 1.00 0.18 1.00 0.88 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.19 1.00 1.47 1.00 1.16 1.00 1.28 1.00 1.09 1.00 0.53 1.00 1.00 1.00 0.72 1.00 1.00 1.00 0.30 1.00 0.77 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.19 1.00 1.39 1.00 1.23 1.00 1.23 1.00 1.14 1.00 0.41 1.00 1.00 1.00 0.65 1.00 1.00 1.00 0.41 1.00 0.65 1.00 1.88 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.19 1.00 1.31 1.00 1.31 1.00 1.19 1.00 1.19 1.00 0.38 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.53 1.00 0.53 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.25 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.25 1.00 1.44 1.00 1.06 1.00 1.44 1.00 1.06 1.00 0.78 1.00 1.00 1.00 0.78 1.00 1.00 1.00 0.12 1.00 0.88 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.25 1.00 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.25 1.00 0.75 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.25 1.00 1.31 1.00 1.19 1.00 1.31 1.00 1.19 1.00 0.53 1.00 1.00 1.00 0.53 1.00 1.00 1.00 0.38 1.00 0.62 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.00 1.00 1.38 1.00 1.62 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.00 1.00 1.12 1.00 1.88 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.06 1.00 1.44 1.00 1.44 1.00 1.06 1.00 1.06 1.00 0.12 1.00 1.00 1.00 0.88 1.00 1.00 1.00 0.78 1.00 0.78 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.06 1.00 1.33 1.00 1.55 1.00 1.05 1.00 1.08 1.00 0.18 1.00 1.00 1.00 0.88 1.00 1.00 1.00 0.84 1.00 0.73 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.06 1.00 1.22 1.00 1.66 1.00 1.03 1.00 1.09 1.00 0.34 1.00 1.00 1.00 0.91 1.00 1.00 1.00 0.89 1.00 0.67 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.06 1.00 1.11 1.00 1.77 1.00 1.02 1.00 1.11 1.00 0.62 1.00 1.00 1.00 0.95 1.00 1.00 1.00 0.95 1.00 0.62 1.00 1.19 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.06 1.00 1.00 1.00 1.88 1.00 1.00 1.00 1.12 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.12 1.00 1.38 1.00 1.38 1.00 1.12 1.00 1.12 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.12 1.00 1.28 1.00 1.47 1.00 1.09 1.00 1.16 1.00 0.30 1.00 1.00 1.00 0.77 1.00 1.00 1.00 0.72 1.00 0.53 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.13 1.00 1.19 1.00 1.56 1.00 1.06 1.00 1.19 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.13 1.00 1.09 1.00 1.66 1.00 1.03 1.00 1.22 1.00 0.67 1.00 1.00 1.00 0.89 1.00 1.00 1.00 0.91 1.00 0.34 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.13 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.19 1.00 1.31 1.00 1.31 1.00 1.19 1.00 1.19 1.00 0.38 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.53 1.00 0.53 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.19 1.00 1.23 1.00 1.39 1.00 1.14 1.00 1.23 1.00 0.41 1.00 1.00 1.00 0.65 1.00 1.00 1.00 0.65 1.00 0.41 1.00 1.88 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.19 1.00 1.16 1.00 1.47 1.00 1.09 1.00 1.28 1.00 0.53 1.00 1.00 1.00 0.72 1.00 1.00 1.00 0.77 1.00 0.30 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.19 1.00 1.08 1.00 1.55 1.00 1.05 1.00 1.33 1.00 0.73 1.00 1.00 1.00 0.84 1.00 1.00 1.00 0.88 1.00 0.18 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.19 1.00 1.00 1.00 1.62 1.00 1.00 1.00 1.38 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.25 1.00 1.19 1.00 1.31 1.00 1.19 1.00 1.31 1.00 0.53 1.00 1.00 1.00 0.53 1.00 1.00 1.00 0.62 1.00 0.38 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.25 1.00 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.75 1.00 0.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.25 1.00 1.06 1.00 1.44 1.00 1.06 1.00 1.44 1.00 0.78 1.00 1.00 1.00 0.78 1.00 1.00 1.00 0.88 1.00 0.12 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.25 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.25 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.25 1.00 1.44 1.00 1.06 1.00 1.44 1.00 1.06 1.00 0.78 1.00 1.00 1.00 0.78 1.00 1.00 1.00 0.12 1.00 0.88 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.25 1.00 1.38 1.00 1.12 1.00 1.38 1.00 1.12 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.25 1.00 0.75 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.25 1.00 1.31 1.00 1.19 1.00 1.31 1.00 1.19 1.00 0.53 1.00 1.00 1.00 0.53 1.00 1.00 1.00 0.38 1.00 0.62 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.31 1.00 1.38 1.00 1.00 1.00 1.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.31 1.00 1.33 1.00 1.05 1.00 1.55 1.00 1.08 1.00 0.84 1.00 1.00 1.00 0.73 1.00 1.00 1.00 0.18 1.00 0.88 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.31 1.00 1.28 1.00 1.09 1.00 1.47 1.00 1.16 1.00 0.72 1.00 1.00 1.00 0.53 1.00 1.00 1.00 0.30 1.00 0.77 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.31 1.00 1.23 1.00 1.14 1.00 1.39 1.00 1.23 1.00 0.65 1.00 1.00 1.00 0.41 1.00 1.00 1.00 0.41 1.00 0.65 1.00 1.88 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.31 1.00 1.19 1.00 1.19 1.00 1.31 1.00 1.31 1.00 0.62 1.00 1.00 1.00 0.38 1.00 1.00 1.00 0.53 1.00 0.53 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.38 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.38 1.00 1.22 1.00 1.03 1.00 1.66 1.00 1.09 1.00 0.89 1.00 1.00 1.00 0.67 1.00 1.00 1.00 0.34 1.00 0.91 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.13 0.38 1.00 1.19 1.00 1.06 1.00 1.56 1.00 1.19 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.44 1.00 0.81 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.38 1.00 1.16 1.00 1.09 1.00 1.47 1.00 1.28 1.00 0.77 1.00 1.00 1.00 0.30 1.00 1.00 1.00 0.53 1.00 0.72 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.38 1.00 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.44 1.00 1.12 1.00 1.00 1.00 1.88 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.44 1.00 1.11 1.00 1.02 1.00 1.77 1.00 1.11 1.00 0.95 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 0.95 1.00 1.19 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.13 0.44 1.00 1.09 1.00 1.03 1.00 1.66 1.00 1.22 1.00 0.91 1.00 1.00 1.00 0.34 1.00 1.00 1.00 0.67 1.00 0.89 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.44 1.00 1.08 1.00 1.05 1.00 1.55 1.00 1.33 1.00 0.88 1.00 1.00 1.00 0.18 1.00 1.00 1.00 0.73 1.00 0.84 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.44 1.00 1.06 1.00 1.06 1.00 1.44 1.00 1.44 1.00 0.88 1.00 1.00 1.00 0.12 1.00 1.00 1.00 0.78 1.00 0.78 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.50 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.06 0.50 1.00 1.00 1.00 1.00 1.00 1.88 1.00 1.12 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.13 0.50 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.19 0.50 1.00 1.00 1.00 1.00 1.00 1.62 1.00 1.38 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 1.25 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 1.00 2.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.25 1.00 1.19 1.00 1.31 1.00 1.19 1.00 1.31 1.00 0.53 1.00 1.00 1.00 0.53 1.00 1.00 1.00 0.62 1.00 0.38 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.25 1.00 1.12 1.00 1.38 1.00 1.12 1.00 1.38 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.75 1.00 0.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.25 1.00 1.06 1.00 1.44 1.00 1.06 1.00 1.44 1.00 0.78 1.00 1.00 1.00 0.78 1.00 1.00 1.00 0.88 1.00 0.12 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.25 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.31 1.00 1.19 1.00 1.19 1.00 1.31 1.00 1.31 1.00 0.62 1.00 1.00 1.00 0.38 1.00 1.00 1.00 0.53 1.00 0.53 1.00 1.94 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.31 1.00 1.14 1.00 1.23 1.00 1.23 1.00 1.39 1.00 0.65 1.00 1.00 1.00 0.41 1.00 1.00 1.00 0.65 1.00 0.41 1.00 1.88 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.31 1.00 1.09 1.00 1.28 1.00 1.16 1.00 1.47 1.00 0.72 1.00 1.00 1.00 0.53 1.00 1.00 1.00 0.77 1.00 0.30 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.31 1.00 1.05 1.00 1.33 1.00 1.08 1.00 1.55 1.00 0.84 1.00 1.00 1.00 0.73 1.00 1.00 1.00 0.88 1.00 0.18 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.31 1.00 1.00 1.00 1.38 1.00 1.00 1.00 1.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.38 1.00 1.12 1.00 1.12 1.00 1.38 1.00 1.38 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.62 1.00 0.62 1.00 1.75 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.38 1.00 1.09 1.00 1.16 1.00 1.28 1.00 1.47 1.00 0.77 1.00 1.00 1.00 0.30 1.00 1.00 1.00 0.72 1.00 0.53 1.00 1.70 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.38 1.00 1.06 1.00 1.19 1.00 1.19 1.00 1.56 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.44 1.00 1.56 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.38 1.00 1.03 1.00 1.22 1.00 1.09 1.00 1.66 1.00 0.89 1.00 1.00 1.00 0.67 1.00 1.00 1.00 0.91 1.00 0.34 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.38 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.44 1.00 1.06 1.00 1.06 1.00 1.44 1.00 1.44 1.00 0.88 1.00 1.00 1.00 0.12 1.00 1.00 1.00 0.78 1.00 0.78 1.00 1.44 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.44 1.00 1.05 1.00 1.08 1.00 1.33 1.00 1.55 1.00 0.88 1.00 1.00 1.00 0.18 1.00 1.00 1.00 0.84 1.00 0.73 1.00 1.41 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.44 1.00 1.03 1.00 1.09 1.00 1.22 1.00 1.66 1.00 0.91 1.00 1.00 1.00 0.34 1.00 1.00 1.00 0.89 1.00 0.67 1.00 1.33 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.44 1.00 1.02 1.00 1.11 1.00 1.11 1.00 1.77 1.00 0.95 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.95 1.00 0.62 1.00 1.19 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.44 1.00 1.00 1.00 1.12 1.00 1.00 1.00 1.88 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.31 0.50 1.00 1.00 1.00 1.00 1.00 1.38 1.00 1.62 1.00 1.00 1.00 1.00 1.00 0.06 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.50 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.44 0.50 1.00 1.00 1.00 1.00 1.00 1.12 1.00 1.88 1.00 1.00 1.00 1.00 1.00 0.56 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.12 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.25 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.38 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.12 1.56 1.19 1.00 1.00 1.19 1.06 1.00 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.44 0.81 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.25 1.38 1.12 1.00 1.00 1.38 1.12 1.00 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 0.25 0.75 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.38 1.19 1.06 1.00 1.00 1.56 1.19 1.00 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.44 0.81 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.50 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.12 1.38 1.38 1.00 1.00 1.12 1.12 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.75 1.00 0.62 0.62 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.25 1.25 1.25 1.00 1.00 1.25 1.25 1.00 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 0.50 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.38 1.12 1.12 1.00 1.00 1.38 1.38 1.00 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.25 1.00 0.62 0.62 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.50 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.12 1.19 1.56 1.00 1.00 1.06 1.19 1.00 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 0.81 0.44 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.25 1.12 1.38 1.00 1.00 1.12 1.38 1.00 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 0.75 0.25 1.00 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.38 1.06 1.19 1.00 1.00 1.19 1.56 1.00 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 0.81 0.44 1.00 1.00 1.00 1.00 1.56 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.50 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.12 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.25 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.38 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.50 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.12 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.25 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.38 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.12 1.00 1.00 1.56 1.19 1.00 1.00 1.19 1.06 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 0.44 0.81 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.25 1.00 1.00 1.38 1.12 1.00 1.00 1.38 1.12 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 0.25 0.75 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.38 1.00 1.00 1.19 1.06 1.00 1.00 1.56 1.19 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 0.44 0.81 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.12 1.00 1.00 1.38 1.38 1.00 1.00 1.12 1.12 1.00 1.00 1.00 0.25 1.00 1.00 1.00 0.75 1.00 1.00 0.62 0.62 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.25 1.00 1.00 1.25 1.25 1.00 1.00 1.25 1.25 1.00 1.00 1.00 0.50 1.00 1.00 1.00 0.50 1.00 1.00 0.50 0.50 1.00 1.00 1.00 2.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.38 1.00 1.00 1.12 1.12 1.00 1.00 1.38 1.38 1.00 1.00 1.00 0.75 1.00 1.00 1.00 0.25 1.00 1.00 0.62 0.62 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.13 1.00 1.00 1.19 1.56 1.00 1.00 1.06 1.19 1.00 1.00 1.00 0.44 1.00 1.00 1.00 0.81 1.00 1.00 0.81 0.44 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.25 1.00 1.00 1.12 1.38 1.00 1.00 1.12 1.38 1.00 1.00 1.00 0.62 1.00 1.00 1.00 0.62 1.00 1.00 0.75 0.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.38 1.00 1.00 1.06 1.19 1.00 1.00 1.19 1.56 1.00 1.00 1.00 0.81 1.00 1.00 1.00 0.44 1.00 1.00 0.81 0.44 1.00 1.00 1.00 1.56 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.13 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.25 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.38 1.00 1.00 1.00 1.25 1.00 1.00 1.00 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.12 0.00 1.56 1.19 1.19 1.06 1.00 1.00 1.00 1.00 0.44 0.81 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.12 0.00 1.38 1.38 1.12 1.12 1.00 1.00 1.00 1.00 0.62 0.62 0.25 0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.12 0.00 1.19 1.56 1.06 1.19 1.00 1.00 1.00 1.00 0.81 0.44 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.12 0.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.25 0.00 1.38 1.12 1.38 1.12 1.00 1.00 1.00 1.00 0.25 0.75 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.25 0.00 1.25 1.25 1.25 1.25 1.00 1.00 1.00 1.00 0.50 0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.25 0.00 1.12 1.38 1.12 1.38 1.00 1.00 1.00 1.00 0.75 0.25 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.38 0.00 1.19 1.06 1.56 1.19 1.00 1.00 1.00 1.00 0.44 0.81 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.38 0.00 1.12 1.12 1.38 1.38 1.00 1.00 1.00 1.00 0.62 0.62 0.75 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.38 0.00 1.06 1.19 1.19 1.56 1.00 1.00 1.00 1.00 0.81 0.44 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.00 0.50 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.00 0.50 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.00 0.50 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.00 0.50 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.00 0.50 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.12 0.50 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.12 0.50 1.00 1.00 1.00 1.00 1.56 1.19 1.19 1.06 1.00 1.00 1.00 1.00 0.44 0.81 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.12 0.50 1.00 1.00 1.00 1.00 1.38 1.38 1.12 1.12 1.00 1.00 1.00 1.00 0.62 0.62 0.25 0.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.13 0.50 1.00 1.00 1.00 1.00 1.19 1.56 1.06 1.19 1.00 1.00 1.00 1.00 0.81 0.44 0.44 0.81 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.13 0.50 1.00 1.00 1.00 1.00 1.00 1.75 1.00 1.25 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.25 0.50 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.25 0.50 1.00 1.00 1.00 1.00 1.38 1.12 1.38 1.12 1.00 1.00 1.00 1.00 0.25 0.75 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.25 0.50 1.00 1.00 1.00 1.00 1.25 1.25 1.25 1.25 1.00 1.00 1.00 1.00 0.50 0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.25 0.50 1.00 1.00 1.00 1.00 1.12 1.38 1.12 1.38 1.00 1.00 1.00 1.00 0.75 0.25 0.62 0.62 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.25 0.50 1.00 1.00 1.00 1.00 1.00 1.50 1.00 1.50 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.38 0.50 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.38 0.50 1.00 1.00 1.00 1.00 1.19 1.06 1.56 1.19 1.00 1.00 1.00 1.00 0.44 0.81 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.38 0.50 1.00 1.00 1.00 1.00 1.12 1.12 1.38 1.38 1.00 1.00 1.00 1.00 0.62 0.62 0.75 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.38 0.50 1.00 1.00 1.00 1.00 1.06 1.19 1.19 1.56 1.00 1.00 1.00 1.00 0.81 0.44 0.81 0.44 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.56 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.38 0.50 1.00 1.00 1.00 1.00 1.00 1.25 1.00 1.75 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::0.00 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.12 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.75 1.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.25 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.50 1.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.38 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.25 1.75 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.25 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::0.50 0.50 0.50 1.00 1.00 1.00 1.00 1.00 1.00 1.00 2.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+DEAL:Face3d-QHierarchical2::
+DEAL:Face3d-QHierarchical2::

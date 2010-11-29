@@ -1,0 +1,73 @@
+// shapes.cc,v 1.18 2003/04/09 15:49:55 wolf Exp
+// (c) Guido Kanschat
+//
+// Show the shape functions implemented.
+
+#include "../tests.h"
+#include "shapes.h"
+#include <fe/fe_dgp.h>
+#include <fe/mapping_q1.h>
+#include <fstream>
+#include <string>
+
+#define PRECISION 2
+
+
+template<int dim>
+void plot_FE_DGP_shape_functions()
+{
+  MappingQ1<dim> m;
+
+  FE_DGP<dim> p1(1);
+  plot_shape_functions(m, p1, "DGP1");
+  plot_face_shape_functions(m, p1, "DGP1");
+  test_compute_functions(m, p1, "DGP1");
+
+  FE_DGP<dim> p2(2);
+  plot_shape_functions(m, p2, "DGP2");
+  plot_face_shape_functions(m, p2, "DGP2");
+  test_compute_functions(m, p2, "DGP2");
+      
+  FE_DGP<dim> p3(3);
+  plot_shape_functions(m, p3, "DGP3");
+  plot_face_shape_functions(m, p3, "DGP3");
+  test_compute_functions(m, p3, "DGP3");
+      
+//    FE_DGP<dim> p4(4);
+//    plot_shape_functions(m, p4, "DGP4");
+//    plot_face_shape_functions(m, p4, "DGP4");
+//    test_compute_functions(m, p4, "DGP4");
+
+//    FE_DGP<dim> p5(5);
+//    plot_shape_functions(m, p5, "DGP5");
+//    FE_DGP<dim> p6(6);
+//    plot_shape_functions(m, p6, "DGP6");
+//    FE_DGP<dim> p7(7);
+//    plot_shape_functions(m, p7, "DGP7");
+//    FE_DGP<dim> p8(8);
+//    plot_shape_functions(m, p8, "DGP8");
+//    FE_DGP<dim> p9(9);
+//    plot_shape_functions(m, p9, "DGP9");
+//    FE_DGP<dim> p10(10);
+//    plot_shape_functions(m, p10, "DGP10");
+}
+
+
+int
+main()
+{
+  std::ofstream logfile ("shapes_dgp/output");
+  deallog << std::setprecision(PRECISION) << std::fixed;
+  deallog.attach(logfile);
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
+  
+  plot_FE_DGP_shape_functions<1>();
+  plot_FE_DGP_shape_functions<2>();
+  plot_FE_DGP_shape_functions<3>();
+  
+  return 0;
+}
+
+
+
