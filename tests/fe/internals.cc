@@ -163,9 +163,9 @@ main()
   CHECK_ALL(Q_Hierarchical,2,3);
 
   CHECK_ALL(Nedelec, 0, 2);
-//  CHECK_ALL(Nedelec, 0, 3);
+  CHECK_ALL(Nedelec, 0, 3);
   CHECK_ALL(Nedelec, 1, 2);
-//  CHECK_ALL(Nedelec, 1, 3);
+  CHECK_ALL(Nedelec, 1, 3);
   
   CHECK_ALL(RaviartThomas, 0, 2);
   CHECK_ALL(RaviartThomas, 0, 3);
