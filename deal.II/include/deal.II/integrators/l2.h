@@ -119,8 +119,7 @@ namespace LocalIntegrators
 	for (unsigned i=0;i<n_dofs;++i)
 	  for (unsigned int d=0;d<n_components;++d)
 	    result(i) += fe.JxW(k) * factor * fe.shape_value_component(i,k,d) * input[d][k];
-    } 
-  }
+    }
 
 /**
  * The jump matrix between two cells for scalar or vector values
@@ -175,12 +174,13 @@ namespace LocalIntegrators
 		  const double v2 =-factor2*fe2.shape_value_component(i,k,d);		  
 		  
 		  M11(i,j) += dx * u1*v1;
-		  M12(i,j) += dx * u1*v2;
-		  M21(i,j) += dx * u2*v1;
+		  M12(i,j) += dx * u2*v1;
+		  M21(i,j) += dx * u1*v2;
 		  M22(i,j) += dx * u2*v2;
 		}
 	}
     }
+  }
 }
 
 DEAL_II_NAMESPACE_CLOSE

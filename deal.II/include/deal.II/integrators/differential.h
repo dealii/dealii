@@ -185,6 +185,116 @@ namespace LocalIntegrators
 	      result(i) += ndx[d] * fetest.shape_value(i,k) * data[d][k];
 	}
     }
+/**
+ * The trace of the divergence
+ * operator, namely the product
+ * of the jump of the normal component of the
+ * vector valued trial function and
+ * the mean value of the test function.
+ * @f[
+ * \int_F (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2) \frac{v_1+v_2}{2} \,ds
+ * @f]
+ */
+    template<int dim>
+    void
+    u_dot_n_matrix (
+      FullMatrix<double>& M11,
+      FullMatrix<double>& M12,
+      FullMatrix<double>& M21,
+      FullMatrix<double>& M22,
+      const FEValuesBase<dim>& fe1,
+      const FEValuesBase<dim>& fe2,
+      const FEValuesBase<dim>& fetest1,
+      const FEValuesBase<dim>& fetest2,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe1.dofs_per_cell;
+      const unsigned int t_dofs = fetest1.dofs_per_cell;
+
+      AssertDimension(fe1.get_fe().n_components(), dim);
+      AssertDimension(fe2.get_fe().n_components(), dim);
+      AssertDimension(fetest1.get_fe().n_components(), 1);
+      AssertDimension(fetest2.get_fe().n_components(), 1);
+      AssertDimension(M11.m(), t_dofs);
+      AssertDimension(M11.n(), n_dofs);
+      AssertDimension(M12.m(), t_dofs);
+      AssertDimension(M12.n(), n_dofs);
+      AssertDimension(M21.m(), t_dofs);
+      AssertDimension(M21.n(), n_dofs);
+      AssertDimension(M22.m(), t_dofs);
+      AssertDimension(M22.n(), n_dofs);
+	
+      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+	{
+	  const double dx = factor * fe1.JxW(k);
+	  for (unsigned i=0;i<t_dofs;++i)
+	    for (unsigned j=0;j<n_dofs;++j)
+	      for (unsigned int d=0;d<dim;++d)
+		{
+		  const double un1 = fe1.shape_value_component(j,k,d) * fe1.normal_vector(k)[d];
+		  const double un2 =-fe2.shape_value_component(j,k,d) * fe1.normal_vector(k)[d];
+		  const double v1 = fetest1.shape_value(i,k);
+		  const double v2 = fetest2.shape_value(i,k);
+		  
+		  M11(i,j) += .5 * dx * un1 * v1;
+		  M12(i,j) += .5 * dx * un2 * v1;
+		  M21(i,j) += .5 * dx * un1 * v2;
+		  M22(i,j) += .5 * dx * un2 * v2;
+		}
+	}
+    }
+
+/**
+ * The jump of the normal component
+ * @f[
+ * \int_F
+ *  (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2)
+ *  (\mathbf v_1\cdot \mathbf n_1 + \mathbf v_2 \cdot \mathbf n_2)
+ * \,ds
+ */
+    template<int dim>
+    void
+    u_dot_n_jump_matrix (
+      FullMatrix<double>& M11,
+      FullMatrix<double>& M12,
+      FullMatrix<double>& M21,
+      FullMatrix<double>& M22,
+      const FEValuesBase<dim>& fe1,
+      const FEValuesBase<dim>& fe2,
+      double factor = 1.)
+    {
+      const unsigned int n_dofs = fe1.dofs_per_cell;
+      
+      AssertDimension(fe1.get_fe().n_components(), dim);
+      AssertDimension(fe2.get_fe().n_components(), dim);
+      AssertDimension(M11.m(), n_dofs);
+      AssertDimension(M11.n(), n_dofs);
+      AssertDimension(M12.m(), n_dofs);
+      AssertDimension(M12.n(), n_dofs);
+      AssertDimension(M21.m(), n_dofs);
+      AssertDimension(M21.n(), n_dofs);
+      AssertDimension(M22.m(), n_dofs);
+      AssertDimension(M22.n(), n_dofs);
+	
+      for (unsigned k=0;k<fe1.n_quadrature_points;++k)
+	{
+	  const double dx = factor * fe1.JxW(k);
+	  for (unsigned i=0;i<n_dofs;++i)
+	    for (unsigned j=0;j<n_dofs;++j)
+	      for (unsigned int d=0;d<dim;++d)
+		{
+		  const double un1 = fe1.shape_value_component(j,k,d) * fe1.normal_vector(k)[d];
+		  const double un2 =-fe2.shape_value_component(j,k,d) * fe1.normal_vector(k)[d];
+		  const double vn1 = fe1.shape_value_component(i,k,d) * fe1.normal_vector(k)[d];
+		  const double vn2 =-fe2.shape_value_component(i,k,d) * fe1.normal_vector(k)[d];
+		  
+		  M11(i,j) += dx * un1 * vn1;
+		  M12(i,j) += dx * un2 * vn1;
+		  M21(i,j) += dx * un1 * vn2;
+		  M22(i,j) += dx * un2 * vn2;
+		}
+	}
+    }
   }
 }
 
