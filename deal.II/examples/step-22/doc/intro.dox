@@ -47,6 +47,22 @@ become clear once we discuss the weak form of the equations.
 The equations covered here fall into the class of vector-valued problems. A
 toplevel overview of this topic can be found in the @ref vector_valued module.
 
+@note Different people mean different things when they talk about the Stokes
+equations. We here adopt the convention of the solid mechanics community which
+uses the symmetric gradient. This differs from the convention in the fluids
+community by a factor of two since the fact that $\textrm{div}\; \textbf{u}=0$
+implies that $-\textrm{div}\; \varepsilon(\textbf{u}) = \frac 12 \Delta
+\textbf{u}$. The equations above are therefore equivalent to 
+@f{eqnarray*}
+  -\frac 12 \Delta\textbf{u} + \nabla p &=& \textbf{f},
+  \\
+  -\textrm{div}\; \textbf{u} &=& 0.
+@f}
+The Stokes equations that the fluid dynamics community would refer to do not
+have the factor $\frac 12$ in front. Depending on your viewpoint you may
+therefore want to adjust the bilinear form in the program when building the
+system matrix and preconditioner.
+
 
 <h3>Weak form</h3>
 
