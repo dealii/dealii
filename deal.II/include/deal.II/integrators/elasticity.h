@@ -34,44 +34,6 @@ namespace LocalIntegrators
  */
   namespace Elasticity
   {
-				     /**
-				      * The weak form of the grad-div
-				      * operator penalizing volume changes
-				      * @f[
-				      * \int_Z \nabla\!\cdot\!u
-				      * \nabla\!\cdot\!v \,dx
-				      * @f]
-				      */
-    template <int dim>
-    void grad_div_matrix (
-      FullMatrix<double>& M,
-      const FEValuesBase<dim>& fe,
-      double factor = 1.)
-    {
-      const unsigned int n_dofs = fe.dofs_per_cell;
-      
-      AssertDimension(fe.get_fe().n_components(), dim);
-      AssertDimension(M.m(), n_dofs);
-      AssertDimension(M.n(), n_dofs);
-      
-      for (unsigned k=0;k<fe.n_quadrature_points;++k)
-	{
-	  const double dx = factor * fe.JxW(k);
-	  for (unsigned i=0;i<n_dofs;++i)
-	    for (unsigned j=0;j<n_dofs;++j)
-	      {
-		double dv = 0.;
-		double du = 0.;
-		for (unsigned int d=0;d<dim;++d)
-		  {
-		    dv += fe.shape_grad_component(i,k,d)[d];
-		    du += fe.shape_grad_component(j,k,d)[d];
-		  }
-		
-		M(i,j) += dx * du * dv;
-	      }
-	}
-    }
   }
 }
 
