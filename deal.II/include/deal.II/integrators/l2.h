@@ -37,9 +37,13 @@ namespace LocalIntegrators
   {
 /**
  * The mass matrix for scalar or vector values finite elements.
- *
  * \f[
- * \int_Z uv\,dx \quad \text{or} \int_Z \mathbf u\cdot \mathbf v\,dx
+ * \int_Z uv\,dx \quad \text{or} \quad \int_Z \mathbf u\cdot \mathbf v\,dx
+ * \f]
+ *
+ * Likewise, this term can be used on faces, where it computes  the integrals
+ * \f[
+ * \int_F uv\,ds \quad \text{or} \quad \int_F \mathbf u\cdot \mathbf v\,ds
  * \f]
  */
     template <int dim>
@@ -68,7 +72,7 @@ namespace LocalIntegrators
  * <i>L<sup>2</sup></i>-inner product for scalar functions.
  *
  * \f[
- * \int_Z fv\,dx
+ * \int_Z fv\,dx \quad \text{or} \quad \int_F fv\,ds
  * \f]
  */
     template <int dim>
@@ -91,9 +95,10 @@ namespace LocalIntegrators
 /**
  * <i>L<sup>2</sup></i>-inner product for a slice of a vector valued
  * right hand side.
- *
  * \f[
  * \int_Z \mathbf f\cdot \mathbf v\,dx
+ * \quad \text{or} \quad
+ * \int_F \mathbf f\cdot \mathbf v\,ds
  * \f]
  */
     template <int dim>
@@ -121,12 +126,14 @@ namespace LocalIntegrators
  * The jump matrix between two cells for scalar or vector values
  * finite elements. Note that the factor $\gamma$ can be used to
  * implement weighted jumps.
- *
  * \f[
- * \int_F [\gamma u][\gamma v]\,dx
+ * \int_F [\gamma u][\gamma v]\,ds
  * \quad \text{or}
- * \int_F [\gamma \mathbf u]\cdot [\gamma \mathbf v]\,dx
+ * \int_F [\gamma \mathbf u]\cdot [\gamma \mathbf v]\,ds
  * \f]
+ *
+ * Using appropriate weights, this term can be used to penalize
+ * violation of conformity in <i>H<sup>1</sup></i>.
  */
     template <int dim>
     void jump_matrix (
