@@ -57,7 +57,7 @@
  *  <li> @ref MTSimpleLoops "Abstractions for tasks: Simple loops"
  *  <li> @ref MTComplexLoops "Abstractions for tasks: More complex loops"
  *  <li> @ref MTWorkStream "Abstractions for tasks: Work streams"
- *  <li> @ref MTTasksSynchronization ""
+ *  <li> @ref MTTaskSynchronization "Tasks and synchronization"
  *  <li> @ref MTThreads "Thread-based parallelism"
  *  <li> @ref MTTaskThreads "Controlling the number of threads used for tasks"
  * </ol> </td> </tr> </table>
@@ -1048,7 +1048,7 @@
  * tutorial programs.
  *
  *
- * @anchor MTTasksSynchronization
+ * @anchor MTTaskSynchronization
  * <h3>Tasks and synchronization</h3>
  *
  * Tasks are powerful but they do have their limitation: to make
@@ -1081,11 +1081,14 @@
  * (a mutex) rather than task scheduler resources. The result is a
  * deadlock.
  *
- * The bottom line is that tasks can not use mutices or condition
- * variables to synchronize with other tasks. If synchronization is
- * necessary, you need to use threads because the operating system
- * makes sure that all threads eventually get to run, independent of
- * the total number of threads.
+ * The bottom line is that tasks can not use mutices or condition variables to
+ * synchronize with other tasks. If communication between tasks is necessary,
+ * you need to use threads because the operating system makes sure that all
+ * threads eventually get to run, independent of the total number of threads.
+ * Note however that the same is not true if you only use a Thread::Mutex on
+ * each task separately to protect access to a variable that the tasks may
+ * write to: this use of mutices is ok; tasks may simply not want to wait for
+ * another task to do something.
  *
  *
  * @anchor MTThreads
