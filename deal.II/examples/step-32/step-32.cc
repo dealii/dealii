@@ -107,10 +107,6 @@ inline std::string stringify(double x)
 
 
 
-#define CONF_LOG_SOLVER
-//#define CONF_COMPARE_SOLVER
-//#define CONF_BENCHMARK
-
 using namespace dealii;
 
 void print_it(Utilities::System::MinMaxAvg & result)
@@ -337,28 +333,7 @@ namespace LinearSolvers
 		       dst, src,
 		       mp_preconditioner);
 
-#ifdef CONF_LOG_SOLVER
-	  TrilinosWrappers::MPI::Vector res(src);
-	  double resid =
-	    stokes_preconditioner_matrix->block(1,1).residual(res,dst,src);
-
-	  double srcl2 = src.l2_norm();
-#endif
 	  dst*=-1.0;
-
-#ifdef CONF_LOG_SOLVER
-	  int myid=Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
-	  if (myid==0)
-	    {
-	      std::cout << " solve_S it=" << cn.last_step()
-			<< " startres=" << stringify(srcl2)
-			<< " res=" << stringify(resid)
-			<< " reduction=" << stringify(resid / srcl2)
-			<< std::endl;
-
-	    }
-#endif
-
 	}
 
       void solve_A(TrilinosWrappers::MPI::Vector &dst,
@@ -367,23 +342,6 @@ namespace LinearSolvers
 	  SolverControl cn(5000, src.l2_norm()*1e-4);
 	  TrilinosWrappers::SolverBicgstab solver(cn);
 	  solver.solve(stokes_matrix->block(0,0), dst, src, a_preconditioner);
-
-#ifdef CONF_LOG_SOLVER
-	  double srcl2 = src.l2_norm();
-	  TrilinosWrappers::MPI::Vector res(src);
-	  double resid = stokes_matrix->block(0,0).residual(res,dst,src);
-
-	  int myid=Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
-	  if (myid==0)
-	    {
-	      std::cout << " solve_A it=" << cn.last_step()
-			<< " startres=" << stringify(srcl2)
-			<< " res=" << stringify(resid)
-			<< " reduction=" << stringify(resid / srcl2)
-			<< std::endl;
-
-	    }
-#endif
 	}
 
       void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
@@ -2915,42 +2873,8 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-#ifdef CONF_COMPARE_SOLVER
-      {
-	TrilinosWrappers::MPI::BlockVector x(distributed_stokes_solution);
-	{
-	TimeBlock<ConditionalOStream> t(pcout, "*TMP: solve bicg", false);
-
-	PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
-	SolverControl solver_control (stokes_matrix.m(), 1e-24*stokes_rhs.l2_norm());
-	SolverBicgstab<TrilinosWrappers::MPI::BlockVector>
-	  solver (solver_control, mem, false);
-	solver.solve(stokes_matrix, x, stokes_rhs,
-		     preconditioner);
-
-	pcout << "  xx  BICG: "
-	      << solver_control.last_step()
-	      << " iterations,"
-	      << " reduced res by " << stringify(solver_control.last_value()/solver_control.initial_value())
-	      << std::endl;
-	}
-	{
-	  TrilinosWrappers::MPI::BlockVector
-	    res (stokes_rhs);
-	  double residual = stokes_matrix.residual(res, x, stokes_rhs);
-
-	  pcout << "     x  BICG: real reduced res by " << stringify(residual
-								  /stokes_rhs.l2_norm())
-		<< std::endl;
-	}
-      }
-#endif
-
     SolverControl solver_control (stokes_matrix.m(), 1e-7*stokes_rhs.l2_norm());
     {
-#ifdef CONF_COMPARE_SOLVER
-      TimeBlock<ConditionalOStream> t(pcout, "*TMP: solve fgmres", false);
-#endif
       PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
       SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
 	solver(solver_control, mem,
@@ -3455,31 +3379,6 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   }
 
 
-#ifdef CONF_BENCHMARK
-				   /* pure refinement to double the number of
-				      cells in benchmark mode if this is
-				      prerefinement. Keep the number of cells
-				      constant later on. */
-  if (timestep_number==0)
-    {
-      pcout << "refine_mesh: prerefine, factor 2." << std::endl;
-      parallel::distributed::GridRefinement::
-	refine_and_coarsen_fixed_number (triangulation,
-					   estimated_error_per_cell,
-					   0.3333, 0.0);
-    }
-  else
-    {
-      pcout << "refine_mesh: keeping mesh constant." << std::endl;
-      TimeBlock<ConditionalOStream> t(pcout, "**refine&coarsen_fixed_nb");
-
-      parallel::distributed::GridRefinement::
-	refine_and_coarsen_fixed_number (triangulation,
-					   estimated_error_per_cell,
-					   0.3333, 0.0);//0.1, 0.4 ?
-    }
-
-#else
   parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction (triangulation,
 				       estimated_error_per_cell,
@@ -3491,7 +3390,6 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 	   cell = triangulation.begin_active(max_grid_level);
 	 cell != triangulation.end(); ++cell)
       cell->clear_refine_flag ();
-#endif
 
   TimeBlock<ConditionalOStream> t_a(pcout, "**prepare_solution_transfer", false);
   std::vector<const TrilinosWrappers::MPI::Vector*> x_temperature (2);
@@ -3570,14 +3468,8 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::run (unsigned int ref)
 {
   pcout << "this is step-32. ref=" << ref << std::endl;
-  #ifdef CONF_BENCHMARK
-				   // create approximately 12*4^(ref/2) cells:
-  const unsigned int initial_refinement = (ref-1)/2;
-  const unsigned int n_pre_refinement_steps = 2+(ref-1)%2;
-#else
   const unsigned int initial_refinement = ref;//(dim == 2 ? 5 : 2);
   const unsigned int n_pre_refinement_steps = 2;//(dim == 2 ? 4 : 2);
-#endif
 
   GridGenerator::hyper_shell (triangulation,
 			      Point<dim>(),
@@ -3623,18 +3515,6 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
 
       pcout << std::endl;
 
-#ifdef CONF_BENCHMARK
-      static int bench_step=0;
-      if (time>=1e5*EquationData::year_in_seconds)
-	{
-	  ++bench_step;
-	  if (bench_step>1)
-	    break;
-	  pcout << "***BEGIN BENCHSTEP" << std::endl;
-	  refine_mesh (initial_refinement + n_pre_refinement_steps);
-	}
-	else
-#endif
       if ((timestep_number == 0) &&
 	  (pre_refinement_step < n_pre_refinement_steps))
 	{
@@ -3642,19 +3522,13 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
 	  ++pre_refinement_step;
 	  goto start_time_iteration;
 	}
-#ifndef CONF_BENCHMARK
       else
 	if ((timestep_number > 0) && (timestep_number % 10 == 0))
 	  refine_mesh (initial_refinement + n_pre_refinement_steps);
-#endif
 
-#ifdef CONF_BENCHMARK
-      if (false)//bench_step)
-#else
-	if (timestep_number % 10 == 0 &&
+      if (timestep_number % 10 == 0 &&
 	  Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD) <= 10)
-#endif
-	  output_results ();
+	output_results ();
 
       time += time_step;
       ++timestep_number;
