@@ -411,6 +411,7 @@ class Step39
 template <int dim>
 Step39<dim>::Step39(const FiniteElement<dim>& fe)
 		:
+                mapping(),
 		fe(fe),
 		mg_dof_handler(triangulation),
 		dof_handler(mg_dof_handler),
