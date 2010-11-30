@@ -287,6 +287,7 @@ namespace LocalIntegrators
  *  (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2)
  *  (\mathbf v_1\cdot \mathbf n_1 + \mathbf v_2 \cdot \mathbf n_2)
  * \,ds
+ * @f]
  */
     template<int dim>
     void
