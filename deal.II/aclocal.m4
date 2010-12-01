@@ -489,7 +489,7 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       AC_TRY_COMPILE(
         [
           #include <mpi.h>
-        ], 
+        ],
         [;],
         [
   	  AC_MSG_RESULT(no)
@@ -5702,9 +5702,9 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
 
 
 dnl -------------------------------------------------------------
-dnl Make sure that if PETSc and deal.II were built with the same 
+dnl Make sure that if PETSc and deal.II were built with the same
 dnl compiler. Actually, this only checks if the compilers are the
-dnl if deal.II has MPI enabled. 
+dnl if deal.II has MPI enabled.
 dnl
 dnl Usage: DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
 dnl
@@ -5772,7 +5772,7 @@ dnl ------------------------------------------------------------
 dnl See if there is a library libmpiuni.a/so available. We need
 dnl to link with it on some systems where PETSc is built without
 dnl a real MPI and we need to handle trivial (one process) MPI
-dnl functionality. 
+dnl functionality.
 dnl
 dnl Usage: DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
 dnl
@@ -6196,8 +6196,8 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY, dnl
 [
-  dnl Check for presence of Epetra_config.h that we need to detect MPI 
-  dnl settings	
+  dnl Check for presence of Epetra_config.h that we need to detect MPI
+  dnl settings
   AC_MSG_CHECKING(Epetra_config.h presence)
   if test -f $DEAL_II_TRILINOS_INCDIR/Epetra_config.h ; then
     AC_MSG_RESULT(yes)
@@ -6714,19 +6714,25 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
               [Use installed UMFPack version. 'umfpack-root-directory' should be the directory containing directories AMD and UMFPACK. The contributed UMFPack library is used if no argument is given. Default is not to use UMFPack.])],
      [
         AC_MSG_CHECKING(UMFPACK library)
-        USE_CONTRIB_UMFPACK='yes'
         if test "x$withval" = "xyes" ; then
+          USE_CONTRIB_UMFPACK='yes'
           UMFPACK_DIR="`pwd`/contrib/umfpack"
           UMFPACK_INCLUDE_DIR="-I`pwd`/contrib/umfpack/UMFPACK/Include"
           AC_MSG_RESULT(using included version)
           DEAL_II_USE_INTERNAL_UMFPACK=yes
+          AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
         else
-          UMFPACK_DIR="$withval"
-          UMFPACK_INCLUDE_DIR="-I$withval/Include"
-          AC_MSG_RESULT(trying version at $withval)
+          if test "x$withval" != "xno" ; then
+            USE_CONTRIB_UMFPACK='yes'
+            UMFPACK_DIR="$withval"
+            UMFPACK_INCLUDE_DIR="-I$withval/Include"
+            AC_MSG_RESULT(trying version at $withval)
+            AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
+	  else
+	    AC_MSG_RESULT(explicitly disabled)
+          fi
         fi
 
-        AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
      ])
 
   acx_umfpack=no
