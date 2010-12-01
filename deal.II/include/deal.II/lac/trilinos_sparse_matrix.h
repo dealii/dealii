@@ -2790,7 +2790,6 @@ namespace TrilinosWrappers
 		     const unsigned int   j,
 		     const TrilinosScalar value)
   {
-
     Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     if (value == 0)

@@ -489,7 +489,7 @@ GridTools::delete_duplicated_vertices (std::vector<Point<spacedim> >    &vertice
 		      :
 		      angle(angle)
 	{}
-      Point<2> operator() (const Point<2> p) const
+      Point<2> operator() (const Point<2> &p) const
 	{
 	  return Point<2> (std::cos(angle)*p(0) - std::sin(angle) * p(1),
 			   std::sin(angle)*p(0) + std::cos(angle) * p(1));

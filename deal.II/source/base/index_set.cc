@@ -241,7 +241,7 @@ IndexSet::block_write(std::ostream & out) const
   size_t n_ranges = ranges.size();
   out.write(reinterpret_cast<const char*>(&n_ranges),
 	    sizeof(n_ranges));
-  if (ranges.size())
+  if (ranges.empty() == false)
     out.write (reinterpret_cast<const char*>(&*ranges.begin()),
 	       reinterpret_cast<const char*>(&*ranges.end())
 	       - reinterpret_cast<const char*>(&*ranges.begin()));
@@ -257,7 +257,7 @@ IndexSet::block_read(std::istream & in)
   in.read(reinterpret_cast<char*>(&n_ranges), sizeof(n_ranges));
 				   // we have to clear ranges first
   ranges.clear();
-  set_size(size);  
+  set_size(size);
   ranges.resize(n_ranges, Range(0,0));
   if (n_ranges)
     in.read(reinterpret_cast<char*>(&*ranges.begin()),

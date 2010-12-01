@@ -990,8 +990,8 @@ namespace internals
 
       ~DataCache()
 	{
-	  if (data != 0)
-	    delete [] data;
+	  delete [] data;
+	  data = 0;
 	}
 
       void reinit ()

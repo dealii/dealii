@@ -1362,7 +1362,7 @@ namespace internal
 				       // finished with.
       Cell &c = mesh.cell_list[cur_posn];
       c.waiting_to_be_processed = false;
-      if (sheet_to_process.size() != 0)
+      if (sheet_to_process.empty() == false)
 	{
 	  cur_posn = sheet_to_process.back();
 	  sheet_to_process.pop_back();
