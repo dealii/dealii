@@ -763,10 +763,10 @@ the following quantities:
   @f]
   where $9.81 \frac{\text{m}}{\text{s}^2}$ happens to be the average gravity
   acceleration at the earth surface. But in the earth interior, the question
-  becomes a bit more complicated: at the center of the earth, for example, you
-  have matter pulling equally hard in all directions, and so $\mathbf g=0$. In
-  between, the net force is described as follows: let us define the
-  <a target="_top"
+  becomes a bit more complicated: at the (bary-)center of the earth, for
+  example, you have matter pulling equally hard in all directions, and so
+  $\mathbf g=0$. In between, the net force is described as follows: let us
+  define the <a target="_top"
   href="http://en.wikipedia.org/wiki/Potential_energy#Gravitational_potential_energy">gravity
   potential</a> by
   @f[
