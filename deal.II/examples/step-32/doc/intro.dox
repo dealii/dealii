@@ -780,7 +780,7 @@ the following quantities:
   the density $\rho$ is constant throughout the earth, we can produce an
   analytical expression for the gravity vector (don't try to integrate above
   equation somehow -- it leads to elliptic integrals; a simpler way is to
-  notice that $-\Delta\varphi(\mathbf x) = 4\pi G \rho
+  notice that $-\Delta\varphi(\mathbf x) = -4\pi G \rho
   \chi_{\text{earth}}(\mathbf x)$ and solving this
   partial differential equation in all of ${\mathbb R}^3$ exploiting the
   radial symmetry):
@@ -818,7 +818,7 @@ the following quantities:
   x)=\rho(\|\mathbf x\|)=\rho(r)$. In that case, one would get
   @f[
     \varphi(r)
-    = 4\pi G \int_0^r \frac 1{s^2} \int_0^s t^2 \rho(t) \; ds \; dt.
+    = 4\pi G \int_0^r \frac 1{s^2} \int_0^s t^2 \rho(t) \; dt \; ds.
   @f]
 
 
@@ -836,8 +836,21 @@ the following quantities:
   vector that varies with space and time, and does not always point straight
   down.
 
-  In order to not make the situation more complicated than necessary, we'll
-  here just go with the constant density model above.
+  In order to not make the situation more complicated than necessary, we could
+  use the approximation that at the inner boundary of the mantle,
+  gravity is $10.7 \frac{\text{m}}{\text{s}^2}$ and at the outer
+  boundary it is $9.81 \frac{\text{m}}{\text{s}^2}$, in each case
+  pointing radially inward, and that in between gravity varies
+  linearly with the radial distance from the earth center. That said, it isn't
+  that hard to actually be slightly more realistic and assume (as we do below)
+  that the earth mantle has constant density. In that case, the equation above
+  can be integrated and we get an expression for $\|\mathbf{g}\|$ where we
+  can fit constants to match the gravity at the top and bottom of the earth
+  mantle to obtain
+  @f[
+    \|\mathbf{g}\|
+    = 1.245\cdot 10^{-6} r + 7.714\cdot 10^{13}\frac 1{r^2}.
+  @f]
 
   <li>The density of the earth mantle varies spatially, but not by very
   much. $\rho_{\text{ref}}=3300 \frac{\text{kg}}{\text{m}^3}$ is a relatively good average
