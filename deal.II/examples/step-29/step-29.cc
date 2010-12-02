@@ -409,18 +409,18 @@ class ComputeIntensity : public DataPostprocessor<dim>
 {
   public:
 
-    void compute_derived_quantities_vector (
-      const std::vector< Vector< double > > &, 
-      const std::vector< std::vector< Tensor< 1, dim > > > &, 
-      const std::vector< std::vector< Tensor< 2, dim > > > &, 
-      const std::vector< Point< dim > > &,
-      const std::vector<Point<dim> > &,
-      std::vector< Vector< double > > &
-    ) const;
+    virtual
+    void
+    compute_derived_quantities_vector (const std::vector< Vector< double > > &uh, 
+				       const std::vector< std::vector< Tensor< 1, dim > > > &duh,
+				       const std::vector< std::vector< Tensor< 2, dim > > > &dduh,
+				       const std::vector< Point< dim > > &normals,
+				       const std::vector<Point<dim> > &evaluation_points,
+				       std::vector< Vector< double > > &computed_quantities) const;
 
-    std::vector<std::string> get_names () const;
-    UpdateFlags              get_needed_update_flags () const;
-    unsigned int             n_output_variables () const;
+    virtual std::vector<std::string> get_names () const;
+    virtual UpdateFlags              get_needed_update_flags () const;
+    virtual unsigned int             n_output_variables () const;
 };
 
 				 // The <code>get_names</code>
