@@ -5778,14 +5778,19 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
       if test `which $DEAL_II_PETSC_PCC` = `which $CC` ; then
         AC_MSG_RESULT(yes)
       else
-        AC_MSG_ERROR([PETSc has not been compiled with the same compiler])
+        DEAL_CC=`which $CC`
+	PETSC_CC=`which $DEAL_II_PETSC_PCC`
+        AC_MSG_ERROR([PETSc has not been compiled with the same compiler. PETS\
+c: '$PETSC_CC', deal: '$DEAL_CC'])
       fi
     ;;
     CXXONLY) dnl PETSC language is C++, check $CXX
       if test `which $DEAL_II_PETSC_PCC` = `which $CXX` ; then
         AC_MSG_RESULT(yes)
       else
-        AC_MSG_ERROR([PETSc has not been compiled with the same compiler])
+        DEAL_CC=`which $CXX`
+	PETSC_CC=`which $DEAL_II_PETSC_PCC`
+        AC_MSG_ERROR([PETSc has not been compiled with the same compiler. PETSc: '$PETSC_CC', deal: '$DEAL_CC'])
       fi
     ;;
   esac
