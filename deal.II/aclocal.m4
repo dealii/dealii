@@ -5773,18 +5773,16 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
       ;;
   esac
 
-  DEAL_II_PETSC_PCC+=" " dnl Add a trailing whitespace
-
   case "$DEAL_II_PETSC_LANGUAGE" in
     CONLY) dnl PETSC language is C, check $CC
-      if test "$DEAL_II_PETSC_PCC" = "$CC" ; then
+      if test `which $DEAL_II_PETSC_PCC` = `which $CC` ; then
         AC_MSG_RESULT(yes)
       else
         AC_MSG_ERROR([PETSc has not been compiled with the same compiler])
       fi
     ;;
     CXXONLY) dnl PETSC language is C++, check $CXX
-      if test "$DEAL_II_PETSC_PCC" = "$CXX" ; then
+      if test `which $DEAL_II_PETSC_PCC` = `which $CXX` ; then
         AC_MSG_RESULT(yes)
       else
         AC_MSG_ERROR([PETSc has not been compiled with the same compiler])
