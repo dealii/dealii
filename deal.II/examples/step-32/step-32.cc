@@ -109,6 +109,9 @@ namespace EquationData
   const double T0      = 4000+273;
   const double T1      =  700+273;
 
+  const double g0      = 10.7;
+  const double g1      = 9.81;
+  
   const double year_in_seconds  = 60*60*24*365.2425;
   const double end_time         = 1e9 * year_in_seconds;
 
@@ -126,7 +129,8 @@ namespace EquationData
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
   {
-    return -9.81 * p / R1;
+    const double r = p.norm();
+    return -(1.245e-6 * r + 7.714e13/r/r) * p / p.norm();
   }
 
 
@@ -156,15 +160,11 @@ namespace EquationData
     const double s = (r-R0)/h;
 // see http://www.wolframalpha.com/input/?i=plot+(sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))),+x%3D-1+to+1,+y%3D-1+to+1
 
-    double s_mod = s*0.95 + 0.05*sin(6.0*atan2(p(0),p(1)));
+    const double s_mod = s*0.95 + 0.05*sin(6.0*atan2(p(0),p(1)));
 //alternative:    http://www.wolframalpha.com/input/?i=plot+atan((sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))-0.5)*10)/pi%2B0.5,+x%3D-1+to+1,+y%3D-1+to+1
 //    s_mod = atan((s_mod-0.5)*10.0)/dealii::numbers::PI+0.5;
 
-    return T1+(T0-T1)*(1.0-s_mod);
-
-				     //old:
-//	return T1+(T0-T1)*((1-s)*(1-s));
-//	return T1+(T0-T1)*((1-s));
+    return T0*(1.0-s_mod) + T1*s_mod;
   }
 
 
@@ -3392,8 +3392,8 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
 	if ((timestep_number > 0) && (timestep_number % 10 == 0))
 	  refine_mesh (initial_refinement + n_pre_refinement_steps);
 
-      if (timestep_number % 10 == 0 &&
-	  Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD) <= 10)
+      if (timestep_number % 50 == 0 &&
+	  Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD) <= 100)
 	output_results ();
 
       time += time_step;
