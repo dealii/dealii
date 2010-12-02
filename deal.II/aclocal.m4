@@ -5720,9 +5720,21 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
   dnl First, get PETSc's language type
   AC_MSG_CHECKING([for PETSc library language])
 
-  DEAL_II_PETSC_LANGUAGE=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
+  case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
+    2.3*) dnl
+      DEAL_II_PETSC_LANGUAGE=`cat $DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf \
                               | grep "PETSC_LANGUAGE = " \
                               | perl -pi -e 's/.*LANGUAGE\s=\s+//g;'`
+      ;;
+    3.*) dnl
+      DEAL_II_PETSC_LANGUAGE=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
+                              | grep "PETSC_LANGUAGE = " \
+                              | perl -pi -e 's/.*LANGUAGE\s=\s+//g;'`
+      ;;
+    *)    dnl
+      AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
+      ;;
+  esac
 
   dnl ...and pretty print that.
   case "$DEAL_II_PETSC_LANGUAGE" in
