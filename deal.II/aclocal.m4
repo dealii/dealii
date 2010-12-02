@@ -5756,9 +5756,23 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
   dnl about is stored in the PCC (PCC_LINKER) flags. So we just check that
   dnl this valus is the same as the corresponding value for the C/C++
   dnl compiler that deal.II knows about.
-  DEAL_II_PETSC_PCC=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
+  case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
+    2.3*) dnl
+      DEAL_II_PETSC_PCC=`cat $DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf \
+                              | grep "PCC = " \
+                              | perl -pi -e 's/.*PCC\s=\s+//g;'`
+      ;;
+    3.*) dnl
+      DEAL_II_PETSC_PCC=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
                          | grep "PCC = " \
                          | perl -pi -e 's/.*PCC\s=\s+//g;'`
+
+      ;;
+    *)    dnl
+      AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
+      ;;
+  esac
+
   DEAL_II_PETSC_PCC+=" " dnl Add a trailing whitespace
 
   case "$DEAL_II_PETSC_LANGUAGE" in
