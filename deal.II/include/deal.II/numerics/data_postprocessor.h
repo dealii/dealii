@@ -136,7 +136,7 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<Tensor<2,dim> > &dduh,
 				       const std::vector<Point<dim> >    &normals,
 				       const std::vector<Point<dim> >    &evaluation_points,
-				       std::vector<Vector<double> >      &computed_quantities) const;			       
+				       std::vector<Vector<double> >      &computed_quantities) const;
     
 				     /**
 				      * @deprecated
@@ -176,7 +176,7 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
 				       const std::vector<Point<dim> >                  &normals,
 				       const std::vector<Point<dim> >                  &evaluation_points,
-				       std::vector<Vector<double> >                    &computed_quantities) const;			       
+				       std::vector<Vector<double> >                    &computed_quantities) const;
 
 				     /**
 				      * Return the vector of strings describing
