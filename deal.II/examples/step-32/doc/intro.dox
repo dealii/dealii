@@ -818,7 +818,7 @@ the following quantities:
   x)=\rho(\|\mathbf x\|)=\rho(r)$. In that case, one would get
   @f[
     \varphi(r)
-    = 4\pi G \int_0^r \frac 1{s^2} \int_0^t t^2 \rho(t) \; ds \; dt.
+    = 4\pi G \int_0^r \frac 1{s^2} \int_0^s t^2 \rho(t) \; ds \; dt.
   @f]
 
 
