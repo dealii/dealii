@@ -998,6 +998,8 @@ class BoussinesqFlowProblem
 
     void
     copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data);
+
+    class Postprocessor;
 };
 
 
@@ -2881,9 +2883,133 @@ void BoussinesqFlowProblem<dim>::solve ()
 }
 
 
-
-
 				 // @sect4{BoussinesqFlowProblem::output_results}
+
+template <int dim>
+class BoussinesqFlowProblem<dim>::Postprocessor : public DataPostprocessor<dim>
+{
+  public:
+    Postprocessor (const unsigned int partition);
+    
+    virtual
+    void
+    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+				       const std::vector<Point<dim> >                  &normals,
+				       const std::vector<Point<dim> >                  &evaluation_points,
+				       std::vector<Vector<double> >                    &computed_quantities) const;
+
+    virtual std::vector<std::string> get_names () const;
+
+    virtual unsigned int n_output_variables() const;
+
+    virtual
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    get_data_component_interpretation () const;
+
+    virtual UpdateFlags get_needed_update_flags () const;
+
+  private:
+    const unsigned int partition;
+};
+
+
+template <int dim>
+BoussinesqFlowProblem<dim>::Postprocessor::Postprocessor (const unsigned int partition)
+		:
+		partition (partition)
+{}
+
+
+template <int dim>
+std::vector<std::string>
+BoussinesqFlowProblem<dim>::Postprocessor::get_names() const
+{
+  std::vector<std::string> solution_names (dim, "velocity");
+  solution_names.push_back ("p");
+  solution_names.push_back ("T");
+  solution_names.push_back ("friction_heating");
+  solution_names.push_back ("partition");
+  return solution_names;
+}
+
+
+template <int dim>
+unsigned int
+BoussinesqFlowProblem<dim>::Postprocessor::n_output_variables() const
+{
+  return dim + 1 + 1 + 1 + 1;
+}
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+BoussinesqFlowProblem<dim>::Postprocessor::
+get_data_component_interpretation () const
+{
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    interpretation (dim,
+		    DataComponentInterpretation::component_is_part_of_vector);
+
+  interpretation.push_back (DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back (DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back (DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back (DataComponentInterpretation::component_is_scalar);
+
+  return interpretation;
+}
+
+
+template <int dim>
+UpdateFlags
+BoussinesqFlowProblem<dim>::Postprocessor::get_needed_update_flags() const
+{
+  return update_values | update_gradients;
+}
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::Postprocessor::
+compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+				   const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+				   const std::vector<Point<dim> >                  &/*normals*/,
+				   const std::vector<Point<dim> >                  &/*evaluation_points*/,
+				   std::vector<Vector<double> >                    &computed_quantities) const
+{
+  const unsigned int n_quadrature_points = uh.size();
+  Assert (duh.size() == n_quadrature_points,                  ExcInternalError());
+  Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
+  Assert (uh[0].size() == dim+2,                              ExcInternalError());
+  Assert (computed_quantities[0].size()==n_output_variables(),ExcInternalError());
+
+  for (unsigned int q=0; q<n_quadrature_points; ++q)
+    {
+				       // velocity; rescale in cm/year
+      for (unsigned int d=0; d<dim; ++d)
+	computed_quantities[q](d)
+	  = (uh[q](d) *  EquationData::year_in_seconds * 100);
+
+				       // pressure
+      computed_quantities[q](dim) = uh[q](dim) *
+				    EquationData::pressure_scaling;
+  
+				       // temperature
+      computed_quantities[q](dim+1) = uh[q](dim+1);
+
+				       // friction heating
+      Tensor<2,dim> grad_u;
+      for (unsigned int d=0; d<dim; ++d)
+	grad_u[d] = duh[q][d];
+      SymmetricTensor<2,dim> strain = symmetrize (grad_u);
+      computed_quantities[q](dim+2) = EquationData::eta * 2 * strain * strain;
+
+      computed_quantities[q](dim+3) = partition;
+    }
+}
+
 
 				 // This function does mostly what the
 				 // corresponding one did in to
@@ -2964,18 +3090,12 @@ void BoussinesqFlowProblem<dim>::output_results ()
                                       estimated_error_per_cell);
 
   const FESystem<dim> joint_fe (stokes_fe, 1,
-                                temperature_fe, 1,
-                                FE_DGQ<dim>(0), 1,
-                                FE_DGQ<dim>(0), 1,
-				temperature_fe, 1);
+                                temperature_fe, 1);
 
   DoFHandler<dim> joint_dof_handler (triangulation);
   joint_dof_handler.distribute_dofs (joint_fe);
   Assert (joint_dof_handler.n_dofs() ==
-	  stokes_dof_handler.n_dofs() +
-	  temperature_dof_handler.n_dofs() +
-	  2*triangulation.n_global_active_cells() +
-	  temperature_dof_handler.n_dofs(),
+	  stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
 	  ExcInternalError());
 
   TrilinosWrappers::MPI::Vector joint_solution;
@@ -2996,7 +3116,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
       joint_endc       = joint_dof_handler.end(),
       stokes_cell      = stokes_dof_handler.begin_active(),
       temperature_cell = temperature_dof_handler.begin_active();
-    for (unsigned int cell_index=0; joint_cell!=joint_endc; ++joint_cell, ++stokes_cell, ++temperature_cell, ++cell_index)
+    for (; joint_cell!=joint_endc;
+	 ++joint_cell, ++stokes_cell, ++temperature_cell)
       if (!joint_cell->is_artificial() && !joint_cell->is_ghost())
 	{
 	  joint_cell->get_dof_indices (local_joint_dof_indices);
@@ -3004,114 +3125,46 @@ void BoussinesqFlowProblem<dim>::output_results ()
 	  temperature_cell->get_dof_indices (local_temperature_dof_indices);
 
 	  for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
-	    {
-	      if (joint_fe.system_to_base_index(i).first.first == 0)
-		{
-		  Assert (joint_fe.system_to_base_index(i).second
-			  <
-			  local_stokes_dof_indices.size(),
-			  ExcInternalError());
+	    if (joint_fe.system_to_base_index(i).first.first == 0)
+	      {
+		Assert (joint_fe.system_to_base_index(i).second
+			<
+			local_stokes_dof_indices.size(),
+			ExcInternalError());
 
-		  const unsigned int index_in_stokes_fe
-		    = joint_fe.system_to_base_index(i).second;
-
-		  if (stokes_fe.system_to_component_index(index_in_stokes_fe).first
-		      < dim)
-		    {
-		      joint_solution(local_joint_dof_indices[i])
-			= (stokes_solution(local_stokes_dof_indices
-					   [joint_fe.system_to_base_index(i).second])
-			   *
-			   EquationData::year_in_seconds
-			   *
-			   100);
-		    }
-		  else
-		    {
-		      Assert (stokes_fe.system_to_component_index(index_in_stokes_fe).first
-			      ==
-			      dim,
-			      ExcInternalError());
-
-		      joint_solution(local_joint_dof_indices[i])
-			= ((stokes_solution(local_stokes_dof_indices
-					    [joint_fe.system_to_base_index(i).second])
-			    )
-			   *
-			   EquationData::pressure_scaling);
-		    }
-		}
-             else if (joint_fe.system_to_base_index(i).first.first == 1)
-               {
-                 Assert (joint_fe.system_to_base_index(i).second
-                         <
-                         local_temperature_dof_indices.size(),
-                         ExcInternalError());
-                 joint_solution(local_joint_dof_indices[i])
-                   = temperature_solution(local_temperature_dof_indices
-                                          [joint_fe.system_to_base_index(i).second]);
-               }
-              else if (joint_fe.system_to_base_index(i).first.first == 2)
-                {
-                  Assert (joint_fe.system_to_base_index(i).second
-                          == 0,
-                          ExcInternalError());
-                  joint_solution(local_joint_dof_indices[i])
-                    = joint_cell->subdomain_id();
-                }
-              else if (joint_fe.system_to_base_index(i).first.first == 3)
-                {
-                  Assert (joint_fe.system_to_base_index(i).first.first == 3,
-                          ExcInternalError());
-                  Assert (joint_fe.system_to_base_index(i).second
-                          == 0,
-                          ExcInternalError());
-                  joint_solution(local_joint_dof_indices[i])
-                    = estimated_error_per_cell (cell_index);
-                }
-	      else
-		{
-                  Assert (joint_fe.system_to_base_index(i).first.first == 4,
-                          ExcInternalError());
-
-                  joint_solution(local_joint_dof_indices[i])
-		    = local_temperature_dof_indices
-		    [joint_fe.system_to_base_index(i).second];
-
-		}
-
-	    }
+		joint_solution(local_joint_dof_indices[i])
+		  = stokes_solution(local_stokes_dof_indices
+				    [joint_fe.system_to_base_index(i).second]);
+	      }
+	    else
+	      {
+		Assert (joint_fe.system_to_base_index(i).first.first == 1,
+			ExcInternalError());
+		Assert (joint_fe.system_to_base_index(i).second
+			<
+			local_temperature_dof_indices.size(),
+			ExcInternalError());
+		joint_solution(local_joint_dof_indices[i])
+		  = temperature_solution(local_temperature_dof_indices
+					 [joint_fe.system_to_base_index(i).second]);
+	      }
 	}
   }
 
-  std::vector<std::string> joint_solution_names (dim, "velocity");
-  joint_solution_names.push_back ("p");
-  joint_solution_names.push_back ("T");
-  joint_solution_names.push_back ("partition");
-  joint_solution_names.push_back ("error");
-  joint_solution_names.push_back ("TDofIndex");
+
+  IndexSet locally_relevant_joint_dofs(joint_dof_handler.n_dofs());
+  DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_joint_dofs);
+  TrilinosWrappers::MPI::Vector locally_relevant_joint_solution;
+  locally_relevant_joint_solution.reinit (locally_relevant_joint_dofs, MPI_COMM_WORLD);
+  locally_relevant_joint_solution = joint_solution;
+
+  Postprocessor postprocessor (Utilities::System::
+			       get_this_mpi_process(MPI_COMM_WORLD));
 
   DataOut<dim> data_out;
-
   data_out.attach_dof_handler (joint_dof_handler);
-
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim+5, DataComponentInterpretation::component_is_scalar);
-  for (unsigned int i=0; i<dim; ++i)
-    data_component_interpretation[i]
-      = DataComponentInterpretation::component_is_part_of_vector;
-
-  IndexSet locally_relevant_dofs(joint_dof_handler.n_dofs());
-  DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_dofs);
-  TrilinosWrappers::MPI::Vector locally_relevant_joint_solution;
-  locally_relevant_joint_solution.reinit (locally_relevant_dofs, MPI_COMM_WORLD);
-  locally_relevant_joint_solution = joint_solution;
-  
-  data_out.add_data_vector (locally_relevant_joint_solution, joint_solution_names,
-			    DataOut<dim>::type_dof_data,
-			    data_component_interpretation);
-  data_out.build_patches (1+std::min(stokes_degree, temperature_degree));
+  data_out.add_data_vector (locally_relevant_joint_solution, postprocessor);
+  data_out.build_patches ();
 
   static int out_index=0;
   const std::string filename = ("solution-" +
