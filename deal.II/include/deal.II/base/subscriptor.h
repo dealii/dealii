@@ -209,7 +209,7 @@ class Subscriptor
 				     /**
 				      * In this map, we count
 				      * subscriptions for each
-				      * different identification strig
+				      * different identification string
 				      * supplied to subscribe().
 				      */
     mutable std::map<const char*, unsigned int> counter_map;
