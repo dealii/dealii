@@ -109,9 +109,12 @@ of the other equations, whether to use one or the other is more a
 matter of taste than of correctness. The flow field is exactly the
 same, but we get a pressure that we can now compare with values that
 are given in geophysical books as those that hold at the bottom of the
-earth mantle, for example.
+earth mantle, for example. A second reason to use the total pressure here is
+that if we wanted to make the model even more realistic, we would have to take
+into account that many of the material parameters (e.g. the viscosity, the
+density, etc) not only depend on the temperature but also the total pressure.
 
-A second reason to do this is discussed in the results section and
+A final reason to do this is discussed in the results section and
 concerns possible extensions to the model we use here. It has to do
 with the fact that while the temperature equation we use here does not
 include a term that contains the pressure. It should, however:
@@ -705,14 +708,35 @@ the following quantities:
   inner and outer boundary.
 
   <li>The right hand side of the temperature equation contains the rate of
-  %internal heating $\gamma$. The earth does heat naturally through three mechanisms:
+  %internal heating $\gamma$. The earth does heat naturally through several mechanisms:
   radioactive decay, chemical separation (heavier elements sink to the bottom,
   lighter ones rise to the top; the countercurrents dissipate emergy equal to
-  the loss of potential energy by this separation process), and heat release
+  the loss of potential energy by this separation process); heat release
   by crystallization of liquid metal as the solid inner core of the earth
-  grows. None of these processes are overly significant in the earth mantle, and
-  so we assume that the %internal heating can be set to zero. We
-  neglect one internal heat source, namely adiabatic heating here,
+  grows; and heat dissipation from viscous friction as the fluid moves.
+
+  Chemical separation is difficult to model since it requires modeling mantle
+  material as multiple phases; it is also a relatively small
+  effect. Crystallization heat is even more difficult since it is confined to
+  areas where temperature and pressure allow for phase changes, i.e. a
+  discontinuous process. Given the difficulties in modeling these two
+  phenomena, we will neglect them.
+
+  The other two are readily handled and, given the way we scaled the
+  temperature equation, lead to the equation
+  @f[
+    \gamma(\mathbf x)
+     = 
+     \frac{\rho q+2\eta \varepsilon(\mathbf u):\varepsilon(\mathbf u)}
+     {\rho c_p},
+  @f]
+  where $q$ is the radiogenic heating in $\frac{W}{kg}$, and the second
+  term in the enumerator is viscous friction heating. $\rho$ is the density
+  and $c_p$ is the specific heat. The literature provides the following
+  approximate values: $c_p=1250 \frac{J}{kg\; K}, q=7.4\cdot 10^{-12}\frac{W}{kg}$.
+  The other parameters are discussed elsewhere in this section.
+
+  We neglect one internal heat source, namely adiabatic heating here,
   which will lead to a surprising temperature field. This point is
   commented on in detail in the results section below.
 
