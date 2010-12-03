@@ -35,12 +35,13 @@ aspects of the library. Each such example has the following structure:
 </p>
 
 <p>
-You can browse the available tutorial programs as
-<a href="toc-map.html">a graph that shows how
-tutorial programs build upon each other</a> (below);
-as <a href="toc-list.html">a list that provides a short
-    synopsis of each program</a>; and
-<a href="toc-topics.html">grouped by topics</a>.
+You can browse the available tutorial programs
+<ol>
+  <li> as <b><a href="#graph">a graph (see below)</a></b> that shows how tutorial programs build upon each other.
+  <li> as <b><a href="toc-list.html">a list</a></b> that provides a short
+    synopsis of each program.
+  <li> or <b><a href="toc-topics.html">grouped by topic</a></b>.
+</ol>
 Some of the programs also jointly form
 the <a href="../../doxygen/deal.II/group__geodynamics.html">geodynamics
   demonstration suite</a>.
