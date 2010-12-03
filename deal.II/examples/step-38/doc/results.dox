@@ -1,0 +1,25 @@
+<h1>Results</h1>
+
+We ran the program using the following <code>parameters.prm</code> file (which
+can also be found in the directory in which all the other source files are):
+@verbatim
+# Listing of Parameters
+# ---------------------
+@endverbatim
+
+When we run the program, the following is printed on screen:
+
+@verbatim
+================================
+          LB PROBLEM 
+================================
+
+DEAL:cg::Starting value 0.677406
+DEAL:cg::Convergence step 580 value 9.71224e-08
+0.00552653
+
+@endverbatim
+
+Here is a plot of the result:
+
+@image html step-XX_0.png
