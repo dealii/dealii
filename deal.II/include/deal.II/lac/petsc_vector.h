@@ -79,6 +79,18 @@ namespace PETScWrappers
       template <typename Number>
       explicit Vector (const dealii::Vector<Number> &v);
 
+				       /**
+					* Construct it from an existing PETSc
+					* Vector of type Vec. Note: this does
+					* not copy the contents and just keeps
+					* a pointer. You need to make sure the
+					* vector is not used twice at the same
+					* time or destroyed while in use. This
+					* class does not destroy the PETSc
+					* object. Handle with care!
+					*/
+      explicit Vector (const Vec & v);
+      
                                        /**
                                         * Copy-constructor the values from a
                                         * PETSc wrapper vector class.
@@ -226,6 +238,13 @@ namespace PETScWrappers
     *this = v;
   }
 
+
+
+  inline
+  Vector::Vector (const Vec & v)
+		  :
+		  VectorBase(v)
+  {}
   
   
   inline
@@ -259,12 +278,18 @@ namespace PETScWrappers
   Vector &
   Vector::operator = (const MPI::Vector &v)
   {
+    int ierr;
+    if (attained_ownership)
+      {
                                      // the petsc function we call wants to
                                      // generate the vector itself, so destroy
                                      // the old one first
-    int ierr = VecDestroy (vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+	ierr = VecDestroy (vector);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
 
+    attained_ownership = true;
+    
                                      // then do the gather
                                      // operation. <rant>petsc has changed its
                                      // interface again, and replaced a single

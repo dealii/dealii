@@ -177,7 +177,8 @@ namespace PETScWrappers
   VectorBase::VectorBase ()
                   :
 		  ghosted(false),
-                  last_action (LastAction::none)
+                  last_action (LastAction::none),
+		  attained_ownership(true)
   {}
 
 
@@ -187,7 +188,8 @@ namespace PETScWrappers
 		  Subscriptor (),
 		  ghosted(v.ghosted),
 		  ghost_indices(v.ghost_indices),
-                  last_action (LastAction::none)
+                  last_action (LastAction::none),
+		  attained_ownership(true)
   {
     int ierr = VecDuplicate (v.vector, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -197,10 +199,25 @@ namespace PETScWrappers
   }
 
 
+  
+  VectorBase::VectorBase (const Vec & v)
+		  :
+		  Subscriptor (),
+		  vector(v),
+		  ghosted(false),
+                  last_action (LastAction::none),
+		  attained_ownership(false)
+  {}
+
+  
+
   VectorBase::~VectorBase ()
   {
-    const int ierr = VecDestroy (vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    if (attained_ownership)
+      {	
+	const int ierr = VecDestroy (vector);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
   }
 
 

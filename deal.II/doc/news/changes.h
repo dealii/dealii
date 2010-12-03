@@ -94,6 +94,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>New: Added a new constructor for PETScWrappers::Vector that takes
+  an existing PETSc Vec that was created by the user and is only wrapped for
+  usage.
+  <br>
+  (TH, 2010/12/03)
+  </p></li>
+
   <li><p>Updated: The version of the <a href="http://www.threadingbuildingblocks.org">Threading
   Building Blocks (TBB)</a> shipped with deal.II has been updated
   to release 3.0 Update 3 (Commercially aligned version).

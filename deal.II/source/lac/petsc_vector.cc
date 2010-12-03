@@ -76,9 +76,11 @@ namespace PETScWrappers
 //         AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                          // so let's go the slow way:
-        int ierr;
-        ierr = VecDestroy (vector);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
+	if (attained_ownership)
+	  {
+	    int ierr = VecDestroy (vector);
+	    AssertThrow (ierr == 0, ExcPETScError(ierr));
+	  }
 
         create_vector (n);
       }
@@ -106,6 +108,7 @@ namespace PETScWrappers
     const int ierr
       = VecCreateSeq (PETSC_COMM_SELF, n, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+    attained_ownership = true;
   }
 }
 
