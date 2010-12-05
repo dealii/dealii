@@ -80,17 +80,7 @@ Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
   return_value[1] = -dPi *sin(dPi * p(0))*sin(dPi * p(1))*exp(p(2));
   return_value[2] = sin(dPi * p(0))*cos(dPi * p(1))*exp(p(2));
   
-  // tangential gradient: nabla u - (nabla u nu)nu
-  Point<dim> normal;
-  double dLength;  
-
-  dLength = sqrt(p(0)*p(0)+p(1)*p(1)+p(2)*p(2));
-  
-  normal[0] = p(0)/dLength;
-  normal[1] = p(1)/dLength;
-  normal[2] = p(2)/dLength;
-  
-  return return_value - (return_value*normal)*normal;
+  return return_value;
 }
 
 template <int dim>

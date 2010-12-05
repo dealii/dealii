@@ -4191,11 +4191,14 @@ namespace internal
           case dealii::VectorTools::W1p_seminorm:
           case dealii::VectorTools::W1infty_seminorm:
                 update_flags |= UpdateFlags (update_gradients);
+		if(spacedim == dim+1) update_flags |= UpdateFlags (update_normal_vectors);
+		
                 break;
           case dealii::VectorTools::H1_norm:
           case dealii::VectorTools::W1p_norm:
           case dealii::VectorTools::W1infty_norm:
                 update_flags |= UpdateFlags (update_gradients);
+		if(spacedim == dim+1) update_flags |= UpdateFlags (update_normal_vectors);
                                                  // no break!
           default:
                 update_flags |= UpdateFlags (update_values);
@@ -4332,13 +4335,35 @@ namespace internal
                 }
 
                                                // then subtract finite element
-                                               // function_grads
+                                               // function_grads. We
+                                               // need to be careful
+                                               // in the codimension
+                                               // one case, since
+                                               // there we only have
+                                               // tangential gradients
+                                               // in the finite
+                                               // element function,
+                                               // not the full
+                                               // gradient. This is
+                                               // taken care of, by
+                                               // subtracting the
+                                               // normal component of
+                                               // the gradient from
+                                               // the exact function.  
               fe_values.get_function_grads (fe_function, function_grads);
-              for (unsigned int k=0; k<n_components; ++k)
-                for (unsigned int q=0; q<n_q_points; ++q)
-                  psi_grads[q][k] -= function_grads[q][k];
+	      if(update_flags & update_normal_vectors)
+		for (unsigned int k=0; k<n_components; ++k)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    psi_grads[q][k] -= (function_grads[q][k] +
+					(psi_grads[q][k]* // (f.n) n
+					 fe_values.normal_vector(q))*
+					fe_values.normal_vector(q));
+	      else
+		for (unsigned int k=0; k<n_components; ++k)
+		  for (unsigned int q=0; q<n_q_points; ++q)
+		    psi_grads[q][k] -= function_grads[q][k];
             }
-
+	  
           switch (norm)
             {
               case dealii::VectorTools::mean:

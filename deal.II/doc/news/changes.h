@@ -94,6 +94,23 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>New: When computing errors using
+  VectorTools::integrate_difference in codimension one problems, if
+  you specified a norm that requires the computation of the gradients,
+  you'd get in trouble, because on codimension one manifolds we only
+  have information on the <em>tangential</em> gradient. This is now
+  fixed, by discarding the normal component of the provided function,
+  before computing the difference with the finite element function.
+  <br>
+  (Luca Heltai, 2010/12/05)
+  </p></li>
+  
+  <li><p>New: We now have a new tutorial program (step-38), written by
+  Andrea Bonito, to compute the Laplace Beltrami operator on
+  a half sphere.
+  <br> (Luca Heltai, 2010/12/03)
+  </p></li>
+
   <li><p>New: Added a new constructor for PETScWrappers::Vector that takes
   an existing PETSc Vec that was created by the user and is only wrapped for
   usage.

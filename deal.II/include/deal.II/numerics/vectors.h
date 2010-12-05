@@ -304,7 +304,15 @@ class ConstraintMatrix;
  *   using the Vector::linfty_norm() function.
  *
  *   For the global <i>H</i><sup>1</sup> norm and seminorm, the same rule applies as for the
- *   <i>L</i><sup>2</sup> norm: compute the <i>l</i><sub>2</sub> norm of the cell error vector.
+ *   <i>L</i><sup>2</sup> norm: compute the <i>l</i><sub>2</sub> norm
+ *   of the cell error vector.
+ *
+ *   Note that, in the codimension one case, if you ask for a norm
+ *   that requires the computation of a gradient, then the provided
+ *   function is automatically projected along the curve, and the
+ *   difference is only computed on the tangential part of the
+ *   gradient, since no information is available, on the finite
+ *   dimensional one, on the normal component of the gradient. 
  * </ul>
  *
  * All functions use the finite element given to the DoFHandler object the last
