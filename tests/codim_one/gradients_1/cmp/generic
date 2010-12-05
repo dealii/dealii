@@ -1,0 +1,34 @@
+
+DEAL::Test <1,2>, Q1, Q2, Q3
+DEAL::no. of cells 126
+DEAL::no. of dofs 126
+DEAL::no. of dofs per cell 2
+DEAL::L2 norm of projected vector: 1.35777
+DEAL::H1 error: 0.0543731
+DEAL::no. of cells 126
+DEAL::no. of dofs 252
+DEAL::no. of dofs per cell 3
+DEAL::L2 norm of projected vector: 1.91735
+DEAL::H1 error: 0.000492067
+DEAL::no. of cells 126
+DEAL::no. of dofs 378
+DEAL::no. of dofs per cell 4
+DEAL::L2 norm of projected vector: 2.34875
+DEAL::H1 error: 8.55495e-06
+DEAL::
+DEAL::Test <2,3>, Q1, Q2, Q3
+DEAL::no. of cells 106
+DEAL::no. of dofs 108
+DEAL::no. of dofs per cell 4
+DEAL::L2 norm of projected vector: 1.93442
+DEAL::H1 error: 0.633166
+DEAL::no. of cells 106
+DEAL::no. of dofs 426
+DEAL::no. of dofs per cell 9
+DEAL::L2 norm of projected vector: 3.66258
+DEAL::H1 error: 0.0412532
+DEAL::no. of cells 106
+DEAL::no. of dofs 956
+DEAL::no. of dofs per cell 16
+DEAL::L2 norm of projected vector: 5.56171
+DEAL::H1 error: 0.00674748
