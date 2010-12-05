@@ -726,9 +726,9 @@ namespace DoFRenumbering
 				    * this function is the identity
 				    * operation.
 				    */
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  component_wise (DoFHandler<dim>                 &dof_handler,
+  component_wise (DoFHandler<dim,spacedim>        &dof_handler,
 		  const std::vector<unsigned int> &target_component
 		  = std::vector<unsigned int>());
 
@@ -784,7 +784,7 @@ namespace DoFRenumbering
 				    * DoFHandler dofs but returns
 				    * the renumbering vector.
 				    */
-  template <int dim, class ITERATOR, class ENDITERATOR>
+  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
   unsigned int
   compute_component_wise (std::vector<unsigned int>& new_dof_indices,
 			  const ITERATOR& start,

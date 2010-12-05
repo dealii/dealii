@@ -538,28 +538,29 @@ namespace DoFRenumbering
 
 
 
-  template <int dim>
+  template <int dim, int spacedim>
   void
-  component_wise (DoFHandler<dim>                 &dof_handler,
+  component_wise (DoFHandler<dim,spacedim>        &dof_handler,
 		  const std::vector<unsigned int> &component_order_arg)
   {
     std::vector<unsigned int> renumbering (dof_handler.n_locally_owned_dofs(),
 					   DoFHandler<dim>::invalid_dof_index);
 
     typedef
-      internal::WrapDoFIterator<typename DoFHandler<dim>::active_cell_iterator> ITERATOR;
+      internal::WrapDoFIterator<typename DoFHandler<dim,spacedim>
+                                ::active_cell_iterator>
+      ITERATOR;
 
-    typename DoFHandler<dim>::active_cell_iterator
+    typename DoFHandler<dim,spacedim>::active_cell_iterator
       istart = dof_handler.begin_active();
     ITERATOR start = istart;
-    const typename DoFHandler<dim>::cell_iterator
+    const typename DoFHandler<dim,spacedim>::cell_iterator
       end = dof_handler.end();
 
     const unsigned int result =
-      compute_component_wise<dim, ITERATOR,
-      typename DoFHandler<dim>::cell_iterator>(renumbering,
-					       start, end,
-					       component_order_arg);
+      compute_component_wise<dim, spacedim, ITERATOR,
+      typename DoFHandler<dim,spacedim>::cell_iterator>
+      (renumbering, start, end, component_order_arg);
     if (result == 0)
       return;
 
@@ -600,7 +601,7 @@ namespace DoFRenumbering
       end = dof_handler.end();
 
     const unsigned int result =
-      compute_component_wise<dim, ITERATOR,
+      compute_component_wise<dim, dim, ITERATOR,
       typename hp::DoFHandler<dim>::cell_iterator>(renumbering,
 						   start, end,
 						   component_order_arg);
@@ -635,7 +636,7 @@ namespace DoFRenumbering
     const ITERATOR end = iend;
 
     const unsigned int result =
-      compute_component_wise<dim, ITERATOR, ITERATOR>(
+      compute_component_wise<dim, dim, ITERATOR, ITERATOR>(
 	renumbering, start, end, component_order_arg);
 
     if (result == 0) return;
@@ -675,14 +676,15 @@ namespace DoFRenumbering
 
 
 
-  template <int dim, class ITERATOR, class ENDITERATOR>
+  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
   unsigned int
   compute_component_wise (std::vector<unsigned int>& new_indices,
 			  const ITERATOR   & start,
 			  const ENDITERATOR& end,
 			  const std::vector<unsigned int> &component_order_arg)
   {
-    const hp::FECollection<dim> fe_collection (start->get_dof_handler().get_fe ());
+    const hp::FECollection<dim,spacedim>
+      fe_collection (start->get_dof_handler().get_fe ());
 
 				     // do nothing if the FE has only
 				     // one component
@@ -727,7 +729,7 @@ namespace DoFRenumbering
     std::vector<std::vector<unsigned int> > component_list (fe_collection.size());
     for (unsigned int f=0; f<fe_collection.size(); ++f)
       {
-	const FiniteElement<dim> & fe = fe_collection[f];
+	const FiniteElement<dim,spacedim> & fe = fe_collection[f];
 	const unsigned int dofs_per_cell = fe.dofs_per_cell;
 	component_list[f].resize(dofs_per_cell);
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -816,8 +818,8 @@ namespace DoFRenumbering
     const unsigned int n_buckets = fe_collection.n_components();
     std::vector<unsigned int> shifts(n_buckets);
 
-    if (const parallel::distributed::Triangulation<dim> * tria
-	= (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+    if (const parallel::distributed::Triangulation<dim,spacedim> * tria
+	= (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
 	   (&start->get_dof_handler().get_tria())))
       {
 #ifdef DEAL_II_USE_P4EST

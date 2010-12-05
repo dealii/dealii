@@ -132,17 +132,17 @@ for (deal_II_dimension : DIMENSIONS)
   (DoFHandler<deal_II_dimension>&,
    const std::vector<unsigned int>&);
 
+#if deal_II_dimension < 3
+  template
+  void component_wise<deal_II_dimension,deal_II_dimension+1>
+  (DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+   const std::vector<unsigned int>&);
+#endif
+
   template
   void component_wise<deal_II_dimension>
   (hp::DoFHandler<deal_II_dimension>&,
    const std::vector<unsigned int>&);
-
-//  template
-//  void
-//  compute_component_wise<deal_II_dimension>
-//  (std::vector<unsigned int>&,
-//   const DoFHandler<deal_II_dimension>&,
-//   const std::vector<unsigned int>&);
 
   template
   void component_wise<deal_II_dimension>
