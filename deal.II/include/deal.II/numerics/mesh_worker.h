@@ -174,9 +174,30 @@ template<int,int> class MGDoFHandler;
 namespace MeshWorker
 {
 /**
- * The class providing the scrapbook to fill with local integration
- * results. These can be values, local contributions to forms or cell
- * and face matrices.
+ * The class providing the scrapbook to fill with results of local
+ * integration. Depending on the tesk the mesh worker loop is
+ * performing, local results can be of different types. They have
+ * in common that they are the result of local integration over a cell
+ * or face. Their actual type is determined by the Assember using
+ * them. It is also the assembler setting the arrays of local results
+ * to the sizes needed. Here is a list of the provided data types and
+ * the assembers using them:
+ *
+ * <ol>
+ * <li> n_values() numbers accessed with value(), and stored in the
+ * data member #J.
+ * 
+ * <li> n_vectors() vectors of the length of dofs on this cell,
+ * accessed by vector(), and stored in #R.
+ * <li> n_matrices() matrices of dimension dofs per cell in each
+ * direction, accessed by matrix() with second argument
+ * <tt>false</tt>. These are stored in #M1, and they are the matrices
+ * coupling degrees of freedom in the same cell. For fluxes across
+ * faces, there is an additional set #M2 of matrices of the same size, but
+ * the dimension of the matrices being according to the degrees of
+ * freedom on both cells. These are accessed with matrix(), using the
+ * second argument <tt>true</tt>.
+ * </ol>
  *
  * The local matrices initialized by reinit() of the info object and
  * then assembled into the global system by Assembler classes.
@@ -187,86 +208,23 @@ namespace MeshWorker
   template <typename number>
   class LocalResults
   {
-    private:
-				       /**
-					* Initialize a single local
-					* matrix block. A helper
-					* function for initialize()
-					*/
-      void initialize_local(MatrixBlock<FullMatrix<number> >& M,
-			    const unsigned int row,
-			    const unsigned int col);
-
     public:
-      void initialize_numbers(const unsigned int n);
-      void initialize_vectors(const unsigned int n);
-				       /**
-					* Allocate @p n local
-					* matrices. Additionally,
-					* set their block row and
-					* column coordinates to
-					* zero. The matrices
-					* themselves are resized by
-					* reinit().
-					*
-					* The template parameter @p
-					* MatrixPtr should point to
-					* a MatrixBlock
-					* instantiation in order to
-					* provide row and column info.
-					*/
-      void initialize_matrices(unsigned int n, bool both);
-
-				       /**
-					* Allocate a local matrix
-					* for each of the global
-					* ones in @p
-					* matrices. Additionally,
-					* set their block row and
-					* column coordinates. The
-					* matrices themselves are
-					* resized by reinit().
-					*/
-      template <class MATRIX>
-      void initialize_matrices(const MatrixBlockVector<MATRIX>& matrices,
-			       bool both);
-
-				       /**
-					* Allocate a local matrix
-					* for each of the global
-					* level objects in @p
-					* matrices. Additionally,
-					* set their block row and
-					* column coordinates. The
-					* matrices themselves are
-					* resized by reinit().
-					*/
-      template <class MATRIX>
-      void initialize_matrices(const MGMatrixBlockVector<MATRIX>& matrices,
-			       bool both);
-
-				       /**
-					* Initialize quadrature values
-					* to <tt>nv</tt> values in
-					* <tt>np</tt> quadrature points.
-					*/
-      void initialize_quadrature(unsigned int np, unsigned int nv);
-      
-				       /**
-					* Reinitialize matrices for
-					* new cell. Resizes the
-					* matrices for hp and sets
-					* them to zero.
-					*/
-      void reinit(const BlockIndices& local_sizes);
-
 				       /**
 					* The number of scalar values.
+					*
+					* This number is set to a
+					* nonzero value by Assember::CellsAndFaces
+					* 
 					*/
       unsigned int n_values () const;
       
 				       /**
 					* The number of vectors.
+					*
+					* This number is set to a
+					* nonzero value by
+					* Assember::ResidualSimple and
+					* Assember::ResidualLocalBlocksToGlobalBlocks.
 					*/
       unsigned int n_vectors () const;
       
@@ -345,11 +303,114 @@ namespace MeshWorker
       number quadrature_value(unsigned int k, unsigned int i) const;
 
 				       /**
+					* Initialize the vector with
+					* scalar values.
+					*
+					* @note This function is
+					* usually only called by the
+					* assembler.
+					*/
+      void initialize_numbers(const unsigned int n);
+				       /**
+					* Initialize the vector with
+					* vector values.
+					*
+					* @note This function is
+					* usually only called by the
+					* assembler.
+					*/
+      void initialize_vectors(const unsigned int n);
+				       /**
+					* Allocate @p n local
+					* matrices. Additionally,
+					* set their block row and
+					* column coordinates to
+					* zero. The matrices
+					* themselves are resized by
+					* reinit().
+					*
+					* The template parameter @p
+					* MatrixPtr should point to
+					* a MatrixBlock
+					* instantiation in order to
+					* provide row and column info.
+					*
+					* @note This function is
+					* usually only called by the
+					* assembler.
+					*/
+      void initialize_matrices(unsigned int n, bool both);
+
+				       /**
+					* Allocate a local matrix
+					* for each of the global
+					* ones in @p
+					* matrices. Additionally,
+					* set their block row and
+					* column coordinates. The
+					* matrices themselves are
+					* resized by reinit().
+					*
+					* @note This function is
+					* usually only called by the
+					* assembler.
+					*/
+      template <class MATRIX>
+      void initialize_matrices(const MatrixBlockVector<MATRIX>& matrices,
+			       bool both);
+
+				       /**
+					* Allocate a local matrix
+					* for each of the global
+					* level objects in @p
+					* matrices. Additionally,
+					* set their block row and
+					* column coordinates. The
+					* matrices themselves are
+					* resized by reinit().
+					*
+					* @note This function is
+					* usually only called by the
+					* assembler.
+					*/
+      template <class MATRIX>
+      void initialize_matrices(const MGMatrixBlockVector<MATRIX>& matrices,
+			       bool both);
+
+				       /**
+					* Initialize quadrature values
+					* to <tt>nv</tt> values in
+					* <tt>np</tt> quadrature points.
+					*/
+      void initialize_quadrature(unsigned int np, unsigned int nv);
+      
+				       /**
+					* Reinitialize matrices for
+					* new cell. Does not resize
+					* any of the data vectors
+					* stored in this object, but
+					* resizes the vectors in #R
+					* and the matrices in #M1 and
+					* #M2 for hp and sets them to
+					* zero.
+					*/
+      void reinit(const BlockIndices& local_sizes);
+
+				       /**
 					* The memory used by this object.
 					*/
       unsigned int memory_consumption () const;
       
     private:
+				       /**
+					* Initialize a single local
+					* matrix block. A helper
+					* function for initialize()
+					*/
+      void initialize_local(MatrixBlock<FullMatrix<number> >& M,
+			    const unsigned int row,
+			    const unsigned int col);
+
 				       /**
 					* The local numbers,
 					* computed on a cell or on a
@@ -387,6 +448,9 @@ namespace MeshWorker
       std::vector<MatrixBlock<FullMatrix<number> > > M2;
 
 				       /**
+					* @todo Shouldn't this be in
+					* IntegrationInfo? Guido
+					*
 					* Values in quadrature points.
 					*/
       std::vector<std::vector<number> > quadrature_values;
