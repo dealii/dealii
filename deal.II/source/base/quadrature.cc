@@ -65,6 +65,18 @@ Quadrature<dim>::Quadrature (const unsigned int n_q) :
 
 
 template <int dim>
+void
+Quadrature<dim>::initialize (const std::vector<Point<dim> > &p,
+			     const std::vector<double>      &w)
+{
+  AssertDimension (w.size(), p.size());
+  quadrature_points = p;
+  weights = w;
+}
+
+
+
+template <int dim>
 Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points,
 			     const std::vector<double>      &weights)
 		:

@@ -192,6 +192,14 @@ class Quadrature : public Subscriptor
     Quadrature& operator = (const Quadrature<dim>&);
 
 				     /**
+				      * Set the quadrature points and
+				      * weights to the values provided
+				      * in the arguments.
+				      */
+    void initialize(const std::vector<Point<dim> > &points,
+		    const std::vector<double>      &weights);
+    
+				     /**
 				      * Virtual destructor.
 				      */
     virtual ~Quadrature ();
