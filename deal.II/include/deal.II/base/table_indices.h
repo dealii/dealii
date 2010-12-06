@@ -69,6 +69,13 @@ class TableIndicesBase
                                       */
     void sort ();
 
+                                     /**
+                                      * Write or read the data of this object to or 
+                                      * from a stream for the purpose of serialization.
+                                      */ 
+    template <class Archive>
+    void serialize (Archive & ar, const unsigned int version);
+
   protected:
                                      /**
                                       * Store the indices in an array.
@@ -448,6 +455,17 @@ TableIndicesBase<N>::operator != (const TableIndicesBase<N> &other) const
 
 
 
+template <int N>
+template <class Archive>
+inline
+void
+TableIndicesBase<N>::serialize (Archive & ar, const unsigned int)
+{
+  ar & indices;
+}
+
+
+
 template <>
 inline
 void
@@ -535,6 +553,7 @@ TableIndices<3>::TableIndices (const unsigned int index1,
   this->indices[1] = index2;
   this->indices[2] = index3;
 }
+
 
 
 inline
@@ -641,6 +660,7 @@ TableIndices<7>::TableIndices (const unsigned int index1,
   this->indices[5] = index6;
   this->indices[6] = index7;
 }
+
 
 
 /**

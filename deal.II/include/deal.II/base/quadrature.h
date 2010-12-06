@@ -190,6 +190,11 @@ class Quadrature : public Subscriptor
 				      * size.
 				      */
     Quadrature& operator = (const Quadrature<dim>&);
+    
+                     /**
+				      *  Test for equality of two quadratures.
+				      */
+    bool operator == (const Quadrature<dim> & p) const;
 
 				     /**
 				      * Set the quadrature points and
@@ -241,6 +246,13 @@ class Quadrature : public Subscriptor
 				      * object.
 				      */
     unsigned int memory_consumption () const;
+
+                         /**
+                      * Write or read the data of this object to or 
+                      * from a stream for the purpose of serialization.
+                      */ 
+    template <class Archive>
+    void serialize (Archive & ar, const unsigned int version);
 
   protected:
 				     /**
@@ -412,6 +424,20 @@ Quadrature<dim>::get_weights () const
   return weights;
 }
 
+
+
+template <int dim>
+template <class Archive>
+inline
+void
+Quadrature<dim>::serialize (Archive & ar, const unsigned int)
+{
+                                     // forward to serialization
+                                     // function in the base class.
+  ar &  static_cast<Subscriptor &>(*this);
+
+  ar & quadrature_points & weights;
+}
 
 
 

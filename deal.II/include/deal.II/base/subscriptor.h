@@ -145,6 +145,13 @@ class Subscriptor
 		   << "\" did subscribe to this object of class " << arg1);
 				     //@}
 
+                     /**
+                      * Read or write the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+
   private:
 				     /**
 				      * Register a subscriber for
@@ -229,6 +236,15 @@ class Subscriptor
 };
 
 //---------------------------------------------------------------------------
+
+template <class Archive>
+inline
+void 
+Subscriptor::serialize(Archive & ar, const unsigned int)
+{
+  ar & (unsigned int&)counter ;//& counter_map;
+  // TODO: Serialize counter_map
+}    
 
 // If we are in optimized mode, the subscription checking is turned
 // off. Therefore, we provide inline definitions of subscribe and

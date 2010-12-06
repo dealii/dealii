@@ -17,6 +17,8 @@
 #include <base/config.h>
 #include <base/exceptions.h>
 #include <base/subscriptor.h>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <vector>
 #include <iostream>
@@ -660,6 +662,11 @@ class SparsityPattern : public Subscriptor
 				      * objects.
 				      */
     SparsityPattern & operator = (const SparsityPattern &);
+    
+                     /**
+	                  *  Test for equality of two SparsityPatterns.
+	                  */
+    bool operator == (const SparsityPattern &)  const;
 
 				     /**
 				      * Reallocate memory and set up data
@@ -1437,6 +1444,22 @@ class SparsityPattern : public Subscriptor
 				      * information!
 				      */
     inline const unsigned int * get_column_numbers () const;
+    
+                     /**
+                      * Write the data of this object to 
+                      * a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void save (Archive & ar, const unsigned int version) const;
+
+                     /**
+                      * Read the data of this object 
+                      * from a stream for the purpose of serialization
+                      */    
+    template <class Archive>
+    void load (Archive & ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 				     /** @addtogroup Exceptions
 				      * @{ */
@@ -2018,6 +2041,65 @@ SparsityPattern::n_nonzero_elements () const
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
   Assert (compressed, ExcNotCompressed());
   return rowstart[rows]-rowstart[0];
+}
+
+
+
+template <class Archive>
+inline
+void
+SparsityPattern::save (Archive & ar, const unsigned int) const
+{
+                                     // forward to serialization
+                                     // function in the base class.
+  ar &  static_cast<const Subscriptor &>(*this);
+  
+  ar & max_dim & rows & cols & max_vec_len & max_row_length & compressed & diagonal_optimized;
+  
+  ar & boost::serialization::make_array(rowstart, max_dim + 1);
+  ar & boost::serialization::make_array(colnums, max_vec_len);
+}
+
+
+
+template <class Archive>
+inline
+void
+SparsityPattern::load (Archive & ar, const unsigned int)
+{
+                                     // forward to serialization
+                                     // function in the base class.
+  ar &  static_cast<Subscriptor &>(*this);
+  
+  ar & max_dim & rows & cols & max_vec_len & max_row_length & compressed & diagonal_optimized;
+  
+  rowstart = new std::size_t [max_dim + 1];
+  colnums = new unsigned int [max_vec_len];
+  
+  ar & boost::serialization::make_array(rowstart, max_dim + 1);
+  ar & boost::serialization::make_array(colnums, max_vec_len);
+}
+
+
+
+inline
+bool 
+SparsityPattern::operator == (const SparsityPattern& sp2)  const
+{
+  if (max_dim != sp2.max_dim || rows != sp2.rows || cols != sp2.cols ||
+      max_vec_len != sp2.max_vec_len || max_row_length != sp2.max_row_length ||
+      compressed != sp2.compressed || diagonal_optimized != sp2.diagonal_optimized)
+    return false;
+  
+  for (unsigned int i = 0; i < max_dim+1; ++i)
+    if (rowstart[i] != sp2.rowstart[i])
+      return false;
+  
+  for (unsigned int i = 0; i < max_vec_len; ++i)
+    if (colnums[i] != sp2.colnums[i])
+      return false;
+      
+  return true;
 }
 
 

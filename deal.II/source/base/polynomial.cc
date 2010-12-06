@@ -210,6 +210,13 @@ namespace Polynomials
     return *this;
   }
 
+  template <typename number >
+  bool 
+  Polynomial<number>::operator == (const Polynomial<number> & p)  const
+  {
+    return (p.coefficients == coefficients);
+  }
+
 
   template <typename number>
   template <typename number2>

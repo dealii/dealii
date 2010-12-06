@@ -273,6 +273,17 @@ Quadrature<dim>::operator= (const Quadrature<dim>& q)
 
 
 template <int dim>
+bool 
+Quadrature<dim>::operator == (const Quadrature<dim> & q) const
+{
+  return ((quadrature_points == q.quadrature_points)
+   &&
+   (weights == q.weights));
+}
+
+
+
+template <int dim>
 Quadrature<dim>::~Quadrature ()
 {}
 

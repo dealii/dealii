@@ -20,6 +20,8 @@
 #include <base/parallel.h>
 #include <base/subscriptor.h>
 #include <boost/lambda/lambda.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <cstdio>
 #include <iostream>
@@ -939,6 +941,22 @@ class Vector : public Subscriptor
 				      */
     unsigned int memory_consumption () const;
 				     //@}
+	
+                     /**
+                      * Write the data of this object to
+                      * a stream for the purpose of serialization.
+                      */ 
+    template <class Archive>
+    void save (Archive & ar, const unsigned int version) const;
+
+                     /**
+                      * Read the data of this object 
+                      * from a stream for the purpose of serialization.
+                      */    
+    template <class Archive>
+    void load (Archive & ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
   protected:
 
@@ -1440,6 +1458,40 @@ Vector<Number>::swap (Vector<Number> &v)
 }
 
 
+
+template <typename Number>
+template <class Archive>
+inline
+void
+Vector<Number>::save (Archive & ar, const unsigned int) const
+{
+                                     // forward to serialization
+                                     // function in the base class.
+  ar &  static_cast<const Subscriptor &>(*this);
+  
+  ar & vec_size & max_vec_size ;
+  ar & boost::serialization::make_array(val, max_vec_size);
+}
+
+
+
+template <typename Number>
+template <class Archive>
+inline
+void
+Vector<Number>::load (Archive & ar, const unsigned int)
+{
+                                     // forward to serialization
+                                     // function in the base class.
+  ar &  static_cast<Subscriptor &>(*this);
+  
+  ar & vec_size & max_vec_size ;
+  
+  val = new Number[max_vec_size];
+  ar & boost::serialization::make_array(val, max_vec_size);
+}
+
+
 #endif
 
 
@@ -1487,6 +1539,7 @@ operator << (LogStream& os, const Vector<number>& v)
   v.print(os);
   return os;  
 }
+
 
 /*@}*/
 

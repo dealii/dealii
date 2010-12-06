@@ -363,6 +363,13 @@ class IndexSet
     DeclException1 (ExcIndexNotPresent, int,
 		    << "The global index " << arg1
 		    << " is not an element of this set.");
+		    
+                         /**
+                      * Write or read the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize (Archive & ar, const unsigned int version);
 
   private:
 				     /**
@@ -426,6 +433,13 @@ class IndexSet
 	  {
 	    return sizeof(Range);
 	  }
+	  
+                         /**
+                      * Write or read the data of this object to or 
+                      * from a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void serialize (Archive & ar, const unsigned int version);
 
     };
 
@@ -792,6 +806,21 @@ IndexSet::print (STREAM &out) const
   out << "}" << std::endl;
 }
 
+template <class Archive>
+inline
+void
+IndexSet::Range::serialize (Archive & ar, const unsigned int)
+{
+  ar & begin & end & nth_index_in_set;
+}
+   
+template <class Archive>
+inline
+void
+IndexSet::serialize (Archive & ar, const unsigned int)
+{
+  ar & ranges & is_compressed & index_space_size;
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

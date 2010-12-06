@@ -200,10 +200,22 @@ namespace Polynomials
                                         */
       Polynomial<number>& operator -= (const Polynomial<number>& p);
 
+    				                   /**
+				                        *  Test for equality of two polynomials.
+				                        */
+      bool operator == (const Polynomial<number> & p)  const;
+    
                                        /**
                                         * Print coefficients.
                                         */
       void print(std::ostream& out) const;
+      
+                                       /**
+                                        * Write or read the data of this object to or 
+                                        * from a stream for the purpose of serialization.
+                                        */ 
+      template <class Archive>
+      void serialize (Archive & ar, const unsigned int version);
 
     protected:
 
@@ -629,6 +641,21 @@ namespace Polynomials
 
     return value;
   }
+  
+
+
+  template <typename number>
+  template <class Archive>
+  inline
+  void
+  Polynomial<number>::serialize (Archive & ar, const unsigned int)
+  {
+                                     // forward to serialization
+                                     // function in the base class.
+    ar &  static_cast<Subscriptor &>(*this);
+    ar & coefficients;
+  }
+
 }
 DEAL_II_NAMESPACE_CLOSE
 

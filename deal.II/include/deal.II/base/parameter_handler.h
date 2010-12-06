@@ -20,6 +20,7 @@
 #include <base/std_cxx1x/shared_ptr.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <map>
 #include <vector>
@@ -2028,6 +2029,27 @@ class ParameterHandler : public Subscriptor
 				      */
     unsigned int memory_consumption () const;
 
+                         /**
+                      * Write the data of this object to 
+                      * a stream for the purpose of serialization.
+                      */ 
+   template <class Archive>
+   void save (Archive & ar, const unsigned int version) const;
+
+                         /**
+                      * Read the data of this object
+                      * from a stream for the purpose of serialization.
+                      */    
+   template <class Archive>
+   void load (Archive & ar, const unsigned int version);
+
+   BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+                         /**
+	                  * Test for equality.
+                      */
+   bool operator == (const ParameterHandler & prm2)  const;
+    
 				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -2577,6 +2599,61 @@ class MultipleParameterLoop : public ParameterHandler
     void fill_entry_values (const unsigned int run_no);
 };
 
+
+template <class Archive>
+inline
+void 
+ParameterHandler::save (Archive & ar, const unsigned int) const
+{
+                                       // Forward to serialization
+                                       // function in the base class.
+  ar &  static_cast<const Subscriptor &>(*this);
+
+  ar & *entries.get();
+
+  std::vector<std::string> descriptions;
+
+  for (unsigned int j=0; j<patterns.size(); ++j)
+    descriptions.push_back (patterns[j]->description());
+
+  ar & descriptions;
+}
+
+   
+template <class Archive>
+inline
+void 
+ParameterHandler::load (Archive & ar, const unsigned int)
+{
+                                       // Forward to serialization
+                                       // function in the base class.
+  ar &  static_cast<Subscriptor &>(*this);
+
+  ar & *entries.get();
+
+  std::vector<std::string> descriptions;
+  ar & descriptions;
+
+  patterns.clear ();
+  for (unsigned int j=0; j<descriptions.size(); ++j)
+    patterns.push_back (std_cxx1x::shared_ptr<Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
+}
+
+inline
+bool 
+ParameterHandler::operator == (const ParameterHandler & prm2)  const
+{
+  if(patterns.size() != prm2.patterns.size())
+    return false;
+    
+  for(unsigned int j=0; j<patterns.size(); ++j)
+    if (patterns[j]->description() != prm2.patterns[j]->description())
+      return false;
+      
+  // return !(*entries != *(prm2.entries));
+  return true;
+  // TODO: Fix
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

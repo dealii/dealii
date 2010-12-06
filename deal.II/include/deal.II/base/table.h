@@ -532,6 +532,11 @@ class TableBase : public Subscriptor
                                       */
     template<typename T2>
     TableBase<N,T>& operator = (const TableBase<N,T2> &src);
+    
+                                     /**
+	                                  *  Test for equality of two tables.
+                                      */
+    bool operator == (const TableBase<N,T> & T2)  const;
 
                                      /**
                                       * Set all entries to their
@@ -645,6 +650,13 @@ class TableBase : public Subscriptor
                                       * of this object.
                                       */
     unsigned int memory_consumption () const;
+
+                                     /**
+                                      * Write or read the data of this object to or 
+                                      * from a stream for the purpose of serialization.
+                                      */ 
+    template <class Archive>
+    void serialize (Archive & ar, const unsigned int version);
 
   protected:
                                      /**
@@ -1739,6 +1751,19 @@ TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
 
 
 
+template <int N, typename T>
+template <class Archive>
+inline
+void
+TableBase<N,T>::serialize (Archive & ar, const unsigned int)
+{
+  ar & static_cast<Subscriptor &>(*this);
+  
+  ar & values & table_size;
+}
+
+
+
 namespace internal
 {
   namespace TableBaseAccessors
@@ -1919,6 +1944,15 @@ TableBase<N,T>::operator = (const TableBase<N,T2>& m)
     std::copy (&m.values[0], &m.values[n_elements()], &values[0]);
 
   return *this;
+}
+
+
+template <int N, typename T>
+inline
+bool 
+TableBase<N,T>::operator == (const TableBase<N,T> & T2)  const
+{
+  return (values == T2.values);
 }
 
 
@@ -2713,7 +2747,6 @@ Table<4,T>::operator () (const TableIndices<4> &indices)
 {
   return TableBase<4,T>::operator () (indices);
 }
-
 
 
 
