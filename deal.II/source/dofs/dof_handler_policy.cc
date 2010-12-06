@@ -65,43 +65,26 @@ namespace internal
 	    {
 
 					       // distribute dofs of vertices
-	      for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
-		{
-		  typename DoFHandler<1,spacedim>::cell_iterator
-		    neighbor = cell->neighbor(v);
-
-		  if (neighbor.state() == IteratorState::valid)
-		    {
-						       // find true neighbor; may be its
-						       // a child of @p{neighbor}
-		      while (neighbor->has_children())
-			neighbor = neighbor->child(v==0 ? 1 : 0);
-
-						       // has neighbor already been processed?
-		      if (neighbor->user_flag_set())
-							 // copy dofs
+	      if (dof_handler.get_fe().dofs_per_vertex > 0)
+		for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
+		  {
+		    if (cell->vertex_dof_index (v,0) ==
+			DoFHandler<1,spacedim>::invalid_dof_index)
+		      for (unsigned int d=0;
+			   d<dof_handler.get_fe().dofs_per_vertex; ++d)
 			{
-			  if (v==0)
-			    for (unsigned int d=0;
-				 d<dof_handler.get_fe().dofs_per_vertex; ++d)
-			      cell->set_vertex_dof_index (0, d,
-							  neighbor->vertex_dof_index (1, d));
-			  else
-			    for (unsigned int d=0;
-				 d<dof_handler.get_fe().dofs_per_vertex; ++d)
-			      cell->set_vertex_dof_index (1, d,
-							  neighbor->vertex_dof_index (0, d));
-
-							   // next neighbor
-			  continue;
+			  Assert ((cell->vertex_dof_index (v,d) ==
+				   DoFHandler<1,spacedim>::invalid_dof_index),
+				  ExcInternalError());
+			  cell->set_vertex_dof_index (v, d, next_free_dof++);
 			}
-		    }
-
-						   // otherwise: create dofs newly
-		  for (unsigned int d=0;
-		       d<dof_handler.get_fe().dofs_per_vertex; ++d)
-		    cell->set_vertex_dof_index (v, d, next_free_dof++);
-		}
+		    else
+		      for (unsigned int d=0;
+			   d<dof_handler.get_fe().dofs_per_vertex; ++d)
+			Assert ((cell->vertex_dof_index (v,d) !=
+				 DoFHandler<1,spacedim>::invalid_dof_index),
+				ExcInternalError());
+		  }
 
 					       // dofs of line
 	      for (unsigned int d=0;
@@ -1558,7 +1541,7 @@ namespace internal
 			       &number_cache
 			       .n_locally_owned_dofs_per_processor[n_cpus],
 			       0 );
-	  
+
 	  tr->load_user_flags(user_flags);
 	}
 #endif
