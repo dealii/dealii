@@ -678,11 +678,13 @@ namespace TrilinosWrappers
 
     if (copy_values == true)
       {
+				// point to the first data entry in the two
+				// matrices and copy the content
 	const TrilinosScalar * in_values = input_matrix[0];
 	TrilinosScalar * values = (*matrix)[0];
 	const unsigned int my_nonzeros = input_matrix.NumMyNonzeros();
-	for (unsigned int i=0; i<my_nonzeros; ++i)
-	  values[i] = in_values[0];
+	std::memcpy (&values[0], &in_values[0],
+		     my_nonzeros*sizeof (TrilinosScalar));
       }
 
     compress();
