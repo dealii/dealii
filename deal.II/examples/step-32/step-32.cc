@@ -300,52 +300,6 @@ namespace LinearSolvers
       const PreconditionerMp &mp_preconditioner;
       const PreconditionerA  &a_preconditioner;
   };
-
-  template <class PreconditionerA, class PreconditionerMp>
-  class BlockSchurPreconditioner : public Subscriptor
-  {
-    public:
-      BlockSchurPreconditioner (
-	const TrilinosWrappers::BlockSparseMatrix  &S,
-	const PreconditionerMp                     &Mppreconditioner,
-	const PreconditionerA                      &Apreconditioner);
-
-      void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
-		  const TrilinosWrappers::MPI::BlockVector &src) const;
-
-    private:
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
-      const PreconditionerMp &mp_preconditioner;
-      const PreconditionerA  &a_preconditioner;
-      mutable TrilinosWrappers::MPI::Vector tmp;
-  };
-
-
-
-  template <class PreconditionerA, class PreconditionerMp>
-  BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-  BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
-			   const PreconditionerMp                    &Mppreconditioner,
-			   const PreconditionerA                     &Apreconditioner)
-		  :
-		  stokes_matrix     (&S),
-		  mp_preconditioner (Mppreconditioner),
-		  a_preconditioner  (Apreconditioner),
-		  tmp               (stokes_matrix->block(1,1).row_partitioner())
-  {}
-
-
-
-  template <class PreconditionerA, class PreconditionerMp>
-  void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-    TrilinosWrappers::MPI::BlockVector       &dst,
-    const TrilinosWrappers::MPI::BlockVector &src) const
-  {
-    a_preconditioner.vmult (dst.block(0), src.block(0));
-    stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
-    tmp *= -1;
-    mp_preconditioner.vmult (dst.block(1), tmp);
-  }
 }
 
 
@@ -2753,14 +2707,10 @@ void BoussinesqFlowProblem<dim>::solve ()
   computing_timer.enter_section ("   Solve Stokes system");
 
   {
-    const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                                                  TrilinosWrappers::PreconditionILU>
-      preconditioner (stokes_matrix, *Mp_preconditioner, *Amg_preconditioner);
-
     const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
       TrilinosWrappers::PreconditionILU>
-      preconditioner_right (stokes_matrix, stokes_preconditioner_matrix,
-			    *Mp_preconditioner, *Amg_preconditioner);
+      preconditioner (stokes_matrix, stokes_preconditioner_matrix,
+		      *Mp_preconditioner, *Amg_preconditioner);
 
     TrilinosWrappers::MPI::BlockVector
       distributed_stokes_solution (stokes_rhs);
@@ -2785,7 +2735,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 	solver(solver_control, mem,
 	       SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(50, true));
       solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
-		   preconditioner_right);
+		   preconditioner);
     }
     stokes_constraints.distribute (distributed_stokes_solution);
 				     //stokes_solution = distributed_stokes_solution;
