@@ -54,7 +54,7 @@ void test(std::string filename, unsigned int degree = 1)
 {
   Triangulation<dim, spacedim> triangulation;
   GridIn<dim, spacedim> gi;
-  
+
   gi.attach_triangulation (triangulation);
   std::ifstream in (filename.c_str());
   gi.read_ucd (in);
@@ -63,10 +63,10 @@ void test(std::string filename, unsigned int degree = 1)
 				// projection
   const FE_Q<dim,spacedim> fe (degree);
   const MappingQ<dim, spacedim> mapping(degree);
-  
+
   DoFHandler<dim,spacedim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
-  
+
   deallog
       << "no. of cells "<< triangulation.n_cells() <<std::endl;
   deallog
@@ -88,7 +88,7 @@ void test(std::string filename, unsigned int degree = 1)
   // if(spacedim==3)
   //     exp[2]=0;
   // Functions::Monomial<spacedim> the_function(exp);
-  
+
   const QGauss<dim> quad(2*fe.degree+1);
   ConstraintMatrix constraints;
   constraints.close();
@@ -97,8 +97,8 @@ void test(std::string filename, unsigned int degree = 1)
 
   deallog << "L2 norm of projected vector: "
 	  << projected_one.l2_norm() << endl;
-  
-  
+
+
 				// compute the H1 difference
   Vector<float> difference_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (dof_handler, projected_one,
@@ -114,7 +114,7 @@ int main ()
 {
   logfile.precision (4);
   deallog.attach(logfile);
-  deallog.depth_console(3);
+  deallog.depth_console(0);
   deallog.threshold_double(1.e-12);
 
     deallog<<"Test <1,2>, Q1, Q2, Q3"<<std::endl;
