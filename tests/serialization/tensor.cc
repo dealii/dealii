@@ -24,7 +24,7 @@
 
 
 template <typename T>
-void verify (T &t1,
+void verify (const T &t1,
 	     T &t2)
 {
 				   // save data to archive
