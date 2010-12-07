@@ -2832,19 +2832,14 @@ inline
 unsigned int
 CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
 {
-  if (dim==1)
-    return neighbor_of_neighbor(neighbor);
+  const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
+  if (n2!=numbers::invalid_unsigned_int)
+				     // return this value as the
+				     // neighbor is not coarser
+    return n2;
   else
-    {
-      const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
-      if (n2!=numbers::invalid_unsigned_int)
-					 // return this value as the
-					 // neighbor is not coarser
-	return n2;
-      else
-					 // the neighbor is coarser
-	return neighbor_of_coarser_neighbor(neighbor).first;
-    }
+				     // the neighbor is coarser
+    return neighbor_of_coarser_neighbor(neighbor).first;
 }
 
 DEAL_II_NAMESPACE_CLOSE

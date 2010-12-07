@@ -1322,7 +1322,16 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 {
   AssertIndexRange (neighbor, GeometryInfo<dim>::faces_per_cell);
 
-  if (dim==1)
+				   // if we have a 1d mesh in 1d, we
+				   // can assume that the left
+				   // neighbor of the right neigbor is
+				   // the current cell. but that is an
+				   // invariant that isn't true if the
+				   // mesh is embedded in a higher
+				   // dimensional space, so we have to
+				   // fall back onto the generic code
+				   // below
+  if ((dim==1) && (spacedim==dim))
     return GeometryInfo<dim>::opposite_face[neighbor];
 
   const TriaIterator<CellAccessor<dim, spacedim> > neighbor_cell = this->neighbor(neighbor);
@@ -1375,7 +1384,8 @@ template <int dim, int spacedim>
 unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor (const unsigned int neighbor) const
 {
   const unsigned int n2=neighbor_of_neighbor_internal(neighbor);
-  Assert (n2!=numbers::invalid_unsigned_int, TriaAccessorExceptions::ExcNeighborIsCoarser());
+  Assert (n2!=numbers::invalid_unsigned_int,
+	  TriaAccessorExceptions::ExcNeighborIsCoarser());
 
   return n2;
 }
