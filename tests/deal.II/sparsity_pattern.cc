@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,27 +34,6 @@
 #include <fe/fe_system.h>
 
 #include <fstream>
-
-
-
-bool operator == (const SparsityPattern &sp1,
-		  const SparsityPattern &sp2)
-{
-  if (sp1.n_nonzero_elements() != sp2.n_nonzero_elements())
-    return false;
-  
-  for (unsigned int i=0; i<sp1.n_nonzero_elements(); ++i)
-    if (sp1.get_column_numbers()[i] !=
-	sp2.get_column_numbers()[i])
-      return false;
-
-  for (unsigned int i=0; i<sp1.n_rows(); ++i)
-    if (sp1.get_rowstart_indices()[i] !=
-	sp2.get_rowstart_indices()[i])
-      return false;
-  
-  return true;
-}
 
 
 
