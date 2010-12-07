@@ -2086,16 +2086,26 @@ inline
 bool 
 SparsityPattern::operator == (const SparsityPattern& sp2)  const
 {
-  if (max_dim != sp2.max_dim || rows != sp2.rows || cols != sp2.cols ||
-      max_vec_len != sp2.max_vec_len || max_row_length != sp2.max_row_length ||
-      compressed != sp2.compressed || diagonal_optimized != sp2.diagonal_optimized)
+				   // it isn't quite necessary to
+				   // compare *all* member
+				   // variables. by only comparing the
+				   // essential ones, we can say that
+				   // two sparsity patterns are equal
+				   // even if one is compressed and
+				   // the other is not (in which case
+				   // some of the member variables are
+				   // not yet set correctly)
+  if (rows != sp2.rows ||
+      cols != sp2.cols ||
+      compressed != sp2.compressed ||
+      diagonal_optimized != sp2.diagonal_optimized)
     return false;
   
-  for (unsigned int i = 0; i < max_dim+1; ++i)
+  for (unsigned int i = 0; i < rows+1; ++i)
     if (rowstart[i] != sp2.rowstart[i])
       return false;
   
-  for (unsigned int i = 0; i < max_vec_len; ++i)
+  for (unsigned int i = 0; i < rowstart[rows]; ++i)
     if (colnums[i] != sp2.colnums[i])
       return false;
       
