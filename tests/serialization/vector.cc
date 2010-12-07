@@ -21,15 +21,15 @@ void test ()
 {
   unsigned int n = 5;
   
-  Vector<int> v1(n);
-  Vector<int> v2(n);
+  Vector<double> v1(n);
+  Vector<double> v2(n);
   
-  Vector<int> v3;
+  Vector<double> v3;
   
   for (unsigned int i = 0; i<n; ++i)
   {
-    v1(i) = i;
-    v2(i) = i + n;
+    v1(i) = i*1.;
+    v2(i) = i*1. + n*1.;
   }
    
 
