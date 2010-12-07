@@ -94,10 +94,18 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>New: A significant number of classes, primarily in the
+  <code>base/<code> subdirectory, now provide the necessary member functions
+  for serialization through BOOST's serialization library.
+  <br>
+  (Pradeep Rao, WB, 2010/12/06)
+  </p></li>
+
   <li><p>Fixed: A good number of problems associated with meshes that are
   embedded in a higher space dimension (i.e. where <code>dim @< spacedim</code>)
   are now fixed.
-  <br> (Sebastian Pauletti, Andrea Bonito, Luca Heltai, WB, 2010/12/06)
+  <br>
+  (Sebastian Pauletti, Andrea Bonito, Luca Heltai, WB, 2010/12/06)
   </p></li>
 
   <li><p>Updated: The version of the <a href="http://www.threadingbuildingblocks.org">Threading
