@@ -94,6 +94,12 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>Fixed: A good number of problems associated with meshes that are
+  embedded in a higher space dimension (i.e. where <code>dim @< spacedim</code>)
+  are now fixed.
+  <br> (Sebastian Pauletti, Andrea Bonito, Luca Heltai, WB, 2010/12/06)
+  </p></li>
+
   <li><p>Updated: The version of the <a href="http://www.threadingbuildingblocks.org">Threading
   Building Blocks (TBB)</a> shipped with deal.II has been updated
   to release 3.0 Update 3 (Commercially aligned version).
