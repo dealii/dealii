@@ -94,30 +94,6 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
-  <li><p>New: When computing errors using
-  VectorTools::integrate_difference in codimension one problems, if
-  you specified a norm that requires the computation of the gradients,
-  you'd get in trouble, because on codimension one manifolds we only
-  have information on the <em>tangential</em> gradient. This is now
-  fixed, by discarding the normal component of the provided function,
-  before computing the difference with the finite element function.
-  <br>
-  (Luca Heltai, 2010/12/05)
-  </p></li>
-  
-  <li><p>New: We now have a new tutorial program (step-38), written by
-  Andrea Bonito, to compute the Laplace Beltrami operator on
-  a half sphere.
-  <br> (Luca Heltai, 2010/12/03)
-  </p></li>
-
-  <li><p>New: Added a new constructor for PETScWrappers::Vector that takes
-  an existing PETSc Vec that was created by the user and is only wrapped for
-  usage.
-  <br>
-  (TH, 2010/12/03)
-  </p></li>
-
   <li><p>Updated: The version of the <a href="http://www.threadingbuildingblocks.org">Threading
   Building Blocks (TBB)</a> shipped with deal.II has been updated
   to release 3.0 Update 3 (Commercially aligned version).
@@ -360,6 +336,13 @@ independent of the dimension.
 <h3>lac</h3>
 
 <ol>
+  <li><p>New: Added a new constructor for PETScWrappers::Vector that takes
+  an existing PETSc Vec that was created by the user and is only wrapped for
+  usage.
+  <br>
+  (TH, 2010/12/03)
+  </p></li>
+
   <li><p>New: When Hypre is available as a sub-package of PETSc, the new class
   PETScWrappers::PreconditionBoomerAMG provides the BoomerAMG implementation
   of the algebraic multigrid method of the Hypre package as a preconditioner.
@@ -410,6 +393,17 @@ independent of the dimension.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: When computing errors using
+  VectorTools::integrate_difference in codimension one problems, if
+  you specified a norm that requires the computation of the gradients,
+  you'd get in trouble, because on codimension one manifolds we only
+  have information on the <em>tangential</em> gradient. This is now
+  fixed, by discarding the normal component of the provided function,
+  before computing the difference with the finite element function.
+  <br>
+  (Luca Heltai, 2010/12/05)
+  </p></li>
+  
   <li><p>New: The VectorTools::interpolate_boundary_values function can now
   also be used to interpolate boundary values on meshes embedded in a higher
   dimensional space.
