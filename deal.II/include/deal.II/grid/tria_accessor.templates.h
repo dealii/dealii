@@ -2445,8 +2445,7 @@ CellAccessor<dim,spacedim>::face_index (const unsigned int i) const
     {
       case 1:
       {
-	Assert (false, ExcImpossibleInDim(1));
-	return numbers::invalid_unsigned_int;
+	return this->vertex_index(i);
       }
 
       case 2:

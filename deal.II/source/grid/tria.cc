@@ -4408,7 +4408,8 @@ namespace internal
 							     // set neighbor to
 							     // cell on same
 							     // level
-			    first_child->set_neighbor (0, cell->neighbor(0)->child(1));
+			    const unsigned int nbnb = cell->neighbor_of_neighbor (0);
+			    first_child->set_neighbor (0, cell->neighbor(0)->child(nbnb));
 
 							     // reset neighbor
 							     // info of all
@@ -4419,8 +4420,8 @@ namespace internal
 			      left_neighbor = cell->neighbor(0);
 			    while (left_neighbor->has_children())
 			      {
-				left_neighbor = left_neighbor->child(1);
-				left_neighbor->set_neighbor (1, first_child);
+				left_neighbor = left_neighbor->child(nbnb);
+				left_neighbor->set_neighbor (nbnb, first_child);
 			      }
 			  }
 
@@ -4446,14 +4447,15 @@ namespace internal
 							   // refined same as
 							   // above
 			  {
-			    second_child->set_neighbor (1, cell->neighbor(1)->child(0));
+			    const unsigned int nbnb = cell->neighbor_of_neighbor (1);
+			    second_child->set_neighbor (1, cell->neighbor(1)->child(nbnb));
 
 			    typename Triangulation<dim,spacedim>::cell_iterator
 			      right_neighbor = cell->neighbor(1);
 			    while (right_neighbor->has_children())
 			      {
-				right_neighbor = right_neighbor->child(0);
-				right_neighbor->set_neighbor (0, second_child);
+				right_neighbor = right_neighbor->child(nbnb);
+				right_neighbor->set_neighbor (nbnb, second_child);
 			      }
 			  }
 		    }

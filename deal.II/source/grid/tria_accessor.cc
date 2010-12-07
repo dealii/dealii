@@ -1349,7 +1349,6 @@ unsigned int CellAccessor<dim,spacedim>::neighbor_of_neighbor_internal (const un
 				   // cases. look up this relationship
 				   // in the table provided by
 				   // GeometryInfo and try it
-
   const unsigned int this_face_index=face_index(neighbor);
 
   const unsigned int neighbor_guess

@@ -2161,10 +2161,11 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * Return the (global) index of the
 				      * @p ith face of this cell.
 				      *
-				      * This function is not
-				      * implemented in 1D, and maps to
-				      * line_index in 2D and quad_index
-				      * in 3D.
+				      * This function returns the
+				      * vertex_index() of the adjacent
+				      * vertex in 1D, and maps to
+				      * line_index() in 2D and
+				      * quad_index() in 3D.
 				      */
     unsigned int
     face_index (const unsigned int i) const;

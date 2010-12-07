@@ -1,0 +1,33 @@
+
+DEAL::Cell=2.0
+DEAL::   neighbors: 2.8 2.1
+DEAL::Cell=2.1
+DEAL::   neighbors: 2.0 2.2
+DEAL::Cell=2.2
+DEAL::   neighbors: 2.1 2.3
+DEAL::Cell=2.3
+DEAL::   neighbors: 2.2 2.12
+DEAL::Cell=2.4
+DEAL::   neighbors: 2.11 2.5
+DEAL::Cell=2.5
+DEAL::   neighbors: 2.4 2.6
+DEAL::Cell=2.6
+DEAL::   neighbors: 2.5 2.7
+DEAL::Cell=2.7
+DEAL::   neighbors: 2.6 2.15
+DEAL::Cell=2.8
+DEAL::   neighbors: 2.0 2.9
+DEAL::Cell=2.9
+DEAL::   neighbors: 2.8 2.10
+DEAL::Cell=2.10
+DEAL::   neighbors: 2.9 2.11
+DEAL::Cell=2.11
+DEAL::   neighbors: 2.10 2.4
+DEAL::Cell=2.12
+DEAL::   neighbors: 2.3 2.13
+DEAL::Cell=2.13
+DEAL::   neighbors: 2.12 2.14
+DEAL::Cell=2.14
+DEAL::   neighbors: 2.13 2.15
+DEAL::Cell=2.15
+DEAL::   neighbors: 2.14 2.7
