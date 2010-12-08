@@ -1958,6 +1958,32 @@ ParameterHandler::memory_consumption () const
 
 
 
+bool
+ParameterHandler::operator == (const ParameterHandler & prm2)  const
+{
+  if(patterns.size() != prm2.patterns.size())
+    return false;
+
+  for(unsigned int j=0; j<patterns.size(); ++j)
+    if (patterns[j]->description() != prm2.patterns[j]->description())
+      return false;
+
+				   // instead of walking through all
+				   // the nodes of the two trees
+				   // entries and prm2.entries and
+				   // comparing them for equality,
+				   // simply dump the content of the
+				   // entire structure into a string
+				   // and compare those for equality
+  std::ostringstream o1, o2;
+  write_json (o1, *entries);
+  write_json (o2, *prm2.entries);
+  return (o1.str() == o2.str());
+}
+
+
+
+
 MultipleParameterLoop::UserClass::~UserClass ()
 {}
 

@@ -148,11 +148,11 @@ namespace Patterns
   };
 
                        /**
-                    * Returns pointer to the correct 
+                    * Returns pointer to the correct
                     * derived class based on description.
                     */
   PatternBase * pattern_factory (const std::string& description);
-  
+
 				   /**
                                     * Test for the string being an
                                     * integer. If bounds are given
@@ -259,14 +259,14 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                        /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
+                    */
       static Integer* create (const std::string& description);
 
     private:
@@ -407,14 +407,14 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                        /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
+                    */
       static Double* create (const std::string& description);
 
     private:
@@ -508,14 +508,14 @@ namespace Patterns
 					* bytes) of this object.
 					*/
       unsigned int memory_consumption () const;
-      
+
                        /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
+                    */
       static Selection* create (const std::string& description);
 
     private:
@@ -608,14 +608,14 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                        /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
+                    */
       static List* create (const std::string& description);
 
 				       /**
@@ -723,14 +723,14 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                        /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
+                    */
       static MultipleSelection* create (const std::string& description);
 
 				       /**
@@ -789,7 +789,7 @@ namespace Patterns
 					* match.
 					*/
       virtual std::string description () const;
-      
+
 				       /**
 					* Return a copy of the
 					* present object, which is
@@ -800,16 +800,16 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                              /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
-      static Bool* create (const std::string& description);      
-      
+                    */
+      static Bool* create (const std::string& description);
+
     private:
 				       /**
 					* Initial part of description
@@ -859,16 +859,16 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                              /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
+                    */
       static Anything* create (const std::string& description);
-      
+
     private:
 				       /**
 					* Initial part of description
@@ -950,15 +950,15 @@ namespace Patterns
 					* file type flag
 					*/
       FileType  file_type;
-      
+
                              /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
-      static FileName* create (const std::string& description);      
+                    */
+      static FileName* create (const std::string& description);
 
     private:
 				       /**
@@ -1020,15 +1020,15 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-      
+
                              /**
                     * Creates new object if the start
                     * of description matches description_init.
-                    * Ownership of that object is 
+                    * Ownership of that object is
                     * transferred to the caller of this
 					* function.
-                    */      
-      static DirectoryName* create (const std::string& description);      
+                    */
+      static DirectoryName* create (const std::string& description);
 
     private:
 				       /**
@@ -2030,16 +2030,16 @@ class ParameterHandler : public Subscriptor
     unsigned int memory_consumption () const;
 
                          /**
-                      * Write the data of this object to 
+                      * Write the data of this object to
                       * a stream for the purpose of serialization.
-                      */ 
+                      */
    template <class Archive>
    void save (Archive & ar, const unsigned int version) const;
 
                          /**
                       * Read the data of this object
                       * from a stream for the purpose of serialization.
-                      */    
+                      */
    template <class Archive>
    void load (Archive & ar, const unsigned int version);
 
@@ -2049,7 +2049,7 @@ class ParameterHandler : public Subscriptor
 	                  * Test for equality.
                       */
    bool operator == (const ParameterHandler & prm2)  const;
-    
+
 				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -2602,7 +2602,7 @@ class MultipleParameterLoop : public ParameterHandler
 
 template <class Archive>
 inline
-void 
+void
 ParameterHandler::save (Archive & ar, const unsigned int) const
 {
                                        // Forward to serialization
@@ -2619,10 +2619,10 @@ ParameterHandler::save (Archive & ar, const unsigned int) const
   ar & descriptions;
 }
 
-   
+
 template <class Archive>
 inline
-void 
+void
 ParameterHandler::load (Archive & ar, const unsigned int)
 {
                                        // Forward to serialization
@@ -2639,21 +2639,6 @@ ParameterHandler::load (Archive & ar, const unsigned int)
     patterns.push_back (std_cxx1x::shared_ptr<Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
 
-inline
-bool 
-ParameterHandler::operator == (const ParameterHandler & prm2)  const
-{
-  if(patterns.size() != prm2.patterns.size())
-    return false;
-    
-  for(unsigned int j=0; j<patterns.size(); ++j)
-    if (patterns[j]->description() != prm2.patterns[j]->description())
-      return false;
-      
-  // return !(*entries != *(prm2.entries));
-  return true;
-  // TODO: Fix
-}
 
 DEAL_II_NAMESPACE_CLOSE
 
