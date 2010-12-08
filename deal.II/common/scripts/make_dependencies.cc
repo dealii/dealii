@@ -46,6 +46,7 @@
 #include <vector>
 #include <cassert>
 #include <cstdlib>
+#include <sys/stat.h>
 
                                  // base path for object files,
                                  // including trailing slash if
@@ -177,18 +178,33 @@ void determine_direct_includes (const std::string &file)
             for (std::vector<std::string>::const_iterator
                    include_dir=include_directories.begin();
                  include_dir!=include_directories.end(); ++include_dir)
-              if (std::ifstream((*include_dir+included_file).c_str()))
-                {
-                  included_file = *include_dir+included_file;
-                  break;
-                }
+	      {
+		struct stat buf;
+		int error = stat ((*include_dir+included_file).c_str(), &buf);
+
+		if ((error == 0) &&
+		    S_ISREG(buf.st_mode))
+		  {
+		    included_file = *include_dir+included_file;
+		    break;
+		  }
+	      }
         }
 
-                                       // make sure the file
-                                       // exists, otherwise just
-                                       // ignore the line
-      if (!std::ifstream(included_file.c_str()))
-        continue;
+                                       // make sure the file exists
+                                       // and that we can read from
+                                       // it, otherwise just ignore
+                                       // the line
+      {
+	struct stat buf;
+	int error = stat (included_file.c_str(), &buf);
+
+	if ((error != 0) ||
+	    !S_ISREG(buf.st_mode))
+	  continue;
+      }
+
+
 
                                        // ok, so we did find an
                                        // appropriate file. add it to
