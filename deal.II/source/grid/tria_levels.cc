@@ -51,6 +51,11 @@ namespace internal
                                 total_cells - subdomain_ids.size(),
                                 0);
 
+	  direction_flags.reserve (total_cells);
+          direction_flags.insert (direction_flags.end(),
+				  total_cells - direction_flags.size(),
+				  true);
+
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
                           (total_cells + 1) / 2 - parents.size (),
@@ -91,6 +96,11 @@ namespace internal
 	      subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("subdomain_ids",
                                subdomain_ids.size(), subdomain_ids.capacity()));
+      Assert (direction_flags.size() <=
+	      direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              ExcMemoryWasted ("direction_flags",
+                               direction_flags.size(), direction_flags.capacity()));
+
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
               ExcMemoryInexact (refine_flags.size(), neighbors.size()));
       Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),

@@ -2610,6 +2610,25 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * object.
 				      */
     void recursively_set_subdomain_id (const types::subdomain_id_t new_subdomain_id) const;
+                                     /**
+				      * @}
+				      */
+                                     
+                                     /**
+				      *  @name Dealing with codim 1 cell orientation
+				      */
+				     /**
+				      * @{
+				      */
+
+				     /**
+				      * Return the orientation of
+				      * this cell.
+				      *
+				      */
+    bool direction_flag () const;
+
+				     
 
 				     /**
 				      *  Return an iterator to the
@@ -2790,7 +2809,12 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
     unsigned int neighbor_of_neighbor_internal (const unsigned int neighbor) const;
 
   private:
-
+				     /**
+				      * Set the orientation of this
+				      * cell.
+				      *
+				      */
+    void set_direction_flag (const bool new_direction_flag) const;
     				     /**
 				      *  Copy operator. This is
 				      *  normally used in a context
@@ -2812,6 +2836,11 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      *  anyway.
 				      */
     void operator = (const CellAccessor<dim, spacedim> &);
+
+    template <int, int> friend class Triangulation;
+
+    friend class internal::Triangulation::Implementation;
+    
 };
 
 

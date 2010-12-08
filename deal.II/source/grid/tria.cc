@@ -12,6 +12,8 @@
 //---------------------------------------------------------------------------
 
 #include <base/memory_consumption.h>
+#include <base/table.h>
+
 #include <grid/tria.h>
 #include <grid/tria_levels.h>
 #include <grid/tria_faces.h>
@@ -23,10 +25,12 @@
 #include <grid/magic_numbers.h>
 #include <fe/mapping_q1.h>
 #include <lac/vector.h>
+#include <lac/full_matrix.h>
 
 #include <algorithm>
 #include <numeric>
 #include <map>
+#include <list>
 #include <cmath>
 #include <functional>
 
@@ -4177,7 +4181,7 @@ namespace internal
 						 // properties
 		subcells[i]->set_material_id (cell->material_id());
 		subcells[i]->set_subdomain_id (cell->subdomain_id());
-
+	
 		if (i%2==0)
 		  subcells[i]->set_parent (cell->index ());
 	      }
@@ -4196,6 +4200,11 @@ namespace internal
 					     // refinement flag was
 					     // already cleared at the
 					     // beginning of this function
+
+	    if (dim < spacedim)
+	      for (unsigned int c=0; c<n_children; ++c)
+		cell->child(c)->set_direction_flag (cell->direction_flag());  
+	  
 	  }
 
 
@@ -4374,6 +4383,8 @@ namespace internal
 							 next_unused_vertex));
 		      first_child->set_material_id (cell->material_id());
 		      first_child->set_subdomain_id (cell->subdomain_id());
+		      first_child->set_direction_flag (cell->direction_flag());
+
 		      first_child->set_parent (cell->index ());
 
 						       // reset neighborship info (refer
@@ -4433,6 +4444,8 @@ namespace internal
 		      second_child->set_neighbor (0, first_child);
 		      second_child->set_material_id (cell->material_id());
 		      second_child->set_subdomain_id (cell->subdomain_id());
+		      second_child->set_direction_flag (cell->direction_flag());
+
 		      if (cell->neighbor(1).state() != IteratorState::valid)
 			second_child->set_neighbor (1, cell->neighbor(1));
 		      else
@@ -9527,6 +9540,142 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
       AssertThrow (distorted_cells.distorted_cells.size() == 0,
 		   distorted_cells);
     }
+
+
+/*
+    When the triangulation is a manifold (dim < spacedim), the normal field
+    provided from the map class depends on the order of the vertices.
+    It may happen that this normal field is discontinous.
+    The following code takes care that this is not the case by setting the
+    cell direction flag on those cell that produce the wrong orientation.
+
+    To determine if 2 neighbours have the same or opposite orientation
+    we use a table of truth.
+    Its entries are indexes by the local indeces of the common face.
+    For example if two elements share a face, and this face is
+    face 0 for element 0 and face 1 for element 1, then
+    table(0,1) will tell wether the orientation are the same (true) or
+    oppositte (false).
+
+    Even though there may be a combinatorial/graph theory argument to get
+    this table in any dimension, I tested by hand all the different possible
+    cases in 1D and 2D to generate the table.
+
+    Assuming that a surface respects the standard orientation for 2d meshes,
+    the tables of truth are symmetric and their true values are the following
+    1D curves:  (0,1)
+    2D surface: (0,1),(0,2),(1,3),(2,3)
+
+    We store this data using an n_faces x n_faces full matrix, which is actually
+    much bigger than the minimal data required, but it makes the code more readable.
+    
+  */
+  if (dim < spacedim) {
+
+    Table<2,bool> correct(GeometryInfo< dim >::faces_per_cell,
+			  GeometryInfo< dim >::faces_per_cell);
+    switch (dim) 
+      {
+	case 1:
+	{
+	  bool values [][2] = {{false,true},
+			       {true,false} };
+	  for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
+	    for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)
+	      correct(i,j) = ( values[i][j]);
+	  break;
+	}
+	case 2:
+	{
+	  bool values [][4]= {{false,true ,true , false},
+			      {true ,false,false, true },
+			      {true ,false,false, true },
+			      {false,true ,true , false} };
+	  for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
+	    for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)
+	      correct(i,j) = ( values[i][j]);
+	  break;
+	}
+	default:
+	      Assert (false, ExcNotImplemented());
+      }
+  
+    
+    std::list<active_cell_iterator> this_round, next_round;
+    active_cell_iterator neighbor;
+
+    this_round.push_back (begin_active());
+    begin_active()->set_direction_flag (true);
+    begin_active()->set_user_flag ();
+
+    int round = 0, ncell=0;
+    
+    while (this_round.size() > 0) {
+      
+      for ( typename std::list<active_cell_iterator>::iterator cell = this_round.begin();
+	    cell != this_round.end(); ++cell) {
+	
+	for (unsigned int i = 0; i < GeometryInfo< dim >::faces_per_cell; ++i) 
+	  {
+	    if ( !((*cell)->face(i)->at_boundary()) )
+	      {
+		neighbor = (*cell)->neighbor(i);
+				
+		unsigned int cf = (*cell)->face_index(i);
+		unsigned int j = 0;
+		while(neighbor->face_index(j) != cf)
+		  {++j;}
+		 
+		if ( (correct(i,j) && !(*cell)->direction_flag())
+		     ||
+		     (!correct(i,j) && (*cell)->direction_flag()) )
+		  {
+		    if (neighbor->user_flag_set() == false)
+		      {
+			neighbor->set_direction_flag (false);
+			neighbor->set_user_flag ();
+			next_round.push_back (neighbor);
+		      }
+		    else 
+		      Assert (neighbor->direction_flag() == false,
+			      ExcNonOrientableTriangulation());
+		    
+		  }
+	      }
+	    
+	  }
+      }
+                
+//Before we quit let's check that if the triangulation is disconnected
+      if (next_round.size() == 0) {
+	for (active_cell_iterator cell = begin_active();
+	     cell != end(); ++cell)
+	  if (cell->user_flag_set() == false) {
+	    next_round.push_back (cell);
+	    cell->set_direction_flag (true);
+	    cell->set_user_flag ();
+	    break;
+	  }
+      }
+      
+      this_round = next_round;
+      next_round.clear();
+    }
+  }
+}
+
+
+
+
+template <int dim, int spacedim>
+void
+Triangulation<dim,spacedim>::
+flip_all_direction_flags()
+{
+  AssertThrow (dim+1 == spacedim, ExcMessage ("Only works for dim == spacedim-1"));
+  for (active_cell_iterator cell = begin_active();
+       cell != end(); ++cell)
+    cell->set_direction_flag (!cell->direction_flag());
 }
 
 

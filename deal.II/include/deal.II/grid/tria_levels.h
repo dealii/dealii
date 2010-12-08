@@ -145,7 +145,16 @@ namespace internal
                                           * index their parent has.
                                           */
         std::vector<int> parents;
-
+	
+					 /**
+					  * One bool per cell to indicate the
+					  * direction of the normal
+					  * true:  use orientation from vertex
+					  * false: revert the orientation.
+					  * It is used for codim==1 meshes
+					  */
+        std::vector<bool> direction_flags;
+	
                                          /**
                                           *  Reserve enough space to accomodate
                                           *  @p total_cells cells on this level.
@@ -161,6 +170,7 @@ namespace internal
                                           *  on the dimensions, you have to pass
                                           *  that additionally.
                                           */
+
         void reserve_space (const unsigned int total_cells,
                             const unsigned int dimension);
 
@@ -221,6 +231,7 @@ namespace internal
         std::vector<std::pair<int,int> > neighbors;
         std::vector<int> parents;
         std::vector<types::subdomain_id_t> subdomain_ids;
+        std::vector<bool> direction_flags; //not use; only needed to allow compilation
         void reserve_space (const unsigned int total_cells,
                             const unsigned int dimension);
         void monitor_memory (const unsigned int true_dimension) const;

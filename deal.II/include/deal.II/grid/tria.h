@@ -1777,6 +1777,12 @@ class Triangulation : public Subscriptor
       const std::vector<CellData<dim> > &cells,
       const SubCellData                 &subcelldata);
 
+/**
+   Revert or flip the direction_flags of a dim<spacedim triangulation.
+   For other dim==spacedim throws an exception.
+ */
+    void flip_all_direction_flags();
+    
 				     /**
 				      * Distort the grid by randomly
 				      * moving around all the vertices
@@ -3170,6 +3176,11 @@ class Triangulation : public Subscriptor
 		    int,
 		    << "You tried to do something on level " << arg1
 		    << ", but this level is empty.");
+				     /**
+				      * Exception
+				      * @ingroup Exceptions
+				      */
+    DeclException0 (ExcNonOrientableTriangulation);
 				     /*@}*/
   protected:
 				     /**
