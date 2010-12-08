@@ -145,10 +145,30 @@ class Subscriptor
 		   << "\" did subscribe to this object of class " << arg1);
 				     //@}
 
-                     /**
-                      * Read or write the data of this object to or 
-                      * from a stream for the purpose of serialization
-                      */ 
+				     /**
+				      * Read or write the data of this
+				      * object to or from a stream for
+				      * the purpose of serialization.
+				      *
+				      * This function does not
+				      * actually serialize any of the
+				      * member variables of this
+				      * class. The reason is that what
+				      * this class stores is only who
+				      * subscribes to this object, but
+				      * who does so at the time of
+				      * storing the contents of this
+				      * object does not necessarily
+				      * have anything to do with who
+				      * subscribes to the object when
+				      * it is restored. Consequently,
+				      * we do not want to overwrite
+				      * the subscribers at the time of
+				      * restoring, and then there is
+				      * no reason to write the
+				      * subscribers out in the first
+				      * place.
+				      */
     template <class Archive>
     void serialize(Archive & ar, const unsigned int version);
 
@@ -239,12 +259,13 @@ class Subscriptor
 
 template <class Archive>
 inline
-void 
-Subscriptor::serialize(Archive & ar, const unsigned int)
+void
+Subscriptor::serialize(Archive &,
+		       const unsigned int)
 {
-  ar & (unsigned int&)counter ;//& counter_map;
-  // TODO: Serialize counter_map
-}    
+				   // do nothing, as explained in the
+				   // documentation of this function
+}
 
 // If we are in optimized mode, the subscription checking is turned
 // off. Therefore, we provide inline definitions of subscribe and
