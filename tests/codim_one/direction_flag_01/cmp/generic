@@ -1,0 +1,21 @@
+
+DEAL::Cell=0.0, direction flag=true
+DEAL::Cell=0.1, direction flag=false
+DEAL::Cell=0.2, direction flag=false
+DEAL::Cell=0.3, direction flag=true
+DEAL::Cell=1.0
+DEAL::, direction flag=true
+DEAL::Cell=1.1
+DEAL::, direction flag=true
+DEAL::Cell=1.2
+DEAL::, direction flag=false
+DEAL::Cell=1.3
+DEAL::, direction flag=false
+DEAL::Cell=1.4
+DEAL::, direction flag=false
+DEAL::Cell=1.5
+DEAL::, direction flag=false
+DEAL::Cell=1.6
+DEAL::, direction flag=true
+DEAL::Cell=1.7
+DEAL::, direction flag=true
