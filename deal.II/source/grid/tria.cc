@@ -9555,7 +9555,7 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     For example if two elements share a face, and this face is
     face 0 for element 0 and face 1 for element 1, then
     table(0,1) will tell wether the orientation are the same (true) or
-    oppositte (false).
+    opposite (false).
 
     Even though there may be a combinatorial/graph theory argument to get
     this table in any dimension, I tested by hand all the different possible
@@ -9608,7 +9608,7 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     begin_active()->set_direction_flag (true);
     begin_active()->set_user_flag ();
 
-    int round = 0, ncell=0;
+    int round = 0;
     
     while (this_round.size() > 0) {
       
