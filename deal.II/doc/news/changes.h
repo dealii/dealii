@@ -95,7 +95,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
   <li><p>New: A significant number of classes, primarily in the
-  <code>base/<code> subdirectory, now provide the necessary member functions
+  <code>base/</code> subdirectory, now provide the necessary member functions
   for serialization through BOOST's serialization library.
   <br>
   (Pradeep Rao, WB, 2010/12/06)
