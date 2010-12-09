@@ -3263,6 +3263,12 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
 			 :
 			 CellSimilarity::none);
 
+  if ( (dim<spacedim) &&  (cell_similarity == CellSimilarity::translation) ) {
+    if (static_cast<const typename Triangulation<dim,spacedim>::cell_iterator &>
+	(*this->present_cell)->direction_flag()
+	!= cell->direction_flag() )
+      cell_similarity =  CellSimilarity::inverted_translation;
+  }
 				   // TODO: here, one could implement other
 				   // checks for similarity, e.g. for
 				   // children of a parallelogram.

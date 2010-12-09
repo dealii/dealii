@@ -340,7 +340,8 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
  * to the previously visited cell. This information is used for reusing data
  * when calling the method FEValues::reinit() (like derivatives, which do
  * not change if one cell is just a translation of the previous). Currently,
- * this variable does only recognize a translation. However, this concept
+ * this variable does only recognize a translation and a inverted traslation
+ * (if dim<spacedim). However, this concept
  * makes it easy to add additional staties to be detected in
  * FEValues/FEFaceValues for making use of these similarities as well.
  */
@@ -350,6 +351,7 @@ namespace CellSimilarity
     {
       none, 
       translation,
+      inverted_translation,
       invalid_next_cell
     };
 }
