@@ -2625,6 +2625,8 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * Return the orientation of
 				      * this cell.
 				      *
+				      * For the meaning of this flag, see
+				      * @ref GlossDirectionFlag .
 				      */
     bool direction_flag () const;
 
@@ -2813,6 +2815,8 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * Set the orientation of this
 				      * cell.
 				      *
+				      * For the meaning of this flag, see
+				      * @ref GlossDirectionFlag .
 				      */
     void set_direction_flag (const bool new_direction_flag) const;
     				     /**

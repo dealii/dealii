@@ -334,6 +334,54 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossDirectionFlag <b>Direction flags</b></dt>
+ *
+ * <dd>The <i>direction flag</i> is used in triangulations embedded in a
+ * higher dimensional space to denote the orientation of cells and make the
+ * manifold oriented. It is accessed using CellAccessor::direction_flag()
+ * and set by the Triangulation class upon creation of a triangulation.
+ *
+ * The flag is necessary to make cases like this work: assume we have a
+ * one-dimensional mesh embedded in a two-dimensional space,
+ *
+ *   @image html direction_flag.png "One dimensional mesh in two dimensions"
+ *
+ * In one dimensional meshes in one dimensional space, we can always make sure
+ * that the location of the left vertex of a cell has a smaller value than the
+ * location of the right vertex. However, if we embed a mesh in a higher
+ * dimensional space, we can no longer do this. For example, the cells in the
+ * mesh above may be described by the following vertex sets: <code>(0,1),
+ * (1,2), (3,2), (4,3), (4,5)</code>. (As a side remark, note that here we
+ * have vertices -- e.g. vertex 2 -- that are the right end points of more
+ * than one cell.) If we define the normal to each cell as that unit vector
+ * that is right perpendicular to the vector that connects the first to the
+ * second vertex of the line, then we would end up with the following picture:
+ *
+ *   @image html direction_flag_normals.png "Normal vectors"
+ *
+ * In other words, this one-dimensional manifold is not oriented. We could in
+ * principle revert the order of vertices when creating such a mesh (though
+ * there are good reasons not to do so, for example because this mesh may have
+ * resulted from extracting the surface mesh of a two dimensional mesh, and we
+ * want to preserve the order of vertices of each line segment because they
+ * currently match the order of vertices of the faces of the 2d cells). An
+ * alternative strategy, chosen in deal.II, is to simply associate with each
+ * cell whether the normal should be the left or right normal to the
+ * cell. (The default is right normals.) In the example above, the flags for
+ * the five cells would be <code>true, true, false, false,
+ * true</code>. Multiplying the right normal with plus or minus one, depending
+ * on the value of the flag on each cell, yields a set of normal vectors that
+ * orient the manifold.
+ *
+ * Similar issues happen with two-dimensional meshes in three space
+ * dimensions. We note that it would not be possible to find consistent
+ * direction flags if the two-dimensional manifold is not orientable; such
+ * manifolds are not currently supported by deal.II, however, and there would
+ * appear to be little cause for anyone to solve partial differential equations
+ * on such manifolds in the first place. 
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossDistorted <b>Distorted cells</b></dt>
  *
  * <dd>A <i>distorted cell</i> is a cell for which the mapping from
