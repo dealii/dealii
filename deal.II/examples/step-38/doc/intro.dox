@@ -7,6 +7,114 @@
 
 <h1>Introduction</h1>
 
+In this example, we show how to solve a partial differential equation (PDE)
+on a codimension one surface $\Gamma \subset \mathbb R^3$
+made of quadrilaterals, i.e. on a surface in 3d or a line in 2d.
+We focus on the following elliptic second order PDE
+@f{align*}
+-\Delta_\Gamma u &= f \qquad \text{on } \qquad \Gamma,\\
+u  &= g \qquad \text{on} \qquad \partial \Gamma,
+@f}
+which generalized the Laplace equation we have previously solved in several of
+the early tutorial programs. Our implementation is based on step-4. step-34
+also solves problems on lower dimensional surfaces; however, there we only
+consider integral equations that do not involve derivatives on the solution
+variable, while here we actually have to investigate what it means to take
+derivatives of a function only defined on a (possibly curved) surface.
+
+In order to define the above operator, we start by introducing some notations.
+Let $\mathbf x_S:\hat S \rightarrow S$ be a parametrization of
+a surface $S$ from a reference element $\hat S \subset \mathbb R^2$,
+i.e. each point $\hat{\mathbf x}\in\hat S$ induces a point ${\mathbf
+  x}_S(\hat{\mathbf x}) \in S$. Then let
+@f[
+G_S:= (D \mathbf{x}_S)^T \ D \mathbf{x}_S
+@f]
+denote the corresponding first fundamental form, where $D
+\mathbf{x}_S=\left(\frac{\partial x_{S,i}(\hat{\mathbf x})}{\partial \hat x_j}\right)_{ij}$ is the 
+derivative (Jacobian) of the mapping.
+In the following, $S$ will be either the entire surface $\Gamma$ or,
+more convenient for the finite element method, any face $S \in
+{\mathbb T}$, where ${\mathbb T}$ is a partition (triangulation) of $\Gamma$
+constituted of quadrilaterals. 
+We are now in position to define the tangential gradient of a function $v : S \rightarrow \mathbb
+R$ by
+@f[
+(\nabla_S v)\circ \mathbf x_S :=  D \mathbf x_S \ G_S^{-1} \ D (v \circ \mathbf x_S).
+@f]
+The surface Laplacian (also called the Laplace-Beltrami operator) is then
+defined as  $\Delta_S:= \nabla_S \cdot \nabla_S$.
+
+As usual, we are only interested in weak solutions for which we can use $C^0$
+finite elements (rather than requiring $C^1$ continuity as for strong
+solutions). We therefore resort to the weak formulation
+@f[
+\int_\Gamma \nabla_\Gamma u \cdot
+\nabla_\Gamma v = \int_\Gamma f \ v  \qquad \forall v \in H^1_0(\Gamma)
+@f]
+and take advantage of the partition ${\mathbb T}$ to further write
+@f[
+\sum_{K\in  {\mathbb T}}\int_K \nabla_K u \cdot \nabla_K v = \sum_{K\in
+  {\mathbb T}} \int_K f \ v  \qquad \forall v \in H^1_0(\Gamma).
+@f]
+Moreover, each integral in the above expression is computed in the reference
+element $\hat K:= [0,1]^2$ 
+so that
+@f{align*}
+&\int_{K} \nabla_{K} u \cdot \nabla_{K} v \\
+&= 
+\int_{\hat K} D(u \circ \mathbf x_K)^T G_K^{-1} (D \mathbf
+  x_K)^T D \mathbf x_K G_K^{-1} D(v \circ \mathbf x_K) \sqrt{\det
+    (G_K)}
+\\
+&= 
+\int_{\hat K} D(u \circ \mathbf x_K)^T G_K^{-1} D(v \circ \mathbf x_K) \sqrt{\det
+    (G_K)}
+@f}
+and
+@f[
+\int_{K} f \ v = \int_{\hat K} (f \circ \mathbf x_K) (v \circ \mathbf
+x_K)  \sqrt{\det
+    (G_K)}.
+@f]
+Finally, we use a quadrature formula defined by points $\{p_l\}_{l=1}^N\subset
+\hat K$ and weights $\{w_l\}_{l=1}^N \subset \mathbb R^+_*$ to
+evaluate the above integrals and
+obtain
+@f[\int_{K} \nabla_{K} u \cdot \nabla_{K} v \approx \sum_{l=1}^N
+ (D(u \circ \mathbf x_K)(p_l))^T G^{-1}(p_l)  D(v \circ \mathbf x_K)
+(p_l) \sqrt{\det (G(p_l))} \ w_l
+@f]
+and
+@f[
+\int_{K} f \ v \approx \sum_{l=1}^N (f \circ \mathbf x_K)(p_l) \ (v \circ \mathbf x_K)(p_l) \sqrt{\det (G(p_l))} \ w_l.
+@f]
+
+
+Fortunately, deal.II has already all the tools to compute the above
+expressions.
+In fact, they barely differ from the ways in which we solve the usual
+Laplacian, only requiring the surface coordinate mapping to be provided in the
+constructor of the FEValues class.
+This surface description given, in the codimension one surface case, the two
+routines FEValues::shape_grad and FEValues::JxW
+return
+@f{align*}
+\text{FEValues::shape\_grad}(i,l)&=D \mathbf x_K(p_l) G^{-1}(p_l)D(\varphi_i \circ \mathbf x_K)
+  (p_l)
+\\
+\text{FEValues::JxW}(l) &=  \sqrt{\det (G(p_l))} \ w_l.
+@f}
+This provides exactly the terms we need for our computations.
+
+On a more general note, details for the finite element approximation on
+surfaces can be found for instance in 
+[Dziuk, in Partial differential equations and calculus of
+variations 1357, Lecture Notes in Math., 1988]  
+and
+[Bonito, Nochetto, and Pauletti, SIAM J. Numer. Anal. 48(5), 2010].
+
+
 <h3>The numerical approximation</h3>
 
 <h3>Implementation</h3>
