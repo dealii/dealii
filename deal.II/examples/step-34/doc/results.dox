@@ -204,6 +204,6 @@ together with a contur plot,
 
 @image html step-34_3d.png
 
-and then the external contur plot of the potential, with opacity set to 25%:
+and then the external contour plot of the potential, with opacity set to 25%:
 
 @image html step-34_3d-2.png
