@@ -207,3 +207,13 @@ together with a contur plot,
 and then the external contour plot of the potential, with opacity set to 25%:
 
 @image html step-34_3d-2.png
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+This is the first tutorial program that considers solving equations defined on
+surfaces embedded in higher dimensional spaces. But the equation discussed
+here was relatively simple because it only involved an integral operator, not
+derivatives which are more difficult to define on the surface. The step-38
+tutorial program considers such problems and provides the necessary tools.
