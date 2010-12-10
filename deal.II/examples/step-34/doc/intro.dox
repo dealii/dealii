@@ -652,7 +652,10 @@ curved manifolds can be found in the report
 <a target="_top"
 href="../../reports/codimension-one/desimone-heltai-manigrasso.pdf"><i>Tools
 for the Solution of PDEs Defined on Curved Manifolds with the deal.II
-Library</i> by A. DeSimone, L. Heltai, C. Manigrasso</a>.
+Library</i> by A. DeSimone, L. Heltai, C. Manigrasso</a>. In addition, the
+step-38 tutorial program extends what we show here to cases where the equation
+posed on the manifold is not an integral operator but in fact involves
+derivatives.
 
 
 <h3>Testcase</h3>
