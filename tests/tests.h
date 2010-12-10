@@ -21,8 +21,11 @@
 #include <base/logstream.h>
 #include <base/exceptions.h>
 #include <base/utilities.h>
+#include <base/thread_management.h>
 #include <cmath>
 #include <fstream>
+#include <sstream>
+#include <cstdlib>
 
 // implicitly use the deal.II namespace everywhere, without us having to say
 // so in each and every testcase
@@ -91,8 +94,6 @@ namespace internal
 
 }
 
-DEAL_II_NAMESPACE_CLOSE
-
 // A structure and a variable that are used to set grainsizes for parallel
 // mode smaller than they would otherwise be. this is used to test that the
 // parallel algorithms in lac/ work alright.
@@ -111,6 +112,61 @@ struct SetGrainSizes
 }
 set_grain_sizes;
 
+
+
+// spawn a thread that terminates the program after a certain time
+// given by the environment variable WALLTIME. this makes sure we
+// don't let jobs that deadlock on some mutex hang around
+// forever. note that this is orthogonal to using "ulimit" in
+// Makefile.rules, which only affects CPU time and consequently works
+// on infinite loops but not deadlocks
+#ifdef DEAL_II_USE_MT
+
+struct DeadlockKiller
+{
+  private:
+    static void nuke_it ()
+      {
+	char * env = std::getenv("WALLTIME");
+
+	if (env != 0)
+	  {
+	    std::istringstream conv (env);
+	    int delay;
+	    conv >> delay;
+	    if (conv)
+	      {
+		sleep (delay);
+		std::cerr << "Time's up: Killing job because it overran its allowed walltime"
+			  << std::endl;
+		std::abort ();
+	      }
+	    else
+	      {
+		std::cerr << "Invalid value for WALLTIME environment variable."
+			  << std::endl;
+		std::abort ();
+	      }
+	  }
+	else
+					   // environment variable is
+					   // not set, so assume
+					   // infinite wait time and
+					   // simply quite this thread
+	  ;
+      }
+
+  public:
+    DeadlockKiller ()
+      {
+	dealii::Threads::new_thread (&nuke_it);
+      }
+};
+DeadlockKiller deadlock_killer;
+
+#endif
+
+DEAL_II_NAMESPACE_CLOSE
 
 
 // append the directory name with an output file name that indicates
