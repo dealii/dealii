@@ -376,9 +376,7 @@
  * Similar issues happen with two-dimensional meshes in three space
  * dimensions. We note that it would not be possible to find consistent
  * direction flags if the two-dimensional manifold is not orientable; such
- * manifolds are not currently supported by deal.II, however, and there would
- * appear to be little cause for anyone to solve partial differential equations
- * on such manifolds in the first place. 
+ * manifolds are not currently supported by deal.II.
  * </dd>
  *
  *
