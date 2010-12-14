@@ -22,6 +22,7 @@
 #include <base/exceptions.h>
 #include <base/utilities.h>
 #include <base/thread_management.h>
+#include <base/multithread_info.h>
 #include <cmath>
 #include <fstream>
 #include <sstream>
@@ -137,7 +138,7 @@ struct DeadlockKiller
 	    conv >> delay;
 	    if (conv)
 	      {
-		sleep (delay*4);
+		sleep (delay*multithread_info.n_cpus);
 		std::cerr << "Time's up: Killing job because it overran its allowed walltime"
 			  << std::endl;
 		std::abort ();
