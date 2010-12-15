@@ -1000,17 +1000,12 @@ namespace internal
 	  		     data,
 	  		     mapping_contravariant);
 
-      	  typename std::vector<Tensor<1,spacedim> >::iterator
-      	    result = boundary_forms.begin();
-      	  const typename std::vector<Tensor<1,spacedim> >::iterator
-      	    end = boundary_forms.end();
-
       	  switch (dim)
       	    {
       	      case 2:
       	      {
-      	  	for (unsigned int i=0; result != end; ++result, ++i)
-      	  	  cross_product (*result, data.aux[0][i]);
+      	  	for (unsigned int i=0; i<n_q_points; ++i)
+      	  	  cross_product (boundary_forms[i], data.aux[0][i]);
       	  	break;
       	      }
 
@@ -1026,8 +1021,8 @@ namespace internal
 				   data.aux[1],
 				   data,
 				   mapping_contravariant);
-      	  	for (unsigned int i=0; result != end; ++result, ++i)
-      	  	  cross_product (*result, data.aux[0][i], data.aux[1][i]);
+      	  	for (unsigned int i=0; i<n_q_points; ++i)
+      	  	  cross_product (boundary_forms[i], data.aux[0][i], data.aux[1][i]);
 
       	  	break;
       	      }
