@@ -9608,8 +9608,6 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     begin_active()->set_direction_flag (true);
     begin_active()->set_user_flag ();
 
-    int round = 0;
-    
     while (this_round.size() > 0) {
       
       for ( typename std::list<active_cell_iterator>::iterator cell = this_round.begin();
