@@ -995,11 +995,22 @@ namespace internal
       	    Assert (JxW_values.size() == n_q_points,
       		    ExcDimensionMismatch(JxW_values.size(), n_q_points));
 
-      	  mapping.transform (data.unit_tangentials[face_no],
-	  		     data.aux[0],
-	  		     data,
-	  		     mapping_contravariant);
-
+					   // map the unit tangentials to the real cell
+	  for (unsigned int d=0; d<dim-1; ++d)
+	    {
+	      Assert (face_no+GeometryInfo<dim>::faces_per_cell*d <
+		      data.unit_tangentials.size(),
+		      ExcInternalError());
+	      Assert (data.aux[d].size() <=
+		      data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d].size(),
+		      ExcInternalError());
+	      
+	      mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d],
+				 data.aux[d],
+				 data,
+				 mapping_contravariant);
+	    }
+	  
       	  switch (dim)
       	    {
       	      case 2:
@@ -1011,19 +1022,8 @@ namespace internal
 
       	      case 3:
       	      {
-      	  	Assert (face_no+GeometryInfo<dim>::faces_per_cell <
-      	  		data.unit_tangentials.size(),
-      	  		ExcInternalError());
-      	  	Assert (data.aux[1].size() <=
-      	  		data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell].size(),
-      	  		ExcInternalError());
-      	  	mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell],
-				   data.aux[1],
-				   data,
-				   mapping_contravariant);
       	  	for (unsigned int i=0; i<n_q_points; ++i)
       	  	  cross_product (boundary_forms[i], data.aux[0][i], data.aux[1][i]);
-
       	  	break;
       	      }
 
