@@ -57,26 +57,12 @@ void test ()
 				    surface_to_volume_mapping,
 				    boundary_ids);
   
-  
-  tria.refine_global(4);
-				   // END OF SURFACE CONSTRUCTION      
-  
   FE_Q<dim-1,dim> fe (1);
   DoFHandler<dim-1,dim> dh(tria);
   MappingQ<dim-1,dim> mapping(1,true);
   
   dh.distribute_dofs (fe);
   
-  QGauss<dim-1>  quadrature_formula(2);
-  QGauss<dim-2>  face_quadrature_formula(2);
-  
-  FEValues<dim-1,dim> fe_values (mapping,fe, QGauss<dim-1>(2), 
-				 update_values   | update_cell_normal_vectors |
-				 update_gradients |
-				 update_quadrature_points | update_JxW_values);
-  
-  
-				   // Neumann BC
   FEFaceValues<dim-1,dim> fe_face_values (mapping, fe, QGauss<dim-2>(2), 
 					  update_values         | update_quadrature_points  |
 					  update_normal_vectors | update_JxW_values);
@@ -84,7 +70,6 @@ void test ()
   typename DoFHandler<dim-1,dim>::active_cell_iterator
     cell = dh.begin_active();
   
-  fe_values.reinit (cell);  
   fe_face_values.reinit (cell,0);
 }
 
@@ -96,7 +81,7 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  test<2> ();
+//  test<2> ();
   test<3> ();
   
   return 0;
