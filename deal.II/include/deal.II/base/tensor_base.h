@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1011,6 +1011,15 @@ bool Tensor<1,dim>::operator == (const Tensor<1,dim> &p) const
   for (unsigned int i=0; i<dim; ++i)
     if (values[i] != p.values[i])
       return false;
+  return true;
+}
+
+
+
+template <>
+inline
+bool Tensor<1,0>::operator == (const Tensor<1,0> &) const
+{
   return true;
 }
 
