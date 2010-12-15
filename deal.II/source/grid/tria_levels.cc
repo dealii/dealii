@@ -25,7 +25,8 @@ namespace internal
     template <int dim>
     void
     TriaLevel<dim>::reserve_space (const unsigned int total_cells,
-				   const unsigned int dimension)
+				   const unsigned int dimension,
+				   const unsigned int space_dimension)
     {
                                        // we need space for total_cells
                                        // cells. Maybe we have more already
@@ -51,10 +52,15 @@ namespace internal
                                 total_cells - subdomain_ids.size(),
                                 0);
 
-	  direction_flags.reserve (total_cells);
-          direction_flags.insert (direction_flags.end(),
-				  total_cells - direction_flags.size(),
-				  true);
+	  if (dimension < space_dimension)
+	    {
+	      direction_flags.reserve (total_cells);
+	      direction_flags.insert (direction_flags.end(),
+				      total_cells - direction_flags.size(),
+				      true);
+	    }
+	  else
+	    direction_flags.clear ();
 
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
@@ -112,10 +118,13 @@ namespace internal
     unsigned int
     TriaLevel<dim>::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (coarsen_flags) +
+      return (MemoryConsumption::memory_consumption (refine_flags) +
+	      MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
-              MemoryConsumption::memory_consumption (cells) +
-              MemoryConsumption::memory_consumption (refine_flags));
+	      MemoryConsumption::memory_consumption (subdomain_ids) +
+	      MemoryConsumption::memory_consumption (parents) +
+	      MemoryConsumption::memory_consumption (direction_flags) +
+              MemoryConsumption::memory_consumption (cells));
     }
 
 // This specialization should be only temporary, until the TriaObjects
@@ -123,7 +132,8 @@ namespace internal
 
     void
     TriaLevel<3>::reserve_space (const unsigned int total_cells,
-				 const unsigned int dimension)
+				 const unsigned int dimension,
+				 const unsigned int space_dimension)
     {
                                        // we need space for total_cells
                                        // cells. Maybe we have more already
@@ -148,6 +158,16 @@ namespace internal
           subdomain_ids.insert (subdomain_ids.end(),
                                 total_cells - subdomain_ids.size(),
                                 0);
+
+	  if (dimension < space_dimension)
+	    {
+	      direction_flags.reserve (total_cells);
+	      direction_flags.insert (direction_flags.end(),
+				      total_cells - direction_flags.size(),
+				      true);
+	    }
+	  else
+	    direction_flags.clear ();
 
           parents.reserve ((int) (total_cells + 1) / 2);
           parents.insert (parents.end (),
@@ -188,6 +208,10 @@ namespace internal
 	      subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("subdomain_ids",
                                subdomain_ids.size(), subdomain_ids.capacity()));
+      Assert (direction_flags.size() <=
+	      direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
+              ExcMemoryWasted ("direction_flags",
+                               direction_flags.size(), direction_flags.capacity()));
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
               ExcMemoryInexact (refine_flags.size(), neighbors.size()));
       Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
@@ -198,10 +222,13 @@ namespace internal
     unsigned int
     TriaLevel<3>::memory_consumption () const
     {
-      return (MemoryConsumption::memory_consumption (coarsen_flags) +
+      return (MemoryConsumption::memory_consumption (refine_flags) +
+	      MemoryConsumption::memory_consumption (coarsen_flags) +
               MemoryConsumption::memory_consumption (neighbors) +
-              MemoryConsumption::memory_consumption (cells) +
-              MemoryConsumption::memory_consumption (refine_flags));
+	      MemoryConsumption::memory_consumption (subdomain_ids) +
+	      MemoryConsumption::memory_consumption (parents) +
+	      MemoryConsumption::memory_consumption (direction_flags) +
+              MemoryConsumption::memory_consumption (cells));
     }
   }
 }

@@ -1265,14 +1265,11 @@ CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id_t new_s
 template <int dim, int spacedim>
 bool CellAccessor<dim, spacedim>::direction_flag () const
 {
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if (dim==spacedim)
     return true;
   else
-    {
-      Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-      return this->tria->levels[this->present_level]->direction_flags[this->present_index];
-    }
-  
+    return this->tria->levels[this->present_level]->direction_flags[this->present_index];
 }
 
 
@@ -1281,12 +1278,14 @@ template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_direction_flag (const bool new_direction_flag) const
 {
+  Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if (dim<spacedim)
-    {
-      Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-      this->tria->levels[this->present_level]->direction_flags[this->present_index]
-	= new_direction_flag;
-    }
+    this->tria->levels[this->present_level]->direction_flags[this->present_index]
+      = new_direction_flag;
+  else
+    Assert (new_direction_flag == true,
+	    ExcMessage ("If dim==spacedim, direction flags are always true and "
+			"can not be set to anything else."));
 }
 
 

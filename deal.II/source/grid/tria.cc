@@ -1433,7 +1433,7 @@ namespace internal
 
 					     // reserve enough space
 	    triangulation.levels.push_back (new internal::Triangulation::TriaLevel<dim>);
-	    triangulation.levels[0]->reserve_space (cells.size(), dim);
+	    triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
 	    triangulation.levels[0]->cells.reserve_space (0,cells.size());
 
 					     // make up cells
@@ -1661,7 +1661,7 @@ namespace internal
 					     // reserve enough space
 	    triangulation.levels.push_back (new internal::Triangulation::TriaLevel<dim>);
 	    triangulation.faces = new internal::Triangulation::TriaFaces<dim>;
-	    triangulation.levels[0]->reserve_space (cells.size(), dim);
+	    triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
 	    triangulation.faces->lines.reserve_space (0,needed_lines.size());
 	    triangulation.levels[0]->cells.reserve_space (0,cells.size());
 
@@ -1970,7 +1970,7 @@ namespace internal
 					     // reserve enough space
 	    triangulation.levels.push_back (new internal::Triangulation::TriaLevel<dim>);
 	    triangulation.faces = new internal::Triangulation::TriaFaces<dim>;
-	    triangulation.levels[0]->reserve_space (cells.size(), dim);
+	    triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
 	    triangulation.faces->lines.reserve_space (0,needed_lines.size());
 
 					     // make up lines
@@ -4181,7 +4181,7 @@ namespace internal
 						 // properties
 		subcells[i]->set_material_id (cell->material_id());
 		subcells[i]->set_subdomain_id (cell->subdomain_id());
-	
+
 		if (i%2==0)
 		  subcells[i]->set_parent (cell->index ());
 	      }
@@ -4203,8 +4203,8 @@ namespace internal
 
 	    if (dim < spacedim)
 	      for (unsigned int c=0; c<n_children; ++c)
-		cell->child(c)->set_direction_flag (cell->direction_flag());  
-	  
+		cell->child(c)->set_direction_flag (cell->direction_flag());
+
 	  }
 
 
@@ -4280,7 +4280,8 @@ namespace internal
 		  ->reserve_space(used_cells+
 				  GeometryInfo<1>::max_children_per_cell *
 				  flagged_cells,
-				  1);
+				  1,
+				  spacedim);
 						 // reserve space for
 						 // 2*flagged_cells new lines on
 						 // the next higher level
@@ -4647,7 +4648,8 @@ namespace internal
 						 // level as well as for the
 						 // needed_cells that will be
 						 // created on that level
-		triangulation.levels[level+1]->reserve_space (used_cells+needed_cells, 2);
+		triangulation.levels[level+1]
+		  ->reserve_space (used_cells+needed_cells, 2, spacedim);
 
 						 // reserve space for
 						 // needed_cells
@@ -5117,7 +5119,8 @@ namespace internal
 						 // level as well as for the
 						 // 8*flagged_cells that will be
 						 // created on that level
-		triangulation.levels[level+1]->reserve_space (used_cells+new_cells, 3);
+		triangulation.levels[level+1]
+		  ->reserve_space (used_cells+new_cells, 3, spacedim);
 						 // reserve space for
 						 // 8*flagged_cells
 						 // new hexes on the next higher
@@ -9568,13 +9571,13 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
 
     We store this data using an n_faces x n_faces full matrix, which is actually
     much bigger than the minimal data required, but it makes the code more readable.
-    
+
   */
   if (dim < spacedim) {
 
     Table<2,bool> correct(GeometryInfo< dim >::faces_per_cell,
 			  GeometryInfo< dim >::faces_per_cell);
-    switch (dim) 
+    switch (dim)
       {
 	case 1:
 	{
@@ -9599,8 +9602,8 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
 	default:
 	      Assert (false, ExcNotImplemented());
       }
-  
-    
+
+
     std::list<active_cell_iterator> this_round, next_round;
     active_cell_iterator neighbor;
 
@@ -9608,54 +9611,56 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     begin_active()->set_direction_flag (true);
     begin_active()->set_user_flag ();
 
-    while (this_round.size() > 0) {
-      
-      for ( typename std::list<active_cell_iterator>::iterator cell = this_round.begin();
-	    cell != this_round.end(); ++cell) {
-	
-	for (unsigned int i = 0; i < GeometryInfo< dim >::faces_per_cell; ++i) 
+    while (this_round.size() > 0)
+      {
+	for ( typename std::list<active_cell_iterator>::iterator cell = this_round.begin();
+	      cell != this_round.end(); ++cell)
 	  {
-	    if ( !((*cell)->face(i)->at_boundary()) )
+	    for (unsigned int i = 0; i < GeometryInfo< dim >::faces_per_cell; ++i)
 	      {
-		neighbor = (*cell)->neighbor(i);
-				
-		unsigned int cf = (*cell)->face_index(i);
-		unsigned int j = 0;
-		while(neighbor->face_index(j) != cf)
-		  {++j;}
-		 
-		if ( (correct(i,j) && !(*cell)->direction_flag())
-		     ||
-		     (!correct(i,j) && (*cell)->direction_flag()) )
+		if ( !((*cell)->face(i)->at_boundary()) )
 		  {
-		    if (neighbor->user_flag_set() == false)
+		    neighbor = (*cell)->neighbor(i);
+
+		    unsigned int cf = (*cell)->face_index(i);
+		    unsigned int j = 0;
+		    while(neighbor->face_index(j) != cf)
+		      {++j;}
+
+		    if ( (correct(i,j) && !(*cell)->direction_flag())
+			 ||
+			 (!correct(i,j) && (*cell)->direction_flag()) )
 		      {
-			neighbor->set_direction_flag (false);
-			neighbor->set_user_flag ();
-			next_round.push_back (neighbor);
+			if (neighbor->user_flag_set() == false)
+			  {
+			    neighbor->set_direction_flag (false);
+			    neighbor->set_user_flag ();
+			    next_round.push_back (neighbor);
+			  }
+			else
+			  Assert (neighbor->direction_flag() == false,
+				  ExcNonOrientableTriangulation());
+
 		      }
-		    else 
-		      Assert (neighbor->direction_flag() == false,
-			      ExcNonOrientableTriangulation());
-		    
 		  }
 	      }
-	    
 	  }
-      }
-                
-//Before we quit let's check that if the triangulation is disconnected
-      if (next_round.size() == 0) {
+
+					 // Before we quit let's check
+					 // that if the triangulation
+					 // is disconnected that we
+					 // still get all cells
+      if (next_round.size() == 0)
 	for (active_cell_iterator cell = begin_active();
 	     cell != end(); ++cell)
-	  if (cell->user_flag_set() == false) {
-	    next_round.push_back (cell);
-	    cell->set_direction_flag (true);
-	    cell->set_user_flag ();
-	    break;
-	  }
-      }
-      
+	  if (cell->user_flag_set() == false)
+	    {
+	      next_round.push_back (cell);
+	      cell->set_direction_flag (true);
+	      cell->set_user_flag ();
+	      break;
+	    }
+
       this_round = next_round;
       next_round.clear();
     }

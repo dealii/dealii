@@ -145,16 +145,26 @@ namespace internal
                                           * index their parent has.
                                           */
         std::vector<int> parents;
-	
+
 					 /**
 					  * One bool per cell to indicate the
 					  * direction of the normal
 					  * true:  use orientation from vertex
-					  * false: revert the orientation.
-					  * It is used for codim==1 meshes
+					  * false: revert the orientation. See
+					  * @ref GlossDirectionFlag .
+					  *
+					  * This is only used for
+					  * codim==1 meshes.
 					  */
         std::vector<bool> direction_flags;
-	
+
+					 /**
+					  * The object containing the data on lines and
+					  * related functions
+					  */
+	TriaObjects<TriaObject<dim> > cells;
+
+
                                          /**
                                           *  Reserve enough space to accomodate
                                           *  @p total_cells cells on this level.
@@ -172,7 +182,8 @@ namespace internal
                                           */
 
         void reserve_space (const unsigned int total_cells,
-                            const unsigned int dimension);
+                            const unsigned int dimension,
+			    const unsigned int space_dimension);
 
                                          /**
                                           *  Check the memory consistency of the
@@ -190,13 +201,6 @@ namespace internal
                                           * of this object.
                                           */
         unsigned int memory_consumption () const;
-
-					 /**
-					  * The object containing the data on lines and
-					  * related functions
-					  */
-	TriaObjects<TriaObject<dim> > cells;
-
 
                                          /**
                                           *  Exception
@@ -229,15 +233,24 @@ namespace internal
         std::vector<unsigned char> refine_flags;
         std::vector<bool> coarsen_flags;
         std::vector<std::pair<int,int> > neighbors;
-        std::vector<int> parents;
         std::vector<types::subdomain_id_t> subdomain_ids;
-        std::vector<bool> direction_flags; //not use; only needed to allow compilation
-        void reserve_space (const unsigned int total_cells,
-                            const unsigned int dimension);
-        void monitor_memory (const unsigned int true_dimension) const;
-        unsigned int memory_consumption () const;
+        std::vector<int> parents;
+
+					 // The following is not used
+					 // since we don't support
+					 // codim=1 meshes in 3d; only
+					 // needed to allow
+					 // compilation
+        std::vector<bool> direction_flags;
+
 	TriaObjectsHex cells;
 
+
+        void reserve_space (const unsigned int total_cells,
+                            const unsigned int dimension,
+			    const unsigned int space_dimension);
+        void monitor_memory (const unsigned int true_dimension) const;
+        unsigned int memory_consumption () const;
 
                                          /**
                                           *  Exception
