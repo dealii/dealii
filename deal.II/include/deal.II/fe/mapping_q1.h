@@ -228,6 +228,20 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * boundary forms and normal
 					  * vectors.
 					  *
+					  * This vector has
+					  * (dim-1)*GeometryInfo<dim>::faces_per_cell
+					  * entries. The first
+					  * GeometryInfo<dim>::faces_per_cell
+					  * contain the vectors in the first
+					  * tangential direction for each
+					  * face; the second set of
+					  * GeometryInfo<dim>::faces_per_cell
+					  * entries contain the vectors in the
+					  * second tangential direction (only
+					  * in 3d, since there we have 2
+					  * tangential directions per face),
+					  * etc.
+					  *
 					  * Filled once.
 					  */
         std::vector<std::vector<Tensor<1,dim> > > unit_tangentials;
