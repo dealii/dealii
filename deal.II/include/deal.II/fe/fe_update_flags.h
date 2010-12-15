@@ -158,7 +158,7 @@ enum UpdateFlags
       update_face_normal_vectors          = update_normal_vectors,
 				       /**
 					* @deprecated Use #update_normal_vectors
-					*/      
+					*/
       update_cell_normal_vectors          = update_normal_vectors,
 				       //! Volume element
 				       /**
@@ -177,7 +177,7 @@ enum UpdateFlags
       update_jacobian_grads               = 0x0100,
 				       //! Volume element
 				       /**
-					* Compute the inverse 
+					* Compute the inverse
 				        * Jacobian of the
 					* transformation from the
 					* reference cell to the real
@@ -340,16 +340,16 @@ operator &= (UpdateFlags &f1, UpdateFlags f2)
  * to the previously visited cell. This information is used for reusing data
  * when calling the method FEValues::reinit() (like derivatives, which do
  * not change if one cell is just a translation of the previous). Currently,
- * this variable does only recognize a translation and a inverted traslation
+ * this variable does only recognize a translation and an inverted translation
  * (if dim<spacedim). However, this concept
  * makes it easy to add additional staties to be detected in
  * FEValues/FEFaceValues for making use of these similarities as well.
  */
 namespace CellSimilarity
 {
-  enum Similarity 
+  enum Similarity
     {
-      none, 
+      none,
       translation,
       inverted_translation,
       invalid_next_cell
