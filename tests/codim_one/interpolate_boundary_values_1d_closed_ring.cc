@@ -50,8 +50,8 @@ void test() {
   Triangulation<spacedim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
 
-  GridTools::extract_boundary_mesh (volume_mesh, tria,
-				      surface_to_volume_mapping);
+  surface_to_volume_mapping
+    = GridTools::extract_boundary_mesh (volume_mesh, tria);
 
     FE_Q<dim,spacedim> fe(2);
     DoFHandler<dim,spacedim> dof_handler (tria);

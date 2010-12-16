@@ -1830,19 +1830,19 @@ fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::Distor
 
 
 template <template <int,int> class Container, int dim, int spacedim>
-void
+std::map<typename Container<dim-1,spacedim>::cell_iterator,
+	 typename Container<dim,spacedim>::face_iterator>
 GridTools::extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
 				  Container<dim-1,spacedim>     &surface_mesh,
-				  std::map<typename Container<dim-1,spacedim>::cell_iterator,
-				  typename Container<dim,spacedim>::face_iterator>
-				    &surface_to_volume_mapping,
 				  const std::set<unsigned char> &boundary_ids)
 {
 // Assumption:
 //    We are relying below on the fact that Triangulation::create_triangulation(...) will keep the order
 //    pass by CellData and that it will not reorder the vertices.
 
-  surface_to_volume_mapping.clear();
+  std::map<typename Container<dim-1,spacedim>::cell_iterator,
+    typename Container<dim,spacedim>::face_iterator>
+  surface_to_volume_mapping;
 
   const unsigned int boundary_dim = dim-1; //dimension of the boundary mesh
 
@@ -1939,6 +1939,8 @@ GridTools::extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
 	break;
     }
   while (true);
+
+  return surface_to_volume_mapping;
 }
 
 // explicit instantiations

@@ -38,8 +38,8 @@ void test ()
   Triangulation<dim> volume_mesh;
   GridGenerator::hyper_cube(volume_mesh);
 
-  GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-				    surface_to_volume_mapping);
+  surface_to_volume_mapping
+    = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
   FE_Q <dim-1,dim>  boundary_fe (1);
   DoFHandler<dim-1,dim> boundary_dh(boundary_mesh);

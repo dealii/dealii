@@ -804,11 +804,15 @@ class GridTools
 				      * mesh").  The boundary to be extracted
 				      * is specified by a list of
 				      * boundary_ids.  If none is specified
-				      * the whole boundary will be extracted.
+				      * the whole boundary will be
+				      * extracted. The function is used in
+				      * step-38.
 				      *
 				      * It also builds a mapping linking the
 				      * cells on the surface mesh to the
-				      * corresponding faces on the volume one.
+				      * corresponding faces on the volume
+				      * one. This mapping is the return value
+				      * of the function.
 				      *
 				      * @note The function builds the surface
 				      * mesh by creating a coarse mesh from
@@ -878,12 +882,11 @@ class GridTools
 				      * curved boundaries.
 				      */
     template <template <int,int> class Container, int dim, int spacedim>
-    static void
+    static
+    std::map<typename Container<dim-1,spacedim>::cell_iterator,
+	     typename Container<dim,spacedim>::face_iterator>
     extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
 			   Container<dim-1,spacedim>     &surface_mesh,
-			   std::map<typename Container<dim-1,spacedim>::cell_iterator,
-			            typename Container<dim,spacedim>::face_iterator>
-			   &surface_to_volume_mapping,
 			   const std::set<unsigned char> &boundary_ids
 			   = std::set<unsigned char>());
 

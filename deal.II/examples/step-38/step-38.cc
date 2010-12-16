@@ -205,10 +205,6 @@ LaplaceBeltrami<dim>::~LaplaceBeltrami ()
 template <int dim>
 void LaplaceBeltrami<dim>::make_mesh ()
 {
-  std::map<typename Triangulation<dim-1,dim>::cell_iterator,
-           typename Triangulation<dim,dim>::face_iterator>
-  surface_to_volume_mapping;
-
   HyperBallBoundary<dim> boundary_description;
   Triangulation<dim> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
@@ -225,7 +221,6 @@ void LaplaceBeltrami<dim>::make_mesh ()
   boundary_ids.insert(0);
   
   GridTools::extract_boundary_mesh (volume_mesh, triangulation,
-				    surface_to_volume_mapping,
 				    boundary_ids);
   triangulation.refine_global(3);
 

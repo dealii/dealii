@@ -104,9 +104,8 @@ int main ()
 
     Triangulation<dim-1,dim> boundary_mesh;
 
-
-    GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-				      surface_to_volume_mapping);
+    surface_to_volume_mapping
+      = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
     if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
       deallog << "Passed.";
@@ -135,9 +134,8 @@ int main ()
 
     Triangulation<dim-1,dim> boundary_mesh;
 
-
-    GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-				      surface_to_volume_mapping);
+    surface_to_volume_mapping
+      = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
 
     if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
       deallog << "Passed.";
@@ -170,9 +168,9 @@ int main ()
     set<unsigned char> boundary_ids;
     boundary_ids.insert(0);
 
-    GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-				      surface_to_volume_mapping,
-				      boundary_ids);
+    surface_to_volume_mapping
+      = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
+					  boundary_ids);
 
     if (test_vertices_orientation(boundary_mesh, surface_to_volume_mapping))
       deallog << "Passed.";

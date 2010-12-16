@@ -114,8 +114,8 @@ int main ()
     Triangulation<dim-1,dim> boundary_mesh;
     boundary_mesh.set_boundary (1, surface_description);
 
-    GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh,
-				      surface_to_volume_mapping);
+    surface_to_volume_mapping
+      = GridTools::extract_boundary_mesh (volume_mesh, boundary_mesh);
     deallog << volume_mesh.n_active_cells () << std::endl;
     deallog << boundary_mesh.n_active_cells () << std::endl;
     save_mesh(boundary_mesh);

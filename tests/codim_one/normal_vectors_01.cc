@@ -53,9 +53,9 @@ void test ()
   std::set<unsigned char> boundary_ids;
   boundary_ids.insert(0);
   
-  GridTools::extract_boundary_mesh (volume_mesh, tria,
-				    surface_to_volume_mapping,
-				    boundary_ids);
+  surface_to_volume_mapping
+    = GridTools::extract_boundary_mesh (volume_mesh, tria,
+					boundary_ids);
   
   FE_Q<dim-1,dim> fe (1);
   DoFHandler<dim-1,dim> dh(tria);

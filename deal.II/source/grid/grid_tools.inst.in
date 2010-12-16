@@ -213,12 +213,10 @@ for (deal_II_dimension : DIMENSIONS)
   {
 #if deal_II_dimension != 1
     template
-      void
+      std::map<  Triangulation<deal_II_dimension-1,deal_II_dimension>::cell_iterator,
+		 Triangulation<deal_II_dimension>::face_iterator>
       GridTools::extract_boundary_mesh (const Triangulation<deal_II_dimension> &volume_mesh,
 					Triangulation<deal_II_dimension-1,deal_II_dimension>  &surface_mesh,
-					std::map<  Triangulation<deal_II_dimension-1,deal_II_dimension>::cell_iterator,
-						   Triangulation<deal_II_dimension>::face_iterator>
-      &surface_to_volume_mapping,
 					const std::set<unsigned char> &boundary_ids);
 #endif
   }
@@ -228,12 +226,10 @@ for (deal_II_dimension : DIMENSIONS; Container : DOFHANDLER_TEMPLATES)
 
 #if deal_II_dimension != 1
     template
-      void
+      std::map<  Container<deal_II_dimension-1,deal_II_dimension>::cell_iterator,
+		 Container<deal_II_dimension>::face_iterator>
       GridTools::extract_boundary_mesh (const Container<deal_II_dimension> &volume_mesh,
 					Container<deal_II_dimension-1,deal_II_dimension>  &surface_mesh,
-					std::map<  Container<deal_II_dimension-1,deal_II_dimension>::cell_iterator,
-						   Container<deal_II_dimension>::face_iterator>
-      &surface_to_volume_mapping,
 					const std::set<unsigned char> &boundary_ids);
 #endif
   }
