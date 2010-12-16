@@ -983,13 +983,17 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
   std::vector<std::pair<cell_iterator, unsigned int> > all_cells;
   {
 				     // set the index of the first
-				     // cell. if first_locally_owned_cell/next_locally_owned_cell
+				     // cell. if
+				     // first_locally_owned_cell /
+				     // next_locally_owned_cell
 				     // returns non-active cells, then
 				     // the index is not usable
 				     // anyway, but otherwise we
 				     // should keep track where we are
     unsigned int index;
-    if (first_locally_owned_cell()->has_children())
+    if ((first_locally_owned_cell() == this->dofs->end())
+	||
+	(first_locally_owned_cell()->has_children()))
       index = 0;
     else
       index = std::distance (this->dofs->begin_active(),

@@ -1909,8 +1909,26 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   const unsigned int n_data_sets = data_names.size();
 
   UcdStream ucd_out(out, flags);
@@ -1990,7 +2008,25 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
+#else
+  if (patches.size() == 0)
+    return;
+#endif
 				   // Stream with special features for dx output
   DXStream dx_out(out, flags);
 
@@ -2256,8 +2292,26 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   const unsigned int n_data_sets = data_names.size();
 
   				   // write preamble
@@ -2473,7 +2527,25 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
+#else
+  if (patches.size() == 0)
+    return;
+#endif
   Assert (dim==2, ExcNotImplemented());        // only for 2-D surfaces on a 2-D plane
   Assert (spacedim==2, ExcNotImplemented());
 
@@ -2819,8 +2891,26 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
 {
   Assert (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
 				   // Do not allow volume rendering
   AssertThrow (dim==2, ExcNotImplemented());
 
@@ -3181,8 +3271,27 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 {
   Assert(dim<=3, ExcNotImplemented());
   AssertThrow (out, ExcIO());
+  
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   GmvStream gmv_out(out, flags);
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
@@ -3317,8 +3426,26 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   TecplotStream tecplot_out(out, flags);
 
   const unsigned int n_data_sets = data_names.size();
@@ -3590,8 +3717,26 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
 				   // first patch. checks against all
@@ -3883,8 +4028,26 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   VtkStream vtk_out(out, flags);
 
   const unsigned int n_data_sets = data_names.size();
@@ -4116,8 +4279,26 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+				   // verify that there are indeed
+				   // patches to be written out. most
+				   // of the times, people just forget
+				   // to call build_patches when there
+				   // are no patches, so a warning is
+				   // in order. that said, the
+				   // assertion is disabled if we
+				   // support MPI since then it can
+				   // happen that on the coarsest
+				   // mesh, a processor simply has no
+				   // cells it actually owns, and in
+				   // that case it is legit if there
+				   // are no patches
   Assert (patches.size() > 0, ExcNoPatches());
-
+#else
+  if (patches.size() == 0)
+    return;
+#endif
+  
   VtuStream vtu_out(out, flags);
 
   const unsigned int n_data_sets = data_names.size();
@@ -5124,6 +5305,7 @@ DataOutReader<dim,spacedim>::
 merge (const DataOutReader<dim,spacedim> &source)
 {
   typedef typename dealii::DataOutBase::Patch<dim,spacedim> Patch;
+
 
   const std::vector<Patch> source_patches = source.get_patches ();
   Assert (patches.size () != 0,        ExcNoPatches ());
