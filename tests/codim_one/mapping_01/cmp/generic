@@ -1,0 +1,45 @@
+
+DEAL::Testing hyper_ball in dim: 2...
+DEAL::Cell = 0.0, with center at 0.00000 -0.707107
+DEAL::  cell_normal[0] = 0.00000 1.00000
+DEAL::  cell_normal[1] = 0.00000 1.00000
+DEAL::Cell = 0.1, with center at -0.707107 0.00000
+DEAL::  cell_normal[0] = 1.00000 0.00000
+DEAL::  cell_normal[1] = 1.00000 0.00000
+DEAL::Cell = 0.2, with center at 0.707107 0.00000
+DEAL::  cell_normal[0] = -1.00000 0.00000
+DEAL::  cell_normal[1] = -1.00000 0.00000
+DEAL::Cell = 0.3, with center at 0.00000 0.707107
+DEAL::  cell_normal[0] = 0.00000 -1.00000
+DEAL::  cell_normal[1] = 0.00000 -1.00000
+DEAL::Testing hyper_ball in dim: 3...
+DEAL::Cell = 0.0, with center at 0.00000 0.00000 -0.577350
+DEAL::  cell_normal[0] = 0.00000 0.00000 1.00000
+DEAL::  cell_normal[1] = 0.00000 0.00000 1.00000
+DEAL::  cell_normal[2] = 0.00000 0.00000 1.00000
+DEAL::  cell_normal[3] = 0.00000 0.00000 1.00000
+DEAL::Cell = 0.1, with center at 0.577350 0.00000 0.00000
+DEAL::  cell_normal[0] = -1.00000 0.00000 0.00000
+DEAL::  cell_normal[1] = -1.00000 0.00000 0.00000
+DEAL::  cell_normal[2] = -1.00000 0.00000 0.00000
+DEAL::  cell_normal[3] = -1.00000 0.00000 0.00000
+DEAL::Cell = 0.2, with center at 0.00000 0.00000 0.577350
+DEAL::  cell_normal[0] = 0.00000 0.00000 -1.00000
+DEAL::  cell_normal[1] = 0.00000 0.00000 -1.00000
+DEAL::  cell_normal[2] = 0.00000 0.00000 -1.00000
+DEAL::  cell_normal[3] = 0.00000 0.00000 -1.00000
+DEAL::Cell = 0.3, with center at -0.577350 0.00000 0.00000
+DEAL::  cell_normal[0] = 1.00000 0.00000 0.00000
+DEAL::  cell_normal[1] = 1.00000 0.00000 0.00000
+DEAL::  cell_normal[2] = 1.00000 0.00000 0.00000
+DEAL::  cell_normal[3] = 1.00000 0.00000 0.00000
+DEAL::Cell = 0.4, with center at 0.00000 -0.577350 0.00000
+DEAL::  cell_normal[0] = 0.00000 1.00000 0.00000
+DEAL::  cell_normal[1] = 0.00000 1.00000 0.00000
+DEAL::  cell_normal[2] = 0.00000 1.00000 0.00000
+DEAL::  cell_normal[3] = 0.00000 1.00000 0.00000
+DEAL::Cell = 0.5, with center at 0.00000 0.577350 0.00000
+DEAL::  cell_normal[0] = 0.00000 -1.00000 0.00000
+DEAL::  cell_normal[1] = 0.00000 -1.00000 0.00000
+DEAL::  cell_normal[2] = 0.00000 -1.00000 0.00000
+DEAL::  cell_normal[3] = 0.00000 -1.00000 0.00000
