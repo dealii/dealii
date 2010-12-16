@@ -1,4 +1,4 @@
-# $Id: Makefile 22601 2010-11-04 03:26:19Z bangerth $
+# $Id$
 
 
 # For the small projects Makefile, you basically need to fill in only
