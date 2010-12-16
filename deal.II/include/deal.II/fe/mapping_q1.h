@@ -229,7 +229,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * vectors.
 					  *
 					  * This vector has
-					  * (dim-1)*GeometryInfo<dim>::faces_per_cell
+					  * (dim-1)*GeometryInfo::faces_per_cell
 					  * entries. The first
 					  * GeometryInfo<dim>::faces_per_cell
 					  * contain the vectors in the first
