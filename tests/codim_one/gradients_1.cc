@@ -96,7 +96,7 @@ void test(std::string filename, unsigned int degree = 1)
 		       quad, the_function, projected_one);
 
   deallog << "L2 norm of projected vector: "
-	  << projected_one.l2_norm() << endl;
+	  << projected_one.l2_norm() << std::endl;
 
 
 				// compute the H1 difference
@@ -105,7 +105,7 @@ void test(std::string filename, unsigned int degree = 1)
 				     the_function, difference_per_cell,
 				     quad, VectorTools::H1_norm);
 
-  deallog << "H1 error: " << difference_per_cell.l2_norm() << endl;
+  deallog << "H1 error: " << difference_per_cell.l2_norm() << std::endl;
 }
 
 
