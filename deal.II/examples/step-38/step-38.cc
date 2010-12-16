@@ -160,8 +160,6 @@ class LaplaceBeltrami
     DoFHandler<dim-1,dim>      dof_handler;
     MappingQ<dim-1, dim>       mapping;
 
-    ConstraintMatrix     matrix_constraints;
-
     SparsityPattern      sparsity_pattern;
     SparseMatrix<double> system_matrix;
   
@@ -228,14 +226,10 @@ void LaplaceBeltrami<dim>::setup_system ()
 	    << " degrees of freedom."
 	    << std::endl;
   
-  matrix_constraints.clear ();
-  matrix_constraints.close ();
-
   CompressedSparsityPattern csp (dof_handler.n_dofs(),
                                  dof_handler.n_dofs());
 
   DoFTools::make_sparsity_pattern (dof_handler, csp);
-  matrix_constraints.condense (csp);
 
   sparsity_pattern.copy_from (csp);
 
@@ -331,25 +325,20 @@ void LaplaceBeltrami<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs,false);
-
-				   // condense matrices
-  matrix_constraints.condense (system_matrix);
-  matrix_constraints.condense (system_rhs);
 }
 
 
 template <int dim>
 void LaplaceBeltrami<dim>::solve () 
 {
-  SolverControl           solver_control (1000, 1e-7);
+  SolverControl           solver_control (solution.size(), 1e-7);
   SolverCG<>              cg (solver_control);
 
+  PreconditionSSOR<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.2);
+
   cg.solve (system_matrix, solution, system_rhs,
-	    PreconditionIdentity());
-
-
-  matrix_constraints.distribute (solution);
-
+	    preconditioner);
 }
 
 
