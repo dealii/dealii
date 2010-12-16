@@ -1,25 +1,29 @@
 <h1>Results</h1>
 
-We ran the program using the following <code>parameters.prm</code> file (which
-can also be found in the directory in which all the other source files are):
-@verbatim
-# Listing of Parameters
-# ---------------------
-@endverbatim
-
-When we run the program, the following is printed on screen:
+When you run the program, the following output should be printed on screen:
 
 @verbatim
-================================
-          LB PROBLEM 
-================================
-
-DEAL:cg::Starting value 0.677406
-DEAL:cg::Convergence step 580 value 9.71224e-08
-0.00552653
-
+Surface mesh has 1280 cells.
+Surface mesh has 5185 degrees of freedom.
+H1 error = 0.0221245
 @endverbatim
 
-Here is a plot of the result:
+By playing around with the number of global refinements in teh
+<code>LaplaceBeltrami::make_mesh</code> function you increase or decrease mesh
+refinement. For example, doing one more refinement yields the following
+output:
+
+@verbatim
+Surface mesh has 5120 cells.
+Surface mesh has 20609 degrees of freedom.
+H1 error = 0.00552639
+@endverbatim
+
+This is what we expect: make the mesh size smaller by a factor of two and the
+error goes down by a factor of four (***HM, SHOULDN'T IT BE A FACTOR OF
+TWO???***)
+
+Finally, the program produces graphical output that we can visualize. Here is
+a plot of the results:
 
 @image html step-38.solution.png
