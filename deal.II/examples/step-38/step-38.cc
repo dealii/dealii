@@ -59,27 +59,32 @@ class Solution  : public Function<dim>
 
 };
  
-template <int dim>
-double Solution<dim>::value (const Point<dim> &p,
-			     const unsigned int) const 
+template <>
+double
+Solution<3>::value (const Point<3> &p,
+		    const unsigned int) const 
 {
-  return sin(numbers::PI * p(0))*cos(numbers::PI * p(1))*exp(p(2)); 
+  return (std::sin(numbers::PI * p(0)) *
+	  std::cos(numbers::PI * p(1))*exp(p(2)));
 }
 
-template <int dim>
-Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,
-				       const unsigned int) const
+
+template <>
+Tensor<1,3>
+Solution<3>::gradient (const Point<3>   &p,
+		       const unsigned int) const
 {
-  double dPi = numbers::PI;
+  using numbers::PI;
 
-  Tensor<1,dim> return_value;
+  Tensor<1,3> return_value;
 
-  return_value[0] = dPi *cos(dPi * p(0))*cos(dPi * p(1))*exp(p(2));
-  return_value[1] = -dPi *sin(dPi * p(0))*sin(dPi * p(1))*exp(p(2));
-  return_value[2] = sin(dPi * p(0))*cos(dPi * p(1))*exp(p(2));
+  return_value[0] = PI *cos(PI * p(0))*cos(PI * p(1))*exp(p(2));
+  return_value[1] = -PI *sin(PI * p(0))*sin(PI * p(1))*exp(p(2));
+  return_value[2] = sin(PI * p(0))*cos(PI * p(1))*exp(p(2));
   
   return return_value;
 }
+
 
 template <int dim>
 class RightHandSide : public Function<dim>
@@ -91,48 +96,50 @@ class RightHandSide : public Function<dim>
 			  const unsigned int  component = 0) const;
 };
 
-template <int dim>
-double RightHandSide<dim>::value (const Point<dim> &p,
-				  const unsigned int comp) const 
+
+template <>
+double
+RightHandSide<3>::value (const Point<3> &p,
+			 const unsigned int comp) const 
 {
-  Assert(dim == 3,  ExcInternalError());
-  
-  double dPi = numbers::PI;
+  using numbers::PI;
 
 				   // LB: u = Delta u - nu D2 u nu - (Grad u nu ) div (nu)
 
-  Tensor<2,dim> hessian;
+  Tensor<2,3> hessian;
 
-  hessian[0][0] = -dPi*dPi*sin(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
-  hessian[1][1] = -dPi*dPi*sin(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
-  hessian[2][2] = sin(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
+  hessian[0][0] = -PI*PI*sin(PI*p(0))*cos(PI*p(1))*exp(p(2));
+  hessian[1][1] = -PI*PI*sin(PI*p(0))*cos(PI*p(1))*exp(p(2));
+  hessian[2][2] = sin(PI*p(0))*cos(PI*p(1))*exp(p(2));
 
-  hessian[0][1] = -dPi*dPi*cos(dPi*p(0))*sin(dPi*p(1))*exp(p(2));
-  hessian[1][0] = -dPi*dPi*cos(dPi*p(0))*sin(dPi*p(1))*exp(p(2));
+  hessian[0][1] = -PI*PI*cos(PI*p(0))*sin(PI*p(1))*exp(p(2));
+  hessian[1][0] = -PI*PI*cos(PI*p(0))*sin(PI*p(1))*exp(p(2));
 
-  hessian[0][2] = dPi*cos(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
-  hessian[2][0] = dPi*cos(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
+  hessian[0][2] = PI*cos(PI*p(0))*cos(PI*p(1))*exp(p(2));
+  hessian[2][0] = PI*cos(PI*p(0))*cos(PI*p(1))*exp(p(2));
 
-  hessian[1][2] = -dPi*sin(dPi*p(0))*sin(dPi*p(1))*exp(p(2));
-  hessian[2][1] = -dPi*sin(dPi*p(0))*sin(dPi*p(1))*exp(p(2));
+  hessian[1][2] = -PI*sin(PI*p(0))*sin(PI*p(1))*exp(p(2));
+  hessian[2][1] = -PI*sin(PI*p(0))*sin(PI*p(1))*exp(p(2));
 
-  Tensor<1,dim> gradient;
-  gradient[0] = dPi * cos(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
-  gradient[1] = - dPi * sin(dPi*p(0))*sin(dPi*p(1))*exp(p(2));
-  gradient[2] = sin(dPi*p(0))*cos(dPi*p(1))*exp(p(2));
+  Tensor<1,3> gradient;
+  gradient[0] = PI * cos(PI*p(0))*cos(PI*p(1))*exp(p(2));
+  gradient[1] = - PI * sin(PI*p(0))*sin(PI*p(1))*exp(p(2));
+  gradient[2] = sin(PI*p(0))*cos(PI*p(1))*exp(p(2));
 
   double curvature;
-  Point<dim> normal;
+  Point<3> normal;
   double dLength;  
 
-  curvature = dim-1;
+  curvature = 3-1; // dim-1
   dLength = sqrt(p(0)*p(0)+p(1)*p(1)+p(2)*p(2));
   
   normal[0] = p(0)/dLength;
   normal[1] = p(1)/dLength;
   normal[2] = p(2)/dLength;
   
-  return -trace(hessian) + (hessian * normal) * normal + (gradient * normal)*curvature;
+  return (-trace(hessian) +
+	  (hessian * normal) * normal +
+	  (gradient * normal) * curvature);
 }
 
 
