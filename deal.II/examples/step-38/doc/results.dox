@@ -20,8 +20,16 @@ H1 error = 0.00552639
 @endverbatim
 
 This is what we expect: make the mesh size smaller by a factor of two and the
-error goes down by a factor of four (***HM, SHOULDN'T IT BE A FACTOR OF
-TWO???***)
+error goes down by a factor of four (remember that we use bi-quadratic
+elements). The full sequence of errors from one to five refinements looks like
+this, neatly following the theoretically predicted pattern:
+@verbatim
+0.360759
+0.0888008
+0.0221245
+0.00552639
+0.0013813
+@endverbatim
 
 Finally, the program produces graphical output that we can visualize. Here is
 a plot of the results:
