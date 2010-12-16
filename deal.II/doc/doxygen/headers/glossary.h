@@ -218,7 +218,7 @@
  * orthogonal to all tangent directions of the boundary and within the
  * tangent plane of the domain. Note that this is compatible with case
  * <code>dim==spacedim</code> since there the tangent plane is the
- * entire space $\R^\text{dim}$.
+ * entire space ${\mathbb R}^\text{dim}$.
  *
  * In either case, the length of the vector equals the determinant of
  * the transformation of reference face to the face of the current
