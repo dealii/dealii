@@ -84,7 +84,7 @@ endif
 	@echo =====Running======= $<
 	@echo Running > $(dir $@)/status
 	@$(ULIMIT) -t $(if $(ULIMIT_LIMIT),$(ULIMIT_LIMIT),300) ; \
-	  export WALLTIME=$(if $(ULIMIT_LIMIT),$(ULIMIT_LIMIT),300) ; \
+	  export WALLTIME=3600 ; \
 	  ./$< ; \
 	  if test ! $$? = 0 ; then rm $@ ; false ; fi
 	@perl -pi $(normalize)  $@

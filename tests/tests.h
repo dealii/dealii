@@ -22,7 +22,6 @@
 #include <base/exceptions.h>
 #include <base/utilities.h>
 #include <base/thread_management.h>
-#include <base/multithread_info.h>
 #include <cmath>
 #include <fstream>
 #include <sstream>
@@ -116,9 +115,7 @@ set_grain_sizes;
 
 
 // spawn a thread that terminates the program after a certain time
-// given by the environment variable WALLTIME (times a factor to
-// account for the fact that we run on multicore systems where things
-// may take longer -- let's take 4*n_cpus as a factor). this makes
+// given by the environment variable WALLTIME. this makes
 // sure we don't let jobs that deadlock on some mutex hang around
 // forever. note that this is orthogonal to using "ulimit" in
 // Makefile.rules, which only affects CPU time and consequently works
@@ -142,7 +139,7 @@ struct DeadlockKiller
 	    conv >> delay;
 	    if (conv)
 	      {
-		sleep (delay*multithread_info.n_cpus*4);
+		sleep (delay);
 		std::cerr << "Time's up: Killing job because it overran its allowed walltime"
 			  << std::endl;
 		std::abort ();
@@ -158,8 +155,9 @@ struct DeadlockKiller
 					   // environment variable is
 					   // not set, so assume
 					   // infinite wait time and
-					   // simply quite this thread
-	  ;
+					   // simply quit this thread
+	  {
+	  }
       }
 
   public:
