@@ -152,18 +152,9 @@ class LaplaceBeltrami
 {
   public:
     LaplaceBeltrami ();
-				     // arguments are:
-				     // triangulation
-				     // right-hand side
-				     // fe_degree for solution
-				     // fe_degree for mapping
-				     // exact solution is known
-  
-    ~LaplaceBeltrami ();
     void run ();
   
   private:
-
     void make_mesh ();
     void setup_system ();
     void assemble_system ();
@@ -194,12 +185,6 @@ LaplaceBeltrami<dim>::LaplaceBeltrami ()
 		mapping(2)
 {}
 
-
-template <int dim>
-LaplaceBeltrami<dim>::~LaplaceBeltrami () 
-{
-  dof_handler.clear ();
-}
 
 
 template <int dim>
@@ -251,19 +236,20 @@ void LaplaceBeltrami<dim>::setup_system ()
   system_rhs.reinit (dof_handler.n_dofs());
 }
 
+
 template <int dim>
 void LaplaceBeltrami<dim>::assemble_system () 
-{  
-
+{
   system_matrix = 0;
   system_rhs = 0;
   
   QGauss<dim-1>  quadrature_formula(2);
 
-  FEValues<dim-1,dim> fe_values (mapping,fe, quadrature_formula, 
-				 update_values   | update_cell_normal_vectors |
-				 update_gradients |
-				 update_quadrature_points | update_JxW_values);
+  FEValues<dim-1,dim> fe_values (mapping, fe, quadrature_formula, 
+				 update_values              |
+				 update_gradients           |
+				 update_quadrature_points   |
+				 update_JxW_values);
 
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
@@ -290,29 +276,18 @@ void LaplaceBeltrami<dim>::assemble_system ()
       rhs.value_list (fe_values.get_quadrature_points(), rhs_values); 
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{	  
-	  for (unsigned int j=0; j<dofs_per_cell; ++j) 
-	    {	      
-	      for (unsigned int q_point=0; q_point<n_q_points;
-		   ++q_point)
-		{
-		  cell_matrix(i,j) 
-		    += fe_values.shape_grad(i,q_point) *
-		    fe_values.shape_grad(j,q_point) *
-		    fe_values.JxW(q_point);
-		}
-	    }
-	}
-
+	for (unsigned int j=0; j<dofs_per_cell; ++j) 
+	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	    cell_matrix(i,j) 
+	      += fe_values.shape_grad(i,q_point) *
+	      fe_values.shape_grad(j,q_point) *
+	      fe_values.JxW(q_point);
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  
-	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
-			   rhs_values[q_point]*
-			   fe_values.JxW(q_point);
-	}
+	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	  cell_rhs(i) += fe_values.shape_value(i,q_point) *
+			 rhs_values[q_point]*
+			 fe_values.JxW(q_point);
 
       cell->get_dof_indices (local_dof_indices);
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -327,14 +302,13 @@ void LaplaceBeltrami<dim>::assemble_system ()
     }
 
 
-  std::map<unsigned int,double> bdy_values; 
-  VectorTools::interpolate_boundary_values (mapping,dof_handler,
+  std::map<unsigned int,double> boundary_values; 
+  VectorTools::interpolate_boundary_values (mapping,
+					    dof_handler,
 					    0,
 					    Solution<dim>(),
-					    bdy_values
-  );
-
-  MatrixTools::apply_boundary_values (bdy_values,
+					    boundary_values);
+  MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
 				      solution,
 				      system_rhs,false);
@@ -344,8 +318,8 @@ void LaplaceBeltrami<dim>::assemble_system ()
 template <int dim>
 void LaplaceBeltrami<dim>::solve () 
 {
-  SolverControl           solver_control (solution.size(), 1e-7);
-  SolverCG<>              cg (solver_control);
+  SolverControl solver_control (solution.size(), 1e-7);
+  SolverCG<>    cg (solver_control);
 
   PreconditionSSOR<> preconditioner;
   preconditioner.initialize(system_matrix, 1.2);
@@ -359,19 +333,14 @@ void LaplaceBeltrami<dim>::solve ()
 template <int dim>
 void LaplaceBeltrami<dim>::output_results () const
 {
-  
-  std::string filename = "solution.vtk";
-
-  std::ofstream output (filename.c_str());
-
   DataOut<dim-1,DoFHandler<dim-1,dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
-
- 
-
-  data_out.add_data_vector (solution, "solution",DataOut_DoFData<DoFHandler<dim-1,dim>,dim-1,dim>::type_dof_data);
+  data_out.add_data_vector (solution, "solution",
+			    DataOut<dim-1,DoFHandler<dim-1,dim> >::type_dof_data);
   data_out.build_patches (mapping,
 			  mapping.get_degree());
+
+  std::ofstream output ("solution.vtk");
   data_out.write_vtk (output);
 }
 
@@ -385,8 +354,7 @@ void LaplaceBeltrami<dim>::compute_error () const
 				     Solution<dim>(),
 				     difference_per_cell,
 				     QGauss<dim-1>(2*fe.degree+1),
-				     VectorTools::H1_norm);
-  
+				     VectorTools::H1_norm);  
   
   std::cout << "H1 error = "
 	    << difference_per_cell.l2_norm()
