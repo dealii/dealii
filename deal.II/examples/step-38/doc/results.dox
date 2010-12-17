@@ -35,3 +35,107 @@ Finally, the program produces graphical output that we can visualize. Here is
 a plot of the results:
 
 @image html step-38.solution.png
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+Computing on surfaces only becomes interesting if the surface is more
+interesting than just 5/6th of a sphere. To achieve this, deal.II can read
+meshes that describe surfaces through the usual GridIn class. Or, in case you
+have an analytic description, a simple mesh can sometimes be stretched and
+bent into a shape we are interested in.
+
+Let us consider a relatively simple example: we take the 5/6th sphere we used
+before, we stretch it by a factor of 10 in the z-direction, and then we jumble
+the x- and y-coordinates a bit. Let's show the computational domain and the
+solution first before we go into details of the implementation below:
+
+@image html step-38.warp-1.png
+
+@image html step-38.warp-2.png
+
+The way to produce such a mesh is by using the GridTools::transform
+function. It needs a way to transform each individual mesh point to a
+different position. Let us here use the following, rather simple function
+(remember: stretch in one direction, jumble in the other two):
+
+@code
+template <int dim>
+Point<dim> warp (const Point<dim> &p)
+{
+  Point<dim> q = p;
+  q[dim-1] *= 10;
+
+  if (dim >= 2)
+    q[0] += 2*std::sin(q[dim-1]);
+  if (dim >= 3)
+    q[1] += 2*std::cos(q[dim-1]);
+
+  return q;
+}
+@endcode
+
+If we followed the <code>LaplaceBeltrami::make_mesh</code> function, we would
+extract the 5/6th spherical surface mesh as before, warp it into the shape we
+want, and refine as often as necessary. This is not quite as simple as we'd
+like here, though: refining requires that we have an appropriate manifold
+object attached to the triangulation that describes where new vertices of the
+mesh should be located upon refinement. I'm sure it's possible to describe
+this manifold in a not-too-complicated way by simply undoing the
+transformation above (yielding the spherical surface again), finding the
+location of a new point on the sphere, and then re-warping the result. But I'm
+a lazy person, and since doing this is not really the point here, let's just
+make our lives a bit easier: we'll extract the 5/6th sphere, refine it as
+often as necessary, get rid of the object that describes the manifold since we
+now no longer need it, and then finally warp the mesh. With the function
+above, this would look as follows:
+
+@code
+template <int dim>
+void LaplaceBeltrami<dim>::make_mesh ()
+{
+  HyperBallBoundary<dim> boundary_description;
+  Triangulation<dim> volume_mesh;
+  GridGenerator::half_hyper_ball(volume_mesh);
+  
+  volume_mesh.set_boundary (1, boundary_description);
+  volume_mesh.set_boundary (0, boundary_description);
+  volume_mesh.refine_global (6);
+  
+  static HyperBallBoundary<dim-1,dim> surface_description;
+  triangulation.set_boundary (1, surface_description);
+  triangulation.set_boundary (0, surface_description);
+  
+  std::set<unsigned char> boundary_ids;
+  boundary_ids.insert(0);
+  
+  GridTools::extract_boundary_mesh (volume_mesh, triangulation,
+				    boundary_ids);
+  triangulation.set_boundary (1);                       /* ** */
+  triangulation.set_boundary (0);                       /* ** */
+  GridTools::transform (&warp<dim>, triangulation);     /* ** */
+
+  std::cout << "Surface mesh has " << triangulation.n_active_cells()
+	    << " cells."
+	    << std::endl;
+}
+@endcode
+
+Note that the only addition has been the three lines marked with asterisks. It
+is worth pointing out one other thing here, though: because we un-attach the
+manifold description from the surface mesh, whenever we use a mapping object
+in the rest of the program, it has no curves boundary description to go on any
+more. Rather, it will have to use the implicit, StraightBoundary class that is
+used on all parts of the boundary not explicitly assigned a different
+mannifold object. Consequently, whether we use MappingQ(2), MappingQ(15) or
+MappingQ1, each cell of our mesh will be mapped using a bilinear
+approximation. 
+
+All these drawbacks aside, the resulting pictures are still pretty. The only
+other differences to what's in step-38 is that we changed the right hand side
+to $f(\mathbf x)=\sin x_3$ and the boundary values (through the
+<code>Solution</code> class) to $u(\mathbf x)|_{\partial\Omega}=\cos x_3$. Of
+course, we now non longer know the exact solution, so the computation of the
+error at the end of <code>LaplaceBeltrami::run</code> will yield a meaningless
+number.
