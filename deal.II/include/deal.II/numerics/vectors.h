@@ -312,7 +312,7 @@ class ConstraintMatrix;
  *   function is automatically projected along the curve, and the
  *   difference is only computed on the tangential part of the
  *   gradient, since no information is available, on the finite
- *   dimensional one, on the normal component of the gradient. 
+ *   dimensional one, on the normal component of the gradient.
  * </ul>
  *
  * All functions use the finite element given to the DoFHandler object the last
@@ -641,7 +641,7 @@ class VectorTools
 			       const std::vector<bool>       &component_mask = std::vector<bool>());
 
 				     /**
-				      * @deprecated This function is there mainly
+				      * @deprecated This function exists mainly
 				      * for backward compatibility.
 				      *
 				      * Same function as above, but
