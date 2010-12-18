@@ -15,52 +15,51 @@
 // dealii:: namespace in order to not confuse the compiler with
 // FEValuesViews::Vector).
 for (deal_II_dimension : DIMENSIONS)
-{
-template class FEValuesData<deal_II_dimension>;
-template class FEValuesBase<deal_II_dimension>;
-template class FEValues<deal_II_dimension>;
-template class FEValuesBase<deal_II_dimension>::
-CellIterator<DoFHandler<deal_II_dimension>::cell_iterator>;
-template class FEValuesBase<deal_II_dimension>::
-CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
+  {
+    template class FEValuesData<deal_II_dimension>;
+    template class FEValuesBase<deal_II_dimension>;
+    template class FEValues<deal_II_dimension>;
+    template class FEValuesBase<deal_II_dimension>::
+      CellIterator<DoFHandler<deal_II_dimension>::cell_iterator>;
+    template class FEValuesBase<deal_II_dimension>::
+      CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
 
 #if deal_II_dimension >= 2
-template class FEFaceValuesBase<deal_II_dimension>;
-template class FEFaceValues<deal_II_dimension>;
-template class FESubfaceValues<deal_II_dimension>;
+    template class FEFaceValuesBase<deal_II_dimension>;
+    template class FEFaceValues<deal_II_dimension>;
+    template class FESubfaceValues<deal_II_dimension>;
 #endif
 
 #if deal_II_dimension != 3
-template class FEValuesData<deal_II_dimension,deal_II_dimension+1>;
-template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>;
-template class FEValues<deal_II_dimension,deal_II_dimension+1>;
-template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
-CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
-template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
- CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
+    template class FEValuesData<deal_II_dimension,deal_II_dimension+1>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>;
+    template class FEValues<deal_II_dimension,deal_II_dimension+1>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
+      CellIterator<DoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
+    template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
+      CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
 
 #if deal_II_dimension == 2
-template class FEFaceValuesBase<deal_II_dimension,deal_II_dimension+1>;
-template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
-template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
+    template class FEFaceValuesBase<deal_II_dimension,deal_II_dimension+1>;
+    template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
+    template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
 #endif
 #endif
 
 
-namespace FEValuesViews
-\{
-  template class Scalar<deal_II_dimension, deal_II_dimension>;
-  template class Vector<deal_II_dimension, deal_II_dimension>;
-  template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension>;
+    namespace FEValuesViews
+      \{
+      template class Scalar<deal_II_dimension, deal_II_dimension>;
+      template class Vector<deal_II_dimension, deal_II_dimension>;
+      template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension>;
 
 #if deal_II_dimension != 3
-  template class Scalar<deal_II_dimension, deal_II_dimension+1>;
-  template class Vector<deal_II_dimension, deal_II_dimension+1>;
-  template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>;
+      template class Scalar<deal_II_dimension, deal_II_dimension+1>;
+      template class Vector<deal_II_dimension, deal_II_dimension+1>;
+      template class SymmetricTensor<2, deal_II_dimension, deal_II_dimension+1>;
 #endif
-\}
-
-}
+      \}
+  }
 
 for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS)
   {
