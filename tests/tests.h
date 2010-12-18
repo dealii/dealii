@@ -166,7 +166,6 @@ struct DeadlockKiller
 	dealii::Threads::new_thread (&nuke_it);
       }
 };
-DeadlockKiller deadlock_killer;
 
 #endif
 
