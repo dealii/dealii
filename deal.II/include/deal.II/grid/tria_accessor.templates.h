@@ -2282,19 +2282,19 @@ unsigned int TriaAccessor<0, 1, spacedim>::max_refinement_depth ()
 
 template <int spacedim>
 inline
-TriaIterator<InvalidAccessor<0,1,spacedim> >
+TriaIterator<TriaAccessor<0,1,spacedim> >
 TriaAccessor<0, 1, spacedim>::child (const unsigned int)
 {
-  return TriaIterator<InvalidAccessor<0,1,spacedim> >();
+  return TriaIterator<TriaAccessor<0,1,spacedim> >();
 }
 
 
 template <int spacedim>
 inline
-TriaIterator<InvalidAccessor<0,1,spacedim> >
+TriaIterator<TriaAccessor<0,1,spacedim> >
 TriaAccessor<0, 1, spacedim>::isotropic_child (const unsigned int)
 {
-  return TriaIterator<InvalidAccessor<0,1,spacedim> >();
+  return TriaIterator<TriaAccessor<0,1,spacedim> >();
 }
 
 

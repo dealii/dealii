@@ -1967,14 +1967,14 @@ class TriaAccessor<0, 1, spacedim>
 				      * @brief Return an invalid object
 				      */
     static
-    TriaIterator<InvalidAccessor<0,1,spacedim> >
+    TriaIterator<TriaAccessor<0,1,spacedim> >
     child (const unsigned int);
 
 				     /**
 				      * @brief Return an invalid object
 				      */
     static
-    TriaIterator<InvalidAccessor<0,1,spacedim> >
+    TriaIterator<TriaAccessor<0,1,spacedim> >
     isotropic_child (const unsigned int);
 
 				     /**
@@ -2613,7 +2613,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
                                      /**
 				      * @}
 				      */
-                                     
+
                                      /**
 				      *  @name Dealing with codim 1 cell orientation
 				      */
@@ -2630,7 +2630,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      */
     bool direction_flag () const;
 
-				     
+
 
 				     /**
 				      *  Return an iterator to the
@@ -2844,7 +2844,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
     template <int, int> friend class Triangulation;
 
     friend class internal::Triangulation::Implementation;
-    
+
 };
 
 
