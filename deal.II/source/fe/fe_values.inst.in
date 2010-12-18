@@ -24,11 +24,9 @@ for (deal_II_dimension : DIMENSIONS)
     template class FEValuesBase<deal_II_dimension>::
       CellIterator<MGDoFHandler<deal_II_dimension>::cell_iterator>;
 
-#if deal_II_dimension >= 2
     template class FEFaceValuesBase<deal_II_dimension>;
     template class FEFaceValues<deal_II_dimension>;
     template class FESubfaceValues<deal_II_dimension>;
-#endif
 
 #if deal_II_dimension != 3
     template class FEValuesData<deal_II_dimension,deal_II_dimension+1>;
@@ -39,11 +37,9 @@ for (deal_II_dimension : DIMENSIONS)
     template class FEValuesBase<deal_II_dimension,deal_II_dimension+1>::
       CellIterator<MGDoFHandler<deal_II_dimension,deal_II_dimension+1>::cell_iterator>;
 
-#if deal_II_dimension == 2
     template class FEFaceValuesBase<deal_II_dimension,deal_II_dimension+1>;
     template class FEFaceValues<deal_II_dimension,deal_II_dimension+1>;
     template class FESubfaceValues<deal_II_dimension,deal_II_dimension+1>;
-#endif
 #endif
 
 
