@@ -120,5 +120,12 @@ and
 <h3>Implementation</h3>
 
 <h3>Testcase</h3>
+In general when you want to test numerically the accuracy and/or 
+order of convergence of an algorithm you need to provide an exact
+solution. 
+The usual trick is to pick a function that we want to be the solution applied 
+the differential operator to define a forcing term for the right hand side.
+This is what we do in this example.
+
 
 Mapping objects
