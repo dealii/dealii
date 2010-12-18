@@ -859,7 +859,7 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 				      * do anything useful here and so
 				      * may not actually be called.
 				      */
-    DoFAccessor (const Triangulation<1,spacedim> * =  0,
+    DoFAccessor (const Triangulation<1,spacedim> *,
 		 const int = 0,
 		 const int = 0,
 		 const DH<1,spacedim> * = 0);

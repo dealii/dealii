@@ -339,6 +339,14 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
 				      */
 
 				     /**
+				      * Return a handle on the
+				      * DoFHandler object which we
+				      * are using.
+				      */
+    const MGDoFHandler<dim,spacedim> &
+    get_mg_dof_handler () const;
+
+				     /**
 				      * Return an iterator pointing to
 				      * the the parent.
 				      */
@@ -411,6 +419,161 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
     template <int, int> friend class MGDoFHandler;
     friend class internal::MGDoFHandler::Implementation;
 };
+
+
+
+/**
+ * Specialization of the general MGDoFAccessor class template for the
+ * case of zero-dimensional objects (a vertex) that are the face of a
+ * one-dimensional cell in spacedim space dimensions. Since vertices
+ * function differently than general faces, this class does a few
+ * things differently than the general template, but the interface
+ * should look the same.
+ *
+ * @author Wolfgang Bangerth, 2010
+ */
+template <int spacedim>
+class MGDoFAccessor<0,1,spacedim> : public internal::MGDoFAccessor::Inheritance<0,1,spacedim>::BaseClass
+{
+  public:
+				     /**
+				      * Declare a typedef to the base
+				      * class to make accessing some
+				      * of the exception classes
+				      * simpler.
+				      */
+    typedef
+    typename internal::MGDoFAccessor::Inheritance<0,1,spacedim>::BaseClass
+    BaseClass;
+
+				     /**
+				      * A typedef necessary for the
+				      * iterator classes.
+				      */
+    typedef MGDoFHandler<1,spacedim> AccessorData;
+
+				     /**
+				      * The dof handler type used by
+				      * this accessor.
+				      */
+    typedef MGDoFHandler<1, spacedim> Container;
+
+				     /**
+				      * @name Constructors
+				      */
+				     /**
+				      * @{
+				      */
+
+				     /**
+				      * Default constructor. Provides
+				      * an accessor that can't be
+				      * used.
+				      */
+    MGDoFAccessor ();
+
+				     /**
+				      * Constructor to be used if the
+				      * object here refers to a vertex
+				      * of a one-dimensional
+				      * triangulation, i.e. a face of
+				      * the triangulation.
+				      *
+				      * Since there is no mapping from
+				      * vertices to cells, an accessor
+				      * object for a point has no way
+				      * to figure out whether it is at
+				      * the boundary of the domain or
+				      * not. Consequently, the second
+				      * argument must be passed by the
+				      * object that generates this
+				      * accessor -- e.g. a 1d cell
+				      * that can figure out whether
+				      * its left or right vertex are
+				      * at the boundary.
+				      *
+				      * The third argument is the
+				      * global index of the vertex we
+				      * point to.
+				      *
+				      * The fourth argument is a
+				      * pointer to the MGDoFHandler
+				      * object.
+				      *
+				      * This iterator can only be
+				      * called for one-dimensional
+				      * triangulations.
+				      */
+    MGDoFAccessor (const Triangulation<1,spacedim> * tria,
+		   const typename TriaAccessor<0,1,spacedim>::VertexKind vertex_kind,
+		   const unsigned int    vertex_index,
+		   const MGDoFHandler<1,spacedim> * dof_handler);
+
+				     /**
+				      * Constructor. This constructor
+				      * exists in order to maintain
+				      * interface compatibility with
+				      * the other accessor
+				      * classes. However, it doesn't
+				      * do anything useful here and so
+				      * may not actually be called.
+				      */
+    MGDoFAccessor (const Triangulation<1,spacedim> * =  0,
+		   const int = 0,
+		   const int = 0,
+		   const MGDoFHandler<1,spacedim> * = 0);
+
+				     /**
+				      * Conversion constructor. This
+				      * constructor exists to make certain
+				      * constructs simpler to write in
+				      * dimension independent code. For
+				      * example, it allows assigning a face
+				      * iterator to a line iterator, an
+				      * operation that is useful in 2d but
+				      * doesn't make any sense in 3d. The
+				      * constructor here exists for the
+				      * purpose of making the code conform to
+				      * C++ but it will unconditionally abort;
+				      * in other words, assigning a face
+				      * iterator to a line iterator is better
+				      * put into an if-statement that checks
+				      * that the dimension is two, and assign
+				      * to a quad iterator in 3d (an operator
+				      * that, without this constructor would
+				      * be illegal if we happen to compile for
+				      * 2d).
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    MGDoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &);
+
+				     /**
+				      * Another conversion operator
+				      * between objects that don't
+				      * make sense, just like the
+				      * previous one.
+				      */
+    template <int structdim2, int dim2, int spacedim2>
+    MGDoFAccessor (const MGDoFAccessor<structdim2, dim2, spacedim2> &);
+
+
+				     /**
+				      * Another conversion operator
+				      * between objects that don't
+				      * make sense, just like the
+				      * previous one.
+				      */
+    template <int dim2, int spacedim2>
+    MGDoFAccessor (const MGDoFCellAccessor<dim2, spacedim2> &);
+
+  protected:
+				     /**
+				      * Store the address of the @p MGDoFHandler object
+				      * to be accessed.
+				      */
+    MGDoFHandler<1,spacedim> *mg_dof_handler;
+};
+
 
 
 /* -------------------------------------------------------------------------- */

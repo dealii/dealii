@@ -45,8 +45,8 @@ namespace internal
     {
       public:
 	typedef dealii::MGDoFCellAccessor<1,spacedim> CellAccessor;
-	typedef InvalidAccessor<0,1,spacedim> FaceAccessor;
-	
+	typedef dealii::MGDoFAccessor<0,1,spacedim> FaceAccessor;
+
 	typedef TriaRawIterator   <CellAccessor> raw_line_iterator;
         typedef TriaIterator      <CellAccessor> line_iterator;
         typedef TriaActiveIterator<CellAccessor> active_line_iterator;
@@ -80,11 +80,11 @@ namespace internal
       public:
 	typedef dealii::MGDoFCellAccessor<2,spacedim> CellAccessor;
 	typedef dealii::MGDoFAccessor<1,2,spacedim> FaceAccessor;
-	
+
         typedef TriaRawIterator   <FaceAccessor> raw_line_iterator;
         typedef TriaIterator      <FaceAccessor> line_iterator;
         typedef TriaActiveIterator<FaceAccessor> active_line_iterator;
-    
+
         typedef TriaRawIterator   <CellAccessor> raw_quad_iterator;
         typedef TriaIterator      <CellAccessor> quad_iterator;
         typedef TriaActiveIterator<CellAccessor> active_quad_iterator;
@@ -99,7 +99,7 @@ namespace internal
 
         typedef raw_line_iterator    raw_face_iterator;
         typedef line_iterator        face_iterator;
-        typedef active_line_iterator active_face_iterator;    
+        typedef active_line_iterator active_face_iterator;
     };
 
 
@@ -133,7 +133,7 @@ namespace internal
 
         typedef raw_quad_iterator    raw_face_iterator;
         typedef quad_iterator        face_iterator;
-        typedef active_quad_iterator active_face_iterator;    
+        typedef active_quad_iterator active_face_iterator;
     };
   }
 }

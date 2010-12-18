@@ -65,6 +65,15 @@ MGDoFAccessor<structdim, dim, spacedim>::set_mg_dof_handler (MGDoFHandler<dim,sp
 
 
 
+template <int structdim, int dim, int spacedim>
+const MGDoFHandler<dim,spacedim> &
+MGDoFAccessor<structdim, dim, spacedim>::get_mg_dof_handler () const
+{
+  return *mg_dof_handler;
+}
+
+
+
 template <int structdim,int dim, int spacedim>
 unsigned int
 MGDoFAccessor<structdim, dim, spacedim>::mg_vertex_dof_index (const int level,
@@ -454,8 +463,77 @@ get_mg_dof_values (const int level,
 
 
 
+/*------------------------- Functions: MGDoFAccessor<0,1,spacedim> -----------------------*/
+
+template <int spacedim>
+inline
+MGDoFAccessor<0,1,spacedim>::MGDoFAccessor ()
+		:
+		BaseClass ()
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
 
 
+
+template <int spacedim>
+inline
+MGDoFAccessor<0,1,spacedim>::
+MGDoFAccessor (const Triangulation<1,spacedim> *tria,
+	       const typename TriaAccessor<0,1,spacedim>::VertexKind vertex_kind,
+	       const unsigned int    vertex_index,
+	       const MGDoFHandler<1,spacedim> * dof_handler)
+		:
+		BaseClass (tria,
+			   vertex_kind,
+			   vertex_index),
+                mg_dof_handler(const_cast<MGDoFHandler<1,spacedim>*>(dof_handler))
+{}
+
+
+
+template <int spacedim>
+inline
+MGDoFAccessor<0,1,spacedim>::
+MGDoFAccessor (const Triangulation<1,spacedim> *,
+	       const int                 ,
+	       const int                 ,
+	       const MGDoFHandler<1,spacedim>     *)
+		:
+                mg_dof_handler(0)
+{
+  Assert (false,
+	  ExcMessage ("This constructor can not be called for face iterators in 1d."));
+}
+
+
+
+template <int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const InvalidAccessor<structdim2,dim2,spacedim2> &)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
+
+
+
+template <int spacedim>
+template <int structdim2, int dim2, int spacedim2>
+inline
+MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const MGDoFAccessor<structdim2, dim2, spacedim2> &)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
+
+
+
+template <int spacedim>
+template <int dim2, int spacedim2>
+inline
+MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const MGDoFCellAccessor<dim2, spacedim2> &)
+{
+  Assert (false, typename BaseClass::ExcInvalidObject());
+}
 
 
 
@@ -538,25 +616,65 @@ MGDoFCellAccessor<dim, spacedim>::parent () const
 }
 
 
+namespace internal
+{
+  namespace MGDoFCellAccessor
+  {
+    template <int spacedim>
+    inline
+    typename internal::MGDoFHandler::Iterators<1,spacedim>::face_iterator
+    get_face (const dealii::MGDoFCellAccessor<1,spacedim> &cell,
+	      const unsigned int i,
+	      const internal::int2type<1>)
+    {
+      dealii::MGDoFAccessor<0,1,spacedim>
+	a (&cell.get_triangulation(),
+      	   ((i == 0) && cell.at_boundary(0)
+      	    ?
+      	    dealii::TriaAccessor<0, 1, spacedim>::left_vertex
+      	    :
+      	    ((i == 1) && cell.at_boundary(1)
+      	     ?
+      	     dealii::TriaAccessor<0, 1, spacedim>::right_vertex
+      	     :
+      	     dealii::TriaAccessor<0, 1, spacedim>::interior_vertex)),
+      	   cell.vertex_index(i),
+	   &cell.get_mg_dof_handler());
+      return typename internal::MGDoFHandler::Iterators<1,spacedim>::face_iterator(a);
+    }
+
+
+    template <int spacedim>
+    inline
+    typename internal::MGDoFHandler::Iterators<2,spacedim>::face_iterator
+    get_face (const dealii::MGDoFCellAccessor<2,spacedim> &cell,
+	      const unsigned int i,
+	      const internal::int2type<2>)
+    {
+      return cell.line(i);
+    }
+
+
+    template <int spacedim>
+    inline
+    typename internal::MGDoFHandler::Iterators<3,spacedim>::face_iterator
+    get_face (const dealii::MGDoFCellAccessor<3,spacedim> &cell,
+	      const unsigned int i,
+	      const internal::int2type<3>)
+    {
+      return cell.quad(i);
+    }
+  }
+}
+
+
 template <int dim, int spacedim>
 typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator
 MGDoFCellAccessor<dim,spacedim>::face (const unsigned int i) const
 {
-  switch (dim)
-    {
-      case 1:
-	    Assert (false, ExcImpossibleInDim(1));
-	    return
-	      typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator();
-      case 2:
-	    return this->line(i);
-      case 3:
-	    return this->quad(i);
-      default:
-	    Assert (false, ExcNotImplemented());
-	    return
-	      typename internal::MGDoFHandler::Iterators<dim,spacedim>::face_iterator();
-    }
+  Assert (i<GeometryInfo<dim>::faces_per_cell, ExcIndexRange (i, 0, GeometryInfo<dim>::faces_per_cell));
+
+  return internal::MGDoFCellAccessor::get_face (*this, i, internal::int2type<dim>());
 }
 
 
