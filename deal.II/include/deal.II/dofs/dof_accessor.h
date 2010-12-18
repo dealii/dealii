@@ -757,6 +757,16 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
 
 
 
+/**
+ * Specialization of the general DoFAccessor class template for the
+ * case of zero-dimensional objects (a vertex) that are the face of a
+ * one-dimensional cell in spacedim space dimensions. Since vertices
+ * function differently than general faces, this class does a few
+ * things differently than the general template, but the interface
+ * should look the same.
+ *
+ * @author Wolfgang Bangerth, 2010
+ */
 template <template <int, int> class DH, int spacedim>
 class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
 {
