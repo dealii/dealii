@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2010 by the deal.II authors
 //
@@ -63,13 +63,13 @@ void laplace_solve (const SparseMatrix<double> &S,
   PreconditionJacobi<SparseMatrix<double> > prec;
   prec.initialize(S, 1.2);
   FilteredMatrix<Vector<double> > PF (prec);
-  
+
   SolverControl control (10000, 1.e-10, false, false);
   GrowingVectorMemory<Vector<double> > mem;
   SolverCG<Vector<double> > solver (control, mem);
-  
+
   Vector<double> f(n_dofs);
-  
+
   SF.add_constraints(m);
   SF.apply_constraints (f, true);
   solver.solve(SF, u, f, PF);
@@ -84,7 +84,7 @@ void curved_grid (std::ofstream &out)
 				   // circumferential direction
   const unsigned int n_phi=4,
 		       n_r=8;
-				   // inner and outer radius  
+				   // inner and outer radius
   const double r_i=0.5,
 	       r_a=2.0;
 				   // we want to increase the radial extent of
@@ -132,8 +132,8 @@ void curved_grid (std::ofstream &out)
   triangulation.create_triangulation_compatibility(vertices,cells,SubCellData());
 				   // now provide everything that is
 				   // needed for solving a Laplace
-				   // equation.  
-  MappingQ1<2> mapping_q1;  
+				   // equation.
+  MappingQ1<2> mapping_q1;
   FE_Q<2> fe(2);
   DoFHandler<2> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
@@ -243,7 +243,7 @@ void curved_grid (std::ofstream &out)
 
 
 
-int main () 
+int main ()
 {
   std::ofstream logfile("data_out_curved_cells/output");
   deallog.attach(logfile);
@@ -251,6 +251,12 @@ int main ()
   logfile << std::setprecision (4);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
+
+				   // this test, for reasons unknown
+				   // to me, appears to deadlock at
+				   // times. make sure we kill it
+				   // after some time
+  DeadlockKiller killer;
 
   curved_grid (logfile);
 }
