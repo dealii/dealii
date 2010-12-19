@@ -5581,13 +5581,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     DEAL_II_CONFIGURE_PETSC_VERSION
     DEAL_II_CONFIGURE_PETSC_ARCH
 
-    dnl Here is where we check for the MPI consistency, iff, MPI is asked for.
-    if test "x$DEAL_II_USE_MPI" = "xyes" ; then
-      DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
-    else
-      DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
-    fi
-
+    DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
+    DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
     DEAL_II_CONFIGURE_PETSC_COMPLEX
 
     DEAL_II_EXPAND_PETSC_VECTOR="PETScWrappers::Vector"
@@ -5711,89 +5706,8 @@ dnl
 dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
 [
-
-  dnl PETSc defines the name of the C/C++ in the same variable, which
-  dnl is contected to PETSc's $PCC flag. Therefore, first we check which
-  dnl language PETSc knows about (CONLY, CXXONLY) and check that against
-  dnl the anological language compiler of deal.II ($CC, $CXX).
-  dnl
-  dnl First, get PETSc's language type
-  AC_MSG_CHECKING([for PETSc library language])
-
-  case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    2.3*) dnl
-      DEAL_II_PETSC_LANGUAGE=`cat $DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf \
-                              | grep "PETSC_LANGUAGE = " \
-                              | perl -pi -e 's/.*LANGUAGE\s=\s+//g;'`
-      ;;
-    3.*) dnl
-      DEAL_II_PETSC_LANGUAGE=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
-                              | grep "PETSC_LANGUAGE = " \
-                              | perl -pi -e 's/.*LANGUAGE\s=\s+//g;'`
-      ;;
-    *)    dnl
-      AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
-      ;;
-  esac
-
-  dnl ...and pretty print that.
-  case "$DEAL_II_PETSC_LANGUAGE" in
-    CONLY) dnl PETSC language is C
-      AC_MSG_RESULT(C)
-      ;;
-    CXXONLY) dnl PETSC language is C++
-      AC_MSG_RESULT(C++)
-      ;;
-    *) dnl This should *never* happen;, but just in case of something/anything...
-      AC_MSG_ERROR([Unrecognized PETSc language $DEAL_II_PETSC_LANGUAGE -- Try to go ahead and get help from dealii@dealii.org])
-      ;;
-  esac
-
   dnl Then check for MPI consistency.
-  AC_MSG_CHECKING(for consistency of PETSc and deal.II MPI settings)
-
-  dnl Information about the C/C++ compiler (linker) that PETSc knows
-  dnl about is stored in the PCC (PCC_LINKER) flags. So we just check that
-  dnl this valus is the same as the corresponding value for the C/C++
-  dnl compiler that deal.II knows about.
-  case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-    2.3*) dnl
-      DEAL_II_PETSC_PCC=`cat $DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf \
-                              | grep "PCC = " \
-                              | perl -pi -e 's/.*PCC\s=\s+//g;'`
-      ;;
-    3.*) dnl
-      DEAL_II_PETSC_PCC=`cat $DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/conf/petscvariables \
-                         | grep "PCC = " \
-                         | perl -pi -e 's/.*PCC\s=\s+//g;'`
-
-      ;;
-    *)    dnl
-      AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
-      ;;
-  esac
-
-  case "$DEAL_II_PETSC_LANGUAGE" in
-    CONLY) dnl PETSC language is C, check $CC
-      if test `which $DEAL_II_PETSC_PCC` = `which $CC` ; then
-        AC_MSG_RESULT(yes)
-      else
-        DEAL_CC=`which $CC`
-	PETSC_CC=`which $DEAL_II_PETSC_PCC`
-        AC_MSG_ERROR([PETSc has not been compiled with the same compiler. PETS\
-c: '$PETSC_CC', deal: '$DEAL_CC'])
-      fi
-    ;;
-    CXXONLY) dnl PETSC language is C++, check $CXX
-      if test `which $DEAL_II_PETSC_PCC` = `which $CXX` ; then
-        AC_MSG_RESULT(yes)
-      else
-        DEAL_CC=`which $CXX`
-	PETSC_CC=`which $DEAL_II_PETSC_PCC`
-        AC_MSG_ERROR([PETSc has not been compiled with the same compiler. PETSc: '$PETSC_CC', deal: '$DEAL_CC'])
-      fi
-    ;;
-  esac
+  dnl AC_MSG_CHECKING(for consistency of PETSc and deal.II MPI settings)
 ])
 
 
