@@ -140,7 +140,9 @@ struct DeadlockKiller
 	    if (conv)
 	      {
 		sleep (delay);
-		std::cerr << "Time's up: Killing job because it overran its allowed walltime"
+		std::cerr << "Time's up: Killing job after "
+			  << delay
+			  << " seconds because it overran its allowed walltime."
 			  << std::endl;
 		std::abort ();
 	      }
