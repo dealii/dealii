@@ -219,6 +219,21 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * i.e. $J_{ij}=dx_i/d\hat x_j$.
 					  *
 					  * Computed on each cell.
+					  *
+					  * @note If dim<spacedim,
+					  * then the Jacobian matrix
+					  * is rectangular, with
+					  * spacedim rows and dim
+					  * columns. We nevertheless
+					  * store it as a square
+					  * rank-2 tensor. The unused
+					  * columns are internally
+					  * used to store temporary
+					  * data, such as the
+					  * "missing" vectors spanning
+					  * the full space (for
+					  * example the cell normal
+					  * vector).
 					  */
 	std::vector<Tensor<2,spacedim> > contravariant;
 
