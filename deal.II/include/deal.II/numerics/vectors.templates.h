@@ -1244,12 +1244,17 @@ VectorTools::create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>
 
 // ----------- interpolate_boundary_values for std::map --------------------
 
-// TODO: it might be possible to avoid the specialization for 1D if we could
-// have hp::FEFaceValues<1>...
 namespace internal
 {
   namespace VectorTools
   {
+				     // interpolate boundary values in
+				     // 1d. in higher dimensions, we
+				     // use FEValues to figure out
+				     // what to do on faces, but in 1d
+				     // faces are points and it is far
+				     // easier to simply work on
+				     // individual vertices
     template <class DH>
     static inline
     void interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension> &,
@@ -1274,116 +1279,68 @@ namespace internal
       if (function_map.size() == 0)
 	return;
 
-      Assert (function_map.find(255) == function_map.end(),
-	      dealii::VectorTools::ExcInvalidBoundaryIndicator());
-
-				       // if this 1d mesh is embedded
-				       // in a higher dimensional
-				       // space, it may be that it is
-				       // a circle; in that case,
-				       // there are no boundary nodes
-				       // and we want to catch this
-				       // now before we get into what
-				       // turns out to be an endless
-				       // loop further down below
-				       // where we try to find the
-				       // cell at the left or right
-				       // edge of the domain
-      if (DH::space_dimension > 1)
-	{
-	  typename DH::cell_iterator cell = dof.begin(0);
-	  unsigned int count = 0;
-	  while (cell->neighbor(1).state() == IteratorState::valid)
-	    {
-	      cell = cell->neighbor(1);
-	      ++count;
-
-	      if (count > dof.get_tria().n_cells(0))
-						 // we looped back
-						 // around. there is
-						 // nothing for us to
-						 // do here
-		return;
-	    }
-	}
-
-					   // now do the actual work
       for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
 	   i!=function_map.end(); ++i)
-	{
-					   // check whether boundary values at
-					   // the left or right boundary of
-					   // the line are
-					   // requested. direction denotes
-					   // the neighboring direction in
-					   // which we seek the boundary,
-					   // i.e. 0 is left boundary and 1 is
-					   // right.
-	  const unsigned int direction = i->first;
-	  Assert (direction < 2,
-		  dealii::VectorTools::ExcInvalidBoundaryIndicator());
+	Assert (i->first < 2,
+		dealii::VectorTools::ExcInvalidBoundaryIndicator());
 
-	  const Function<DH::space_dimension> & boundary_function = *(i->second);
+      for (typename DH::active_cell_iterator cell = dof.begin_active();
+	   cell != dof.end(); ++cell)
+	for (unsigned int direction=0;
+	     direction<GeometryInfo<dim>::faces_per_cell; ++direction)
+	  if (cell->at_boundary(direction)
+	      &&
+	      (function_map.find(direction) != function_map.end()))
+	    {
+	      const Function<DH::space_dimension> & boundary_function
+		= *function_map.find(direction)->second;
 
-					   // first find the outermost active
-					   // cell by first traversing the coarse
-					   // grid to its end and then going
-					   // to the children.
-					   //
-					   // note that we have
-					   // already ruled out the
-					   // case that the mesh is a
-					   // topological circle
-					   // above, so we don't have
-					   // to check here any more
-	  typename DH::cell_iterator outermost_cell = dof.begin(0);
-	  while (outermost_cell->neighbor(direction).state() == IteratorState::valid)
-	    outermost_cell = outermost_cell->neighbor(direction);
+					       // get the FE corresponding to this
+					       // cell
+	      const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+	      Assert (fe.n_components() == boundary_function.n_components,
+		      ExcDimensionMismatch(fe.n_components(),
+					   boundary_function.n_components));
 
-	  while (outermost_cell->has_children())
-	    outermost_cell = outermost_cell->child(direction);
+					       // set the component mask to either
+					       // the original value or a vector
+					       // of trues
+	      const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
+						      std::vector<bool> (fe.n_components(), true) :
+						      component_mask_);
+	      Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
+		      dealii::VectorTools::ExcNoComponentSelected());
 
-                                   // get the FE corresponding to this
-                                   // cell
-	  const FiniteElement<dim,spacedim> &fe = outermost_cell->get_fe();
-	  Assert (fe.n_components() == boundary_function.n_components,
-		  ExcDimensionMismatch(fe.n_components(), boundary_function.n_components));
+					       // now set the value of
+					       // the vertex degree of
+					       // freedom. setting
+					       // also creates the
+					       // entry in the map if
+					       // it did not exist
+					       // beforehand
+					       //
+					       // save some time by
+					       // requesting values
+					       // only once for each
+					       // point, irrespective
+					       // of the number of
+					       // components of the
+					       // function
+	      dealii::Vector<double> function_values (fe.n_components());
+	      if (fe.n_components() == 1)
+		function_values(0)
+		  = boundary_function.value (cell->vertex(direction));
+	      else
+		boundary_function.vector_value (cell->vertex(direction),
+						function_values);
 
-				   // set the component mask to either
-				   // the original value or a vector
-				   // of trues
-	  const std::vector<bool> component_mask ((component_mask_.size() == 0) ?
-						  std::vector<bool> (fe.n_components(), true) :
-						  component_mask_);
-	  Assert (std::count(component_mask.begin(), component_mask.end(), true) > 0,
-		  dealii::VectorTools::ExcNoComponentSelected());
-
-				   // now set the value of the
-				   // outermost degree of
-				   // freedom. setting also
-				   // creates the entry in the map
-				   // if it did not exist
-				   // beforehand
-				   //
-				   // save some time by requesting
-				   // values only once for each point,
-				   // irrespective of the number of
-				   // components of the function
-	  dealii::Vector<double> function_values (fe.n_components());
-	  if (fe.n_components() == 1)
-	    function_values(0)
-	      = boundary_function.value (outermost_cell->vertex(direction));
-	  else
-	    boundary_function.vector_value (outermost_cell->vertex(direction),
-					    function_values);
-
-	  for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
-	    if (component_mask[fe.face_system_to_component_index(i).first])
-	      boundary_values[outermost_cell->
-			      vertex_dof_index(direction,i,
-					       outermost_cell->active_fe_index())]
-		= function_values(fe.face_system_to_component_index(i).first);
-	}
+	      for (unsigned int i=0; i<fe.dofs_per_vertex; ++i)
+		if (component_mask[fe.face_system_to_component_index(i).first])
+		  boundary_values[cell->
+				  vertex_dof_index(direction,i,
+						   cell->active_fe_index())]
+		    = function_values(fe.face_system_to_component_index(i).first);
+	    }
     }
 
 
@@ -1443,7 +1400,7 @@ namespace internal
 
 				   // array to store the values of
 				   // the boundary function at the
-				   // boundary points. have to arrays
+				   // boundary points. have two arrays
 				   // for scalar and vector functions
 				   // to use the more efficient one
 				   // respectively
@@ -4192,7 +4149,7 @@ namespace internal
           case dealii::VectorTools::W1infty_seminorm:
                 update_flags |= UpdateFlags (update_gradients);
 		if(spacedim == dim+1) update_flags |= UpdateFlags (update_normal_vectors);
-		
+
                 break;
           case dealii::VectorTools::H1_norm:
           case dealii::VectorTools::W1p_norm:
@@ -4349,7 +4306,7 @@ namespace internal
                                                // subtracting the
                                                // normal component of
                                                // the gradient from
-                                               // the exact function.  
+                                               // the exact function.
               fe_values.get_function_grads (fe_function, function_grads);
 	      if(update_flags & update_normal_vectors)
 		for (unsigned int k=0; k<n_components; ++k)
@@ -4363,7 +4320,7 @@ namespace internal
 		  for (unsigned int q=0; q<n_q_points; ++q)
 		    psi_grads[q][k] -= function_grads[q][k];
             }
-	  
+
           switch (norm)
             {
               case dealii::VectorTools::mean:
