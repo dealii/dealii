@@ -783,6 +783,15 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  {
 	    if (dim==spacedim)
+					       // if dim==spacedim,
+					       // then there is no
+					       // cell normal to
+					       // compute. since this
+					       // is for FEValues (and
+					       // not FEFaceValues),
+					       // there are also no
+					       // face normals to
+					       // compute
 	      JxW_values[point]
 		= determinant(data.contravariant[point])*weights[point];
 	    else
@@ -790,28 +799,30 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 		if (cell_similarity == CellSimilarity::inverted_translation)
 		  {
 						     // we only need to flip the normal
-		    if(update_flags & update_normal_vectors)
+		    if (update_flags & update_normal_vectors)
 		      normal_vectors[point] *= -1.;
 		  }
 		else
 		  {
 		    if ( (dim==1) && (spacedim==2) )
 		      {
-			data.contravariant[point]=transpose(data.contravariant[point]);
+			data.contravariant[point] = transpose(data.contravariant[point]);
 			JxW_values[point]
 			  = data.contravariant[point][0].norm()*weights[point];
-			if(update_flags & update_normal_vectors) {
-			  normal_vectors[point][0]
-			    = -(data.contravariant[point][0][1]
-				/
-				data.contravariant[point][0].norm());
-			  normal_vectors[point][1]
-			    = (data.contravariant[point][0][0]
-			       /
-			       data.contravariant[point][0].norm());
-			  if (!cell->direction_flag())
-			    normal_vectors[point] *= -1.;
-			}
+			if (update_flags & update_normal_vectors)
+			  {
+			    normal_vectors[point][0]
+			      = -(data.contravariant[point][0][1]
+				  /
+				  data.contravariant[point][0].norm());
+			    normal_vectors[point][1]
+			      = (data.contravariant[point][0][0]
+				 /
+				 data.contravariant[point][0].norm());
+
+			    if (cell->direction_flag() == false)
+			      normal_vectors[point] *= -1.;
+			  }
 		      }
 		    else
 		      {
@@ -839,10 +850,10 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 							     // contravariant
 							     // tensor
 			    data.contravariant[point][2] /= data.contravariant[point][2].norm();
-			    if(update_flags & update_normal_vectors)
+			    if (update_flags & update_normal_vectors)
 			      {
 				normal_vectors[point]=data.contravariant[point][2];
-				if (!cell->direction_flag())
+				if (cell->direction_flag() == false)
 				  normal_vectors[point] *= -1.;
 			      }
 			  }
