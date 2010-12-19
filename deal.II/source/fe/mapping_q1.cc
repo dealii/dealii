@@ -719,6 +719,7 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
 }
 
 
+
 template<int dim, int spacedim>
 void
 MappingQ1<dim,spacedim>::compute_mapping_support_points(
@@ -730,6 +731,8 @@ MappingQ1<dim,spacedim>::compute_mapping_support_points(
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     a[i] = cell->vertex(i);
 }
+
+
 
 template<int dim, int spacedim>
 void
@@ -745,7 +748,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                           &cell_similarity) const
 {
-  // ensure that the following cast is really correct:
+				   // ensure that the following cast
+				   // is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
 	  ExcInternalError());
   InternalData &data = static_cast<InternalData&>(mapping_data);
@@ -769,69 +773,86 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 		      | update_JxW_values))
     {
       Assert (JxW_values.size() == n_q_points,
-	       ExcDimensionMismatch(JxW_values.size(), n_q_points));
+	      ExcDimensionMismatch(JxW_values.size(), n_q_points));
 
       Assert( !(update_flags & update_normal_vectors ) ||
 	      (normal_vectors.size() == n_q_points),
-	     ExcDimensionMismatch(normal_vectors.size(), n_q_points));
+	      ExcDimensionMismatch(normal_vectors.size(), n_q_points));
 
       if (cell_similarity != CellSimilarity::translation)
-	for (unsigned int point=0; point<n_q_points; ++point) {
-
-	  if (dim==spacedim)
-	    JxW_values[point]
-	      = determinant(data.contravariant[point])*weights[point];
-
-	  else {
-	    if (cell_similarity == CellSimilarity::inverted_translation) {
-	      // we only need to flip the normal
-	      if(update_flags & update_normal_vectors)
-		normal_vectors[point] *= -1.;
-	    }
-	    else {
-	      if ( (dim==1) && (spacedim==2) ) {
-		data.contravariant[point]=transpose(data.contravariant[point]);
-		JxW_values[point]
-		  = data.contravariant[point][0].norm()*weights[point];
-		if(update_flags & update_normal_vectors) {
-		  normal_vectors[point][0]
-		    = -(data.contravariant[point][0][1]
-			/
-			data.contravariant[point][0].norm());
-		  normal_vectors[point][1]
-		    = (data.contravariant[point][0][0]
-		       /
-		       data.contravariant[point][0].norm());
-		  if (!cell->direction_flag())
-		    normal_vectors[point] *= -1.;
-		}
-	      }
-	      else {
-		if ( (dim==2) && (spacedim==3) ) {
-		  data.contravariant[point]=transpose(data.contravariant[point]);
-		  cross_product(data.contravariant[point][2],
-				data.contravariant[point][0],
-				data.contravariant[point][1]);
-		  JxW_values[point]
-		    = data.contravariant[point][2].norm()*weights[point];
-		  //the cell normal vector
-		  //(normal to the surface)
-		  //is stored in the 3d
-		  //subtensor of the contravariant tensor
-		  data.contravariant[point][2] /= data.contravariant[point][2].norm();
-		  if(update_flags & update_normal_vectors){
-		    normal_vectors[point]=data.contravariant[point][2];
-		    if (!cell->direction_flag())
+	for (unsigned int point=0; point<n_q_points; ++point)
+	  {
+	    if (dim==spacedim)
+	      JxW_values[point]
+		= determinant(data.contravariant[point])*weights[point];
+	    else
+	      {
+		if (cell_similarity == CellSimilarity::inverted_translation)
+		  {
+						     // we only need to flip the normal
+		    if(update_flags & update_normal_vectors)
 		      normal_vectors[point] *= -1.;
 		  }
-		}
+		else
+		  {
+		    if ( (dim==1) && (spacedim==2) )
+		      {
+			data.contravariant[point]=transpose(data.contravariant[point]);
+			JxW_values[point]
+			  = data.contravariant[point][0].norm()*weights[point];
+			if(update_flags & update_normal_vectors) {
+			  normal_vectors[point][0]
+			    = -(data.contravariant[point][0][1]
+				/
+				data.contravariant[point][0].norm());
+			  normal_vectors[point][1]
+			    = (data.contravariant[point][0][0]
+			       /
+			       data.contravariant[point][0].norm());
+			  if (!cell->direction_flag())
+			    normal_vectors[point] *= -1.;
+			}
+		      }
+		    else
+		      {
+			if ( (dim==2) && (spacedim==3) )
+			  {
+			    data.contravariant[point]=transpose(data.contravariant[point]);
+			    cross_product(data.contravariant[point][2],
+					  data.contravariant[point][0],
+					  data.contravariant[point][1]);
+			    JxW_values[point]
+			      = data.contravariant[point][2].norm()*weights[point];
+
+							     // the cell
+							     // normal
+							     // vector
+							     // (normal
+							     // to the
+							     // surface)
+							     // is
+							     // stored
+							     // in the
+							     // 3d
+							     // subtensor
+							     // of the
+							     // contravariant
+							     // tensor
+			    data.contravariant[point][2] /= data.contravariant[point][2].norm();
+			    if(update_flags & update_normal_vectors)
+			      {
+				normal_vectors[point]=data.contravariant[point][2];
+				if (!cell->direction_flag())
+				  normal_vectors[point] *= -1.;
+			      }
+			  }
+		      }
+		  }
 	      }
-	    }
 	  }
-	}
     }
-				   // copy values from InternalData to vector
-				   // given by reference
+				   // copy values from InternalData to
+				   // vector given by reference
   if (update_flags & update_jacobians)
     {
       Assert (jacobians.size() == n_q_points,
@@ -840,9 +861,10 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  jacobians[point] = data.contravariant[point];
     }
-				   // calculate values of the derivatives of the
-				   // Jacobians. do it here, since we only do it
-				   // for cells, not faces.
+				   // calculate values of the
+				   // derivatives of the Jacobians. do
+				   // it here, since we only do it for
+				   // cells, not faces.
   if (update_flags & update_jacobian_grads)
     {
       Assert (jacobian_grads.size() == n_q_points,
