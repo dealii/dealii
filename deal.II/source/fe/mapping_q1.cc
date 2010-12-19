@@ -395,15 +395,18 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 				      | update_jacobian_grads
 				      | update_inverse_jacobians));
 
-				   // add a few flags. note that some
-				   // flags appear in both conditions
-				   // and in subsequents set
-				   // operations. this leads to some
-				   // circular logic. the only way to
-				   // treat this is to iterate. since
-				   // there are 4 if-clauses in the
-				   // loop, it will take at most 3
-				   // iterations to converge. do them:
+				   // add flags if the respective
+				   // quantities are necessary to
+				   // compute what we need. note that
+				   // some flags appear in both
+				   // conditions and in subsequents
+				   // set operations. this leads to
+				   // some circular logic. the only
+				   // way to treat this is to
+				   // iterate. since there are 4
+				   // if-clauses in the loop, it will
+				   // take at most 3 iterations to
+				   // converge. do them:
   for (unsigned int i=0; i<4; ++i)
     {
 				       // The following is a little incorrect:
@@ -441,7 +444,6 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 
       if (out & update_normal_vectors)
 	out |= update_JxW_values;
-
     }
 
   return out;
@@ -779,14 +781,14 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 	  if (dim==spacedim)
 	    JxW_values[point]
 	      = determinant(data.contravariant[point])*weights[point];
-	    
+
 	  else {
 	    if (cell_similarity == CellSimilarity::inverted_translation) {
 	      // we only need to flip the normal
 	      if(update_flags & update_normal_vectors)
 		normal_vectors[point] *= -1.;
 	    }
-	    else { 
+	    else {
 	      if ( (dim==1) && (spacedim==2) ) {
 		data.contravariant[point]=transpose(data.contravariant[point]);
 		JxW_values[point]
@@ -804,7 +806,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 		    normal_vectors[point] *= -1.;
 		}
 	      }
-	      else { 
+	      else {
 		if ( (dim==2) && (spacedim==3) ) {
 		  data.contravariant[point]=transpose(data.contravariant[point]);
 		  cross_product(data.contravariant[point][2],
@@ -1004,13 +1006,13 @@ namespace internal
 	      Assert (data.aux[d].size() <=
 		      data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d].size(),
 		      ExcInternalError());
-	      
+
 	      mapping.transform (data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d],
 				 data.aux[d],
 				 data,
 				 mapping_contravariant);
 	    }
-	  
+
       	  switch (dim)
       	    {
       	      case 2:
