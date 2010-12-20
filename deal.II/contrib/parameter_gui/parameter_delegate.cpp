@@ -85,7 +85,8 @@ QWidget *ParameterDelegate::createEditor(QWidget *parent,
                rx_dirname("\\b(DirectoryName)\\b"),	
                rx_integer("\\b(Integer)\\b"),
                rx_double("\\b(Double|Float|Floating)\\b"),
-               rx_selection("\\b(Selection)\\b");
+               rx_selection("\\b(Selection)\\b"),
+               rx_bool("\\b(Bool)\\b");
 
       if (rx_string.indexIn (pattern_description) != -1)		// if the type "Anything"
         {
@@ -175,6 +176,24 @@ QWidget *ParameterDelegate::createEditor(QWidget *parent,
             tmp.erase (tmp.find(" "));
 
           choices.push_back(tmp);					// add last item
+
+          for (unsigned int i=0; i<choices.size(); ++i)			// add items to the combo box
+            combo_box->addItem (tr(choices[i].c_str()), tr(choices[i].c_str()));
+
+          combo_box->setEditable(false);
+
+          connect(combo_box, SIGNAL(currentIndexChanged(int)),		// connect editors signal to the closer function
+                  this, SLOT(commit_and_close_editor()));
+
+          return combo_box;
+        }
+      else if (rx_bool.indexIn (pattern_description) != -1)		// and booleans
+        {
+          QComboBox * combo_box = new QComboBox(parent);
+
+          std::vector<std::string> choices;				// list with the different items
+          choices.push_back(std::string("true"));			// add true
+          choices.push_back(std::string("false"));			// and false
 
           for (unsigned int i=0; i<choices.size(); ++i)			// add items to the combo box
             combo_box->addItem (tr(choices[i].c_str()), tr(choices[i].c_str()));
