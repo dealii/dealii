@@ -124,12 +124,97 @@ enum MappingType
  * <tt>fill_fe_*_values</tt> with the result of @p update_each to compute
  * values for a special cell.
  *
+ * <h3>Mathematics of the mapping</h3>
+ *
+ * The mapping is a transformation $\mathbf x = \Phi(\mathbf{\hat x})$
+ * which maps the reference cell [0,1]<sup>dim</sup> to the actual
+ * grid cell. In order to describe the application of the mapping to
+ * different objects, we introduce the notation for the Jacobian
+ * $J(\mathbf{\hat x}) = \nabla\Phi(\mathbf{\hat x})$. For instance,
+ * in two dimensions, we have
+ * @f[
+ * J(\mathbf{\hat x}) = \begin{matrix}
+ * \frac{\partial x}{\partial \hat x} & \frac{\partial x}{\partial \hat y}
+ * \\
+ * \frac{\partial y}{\partial \hat x} & \frac{\partial y}{\partial \hat y}
+ * \end{matrix}
+ * @f]
+ *
+ * <h4>Mapping of functions</h4>
+ *
+ * Functions are simply mapped such that
+ * @f[
+ * u(\mathbf x) = u\bigl(\Phi(\mathbf{\hat x})\bigr)
+ * = \hat u(\mathbf{\hat x}).
+ * @f]
+ * Since finite element shape functions are usually defined on the
+ * reference cell, nothing needs to be done for them. For a function
+ * defined on the computational domain, the quadrature points need to
+ * be mapped, which is done in fill_fe_values() if
+ * #update_quadrature_points is set in the update flags. The mapped
+ * quadrature points are then accessed through FEValuesBase::quadrature_point().
+ *
+ * @todo Add a function <tt>transform_quadrature_points</tt> for this.
+ *
+ * <h4>Mapping of integrals</h4>
+ *
+ * The volume form $d\hat x$ is mapped such that for a grid cell <i>Z</i>
+ * @f[
+ *  \int_Z u(\mathbf x)\,d\mathbf x = \int_{\hat Z} \hat
+ * u(\mathbf{\hat x}) \left|\text{det}J(\mathbf{\hat x})\right|
+ * \,d\mathbf{\hat x}.
+ * @f]
+ *
+ * The transformed quadrature weights $\left|\text{det}J(\mathbf{\hat
+ * x})\right|$ are accessed through FEValuesBase::JxW() and
+ * computed in fill_fe_values(), if #update_JxW_values is set in the
+ * update flags.
+ *
+ * @todo Add a function <tt>transform_quadrature_weights</tt> for
+ * this.
+ *
+ * @todo Add documentation on the codimension-one case
+ *
+ * <h4>Mapping of vector fields and tensor fields</h4>
+ *
+ * Mappings of a vector field <b>v</b> and a tensor field <b>T</b>
+ * follows the general form
+ *
+ * @f[
+ * \mathbf v(\mathbf x) = \mathbf A(\mathbf{\hat x})
+ * \mathbf{\hat v}(\mathbf{\hat x}),
+ * \qquad
+ * \mathbf v(\mathbf x) = \mathbf A(\mathbf{\hat x})
+ * \mathbf{\hat T}(\mathbf{\hat x}) \mathbf B(\mathbf{\hat x}), 
+ * @f]
+ * respectively, where the tensors <b>A</b> and <b>B</b> are
+ * determined by the MappingType enumerator.
+ * These transformations are performed through the two functions
+ * transform(). See the documentation there for possible
+ * choices.
+ *
+ * <h3>Technical notes</h3>
+ *
  * A hint to implementators: no function except the two functions
  * @p update_once and @p update_each may add any flags.
  *
  * For more information about the <tt>spacedim</tt> template parameter
  * check the documentation of FiniteElement or the one of
  * Triangulation.
+ *
+ * <h3>References</h3>
+ *
+ * A general publication on differential geometry and finite elements
+ * is the survey <ul><li>Douglas N. Arnold, Richard S. Falk, and
+ * Ragnar Winther. \textit{Finite element exterior calculus: from
+ * Hodge theory to numerical stability.}
+ * Bull. Amer. Math. Soc. (N.S.), 47:281-354, 2010. <a
+ * href="http://dx.doi.org/10.1090/S0273-0979-10-01278-4">DOI:
+ * 10.1090/S0273-0979-10-01278-4</a>.</ul>
+ *
+ * The description of the Piola transform has been taken from the <a
+ * href="http://www.math.uh.edu/~rohop/spring_05/downloads/">lecture
+ * notes</a> by Ronald H. W. Hoppe, University of Houston, Chapter 7.
  *
  * @ingroup mapping
  * @author Guido Kanschat, Ralf Hartmann 2000, 2001
@@ -336,11 +421,49 @@ class Mapping : public Subscriptor
         bool first_cell;
     };
 
-                                     /**
-                                      * Transform a field of
-                                      * vectors accorsing to
-                                      * the selected MappingType.
-                                      */
+/**
+ * Transform a field of vectors or forms according to the selected
+ * MappingType.
+ *
+ * @note Normally, this function is called by a finite element,
+ * filling FEValues objects. For this finite element, there should be
+ * an alias MappingType like #mapping_bdm, #mapping_nedelec, etc. This
+ * alias should be preferred to using the types below.
+ *
+ * The mapping types currently implemented by derived classes are:
+ * <ul>
+ * <li>
+ * A vector field on the reference cell is mapped to the physical cell
+ * by the Jacobian:
+ * @f[
+ * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat
+ * u}(\mathbf{\hat x}).
+ * @f]
+ * In physics, this is usually refered to as the contravariant
+ * transformation, and here it is triggered by the MappingType
+ * #mapping_contravariant. Mathematically, it is the push forward of a
+ * vector field.
+ *
+ * <li> A field of one-forms on the reference cell is usually
+ * represented as a vector field as well, but is transformed by the
+ * pull back, which is selected by #mapping_covariant:
+ * @f[
+ * \mathbf u(\mathbf x) = J^{-T}(\mathbf{\hat x})\mathbf{\hat
+ * u}(\mathbf{\hat x}).
+ * @f]
+ * Gradients of differentiable functions are transformed this way.
+ *
+ * <li> A field of <i>n-1</i>-forms on the reference cell is also
+ * represented by a vector field, but again transforms differently,
+ * namely by the Piola transform (#mapping_piola)
+ * @f[
+ *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
+ * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
+ * @f]
+ *
+ * </ul>
+ *
+ */
     virtual
     void
     transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
@@ -349,11 +472,54 @@ class Mapping : public Subscriptor
                const MappingType type) const = 0;
 
 
-                                     /**
-                                      * Transform a field of
-                                      * rank two tensors accorsing to
-                                      * the selected MappingType.
-                                      */
+/**
+ * Transform a field of rank two tensors according to the selected
+ * MappingType.
+ *
+ * @note Normally, this function is called by a finite element,
+ * filling FEValues objects. For this finite element, there should be
+ * an alias MappingType like #mapping_bdm, #mapping_nedelec, etc. This
+ * alias should be preferred to using the types below.
+ *
+ * This function is most of the time applied to gradients of a
+ * Tensor<1,dim> object, thus in the formulas below, it is useful to
+ * think of $\mathbf{T} = \nabla \mathbf u$ and $\mathbf{\hat T} =
+ * \hat\nabla \mathbf{\hat u}$.
+ *
+ * @todo The formulas for #mapping_covariant_gradient and
+ * #mapping_contravariant_gradient have been reverse engineered from
+ * MappingQ1. They should be verified for consistency with
+ * mathematics. The description of the Piola transform is from Hoppe's
+ * lecture notes and the implementation should be verified.
+ *
+ * The mapping types currently implemented by derived classes are:
+ * <ul>
+ * <li> #mapping_contravariant_gradient, which is the consistent gradient
+ * for a vector field mapped with #mapping_contravariant, namely
+ * @f[
+ *  \mathbf T(\mathbf x) =
+ * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+ * J^{-T}(\mathbf{\hat x}).
+ * @f]
+ *
+ * <li> Correspondingly, #mapping_covariant_gradient is the consistent
+ * gradient of a one-form, namely,
+ * @f[
+ *  \mathbf T(\mathbf x) =
+ * J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+ * J^{-T}(\mathbf{\hat x}).
+ * @f]
+ *
+ * <li> The gradients of <i>n-1</i>-forms mapped by the Piola
+ * transform are mapped by #mapping_piola, and the formul is
+ * @f[
+ *  \mathbf T(\mathbf x) =
+ * \frac{1}{\text{det}J(\mathbf x)}
+ * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+ * J^{-1}(\mathbf{\hat x}).
+ * @f] 
+ * </ul>
+ */
     virtual
     void
     transform (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
