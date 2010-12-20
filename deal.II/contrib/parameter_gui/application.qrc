@@ -1,0 +1,16 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>icons/document.png</file>
+     <file>icons/exit.png</file>
+     <file>icons/fileclose.png</file>
+     <file>icons/fileopen.png</file>
+     <file>icons/filesaveas.png</file>
+     <file>icons/filesave.png</file>
+     <file>icons/folder_open.png</file>
+     <file>icons/folder.png</file>
+     <file>icons/idea.png</file>
+     <file>images/logo_dealii_64.png</file>
+     <file>images/logo_dealii_gui.png</file>
+     <file>images/logo_dealii_gui_128.png</file>
+ </qresource>
+ </RCC>
