@@ -1087,11 +1087,19 @@ namespace internal
 						   // tangent and the cell
 						   // normal:
 		  if ( (dim==1) && (spacedim==2) )
-						     // need to think how to
-						     // figure out whether we
-						     // need to point to the
-						     // left or right
-		    Assert (false, ExcNotImplemented())
+		    {
+						       // need to think how to
+						       // do this. the code
+						       // should be something
+						       // like the below, but
+						       // I can't test it
+						       // right now since we
+						       // can't use
+						       // FEFaceValues in 1d
+		      Assert (false, ExcNotImplemented());
+		      cross_product (boundary_forms[point],
+				     (face_no == 0 ? 1 : -1) * cell_normal);
+		    }
 		  else if ( (dim==2) && (spacedim==3) )
 		    cross_product (boundary_forms[point],
 				   data.aux[0][point], cell_normal);
