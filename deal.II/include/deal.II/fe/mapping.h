@@ -184,7 +184,7 @@ enum MappingType
  * \mathbf v(\mathbf x) = \mathbf A(\mathbf{\hat x})
  * \mathbf{\hat v}(\mathbf{\hat x}),
  * \qquad
- * \mathbf v(\mathbf x) = \mathbf A(\mathbf{\hat x})
+ * \mathbf T(\mathbf x) = \mathbf A(\mathbf{\hat x})
  * \mathbf{\hat T}(\mathbf{\hat x}) \mathbf B(\mathbf{\hat x}),
  * @f]
  * respectively, where the tensors <b>A</b> and <b>B</b> are
