@@ -1016,7 +1016,8 @@ namespace internal
       	    Assert (JxW_values.size() == n_q_points,
       		    ExcDimensionMismatch(JxW_values.size(), n_q_points));
 
-					   // map the unit tangentials to the real cell
+					   // map the unit tangentials to the
+					   // real cell
 	  for (unsigned int d=0; d<dim-1; ++d)
 	    {
 	      Assert (face_no+GeometryInfo<dim>::faces_per_cell*d <
@@ -1032,35 +1033,81 @@ namespace internal
 				 mapping_contravariant);
 	    }
 
-      	  switch (dim)
-      	    {
-      	      case 2:
-      	      {
-      	  	for (unsigned int i=0; i<n_q_points; ++i)
+					   // if dim==spacedim, we can use the
+					   // unit tangentials to compute the
+					   // boundary form by simply taking
+					   // the cross product
+	  if (dim == spacedim)
+	    {
+	      for (unsigned int i=0; i<n_q_points; ++i)
+		if (dim == 2)
       	  	  cross_product (boundary_forms[i], data.aux[0][i]);
-      	  	break;
-      	      }
-
-      	      case 3:
-      	      {
-      	  	for (unsigned int i=0; i<n_q_points; ++i)
+		else if (dim == 3)
       	  	  cross_product (boundary_forms[i], data.aux[0][i], data.aux[1][i]);
-      	  	break;
-      	      }
-
-      	      default:
-      	  	    Assert(false, ExcNotImplemented());
+		else
+		  Assert(false, ExcNotImplemented());
       	    }
+	  else
+	    {
+					       // in the codim-one case, the
+					       // boundary form results from
+					       // the cross product of all the
+					       // face tangential vectors and
+					       // the cell normal vector
+					       //
+					       // to compute the cell normal,
+					       // use the same method used in
+					       // fill_fe_values for cells
+					       // above
+	      Assert (data.contravariant.size() == n_q_points,
+		      ExcInternalError());
+	      for (unsigned int point=0; point<n_q_points; ++point)
+		{
+		  Tensor<1,spacedim> cell_normal;
+
+		  data.contravariant[point] = transpose(data.contravariant[point]);
+
+						   // compute the normal
+						   // vector to this cell
+						   // and put it into the
+						   // last row of
+						   // data.contravariant
+		  if ( (dim==1) && (spacedim==2) )
+		    cross_product(cell_normal,
+				  -data.contravariant[point][0]);
+		  else if ( (dim==2) && (spacedim==3) )
+		    cross_product(cell_normal,
+				  data.contravariant[point][0],
+				  data.contravariant[point][1]);
+		  else
+		    Assert (false, ExcNotImplemented());
+
+						   // then compute the face
+						   // normal from the face
+						   // tangent and the cell
+						   // normal:
+		  if ( (dim==1) && (spacedim==2) )
+						     // need to think how to
+						     // figure out whether we
+						     // need to point to the
+						     // left or right
+		    Assert (false, ExcNotImplemented())
+		  else if ( (dim==2) && (spacedim==3) )
+		    cross_product (boundary_forms[point],
+				   data.aux[0][point], cell_normal);
+		  else
+		    Assert (false, ExcNotImplemented());
+		}
+	    }
+	  
 
       	  if (update_flags & (update_normal_vectors
       	  		      | update_JxW_values))
       	    for (unsigned int i=0;i<boundary_forms.size();++i)
       	      {
-      	  	const double f = std::sqrt(contract(boundary_forms[i],
-      	  					    boundary_forms[i]));
       	  	if (update_flags & update_JxW_values)
       	  	  {
-      	  	    JxW_values[i] = f * weights[i];
+      	  	    JxW_values[i] = boundary_forms[i].norm() * weights[i];
       	  	    if (subface_no!=deal_II_numbers::invalid_unsigned_int)
       	  	      {
       	  		const double area_ratio=GeometryInfo<dim>::subface_ratio(
@@ -1070,7 +1117,7 @@ namespace internal
       	  	  }
 
       	  	if (update_flags & update_normal_vectors)
-      	  	  normal_vectors[i] = boundary_forms[i] / f;
+      	  	  normal_vectors[i] = boundary_forms[i] / boundary_forms[i].norm();
       	      }
 	}
     }
