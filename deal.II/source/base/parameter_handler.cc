@@ -1141,9 +1141,148 @@ bool ParameterHandler::read_input_from_string (const char *s)
 
       if (!scan_line (line, lineno))
 	status = false;
-    };
+    }
 
   return status;
+}
+
+
+
+namespace
+{
+				   // Recursively go through the 'source' tree
+				   // and see if we can find corresponding
+				   // entries in the 'destination' tree. If
+				   // not, error out (i.e. we have just read
+				   // an XML file that has entries that
+				   // weren't declared in the ParameterHandler
+				   // object); if so, copy the value of these
+				   // nodes into the destination object
+  bool
+  read_xml_recursively (const boost::property_tree::ptree &source,
+			const std::string                 &current_path,
+			const char                         path_separator,
+			boost::property_tree::ptree       &destination)
+  {
+    for (boost::property_tree::ptree::const_iterator p = source.begin();
+	 p != source.end(); ++p)
+      {
+					 // a sub-tree must either be a
+					 // parameter node or a subsection
+	if (p->second.get_optional<std::string>("value"))
+	  {
+					     // make sure we have a
+					     // corresponding entry in the
+					     // destination object as well
+	    const std::string full_path
+	      = (current_path == ""
+		 ?
+		 p->first
+		 :
+		 current_path + path_separator + p->first);
+	    if (destination.get_optional<std::string> (full_path)
+		&&
+		destination.get_optional<std::string> (full_path +
+						       path_separator +
+						       "value"))
+	      {
+						 // set the found parameter in
+						 // the destination argument
+		destination.put (full_path + path_separator + "value",
+				 p->second.get_optional<std::string>("value"));
+		
+						 // this node might have
+						 // sub-nodes in addition to
+						 // "value", such as
+						 // "default_value",
+						 // "documentation", etc. we
+						 // might at some point in the
+						 // future want to make sure
+						 // that if they exist that
+						 // they match the ones in the
+						 // 'destination' tree
+	      }
+	    else
+	      {
+		std::cerr << "The entry <" << full_path
+			  << "> with value <"
+			  << p->second.get<std::string>("value")
+			  << "> has not been declared.";
+		return false;
+	      }
+	  }
+	else
+	  {
+					     // it must be a subsection
+	    const bool result
+	      = read_xml_recursively (p->second,
+				      (current_path == "" ?
+				       p->first :
+				       current_path + path_separator + p->first),
+				      path_separator,
+				      destination);
+
+					     // see if the recursive read
+					     // succeeded. if yes, continue,
+					     // otherwise exit now
+	    if (result == false)
+	      return false;
+	  }
+      }
+
+    return true;
+  }
+}
+
+
+
+bool ParameterHandler::read_input_from_xml (std::istream &in)
+{
+				   // read the XML tree assuming that (as we
+				   // do in print_parameters(XML) it has only
+				   // a single top-level node called
+				   // "ParameterHandler"
+  boost::property_tree::ptree single_node_tree;
+  try
+    {
+      read_xml (in, single_node_tree);
+    }
+  catch (...)
+    {
+      std::cerr << "This input stream appears not to be valid XML"
+		<< std::endl;
+      return false;
+    }
+
+				   // make sure there is a top-level element
+				   // called "ParameterHandler"
+  if (!single_node_tree.get_optional<std::string>("ParameterHandler"))
+    {
+      std::cerr << "There is no top-level XML element called \"ParameterHandler\"."
+		<< std::endl;
+      return false;
+    }
+
+				   // ensure that there is only a single
+				   // top-level element
+  if (std::distance (single_node_tree.begin(), single_node_tree.end()) != 1)
+    {
+      std::cerr << "The top-level XML element \"ParameterHandler\" is "
+		<< "not the only one."
+		<< std::endl;
+      std::cerr << "(There are "
+		<< std::distance (single_node_tree.begin(),
+				  single_node_tree.end())
+		<< " top-level elements.)"
+		<< std::endl;
+      return false;
+    }
+
+				   // read the child elements recursively
+  const boost::property_tree::ptree
+    &my_entries = single_node_tree.get_child("ParameterHandler");
+
+  return read_xml_recursively (my_entries, "", path_separator, *entries);
 }
 
 

@@ -1747,6 +1747,23 @@ class ParameterHandler : public Subscriptor
     virtual bool read_input_from_string (const char *s);
 
 				     /**
+				      * Read a parameter file in XML
+				      * format. This could be from a file
+				      * originally written by the
+				      * print_parameters() function using the
+				      * XML output style and then modified by
+				      * hand as necessary; or from a file
+				      * written using this method and then
+				      * modified by the graphical parameter
+				      * GUI (see the general documentation of
+				      * this class).
+				      *
+				      * Return whether the read was
+				      * successful.
+				      */
+    virtual bool read_input_from_xml (std::istream &input);
+    
+				     /**
 				      * Clear all contents.
 				      */
     void clear ();
