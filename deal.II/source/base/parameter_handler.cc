@@ -1162,6 +1162,8 @@ namespace
   read_xml_recursively (const boost::property_tree::ptree &source,
 			const std::string                 &current_path,
 			const char                         path_separator,
+			const std::vector<std_cxx1x::shared_ptr<const Patterns::PatternBase> > &
+			patterns,
 			boost::property_tree::ptree       &destination)
   {
     for (boost::property_tree::ptree::const_iterator p = source.begin();
@@ -1186,10 +1188,32 @@ namespace
 						       path_separator +
 						       "value"))
 	      {
+						 // first make sure that the
+						 // new entry actually
+						 // satisfies its constraints
+		const std::string new_value
+		  = p->second.get<std::string>("value");
+		
+		const unsigned int pattern_index
+		  = destination.get<unsigned int> (full_path +
+						   path_separator +
+						   "pattern");
+		if (patterns[pattern_index]->match(new_value) == false)
+		  {
+		    std::cerr << "    The entry value" << std::endl
+			      << "        " << new_value << std::endl
+			      << "    for the entry named" << std::endl
+			      << "        " << full_path << std::endl
+			      << "    does not match the given pattern" << std::endl
+			      << "        " << patterns[pattern_index]->description()
+			      << std::endl;
+		    return false;
+		  }
+
 						 // set the found parameter in
 						 // the destination argument
 		destination.put (full_path + path_separator + "value",
-				 p->second.get_optional<std::string>("value"));
+				 new_value);
 		
 						 // this node might have
 						 // sub-nodes in addition to
@@ -1221,6 +1245,7 @@ namespace
 				       p->first :
 				       current_path + path_separator + p->first),
 				      path_separator,
+				      patterns,
 				      destination);
 
 					     // see if the recursive read
@@ -1283,7 +1308,8 @@ bool ParameterHandler::read_input_from_xml (std::istream &in)
   const boost::property_tree::ptree
     &my_entries = single_node_tree.get_child("ParameterHandler");
 
-  return read_xml_recursively (my_entries, "", path_separator, *entries);
+  return read_xml_recursively (my_entries, "", path_separator, patterns,
+			       *entries);
 }
 
 
