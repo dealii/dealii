@@ -804,59 +804,45 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 		  }
 		else
 		  {
+		    data.contravariant[point]=transpose(data.contravariant[point]);
+
+						     // compute the normal
+						     // vector to this cell
+						     // and put it into the
+						     // last row of
+						     // data.contravariant
 		    if ( (dim==1) && (spacedim==2) )
-		      {
-			data.contravariant[point] = transpose(data.contravariant[point]);
-			JxW_values[point]
-			  = data.contravariant[point][0].norm()*weights[point];
-			if (update_flags & update_normal_vectors)
-			  {
-			    normal_vectors[point][0]
-			      = -(data.contravariant[point][0][1]
-				  /
-				  data.contravariant[point][0].norm());
-			    normal_vectors[point][1]
-			      = (data.contravariant[point][0][0]
-				 /
-				 data.contravariant[point][0].norm());
-
-			    if (cell->direction_flag() == false)
-			      normal_vectors[point] *= -1.;
-			  }
-		      }
+		      cross_product(data.contravariant[point][1],
+				    -data.contravariant[point][0]);
+		    else if ( (dim==2) && (spacedim==3) )
+		      cross_product(data.contravariant[point][2],
+				    data.contravariant[point][0],
+				    data.contravariant[point][1]);
 		    else
-		      {
-			if ( (dim==2) && (spacedim==3) )
-			  {
-			    data.contravariant[point]=transpose(data.contravariant[point]);
-			    cross_product(data.contravariant[point][2],
-					  data.contravariant[point][0],
-					  data.contravariant[point][1]);
-			    JxW_values[point]
-			      = data.contravariant[point][2].norm()*weights[point];
+		      Assert (false, ExcNotImplemented());
 
-							     // the cell
-							     // normal
-							     // vector
-							     // (normal
-							     // to the
-							     // surface)
-							     // is
-							     // stored
-							     // in the
-							     // 3d
-							     // subtensor
-							     // of the
-							     // contravariant
-							     // tensor
-			    data.contravariant[point][2] /= data.contravariant[point][2].norm();
-			    if (update_flags & update_normal_vectors)
-			      {
-				normal_vectors[point]=data.contravariant[point][2];
-				if (cell->direction_flag() == false)
-				  normal_vectors[point] *= -1.;
-			      }
-			  }
+						     // det(J) is now the norm
+						     // of the cross product
+						     // of all the mapped unit
+						     // tangential vectors
+		    JxW_values[point]
+		      = data.contravariant[point][spacedim-1].norm()*weights[point];
+
+						     // in order to compute
+						     // the normal vector,
+						     // normalize the cross
+						     // product of mapped unit
+						     // vectors
+		    data.contravariant[point][spacedim-1]
+		      /= data.contravariant[point][spacedim-1].norm();
+		    
+		    if (update_flags & update_normal_vectors)
+		      {
+			normal_vectors[point]
+			  = data.contravariant[point][spacedim-1];
+			
+			if (cell->direction_flag() == false)
+			  normal_vectors[point] *= -1.;
 		      }
 		  }
 	      }
