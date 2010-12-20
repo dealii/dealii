@@ -5581,8 +5581,8 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC, dnl
     DEAL_II_CONFIGURE_PETSC_VERSION
     DEAL_II_CONFIGURE_PETSC_ARCH
 
-    DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
     DEAL_II_CONFIGURE_PETSC_MPIUNI_LIB
+    DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
     DEAL_II_CONFIGURE_PETSC_COMPLEX
 
     DEAL_II_EXPAND_PETSC_VECTOR="PETScWrappers::Vector"
@@ -5698,8 +5698,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
 
 dnl -------------------------------------------------------------
 dnl Make sure that if PETSc and deal.II were built with the same
-dnl compiler. Actually, this only checks if the compilers are the
-dnl if deal.II has MPI enabled.
+dnl MPI enabled (or disabled) functionality.
 dnl
 dnl Usage: DEAL_II_CHECK_PETSC_MPI_CONSISTENCY
 dnl
@@ -5707,7 +5706,74 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
 [
   dnl Then check for MPI consistency.
-  dnl AC_MSG_CHECKING(for consistency of PETSc and deal.II MPI settings)
+  AC_MSG_CHECKING(for consistency of PETSc and deal.II MPI settings)
+
+  if test "x$DEAL_II_USE_MPI" = "xyes" ; then
+
+  dnl So we support MPI. Check that our PETSc installation does
+  dnl too. PETSc sets the variable PETSC_HAVE_MPIUNI to 1 in case
+  dnl he *does not* support MPI, so just read out that information.
+  dnl
+  dnl Like always, we have to cake care of version control!
+    case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
+      2.3*) dnl
+        AC_TRY_COMPILE(
+        [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
+        ],
+        [#ifdef PETSC_HAVE_MPIUNI
+           compile error;
+         #endif
+        ],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!]
+        )])
+      ;;
+      3.*) dnl
+        AC_TRY_COMPILE(
+        [#include "$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h"
+        ],
+        [#ifdef PETSC_HAVE_MPIUNI
+           compile error;
+         #endif
+        ],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!]
+        )])
+      ;;
+      *) dnl
+        AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
+      ;;
+    esac
+  else
+    case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
+      2.3*) dnl
+        AC_TRY_COMPILE(
+        [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
+        ],
+        [#ifndef PETSC_HAVE_MPIUNI
+           compile error;
+         #endif
+        ],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!]
+        )])
+      ;;
+      3.*) dnl
+        AC_TRY_COMPILE(
+        [#include "$DEAL_II_PETSC_DIR/$DEAL_II_PETSC_ARCH/include/petscconf.h"
+        ],
+        [#ifndef PETSC_HAVE_MPIUNI
+           compile error;
+         #endif],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!])
+        ])
+      ;;
+      *) dnl
+        AC_MSG_ERROR([Unknown PETSc version ${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}])
+      ;;
+    esac
+  fi
 ])
 
 
