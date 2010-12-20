@@ -43,6 +43,7 @@ F77LIBS              = @F77LIBS@
 LIBS                 = @LIBS@
 LIBDIR               = $D/lib
 PERL                 = @PERL@
+QMAKE                = @QMAKE@
 enable-threads       = @enablethreads@
 enable-shared        = @enableshared@
 enable-parser        = @enableparser@

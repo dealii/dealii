@@ -667,6 +667,15 @@ AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 
 
+dnl Check for the Qt library and associated programs. We need those for
+dnl the parameter GUI program in contrib/parameter_gui
+AC_CHECK_PROG(QMAKE,qmake,qmake)
+if test -n "$QMAKE" ; then
+  AC_PATH_PROG(QMAKE,$QMAKE)
+
+  dnl Verify that Qt version is at least 4.3
+fi
+AC_SUBST(QMAKE)
 
 
 dnl -------------------------------------------------------------
