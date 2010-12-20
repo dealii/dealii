@@ -407,10 +407,18 @@ independent of the dimension.
 <h3>deal.II</h3>
 
 <ol>
+  <li><p>New: The GridTools::transform function used to work only on
+  meshes that are not refined at all. It now also works on meshes
+  that have been refined uniformly, though not on adaptively refined
+  ones.
+  <br>
+  (WB, 2010/12/20)
+  </p></li>
+  
   <li><p>New: When computing errors using
   VectorTools::integrate_difference in codimension one problems, if
   you specified a norm that requires the computation of the gradients,
-  you'd get in trouble, because on codimension one manifolds we only
+  you would get in trouble, because on codimension one manifolds we only
   have information on the <em>tangential</em> gradient. This is now
   fixed, by discarding the normal component of the provided function,
   before computing the difference with the finite element function.

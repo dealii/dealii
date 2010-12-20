@@ -166,20 +166,17 @@ class GridTools
 				     const double                 tol=1e-12);
 
 				     /**
-				      * Transform the vertices of the
-				      * given triangulation by
-				      * applying the predicate to all
-				      * its vertices. Since the
-				      * internal consistency of a
-				      * triangulation can only be
-				      * guaranteed if the
-				      * transformation is applied to
-				      * the vertices of only one level
-				      * of a hierarchically refined
-				      * cells, this function may only
-				      * be used on coarse grids,
-				      * i.e. before any refinement of
-				      * it has taken place.
+				      * Transform the vertices of the given
+				      * triangulation by applying the
+				      * predicate to all its vertices. Since
+				      * the internal consistency of a
+				      * triangulation can only be guaranteed
+				      * if the transformation is applied to
+				      * the vertices of only one level of a
+				      * hierarchically refined cells, this
+				      * function may only be used if all cells
+				      * of the triangulation are on the same
+				      * refinement level.
 				      *
 				      * The predicate given as
 				      * argument is used to transform
@@ -949,8 +946,12 @@ template <int dim, typename Predicate, int spacedim>
 void GridTools::transform (const Predicate    &predicate,
 			   Triangulation<dim, spacedim> &triangulation)
 {
-  Assert (triangulation.n_levels() == 1,
-	  ExcTriangulationHasBeenRefined());
+				   // ensure that all the cells of the
+				   // triangulation are on the same level
+  Assert (triangulation.n_levels() ==
+	  static_cast<unsigned int>(triangulation.begin_active()->level()+1),
+  	  ExcMessage ("Not all cells of this triangulation are at the same "
+		      "refinement level, as is required for this function."));
 
   std::vector<bool> treated_vertices (triangulation.n_vertices(),
 				      false);
