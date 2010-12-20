@@ -190,6 +190,10 @@ class GridTools
 				      * either case, argument and
 				      * return value have to be of
 				      * type <tt>Point<dim></tt>.
+				      *
+				      * This function is used in the
+				      * "Possibilities for extensions" section
+				      * of step-38.
 				      */
     template <int dim, typename Predicate, int spacedim>
     static
