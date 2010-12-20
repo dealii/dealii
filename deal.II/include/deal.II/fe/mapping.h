@@ -185,7 +185,7 @@ enum MappingType
  * \mathbf{\hat v}(\mathbf{\hat x}),
  * \qquad
  * \mathbf v(\mathbf x) = \mathbf A(\mathbf{\hat x})
- * \mathbf{\hat T}(\mathbf{\hat x}) \mathbf B(\mathbf{\hat x}), 
+ * \mathbf{\hat T}(\mathbf{\hat x}) \mathbf B(\mathbf{\hat x}),
  * @f]
  * respectively, where the tensors <b>A</b> and <b>B</b> are
  * determined by the MappingType enumerator.
@@ -206,8 +206,8 @@ enum MappingType
  *
  * A general publication on differential geometry and finite elements
  * is the survey <ul><li>Douglas N. Arnold, Richard S. Falk, and
- * Ragnar Winther. \textit{Finite element exterior calculus: from
- * Hodge theory to numerical stability.}
+ * Ragnar Winther. <i>Finite element exterior calculus: from
+ * Hodge theory to numerical stability.</i>
  * Bull. Amer. Math. Soc. (N.S.), 47:281-354, 2010. <a
  * href="http://dx.doi.org/10.1090/S0273-0979-10-01278-4">DOI:
  * 10.1090/S0273-0979-10-01278-4</a>.</ul>
@@ -517,7 +517,7 @@ class Mapping : public Subscriptor
  * \frac{1}{\text{det}J(\mathbf x)}
  * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
  * J^{-1}(\mathbf{\hat x}).
- * @f] 
+ * @f]
  * </ul>
  */
     virtual
