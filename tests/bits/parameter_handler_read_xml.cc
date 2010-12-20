@@ -12,8 +12,7 @@
 //----------------------------  parameter_handler_read_xml.cc  ---------------------------
 
 
-// check ParameterHandler::print_parameters (..., XML). have a few
-// names that contain all sorts of weird (for XML) characters
+// check ParameterHandler::read_input_from_xml
 
 #include "../tests.h"
 #include <base/logstream.h>
