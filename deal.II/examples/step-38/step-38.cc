@@ -102,7 +102,31 @@ class Solution  : public Function<dim>
 				    const unsigned int  component = 0) const;
 
 };
- 
+
+
+template <>
+double
+Solution<2>::value (const Point<2> &p,
+		    const unsigned int) const 
+{
+  return ( -2. * p(0) * p(1) );
+}
+
+
+template <>
+Tensor<1,2>
+Solution<2>::gradient (const Point<2>   &p,
+		       const unsigned int) const
+{
+
+  Tensor<1,2> return_value;
+  return_value[0] = -2. * p(1) * (1 - 2. * p(0) * p(0));
+  return_value[1] = -2. * p(0) * (1 - 2. * p(1) * p(1));
+
+  return return_value;
+}
+
+
 template <>
 double
 Solution<3>::value (const Point<3> &p,
@@ -179,7 +203,13 @@ RightHandSide<3>::value (const Point<3> &p,
 }
 
 
-
+template <>
+double
+RightHandSide<2>::value (const Point<2> &p,
+			 const unsigned int comp) const 
+{
+  return ( -8. * p(0) * p(1) ); 
+}
 
 
 template <int spacedim>
@@ -294,11 +324,9 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 
 
   std::map<unsigned int,double> boundary_values; 
-  VectorTools::interpolate_boundary_values (mapping,
-					    dof_handler,
-					    0,
-					    Solution<spacedim>(),
+  VectorTools::interpolate_boundary_values (mapping,dof_handler,0,Solution<spacedim>(),
 					    boundary_values);
+  
   MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
 				      solution,
@@ -331,7 +359,9 @@ void LaplaceBeltramiProblem<spacedim>::output_results () const
   data_out.build_patches (mapping,
 			  mapping.get_degree());
 
-  std::ofstream output ("solution.vtk");
+  std::string filename ("solution-");
+  filename += ('0'+spacedim);filename += "d.vtk"; 
+  std::ofstream output (filename.c_str());
   data_out.write_vtk (output);
 }
 
@@ -369,8 +399,14 @@ void LaplaceBeltramiProblem<spacedim>::run ()
 int main ( int argc, char **argv )
 {
   deallog.depth_console (0);
+
   {
-    LaplaceBeltramiProblem<3> laplace_beltrami_2d;
+    LaplaceBeltramiProblem<3> laplace_beltrami_3d;
+    laplace_beltrami_3d.run();
+  }
+  
+  {
+    LaplaceBeltramiProblem<2> laplace_beltrami_2d;
     laplace_beltrami_2d.run();
   }
     
