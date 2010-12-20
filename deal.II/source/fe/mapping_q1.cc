@@ -804,7 +804,14 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 		  }
 		else
 		  {
-		    data.contravariant[point]=transpose(data.contravariant[point]);
+						     // temporarily
+						     // transpose the
+						     // matrix so that
+						     // we can refer
+						     // to its columns
+						     // using a single
+						     // index
+		    data.contravariant[point] = transpose(data.contravariant[point]);
 
 						     // compute the normal
 						     // vector to this cell
@@ -835,15 +842,20 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 						     // vectors
 		    data.contravariant[point][spacedim-1]
 		      /= data.contravariant[point][spacedim-1].norm();
-		    
+
 		    if (update_flags & update_normal_vectors)
 		      {
 			normal_vectors[point]
 			  = data.contravariant[point][spacedim-1];
-			
+
 			if (cell->direction_flag() == false)
 			  normal_vectors[point] *= -1.;
 		      }
+
+						     // un-transpose
+						     // the matrix
+						     // again
+		    data.contravariant[point] = transpose(data.contravariant[point]);
 		  }
 	      }
 	  }
@@ -1065,6 +1077,13 @@ namespace internal
 		{
 		  Tensor<1,spacedim> cell_normal;
 
+						   // temporarily
+						   // transpose the
+						   // matrix so that
+						   // we can refer
+						   // to its columns
+						   // using a single
+						   // index
 		  data.contravariant[point] = transpose(data.contravariant[point]);
 
 						   // compute the normal
@@ -1105,9 +1124,14 @@ namespace internal
 				   data.aux[0][point], cell_normal);
 		  else
 		    Assert (false, ExcNotImplemented());
+
+						   // un-transpose
+						   // the matrix
+						   // again
+		  data.contravariant[point] = transpose(data.contravariant[point]);
 		}
 	    }
-	  
+
 
       	  if (update_flags & (update_normal_vectors
       	  		      | update_JxW_values))
