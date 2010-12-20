@@ -1207,7 +1207,8 @@ namespace
 		std::cerr << "The entry <" << full_path
 			  << "> with value <"
 			  << p->second.get<std::string>("value")
-			  << "> has not been declared.";
+			  << "> has not been declared."
+			  << std::endl;
 		return false;
 	      }
 	  }
