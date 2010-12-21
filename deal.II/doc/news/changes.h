@@ -94,6 +94,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 <h3>General</h3>
 
 <ol>
+  <li><p>New: deal.II now has a Qt based graphical user interface to edit
+  input parameter files. The executable is located in
+  <code>contrib/parameter_gui</code>.
+  <br>
+  (Martin Steigemann, 2010/12/20)
+  </p></li>
+
   <li><p>New: A significant number of classes, primarily in the
   <code>base/</code> subdirectory, now provide the necessary member functions
   for serialization through BOOST's serialization library.
