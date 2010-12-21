@@ -1,8 +1,8 @@
 //----------------------------  rt_crash_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //----------------------------  rt_crash_01.cc  ---------------------------
 
 #include "../tests.h"
-#include "../bits/dof_tools_common.cc"
+#include "../bits/dof_tools_common.h"
 #include <lac/constraint_matrix.h>
 #include <base/function.h>
 #include <base/quadrature_lib.h>
@@ -40,8 +40,8 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().get_name().find ("RaviartThomas") ==
       std::string::npos)
     return;
-  
-  ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ()); 
+
+  ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ());
 
                                    // don't run this test if hanging
                                    // nodes are not implemented
@@ -70,7 +70,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   for (unsigned int i=0; i<solution.size(); ++i)
     Assert (std::fabs (solution(i)-1) < 1e-6,
 	    ExcInternalError());
-  
+
   // Evaluate error
   Vector<double> cellwise_errors (dof_handler.get_tria ().n_active_cells());
   VectorTools::integrate_difference (dof_handler, solution, test_func,
@@ -79,7 +79,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   const double p_l2_error = cellwise_errors.l2_norm();
 
   deallog << "L2_Error : " << p_l2_error << std::endl;
-  
+
   {
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
@@ -87,6 +87,6 @@ check_this (const DoFHandler<dim> &dof_handler)
     data_out.build_patches ();
     data_out.write_gnuplot (deallog.get_file_stream());
   }
-  
-  Assert (p_l2_error < 1e-12, ExcInternalError());  
+
+  Assert (p_l2_error < 1e-12, ExcInternalError());
 }

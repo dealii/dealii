@@ -1,8 +1,8 @@
 //----------------------------  project_dgp_nonparametric_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 char logname[] = "project_dgp_nonparametric_01/output";
 
 
-#include "../deal.II/project_common.cc"
+#include "../deal.II/project_common.h"
 
 
 template <int dim>
