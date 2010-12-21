@@ -64,6 +64,7 @@ endif
 # generic targets
 clean: hsl-clean tbb-clean
 	@-rm -f ../lib/contrib/*/*.o
+	@-cd parameter_gui ; $(MAKE) clean
 
 .PHONY: default hsl clean hsl-clean umfpack tbb tbb-clean functionparser parameter_gui
 
