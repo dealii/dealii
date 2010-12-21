@@ -160,6 +160,7 @@ clean-contrib:
 
 clean-bin:
 	-rm bin/detached_ma27
+	-rm bin/dealii_parameter_gui
 
 distclean: clean
 	-rm -f lib* bin/*
