@@ -673,7 +673,18 @@ AC_CHECK_PROG(QMAKE,qmake,qmake)
 if test -n "$QMAKE" ; then
   AC_PATH_PROG(QMAKE,$QMAKE)
 
-  dnl Verify that Qt version is at least 4.3
+  dnl Verify that Qt version is at least 4.3. Only consider the major
+  dnl and minor version number, don't care about the subminor
+  DEAL_II_QT_VERSION="`$QMAKE --version | grep -i version | grep -i qt | perl -pi -e 's/.*(\d+)\.(\d+)\.(\d+).*/\1.\2/g;'`"
+
+  AC_MSG_CHECKING(whether Qt version is >= 4.3)
+  if (echo $DEAL_II_QT_VERSION | perl -e '$ver=<>; if ($ver < 4.3) { exit(1); }') ; then
+    AC_MSG_RESULT(yes)
+  else
+    dnl Version is too old. Simply forget about the location of qmake again
+    AC_MSG_RESULT(no)
+    QMAKE=
+  fi
 fi
 AC_SUBST(QMAKE)
 
