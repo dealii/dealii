@@ -510,6 +510,7 @@ namespace internal
 	  = IndexSet (number_cache.n_global_dofs);
 	number_cache.locally_owned_dofs.add_range (0,
 						   number_cache.n_global_dofs);
+	number_cache.locally_owned_dofs.compress();
 
 	number_cache.n_locally_owned_dofs_per_processor
 	  = std::vector<unsigned int> (1,
@@ -546,6 +547,7 @@ namespace internal
 	  = IndexSet (number_cache.n_global_dofs);
 	number_cache.locally_owned_dofs.add_range (0,
 						   number_cache.n_global_dofs);
+	number_cache.locally_owned_dofs.compress();
 
 	number_cache.n_locally_owned_dofs_per_processor
 	  = std::vector<unsigned int> (1,
@@ -1163,6 +1165,7 @@ namespace internal
 	number_cache.locally_owned_dofs
 	  .add_range(shift,
 		     shift+number_cache.n_locally_owned_dofs);
+	number_cache.locally_owned_dofs.compress();
 
 					 // fill global_dof_indexsets
 	number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
