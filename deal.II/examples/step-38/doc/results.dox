@@ -8,9 +8,11 @@ Surface mesh has 5185 degrees of freedom.
 H1 error = 0.0221245
 @endverbatim
 
-By playing around with the number of global refinements in teh
-<code>LaplaceBeltrami::make_mesh</code> function you increase or decrease mesh
-refinement. For example, doing one more refinement yields the following
+
+By playing around with the number of global refinements in the
+<code>LaplaceBeltrami::make_grid_and_dofs</code> function you increase or decrease mesh
+refinement. For example, doing one more refinement and only running the 3d surface
+problem yields the following
 output:
 
 @verbatim
@@ -34,6 +36,7 @@ this, neatly following the theoretically predicted pattern:
 Finally, the program produces graphical output that we can visualize. Here is
 a plot of the results:
 
+@image html step-38.solution-2d.png
 @image html step-38.solution-3d.png
 
 
@@ -76,7 +79,7 @@ Point<dim> warp (const Point<dim> &p)
 }
 @endcode
 
-If we followed the <code>LaplaceBeltrami::make_mesh</code> function, we would
+If we followed the <code>LaplaceBeltrami::make_grid_and_dofs</code> function, we would
 extract the 5/6th spherical surface mesh as before, warp it into the shape we
 want, and refine as often as necessary. This is not quite as simple as we'd
 like here, though: refining requires that we have an appropriate manifold
@@ -93,7 +96,7 @@ above, this would look as follows:
 
 @code
 template <int dim>
-void LaplaceBeltrami<dim>::make_mesh ()
+void LaplaceBeltrami<dim>::make_grid_and_dofs ()
 {
   HyperBallBoundary<dim> boundary_description;
   Triangulation<dim> volume_mesh;

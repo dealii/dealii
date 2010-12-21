@@ -123,9 +123,10 @@ and
 In general when you want to test numerically the accuracy and/or 
 order of convergence of an algorithm you need to provide an exact
 solution. 
-The usual trick is to pick a function that we want to be the solution applied 
-the differential operator to define a forcing term for the right hand side.
+The usual trick is to pick a function that we want to be the solution,
+then apply the differential operator to it that defines a forcing term 
+for the right hand side.
 This is what we do in this example.
-
+We produce one test case for a 2d problem and another one for the 3d one.
 
 Mapping objects
