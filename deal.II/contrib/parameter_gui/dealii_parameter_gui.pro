@@ -6,6 +6,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
+DESTDIR = ../../lib/bin
 
 # Input
 HEADERS += browse_lineedit.h \
