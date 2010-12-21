@@ -2307,7 +2307,7 @@ RefinementCase<0> TriaAccessor<0, 1, spacedim>::refinement_case ()
 
 template <int spacedim>
 inline
-int TriaAccessor<0, 1, spacedim>::child_index (const unsigned int i)
+int TriaAccessor<0, 1, spacedim>::child_index (const unsigned int)
 {
   return -1;
 }
