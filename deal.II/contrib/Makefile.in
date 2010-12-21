@@ -53,7 +53,7 @@ endif
 
 ifneq ($(QMAKE),)
 parameter_gui:
-	@-cd parameter_gui ; $(QMAKE) -Wnone && $(MAKE)
+	@-cd parameter_gui ; $(QMAKE) -Wnone QMAKE_CXX=$(CXX) && $(MAKE)
 else
 parameter_gui:
 	@echo "**** Can't build the Parameter GUI because no suitable"
