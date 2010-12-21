@@ -7,7 +7,7 @@ include ../common/Make.global_options
 # by default make sublibs. the functionparser is not part of the
 # default make list, since it needs to be built *before* the rest of
 # this stuff as it is needed by libbase
-default: hsl umfpack functionparser tbb
+default: hsl umfpack functionparser tbb parameter_gui
 
 
 ifeq ($(USE_CONTRIB_HSL),yes)
@@ -51,9 +51,19 @@ tbb tbb-clean:
 endif
 
 
+ifneq ($(QMAKE),)
+parameter_gui:
+	@cd parameter_gui ; $(QMAKE) -Wnone && $(MAKE)
+else
+parameter_gui:
+	@echo "**** Can't build the Parameter GUI because no suitable"
+	@echo "**** version of the Qt toolkit was found"
+endif
+
+
 # generic targets
 clean: hsl-clean tbb-clean
 	@-rm -f ../lib/contrib/*/*.o
 
-.PHONY: default hsl clean hsl-clean umfpack tbb tbb-clean functionparser
+.PHONY: default hsl clean hsl-clean umfpack tbb tbb-clean functionparser parameter_gui
 
