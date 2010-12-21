@@ -124,7 +124,7 @@ set_grain_sizes;
 //
 // the actual sleep time isn't all that important. the point is that
 // we need to kill deadlocked threads at one point, whenever that is
-#ifdef DEAL_II_USE_MT
+#if DEAL_II_USE_MT == 1
 
 struct DeadlockKiller
 {
