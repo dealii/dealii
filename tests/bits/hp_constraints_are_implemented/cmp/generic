@@ -54,7 +54,7 @@ DEAL::FE_DGP<2>(3): true
 DEAL::Checking DGP3 in 3d:
 DEAL::FE_DGP<3>(3): true
 DEAL::Checking Nedelec0 in 2d:
-DEAL::FE_Nedelec<2>(0): false
+DEAL::FE_Nedelec<2>(0): true
 DEAL::Checking Nedelec0 in 3d:
 DEAL::FE_Nedelec<3>(0): true
 DEAL::Checking RaviartThomas0 in 2d:
@@ -124,6 +124,6 @@ DEAL::FESystem<2>[FESystem<2>[FE_Q<2>(1)^3]^3-FE_DGQ<2>(0)-FE_Q<2>(1)^3]: true
 DEAL::Checking FE_DGQ<2>(3)1FESystem<2>(FE_DGQ<2>(0),3)1FESystem<2>(FE_Q<2>(2),1, FE_DGQ<2>(0),1)2 in 2d:
 DEAL::FESystem<2>[FE_DGQ<2>(3)-FESystem<2>[FE_DGQ<2>(0)^3]-FESystem<2>[FE_Q<2>(2)-FE_DGQ<2>(0)]^2]: true
 DEAL::Checking FE_DGQ<2>(3)1FE_Nedelec<2>(0)2 in 2d:
-DEAL::FESystem<2>[FE_DGQ<2>(3)-FE_Nedelec<2>(0)^2]: false
+DEAL::FESystem<2>[FE_DGQ<2>(3)-FE_Nedelec<2>(0)^2]: true
 DEAL::Checking FE_Nedelec<2>(0)1FESystem<2>(FE_DGQ<2>(1),2)1FESystem<2>(FE_Q<2>(2),1, FE_Nedelec<2>(0),2)2 in 2d:
-DEAL::FESystem<2>[FE_Nedelec<2>(0)-FESystem<2>[FE_DGQ<2>(1)^2]-FESystem<2>[FE_Q<2>(2)-FE_Nedelec<2>(0)^2]^2]: false
+DEAL::FESystem<2>[FE_Nedelec<2>(0)-FESystem<2>[FE_DGQ<2>(1)^2]-FESystem<2>[FE_Q<2>(2)-FE_Nedelec<2>(0)^2]^2]: true

@@ -468,11 +468,11 @@ DEAL::Checking DGP3 against DGP3 in 3d:
 DEAL::true
 DEAL::true
 DEAL::Checking Nedelec0 against Nedelec0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking Nedelec0 against Nedelec0 in 2d:
-DEAL::false
-DEAL::false
+DEAL::true
+DEAL::true
 DEAL::Checking Nedelec0 against Nedelec0 in 3d:
 DEAL::true
 DEAL::true

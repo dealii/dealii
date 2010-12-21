@@ -103,6 +103,9 @@ DEAL::4
 DEAL::1
 DEAL::L2_Error : 0
 DEAL::Checking Nedelec0 in 3d:
+DEAL::40
+DEAL::2
+DEAL::L2_Error : 0
 DEAL::Checking RaviartThomas0 in 2d:
 DEAL::Checking RaviartThomas1 in 2d:
 DEAL::Checking RaviartThomas2 in 2d:

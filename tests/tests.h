@@ -23,6 +23,7 @@
 #include <base/utilities.h>
 #include <base/thread_management.h>
 #include <cmath>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
