@@ -6435,8 +6435,6 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   echo "#endif" >> confdefs.h
 
   AC_CHECK_HEADERS([Amesos.h \
-                    AztecOO.h \
-                    AztecOO_Operator.h \
                     Epetra_CrsGraph.h \
                     Epetra_CrsMatrix.h \
                     Epetra_Import.h \
@@ -6448,6 +6446,8 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
                     Epetra_Vector.h \
                     Ifpack.h \
                     ml_MultiLevelPreconditioner.h \
+                    AztecOO.h \
+                    AztecOO_Operator.h \
                     Sacado.hpp \
                     Teuchos_ParameterList.hpp \
                     Teuchos_RCP.hpp \
