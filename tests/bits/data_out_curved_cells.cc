@@ -256,7 +256,9 @@ int main ()
 				   // to me, appears to deadlock at
 				   // times. make sure we kill it
 				   // after some time
+#if DEAL_II_USE_MT == 1
   DeadlockKiller killer;
+#endif
 
   curved_grid (logfile);
 }
