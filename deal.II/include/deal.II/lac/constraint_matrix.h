@@ -1871,8 +1871,16 @@ inline
 bool
 ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) const
 {
-  return (is_constrained(index) &&
-	  lines[lines_cache[calculate_line_index(index)]].inhomogeneity != 0);
+				// check whether the entry is
+				// constrained. could use is_constrained, but
+				// that means computing the line index twice
+  const unsigned int line_index = calculate_line_index(index);
+  if (line_index > lines_cache.size() ||
+      lines_cache[line_index] == numbers::invalid_unsigned_int ||
+      lines[lines_cache[line_index]].inhomogeneity == 0)
+    return false;
+  else
+    return true;
 }
 
 
@@ -1881,10 +1889,15 @@ inline
 const std::vector<std::pair<unsigned int,double> >*
 ConstraintMatrix::get_constraint_entries (unsigned int line) const
 {
-  if (is_constrained(line))
-    return &lines[lines_cache[calculate_line_index(line)]].entries;
-  else
+				// check whether the entry is
+				// constrained. could use is_constrained, but
+				// that means computing the line index twice
+  const unsigned int line_index = calculate_line_index(line);
+  if (line_index > lines_cache.size() ||
+      lines_cache[line_index] == numbers::invalid_unsigned_int)
     return 0;
+  else
+    return &lines[lines_cache[line_index]].entries;
 }
 
 
@@ -1893,10 +1906,15 @@ inline
 double
 ConstraintMatrix::get_inhomogeneity (unsigned int line) const
 {
-  if (is_constrained(line))
-    return lines[lines_cache[calculate_line_index(line)]].inhomogeneity;
-  else
+				// check whether the entry is
+				// constrained. could use is_constrained, but
+				// that means computing the line index twice
+  const unsigned int line_index = calculate_line_index(line);
+  if (line_index > lines_cache.size() ||
+      lines_cache[line_index] == numbers::invalid_unsigned_int)
     return 0;
+  else
+    return lines[lines_cache[line_index]].inhomogeneity;
 }
 
 
@@ -1917,7 +1935,7 @@ ConstraintMatrix::calculate_line_index (const unsigned int line) const
 
 
 inline bool
-ConstraintMatrix::can_store_line(unsigned int line_index) const
+ConstraintMatrix::can_store_line (unsigned int line_index) const
 {
   return !local_lines.size() || local_lines.is_element(line_index);
 }
