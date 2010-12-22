@@ -207,10 +207,13 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
           else if test "x$version11" != "x" ; then
             AC_MSG_RESULT(C++ compiler is icc-11)
             GXX_VERSION=intel_icc11
+          else if test "x$version12" != "x" ; then
+            AC_MSG_RESULT(C++ compiler is icc-12)
+            GXX_VERSION=intel_icc12
           else
             AC_MSG_RESULT(C++ compiler is icc)
             GXX_VERSION=intel_icc
-          fi fi fi fi fi fi fi
+          fi fi fi fi fi fi fi fi
           GXX_VERSION_DETAILED="$GXX_VERSION"
         else
 
@@ -1804,7 +1807,12 @@ AC_DEFUN(DEAL_II_CHECK_CPU_OPTIMIZATIONS, dnl
 
 	      dnl Also set the mode for f77 compiler
 	      F77FLAGSO="$F77FLAGSO -march=native"
-          ;;
+              ;;
+
+          intel_icc*)
+              dnl Same, but for the icc compiler
+              CXXFLAGSO="$CXXFLAGSO -xhost"
+              ;;
         esac
         ;;
 
