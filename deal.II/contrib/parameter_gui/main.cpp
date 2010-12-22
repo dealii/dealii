@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   QApplication app(argc, argv);
 
   QSplashScreen * splash = new QSplashScreen;			// setup a splash screen
-  splash->setPixmap(QPixmap("./images/logo_dealii_gui.png"));
+  splash->setPixmap(QPixmap(":/images/logo_dealii_gui.png"));
   splash->show();
 
   QTimer::singleShot(3000, splash, SLOT(close()));		// and close it after 3000 ms
