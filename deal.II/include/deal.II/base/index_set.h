@@ -483,6 +483,23 @@ class IndexSet
     unsigned int index_space_size;
 
 				     /**
+				      * This integer caches the index of the
+				      * largest range in @p ranges. This gives
+				      * <tt>O(1)</tt> access to the range with
+				      * most elements, while general access
+				      * costs <tt>O(log(n_ranges))</tt>. The
+				      * largest range is needed for the
+				      * methods @p is_element(), @p
+				      * index_within_set(), @p
+				      * nth_index_in_set. In many
+				      * applications, the largest range
+				      * contains most elements (the locally
+				      * owned range), whereas there are only a
+				      * few other elements (ghosts).
+				      */
+    mutable unsigned int largest_range;
+
+				     /**
 				      * Actually perform the compress()
 				      * operation.
 				      */
@@ -506,7 +523,8 @@ inline
 IndexSet::IndexSet ()
 		:
 		is_compressed (true),
-		index_space_size (0)
+		index_space_size (0),
+		largest_range (deal_II_numbers::invalid_unsigned_int)
 {}
 
 
@@ -515,7 +533,8 @@ inline
 IndexSet::IndexSet (const unsigned int size)
 		:
 		is_compressed (true),
-		index_space_size (size)
+		index_space_size (size),
+		largest_range (deal_II_numbers::invalid_unsigned_int)
 {}
 
 
@@ -571,10 +590,17 @@ IndexSet::add_range (const unsigned int begin,
   if (begin != end)
     {
       const Range new_range(begin,end);
-      ranges.insert (std::lower_bound (ranges.begin(),
-				       ranges.end(),
-				       new_range),
-		     new_range);
+
+				// the new index might be larger than the last
+				// index present in the ranges. Then we can
+				// skip the binary search
+      if (ranges.size() == 0 || begin > ranges.back().end)
+	ranges.push_back(new_range);
+      else
+	ranges.insert (std::lower_bound (ranges.begin(),
+					 ranges.end(),
+					 new_range),
+		       new_range);
       is_compressed = false;
     }
 }
@@ -589,10 +615,15 @@ IndexSet::add_index (const unsigned int index)
 	  ExcIndexRange (index, 0, index_space_size));
 
   const Range new_range(index, index+1);
-  ranges.insert (std::lower_bound (ranges.begin(),
-				   ranges.end(),
-				   new_range),
-		 new_range);
+  if (ranges.size() == 0 || index > ranges.back().end)
+    ranges.push_back(new_range);
+  else if (index == ranges.back().end)
+    ranges.back().end++;
+  else
+    ranges.insert (std::lower_bound (ranges.begin(),
+				     ranges.end(),
+				     new_range),
+		   new_range);
   is_compressed = false;
 }
 
@@ -635,6 +666,13 @@ IndexSet::is_element (const unsigned int index) const
     {
       compress ();
 
+				// fast check whether the index is in the
+				// largest range
+      Assert (largest_range < ranges.size(), ExcInternalError());
+      if (index >= ranges[largest_range].begin &&
+	  index < ranges[largest_range].end)
+	return true;
+
 				       // get the element after which
 				       // we would have to insert a
 				       // range that consists of all
@@ -653,8 +691,18 @@ IndexSet::is_element (const unsigned int index) const
 				       // of the following ranges
 				       // because otherwise p would be
 				       // a different iterator
+				       // 
+				       // since we already know the position
+				       // relative to the largest range (we
+				       // called compress!), we can perform
+				       // the binary search on ranges with
+				       // lower/higher number compared to the
+				       // largest range
       std::vector<Range>::const_iterator
-	p = std::upper_bound (ranges.begin(),
+	p = std::upper_bound (ranges.begin() + (index<ranges[largest_range].begin?
+						0 : largest_range+1),
+			      index<ranges[largest_range].begin ? 
+			      ranges.begin() + largest_range:
 			      ranges.end(),
 			      Range (index, size()+1));
 
@@ -712,18 +760,34 @@ inline
 unsigned int
 IndexSet::nth_index_in_set (const unsigned int n) const
 {
+				// to make this call thread-safe, compress()
+				// must not be called through this function
+  Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
   Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
+
+				// first check whether the index is in the
+				// largest range
+  Assert (largest_range < ranges.size(), ExcInternalError());
+  std::vector<Range>::const_iterator main_range=ranges.begin()+largest_range;
+  if (n>=main_range->nth_index_in_set &&
+      n<main_range->nth_index_in_set+(main_range->end-main_range->begin))
+    return main_range->begin + (n-main_range->nth_index_in_set);
 
 				// find out which chunk the local index n
 				// belongs to by using a binary search. the
 				// comparator is based on the end of the
-				// ranges
+				// ranges. Use the position relative to main_range to
+				// subdivide the ranges
   Range r (n,n+1);
   r.nth_index_in_set = n;
-  std::vector<Range>::const_iterator p = std::lower_bound(ranges.begin(),
-							  ranges.end(),
-							  r,
-							  Range::nth_index_compare);
+  std::vector<Range>::const_iterator 
+    p = std::lower_bound(n<main_range->nth_index_in_set ?
+			 ranges.begin() : ++main_range, 
+			 n<main_range->nth_index_in_set ?
+			 main_range : ranges.end(),
+			 r,
+			 Range::nth_index_compare);
+
   if (p != ranges.end())
     return p->begin + (n-p->nth_index_in_set);
   else
@@ -739,15 +803,29 @@ inline
 unsigned int
 IndexSet::index_within_set (const unsigned int n) const
 {
+				// to make this call thread-safe, compress()
+				// must not be called through this function
+  Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
   Assert (is_element(n) == true, ExcIndexNotPresent (n));
   Assert (n < size(), ExcIndexRange (n, 0, size()));
 
+				// check whether the index is in the largest
+				// range. use the result to perform a
+				// one-sided binary search afterward
+  Assert (largest_range < ranges.size(), ExcInternalError());
+  std::vector<Range>::const_iterator main_range=ranges.begin()+largest_range;
+  if (n >= main_range->begin && n < main_range->end)
+    return (n-main_range->begin) + main_range->nth_index_in_set;
+
   Range r(n, n);
 
-  std::vector<Range>::const_iterator p = std::lower_bound(ranges.begin(),
-							  ranges.end(),
-							  r,
-							  Range::end_compare);
+  std::vector<Range>::const_iterator
+      p = std::lower_bound(n<main_range->begin ?
+			   ranges.begin() : ++main_range, 
+			   n<main_range->begin ?
+			   main_range : ranges.end(),
+			   r,
+			   Range::end_compare);
 
   Assert(p!=ranges.end(), ExcInternalError());
   Assert(p->begin<=n, ExcInternalError());
@@ -819,7 +897,7 @@ inline
 void
 IndexSet::serialize (Archive & ar, const unsigned int)
 {
-  ar & ranges & is_compressed & index_space_size;
+  ar & ranges & is_compressed & index_space_size & largest_range;
 }
 
 DEAL_II_NAMESPACE_CLOSE

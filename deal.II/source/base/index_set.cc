@@ -70,8 +70,9 @@ IndexSet::do_compress () const
     }
 
 
-				   // now compute indices within set
-  unsigned int next_index = 0;
+				   // now compute indices within set and the
+				   // range with most elements
+  unsigned int next_index = 0, largest_range_size = 0;
   for (std::vector<Range>::iterator
 	 i = ranges.begin();
        i != ranges.end();
@@ -81,6 +82,11 @@ IndexSet::do_compress () const
 
       i->nth_index_in_set = next_index;
       next_index += (i->end - i->begin);
+      if (i->end - i->begin > largest_range_size)
+	{
+	  largest_range_size = i->end - i->begin;
+	  largest_range = i - ranges.begin();
+	}
     }
   is_compressed = true;
 
