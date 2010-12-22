@@ -126,6 +126,7 @@ ifeq ($(shared-lib-suffix),.so)
 else
   DEAL_II_SHLIB_NAME = lib$(1).$(DEAL_II_VERSION)$(shared-lib-suffix)
 endif
+
 ifeq (@DEAL_II_LD_UNDERSTANDS_SONAME@,yes)
   DEAL_II_ADD_SONAME = -Wl,-soname,$(call DEAL_II_SHLIB_NAME,$(1))
 else
@@ -135,6 +136,13 @@ else
     DEAL_II_ADD_SONAME =
   endif
 endif
+
+ifeq (@DEAL_II_LD_UNDERSTANDS_RPATH@,yes)
+  DEAL_II_RPATH = -Wl,-rpath,$1
+else
+  DEAL_II_RPATH =
+endif
+
 
 # since the PETSc libs are called the same for both debug and
 # optimized mode, we have to have a trick to let the executable

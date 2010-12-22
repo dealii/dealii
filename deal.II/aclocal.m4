@@ -1646,10 +1646,14 @@ AC_DEFUN(DEAL_II_CHECK_RPATH,
    [ AC_LANG_PROGRAM([[]],[[]])],
      dnl Note the 'space' at the end of the string!
    [ AC_MSG_RESULT(yes)
-     LD_PATH_OPTION="-Wl,-rpath "],
+     LD_PATH_OPTION="-Wl,-rpath "
+     DEAL_II_LD_UNDERSTANDS_RPATH=yes
+   ],
    [ AC_MSG_RESULT(no)
      LDFLAGS="$OLD_LDFLAGS"
-     LD_PATH_OPTION="no"])
+     LD_PATH_OPTION="no"
+   ])
+  AC_SUBST(DEAL_II_LD_UNDERSTANDS_RPATH)
 ])
 
 

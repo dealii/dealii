@@ -124,10 +124,10 @@ ifneq ($(GXX-VERSION),compaq_cxx)
   ifeq ($(USE_CONTRIB_P4EST),yes)
     deplibs.g += $(DEAL_II_P4EST_DIR)/DEBUG/lib/libp4est$(shared-lib-suffix) \
                  $(DEAL_II_P4EST_DIR)/DEBUG/lib/libsc$(shared-lib-suffix) \
-		 -Wl,-rpath,$(DEAL_II_P4EST_DIR)/DEBUG/lib
+		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/DEBUG/lib)
     deplibs.o += $(DEAL_II_P4EST_DIR)/FAST/lib/libp4est$(shared-lib-suffix) \
                  $(DEAL_II_P4EST_DIR)/FAST/lib/libsc$(shared-lib-suffix) \
-		 -Wl,-rpath,$(DEAL_II_P4EST_DIR)/FAST/lib
+		 $(call DEAL_II_RPATH,$(DEAL_II_P4EST_DIR)/FAST/lib)
   endif
 
   # for cygwin and darwin, also llapack and such are necessary
