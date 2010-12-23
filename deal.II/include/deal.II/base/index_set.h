@@ -780,12 +780,20 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 				// subdivide the ranges
   Range r (n,n+1);
   r.nth_index_in_set = n;
+  std::vector<Range>::const_iterator range_begin, range_end;
+  if (n<main_range->nth_index_in_set)
+    {
+      range_begin = ranges.begin();
+      range_end   = main_range;
+    }
+  else
+    {
+      range_begin = main_range + 1;
+      range_end   = ranges.end();
+    }
+
   std::vector<Range>::const_iterator 
-    p = std::lower_bound(n<main_range->nth_index_in_set ?
-			 ranges.begin() : ++main_range, 
-			 n<main_range->nth_index_in_set ?
-			 main_range : ranges.end(),
-			 r,
+    p = std::lower_bound(range_begin, range_end, r,
 			 Range::nth_index_compare);
 
   if (p != ranges.end())
@@ -818,14 +826,21 @@ IndexSet::index_within_set (const unsigned int n) const
     return (n-main_range->begin) + main_range->nth_index_in_set;
 
   Range r(n, n);
+  std::vector<Range>::const_iterator range_begin, range_end;
+  if (n<main_range->begin)
+    {
+      range_begin = ranges.begin();
+      range_end   = main_range;
+    }
+  else
+    {
+      range_begin = main_range + 1;
+      range_end   = ranges.end();
+    }
 
-  std::vector<Range>::const_iterator
-      p = std::lower_bound(n<main_range->begin ?
-			   ranges.begin() : ++main_range, 
-			   n<main_range->begin ?
-			   main_range : ranges.end(),
-			   r,
-			   Range::end_compare);
+  std::vector<Range>::const_iterator 
+    p = std::lower_bound(range_begin, range_end, r,
+			 Range::end_compare);
 
   Assert(p!=ranges.end(), ExcInternalError());
   Assert(p->begin<=n, ExcInternalError());
