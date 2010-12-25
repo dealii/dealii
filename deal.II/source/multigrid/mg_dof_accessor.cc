@@ -466,7 +466,6 @@ get_mg_dof_values (const int level,
 /*------------------------- Functions: MGDoFAccessor<0,1,spacedim> -----------------------*/
 
 template <int spacedim>
-inline
 MGDoFAccessor<0,1,spacedim>::MGDoFAccessor ()
 		:
 		BaseClass ()
@@ -477,7 +476,6 @@ MGDoFAccessor<0,1,spacedim>::MGDoFAccessor ()
 
 
 template <int spacedim>
-inline
 MGDoFAccessor<0,1,spacedim>::
 MGDoFAccessor (const Triangulation<1,spacedim> *tria,
 	       const typename TriaAccessor<0,1,spacedim>::VertexKind vertex_kind,
@@ -493,7 +491,6 @@ MGDoFAccessor (const Triangulation<1,spacedim> *tria,
 
 
 template <int spacedim>
-inline
 MGDoFAccessor<0,1,spacedim>::
 MGDoFAccessor (const Triangulation<1,spacedim> *,
 	       const int                 ,
@@ -519,7 +516,6 @@ MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const InvalidAccessor<structdim2,dim
 
 template <int spacedim>
 template <int structdim2, int dim2, int spacedim2>
-inline
 MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const MGDoFAccessor<structdim2, dim2, spacedim2> &)
 {
   Assert (false, typename BaseClass::ExcInvalidObject());
@@ -529,7 +525,6 @@ MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const MGDoFAccessor<structdim2, dim2
 
 template <int spacedim>
 template <int dim2, int spacedim2>
-inline
 MGDoFAccessor<0,1,spacedim>::MGDoFAccessor (const MGDoFCellAccessor<dim2, spacedim2> &)
 {
   Assert (false, typename BaseClass::ExcInvalidObject());
