@@ -53,7 +53,7 @@ endif
 
 ifneq ($(QMAKE),)
 parameter_gui:
-	@-cd parameter_gui ; $(QMAKE) -Wnone QMAKE_CXX=$(CXX) && $(MAKE)
+	@-cd parameter_gui ; $(QMAKE) -Wnone QMAKE_CXX=$(CXX) QMAKE_CXXFLAGS="$(CXXFLAGS.o)" QMAKE_CXXFLAGS_RELEASE="" && $(MAKE)
 else
 parameter_gui:
 	@echo "**** Can't build the Parameter GUI because no suitable"
@@ -64,7 +64,7 @@ endif
 # generic targets
 clean: hsl-clean tbb-clean
 	@-rm -f ../lib/contrib/*/*.o
-	@-cd parameter_gui ; $(MAKE) clean
+	@-cd parameter_gui ; $(MAKE) clean distclean
 
 .PHONY: default hsl clean hsl-clean umfpack tbb tbb-clean functionparser parameter_gui
 
