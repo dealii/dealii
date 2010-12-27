@@ -745,13 +745,23 @@ IndexSet::n_elements () const
 				   // non-overlapping ranges
   compress ();
 
+  unsigned int v = 0;
+  if (!ranges.empty())
+    {
+      Range & r = ranges.back();
+      v = r.nth_index_in_set + r.end - r.begin;
+    }
+  
+#ifdef DEBUG  
   unsigned int s = 0;
   for (std::vector<Range>::iterator range = ranges.begin();
        range != ranges.end();
        ++range)
     s += (range->end - range->begin);
-
-  return s;
+  Assert(s==v, ExcInternalError());
+#endif  
+  
+  return v;
 }
 
 
