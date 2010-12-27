@@ -1227,7 +1227,34 @@ namespace Patterns
  *   deal.II and had previously been written for a different project.
  *
  *
- *   <h3>Getting entry values out of a ParameterHandler object</h3>
+ *   <h3>Using the %ParameterHandler Graphical User Interface</h3>
+ * 
+ *   An alternative to using the hand-written input files shown above is to
+ *   use the graphical user interface (GUI) that accompanies this class. For
+ *   this, you first need to write a description of all the parameters, their
+ *   default values, patterns and documentation strings into a file in a
+ *   format that the GUI can understand; this is done using the
+ *   ParameterHandler::print_parameters() function with ParameterHandler::XML
+ *   as second argument, as discussed in more detail below in the
+ *   <i>Representation of Parameters</i> section. This file can then be loaded
+ *   using the executable for the GUI, which should be located in
+ *   <code>lib/bin/dealii_parameter_gui</code> of your deal.II installation,
+ *   assuming that you have a sufficiently recent version of the <a
+ *   href="http://qt.nokia.com/">Qt toolkit</a> installed.
+ *
+ *   Once loaded, the GUI displays subsections and individual parameters in
+ *   tree form (see also the discussion in the <i>Representation of
+ *   Parameters</i> section below). Here is a screen shot with some
+ *   sub-sections expanded and one parameter selected for editing:
+ *
+ *   @image html parameter_gui.png "Parameter GUI"
+ *
+ *   Using the GUI, you can edit the values of individual parameters and
+ *   save the result in the same format as before. It can then be read in
+ *   using the ParameterHandler::read_input_from_xml() function.
+ *
+ *
+ *   <h3>Getting entry values out of a %ParameterHandler object</h3>
  *
  *   Each class gets its data out of a ParameterHandler object by
  *   calling the get()  member functions like this:
@@ -1297,7 +1324,7 @@ namespace Patterns
  *     #include <iostream>
  *     #include "../include/parameter_handler.h"
  *
- DEAL_II_NAMESPACE_OPEN
+ *     using namespace dealii;
  *
  *     class LinEq {
  *       public:
@@ -1610,6 +1637,9 @@ namespace Patterns
  *   In addition, the entire tree is wrapped into a tag
  *   <code>ParameterHandler</code> to satisfy the XML requirement that there
  *   be only a single top-level construct in each file.
+ *
+ *   The tree structure is what the graphical user interface (see above) uses to
+ *   represent all parameters.
  *
  *
  *   @ingroup input
