@@ -91,6 +91,11 @@ for (deal_II_dimension : DIMENSIONS)
   template class MGDoFCellAccessor<1>;
   template class MGDoFCellAccessor<1,2>;
 
+  template MGDoFAccessor<0, 1, 1>::MGDoFAccessor (const MGDoFCellAccessor<1, 1> &);
+  template MGDoFAccessor<0, 1, 1>::MGDoFAccessor (const InvalidAccessor<2, 1, 1> &);
+  template MGDoFAccessor<0, 1, 2>::MGDoFAccessor (const MGDoFCellAccessor<1, 2> &);
+  template MGDoFAccessor<0, 1, 2>::MGDoFAccessor (const InvalidAccessor<2, 1, 2> &);
+
   template class TriaRawIterator<MGDoFCellAccessor<1> >;
   template class TriaIterator<MGDoFCellAccessor<1> >;
   template class TriaActiveIterator<MGDoFCellAccessor<1> >;
