@@ -260,13 +260,13 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                       /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static Integer* create (const std::string& description);
 
     private:
@@ -408,13 +408,13 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                       /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static Double* create (const std::string& description);
 
     private:
@@ -509,13 +509,13 @@ namespace Patterns
 					*/
       unsigned int memory_consumption () const;
 
-                       /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static Selection* create (const std::string& description);
 
     private:
@@ -609,13 +609,13 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                       /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static List* create (const std::string& description);
 
 				       /**
@@ -724,13 +724,13 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                       /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static MultipleSelection* create (const std::string& description);
 
 				       /**
@@ -800,14 +800,14 @@ namespace Patterns
 					* function.
 					*/
       virtual PatternBase * clone () const;
-
-                             /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+      
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static Bool* create (const std::string& description);
 
     private:
@@ -860,13 +860,13 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                             /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static Anything* create (const std::string& description);
 
     private:
@@ -951,13 +951,13 @@ namespace Patterns
 					*/
       FileType  file_type;
 
-                             /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static FileName* create (const std::string& description);
 
     private:
@@ -1021,13 +1021,13 @@ namespace Patterns
 					*/
       virtual PatternBase * clone () const;
 
-                             /**
-                    * Creates new object if the start
-                    * of description matches description_init.
-                    * Ownership of that object is
-                    * transferred to the caller of this
-					* function.
-                    */
+				       /**
+					* Creates new object if the start of
+					* description matches
+					* description_init.  Ownership of that
+					* object is transferred to the caller
+					* of this function.
+					*/
       static DirectoryName* create (const std::string& description);
 
     private:
