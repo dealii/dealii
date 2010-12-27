@@ -1194,9 +1194,11 @@ namespace Patterns
  *
  *   <h3>Reading data from input sources</h3>
  *
- *   In order to read input you can use three possibilities: reading from an <tt>std::istream</tt> object,
- *   reading from a file of which the name is given and reading from a string in memory in
- *   which the lines are separated by <tt>@\n</tt> characters. These possibilites are used as follows:
+ *   In order to read input you can use three possibilities: reading from an
+ *   <tt>std::istream</tt> object, reading from a file of which the name is
+ *   given and reading from a string in memory in which the lines are
+ *   separated by <tt>@\n</tt> characters. These possibilites are used as
+ *   follows:
  *   @code
  *     ParameterHandler prm;
  *     ...
@@ -1211,15 +1213,18 @@ namespace Patterns
  *     ...
  *   @endcode
  *   You can use several sources of input successively. Entries which are changed more than
- *   once will be overwritten everytime they are used. It is suggested to let the name of
- *   parameter input end in <tt>.prm</tt>.
+ *   once will be overwritten everytime they are used.
  *
  *   You should not try to declare entries using declare_entry() and
  *   enter_subsection() with as yet unknown subsection names after
  *   using read_input(). The results in this case are unspecified.
  *
- *   If an error occurs upon reading the input, error messages are
- *   written to <tt>std::cerr</tt>.
+ *   If an error occurs upon reading the input, error messages are written to
+ *   <tt>std::cerr</tt> and the reader function returns with a return value of
+ *   <code>false</code>. This is opposed to almost all other functions in
+ *   deal.II, which would normally throw an exception if an error occurs; this
+ *   difference in behavior is a relic of the fact that this class predates
+ *   deal.II and had previously been written for a different project.
  *
  *
  *   <h3>Getting entry values out of a ParameterHandler object</h3>
