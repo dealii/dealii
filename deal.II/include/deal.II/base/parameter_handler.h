@@ -1635,11 +1635,12 @@ namespace Patterns
  *   numbers, every character in their names that's not one is replaced
  *   by an underscore followed by its two-digit hexadecimal representation.
  *   In addition, the entire tree is wrapped into a tag
- *   <code>ParameterHandler</code> to satisfy the XML requirement that there
+ *   <code>%ParameterHandler</code> to satisfy the XML requirement that there
  *   be only a single top-level construct in each file.
  *
- *   The tree structure is what the graphical user interface (see above) uses to
- *   represent all parameters.
+ *   The tree structure (and its XML representation) is what the graphical
+ *   user interface (see above) uses to represent parameters like a
+ *   directory/file collection.
  *
  *
  *   @ingroup input
