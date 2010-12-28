@@ -12267,9 +12267,9 @@ cat >>confdefs.h <<\_ACEOF
 #define DEAL_II_HAVE_DARWIN_DYNACAST_BUG 1
 _ACEOF
 
-    CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=10.4"
-    CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=10.4"
-    LDFLAGS="$LDFLAGS -mmacosx-version-min=10.4"
+    CXXFLAGSG="$CXXFLAGSG -mmacosx-version-min=`uname -r`"
+    CXXFLAGSO="$CXXFLAGSO -mmacosx-version-min=`uname -r`"
+    LDFLAGS="$LDFLAGS -mmacosx-version-min=`uname -r`"
   fi
   rm -f contrib/config/tests/darwin-dynamic-cast/libDynamicCastTestLib.dylib
   rm -f contrib/config/tests/darwin-dynamic-cast/main.o
