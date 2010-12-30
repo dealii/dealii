@@ -28,42 +28,62 @@
  * modules follow roughly the following collaboration diagram that
  * finite element programs follow:
  *
- * @image html collaboration.png "Collaboration diagram for the most important groups of classes in deal.II"
- * @image latex collaboration.eps "Collaboration diagram for the most important groups of classes in deal.II" width=.9\textwidth
+ * @dot
+ digraph G
+{
+  graph[rankdir="TB",aspect=1.5,bgcolor="transparent"];
+  
+  edge [fontname="FreeSans",fontsize=15,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=15,
+        shape=record,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+
+  FE [label="FiniteElement",URL="\ref feall"];
+  Tria [label="Triangulation",URL="\ref grid"];
+  DoFHandler [label="DoFHandler",URL="\ref dofs"];
+  Quadrature [label="Quadrature",URL="\ref Quadrature"];
+  Mapping [label="Mapping",URL="\ref mapping"];
+  FEValues [label="FEValues",URL="\ref feaccess"];
+  Linear [label="Discrete System",URL="\ref LAC"];
+  LinearSolver [label="Solver",URL="\ref Solvers"];
+  Output [label="Output",URL="\ref output"];
+
+  Tria -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  FE -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  FE -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  Mapping -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  Quadrature -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  FEValues -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  DoFHandler -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  Linear -> LinearSolver [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  LinearSolver -> Output [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+}
+ * @enddot
+ *
  *
  * Here is a guide to this classification of groups, as well as links
  * to the documentation pertaining to each of them:
  *
  * <ol>
- * 
- *   <li> <b>Unit cell</b>: deal.II supports only hypercubes as unit
- *   cells, i.e. the unit cell $[0,1]$ in 1d, the unit square $[0,1]^2$ in
- *   2d, and the unit cube $[0,1]^3$ in 3d. We do not support triangles,
- *   tetrahedra, pyramids, or prisms.
- *
- *   Inside the library, most properties of unit cells such as the
- *   number of vertices per cell, ordering of faces, or direction of
- *   edges, are explicitly described in the GeometryInfo class. This
- *   avoids the use of implicit assumptions in many places of the
- *   code.
- *
  *
  *   <li> <b>%Triangulation</b>: Triangulations are collections of
- *   cells that have the general shape derived from the unit cell. The
- *   only thing a triangulation stores are the geometric and topologic
- *   properties of a mesh: where are vertices located, and how are
- *   these vertices connected to cells. A triangulation doesn't know
+ *   cells and their lower-dimensional boundary objects. Cells are
+ *   images of the reference hypercube [0,1]<sup>dim</sup> under a
+ *   suitable mapping in the @ref mapping module.
+ *
+ *   The triangulation stores geometric and topological
+ *   properties of a mesh: how are the cells connected and where are
+ *   their vertices. A triangulation doesn't know
  *   anything about the finite elements that you may want to used on
  *   this mesh, and a triangulation does not even know anything about
- *   the shape of its cells: in 2d it only knows that a cell has four
- *   vertices (and in 3d that it has 8 vertices), but there are no
- *   provisions that the mapping from the unit cell to a particular
- *   cell in the triangulation is well-behaved in any way: it really
- *   only knows about the geometric location of vertices and their
- *   topological connection.
+ *   the shape of its cells: in 2d it only knows that a cell has 4
+ *   faces (lines) and 4 vertices (and in 3d that it has 6 faces
+ *   (quadrilaterals), 12 lines, and 8 vertices), but everything else
+ *   is defined by a mapping class.
  *
  *   The properties and data of triangulations are almost always
- *   queried through loops over all cells, or all faces of cells. Most
+ *   queried through loops over all cells, possibly querying all faces
+ *   of each cell as well. Most
  *   of the knowledge about a mesh is therefore hidden behind
  *   @em iterators, i.e. pointer-like structures that one can
  *   iterate from one cell to the next, and that one can ask for
