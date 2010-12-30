@@ -31,7 +31,7 @@
  * @dot
  digraph G
 {
-  graph[rankdir="TB",aspect=1.5,bgcolor="transparent"];
+  graph[rankdir="TB",bgcolor="transparent"];
   
   edge [fontname="FreeSans",fontsize=15,labelfontname="FreeSans",labelfontsize=10];
   node [fontname="FreeSans",fontsize=15,
@@ -69,7 +69,7 @@
  *   <li> <b>%Triangulation</b>: Triangulations are collections of
  *   cells and their lower-dimensional boundary objects. Cells are
  *   images of the reference hypercube [0,1]<sup>dim</sup> under a
- *   suitable mapping in the @ref mapping module.
+ *   suitable mapping in the module on @ref mapping.
  *
  *   The triangulation stores geometric and topological
  *   properties of a mesh: how are the cells connected and where are
