@@ -1,0 +1,37 @@
+digraph G
+{
+  graph[rankdir="TB",aspect=1.5,bgcolor="transparent"];
+  
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,
+        shape=record,height=0.2,width=0.4,
+        color="black", fillcolor="white", style="filled"];
+
+  FE [label="FiniteElement",URL="../deal.II/group_fe.html"];
+  Tria [label="Triangulation",URL="../deal.II/group_grid.html"];
+  DoFHandler [label="DoFHandler",URL="../deal.II/group_dofs.html"];
+  Quadrature [label="Quadrature",URL="../deal.II/group_Quadrature.html"];
+  Mapping [label="Mapping",URL="../deal.II/group_mapping.html"];
+  FEValues [label="FEValues",URL="../deal.II/group_feaccess.html"];
+#  MeshWorker [label="MeshWorker",URL="../deal.II/group_MeshWorker.html"];
+#  Forms [label="(Bi-)Linear Forms",URL="../deal.II/group_Integrators.html"];
+  Linear [label="Discrete System",URL="../deal.II/group_LAC.html"];
+  LinearSolver [label="Solver",URL="../deal.II/group_Solvers.html"];
+  Output [label="Output",URL="../deal.II/group_output.html"];
+
+  Tria -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+#  Tria -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  FE -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  FE -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  Mapping -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  Quadrature -> FEValues [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  FEValues -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+#  FEValues -> MeshWorker [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+#  FEValues -> Forms [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+#  Forms -> MeshWorker [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  DoFHandler -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+#  DoFHandler -> MeshWorker [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+#  MeshWorker -> Linear [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  Linear -> LinearSolver [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+  LinearSolver -> Output [color="black",fontsize=10,style="solid",fontname="FreeSans"];
+}

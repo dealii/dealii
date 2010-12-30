@@ -1,0 +1,11 @@
+<map id="G" name="G">
+<area shape="rect" href="../deal.II/group_fe.html" title="FiniteElement" alt="" coords="123,5,224,32"/>
+<area shape="rect" href="../deal.II/group_dofs.html" title="DoFHandler" alt="" coords="129,80,217,107"/>
+<area shape="rect" href="../deal.II/group_feaccess.html" title="FEValues" alt="" coords="247,80,324,107"/>
+<area shape="rect" href="../deal.II/group_grid.html" title="Triangulation" alt="" coords="5,5,99,32"/>
+<area shape="rect" href="../deal.II/group_LAC.html" title="Discrete System" alt="" coords="171,155,288,181"/>
+<area shape="rect" href="../deal.II/group_Quadrature.html" title="Quadrature" alt="" coords="248,5,333,32"/>
+<area shape="rect" href="../deal.II/group_mapping.html" title="Mapping" alt="" coords="357,5,427,32"/>
+<area shape="rect" href="../deal.II/group_Solvers.html" title="Solver" alt="" coords="201,229,257,256"/>
+<area shape="rect" href="../deal.II/group_output.html" title="Output" alt="" coords="200,304,259,331"/>
+</map>
