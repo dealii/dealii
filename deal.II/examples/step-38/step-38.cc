@@ -396,19 +396,38 @@ void LaplaceBeltramiProblem<spacedim>::run ()
 
 
 
-int main ( int argc, char **argv )
+int main ()
 {
-  deallog.depth_console (0);
+ try
+   {
+     deallog.depth_console (0);
 
-  {
-    LaplaceBeltramiProblem<3> laplace_beltrami_3d;
-    laplace_beltrami_3d.run();
-  }
-  
-  {
-    LaplaceBeltramiProblem<2> laplace_beltrami_2d;
-    laplace_beltrami_2d.run();
-  }
+     LaplaceBeltramiProblem<3> laplace_beltrami;
+     laplace_beltrami.run();
+   }
+ catch (std::exception &exc)
+   {
+     std::cerr << std::endl << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+     std::cerr << "Exception on processing: " << std::endl
+              << exc.what() << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+     return 1;
+   }
+ catch (...)
+   {
+     std::cerr << std::endl << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+     std::cerr << "Unknown exception!" << std::endl
+              << "Aborting!" << std::endl
+              << "----------------------------------------------------"
+              << std::endl;
+     return 1;
+   }
     
   return 0;
 }
