@@ -36,8 +36,19 @@ this, neatly following the theoretically predicted pattern:
 Finally, the program produces graphical output that we can visualize. Here is
 a plot of the results:
 
-@image html step-38.solution-2d.png
 @image html step-38.solution-3d.png
+
+The program also works for 1d curves in 2d, not just 2d surfaces in 3d. You
+can test this by changing the template argument in <code>main()</code> like
+so:
+@code
+      LaplaceBeltramiProblem<2> laplace_beltrami;  
+@endcode
+The domain is a curve in 2d, and we can visualize the solution by using the
+third dimension (and color) to denote the value of the function $u(x)$. This
+then looks like so:
+
+@image html step-38.solution-2d.png
 
 
 <a name="extensions"></a>
