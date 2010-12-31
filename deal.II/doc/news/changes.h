@@ -95,8 +95,8 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 <ol>
   <li><p>New: deal.II now has a Qt based graphical user interface to edit
-  input parameter files. The executable is located in
-  <code>lib/bin/dealii_parameter_gui</code>.
+  input parameter files for the ParameterHandler class. The executable is
+  located in <code>lib/bin/dealii_parameter_gui</code>.
   <br>
   (Martin Steigemann, 2010/12/20)
   </p></li>
