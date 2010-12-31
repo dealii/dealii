@@ -414,10 +414,8 @@ namespace PETScWrappers
   PetscScalar
   VectorBase::mean_value () const
   {
-#ifdef DEBUG
-    Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(this) != 0,
-    ExcMessage	("::mean_value() not implemented for MPI::Vector."));    
-#endif
+    Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(this) == 0,
+	   ExcMessage	("::mean_value() not implemented for MPI::Vector."));
     
                                      // get a representation of the vector and
                                      // loop over all the elements
