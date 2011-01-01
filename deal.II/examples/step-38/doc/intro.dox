@@ -115,18 +115,31 @@ and
 [Bonito, Nochetto, and Pauletti, SIAM J. Numer. Anal. 48(5), 2010].
 
 
-<h3>The numerical approximation</h3>
+
+<h3>Testcase</h3>
+
+In general when you want to test numerically the accuracy and/or order of
+convergence of an algorithm you need to provide an exact solution. The usual
+trick is to pick a function that we want to be the solution, then apply the
+differential operator to it that defines a forcing term for the right hand
+side. This is what we do in this example. In the current case, the form of the
+domain is obviously also essential.
+
+We produce one test case for a 2d problem and another one for 3d:
+
+- In 2d, let's choose as domain a half circle. On this domain, we choose the
+  function $u(\mathbf x)=-2x_1x_2$ as the solution.
+
+- In 3d, the domain is again half of the surface of the unit sphere but this
+  time without the disk that closes it. We choose $u(\mathbf x)=-2\sin(\pi
+  x_1)\cos(\pi x_2)e^z$ as the solution.
+  
+
 
 <h3>Implementation</h3>
 
-<h3>Testcase</h3>
-In general when you want to test numerically the accuracy and/or 
-order of convergence of an algorithm you need to provide an exact
-solution. 
-The usual trick is to pick a function that we want to be the solution,
-then apply the differential operator to it that defines a forcing term 
-for the right hand side.
-This is what we do in this example.
-We produce one test case for a 2d problem and another one for the 3d one.
 
 Mapping objects
+
+
+

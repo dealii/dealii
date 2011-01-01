@@ -45,19 +45,17 @@
 
 using namespace dealii;
 
-				 /**
-				    @sect3{The <code>LaplaceBeltramiProblem</code> class template}
+				 // @sect3{The <code>LaplaceBeltramiProblem</code> class template}
 
-				    This class is extremely similar to the
-				    <code>LaplaceProblem</code> class as in 
-				    example 4.
-				    One difference is that now some members
-				    will be defined with two template parameters
-				    one for the dimension of the mesh @p dim,
-				    and the other for the dimension of
-				    the embedding space @p spacedim.
-				    Now <code>MappingQ</code> appears.
-				 */
+				 // This class is extremely similar to the
+				 // <code>LaplaceProblem</code> class as in 
+				 // example 4.
+				 // One difference is that now some members
+				 // will be defined with two template parameters
+				 // one for the dimension of the mesh @p dim,
+				 // and the other for the dimension of
+				 // the embedding space @p spacedim.
+				 // Now <code>MappingQ</code> appears.
 template <int spacedim>
 class LaplaceBeltramiProblem 
 {
@@ -225,7 +223,6 @@ LaplaceBeltramiProblem<spacedim>::LaplaceBeltramiProblem (const unsigned degree)
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
 {
-  
   Triangulation<spacedim> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
   
