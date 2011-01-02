@@ -57,12 +57,12 @@ as the curve moves from one quadrant of the domain into the adjacent one):
 <h3>Possibilities for extensions</h3>
 
 Computing on surfaces only becomes interesting if the surface is more
-interesting than just 5/6th of a sphere. To achieve this, deal.II can read
+interesting than just a half sphere. To achieve this, deal.II can read
 meshes that describe surfaces through the usual GridIn class. Or, in case you
 have an analytic description, a simple mesh can sometimes be stretched and
 bent into a shape we are interested in.
 
-Let us consider a relatively simple example: we take the 5/6th sphere we used
+Let us consider a relatively simple example: we take the half sphere we used
 before, we stretch it by a factor of 10 in the z-direction, and then we jumble
 the x- and y-coordinates a bit. Let's show the computational domain and the
 solution first before we go into details of the implementation below:
@@ -93,7 +93,7 @@ Point<dim> warp (const Point<dim> &p)
 @endcode
 
 If we followed the <code>LaplaceBeltrami::make_grid_and_dofs</code> function, we would
-extract the 5/6th spherical surface mesh as before, warp it into the shape we
+extract the half spherical surface mesh as before, warp it into the shape we
 want, and refine as often as necessary. This is not quite as simple as we'd
 like here, though: refining requires that we have an appropriate manifold
 object attached to the triangulation that describes where new vertices of the
@@ -102,7 +102,7 @@ this manifold in a not-too-complicated way by simply undoing the
 transformation above (yielding the spherical surface again), finding the
 location of a new point on the sphere, and then re-warping the result. But I'm
 a lazy person, and since doing this is not really the point here, let's just
-make our lives a bit easier: we'll extract the 5/6th sphere, refine it as
+make our lives a bit easier: we'll extract the half sphere, refine it as
 often as necessary, get rid of the object that describes the manifold since we
 now no longer need it, and then finally warp the mesh. With the function
 above, this would look as follows:
