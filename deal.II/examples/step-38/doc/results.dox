@@ -46,7 +46,9 @@ so:
 @endcode
 The domain is a curve in 2d, and we can visualize the solution by using the
 third dimension (and color) to denote the value of the function $u(x)$. This
-then looks like so:
+then looks like so (the white curve is the domain, the colored curve is the
+solution extruded into the third dimension, clearly showing the change in sign
+as the curve moves from one quadrant of the domain into the adjacent one):
 
 @image html step-38.solution-2d.png
 
