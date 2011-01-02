@@ -295,15 +295,32 @@ defined on the manifold, the obvious definition of this error functional is
 $| e |_{H^1} = \left( \int_\Omega | \left[\mathbf n \otimes \mathbf
 n\right]\nabla (u-u_h) |^2 \right)^{1/2}$. This requires us to provide the
 <i>tangential</i> gradient $\left[\mathbf n \otimes \mathbf
-n\right]\nabla u$ to the function VectorTools::integrate_difference, which we
+n\right]\nabla u$ to the function VectorTools::integrate_difference
+(introduced first in step-7), which we
 will do by implementing the function <code>Solution::gradient</code> in the
 program below.
 
 
 <h3>Implementation</h3>
 
+If you've read through step-4 and understand the discussion above of how
+solution and right hand side correspond to each other, you will be immediately
+familiar with this program as well. In fact, there are only two things that
+are of significance:
 
-Mapping objects
+- The way we generate the mesh that triangulates the computational domain.
 
+- The way we use Mapping objects to describe that the domain on which we solve
+  the partial differential equation is not planar but in fact curved.
 
+Mapping objects were already introduced in step-10 and step-11 and as
+explained there, there is usually not a whole lot you have to know about how
+they work as long as you have a working description of how the boundary
+looks. In essence, we will simply declare an appropriate object of type
+MappingQ that will automatically obtain the boundary description from the
+Triangulation. The mapping object will then be passed to the appropriate
+functions, and we will get a boundary description for half circles or half
+spheres that is pre-defined in the library.
 
+The rest of the program follows closely step-4 and, as far as computing the
+error, step-7.
