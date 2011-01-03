@@ -289,7 +289,8 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 				 // triangulation just as in the previous
 				 // example program, step-3:
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem () :
+LaplaceProblem<dim>::LaplaceProblem ()
+		:
                 fe (1),
 		dof_handler (triangulation)
 {}
@@ -297,23 +298,20 @@ LaplaceProblem<dim>::LaplaceProblem () :
 
                                  // @sect4{LaplaceProblem::make_grid_and_dofs}
 
-				 // Grid creation is something
-				 // inherently dimension
-				 // dependent. However, as long as the
-				 // domains are sufficiently similar
-				 // in 2D or 3D, the library can
-				 // abstract for you. In our case, we
-				 // would like to again solve on the
-				 // square [-1,1]x[-1,1] in 2D, or on
-				 // the cube [-1,1]x[-1,1]x[-1,1] in
-				 // 3D; both can be termed
-				 // <code>hyper_cube</code>, so we may use the
-				 // same function in whatever
-				 // dimension we are. Of course, the
-				 // functions that create a hypercube
-				 // in two and three dimensions are
-				 // very much different, but that is
-				 // something you need not care
+				 // Grid creation is something inherently
+				 // dimension dependent. However, as long as
+				 // the domains are sufficiently similar in 2D
+				 // or 3D, the library can abstract for
+				 // you. In our case, we would like to again
+				 // solve on the square $[-1,1]\times [-1,1]$
+				 // in 2D, or on the cube $[-1,1] \times
+				 // [-1,1] \times [-1,1]$ in 3D; both can be
+				 // termed <code>hyper_cube</code>, so we may
+				 // use the same function in whatever
+				 // dimension we are. Of course, the functions
+				 // that create a hypercube in two and three
+				 // dimensions are very much different, but
+				 // that is something you need not care
 				 // about. Let the library handle the
 				 // difficult things.
 				 //
