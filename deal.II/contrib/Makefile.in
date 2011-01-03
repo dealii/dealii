@@ -58,6 +58,11 @@ else
 parameter_gui:
 	@echo "**** Can't build the Parameter GUI because no suitable"
 	@echo "**** version of the Qt toolkit was found"
+	@(echo "#!/bin/bash" ; \
+	  echo "echo '*** The Parameter GUI could not be built because no'" ; \
+	  echo "echo '*** suitable version of the Qt toolkit could be found.'" ) \
+	 > $D/lib/bin/dealii_parameter_gui
+	@-chmod u+x $D/lib/bin/dealii_parameter_gui
 endif
 
 
