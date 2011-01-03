@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -108,38 +108,37 @@ class LaplaceProblem
 				 // dim-dimensional space variable, so we
 				 // declare them as templates as well.
 				 //
-				 // Each of these classes is derived
-				 // from a common, abstract base class
-				 // Function, which declares the
-				 // common interface which all
-				 // functions have to follow. In
-				 // particular, concrete classes have
-				 // to overload the `value' function,
-				 // which takes a point in
-				 // dim-dimensional space as
-				 // parameters and shall return the
-				 // value at that point as a `double'
-				 // variable.
+				 // Each of these classes is derived from a
+				 // common, abstract base class Function,
+				 // which declares the common interface which
+				 // all functions have to follow. In
+				 // particular, concrete classes have to
+				 // overload the <code>value</code> function,
+				 // which takes a point in dim-dimensional
+				 // space as parameters and shall return the
+				 // value at that point as a
+				 // <code>double</code> variable.
 				 //
-				 // The `value' function takes a second
-				 // argument, which we have here named
-				 // `component': This is only meant for vector
-				 // valued functions, where you may want to
-				 // access a certain component of the vector
-				 // at the point `p'. However, our functions
-				 // are scalar, so we need not worry about
-				 // this parameter and we will not use it in
-				 // the implementation of the
-				 // functions. Inside the library's header
-				 // files, the Function base class's
-				 // declaration of the `value' function has a
-				 // default value of zero for the component,
-				 // so we will access the `value' function of
-				 // the right hand side with only one
-				 // parameter, namely the point where we want
-				 // to evaluate the function. A value for the
-				 // component can then simply be omitted for
-				 // scalar functions.
+				 // The <code>value</code> function takes a
+				 // second argument, which we have here named
+				 // <code>component</code>: This is only meant
+				 // for vector valued functions, where you may
+				 // want to access a certain component of the
+				 // vector at the point
+				 // <code>p</code>. However, our functions are
+				 // scalar, so we need not worry about this
+				 // parameter and we will not use it in the
+				 // implementation of the functions. Inside
+				 // the library's header files, the Function
+				 // base class's declaration of the
+				 // <code>value</code> function has a default
+				 // value of zero for the component, so we
+				 // will access the <code>value</code>
+				 // function of the right hand side with only
+				 // one parameter, namely the point where we
+				 // want to evaluate the function. A value for
+				 // the component can then simply be omitted
+				 // for scalar functions.
 				 //
 				 // Note that the C++ language forces
 				 // us to declare and define a
@@ -204,7 +203,7 @@ class BoundaryValues : public Function<dim>
 				 // The last thing to note is that a
 				 // <code>Point@<dim@></code> denotes a point in
 				 // dim-dimensionsal space, and its individual
-				 // components (i.e. `x', `y',
+				 // components (i.e. $x$, $y$,
 				 // ... coordinates) can be accessed using the
 				 // () operator (in fact, the [] operator will
 				 // work just as well) with indices starting
@@ -612,7 +611,7 @@ void LaplaceProblem<dim>::solve ()
                                  // dimension in the filename to generate
                                  // distinct filenames for each run (in a
                                  // better program, one would check whether
-                                 // `dim' can have other values than 2 or 3,
+                                 // <code>dim</code> can have other values than 2 or 3,
                                  // but we neglect this here for the sake of
                                  // brevity).
 template <int dim>
