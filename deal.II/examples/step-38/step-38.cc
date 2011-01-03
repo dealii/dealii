@@ -281,31 +281,107 @@ RightHandSide<3>::value (const Point<3> &p,
 
                                  // @sect3{Implementation of the <code>LaplaceBeltramiProblem</code> class}
 
+				 // The rest of the program is actually quite
+				 // unspectacular if you know step-4. Our
+				 // first step is to define the constructor,
+				 // setting the polynomial degree of the
+				 // finite element and mapping, and
+				 // associating the DoF handler to the
+				 // triangulation:
 template <int spacedim>
 LaplaceBeltramiProblem<spacedim>::
 LaplaceBeltramiProblem (const unsigned degree)
 		:
 		fe (degree),
 		dof_handler(triangulation),
-		mapping(degree)
+		mapping (degree)
 {}
 
 
+                                 // @sect4{LaplaceBeltramiProblem::make_grid_and_dofs}
 
+				 // The next step is to create the mesh,
+				 // distribute degrees of freedom, and set up
+				 // the various variables that describe the
+				 // linear system. All of these steps are
+				 // standard with the exception of how to
+				 // create a mesh that describes a surface. We
+				 // could generate a mesh for the domain we
+				 // are interested in, generate a
+				 // triangulation using a mesh generator, and
+				 // read it in using the GridIn class. Or, as
+				 // we do here, we generate the mesh using the
+				 // facilities in the GridGenerator namespace.
+				 //
+				 // In particular, what we're going to do is
+				 // this (enclosed between the set of braces
+				 // below): we generate a
+				 // <code>spacedim</code> dimensional mesh for
+				 // the half disk (in 2d) or half ball (in
+				 // 3d), using the
+				 // GridGenerator::half_hyper_ball
+				 // function. This function sets the boundary
+				 // indicators of all faces on the outside of
+				 // the boundary to zero for the ones located
+				 // on the perimeter of the disk/ball, and one
+				 // on the straight part that splits the full
+				 // disk/ball into two halves. The next step
+				 // is the main point: The
+				 // GridTools::extract_boundary_mesh function
+				 // creates a mesh that consists of those
+				 // cells that are the faces of the previous
+				 // mesh, i.e. it describes the <i>surface</i>
+				 // cells of the original (volume)
+				 // mesh. However, we do not want all faces:
+				 // only those on the perimeter of the disk or
+				 // ball which carry boundary indicator zero;
+				 // we can select these cells using a set of
+				 // boundary indicators that we pass to
+				 // GridTools::extract_boundary_mesh.
+				 //
+				 // There is one point that needs to be
+				 // mentioned. In order to refine a surface
+				 // mesh appropriately if the manifold is
+				 // curved (similarly to refining the faces of
+				 // cells that are adjacent to a curved
+				 // boundary), the triangulation has to have
+				 // an object attached to it that described
+				 // where new vertices should be located. If
+				 // you don't attach such a boundary object,
+				 // they will be located halfway between
+				 // existing vertices; this is appropriate if
+				 // you have a domain with straight boundaries
+				 // (e.g. a polygon) but not when, as here,
+				 // the manifold has curvature. So for things
+				 // to work properly, we need to attach a
+				 // manifold object to our (surface)
+				 // triangulation. We create such an object
+				 // (with indefinite, <code>static</code>,
+				 // lifetime) at the top of the function and
+				 // attach it to the triangulation for all
+				 // cells with boundary indicator zero that
+				 // will be created henceforth.
+				 //
+				 // The final step in creating the mesh is to
+				 // refine it a number of times. The rest of
+				 // the function is the same as in previous
+				 // tutorial programs.
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
 {
-  Triangulation<spacedim> volume_mesh;
-  GridGenerator::half_hyper_ball(volume_mesh);
-  
   static HyperBallBoundary<dim,spacedim> surface_description;
   triangulation.set_boundary (0, surface_description);
   
-  std::set<unsigned char> boundary_ids;
-  boundary_ids.insert(0);
+  {
+    Triangulation<spacedim> volume_mesh;
+    GridGenerator::half_hyper_ball(volume_mesh);
   
-  GridTools::extract_boundary_mesh (volume_mesh, triangulation,
-				    boundary_ids);
+    std::set<unsigned char> boundary_ids;
+    boundary_ids.insert (0);
+  
+    GridTools::extract_boundary_mesh (volume_mesh, triangulation,
+				      boundary_ids);
+  }
   triangulation.refine_global(4);
 
   std::cout << "Surface mesh has " << triangulation.n_active_cells()
@@ -329,34 +405,50 @@ void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
 }
 
 
+                                 // @sect4{LaplaceBeltramiProblem::assemble_system}
+
+				 // The following is the central function of
+				 // this program, assembling the matrix that
+				 // corresponds to the surface Laplacian
+				 // (Laplace-Beltrami operator). Maybe
+				 // surprisingly, it actually looks exactly
+				 // the same as for the regular Laplace
+				 // operator discussed in, for example,
+				 // step-4. The key is that the
+				 // FEValues::shape_gradient function does the
+				 // magic: It returns the surface gradient
+				 // $\nabla_K \phi_i(x_q)$ of the $i$th shape
+				 // function at the $q$th quadrature
+				 // point. The rest then does not need any
+				 // changes either:
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::assemble_system () 
 {
   system_matrix = 0;
   system_rhs = 0;
   
-  QGauss<dim>  quadrature_formula(2);
-
+  const QGauss<dim>  quadrature_formula(2);
   FEValues<dim,spacedim> fe_values (mapping, fe, quadrature_formula, 
 				    update_values              |
 				    update_gradients           |
 				    update_quadrature_points   |
 				    update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-  const unsigned int   n_q_points    = quadrature_formula.size();
+  const unsigned int        dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int        n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
+  Vector<double>            cell_rhs (dofs_per_cell);
 
-  std::vector< double > rhs_values(n_q_points);
+  std::vector<double>       rhs_values(n_q_points);
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   const RightHandSide<spacedim> rhs;
   
   for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 	 cell = dof_handler.begin_active(),
-	 endc = dof_handler.end(); cell!=endc; ++cell)
+	 endc = dof_handler.end();
+       cell!=endc; ++cell)
     {
       cell_matrix = 0;
       cell_rhs = 0;
@@ -368,10 +460,9 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j) 
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	    cell_matrix(i,j) 
-	      += fe_values.shape_grad(i,q_point) *
-	      fe_values.shape_grad(j,q_point) *
-	      fe_values.JxW(q_point);
+	    cell_matrix(i,j) += fe_values.shape_grad(i,q_point) *
+				fe_values.shape_grad(j,q_point) *
+				fe_values.JxW(q_point);
       
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
@@ -391,7 +482,6 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 	}
     }
 
-
   std::map<unsigned int,double> boundary_values; 
   VectorTools::interpolate_boundary_values (mapping,
 					    dof_handler,
@@ -406,10 +496,17 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 }
 
 
+
+                                 // @sect4{LaplaceBeltramiProblem::solve}
+
+				 // The next function is the one that solves
+				 // the linear system. Here, too, no changes
+				 // are necessary:
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::solve () 
 {
-  SolverControl solver_control (solution.size(), 1e-7);
+  SolverControl solver_control (solution.size(),
+				1e-7 * system_rhs.l2_norm());
   SolverCG<>    cg (solver_control);
 
   PreconditionSSOR<> preconditioner;
@@ -421,12 +518,57 @@ void LaplaceBeltramiProblem<spacedim>::solve ()
 
 
 
+                                 // @sect4{LaplaceBeltramiProblem::output_result}
+
+				 // This is the function that generates
+				 // graphical output from the solution. Most
+				 // of it is boilerplate code, but there are
+				 // two points worth pointing out:
+				 //
+				 // - The DataOut::add_data_vector function
+				 //   can take two kinds of vectors: Either
+				 //   vectors that have one value per degree
+				 //   of freedom defined by the DoFHandler
+				 //   object previously attached via
+				 //   DataOut::attach_dof_handler; and vectors
+				 //   that have one value for each cell of the
+				 //   triangulation, for example to output
+				 //   estimated errors for each
+				 //   cell. Typically, the DataOut class knows
+				 //   to tell these two kinds of vectors
+				 //   apart: there are almost always more
+				 //   degrees of freedom than cells, so we can
+				 //   differentiate by the two kinds looking
+				 //   at the length of a vector. We could do
+				 //   the same here, but only because we got
+				 //   lucky: we use a half sphere. If we had
+				 //   used the whole sphere as domain and
+				 //   $Q_1$ elements, we would have the same
+				 //   number of cells as vertices and
+				 //   consequently the two kinds of vectors
+				 //   would have the same number of
+				 //   elements. To avoid the resulting
+				 //   confusion, we have to tell the
+				 //   DataOut::add_data_vector function which
+				 //   kind of vector we have: DoF data. This
+				 //   is what the third argument to the
+				 //   function does.
+				 // - The DataOut::build_patches function can
+				 //   generate output that subdivides each
+				 //   cell so that visualization programs can
+				 //   resolve curved manifolds or higher
+				 //   polynomial degree shape functions
+				 //   better. We here subdivide each element
+				 //   in each coordinate direction as many
+				 //   times as the polynomial degree of the
+				 //   finite element in use.
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::output_results () const
 {
   DataOut<dim,DoFHandler<dim,spacedim> > data_out;
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution",
+  data_out.add_data_vector (solution,
+			    "solution",
 			    DataOut<dim,DoFHandler<dim,spacedim> >::type_dof_data);
   data_out.build_patches (mapping,
 			  mapping.get_degree());
@@ -439,6 +581,19 @@ void LaplaceBeltramiProblem<spacedim>::output_results () const
 
 
 
+                                 // @sect4{LaplaceBeltramiProblem::compute_error}
+
+				 // This is the last piece of functionality:
+				 // we want to compute the error in the
+				 // numerical solution. It is a verbatim copy
+				 // of the code previously shown and discussed
+				 // in step-7. As mentioned in the
+				 // introduction, the <code>Solution</code>
+				 // class provides the (tangential) gradient
+				 // of the solution. To avoid evaluating the
+				 // error only a superconvergence points, we
+				 // choose a quadrature rule of sufficiently
+				 // high order.
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::compute_error () const
 {  
@@ -456,6 +611,10 @@ void LaplaceBeltramiProblem<spacedim>::compute_error () const
 
 
 
+                                 // @sect4{LaplaceBeltramiProblem::run}
+
+				 // The last function provides the top-level
+				 // logic. Its contents are self-explanatory:
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::run () 
 {
