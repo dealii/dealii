@@ -1,16 +1,17 @@
 <map id="StepsMap" name="StepsMap">
-<area shape="poly" href="../deal.II/step_1.html" title="Creating a grid. Refining it. Writing it to a file" alt="" coords="860,60 860,28 837,5 805,5 783,28 783,60 805,83 837,83"/>
-<area shape="poly" href="../deal.II/step_2.html" title="Assigning degrees of freedom to a grid." alt="" coords="860,185 860,153 837,131 805,131 783,153 783,185 805,208 837,208"/>
-<area shape="poly" href="../deal.II/step_3.html" title="Solving Poisson&#39;s equation." alt="" coords="860,311 860,279 837,256 805,256 783,279 783,311 805,333 837,333"/>
-<area shape="poly" href="../deal.II/step_4.html" title="Dimension independent programming. Boundary conditions." alt="" coords="860,436 860,404 837,381 805,381 783,404 783,436 805,459 837,459"/>
+<area shape="poly" href="../deal.II/step_1.html" title="Creating a grid. Refining it. Writing it to a file" alt="" coords="889,60 889,28 867,5 835,5 812,28 812,60 835,83 867,83"/>
+<area shape="poly" href="../deal.II/step_2.html" title="Assigning degrees of freedom to a grid." alt="" coords="889,185 889,153 867,131 835,131 812,153 812,185 835,208 867,208"/>
+<area shape="poly" href="../deal.II/step_3.html" title="Solving Poisson&#39;s equation." alt="" coords="889,311 889,279 867,256 835,256 812,279 812,311 835,333 867,333"/>
+<area shape="poly" href="../deal.II/step_4.html" title="Dimension independent programming. Boundary conditions." alt="" coords="889,436 889,404 867,381 835,381 812,404 812,436 835,459 867,459"/>
 <area shape="poly" href="../deal.II/step_5.html" title="Reading a grid from disk. Computations on successively refined grids." alt="" coords="535,561 535,529 512,507 480,507 457,529 457,561 480,584 512,584"/>
 <area shape="rect" href="../deal.II/step_10.html" title="Higher order mappings." alt="" coords="745,529,780,561"/>
 <area shape="rect" href="../deal.II/step_15.html" title="1d problems. A nonlinear problem." alt="" coords="804,529,839,561"/>
 <area shape="rect" href="../deal.II/step_20.html" title="Mixed finite elements for the mixed Laplacian. Block solvers." alt="" coords="636,532,671,559"/>
 <area shape="rect" href="../deal.II/step_23.html" title="Time dependent problems. The wave equation." alt="" coords="863,532,897,559"/>
 <area shape="rect" href="../deal.II/step_29.html" title="A complex&#45;valued Helmholtz equation. Sparse direct solvers." alt="" coords="921,529,956,561"/>
-<area shape="rect" href="../deal.II/step_34.html" title="Boundary element methods for potential flow." alt="" coords="980,532,1015,559"/>
-<area shape="rect" href="../deal.II/step_36.html" title="Finding eigenvalues of the Schr&ouml;dinger equation." alt="" coords="1039,529,1073,561"/>
+<area shape="rect" href="../deal.II/step_34.html" title="Boundary element methods for potential flow." alt="" coords="1031,532,1065,559"/>
+<area shape="rect" href="../deal.II/step_36.html" title="Finding eigenvalues of the Schr&ouml;dinger equation." alt="" coords="1089,529,1124,561"/>
+<area shape="rect" href="../deal.II/step_38.html" title="Solve the Laplace Beltrami operator on a Half Sphere." alt="" coords="1031,655,1065,687"/>
 <area shape="rect" href="../deal.II/step_45.html" title="Periodic boundary conditions" alt="" coords="695,759,729,791"/>
 <area shape="poly" href="../deal.II/step_6.html" title="Adaptive local refinement. Higher order elements" alt="" coords="487,687 487,655 464,632 432,632 409,655 409,687 432,709 464,709"/>
 <area shape="rect" href="../deal.II/step_7.html" title="Helmholtz equation. Computing errors. Boundary integrals." alt="" coords="69,759,101,791"/>
