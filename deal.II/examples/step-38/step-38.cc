@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2010 by the deal.II authors */
+/*    Copyright (C) 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -12,11 +12,11 @@
 
 				 // @sect3{Include files}
 
-				 // The first few (many?) include
-				 // files have already been used in
-				 // example 4, so we will
-				 // not explain their meaning here
-				 // again.
+				 // If you've read through step-4 and step-7,
+				 // you will recognize that we have used all
+				 // of the following include files there
+				 // already. Consequently, we will not explain
+				 // their meaning here again.
 #include <base/quadrature_lib.h>
 #include <base/function.h>
 #include <grid/tria.h>
@@ -47,46 +47,118 @@ using namespace dealii;
 
 				 // @sect3{The <code>LaplaceBeltramiProblem</code> class template}
 
-				 // This class is extremely similar to the
-				 // <code>LaplaceProblem</code> class as in 
-				 // example 4.
-				 // One difference is that now some members
-				 // will be defined with two template parameters
-				 // one for the dimension of the mesh @p dim,
-				 // and the other for the dimension of
-				 // the embedding space @p spacedim.
-				 // Now <code>MappingQ</code> appears.
+				 // This class is almost exactly similar to
+				 // the <code>LaplaceProblem</code> class in
+				 // step-4.
+
+				 // The essential differences are these:
+				 //
+				 // - The template parameter now denotes the
+				 //   dimensionality of the embedding space,
+				 //   which is no longer the same as the
+				 //   dimensionality of the domain and the
+				 //   triangulation on which we compute. We
+				 //   indicate this by calling the parameter
+				 //   @p spacedim , and introducing a constant
+				 //   @p dim equal to the dimensionality of
+				 //   the domain -- here equal to
+				 //   <code>spacedim-1</code>.
+				 // - All member variables that have geometric
+				 //   aspects now need to know about both
+				 //   their own dimensionality as well as that
+				 //   of the embedding space. Consequently, we
+				 //   need to specify both of their template
+				 //   parameters one for the dimension of the
+				 //   mesh @p dim, and the other for the
+				 //   dimension of the embedding space,
+				 //   @p spacedim. This is exactly what we
+				 //   did in step-34, take a look there for
+				 //   a deeper explanation.
+
+				 // - We need an object that describes which
+				 //   kind of mapping to use from the
+				 //   reference cell to the cells that the
+				 //   triangulation is composed of. The
+				 //   classes derived from the Mapping base
+				 //   class do exactly this. Throughout most
+				 //   of deal.II, if you don't do anything at
+				 //   all, the library assumes that you want
+				 //   an object of kind MappingQ1 that uses a
+				 //   (bi-, tri-)linear mapping. In many
+				 //   cases, this is quite sufficient, which
+				 //   is why the use of these objects is
+				 //   mostly optional: for example, if you
+				 //   have a polygonal two-dimensional domain
+				 //   in two-dimensional space, a bilinear
+				 //   mapping of the reference cell to the
+				 //   cells of the triangulation yields an
+				 //   exact representation of the domain. If
+				 //   you have a curved domain, one may want
+				 //   to use a higher order mapping for those
+				 //   cells that lie at the boundary of the
+				 //   domain -- this is what we did in
+				 //   step-11, for example. However, here we
+				 //   have a curved domain, not just a curved
+				 //   boundary, and while we can approximate
+				 //   it with bilinearly mapped cells, it is
+				 //   really only prodent to use a higher
+				 //   order mapping for all
+				 //   cells. Consequently, this class has a
+				 //   member variable of type MappingQ; we
+				 //   will choose the polynomial degree of the
+				 //   mapping equal to the polynomial degree
+				 //   of the finite element used in the
+				 //   computations, though this
+				 //   iso-parametricity is not necessary.
 template <int spacedim>
 class LaplaceBeltramiProblem 
 {
-  private:
-    static const unsigned int dim = spacedim-1;
-        
   public:
     LaplaceBeltramiProblem (const unsigned degree = 2);
     void run ();
   
   private:
+    static const unsigned int dim = spacedim-1;
+
     void make_grid_and_dofs ();
     void assemble_system ();
     void solve ();
     void output_results () const;
     void compute_error () const;
-  
-  
+    
   
     Triangulation<dim,spacedim>   triangulation;
     FE_Q<dim,spacedim>            fe;
     DoFHandler<dim,spacedim>      dof_handler;
     MappingQ<dim, spacedim>       mapping;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+    SparsityPattern               sparsity_pattern;
+    SparseMatrix<double>          system_matrix;
   
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double>                solution;
+    Vector<double>                system_rhs;
 };
 
+
+				 // @sect3{Equation data}
+
+                                 // Next, let us define the classes that
+                                 // describe the exact solution and the right
+                                 // hand sides of the problem. This is in
+                                 // analogy to step-4 and step-7 where we also
+                                 // defined such objects. Given the discussion
+                                 // in the introduction, the actual formulas
+                                 // should be self-explanatory. A point of
+                                 // interest may be how we define the value
+                                 // and gradient functions for the 2d and 3d
+                                 // cases separately, using explicit
+                                 // specializations of the general
+                                 // template. An alternative to doing it this
+                                 // way might have been to define the general
+                                 // template and have a <code>switch</code>
+                                 // statement (or a sequence of
+                                 // <code>if</code>s) for each possible value
+                                 // of the spatial dimension.
 template <int dim>
 class Solution  : public Function<dim>
 {
@@ -116,7 +188,6 @@ Tensor<1,2>
 Solution<2>::gradient (const Point<2>   &p,
 		       const unsigned int) const
 {
-
   Tensor<1,2> return_value;
   return_value[0] = -2. * p(1) * (1 - 2. * p(0) * p(0));
   return_value[1] = -2. * p(0) * (1 - 2. * p(1) * p(1));
@@ -151,7 +222,8 @@ Solution<3>::gradient (const Point<3>   &p,
   return return_value;
 }
 
-// LB: u = Delta u - nu D2 u nu - (Grad u nu ) div (nu)
+
+
 template <int dim>
 class RightHandSide : public Function<dim>
 {
@@ -164,13 +236,20 @@ class RightHandSide : public Function<dim>
 
 template <>
 double
+RightHandSide<2>::value (const Point<2> &p,
+			 const unsigned int comp) const 
+{
+  return ( -8. * p(0) * p(1) ); 
+}
+
+
+template <>
+double
 RightHandSide<3>::value (const Point<3> &p,
 			 const unsigned int comp) const 
 {
   using numbers::PI;
-
-				   
-
+  
   Tensor<2,3> hessian;
 
   hessian[0][0] = -PI*PI*sin(PI*p(0))*cos(PI*p(1))*exp(p(2));
@@ -193,25 +272,18 @@ RightHandSide<3>::value (const Point<3> &p,
 
   Point<3> normal = p;
   normal /= p.norm();
-  
    
-  return (-trace(hessian) +
-	  (hessian * normal) * normal +
-	  (gradient * normal) * 2.);
+  return (- trace(hessian)
+	  - (2-3-1) * (gradient * normal)
+	  + (hessian * normal) * normal);
 }
 
 
-template <>
-double
-RightHandSide<2>::value (const Point<2> &p,
-			 const unsigned int comp) const 
-{
-  return ( -8. * p(0) * p(1) ); 
-}
-
+                                 // @sect3{Implementation of the <code>LaplaceBeltramiProblem</code> class}
 
 template <int spacedim>
-LaplaceBeltramiProblem<spacedim>::LaplaceBeltramiProblem (const unsigned degree)
+LaplaceBeltramiProblem<spacedim>::
+LaplaceBeltramiProblem (const unsigned degree)
 		:
 		fe (degree),
 		dof_handler(triangulation),
@@ -321,7 +393,10 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 
 
   std::map<unsigned int,double> boundary_values; 
-  VectorTools::interpolate_boundary_values (mapping,dof_handler,0,Solution<spacedim>(),
+  VectorTools::interpolate_boundary_values (mapping,
+					    dof_handler,
+					    0,
+					    Solution<spacedim>(),
 					    boundary_values);
   
   MatrixTools::apply_boundary_values (boundary_values,
@@ -392,7 +467,13 @@ void LaplaceBeltramiProblem<spacedim>::run ()
 }
 
 
+                                 // @sect3{The main() function}
 
+				 // The remainder of the program is taken up
+				 // by the <code>main()</code> function. It
+				 // follows exactly the general layout first
+				 // introduced in step-6 and used in all
+				 // following tutorial programs:
 int main ()
 {
   try
