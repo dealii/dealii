@@ -101,6 +101,13 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   (Martin Steigemann, 2010/12/20)
   </p></li>
 
+  <li><p>New: The new step-38 program shows how to discretize and solve
+  partial differential equations posed on curved manifolds embedded in
+  higher dimensional spaces.
+  <br>
+  (Andrea Bonito, M. Sebastian Pauletti, 2011/01/02)
+  </p></li>
+
   <li><p>New: A significant number of classes, primarily in the
   <code>base/</code> subdirectory, now provide the necessary member functions
   for serialization through BOOST's serialization library.
