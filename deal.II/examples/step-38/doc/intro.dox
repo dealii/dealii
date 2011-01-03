@@ -31,7 +31,7 @@ i.e. each point $\hat{\mathbf x}\in\hat S$ induces a point ${\mathbf
 @f[
 G_S:= (D \mathbf{x}_S)^T \ D \mathbf{x}_S
 @f]
-denote the corresponding first fundamental form, where $D
+denotes the corresponding first fundamental form, where $D
 \mathbf{x}_S=\left(\frac{\partial x_{S,i}(\hat{\mathbf x})}{\partial \hat x_j}\right)_{ij}$ is the 
 derivative (Jacobian) of the mapping.
 In the following, $S$ will be either the entire surface $\Gamma$ or,
@@ -45,6 +45,12 @@ R$ by
 @f]
 The surface Laplacian (also called the Laplace-Beltrami operator) is then
 defined as  $\Delta_S:= \nabla_S \cdot \nabla_S$.
+Note that an alternate way to define the surface gradient on smooth surfaces $\Gamma$ is 
+@f[
+\nabla_S v := \nabla \tilde v - \mathbf n (\mathbf n \nabla \tilde v),
+@f]
+where $\tilde v$ is a "smooth" extension of $v$ in a tubular neighborhood of $\Gamma$ and
+$\mathbf n$ is the normal of $\Gamma$. 
 
 As usual, we are only interested in weak solutions for which we can use $C^0$
 finite elements (rather than requiring $C^1$ continuity as for strong
@@ -132,9 +138,9 @@ We produce one test case for a 2d problem and another one for 3d:
 <li>
   In 2d, let's choose as domain a half circle. On this domain, we choose the
   function $u(\mathbf x)=-2x_1x_2$ as the solution. To compute the right hand
-  side, we have to compute the second <i>tangential</i> derivatives of the
+  side, we have to compute the surface Laplacian of the
   solution function. There are (at least) two ways to do that. The first one
-  is to project away the normal derivative, i.e. to compute
+  is to project away the normal derivative as described above using the natural extension of $u(\mathbf x)$ (still denoted by $u$) over $\mathbb R^d$, i.e. to compute
   @f[
     -\Delta_\Gamma u
     =
