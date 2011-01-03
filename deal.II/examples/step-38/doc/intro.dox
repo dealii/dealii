@@ -142,8 +142,9 @@ We produce one test case for a 2d problem and another one for 3d:
     \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right]
     \cdot
     \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right]
-    u.
+    u,
   @f]
+  where, of course, $\nabla - \mathbf n (\mathbf n \cdot \nabla)=\nabla_\Gamma$.
   Since we are on the unit circle, $\mathbf n=\mathbf x$. Furthermore, $\nabla
   u = \left(\begin{array}{c}-2x_2 \\ -2x_1\end{array}\right)$.
   Consequently, we have the following identities:
@@ -199,7 +200,9 @@ We produce one test case for a 2d problem and another one for 3d:
     = -2 \frac{d}{dt}(-sin^2 t + \cos^2 t)
     = -2 (-2 \sin t \cos t - 2 \cos t \sin t)
     \\
-    &= 8 \sin t \cos t,
+    &= 8 \sin t \cos t
+    \\
+    &= 8 x_1x_2,
   @f}
   which is of course the same result as we had above.
 
@@ -293,11 +296,13 @@ We produce one test case for a 2d problem and another one for 3d:
 In the program, we will also compute the $H^1$ seminorm error of the
 solution. Since the solution function and its numerical approximation are only
 defined on the manifold, the obvious definition of this error functional is
-$| e |_{H^1} = \left( \int_\Omega | \left[\mathbf n \otimes \mathbf
+$| e |_{H^1} 
+  = | \nabla_\Gamma e |_{L_2} 
+  = \left( \int_\Omega | \left[\mathbf 1 - \mathbf n \otimes \mathbf
 n\right]\nabla (u-u_h) |^2 \right)^{1/2}$. This requires us to provide the
-<i>tangential</i> gradient $\left[\mathbf n \otimes \mathbf
+<i>tangential</i> gradient $\left[\mathbf 1 - \mathbf n \otimes \mathbf
 n\right]\nabla u$ to the function VectorTools::integrate_difference
-(introduced first in step-7), which we
+(first introduced in step-7), which we
 will do by implementing the function <code>Solution::gradient</code> in the
 program below.
 
@@ -324,4 +329,7 @@ functions, and we will get a boundary description for half circles or half
 spheres that is pre-defined in the library.
 
 The rest of the program follows closely step-4 and, as far as computing the
-error, step-7.
+error, step-7. Some aspects of this program, in particular the use of two
+template arguments on the classes Triangulation, DoFHandler, and similar, are
+already described in detail in step-34; you may wish to read through this
+tutorial program as well.
