@@ -1,0 +1,65 @@
+
+DEAL::Cell = 0.1
+DEAL::  direction_flag = 0
+DEAL::  face = 0  (neighbor = 0.3)
+DEAL::  face = 1  (neighbor = 0.4)
+DEAL::  face = 2  (neighbor = -1.-1)
+DEAL::  face = 3  (neighbor = 0.0)
+DEAL::    subface = 0
+DEAL::              1.0
+DEAL::    subface = 1
+DEAL::              1.2
+DEAL::Cell = 0.2
+DEAL::  direction_flag = 1
+DEAL::  face = 0  (neighbor = 0.3)
+DEAL::  face = 1  (neighbor = 0.4)
+DEAL::  face = 2  (neighbor = -1.-1)
+DEAL::  face = 3  (neighbor = 0.0)
+DEAL::    subface = 0
+DEAL::              1.1
+DEAL::    subface = 1
+DEAL::              1.3
+DEAL::Cell = 0.3
+DEAL::  direction_flag = 0
+DEAL::  face = 0  (neighbor = -1.-1)
+DEAL::  face = 1  (neighbor = 0.0)
+DEAL::    subface = 0
+DEAL::              1.0
+DEAL::    subface = 1
+DEAL::              1.1
+DEAL::  face = 2  (neighbor = 0.1)
+DEAL::  face = 3  (neighbor = 0.2)
+DEAL::Cell = 0.4
+DEAL::  direction_flag = 1
+DEAL::  face = 0  (neighbor = -1.-1)
+DEAL::  face = 1  (neighbor = 0.0)
+DEAL::    subface = 0
+DEAL::              1.2
+DEAL::    subface = 1
+DEAL::              1.3
+DEAL::  face = 2  (neighbor = 0.1)
+DEAL::  face = 3  (neighbor = 0.2)
+DEAL::Cell = 1.0
+DEAL::  direction_flag = 1
+DEAL::  face = 0  (neighbor = 0.1)
+DEAL::  face = 1  (neighbor = 1.1)
+DEAL::  face = 2  (neighbor = 0.3)
+DEAL::  face = 3  (neighbor = 1.2)
+DEAL::Cell = 1.1
+DEAL::  direction_flag = 1
+DEAL::  face = 0  (neighbor = 1.0)
+DEAL::  face = 1  (neighbor = 0.2)
+DEAL::  face = 2  (neighbor = 0.3)
+DEAL::  face = 3  (neighbor = 1.3)
+DEAL::Cell = 1.2
+DEAL::  direction_flag = 1
+DEAL::  face = 0  (neighbor = 0.1)
+DEAL::  face = 1  (neighbor = 1.3)
+DEAL::  face = 2  (neighbor = 1.0)
+DEAL::  face = 3  (neighbor = 0.4)
+DEAL::Cell = 1.3
+DEAL::  direction_flag = 1
+DEAL::  face = 0  (neighbor = 1.2)
+DEAL::  face = 1  (neighbor = 0.2)
+DEAL::  face = 2  (neighbor = 1.1)
+DEAL::  face = 3  (neighbor = 0.4)

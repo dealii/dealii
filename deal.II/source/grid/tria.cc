@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1051,8 +1051,8 @@ namespace
 				     // intrinsic normal we define the left
 				     // neighbor as the one for which the face
 				     // normal points outward, and store that
-				     // one first, with an offset of one we
-				     // store the right neighbor for which the
+				     // one first; the second one is then
+				     // the right neighbor for which the
 				     // face normal points inward. This
 				     // information depends on the type of cell
 				     // and local number of face for the
@@ -1072,6 +1072,27 @@ namespace
 				     // thus define here that the normal for a
 				     // line points to the right if the line
 				     // points upwards.
+				     //
+				     // There is one more point to
+				     // consider, however: if we have
+				     // dim<spacedim, then we may have
+				     // cases where cells are
+				     // inverted. In effect, both
+				     // cells think they are the left
+				     // neighbor of an edge, for
+				     // example, which leads us to
+				     // forget neighborship
+				     // information (a case that shows
+				     // this is
+				     // codim_one/hanging_nodes_02). We
+				     // store whether a cell is
+				     // inverted using the
+				     // direction_flag, so if a cell
+				     // has a false direction_flag,
+				     // then we need to invert our
+				     // selection whether we are a
+				     // left or right neighbor in all
+				     // following computations.
 				     //
 				     // first index:  dimension (minus 2)
 				     // second index: local face index
@@ -1111,9 +1132,18 @@ namespace
     for (; cell != endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	{
-	  const typename Triangulation<dim,spacedim>::face_iterator face=cell->face(f);
-	  const unsigned int offset=left_right_offset[dim-2][f][cell->face_orientation(f)];
+	  const typename Triangulation<dim,spacedim>::face_iterator
+	    face=cell->face(f);
+
+	  const unsigned int
+	    offset = (cell->direction_flag()
+		      ?
+		      left_right_offset[dim-2][f][cell->face_orientation(f)]
+		      :
+		      1-left_right_offset[dim-2][f][cell->face_orientation(f)]);
+
 	  adjacent_cells[2*face->index() + offset] = cell;
+
 					   // if this cell is not refined, but the
 					   // face is, then we'll have to set our
 					   // cell as neighbor for the cild faces
@@ -1178,9 +1208,16 @@ namespace
 				     // the offset of the neighbor, not our own.
     for (cell=triangulation.begin(); cell != endc; ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	cell->set_neighbor(f,
-			   adjacent_cells[2*cell->face(f)->index() + 1
-					  - left_right_offset[dim-2][f][cell->face_orientation(f)]]);
+	{
+	  const unsigned int
+	    offset = (cell->direction_flag()
+		      ?
+		      left_right_offset[dim-2][f][cell->face_orientation(f)]
+		      :
+		      1-left_right_offset[dim-2][f][cell->face_orientation(f)]);
+	  cell->set_neighbor(f,
+			     adjacent_cells[2*cell->face(f)->index() + 1 - offset]);
+	}
   }
 
 }// end of anonymous namespace
