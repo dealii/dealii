@@ -108,8 +108,8 @@ using namespace dealii;
 				 //   will choose the polynomial degree of the
 				 //   mapping equal to the polynomial degree
 				 //   of the finite element used in the
-				 //   computations, though this
-				 //   iso-parametricity is not necessary.
+				 //   computations to ensure optimal approximation, though this
+				 //   iso-parametricity is not required.
 template <int spacedim>
 class LaplaceBeltramiProblem 
 {

@@ -117,7 +117,8 @@ This provides exactly the terms we need for our computations.
 On a more general note, details for the finite element approximation on
 surfaces can be found for instance in 
 [Dziuk, in Partial differential equations and calculus of
-variations 1357, Lecture Notes in Math., 1988]  
+variations 1357, Lecture Notes in Math., 1988],
+[Demlow, SIAM J. Numer. Anal.  47(2), 2009]
 and
 [Bonito, Nochetto, and Pauletti, SIAM J. Numer. Anal. 48(5), 2010].
 
