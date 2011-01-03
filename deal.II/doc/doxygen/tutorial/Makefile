@@ -51,7 +51,7 @@ toc.html: steps.cmapx toc.html.in
 	@perl make_toc.pl > toc.html
 
 # generate dot file
-steps.dot: steps.pl $D/examples/*/doc/tooltip $D/examples/*/doc/builds-on
+steps.dot: steps.pl $D/examples/*/doc/tooltip $D/examples/*/doc/builds-on $D/examples/*/doc/kind
 	@echo ================== Making $@
 	@perl $< > $@
 
