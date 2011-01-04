@@ -151,7 +151,7 @@ We produce one test case for a 2d problem and another one for 3d:
   @f]	
   Since we are on the unit circle, $\mathbf n=\mathbf x$ so that
   @f[
-    -\Delta_\Gamma u = -8 x_1x_2$.
+    -\Delta_\Gamma u = -8 x_1x_2.
   @f]	
 
   A somewhat simpler way, at least for the current case of a curve in
