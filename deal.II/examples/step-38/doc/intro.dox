@@ -45,12 +45,16 @@ R$ by
 @f]
 The surface Laplacian (also called the Laplace-Beltrami operator) is then
 defined as  $\Delta_S:= \nabla_S \cdot \nabla_S$.
-Note that an alternate way to define the surface gradient on smooth surfaces $\Gamma$ is 
+Note that an alternate way to compute the surface gradient on smooth surfaces $\Gamma$ is 
 @f[
-\nabla_S v := \nabla \tilde v - \mathbf n (\mathbf n \nabla \tilde v),
+\nabla_S v = \nabla \tilde v - \mathbf n (\mathbf n \cdot \nabla \tilde v),
 @f]
 where $\tilde v$ is a "smooth" extension of $v$ in a tubular neighborhood of $\Gamma$ and
 $\mathbf n$ is the normal of $\Gamma$. 
+Since $\Delta_S = \nabla_S \cdot \nabla_S$, we deduce
+@f[
+\Delta_S v = \Delta \tilde v - \mathbf n^T D \tilde v \mathbf n - (\nabla \tilde v)\cdot \mathbf n (\nabla \cdot \mathbf n).
+@f]
 
 As usual, we are only interested in weak solutions for which we can use $C^0$
 finite elements (rather than requiring $C^1$ continuity as for strong
