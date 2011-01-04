@@ -166,7 +166,7 @@ We produce one test case for a 2d problem and another one for 3d:
   @f{align*}
     \Delta_\Gamma u 
     &= \frac{d^2}{dt^2}(-2\cos t \sin t)
-    = -2 \frac{d}{dt}(-sin^2 t + \cos^2 t)
+    = -2 \frac{d}{dt}(-\sin^2 t + \cos^2 t)
     = -2 (-2 \sin t \cos t - 2 \cos t \sin t)
     \\
     &= 8 \sin t \cos t
