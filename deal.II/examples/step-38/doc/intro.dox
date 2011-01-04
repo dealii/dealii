@@ -147,56 +147,14 @@ We produce one test case for a 2d problem and another one for 3d:
   solution function. There are (at least) two ways to do that. The first one
   is to project away the normal derivative as described above using the natural extension of $u(\mathbf x)$ (still denoted by $u$) over $\mathbb R^d$, i.e. to compute
   @f[
-    -\Delta_\Gamma u
-    =
-    -
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right]
-    \cdot
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right]
-    u,
-  @f]
-  where, of course, $\nabla - \mathbf n (\mathbf n \cdot \nabla)=\nabla_\Gamma$.
-  Since we are on the unit circle, $\mathbf n=\mathbf x$. Furthermore, $\nabla
-  u = \left(\begin{array}{c}-2x_2 \\ -2x_1\end{array}\right)$.
-  Consequently, we have the following identities:
-  @f{align*}
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right] u
-    &=
-    \left(\begin{array}{c}-2x_2 \\ -2x_1\end{array}\right)
-    +
-    4x_1x_2
-    \left(\begin{array}{c}x_1 \\ x_2\end{array}\right)
-    =
-    \left(\begin{array}{c}-2x_2(1-2x_1^2) \\ -2x_1(1-2x_2^2)\end{array}\right)
-    \\
-    \nabla \cdot \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right] u
-    &=
-    16x_1x_2
-    \\
-    (\mathbf n \cdot \nabla)
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right] u
-    &=
-    \left(\begin{array}{c}
-      12x_1^2x_2 -2x_2\\
-      12x_1x_2^2 -2x_1
-    \end{array}\right)
-    \\
-    \left[\mathbf n (\mathbf n \cdot \nabla)\right] \cdot
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right] u
-    &=
-    12x_1^3x_2 -4x_1x_2 + 12x_1x_2^3
-    \\
-    \Delta_\Gamma u
-    &=
-    16x_1x_2 - (12x_1^3x_2 -4x_1x_2 + 12x_1x_2^3)
-    =
-    20x_1x_2 - 12 x_1x_2 (x_1^2+x_2^2).
-  @f}
-  In the last equation, we can note that since we only ever evaluate this
-  right hand side on the unit circle, $x_1^2+x_2^2=1$, yielding the final
-  value $-\Delta_\Gamma u = -8 x_1x_2$.
+    -\Delta_\Gamma u =  \Delta u - \mathbf n^T D u \mathbf n - (\nabla u)\cdot \mathbf n (\nabla \cdot \mathbf n).
+  @f]	
+  Since we are on the unit circle, $\mathbf n=\mathbf x$ so that
+  @f[
+    -\Delta_\Gamma u = -8 x_1x_2$.
+  @f]	
 
-  A somewhat simpler version, at least for the current case of a curve in
+  A somewhat simpler way, at least for the current case of a curve in
   two-dimensional space, is to note that we can map the interval $t \in
   [0,\pi]$ onto the domain $\Omega$ using the transformation
   $\mathbf x(t)= \left(\begin{array}{c} \cos t \\ \sin t \end{array}\right)$.
@@ -216,92 +174,15 @@ We produce one test case for a 2d problem and another one for 3d:
     &= 8 x_1x_2,
   @f}
   which is of course the same result as we had above.
-
+</li>
 <li>
   In 3d, the domain is again half of the surface of the unit ball, i.e. a half
   sphere or dome. We choose $u(\mathbf x)=-2\sin(\pi x_1)\cos(\pi x_2)e^z$ as
   the solution. We can compute the right hand side of the
-  equation, $f=-\Delta_\Gamma u$, in the same way as above, yielding an
+  equation, $f=-\Delta_\Gamma u$, in the same way as the method above, yielding an
   awkward and lengthy expression. You can find the full expression in the
-  source code, where we use the fact that
-  @f{align*}
-    \Delta_\Gamma 
-    &=
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right]
-    \cdot
-    \left[\nabla - \mathbf n (\mathbf n \cdot \nabla)\right]
-    \\
-    &=
-    \left[\mathbf I - \mathbf n \otimes \mathbf n\right]\nabla
-    \cdot
-    \left[\mathbf I - \mathbf n \otimes \mathbf n\right]\nabla
-    \\
-    &=
-    \text{trace}\;
-    \left\{
-      (\left[\mathbf I - \mathbf n \otimes \mathbf n\right]\nabla)
-      \otimes
-      (\left[\mathbf I - \mathbf n \otimes \mathbf n\right]\nabla)
-    \right\}
-    \\
-    &=
-    \text{trace}\;
-    \left\{
-      \nabla^2
-      +
-      (\left[\mathbf n \otimes \mathbf n\right]\nabla)
-      \otimes
-      (\left[\mathbf n \otimes \mathbf n\right]\nabla)
-      -
-      \nabla \otimes (\left[\mathbf n \otimes \mathbf n\right]\nabla)
-      -
-      \left[\mathbf n \otimes \mathbf n\right]\nabla^2
-    \right\}.
-  @f}
-  Applied to the solution, we then get using the abbreviation $H=\nabla^2 u$
-  for the Hessian with derivatives in all three spatial directions:
-  @f{align*}
-    \Delta_\Gamma u
-    &=
-    \text{trace}\;
-    \left\{
-      H
-      +
-      (\left[\mathbf n \otimes \mathbf n\right]\nabla)
-      \otimes
-      (\left[\mathbf n \otimes \mathbf n\right]\nabla) u
-      -
-      \nabla \otimes (\left[\mathbf n \otimes \mathbf n\right]\nabla) u
-      -
-      \left[\mathbf n \otimes \mathbf n\right] H
-    \right\}
-    \\
-    &=
-    \text{trace}\; H
-    +
-    \text{trace}\;
-    \left\{
-      (\left[\mathbf n \otimes \mathbf n\right]\nabla)
-      \otimes
-      (\left[\mathbf n \otimes \mathbf n\right]\nabla) u
-      -
-      \nabla \otimes (\left[\mathbf n \otimes \mathbf n\right]\nabla) u
-    \right\}
-    -
-    \mathbf n^T H \mathbf n.
-  @f}
-  A lengthier computation shows that if we take into account that $\mathbf n =
-  \mathbf x$, then the middle term can be simplified in
-  such a way that we obtain
-  @f{align*}
-    \Delta_\Gamma u
-    &=
-    \text{trace}\; H
-    +
-    (2-\text{spacedim}-1) \mathbf n \cdot \nabla u
-    -
-    \mathbf n^T H \mathbf n.
-  @f}
+  source code.
+</li>
 </ul> 
 
 In the program, we will also compute the $H^1$ seminorm error of the
