@@ -24,27 +24,40 @@ Research Fellowship.
 
 <a name="Intro"></a> <h1>Introduction</h1>
 
-The simulation of multiphase flow in porous media is a ubiquitous problem, but it faces two major difficulties: numerical accuracy and efficiency. In this tutorial, in order to overcome these two problems, there are five areas which we are trying to improve for a high performance simulator:
+The simulation of multiphase flow in porous media is a ubiquitous problem, and
+we have previously addressed it already in some form in step-20 and
+step-21. However, as was easy to see there,
+it faces two major difficulties: numerical accuracy and efficiency. The first
+is easy to see in step-20: using lowest order Raviart-Thomas elements can not
+be expected to yield highly accurate solutions. We need more accurate
+methods. The second reason is apparent from step-21: that program is
+exceedingly slow, and there is no hope to get highly accurate solutions in 3d
+within reasonable time frames.
+
+In this
+program, in order to overcome these two problems, there are five areas which
+we are trying to improve for a high performance simulator:
+
 <ul>
 <li> Higher order spatial discretizations
 <li> Adaptive mesh refinement
-<li> Adaptive time stepping method
-<li> Operator splitting method
-<li> Efficient solver and preconditioning method
+<li> Adaptive time stepping
+<li> Operator splitting
+<li> Efficient solver and preconditioning
 </ul>
 
 <h3>Advection-dominated two-phase flow mathematical model.</h3>
 
 We consider the flow of a two-phase immiscible, incompressible
-fluid. Capillary and gravity effects are neglected, and that viscous
+fluid. Capillary and gravity effects are neglected, and viscous
 effects are assumed dominant. The governing equations for such a
-flow that are identical to those used in step-21 are then
+flow that are identical to those used in step-21 and are
 @f{align*}
   \mathbf{u}_t &= - \mathbf{K} \lambda_t \left(S\right) \nabla p, \\
   \nabla \cdot \mathbf{u}_t &= q, \\
   \epsilon \frac{\partial S}{\partial t} + \nabla \cdot \left( \mathbf{u}_t  F\left( S \right) \right)&=0,
 @f}
-where $S$ is the saturation (volume fraction) of the second (wetting) phase, $p$ is the pressure, $\mathbf{K}$ is the permeability tensor, $\lambda_t$ is the total mobility, $\epsilon$ is the porosity, $F$ is the fractional flow of the wetting phase, $q$ is the source term and $\mathbf{u}_t$ is the total velocity. The total mobility, fractional flow of the wetting phase and total velocity are respectively given by
+where $S$ is the saturation (volume fraction between zero and one) of the second (wetting) phase, $p$ is the pressure, $\mathbf{K}$ is the permeability tensor, $\lambda_t$ is the total mobility, $\epsilon$ is the porosity, $F$ is the fractional flow of the wetting phase, $q$ is the source term and $\mathbf{u}_t$ is the total velocity. The total mobility, fractional flow of the wetting phase and total velocity are respectively given by
 @f{align*}
    \lambda_t(S)&= \lambda_w + \lambda_{nw} = \frac{k_{rw}(S)}{\mu_w} + \frac{k_{rnw}(S)}{\mu_{nw}}, \\
    F(S) &= \frac{\lambda_w}{\lambda_t} = \frac{\lambda_w}{\lambda_w + \lambda_{nw}} = \frac{k_{rw}(S)/\mu_w}{k_{rw}(S)/\mu_w + k_{rnw}(S)/\mu_{nw}}, \\
@@ -59,7 +72,7 @@ scaling factor for the time variable, is set to
 one. Following a commonly used prescription for the dependence of the relative
 permeabilities $k_{rw}$ and $k_{rnw}$ on saturation, we use
 @f{align*}
-   k_{rw}  &= S^2, \qquad\qquad
+   k_{rw}  &= S^2, \qquad&\qquad
    k_{rnw} &= \left( 1-S \right)^2.
 @f}
 
@@ -76,15 +89,21 @@ parts. Specifically,
 and we arrive at a complete model by also imposing boundary values for the
 saturation variable on the inflow boundary $\mathbf{\Gamma}_{in}$.
 
+
 <h3>Adaptive operator splitting and time stepping.</h3>
-Based on facts that an implicit pressure-velocity part is computationally
-costly and the pressure and velocity depend only weakly on saturation, we
-don't have to solve it every saturation time step. Therefore, operator
-splitting is employed. However, with operator splitting that is not enough, we
-still needs an objective criterion to tell us when the pressure-velocity part
-needs to be solved at every saturation time step to control the amount of
-splitting error in a reasonable frame. Here, we use an a poteriori criterion
-(which detailed derivations and descriptions can be found in [Chueh, Bangerth
+
+As seen in step-21, solving the flow equations for velocity and pressure are
+the parts of the program that take far longer than the (explicit) updating
+step for the saturation variable once we know the flow variables. On the other
+hand,  the pressure and velocity depend only weakly on saturation, so one may
+think about only solving for pressure and velocity every few time steps while
+updating the saturation in every step. If we can find a criterion for when the
+flow variables need to be updated, we call this splitting an "adaptive
+operator splitting" scheme.
+
+Here, we use the following a posteriori criterion to decide when to re-compute
+pressure and velocity variables:
+(detailed derivations and descriptions can be found in [Chueh, Bangerth
 and Djilali 2010]):
 @f{align*}
   \theta(n,n_p)
@@ -93,11 +112,16 @@ and Djilali 2010]):
     \left(
     \left\|
       \frac 1{\lambda_t\left(S^{(n-1)}\right)}
-      - \frac 1{\lambda_t\left(S^{(n_p-1)}\right)} \right\|_{L^\infty(\kappa)}
+      - \frac 1{\lambda_t\left(S^{(n_p)}\right)} \right\|_{L^\infty(\kappa)}
     \left\|\|\mathbf{K}^{-1}\|_1\right\|_{L^\infty(\kappa)}
     \right).
 @f}
-where superscripts in parentheses denote the number of the saturation time step at which any quantity is defined and $n_p<n$ represents the last step where actually we computed the pressure and velocity.
+where superscripts in parentheses denote the number of the saturation time
+step at which any quantity is defined and $n_p<n$ represents the last step
+where actually we computed the pressure and velocity. If $\theta(n,n_p)$
+exceeds a certain threshold we re-compute the flow variables; otherwise, we
+skip this computation in time step $n$ and only move the saturation variable
+one time step forward.
 
 In short, the algorithm allows us to perform a number of
 saturation time steps of length $\Delta t_c^{(n)}$ until the criterion above
