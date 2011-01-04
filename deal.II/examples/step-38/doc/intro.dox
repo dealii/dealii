@@ -53,7 +53,7 @@ where $\tilde v$ is a "smooth" extension of $v$ in a tubular neighborhood of $\G
 $\mathbf n$ is the normal of $\Gamma$. 
 Since $\Delta_S = \nabla_S \cdot \nabla_S$, we deduce
 @f[
-\Delta_S v = \Delta \tilde v - \mathbf n^T D \tilde v \mathbf n - (\nabla \tilde v)\cdot \mathbf n (\nabla \cdot \mathbf n).
+\Delta_S v = \Delta \tilde v - \mathbf n^T \ D \tilde v \ \mathbf n - (\nabla \tilde v)\cdot \mathbf n (\nabla \cdot \mathbf n).
 @f]
 
 As usual, we are only interested in weak solutions for which we can use $C^0$
@@ -147,7 +147,7 @@ We produce one test case for a 2d problem and another one for 3d:
   solution function. There are (at least) two ways to do that. The first one
   is to project away the normal derivative as described above using the natural extension of $u(\mathbf x)$ (still denoted by $u$) over $\mathbb R^d$, i.e. to compute
   @f[
-    -\Delta_\Gamma u =  \Delta u - \mathbf n^T D u \mathbf n - (\nabla u)\cdot \mathbf n (\nabla \cdot \mathbf n).
+    -\Delta_\Gamma u =  \Delta u - \mathbf n^T \ D u \ \mathbf n - (\nabla u)\cdot \mathbf n (\nabla \cdot \mathbf n).
   @f]	
   Since we are on the unit circle, $\mathbf n=\mathbf x$ so that
   @f[
