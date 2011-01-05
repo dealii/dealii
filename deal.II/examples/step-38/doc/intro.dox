@@ -53,7 +53,7 @@ where $\tilde v$ is a "smooth" extension of $v$ in a tubular neighborhood of $\G
 $\mathbf n$ is the normal of $\Gamma$. 
 Since $\Delta_S = \nabla_S \cdot \nabla_S$, we deduce
 @f[
-\Delta_S v = \Delta \tilde v - \mathbf n^T \ D \tilde v \ \mathbf n - (\nabla \tilde v)\cdot \mathbf n (\nabla \cdot \mathbf n - \mathbf n \ D \mathbf n \ \mathbf n ).
+\Delta_S v = \Delta \tilde v - \mathbf n^T \ D^2 \tilde v \ \mathbf n - (\mathbf n \cdot \nabla \tilde v) (\nabla \cdot \mathbf n - \mathbf n^T \ D \mathbf n \ \mathbf n ).
 @f]
 Worth mentioning, the term $\nabla \cdot \mathbf n - \mathbf n \ D \mathbf n \ \mathbf n$ appearing in the above expression is the total curvature of the surface (sum of principal curvatures).
 
@@ -148,7 +148,7 @@ We produce one test case for a 2d problem and another one for 3d:
   solution function. There are (at least) two ways to do that. The first one
   is to project away the normal derivative as described above using the natural extension of $u(\mathbf x)$ (still denoted by $u$) over $\mathbb R^d$, i.e. to compute
   @f[
-    -\Delta_\Gamma u =  \Delta u - \mathbf n^T \ D u \ \mathbf n - (\nabla u)\cdot \mathbf n \kappa,
+    -\Delta_\Gamma u =  \Delta u - \mathbf n^T \ D^2 u \ \mathbf n - (\mathbf n \cdot \nabla u)\ \kappa,
   @f]	
   where $\kappa$ is the total curvature of $\Gamma$.
   Since we are on the unit circle, $\mathbf n=\mathbf x$ and $\kappa = 1$ so that
