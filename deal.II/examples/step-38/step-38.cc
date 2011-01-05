@@ -111,12 +111,12 @@ using namespace dealii;
 				 //   computations to ensure optimal approximation, though this
 				 //   iso-parametricity is not required.
 template <int spacedim>
-class LaplaceBeltramiProblem 
+class LaplaceBeltramiProblem
 {
   public:
     LaplaceBeltramiProblem (const unsigned degree = 2);
     void run ();
-  
+
   private:
     static const unsigned int dim = spacedim-1;
 
@@ -125,8 +125,8 @@ class LaplaceBeltramiProblem
     void solve ();
     void output_results () const;
     void compute_error () const;
-    
-  
+
+
     Triangulation<dim,spacedim>   triangulation;
     FE_Q<dim,spacedim>            fe;
     DoFHandler<dim,spacedim>      dof_handler;
@@ -134,7 +134,7 @@ class LaplaceBeltramiProblem
 
     SparsityPattern               sparsity_pattern;
     SparseMatrix<double>          system_matrix;
-  
+
     Vector<double>                solution;
     Vector<double>                system_rhs;
 };
@@ -164,10 +164,10 @@ class Solution  : public Function<dim>
 {
   public:
     Solution () : Function<dim>() {}
-  
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-  
+
     virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				    const unsigned int  component = 0) const;
 
@@ -177,7 +177,7 @@ class Solution  : public Function<dim>
 template <>
 double
 Solution<2>::value (const Point<2> &p,
-		    const unsigned int) const 
+		    const unsigned int) const
 {
   return ( -2. * p(0) * p(1) );
 }
@@ -199,7 +199,7 @@ Solution<2>::gradient (const Point<2>   &p,
 template <>
 double
 Solution<3>::value (const Point<3> &p,
-		    const unsigned int) const 
+		    const unsigned int) const
 {
   return (std::sin(numbers::PI * p(0)) *
 	  std::cos(numbers::PI * p(1))*exp(p(2)));
@@ -218,7 +218,7 @@ Solution<3>::gradient (const Point<3>   &p,
   return_value[0] = PI *cos(PI * p(0))*cos(PI * p(1))*exp(p(2));
   return_value[1] = -PI *sin(PI * p(0))*sin(PI * p(1))*exp(p(2));
   return_value[2] = sin(PI * p(0))*cos(PI * p(1))*exp(p(2));
-  
+
   return return_value;
 }
 
@@ -229,7 +229,7 @@ class RightHandSide : public Function<dim>
 {
   public:
     RightHandSide () : Function<dim>() {}
-  
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 };
@@ -237,19 +237,19 @@ class RightHandSide : public Function<dim>
 template <>
 double
 RightHandSide<2>::value (const Point<2> &p,
-			 const unsigned int comp) const 
+			 const unsigned int /*component*/) const
 {
-  return ( -8. * p(0) * p(1) ); 
+  return ( -8. * p(0) * p(1) );
 }
 
 
 template <>
 double
 RightHandSide<3>::value (const Point<3> &p,
-			 const unsigned int comp) const 
+			 const unsigned int /*component*/) const
 {
   using numbers::PI;
-  
+
   Tensor<2,3> hessian;
 
   hessian[0][0] = -PI*PI*sin(PI*p(0))*cos(PI*p(1))*exp(p(2));
@@ -272,7 +272,7 @@ RightHandSide<3>::value (const Point<3> &p,
 
   Point<3> normal = p;
   normal /= p.norm();
-   
+
   return (- trace(hessian)
 	  - (2-3-1) * (gradient * normal)
 	  + (hessian * normal) * normal);
@@ -371,14 +371,14 @@ void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
 {
   static HyperBallBoundary<dim,spacedim> surface_description;
   triangulation.set_boundary (0, surface_description);
-  
+
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::half_hyper_ball(volume_mesh);
-  
+
     std::set<unsigned char> boundary_ids;
     boundary_ids.insert (0);
-  
+
     GridTools::extract_boundary_mesh (volume_mesh, triangulation,
 				      boundary_ids);
   }
@@ -393,13 +393,13 @@ void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
   std::cout << "Surface mesh has " << dof_handler.n_dofs()
 	    << " degrees of freedom."
 	    << std::endl;
-  
+
   CompressedSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, csp);
   sparsity_pattern.copy_from (csp);
 
   system_matrix.reinit (sparsity_pattern);
-  
+
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 }
@@ -422,13 +422,13 @@ void LaplaceBeltramiProblem<spacedim>::make_grid_and_dofs ()
 				 // point. The rest then does not need any
 				 // changes either:
 template <int spacedim>
-void LaplaceBeltramiProblem<spacedim>::assemble_system () 
+void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 {
   system_matrix = 0;
   system_rhs = 0;
-  
+
   const QGauss<dim>  quadrature_formula(2);
-  FEValues<dim,spacedim> fe_values (mapping, fe, quadrature_formula, 
+  FEValues<dim,spacedim> fe_values (mapping, fe, quadrature_formula,
 				    update_values              |
 				    update_gradients           |
 				    update_quadrature_points   |
@@ -444,7 +444,7 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   const RightHandSide<spacedim> rhs;
-  
+
   for (typename DoFHandler<dim,spacedim>::active_cell_iterator
 	 cell = dof_handler.begin_active(),
 	 endc = dof_handler.end();
@@ -455,15 +455,15 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 
       fe_values.reinit (cell);
 
-      rhs.value_list (fe_values.get_quadrature_points(), rhs_values); 
+      rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=0; j<dofs_per_cell; ++j) 
+	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	    cell_matrix(i,j) += fe_values.shape_grad(i,q_point) *
 				fe_values.shape_grad(j,q_point) *
 				fe_values.JxW(q_point);
-      
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	  cell_rhs(i) += fe_values.shape_value(i,q_point) *
@@ -477,18 +477,18 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	
+
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
     }
 
-  std::map<unsigned int,double> boundary_values; 
+  std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (mapping,
 					    dof_handler,
 					    0,
 					    Solution<spacedim>(),
 					    boundary_values);
-  
+
   MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
 				      solution,
@@ -503,7 +503,7 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
 				 // the linear system. Here, too, no changes
 				 // are necessary:
 template <int spacedim>
-void LaplaceBeltramiProblem<spacedim>::solve () 
+void LaplaceBeltramiProblem<spacedim>::solve ()
 {
   SolverControl solver_control (solution.size(),
 				1e-7 * system_rhs.l2_norm());
@@ -574,7 +574,7 @@ void LaplaceBeltramiProblem<spacedim>::output_results () const
 			  mapping.get_degree());
 
   std::string filename ("solution-");
-  filename += ('0'+spacedim);filename += "d.vtk"; 
+  filename += ('0'+spacedim);filename += "d.vtk";
   std::ofstream output (filename.c_str());
   data_out.write_vtk (output);
 }
@@ -596,14 +596,14 @@ void LaplaceBeltramiProblem<spacedim>::output_results () const
 				 // high order.
 template <int spacedim>
 void LaplaceBeltramiProblem<spacedim>::compute_error () const
-{  
+{
   Vector<float> difference_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (mapping, dof_handler, solution,
 				     Solution<spacedim>(),
 				     difference_per_cell,
 				     QGauss<dim>(2*fe.degree+1),
-				     VectorTools::H1_norm);  
-  
+				     VectorTools::H1_norm);
+
   std::cout << "H1 error = "
 	    << difference_per_cell.l2_norm()
 	    << std::endl;
@@ -616,7 +616,7 @@ void LaplaceBeltramiProblem<spacedim>::compute_error () const
 				 // The last function provides the top-level
 				 // logic. Its contents are self-explanatory:
 template <int spacedim>
-void LaplaceBeltramiProblem<spacedim>::run () 
+void LaplaceBeltramiProblem<spacedim>::run ()
 {
   make_grid_and_dofs();
   assemble_system ();
@@ -665,6 +665,6 @@ int main ()
 		<< std::endl;
       return 1;
     }
-    
+
   return 0;
 }
