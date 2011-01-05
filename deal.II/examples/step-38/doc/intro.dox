@@ -41,7 +41,7 @@ constituted of quadrilaterals.
 We are now in position to define the tangential gradient of a function $v : S \rightarrow \mathbb
 R$ by
 @f[
-(\nabla_S v)\circ \mathbf x_S :=  D \mathbf x_S \ G_S^{-1} \ D (v \circ \mathbf x_S).
+(\nabla_S v)\circ \mathbf x_S :=  D \mathbf x_S \ G_S^{-1} \ \nabla (v \circ \mathbf x_S).
 @f]
 The surface Laplacian (also called the Laplace-Beltrami operator) is then
 defined as  $\Delta_S:= \nabla_S \cdot \nabla_S$.
@@ -66,7 +66,7 @@ solutions). We therefore resort to the weak formulation
 @f]
 and take advantage of the partition ${\mathbb T}$ to further write
 @f[
-\sum_{K\in  {\mathbb T}}\int_K \nabla_K u \cdot \nabla_K v = \sum_{K\in
+\sum_{K\in  {\mathbb T}}\int_K \nabla_{K} u \cdot \nabla_{K} v = \sum_{K\in
   {\mathbb T}} \int_K f \ v  \qquad \forall v \in H^1_0(\Gamma).
 @f]
 Moreover, each integral in the above expression is computed in the reference
@@ -75,12 +75,12 @@ so that
 @f{align*}
 &\int_{K} \nabla_{K} u \cdot \nabla_{K} v \\
 &= 
-\int_{\hat K} D(u \circ \mathbf x_K)^T G_K^{-1} (D \mathbf
-  x_K)^T D \mathbf x_K G_K^{-1} D(v \circ \mathbf x_K) \sqrt{\det
+\int_{\hat K} \nabla (u \circ \mathbf x_K)^T G_K^{-1} (D \mathbf
+  x_K)^T D \mathbf x_K G_K^{-1} \nabla(v \circ \mathbf x_K) \sqrt{\det
     (G_K)}
 \\
 &= 
-\int_{\hat K} D(u \circ \mathbf x_K)^T G_K^{-1} D(v \circ \mathbf x_K) \sqrt{\det
+\int_{\hat K} \nabla (u \circ \mathbf x_K)^T G_K^{-1} \nabla (v \circ \mathbf x_K) \sqrt{\det
     (G_K)}
 @f}
 and
@@ -94,7 +94,7 @@ Finally, we use a quadrature formula defined by points $\{p_l\}_{l=1}^N\subset
 evaluate the above integrals and
 obtain
 @f[\int_{K} \nabla_{K} u \cdot \nabla_{K} v \approx \sum_{l=1}^N
- (D(u \circ \mathbf x_K)(p_l))^T G^{-1}(p_l)  D(v \circ \mathbf x_K)
+ (\nabla (u \circ \mathbf x_K)(p_l))^T G^{-1}(p_l)  \nabla (v \circ \mathbf x_K)
 (p_l) \sqrt{\det (G(p_l))} \ w_l
 @f]
 and
