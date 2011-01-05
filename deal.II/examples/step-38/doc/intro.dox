@@ -53,8 +53,9 @@ where $\tilde v$ is a "smooth" extension of $v$ in a tubular neighborhood of $\G
 $\mathbf n$ is the normal of $\Gamma$. 
 Since $\Delta_S = \nabla_S \cdot \nabla_S$, we deduce
 @f[
-\Delta_S v = \Delta \tilde v - \mathbf n^T \ D \tilde v \ \mathbf n - (\nabla \tilde v)\cdot \mathbf n (\nabla \cdot \mathbf n).
+\Delta_S v = \Delta \tilde v - \mathbf n^T \ D \tilde v \ \mathbf n - (\nabla \tilde v)\cdot \mathbf n (\nabla \cdot \mathbf n - \mathbf n \ D \mathbf n \ \mathbf n ).
 @f]
+Worth mentioning, the term $\nabla \cdot \mathbf n - \mathbf n \ D \mathbf n \ \mathbf n$ appearing in the above expression is the total curvature of the surface (sum of principal curvatures).
 
 As usual, we are only interested in weak solutions for which we can use $C^0$
 finite elements (rather than requiring $C^1$ continuity as for strong
@@ -147,9 +148,10 @@ We produce one test case for a 2d problem and another one for 3d:
   solution function. There are (at least) two ways to do that. The first one
   is to project away the normal derivative as described above using the natural extension of $u(\mathbf x)$ (still denoted by $u$) over $\mathbb R^d$, i.e. to compute
   @f[
-    -\Delta_\Gamma u =  \Delta u - \mathbf n^T \ D u \ \mathbf n - (\nabla u)\cdot \mathbf n (\nabla \cdot \mathbf n).
+    -\Delta_\Gamma u =  \Delta u - \mathbf n^T \ D u \ \mathbf n - (\nabla u)\cdot \mathbf n \kappa,
   @f]	
-  Since we are on the unit circle, $\mathbf n=\mathbf x$ so that
+  where $\kappa$ is the total curvature of $\Gamma$.
+  Since we are on the unit circle, $\mathbf n=\mathbf x$ and $\kappa = 1$ so that
   @f[
     -\Delta_\Gamma u = -8 x_1x_2.
   @f]	
@@ -179,7 +181,7 @@ We produce one test case for a 2d problem and another one for 3d:
   In 3d, the domain is again half of the surface of the unit ball, i.e. a half
   sphere or dome. We choose $u(\mathbf x)=-2\sin(\pi x_1)\cos(\pi x_2)e^z$ as
   the solution. We can compute the right hand side of the
-  equation, $f=-\Delta_\Gamma u$, in the same way as the method above, yielding an
+  equation, $f=-\Delta_\Gamma u$, in the same way as the method above (in that case $\kappa = 2$), yielding an
   awkward and lengthy expression. You can find the full expression in the
   source code.
 </li>

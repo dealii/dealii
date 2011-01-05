@@ -274,7 +274,7 @@ RightHandSide<3>::value (const Point<3> &p,
   normal /= p.norm();
 
   return (- trace(hessian)
-	  - (2-3-1) * (gradient * normal)
+	  + 2 * (gradient * normal)
 	  + (hessian * normal) * normal);
 }
 
