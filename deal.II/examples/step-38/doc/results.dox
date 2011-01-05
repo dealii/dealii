@@ -77,16 +77,16 @@ different position. Let us here use the following, rather simple function
 (remember: stretch in one direction, jumble in the other two):
 
 @code
-template <int dim>
-Point<dim> warp (const Point<dim> &p)
+template <int spacedim>
+Point<spacedim> warp (const Point<spacedim> &p)
 {
-  Point<dim> q = p;
-  q[dim-1] *= 10;
+  Point<spacedim> q = p;
+  q[spacedim-1] *= 10;
 
-  if (dim >= 2)
-    q[0] += 2*std::sin(q[dim-1]);
-  if (dim >= 3)
-    q[1] += 2*std::cos(q[dim-1]);
+  if (spacedim >= 2)
+    q[0] += 2*std::sin(q[spacedim-1]);
+  if (spacedim >= 3)
+    q[1] += 2*std::cos(q[spacedim-1]);
 
   return q;
 }
@@ -108,45 +108,49 @@ now no longer need it, and then finally warp the mesh. With the function
 above, this would look as follows:
 
 @code
-template <int dim>
-void LaplaceBeltrami<dim>::make_grid_and_dofs ()
+template <int spacedim>
+void LaplaceBeltrami<spacedim>::make_grid_and_dofs ()
 {
-  HyperBallBoundary<dim> boundary_description;
-  Triangulation<dim> volume_mesh;
-  GridGenerator::half_hyper_ball(volume_mesh);
-  
-  volume_mesh.set_boundary (1, boundary_description);
-  volume_mesh.set_boundary (0, boundary_description);
-  volume_mesh.refine_global (6);
-  
-  static HyperBallBoundary<dim-1,dim> surface_description;
-  triangulation.set_boundary (1, surface_description);
+  static HyperBallBoundary<dim,spacedim> surface_description;
   triangulation.set_boundary (0, surface_description);
-  
-  std::set<unsigned char> boundary_ids;
-  boundary_ids.insert(0);
-  
-  GridTools::extract_boundary_mesh (volume_mesh, triangulation,
-				    boundary_ids);
-  triangulation.set_boundary (1);                       /* ** */
-  triangulation.set_boundary (0);                       /* ** */
-  GridTools::transform (&warp<dim>, triangulation);     /* ** */
+
+  {
+    HyperBallBoundary<spacedim> boundary_description;
+    Triangulation<spacedim> volume_mesh;
+    GridGenerator::half_hyper_ball(volume_mesh);
+
+    volume_mesh.set_boundary (0, boundary_description);
+    volume_mesh.refine_global (4);
+
+    std::set<unsigned char> boundary_ids;
+    boundary_ids.insert (0);
+
+    GridTools::extract_boundary_mesh (volume_mesh, triangulation,
+				      boundary_ids);
+    triangulation.set_boundary (1);                            /* ** */
+    triangulation.set_boundary (0);                            /* ** */
+    GridTools::transform (&warp<spacedim>, triangulation);     /* ** */
+    std::ofstream x("x"), y("y");
+    GridOut().write_gnuplot (volume_mesh, x);
+    GridOut().write_gnuplot (triangulation, y);
+  }
 
   std::cout << "Surface mesh has " << triangulation.n_active_cells()
 	    << " cells."
 	    << std::endl;
-}
+
+  ...
 @endcode
 
-Note that the only addition has been the three lines marked with asterisks. It
-is worth pointing out one other thing here, though: because we un-attach the
-manifold description from the surface mesh, whenever we use a mapping object
-in the rest of the program, it has no curves boundary description to go on any
-more. Rather, it will have to use the implicit, StraightBoundary class that is
-used on all parts of the boundary not explicitly assigned a different
-mannifold object. Consequently, whether we use MappingQ(2), MappingQ(15) or
-MappingQ1, each cell of our mesh will be mapped using a bilinear
-approximation. 
+Note that the only essential addition has been the three lines marked with
+asterisks. It is worth pointing out one other thing here, though: because we
+un-attach the manifold description from the surface mesh, whenever we use a
+mapping object in the rest of the program, it has no curves boundary
+description to go on any more. Rather, it will have to use the implicit,
+StraightBoundary class that is used on all parts of the boundary not
+explicitly assigned a different mannifold object. Consequently, whether we use
+MappingQ(2), MappingQ(15) or MappingQ1, each cell of our mesh will be mapped
+using a bilinear approximation.
 
 All these drawbacks aside, the resulting pictures are still pretty. The only
 other differences to what's in step-38 is that we changed the right hand side
