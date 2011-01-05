@@ -76,7 +76,7 @@ so that
 \int_{K} \nabla_{K} u \cdot \nabla_{K} v 
 &= 
 \int_{\hat K} \nabla (u \circ \mathbf x_K)^T G_K^{-1} (D \mathbf
-  x_K)^T D \mathbf x_K G_K^{-1} \nabla(v \circ \mathbf x_K) \sqrt{\det
+  x_K)^T D \mathbf x_K G_K^{-1} \nabla (v \circ \mathbf x_K) \sqrt{\det
     (G_K)}
 \\
 &= 
