@@ -192,7 +192,7 @@ solution. Since the solution function and its numerical approximation are only
 defined on the manifold, the obvious definition of this error functional is
 $| e |_{H^1} 
   = | \nabla_\Gamma e |_{L_2} 
-  = \left( \int_\Omega | \left[\mathbf 1 - \mathbf n \otimes \mathbf
+  = \left( \int_\Gamma | \left[\mathbf 1 - \mathbf n \otimes \mathbf
 n\right]\nabla (u-u_h) |^2 \right)^{1/2}$. This requires us to provide the
 <i>tangential</i> gradient $\left[\mathbf 1 - \mathbf n \otimes \mathbf
 n\right]\nabla u$ to the function VectorTools::integrate_difference
