@@ -55,7 +55,7 @@ Since $\Delta_S = \nabla_S \cdot \nabla_S$, we deduce
 @f[
 \Delta_S v = \Delta \tilde v - \mathbf n^T \ D^2 \tilde v \ \mathbf n - (\mathbf n \cdot \nabla \tilde v) (\nabla \cdot \mathbf n - \mathbf n^T \ D \mathbf n \ \mathbf n ).
 @f]
-Worth mentioning, the term $\nabla^T \cdot \mathbf n - \mathbf n \ D \mathbf n \ \mathbf n$ appearing in the above expression is the total curvature of the surface (sum of principal curvatures).
+Worth mentioning, the term $\nabla \cdot \mathbf n - \mathbf n \ D \mathbf n \ \mathbf n$ appearing in the above expression is the total curvature of the surface (sum of principal curvatures).
 
 As usual, we are only interested in weak solutions for which we can use $C^0$
 finite elements (rather than requiring $C^1$ continuity as for strong
