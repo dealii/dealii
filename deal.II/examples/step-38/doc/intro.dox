@@ -193,7 +193,7 @@ defined on the manifold, the obvious definition of this error functional is
 $| e |_{H^1(\Gamma)} 
   = | \nabla_\Gamma e |_{L_2(\Gamma)} 
   = \left( \int_\Gamma | \nabla_\Gamma (u-u_h) |^2 \right)^{1/2}$. This requires us to provide the
-<i>tangential</i> gradient to the function VectorTools::integrate_difference
+<i>tangential</i> gradient $\nabla_\Gamma u$ to the function VectorTools::integrate_difference
 (first introduced in step-7), which we
 will do by implementing the function <code>Solution::gradient</code> in the
 program below.
