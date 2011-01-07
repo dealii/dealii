@@ -1833,6 +1833,14 @@ class TriaAccessor<0, 1, spacedim>
     Point<spacedim> & vertex (const unsigned int i = 0) const;
 
 				     /**
+				      * Return the center of this object,
+				      * which of course co-incides with the
+				      * location of the vertex this object
+				      * refers to.
+				      */
+    Point<spacedim> center () const;
+    
+				     /**
 				      * Pointer to the @p ith line
 				      * bounding this object. Will
 				      * point to an invalid object.

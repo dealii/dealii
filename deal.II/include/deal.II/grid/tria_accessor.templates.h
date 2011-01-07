@@ -2143,6 +2143,17 @@ TriaAccessor<0, 1, spacedim>::vertex (const unsigned int i) const
 }
 
 
+
+template <int spacedim>
+inline
+Point<spacedim>
+TriaAccessor<0, 1, spacedim>::center () const
+{
+  return this->tria->vertices[global_vertex_index];
+}
+
+
+
 template <int spacedim>
 inline
 typename internal::Triangulation::Iterators<1,spacedim>::line_iterator
