@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * @warning This class is still experimental and will most likely be
+ * changed in a future release.
+ *
  * A vector of index sets listing the indices of small blocks of a
  * linear system. For each block, the indices in that block are
  * listed.
