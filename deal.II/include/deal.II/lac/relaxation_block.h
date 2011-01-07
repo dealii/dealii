@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * @warning The part of the interface based on BlockList may change in
+ * a future release.
+ *
  * Base class for the implementation of overlapping, multiplicative
  * Schwarz relaxation methods and smoothers.
  *
