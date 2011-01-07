@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,17 +72,24 @@ template <int dim, int spacedim> class MappingQ;
  * <h3>Interpolation</h3>
  *
  * The @ref GlossInterpolation "interpolation" operators associated
- * with the N&eacute;d&eacute;lec element are constructed such that interpolation and
- * computing the curl are commuting operations. We require this
- * from interpolating arbitrary functions as well as the #restriction
- * matrices.
+ * with the N&eacute;d&eacute;lec element are constructed such that
+ * interpolation and computing the curl are commuting operations on
+ * rectangular mesh cells. We require this from interpolating
+ * arbitrary functions as well as the #restriction matrices.
  *
  * <h4>Node values</h4>
  *
- * The @ref GlossNodes "node values" on edges are the moments of the
- * tangential component of the interpolated function with respect to
- * the traces of the N&eacute;d&eacute;lec polynomials. Higher-order N&eacute;d&eacute;lec spaces
- * also have face and interior nodes.
+ * The @ref GlossNodes "node values" for an element of degree <i>k</i>
+ * on the reference cell are:
+ * <ol>
+ * <li> On edges: the moments of the tangential component with respect
+ * to polynomials of degree <i>k</i>.
+ * <li> On faces: the moments of the tangential components with
+ * respect to <tt>dim</tt>-1 dimensional FE_Nedelec
+ * polynomials of degree <i>k</i>-1.
+ * <li> In cells: the moments with respect to gradients of polynomials
+ * in FE_Q of degree <i>k</i>.
+ * </ol>
  *
  * <h4>Generalized support points</h4>
  *
@@ -93,8 +100,8 @@ template <int dim, int spacedim> class MappingQ;
  * QGauss<sub>k+1</sub> on each edge and QGauss<sub>k+2</sub> on each face and in
  * the interior of the cell (or none for N<sub>1</sub>).
  *
- *
- * @author Markus B&uuml;rg, 2009
+ * @author Markus B&uuml;rg
+ * @date 2009, 2010, 2011
  */
 template <int dim>
 class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
