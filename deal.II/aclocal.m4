@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -176,7 +176,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 	dnl sure we're not confused
 	is_pgi="`($CXX -V 2>&1) | grep 'Portland'`"
 
-        if test "x$is_intel_icc" != "x" -a "x$is_pgi" == "x" ; then
+        if test "x$is_intel_icc" != "x" -a "x$is_pgi" = "x" ; then
 	  GXX_BRAND=Intel
 	  version_string="`($CXX -V 2>&1) | grep 'Version'` `($CXX -help 2>&1) | grep 'Version'`"
 	  version5="`echo $version_string | grep 'Version 5'`"
@@ -1188,7 +1188,7 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 	dnl sure we're not confused
 	is_pgi="`($CXX -V 2>&1) | grep 'Portland'`"
 
-        if test "x$is_intel_icc" != "x" -a "x$is_pgi" == "x"; then
+        if test "x$is_intel_icc" != "x" -a "x$is_pgi" = "x"; then
 	  version_string="`($CC -V 2>&1) | grep 'Version'` `($CC -help 2>&1) | grep 'Version'`"
 	  version5="`echo $version_string | grep 'Version 5'`"
 	  version6="`echo $version_string | grep 'Version 6'`"
@@ -6778,7 +6778,7 @@ AC_DEFUN(DEAL_II_WITH_UMFPACK, dnl
     AC_DEFINE(HAVE_LIBUMFPACK,1,[UMFPACK is $1])
   fi
 
-  if test "x$UMFPACK_DIR" != "x" -a "x$acx_umfpack" == "xno" ; then
+  if test "x$UMFPACK_DIR" != "x" -a "x$acx_umfpack" = "xno" ; then
     dnl A pathname has been given to --with-umfpack but nothing
     dnl has been specified through the other two flags
 
