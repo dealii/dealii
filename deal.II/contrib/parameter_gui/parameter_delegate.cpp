@@ -246,7 +246,7 @@ void ParameterDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 
           QComboBox * combo_box = qobject_cast<QComboBox *>(editor);
 
-          for (unsigned int i=0; i<combo_box->count(); ++i)		// we look, which index
+          for (int i=0; i<combo_box->count(); ++i)		// we look, which index
             if (rx.exactMatch(combo_box->itemText(i)))			// the data has and set
               combo_box->setCurrentIndex(i);				// it to the combo_box
         }
