@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1155,6 +1155,52 @@ double contract3 (const Tensor<1,dim>& u,
 
 
 /**
+ * Compute the contraction of three tensors $s=\sum_{i,j,k,l}
+ * a_{ij}b_{ijkl}c_{kl}$.
+ *
+ * @relates Tensor
+ */
+template <int dim>
+inline
+double
+contract3 (const Tensor<2,dim> &t1,
+	   const Tensor<4,dim> &t2,
+	   const Tensor<2,dim> &t3)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  s += t1[i][j] * t2[i][j][k][l] * t3[k][l];
+  return s;
+}
+
+
+/**
+ * Compute the contraction of three tensors $s=\sum_{i,j,k,l}
+ * a_{i}b_{ijk}c_{kl}$.
+ *
+ * @relates Tensor
+ */
+template <int dim>
+inline
+double
+contract3 (const Tensor<1,dim> &t1,
+	   const Tensor<3,dim> &t2,
+	   const Tensor<2,dim> &t3)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	for (unsigned int l=0; l<dim; ++l)
+	  s += t1[i] * t2[i][j][k] * t3[k][l];
+  return s;
+}
+
+
+/**
  * Form the outer product of two tensors of rank 1 and 1, i.e.
  * <tt>dst[i][j] = src1[i] * src2[j]</tt>.
  *
@@ -1331,7 +1377,6 @@ scalar_product (const Tensor<2,dim> &t1,
       s += t1[i][j] * t2[i][j];
   return s;
 }
-
 
 
 /**
