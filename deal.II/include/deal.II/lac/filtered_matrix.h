@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -107,7 +107,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  * While this is a feasible method in cases where only
  * one solution of the linear system is required, for example in
  * solving linear stationary systems, one would often like to have the
- * ability to solve multiply with the same matrix in nonlinear
+ * ability to solve multiple times with the same matrix in nonlinear
  * problems (where one often does not want to update the Hessian
  * between Newton steps, despite having different right hand sides in
  * subsequent steps) or time dependent problems, without having to
