@@ -333,7 +333,6 @@ Tensor<rank_,dim>::operator = (const Tensor<rank_,dim> &t)
 }
 
 
-
 template <int rank_, int dim>
 inline
 Tensor<rank_,dim> &
@@ -345,7 +344,6 @@ Tensor<rank_,dim>::operator = (const double d)
     subtensor[i] = 0;
   return *this;
 }
-
 
 
 template <int rank_, int dim>
@@ -454,14 +452,12 @@ Tensor<rank_,dim>::operator - () const
 }
 
 
-
 template <int rank_, int dim>
 inline
 double Tensor<rank_,dim>::norm () const
 {
   return std::sqrt (norm_square());
 }
-
 
 
 template <int rank_, int dim>
@@ -476,7 +472,6 @@ double Tensor<rank_,dim>::norm_square () const
 }
 
 
-
 template <int rank_, int dim>
 inline
 void Tensor<rank_,dim>::clear ()
@@ -486,7 +481,6 @@ void Tensor<rank_,dim>::clear ()
 }
 
 
-
 template <int rank_, int dim>
 inline
 unsigned int
@@ -494,6 +488,7 @@ Tensor<rank_,dim>::memory_consumption ()
 {
   return sizeof(Tensor<rank_,dim>);
 }
+
 
 template <int rank_, int dim>
 template <class Archive>
@@ -564,7 +559,6 @@ double contract (const Tensor<1,dim> &src1,
 }
 
 
-
 /**
  * Multiplication operator performing a contraction of the last index
  * of the first argument and the first index of the second
@@ -591,7 +585,6 @@ operator * (const Tensor<1,dim> &src1,
 }
 
 
-
 /**
  * Contract a tensor of rank 2 with a tensor of rank 1. The result is
  * <tt>dest[i] = sum_j src1[i][j] src2[j]</tt>.
@@ -610,7 +603,6 @@ void contract (Tensor<1,dim>       &dest,
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[i][j] * src2[j];
 }
-
 
 
 /**
@@ -642,7 +634,6 @@ operator * (const Tensor<2,dim> &src1,
 }
 
 
-
 /**
  * Contract a tensor of rank 1 with a tensor of rank 2. The result is
  * <tt>dest[i] = sum_j src1[j] src2[j][i]</tt>.
@@ -661,7 +652,6 @@ void contract (Tensor<1,dim>       &dest,
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[j] * src2[j][i];
 }
-
 
 
 /**
@@ -694,7 +684,6 @@ operator * (const Tensor<1,dim> &src1,
 }
 
 
-
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The result is
  * <tt>dest[i][k] = sum_j src1[i][j] src2[j][k]</tt>.
@@ -714,7 +703,6 @@ void contract (Tensor<2,dim>       &dest,
       for (unsigned int k=0; k<dim; ++k)
 	dest[i][j] += src1[i][k] * src2[k][j];
 }
-
 
 
 /**
@@ -746,7 +734,6 @@ operator * (const Tensor<2,dim> &src1,
 	dest[i][j] += src1[i][k] * src2[k][j];
   return dest;
 }
-
 
 
 /**
@@ -822,7 +809,6 @@ void contract (Tensor<2,dim>       &dest,
 }
 
 
-
 /**
  * Contract a tensor of rank 3 with a tensor of rank 1. The
  * contraction is performed over index <tt>index1</tt> of the first
@@ -872,7 +858,6 @@ void contract (Tensor<2,dim>       &dest,
 }
 
 
-
 /**
  * Contract a tensor of rank 3 with a tensor of rank 2. The result is
  * <tt>dest[i][j][l] = sum_k src1[i][j][k] src2[k][l]</tt>.
@@ -893,7 +878,6 @@ void contract (Tensor<3,dim>       &dest,
 	for (unsigned int l=0; l<dim; ++l)
 	  dest[i][j][k] += src1[i][j][l] * src2[l][k];
 }
-
 
 
 /**
@@ -994,7 +978,6 @@ void contract (Tensor<3,dim>       &dest,
     }
 }
 
-
    
 /**
  * Multiplication operator performing a contraction of the last index
@@ -1028,7 +1011,6 @@ operator * (const Tensor<3,dim> &src1,
 }
 
 
-
 /**
  * Contract a tensor of rank 2 with a tensor of rank 3. The result is
  * <tt>dest[i][j][l] = sum_k src1[i][k] src2[k][j][l]</tt>.
@@ -1049,7 +1031,6 @@ void contract (Tensor<3,dim>       &dest,
 	for (unsigned int l=0; l<dim; ++l)
 	  dest[i][j][k] += src1[i][l] * src2[l][j][k];
 }
-
 
 
 /**
@@ -1131,7 +1112,6 @@ void double_contract (Tensor<2,dim>       &dest,
 }
 
 
-
 /**
  * Contract three tensors, corresponding to the matrix vector product
  * <i>u<sup>T</sup> A v</i>.
@@ -1155,10 +1135,57 @@ double contract3 (const Tensor<1,dim>& u,
 
 
 /**
+ * Compute the contraction of three tensors $s=\sum_{i,j,k}
+ * a_{i}b_{ijk}c_{jk}$.
+ *
+ * @relates Tensor
+ * @author Toby D. Young, 2011
+ */
+template <int dim>
+inline
+double
+contract3 (const Tensor<1,dim> &t1,
+	   const Tensor<3,dim> &t2,
+	   const Tensor<2,dim> &t3)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	  s += t1[i] * t2[i][j][k] * t3[j][k];
+  return s;
+}
+
+
+/**
+ * Compute the contraction of three tensors $s=\sum_{i,j,k}
+ * a_{ij}b_{ijk}c_{k}$.
+ *
+ * @relates Tensor
+ * @author Toby D. Young, 2011
+ */
+template <int dim>
+inline
+double
+contract3 (const Tensor<2,dim> &t1,
+	   const Tensor<3,dim> &t2,
+	   const Tensor<1,dim> &t3)
+{
+  double s = 0;
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	  s += t1[i][j] * t2[i][j][k] * t3[k];
+  return s;
+}
+
+
+/**
  * Compute the contraction of three tensors $s=\sum_{i,j,k,l}
  * a_{ij}b_{ijkl}c_{kl}$.
  *
  * @relates Tensor
+ * @author Toby D. Young, 2011
  */
 template <int dim>
 inline
@@ -1173,29 +1200,6 @@ contract3 (const Tensor<2,dim> &t1,
       for (unsigned int k=0; k<dim; ++k)
 	for (unsigned int l=0; l<dim; ++l)
 	  s += t1[i][j] * t2[i][j][k][l] * t3[k][l];
-  return s;
-}
-
-
-/**
- * Compute the contraction of three tensors $s=\sum_{i,j,k,l}
- * a_{i}b_{ijk}c_{kl}$.
- *
- * @relates Tensor
- */
-template <int dim>
-inline
-double
-contract3 (const Tensor<1,dim> &t1,
-	   const Tensor<3,dim> &t2,
-	   const Tensor<2,dim> &t3)
-{
-  double s = 0;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-	for (unsigned int l=0; l<dim; ++l)
-	  s += t1[i] * t2[i][j][k] * t3[k][l];
   return s;
 }
 
@@ -1218,7 +1222,6 @@ void outer_product (Tensor<2,dim>       &dst,
 }
 
 
-
 /**
  * Form the outer product of two tensors of rank 1 and 2, i.e.
  * <tt>dst[i][j][k] = src1[i] * src2[j][k]</tt>.
@@ -1238,7 +1241,6 @@ void outer_product (Tensor<3,dim>       &dst,
 }
 
 
-
 /**
  * Form the outer product of two tensors of rank 2 and 1, i.e.
  * <tt>dst[i][j][k] = src1[i][j] * src2[k]</tt>.
@@ -1256,7 +1258,6 @@ void outer_product (Tensor<3,dim>       &dst,
       for (unsigned int k=0; k<dim; ++k)
 	dst[i][j][k] = src1[i][j] * src2[k];
 }
-
 
 
 /**
@@ -1302,7 +1303,6 @@ void outer_product (Tensor<1,dim>       &dst,
 }
 
 
-
 /**
  * Cross-product in 2d. This is just a rotation by 90 degrees
  * clockwise to compute the outer normal from a tangential
@@ -1328,7 +1328,6 @@ cross_product (Tensor<1,dim>       &dst,
 }
 
 
-
 /**
  * Cross-product of 2 vectors in 3d. This function is defined for all
  * space dimensions to allow for dimension independent programming
@@ -1352,7 +1351,6 @@ cross_product (Tensor<1,dim>       &dst,
   dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
   dst[2] = src1[0]*src2[1] - src1[1]*src2[0];
 }
-
 
 
 /**
@@ -1411,7 +1409,6 @@ double determinant (const Tensor<1,1> &t)
 }
 
 
-
 /**
  * Compute the determinant of a tensor of rank two and dimension
  * one. Since this is a number, the return value is, of course, the
@@ -1442,8 +1439,6 @@ double determinant (const Tensor<2,2> &t)
 }
 
 
-
-
 /**
  * Compute the determinant of a tensor or rank 2, here for <tt>dim==3</tt>.
  *
@@ -1466,7 +1461,6 @@ double determinant (const Tensor<2,3> &t)
 	   +t[2][0]*t[0][1]*t[1][2]
 	   -t[2][0]*t[0][2]*t[1][1] );
 }
-
 
 
 /**
