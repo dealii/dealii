@@ -31,7 +31,7 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> Extended: <code>base/tensor.h</code> has an additional collection of contractions between three tensors <i>ie</i>. <code>contract3</code>). This can be useful for writing matrix/vector assembly in a more compact form than before.<br>
+<li> Extended: <code>base/tensor.h</code> has an additional collection of contractions between three tensors (<i>ie</i>. <code>contract3</code>). This can be useful for writing matrix/vector assembly in a more compact form than before.<br>
 (Toby D. Young, 2011/01/12)
 </ol>
 

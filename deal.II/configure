@@ -18847,6 +18847,7 @@ else
 $as_echo "no" >&6; }
 fi
 
+subdirs="$subdirs contrib tests"
 
 
       DEAL_II_QT_VERSION="`($QMAKE --version 2>&1) | grep -i version | grep -i qt | perl -pi -e 's/.*(\d+)\.(\d+)\.(\d+).*/\1.\2/g;'`"
@@ -18865,6 +18866,10 @@ fi
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
+$as_echo "" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ---------------- generating output --------------------------" >&5
+$as_echo "---------------- generating output --------------------------" >&6; }
 
 
 
