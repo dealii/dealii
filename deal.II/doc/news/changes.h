@@ -31,7 +31,19 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> Extended: <code>base/tensor.h</code> has an additional collection of contractions between three tensors (<i>ie</i>. <code>contract3</code>). This can be useful for writing matrix/vector assembly in a more compact form than before.<br>
+<li> Fixed: Boundary conditions in the step-23 tutorial program are now 
+applied correctly. Matrix columns get eliminated with the used method
+and introduce some contribution to the right hand side coming from
+inhomogeneous boundary values. The old implementation did not reset the
+matrix columns before applying new boundary values.<br>
+(Martin Stoll, Martin Kronbichler, 2011/01/14)
+</ol>
+
+<ol>
+<li> Extended: <code>base/tensor.h</code> has an additional collection of
+contractions between three tensors (<i>ie</i>. <code>contract3</code>).
+This can be useful for writing matrix/vector assembly in a more compact
+form than before.<br>
 (Toby D. Young, 2011/01/12)
 </ol>
 

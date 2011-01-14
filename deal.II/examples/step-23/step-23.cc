@@ -116,28 +116,31 @@ using namespace dealii;
 
 				 // @sect3{The <code>WaveEquation</code> class}
 
-				 // Next comes the declaration of the
-				 // main class. It's public interface
-				 // of functions is like in most of
-				 // the other tutorial programs. Worth
-				 // mentioning is that we now have to
-				 // store three matrices instead of
-				 // one: the mass matrix $M$, the
-				 // Laplace matrix $A$, and the system
-				 // matrix $M+k^2\theta^2A$ used when
-				 // solving for $U^n$. Likewise, we
-				 // need solution vectors for
-				 // $U^n,V^n$ as well as for the
-				 // corresponding vectors at the
-				 // previous time step,
+				 // Next comes the declaration of the main
+				 // class. It's public interface of functions
+				 // is like in most of the other tutorial
+				 // programs. Worth mentioning is that we now
+				 // have to store four matrices instead of
+				 // one: the mass matrix $M$, the Laplace
+				 // matrix $A$, the matrix $M+k^2\theta^2A$
+				 // used for solving for $U^n$, and a copy of
+				 // the mass matrix with boundary conditions
+				 // applied used for solving for $V^n$. Note
+				 // that it is a bit wasteful to have an
+				 // additional copy of the mass matrix
+				 // around. We will discuss strategies for how
+				 // to avoid this in the section on possible
+				 // improvements.
+				 // 
+				 // Likewise, we need solution vectors for
+				 // $U^n,V^n$ as well as for the corresponding
+				 // vectors at the previous time step,
 				 // $U^{n-1},V^{n-1}$. The
-				 // <code>system_rhs</code> will be
-				 // used for whatever right hand side
-				 // vector we have when solving one of
-				 // the two linear systems in each
-				 // time step. These will be solved in
-				 // the two functions
-				 // <code>solve_u</code> and
+				 // <code>system_rhs</code> will be used for
+				 // whatever right hand side vector we have
+				 // when solving one of the two linear systems
+				 // in each time step. These will be solved in
+				 // the two functions <code>solve_u</code> and
 				 // <code>solve_v</code>.
 				 //
 				 // Finally, the variable
@@ -167,9 +170,10 @@ class WaveEquation
     ConstraintMatrix constraints;
     
     SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
+    SparseMatrix<double> matrix_u;
+    SparseMatrix<double> matrix_v;
 
     Vector<double>       solution_u, solution_v;
     Vector<double>       old_solution_u, old_solution_v;
@@ -420,36 +424,30 @@ void WaveEquation<dim>::setup_system ()
 				   // memory on it several times.
 				   //
 				   // After initializing all of these
-				   // matrices, we call library
-				   // functions that build the Laplace
-				   // and mass matrices. All they need
-				   // is a DoFHandler object and a
-				   // quadrature formula object that
-				   // is to be used for numerical
-				   // integration. Note that in many
-				   // respects these functions are
-				   // better than what we would
-				   // usually do in application
-				   // programs, for example because
-				   // they automatically parallelize
-				   // building the matrices if
-				   // multiple processors are
-				   // available in a machine. When we
-				   // have both of these matrices, we
-				   // form the third one by copying
-				   // and adding the first two in
-				   // appropriate multiples:
-  system_matrix.reinit (sparsity_pattern);
+				   // matrices, we call library functions that
+				   // build the Laplace and mass matrices. All
+				   // they need is a DoFHandler object and a
+				   // quadrature formula object that is to be
+				   // used for numerical integration. Note
+				   // that in many respects these functions
+				   // are better than what we would usually do
+				   // in application programs, for example
+				   // because they automatically parallelize
+				   // building the matrices if multiple
+				   // processors are available in a
+				   // machine. The matrices for solving linear
+				   // systems will be filled in the run()
+				   // method because we need to re-apply
+				   // boundary conditions every time step.
   mass_matrix.reinit (sparsity_pattern);
   laplace_matrix.reinit (sparsity_pattern);
+  matrix_u.reinit (sparsity_pattern);
+  matrix_v.reinit (sparsity_pattern);
 
   MatrixCreator::create_mass_matrix (dof_handler, QGauss<dim>(3),
 				     mass_matrix);
   MatrixCreator::create_laplace_matrix (dof_handler, QGauss<dim>(3),
 					laplace_matrix);
-  
-  system_matrix.copy_from (mass_matrix);
-  system_matrix.add (theta * theta * time_step * time_step, laplace_matrix);
 
 				   // The rest of the function is spent on
 				   // setting vector sizes to the correct
@@ -498,7 +496,7 @@ void WaveEquation<dim>::solve_u ()
   SolverControl           solver_control (1000, 1e-8*system_rhs.l2_norm());
   SolverCG<>              cg (solver_control);
 
-  cg.solve (system_matrix, solution_u, system_rhs,
+  cg.solve (matrix_u, solution_u, system_rhs,
 	    PreconditionIdentity());
 
   std::cout << "   u-equation: " << solver_control.last_step()
@@ -513,7 +511,7 @@ void WaveEquation<dim>::solve_v ()
   SolverControl           solver_control (1000, 1e-8*system_rhs.l2_norm());
   SolverCG<>              cg (solver_control);
 
-  cg.solve (mass_matrix, solution_v, system_rhs,
+  cg.solve (matrix_v, solution_v, system_rhs,
 	    PreconditionIdentity());
 
   std::cout << "   v-equation: " << solver_control.last_step()
@@ -676,26 +674,42 @@ void WaveEquation<dim>::run ()
 						  0,
 						  boundary_values_u_function,
 						  boundary_values);
+
+				   // The matrix for solve_u() is the same in
+				   // every time steps, so one could think
+				   // that it is enough to do this only once
+				   // at the beginning of the
+				   // simulation. However, since we need to
+				   // apply boundary values to the linear
+				   // system (which eliminate some matrix rows
+				   // and columns and give contributions to
+				   // the right hand side), we have to refill
+				   // the matrix in every time steps before we
+				   // actually apply boundary data. The actual
+				   // content is very simple: it is the sum of
+				   // the mass matrix and a weighted Laplace
+				   // matrix:
+  	matrix_u.copy_from (mass_matrix);
+	matrix_u.add (theta * theta * time_step * time_step, laplace_matrix);
 	MatrixTools::apply_boundary_values (boundary_values,
-					    system_matrix,
+					    matrix_u,
 					    solution_u,
 					    system_rhs);
       }
       solve_u ();
 
 
-				       // The second step,
-				       // i.e. solving for $V^n$,
-				       // works similarly, except that
-				       // this time the matrix on the
-				       // left is the mass matrix, and
-				       // the right hand side is
-				       // $MV^{n-1} - k\left[ \theta A
-				       // U^n + (1-\theta)
-				       // AU^{n-1}\right]$ plus
-				       // forcing terms. %Boundary
-				       // values are applied in the
-				       // same way as before, except
+				       // The second step, i.e. solving for
+				       // $V^n$, works similarly, except that
+				       // this time the matrix on the left is
+				       // the mass matrix (which we copy again
+				       // in order to be able to apply
+				       // boundary conditions, and the right
+				       // hand side is $MV^{n-1} - k\left[
+				       // \theta A U^n + (1-\theta)
+				       // AU^{n-1}\right]$ plus forcing
+				       // terms. %Boundary values are applied
+				       // in the same way as before, except
 				       // that now we have to use the
 				       // BoundaryValuesV class:
       laplace_matrix.vmult (system_rhs, solution_u);
@@ -718,8 +732,9 @@ void WaveEquation<dim>::run ()
 						  0,
 						  boundary_values_v_function,
 						  boundary_values);
+	matrix_v.copy_from (mass_matrix);
 	MatrixTools::apply_boundary_values (boundary_values,
-					    mass_matrix,
+					    matrix_v,
 					    solution_v,
 					    system_rhs);
       }

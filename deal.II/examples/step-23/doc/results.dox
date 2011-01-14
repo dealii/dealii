@@ -8,53 +8,53 @@ Number of degrees of freedom: 16641
 Time step 1 at t=0.015625
    u-equation: 8 CG iterations.
    v-equation: 22 CG iterations.
-   Total energy: 0.982265
+   Total energy: 1.17887
 Time step 2 at t=0.03125
    u-equation: 8 CG iterations.
-   v-equation: 23 CG iterations.
-   Total energy: 4.10195
+   v-equation: 20 CG iterations.
+   Total energy: 2.9655
 Time step 3 at t=0.046875
    u-equation: 8 CG iterations.
-   v-equation: 20 CG iterations.
-   Total energy: 6.95484
-Time step 4 at t=0.0625
-   u-equation: 8 CG iterations.
    v-equation: 21 CG iterations.
-   Total energy: 7.92609
+   Total energy: 4.33761
+Time step 4 at t=0.0625
+   u-equation: 7 CG iterations.
+   v-equation: 21 CG iterations.
+   Total energy: 5.35499
 Time step 5 at t=0.078125
    u-equation: 7 CG iterations.
-   v-equation: 22 CG iterations.
-   Total energy: 8.9877
-Time step 6 at t=0.09375
-   u-equation: 8 CG iterations.
    v-equation: 21 CG iterations.
-   Total energy: 10.1318
+   Total energy: 6.18652
+Time step 6 at t=0.09375
+   u-equation: 7 CG iterations.
+   v-equation: 20 CG iterations.
+   Total energy: 6.6799
 
 ...
 
 Time step 31 at t=0.484375
    u-equation: 7 CG iterations.
-   v-equation: 21 CG iterations.
-   Total energy: 21.6306
+   v-equation: 20 CG iterations.
+   Total energy: 21.9068
 Time step 32 at t=0.5
    u-equation: 7 CG iterations.
-   v-equation: 21 CG iterations.
-   Total energy: 23.417
+   v-equation: 20 CG iterations.
+   Total energy: 23.3394
 Time step 33 at t=0.515625
    u-equation: 7 CG iterations.
-   v-equation: 21 CG iterations.
-   Total energy: 23.2328
+   v-equation: 20 CG iterations.
+   Total energy: 23.1019
 
 ...
 
 Time step 319 at t=4.98438
    u-equation: 7 CG iterations.
-   v-equation: 21 CG iterations.
-  Total energy: 23.2328
+   v-equation: 20 CG iterations.
+   Total energy: 23.1019
 Time step 320 at t=5
    u-equation: 7 CG iterations.
-   v-equation: 21 CG iterations.
-  Total energy: 23.2328
+   v-equation: 20 CG iterations.
+   Total energy: 23.1019
 @endcode
 
 What we see immediately is that the energy is a constant at least after
@@ -108,4 +108,17 @@ If you want to explore a bit, try out some of the following things:
   be used to pass non-constant coefficient functions to them. The required
   changes are therefore relatively small. On the other hand, care must be
   taken again to make sure the time step is within the allowed range.
+
+  <li>In the in-code comments, we discussed the fact that the matrices for
+  solving for $U^n$ and $V^n$ need to be reset in every time because of
+  boundary conditions, even though the actual content does not change. It is
+  possible to avoid copying by not eliminating columns in the linear systems,
+  which is implemented by appending a @p false argument to the call:
+  @code
+    MatrixTools::apply_boundary_values (boundary_values,
+    					matrix_u,
+					solution_u,
+					system_rhs,
+					false);
+  @endcode 
 </ul>
