@@ -147,9 +147,11 @@ $(example-doxygen):
 	@echo "@endhtmlonly" >> $@
 	@cat $D/examples/$(call get_basename, $@)/doc/intro.dox \
 		| $(PERL) create_anchors >> $@
+	@echo >> $@
 	@cat generated/$(call get_basename, $@)_prog.dox >> $@
 	@cat $D/examples/$(call get_basename, $@)/doc/results.dox \
 		| $(PERL) create_anchors >> $@
+	@echo >> $@
 	@echo " <a name=\"PlainProg\"></a>" >> $@
 	@echo " <h1> The plain program</h1>" >> $@
 	@echo " @include \"$(call get_basename, $@).cc\"" >> $@
