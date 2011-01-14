@@ -1,7 +1,7 @@
 
 DEAL::Size 32 Unknowns 961
-DEAL::Solver type: N6dealii13PETScWrappers10SolverLSQRE
-DEAL::Starting value 31.00
-DEAL::Failure step 100 value 24.01
-DEAL::Iterative method reported convergence failure in step 100 with residual 24.0098
-DEAL::Solver stopped after 100 iterations
+DEAL::Solver type: N6dealii13PETScWrappers13SolverPreOnlyE
+DEAL::Convergence step 1 value 0
+DEAL::Solver stopped after 1 iterations
+DEAL::Solver type: N6dealii13PETScWrappers13SolverPreOnlyE
+DEAL::Solver stopped after 1 iterations
