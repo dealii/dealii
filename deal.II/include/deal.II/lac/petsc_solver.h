@@ -1040,11 +1040,12 @@ namespace PETScWrappers
 
 /**
  * An implementation of the solver interface using the PETSc PREONLY
- * solver. Actually this is NOT a real solution algorithm. Its only
- * purpose is to provide a solver object, when the preconditioner
- * should be used as real solver. It is very useful in conjunction with
- * the complete LU decomposition preconditioner <tt> PreconditionLU </tt>,
- * which in conjunction with this solver class becomes a direct solver.
+ * solver. Actually this is NOT a real solution algorithm. solve() only
+ * applies the preconditioner once and returns immediately. Its only purpose
+ * is to provide a solver object, when the preconditioner should be used as a
+ * real solver. It is very useful in conjunction with the complete LU
+ * decomposition preconditioner <tt> PreconditionLU </tt>, which in
+ * conjunction with this solver class becomes a direct solver.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004, Oliver Kayser-Herold, 2004
