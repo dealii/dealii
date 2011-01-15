@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -115,6 +115,18 @@ for (deal_II_dimension : DIMENSIONS)
       GridTools::partition_triangulation (const unsigned int,
 					  const SparsityPattern &,
 					  Triangulation<deal_II_dimension> &);
+#if deal_II_dimension < 3
+    template
+      void
+      GridTools::partition_triangulation (const unsigned int,
+					  Triangulation<deal_II_dimension,deal_II_dimension+1> &);
+
+    template
+      void
+      GridTools::partition_triangulation (const unsigned int,
+					  const SparsityPattern &,
+					  Triangulation<deal_II_dimension,deal_II_dimension+1> &);
+#endif
 
     template
       void
