@@ -836,6 +836,13 @@ process_files="common/Make.global_options
                common/scripts/make_dependencies.pl
 	       common/scripts/make_todo.pl
 	       Version
+               common/template-arguments"
+
+dnl Also replace stuff in the doc/ files, but we can't rely on
+dnl their presence because we package the .nodoc.tar.gz files
+dnl that omit the entire doc/ directory.
+if test -d doc ; then
+  process_files="${process_files}
                doc/Makefile
 	       doc/title.html
 	       doc/doxygen/Makefile
@@ -843,8 +850,9 @@ process_files="common/Make.global_options
                doc/doxygen/options.136
 	       doc/doxygen/header.html
 	       doc/doxygen/header.136
-               doc/doxygen/header.tex
-               common/template-arguments"
+               doc/doxygen/header.tex"
+fi
+
 AC_CONFIG_FILES([$process_files])
 AC_OUTPUT
 
