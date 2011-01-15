@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -417,6 +417,42 @@ DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension
 (const hp::DoFHandler<deal_II_dimension> &,
  const types::subdomain_id_t,
  std::vector<unsigned int> &);
+
+#if deal_II_dimension < 3
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const types::subdomain_id_t);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const types::subdomain_id_t);
+template
+void
+DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const types::subdomain_id_t,
+ std::vector<unsigned int> &);
+
+template
+unsigned int
+DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const types::subdomain_id_t);
+template
+IndexSet
+DoFTools::dof_indices_with_subdomain_association<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const types::subdomain_id_t);
+template
+void
+DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+ const types::subdomain_id_t,
+ std::vector<unsigned int> &);
+#endif
 
 template
 unsigned int

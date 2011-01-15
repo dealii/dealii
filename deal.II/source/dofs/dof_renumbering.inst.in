@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -133,6 +133,22 @@ for (deal_II_dimension : DIMENSIONS)
    const std::vector<unsigned int>&);
 
 #if deal_II_dimension < 3
+  template
+  void Cuthill_McKee<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+  (DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+   const bool,
+   const bool,
+   const std::vector<unsigned int>&);
+
+  template
+  void
+  compute_Cuthill_McKee<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+  (std::vector<unsigned int>&,
+   const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+   const bool,
+   const bool,
+   const std::vector<unsigned int>&);
+
   template
   void component_wise<deal_II_dimension,deal_II_dimension+1>
   (DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
@@ -358,6 +374,12 @@ for (deal_II_dimension : DIMENSIONS)
   template
   void subdomain_wise<DoFHandler<deal_II_dimension> >
   (DoFHandler<deal_II_dimension> &);
+
+#if deal_II_dimension < 3
+  template
+  void subdomain_wise<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+  (DoFHandler<deal_II_dimension,deal_II_dimension+1> &);
+#endif
 
   template
   void subdomain_wise<hp::DoFHandler<deal_II_dimension> >
