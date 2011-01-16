@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -930,7 +930,7 @@ partition_triangulation (const unsigned int           n_partitions,
                                    // check for an easy return
   if (n_partitions == 1)
     {
-      for (typename Triangulation<dim>::active_cell_iterator
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
              cell = triangulation.begin_active();
            cell != triangulation.end(); ++cell)
         cell->set_subdomain_id (0);
@@ -975,7 +975,7 @@ partition_triangulation (const unsigned int           n_partitions,
                                    // check for an easy return
   if (n_partitions == 1)
     {
-      for (typename Triangulation<dim>::active_cell_iterator
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
              cell = triangulation.begin_active();
            cell != triangulation.end(); ++cell)
         cell->set_subdomain_id (0);
