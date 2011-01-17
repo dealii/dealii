@@ -68,7 +68,6 @@ namespace PETScWrappers
                      const PreconditionerBase &preconditioner)
   {
     int ierr;
-
                                      // first create a solver object if this
                                      // is necessary
     if (solver_data.get() == 0)
@@ -92,10 +91,8 @@ namespace PETScWrappers
                                          // preconditioner
         set_solver_type (solver_data->ksp);
 
-        ierr = KSPGetPC (solver_data->ksp, &solver_data->pc);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        preconditioner.set_preconditioner_type (solver_data->pc);
+	ierr = KSPSetPC (solver_data->ksp, preconditioner.get_pc());
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                          // then a convergence monitor
                                          // function. that function simply

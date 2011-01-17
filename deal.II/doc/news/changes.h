@@ -40,13 +40,22 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Restructured the internals of PETScWrappers::Precondition* to allow a
+PETSc PC object to exist without a solver. New: use Precondition*::vmult() to
+apply the preconditioner once. Preconditioners now have a default constructor
+and an initialize() function and are no longer initialized in the solver call,
+but in the constructor or initialize().
+<br>
+(Timo Heister, 2011/01/17)
+</li>
+
 <li> Fixed: Boundary conditions in the step-23 tutorial program are now
 applied correctly. Matrix columns get eliminated with the used method
 and introduce some contribution to the right hand side coming from
 inhomogeneous boundary values. The old implementation did not reset the
 matrix columns before applying new boundary values.<br>
 (Martin Stoll, Martin Kronbichler, 2011/01/14)
-</ol>
+</li>
 
 <li> Extended: <code>base/tensor.h</code> has an additional collection of
 contractions between three tensors (<i>ie</i>. <code>contract3</code>).

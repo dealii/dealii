@@ -47,31 +47,54 @@ namespace PETScWrappers
  * for parallel jobs, such as for example the ILU preconditioner.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionerBase
   {
     public:
                                        /**
-                                        * Constructor. Take a pointer to the
-                                        * matrix from which the preconditioner
-                                        * shall be constructed.
+                                        * Constructor.
                                         */
-      PreconditionerBase (const MatrixBase &matrix);
+      PreconditionerBase ();
 
                                        /**
                                         * Destructor.
                                         */
       virtual ~PreconditionerBase ();
 
+				       /**
+					* Apply the preconditioner once to the
+					* given src vector.
+					*/
+      void vmult (VectorBase       &dst,
+		  const VectorBase &src) const;
 
+
+				       /**
+					* Gives access to the underlying PETSc
+					* object.
+					*/
+      const PC & get_pc () const;
+      
     protected:
+				       /**
+					* the PETSc preconditioner object
+					*/
+      PC pc;
+      
                                        /**
                                         * A pointer to the matrix that acts as
                                         * a preconditioner.
                                         */
-      const Mat matrix;
+      Mat matrix;
 
+				       /**
+					* Internal function to create the
+					* PETSc preconditioner object. Fails
+					* if called twice.
+					*/
+      void create_pc ();
+      
                                        /**
                                         * Conversion operator to get a
                                         * representation of the matrix that
@@ -81,16 +104,7 @@ namespace PETScWrappers
                                         * the PETSc solvers.
                                         */
       operator Mat () const;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is requested by
-                                        * the derived class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const = 0;
-
+      
                                        /**
                                         * Make the solver class a friend,
                                         * since it needs to call the
@@ -109,7 +123,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionJacobi : public PreconditionerBase
   {
@@ -122,6 +136,14 @@ namespace PETScWrappers
       struct AdditionalData
       {};
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionJacobi ();
+      
+      
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -131,21 +153,26 @@ namespace PETScWrappers
       PreconditionJacobi (const MatrixBase     &matrix,
                           const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+		       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -165,7 +192,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionBlockJacobi : public PreconditionerBase
   {
@@ -177,6 +204,13 @@ namespace PETScWrappers
                                         */
       struct AdditionalData
       {};
+      
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionBlockJacobi ();
 
                                        /**
                                         * Constructor. Take the matrix which
@@ -187,21 +221,26 @@ namespace PETScWrappers
       PreconditionBlockJacobi (const MatrixBase     &matrix,
                                const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+		       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -214,7 +253,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionSOR : public PreconditionerBase
   {
@@ -239,6 +278,13 @@ namespace PETScWrappers
           double omega;
       };
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionSOR ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -248,21 +294,26 @@ namespace PETScWrappers
       PreconditionSOR (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -275,7 +326,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionSSOR : public PreconditionerBase
   {
@@ -300,6 +351,13 @@ namespace PETScWrappers
           double omega;
       };
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionSSOR ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -309,21 +367,26 @@ namespace PETScWrappers
       PreconditionSSOR (const MatrixBase     &matrix,
                         const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -336,7 +399,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionEisenstat : public PreconditionerBase
   {
@@ -361,6 +424,13 @@ namespace PETScWrappers
           double omega;
       };
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionEisenstat ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -370,21 +440,26 @@ namespace PETScWrappers
       PreconditionEisenstat (const MatrixBase     &matrix,
                              const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -397,7 +472,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionICC : public PreconditionerBase
   {
@@ -422,6 +497,13 @@ namespace PETScWrappers
           unsigned int levels;
       };
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionICC ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -431,21 +513,26 @@ namespace PETScWrappers
       PreconditionICC (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -458,7 +545,7 @@ namespace PETScWrappers
  * preconditioner may or may not work.
  *
  * @ingroup PETScWrappers
- * @author Wolfgang Bangerth, 2004
+ * @author Wolfgang Bangerth, Timo Heister, 2004, 2011
  */
   class PreconditionILU : public PreconditionerBase
   {
@@ -483,6 +570,13 @@ namespace PETScWrappers
           unsigned int levels;
       };
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionILU ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -492,21 +586,26 @@ namespace PETScWrappers
       PreconditionILU (const MatrixBase     &matrix,
                        const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -568,6 +667,13 @@ namespace PETScWrappers
 	  double damping;
       };
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionLU ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -577,21 +683,26 @@ namespace PETScWrappers
       PreconditionLU (const MatrixBase     &matrix,
 		      const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 
 
@@ -696,6 +807,13 @@ namespace PETScWrappers
 
 
 
+				       /**
+					* Empty Constructor. You need to call
+					* initialize() before using this
+					* object.
+					*/
+      PreconditionBoomerAMG ();
+
                                        /**
                                         * Constructor. Take the matrix which
                                         * is used to form the preconditioner,
@@ -705,21 +823,26 @@ namespace PETScWrappers
       PreconditionBoomerAMG (const MatrixBase     &matrix,
 			     const AdditionalData &additional_data = AdditionalData());
 
+				       /**
+					* Initializes the preconditioner
+					* object and calculate all data that
+					* is necessary for applying it in a
+					* solver. This function is
+					* automatically called when calling
+					* the constructor with the same
+					* arguments and is only used if you
+					* create the preconditioner without
+					* arguments.
+					*/
+      void initialize (const MatrixBase     &matrix,
+                       const AdditionalData &additional_data = AdditionalData());
+
     protected:
                                        /**
                                         * Store a copy of the flags for this
                                         * particular preconditioner.
                                         */
-      const AdditionalData additional_data;
-
-                                       /**
-                                        * Function that takes a Krylov
-                                        * Subspace Preconditioner context
-                                        * object, and sets the type of
-                                        * preconditioner that is appropriate
-                                        * for the present class.
-                                        */
-      virtual void set_preconditioner_type (PC &pc) const;
+      AdditionalData additional_data;
   };
 }
 

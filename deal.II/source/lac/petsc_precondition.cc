@@ -19,6 +19,7 @@
 #  include <base/utilities.h>
 #  include <lac/petsc_matrix_base.h>
 #  include <lac/petsc_vector_base.h>
+#  include <lac/petsc_solver.h>
 #  include <petscconf.h>
 #  include <cmath>
 
@@ -26,18 +27,64 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  PreconditionerBase::PreconditionerBase (const MatrixBase &matrix)
-                  :
-                  matrix (matrix)
+  PreconditionerBase::PreconditionerBase ()
+		  :
+		  pc(NULL), matrix(NULL)
   {}
-
 
 
   PreconditionerBase::~PreconditionerBase ()
-  {}
+  {
+    if (pc!=NULL)
+      {
+	int ierr = PCDestroy(pc);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+      }
+  }
+  
+  
+  void
+  PreconditionerBase::vmult (VectorBase       &dst,
+			     const VectorBase &src) const
+  {
+    AssertThrow (pc != NULL, StandardExceptions::ExcInvalidState ());
+
+    int ierr;
+    ierr = PCApply(pc, src, dst);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }  
+
+  
+  void
+  PreconditionerBase::create_pc ()
+  {
+				     // only allow the creation of the
+				     // preconditioner once
+    AssertThrow (pc == NULL, StandardExceptions::ExcInvalidState ());
+    
+    MPI_Comm comm;
+    int ierr;
+				     // this ugly cast is necessay because the
+				     // type Mat and PETScObject are
+				     // unrelated.
+    ierr = PetscObjectGetComm(reinterpret_cast<PetscObject>(matrix), &comm);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    ierr = PCCreate(comm, &pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetOperators(pc , matrix, matrix, SAME_PRECONDITIONER);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
 
 
+  const PC &
+  PreconditionerBase::get_pc () const
+  {
+    return pc;
+  }
 
+  
   PreconditionerBase::operator Mat () const
   {
     return matrix;
@@ -46,51 +93,68 @@ namespace PETScWrappers
 
 /* ----------------- PreconditionJacobi -------------------- */
 
-
+  PreconditionJacobi::PreconditionJacobi ()
+  {}
+  
+    
   PreconditionJacobi::PreconditionJacobi (const MatrixBase     &matrix,
                                           const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionJacobi::set_preconditioner_type (PC &pc) const
+  PreconditionJacobi::initialize (const MatrixBase     &matrix_,
+				  const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+    
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
-/* ----------------- PreconditionJacobi -------------------- */
+/* ----------------- PreconditionBlockJacobi -------------------- */
 
-
+  PreconditionBlockJacobi::PreconditionBlockJacobi ()
+  {}
+  
+    
   PreconditionBlockJacobi::
   PreconditionBlockJacobi (const MatrixBase     &matrix,
                            const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
-
+  {
+    initialize(matrix, additional_data);    
+  }
 
   void
-  PreconditionBlockJacobi::set_preconditioner_type (PC &pc) const
+  PreconditionBlockJacobi::initialize (const MatrixBase     &matrix_,
+				       const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCBJACOBI));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -104,20 +168,26 @@ namespace PETScWrappers
   {}
 
 
+  PreconditionSOR::PreconditionSOR ()
+  {}
+  
 
   PreconditionSOR::PreconditionSOR (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionSOR::set_preconditioner_type (PC &pc) const
+  PreconditionSOR::initialize (const MatrixBase     &matrix_,
+			       const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -127,6 +197,9 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -139,21 +212,27 @@ namespace PETScWrappers
                   omega (omega)
   {}
 
+  
+  PreconditionSSOR::PreconditionSSOR ()
+  {}
 
 
   PreconditionSSOR::PreconditionSSOR (const MatrixBase     &matrix,
                                       const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionSSOR::set_preconditioner_type (PC &pc) const
+  PreconditionSSOR::initialize (const MatrixBase     &matrix_,
+				const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCSOR));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -168,6 +247,9 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -180,20 +262,26 @@ namespace PETScWrappers
   {}
 
 
+  PreconditionEisenstat::PreconditionEisenstat ()
+  {}
+  
 
   PreconditionEisenstat::PreconditionEisenstat (const MatrixBase     &matrix,
                                                 const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionEisenstat::set_preconditioner_type (PC &pc) const
+  PreconditionEisenstat::initialize (const MatrixBase     &matrix_,
+				     const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCEISENSTAT));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -203,6 +291,9 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -217,20 +308,26 @@ namespace PETScWrappers
   {}
 
 
+  PreconditionICC::PreconditionICC ()
+  {}
 
+  
   PreconditionICC::PreconditionICC (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionICC::set_preconditioner_type (PC &pc) const
+  PreconditionICC::initialize (const MatrixBase     &matrix_,
+			       const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCICC));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -245,6 +342,9 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
 
@@ -257,20 +357,26 @@ namespace PETScWrappers
   {}
 
 
+  PreconditionILU::PreconditionILU ()
+  {}
+  
 
   PreconditionILU::PreconditionILU (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionILU::set_preconditioner_type (PC &pc) const
+  PreconditionILU::initialize (const MatrixBase     &matrix_,
+			       const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCILU));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -284,6 +390,9 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -306,20 +415,27 @@ namespace PETScWrappers
   {}
 
 
+  PreconditionBoomerAMG::PreconditionBoomerAMG ()
+  {}
+
+  
   PreconditionBoomerAMG::PreconditionBoomerAMG (const MatrixBase     &matrix,
 						const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionBoomerAMG::set_preconditioner_type (PC &pc) const
+  PreconditionBoomerAMG::initialize (const MatrixBase     &matrix_,
+				     const AdditionalData &additional_data_)
   {
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+
 #ifdef PETSC_HAVE_HYPRE
-                                     // set the right type for the
-                                     // preconditioner
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCHYPRE));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -358,6 +474,10 @@ namespace PETScWrappers
 
     ierr = PCSetFromOptions (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
 #else // PETSC_HAVE_HYPRE
     (void)pc;
     Assert (false,
@@ -380,20 +500,26 @@ namespace PETScWrappers
   {}
 
 
+  PreconditionLU::PreconditionLU ()
+  {}
 
+  
   PreconditionLU::PreconditionLU (const MatrixBase     &matrix,
 				  const AdditionalData &additional_data)
-                  :
-                  PreconditionerBase (matrix),
-                  additional_data (additional_data)
-  {}
+  {
+    initialize(matrix, additional_data);    
+  }
 
 
   void
-  PreconditionLU::set_preconditioner_type (PC &pc) const
+  PreconditionLU::initialize (const MatrixBase     &matrix_,
+			      const AdditionalData &additional_data_)
   {
-                                     // set the right type for the
-                                     // preconditioner
+    matrix = static_cast<Mat>(matrix_);
+    additional_data = additional_data_;
+    
+    create_pc();
+
     int ierr;
     ierr = PCSetType (pc, const_cast<char *>(PCLU));
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -426,6 +552,9 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     ierr = PCSetFromOptions (pc);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp (pc);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
