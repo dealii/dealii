@@ -29,6 +29,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: At the bottom of the page of tutorial programs we show a "plain"
+version of the tutorial program. However, the script that generates this plain
+version was broken and sometimes truncated the file. This
+should be fixed now.
+<br>
+(Wolfgang Bangerth, 2011/01/18)
+
 <li> Extended: Several missing instantiations of functions for triangulations and DoF handlers embedded in higher dimensional space have been added.
 <br>
 (Wolfgang Bangerth, 2011/01/15)
