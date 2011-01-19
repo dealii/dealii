@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2010 by the deal.II authors
+#    Copyright (C) 2010, 2011 by the deal.II authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -17,33 +17,10 @@
 
 my $block_comment = 0;
 while (<>) {
-    # Eliminate comment lines
+    # Eliminate //-comment lines
     next if (m!^\s*//!);
-    if (s!^\s*/\*.*\*/!!g)
-    {
-	print unless (m/^\s*$/);
-	next;
-    }    
-    #Find begin of block comment
-    if (s!/\*.*!!)
-    {
-	$block_comment = 1;
-	# Print unless empty
-	print unless m/^\s*$/;
-	next;
-    }
-    
-    # Find end of block comment
-    if ($block_comment != 0)
-    {
-	if (s!.*\*/!!)
-	{
-	    $block_comment = 0;
-            # Print unless empty
-	    print unless m/^\s*$/;
-	}
-	next;
-    }
+
+    # Otherwise print the line
     print;
 }	
 
