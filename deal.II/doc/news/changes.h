@@ -47,7 +47,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Restructured the internals of PETScWrappers::Precondition* to allow a
+<li> Fixed: When calling DataOut::build_patches with a mapping, requesting more
+than one subdivision, and when <code>dim@<spacedim</code>, then some cells
+were not properly mapped. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/01/18)
+</li>
+
+<li> New: Restructured the internals of PETScWrappers::Precondition* to allow a
 PETSc PC object to exist without a solver. New: use Precondition*::vmult() to
 apply the preconditioner once. Preconditioners now have a default constructor
 and an initialize() function and are no longer initialized in the solver call,

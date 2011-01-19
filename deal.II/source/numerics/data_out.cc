@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -708,14 +708,22 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 				       // of curved cells, if necessary
 				       // append the quadrature points to
 				       // the last rows of the patch.data
-				       // member. THis is the case if we
+				       // member. This is the case if we
 				       // want to produce curved cells at
 				       // the boundary and this cell
 				       // actually is at the boundary, or
 				       // else if we want to produce curved
 				       // cells everywhere
-      if (curved_cell_region==curved_inner_cells ||
-	  (curved_cell_region==curved_boundary && cell_and_index->first->at_boundary()))
+				       //
+				       // note: a cell is *always* at
+				       // the boundary if dim<spacedim
+      if (curved_cell_region==curved_inner_cells
+	  ||
+	  (curved_cell_region==curved_boundary
+	   &&
+	   (cell_and_index->first->at_boundary()
+	    ||
+	    (DH::dimension != DH::space_dimension))))
 	{
 	  Assert(patch.space_dim==DH::space_dimension, ExcInternalError());
 	  const std::vector<Point<DH::space_dimension> > & q_points=fe_patch_values.get_quadrature_points();
@@ -768,11 +776,11 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 		  if (update_flags & update_hessians)
 		    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 								    data.patch_hessians);
-								    
+
 		  if (update_flags & update_quadrature_points)
 		    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
-		    
-		    
+
+
 		  std::vector<Point<DH::space_dimension> > dummy_normals;
 		  postprocessor->
 		    compute_derived_quantities_scalar(data.patch_values,
@@ -797,12 +805,12 @@ build_one_patch (const std::pair<cell_iterator, unsigned int> *cell_and_index,
 		  if (update_flags & update_hessians)
 		    this->dof_data[dataset]->get_function_hessians (fe_patch_values,
 								    data.patch_hessians_system);
-		  
+
 		  if (update_flags & update_quadrature_points)
 		    data.patch_evaluation_points = fe_patch_values.get_quadrature_points();
-		  
+
 		  std::vector<Point<DH::space_dimension> > dummy_normals;
-		  
+
 		  postprocessor->
 		    compute_derived_quantities_vector(data.patch_values_system,
 						      data.patch_gradients_system,
