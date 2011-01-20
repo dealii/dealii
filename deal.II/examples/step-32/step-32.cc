@@ -101,7 +101,7 @@ namespace EquationData
   const double kappa                 = 1e-6;
   const double reference_density     = 3300;    /* kg / m^3   */
   const double reference_temperature = 293;     /* K          */
-  const double expansion_coefficient = 2e-5;    /* 1/K        */  //??
+  const double expansion_coefficient = 2e-5;    /* 1/K        */
   const double specific_heat         = 1250;    /* J / K / kg */  //??
   const double radiogenic_heating    = 7.4e-12; /* W / kg     */  //??
 
@@ -504,8 +504,8 @@ namespace Assembly
 	std::vector<Tensor<1,dim> > old_velocity_values;
 	std::vector<Tensor<1,dim> > old_old_velocity_values;
 
-	std::vector<Tensor<2,dim> > old_velocity_grads;
-	std::vector<Tensor<2,dim> > old_old_velocity_grads;
+	std::vector<SymmetricTensor<2,dim> > old_strain_rates;
+	std::vector<SymmetricTensor<2,dim> > old_old_strain_rates;
 	
 	std::vector<double>         old_temperature_values;
 	std::vector<double>         old_old_temperature_values;
@@ -534,8 +534,8 @@ namespace Assembly
 
 		    old_velocity_values (quadrature.size()),
 		    old_old_velocity_values (quadrature.size()),
-		    old_velocity_grads (quadrature.size()),
-		    old_old_velocity_grads (quadrature.size()),
+		    old_strain_rates (quadrature.size()),
+		    old_old_strain_rates (quadrature.size()),
 		    
 		    old_temperature_values (quadrature.size()),
 		    old_old_temperature_values(quadrature.size()),
@@ -561,8 +561,8 @@ namespace Assembly
 
 		    old_velocity_values (scratch.old_velocity_values),
 		    old_old_velocity_values (scratch.old_old_velocity_values),
-		    old_velocity_grads (scratch.old_velocity_grads),
-		    old_old_velocity_grads (scratch.old_old_velocity_grads),
+		    old_strain_rates (scratch.old_strain_rates),
+		    old_old_strain_rates (scratch.old_old_strain_rates),
 
 		    old_temperature_values (scratch.old_temperature_values),
 		    old_old_temperature_values (scratch.old_old_temperature_values),
@@ -825,8 +825,8 @@ class BoussinesqFlowProblem
 		      const std::vector<double>          &old_old_temperature_laplacians,
 		      const std::vector<Tensor<1,dim> >  &old_velocity_values,
 		      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
-		      const std::vector<Tensor<2,dim> >  &old_velocity_grads,
-		      const std::vector<Tensor<2,dim> >  &old_old_velocity_grads,
+		      const std::vector<SymmetricTensor<2,dim> >  &old_strain_rates,
+		      const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
 		      const double                        cell_diameter) const;
@@ -1227,8 +1227,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<double>          &old_old_temperature_laplacians,
 		   const std::vector<Tensor<1,dim> >  &old_velocity_values,
 		   const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
-		   const std::vector<Tensor<2,dim> >  &old_velocity_grads,
-		   const std::vector<Tensor<2,dim> >  &old_old_velocity_grads,
+		   const std::vector<SymmetricTensor<2,dim> >  &old_strain_rates,
+		   const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
 		   const double                        cell_diameter) const
@@ -1249,9 +1249,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       const Tensor<1,dim> u = (old_velocity_values[q] +
 			       old_old_velocity_values[q]) / 2;
 
-      const Tensor<2,dim> grad_u = (old_velocity_grads[q] +
-				    old_old_velocity_grads[q]) / 2;
-      const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);      
+      const SymmetricTensor<2,dim> strain_rate = (old_strain_rates[q] +
+						  old_old_strain_rates[q]) / 2;
       
       const double T = (old_temperature[q] + old_old_temperature[q]) / 2;
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
@@ -2437,10 +2436,10 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 							    scratch.old_velocity_values);
   scratch.stokes_fe_values[velocities].get_function_values (old_stokes_solution,
 							    scratch.old_old_velocity_values);
-  scratch.stokes_fe_values[velocities].get_function_gradients (stokes_solution,
-							       scratch.old_velocity_grads);
-  scratch.stokes_fe_values[velocities].get_function_gradients (old_stokes_solution,
-							       scratch.old_old_velocity_grads);
+  scratch.stokes_fe_values[velocities].get_function_symmetric_gradients (stokes_solution,
+							       scratch.old_strain_rates);
+  scratch.stokes_fe_values[velocities].get_function_symmetric_gradients (old_stokes_solution,
+							       scratch.old_old_strain_rates);
 
   const double nu
     = compute_viscosity (scratch.old_temperature_values,
@@ -2451,8 +2450,8 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 			 scratch.old_old_temperature_laplacians,
 			 scratch.old_velocity_values,
 			 scratch.old_old_velocity_values,
-			 scratch.old_velocity_grads,
-			 scratch.old_old_velocity_grads,
+			 scratch.old_strain_rates,
+			 scratch.old_old_strain_rates,
 			 global_max_velocity,
 			 global_T_range.second - global_T_range.first,
 			 cell->diameter());
@@ -2493,13 +2492,12 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 	    scratch.old_old_velocity_values[q] * time_step/old_time_step)
 	   :
 	   scratch.old_velocity_values[q]);
-      const Tensor<2,dim> extrapolated_grad_u
+      const SymmetricTensor<2,dim> extrapolated_strain_rate
 	= (use_bdf2_scheme ?
-	   (scratch.old_velocity_grads[q] * (1+time_step/old_time_step) -
-	    scratch.old_old_velocity_grads[q] * time_step/old_time_step)
+	   (scratch.old_strain_rates[q] * (1+time_step/old_time_step) -
+	    scratch.old_old_strain_rates[q] * time_step/old_time_step)
 	   :
-	   scratch.old_velocity_grads[q]);
-      const SymmetricTensor<2,dim> extrapolated_strain_rate = symmetrize (extrapolated_grad_u);      
+	   scratch.old_strain_rates[q]);
 
       const double gamma
 	= ((EquationData::radiogenic_heating * EquationData::density(old_Ts) //?????? why old_Ts?
