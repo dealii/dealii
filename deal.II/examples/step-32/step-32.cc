@@ -111,9 +111,6 @@ namespace EquationData
   const double T0      = 4000+273;              /* K          */
   const double T1      =  700+273;              /* K          */
 
-  const double g0      = 10.7;                  /* m / s^2    */
-  const double g1      = 9.81;                  /* m / s^2    */
-  
   const double year_in_seconds  = 60*60*24*365.2425;
   const double end_time         = 1e8 * year_in_seconds;
 
@@ -131,6 +128,10 @@ namespace EquationData
   template <int dim>
   Tensor<1,dim> gravity_vector (const Point<dim> &p)
   {
+// interpolate the following values with a physically realistic model:
+//    const double g0      = 10.7;                  /* m / s^2    */
+//    const double g1      = 9.81;                  /* m / s^2    */
+  
     const double r = p.norm();
     return -(1.245e-6 * r + 7.714e13/r/r) * p / p.norm();
   }
@@ -3413,7 +3414,7 @@ int main (int argc, char *argv[])
 
       Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-      const int dim = 2;
+      const int dim = 3;
       BoussinesqFlowProblem<dim> flow_problem;
 
       unsigned int ref = (dim == 2 ? 5 : 2);
