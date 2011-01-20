@@ -8,7 +8,7 @@
 /* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University 2008, 2009 */
 /*                                                                */
-/*    Copyright (C) 2008, 2009, 2010 by the deal.II authors */
+/*    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -97,23 +97,25 @@ using namespace dealii;
 				 // introduction:
 namespace EquationData
 {
-  const double eta                   = 1e21;
+  const double eta                   = 1e21;    /* Pa s       */
   const double kappa                 = 1e-6;
-  const double reference_density     = 3300;
-  const double reference_temperature = 293;
-  const double expansion_coefficient = 2e-5;
+  const double reference_density     = 3300;    /* kg / m^3   */
+  const double reference_temperature = 293;     /* K          */
+  const double expansion_coefficient = 2e-5;    /* 1/K        */  //??
+  const double specific_heat         = 1250;    /* J / K / kg */  //??
+  const double radiogenic_heating    = 7.4e-12; /* W / kg     */  //??
 
-  const double R0      = 6371000.-2890000.;
-  const double R1      = 6371000.-  35000.;
+  const double R0      = 6371000.-2890000.;     /* m          */
+  const double R1      = 6371000.-  35000.;     /* m          */
 
-  const double T0      = 4000+273;
-  const double T1      =  700+273;
+  const double T0      = 4000+273;              /* K          */
+  const double T1      =  700+273;              /* K          */
 
-  const double g0      = 10.7;
-  const double g1      = 9.81;
+  const double g0      = 10.7;                  /* m / s^2    */
+  const double g1      = 9.81;                  /* m / s^2    */
   
   const double year_in_seconds  = 60*60*24*365.2425;
-  const double end_time         = 1e9 * year_in_seconds;
+  const double end_time         = 1e8 * year_in_seconds;
 
   const double pressure_scaling = eta / (R1-R0);
 
@@ -175,41 +177,6 @@ namespace EquationData
   {
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = TemperatureInitialValues<dim>::value (p, c);
-  }
-
-
-
-  template <int dim>
-  class TemperatureRightHandSide : public Function<dim>
-  {
-    public:
-      TemperatureRightHandSide () : Function<dim>(1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-
-      virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &value) const;
-  };
-
-
-
-  template <int dim>
-  double
-  TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
-					const unsigned int component) const
-  {
-    return 0;
-  }
-
-
-  template <int dim>
-  void
-  TemperatureRightHandSide<dim>::vector_value (const Point<dim> &p,
-					       Vector<double>   &values) const
-  {
-    for (unsigned int c=0; c<this->n_components; ++c)
-      values(c) = TemperatureRightHandSide<dim>::value (p, c);
   }
 }
 
@@ -537,14 +504,15 @@ namespace Assembly
 	std::vector<Tensor<1,dim> > old_velocity_values;
 	std::vector<Tensor<1,dim> > old_old_velocity_values;
 
+	std::vector<Tensor<2,dim> > old_velocity_grads;
+	std::vector<Tensor<2,dim> > old_old_velocity_grads;
+	
 	std::vector<double>         old_temperature_values;
 	std::vector<double>         old_old_temperature_values;
 	std::vector<Tensor<1,dim> > old_temperature_grads;
 	std::vector<Tensor<1,dim> > old_old_temperature_grads;
 	std::vector<double>         old_temperature_laplacians;
 	std::vector<double>         old_old_temperature_laplacians;
-
-	std::vector<double>         gamma_values;
     };
 
     template <int dim>
@@ -560,21 +528,21 @@ namespace Assembly
 					   update_quadrature_points |
 					   update_JxW_values),
 		    stokes_fe_values (stokes_fe, quadrature,
-				      update_values),
+				      update_values | update_gradients),
 		    phi_T (temperature_fe.dofs_per_cell),
 		    grad_phi_T (temperature_fe.dofs_per_cell),
 
 		    old_velocity_values (quadrature.size()),
 		    old_old_velocity_values (quadrature.size()),
-
+		    old_velocity_grads (quadrature.size()),
+		    old_old_velocity_grads (quadrature.size()),
+		    
 		    old_temperature_values (quadrature.size()),
 		    old_old_temperature_values(quadrature.size()),
 		    old_temperature_grads(quadrature.size()),
 		    old_old_temperature_grads(quadrature.size()),
 		    old_temperature_laplacians(quadrature.size()),
-		    old_old_temperature_laplacians(quadrature.size()),
-
-		    gamma_values (quadrature.size())
+		    old_old_temperature_laplacians(quadrature.size())
     {}
 
 
@@ -593,15 +561,15 @@ namespace Assembly
 
 		    old_velocity_values (scratch.old_velocity_values),
 		    old_old_velocity_values (scratch.old_old_velocity_values),
+		    old_velocity_grads (scratch.old_velocity_grads),
+		    old_old_velocity_grads (scratch.old_old_velocity_grads),
 
 		    old_temperature_values (scratch.old_temperature_values),
 		    old_old_temperature_values (scratch.old_old_temperature_values),
 		    old_temperature_grads (scratch.old_temperature_grads),
 		    old_old_temperature_grads (scratch.old_old_temperature_grads),
 		    old_temperature_laplacians (scratch.old_temperature_laplacians),
-		    old_old_temperature_laplacians (scratch.old_old_temperature_laplacians),
-
-		    gamma_values (scratch.gamma_values)
+		    old_old_temperature_laplacians (scratch.old_old_temperature_laplacians)
     {}
   }
 
@@ -857,7 +825,8 @@ class BoussinesqFlowProblem
 		      const std::vector<double>          &old_old_temperature_laplacians,
 		      const std::vector<Tensor<1,dim> >  &old_velocity_values,
 		      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
-		      const std::vector<double>          &gamma_values,
+		      const std::vector<Tensor<2,dim> >  &old_velocity_grads,
+		      const std::vector<Tensor<2,dim> >  &old_old_velocity_grads,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
 		      const double                        cell_diameter) const;
@@ -1258,7 +1227,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<double>          &old_old_temperature_laplacians,
 		   const std::vector<Tensor<1,dim> >  &old_velocity_values,
 		   const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
-		   const std::vector<double>          &gamma_values,
+		   const std::vector<Tensor<2,dim> >  &old_velocity_grads,
+		   const std::vector<Tensor<2,dim> >  &old_old_velocity_grads,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
 		   const double                        cell_diameter) const
@@ -1279,6 +1249,11 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       const Tensor<1,dim> u = (old_velocity_values[q] +
 			       old_old_velocity_values[q]) / 2;
 
+      const Tensor<2,dim> grad_u = (old_velocity_grads[q] +
+				    old_old_velocity_grads[q]) / 2;
+      const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);      
+      
+      const double T = (old_temperature[q] + old_old_temperature[q]) / 2;
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
       const double u_grad_T = u * (old_temperature_grads[q] +
@@ -1287,9 +1262,14 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       const double kappa_Delta_T = EquationData::kappa
 				   * (old_temperature_laplacians[q] +
 				      old_old_temperature_laplacians[q]) / 2;
+      const double gamma
+	= ((EquationData::radiogenic_heating * EquationData::density(T)
+	    +
+	    2 * EquationData::eta * strain_rate * strain_rate) /
+	   (EquationData::density(T) * EquationData::specific_heat));      
 
       const double residual
-	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma_values[q]) *
+	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma) *
 		   std::pow((old_temperature[q]+old_old_temperature[q]) / 2,
 			    alpha-1.));
 
@@ -1462,7 +1442,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 							    matrix_for_bc);
       }
 
-  rhs.compress ();
+  rhs.compress (Add);
 
   SolverControl solver_control(5*rhs.size(), 1e-12*rhs.l2_norm());
   SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
@@ -2423,8 +2403,6 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
   const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
   const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
 
-  EquationData::TemperatureRightHandSide<dim>  temperature_right_hand_side;
-
   const FEValuesExtractors::Vector velocities (0);
 
   data.local_rhs = 0;
@@ -2455,13 +2433,14 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
   scratch.temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
 							 scratch.old_old_temperature_laplacians);
 
-  temperature_right_hand_side.value_list (scratch.temperature_fe_values.get_quadrature_points(),
-					  scratch.gamma_values);
-
   scratch.stokes_fe_values[velocities].get_function_values (stokes_solution,
 							    scratch.old_velocity_values);
   scratch.stokes_fe_values[velocities].get_function_values (old_stokes_solution,
 							    scratch.old_old_velocity_values);
+  scratch.stokes_fe_values[velocities].get_function_gradients (stokes_solution,
+							       scratch.old_velocity_grads);
+  scratch.stokes_fe_values[velocities].get_function_gradients (old_stokes_solution,
+							       scratch.old_old_velocity_grads);
 
   const double nu
     = compute_viscosity (scratch.old_temperature_values,
@@ -2472,7 +2451,8 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 			 scratch.old_old_temperature_laplacians,
 			 scratch.old_velocity_values,
 			 scratch.old_old_velocity_values,
-			 scratch.gamma_values,
+			 scratch.old_velocity_grads,
+			 scratch.old_old_velocity_grads,
 			 global_max_velocity,
 			 global_T_range.second - global_T_range.first,
 			 cell->diameter());
@@ -2513,7 +2493,20 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 	    scratch.old_old_velocity_values[q] * time_step/old_time_step)
 	   :
 	   scratch.old_velocity_values[q]);
+      const Tensor<2,dim> extrapolated_grad_u
+	= (use_bdf2_scheme ?
+	   (scratch.old_velocity_grads[q] * (1+time_step/old_time_step) -
+	    scratch.old_old_velocity_grads[q] * time_step/old_time_step)
+	   :
+	   scratch.old_velocity_grads[q]);
+      const SymmetricTensor<2,dim> extrapolated_strain_rate = symmetrize (extrapolated_grad_u);      
 
+      const double gamma
+	= ((EquationData::radiogenic_heating * EquationData::density(old_Ts) //?????? why old_Ts?
+	    +
+	    2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
+	   (EquationData::density(old_Ts) * EquationData::specific_heat));
+      
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 	  data.local_rhs(i) += (old_Ts * scratch.phi_T[i]
@@ -2525,7 +2518,7 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 				nu * ext_grad_T * scratch.grad_phi_T[i]
 				+
 				time_step *
-				scratch.gamma_values[q] * scratch.phi_T[i])
+				gamma * scratch.phi_T[i])
 	                       *
 	                       scratch.temperature_fe_values.JxW(q);
 
@@ -2649,7 +2642,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 	 Assembly::CopyData::
 	 TemperatureRHS<dim> (temperature_fe));
 
-  temperature_rhs.compress();
+  temperature_rhs.compress(Add);
 }
 
 
@@ -2953,8 +2946,8 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
       Tensor<2,dim> grad_u;
       for (unsigned int d=0; d<dim; ++d)
 	grad_u[d] = duh[q][d];
-      SymmetricTensor<2,dim> strain = symmetrize (grad_u);
-      computed_quantities[q](dim+2) = EquationData::eta * 2 * strain * strain;
+      const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
+      computed_quantities[q](dim+2) = 2 * EquationData::eta * strain_rate * strain_rate;
 
       computed_quantities[q](dim+3) = partition;
     }
@@ -3422,13 +3415,12 @@ int main (int argc, char *argv[])
 
       Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-      BoussinesqFlowProblem<2> flow_problem;
+      const int dim = 2;
+      BoussinesqFlowProblem<dim> flow_problem;
 
-      unsigned int ref=5;
+      unsigned int ref = (dim == 2 ? 5 : 2);
       if (argc>=2)
-	{
-	  ref = (unsigned int)Utilities::string_to_int(argv[1]);
-	}
+	ref = (unsigned int)Utilities::string_to_int(argv[1]);
 
       flow_problem.run (ref);
     }
