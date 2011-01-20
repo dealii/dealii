@@ -1875,12 +1875,14 @@ ConstraintMatrix::is_inhomogeneously_constrained (const unsigned int index) cons
 				// constrained. could use is_constrained, but
 				// that means computing the line index twice
   const unsigned int line_index = calculate_line_index(index);
-  if (line_index > lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_unsigned_int ||
-      lines[lines_cache[line_index]].inhomogeneity == 0)
+  if (line_index >= lines_cache.size() ||
+      lines_cache[line_index] == numbers::invalid_unsigned_int)
     return false;
   else
-    return true;
+    {
+      Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
+      return !(lines[lines_cache[line_index]].inhomogeneity == 0);
+    }
 }
 
 
@@ -1893,7 +1895,7 @@ ConstraintMatrix::get_constraint_entries (unsigned int line) const
 				// constrained. could use is_constrained, but
 				// that means computing the line index twice
   const unsigned int line_index = calculate_line_index(line);
-  if (line_index > lines_cache.size() ||
+  if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_unsigned_int)
     return 0;
   else
@@ -1910,7 +1912,7 @@ ConstraintMatrix::get_inhomogeneity (unsigned int line) const
 				// constrained. could use is_constrained, but
 				// that means computing the line index twice
   const unsigned int line_index = calculate_line_index(line);
-  if (line_index > lines_cache.size() ||
+  if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_unsigned_int)
     return 0;
   else
