@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
-//    $Id: 2d_coarse_grid_01.cc 17444 2008-10-31 19:35:14Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,7 +30,6 @@
 #include <grid/grid_out.h>
 #include <dofs/dof_handler.h>
 #include <distributed/solution_transfer.h>
-#include <dofs/dof_handler.h>
 #include <dofs/dof_tools.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
@@ -153,8 +152,8 @@ void test()
 
 
 //  GridGenerator::hyper_cube(tr);
-  
-  
+
+
   GridGenerator::hyper_shell (tr,
 			      Point<dim>(),
 			      R0,
@@ -164,7 +163,7 @@ void test()
   static HyperShellBoundary<dim> boundary;
 //  tr.set_boundary (0, boundary);
 //tr.set_boundary (1, boundary);
-  
+
   tr.refine_global (1);
   if (1)
     for (unsigned int step=0; step<5;++step)
@@ -172,22 +171,22 @@ void test()
 	typename Triangulation<dim>::active_cell_iterator
 	  cell = tr.begin_active(),
 	  endc = tr.end();
-      
+
 	for (; cell!=endc; ++cell)
 	  if (std::rand()%42==1)
 	    cell->set_refine_flag ();
-      
+
 	tr.execute_coarsening_and_refinement ();
       }
- 
+
   DoFHandler<dim> dofh(tr);
 
   static FE_Q<dim> fe(3);
-  
+
   dofh.distribute_dofs (fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
-  
+
   IndexSet dof_set;
   DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
@@ -204,14 +203,14 @@ void test()
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
   x_rel = x;
-  
+
   for (unsigned int steps=0;steps<7;++steps)
-    { 
+    {
       {
 	typename Triangulation<dim>::active_cell_iterator
 	  cell = tr.begin_active(),
 	  endc = tr.end();
-	
+
 	for (; cell!=endc; ++cell)
 	  if (!cell->is_artificial() && !cell->is_ghost())
 	    {
@@ -219,7 +218,7 @@ void test()
 		cell->set_refine_flag ();
 	      else if (std::rand()%7==1)
 		cell->set_coarsen_flag ();
-	    }	
+	    }
       }
       for (typename Triangulation<dim>::cell_iterator
 	     cell = tr.begin();
@@ -227,7 +226,7 @@ void test()
 	{
 	  if (!cell->has_children())
 	    continue;
-	  
+
 	  bool coarsen_me = false;
 	  for (unsigned int i=0;i<cell->n_children();++i)
 	    if (cell->child(i)->coarsen_flag_set())
@@ -253,23 +252,23 @@ void test()
 	      }
 
 	}
-      
+
       parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
 	trans(dofh);
       tr.prepare_coarsening_and_refinement();
-	
+
 
       trans.prepare_for_coarsening_and_refinement(x_rel);
-	
+
       tr.execute_coarsening_and_refinement ();
-	
+
 
       static FE_Q<dim> fe(1);
-  
+
       dofh.distribute_dofs (fe);
 
       owned_set = dofh.locally_owned_dofs();
-  
+
       DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
       DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
@@ -277,17 +276,17 @@ void test()
       x.reinit(owned_set, MPI_COMM_WORLD);
 
       trans.interpolate(x);
-      
+
       x_rel.reinit(relevant_set, MPI_COMM_WORLD);
       x_rel = 0;
       x_rel.compress();
-  
+
       ConstraintMatrix cm(relevant_set);
       DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm);
 /*  std::vector<bool> velocity_mask (dim+1, true);
-  
+
     velocity_mask[dim] = false;
-				    
+
     VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(dofh),
     0,
     ZeroFunction<dim>(1),
@@ -303,27 +302,27 @@ void test()
 
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
-  
+
   VectorTools::interpolate(* static_cast<DoFHandler<dim>* >(&dofh),
 			   TemperatureInitialValues<dim>(),
 			   x_ref);
   x_ref.compress();
-  
+
   x_ref -= x;
   double err = x_ref.linfty_norm();
   if (err>1.0e-12)
     if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
       deallog << "err:" << err << std::endl;
-  
+
 //	x_rel=x_ref; //uncomment to output error
-  
+
   std::vector<std::string> solution_names(1,"T");
-  
+
   FilteredDataOut<dim> data_out (tr.locally_owned_subdomain());
   data_out.attach_dof_handler (dofh);
-  
+
   data_out.add_data_vector(x_rel, solution_names);
-  
+
   data_out.build_patches (1);
   const std::string filename = ("p4est_3d_constraintmatrix_03/solution." +
 				Utilities::int_to_string
@@ -331,7 +330,7 @@ void test()
 				".vtu");
   std::ofstream output (filename.c_str());
   data_out.write_vtu (output);
-  
+
   tr.set_boundary (0);
   tr.set_boundary (1);
 
