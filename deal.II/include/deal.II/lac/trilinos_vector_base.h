@@ -1133,8 +1133,8 @@ namespace TrilinosWrappers
   {
     Epetra_CombineMode mode = (last_action != Zero) ?
 			      last_action : given_last_action;
-    #ifdef DEBUG
-    #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEBUG
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				     // check that every process has decided
 				     // to use the same mode. This will
 				     // otherwise result in undefined
@@ -1148,8 +1148,8 @@ namespace TrilinosWrappers
       result);
     Assert(result.max-result.min<1e-5,  ExcTrilinosError(0));
     
-    #endif
-    #endif
+#  endif
+#endif
     
 				 // Now pass over the information about
 				 // what we did last to the vector.
