@@ -47,6 +47,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: The TrilinosWrappers::MPI::BlockVector::compress function now takes an
+argument (with a default value) in exactly the same way as the
+TrilinosWrappers::MPI::Vector::compress function already did.
+<br>
+(Wolfgang Bangerth, 2011/01/21)
+</li>
+
 <li> Fixed: When calling DataOut::build_patches with a mapping, requesting more
 than one subdivision, and when <code>dim@<spacedim</code>, then some cells
 were not properly mapped. This is now fixed.

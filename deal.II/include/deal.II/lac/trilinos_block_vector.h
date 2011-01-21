@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -308,11 +308,35 @@ namespace TrilinosWrappers
 					  const BlockVector                         &v);
 
 					 /**
-					  * Compresses all the components
-					  * after assembling together all
-					  * elements.
+					  * Compress the underlying
+					  * representation of the Trilinos
+					  * object, i.e. flush the buffers
+					  * of the vector object if it has
+					  * any. This function is
+					  * necessary after writing into a
+					  * vector element-by-element and
+					  * before anything else can be
+					  * done on it.
+					  *
+					  * The (defaulted) argument can
+					  * be used to specify the
+					  * compress mode
+					  * (<code>Add</code> or
+					  * <code>Insert</code>) in case
+					  * the vector has not been
+					  * written to since the last
+					  * time this function was
+					  * called. The argument is
+					  * ignored if the vector has
+					  * been added or written to
+					  * since the last time
+					  * compress() was called.
+					  *
+					  * See @ref GlossCompress "Compressing distributed objects"
+					  * for more information.
+					  * more information.
 					  */
-	void compress ();
+	void compress (const Epetra_CombineMode last_action = Zero);
 
 				         /**
 					  * Returns the state of the
