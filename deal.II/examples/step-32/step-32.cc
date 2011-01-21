@@ -160,12 +160,23 @@ namespace EquationData
     const double r = p.norm();
     const double h = R1-R0;
 
+				     // s = fraction of the way from
+				     // the inner to the outer
+				     // boundary; 0<=s<=1
     const double s = (r-R0)/h;
-// see http://www.wolframalpha.com/input/?i=plot+(sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))),+x%3D-1+to+1,+y%3D-1+to+1
 
-    const double s_mod = s*0.95 + 0.05*sin(6.0*atan2(p(0),p(1)));
-//alternative:    http://www.wolframalpha.com/input/?i=plot+atan((sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))-0.5)*10)/pi%2B0.5,+x%3D-1+to+1,+y%3D-1+to+1
-//    s_mod = atan((s_mod-0.5)*10.0)/dealii::numbers::PI+0.5;
+/* now compute an angular variation of the linear temperature field by
+   stretching the variable s appropriately. note that the following
+   formula leaves the end points s=0 and s=1 fixed, but stretches the
+   region in between depending on the angle phi=atan2(x,y).
+
+   For a plot, see
+   http://www.wolframalpha.com/input/?i=plot+%28%282*sqrt%28x^2%2By^2%29-1%29%2B0.2*%282*sqrt%28x^2%2By^2%29-1%29*%281-%282*sqrt%28x^2%2By^2%29-1%29%29*sin%286*atan2%28x%2Cy%29%29%29%2C+x%3D-1+to+1%2C+y%3D-1+to+1
+*/
+    const double phi   = std::atan2(p(0),p(1));
+    const double s_mod = (s
+			  +
+			  0.2 * s * (1-s) * std::sin(6*phi));
 
     return T0*(1.0-s_mod) + T1*s_mod;
   }
@@ -853,16 +864,16 @@ class BoussinesqFlowProblem
 
     const unsigned int                  temperature_degree;
     FE_Q<dim>                           temperature_fe;
-    DoFHandler<dim> temperature_dof_handler;
+    DoFHandler<dim>                     temperature_dof_handler;
     ConstraintMatrix                    temperature_constraints;
 
     TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
     TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
     TrilinosWrappers::SparseMatrix      temperature_matrix;
 
-    TrilinosWrappers::MPI::Vector            temperature_solution;
-    TrilinosWrappers::MPI::Vector            old_temperature_solution;
-    TrilinosWrappers::MPI::Vector            old_old_temperature_solution;
+    TrilinosWrappers::MPI::Vector       temperature_solution;
+    TrilinosWrappers::MPI::Vector       old_temperature_solution;
+    TrilinosWrappers::MPI::Vector       old_old_temperature_solution;
     TrilinosWrappers::MPI::Vector       temperature_rhs;
 
 
