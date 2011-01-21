@@ -2251,7 +2251,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	 StokesSystem<dim> (stokes_fe));
 
   stokes_matrix.compress();
-  stokes_rhs.compress();
+  stokes_rhs.compress(Add);
 
   rebuild_stokes_matrix = false;
 
