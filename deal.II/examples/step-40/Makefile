@@ -7,8 +7,7 @@
 # The first is the name of the application. It is assumed that the
 # application name is the same as the base file name of the single C++
 # file from which the application is generated.
-target = step-40
-#$(basename $(shell echo step-*.cc))
+target = $(basename $(shell echo step-*.cc))
 
 # The second field determines whether you want to run your program in
 # debug or optimized mode. The latter is significantly faster, but no
@@ -168,4 +167,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
-endif  # USE_CONTRIB_TRILINOS
+endif  # USE_CONTRIB_PETSC

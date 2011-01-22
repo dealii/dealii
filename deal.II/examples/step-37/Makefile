@@ -1,5 +1,6 @@
 # $Id$
 
+
 # For the small projects Makefile, you basically need to fill in only
 # four fields.
 #
@@ -43,8 +44,6 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 # deal.II top level directory and to include the file with the global
 # settings
 include $D/common/Make.global_options
-
-
 
 
 # Since the whole project consists of only one file, we need not

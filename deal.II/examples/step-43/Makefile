@@ -26,18 +26,11 @@ debug-mode = on
 D = ../../
 
 
-# The fourth field specifies the names of data and other files that
+# The last field specifies the names of data and other files that
 # shall be deleted when calling `make clean'. Object and backup files,
 # executables and the like are removed anyway. Here, we give a list of
 # files in the various output formats that deal.II supports.
 clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
-
-
-
-# The last field specifies the name of the input file that passes the
-# parameters to the program.
-run-parameters = input.prm
-
 
 
 
@@ -112,7 +105,8 @@ $(target)$(EXEEXT) : $(libraries)
 # following rule:
 run: $(target)$(EXEEXT)
 	@echo ============================ Running $<
-	@./$(target)$(EXEEXT) $(run-parameters)
+	@./$(target)$(EXEEXT)
+
 
 
 # As a last rule to the `make' program, we define what to do when
@@ -135,6 +129,7 @@ clean:
 ./%.$(OBJEXT) :
 	@echo "==============optimized===== $(<F)  ->  $@"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+
 
 
 # The following statement tells make that the rules `run' and `clean'
@@ -167,4 +162,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
-endif  # CONTRIB_USE_TRILINOS
+endif  # USE_CONTRIB_TRILINOS

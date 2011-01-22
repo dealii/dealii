@@ -46,7 +46,6 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 include $D/common/Make.global_options
 
 
-################################################################
 # Since the whole project consists of only one file, we need not
 # consider difficult dependencies. We only have to declare the
 # libraries which we want to link to the object file. deal.II has two
@@ -140,3 +139,5 @@ Makefile.dep: $(target).cc Makefile \
 # To make the dependencies known to `make', we finally have to include
 # them:
 include Makefile.dep
+
+
