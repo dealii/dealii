@@ -29,6 +29,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: When using Trilinos and using the Intel C++ compiler,
+we accidentally used invalid compiler flags that led to a warning
+every time we compiled a file..
+<br>
+(Wolfgang Bangerth, 2011/01/22)
+
 <li> Fixed: At the bottom of the page of tutorial programs we show a "plain"
 version of the tutorial program. However, the script that generates this plain
 version was broken and sometimes truncated the file. This

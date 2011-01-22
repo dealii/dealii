@@ -6366,38 +6366,40 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_WARNINGS, dnl
 [
   OLD_CXXFLAGS="$CXXFLAGS"
 
-  AC_MSG_CHECKING(whether we can use -Wno-unused to suppress Trilinos warnings)
-  CXXFLAGS=-Wno-unused
-  AC_TRY_COMPILE([], [;],
-    [
-      AC_MSG_RESULT(yes)
-      CXXFLAGSG="$CXXFLAGSG -Wno-unused"
-    ],
-    [
-      AC_MSG_RESULT(no)
-    ])
+  if test "$GXX" = yes ; then
+    AC_MSG_CHECKING(whether we can use -Wno-unused to suppress Trilinos warnings)
+    CXXFLAGS=-Wno-unused
+    AC_TRY_COMPILE([], [;],
+      [
+        AC_MSG_RESULT(yes)
+        CXXFLAGSG="$CXXFLAGSG -Wno-unused"
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ])
 
-  AC_MSG_CHECKING(whether we can use -Wno-overloaded-virtual to suppress Trilinos warnings)
-  CXXFLAGS=-Wno-overloaded-virtual
-  AC_TRY_COMPILE([], [;],
-    [
-      AC_MSG_RESULT(yes)
-      CXXFLAGSG="$CXXFLAGSG -Wno-overloaded-virtual"
-    ],
-    [
-      AC_MSG_RESULT(no)
-    ])
+    AC_MSG_CHECKING(whether we can use -Wno-overloaded-virtual to suppress Trilinos warnings)
+    CXXFLAGS=-Wno-overloaded-virtual
+    AC_TRY_COMPILE([], [;],
+      [
+        AC_MSG_RESULT(yes)
+        CXXFLAGSG="$CXXFLAGSG -Wno-overloaded-virtual"
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ])
 
-  AC_MSG_CHECKING(whether we can use -Wno-extra to suppress Trilinos warnings)
-  CXXFLAGS=-Wno-extra
-  AC_TRY_COMPILE([], [;],
-    [
-      AC_MSG_RESULT(yes)
-      CXXFLAGSG="$CXXFLAGSG -Wno-extra"
-    ],
-    [
-      AC_MSG_RESULT(no)
-    ])
+    AC_MSG_CHECKING(whether we can use -Wno-extra to suppress Trilinos warnings)
+    CXXFLAGS=-Wno-extra
+    AC_TRY_COMPILE([], [;],
+      [
+        AC_MSG_RESULT(yes)
+        CXXFLAGSG="$CXXFLAGSG -Wno-extra"
+      ],
+      [
+        AC_MSG_RESULT(no)
+      ])
+  fi
 
   CXXFLAGS="${OLD_CXXFLAGS}"
 ])
