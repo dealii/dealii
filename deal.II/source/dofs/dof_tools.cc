@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -58,7 +58,7 @@ DoFTools::make_sparsity_pattern (const DH               &dof,
 				 SparsityPattern        &sparsity,
 				 const ConstraintMatrix &constraints,
 				 const bool              keep_constrained_dofs,
-				 const unsigned int      subdomain_id)
+				 const types::subdomain_id_t subdomain_id)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -495,7 +495,7 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 				      SparsityPattern &sparsity,
 				      const ConstraintMatrix &constraints,
 				      const bool              keep_constrained_dofs,
-				      const unsigned int      subdomain_id)
+				      const types::subdomain_id_t subdomain_id)
 {
   const unsigned int n_dofs = dof.n_dofs();
 
@@ -522,7 +522,7 @@ DoFTools::make_flux_sparsity_pattern (const DH        &dof,
 				// current cell is owned by the calling
 				// processor. Otherwise, just continue.
   for (; cell!=endc; ++cell)
-    if ((subdomain_id == numbers::invalid_unsigned_int)
+    if ((subdomain_id == types::invalid_subdomain_id)
         ||
         (subdomain_id == cell->subdomain_id()))
     {
@@ -4198,7 +4198,7 @@ DoFTools::count_dofs_with_subdomain_association (const DH           &dof_handler
   }
 #endif
 
-  std::vector<unsigned int> subdomain_association (dof_handler.n_dofs());
+  std::vector<types::subdomain_id_t> subdomain_association (dof_handler.n_dofs());
   get_subdomain_association (dof_handler, subdomain_association);
 
   std::vector<unsigned char> component_association (dof_handler.n_dofs());

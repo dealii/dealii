@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -311,7 +311,7 @@ class DoFTools
 				      * property.
 				      */
     template <int dim, int spacedim>
-    static unsigned int
+    static bool
     fe_is_primitive (const DoFHandler<dim,spacedim> &dh);
 
 				     /**
@@ -325,7 +325,7 @@ class DoFTools
 				      * property.
 				      */
     template <int dim, int spacedim>
-    static unsigned int
+    static bool
     fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh);
 
 				     /**
@@ -781,7 +781,7 @@ class DoFTools
 				SparsityPattern &sparsity_pattern,
                                 const ConstraintMatrix   &constraints,
                                 const bool                keep_constrained_dofs = true,
-                                const unsigned int        subdomain_id = numbers::invalid_unsigned_int);
+                                const types::subdomain_id_t  subdomain_id = numbers::invalid_unsigned_int);
 
 				     /**
 				      * This function does the same as
@@ -2205,7 +2205,8 @@ DoFTools::n_components (const DoFHandler<dim,spacedim> &dh)
 
 
 template <int dim, int spacedim>
-inline unsigned int
+inline
+bool
 DoFTools::fe_is_primitive (const DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe().is_primitive();
@@ -2245,7 +2246,8 @@ DoFTools::n_components (const hp::DoFHandler<dim,spacedim> &dh)
 
 
 template <int dim, int spacedim>
-inline unsigned int
+inline
+bool
 DoFTools::fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh)
 {
   return dh.get_fe()[0].is_primitive();

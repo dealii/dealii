@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -848,7 +848,7 @@ namespace DoFRenumbering
 	for (unsigned int c=0; c<n_buckets; ++c)
 	  {
 	    shifts[c]=cumulated;
-	    for (unsigned int i=0; i<tria->locally_owned_subdomain(); ++i)
+	    for (types::subdomain_id_t i=0; i<tria->locally_owned_subdomain(); ++i)
 	      shifts[c] += all_dof_counts[c+n_buckets*i];
 	    for (unsigned int i=0; i<Utilities::System::get_n_mpi_processes (tria->get_communicator()); ++i)
 	      cumulated += all_dof_counts[c+n_buckets*i];
