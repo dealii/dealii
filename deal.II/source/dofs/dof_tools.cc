@@ -49,9 +49,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-//#define WOLFGANG
-
-
 template <class DH, class SparsityPattern>
 void
 DoFTools::make_sparsity_pattern (const DH               &dof,
@@ -1625,17 +1622,9 @@ namespace internal
                     if ((face_constraints(row,i) != 0)
 			&&
 			(std::fabs(face_constraints(row,i)) >= 1e-14*abs_sum))
-                      {
-#ifdef WOLFGANG
-                        std::cout << "   " << slave_dofs[row]
-                                  << " -> " << face_constraints (row,i) << " * "
-                                  << master_dofs[i]
-                                  << std::endl;
-#endif
-                        constraints.add_entry (slave_dofs[row],
-                                               master_dofs[i],
-                                               face_constraints (row,i));
-                      }
+		      constraints.add_entry (slave_dofs[row],
+					     master_dofs[i],
+					     face_constraints (row,i));
 		  constraints.set_inhomogeneity (slave_dofs[row], 0.);
                 }
             }
@@ -2520,13 +2509,6 @@ namespace internal
 
 							   // Add constraints to global constraint
 							   // matrix.
-#ifdef WOLFGANG
-			  std::cout << "Constraints for cell=" << cell
-				    << ", face=" << face
-				    << ", subface=" << c
-				    << std::endl;
-#endif
-
 			  filter_constraints (master_dofs,
 					      slave_dofs,
 					      *(subface_interpolation_matrices
@@ -2683,12 +2665,6 @@ namespace internal
 		      AssertDimension (slave_dofs.size(),
 				       cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face);
 
-#ifdef WOLFGANG
-		      std::cout << "Constraints for cell=" << cell
-				<< ", face=" << face
-				<< " (complicated case, mother)"
-				<< std::endl;
-#endif
 		      filter_constraints (master_dofs,
 					  slave_dofs,
 					  constraint_matrix,
@@ -2762,13 +2738,6 @@ namespace internal
 			  cell->face(face)->child(sf)->get_dof_indices (slave_dofs,
 									subface_fe_index);
 
-#ifdef WOLFGANG
-			  std::cout << "Constraints for cell=" << cell
-				    << ", face=" << face
-				    << ", subface=" << sf
-				    << " (complicated case, children)"
-				    << std::endl;
-#endif
 			  filter_constraints (master_dofs,
 					      slave_dofs,
 					      constraint_matrix,
@@ -2870,10 +2839,6 @@ namespace internal
 
 							   // Add constraints to global constraint
 							   // matrix.
-#ifdef WOLFGANG
-			  std::cout << "p-constraints for cell=" << cell
-				    << ", face=" << face << std::endl;
-#endif
 			  filter_constraints (master_dofs,
 					      slave_dofs,
 					      *(face_interpolation_matrices
