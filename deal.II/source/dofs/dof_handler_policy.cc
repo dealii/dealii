@@ -1004,8 +1004,8 @@ namespace internal
 	    unsigned int sent=needs_to_get_cells.size();
 	    unsigned int recv=senders.size();
 
-	    MPI_Reduce(&sent, &sum_send, 1, MPI_INT, MPI_SUM, 0, tr->get_communicator());
-	    MPI_Reduce(&recv, &sum_recv, 1, MPI_INT, MPI_SUM, 0, tr->get_communicator());
+	    MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
+	    MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
 	    Assert(sum_send==sum_recv, ExcInternalError());
 	  }
 #endif
@@ -1127,9 +1127,9 @@ namespace internal
 	number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
 	MPI_Allgather ( &number_cache.n_locally_owned_dofs,
-			1, MPI_INT,
+			1, MPI_UNSIGNED,
 			&number_cache.n_locally_owned_dofs_per_processor[0],
-			1, MPI_INT,
+			1, MPI_UNSIGNED,
 			tr->get_communicator());
 
 	const unsigned int
@@ -1506,7 +1506,7 @@ namespace internal
 					   // determine maximum size of IndexSet
 	  unsigned int max_size;
 
-	  MPI_Allreduce(&my_size, &max_size, 1, MPI_INT, MPI_MAX, tr->get_communicator());
+	  MPI_Allreduce(&my_size, &max_size, 1, MPI_UNSIGNED, MPI_MAX, tr->get_communicator());
 
 					   // as we are reading past the end, we
 					   // need to increase the size of the

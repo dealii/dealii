@@ -834,8 +834,8 @@ namespace DoFRenumbering
 	  all_dof_counts(fe_collection.n_components() *
 			 Utilities::System::get_n_mpi_processes (tria->get_communicator()));
 
-	MPI_Allgather ( &local_dof_count[0], n_buckets, MPI_INT, &all_dof_counts[0],
-			n_buckets, MPI_INT, tria->get_communicator());
+	MPI_Allgather ( &local_dof_count[0], n_buckets, MPI_UNSIGNED, &all_dof_counts[0],
+			n_buckets, MPI_UNSIGNED, tria->get_communicator());
 
 	for (unsigned int i=0; i<n_buckets; ++i)
 	  Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]

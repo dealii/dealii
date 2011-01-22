@@ -4340,7 +4340,7 @@ DoFTools::count_dofs_per_component (
       std::vector<unsigned int> local_dof_count = dofs_per_component;
 
       MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
-		      MPI_INT, MPI_SUM, tria->get_communicator());
+		      MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
     }
 #endif
 #endif
@@ -4417,7 +4417,7 @@ count_dofs_per_block (const DoFHandler<dim,spacedim>& dof_handler,
     {
       std::vector<unsigned int> local_dof_count = dofs_per_block;
       MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0], n_target_blocks,
-		      MPI_INT, MPI_SUM, tria->get_communicator());
+		      MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
     }
 #endif
 #endif
