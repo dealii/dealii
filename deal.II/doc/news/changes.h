@@ -29,9 +29,16 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: When using the <code>--enable-mpi</code> to 
+<code>./configure</code>, the script only tried <code>mpiCC</code>
+as the MPI C++ compiler. However, on some systems, it is called
+<code>mpicxx</code>. The script now tries that as well.
+<br>
+(Wolfgang Bangerth, 2011/01/22)
+
 <li> Fixed: When using Trilinos and using the Intel C++ compiler,
 we accidentally used invalid compiler flags that led to a warning
-every time we compiled a file..
+every time we compiled a file.
 <br>
 (Wolfgang Bangerth, 2011/01/22)
 

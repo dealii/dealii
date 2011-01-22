@@ -2589,8 +2589,37 @@ $as_echo_n "checking whether to explicitly use MPI... " >&6; }
 	  if test "x$enableval" = "xyes" ; then
 	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	    if test "x$CXX" = "x" ; then CXX=mpiCC ; fi
-	    if test "x$CC" = "x" ; then CC=mpicc ; fi
+
+	    if test "x$CXX" = "x" ; then
+	      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI C++ compiler" >&5
+$as_echo_n "checking for MPI C++ compiler... " >&6; }
+	      if ((which mpiCC 2>&1) > /dev/null) ; then
+                CXX=mpiCC ;
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: mpiCC" >&5
+$as_echo "mpiCC" >&6; }
+              else
+	        if ((which mpicxx 2>&1) > /dev/null) ; then
+                  CXX=mpicxx ;
+		  { $as_echo "$as_me:${as_lineno-$LINENO}: result: mpicxx" >&5
+$as_echo "mpicxx" >&6; }
+                else
+		  as_fn_error $? "no MPI C++ compiler found" "$LINENO" 5
+                fi
+              fi
+            fi
+
+	    if test "x$CC" = "x" ; then
+	      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI C compiler" >&5
+$as_echo_n "checking for MPI C compiler... " >&6; }
+	      if ((which mpicc 2>&1) > /dev/null) ; then
+                CC=mpicc ;
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: mpicc" >&5
+$as_echo "mpicc" >&6; }
+              else
+	      	as_fn_error $? "no MPI C compiler found" "$LINENO" 5
+              fi
+            fi
+
 	  else
 	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
