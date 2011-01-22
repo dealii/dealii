@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -157,11 +157,11 @@ class BlockInfo : public Subscriptor
 				      * indices of the first system
 				      * block, then all of the second
 				      * block and so forth. The
-				      * function then outpus the index
+				      * function then outputs the index
 				      * in the standard local
 				      * numbering of DoFAccessor.
 				      */
-    unsigned int renumber (unsigned int i) const;
+    unsigned int renumber (const unsigned int i) const;
 
 				     /**
 				      * The number of base elements.
@@ -172,7 +172,7 @@ class BlockInfo : public Subscriptor
 				      * Return the base element of
 				      * this index.
 				      */
-    unsigned int base_element(unsigned int i) const;
+    unsigned int base_element (const unsigned int i) const;
 
 				     /**
 				      * Write a summary of the block
@@ -246,7 +246,7 @@ BlockInfo::local() const
 
 inline
 const BlockIndices&
-BlockInfo::level(unsigned int l) const
+BlockInfo::level (const unsigned int l) const
 {
   AssertIndexRange(l, levels.size());
   return levels[l];
@@ -254,7 +254,7 @@ BlockInfo::level(unsigned int l) const
 
 
 inline
-unsigned int BlockInfo::renumber(unsigned int i) const
+unsigned int BlockInfo::renumber (const unsigned int i) const
 {
   AssertIndexRange(i, local_renumbering.size());
   return local_renumbering[i];
@@ -263,7 +263,7 @@ unsigned int BlockInfo::renumber(unsigned int i) const
 
 inline
 unsigned int
-BlockInfo::base_element(unsigned int i) const
+BlockInfo::base_element (const unsigned int i) const
 {
   AssertIndexRange(i, base_elements.size());
 
