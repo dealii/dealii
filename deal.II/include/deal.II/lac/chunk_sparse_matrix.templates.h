@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1577,7 +1577,7 @@ ChunkSparseMatrix<number>::block_read (std::istream &in)
 
 
 template <typename number>
-unsigned int
+std::size_t
 ChunkSparseMatrix<number>::memory_consumption () const
 {
   return sizeof(*this) + max_len*sizeof(number);

@@ -157,7 +157,7 @@ class MappingCartesian : public Mapping<dim,spacedim>
 					  * consumption of this
 					  * object.
 					  */
-	virtual unsigned int memory_consumption () const;
+	virtual std::size_t memory_consumption () const;
 
 					 /**
 					  * Length of the cell in

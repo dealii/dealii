@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,7 +77,7 @@ namespace mg
 				       /**
 					* Memory used by this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
     private:
       MGLevelObject<std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > > matrices;
   };
@@ -154,7 +154,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 
   private:
@@ -343,7 +343,7 @@ namespace mg
 
   template <class VECTOR>
   inline
-  unsigned int
+  std::size_t
   Matrix<VECTOR>::memory_consumption () const
   {
     return sizeof(*this) + matrices->memory_consumption();
@@ -420,7 +420,7 @@ MGMatrix<MATRIX, VECTOR>::Tvmult_add  (const unsigned int level,
 
 
 template <class MATRIX, class VECTOR>
-unsigned int
+std::size_t
 MGMatrix<MATRIX, VECTOR>::memory_consumption () const
 {
   return sizeof(*this) + matrix->memory_consumption();

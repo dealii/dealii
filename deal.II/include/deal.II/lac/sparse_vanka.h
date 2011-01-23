@@ -258,7 +258,7 @@ class SparseVanka
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
   private:
 				     /**
@@ -545,7 +545,7 @@ class SparseBlockVanka : public SparseVanka<number>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   private:
 				     /**

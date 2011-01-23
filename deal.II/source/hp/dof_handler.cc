@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2926,18 +2926,18 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  unsigned int
+  std::size_t
   DoFHandler<dim,spacedim>::memory_consumption () const
   {
-    unsigned int mem = (MemoryConsumption::memory_consumption (tria) +
-                        MemoryConsumption::memory_consumption (finite_elements) +
-                        MemoryConsumption::memory_consumption (tria) +
-                        MemoryConsumption::memory_consumption (levels) +
-                        MemoryConsumption::memory_consumption (*faces) +
-                        MemoryConsumption::memory_consumption (number_cache) +
-                        MemoryConsumption::memory_consumption (vertex_dofs) +
-                        MemoryConsumption::memory_consumption (vertex_dofs_offsets) +
-                        MemoryConsumption::memory_consumption (has_children));
+    std::size_t mem = (MemoryConsumption::memory_consumption (tria) +
+		       MemoryConsumption::memory_consumption (finite_elements) +
+		       MemoryConsumption::memory_consumption (tria) +
+		       MemoryConsumption::memory_consumption (levels) +
+		       MemoryConsumption::memory_consumption (*faces) +
+		       MemoryConsumption::memory_consumption (number_cache) +
+		       MemoryConsumption::memory_consumption (vertex_dofs) +
+		       MemoryConsumption::memory_consumption (vertex_dofs_offsets) +
+		       MemoryConsumption::memory_consumption (has_children));
     for (unsigned int i=0; i<levels.size(); ++i)
       mem += MemoryConsumption::memory_consumption (*levels[i]);
     mem += MemoryConsumption::memory_consumption (*faces);

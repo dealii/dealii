@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -229,7 +229,7 @@ class SmartPointer
 				      * used by <b>this</b> object, not
 				      * by the object pointed to.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
   private:
 				     /**
@@ -459,7 +459,8 @@ void SmartPointer<T,P>::swap (T *&tt)
 
 template <typename T, typename P>
 inline
-unsigned int SmartPointer<T,P>::memory_consumption () const
+std::size_t
+SmartPointer<T,P>::memory_consumption () const
 {
   return sizeof(SmartPointer<T,P>);
 }

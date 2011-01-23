@@ -2777,7 +2777,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 				     //@}
 
 
@@ -3135,7 +3135,7 @@ class FEValues : public FEValuesBase<dim,spacedim>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
                                      /**
                                       * Return a reference to this
@@ -3273,7 +3273,7 @@ class FEFaceValuesBase : public FEValuesBase<dim,spacedim>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   protected:
 

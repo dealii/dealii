@@ -286,7 +286,7 @@ get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe
 template <class DH,
 	  int patch_dim, int patch_space_dim>
 template <typename VectorType>
-unsigned int
+std::size_t
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::
 DataEntry<VectorType>::memory_consumption () const
 {
@@ -660,7 +660,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_patches () const
 
 template <class DH,
 	  int patch_dim, int patch_space_dim>
-unsigned int
+std::size_t
 DataOut_DoFData<DH,patch_dim,patch_space_dim>::memory_consumption () const
 {
   return (DataOutInterface<patch_dim,patch_space_dim>::memory_consumption () +

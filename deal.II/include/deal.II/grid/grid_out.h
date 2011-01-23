@@ -1225,7 +1225,7 @@ class GridOut
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception

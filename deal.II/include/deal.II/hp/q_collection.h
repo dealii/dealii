@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -132,7 +132,7 @@ namespace hp
                                         * memory consumption (in bytes)
                                         * of this object.
                                         */
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
                                        /**
                                         * Exception
@@ -233,7 +233,7 @@ namespace hp
 
   template <int dim>
   inline
-  unsigned int
+  std::size_t
   QCollection<dim>::memory_consumption () const
   {
     return (sizeof(*this) +

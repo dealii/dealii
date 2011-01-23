@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1109,7 +1109,7 @@ class BlockVectorBase : public Subscriptor
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   protected:
 				     /**
@@ -2212,9 +2212,10 @@ void BlockVectorBase<VectorType>::equ (const value_type a,
 
 
 template <class VectorType>
-unsigned int BlockVectorBase<VectorType>::memory_consumption () const
+std::size_t
+BlockVectorBase<VectorType>::memory_consumption () const
 {
-  unsigned int mem = sizeof(this->n_blocks());
+  std::size_t mem = sizeof(this->n_blocks());
   for (unsigned int i=0; i<this->components.size(); ++i)
     mem += MemoryConsumption::memory_consumption (this->components[i]);
   mem += MemoryConsumption::memory_consumption (this->block_indices);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -201,7 +201,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 }
 
 
-unsigned int
+std::size_t
 CompressedSimpleSparsityPattern::Line::memory_consumption () const
 {
   return entries.capacity()*sizeof(unsigned int)+sizeof(Line);
@@ -448,11 +448,11 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
 }
 
 
-unsigned int
+std::size_t
 CompressedSimpleSparsityPattern::memory_consumption () const
 {
 				   //TODO: IndexSet...
-  unsigned int mem = sizeof(CompressedSimpleSparsityPattern);
+  std::size_t mem = sizeof(CompressedSimpleSparsityPattern);
   for (unsigned int i=0; i<lines.size(); ++i)
     mem += MemoryConsumption::memory_consumption (lines[i]);
 

@@ -245,7 +245,7 @@ class Quadrature : public Subscriptor
 				      * bytes) of this
 				      * object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
                          /**
                       * Write or read the data of this object to or 

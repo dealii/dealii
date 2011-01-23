@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -103,7 +103,7 @@ class Vector : public Subscriptor
     typedef const value_type                                 *const_iterator;
     typedef value_type                                       &reference;
     typedef const value_type                                 &const_reference;
-    typedef size_t                                            size_type;
+    typedef std::size_t                                       size_type;
 
 				     /**
 				      * Declare a type that has holds
@@ -939,7 +939,7 @@ class Vector : public Subscriptor
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 				     //@}
 	
                      /**

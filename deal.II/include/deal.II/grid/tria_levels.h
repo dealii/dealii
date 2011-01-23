@@ -200,7 +200,7 @@ namespace internal
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
-        unsigned int memory_consumption () const;
+        std::size_t memory_consumption () const;
 
                                          /**
                                           *  Exception
@@ -250,7 +250,7 @@ namespace internal
                             const unsigned int dimension,
 			    const unsigned int space_dimension);
         void monitor_memory (const unsigned int true_dimension) const;
-        unsigned int memory_consumption () const;
+        std::size_t memory_consumption () const;
 
                                          /**
                                           *  Exception

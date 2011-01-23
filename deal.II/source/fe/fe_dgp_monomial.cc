@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -433,7 +433,7 @@ FE_DGPMonomial<3>::has_support_on_face (const unsigned int shape_index,
 
 
 template <int dim>
-unsigned int
+std::size_t
 FE_DGPMonomial<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());

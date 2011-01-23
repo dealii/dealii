@@ -398,7 +398,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
 
 					 /**
 					  * Value to be used if this
@@ -497,7 +497,7 @@ class DataOutBase
 					  * bytes) of this
 					  * object.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 				     /**
@@ -568,7 +568,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 				     /**
@@ -631,7 +631,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
     				     /**
@@ -712,7 +712,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 
@@ -1043,7 +1043,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
     				     /**
@@ -1107,7 +1107,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
     				     /**
@@ -1180,7 +1180,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
     				     /**
@@ -1244,7 +1244,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
     				     /**
 				      * Flags controlling the details
@@ -1322,7 +1322,7 @@ class DataOutBase
 					  * quite close to the true
 					  * value.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 				     /**
@@ -1867,7 +1867,7 @@ class DataOutBase
 				      * quite close to the true
 				      * value.
 				      */
-    static unsigned int memory_consumption ();
+    static std::size_t memory_consumption ();
 
 				     /** @addtogroup Exceptions
 				      * @{ */
@@ -2457,7 +2457,7 @@ class DataOutInterface : private DataOutBase
 				      * quite close to the true
 				      * value.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   protected:
 				     /**

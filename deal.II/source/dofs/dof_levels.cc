@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,7 +22,7 @@ namespace internal
   namespace DoFHandler
   {
     
-    unsigned int
+    std::size_t
     DoFLevel<0>::memory_consumption () const
     {
       return MemoryConsumption::memory_consumption (cell_dof_indices_cache);
@@ -30,7 +30,7 @@ namespace internal
 
 
     
-    unsigned int
+    std::size_t
     DoFLevel<1>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption () +
@@ -39,7 +39,7 @@ namespace internal
 
     
     
-    unsigned int
+    std::size_t
     DoFLevel<2>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption () +
@@ -48,7 +48,7 @@ namespace internal
 
     
 
-    unsigned int
+    std::size_t
     DoFLevel<3>::memory_consumption () const
     {
       return (DoFLevel<0>::memory_consumption () +

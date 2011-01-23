@@ -266,7 +266,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception.

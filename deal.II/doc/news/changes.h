@@ -29,6 +29,17 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Changed: Most classes in deal.II have a member function
+<code>memory_consumption</code> that used to return an unsigned int.
+However, on most 64-bit systems, unsigned int is still only 32-bit
+wide, and consequently the return type does not provide enough
+precision to return the size of very large objects. The return types
+of all of these functions has been changed to std::size_t, which is
+defined to be a type that can hold the sizes of all objects possible
+on any system.
+<br>
+(Wolfgang Bangerth, 2011/01/22)
+
 <li> Fixed: When using the <code>--enable-mpi</code> to 
 <code>./configure</code>, the script only tried <code>mpiCC</code>
 as the MPI C++ compiler. However, on some systems, it is called

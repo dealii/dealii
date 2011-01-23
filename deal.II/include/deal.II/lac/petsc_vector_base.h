@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -236,7 +236,7 @@ namespace PETScWrappers
                                         */
       typedef PetscScalar               value_type;
       typedef PetscReal                 real_type;
-      typedef size_t                    size_type;
+      typedef std::size_t               size_type;
       typedef internal::VectorReference reference;
       typedef const internal::VectorReference const_reference;
 
@@ -742,7 +742,7 @@ namespace PETScWrappers
 					* consumption (not implemented
 					* for this class).
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
     protected:
                                        /**

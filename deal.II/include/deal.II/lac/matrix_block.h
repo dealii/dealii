@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -330,7 +330,7 @@ class MatrixBlock
 				     /**
 				      * The memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * The block number computed from
@@ -441,7 +441,7 @@ class MatrixBlockVector
 				     /**
 				      * The memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Access a constant reference to
@@ -639,7 +639,7 @@ class MGMatrixBlockVector
 				     /**
 				      * The memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
   private:
 				     /// Clear one of the matrix objects
     void clear_object(NamedData<MGLevelObject<MatrixBlock<MATRIX> > >&);
@@ -906,13 +906,12 @@ MatrixBlock<MATRIX>::Tvmult_add (VECTOR& w, const VECTOR& v) const
 
 template <class MATRIX>
 inline
-unsigned int
+std::size_t
 MatrixBlock<MATRIX>::memory_consumption () const
 {
-  unsigned int mem = sizeof(*this)
-		     + MemoryConsumption::memory_consumption(matrix)
-		     - sizeof(matrix);
-  return mem;
+  return (sizeof(*this)
+	  + MemoryConsumption::memory_consumption(matrix)
+	  - sizeof(matrix));
 }
 
 //----------------------------------------------------------------------//

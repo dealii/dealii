@@ -370,7 +370,7 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   private:
 				     /**
@@ -434,7 +434,7 @@ class CompressedSimpleSparsityPattern : public Subscriptor
 					 /**
 					  * estimates memory consumption.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 

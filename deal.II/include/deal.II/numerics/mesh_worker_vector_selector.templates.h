@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -145,10 +145,10 @@ namespace MeshWorker
 
 
   template <class VECTOR, int dim, int spacedim>
-  unsigned int
+  std::size_t
   VectorData<VECTOR, dim, spacedim>::memory_consumption () const
   {
-    unsigned int mem = VectorSelector::memory_consumption();
+    std::size_t mem = VectorSelector::memory_consumption();
     mem += sizeof (data);
     return mem;
   }
@@ -229,10 +229,10 @@ namespace MeshWorker
 
 
   template <class VECTOR, int dim, int spacedim>
-  unsigned int
+  std::size_t
   MGVectorData<VECTOR, dim, spacedim>::memory_consumption () const
   {
-    unsigned int mem = VectorSelector::memory_consumption();
+    std::size_t mem = VectorSelector::memory_consumption();
     mem += sizeof (data);
     return mem;
   }

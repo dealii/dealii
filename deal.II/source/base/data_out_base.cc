@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1132,7 +1132,7 @@ DataOutBase::Patch<dim,spacedim>::operator == (const Patch &patch) const
 
 
 template <int dim, int spacedim>
-unsigned int
+std::size_t
 DataOutBase::Patch<dim,spacedim>::memory_consumption () const
 {
   return (sizeof(vertices) / sizeof(vertices[0]) *
@@ -1211,7 +1211,7 @@ void DataOutBase::DXFlags::parse_parameters (const ParameterHandler &prm)
 
 
 
-unsigned int
+std::size_t
 DataOutBase::DXFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1240,7 +1240,7 @@ void DataOutBase::UcdFlags::parse_parameters (const ParameterHandler &prm)
 }
 
 
-unsigned int
+std::size_t
 DataOutBase::UcdFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1267,7 +1267,7 @@ void DataOutBase::GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*
 
 
 
-unsigned int
+size_t
 DataOutBase::GnuplotFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1305,7 +1305,7 @@ void DataOutBase::PovrayFlags::parse_parameters (const ParameterHandler &prm)
 
 
 
-unsigned int
+std::size_t
 DataOutBase::PovrayFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1551,7 +1551,7 @@ void DataOutBase::EpsFlags::parse_parameters (const ParameterHandler &prm)
 
 
 
-unsigned int
+std::size_t
 DataOutBase::EpsFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1575,7 +1575,7 @@ void DataOutBase::GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) c
 {}
 
 
-unsigned int
+std::size_t
 DataOutBase::GmvFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1604,7 +1604,7 @@ void DataOutBase::TecplotFlags::parse_parameters (const ParameterHandler &/*prm*
 {}
 
 
-unsigned int
+std::size_t
 DataOutBase::TecplotFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1629,7 +1629,7 @@ void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler &/*prm*/) c
 
 
 
-unsigned int
+std::size_t
 DataOutBase::VtkFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1655,7 +1655,7 @@ void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (const ParameterHa
 {}
 
 
-unsigned int
+std::size_t
 DataOutBase::Deal_II_IntermediateFlags::memory_consumption () const
 {
 				   // only simple data elements, so
@@ -1665,7 +1665,8 @@ DataOutBase::Deal_II_IntermediateFlags::memory_consumption () const
 
 
 
-unsigned int DataOutBase::memory_consumption ()
+std::size_t
+DataOutBase::memory_consumption ()
 {
   return 0;
 }
@@ -5156,7 +5157,7 @@ DataOutInterface<dim,spacedim>::parse_parameters (ParameterHandler &prm)
 
 
 template <int dim, int spacedim>
-unsigned int
+std::size_t
 DataOutInterface<dim,spacedim>::memory_consumption () const
 {
   return (sizeof (default_fmt) +

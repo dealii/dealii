@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -616,13 +616,13 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  std::size_t
   MatrixBase::memory_consumption() const
   {
-      MatInfo info;
-      MatGetInfo(matrix, MAT_LOCAL, &info);
+    MatInfo info;
+    MatGetInfo(matrix, MAT_LOCAL, &info);
 
-      return sizeof(*this) + static_cast<unsigned int>(info.memory);
+    return sizeof(*this) + static_cast<unsigned int>(info.memory);
   }
 
 }

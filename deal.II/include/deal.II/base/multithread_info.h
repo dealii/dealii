@@ -96,7 +96,7 @@ class MultithreadInfo
 				      * quite close to the true
 				      * value.
 				      */
-    static unsigned int memory_consumption ();
+    static std::size_t memory_consumption ();
 
 				     /**
 				      * Exception

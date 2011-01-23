@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,7 +64,7 @@ class MGTransferBlockBase
     				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
   protected:  
 				     /**
@@ -277,7 +277,7 @@ class MGTransferBlock : public MGTransferBase<BlockVector<number> >,
 		      BlockVector<number2>& dst,
 		      const MGLevelObject<BlockVector<number> > &src) const;
 
-    MGTransferBlockBase::memory_consumption;
+    using MGTransferBlockBase::memory_consumption;
     
   private:
 				     /**
@@ -443,7 +443,7 @@ class MGTransferBlockSelect : public MGTransferBase<Vector<number> >,
 				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
   private:
 				     /**

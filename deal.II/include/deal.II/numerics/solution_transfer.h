@@ -330,7 +330,7 @@ class SolutionTransfer
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception
@@ -432,7 +432,7 @@ class SolutionTransfer
 				      */
     struct Pointerstruct {
 	Pointerstruct();
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
 
 	std::vector<unsigned int>    *indices_ptr;
 	std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr;

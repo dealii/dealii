@@ -161,7 +161,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 					  * consumption of this
 					  * object.
 					  */
-	virtual unsigned int memory_consumption () const;
+	virtual std::size_t memory_consumption () const;
 
 					 /**
 					  * Unit normal vectors. Used

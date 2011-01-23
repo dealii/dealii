@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,7 +20,7 @@
 #include <string>
 #include <complex>
 #include <vector>
-#include <utility>
+#include <cstddef>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -103,7 +103,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const T &t);
+  std::size_t memory_consumption (const T &t);
 
 				   /**
 				    * Determine the amount of memory
@@ -111,7 +111,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const bool);
+  std::size_t memory_consumption (const bool);
 
 				   /**
 				    * Determine the amount of memory
@@ -119,7 +119,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const char);
+  std::size_t memory_consumption (const char);
 
 				   /**
 				    * Determine the amount of memory
@@ -127,7 +127,7 @@ namespace MemoryConsumption
 				    * <tt>short int</tt> variable.
 				    */
   inline
-  unsigned int memory_consumption (const short int);
+  std::size_t memory_consumption (const short int);
 
 				   /**
 				    * Determine the amount of memory
@@ -135,7 +135,7 @@ namespace MemoryConsumption
 				    * <tt>short unsigned int</tt> variable.
 				    */
   inline
-  unsigned int memory_consumption (const short unsigned int);
+  std::size_t memory_consumption (const short unsigned int);
 
 				   /**
 				    * Determine the amount of memory
@@ -143,7 +143,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const int);
+  std::size_t memory_consumption (const int);
 
 				   /**
 				    * Determine the amount of memory
@@ -151,7 +151,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const unsigned int);
+  std::size_t memory_consumption (const unsigned int);
 
 				   /**
 				    * Determine the amount of memory
@@ -159,7 +159,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const float);
+  std::size_t memory_consumption (const float);
 
 				   /**
 				    * Determine the amount of memory
@@ -167,7 +167,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const double);
+  std::size_t memory_consumption (const double);
 
 				   /**
 				    * Determine the amount of memory
@@ -175,7 +175,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const long double);
+  std::size_t memory_consumption (const long double);
 
 				   /**
 				    * Determine the amount of memory
@@ -184,7 +184,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const std::complex<T> &);
+  std::size_t memory_consumption (const std::complex<T> &);
 
 				   /**
 				    * Determine an estimate of the
@@ -193,7 +193,7 @@ namespace MemoryConsumption
 				    * variable.
 				    */
   inline
-  unsigned int memory_consumption (const std::string &s);
+  std::size_t memory_consumption (const std::string &s);
 
 				   /**
 				    * Determine the amount of memory
@@ -247,7 +247,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const std::vector<T> &v);
+  std::size_t memory_consumption (const std::vector<T> &v);
 
 				   /**
 				    * Estimate the amount of memory
@@ -266,7 +266,7 @@ namespace MemoryConsumption
 				    */
   template <typename T, int N>
   inline
-  unsigned int memory_consumption (const T (&v)[N]);
+  std::size_t memory_consumption (const T (&v)[N]);
 
 				   /**
 				    * Specialization of the
@@ -280,7 +280,7 @@ namespace MemoryConsumption
 				    * field.
 				    */
   inline
-  unsigned int memory_consumption (const std::vector<bool> &v);
+  std::size_t memory_consumption (const std::vector<bool> &v);
 
 				   /**
 				    * Specialization of the
@@ -289,7 +289,7 @@ namespace MemoryConsumption
 				    * for a vector of <tt>int</tt>s.
 				    */
   inline
-  unsigned int memory_consumption (const std::vector<int> &v);
+  std::size_t memory_consumption (const std::vector<int> &v);
 
 				   /**
 				    * Specialization of the
@@ -298,7 +298,7 @@ namespace MemoryConsumption
 				    * for a vector of <tt>double</tt>s.
 				    */
   inline
-  unsigned int memory_consumption (const std::vector<double> &v);
+  std::size_t memory_consumption (const std::vector<double> &v);
 
 				   /**
 				    * Specialization of the
@@ -307,7 +307,7 @@ namespace MemoryConsumption
 				    * for a vector of <tt>float</tt>s.
 				    */
   inline
-  unsigned int memory_consumption (const std::vector<float> &v);
+  std::size_t memory_consumption (const std::vector<float> &v);
 
 				   /**
 				    * Specialization of the
@@ -316,7 +316,7 @@ namespace MemoryConsumption
 				    * for a vector of <tt>char</tt>s.
 				    */
   inline
-  unsigned int memory_consumption (const std::vector<char> &v);
+  std::size_t memory_consumption (const std::vector<char> &v);
 
 				   /**
 				    * Specialization of the
@@ -325,7 +325,7 @@ namespace MemoryConsumption
 				    * for a vector of <tt>unsigned char</tt>s.
 				    */
   inline
-  unsigned int memory_consumption (const std::vector<unsigned char> &v);
+  std::size_t memory_consumption (const std::vector<unsigned char> &v);
 
 				   /**
 				    * Specialization of the
@@ -335,7 +335,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const std::vector<T *> &v);
+  std::size_t memory_consumption (const std::vector<T *> &v);
 
 				   /**
 				    * Specialization of the
@@ -350,7 +350,7 @@ namespace MemoryConsumption
 				    * doesn't harm for other compilers
 				    * as well.
 				    */
-  unsigned int memory_consumption (const std::vector<std::string> &v);
+  std::size_t memory_consumption (const std::vector<std::string> &v);
 
 
 				   /**
@@ -360,7 +360,7 @@ namespace MemoryConsumption
 				    */
   template <typename A, typename B>
   inline
-  unsigned int memory_consumption (const std::pair<A,B> &p);
+  std::size_t memory_consumption (const std::pair<A,B> &p);
 
 				   /**
 				    * Return the amount of memory
@@ -372,7 +372,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const T * const);
+  std::size_t memory_consumption (const T * const);
 
 				   /**
 				    * Return the amount of memory
@@ -384,7 +384,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (T * const);
+  std::size_t memory_consumption (T * const);
 
 				   /**
 				    * Return the amount of memory
@@ -402,7 +402,7 @@ namespace MemoryConsumption
 				    * pointed to.
 				    */
   inline
-  unsigned int memory_consumption (void * const);
+  std::size_t memory_consumption (void * const);
 
 				   /**
 				    * Return the amount of memory used
@@ -414,7 +414,7 @@ namespace MemoryConsumption
 				    */
   template <typename T>
   inline
-  unsigned int memory_consumption (const std_cxx1x::shared_ptr<T> &);
+  std::size_t memory_consumption (const std_cxx1x::shared_ptr<T> &);
 }
 
 
@@ -424,7 +424,7 @@ namespace MemoryConsumption
 namespace MemoryConsumption
 {
   inline
-  unsigned int memory_consumption (const bool)
+  std::size_t memory_consumption (const bool)
   {
     return sizeof(bool);
   }
@@ -432,7 +432,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const char)
+  std::size_t memory_consumption (const char)
   {
     return sizeof(char);
   }
@@ -440,7 +440,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const short int)
+  std::size_t memory_consumption (const short int)
   {
     return sizeof(short int);
   }
@@ -448,7 +448,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const short unsigned int)
+  std::size_t memory_consumption (const short unsigned int)
   {
     return sizeof(short unsigned int);
   }
@@ -456,7 +456,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const int)
+  std::size_t memory_consumption (const int)
   {
     return sizeof(int);
   }
@@ -464,7 +464,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const unsigned int)
+  std::size_t memory_consumption (const unsigned int)
   {
     return sizeof(unsigned int);
   }
@@ -472,7 +472,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const float)
+  std::size_t memory_consumption (const float)
   {
     return sizeof(float);
   }
@@ -480,7 +480,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const double)
+  std::size_t memory_consumption (const double)
   {
     return sizeof(double);
   }
@@ -488,7 +488,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const long double)
+  std::size_t memory_consumption (const long double)
   {
     return sizeof(long double);
   }
@@ -496,7 +496,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  unsigned int memory_consumption (const std::complex<T> &)
+  std::size_t memory_consumption (const std::complex<T> &)
   {
     return sizeof(std::complex<T>);
   }
@@ -504,7 +504,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::string &s)
+  std::size_t memory_consumption (const std::string &s)
   {
     return sizeof(s) + s.length();
   }
@@ -512,7 +512,7 @@ namespace MemoryConsumption
 
 
   template <typename T>
-  unsigned int memory_consumption (const std::vector<T> &v)
+  std::size_t memory_consumption (const std::vector<T> &v)
   {
     unsigned int mem = sizeof(std::vector<T>);
     const unsigned int n = v.size();
@@ -525,7 +525,7 @@ namespace MemoryConsumption
 
 
   template <typename T, int N>
-  unsigned int memory_consumption (const T (&v)[N])
+  std::size_t memory_consumption (const T (&v)[N])
   {
     unsigned int mem = 0;
     for (unsigned int i=0; i<N; ++i)
@@ -536,7 +536,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::vector<bool> &v)
+  std::size_t memory_consumption (const std::vector<bool> &v)
   {
     return v.capacity() / 8 + sizeof(v);
   }
@@ -544,7 +544,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::vector<int> &v)
+  std::size_t memory_consumption (const std::vector<int> &v)
   {
     return (v.capacity() * sizeof(int) +
 	    sizeof(v));
@@ -553,7 +553,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::vector<double> &v)
+  std::size_t memory_consumption (const std::vector<double> &v)
   {
     return (v.capacity() * sizeof(double) +
 	    sizeof(v));
@@ -562,7 +562,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::vector<float> &v)
+  std::size_t memory_consumption (const std::vector<float> &v)
   {
     return (v.capacity() * sizeof(float) +
 	    sizeof(v));
@@ -571,7 +571,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::vector<char> &v)
+  std::size_t memory_consumption (const std::vector<char> &v)
   {
     return (v.capacity() * sizeof(char) +
 	    sizeof(v));
@@ -580,7 +580,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int memory_consumption (const std::vector<unsigned char> &v)
+  std::size_t memory_consumption (const std::vector<unsigned char> &v)
   {
     return (v.capacity() * sizeof(unsigned char) +
 	    sizeof(v));
@@ -590,7 +590,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  unsigned int memory_consumption (const std::vector<T *> &v)
+  std::size_t memory_consumption (const std::vector<T *> &v)
   {
     return (v.capacity() * sizeof(T *) +
 	    sizeof(v));
@@ -600,7 +600,7 @@ namespace MemoryConsumption
 
   template <typename A, typename B>
   inline
-  unsigned int memory_consumption (const std::pair<A,B> &p)
+  std::size_t memory_consumption (const std::pair<A,B> &p)
   {
     return (memory_consumption(p.first) +
 	    memory_consumption(p.second));
@@ -610,7 +610,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  unsigned int
+  std::size_t
   memory_consumption (const T * const)
   {
     return sizeof(T*);
@@ -620,7 +620,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  unsigned int
+  std::size_t
   memory_consumption (T * const)
   {
     return sizeof(T*);
@@ -629,7 +629,7 @@ namespace MemoryConsumption
 
 
   inline
-  unsigned int
+  std::size_t
   memory_consumption (void * const)
   {
     return sizeof(void*);
@@ -639,7 +639,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  unsigned int
+  std::size_t
   memory_consumption (const std_cxx1x::shared_ptr<T> &)
   {
     return sizeof(std_cxx1x::shared_ptr<T>);
@@ -649,7 +649,7 @@ namespace MemoryConsumption
 
   template <typename T>
   inline
-  unsigned int
+  std::size_t
   memory_consumption (const T &t)
   {
     return t.memory_consumption();

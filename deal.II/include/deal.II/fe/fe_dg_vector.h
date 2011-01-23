@@ -91,7 +91,7 @@ class FE_DGVector
     virtual void interpolate(
       std::vector<double>& local_dofs,
       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
     
   private:
     				     /**

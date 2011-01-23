@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -195,12 +195,12 @@ GrowingVectorMemory<VECTOR>::release_unused_memory ()
 
 template<typename VECTOR>
 inline
-unsigned int
+std::size_t
 GrowingVectorMemory<VECTOR>::memory_consumption () const
 {
   Threads::ThreadMutex::ScopedLock lock(mutex);
 
-  unsigned int result = sizeof (*this);
+  std::size_t result = sizeof (*this);
   const typename std::vector<entry_type>::const_iterator
     end = pool.data->end();
   for (typename std::vector<entry_type>::const_iterator

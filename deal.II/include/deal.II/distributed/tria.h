@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -378,7 +378,7 @@ namespace parallel
 					  * Return the local memory
 					  * consumption in bytes.
 					  */
-	virtual unsigned int memory_consumption () const;
+	virtual std::size_t memory_consumption () const;
 
 					 /**
 					  * Return the local memory
@@ -389,7 +389,7 @@ namespace parallel
 					  * available separately for debugging
 					  * purposes.
 					  */
-	virtual unsigned int memory_consumption_p4est () const;
+	virtual std::size_t memory_consumption_p4est () const;
 
 					 /**
 					  * A collective operation that produces
@@ -458,7 +458,7 @@ namespace parallel
 					  * notify_ready_to_unpack().
 					  */
 	unsigned int
-	register_data_attach (const size_t size,
+	register_data_attach (const std::size_t size,
 			      const std_cxx1x::function<void (const cell_iterator &,
 							      const CellStatus,
 							      void*)> & pack_callback);

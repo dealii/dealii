@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -122,7 +122,7 @@ namespace Patterns
   {}
 
 
-  unsigned int
+  std::size_t
   PatternBase::memory_consumption () const
   {
     if (dynamic_cast<const Integer*>(this) != 0)
@@ -420,7 +420,7 @@ namespace Patterns
   }
 
 
-  unsigned int
+  std::size_t
   Selection::memory_consumption () const
   {
     return (sizeof(PatternBase) +
@@ -547,7 +547,7 @@ namespace Patterns
   }
 
 
-  unsigned int
+  std::size_t
   List::memory_consumption () const
   {
     return (sizeof(PatternBase) +
@@ -688,7 +688,7 @@ namespace Patterns
   }
 
 
-  unsigned int
+  std::size_t
   MultipleSelection::memory_consumption () const
   {
     return (sizeof(PatternBase) +
@@ -2115,7 +2115,7 @@ ParameterHandler::scan_line (std::string        line,
 
 
 
-unsigned int
+std::size_t
 ParameterHandler::memory_consumption () const
 {
 //TODO: add to this an estimate of the memory in the property_tree
@@ -2342,10 +2342,10 @@ void MultipleParameterLoop::fill_entry_values (const unsigned int run_no)
 
 
 
-unsigned int
+std::size_t
 MultipleParameterLoop::memory_consumption () const
 {
-  unsigned int mem = ParameterHandler::memory_consumption ();
+  std::size_t mem = ParameterHandler::memory_consumption ();
   for (unsigned int i=0; i<multiple_choices.size(); ++i)
     mem += multiple_choices[i].memory_consumption ();
 
@@ -2410,7 +2410,7 @@ void MultipleParameterLoop::Entry::split_different_values ()
 }
 
 
-unsigned int
+std::size_t
 MultipleParameterLoop::Entry::memory_consumption () const
 {
   return (MemoryConsumption::memory_consumption (subsection_path) +

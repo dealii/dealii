@@ -163,7 +163,7 @@ class FE_ABF : public FE_PolyTensor<PolynomialsABF<dim>, dim>
     virtual void interpolate(
       std::vector<double>& local_dofs,
       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
     virtual FiniteElement<dim> * clone() const;
     
   private:

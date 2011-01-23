@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -234,7 +234,7 @@ class PreconditionBlockBase
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
 				     /**
 				      * You are trying to access a
@@ -663,10 +663,10 @@ PreconditionBlockBase<number>::inverses_ready() const
 
 template <typename number>
 inline
-unsigned int
+std::size_t
 PreconditionBlockBase<number>::memory_consumption () const
 {
-  unsigned int mem = sizeof(*this);
+  std::size_t mem = sizeof(*this);
   for (unsigned int i=0; i<var_inverse_full.size(); ++i)
     mem += MemoryConsumption::memory_consumption(var_inverse_full[i]);
   for (unsigned int i=0; i<var_diagonal.size(); ++i)

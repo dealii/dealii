@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -395,7 +395,7 @@ namespace TrilinosWrappers
 
 
 
-  unsigned int
+  std::size_t
   VectorBase::memory_consumption () const
   {
 				     //TODO[TH]: No accurate memory

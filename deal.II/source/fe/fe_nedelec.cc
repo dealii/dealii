@@ -5430,7 +5430,7 @@ const
 
 
 template <int dim>
-unsigned int
+std::size_t
 FE_Nedelec<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());

@@ -189,7 +189,7 @@ class MGTransferPrebuilt : public MGTransferBase<VECTOR>
     				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 
   private:

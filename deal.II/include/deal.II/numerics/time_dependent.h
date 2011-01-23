@@ -683,7 +683,7 @@ class TimeDependent
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception.
@@ -1001,7 +1001,7 @@ class TimeStepBase : public Subscriptor
 				      * result of this function to
 				      * your result.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception
@@ -1772,7 +1772,7 @@ class TimeStepBase_Tria : public TimeStepBase
 				      * result of this function to
 				      * your result.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -416,7 +416,7 @@ void SolutionTransfer<dim, VECTOR, DH>::interpolate(const VECTOR &in,
 
 
 template<int dim, typename VECTOR, class DH>
-unsigned int
+std::size_t
 SolutionTransfer<dim, VECTOR, DH>::memory_consumption () const
 {
 				   // at the moment we do not include the memory
@@ -433,7 +433,7 @@ SolutionTransfer<dim, VECTOR, DH>::memory_consumption () const
 
 
 template<int dim, typename VECTOR, class DH>
-unsigned int
+std::size_t
 SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::memory_consumption () const
 {
   return sizeof(*this);

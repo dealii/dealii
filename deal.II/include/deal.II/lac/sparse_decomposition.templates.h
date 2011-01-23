@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009, 2011 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -266,13 +266,11 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl ()
 
 
 template <typename number>
-unsigned int
+std::size_t
 SparseLUDecomposition<number>::memory_consumption () const
 {
-  unsigned int
-    res = (SparseMatrix<number>::memory_consumption () +
-           MemoryConsumption::memory_consumption(prebuilt_lower_bound));
-  return res;
+  return (SparseMatrix<number>::memory_consumption () +
+	  MemoryConsumption::memory_consumption(prebuilt_lower_bound));
 }
 
 

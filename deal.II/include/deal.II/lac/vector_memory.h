@@ -314,7 +314,7 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 				      * and all currently allocated
 				      * vectors.
 				      */
-    virtual unsigned int memory_consumption() const;
+    virtual std::size_t memory_consumption() const;
 
   private:
 				     /**

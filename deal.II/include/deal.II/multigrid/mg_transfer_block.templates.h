@@ -2,7 +2,7 @@
 //    mg_transfer.templates.h,v 1.22 2006/01/29 15:03:55 guido Exp
 //    Version:
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -99,7 +99,7 @@ MGTransferBlockSelect<number>::copy_from_mg_add (
 
 
 template <typename number>
-unsigned int
+std::size_t
 MGTransferBlockSelect<number>::memory_consumption () const
 {
   return sizeof(int) + MGTransferBlockBase::memory_consumption();

@@ -1092,7 +1092,7 @@ namespace TrilinosWrappers
 					* of this object. Currently not
 					* implemented for this class.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
 //@}
 /**

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,7 +22,7 @@ namespace internal
   namespace hp
   {
     template <int structdim>
-    unsigned int
+    std::size_t
     DoFObjects<structdim>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (dofs) +
@@ -32,19 +32,16 @@ namespace internal
 
 				     // explicit instantiations
     template
-    unsigned int
-    DoFObjects<1>::
-    memory_consumption () const;
+    std::size_t
+    DoFObjects<1>::memory_consumption () const;
     
     template
-    unsigned int
-    DoFObjects<2>::
-    memory_consumption () const;
+    std::size_t
+    DoFObjects<2>::memory_consumption () const;
     
     template
-    unsigned int
-    DoFObjects<3>::
-    memory_consumption () const;
+    std::size_t
+    DoFObjects<3>::memory_consumption () const;
   }
 }
 

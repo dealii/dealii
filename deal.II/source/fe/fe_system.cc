@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -3364,7 +3364,7 @@ FESystem<dim,spacedim>::unit_face_support_point (const unsigned index) const
 
 
 template <int dim, int spacedim>
-unsigned int
+std::size_t
 FESystem<dim,spacedim>::memory_consumption () const
 {
 				   // neglect size of data stored in
@@ -3373,8 +3373,8 @@ FESystem<dim,spacedim>::memory_consumption () const
 				   // compiler. should be neglectable
 				   // after all, considering the size
 				   // of the data of the subelements
-  unsigned int mem = (FiniteElement<dim,spacedim>::memory_consumption () +
-		      sizeof (base_elements));
+  std::size_t mem = (FiniteElement<dim,spacedim>::memory_consumption () +
+		     sizeof (base_elements));
   for (unsigned int i=0; i<base_elements.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*base_elements[i].first);
   return mem;

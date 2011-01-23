@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -233,10 +233,10 @@ void MGTransferBlock<number>::restrict_and_add (
 
 
 
-unsigned int
+std::size_t
 MGTransferComponentBase::memory_consumption () const
 {
-  unsigned int result = sizeof(*this);
+  std::size_t result = sizeof(*this);
   result += MemoryConsumption::memory_consumption(selected)
 	    - sizeof(selected);
   result += MemoryConsumption::memory_consumption(target_component)
@@ -259,10 +259,10 @@ MGTransferComponentBase::memory_consumption () const
 
 
 //TODO:[GK] Add all those little vectors.
-unsigned int
+std::size_t
 MGTransferBlockBase::memory_consumption () const
 {
-  unsigned int result = sizeof(*this);
+  std::size_t result = sizeof(*this);
   result += sizeof(unsigned int) * sizes.size();
   result += MemoryConsumption::memory_consumption(selected)
 	    - sizeof(selected);

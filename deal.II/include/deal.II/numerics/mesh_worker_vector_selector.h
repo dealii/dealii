@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -169,7 +169,7 @@ namespace MeshWorker
 				       /**
 					* The memory used by this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
       
     protected:
 				       /**
@@ -323,7 +323,7 @@ namespace MeshWorker
 				       /**
 					* The memory used by this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
   };
 
   
@@ -392,7 +392,7 @@ namespace MeshWorker
 				       /**
 					* The memory used by this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
     private:
       NamedData<SmartPointer<const VECTOR,VectorData<VECTOR,dim,spacedim> > > data;
@@ -465,7 +465,7 @@ namespace MeshWorker
 				       /**
 					* The memory used by this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
     private:
       NamedData<SmartPointer<const MGLevelObject<VECTOR>,MGVectorData<VECTOR,dim,spacedim> > > data;
@@ -603,13 +603,12 @@ namespace MeshWorker
   }
 
 
-  inline unsigned int
+  inline
+  std::size_t
   VectorSelector::memory_consumption () const
   {
-    unsigned int mem = sizeof(*this);
-    return mem;
-  }
-  
+    return sizeof(*this);
+  }  
 }
 
 

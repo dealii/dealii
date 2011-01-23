@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1030,7 +1030,7 @@ SparsityPattern::block_read (std::istream &in)
 std::size_t
 SparsityPattern::memory_consumption () const
 {
-  return (max_dim * static_cast<size_t>(sizeof(unsigned int)) +
+  return (max_dim * sizeof(unsigned int) +
 	  sizeof(*this) +
 	  max_vec_len * sizeof(unsigned int));
 }

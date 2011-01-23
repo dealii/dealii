@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -171,7 +171,8 @@ namespace Functions
 
 
   template<int dim>
-  unsigned int FlowFunction<dim>::memory_consumption () const
+  std::size_t
+  FlowFunction<dim>::memory_consumption () const
   {
     Assert(false, ExcNotImplemented());
     return 0;

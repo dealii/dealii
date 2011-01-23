@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -649,7 +649,7 @@ class TableBase : public Subscriptor
                                       * memory consumption (in bytes)
                                       * of this object.
                                       */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
                                      /**
                                       * Write or read the data of this object to or 
@@ -2089,7 +2089,7 @@ TableBase<N,T>::fill (const T2* entries)
 
 template <int N, typename T>
 inline
-unsigned int
+std::size_t
 TableBase<N,T>::memory_consumption () const
 {
   return sizeof(*this) + MemoryConsumption::memory_consumption(values);

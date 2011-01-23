@@ -378,7 +378,7 @@ class Mapping : public Subscriptor
 					  * consumption of this
 					  * object.
 					  */
-	virtual unsigned int memory_consumption () const;
+	virtual std::size_t memory_consumption () const;
 
 					 /**
 					  * The determinant of the

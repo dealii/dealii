@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -966,7 +966,7 @@ class SymmetricTensor
 				      * bytes) of this
 				      * object.
 				      */
-    static unsigned int memory_consumption ();
+    static std::size_t memory_consumption ();
 
                      /**
                       * Read or write the data of this object to or 
@@ -1300,7 +1300,7 @@ SymmetricTensor<rank,dim>::clear ()
 
 template <int rank, int dim>
 inline
-unsigned int
+std::size_t
 SymmetricTensor<rank,dim>::memory_consumption ()
 {
   return

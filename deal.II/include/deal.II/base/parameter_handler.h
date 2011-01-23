@@ -144,7 +144,7 @@ namespace Patterns
 					* you can still overload
 					* this function.
 					*/
-      virtual unsigned int memory_consumption () const;
+      virtual std::size_t memory_consumption () const;
   };
 
                        /**
@@ -507,7 +507,7 @@ namespace Patterns
 					* the memory consumption (in
 					* bytes) of this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
 				       /**
 					* Creates new object if the start of
@@ -623,7 +623,7 @@ namespace Patterns
 					* the memory consumption (in
 					* bytes) of this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
 				       /** @addtogroup Exceptions
 					* @{ */
@@ -738,7 +738,7 @@ namespace Patterns
 					* the memory consumption (in
 					* bytes) of this object.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
 				       /** @addtogroup Exceptions
 					* @{ */
@@ -2080,7 +2080,7 @@ class ParameterHandler : public Subscriptor
 				      * bytes) of this
 				      * object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
                          /**
                       * Write the data of this object to
@@ -2530,7 +2530,7 @@ class MultipleParameterLoop : public ParameterHandler
 				      * bytes) of this
 				      * object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   private:
 
@@ -2608,7 +2608,7 @@ class MultipleParameterLoop : public ParameterHandler
 					  * bytes) of this
 					  * object.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 				     /**

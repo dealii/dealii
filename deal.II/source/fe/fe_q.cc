@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1981,7 +1981,7 @@ FE_Q<dim,spacedim>::has_support_on_face (const unsigned int shape_index,
 
 
 template <int dim, int spacedim>
-unsigned int
+std::size_t
 FE_Q<dim,spacedim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());

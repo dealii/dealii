@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -295,7 +295,8 @@ class SmootherRelaxation : public MGSmoother<VECTOR>
     				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
+
   private:
  				     /**
 				      * Object containing relaxation
@@ -471,7 +472,7 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
     				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 
  private:
@@ -640,7 +641,7 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
     				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 
  private:
@@ -839,7 +840,8 @@ namespace mg
 
 
   template <class RELAX, class VECTOR>
-  inline unsigned int
+  inline
+  std::size_t
   SmootherRelaxation<RELAX, VECTOR>::
   memory_consumption () const
   {
@@ -1066,7 +1068,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
 
 
 template <class MATRIX, class RELAX, class VECTOR>
-inline unsigned int
+inline
+std::size_t
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::
 memory_consumption () const
 {
@@ -1269,7 +1272,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
 
 
 template <class MATRIX, class PRECONDITIONER, class VECTOR>
-inline unsigned int
+inline
+std::size_t
 MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::
 memory_consumption () const
 {

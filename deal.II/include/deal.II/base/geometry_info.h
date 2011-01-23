@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -379,7 +379,7 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      * occupied by an object of this
 				      * type.
 				      */
-    static unsigned int memory_consumption ();
+    static std::size_t memory_consumption ();
 
 				     /**
 				      * Exception.
@@ -726,7 +726,7 @@ namespace internal
 					* occupied by an object of this
 					* type.
 					*/
-      static unsigned int memory_consumption ();
+      static std::size_t memory_consumption ();
 
 				       /**
 					* Exception.
@@ -2441,7 +2441,7 @@ RefinementCase<dim>::operator ~ () const
 
 template <int dim>
 inline
-unsigned int
+std::size_t
 RefinementCase<dim>::memory_consumption ()
 {
   return sizeof(RefinementCase<dim>);

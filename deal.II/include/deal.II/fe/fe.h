@@ -1844,7 +1844,7 @@ class FiniteElement : public Subscriptor,
 				      * pointers to their base class,
 				      * rather than the class itself.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 				     /**
 				      * Exception
 				      *

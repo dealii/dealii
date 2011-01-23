@@ -69,7 +69,7 @@ namespace internal
 
 
 
-    unsigned int
+    std::size_t
     NumberCache<1>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (n_levels) +
@@ -89,7 +89,7 @@ namespace internal
 
 
 
-    unsigned int
+    std::size_t
     NumberCache<2>::memory_consumption () const
     {
       return (NumberCache<1>::memory_consumption () +
@@ -110,7 +110,7 @@ namespace internal
 
 
 
-    unsigned int
+    std::size_t
     NumberCache<3>::memory_consumption () const
     {
       return (NumberCache<2>::memory_consumption () +
@@ -14394,10 +14394,10 @@ void Triangulation<dim, spacedim>::read_bool_vector (const unsigned int  magic_n
 
 
 template <int dim, int spacedim>
-unsigned int
+std::size_t
 Triangulation<dim, spacedim>::memory_consumption () const
 {
-  unsigned int mem = 0;
+  std::size_t mem = 0;
   mem += MemoryConsumption::memory_consumption(levels);
   for (unsigned int i=0; i<levels.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*levels[i]);

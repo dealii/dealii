@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -149,7 +149,7 @@ namespace internal
 	static
 	types<2>::forest * (&load) (const char *filename,
 				    MPI_Comm mpicomm,
-				    std::size_t data_size,
+				    size_t data_size,
 				    int load_data,
 				    void *user_pointer,
 				    types<2>::connectivity ** p4est);
@@ -2726,7 +2726,7 @@ namespace parallel
     template <int dim, int spacedim>
     unsigned int
     Triangulation<dim,spacedim>::
-    register_data_attach (const size_t size,
+    register_data_attach (const std::size_t size,
 			  const std_cxx1x::function<void(const cell_iterator&,
 							 const CellStatus,
 							 void*)> & pack_callback)
@@ -2813,10 +2813,10 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    unsigned int
+    std::size_t
     Triangulation<dim,spacedim>::memory_consumption () const
     {
-      unsigned int mem=
+      std::size_t mem=
 	this->dealii::Triangulation<dim,spacedim>::memory_consumption()
 	+ MemoryConsumption::memory_consumption(mpi_communicator)
 	+ MemoryConsumption::memory_consumption(my_subdomain)
@@ -2831,8 +2831,7 @@ namespace parallel
 //	+ MemoryConsumption::memory_consumption(attached_data_pack_callbacks) //TODO[TH]: how?
 	+ MemoryConsumption::memory_consumption(coarse_cell_to_p4est_tree_permutation)
 	+ MemoryConsumption::memory_consumption(p4est_tree_to_coarse_cell_permutation)
-	+ memory_consumption_p4est()
-	;
+	+ memory_consumption_p4est();
 
       return mem;
     }
@@ -2840,7 +2839,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    unsigned int
+    std::size_t
     Triangulation<dim,spacedim>::memory_consumption_p4est () const
     {
       return internal::p4est::functions<dim>::forest_memory_used(parallel_forest)

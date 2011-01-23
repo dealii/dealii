@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -786,7 +786,7 @@ namespace internal
 
 
     template<typename G>
-    unsigned int
+    std::size_t
     TriaObjects<G>::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (cells) +
@@ -799,7 +799,7 @@ namespace internal
     }
 
 
-    unsigned int
+    std::size_t
     TriaObjectsHex::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (face_orientations) +
@@ -809,7 +809,7 @@ namespace internal
     }
 
 
-    unsigned int
+    std::size_t
     TriaObjectsQuad3D::memory_consumption () const
     {
       return (MemoryConsumption::memory_consumption (line_orientations) +

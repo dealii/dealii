@@ -343,7 +343,7 @@ class SparseLUDecomposition : protected SparseMatrix<number>,
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 
     				     /** @addtogroup Exceptions
 				      * @{ */

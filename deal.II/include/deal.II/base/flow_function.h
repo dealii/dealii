@@ -115,7 +115,7 @@ namespace Functions
       virtual void vector_laplacian_list (const std::vector<Point<dim> > &points,
 					  std::vector<Vector<double> >   &values) const;
 
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
     protected:
 				       /**

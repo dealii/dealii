@@ -1136,7 +1136,7 @@ namespace PETScWrappers
 					*  Returns the number bytes consumed
 					*  by this matrix on this CPU.
 					*/
-      unsigned int memory_consumption() const;
+      std::size_t memory_consumption() const;
 
                                        /**
                                         * Exception

@@ -321,7 +321,7 @@ class SparseDirectMA27 : public Subscriptor
 				      * Return an estimate of the
 				      * memory used by this class.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
 				     /**
 				      * Get a reference to the
@@ -791,7 +791,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * Return an estimate of the
 				      * memory used by this class.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Get a reference to the

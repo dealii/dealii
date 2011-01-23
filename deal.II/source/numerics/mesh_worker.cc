@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -38,10 +38,10 @@ namespace MeshWorker
 
 
   template <typename number>
-  unsigned int
+  std::size_t
   LocalResults<number>::memory_consumption () const
   {
-    unsigned int mem = sizeof(*this)
+    std::size_t mem = sizeof(*this)
 		       + MemoryConsumption::memory_consumption(J)
 		       + MemoryConsumption::memory_consumption(R)
 		       + MemoryConsumption::memory_consumption(M1)

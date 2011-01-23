@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be distributed
 //    without copyright and license information. Please refer
@@ -684,7 +684,8 @@ namespace TrilinosWrappers
 
 
 
-  unsigned int PreconditionAMG::memory_consumption() const
+  std::size_t
+  PreconditionAMG::memory_consumption() const
   {
     unsigned int memory = sizeof(this);
 

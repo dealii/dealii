@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1824,7 +1824,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs (const unsigned int sub_degree) const
 
 
 template <int dim>
-unsigned int
+std::size_t
 FE_Q_Hierarchical<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1074,15 +1074,15 @@ namespace PETScWrappers
   }
 
 
-  unsigned int
+  std::size_t
   VectorBase::memory_consumption () const
   {    
-    unsigned int mem = sizeof(Vec)+sizeof(LastAction::Values)
+    std::size_t mem = sizeof(Vec)+sizeof(LastAction::Values)
       +MemoryConsumption::memory_consumption(ghosted)
       +MemoryConsumption::memory_consumption(ghost_indices);
 
 				     // TH: I am relatively sure that PETSc is
-				     // storing the local data in a contigious
+				     // storing the local data in a contiguous
 				     // block without indices:
     mem += local_size()*sizeof(PetscScalar);
 				     // assume that PETSc is storing one index

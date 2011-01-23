@@ -63,7 +63,7 @@ class MGTransferComponentBase
     				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 
   protected:
@@ -374,7 +374,7 @@ class MGTransferSelect : public MGTransferBase<Vector<number> >,
 				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   private:
 				     /**

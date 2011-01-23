@@ -654,7 +654,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception
@@ -864,7 +864,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * the memory consumption (in
 					  * bytes) of this object.
 					  */
-	virtual unsigned int memory_consumption () const = 0;
+	virtual std::size_t memory_consumption () const = 0;
 
 					 /**
 					  * Names of the components of this
@@ -1031,7 +1031,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 					  * the memory consumption (in
 					  * bytes) of this object.
 					  */
-	virtual unsigned int memory_consumption () const;
+	virtual std::size_t memory_consumption () const;
 
       private:
                                          /**

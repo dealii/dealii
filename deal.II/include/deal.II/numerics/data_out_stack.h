@@ -290,7 +290,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 				     /**
 				      * Exception
@@ -403,7 +403,7 @@ class DataOutStack : public DataOutInterface<dim+1>
 					  * the memory consumption (in
 					  * bytes) of this object.
 					  */
-	unsigned int memory_consumption () const;
+	std::size_t memory_consumption () const;
     };
 
 				     /**

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -532,12 +532,12 @@ void PreconditionBlock<MATRIX,inverse_type>::set_permutation (
 
 
 template <class MATRIX, typename inverse_type>
-unsigned int
+std::size_t
 PreconditionBlock<MATRIX,inverse_type>::memory_consumption () const
 {
-  unsigned int mem = sizeof(*this) - sizeof(PreconditionBlockBase<inverse_type>);
-  mem += PreconditionBlockBase<inverse_type>::memory_consumption();
-  return mem;
+  return (sizeof(*this)
+	  - sizeof(PreconditionBlockBase<inverse_type>)
+	  + PreconditionBlockBase<inverse_type>::memory_consumption());
 }
 
 

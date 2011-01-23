@@ -552,7 +552,7 @@ class FilteredMatrix : public Subscriptor
 				      * referenced, its memory
 				      * consumption is not included.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
   private:
 				     /**
@@ -1099,11 +1099,11 @@ FilteredMatrix<VECTOR>::Tvmult_add (VECTOR& dst, const VECTOR& src) const
 
 template <class VECTOR>
 inline
-unsigned int
+std::size_t
 FilteredMatrix<VECTOR>::memory_consumption () const
 {
-    return (MemoryConsumption::memory_consumption (matrix) +
-	    MemoryConsumption::memory_consumption (constraints));
+  return (MemoryConsumption::memory_consumption (matrix) +
+	  MemoryConsumption::memory_consumption (constraints));
 }
 
 

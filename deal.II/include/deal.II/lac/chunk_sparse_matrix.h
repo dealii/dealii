@@ -346,7 +346,7 @@ class ChunkSparseMatrix : public virtual Subscriptor
 				      * of this object. See
 				      * MemoryConsumption.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
 //@}
 /**

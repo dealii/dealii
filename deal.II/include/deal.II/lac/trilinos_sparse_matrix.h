@@ -1080,7 +1080,7 @@ namespace TrilinosWrappers
 					* returned in case this is called in
 					* an MPI-based program.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
 
 //@}
 /**

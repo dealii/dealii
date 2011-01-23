@@ -363,7 +363,7 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * pointers to their base class,
 				      * rather than the class itself.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 
                                      /**
 				      * For a finite element of degree

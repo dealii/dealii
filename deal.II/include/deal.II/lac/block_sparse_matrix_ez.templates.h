@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -200,10 +200,10 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
 
 
 //  template <typename number>
-//  unsigned int
+//  std::size_t
 //  BlockSparseMatrixEZ<number>::memory_consumption () const
 //  {
-//    unsigned int mem = sizeof(*this);
+//    std::size_t mem = sizeof(*this);
 //    mem += MemoryConsumption::memory_consumption (sub_objects);
 //    for (unsigned int r=0; r<rows; ++r)
 //      for (unsigned int c=0; c<columns; ++c)

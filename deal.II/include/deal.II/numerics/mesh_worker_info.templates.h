@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -180,13 +180,12 @@ namespace MeshWorker
 
 
   template<int dim, int sdim>
-  unsigned int
+  std::size_t
   IntegrationInfo<dim,sdim>::memory_consumption () const
   {
-    unsigned int mem = sizeof(*this)
-		       + MemoryConsumption::memory_consumption(fevalv)
-		       - sizeof (fevalv)
-		       ;
+    std::size_t mem = sizeof(*this)
+		      + MemoryConsumption::memory_consumption(fevalv)
+		      - sizeof (fevalv);
     for (unsigned int i=0;i<fevalv.size();++i)
       mem += fevalv[i]->memory_consumption();
     return mem;
@@ -248,33 +247,32 @@ namespace MeshWorker
 
   
   template<int dim, int sdim>
-  unsigned int
+  std::size_t
   IntegrationInfoBox<dim,sdim>::memory_consumption () const
   {
-    unsigned int mem = sizeof(*this)
-		       + MemoryConsumption::memory_consumption(cell_quadrature)
-		       - sizeof (cell_quadrature)
-		       + MemoryConsumption::memory_consumption(boundary_quadrature)
-		       - sizeof (boundary_quadrature)
-		       + MemoryConsumption::memory_consumption(face_quadrature)
-		       - sizeof (face_quadrature)
-		       + MemoryConsumption::memory_consumption(cell_selector)
-		       -sizeof (cell_selector)
-		       + MemoryConsumption::memory_consumption(boundary_selector)
-		       -sizeof (boundary_selector)
-		       + MemoryConsumption::memory_consumption(face_selector)
-		       -sizeof (face_selector)
-		       + MemoryConsumption::memory_consumption(cell)
-		       - sizeof(cell)
-		       + MemoryConsumption::memory_consumption(boundary)
-		       - sizeof(boundary)
-		       + MemoryConsumption::memory_consumption(face)
-		       - sizeof(face)
-		       + MemoryConsumption::memory_consumption(subface)
-		       - sizeof(subface)
-		       + MemoryConsumption::memory_consumption(neighbor)
-		       - sizeof(neighbor)
-		       ;
+    std::size_t mem = sizeof(*this)
+		      + MemoryConsumption::memory_consumption(cell_quadrature)
+		      - sizeof (cell_quadrature)
+		      + MemoryConsumption::memory_consumption(boundary_quadrature)
+		      - sizeof (boundary_quadrature)
+		      + MemoryConsumption::memory_consumption(face_quadrature)
+		      - sizeof (face_quadrature)
+		      + MemoryConsumption::memory_consumption(cell_selector)
+		      -sizeof (cell_selector)
+		      + MemoryConsumption::memory_consumption(boundary_selector)
+		      -sizeof (boundary_selector)
+		      + MemoryConsumption::memory_consumption(face_selector)
+		      -sizeof (face_selector)
+		      + MemoryConsumption::memory_consumption(cell)
+		      - sizeof(cell)
+		      + MemoryConsumption::memory_consumption(boundary)
+		      - sizeof(boundary)
+		      + MemoryConsumption::memory_consumption(face)
+		      - sizeof(face)
+		      + MemoryConsumption::memory_consumption(subface)
+		      - sizeof(subface)
+		      + MemoryConsumption::memory_consumption(neighbor)
+		      - sizeof(neighbor);
 //   if (cell_data != 0)
 //     mem += MemoryConsumption::memory_consumption(*cell_data);
 //   if (boundary_data != 0)

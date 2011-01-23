@@ -187,7 +187,7 @@ class BlockInfo : public Subscriptor
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   private:
 				     /**
@@ -313,16 +313,13 @@ BlockInfo::print (OS& os) const
 
 
 inline
-unsigned int
+std::size_t
 BlockInfo::memory_consumption () const
 {
-  unsigned int mem = (MemoryConsumption::memory_consumption (bi_global) +
-		      MemoryConsumption::memory_consumption (levels) +
-		      MemoryConsumption::memory_consumption (bi_local) +
-		      MemoryConsumption::memory_consumption (base_elements)
-  );
-
-  return mem;
+  return (MemoryConsumption::memory_consumption (bi_global) +
+	  MemoryConsumption::memory_consumption (levels) +
+	  MemoryConsumption::memory_consumption (bi_local) +
+	  MemoryConsumption::memory_consumption (base_elements));
 }
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -720,7 +720,7 @@ FE_ABF<dim>::interpolate(
 
 
 template <int dim>
-unsigned int
+std::size_t
 FE_ABF<dim>::memory_consumption () const
 {
   Assert (false, ExcNotImplemented ());

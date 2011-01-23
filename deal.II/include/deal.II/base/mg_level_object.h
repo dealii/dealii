@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -111,7 +111,7 @@ class MGLevelObject : public Subscriptor
 				     /**
 				      * Memory used by this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
     
   private:
 				     /**
@@ -231,10 +231,10 @@ MGLevelObject<Object>::max_level () const
 
 
 template<class Object>
-unsigned int
+std::size_t
 MGLevelObject<Object>::memory_consumption () const
 {
-  unsigned int result = sizeof(*this);
+  std::size_t result = sizeof(*this);
   typedef typename std::vector<std_cxx1x::shared_ptr<Object> >::const_iterator Iter;
   const Iter end = objects.end();
   for (Iter o=objects.begin(); o!=end; ++o)

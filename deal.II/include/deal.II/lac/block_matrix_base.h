@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -371,7 +371,7 @@ class BlockMatrixBase : public Subscriptor
     typedef const value_type       *const_pointer;
     typedef value_type             &reference;
     typedef const value_type       &const_reference;
-    typedef size_t                  size_type;
+    typedef std::size_t             size_type;
 
     typedef
     MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, false> >
@@ -907,7 +907,7 @@ class BlockMatrixBase : public Subscriptor
 					* returned in case this is called in
 					* an MPI-based program.
 					*/
-      unsigned int memory_consumption () const;
+      std::size_t memory_consumption () const;
     
       				     /** @addtogroup Exceptions
 				      * @{ */
@@ -1722,10 +1722,10 @@ copy_from (const BlockMatrixType &source)
 
 
 template <class MatrixType>
-unsigned int
+std::size_t
 BlockMatrixBase<MatrixType>::memory_consumption () const
 {
-  unsigned int mem =
+  std::size_t mem =
     MemoryConsumption::memory_consumption(row_block_indices)+
     MemoryConsumption::memory_consumption(column_block_indices)+
     MemoryConsumption::memory_consumption(sub_objects)+

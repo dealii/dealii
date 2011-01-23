@@ -358,7 +358,7 @@ class IndexSet
                                       * consumption (in bytes) of this
                                       * object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
     DeclException1 (ExcIndexNotPresent, int,
 		    << "The global index " << arg1
@@ -429,7 +429,7 @@ class IndexSet
 		    (range_1.begin == range_2.begin));
 	  }
 
-	unsigned int memory_consumption () const
+	std::size_t memory_consumption () const
 	  {
 	    return sizeof(Range);
 	  }

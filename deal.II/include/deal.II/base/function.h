@@ -371,7 +371,7 @@ class Function : public FunctionTime,
 				      * quite close to the true
 				      * value.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 };
 
 
@@ -592,7 +592,7 @@ class ConstantFunction : public ZeroFunction<dim>
 				      * quite close to the true
 				      * value.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   protected:
 				     /**
@@ -695,7 +695,7 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				      * quite close to the true
 				      * value.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
   protected:
 				     /**

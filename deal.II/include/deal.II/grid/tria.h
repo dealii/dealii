@@ -253,7 +253,7 @@ namespace internal
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
-        unsigned int memory_consumption () const;
+        std::size_t memory_consumption () const;
     };
 
 
@@ -310,7 +310,7 @@ namespace internal
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
-        unsigned int memory_consumption () const;
+        std::size_t memory_consumption () const;
     };
 
 //TODO: Replace boundary[255] by a std::vector so we can use constructor of SmartPointer
@@ -368,7 +368,7 @@ namespace internal
                                           * memory consumption (in bytes)
                                           * of this object.
                                           */
-        unsigned int memory_consumption () const;
+        std::size_t memory_consumption () const;
     };
   }
 }
@@ -3130,7 +3130,7 @@ class Triangulation : public Subscriptor
 				      * even if the actual object is a
 				      * derived class.
 				      */
-    virtual unsigned int memory_consumption () const;
+    virtual std::size_t memory_consumption () const;
 
 
 				     /**

@@ -634,7 +634,7 @@ class FullMatrix : public Table<2,number>
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 //@}
 ///@name Iterator functions

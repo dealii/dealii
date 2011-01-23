@@ -984,7 +984,7 @@ namespace hp
                                         * although the actual object
                                         * might be a derived class.
                                         */
-      virtual unsigned int memory_consumption () const;
+      virtual std::size_t memory_consumption () const;
 
                                        /**
                                         * Exception

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -315,7 +315,7 @@ struct SparseDirectMA27::DetachedModeData
                                       */
     template <typename T>
     void put (const T *t,
-              const size_t N,
+              const std::size_t N,
 	      const char * /*debug_info*/) const
       {
         unsigned int count = 0;
@@ -349,7 +349,7 @@ struct SparseDirectMA27::DetachedModeData
                                       */
     template <typename T>
     void get (T *t,
-	      const size_t N,
+	      const std::size_t N,
 	      const char * /*debug_info*/) const
       {
         unsigned int count = 0;
@@ -823,7 +823,7 @@ SparseDirectMA27::solve (const SparseMatrix<number> &matrix,
 
 
 
-unsigned int
+std::size_t
 SparseDirectMA27::memory_consumption () const
 {
   return (sizeof(*this) +
@@ -1346,7 +1346,7 @@ SparseDirectMA47::solve (const SparseMatrix<double> &matrix,
 
 
 
-unsigned int
+std::size_t
 SparseDirectMA47::memory_consumption () const
 {
   return (sizeof(*this) +

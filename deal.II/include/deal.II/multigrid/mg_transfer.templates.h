@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -96,10 +96,10 @@ set_component_to_block_map (const std::vector<unsigned int> &map)
 }
 
 template <class VECTOR>
-unsigned int
+std::size_t
 MGTransferPrebuilt<VECTOR>::memory_consumption () const
 {
-  unsigned int result = sizeof(*this);
+  std::size_t result = sizeof(*this);
   result += sizeof(unsigned int) * sizes.size();
 #ifdef DEAL_PREFER_MATRIX_EZ
   std::vector<std_cxx1x::shared_ptr<SparseMatrixEZ<double> > >::const_iterator m;

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -525,7 +525,7 @@ class TriaRawIterator :
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    unsigned int memory_consumption () const;
+    std::size_t memory_consumption () const;
 
 
 				     /**@name Exceptions*/
@@ -1177,7 +1177,7 @@ TriaRawIterator<Accessor>::print (std::ostream &out) const
 
 template <typename Accessor>
 inline
-unsigned int
+std::size_t
 TriaRawIterator<Accessor>::memory_consumption () const
 {
   return sizeof(TriaRawIterator<Accessor>);

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -234,13 +234,14 @@ void TimeDependent::end_sweep (const unsigned int begin,
 
 
 
-unsigned int TimeDependent::memory_consumption () const
+std::size_t
+TimeDependent::memory_consumption () const
 {
-  unsigned int mem = (MemoryConsumption::memory_consumption (timesteps) +
-		      MemoryConsumption::memory_consumption (sweep_no) +
-		      sizeof(timestepping_data_primal) +
-		      sizeof(timestepping_data_dual) +
-		      sizeof(timestepping_data_postprocess));
+  std::size_t mem = (MemoryConsumption::memory_consumption (timesteps) +
+		     MemoryConsumption::memory_consumption (sweep_no) +
+		     sizeof(timestepping_data_primal) +
+		     sizeof(timestepping_data_dual) +
+		     sizeof(timestepping_data_postprocess));
   for (unsigned int i=0; i<timesteps.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*timesteps[i]);
 
@@ -397,7 +398,7 @@ TimeStepBase::set_sweep_no (const unsigned int sweep)
 
 
 
-unsigned int
+std::size_t
 TimeStepBase::memory_consumption () const
 {
 				   // only simple data types
@@ -1125,7 +1126,7 @@ void TimeStepBase_Tria<dim>::init_for_refinement ()
 
 
 template <int dim>
-unsigned int
+std::size_t
 TimeStepBase_Tria<dim>::memory_consumption () const
 {
   return (TimeStepBase::memory_consumption () +

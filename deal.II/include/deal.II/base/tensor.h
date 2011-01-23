@@ -234,7 +234,7 @@ class Tensor
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
-    static unsigned int memory_consumption ();
+    static std::size_t memory_consumption ();
 
                                      /**
                                       * Exception.
@@ -483,7 +483,7 @@ void Tensor<rank_,dim>::clear ()
 
 template <int rank_, int dim>
 inline
-unsigned int
+std::size_t
 Tensor<rank_,dim>::memory_consumption ()
 {
   return sizeof(Tensor<rank_,dim>);
