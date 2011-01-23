@@ -1135,12 +1135,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
   if (timestep_number != 0)
     {
-      double min_local_temperature = (1. + time_step/old_time_step) *
-	                             old_temperature_solution.linfty_norm()
-	                             +
-			             time_step/old_time_step *
-			             old_old_temperature_solution.linfty_norm(),
-	     max_local_temperature = -min_local_temperature;
+      double min_local_temperature = 1e30,
+	     max_local_temperature = -1e30;
 
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
