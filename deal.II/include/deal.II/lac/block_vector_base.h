@@ -1104,6 +1104,23 @@ class BlockVectorBase : public Subscriptor
     void equ (const value_type a, const BlockVectorBase& V,
 	      const value_type b, const BlockVectorBase& W);
 
+                                     /**
+                                      * This function does nothing but is
+                                      * there for compatibility with the
+                                      * @p PETScWrappers::Vector class.
+                                      *
+                                      * For the PETSc vector wrapper class,
+                                      * this function updates the ghost
+                                      * values of the PETSc vector. This
+                                      * is necessary after any modification
+                                      * before reading ghost values.
+                                      *
+                                      * However, for the implementation of
+                                      * this class, it is immaterial and thus
+                                      * an empty function.
+                                      */
+    void update_ghost_values () const;
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -2237,6 +2254,15 @@ void BlockVectorBase<VectorType>::equ (const value_type    a,
 
   for (unsigned int i=0;i<n_blocks();++i)
     components[i].equ( a, v.components[i]);
+}
+
+
+
+template <class VectorType>
+void BlockVectorBase<VectorType>::update_ghost_values () const
+{
+  for (unsigned int i=0; i<n_blocks(); ++i)
+    block(i).update_ghost_values ();
 }
 
 

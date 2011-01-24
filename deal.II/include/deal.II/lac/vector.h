@@ -851,6 +851,23 @@ class Vector : public Subscriptor
 				      */
     void ratio (const Vector<Number> &a,
 		const Vector<Number> &b);
+
+                                     /**
+                                      * This function does nothing but is
+                                      * there for compatibility with the
+                                      * @p PETScWrappers::Vector class.
+                                      *
+                                      * For the PETSc vector wrapper class,
+                                      * this function updates the ghost
+                                      * values of the PETSc vector. This
+                                      * is necessary after any modification
+                                      * before reading ghost values.
+                                      *
+                                      * However, for the implementation of
+                                      * this class, it is immaterial and thus
+                                      * an empty function.
+                                      */
+    void update_ghost_values () const;
 				     //@}
 
 
@@ -1442,6 +1459,15 @@ inline
 void
 Vector<Number>::compress () const
 {}
+
+
+
+template <typename Number>
+inline
+void
+Vector<Number>::update_ghost_values () const
+{}
+
 
 
 // Moved from vector.templates.h as an inline function by Luca Heltai
