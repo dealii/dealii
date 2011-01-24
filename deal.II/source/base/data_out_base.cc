@@ -4405,7 +4405,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n";
   for(unsigned int i=0; i<n_cells; ++i)
     out << ' ' << ( (i+1)*GeometryInfo<dim>::vertices_per_cell);
-  	
+  out << "\n";  	
   out << "    </DataArray>\n";
   
 				   // next output the types of the
@@ -4415,7 +4415,8 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   
   for (unsigned int i=0; i<n_cells; ++i)
     out << ' ' << vtk_cell_type[dim];
-   
+
+  out << "\n"; 
   out << "    </DataArray>\n"; 
   out << "  </Cells>\n";
   
@@ -4470,15 +4471,15 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
       out << "    <DataArray type=\"Float64\" Name=\"";
       
       if (std_cxx1x::get<2>(vector_data_ranges[n_th_vector]) != "")
-			out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
+	out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
       else
-		{
-		  for (unsigned int i=std_cxx1x::get<0>(vector_data_ranges[n_th_vector]);
-			   i<std_cxx1x::get<1>(vector_data_ranges[n_th_vector]);
-			   ++i)
-			out << data_names[i] << "__";
-		  out << data_names[std_cxx1x::get<1>(vector_data_ranges[n_th_vector])];
-		}
+	{
+	  for (unsigned int i=std_cxx1x::get<0>(vector_data_ranges[n_th_vector]);
+	       i<std_cxx1x::get<1>(vector_data_ranges[n_th_vector]);
+	       ++i)
+	    out << data_names[i] << "__";
+	  out << data_names[std_cxx1x::get<1>(vector_data_ranges[n_th_vector])];
+	}
 
       out << "\" NumberOfComponents=\"3\" format=\"ascii\">\n";
 
@@ -4532,7 +4533,6 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 	std::copy (data_vectors[data_set].begin(),
 		   data_vectors[data_set].end(),
 		   std::ostream_iterator<double>(out, "\n"));
-	out << '\n';
 	out << "    </DataArray>\n";
       }
 
