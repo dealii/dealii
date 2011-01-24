@@ -1135,6 +1135,10 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
   if (timestep_number != 0)
     {
+				       // use different formula here than in
+				       // step-31 to avoid computing the
+				       // linfty_norm of the temperature
+				       // (which requires a communication)
       double min_local_temperature = 1e30,
 	     max_local_temperature = -1e30;
 
