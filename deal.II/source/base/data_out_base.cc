@@ -4382,8 +4382,9 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 				   // vertices along with their
 				   // coordinates
 				   //
-				   // note that we have to print
-				   // d=1..3 dimensions
+				   // note that according to the standard, we
+				   // have to print d=1..3 dimensions, even if
+				   // we are in reality in 2d, for example
   out << "<Piece NumberOfPoints=\"" << n_nodes <<"\" NumberOfCells=\"" << n_cells << "\" > \n";
   out << "  <Points> \n";
   out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\"> \n";
