@@ -39,6 +39,9 @@
 
 
 
+/* Define if building universal (internal helper macro) */
+#undef AC_APPLE_UNIVERSAL_BUILD
+
 /* Defined if the prototype of abort() has a no-throw exception specification.
    */
 #undef DEAL_II_ABORT_NOTHROW_EXCEPTION
@@ -275,6 +278,9 @@
    Darwin7.9.0 and probably previous version. It leads to problems during
    linking. For the details, look at aclocal.m4 in the top-level directory. */
 #undef DEAL_II_WEAK_LINKAGE_BUG
+
+/* Defined if the system stores words with the most significant byte first */
+#undef DEAL_II_WORDS_BIGENDIAN
 
 /* Define to 1 if you have the <Amesos.h> header file. */
 #undef HAVE_AMESOS_H
@@ -552,6 +558,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -564,6 +573,18 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
 
 /* If already available, do not define at all. Otherwise, define to __func__
    if that is available. In all other cases, indicate that no information

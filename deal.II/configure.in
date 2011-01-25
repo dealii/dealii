@@ -605,6 +605,13 @@ AC_ARG_WITH(zlib,
 			  search path of ld],
   DEAL_II_WITH_ZLIB($withval))
 
+dnl In the context of libz, we also need to know the endianness of the system
+dnl (e.g. when encoding compressed XML-based VTK files)
+AC_C_BIGENDIAN(
+  AC_DEFINE(DEAL_II_WORDS_BIGENDIAN, 1,
+            [Defined if the system stores words with the most
+             significant byte first])
+)
 
 DEAL_II_CONFIGURE_TECPLOT
 AC_SUBST(TECPLOT_INCLUDE_DIR)
