@@ -1008,7 +1008,7 @@ namespace
     unsigned int d1,
     unsigned int d2,
     unsigned int d3)
-  {   
+  {
     stream << start << '\t'
 	   << start+d1;
     if (dim>=2)
@@ -1933,7 +1933,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
   if (patches.size() == 0)
     return;
 #endif
-  
+
   const unsigned int n_data_sets = data_names.size();
 
   UcdStream ucd_out(out, flags);
@@ -2316,7 +2316,7 @@ void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patche
   if (patches.size() == 0)
     return;
 #endif
-  
+
   const unsigned int n_data_sets = data_names.size();
 
   				   // write preamble
@@ -2915,7 +2915,7 @@ void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
   if (patches.size() == 0)
     return;
 #endif
-  
+
 				   // Do not allow volume rendering
   AssertThrow (dim==2, ExcNotImplemented());
 
@@ -3276,7 +3276,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
 {
   Assert(dim<=3, ExcNotImplemented());
   AssertThrow (out, ExcIO());
-  
+
 #ifndef DEAL_II_COMPILER_SUPPORTS_MPI
 				   // verify that there are indeed
 				   // patches to be written out. most
@@ -3296,7 +3296,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
   if (patches.size() == 0)
     return;
 #endif
-  
+
   GmvStream gmv_out(out, flags);
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
@@ -3450,7 +3450,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
   if (patches.size() == 0)
     return;
 #endif
-  
+
   TecplotStream tecplot_out(out, flags);
 
   const unsigned int n_data_sets = data_names.size();
@@ -3741,7 +3741,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
   if (patches.size() == 0)
     return;
 #endif
-  
+
   const unsigned int n_data_sets = data_names.size();
 				   // check against # of data sets in
 				   // first patch. checks against all
@@ -4052,7 +4052,7 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
   if (patches.size() == 0)
     return;
 #endif
-  
+
   VtkStream vtk_out(out, flags);
 
   const unsigned int n_data_sets = data_names.size();
@@ -4320,9 +4320,9 @@ namespace
       char* codechar = code_out;
       char result;
       char fragment;
-	
+
       result = state_in->result;
-	
+
       switch (state_in->step)
 	{
 	  while (1)
@@ -4370,7 +4370,7 @@ namespace
     int base64_encode_blockend(char* code_out, base64_encodestate* state_in)
     {
       char* codechar = code_out;
-	
+
       switch (state_in->step)
 	{
 	  case step_B:
@@ -4386,12 +4386,12 @@ namespace
 		break;
 	}
       *codechar++ = '\0';
-	
+
       return codechar - code_out;
     }
   }
-  
-    
+
+
 				   /**
 				    * Do a base64 encoding of the given data.
 				    *
@@ -4420,12 +4420,12 @@ namespace
 				     encoded_data + encoded_length_header, &state);
     base64::base64_encode_blockend (encoded_data + encoded_length_header + encoded_length_data,
 				    &state);
-    
+
     return encoded_data;
   }
-  
 
-  
+
+
 #ifdef HAVE_LIBZ
 				   /**
 				    * Do a zlib compression followed by a
@@ -4453,7 +4453,7 @@ namespace
 			     data.size() * sizeof(T),
 			     Z_BEST_COMPRESSION);
 	Assert (err == Z_OK, ExcInternalError());
-	
+
 					 // now encode the compression header
 	const uint32_t compression_header[5]
 	  = { 1,                                   /* number of blocks */
@@ -4464,17 +4464,17 @@ namespace
 
 	char *encoded_header = encode_block ((char*)&compression_header[0],
 					     5 * sizeof(compression_header[0]));
-	
-	
+
+
 					 // now do the encoding in base64
 	char *encoded_data = encode_block (compressed_data,
 					   compressed_data_length);
-	
+
 					 // release the buffer for the
 					 // compressed data and return the
 					 // encoded data
 	delete[] compressed_data;
-	
+
 	return std::make_pair (encoded_header, encoded_data);
       }
     else
@@ -4513,7 +4513,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   if (patches.size() == 0)
     return;
 #endif
-  
+
   VtuStream vtu_out(out, flags);
 
   const unsigned int n_data_sets = data_names.size();
@@ -4610,7 +4610,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   out << "<Piece NumberOfPoints=\"" << n_nodes
       <<"\" NumberOfCells=\"" << n_cells << "\" >\n";
   out << "  <Points>\n";
-#if !defined(HAVE_LIBZ) && 1
+#if !defined(HAVE_LIBZ) || 1
   out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n";
   write_nodes(patches, vtu_out);
   out << "    </DataArray>\n";
@@ -4653,7 +4653,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 	      }
       }
 
-/*    
+/*
     const char *
       encoded_vertices
       = encode_block ((char*)&vertices[0],
@@ -4665,7 +4665,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
       data
       = compress_and_encode_block (vertices);
     out << data.first << data.second;
-    
+
     delete[] data.first;
     delete[] data.second;
   }
@@ -4678,7 +4678,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
   write_cells(patches, vtu_out);
   out << "    </DataArray>\n";
-  
+
 				   // XML VTU format uses offsets; this is
 				   // different than the VTK format, which
 				   // puts the number of nodes per cell in
@@ -4686,21 +4686,21 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n";
   for(unsigned int i=0; i<n_cells; ++i)
     out << ' ' << ( (i+1)*GeometryInfo<dim>::vertices_per_cell);
-  out << "\n";  	
+  out << "\n";
   out << "    </DataArray>\n";
-  
+
 				   // next output the types of the
 				   // cells. since all cells are
 				   // the same, this is simple
   out << "    <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n";
-  
+
   for (unsigned int i=0; i<n_cells; ++i)
     out << ' ' << vtk_cell_type[dim];
 
-  out << "\n"; 
-  out << "    </DataArray>\n"; 
+  out << "\n";
+  out << "    </DataArray>\n";
   out << "  </Cells>\n";
-  
+
 
 				   ///////////////////////////////////////
 				   // data output.
@@ -4750,7 +4750,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 				       // underscores unless a vector
 				       // name has been specified
       out << "    <DataArray type=\"Float64\" Name=\"";
-      
+
       if (std_cxx1x::get<2>(vector_data_ranges[n_th_vector]) != "")
 	out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
       else
@@ -4799,7 +4799,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 		    Assert (false, ExcInternalError());
 	    }
 	}
-    
+
       out << "    </DataArray>\n";
     }
 
@@ -4810,7 +4810,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 	out << "    <DataArray type=\"Float64\" Name=\""
 	    << data_names[data_set]
 	    << "\" format=\"ascii\">\n";
-	    
+
 	std::copy (data_vectors[data_set].begin(),
 		   data_vectors[data_set].end(),
 		   std::ostream_iterator<double>(out, "\n"));
@@ -5064,15 +5064,15 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 						   const std::vector<std::string> &piece_names) const
 {
   AssertThrow (out, ExcIO());
-	  
+
   const std::vector<std::string> data_names = get_dataset_names();
   const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > vector_data_ranges
     = get_vector_data_ranges();
-	
+
   const unsigned int n_data_sets = data_names.size();
-	
+
   out << "<?xml version=\"1.0\"?>\n";
-	
+
   std::time_t  time1= std::time (0);
   std::tm     *time = std::localtime(&time1);
   out << "<!--\n";
@@ -5084,13 +5084,13 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
       << std::setw(2) << time->tm_min << ":"
       << std::setw(2) << time->tm_sec
       << "\n-->\n";
-	
+
   out << "<VTKFile type=\"PUnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
   out << "  <PUnstructuredGrid GhostLevel=\"0\">\n";
   out << "    <PPointData Scalars=\"scalars\">\n";
-	
+
 				   // We need to output in the same order as
-				   // the write_vtu function does:	
+				   // the write_vtu function does:
   std::vector<bool> data_set_written (n_data_sets, false);
   for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
     {
@@ -5105,21 +5105,21 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 		   - std_cxx1x::get<0>(vector_data_ranges[n_th_vector]) <= 3,
 		   ExcMessage ("Can't declare a vector with more than 3 components "
 			       "in VTK"));
-		
+
 				       // mark these components as already
 				       // written:
       for (unsigned int i=std_cxx1x::get<0>(vector_data_ranges[n_th_vector]);
 	   i<=std_cxx1x::get<1>(vector_data_ranges[n_th_vector]);
 	   ++i)
 	data_set_written[i] = true;
-		
+
 				       // write the
 				       // header. concatenate all the
 				       // component names with double
 				       // underscores unless a vector
 				       // name has been specified
       out << "    <PDataArray type=\"Float64\" Name=\"";
-		
+
       if (std_cxx1x::get<2>(vector_data_ranges[n_th_vector]) != "")
 	out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
       else
@@ -5130,32 +5130,32 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 	    out << data_names[i] << "__";
 	  out << data_names[std_cxx1x::get<1>(vector_data_ranges[n_th_vector])];
 	}
-	
+
       out << "\" NumberOfComponents=\"3\" format=\"ascii\"/>\n";
     }
-	
+
   for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
     if (data_set_written[data_set] == false)
       {
 	out << "    <PDataArray type=\"Float64\" Name=\""
 	    << data_names[data_set]
 	    << "\" format=\"ascii\"/>\n";
-      }  
+      }
 
   out << "    </PPointData>\n";
 
   out << "    <PPoints>\n";
   out << "      <PDataArray type=\"Float64\" NumberOfComponents=\"3\"/>\n";
   out << "    </PPoints>\n";
-	
-  for(unsigned int i=0; i<piece_names.size(); ++i)		
+
+  for(unsigned int i=0; i<piece_names.size(); ++i)
     out << "    <Piece Source=\"" << piece_names[i] << "\"/>\n";
-		
+
   out << "  </PUnstructuredGrid>\n";
   out << "</VTKFile>\n";
-	
+
   out.flush();
-	
+
 				   // assert the stream is still ok
   AssertThrow (out, ExcIO());
 }
@@ -5221,10 +5221,10 @@ DataOutInterface<dim,spacedim>::write (std::ostream &out,
       case vtk:
 	    write_vtk (out);
 	    break;
-	    
+
       case vtu:
 	    write_vtu (out);
-	    break;  
+	    break;
 
       case deal_II_intermediate:
 	    write_deal_II_intermediate (out);
