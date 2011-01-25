@@ -4550,7 +4550,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 	  << "\n-->\n";
 
       out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
-#ifdef HAVE_LIBZ && 0
+#if defined(HAVE_LIBZ) && 0
       out << " compressor=\"vtkZLibDataCompressor\"";
 #endif
 #ifdef DEAL_II_WORDS_BIGENDIAN
@@ -4610,7 +4610,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   out << "<Piece NumberOfPoints=\"" << n_nodes
       <<"\" NumberOfCells=\"" << n_cells << "\" >\n";
   out << "  <Points>\n";
-#ifndef HAVE_LIBZ && 0
+#if !defined(HAVE_LIBZ) && 1
   out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n";
   write_nodes(patches, vtu_out);
   out << "    </DataArray>\n";
