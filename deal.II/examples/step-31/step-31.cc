@@ -67,6 +67,7 @@
 				 // aforelisted header files:
 #include <fstream>
 #include <sstream>
+#include <limits>
 
 
 				 // At the end of this top-matter, we import
@@ -826,24 +827,9 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 				 // value is bigger/smaller than the previous
 				 // one. We initialize the variables that
 				 // store the max and min before the loop over
-				 // all quadrature points by bounding
-				 // $\left(1+\frac{k_n}{k_{n-1}}
-				 // \right)T^{n-1}({\mathbf x}_s) +
-				 // \frac{k_n}{k_{n-1}} T^{n-2}({\mathbf x}_s)
-				 // \le \max_{{\mathbf
-				 // x}'_s}\left(1+\frac{k_n}{k_{n-1}}
-				 // \right)T^{n-1}({\mathbf x}'_s) +
-				 // \max_{{\mathbf x}'_s} \frac{k_n}{k_{n-1}}
-				 // T^{n-2}({\mathbf x}'_s)$, where ${\mathbf
-				 // x}_s$ is the set of the support points
-				 // (i.e. nodal points, but note that the
-				 // maximum of a finite element function can
-				 // be attained at a point that's not a
-				 // support point unless one is using $Q_1$
-				 // elements). So if we initialize the minimal
-				 // value by this upper bound, and the maximum
-				 // value by the negative of this upper bound,
-				 // then we know for a fact that it is
+				 // all quadrature points by the smallest and
+				 // the largest number representable as a
+				 // double. Then we know for a fact that it is
 				 // larger/smaller than the minimum/maximum
 				 // and that the loop over all quadrature
 				 // points is ultimately going to update the
@@ -875,12 +861,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 
   if (timestep_number != 0)
     {
-      double min_temperature = (1. + time_step/old_time_step) *
-			       old_temperature_solution.linfty_norm()
-			       +
-			       time_step/old_time_step *
-			       old_old_temperature_solution.linfty_norm(),
-	     max_temperature = -min_temperature;
+      double min_temperature = std::numeric_limits<double>::max(),
+	     max_temperature = -std::numeric_limits<double>::max();
 
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
@@ -908,8 +890,8 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
     }
   else
     {
-      double min_temperature = old_temperature_solution.linfty_norm(),
-	     max_temperature = -min_temperature;
+      double min_temperature = std::numeric_limits<double>::max(),
+	     max_temperature = -std::numeric_limits<double>::max();
 
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
