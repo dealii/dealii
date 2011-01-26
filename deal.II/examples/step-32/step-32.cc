@@ -69,6 +69,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <limits>
 
 				 // This is the only include file that is new:
 				 // We use an IndexSet to describe the
@@ -1133,15 +1134,17 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
 
+				   // This presets the minimum with a bigger
+				   // and the maximum with a smaller number
+				   // than one that is going to appear. Will
+				   // be overwritten in the cell loop or in
+				   // the communication step at the
+				   // latest.
+  double min_local_temperature = std::numeric_limits<double>::max(),
+	 max_local_temperature = -std::numeric_limits<double>::max();
+
   if (timestep_number != 0)
     {
-				       // use different formula here than in
-				       // step-31 to avoid computing the
-				       // linfty_norm of the temperature
-				       // (which requires a communication)
-      double min_local_temperature = 1e30,
-	     max_local_temperature = -1e30;
-
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
 	endc = temperature_dof_handler.end();
@@ -1167,25 +1170,9 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 						  temperature);
 	      }
 	  }
-
-      double min_temperature, max_temperature;
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      MPI_Allreduce (&max_local_temperature, &max_temperature, 1, MPI_DOUBLE,
-		     MPI_MAX, MPI_COMM_WORLD);
-      MPI_Allreduce (&min_local_temperature, &min_temperature, 1, MPI_DOUBLE,
-		     MPI_MIN, MPI_COMM_WORLD);
-#else
-      min_temperature = min_local_temperature;
-      max_temperature = max_local_temperature;
-#endif
-
-      return std::make_pair(min_temperature, max_temperature);
     }
   else
     {
-      double min_local_temperature = 1e30,
-	     max_local_temperature = -1e30;      
-
       typename DoFHandler<dim>::active_cell_iterator
 	cell = temperature_dof_handler.begin_active(),
 	endc = temperature_dof_handler.end();
@@ -1207,20 +1194,20 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 						  temperature);
 	      }
 	  }
-
-      double min_temperature, max_temperature;
+    }
+  
+  double min_temperature, max_temperature;
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      MPI_Allreduce (&max_local_temperature, &max_temperature, 1, MPI_DOUBLE,
-		     MPI_MAX, MPI_COMM_WORLD);
-      MPI_Allreduce (&min_local_temperature, &min_temperature, 1, MPI_DOUBLE,
-		     MPI_MIN, MPI_COMM_WORLD);
+  MPI_Allreduce (&max_local_temperature, &max_temperature, 1, MPI_DOUBLE,
+		 MPI_MAX, MPI_COMM_WORLD);
+  MPI_Allreduce (&min_local_temperature, &min_temperature, 1, MPI_DOUBLE,
+		 MPI_MIN, MPI_COMM_WORLD);
 #else
-      min_temperature = min_local_temperature;
-      max_temperature = max_local_temperature;
+  min_temperature = min_local_temperature;
+  max_temperature = max_local_temperature;
 #endif
 
-      return std::make_pair(min_temperature, max_temperature);
-    }
+  return std::make_pair(min_temperature, max_temperature);
 }
 
 
