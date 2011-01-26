@@ -52,19 +52,18 @@ void test ()
 
   v_tmp.reinit(v,false,true);
 
+  Assert (v_tmp.has_ghost_elements(), ExcInternalError());
+
   deal_II_exceptions::disable_abort_on_exception();
 
-  bool exc = false;
   try
     {
-	v_tmp.l2_norm();
+      v_tmp.l2_norm();
     }
-  catch (TrilinosWrappers::VectorBase::ExcTrilinosError e)
+  catch (...)
     {
-      exc = true;
     }
   
-  Assert (exc == true, ExcInternalError());
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
