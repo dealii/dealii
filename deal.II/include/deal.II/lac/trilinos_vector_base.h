@@ -477,6 +477,12 @@ namespace TrilinosWrappers
 					*/
       bool in_local_range (const unsigned int index) const;
 
+				       /**
+					* Return if the vector contains ghost
+					* elements.
+					*/
+      bool has_ghost_elements() const;
+      
                                        /**
                                         * Return the scalar (inner)
                                         * product of two vectors. The
@@ -1102,8 +1108,17 @@ namespace TrilinosWrappers
     return ((index >= range.first) && (index <  range.second));
   }
 
+  
 
+  inline
+  bool
+  VectorBase::has_ghost_elements() const
+  {
+    return vector->Map().UniqueGIDs()==false;
+  }
 
+  
+  
   inline
   internal::VectorReference
   VectorBase::operator () (const unsigned int index)
@@ -1112,7 +1127,7 @@ namespace TrilinosWrappers
   }
 
 
-
+  
   inline
   void
   VectorBase::reinit (const VectorBase &v,
@@ -1212,8 +1227,7 @@ namespace TrilinosWrappers
   {
 				     // if we have ghost values, do not allow
 				     // writing to this vector at all.
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
     
     if (last_action == Add)
       vector->GlobalAssemble(Add);
@@ -1274,8 +1288,7 @@ namespace TrilinosWrappers
   {
 				     // if we have ghost values, do not allow
 				     // writing to this vector at all.
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
 
     if (last_action != Add)
       {
@@ -1340,8 +1353,7 @@ namespace TrilinosWrappers
   {
     Assert (vector->Map().SameAs(vec.vector->Map()),
 	    ExcDifferentParallelPartitioning());
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
 
     TrilinosScalar result;
 
@@ -1367,7 +1379,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::mean_value () const
   {
-    Assert (vector->Map().UniqueGIDs()==true, ExcGhostsPresent());
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
 
     TrilinosScalar mean;
     const int ierr = vector->MeanValue (&mean);
@@ -1382,8 +1394,7 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::l1_norm () const
   {
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
 
     TrilinosScalar d;
     const int ierr = vector->Norm1 (&d);
@@ -1398,8 +1409,7 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::l2_norm () const
   {
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
 
     TrilinosScalar d;
     const int ierr = vector->Norm2 (&d);
@@ -1414,8 +1424,7 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::lp_norm (const TrilinosScalar p) const
   {
-    Assert (vector->Map().UniqueGIDs()==true,
-	    ExcGhostsPresent());
+    Assert (!has_ghost_elements(), ExcGhostsPresent());    
 
     TrilinosScalar norm = 0;
     TrilinosScalar sum=0;

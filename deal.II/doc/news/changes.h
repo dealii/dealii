@@ -71,6 +71,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Trilinos and PETSc vectors now have a function has_ghost_elements().
+<br>
+(Timo Heister, 2011/01/26)
+</li>
+
 <li> Changed: The TrilinosWrappers::MPI::BlockVector::compress function now takes an
 argument (with a default value) in exactly the same way as the
 TrilinosWrappers::MPI::Vector::compress function already did.

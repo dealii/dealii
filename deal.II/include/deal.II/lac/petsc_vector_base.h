@@ -372,6 +372,12 @@ namespace PETScWrappers
 					*/
       bool in_local_range (const unsigned int index) const;
 
+				       /**
+					* Return if the vector contains ghost
+					* elements.
+					*/
+      bool has_ghost_elements() const;
+       
                                        /**
                                         * Provide access to a given element,
                                         * both read and write.
@@ -1120,6 +1126,13 @@ namespace PETScWrappers
             (index < static_cast<unsigned int>(end)));
   }
 
+  inline
+  bool
+  VectorBase::has_ghost_elements() const
+  {
+    return ghosted;
+  }
+  
 
 
   inline
