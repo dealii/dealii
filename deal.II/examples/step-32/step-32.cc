@@ -243,7 +243,7 @@ namespace LinearSolvers
 	{
 	  SolverControl cn(5000, 1e-5);//src.l2_norm()*1e-5);
 
-	  TrilinosWrappers::SolverBicgstab solver(cn);
+	  TrilinosWrappers::SolverCG solver(cn);
 
 	  solver.solve(stokes_preconditioner_matrix->block(1,1),
 		       dst, src,
@@ -256,7 +256,7 @@ namespace LinearSolvers
 		  const TrilinosWrappers::MPI::Vector &src) const
 	{
 	  SolverControl cn(5000, src.l2_norm()*1e-4);
-	  TrilinosWrappers::SolverBicgstab solver(cn);
+	  TrilinosWrappers::SolverCG solver(cn);
 	  solver.solve(stokes_matrix->block(0,0), dst, src, a_preconditioner);
 	}
 
@@ -1445,12 +1445,13 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   SolverControl solver_control(5*rhs.size(), 1e-12*rhs.l2_norm());
   SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
-  TrilinosWrappers::PreconditionSSOR preconditioner_mass;
+  TrilinosWrappers::PreconditionJacobi preconditioner_mass;
   preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
 
   cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
   temperature_constraints.distribute (solution);
+
 //  old_temperature_solution = solution;
   old_temperature_solution.reinit(solution, false, true);
 }
@@ -1782,6 +1783,8 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_constraints.clear ();
     temperature_constraints.reinit(temperature_relevant_partitioning);//temp_locally_active);
 
+    DoFTools::make_hanging_node_constraints (temperature_dof_handler,
+					     temperature_constraints);
     VectorTools::interpolate_boundary_values (temperature_dof_handler,
 					      0,
 					      EquationData::TemperatureInitialValues<dim>(),
@@ -1790,8 +1793,6 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 					      1,
 					      EquationData::TemperatureInitialValues<dim>(),
 					      temperature_constraints);
-    DoFTools::make_hanging_node_constraints (temperature_dof_handler,
-					     temperature_constraints);
     temperature_constraints.close ();
   }
 
@@ -1824,6 +1825,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
   temperature_solution.reinit (temperature_relevant_partitioning, MPI_COMM_WORLD);
   old_temperature_solution.reinit (temperature_solution);
   old_old_temperature_solution.reinit (temperature_solution);
+
+  rebuild_stokes_matrix              = true;
+  rebuild_stokes_preconditioner      = true;
+  rebuild_temperature_matrices       = true;
+  rebuild_temperature_preconditioner = true;
 
   computing_timer.exit_section();
 }
@@ -3260,7 +3266,9 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   std::vector<const TrilinosWrappers::MPI::Vector*> x_temperature (2);
   x_temperature[0] = &temperature_solution;
   x_temperature[1] = &old_temperature_solution;
-  TrilinosWrappers::MPI::BlockVector x_stokes = stokes_solution;
+  std::vector<const TrilinosWrappers::MPI::BlockVector*> x_stokes (2);
+  x_stokes[0] = &stokes_solution;
+  x_stokes[1] = &old_stokes_solution;
 
   parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
     temperature_trans(temperature_dof_handler);
@@ -3278,34 +3286,39 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 
   computing_timer.enter_section ("Refine mesh structure, part 2");
 
-  TrilinosWrappers::MPI::Vector
-    distributed_temp1 (temperature_rhs);
-  TrilinosWrappers::MPI::Vector
-    distributed_temp2 (temperature_rhs);
+  {
+    TrilinosWrappers::MPI::Vector
+      distributed_temp1 (temperature_rhs);
+    TrilinosWrappers::MPI::Vector
+      distributed_temp2 (temperature_rhs);
 
-  std::vector<TrilinosWrappers::MPI::Vector*> tmp (2);
-  tmp[0] = &(distributed_temp1);
-  tmp[1] = &(distributed_temp2);
-  temperature_trans.interpolate(tmp);
+    std::vector<TrilinosWrappers::MPI::Vector*> tmp (2);
+    tmp[0] = &(distributed_temp1);
+    tmp[1] = &(distributed_temp2);
+    temperature_trans.interpolate(tmp);
 
-//  temperature_solution = distributed_temp1;
-  temperature_solution.reinit(distributed_temp1, false, true);
-//  old_temperature_solution = distributed_temp2;
-  old_temperature_solution.reinit(distributed_temp2, false, true);
+    //  temperature_solution = distributed_temp1;
+    temperature_solution.reinit(distributed_temp1, false, true);
+    //  old_temperature_solution = distributed_temp2;
+    old_temperature_solution.reinit(distributed_temp2, false, true);
+  }
 
-  TrilinosWrappers::MPI::BlockVector
-    distributed_stokes (stokes_rhs);
+  {
+    TrilinosWrappers::MPI::BlockVector
+      distributed_stokes (stokes_rhs);
+    TrilinosWrappers::MPI::BlockVector
+      old_distributed_stokes (stokes_rhs);
+    std::vector<TrilinosWrappers::MPI::BlockVector*> stokes_tmp (2);
+    stokes_tmp[0] = &(distributed_stokes);
+    stokes_tmp[1] = &(old_distributed_stokes);
 
-  stokes_trans.interpolate (distributed_stokes);
-//  stokes_solution = distributed_stokes;
-  stokes_solution.block(0).reinit(distributed_stokes.block(0), false, true);
-  stokes_solution.block(1).reinit(distributed_stokes.block(1), false, true);
-
-
-  rebuild_stokes_matrix              = true;
-  rebuild_stokes_preconditioner      = true;
-  rebuild_temperature_matrices       = true;
-  rebuild_temperature_preconditioner = true;
+    stokes_trans.interpolate (stokes_tmp);
+    //  stokes_solution = distributed_stokes;
+    stokes_solution.block(0).reinit(distributed_stokes.block(0), false, true);
+    stokes_solution.block(1).reinit(distributed_stokes.block(1), false, true);
+    old_stokes_solution.block(0).reinit(old_distributed_stokes.block(0), false, true);
+    old_stokes_solution.block(1).reinit(old_distributed_stokes.block(1), false, true);
+  }
 
   computing_timer.exit_section();
 }
@@ -3392,9 +3405,19 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
       time += time_step;
       ++timestep_number;
 
+      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
+      old_old_stokes_solution      = old_stokes_solution;
       old_stokes_solution          = stokes_solution;
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
+      if (old_time_step > 0)
+      	{
+      	  stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
+      				old_old_stokes_solution);
+      	  temperature_solution.sadd (1.+time_step/old_time_step, 
+      				     -time_step/old_time_step,
+      				     old_old_temperature_solution);
+      	}
     }
   while (time <= EquationData::end_time);
 }
