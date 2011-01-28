@@ -1,5 +1,5 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002, 2010
+# Copyright W. Bangerth, University of Heidelberg, 1998, 1999, 2000, 2001, 2002, 2010, 2011
 
 
 ifneq ($(CLEAN),yes)
@@ -143,7 +143,7 @@ else
 endif
 
 
-# rules how to make the libraries themselves
+# rules for static libraries
 $(LIBDIR)/libdeal_II.g$(static-lib-suffix): $(go-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files) $(extra-g.o-files)
@@ -154,14 +154,26 @@ $(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files)
 	@$(RANLIB) $@
 
 
+# Rules for shared libraries. these are much more difficult to link
+# because the linker has to update relocations etc. This requires
+# seeking back and forth in memory mapped files and is excruciatingly
+# slow on remotely mounted file systems. Consequently, we link in a
+# local file in the $TMPDIR directory, and only after the fact move
+# them to their final location
 $(LIBDIR)/libdeal_II.g$(shared-lib-suffix): $(go-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g) $(call DEAL_II_ADD_SONAME,deal_II.g) $(go-files) $(extra-g.o-files) $(deplibs.g)
+	@rm -f $@
+	@WORKFILE=`mktemp` && \
+		$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II.g) $(go-files) $(extra-g.o-files) $(deplibs.g) && \
+	 	mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,deal_II.g) $@
 
 $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
-	@$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II) $(call DEAL_II_ADD_SONAME,deal_II) $(o-files) $(extra-o-files) $(deplibs.o)
+	@rm -f $@
+	@WORKFILE=`mktemp` && \
+		$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II) $(o-files) $(extra-o-files) $(deplibs.o) && \
+		mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,deal_II) $@
 
 

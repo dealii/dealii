@@ -29,6 +29,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Improved: Linking the deal.II libraries on file systems that
+are mounted remotely from a file server took painfully long. This
+is now fixed by linking everything on the local file system
+and only subsequently moving the file into its final location.
+<br>
+(Wolfgang Bangerth, 2011/01/28)
+
 <li> Changed: Most classes in deal.II have a member function
 <code>memory_consumption</code> that used to return an unsigned int.
 However, on most 64-bit systems, unsigned int is still only 32-bit
