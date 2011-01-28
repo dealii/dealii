@@ -15,6 +15,7 @@
 #include <lac/sparse_direct.h>
 #include <base/memory_consumption.h>
 #include <base/thread_management.h>
+#include <base/utilities.h>
 #include <lac/sparse_matrix.h>
 #include <lac/block_sparse_matrix.h>
 #include <lac/vector.h>
@@ -1988,7 +1989,7 @@ void SparseDirectMUMPS::solve (Vector<double>& vector)
                         // Copy solution into the given vector
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0) 
     {
-      for (unsigned int i=0; i<n; ++i)
+      for (int i=0; i<n; ++i)
 	vector(i) = rhs[i];
       
       delete[] a;
