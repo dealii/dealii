@@ -40,7 +40,7 @@ on any system.
 <br>
 (Wolfgang Bangerth, 2011/01/22)
 
-<li> Fixed: When using the <code>--enable-mpi</code> to 
+<li> Fixed: When using the <code>--enable-mpi</code> to
 <code>./configure</code>, the script only tried <code>mpiCC</code>
 as the MPI C++ compiler. However, on some systems, it is called
 <code>mpicxx</code>. The script now tries that as well.
@@ -71,6 +71,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: If the <code>libz</code> library was detected during library
+configuration, the function DataOutBase::write_vtu now writes data in compressed
+format, saving a good fraction of disk space in output files.
+<br>
+(Wolfgang Bangerth, 2011/01/28)
+</li>
+
 <li> New: Trilinos and PETSc vectors now have a function has_ghost_elements().
 <br>
 (Timo Heister, 2011/01/26)

@@ -48,6 +48,7 @@
 #  include <zlib.h>
 #endif
 
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -61,6 +62,203 @@ namespace
 		  << arg1
 		  << ">\nbut got\n  <"
 		  << arg2 << ">");
+}
+
+
+namespace
+{
+				   // the functions in this namespace are
+				   // taken from the libb64 project, see
+				   // http://sourceforge.net/projects/libb64
+				   //
+				   // libb64 has been placed in the public
+				   // domain
+  namespace base64
+  {
+    typedef enum
+    {
+	  step_A, step_B, step_C
+    } base64_encodestep;
+
+    typedef struct
+    {
+	base64_encodestep step;
+	char result;
+    } base64_encodestate;
+
+    void base64_init_encodestate(base64_encodestate* state_in)
+    {
+      state_in->step = step_A;
+      state_in->result = 0;
+    }
+
+    inline
+    char base64_encode_value(char value_in)
+    {
+      static const char* encoding
+	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      if (value_in > 63) return '=';
+      return encoding[(int)value_in];
+    }
+
+    int base64_encode_block(const char* plaintext_in,
+			    int length_in,
+			    char* code_out,
+			    base64_encodestate *state_in)
+    {
+      const char* plainchar = plaintext_in;
+      const char* const plaintextend = plaintext_in + length_in;
+      char* codechar = code_out;
+      char result;
+      char fragment;
+
+      result = state_in->result;
+
+      switch (state_in->step)
+	{
+	  while (1)
+	    {
+	      case step_A:
+		    if (plainchar == plaintextend)
+		      {
+			state_in->result = result;
+			state_in->step = step_A;
+			return codechar - code_out;
+		      }
+		    fragment = *plainchar++;
+		    result = (fragment & 0x0fc) >> 2;
+		    *codechar++ = base64_encode_value(result);
+		    result = (fragment & 0x003) << 4;
+	      case step_B:
+		    if (plainchar == plaintextend)
+		      {
+			state_in->result = result;
+			state_in->step = step_B;
+			return codechar - code_out;
+		      }
+		    fragment = *plainchar++;
+		    result |= (fragment & 0x0f0) >> 4;
+		    *codechar++ = base64_encode_value(result);
+		    result = (fragment & 0x00f) << 2;
+	      case step_C:
+		    if (plainchar == plaintextend)
+		      {
+			state_in->result = result;
+			state_in->step = step_C;
+			return codechar - code_out;
+		      }
+		    fragment = *plainchar++;
+		    result |= (fragment & 0x0c0) >> 6;
+		    *codechar++ = base64_encode_value(result);
+		    result  = (fragment & 0x03f) >> 0;
+		    *codechar++ = base64_encode_value(result);
+	    }
+	}
+				       /* control should not reach here */
+      return codechar - code_out;
+    }
+
+    int base64_encode_blockend(char* code_out, base64_encodestate* state_in)
+    {
+      char* codechar = code_out;
+
+      switch (state_in->step)
+	{
+	  case step_B:
+		*codechar++ = base64_encode_value(state_in->result);
+		*codechar++ = '=';
+		*codechar++ = '=';
+		break;
+	  case step_C:
+		*codechar++ = base64_encode_value(state_in->result);
+		*codechar++ = '=';
+		break;
+	  case step_A:
+		break;
+	}
+      *codechar++ = '\0';
+
+      return codechar - code_out;
+    }
+  }
+
+
+				   /**
+				    * Do a base64 encoding of the given data.
+				    *
+				    * The function allocates memory as
+				    * necessary and returns a pointer to
+				    * it. The calling function must release
+				    * this memory again.
+				    */
+  char *
+  encode_block (const char *data,
+		const int   data_size)
+  {
+    base64::base64_encodestate state;
+    base64::base64_init_encodestate(&state);
+
+    char *encoded_data = new char[2*data_size+1];
+
+    const int encoded_length_data
+      = base64::base64_encode_block (data, data_size,
+				     encoded_data, &state);
+    base64::base64_encode_blockend (encoded_data + encoded_length_data,
+				    &state);
+
+    return encoded_data;
+  }
+
+
+
+#ifdef HAVE_LIBZ
+				   /**
+				    * Do a zlib compression followed
+				    * by a base64 encoding of the
+				    * given data. The result is then
+				    * written to the given stream.
+				    */
+  template <typename T>
+  void write_compressed_block (const std::vector<T> &data,
+			       std::ostream         &output_stream)
+  {
+    if (data.size() != 0)
+      {
+					 // allocate a buffer for compressing
+					 // data and do so
+	uLongf compressed_data_length
+	  = compressBound (data.size() * sizeof(T));
+	char *compressed_data = new char[compressed_data_length];
+	int err = compress2 ((Bytef *) compressed_data,
+			     &compressed_data_length,
+			     (const Bytef *) &data[0],
+			     data.size() * sizeof(T),
+			     Z_BEST_COMPRESSION);
+	Assert (err == Z_OK, ExcInternalError());
+
+					 // now encode the compression header
+	const uint32_t compression_header[4]
+	  = { 1,                                   /* number of blocks */
+	      32768, /* size of block */
+	      (uint32_t)(data.size() * sizeof(T)), /* size of last block */
+	      (uint32_t)compressed_data_length  }; /* list of compressed sizes of blocks */
+
+	char *encoded_header = encode_block ((char*)&compression_header[0],
+					     4 * sizeof(compression_header[0]));
+	output_stream << encoded_header;
+	delete[] encoded_header;
+
+					 // next do the compressed
+					 // data encoding in base64
+	char *encoded_data = encode_block (compressed_data,
+					   compressed_data_length);
+	delete[] compressed_data;
+
+	output_stream << encoded_data;
+	delete[] encoded_data;
+      }
+  }
+#endif
 }
 
 
@@ -209,6 +407,12 @@ namespace
 			const Point<dim>&);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of points.
+					*/
+      void flush_points ();
+
+				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
 					* number start and further
@@ -231,6 +435,12 @@ namespace
 		       const unsigned int x_offset,
 		       const unsigned int y_offset,
 		       const unsigned int z_offset);
+
+				       /**
+					* Do whatever is necessary to
+					* terminate the list of cells.
+					*/
+      void flush_cells ();
 
 				       /**
 					* Write a complete set of
@@ -293,6 +503,12 @@ namespace
 			const Point<dim>&);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of points.
+					*/
+      void flush_points ();
+
+				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
 					* number start and further
@@ -315,6 +531,12 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
+
+				       /**
+					* Do whatever is necessary to
+					* terminate the list of cells.
+					*/
+      void flush_cells ();
 
 				       /**
 					* Forwarding of output stream
@@ -376,6 +598,12 @@ namespace
 			const Point<dim>&);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of points.
+					*/
+      void flush_points ();
+
+				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
 					* number start and further
@@ -398,6 +626,12 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
+
+				       /**
+					* Do whatever is necessary to
+					* terminate the list of cells.
+					*/
+      void flush_cells ();
 
 				       /**
 					* Forwarding of output stream
@@ -460,6 +694,12 @@ namespace
 			const Point<dim>&);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of points.
+					*/
+      void flush_points ();
+
+				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
 					* number start and further
@@ -486,6 +726,12 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
+
+				       /**
+					* Do whatever is necessary to
+					* terminate the list of cells.
+					*/
+      void flush_cells ();
 
 				       /**
 					* Write a complete set of
@@ -547,6 +793,12 @@ namespace
 			const Point<dim>&);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of points.
+					*/
+      void flush_points ();
+
+				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
 					* number start and further
@@ -569,6 +821,12 @@ namespace
 		      const unsigned int x_offset,
 		      const unsigned int y_offset,
 		      const unsigned int z_offset);
+
+				       /**
+					* Do whatever is necessary to
+					* terminate the list of cells.
+					*/
+      void flush_cells ();
 
 				       /**
 					* Forwarding of output stream
@@ -612,6 +870,12 @@ namespace
 			const Point<dim>&);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of points.
+					*/
+      void flush_points ();
+
+				       /**
 					* Write dim-dimensional cell
 					* with first vertex at
 					* number start and further
@@ -636,10 +900,30 @@ namespace
 		      const unsigned int z_offset);
 
 				       /**
+					* Do whatever is necessary to
+					* terminate the list of cells.
+					*/
+      void flush_cells ();
+
+				       /**
 					* Forwarding of output stream
 					*/
       template <typename T>
       std::ostream& operator<< (const T&);
+
+				       /**
+					* Forwarding of output stream.
+					*
+					* If libz was found during
+					* configuration, this operator
+					* compresses and encodes the
+					* entire data
+					* block. Otherwise, it simply
+					* writes it element by
+					* element.
+					*/
+      template <typename T>
+      std::ostream& operator<< (const std::vector<T>&);
 
     private:
 				       /**
@@ -655,6 +939,21 @@ namespace
 					* The flags controlling the output
 					*/
       const DataOutBase::VtkFlags flags;
+
+				       /**
+					* A list of vertices and
+					* cells, to be used in case we
+					* want to compress the data.
+					*
+					* The data types of these
+					* arrays needs to match what
+					* we print in the XML-preamble
+					* to the respective parts of
+					* VTU files (e.g. Float64 and
+					* Int32)
+					*/
+      std::vector<double>  vertices;
+      std::vector<int32_t> cells;
   };
 
 
@@ -687,6 +986,11 @@ namespace
 	stream << '\n';
       }
   }
+
+
+  void
+  DXStream::flush_points ()
+  {}
 
 
   template<int dim>
@@ -727,6 +1031,11 @@ namespace
 	stream << nodes[final] << '\n';
       }
   }
+
+
+  void
+  DXStream::flush_cells ()
+  {}
 
 
   template<typename data>
@@ -771,6 +1080,11 @@ namespace
   }
 
 
+  void
+  GmvStream::flush_points ()
+  {}
+
+
   template<int dim>
   void
   GmvStream::write_cell(
@@ -804,6 +1118,11 @@ namespace
 
 
 
+  void
+  GmvStream::flush_cells ()
+  {}
+
+
 //----------------------------------------------------------------------//
 
   TecplotStream::TecplotStream(std::ostream& out, const DataOutBase::TecplotFlags f)
@@ -822,6 +1141,11 @@ namespace
 	   ExcNotInitialized());
     stream << p(selected_component) << '\n';
   }
+
+
+  void
+  TecplotStream::flush_points ()
+  {}
 
 
   template<int dim>
@@ -854,6 +1178,12 @@ namespace
 
 
 
+  void
+  TecplotStream::flush_cells ()
+  {}
+
+
+
 //----------------------------------------------------------------------//
 
   UcdStream::UcdStream(std::ostream& out, const DataOutBase::UcdFlags f)
@@ -877,6 +1207,12 @@ namespace
       stream << "0 ";
     stream << '\n';
   }
+
+
+
+  void
+  UcdStream::flush_points ()
+  {}
 
 
   template<int dim>
@@ -917,6 +1253,12 @@ namespace
   }
 
 
+
+  void
+  UcdStream::flush_cells ()
+  {}
+
+
   template<typename data>
   inline
   void
@@ -953,6 +1295,12 @@ namespace
   }
 
 
+
+  void
+  VtkStream::flush_points ()
+  {}
+
+
   template<int dim>
   void
   VtkStream::write_cell(
@@ -980,6 +1328,13 @@ namespace
     stream << '\n';
   }
 
+
+  void
+  VtkStream::flush_cells ()
+  {}
+
+
+
   VtuStream::VtuStream(std::ostream& out, const DataOutBase::VtkFlags f)
 		  :
 		  stream(out), flags(f)
@@ -991,12 +1346,35 @@ namespace
   VtuStream::write_point (const unsigned int,
 			  const Point<dim>& p)
   {
+#if !defined(HAVE_LIBZ)
 				     // write out coordinates
     stream << p;
 				     // fill with zeroes
     for (unsigned int i=dim; i<3; ++i)
       stream << " 0";
     stream << '\n';
+#else
+				     // if we want to compress, then
+				     // first collect all the data in
+				     // an array
+    for (unsigned int i=0; i<dim; ++i)
+      vertices.push_back(p[i]);
+    for (unsigned int i=dim; i<3; ++i)
+      vertices.push_back(0);
+#endif
+  }
+
+
+  void
+  VtuStream::flush_points ()
+  {
+#ifdef HAVE_LIBZ
+				     // compress the data we have in
+				     // memory and write them to the
+				     // stream. then release the data
+    *this << vertices << '\n';
+    vertices.clear ();
+#endif
   }
 
 
@@ -1009,6 +1387,7 @@ namespace
     unsigned int d2,
     unsigned int d3)
   {
+#if !defined(HAVE_LIBZ)
     stream << start << '\t'
 	   << start+d1;
     if (dim>=2)
@@ -1024,6 +1403,54 @@ namespace
 	  }
       }
     stream << '\n';
+#else
+    cells.push_back (start);
+    cells.push_back (start+d1);
+    if (dim>=2)
+      {
+	cells.push_back (start+d2+d1);
+	cells.push_back (start+d2);
+	if (dim>=3)
+	  {
+	    cells.push_back (start+d3);
+	    cells.push_back (start+d3+d1);
+	    cells.push_back (start+d3+d2+d1);
+	    cells.push_back (start+d3+d2);
+	  }
+      }
+#endif
+  }
+
+
+
+  void
+  VtuStream::flush_cells ()
+  {
+#ifdef HAVE_LIBZ
+				     // compress the data we have in
+				     // memory and write them to the
+				     // stream. then release the data
+    *this << cells << '\n';
+    cells.clear ();
+#endif
+  }
+
+
+  template <typename T>
+  std::ostream&
+  VtuStream::operator<< (const std::vector<T> &data)
+  {
+#ifdef HAVE_LIBZ
+				     // compress the data we have in
+				     // memory and write them to the
+				     // stream. then release the data
+    write_compressed_block (data, stream);
+#else
+    for (unsigned int i=0; i<data.size(); ++i)
+      stream << data[i] << ' ';
+#endif
+
+    return stream;
   }
 
 
@@ -1774,9 +2201,8 @@ default_suffix (const OutputFormat output_format)
 
 template <int dim, int spacedim, typename STREAM>
 void
-DataOutBase::write_nodes (
-  const std::vector<Patch<dim,spacedim> >& patches,
-  STREAM& out)
+DataOutBase::write_nodes (const std::vector<Patch<dim,spacedim> >& patches,
+			  STREAM& out)
 {
   Assert (dim<=3, ExcNotImplemented());
   unsigned int count = 0;
@@ -1785,7 +2211,8 @@ DataOutBase::write_nodes (
 				   // it here.
   Point<spacedim> node;
 
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator
+	 patch=patches.begin();
        patch!=patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1810,12 +2237,13 @@ DataOutBase::write_nodes (
 	      out.write_point(count++, node);
 	    }
     }
+  out.flush_points ();
 }
 
 template <int dim, int spacedim, typename STREAM>
-void DataOutBase::write_cells(
-  const std::vector<Patch<dim,spacedim> >& patches,
-  STREAM& out)
+void
+DataOutBase::write_cells (const std::vector<Patch<dim,spacedim> >& patches,
+			  STREAM& out)
 {
   Assert (dim<=3, ExcNotImplemented());
   unsigned int count = 0;
@@ -1823,7 +2251,8 @@ void DataOutBase::write_cells(
 				   // Array to hold all the node
 				   // numbers of a cell. 8 is
 				   // sufficient for 3D
-  for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
+  for (typename std::vector<Patch<dim,spacedim> >::const_iterator
+	 patch=patches.begin();
        patch!=patches.end(); ++patch)
     {
       const unsigned int n_subdivisions = patch->n_subdivisions;
@@ -1833,9 +2262,6 @@ void DataOutBase::write_cells(
       const unsigned int n2 = (dim>1) ? n_subdivisions : 1;
       const unsigned int n3 = (dim>2) ? n_subdivisions : 1;
 				       // Offsets of outer loops
-//       const unsigned int d1 = 1;
-//       const unsigned int d2 = n_subdivisions+1;
-//       const unsigned int d3 = d2*d2;
       unsigned int d1 = 1;
       unsigned int d2 = n;
       unsigned int d3 = n*n;
@@ -1851,6 +2277,8 @@ void DataOutBase::write_cells(
 				       // of the first vertex of this patch
       first_vertex_of_patch += Utilities::fixed_power<dim>(n_subdivisions+1);
     }
+
+  out.flush_cells ();
 }
 
 
@@ -4274,216 +4702,6 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 }
 
 
-namespace
-{
-				   // the functions in this namespace are
-				   // taken from the libb64 project, see
-				   // http://sourceforge.net/projects/libb64
-				   //
-				   // libb64 has been placed in the public
-				   // domain
-  namespace base64
-  {
-    typedef enum
-    {
-	  step_A, step_B, step_C
-    } base64_encodestep;
-
-    typedef struct
-    {
-	base64_encodestep step;
-	char result;
-    } base64_encodestate;
-
-    void base64_init_encodestate(base64_encodestate* state_in)
-    {
-      state_in->step = step_A;
-      state_in->result = 0;
-    }
-
-    inline
-    char base64_encode_value(char value_in)
-    {
-      static const char* encoding
-	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-      if (value_in > 63) return '=';
-      return encoding[(int)value_in];
-    }
-
-    int base64_encode_block(const char* plaintext_in,
-			    int length_in,
-			    char* code_out,
-			    base64_encodestate *state_in)
-    {
-      const char* plainchar = plaintext_in;
-      const char* const plaintextend = plaintext_in + length_in;
-      char* codechar = code_out;
-      char result;
-      char fragment;
-
-      result = state_in->result;
-
-      switch (state_in->step)
-	{
-	  while (1)
-	    {
-	      case step_A:
-		    if (plainchar == plaintextend)
-		      {
-			state_in->result = result;
-			state_in->step = step_A;
-			return codechar - code_out;
-		      }
-		    fragment = *plainchar++;
-		    result = (fragment & 0x0fc) >> 2;
-		    *codechar++ = base64_encode_value(result);
-		    result = (fragment & 0x003) << 4;
-	      case step_B:
-		    if (plainchar == plaintextend)
-		      {
-			state_in->result = result;
-			state_in->step = step_B;
-			return codechar - code_out;
-		      }
-		    fragment = *plainchar++;
-		    result |= (fragment & 0x0f0) >> 4;
-		    *codechar++ = base64_encode_value(result);
-		    result = (fragment & 0x00f) << 2;
-	      case step_C:
-		    if (plainchar == plaintextend)
-		      {
-			state_in->result = result;
-			state_in->step = step_C;
-			return codechar - code_out;
-		      }
-		    fragment = *plainchar++;
-		    result |= (fragment & 0x0c0) >> 6;
-		    *codechar++ = base64_encode_value(result);
-		    result  = (fragment & 0x03f) >> 0;
-		    *codechar++ = base64_encode_value(result);
-	    }
-	}
-				       /* control should not reach here */
-      return codechar - code_out;
-    }
-
-    int base64_encode_blockend(char* code_out, base64_encodestate* state_in)
-    {
-      char* codechar = code_out;
-
-      switch (state_in->step)
-	{
-	  case step_B:
-		*codechar++ = base64_encode_value(state_in->result);
-		*codechar++ = '=';
-		*codechar++ = '=';
-		break;
-	  case step_C:
-		*codechar++ = base64_encode_value(state_in->result);
-		*codechar++ = '=';
-		break;
-	  case step_A:
-		break;
-	}
-      *codechar++ = '\0';
-
-      return codechar - code_out;
-    }
-  }
-
-
-				   /**
-				    * Do a base64 encoding of the given data.
-				    *
-				    * The function allocates memory as
-				    * necessary and returns a pointer to
-				    * it. The calling function must release
-				    * this memory again.
-				    */
-  char *
-  encode_block (const char *data,
-		const int   data_size)
-  {
-    base64::base64_encodestate state;
-    base64::base64_init_encodestate(&state);
-
-    char *encoded_data = new char[sizeof(uint32_t)+2*data_size+1];
-
-    uint32_t int_header = data_size;
-
-    const int encoded_length_header
-      = base64::base64_encode_block ((char*)&int_header, sizeof(int_header),
-				     encoded_data, &state);
-
-    const int encoded_length_data
-      = base64::base64_encode_block (data, data_size,
-				     encoded_data + encoded_length_header, &state);
-    base64::base64_encode_blockend (encoded_data + encoded_length_header + encoded_length_data,
-				    &state);
-
-    return encoded_data;
-  }
-
-
-
-#ifdef HAVE_LIBZ
-				   /**
-				    * Do a zlib compression followed by a
-				    * base64 encoding of the given data.
-				    *
-				    * The function allocates memory as
-				    * necessary and returns a pointer to
-				    * it. The calling function must release
-				    * this memory again.
-				    */
-  template <typename T>
-  std::pair<char *, char *>
-  compress_and_encode_block (const std::vector<T> &data)
-  {
-    if (data.size() != 0)
-      {
-					 // allocate a buffer for compressing
-					 // data and do so
-	uLongf compressed_data_length
-	  = compressBound (data.size() * sizeof(T));
-	char *compressed_data = new char[compressed_data_length];
-	int err = compress2 ((Bytef *) compressed_data,
-			     &compressed_data_length,
-			     (const Bytef *) &data[0],
-			     data.size() * sizeof(T),
-			     Z_BEST_COMPRESSION);
-	Assert (err == Z_OK, ExcInternalError());
-
-					 // now encode the compression header
-	const uint32_t compression_header[5]
-	  = { 1,                                   /* number of blocks */
-	      (uint32_t)(data.size() * sizeof(T)), /* size of block */
-	      0, /* size of last block */
-	      (uint32_t)compressed_data_length,
-	      0};  /* list of compressed sizes of blocks */
-
-	char *encoded_header = encode_block ((char*)&compression_header[0],
-					     5 * sizeof(compression_header[0]));
-
-
-					 // now do the encoding in base64
-	char *encoded_data = encode_block (compressed_data,
-					   compressed_data_length);
-
-					 // release the buffer for the
-					 // compressed data and return the
-					 // encoded data
-	delete[] compressed_data;
-
-	return std::make_pair (encoded_header, encoded_data);
-      }
-    else
-      return std::pair<char *, char *>(0,0);
-  }
-#endif
-}
-
-
 template <int dim, int spacedim>
 void
 DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
@@ -4550,7 +4768,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 	  << "\n-->\n";
 
       out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
-#if defined(HAVE_LIBZ) && 0
+#ifdef HAVE_LIBZ
       out << " compressor=\"vtkZLibDataCompressor\"";
 #endif
 #ifdef DEAL_II_WORDS_BIGENDIAN
@@ -4563,6 +4781,13 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
       out << "<UnstructuredGrid>";
       out << '\n';
     }
+
+
+#ifdef HAVE_LIBZ
+  const char *ascii_or_binary = "binary";
+#else
+  const char *ascii_or_binary = "ascii";
+#endif
 
 
 				   // first count the number of cells
@@ -4610,72 +4835,16 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
   out << "<Piece NumberOfPoints=\"" << n_nodes
       <<"\" NumberOfCells=\"" << n_cells << "\" >\n";
   out << "  <Points>\n";
-#if !defined(HAVE_LIBZ) || 1
-  out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+  out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\""
+      << ascii_or_binary << "\">\n";
   write_nodes(patches, vtu_out);
   out << "    </DataArray>\n";
-#else
-  out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"binary\">\n";
-  {
-				     // collect vertices into one big array,
-				     // then compress and encode it. we don't
-				     // know up front how many vertices we
-				     // need, so only allocate a typical guess
-    std::vector<double> vertices;
-    vertices.reserve (patches.size() * 3 * GeometryInfo<spacedim>::vertices_per_cell);
-    for (typename std::vector<Patch<dim,spacedim> >::const_iterator patch=patches.begin();
-	 patch!=patches.end(); ++patch)
-      {
-	const unsigned int n_subdivisions = patch->n_subdivisions;
-	const unsigned int n = n_subdivisions+1;
-					 // Length of loops in all
-					 // dimensions. If a dimension
-					 // is not used, a loop of
-					 // length one will do the job.
-	const unsigned int n1 = (dim>0) ? n : 1;
-	const unsigned int n2 = (dim>1) ? n : 1;
-	const unsigned int n3 = (dim>2) ? n : 1;
-
-	for (unsigned int i3=0; i3<n3; ++i3)
-	  for (unsigned int i2=0; i2<n2; ++i2)
-	    for (unsigned int i1=0; i1<n1; ++i1)
-	      {
-		Point<spacedim> node;
-		compute_node(node, &*patch,
-			     i1,
-			     i2,
-			     i3,
-			     n_subdivisions);
-		for (unsigned int d=0; d<spacedim; ++d)
-		  vertices.push_back (node[d]);
-		for (unsigned int d=spacedim; d<3; ++d)
-		  vertices.push_back (0);
-	      }
-      }
-
-/*
-    const char *
-      encoded_vertices
-      = encode_block ((char*)&vertices[0],
-		      vertices.size() * sizeof(vertices[0]));
-    out << encoded_vertices << std::endl;
-    delete[] encoded_vertices;
-*/
-    const std::pair<char *, char *>
-      data
-      = compress_and_encode_block (vertices);
-    out << data.first << data.second;
-
-    delete[] data.first;
-    delete[] data.second;
-  }
-  out << "    </DataArray>\n";
-#endif
   out << "  </Points>\n\n";
 				   /////////////////////////////////
 				   // now for the cells
   out << "  <Cells>\n";
-  out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
+  out << "    <DataArray type=\"Int32\" Name=\"connectivity\" format=\""
+      << ascii_or_binary << "\">\n";
   write_cells(patches, vtu_out);
   out << "    </DataArray>\n";
 
@@ -4683,20 +4852,27 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 				   // different than the VTK format, which
 				   // puts the number of nodes per cell in
 				   // front of the connectivity list.
-  out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n";
+  out << "    <DataArray type=\"Int32\" Name=\"offsets\" format=\""
+      << ascii_or_binary << "\">\n";
+
+  std::vector<int32_t> offsets (n_cells);
   for(unsigned int i=0; i<n_cells; ++i)
-    out << ' ' << ( (i+1)*GeometryInfo<dim>::vertices_per_cell);
+    offsets[i] = (i+1)*GeometryInfo<dim>::vertices_per_cell;
+  vtu_out << offsets;
   out << "\n";
   out << "    </DataArray>\n";
 
 				   // next output the types of the
 				   // cells. since all cells are
 				   // the same, this is simple
-  out << "    <DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\">\n";
+  out << "    <DataArray type=\"UInt8\" Name=\"types\" format=\""
+      << ascii_or_binary << "\">\n";
 
-  for (unsigned int i=0; i<n_cells; ++i)
-    out << ' ' << vtk_cell_type[dim];
-
+  {
+				     // this should compress well :-)
+    std::vector<uint8_t> cell_types (n_cells, vtk_cell_type[dim]);
+    vtu_out << cell_types;
+  }
   out << "\n";
   out << "    </DataArray>\n";
   out << "  </Cells>\n";
@@ -4762,31 +4938,35 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 	  out << data_names[std_cxx1x::get<1>(vector_data_ranges[n_th_vector])];
 	}
 
-      out << "\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+      out << "\" NumberOfComponents=\"3\" format=\""
+	  << ascii_or_binary << "\">\n";
 
 				       // now write data. pad all
 				       // vectors to have three
 				       // components
+      std::vector<double> data;
+      data.reserve (n_nodes*dim);
+
       for (unsigned int n=0; n<n_nodes; ++n)
 	{
 	  switch (std_cxx1x::get<1>(vector_data_ranges[n_th_vector]) -
 		  std_cxx1x::get<0>(vector_data_ranges[n_th_vector]))
 	    {
 	      case 0:
-		    out << data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector]), n) << " 0 0"
-			<< '\n';
+		    data.push_back (data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector]), n));
+		    data.push_back (0);
+		    data.push_back (0);
 		    break;
 
 	      case 1:
-		    out << data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '
-			<< data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1, n) << " 0"
-			<< '\n';
+		    data.push_back (data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector]),   n));
+		    data.push_back (data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1, n));
+		    data.push_back (0);
 		    break;
 	      case 2:
-		    out << data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector]),   n) << ' '
-			<< data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1, n) << ' '
-			<< data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+2, n)
-			<< '\n';
+		    data.push_back (data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector]),   n));
+		    data.push_back (data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+1, n));
+		    data.push_back (data_vectors(std_cxx1x::get<0>(vector_data_ranges[n_th_vector])+2, n));
 		    break;
 
 	      default:
@@ -4799,7 +4979,7 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
 		    Assert (false, ExcInternalError());
 	    }
 	}
-
+      vtu_out << data;
       out << "    </DataArray>\n";
     }
 
@@ -4809,11 +4989,12 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
       {
 	out << "    <DataArray type=\"Float64\" Name=\""
 	    << data_names[data_set]
-	    << "\" format=\"ascii\">\n";
+	    << "\" format=\""
+	    << ascii_or_binary << "\">\n";
 
-	std::copy (data_vectors[data_set].begin(),
-		   data_vectors[data_set].end(),
-		   std::ostream_iterator<double>(out, "\n"));
+	std::vector<double> data (data_vectors[data_set].begin(),
+				  data_vectors[data_set].end());
+	vtu_out << data;
 	out << "    </DataArray>\n";
       }
 
