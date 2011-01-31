@@ -674,7 +674,7 @@ namespace SLEPcWrappers
       kr.resize (n_converged);
 
       for (unsigned int index=0; index < n_converged; ++index)
-	get_eigenpair (index,5D kr[index], vr[index]);
+	get_eigenpair (index, kr[index], vr[index]);
     }
 
   template <typename OutputVector>
