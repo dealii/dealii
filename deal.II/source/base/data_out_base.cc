@@ -239,7 +239,7 @@ namespace
 					 // now encode the compression header
 	const uint32_t compression_header[4]
 	  = { 1,                                   /* number of blocks */
-	      32768, /* size of block */
+	      (uint32_t)(data.size() * sizeof(T)), /* size of block */
 	      (uint32_t)(data.size() * sizeof(T)), /* size of last block */
 	      (uint32_t)compressed_data_length  }; /* list of compressed sizes of blocks */
 
