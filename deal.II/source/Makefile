@@ -54,7 +54,7 @@ $(LIBDIR)/optimized/%.$(OBJEXT) :
 
 %.inst : %.inst.in $D/common/template-arguments
 	@echo "===================================== $(@F)"
-	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@
+	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@ || exit 1
 
 
 
