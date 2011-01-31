@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2010 by the deal.II authors */
+/*    Copyright (C) 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -111,7 +111,7 @@ class MatrixIntegrator : public Subscriptor
   public:
     static void cell(MeshWorker::DoFInfo<dim>& dinfo,
 		     typename MeshWorker::IntegrationInfo<dim>& info);
-    static void bdry(MeshWorker::DoFInfo<dim>& dinfo,
+    static void boundary(MeshWorker::DoFInfo<dim>& dinfo,
 		     typename MeshWorker::IntegrationInfo<dim>& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
@@ -147,7 +147,7 @@ void MatrixIntegrator<dim>::cell(
 
 
 template <int dim>
-void MatrixIntegrator<dim>::bdry(
+void MatrixIntegrator<dim>::boundary(
   MeshWorker::DoFInfo<dim>& dinfo,
   typename MeshWorker::IntegrationInfo<dim>& info)
 {
@@ -185,7 +185,7 @@ class RHSIntegrator : public Subscriptor
 {
   public:
     static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
-    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
+    static void boundary(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
 		     typename MeshWorker::IntegrationInfo<dim>& info1,
@@ -199,7 +199,7 @@ void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>&, typename MeshWorker::In
 
 
 template <int dim>
-void RHSIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info)
+void RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   Vector<double>& local_vector = dinfo.vector(0).block(0);
@@ -236,7 +236,7 @@ class Estimator : public Subscriptor
 {
   public:
     static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
-    static void bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
+    static void boundary(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
 		     typename MeshWorker::IntegrationInfo<dim>& info1,
@@ -269,7 +269,7 @@ void Estimator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::
 				 // element solution and the correct
 				 // boundary condition.
 template <int dim>
-void Estimator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info)
+void Estimator<dim>::boundary(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info)
 {
   const FEValuesBase<dim>& fe = info.fe_values();
   
@@ -583,7 +583,7 @@ Step39<dim>::assemble_matrix()
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
-    &MatrixIntegrator<dim>::bdry,
+    &MatrixIntegrator<dim>::boundary,
     &MatrixIntegrator<dim>::face,
     assembler);
 }
@@ -626,7 +626,7 @@ Step39<dim>::assemble_mg_matrix()
     mg_dof_handler.begin(), mg_dof_handler.end(),
     dof_info, info_box,
     &MatrixIntegrator<dim>::cell,
-    &MatrixIntegrator<dim>::bdry,
+    &MatrixIntegrator<dim>::boundary,
     &MatrixIntegrator<dim>::face,
     assembler);
 }
@@ -668,7 +668,7 @@ Step39<dim>::assemble_right_hand_side()
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &RHSIntegrator<dim>::cell,
-    &RHSIntegrator<dim>::bdry,
+    &RHSIntegrator<dim>::boundary,
     &RHSIntegrator<dim>::face,
     assembler);
   
@@ -861,7 +861,7 @@ Step39<dim>::estimate()
     dof_handler.begin_active(), dof_handler.end(),
     dof_info, info_box,
     &Estimator<dim>::cell,
-    &Estimator<dim>::bdry,
+    &Estimator<dim>::boundary,
     &Estimator<dim>::face,
     assembler);
   return estimates.block(0).l2_norm();
