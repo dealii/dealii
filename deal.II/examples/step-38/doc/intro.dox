@@ -226,5 +226,8 @@ template arguments on the classes Triangulation, DoFHandler, and similar, are
 already described in detail in step-34; you may wish to read through this
 tutorial program as well.
 
-This material is based upon work supported by the National Science Foundation under Grant No. DMS-0914977.
-Any opinions, findings and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation (NSF).
+@note This material is based upon work supported by the National Science
+Foundation under Grant No. DMS-0914977. Any opinions, findings and conclusions
+or recommendations expressed in this material are those of the author(s) and
+do not necessarily reflect the views of the National Science Foundation
+(NSF).
