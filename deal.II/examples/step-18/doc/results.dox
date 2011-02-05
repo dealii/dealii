@@ -330,7 +330,7 @@ the present one. One would need an even finer computation to find out. However,
 the point may be moot: looking at the last picture in detail, it is pretty
 obvious that not only is the linear small
 deformation model we chose completely inadequate, but for a realistic
-simulation we would also need to make sure that the body does not intersects
+simulation we would also need to make sure that the body does not intersect
 itself during deformation. Without such a formulation we cannot expect anything
-that make sense, even if it produces nice pictures!
+to make physical sense, even if it produces nice pictures!
 
