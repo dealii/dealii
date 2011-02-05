@@ -98,8 +98,10 @@ ifneq ($(GXX-VERSION),compaq_cxx)
 
   # same with TRILINOS
   ifeq ($(USE_CONTRIB_TRILINOS),yes)
-    deplibs.g += $(lib-contrib-trilinos)
-    deplibs.o += $(lib-contrib-trilinos)
+    deplibs.g += $(lib-contrib-trilinos) \
+	         $(call DEAL_II_RPATH,$(DEAL_II_TRILINOS_LIBDIR))
+    deplibs.o += $(lib-contrib-trilinos) \
+	         $(call DEAL_II_RPATH,$(DEAL_II_TRILINOS_LIBDIR))
   endif
 
   # same with MUMPS
