@@ -639,7 +639,14 @@ is only slightly messy in the sequential case; in fact, the functions
 FETools::get_projection_from_quadrature_points_matrix will do
 the projection, and the FiniteElement::get_restriction_matrix and
 FiniteElement::get_prolongation_matrix functions will do the
-transfer between mother and child cells. However, it becomes complicated
+transfer between mother and child cells. Alternatively, one can use
+FETools::get_projection_from_quadrature_points_matrix to convert data only
+defined in quadrature points to a finite element field, use the
+SolutionTransfer class to move the field to a refined/coarsened version of the
+mesh, and then use FETools::compute_interpolation_to_quadrature_points_matrix
+to get the information back into the quadrature points of the new mesh.
+
+However, whichever way we do it, it becomes complicated
 once we run the program in parallel, since then each process only stores this
 data for the cells it owned on the old mesh, and it may need to know the
 values of the quadrature point data on other cells if the corresponding cells
