@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,12 +17,10 @@
 
 for (VEC : SERIAL_VECTORS)
   {
-				     /**
-				      * Call
-				      * @p get_interpolated_dof_values
-				      * of the iterator with the
-				      * given arguments.
-				      */
+				      /// Call
+				      /// @p get_interpolated_dof_values
+				      /// of the iterator with the
+				      /// given arguments.
     virtual
     void
     get_interpolated_dof_values (const VEC &in,
