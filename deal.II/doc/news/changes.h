@@ -80,7 +80,7 @@ should be fixed now.
 <ol>
 <li> Changed: If the <code>libz</code> library was detected during library
 configuration, the function DataOutBase::write_vtu now writes data in compressed
-format, saving a good fraction of disk space in output files.
+format, saving a good fraction of disk space (80-90% for big output files).
 <br>
 (Wolfgang Bangerth, 2011/01/28)
 </li>
