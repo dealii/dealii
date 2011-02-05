@@ -1383,7 +1383,7 @@ template <int dim>
     double v_e = 0.0; // Volume in current configuration
     double V_e = 0.0; // Volume in reference configuration
 
-    static FEValues<dim> fe_values_ref (fe, qf_cell, update_JxW_values);
+    FEValues<dim> fe_values_ref (fe, qf_cell, update_JxW_values);
 
     typename DoFHandler<dim>::active_cell_iterator
             cell = dof_handler_ref.begin_active(),
