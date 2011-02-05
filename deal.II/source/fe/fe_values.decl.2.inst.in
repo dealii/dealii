@@ -17,12 +17,10 @@
 
 for (VEC : SERIAL_VECTORS)
   {
-				     /**
-				      * Call
-				      * @p get_interpolated_dof_values
-				      * of the iterator with the
-				      * given arguments.
-				      */
+				      /// Call
+				      /// @p get_interpolated_dof_values
+				      /// of the iterator with the
+				      /// given arguments.
     virtual
     void
     get_interpolated_dof_values (const VEC &in,
