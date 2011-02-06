@@ -2752,7 +2752,11 @@ void BoussinesqFlowProblem<dim>::solve ()
   {
     old_time_step = time_step;
     const double maximal_velocity = get_maximal_velocity();
-    double local_time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+				     // we found out that we need
+				     // approximately a quarter the time step
+				     // size in 3d
+    double scaling = (dim==3)?0.25:1.0;
+    double local_time_step = scaling/(1.6*dim*std::sqrt(1.*dim)) /
 			     temperature_degree *
 			     GridTools::minimal_cell_diameter(triangulation) /
 			     std::max(1e-10,maximal_velocity);
