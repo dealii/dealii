@@ -414,13 +414,21 @@ namespace PETScWrappers
   PetscScalar
   VectorBase::mean_value () const
   {
-    Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(this) == 0,
-	   ExcMessage	("::mean_value() not implemented for MPI::Vector."));
+    int ierr;
+				     // We can only use our more efficient
+				     // routine in the serial case.
+    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(this) != 0)
+      {
+	PetscScalar sum;
+	ierr = VecSum( vector, &sum);
+	AssertThrow (ierr == 0, ExcPETScError(ierr));
+	return sum/size();
+      }
     
                                      // get a representation of the vector and
                                      // loop over all the elements
     PetscScalar *start_ptr;
-    int ierr = VecGetArray (vector, &start_ptr);
+    ierr = VecGetArray (vector, &start_ptr);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     PetscScalar mean = 0;
