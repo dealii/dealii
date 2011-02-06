@@ -29,6 +29,7 @@
 #include <base/conditional_ostream.h>
 #include <base/work_stream.h>
 #include <base/timer.h>
+#include <base/parameter_handler.h>
 
 #include <lac/full_matrix.h>
 #include <lac/solver_bicgstab.h>
@@ -114,7 +115,6 @@ namespace EquationData
   const double T1      =  700+273;              /* K          */
 
   const double year_in_seconds  = 60*60*24*365.2425;
-  const double end_time         = 1e8 * year_in_seconds;
 
   const double pressure_scaling = eta / (R1-R0);
 
@@ -814,7 +814,7 @@ class BoussinesqFlowProblem
 {
   public:
     BoussinesqFlowProblem ();
-    void run (unsigned int ref);
+    void run (const std::string parameter_filename);
 
   private:
     void setup_dofs ();
@@ -845,8 +845,29 @@ class BoussinesqFlowProblem
 		      const double                        global_T_variation,
 		      const double                        cell_diameter) const;
 
+    struct Parameters
+    {
+	Parameters ();
+	
+	static void declare_parameters (ParameterHandler &prm);
+	void parse_parameters (ParameterHandler &prm);
+	
+	double end_time;
+
+	unsigned int initial_global_refinement;
+	unsigned int initial_adaptive_refinement;
+
+	bool         generate_graphical_output;
+	unsigned int graphical_output_interval;
+	
+	double stabilization_alpha;
+	double stabilization_c_R;
+	double stabilization_beta;
+    };
+    
 
     ConditionalOStream                  pcout;
+    Parameters                          parameters;
 
     parallel::distributed::Triangulation<dim> triangulation;
     double                              global_Omega_diameter;
@@ -941,6 +962,91 @@ class BoussinesqFlowProblem
 
 
 				 // @sect3{BoussinesqFlowProblem class implementation}
+
+				 // @sect4{BoussinesqFlowProblem::Parameters}
+template <int dim>
+BoussinesqFlowProblem<dim>::Parameters::Parameters ()
+		:
+		end_time (1e8),
+		initial_global_refinement (2),
+		initial_adaptive_refinement (2),
+		stabilization_alpha (2),
+		stabilization_c_R (0.11),
+		stabilization_beta (0.078)
+{}
+  
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::Parameters::
+declare_parameters (ParameterHandler &prm)
+{
+  prm.declare_entry ("End time", "1e8",
+		     Patterns::Double (0),
+		     "The end time of the simulation in years.");
+  prm.declare_entry ("Initial global refinement", "2",
+		     Patterns::Integer (0),
+		     "The number of global refinement steps performed on "
+		     "the initial coarse mesh, before the problem is first "
+		     "solved there.");
+  prm.declare_entry ("Initial adaptive refinement", "2",
+		     Patterns::Integer (0),
+		     "The number of adaptive refinement steps performed after "
+		     "initial global refinement.");
+  prm.declare_entry ("Generate graphical output", "false",
+		     Patterns::Bool (),
+		     "Whether graphical output is to be generated or not. "
+		     "You may not want to get graphical output if the number "
+		     "of processors is large.");
+  prm.declare_entry ("Time steps between graphical output", "50",
+		     Patterns::Integer (1),
+		     "The number of time steps between each generation of "
+		     "graphical output files.");
+
+  prm.enter_subsection ("Stabilization parameters");
+  {
+    prm.declare_entry ("alpha", "2",
+		       Patterns::Double (1, 2),
+		       "The exponent in the entropy viscosity stabilization.");
+    prm.declare_entry ("c_R", "0.11",
+		       Patterns::Double (0),
+		       "The c_R factor in the entropy viscosity "
+		       "stabilization.");    
+    prm.declare_entry ("beta", "0.078",
+		       Patterns::Double (0),
+		       "The beta factor in the artificial viscosity "
+		       "stabilization. An appropriate value for 2d is 0.052 "
+		       "and 0.078 for 3d.");
+  }
+  prm.leave_subsection ();
+}
+
+
+
+template <int dim>
+void
+BoussinesqFlowProblem<dim>::Parameters::
+parse_parameters (ParameterHandler &prm)
+{
+  end_time                    = prm.get_double ("End time");
+  initial_global_refinement   = prm.get_integer ("Initial global refinement");
+  initial_adaptive_refinement = prm.get_integer ("Initial adaptive refinement");
+
+  generate_graphical_output   = prm.get_bool ("Generate graphical output");
+  graphical_output_interval   = prm.get_integer ("Time steps between graphical output");
+  
+  prm.enter_subsection ("Stabilization parameters");
+  {
+    stabilization_alpha = prm.get_double ("alpha");
+    stabilization_c_R   = prm.get_double ("c_R");
+    stabilization_beta  = prm.get_double ("beta");
+  }
+  prm.leave_subsection ();
+}
+
+  
+
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
 				 //
@@ -1233,9 +1339,6 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const double                        global_T_variation,
 		   const double                        cell_diameter) const
 {
-  const double beta = 0.026 * dim;
-  const double alpha = 1;
-
   if (global_u_infty == 0)
     return 5e-3 * cell_diameter;
 
@@ -1270,26 +1373,26 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       const double residual
 	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma) *
 		   std::pow((old_temperature[q]+old_old_temperature[q]) / 2,
-			    alpha-1.));
+			    parameters.stabilization_alpha-1.));
 
       max_residual = std::max (residual,        max_residual);
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
 
   if (timestep_number == 0)
-    return beta * max_velocity * cell_diameter;
+    return parameters.stabilization_beta * max_velocity * cell_diameter;
   else
     {
       Assert (old_time_step > 0, ExcInternalError());
 
-      const double c_R = 0.11;
-      const double global_scaling = c_R * global_u_infty * global_T_variation *
-				    std::pow(global_Omega_diameter, alpha - 2.);
+      const double global_scaling = parameters.stabilization_c_R *
+				    global_u_infty * global_T_variation *
+				    std::pow(global_Omega_diameter, parameters.stabilization_alpha - 2.);
 
-      return (beta *
+      return (parameters.stabilization_beta *
 	      max_velocity *
 	      std::min (cell_diameter,
-			std::pow(cell_diameter,alpha) * max_residual /
+			std::pow(cell_diameter,parameters.stabilization_alpha) * max_residual /
 			global_scaling));
     }
 }
@@ -3342,12 +3445,36 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				 // <code>VectorTools::project</code>, the
 				 // rest is as before.
 template <int dim>
-void BoussinesqFlowProblem<dim>::run (unsigned int ref)
+void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 {
-  pcout << "this is step-32. ref=" << ref << std::endl;
-  const unsigned int initial_refinement = ref;//(dim == 2 ? 5 : 2);
-  const unsigned int n_pre_refinement_steps = 2;//(dim == 2 ? 4 : 2);
+  {
+    ParameterHandler prm;
+    Parameters::declare_parameters (prm);
 
+    std::ifstream parameter_file (parameter_filename.c_str());
+
+    if (!parameter_file)
+      {
+	parameter_file.close ();
+
+	std::cerr << "*** Input parameter file <"
+		  << parameter_filename << "> not found. Creating a"
+		  << std::endl
+		  << "*** template file of the same name."
+		  << std::endl;
+	
+	std::ofstream parameter_out (parameter_filename.c_str());
+	prm.print_parameters (parameter_out,
+			      ParameterHandler::Text);
+
+	std::exit (1);
+      }
+      
+    prm.read_input (parameter_file);
+    parameters.parse_parameters (prm);
+  }
+  
+  
   GridGenerator::hyper_shell (triangulation,
 			      Point<dim>(),
 			      EquationData::R0,
@@ -3362,7 +3489,7 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
 
   global_Omega_diameter = GridTools::diameter (triangulation);
 
-  triangulation.refine_global (initial_refinement);
+  triangulation.refine_global (parameters.initial_global_refinement);
 
   setup_dofs();
 
@@ -3393,18 +3520,21 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
       pcout << std::endl;
 
       if ((timestep_number == 0) &&
-	  (pre_refinement_step < n_pre_refinement_steps))
+	  (pre_refinement_step < parameters.initial_adaptive_refinement))
 	{
-	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+	  refine_mesh (parameters.initial_global_refinement +
+		       parameters.initial_adaptive_refinement);
 	  ++pre_refinement_step;
 	  goto start_time_iteration;
 	}
       else
 	if ((timestep_number > 0) && (timestep_number % 10 == 0))
-	  refine_mesh (initial_refinement + n_pre_refinement_steps);
+	  refine_mesh (parameters.initial_global_refinement +
+		       parameters.initial_adaptive_refinement);
 
-      if (timestep_number % 50 == 0 &&
-	  Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD) <= 100)
+      if ((parameters.generate_graphical_output == true)
+	  &&
+	  (timestep_number % parameters.graphical_output_interval == 0))
 	output_results ();
 
       time += time_step;
@@ -3424,7 +3554,7 @@ void BoussinesqFlowProblem<dim>::run (unsigned int ref)
       				     old_old_temperature_solution);
       	}
     }
-  while (time <= EquationData::end_time);
+  while (time <= parameters.end_time * EquationData::year_in_seconds);
 }
 
 
@@ -3440,14 +3570,15 @@ int main (int argc, char *argv[])
 
       Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
+      std::string parameter_filename;
+      if (argc>=2)
+	parameter_filename = argv[1];
+      else
+	parameter_filename = "step-32.prm";
+      
       const int dim = 3;
       BoussinesqFlowProblem<dim> flow_problem;
-
-      unsigned int ref = (dim == 2 ? 5 : 2);
-      if (argc>=2)
-	ref = (unsigned int)Utilities::string_to_int(argv[1]);
-
-      flow_problem.run (ref);
+      flow_problem.run (parameter_filename);
     }
   catch (std::exception &exc)
     {

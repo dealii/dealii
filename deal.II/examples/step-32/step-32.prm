@@ -1,0 +1,34 @@
+# Listing of Parameters
+# ---------------------
+# The end time of the simulation in years.
+set End time                            = 1e8
+
+# The number of adaptive refinement steps performed after initial global
+# refinement.
+set Initial adaptive refinement         = 2
+
+# The number of global refinement steps performed on the initial coarse mesh,
+# before the problem is first solved there.
+set Initial global refinement           = 2
+
+# Whether graphical output is to be generated or not. You may not want to get
+# graphical output if the number of processors is large.
+set Generate graphical output           = false
+
+# The number of time steps between each generation of graphical output files.
+set Time steps between graphical output = 50
+
+
+subsection Stabilization parameters
+  # The exponent in the entropy viscosity stabilization.
+  set alpha = 2
+
+  # The c_R factor in the entropy viscosity stabilization.
+  set c_R   = 0.11
+
+  # The beta factor in the artificial viscosity stabilization. An appropriate
+  # value for 2d is 0.052 and 0.078 for 3d.
+  set beta  = 0.078
+end
+
+
