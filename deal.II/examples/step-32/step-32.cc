@@ -175,10 +175,11 @@ namespace EquationData
    For a plot, see
    http://www.wolframalpha.com/input/?i=plot+%28%282*sqrt%28x^2%2By^2%29-1%29%2B0.2*%282*sqrt%28x^2%2By^2%29-1%29*%281-%282*sqrt%28x^2%2By^2%29-1%29%29*sin%286*atan2%28x%2Cy%29%29%29%2C+x%3D-1+to+1%2C+y%3D-1+to+1
 */
+    const double scale = (dim==3)?std::max(0.0,cos(3.14159*abs(p(2)/R1))):1.0;
     const double phi   = std::atan2(p(0),p(1));
-    const double s_mod = (s
-			  +
-			  0.2 * s * (1-s) * std::sin(6*phi));
+    const double s_mod = s
+			 +
+			 0.2 * s * (1-s) * std::sin(6*phi) * scale;
 
     return T0*(1.0-s_mod) + T1*s_mod;
   }
