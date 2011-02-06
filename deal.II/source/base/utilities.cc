@@ -809,7 +809,18 @@ namespace Utilities
       MPI_Initialized(&MPI_has_been_started);
       if (program_uses_mpi() == true && owns_mpi == true &&
 	  MPI_has_been_started != 0)
-	mpi_err = MPI_Finalize();
+	{
+	  if (std::uncaught_exception())
+	    {    
+	      std::cerr << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
+			<< get_this_mpi_process(MPI_COMM_WORLD)
+			<< ". Skipping MPI_Finalize() to avoid a deadlock."
+			<< std::endl;
+	    }
+	  else
+	    mpi_err = MPI_Finalize();
+	}
+      
 
       AssertThrow (mpi_err == 0,
 		   ExcMessage ("An error occurred while calling MPI_Finalize()"));
