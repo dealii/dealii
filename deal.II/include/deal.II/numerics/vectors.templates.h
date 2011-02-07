@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name:  $
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4194,272 +4194,280 @@ namespace internal
       typename DH::active_cell_iterator cell = dof.begin_active(),
                                         endc = dof.end();
       for (unsigned int index=0; cell != endc; ++cell, ++index)
-        {
-          double diff=0;
-                                           // initialize for this cell
-          x_fe_values.reinit (cell);
+	if (!cell->is_artificial() && !cell->is_ghost())
+	  {
+	    double diff=0;
+					     // initialize for this cell
+	    x_fe_values.reinit (cell);
 
-          const dealii::FEValues<dim, spacedim> &fe_values  = x_fe_values.get_present_fe_values ();
-          const unsigned int   n_q_points = fe_values.n_quadrature_points;
+	    const dealii::FEValues<dim, spacedim> &fe_values  = x_fe_values.get_present_fe_values ();
+	    const unsigned int   n_q_points = fe_values.n_quadrature_points;
 
-                                           // resize all out scratch
-                                           // arrays to the number of
-                                           // quadrature points we use
-                                           // for the present cell
-          function_values.resize (n_q_points,
-                                  dealii::Vector<double>(n_components));
-          function_grads.resize (n_q_points,
-                                 std::vector<Tensor<1,spacedim> >(n_components));
+					     // resize all out scratch
+					     // arrays to the number of
+					     // quadrature points we use
+					     // for the present cell
+	    function_values.resize (n_q_points,
+				    dealii::Vector<double>(n_components));
+	    function_grads.resize (n_q_points,
+				   std::vector<Tensor<1,spacedim> >(n_components));
 
-          weight_values.resize (n_q_points);
-          weight_vectors.resize (n_q_points,
-                                 dealii::Vector<double>(n_components));
+	    weight_values.resize (n_q_points);
+	    weight_vectors.resize (n_q_points,
+				   dealii::Vector<double>(n_components));
 
-          psi_values.resize (n_q_points,
-                             dealii::Vector<double>(n_components));
-          psi_grads.resize (n_q_points,
-                            std::vector<Tensor<1,spacedim> >(n_components));
-          psi_scalar.resize (n_q_points);
+	    psi_values.resize (n_q_points,
+			       dealii::Vector<double>(n_components));
+	    psi_grads.resize (n_q_points,
+			      std::vector<Tensor<1,spacedim> >(n_components));
+	    psi_scalar.resize (n_q_points);
 
-          tmp_values.resize (n_q_points);
-          tmp_gradients.resize (n_q_points);
+	    tmp_values.resize (n_q_points);
+	    tmp_gradients.resize (n_q_points);
 
-          if (weight!=0)
-            {
-              if (weight->n_components>1)
-                weight->vector_value_list (fe_values.get_quadrature_points(),
-                                           weight_vectors);
-              else
-                {
-                  weight->value_list (fe_values.get_quadrature_points(),
-                                      weight_values);
-                  for (unsigned int k=0;k<n_q_points;++k)
-                    weight_vectors[k] = weight_values[k];
-                }
-            }
-          else
-            {
-              for (unsigned int k=0;k<n_q_points;++k)
-                weight_vectors[k] = 1.;
-            }
+	    if (weight!=0)
+	      {
+		if (weight->n_components>1)
+		  weight->vector_value_list (fe_values.get_quadrature_points(),
+					     weight_vectors);
+		else
+		  {
+		    weight->value_list (fe_values.get_quadrature_points(),
+					weight_values);
+		    for (unsigned int k=0;k<n_q_points;++k)
+		      weight_vectors[k] = weight_values[k];
+		  }
+	      }
+	    else
+	      {
+		for (unsigned int k=0;k<n_q_points;++k)
+		  weight_vectors[k] = 1.;
+	      }
 
 
-          if (update_flags & update_values)
-            {
-                                               // first compute the exact solution
-                                               // (vectors) at the quadrature points
-                                               // try to do this as efficient as
-                                               // possible by avoiding a second
-                                               // virtual function call in case
-                                               // the function really has only
-                                               // one component
-              if (fe_is_system)
-                exact_solution.vector_value_list (fe_values.get_quadrature_points(),
-                                                  psi_values);
-              else
-                {
-                  exact_solution.value_list (fe_values.get_quadrature_points(),
-                                             tmp_values);
-                  for (unsigned int i=0; i<n_q_points; ++i)
-                    psi_values[i](0) = tmp_values[i];
-                }
+	    if (update_flags & update_values)
+	      {
+						 // first compute the exact solution
+						 // (vectors) at the quadrature points
+						 // try to do this as efficient as
+						 // possible by avoiding a second
+						 // virtual function call in case
+						 // the function really has only
+						 // one component
+		if (fe_is_system)
+		  exact_solution.vector_value_list (fe_values.get_quadrature_points(),
+						    psi_values);
+		else
+		  {
+		    exact_solution.value_list (fe_values.get_quadrature_points(),
+					       tmp_values);
+		    for (unsigned int i=0; i<n_q_points; ++i)
+		      psi_values[i](0) = tmp_values[i];
+		  }
 
-                                               // then subtract finite element
-                                               // fe_function
-              fe_values.get_function_values (fe_function, function_values);
-              for (unsigned int q=0; q<n_q_points; ++q)
-                psi_values[q] -= function_values[q];
-            }
+						 // then subtract finite element
+						 // fe_function
+		fe_values.get_function_values (fe_function, function_values);
+		for (unsigned int q=0; q<n_q_points; ++q)
+		  psi_values[q] -= function_values[q];
+	      }
 
-                                           // Do the same for gradients, if required
-          if (update_flags & update_gradients)
-            {
-                                               // try to be a little clever
-                                               // to avoid recursive virtual
-                                               // function calls when calling
-                                               // gradient_list for functions
-                                               // that are really scalar
-                                               // functions
-              if (fe_is_system)
-                exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
-                                                     psi_grads);
-              else
-                {
-                  exact_solution.gradient_list (fe_values.get_quadrature_points(),
-                                                tmp_gradients);
-                  for (unsigned int i=0; i<n_q_points; ++i)
-                    psi_grads[i][0] = tmp_gradients[i];
-                }
+					     // Do the same for gradients, if required
+	    if (update_flags & update_gradients)
+	      {
+						 // try to be a little clever
+						 // to avoid recursive virtual
+						 // function calls when calling
+						 // gradient_list for functions
+						 // that are really scalar
+						 // functions
+		if (fe_is_system)
+		  exact_solution.vector_gradient_list (fe_values.get_quadrature_points(),
+						       psi_grads);
+		else
+		  {
+		    exact_solution.gradient_list (fe_values.get_quadrature_points(),
+						  tmp_gradients);
+		    for (unsigned int i=0; i<n_q_points; ++i)
+		      psi_grads[i][0] = tmp_gradients[i];
+		  }
 
-                                               // then subtract finite element
-                                               // function_grads. We
-                                               // need to be careful
-                                               // in the codimension
-                                               // one case, since
-                                               // there we only have
-                                               // tangential gradients
-                                               // in the finite
-                                               // element function,
-                                               // not the full
-                                               // gradient. This is
-                                               // taken care of, by
-                                               // subtracting the
-                                               // normal component of
-                                               // the gradient from
-                                               // the exact function.
-              fe_values.get_function_grads (fe_function, function_grads);
-	      if(update_flags & update_normal_vectors)
-		for (unsigned int k=0; k<n_components; ++k)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    psi_grads[q][k] -= (function_grads[q][k] +
-					(psi_grads[q][k]* // (f.n) n
-					 fe_values.normal_vector(q))*
-					fe_values.normal_vector(q));
-	      else
-		for (unsigned int k=0; k<n_components; ++k)
-		  for (unsigned int q=0; q<n_q_points; ++q)
-		    psi_grads[q][k] -= function_grads[q][k];
-            }
+						 // then subtract finite element
+						 // function_grads. We
+						 // need to be careful
+						 // in the codimension
+						 // one case, since
+						 // there we only have
+						 // tangential gradients
+						 // in the finite
+						 // element function,
+						 // not the full
+						 // gradient. This is
+						 // taken care of, by
+						 // subtracting the
+						 // normal component of
+						 // the gradient from
+						 // the exact function.
+		fe_values.get_function_grads (fe_function, function_grads);
+		if(update_flags & update_normal_vectors)
+		  for (unsigned int k=0; k<n_components; ++k)
+		    for (unsigned int q=0; q<n_q_points; ++q)
+		      psi_grads[q][k] -= (function_grads[q][k] +
+					  (psi_grads[q][k]* // (f.n) n
+					   fe_values.normal_vector(q))*
+					  fe_values.normal_vector(q));
+		else
+		  for (unsigned int k=0; k<n_components; ++k)
+		    for (unsigned int q=0; q<n_q_points; ++q)
+		      psi_grads[q][k] -= function_grads[q][k];
+	      }
 
-          switch (norm)
-            {
-              case dealii::VectorTools::mean:
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                                                     // Compute values in
-                                                     // quadrature points
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += psi_values[q](k)
-                                         * weight_vectors[q](k);
+	    switch (norm)
+	      {
+		case dealii::VectorTools::mean:
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+						       // Compute values in
+						       // quadrature points
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  psi_scalar[q] += psi_values[q](k)
+					   * weight_vectors[q](k);
 
-                                                     // Integrate
-                    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-                                               fe_values.get_JxW_values().begin(),
-                                               0.0);
-                    break;
-              case dealii::VectorTools::Lp_norm:
-              case dealii::VectorTools::L1_norm:
-              case dealii::VectorTools::W1p_norm:
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                                                     // Compute values in
-                                                     // quadrature points
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += std::pow(psi_values[q](k)*psi_values[q](k),
-                                                  exponent/2.)
-                                         * weight_vectors[q](k);
+						       // Integrate
+		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0);
+		      break;
+		case dealii::VectorTools::Lp_norm:
+		case dealii::VectorTools::L1_norm:
+		case dealii::VectorTools::W1p_norm:
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+						       // Compute values in
+						       // quadrature points
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  psi_scalar[q] += std::pow(psi_values[q](k)*psi_values[q](k),
+						    exponent/2.)
+					   * weight_vectors[q](k);
 
-                                                     // Integrate
-                    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-                                               fe_values.get_JxW_values().begin(),
-                                               0.0);
-                                                     // Compute the root only,
-                                                     // if no derivative
-                                                     // values are added later
-                    if (!(update_flags & update_gradients))
-                      diff = std::pow(diff, 1./exponent);
-                    break;
-              case dealii::VectorTools::L2_norm:
-              case dealii::VectorTools::H1_norm:
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                                                     // Compute values in
-                                                     // quadrature points
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += psi_values[q](k)*psi_values[q](k)
-                                         * weight_vectors[q](k);
+						       // Integrate
+		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0);
+						       // Compute the root only,
+						       // if no derivative
+						       // values are added later
+		      if (!(update_flags & update_gradients))
+			diff = std::pow(diff, 1./exponent);
+		      break;
+		case dealii::VectorTools::L2_norm:
+		case dealii::VectorTools::H1_norm:
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+						       // Compute values in
+						       // quadrature points
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  psi_scalar[q] += psi_values[q](k)*psi_values[q](k)
+					   * weight_vectors[q](k);
 
-                                                     // Integrate
-                    diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-                                               fe_values.get_JxW_values().begin(),
-                                               0.0);
-                                                     // Compute the root only,
-                                                     // if no derivative
-                                                     // values are added later
-                    if (norm == dealii::VectorTools::L2_norm)
-                      diff=std::sqrt(diff);
-                    break;
-              case dealii::VectorTools::Linfty_norm:
-              case dealii::VectorTools::W1infty_norm:
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        {
-                          double newval = std::fabs(psi_values[q](k))
-                                          * weight_vectors[q](k);
-                          if (psi_scalar[q]<newval)
-                            psi_scalar[q] = newval;
-                        }
-                                                     // Maximum on one cell
-                    diff = *std::max_element (psi_scalar.begin(), psi_scalar.end());
-                    break;
-              case dealii::VectorTools::H1_seminorm:
-              case dealii::VectorTools::W1p_seminorm:
-              case dealii::VectorTools::W1infty_seminorm:
-                    break;
-              default:
-                    Assert (false, ExcNotImplemented());
-                    break;
-            }
+						       // Integrate
+		      diff = std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						 fe_values.get_JxW_values().begin(),
+						 0.0);
+						       // Compute the root only,
+						       // if no derivative
+						       // values are added later
+		      if (norm == dealii::VectorTools::L2_norm)
+			diff=std::sqrt(diff);
+		      break;
+		case dealii::VectorTools::Linfty_norm:
+		case dealii::VectorTools::W1infty_norm:
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  {
+			    double newval = std::fabs(psi_values[q](k))
+					    * weight_vectors[q](k);
+			    if (psi_scalar[q]<newval)
+			      psi_scalar[q] = newval;
+			  }
+						       // Maximum on one cell
+		      diff = *std::max_element (psi_scalar.begin(), psi_scalar.end());
+		      break;
+		case dealii::VectorTools::H1_seminorm:
+		case dealii::VectorTools::W1p_seminorm:
+		case dealii::VectorTools::W1infty_seminorm:
+		      break;
+		default:
+		      Assert (false, ExcNotImplemented());
+		      break;
+	      }
 
-          switch (norm)
-            {
-              case dealii::VectorTools::W1p_seminorm:
-              case dealii::VectorTools::W1p_norm:
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += std::pow(psi_grads[q][k] * psi_grads[q][k],
-                                                  exponent/2.)
-                                         * weight_vectors[q](k);
+	    switch (norm)
+	      {
+		case dealii::VectorTools::W1p_seminorm:
+		case dealii::VectorTools::W1p_norm:
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  psi_scalar[q] += std::pow(psi_grads[q][k] * psi_grads[q][k],
+						    exponent/2.)
+					   * weight_vectors[q](k);
 
-                    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-                                                fe_values.get_JxW_values().begin(),
-                                                0.0);
-                    diff = std::pow(diff, 1./exponent);
-                    break;
-              case dealii::VectorTools::H1_seminorm:
-              case dealii::VectorTools::H1_norm:
-                                                     // take square of integrand
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        psi_scalar[q] += (psi_grads[q][k] * psi_grads[q][k])
-                                         * weight_vectors[q](k);
+		      diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						  fe_values.get_JxW_values().begin(),
+						  0.0);
+		      diff = std::pow(diff, 1./exponent);
+		      break;
+		case dealii::VectorTools::H1_seminorm:
+		case dealii::VectorTools::H1_norm:
+						       // take square of integrand
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  psi_scalar[q] += (psi_grads[q][k] * psi_grads[q][k])
+					   * weight_vectors[q](k);
 
-                                                     // add seminorm to L_2 norm or
-                                                     // to zero
-                    diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
-                                                fe_values.get_JxW_values().begin(),
-                                                0.0);
-                    diff = std::sqrt(diff);
-                    break;
-              case dealii::VectorTools::W1infty_seminorm:
-              case dealii::VectorTools::W1infty_norm:
-                    Assert(false, ExcNotImplemented());
-                    std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
-                    for (unsigned int k=0; k<n_components; ++k)
-                      for (unsigned int q=0; q<n_q_points; ++q)
-                        {
-                          double t = 0.;
-                          for (unsigned int d=0;d<dim;++d)
-                            t = std::max(t,std::fabs(psi_grads[q][k][d])
-                                         * weight_vectors[q](k));
+						       // add seminorm to L_2 norm or
+						       // to zero
+		      diff += std::inner_product (psi_scalar.begin(), psi_scalar.end(),
+						  fe_values.get_JxW_values().begin(),
+						  0.0);
+		      diff = std::sqrt(diff);
+		      break;
+		case dealii::VectorTools::W1infty_seminorm:
+		case dealii::VectorTools::W1infty_norm:
+		      Assert(false, ExcNotImplemented());
+		      std::fill_n (psi_scalar.begin(), n_q_points, 0.0);
+		      for (unsigned int k=0; k<n_components; ++k)
+			for (unsigned int q=0; q<n_q_points; ++q)
+			  {
+			    double t = 0.;
+			    for (unsigned int d=0;d<dim;++d)
+			      t = std::max(t,std::fabs(psi_grads[q][k][d])
+					   * weight_vectors[q](k));
 
-                          psi_scalar[q] = std::max(psi_scalar[q],t);
-                        }
+			    psi_scalar[q] = std::max(psi_scalar[q],t);
+			  }
 
-                    for (unsigned int i=0;i<psi_scalar.size();++i)
-                      diff = std::max (diff, psi_scalar[i]);
-                    break;
-              default:
-                    break;
-            }
-                                           // append result of this cell
-                                           // to the end of the vector
-          Assert (numbers::is_finite(diff), ExcNumberNotFinite());
-          difference(index) = diff;
-        }
+		      for (unsigned int i=0;i<psi_scalar.size();++i)
+			diff = std::max (diff, psi_scalar[i]);
+		      break;
+		default:
+		      break;
+	      }
+					     // append result of this cell
+					     // to the end of the vector
+	    Assert (numbers::is_finite(diff), ExcNumberNotFinite());
+	    difference(index) = diff;
+	  }
+	else
+					   // the cell is a ghost cell
+					   // or is artificial. write
+					   // a zero into the
+					   // corresponding value of
+					   // the returned vector
+	  difference(index) = 0;
     }
 
   } //namespace VectorTools
@@ -4730,23 +4738,44 @@ VectorTools::compute_mean_value (const Mapping<dim, spacedim>    &mapping,
 		   UpdateFlags(update_JxW_values
 			       | update_values));
 
-  typename DoFHandler<dim,spacedim>::active_cell_iterator c;
+  typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
   std::vector<Vector<double> > values(quadrature.size(),
 				      Vector<double> (dof.get_fe().n_components()));
 
   double mean = 0.;
   double area = 0.;
 				   // Compute mean value
-  for (c = dof.begin_active(); c != dof.end(); ++c)
+  for (cell = dof.begin_active(); cell != dof.end(); ++cell)
+    if (!cell->is_artificial() && !cell->is_ghost())
+      {
+	fe.reinit (cell);
+	fe.get_function_values(v, values);
+	for (unsigned int k=0; k< quadrature.size(); ++k)
+	  {
+	    mean += fe.JxW(k) * values[k](component);
+	    area += fe.JxW(k);
+	  }
+      }
+
+#if DEAL_II_USE_P4EST
+				   // if this was a distributed
+				   // DoFHandler, we need to do the
+				   // reduction over the entire domain
+  if (const parallel::distributed::Triangulation<dim,spacedim> *
+      p_d_triangulation
+      = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
     {
-      fe.reinit (c);
-      fe.get_function_values(v, values);
-      for (unsigned int k=0; k< quadrature.size(); ++k)
-	{
-	  mean += fe.JxW(k) * values[k](component);
-	  area += fe.JxW(k);
-	};
-    };
+      double my_values[2] = { mean, area };
+      double global_values[2];
+
+      MPI_Reduce (&my_values, &global_values, 2, MPI_DOUBLE,
+		  MPI_SUM, 0,
+		  p_d_triangulation->get_communicator());
+
+      mean = global_values[0];
+      area = global_values[1];
+    }
+#endif
 
   return (mean/area);
 }

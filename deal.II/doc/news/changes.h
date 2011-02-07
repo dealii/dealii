@@ -78,6 +78,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The functions VectorTools::compute_mean_value and
+VectorTools::integrate_difference now also work for distributed
+triangulations of type parallel::distributed::Triangulation.
+<br>
+(Wolfgang Bangerth, 2011/02/07)
+</li>
+
 <li> Changed: If the <code>libz</code> library was detected during library
 configuration, the function DataOutBase::write_vtu now writes data in compressed
 format, saving a good fraction of disk space (80-90% for big output files).
