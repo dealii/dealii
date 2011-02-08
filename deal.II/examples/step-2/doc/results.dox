@@ -31,7 +31,7 @@ might be nonzero; of course the fact whether the entry actually is
 zero or not depends on the equation under consideration, but the
 indicated positions in the matrix tell us which shape functions can
 and which can't couple, if the equation is a local, i.e. differential
-one): 
+one):
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -51,7 +51,23 @@ clustered around the main diagonal of the matrix after
 renumbering. Although this might not be apparent, the number of
 nonzero entries is the same in both pictures, of course.
 
-A common observation is that the more refined the grid is, the better
-the clustering around the diagonal will get.
 
 
+<h3> Possible extensions </h3>
+
+Just as with step-1, you may want to play with the program a bit to
+familiarize yourself with deal.II. For example, in the
+<code>distribute_dofs</code> function, we use linear finite elements
+(that's what the argument "1" to the FE_Q object is). Explore how the
+sparsity pattern changes if you use higher order elements, for example
+cubic or quintic ones (by using 3 and 5 as the respective arguments).
+
+Or, you could see how the sparsity pattern changes with more
+refinements. You will see that not only the size of the matrix
+changes, but also its bandwidth (the distance from the diagonal of
+those nonzero elements of the matrix that are farthest away from the
+diagonal), though the ratio of bandwidth to size typically shrinks,
+i.e. the matrix clusters more around the diagonal.
+
+Another idea of experiments would be to try other renumbering
+strategies than Cuthill-McKee from the DoFRenumbering namespace.
