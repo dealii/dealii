@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -80,7 +80,7 @@ using namespace dealii;
 				 // The details of what the function does are
 				 // explained in step-1. The only thing we
 				 // would like to comment on is this:
-				 // 
+				 //
                                  // Since we want to export the triangulation
                                  // through this function's parameter, we need
                                  // to make sure that the boundary object
@@ -106,7 +106,7 @@ void make_grid (Triangulation<2> &triangulation)
 
   static const HyperShellBoundary<2> boundary_description(center);
   triangulation.set_boundary (0, boundary_description);
-  
+
   for (unsigned int step=0; step<5; ++step)
     {
       Triangulation<2>::active_cell_iterator
@@ -120,7 +120,7 @@ void make_grid (Triangulation<2> &triangulation)
 	  {
             const double distance_from_center
               = center.distance (cell->vertex(v));
-	    
+
 	    if (std::fabs(distance_from_center - inner_radius) < 1e-10)
 	      {
 		cell->set_refine_flag ();
@@ -194,7 +194,7 @@ void make_grid (Triangulation<2> &triangulation)
                                  // this and abort the program if that
                                  // occured. You can check this, if you want,
                                  // by removing the 'static' declaration.)
-void distribute_dofs (DoFHandler<2> &dof_handler) 
+void distribute_dofs (DoFHandler<2> &dof_handler)
 {
                                    // As described above, let us first create
                                    // a finite element object, and then use it
@@ -225,7 +225,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // of such shape functions. Obviously,
 				   // since the shape functions are nonzero
 				   // only on the cells adjacent to the vertex
-				   // they are associated to, matrix entries
+				   // they are associated with, matrix entries
 				   // will be nonzero only if the supports of
 				   // the shape functions associated to that
 				   // column and row %numbers intersect. This
@@ -239,53 +239,64 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // will be somewhat ragged, and we will
 				   // take a look at it now.
 				   //
-				   // First we have to create a structure
-				   // which we use to store the places of
-				   // nonzero elements. This can then later be
-				   // used by one or more sparse matrix
-				   // objects that store the values of the
-				   // entries in the locations stored by this
-				   // sparsity pattern. The class that stores
-				   // the locations is the SparsityPattern
-				   // class. As it turns out, however, this
-				   // class has some drawbacks when we try to
-				   // fill it right away: its data structures
-				   // are set up in such a way that we need to
-				   // have an estimate for the maximal number
-				   // of entries we may wish to have in each
-				   // row. In two space dimensions, reasonable
-				   // values for this estimate are available
+				   // First we have to create a
+				   // structure which we use to store
+				   // the places of nonzero
+				   // elements. This can then later be
+				   // used by one or more sparse
+				   // matrix objects that store the
+				   // values of the entries in the
+				   // locations stored by this
+				   // sparsity pattern. The class that
+				   // stores the locations is the
+				   // SparsityPattern class. As it
+				   // turns out, however, this class
+				   // has some drawbacks when we try
+				   // to fill it right away: its data
+				   // structures are set up in such a
+				   // way that we need to have an
+				   // estimate for the maximal number
+				   // of entries we may wish to have
+				   // in each row. In two space
+				   // dimensions, reasonable values
+				   // for this estimate are available
 				   // through the
 				   // DoFHandler::max_couplings_between_dofs()
-				   // function, but in three dimensions the
-				   // function almost always severely
-				   // overestimates the true number, leading
-				   // to a lot of wasted memory, sometimes too
-				   // much for the machine used, even if the
-				   // unused memory can be released
-				   // immediately after computing the sparsity
-				   // pattern. In order to avoid this, we use
-				   // an intermediate object of type
-				   // CompressedSparsityPattern that uses a
-				   // different %internal data structure and
-				   // that we can later copy into the
-				   // SparsityPattern object without much
-				   // overhead. (Some more information on
-				   // these data structures can be found in
-				   // the @ref Sparsity module.) In order to
-				   // initialize this intermediate data
-				   // structure, we have to give it the size
-				   // of the matrix, which in our case will be
-				   // square with as many rows and columns as
-				   // there are degrees of freedom on the
-				   // grid:
-  CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
+				   // function, but in three
+				   // dimensions the function almost
+				   // always severely overestimates
+				   // the true number, leading to a
+				   // lot of wasted memory, sometimes
+				   // too much for the machine used,
+				   // even if the unused memory can be
+				   // released immediately after
+				   // computing the sparsity
+				   // pattern. In order to avoid this,
+				   // we use an intermediate object of
+				   // type CompressedSparsityPattern
+				   // that uses a different %internal
+				   // data structure and that we can
+				   // later copy into the
+				   // SparsityPattern object without
+				   // much overhead. (Some more
+				   // information on these data
+				   // structures can be found in the
+				   // @ref Sparsity module.) In order
+				   // to initialize this intermediate
+				   // data structure, we have to give
+				   // it the size of the matrix, which
+				   // in our case will be square with
+				   // as many rows and columns as
+				   // there are degrees of freedom on
+				   // the grid:
+  CompressedSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
+							dof_handler.n_dofs());
 
 				   // We then fill this object with the
 				   // places where nonzero elements will be
 				   // located given the present numbering of
 				   // degrees of freedom:
-  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+  DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
 
 				   // Now we are ready to create the actual
 				   // sparsity pattern that we could later use
@@ -293,7 +304,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				   // data already assembled in the
 				   // CompressedSparsityPattern.
   SparsityPattern sparsity_pattern;
-  sparsity_pattern.copy_from(c_sparsity);
+  sparsity_pattern.copy_from (compressed_sparsity_pattern);
 
 				   // With this, we can now write the results
 				   // to a file:
@@ -344,7 +355,7 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				 // shape function is zero at some
 				 // point). However, the supports of
 				 // shape functions intersected only
-				 // of they were adjacent to each
+				 // if they were adjacent to each
 				 // other, so in order to have the
 				 // nonzero entries clustered around
 				 // the diagonal (where $i$ equals $j$),
@@ -374,15 +385,16 @@ void distribute_dofs (DoFHandler<2> &dof_handler)
 				 // the function is the first call to
 				 // <code>DoFRenumbering::Cuthill_McKee</code>, the
 				 // rest is essentially as before:
-void renumber_dofs (DoFHandler<2> &dof_handler) 
+void renumber_dofs (DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee (dof_handler);
-  SparsityPattern sparsity_pattern (dof_handler.n_dofs(),
-				    dof_handler.n_dofs(),
-				    20);
 
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
-  sparsity_pattern.compress ();
+  CompressedSparsityPattern compressed_sparsity_pattern(dof_handler.n_dofs(),
+							dof_handler.n_dofs());
+  DoFTools::make_sparsity_pattern (dof_handler, compressed_sparsity_pattern);
+
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.copy_from (compressed_sparsity_pattern);
 
   std::ofstream out ("sparsity_pattern.2");
   sparsity_pattern.print_gnuplot (out);
@@ -426,7 +438,7 @@ void renumber_dofs (DoFHandler<2> &dof_handler)
 				 // <code>DoFHandler</code> object and associate it to
 				 // the triangulation, and finally call above
 				 // two functions on it:
-int main () 
+int main ()
 {
   Triangulation<2> triangulation;
   make_grid (triangulation);
