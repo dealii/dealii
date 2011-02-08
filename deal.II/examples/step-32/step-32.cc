@@ -133,7 +133,7 @@ namespace EquationData
 // interpolate the following values with a physically realistic model:
 //    const double g0      = 10.7;                  /* m / s^2    */
 //    const double g1      = 9.81;                  /* m / s^2    */
-  
+
     const double r = p.norm();
     return -(1.245e-6 * r + 7.714e13/r/r) * p / p.norm();
   }
@@ -362,8 +362,8 @@ namespace Assembly
 
 	FEValues<dim>               stokes_fe_values;
 
-	std::vector<Tensor<2,dim> > grad_phi_u;
-	std::vector<double>         phi_p;
+	std::vector<SymmetricTensor<2,dim> > grads_phi_u;
+	std::vector<double>                  phi_p;
     };
 
     template <int dim>
@@ -374,7 +374,7 @@ namespace Assembly
 		    :
 		    stokes_fe_values (stokes_fe, stokes_quadrature,
 				      update_flags),
-		    grad_phi_u (stokes_fe.dofs_per_cell),
+		    grads_phi_u (stokes_fe.dofs_per_cell),
 		    phi_p (stokes_fe.dofs_per_cell)
     {}
 
@@ -387,7 +387,7 @@ namespace Assembly
 		    stokes_fe_values (scratch.stokes_fe_values.get_fe(),
 				      scratch.stokes_fe_values.get_quadrature(),
 				      scratch.stokes_fe_values.get_update_flags()),
-		    grad_phi_u (scratch.grad_phi_u),
+		    grads_phi_u (scratch.grads_phi_u),
 		    phi_p (scratch.phi_p)
     {}
 
@@ -521,7 +521,7 @@ namespace Assembly
 
 	std::vector<SymmetricTensor<2,dim> > old_strain_rates;
 	std::vector<SymmetricTensor<2,dim> > old_old_strain_rates;
-	
+
 	std::vector<double>         old_temperature_values;
 	std::vector<double>         old_old_temperature_values;
 	std::vector<Tensor<1,dim> > old_temperature_grads;
@@ -551,7 +551,7 @@ namespace Assembly
 		    old_old_velocity_values (quadrature.size()),
 		    old_strain_rates (quadrature.size()),
 		    old_old_strain_rates (quadrature.size()),
-		    
+
 		    old_temperature_values (quadrature.size()),
 		    old_old_temperature_values(quadrature.size()),
 		    old_temperature_grads(quadrature.size()),
@@ -849,10 +849,10 @@ class BoussinesqFlowProblem
     struct Parameters
     {
 	Parameters ();
-	
+
 	static void declare_parameters (ParameterHandler &prm);
 	void parse_parameters (ParameterHandler &prm);
-	
+
 	double end_time;
 
 	unsigned int initial_global_refinement;
@@ -860,12 +860,12 @@ class BoussinesqFlowProblem
 
 	bool         generate_graphical_output;
 	unsigned int graphical_output_interval;
-	
+
 	double stabilization_alpha;
 	double stabilization_c_R;
 	double stabilization_beta;
     };
-    
+
 
     ConditionalOStream                  pcout;
     Parameters                          parameters;
@@ -975,7 +975,7 @@ BoussinesqFlowProblem<dim>::Parameters::Parameters ()
 		stabilization_c_R (0.11),
 		stabilization_beta (0.078)
 {}
-  
+
 
 
 template <int dim>
@@ -1013,7 +1013,7 @@ declare_parameters (ParameterHandler &prm)
     prm.declare_entry ("c_R", "0.11",
 		       Patterns::Double (0),
 		       "The c_R factor in the entropy viscosity "
-		       "stabilization.");    
+		       "stabilization.");
     prm.declare_entry ("beta", "0.078",
 		       Patterns::Double (0),
 		       "The beta factor in the artificial viscosity "
@@ -1036,7 +1036,7 @@ parse_parameters (ParameterHandler &prm)
 
   generate_graphical_output   = prm.get_bool ("Generate graphical output");
   graphical_output_interval   = prm.get_integer ("Time steps between graphical output");
-  
+
   prm.enter_subsection ("Stabilization parameters");
   {
     stabilization_alpha = prm.get_double ("alpha");
@@ -1046,7 +1046,7 @@ parse_parameters (ParameterHandler &prm)
   prm.leave_subsection ();
 }
 
-  
+
 
 
 				 // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
@@ -1303,7 +1303,7 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 	      }
 	  }
     }
-  
+
   double min_temperature, max_temperature;
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
   MPI_Allreduce (&max_local_temperature, &max_temperature, 1, MPI_DOUBLE,
@@ -1355,7 +1355,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 
       const SymmetricTensor<2,dim> strain_rate = (old_strain_rates[q] +
 						  old_old_strain_rates[q]) / 2;
-      
+
       const double T = (old_temperature[q] + old_old_temperature[q]) / 2;
       const double dT_dt = (old_temperature[q] - old_old_temperature[q])
 			   / old_time_step;
@@ -1369,7 +1369,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 	= ((EquationData::radiogenic_heating * EquationData::density(T)
 	    +
 	    2 * EquationData::eta * strain_rate * strain_rate) /
-	   (EquationData::density(T) * EquationData::specific_heat));      
+	   (EquationData::density(T) * EquationData::specific_heat));
 
       const double residual
 	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma) *
@@ -2014,15 +2014,18 @@ local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cel
     {
       for (unsigned int k=0; k<dofs_per_cell; ++k)
 	{
-	  scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
-	  scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value (k, q);
+	  scratch.grads_phi_u[k] = scratch.stokes_fe_values[velocities].symmetric_gradient(k,q);
+	  scratch.phi_p[k]       = scratch.stokes_fe_values[pressure].value (k, q);
 	}
 
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
+	  if (stokes_fe.system_to_component_index(i).first
+	      ==
+	      stokes_fe.system_to_component_index(j).first)
 	  data.local_matrix(i,j) += (EquationData::eta *
-				     scalar_product (scratch.grad_phi_u[i],
-						     scratch.grad_phi_u[j])
+				     (scratch.grads_phi_u[i] *
+				      scratch.grads_phi_u[j])
 				     +
 				     (1./EquationData::eta) *
 				     EquationData::pressure_scaling *
@@ -2614,7 +2617,7 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 	    +
 	    2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
 	   (EquationData::density(old_Ts) * EquationData::specific_heat));
-      
+
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	{
 	  data.local_rhs(i) += (old_Ts * scratch.phi_T[i]
@@ -2945,7 +2948,7 @@ class BoussinesqFlowProblem<dim>::Postprocessor : public DataPostprocessor<dim>
 {
   public:
     Postprocessor (const unsigned int partition);
-    
+
     virtual
     void
     compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
@@ -3050,7 +3053,7 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
 				       // pressure
       computed_quantities[q](dim) = uh[q](dim) *
 				    EquationData::pressure_scaling;
-  
+
 				       // temperature
       computed_quantities[q](dim+1) = uh[q](dim+1);
 
@@ -3155,7 +3158,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
 
   TrilinosWrappers::MPI::Vector joint_solution;
   joint_solution.reinit (joint_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
-  
+
   {
     //double minimal_pressure = stokes_solution.block(1)(0);
     //for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
@@ -3463,19 +3466,19 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 		  << std::endl
 		  << "*** template file of the same name."
 		  << std::endl;
-	
+
 	std::ofstream parameter_out (parameter_filename.c_str());
 	prm.print_parameters (parameter_out,
 			      ParameterHandler::Text);
 
 	std::exit (1);
       }
-      
+
     prm.read_input (parameter_file);
     parameters.parse_parameters (prm);
   }
-  
-  
+
+
   GridGenerator::hyper_shell (triangulation,
 			      Point<dim>(),
 			      EquationData::R0,
@@ -3550,7 +3553,7 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
       	{
       	  stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
       				old_old_stokes_solution);
-      	  temperature_solution.sadd (1.+time_step/old_time_step, 
+      	  temperature_solution.sadd (1.+time_step/old_time_step,
       				     -time_step/old_time_step,
       				     old_old_temperature_solution);
       	}
@@ -3576,7 +3579,7 @@ int main (int argc, char *argv[])
 	parameter_filename = argv[1];
       else
 	parameter_filename = "step-32.prm";
-      
+
       const int dim = 3;
       BoussinesqFlowProblem<dim> flow_problem;
       flow_problem.run (parameter_filename);
