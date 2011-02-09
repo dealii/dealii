@@ -1,5 +1,5 @@
 //----------------------------  hanging_nodes_03.cc  ---------------------------
-//    $Id: bem.cc 22693 2010-11-11 20:11:47Z kanschat $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2010, 2011 by the deal.II authors
