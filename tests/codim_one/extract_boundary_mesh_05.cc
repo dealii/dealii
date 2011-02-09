@@ -1,15 +1,15 @@
-//----------------------------  extract_boundary_mesh_03.cc  ---------------------------
+//----------------------------  extract_boundary_mesh_05.cc  ---------------------------
 //    $Id: bem.cc 22693 2010-11-11 20:11:47Z kanschat $
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  extract_boundary_mesh_03.cc  ---------------------------
+//----------------------------  extract_boundary_mesh_05.cc  ---------------------------
 
 
 #include "../tests.h"
