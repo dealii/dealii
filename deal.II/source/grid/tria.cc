@@ -4660,11 +4660,31 @@ namespace internal
 			      if (line->has_children() == false)
 				{
 				  line->set_user_flag ();
-//TODO[WB]: we overwrite the user_index here because we later on need to find
-// out which boundary object we have to ask to refine this line. find a better
-// way to do that
+//TODO[WB]: we overwrite the user_index here because we later on need
+// to find out which boundary object we have to ask to refine this
+// line. we can't use the boundary_indicator field because that can
+// only be used for lines at the boundary of the domain, but we also
+// need a domain description for interior lines in the codim-1 case
 				  if (spacedim > dim)
-				    line->set_user_index(cell->material_id());
+				    {
+				      if (line->at_boundary())
+									 // if
+									 // possible
+									 // honor
+									 // boundary
+									 // indicator
+				    	line->set_user_index(line->boundary_indicator());
+				      else
+									 // otherwise
+									 // take
+									 // manifold
+									 // description
+									 // from
+									 // the
+									 // adjacent
+									 // cell
+				    	line->set_user_index(cell->material_id());
+				    }
 				}
 			    }
 			}
