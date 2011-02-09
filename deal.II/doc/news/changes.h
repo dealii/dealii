@@ -78,6 +78,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: There are systems where the <code>libz</code> library is installed
+but the <code>zlib.h</code> header file is not available. Since the latter
+condition was not tested, this would result in compiler errors. This is now
+fixed.
+<br>
+(Wolfgang Bangerth, 2011/02/09)
+</li>
+
 <li> Fixed: Prolongation and restriction matrices were not computed at all
 for elements of type FE_DGQ if <code>dim@<spacedim</code>. Consequently,
 consumers of this information, such as the SolutionTransfer class or

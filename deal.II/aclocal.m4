@@ -7141,16 +7141,23 @@ dnl Include the libz library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
 [
-  dnl -- We should check for zlib.h, but I could not make AC_CHECK_HEADERS run (GK)
   if test "x$1" != "xyes" ; then
-    AC_CHECK_LIB($1, crc32,
-    [ DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$1)
-      AC_DEFINE(HAVE_LIBZ)
-    ])
-dnl    fi
+    zlib=$1
   else
-    AC_CHECK_LIB(z, crc32)
+    zlib=z
   fi
+
+  dnl See if we can find the function crc32 in libz.so
+  AC_CHECK_LIB($zlib, crc32,
+    [
+      dnl Yes, we can. Now also check whether we can do
+      dnl #include <zlib.h>
+      AC_CHECK_HEADER(zlib.h,
+        [
+          DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$zlib)
+          AC_DEFINE(HAVE_LIBZ)
+        ])
+    ])
 ])
 
 
