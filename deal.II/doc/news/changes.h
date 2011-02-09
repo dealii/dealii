@@ -78,6 +78,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: When refining a mesh with codimension one, edges were refined using
+the same manifold description as adjacent cells, but this ignored that a
+boundary indicator might have been purposefully set for edges that are truly at
+the boundary of the mesh. For such edges, the boundary indicator is now honored.
+<br>
+(M. Sebastian Pauletti, Wolfgang Bangerth, 2011/02/09)
+</li>
+
 <li> Fixed: The functions VectorTools::compute_mean_value and
 VectorTools::integrate_difference now also work for distributed
 triangulations of type parallel::distributed::Triangulation.
