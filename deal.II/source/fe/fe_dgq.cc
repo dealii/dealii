@@ -142,12 +142,32 @@ FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
 				   // restriction and prolongation
 				   // matrices to the right sizes
   this->reinit_restriction_and_prolongation_matrices();
-				   // Fill prolongation matrices with embedding operators
-  if (dim ==spacedim)
-  FETools::compute_embedding_matrices (*this, this->prolongation);
-				   // Fill restriction matrices with L2-projection
-  if (dim ==spacedim)
-  FETools::compute_projection_matrices (*this, this->restriction);
+
+				   // Fill prolongation matrices with
+				   // embedding operators and
+				   // restriction with L2 projection
+				   //
+				   // we can call the respective
+				   // functions in the case
+				   // dim==spacedim, but they are not
+				   // currently implemented for the
+				   // codim-1 case. there's no harm
+				   // here, though, since these
+				   // matrices are independent of the
+				   // space dimension and so we can
+				   // copy them from the respective
+				   // elements (not cheap, but works)
+  if (dim == spacedim)
+    {
+      FETools::compute_embedding_matrices (*this, this->prolongation);
+      FETools::compute_projection_matrices (*this, this->restriction);
+    }
+  else
+    {
+      FE_DGQ<dim> tmp (degree);
+      this->prolongation = tmp.prolongation;
+      this->restriction  = tmp.restriction;
+    }
 
 
 				   // finally fill in support points

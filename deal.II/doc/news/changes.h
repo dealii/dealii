@@ -78,6 +78,15 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Prolongation and restriction matrices were not computed at all
+for elements of type FE_DGQ if <code>dim@<spacedim</code>. Consequently,
+consumers of this information, such as the SolutionTransfer class or
+the DoFCellAccess::set_dof_values_by_interpolation function did not
+work either and simply returned zero results. This is now fixed.
+<br>
+(M. Sebastian Pauletti, Wolfgang Bangerth, 2011/02/09)
+</li>
+
 <li> Fixed: When refining a mesh with codimension one, edges were refined using
 the same manifold description as adjacent cells, but this ignored that a
 boundary indicator might have been purposefully set for edges that are truly at
