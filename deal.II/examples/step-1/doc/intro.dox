@@ -1,6 +1,44 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+Since this is the first tutorial program, let us comment first on how
+this tutorial and the rest of the deal.II documentation is supposed to
+work. The documentation for deal.II comes essentially at three
+different levels:
+- The tutorial: This is a collection of programs that shows how
+  deal.II is used in practice. It doesn't typically discuss individual
+  functions at the level of individual arguments, but rather wants to
+  give the big picture of how things work together. In other words, it
+  discusses "concepts": what are the building blocks of deal.II and
+  how are they used together in finite element programs.
+- The manual: This is the documentation of every single class and
+  every single (member) function in deal.II. You get there if, for
+  example, you click on the "Main page" or "Classes" tab at the top of
+  this page. This is the place where you would look up what the second
+  argument of Triangulation::create_triangulation_compatibility means,
+  to give just one slightly obscure example. You need this level of
+  documentation for when you know what you want to do, but forgot how
+  exactly the function was named, what its arguments are, or what it
+  returns. Note that you also get into the manual whenever you read
+  through the tutorial and click on any of the class or function
+  names, i.e. the tutorial contains a great many links into the manual
+  for whenever you need a more detailed description of a function or
+  class. On the other hand, the manual is not a good place to learn
+  deal.II since it gives you a microscopic view of things without
+  telling you how a function might fit into the bigger picture.
+- Modules: These are groups of classes and functions that work
+  together or have related functionality. If you click on the
+  "Modules" tab at the top of this page, you end up on a page that
+  lists a number of such groups. Each module discusses the underlying
+  principles of these classes; for example, the @ref Sparsity module
+  talks about all sorts of different issues related to storing
+  sparsity patterns of matrices. This is documentation at an
+  intermediate level: they give you an overview of what's there in a
+  particular area. For example when you wonder what finite element
+  classes exist, you would take a look at the @ref fe module.
+
+
+
 In this first example, we don't actually do very much, but show two
 techniques: what is the syntax to generate triangulation objects, and
 some elements of simple loops over all cells. We create two grids, one
