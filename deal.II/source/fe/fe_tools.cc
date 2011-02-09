@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -622,8 +622,7 @@ namespace FETools
       const FiniteElement<dim, spacedim>& fe,
       const FEValues<dim>& coarse,
       const Householder<double>& H,
-      FullMatrix<number>& this_matrix,
-      Threads::Mutex& /*mutex*/)
+      FullMatrix<number>& this_matrix)
     {
       const unsigned int n  = fe.dofs_per_cell;
       const unsigned int nd = fe.n_components ();
@@ -664,18 +663,8 @@ namespace FETools
 				       // function to a fine grid
 				       // function, the columns
 				       // are fine grid.
-
-//TODO: This function is called in parallel for different sets of
-//matrices, thus there should be no overlap and the mutex should not
-//be necessary. Remove this TODO and the mutex if everybody agrees.
-
-
-//      mutex.acquire ();
-
       for (unsigned int j = 0; j < n; ++j)
 	this_matrix(j, i) = v_fine(j);
-
-//      mutex.release ();
     }
 
 
@@ -733,7 +722,6 @@ namespace FETools
 	  for (unsigned int k = 0; k < nq; ++k)
 	    A (k * nd + d, j) = fine.shape_value_component (j, k, d);
 
-      static Threads::Mutex mutex;
       Householder<double> H (A);
       unsigned int cell_number = 0;
 
@@ -771,7 +759,7 @@ namespace FETools
 		{
 		  task_group +=
 		    Threads::new_task (&compute_embedding_for_shape_function<dim, number, spacedim>,
-				       i, fe, coarse, H, this_matrix, mutex);
+				       i, fe, coarse, H, this_matrix);
 		}
 	      task_group.join_all();
 	    }
@@ -780,24 +768,16 @@ namespace FETools
 	      for (unsigned int i = 0; i < n; ++i)
 		{
 		  compute_embedding_for_shape_function<dim, number, spacedim>
-		    (i, fe, coarse, H, this_matrix, mutex);
+		    (i, fe, coarse, H, this_matrix);
 		}
 	    }
 
-//TODO: This function is called in parallel for different sets of
-//matrices, thus there should be no overlap and the mutex should not
-//be necessary. Remove this TODO and the mutex if everybody agrees.
-
-
-//	  mutex.acquire ();
 					   // Remove small entries from
 					   // the matrix
 	  for (unsigned int i = 0; i < this_matrix.m (); ++i)
 	    for (unsigned int j = 0; j < this_matrix.n (); ++j)
 	      if (std::fabs (this_matrix (i, j)) < 1e-12)
 		this_matrix (i, j) = 0.;
-
-//	  mutex.release ();
 	}
 
       Assert (cell_number == GeometryInfo<dim>::n_children (RefinementCase<dim> (ref_case)),
@@ -806,7 +786,6 @@ namespace FETools
   }
 
 
-// This function is tested by tests/fe/internals, since it produces the matrices printed there
   template <int dim, typename number, int spacedim>
   void
   compute_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
@@ -828,7 +807,7 @@ namespace FETools
   }
 
 
-// This function is tested by tests/fe/internals, since it produces the matrices printed there
+
   template <int dim, typename number, int spacedim>
   void
   compute_face_embedding_matrices(const FiniteElement<dim,spacedim>& fe,
