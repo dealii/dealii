@@ -3,13 +3,12 @@
  @{
 
 deal.II has several classes which are understood conceptionally as
-meshes. Apart from the obvious Triangulation, these are DoFHandler,
-hp::DoFHandler and MGDoFHandler. All of those define a set of iterators,
-allowing the user to traverse the whole mesh, i.e. the set of cells, faces,
-edges, etc that comprise the mesh, or portions of it. Therefore, they have
-somethings in common. In fact, these iterators are instantiations or
-subclasses of the same class TriaIterator (we do not include TriaRawIterator
-here, since it is only for %internal use).
+meshes. Apart from the obvious Triangulation, these are, for example,
+DoFHandler, hp::DoFHandler and MGDoFHandler. All of those define a set
+of iterators, allowing the user to traverse the whole mesh, i.e. the
+set of cells, faces, edges, etc that comprise the mesh, or portions of
+it. These iterators are all in a sense derived from the TriaIterator
+class.
 
 Basically, the template signature of TriaIterator is
 @code
