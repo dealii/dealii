@@ -13,7 +13,14 @@ Defining degrees of freedom ("DoF"s in short) on a mesh is a rather
 simple task, since the library does all the work for you. Essentially,
 all you have to do is create a finite element object (from one of the
 many finite element classes deal.II already has, see for example the
-@ref fe documentation) and give it to a DoFHandler object.
+@ref fe documentation) and give it to a DoFHandler object through the
+DoFHandler::distribute_dofs function. The DoFHandler is a class that
+manages which degrees of freedom live where, i.e. it can answer
+questions like "how many degrees of freedom are there globally" and
+"on this cell, give me the global indices of the shape functions that
+live here". This is the sort of information you need when determining
+how big your system matrix should be, and when copying the
+contributions of a single cell into the global matrix.
 
 The next step would then be to compute a matrix and right hand side
 corresponding to a particular differential equation using this finite
