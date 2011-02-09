@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1777,12 +1777,18 @@ class Triangulation : public Subscriptor
       const std::vector<CellData<dim> > &cells,
       const SubCellData                 &subcelldata);
 
-/**
-   Revert or flip the direction_flags of a dim<spacedim triangulation.
-   For other dim==spacedim throws an exception.
- */
+				     /**
+				      *	Revert or flip the
+				      *	direction_flags of a
+				      *	dim<spacedim triangulation,
+				      *	see @ref GlossDirectionFlag .
+				      *
+				      *	This function throws an
+				      *	exception if dim equals
+				      *	spacedim.
+				     */
     void flip_all_direction_flags();
-    
+
 				     /**
 				      * Distort the grid by randomly
 				      * moving around all the vertices
@@ -3355,7 +3361,7 @@ class Triangulation : public Subscriptor
 				      */
     bool                             anisotropic_refinement;
 
-    
+
 				     /**
 				      * A flag that determines whether
 				      * we are to check for distorted
