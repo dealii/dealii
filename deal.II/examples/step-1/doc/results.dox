@@ -18,3 +18,34 @@ like this:
 The left one, well, is not very exciting. The right one is &mdash; at least
 &mdash; unconventional.
 
+While the second mesh is entirely artificial and made-up, and
+certainly not very practical in applications, to everyone's surprise it
+has found its way into the literature: see the paper by M. Mu
+titled "PDE.MART: A network-based problem-solving environment", ACM
+Trans. Math. Software, vol. 31, pp. 508-531, 2005. Apparently it is
+good for some things at least.
+
+
+<h3> Possible extensions </h3>
+
+This program obviously does not have a whole lot of functionality, but
+in particular the <code>second_grid</code> function has a bunch of
+places where you can play with it. For example, you could modify the
+criterion by which we decide which cells to refine. An example would
+be to change the condition to this:
+@code
+      for (; cell!=endc; ++cell)
+        if (cell->center()[1] > 0)
+          cell->set_refine_flag ();
+@endcode
+This would refine all cells for which the $y$-coordinate of the cell's
+center is greater than zero (the <code>TriaAccessor::center</code>
+function that we call by dereferencing the <code>cell</code> iterator
+returns a Point<2> object; subscripting <code>[0]</code> would give
+the $x$-coordinate, subscripting <code>[1]</code> the
+$y$-coordinate). By looking at the functions that TriaAccessor
+provides, you can also use more complicated criteria for refinement.
+
+Another possibility would be to generate meshes of entirely different
+geometries altogether. For this, take a look at the GridGenerator
+namespace to see what it provides.
