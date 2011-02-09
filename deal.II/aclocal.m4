@@ -7127,7 +7127,7 @@ AC_DEFUN(DEAL_II_WITH_BOOST, dnl
 
 
 dnl --------------------------------------------------
-dnl Include the libz library
+dnl Include the GSL library
 dnl --------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_GSL, dnl
 [
