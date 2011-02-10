@@ -1745,7 +1745,9 @@ class Triangulation : public Subscriptor
 				      * case ignoring the exception is
 				      * probably unwise.
 				      *
-				      * @note: The check for distorted
+				      * @note This function is used in step-14 .
+				      *
+				      * @note The check for distorted
 				      * cells is only done if
 				      * dim==spacedim, as otherwise
 				      * cells can legitimately be
