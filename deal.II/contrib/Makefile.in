@@ -53,7 +53,9 @@ endif
 
 ifneq ($(QMAKE),)
 parameter_gui:
-	@-cd parameter_gui ; $(QMAKE) -Wnone QMAKE_CXX=$(CXX) QMAKE_CXXFLAGS="$(CXXFLAGS.o)" QMAKE_CXXFLAGS_RELEASE="" && $(MAKE)
+	@-cd parameter_gui ; \
+		$(QMAKE) -Wnone QMAKE_CXX=$(CXX) --unix QMAKE_CXXFLAGS="$(CXXFLAGS.o)" QMAKE_CXXFLAGS_RELEASE="" && \
+		$(MAKE)
 else
 parameter_gui:
 	@echo "**** Can't build the Parameter GUI because no suitable"
