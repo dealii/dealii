@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: 2d_coarse_grid_01.cc 17444 2008-10-31 19:35:14Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009 by the deal.II authors

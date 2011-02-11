@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: refine_and_coarsen_fixed_number_04.cc 17444 2008-10-31 19:35:14Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010 by the deal.II authors

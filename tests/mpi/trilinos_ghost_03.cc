@@ -1,5 +1,5 @@
 //----------------------------  trilinos_ghost_03.cc  ---------------------------
-//    $Id: vector_equality_4.cc 17992 2008-12-18 03:03:20Z bangerth $
+//    $Id$
 //    Version: $Name$ 
 //
 //    Copyright (C) 2004, 2005, 2008, 2010 by the deal.II authors
