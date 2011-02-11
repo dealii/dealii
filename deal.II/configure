@@ -13233,6 +13233,13 @@ fi
 
 
 
+      case "$target" in
+    *apple-darwin*)
+        QMAKE="$QMAKE -spec macx-g++"
+	;;
+  esac
+
+
       DEAL_II_QT_VERSION="`($QMAKE --version 2>&1) | grep -i version | grep -i qt | perl -pi -e 's/.*(\d+)\.(\d+)\.(\d+).*/\1.\2/g;'`"
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether Qt version is >= 4.3" >&5

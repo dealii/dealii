@@ -706,6 +706,15 @@ AC_CHECK_PROG(QMAKE,qmake,qmake)
 if test -n "$QMAKE" ; then
   AC_PATH_PROG(QMAKE,$QMAKE)
 
+  dnl On Mac OS X, qmake's default is to generate XCode project files
+  dnl rather than Makefiles. Override this:
+  case "$target" in
+    *apple-darwin*)
+        QMAKE="$QMAKE -spec macx-g++"
+	;;
+  esac
+
+
   dnl Verify that Qt version is at least 4.3. Only consider the major
   dnl and minor version number, don't care about the subminor
   DEAL_II_QT_VERSION="`($QMAKE --version 2>&1) | grep -i version | grep -i qt | perl -pi -e 's/.*(\d+)\.(\d+)\.(\d+).*/\1.\2/g;'`"
