@@ -27,6 +27,7 @@
 #include <grid/tria.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
+#include <grid/tria_boundary_lib.h>
 #include <dofs/dof_handler.h>
 #include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
@@ -2350,6 +2351,64 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
 	}
 
       tria.create_triangulation (vertices, cells, SubCellData());
+    }
+  else if (n == 96)
+    {
+				       // create a triangulation based on the
+				       // 12-cell one where we refine the mesh
+				       // once and then re-arrange all
+				       // interior nodes so that the mesh is
+				       // the least distorted
+      HyperShellBoundary<3> boundary (p);
+      Triangulation<3> tmp;
+      GridGenerator::hyper_shell (tmp, p, inner_radius, outer_radius, 12);
+      tmp.set_boundary(0, boundary);
+      tmp.set_boundary(1, boundary);
+      tmp.refine_global (1);
+
+      std::vector<bool> vertex_already_treated (tmp.n_vertices(), false);
+      for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
+	   cell != tmp.end(); ++cell)
+	for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+	  if ((cell->vertex(v).distance(p) > 1.05*inner_radius)
+	      &&
+	      (cell->vertex(v).distance(p) > 0.95*outer_radius)
+	      &&
+	      (vertex_already_treated[cell->vertex_index(v)] == false))
+	    {
+					       // this is a new interior
+					       // vertex. mesh refinement may
+					       // have placed it at a number
+					       // of places in radial
+					       // direction and oftentimes not
+					       // in a particularly good
+					       // one. move it to halfway
+					       // between inner and outer
+					       // sphere
+	      const Point<3> old_distance = cell->vertex(v) - p;
+	      
+	      const double old_radius = cell->vertex(v).distance(p);
+	      const double new_radius = (inner_radius + outer_radius)/2;
+	      
+	      cell->vertex(v) = p + old_distance * (new_radius / old_radius);
+	      
+	      vertex_already_treated[cell->vertex_index(v)] = true;
+	    }
+
+				       // now copy the resulting level 1 cells
+				       // into the new triangulation,
+      cells.resize(tmp.n_active_cells(), CellData<3>());
+
+      unsigned int index = 0;
+      for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
+	   cell != tmp.end(); ++cell, ++index)
+	{
+	  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
+	    cells[index].vertices[v] = cell->vertex_index(v);
+      	  cells[index].material_id = 0;
+	}
+
+      tria.create_triangulation (tmp.get_vertices(), cells, SubCellData());
     }
   else
     {
