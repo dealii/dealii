@@ -4768,9 +4768,9 @@ VectorTools::compute_mean_value (const Mapping<dim, spacedim>    &mapping,
       double my_values[2] = { mean, area };
       double global_values[2];
 
-      MPI_Reduce (&my_values, &global_values, 2, MPI_DOUBLE,
-		  MPI_SUM, 0,
-		  p_d_triangulation->get_communicator());
+      MPI_Allreduce (&my_values, &global_values, 2, MPI_DOUBLE,
+		     MPI_SUM,
+		     p_d_triangulation->get_communicator());
 
       mean = global_values[0];
       area = global_values[1];
