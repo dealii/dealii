@@ -482,7 +482,7 @@ namespace TrilinosWrappers
 					* elements.
 					*/
       bool has_ghost_elements() const;
-      
+
                                        /**
                                         * Return the scalar (inner)
                                         * product of two vectors. The
@@ -1108,7 +1108,7 @@ namespace TrilinosWrappers
     return ((index >= range.first) && (index <  range.second));
   }
 
-  
+
 
   inline
   bool
@@ -1117,8 +1117,8 @@ namespace TrilinosWrappers
     return vector->Map().UniqueGIDs()==false;
   }
 
-  
-  
+
+
   inline
   internal::VectorReference
   VectorBase::operator () (const unsigned int index)
@@ -1127,7 +1127,7 @@ namespace TrilinosWrappers
   }
 
 
-  
+
   inline
   void
   VectorBase::reinit (const VectorBase &v,
@@ -1162,10 +1162,10 @@ namespace TrilinosWrappers
       double_mode,
       result);
     Assert(result.max-result.min<1e-5,  ExcTrilinosError(0));
-    
+
 #  endif
 #endif
-    
+
 				 // Now pass over the information about
 				 // what we did last to the vector.
     const int ierr = vector->GlobalAssemble(mode);
@@ -1227,8 +1227,8 @@ namespace TrilinosWrappers
   {
 				     // if we have ghost values, do not allow
 				     // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
-    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
+
     if (last_action == Add)
       vector->GlobalAssemble(Add);
 
@@ -1259,6 +1259,9 @@ namespace TrilinosWrappers
   VectorBase::add (const std::vector<unsigned int>    &indices,
 		   const std::vector<TrilinosScalar>  &values)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (indices.size() == values.size(),
 	    ExcDimensionMismatch(indices.size(),values.size()));
 
@@ -1272,6 +1275,9 @@ namespace TrilinosWrappers
   VectorBase::add (const std::vector<unsigned int>        &indices,
 		   const ::dealii::Vector<TrilinosScalar> &values)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (indices.size() == values.size(),
 	    ExcDimensionMismatch(indices.size(),values.size()));
 
@@ -1288,7 +1294,7 @@ namespace TrilinosWrappers
   {
 				     // if we have ghost values, do not allow
 				     // writing to this vector at all.
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     if (last_action != Add)
       {
@@ -1320,7 +1326,7 @@ namespace TrilinosWrappers
   unsigned int
   VectorBase::size () const
   {
-    return (unsigned int) (vector->Map().MaxAllGID() + 1 - 
+    return (unsigned int) (vector->Map().MaxAllGID() + 1 -
 			   vector->Map().MinAllGID());
   }
 
@@ -1353,7 +1359,7 @@ namespace TrilinosWrappers
   {
     Assert (vector->Map().SameAs(vec.vector->Map()),
 	    ExcDifferentParallelPartitioning());
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     TrilinosScalar result;
 
@@ -1379,7 +1385,7 @@ namespace TrilinosWrappers
   TrilinosScalar
   VectorBase::mean_value () const
   {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     TrilinosScalar mean;
     const int ierr = vector->MeanValue (&mean);
@@ -1394,7 +1400,7 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::l1_norm () const
   {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     TrilinosScalar d;
     const int ierr = vector->Norm1 (&d);
@@ -1409,7 +1415,7 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::l2_norm () const
   {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     TrilinosScalar d;
     const int ierr = vector->Norm2 (&d);
@@ -1424,7 +1430,7 @@ namespace TrilinosWrappers
   VectorBase::real_type
   VectorBase::lp_norm (const TrilinosScalar p) const
   {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());    
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     TrilinosScalar norm = 0;
     TrilinosScalar sum=0;
@@ -1469,6 +1475,9 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator *= (const TrilinosScalar a)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
@@ -1484,6 +1493,9 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator /= (const TrilinosScalar a)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
@@ -1503,6 +1515,9 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator += (const VectorBase &v)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (vector->Map().SameAs(v.vector->Map()),
@@ -1520,6 +1535,9 @@ namespace TrilinosWrappers
   VectorBase &
   VectorBase::operator -= (const VectorBase &v)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (vector->Map().SameAs(v.vector->Map()),
@@ -1537,6 +1555,9 @@ namespace TrilinosWrappers
   void
   VectorBase::add (const TrilinosScalar s)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
@@ -1552,6 +1573,9 @@ namespace TrilinosWrappers
   VectorBase::add (const TrilinosScalar  a,
 		   const VectorBase     &v)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (vector->Map().SameAs(v.vector->Map()),
@@ -1572,6 +1596,9 @@ namespace TrilinosWrappers
 		   const TrilinosScalar  b,
 		   const VectorBase     &w)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (size() == w.size(),
@@ -1596,6 +1623,9 @@ namespace TrilinosWrappers
   VectorBase::sadd (const TrilinosScalar  s,
 		    const VectorBase     &v)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (vector->Map().SameAs(v.vector->Map()),
@@ -1616,6 +1646,9 @@ namespace TrilinosWrappers
 		    const TrilinosScalar  a,
 		    const VectorBase     &v)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (vector->Map().SameAs(v.vector->Map()),
@@ -1639,6 +1672,9 @@ namespace TrilinosWrappers
 		    const TrilinosScalar  b,
 		    const VectorBase     &w)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (size() == w.size(),
@@ -1669,6 +1705,9 @@ namespace TrilinosWrappers
 		    const TrilinosScalar  c,
 		    const VectorBase     &x)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == v.size(),
 	    ExcDimensionMismatch(size(), v.size()));
     Assert (size() == w.size(),
@@ -1703,6 +1742,9 @@ namespace TrilinosWrappers
   void
   VectorBase::scale (const VectorBase &factors)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (size() == factors.size(),
 	    ExcDimensionMismatch(size(), factors.size()));
     Assert (vector->Map().SameAs(factors.vector->Map()),
@@ -1719,6 +1761,9 @@ namespace TrilinosWrappers
   VectorBase::equ (const TrilinosScalar  a,
 		   const VectorBase     &v)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
 				   // If we don't have the same map, copy.
@@ -1751,6 +1796,9 @@ namespace TrilinosWrappers
 		   const TrilinosScalar  b,
 		   const VectorBase     &w)
   {
+				     // if we have ghost values, do not allow
+				     // writing to this vector at all.
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (v.size() == w.size(),
 	    ExcDimensionMismatch (v.size(), w.size()));
 
