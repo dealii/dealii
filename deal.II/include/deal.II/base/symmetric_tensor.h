@@ -969,12 +969,12 @@ class SymmetricTensor
     static std::size_t memory_consumption ();
 
                      /**
-                      * Read or write the data of this object to or 
+                      * Read or write the data of this object to or
                       * from a stream for the purpose of serialization
-                      */ 
+                      */
     template <class Archive>
     void serialize(Archive & ar, const unsigned int version);
-    
+
   private:
 				     /**
 				      * A structure that describes
@@ -2144,12 +2144,12 @@ SymmetricTensor<2,3>::unrolled_to_component_indices (const unsigned int i)
 
 template <int rank, int dim>
 template <class Archive>
-inline    
-void 
+inline
+void
 SymmetricTensor<rank,dim>::serialize(Archive & ar, const unsigned int)
 {
   ar & data;
-} 
+}
 
 
 #endif // DOXYGEN
@@ -2278,18 +2278,49 @@ double first_invariant (const SymmetricTensor<2,dim> &t)
 
 
 /**
- * Compute the second invariant a tensor or rank 2. The second invariant is
+ * Compute the second invariant of a tensor of rank 2. The second invariant is
  * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
  *
  * @relates SymmetricTensor
- * @author Wolfgang Bangerth, 2005
+ * @author Wolfgang Bangerth, 2005, 2010
  */
-template <int dim>
 inline
-double second_invariant (const SymmetricTensor<2,dim> &t)
+double second_invariant (const SymmetricTensor<2,1> &t)
 {
-  return (trace(t)*trace(t) - t*t) / 2;
+  return 0;
 }
+
+
+
+/**
+ * Compute the second invariant of a tensor of rank 2. The second invariant is
+ * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005, 2010
+ */
+inline
+double second_invariant (const SymmetricTensor<2,2> &t)
+{
+  return t[0][0]*t[1][1] - t[0][1]*t[0][1];
+}
+
+
+
+/**
+ * Compute the second invariant of a tensor of rank 2. The second invariant is
+ * defined as <tt>I2 = 1/2[ (trace sigma)^2 - trace (sigma^2) ]</tt>.
+ *
+ * @relates SymmetricTensor
+ * @author Wolfgang Bangerth, 2005, 2010
+ */
+inline
+double second_invariant (const SymmetricTensor<2,3> &t)
+{
+  return (t[0][0]*t[1][1] + t[1][1]*t[2][2] + t[2][2]*t[0][0]
+	  - t[0][1]*t[0][1] - t[0][2]*t[0][2] - t[1][2]*t[1][2]);
+}
+
 
 
 
