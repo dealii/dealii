@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -584,11 +584,13 @@ class GridGenerator
 				      * that the resulting elements
 				      * have the least aspect ratio.
 				      *
-				      * In 3D, only two different
-				      * numbers are meaningful, 6 for
-				      * a surface based on a
-				      * hexahedron and 12 for the
-				      * rhombic dodecahedron.
+				      * In 3D, only two different numbers are
+				      * meaningful, 6 for a surface based on a
+				      * hexahedron (i.e. 6 panels on the inner
+				      * sphere extruded in radial direction to
+				      * form 6 cells) and 12 for the rhombic
+				      * dodecahedron. These give rise to the
+				      * following meshes upon one refinement:
 				      *
 				      * @image html hypershell3d-6.png
 				      * @image html hypershell3d-12.png
