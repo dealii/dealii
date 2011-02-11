@@ -2281,7 +2281,7 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
 
 				   // Start with the shell bounded by
 				   // two nested cubes
-  if (n <= 6)
+  if (n == 6)
     {
       for (unsigned int i=0;i<8;++i)
 	vertices.push_back(p+hexahedron[i]*irad);
@@ -2305,11 +2305,13 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
 	    cells[i].vertices[j] = cell_vertices[i][j];
 	  cells[i].material_id = 0;
 	}
+
+      tria.create_triangulation (vertices, cells, SubCellData());
     }
 				   // A more regular subdivision can
 				   // be obtained by two nested
 				   // rhombic dodecahedra
-  else if (n <= 12)
+  else if (n == 12)
     {
       for (unsigned int i=0;i<8;++i)
 	vertices.push_back(p+hexahedron[i]*irad);
@@ -2346,15 +2348,13 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
 	    }
 	  cells[i].material_id = 0;
 	}
+
+      tria.create_triangulation (vertices, cells, SubCellData());
     }
   else
     {
-      Assert(false, ExcIndexRange(n, 1, 12));
+      Assert(false, ExcMessage ("Invalid number of coarse mesh cells."));
     }
-
-  tria.create_triangulation (vertices, cells,
-			     SubCellData());       // no boundary
-						   // information
 
   if (colorize)
     colorize_hyper_shell(tria, p, inner_radius, outer_radius);
