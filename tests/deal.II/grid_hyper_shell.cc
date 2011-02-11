@@ -35,8 +35,10 @@ std::ofstream logfile("grid_hyper_shell/output");
 
 
 template<int dim>
-void check (double r1, double r2, unsigned int n, bool)
+void check (double r1, double r2, unsigned int n)
 {
+  deallog << "dim=" << dim << std::endl;
+  
   Point<dim> center;
   Triangulation<dim> tria (Triangulation<dim>::none, true);
   GridGenerator::hyper_shell (tria, center, r1, r2, n, true);
@@ -72,12 +74,11 @@ void check (double r1, double r2, unsigned int n, bool)
 
 int main()
 {
-  std::ofstream logfile("grid_hyper_shell/output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  check<2> (4., 5., 10, true);
-  check<3> (3., 5., 6, true);
+  check<2> (4., 5., 10);
+  check<3> (3., 5., 6);
 }
