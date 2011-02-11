@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2229,9 +2229,11 @@ GridGenerator::half_hyper_ball (Triangulation<3>& tria,
 // Implementation for 3D only
 template<>
 void
-GridGenerator::colorize_hyper_shell (
-  Triangulation<3>& tria,
-  const Point<3>&, const double, const double)
+GridGenerator::
+colorize_hyper_shell (Triangulation<3>& tria,
+		      const Point<3>&,
+		      const double,
+		      const double)
 {
 				   // Inspite of receiving geometrical
 				   // data, we do this only based on
@@ -2261,12 +2263,13 @@ GridGenerator::colorize_hyper_shell (
 
 
 template <>
-void GridGenerator::hyper_shell (Triangulation<3>& tria,
-				 const Point<3>& p,
-				 const double inner_radius,
-				 const double outer_radius,
-				 const unsigned int n,
-				 const bool colorize)
+void
+GridGenerator::hyper_shell (Triangulation<3>& tria,
+			    const Point<3>& p,
+			    const double inner_radius,
+			    const double outer_radius,
+			    const unsigned int n,
+			    const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
@@ -2346,7 +2349,7 @@ void GridGenerator::hyper_shell (Triangulation<3>& tria,
     }
   else
     {
-      Assert(false, ExcIndexRange(n, 1, 7));
+      Assert(false, ExcIndexRange(n, 1, 12));
     }
 
   tria.create_triangulation (vertices, cells,
