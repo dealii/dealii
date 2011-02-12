@@ -595,7 +595,38 @@ class GridGenerator
 				      * @image html hypershell3d-6.png
 				      * @image html hypershell3d-12.png
 				      *
-				      * This function is declared to
+				      * Neither of these meshes is
+				      * particularly good since one ends up
+				      * with poorly shaped cells at the inner
+				      * edge upon refinement. For example,
+				      * this is the middle plane of the mesh
+				      * for the <code>n_cells=6</code>:
+				      *
+				      * @image html hyper_shell-6_cross_plane.png
+				      *
+				      * The mesh generated with
+				      * <code>n_cells=6</code> is better but
+				      * still not good. As a consequence, you
+				      * may also specify
+				      * <code>n_cells=96</code> as a third
+				      * option. The mesh generated in this way
+				      * is based on a once refined version of
+				      * the one with <code>n_cells=12</code>,
+				      * where all internal nodes are re-placed
+				      * along a shell halfway between the
+				      * inner and outer boundary of the
+				      * domain. The following two images
+				      * compare half of the hyper shell for
+				      * <code>n_cells=12</code> and
+				      * <code>n_cells=96</code> (note that the
+				      * doubled radial lines on the cross
+				      * section are artifacts of the
+				      * visualization):
+				      *
+				      * @image html hyper_shell_12_cut.png
+				      * @image html hyper_shell_96_cut.png
+				      *
+				      * @note This function is declared to
 				      * exist for triangulations of
 				      * all space dimensions, but
 				      * throws an error if called in
