@@ -78,6 +78,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: The GridGenerator::hyper_shell function generated meshes in 3d
+that are valid but of poor quality upon refinement. There is now an additional
+option to generate a coarse mesh of 96 cells that has a much better quality.
+<br>
+(Wolfgang Bangerth, 2011/02/12)
+</li>
+
 <li> Fixed: There are systems where the <code>libz</code> library is installed
 but the <code>zlib.h</code> header file is not available. Since the latter
 condition was not tested, this would result in compiler errors. This is now
