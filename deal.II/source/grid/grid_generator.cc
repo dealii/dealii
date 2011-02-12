@@ -2366,15 +2366,23 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
       tmp.set_boundary(1, boundary);
       tmp.refine_global (1);
 
+				       // mark vertices we've already moved or
+				       // that we want to ignore: we don't
+				       // want to move vertices at the inner
+				       // or outer boundaries
       std::vector<bool> vertex_already_treated (tmp.n_vertices(), false);
       for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
 	   cell != tmp.end(); ++cell)
+	for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+	  if (cell->at_boundary(f))
+	    for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
+	      vertex_already_treated[cell->face(f)->vertex_index(v)] = true;
+
+				       // now move the remaining vertices
+      for (Triangulation<3>::active_cell_iterator cell = tmp.begin_active();
+	   cell != tmp.end(); ++cell)
 	for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
-	  if ((cell->vertex(v).distance(p) > 1.05*inner_radius)
-	      &&
-	      (cell->vertex(v).distance(p) > 0.95*outer_radius)
-	      &&
-	      (vertex_already_treated[cell->vertex_index(v)] == false))
+	  if (vertex_already_treated[cell->vertex_index(v)] == false)
 	    {
 					       // this is a new interior
 					       // vertex. mesh refinement may
