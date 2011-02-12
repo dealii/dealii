@@ -602,7 +602,7 @@ class GridGenerator
 				      * this is the middle plane of the mesh
 				      * for the <code>n_cells=6</code>:
 				      *
-				      * @image html hyper_shell-6_cross_plane.png
+				      * @image html hyper_shell_6_cross_plane.png
 				      *
 				      * The mesh generated with
 				      * <code>n_cells=6</code> is better but
