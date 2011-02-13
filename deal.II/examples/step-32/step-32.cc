@@ -861,6 +861,8 @@ class BoussinesqFlowProblem
 	bool         generate_graphical_output;
 	unsigned int graphical_output_interval;
 
+	unsigned int adaptive_refinement_interval;
+
 	double stabilization_alpha;
 	double stabilization_c_R;
 	double stabilization_beta;
@@ -971,6 +973,7 @@ BoussinesqFlowProblem<dim>::Parameters::Parameters ()
 		end_time (1e8),
 		initial_global_refinement (2),
 		initial_adaptive_refinement (2),
+		adaptive_refinement_interval (10),
 		stabilization_alpha (2),
 		stabilization_c_R (0.11),
 		stabilization_beta (0.078)
@@ -995,6 +998,10 @@ declare_parameters (ParameterHandler &prm)
 		     Patterns::Integer (0),
 		     "The number of adaptive refinement steps performed after "
 		     "initial global refinement.");
+  prm.declare_entry ("Time steps between mesh refinement", "10",
+		     Patterns::Integer (10),
+		     "The number of time steps after which the mesh is to be "
+		     "adapted based on computed error indicators.");
   prm.declare_entry ("Generate graphical output", "false",
 		     Patterns::Bool (),
 		     "Whether graphical output is to be generated or not. "
@@ -1033,6 +1040,8 @@ parse_parameters (ParameterHandler &prm)
   end_time                    = prm.get_double ("End time");
   initial_global_refinement   = prm.get_integer ("Initial global refinement");
   initial_adaptive_refinement = prm.get_integer ("Initial adaptive refinement");
+
+  adaptive_refinement_interval= prm.get_integer ("Time steps between mesh refinement");
 
   generate_graphical_output   = prm.get_bool ("Generate graphical output");
   graphical_output_interval   = prm.get_integer ("Time steps between graphical output");
@@ -3532,7 +3541,9 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 	  goto start_time_iteration;
 	}
       else
-	if ((timestep_number > 0) && (timestep_number % 10 == 0))
+	if ((timestep_number > 0)
+	    &&
+	    (timestep_number % parameters.adaptive_refinement_interval == 0))
 	  refine_mesh (parameters.initial_global_refinement +
 		       parameters.initial_adaptive_refinement);
 
@@ -3566,12 +3577,12 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 	  TrilinosWrappers::MPI::Vector
 	    distributed_old_old_temperature_solution (temperature_rhs);
 	  distributed_old_old_temperature_solution.reinit(old_old_temperature_solution, false, true);
-	  
+
 
       	  distributed_temperature_solution.sadd (1.+time_step/old_time_step,
 						 -time_step/old_time_step,
 						 distributed_old_old_temperature_solution);
-	  temperature_solution.reinit(distributed_temperature_solution, false, true);	  
+	  temperature_solution.reinit(distributed_temperature_solution, false, true);
       	}
     }
   while (time <= parameters.end_time * EquationData::year_in_seconds);

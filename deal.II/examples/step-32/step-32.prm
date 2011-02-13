@@ -11,6 +11,10 @@ set Initial adaptive refinement         = 2
 # before the problem is first solved there.
 set Initial global refinement           = 1
 
+# The number of time steps after which the mesh is to be adapted based on
+# computed error indicators.
+set Time steps between mesh refinement  = 10
+
 # Whether graphical output is to be generated or not. You may not want to get
 # graphical output if the number of processors is large.
 set Generate graphical output           = false
