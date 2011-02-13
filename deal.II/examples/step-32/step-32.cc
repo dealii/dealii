@@ -3474,7 +3474,9 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 	std::exit (1);
       }
 
-    prm.read_input (parameter_file);
+    const bool success = prm.read_input (parameter_file);
+    AssertThrow (success, ExcMessage ("Invalid input parameter file."));
+
     parameters.parse_parameters (prm);
   }
 
