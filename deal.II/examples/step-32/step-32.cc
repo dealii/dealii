@@ -999,7 +999,7 @@ declare_parameters (ParameterHandler &prm)
 		     "The number of adaptive refinement steps performed after "
 		     "initial global refinement.");
   prm.declare_entry ("Time steps between mesh refinement", "10",
-		     Patterns::Integer (10),
+		     Patterns::Integer (1),
 		     "The number of time steps after which the mesh is to be "
 		     "adapted based on computed error indicators.");
   prm.declare_entry ("Generate graphical output", "false",
@@ -3601,7 +3601,7 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 				   // do-while loop
   if ((parameters.generate_graphical_output == true)
       &&
-      (timestep_number % parameters.graphical_output_interval != 1))
+      !((timestep_number-1) % parameters.graphical_output_interval == 0))
     output_results ();
 }
 
