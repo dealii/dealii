@@ -3555,6 +3555,13 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
       time += time_step;
       ++timestep_number;
 
+				       // if we are at the end of
+				       // time, stop now
+      if (time > parameters.end_time * EquationData::year_in_seconds)
+	break;
+
+				       // otherwise prepare for the
+				       // next time step
       TrilinosWrappers::MPI::BlockVector old_old_stokes_solution (stokes_rhs);
       old_old_stokes_solution.block(0).reinit(old_stokes_solution.block(0),false,true);
       old_old_stokes_solution.block(1).reinit(old_stokes_solution.block(1),false,true);
@@ -3585,7 +3592,17 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 	  temperature_solution.reinit(distributed_temperature_solution, false, true);
       	}
     }
-  while (time <= parameters.end_time * EquationData::year_in_seconds);
+  while (true);
+
+				   // if we are generating graphical
+				   // output, do so also for the last
+				   // time step unless we had just
+				   // done so before we left the
+				   // do-while loop
+  if ((parameters.generate_graphical_output == true)
+      &&
+      (timestep_number % parameters.graphical_output_interval != 1))
+    output_results ();
 }
 
 
