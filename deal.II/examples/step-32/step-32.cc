@@ -3542,18 +3542,34 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
       time += time_step;
       ++timestep_number;
 
-      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
-      old_old_stokes_solution      = old_stokes_solution;
+      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution (stokes_rhs);
+      old_old_stokes_solution.block(0).reinit(old_stokes_solution.block(0),false,true);
+      old_old_stokes_solution.block(1).reinit(old_stokes_solution.block(1),false,true);
       old_stokes_solution          = stokes_solution;
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
       if (old_time_step > 0)
       	{
-      	  stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
-      				old_old_stokes_solution);
-      	  temperature_solution.sadd (1.+time_step/old_time_step,
-      				     -time_step/old_time_step,
-      				     old_old_temperature_solution);
+	  TrilinosWrappers::MPI::BlockVector distributed_stokes_solution (stokes_rhs);
+	  distributed_stokes_solution.block(0).reinit(stokes_solution.block(0),false,true);
+	  distributed_stokes_solution.block(1).reinit(stokes_solution.block(1),false,true);
+      	  distributed_stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
+					    old_old_stokes_solution);
+	  stokes_solution.block(0).reinit(distributed_stokes_solution.block(0), false, true);
+	  stokes_solution.block(1).reinit(distributed_stokes_solution.block(1), false, true);
+
+	  TrilinosWrappers::MPI::Vector
+	    distributed_temperature_solution (temperature_rhs);
+	  distributed_temperature_solution.reinit(temperature_solution, false, true);
+	  TrilinosWrappers::MPI::Vector
+	    distributed_old_old_temperature_solution (temperature_rhs);
+	  distributed_old_old_temperature_solution.reinit(old_old_temperature_solution, false, true);
+	  
+
+      	  distributed_temperature_solution.sadd (1.+time_step/old_time_step,
+						 -time_step/old_time_step,
+						 distributed_old_old_temperature_solution);
+	  temperature_solution.reinit(distributed_temperature_solution, false, true);	  
       	}
     }
   while (time <= parameters.end_time * EquationData::year_in_seconds);
