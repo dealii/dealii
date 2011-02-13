@@ -3483,13 +3483,11 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 			      Point<dim>(),
 			      EquationData::R0,
 			      EquationData::R1,
-			      12,
+			      96,
 			      true);
   static HyperShellBoundary<dim> boundary;
   triangulation.set_boundary (0, boundary);
   triangulation.set_boundary (1, boundary);
-
-				   //GridGenerator::hyper_cube (triangulation, EquationData::R0, EquationData::R1);
 
   global_Omega_diameter = GridTools::diameter (triangulation);
 

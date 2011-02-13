@@ -9,7 +9,7 @@ set Initial adaptive refinement         = 2
 
 # The number of global refinement steps performed on the initial coarse mesh,
 # before the problem is first solved there.
-set Initial global refinement           = 2
+set Initial global refinement           = 1
 
 # Whether graphical output is to be generated or not. You may not want to get
 # graphical output if the number of processors is large.
