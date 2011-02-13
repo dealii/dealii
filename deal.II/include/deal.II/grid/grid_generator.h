@@ -613,7 +613,7 @@ class GridGenerator
 				      * is based on a once refined version of
 				      * the one with <code>n_cells=12</code>,
 				      * where all internal nodes are re-placed
-				      * along a shell halfway between the
+				      * along a shell somewhere between the
 				      * inner and outer boundary of the
 				      * domain. The following two images
 				      * compare half of the hyper shell for
