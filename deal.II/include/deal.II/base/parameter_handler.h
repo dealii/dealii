@@ -1695,7 +1695,7 @@ class ParameterHandler : public Subscriptor
 
 					   /**
 					    * Write out everything as
-					    * an <a href="http://en.wikipedia.org/wiki/XML>XML</a>
+					    * an <a href="http://en.wikipedia.org/wiki/XML">XML</a>
 					    * file.
 					    *
 					    * See the general
@@ -1867,7 +1867,7 @@ class ParameterHandler : public Subscriptor
 				      * <tt>entry_string</tt> as <tt>long
 				      * int</tt>. (A long int is chosen so
 				      * that even very large unsigned values
-				      * can be returned by this function.)
+				      * can be returned by this function).
 				      */
     long int       get_integer (const std::string &entry_string) const;
 
