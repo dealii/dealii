@@ -96,7 +96,7 @@ AC_ARG_ENABLE(mpi,
 	  if test "x$enableval" = "xyes" ; then
 	    AC_MSG_RESULT(yes)
 
-	    if test "x$CXX" = "x" ; then 
+	    if test "x$CXX" = "x" ; then
 	      AC_MSG_CHECKING(for MPI C++ compiler)
 	      if ((which mpiCC 2>&1) > /dev/null) ; then
                 CXX=mpiCC ;
@@ -949,10 +949,10 @@ if test "x$darwin_shared_lib" = "xyes" ; then
 
   if test "x$DARWIN_GCC_WEAK_LINKAGE_BUG" = "xyes" ; then
     echo "     WARNING: The installed compiler version seems to be "
-    echo "     WARNING: the Apple gcc3.3, build 1666, which does not"
+    echo "     WARNING: Apple gcc3.3, build 1666, which does not"
     echo "     WARNING: work properly for building dynamics libs"
     echo "     WARNING: Please install Apple's November 2004 patch"
-    echo "     WARNING: for the gcc, which can be found on:"
+    echo "     WARNING: for gcc, which can be found on:"
     echo "     WARNING: http://www.apple.com/developer"
     echo
   fi
