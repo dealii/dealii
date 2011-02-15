@@ -2285,7 +2285,7 @@ double first_invariant (const SymmetricTensor<2,dim> &t)
  * @author Wolfgang Bangerth, 2005, 2010
  */
 inline
-double second_invariant (const SymmetricTensor<2,1> &t)
+double second_invariant (const SymmetricTensor<2,1> &)
 {
   return 0;
 }
