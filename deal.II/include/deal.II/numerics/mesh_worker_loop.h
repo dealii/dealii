@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,9 +44,9 @@ namespace internal
   }
 
   template<int dim, class DOFINFO, class A>
-  void assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO>& dinfo, A& assembler)
+  void assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO>& dinfo, A* assembler)
   {
-    dinfo.assemble(assembler);
+    dinfo.assemble(*assembler);
   }
 }
 
@@ -240,12 +240,12 @@ namespace MeshWorker
 	    typename identity<ITERATOR>::type end,
 	    DOFINFO& dinfo,
 	    INFOBOX& info,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)> &cell_worker,
-	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)> &boundary_worker,
+	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& cell_worker,
+	    const std_cxx1x::function<void (DOFINFO&, typename INFOBOX::CellInfo&)>& boundary_worker,
 	    const std_cxx1x::function<void (DOFINFO&, DOFINFO&,
 					    typename INFOBOX::CellInfo&,
-					    typename INFOBOX::CellInfo&)> &face_worker,
-	    ASSEMBLER &assembler,
+					    typename INFOBOX::CellInfo&)>& face_worker,
+	    ASSEMBLER& assembler,
 	    bool cells_first = true)
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
@@ -262,7 +262,7 @@ namespace MeshWorker
     WorkStream::run(begin, end,
  		    std_cxx1x::bind(cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>, _1, _3, _2,
  				    cell_worker, boundary_worker, face_worker, cells_first, true),
- 		    std_cxx1x::bind(internal::assemble<dim,DOFINFO,ASSEMBLER>, _1, assembler),
+ 		    std_cxx1x::bind(internal::assemble<dim,DOFINFO,ASSEMBLER>, _1, &assembler),
  		    info, dof_info);
 #else
     for (ITERATOR cell = begin; cell != end; ++cell)
@@ -275,6 +275,8 @@ namespace MeshWorker
 	dof_info.assemble(assembler);
       }
 #endif
+    for (unsigned int i=0;i<3;++i)
+      deallog << '[' << assembler(i) << ']';
   }
 
 /**
