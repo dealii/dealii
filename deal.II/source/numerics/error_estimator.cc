@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -871,7 +871,7 @@ namespace internal
 					   // then do nothing since we
 					   // integrate over the subfaces when
 					   // we visit the coarse cells.
-	  if (cell->at_boundary(face_no) == false)
+	  if (face->at_boundary() == false)
 	    if (cell->neighbor_is_coarser(face_no))
 	      continue;
 
@@ -884,11 +884,9 @@ namespace internal
 					   // cells, we enter this face into
 					   // the list of faces with
 					   // contribution zero.
-	  const unsigned char boundary_indicator
-	    = face->boundary_indicator();
 	  if (face->at_boundary()
 	      &&
-	      (parallel_data.neumann_bc->find(boundary_indicator) ==
+	      (parallel_data.neumann_bc->find(face->boundary_indicator()) ==
 	       parallel_data.neumann_bc->end()))
 	    {
 	      local_face_integrals[face]
