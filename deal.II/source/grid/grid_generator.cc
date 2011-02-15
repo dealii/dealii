@@ -1442,6 +1442,7 @@ GridGenerator::colorize_hyper_shell (
   for (Triangulation<2>::cell_iterator cell = tria.begin();
        cell != tria.end(); ++cell)
     {
+      Assert (cell->face(2)->at_boundary(), ExcInternalError());
       cell->face(2)->set_boundary_indicator(1);
     }
 }
@@ -2236,29 +2237,68 @@ colorize_hyper_shell (Triangulation<3>& tria,
 		      const double,
 		      const double)
 {
-				   // Inspite of receiving geometrical
-				   // data, we do this only based on
-				   // topology.
-
-				   // For the mesh based on  cube,
-				   // this is highly irregular
+				   // the following uses a good amount
+				   // of knowledge about the
+				   // orientation of cells. this is
+				   // probably not good style...
   if (tria.n_cells() == 6)
     {
       Triangulation<3>::cell_iterator cell = tria.begin();
+
       cell->face(4)->set_boundary_indicator(1);
+      Assert (cell->face(4)->at_boundary(), ExcInternalError());
+
       (++cell)->face(2)->set_boundary_indicator(1);
+      Assert (cell->face(2)->at_boundary(), ExcInternalError());
+
       (++cell)->face(2)->set_boundary_indicator(1);
+      Assert (cell->face(2)->at_boundary(), ExcInternalError());
+
       (++cell)->face(0)->set_boundary_indicator(1);
+      Assert (cell->face(0)->at_boundary(), ExcInternalError());
+
       (++cell)->face(2)->set_boundary_indicator(1);
+      Assert (cell->face(2)->at_boundary(), ExcInternalError());
+
       (++cell)->face(0)->set_boundary_indicator(1);
+      Assert (cell->face(0)->at_boundary(), ExcInternalError());
     }
-  else
-				     // For higher polyhedra, this is regular.
+  else if (tria.n_cells() == 12)
     {
+				       // again use some internal
+				       // knowledge
       for (Triangulation<3>::cell_iterator cell = tria.begin();
 	   cell != tria.end(); ++cell)
-	cell->face(5)->set_boundary_indicator(1);
+	{
+	  Assert (cell->face(5)->at_boundary(), ExcInternalError());
+	  cell->face(5)->set_boundary_indicator(1);
+	}
     }
+  else if (tria.n_cells() == 96)
+    {
+				       // the 96-cell hypershell is
+				       // based on a once refined
+				       // 12-cell mesh. consequently,
+				       // since the outer faces all
+				       // are face_no==5 above, so
+				       // they are here (unless they
+				       // are in the interior). Use
+				       // this to assign boundary
+				       // indicators, but also make
+				       // sure that we encounter
+				       // exactly 48 such faces
+      unsigned int count = 0;
+      for (Triangulation<3>::cell_iterator cell = tria.begin();
+	   cell != tria.end(); ++cell)
+	if (cell->face(5)->at_boundary())
+	  {
+	    cell->face(5)->set_boundary_indicator(1);
+	    ++count;
+	  }
+      Assert (count == 48, ExcInternalError());
+    }
+  else
+    Assert (false, ExcNotImplemented());
 }
 
 
@@ -2422,11 +2462,11 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
       const double r = inner_radius / outer_radius;
       const double pi = numbers::PI;
       const double rho = 2*r/(1+r);
-      
+
 				       // then this is the distance of the
 				       // interior nodes from the center:
       const double middle_radius = rho * outer_radius;
-      
+
 				       // mark vertices we've already moved or
 				       // that we want to ignore: we don't
 				       // want to move vertices at the inner
@@ -2457,7 +2497,7 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
 	      const Point<3> old_distance = cell->vertex(v) - p;
 	      const double old_radius = cell->vertex(v).distance(p);
 	      cell->vertex(v) = p + old_distance * (middle_radius / old_radius);
-	      
+
 	      vertex_already_treated[cell->vertex_index(v)] = true;
 	    }
 
