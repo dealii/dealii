@@ -455,7 +455,7 @@ class GridGenerator
                                       * a trapezoid from
                                       * <tt>x=-half_length</tt> to
                                       * <tt>x=+half_length</tt> and
-                                      * from <tt>y=-radius</tt> to
+                                      * from <tt>y=-radius_0</tt> to
                                       * <tt>y=radius_0</tt> at
                                       * <tt>x=-half_length</tt> and
                                       * from <tt>y=-radius_1</tt> to
