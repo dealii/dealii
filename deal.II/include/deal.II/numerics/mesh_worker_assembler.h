@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,7 +93,10 @@ namespace MeshWorker
       public:
 					 /**
 					  * Initialize local data to
-					  * store functionals.
+					  * store functionals. The
+					  * number <tt>n</tt> is the
+					  * number of functionals to
+					  * be computed.
 					  */
 	void initialize(unsigned int n);
 					 /**
@@ -102,20 +105,9 @@ namespace MeshWorker
 					  * DoFInfo
 					  * object used later for
 					  * assembling.
-					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
 					  */
-	template <int dim>
-	void initialize_info(DoFInfo<dim>& info,
-			     bool interior_face);
+	template <class DOFINFO>
+	void initialize_info(DOFINFO& info, bool interior_face);
 	
 					 /**
 					  * Assemble the local values
@@ -1120,6 +1112,16 @@ namespace MeshWorker
     Functional<number>::initialize(unsigned int n)
     {
       results.resize(n);
+      std::fill(results.begin(), results.end(), 0.);
+    }
+    
+    
+    template <typename number>
+    template <class DOFINFO>
+    inline void
+    Functional<number>::initialize_info(DOFINFO& info, bool)
+    {
+      info.initialize_numbers(results.size());
     }
     
     
