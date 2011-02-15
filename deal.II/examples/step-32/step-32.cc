@@ -2820,6 +2820,8 @@ void BoussinesqFlowProblem<dim>::solve ()
   computing_timer.enter_section ("   Solve Stokes system");
 
   {
+    pcout << "   Solving Stokes system... " << std::flush;
+
     const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
       TrilinosWrappers::PreconditionILU>
       preconditioner (stokes_matrix, stokes_preconditioner_matrix,
@@ -2855,10 +2857,10 @@ void BoussinesqFlowProblem<dim>::solve ()
     stokes_solution.block(0).reinit(distributed_stokes_solution.block(0), false, true);
     stokes_solution.block(1).reinit(distributed_stokes_solution.block(1), false, true);
 
-    pcout << "   "
-	  << solver_control.last_step()
-	  << " iterations for Stokes subsystem."
-          << " reduced res by " << solver_control.last_value()/solver_control.initial_value()
+    pcout << solver_control.last_step()
+	  << " iterations."
+          << " Reduced residual by "
+	  << solver_control.last_value()/solver_control.initial_value()
 	  << std::endl;
   }
   computing_timer.exit_section();
