@@ -275,8 +275,6 @@ namespace MeshWorker
 	dof_info.assemble(assembler);
       }
 #endif
-    for (unsigned int i=0;i<3;++i)
-      deallog << '[' << assembler(i) << ']';
   }
 
 /**
