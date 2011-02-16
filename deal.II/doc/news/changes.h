@@ -78,6 +78,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a function TrilinosWrappers::VectorBase::minimal_value.
+<br>
+(Wolfgang Bangerth, 2011/02/16)
+</li>
+
 <li> Improved: The GridGenerator::hyper_shell function generated meshes in 3d
 that are valid but of poor quality upon refinement. There is now an additional
 option to generate a coarse mesh of 96 cells that has a much better quality.
