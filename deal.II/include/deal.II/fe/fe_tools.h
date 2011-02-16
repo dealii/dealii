@@ -35,6 +35,13 @@ namespace hp
 }
 template <int dim> class FiniteElementData;
 class ConstraintMatrix;
+namespace PETScWrappers
+{
+  namespace MPI
+  {
+    class Vector;
+  }
+}
 
 
 #include <base/config.h>
@@ -981,6 +988,8 @@ namespace FETools
 				const DoFHandler<dim,spacedim>&  dof2,
 				const ConstraintMatrix& constraints2,
 				OutVector&              z1_difference);
+
+
 
 				   /**
 				    * $L^2$ projection for
