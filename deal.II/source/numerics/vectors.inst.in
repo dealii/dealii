@@ -673,6 +673,22 @@ void VectorTools::interpolate_boundary_values
 template
 void VectorTools::interpolate_boundary_values
 (const Mapping<deal_II_dimension>    &,
+ const hp::DoFHandler<deal_II_dimension> &,
+ const FunctionMap<deal_II_dimension>::type &,
+ std::map<unsigned int,double>       &,
+ const std::vector<bool>    &);
+
+template
+void VectorTools::interpolate_boundary_values
+(const Mapping<deal_II_dimension>    &,
+ const MGDoFHandler<deal_II_dimension> &,
+ const FunctionMap<deal_II_dimension>::type &,
+ std::map<unsigned int,double>       &,
+ const std::vector<bool>    &);
+
+template
+void VectorTools::interpolate_boundary_values
+(const Mapping<deal_II_dimension>    &,
  const DoFHandler<deal_II_dimension> &,
  const unsigned char,
  const Function<deal_II_dimension>   &,
