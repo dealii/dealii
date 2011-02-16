@@ -504,6 +504,12 @@ namespace TrilinosWrappers
       TrilinosScalar mean_value () const;
 
                                        /**
+                                        * Compute the minimal value of
+                                        * the elements of this vector.
+                                        */
+      TrilinosScalar minimal_value () const;
+
+                                       /**
                                         * $l_1$-norm of the vector.  The
                                         * sum of the absolute values.
                                         */
@@ -1392,6 +1398,19 @@ namespace TrilinosWrappers
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
     return mean;
+  }
+
+
+
+  inline
+  TrilinosScalar
+  VectorBase::minimal_value () const
+  {
+    TrilinosScalar min_value;
+    const int ierr = vector->MinValue (&min_value);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    return min_value;
   }
 
 
