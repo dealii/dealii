@@ -1768,10 +1768,14 @@ namespace TrilinosWrappers
       }
     else
       {
-				   // Otherwise, just update
-	int ierr;
+				   // Otherwise, just update. verify
+				   // that *this does not only have
+				   // the same map as v (the
+				   // if-condition above) but also as
+				   // w
 	Assert (vector->Map().SameAs(w.vector->Map()),
 		ExcDifferentParallelPartitioning());
+	int ierr;
 	ierr = vector->GlobalAssemble(last_action);
 	AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
