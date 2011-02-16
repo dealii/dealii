@@ -19,6 +19,7 @@
 #include <lac/householder.h>
 #include <lac/vector.h>
 #include <lac/block_vector.h>
+#include <lac/petsc_parallel_vector.h>
 #include <lac/trilinos_vector.h>
 #include <lac/trilinos_block_vector.h>
 #include <lac/constraint_matrix.h>
@@ -44,6 +45,8 @@
 #include <hp/dof_handler.h>
 
 #include <base/std_cxx1x/shared_ptr.h>
+
+#include <base/index_set.h>
 
 #include <iostream>
 
@@ -1197,55 +1200,85 @@ namespace FETools
 
 
 
-template <int dim, int spacedim,
-          template <int, int> class DH1,
-          template <int, int> class DH2,
-          class InVector, class OutVector>
-void
-interpolate (const DH1<dim, spacedim> &dof1,
-	     const InVector           &u1,
-	     const DH2<dim, spacedim> &dof2,
-	     const ConstraintMatrix   &constraints,
-	     OutVector                &u2)
-{
-  Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
+  template <int dim, int spacedim,
+            template <int, int> class DH1,
+            template <int, int> class DH2,
+            class InVector, class OutVector>
+  void
+  interpolate (const DH1<dim, spacedim> &dof1,
+	       const InVector           &u1,
+	       const DH2<dim, spacedim> &dof2,
+	       const ConstraintMatrix   &constraints,
+	       OutVector                &u2)
+  {
+    Assert(&dof1.get_tria()==&dof2.get_tria(), ExcTriangulationMismatch());
 
-  Assert(u1.size()==dof1.n_dofs(),
-         ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-  Assert(u2.size()==dof2.n_dofs(),
-         ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
+    Assert(u1.size()==dof1.n_dofs(),
+           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    Assert(u2.size()==dof2.n_dofs(),
+           ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
+#ifdef DEAL_II_USE_PETSC
+    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+                                   // if u1 is a parallel distributed
+                                   // PETSc vector, we check the local
+                                   // size of u1 for safety
+          Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
+
+    if (dynamic_cast<PETScWrappers::MPI::Vector *>(&u2) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof2) != 0)
+        {
+          Assert(dynamic_cast<PETScWrappers::MPI::Vector *>(&u2)->local_size() == dof2.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<PETScWrappers::MPI::Vector *>(&u2)->local_size(), dof2.locally_owned_dofs().n_elements()));
+        };
+#endif
                                    // allocate vectors at maximal
                                    // size. will be reinited in inner
                                    // cell, but Vector makes sure that
                                    // this does not lead to
                                    // reallocation of memory
-  Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
-  Vector<typename OutVector::value_type> u2_local(DoFTools::max_dofs_per_cell(dof2));
+    Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
+    Vector<typename OutVector::value_type> u2_local(DoFTools::max_dofs_per_cell(dof2));
 
                                    // have a map for interpolation
                                    // matrices. shared_ptr make sure
                                    // that memory is released again
-  std::map<const FiniteElement<dim,spacedim> *,
     std::map<const FiniteElement<dim,spacedim> *,
-    std_cxx1x::shared_ptr<FullMatrix<double> > > >
-    interpolation_matrices;
+      std::map<const FiniteElement<dim,spacedim> *,
+      std_cxx1x::shared_ptr<FullMatrix<double> > > >
+      interpolation_matrices;
 
-  typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
-                                                   endc1 = dof1.end();
-  typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
-                                                   endc2 = dof2.end();
+    typename DH1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
+                                                     endc1 = dof1.end();
+    typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
+                                                     endc2 = dof2.end();
 
-  std::vector<unsigned int> touch_count(dof2.n_dofs(),0);
-  std::vector<unsigned int> dofs;
-  dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
-  u2 = 0;
+    std::vector<unsigned int> dofs;
+    dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
 
-  for (; cell1!=endc1; ++cell1, ++cell2)
-    {
-      Assert(cell1->get_fe().n_components() == cell2->get_fe().n_components(),
-             ExcDimensionMismatch (cell1->get_fe().n_components(),
-                                   cell2->get_fe().n_components()));
+    u2 = 0;
+    OutVector touch_count(u2);
+    touch_count = 0;
+
+                                   // for distributed triangulations,
+                                   // we can only interpolate u1 on
+                                   // a cell, which this processor owns,
+				   // so we have to know the subdomain_id
+    const types::subdomain_id_t subdomain_id =
+      dof1.get_tria().locally_owned_subdomain();
+
+    for (; cell1!=endc1; ++cell1, ++cell2)
+      if ((cell1->subdomain_id() == subdomain_id)
+          ||
+          (subdomain_id == types::invalid_subdomain_id))
+        {
+          Assert(cell1->get_fe().n_components() == cell2->get_fe().n_components(),
+                 ExcDimensionMismatch (cell1->get_fe().n_components(),
+                                       cell2->get_fe().n_components()));
 
                                        // for continuous elements on
                                        // grids with hanging nodes we
@@ -1254,69 +1287,85 @@ interpolate (const DH1<dim, spacedim> &dof1,
                                        // if there are no constraints
                                        // then hanging nodes are not
                                        // allowed.
-      const bool hanging_nodes_not_allowed
-        = ((cell2->get_fe().dofs_per_vertex != 0) &&
-           (constraints.n_constraints() == 0));
+          const bool hanging_nodes_not_allowed
+            = ((cell2->get_fe().dofs_per_vertex != 0) &&
+               (constraints.n_constraints() == 0));
 
-      if (hanging_nodes_not_allowed)
-	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	  Assert (cell1->at_boundary(face) ||
-		  cell1->neighbor(face)->level() == cell1->level(),
-		  ExcHangingNodesNotAllowed(0));
+          if (hanging_nodes_not_allowed)
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	      Assert (cell1->at_boundary(face) ||
+		      cell1->neighbor(face)->level() == cell1->level(),
+		      ExcHangingNodesNotAllowed(0));
 
 
-      const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
-      const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
-      u1_local.reinit (dofs_per_cell1);
-      u2_local.reinit (dofs_per_cell2);
+          const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
+          u1_local.reinit (dofs_per_cell1);
+          u2_local.reinit (dofs_per_cell2);
 
                                        // check if interpolation
                                        // matrix for this particular
                                        // pair of elements is already
                                        // there
-      if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() ==
-	  0)
-        {
-          std_cxx1x::shared_ptr<FullMatrix<double> >
-            interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
-                                                          dofs_per_cell1));
+          if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() == 0)
+            {
+              std_cxx1x::shared_ptr<FullMatrix<double> >
+                interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
+                                                              dofs_per_cell1));
+              interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
+                = interpolation_matrix;
+
+              get_interpolation_matrix(cell1->get_fe(),
+				       cell2->get_fe(),
+				       *interpolation_matrix);
+            }
+
+          cell1->get_dof_values(u1, u1_local);
           interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
-            = interpolation_matrix;
+            ->vmult(u2_local, u1_local);
 
-          get_interpolation_matrix(cell1->get_fe(),
-				   cell2->get_fe(),
-				   *interpolation_matrix);
+          dofs.resize (dofs_per_cell2);
+          cell2->get_dof_indices(dofs);
+
+          for (unsigned int i=0; i<dofs_per_cell2; ++i)
+            {
+              u2(dofs[i])+=u2_local(i);
+              touch_count(dofs[i]) += 1;
+            }
         }
-
-      cell1->get_dof_values(u1, u1_local);
-      interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
-        ->vmult(u2_local, u1_local);
-
-      dofs.resize (dofs_per_cell2);
-      cell2->get_dof_indices(dofs);
-
-      for (unsigned int i=0; i<dofs_per_cell2; ++i)
-	{
-	  u2(dofs[i])+=u2_local(i);
-	  ++touch_count[dofs[i]];
-	}
-    }
                                    // cell1 is at the end, so should
                                    // be cell2
-  Assert (cell2 == endc2, ExcInternalError());
+    Assert (cell2 == endc2, ExcInternalError());
+
+    u2.compress();
+    touch_count.compress();
+
+                                   // if we work on parallel distributed
+                                   // vectors, we have to ensure, that we only
+                                   // work on dofs this processor owns.
+    IndexSet  locally_owned_dofs = dof2.locally_owned_dofs();
 
 				   // when a discontinuous element is
 				   // interpolated to a continuous
 				   // one, we take the mean values.
-  for (unsigned int i=0; i<dof2.n_dofs(); ++i)
-    {
-      Assert(touch_count[i]!=0, ExcInternalError());
-      u2(i) /= touch_count[i];
-    }
+				   // for parallel vectors check,
+				   // if this component is owned by
+				   // this processor.
+    for (unsigned int i=0; i<dof2.n_dofs(); ++i)
+      if (locally_owned_dofs.is_element(i))
+        {
+          Assert(touch_count(i)!=0, ExcInternalError());
+          u2(i) /= touch_count(i);
+        }
 
+				   // finish the work on parallel vectors
+    u2.compress();
 				   // Apply hanging node constraints.
-  constraints.distribute(u2);
-}
+    constraints.distribute(u2);
+
+				   // and finally update ghost values
+    u2.update_ghost_values();
+  }
 
 
 
@@ -1333,6 +1382,25 @@ interpolate (const DH1<dim, spacedim> &dof1,
     Assert(u1_interpolated.size()==dof1.n_dofs(),
 	   ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
+#ifdef DEAL_II_USE_PETSC
+    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+                                   // if u1 is a parallel distributed
+                                   // PETSc vector, we check the local
+                                   // size of u1 for safety
+          Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
+
+    if (dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_interpolated) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+          Assert(dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_interpolated)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_interpolated)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
+#endif
+
 				     // For continuous elements on grids
 				     // with hanging nodes we need
 				     // hanging node
@@ -1348,6 +1416,9 @@ interpolate (const DH1<dim, spacedim> &dof1,
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell1);
     Vector<typename OutVector::value_type> u1_int_local(dofs_per_cell1);
 
+    const types::subdomain_id_t subdomain_id =
+      dof1.get_tria().locally_owned_subdomain();
+
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
 							    endc = dof1.end();
 
@@ -1355,17 +1426,26 @@ interpolate (const DH1<dim, spacedim> &dof1,
     get_back_interpolation_matrix(dof1.get_fe(), fe2,
 				  interpolation_matrix);
     for (; cell!=endc; ++cell)
-      {
-	if (hanging_nodes_not_allowed)
-	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	    Assert (cell->at_boundary(face) ||
-		    cell->neighbor(face)->level() == cell->level(),
-		    ExcHangingNodesNotAllowed(0));
+      if ((cell->subdomain_id() == subdomain_id)
+          ||
+          (subdomain_id == types::invalid_subdomain_id))
+        {
+	  if (hanging_nodes_not_allowed)
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	      Assert (cell->at_boundary(face) ||
+		      cell->neighbor(face)->level() == cell->level(),
+		      ExcHangingNodesNotAllowed(0));
 
-	cell->get_dof_values(u1, u1_local);
-	interpolation_matrix.vmult(u1_int_local, u1_local);
-	cell->set_dof_values(u1_int_local, u1_interpolated);
-      }
+	  cell->get_dof_values(u1, u1_local);
+	  interpolation_matrix.vmult(u1_int_local, u1_local);
+	  cell->set_dof_values(u1_int_local, u1_interpolated);
+        }
+
+				   // if we work on a parallel PETSc vector
+				   // we have to finish the work and
+				   // update ghost values
+    u1_interpolated.compress();
+    u1_interpolated.update_ghost_values();
   }
 
 
@@ -1378,29 +1458,54 @@ interpolate (const DH1<dim, spacedim> &dof1,
 		   const InVector           &u1,
 		   const FiniteElement<dim,spacedim> &fe2,
 		   OutVector                &u1_interpolated)
-	    {
-	      Assert(u1.size() == dof1.n_dofs(),
-		     ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
-	      Assert(u1_interpolated.size() == dof1.n_dofs(),
-		     ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
+  {
+    Assert(u1.size() == dof1.n_dofs(),
+           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    Assert(u1_interpolated.size() == dof1.n_dofs(),
+           ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-	      Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
-	      Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
+#ifdef DEAL_II_USE_PETSC
+    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+                                   // if u1 is a parallel distributed
+                                   // PETSc vector, we check the local
+                                   // size of u1 for safety
+          Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
 
-	      typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
-						     endc = dof1.end();
+    if (dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_interpolated) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+          Assert(dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_interpolated)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_interpolated)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
+#endif
+
+    Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
+    Vector<typename OutVector::value_type> u1_int_local(DoFTools::max_dofs_per_cell(dof1));
+
+    const types::subdomain_id_t subdomain_id =
+      dof1.get_tria().locally_owned_subdomain();
+
+    typename DH<dim>::active_cell_iterator cell = dof1.begin_active(),
+                                           endc = dof1.end();
 
 					       // map from possible fe objects in
 					       // dof1 to the back_interpolation
 					       // matrices
-	      std::map<const FiniteElement<dim> *,
-		std_cxx1x::shared_ptr<FullMatrix<double> > > interpolation_matrices;
+    std::map<const FiniteElement<dim> *,
+       std_cxx1x::shared_ptr<FullMatrix<double> > > interpolation_matrices;
 
-for (; cell!=endc; ++cell)
-  {
-    Assert(cell->get_fe().n_components() == fe2.n_components(),
-	   ExcDimensionMismatch(cell->get_fe().n_components(),
-				fe2.n_components()));
+    for (; cell!=endc; ++cell)
+      if ((cell->subdomain_id() == subdomain_id)
+          ||
+          (subdomain_id == types::invalid_subdomain_id))
+        {
+          Assert(cell->get_fe().n_components() == fe2.n_components(),
+                 ExcDimensionMismatch(cell->get_fe().n_components(),
+                 fe2.n_components()));
 
 				     // For continuous elements on
 				     // grids with hanging nodes we
@@ -1409,36 +1514,42 @@ for (; cell!=endc; ++cell)
 				     // when the elements are
 				     // continuous no hanging node
 				     // constraints are allowed.
-    const bool hanging_nodes_not_allowed=
-      (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+          const bool hanging_nodes_not_allowed=
+            (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
 
-    if (hanging_nodes_not_allowed)
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	Assert (cell->at_boundary(face) ||
-		cell->neighbor(face)->level() == cell->level(),
-		ExcHangingNodesNotAllowed(0));
+          if (hanging_nodes_not_allowed)
+            for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+              Assert (cell->at_boundary(face) ||
+                      cell->neighbor(face)->level() == cell->level(),
+                      ExcHangingNodesNotAllowed(0));
 
-    const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
 
 				     // make sure back_interpolation
 				     // matrix is available
-    if (interpolation_matrices[&cell->get_fe()] != 0)
-      {
-	interpolation_matrices[&cell->get_fe()] =
-	  std_cxx1x::shared_ptr<FullMatrix<double> >
-	  (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
-	get_back_interpolation_matrix(dof1.get_fe(), fe2,
-				      *interpolation_matrices[&cell->get_fe()]);
-      }
+          if (interpolation_matrices[&cell->get_fe()] != 0)
+            {
+              interpolation_matrices[&cell->get_fe()] =
+                std_cxx1x::shared_ptr<FullMatrix<double> >
+                  (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
+              get_back_interpolation_matrix(dof1.get_fe(), fe2,
+                                            *interpolation_matrices[&cell->get_fe()]);
+            }
 
-    u1_local.reinit (dofs_per_cell1);
-    u1_int_local.reinit (dofs_per_cell1);
+          u1_local.reinit (dofs_per_cell1);
+          u1_int_local.reinit (dofs_per_cell1);
 
-    cell->get_dof_values(u1, u1_local);
-    interpolation_matrices[&cell->get_fe()]->vmult(u1_int_local, u1_local);
-    cell->set_dof_values(u1_int_local, u1_interpolated);
+          cell->get_dof_values(u1, u1_local);
+          interpolation_matrices[&cell->get_fe()]->vmult(u1_int_local, u1_local);
+          cell->set_dof_values(u1_int_local, u1_interpolated);
+        };
+
+				   // if we work on a parallel PETSc vector
+				   // we have to finish the work and
+				   // update ghost values
+    u1_interpolated.compress();
+    u1_interpolated.update_ghost_values();
   }
-}
 
 
 
@@ -1472,9 +1583,34 @@ for (; cell!=endc; ++cell)
 					 // interpolate back to dof1
 					 // taking into account
 					 // constraints1
-	Vector<typename OutVector::value_type> u2(dof2.n_dofs());
-	interpolate(dof1, u1, dof2, constraints2, u2);
-	interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+#ifdef DEAL_II_USE_PETSC
+        if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
+          {
+            AssertThrow (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1_interpolated) != 0,
+                         ExcMessage("Interpolation can only be done between vectors of same type!"));
+
+					 // if u1 is a parallel distributed
+					 // PETSc vector, we create a vector u2
+					 // with based on the sets of locally owned
+					 // and relevant dofs of dof2
+            IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+            IndexSet  dof2_locally_relevant_dofs;
+            DoFTools::extract_locally_relevant_dofs (dof2,
+                                                     dof2_locally_relevant_dofs);
+
+            PETScWrappers::MPI::Vector  u2 (dynamic_cast<const PETScWrappers::MPI::Vector *> (&u1)->get_mpi_communicator(),
+                                            dof2_locally_owned_dofs,
+                                            dof2_locally_relevant_dofs);
+            interpolate(dof1, u1, dof2, constraints2, u2);
+            interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+          }
+        else
+#endif
+          {
+            Vector<typename OutVector::value_type> u2(dof2.n_dofs());
+            interpolate(dof1, u1, dof2, constraints2, u2);
+            interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+          }
       }
   }
 
@@ -1492,9 +1628,28 @@ for (; cell!=endc; ++cell)
     Assert(u1_difference.size()==dof1.n_dofs(),
 	   ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
+#ifdef DEAL_II_USE_PETSC
+    if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+                                   // if u1 is a parallel distributed
+                                   // PETSc vector, we check the local
+                                   // size of u1 for safety
+          Assert(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
+
+    if (dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_difference) != 0)
+      if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
+        {
+          Assert(dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_difference)->local_size() == dof1.locally_owned_dofs().n_elements(),
+                 ExcDimensionMismatch(dynamic_cast<PETScWrappers::MPI::Vector *>(&u1_difference)->local_size(), dof1.locally_owned_dofs().n_elements()));
+        };
+#endif
+
 				     // For continuous elements on grids
 				     // with hanging nodes we need
-				     // hnaging node
+				     // hanging node
 				     // constraints. Consequently, when
 				     // the elements are continuous no
 				     // hanging node constraints are
@@ -1507,6 +1662,9 @@ for (; cell!=endc; ++cell)
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
     Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
 
+    const types::subdomain_id_t subdomain_id =
+      dof1.get_tria().locally_owned_subdomain();
+
     FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
     get_interpolation_difference_matrix(dof1.get_fe(), fe2,
 					difference_matrix);
@@ -1515,17 +1673,26 @@ for (; cell!=endc; ++cell)
 							    endc = dof1.end();
 
     for (; cell!=endc; ++cell)
-      {
-	if (hanging_nodes_not_allowed)
-	  for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-	    Assert (cell->at_boundary(face) ||
-		    cell->neighbor(face)->level() == cell->level(),
-		    ExcHangingNodesNotAllowed(0));
+      if ((cell->subdomain_id() == subdomain_id)
+          ||
+          (subdomain_id == types::invalid_subdomain_id))
+        {
+	  if (hanging_nodes_not_allowed)
+	    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	      Assert (cell->at_boundary(face) ||
+		      cell->neighbor(face)->level() == cell->level(),
+		      ExcHangingNodesNotAllowed(0));
 
-	cell->get_dof_values(u1, u1_local);
-	difference_matrix.vmult(u1_diff_local, u1_local);
-	cell->set_dof_values(u1_diff_local, u1_difference);
-      }
+	  cell->get_dof_values(u1, u1_local);
+	  difference_matrix.vmult(u1_diff_local, u1_local);
+	  cell->set_dof_values(u1_diff_local, u1_difference);
+        }
+
+				   // if we work on a parallel PETSc vector
+				   // we have to finish the work and
+				   // update ghost values
+      u1_difference.compress();
+      u1_difference.update_ghost_values();
   }
 
 
@@ -1549,8 +1716,15 @@ for (; cell!=endc; ++cell)
       {
 	back_interpolate(dof1, constraints1, u1, dof2, constraints2, u1_difference);
 	u1_difference.sadd(-1, u1);
+
+				   // if we work on a parallel PETSc vector
+				   // we have to finish the work and
+				   // update ghost values
+        u1_difference.compress();
+        u1_difference.update_ghost_values();
       }
   }
+
 
 
   template <int dim, class InVector, class OutVector, int spacedim>

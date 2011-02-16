@@ -3124,6 +3124,19 @@ class Triangulation : public Subscriptor
 				      * returned.
 				      */
     unsigned int max_adjacent_cells () const;
+
+				     /**
+				      * This function always returns
+				      * @p invalid_subdomain_id
+				      * but is there for compatibility
+				      * with the derived
+				      * @p parallel::distributed::Triangulation
+				      * class. For distributed parallel triangulations
+				      * this function returns the subdomain id
+				      * of those cells that are owned
+				      * by the current processor.
+				      */
+    virtual types::subdomain_id_t locally_owned_subdomain () const;
     				     /*@}*/
 
 				     /**
@@ -3139,7 +3152,6 @@ class Triangulation : public Subscriptor
 				      * derived class.
 				      */
     virtual std::size_t memory_consumption () const;
-
 
 				     /**
 				      *  @name Exceptions

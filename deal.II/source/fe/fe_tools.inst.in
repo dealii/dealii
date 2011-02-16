@@ -200,6 +200,41 @@ for (deal_II_dimension : DIMENSIONS)
    Vector<float> &);
 
 
+#ifdef DEAL_II_USE_PETSC
+
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const PETScWrappers::MPI::Vector &,
+   const DoFHandler<deal_II_dimension> &,  PETScWrappers::MPI::Vector &);
+  template
+  void interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const PETScWrappers::MPI::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   PETScWrappers::MPI::Vector &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const PETScWrappers::MPI::Vector &,
+   const FiniteElement<deal_II_dimension> &,  PETScWrappers::MPI::Vector &);
+  template
+  void back_interpolate<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const PETScWrappers::MPI::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   PETScWrappers::MPI::Vector &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const PETScWrappers::MPI::Vector &,
+   const FiniteElement<deal_II_dimension> &, PETScWrappers::MPI::Vector &);
+  template
+  void interpolation_difference<deal_II_dimension>
+  (const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   const PETScWrappers::MPI::Vector &,
+   const DoFHandler<deal_II_dimension> &, const ConstraintMatrix &,
+   PETScWrappers::MPI::Vector &);
+
+#endif
+
+
 #ifdef DEAL_II_USE_TRILINOS
 
   template
@@ -246,7 +281,6 @@ for (deal_II_dimension : DIMENSIONS)
    TrilinosWrappers::Vector &);
 
 #endif
-
 
   template
   void interpolate<deal_II_dimension>

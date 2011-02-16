@@ -12397,6 +12397,15 @@ unsigned int Triangulation<dim, spacedim>::max_adjacent_cells () const
 
 
 template <int dim, int spacedim>
+types::subdomain_id_t
+Triangulation<dim,spacedim>::locally_owned_subdomain () const
+{
+  return types::invalid_subdomain_id;
+}
+
+
+
+template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
 {
