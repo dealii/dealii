@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1712,7 +1712,8 @@ class DataOutBase
  * separate VTU files to parallelize visualization. In that case, you
  * need a <code>.pvtu</code> file that describes which VTU files form
  * a group. The DataOutInterface::write_pvtu_record() function can
- * generate such a master record.
+ * generate such a master record. Likewise,
+ * DataOutInterface::write_visit_record() does the same for VisIt.
  *
  * The use of this function is explained in step-40.
  */
@@ -2234,16 +2235,19 @@ class DataOutInterface : private DataOutBase
 				      * in Vtu (VTK's XML) format. See
 				      * DataOutBase::write_vtu.
 				      *
-				      * Some visualization programs, such as
-				      * ParaView, can read several separate
-				      * VTU files to parallelize
-				      * visualization. In that case, you need
-				      * a <code>.pvtu</code> file that
-				      * describes which VTU files form a
-				      * group. The
+				      * Some visualization programs,
+				      * such as ParaView, can read
+				      * several separate VTU files to
+				      * parallelize visualization. In
+				      * that case, you need a
+				      * <code>.pvtu</code> file that
+				      * describes which VTU files form
+				      * a group. The
 				      * DataOutInterface::write_pvtu_record()
-				      * function can generate such a master
-				      * record.
+				      * function can generate such a
+				      * master record. Likewise,
+				      * DataOutInterface::write_visit_record()
+				      * does the same for VisIt.
 				      */
     void write_vtu (std::ostream &out) const;
 
@@ -2281,10 +2285,37 @@ class DataOutInterface : private DataOutBase
 				      *
 				      * @note The use of this function is
 				      * explained in step-40.
+				      *
+				      * @note At the time of writing,
+				      * the other big VTK-based
+				      * visualization program, VisIt,
+				      * can not read <code>pvtu</code>
+				      * records. However, it can read
+				      * visit records as written by
+				      * the write_visit_record()
+				      * function.
 				      */
     void write_pvtu_record (std::ostream &out,
 			    const std::vector<std::string> &piece_names) const;
 
+				     /**
+				      * This function is the exact
+				      * equivalent of the
+				      * write_pvtu_record() function
+				      * but for the VisIt
+				      * visualization program. See
+				      * there for the purpose of this
+				      * function.
+				      *
+				      * This function is documented
+				      * in the "Creating a master file
+				      * for parallel" section (section 5.7)
+				      * of the "Getting data into VisIt"
+				      * report that can be found here:
+				      * https://wci.llnl.gov/codes/visit/2.0.0/GettingDataIntoVisIt2.0.0.pdf
+				      */
+    void write_visit_record (std::ostream &out,
+			     const std::vector<std::string> &piece_names) const;
 
     				     /**
 				      * Obtain data through get_patches()

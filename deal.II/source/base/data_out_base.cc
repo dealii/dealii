@@ -5342,6 +5342,19 @@ DataOutInterface<dim,spacedim>::write_pvtu_record (std::ostream &out,
 }
 
 
+
+template <int dim, int spacedim>
+void
+DataOutInterface<dim,spacedim>::write_visit_record (std::ostream &out,
+						   const std::vector<std::string> &piece_names) const
+{
+  out << "!NBLOCKS " << piece_names.size() << std::endl;
+  for (unsigned int i=0; i<piece_names.size(); ++i)
+    out << piece_names[i] << std::endl;
+}
+
+
+
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_deal_II_intermediate (std::ostream &out) const

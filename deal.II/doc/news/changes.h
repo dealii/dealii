@@ -78,6 +78,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a function DataOutBase::write_visit_record that does
+the equivalent for VisIt that DataOutBase::write_pvtu_record does for ParaView:
+generate a file that contains a list of all other VTK or VTU files of which the
+current parallel simulation consists.
+<br>
+(Wolfgang Bangerth, 2011/02/16)
+</li>
+
 <li> New: There is now a function TrilinosWrappers::VectorBase::minimal_value.
 <br>
 (Wolfgang Bangerth, 2011/02/16)
