@@ -1926,7 +1926,7 @@ TableBase<N,T>::operator = (const TableBase<N,T>& m)
 {
   reinit (m.size());
   if (!empty())
-    std::copy (&m.values[0], &m.values[n_elements()], &values[0]);
+    std::copy (m.values.begin(), m.values.end(), values.begin());
 
   return *this;
 }

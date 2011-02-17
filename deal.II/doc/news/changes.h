@@ -83,6 +83,12 @@ should be fixed now.
 (Wolfgang Bangerth, 2011/02/16)
 </li>
 
+<li> Fixed: TableBase::operator= could not be compiled if the type of the
+elements of the table was <code>bool</code>. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/02/16)
+</li>
+
 <li> Improved: The GridGenerator::hyper_shell function generated meshes in 3d
 that are valid but of poor quality upon refinement. There is now an additional
 option to generate a coarse mesh of 96 cells that has a much better quality.
