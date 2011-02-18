@@ -24,6 +24,7 @@
 
 #include <sstream>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 /* ----------------------- FESystem::InternalData ------------------- */
@@ -235,7 +236,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 							  fe4 ,n4)),
   base_elements(4)
 {
-  base_elements[0] = ElementPair(fe1.clone(), n1);  
+  base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first->subscribe (typeid(*this).name());
@@ -277,7 +278,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 							  fe5, n5)),
   base_elements(5)
 {
-  base_elements[0] = ElementPair(fe1.clone(), n1);  
+  base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first->subscribe (typeid(*this).name());
@@ -718,6 +719,7 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
       typename FiniteElement<dim,spacedim>::InternalDataBase *base_fe_data =
 	dynamic_cast<typename FiniteElement<dim,spacedim>::InternalDataBase *>
 	(base_fe_data_base);
+      Assert (base_fe_data != 0, ExcInternalError());
 
       data->set_fe_data(base_no, base_fe_data);
 
@@ -2633,7 +2635,7 @@ FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				   // degree is the maximal degree of the components
   const unsigned int
     degree = std::max(std::max (std::max(fe1.tensor_degree(),fe2.tensor_degree()),fe3.tensor_degree()), fe4.tensor_degree());
-		       
+
   return FiniteElementData<dim> (
     dpo,
     fe1.n_components() * N1 + fe2.n_components() * N2 + fe3.n_components() * N3 +
@@ -2684,7 +2686,7 @@ FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 				   // degree is the maximal degree of the components
   const unsigned int
     degree = std::max(std::max(std::max (std::max(fe1.tensor_degree(),fe2.tensor_degree()),fe3.tensor_degree()), fe4.tensor_degree()), fe5.tensor_degree());
-		       
+
   return FiniteElementData<dim> (
     dpo,
     fe1.n_components() * N1 + fe2.n_components() * N2 + fe3.n_components() * N3 +
@@ -2770,7 +2772,7 @@ FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteEleme
 							       const FiniteElement<dim,spacedim> &fe3,
 							       const unsigned int        N3,
 							       const FiniteElement<dim,spacedim> &fe4,
-							       const unsigned int        N4) 
+							       const unsigned int        N4)
 {
   std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
@@ -2786,7 +2788,7 @@ FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteEleme
 
   fe_list.push_back (&fe4);
   multiplicities.push_back (N4);
-  
+
   return compute_restriction_is_additive_flags (fe_list, multiplicities);
 }
 
@@ -2802,7 +2804,7 @@ FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteEleme
 							       const FiniteElement<dim,spacedim> &fe4,
 							       const unsigned int        N4,
 							       const FiniteElement<dim,spacedim> &fe5,
-							       const unsigned int        N5) 
+							       const unsigned int        N5)
 {
   std::vector<const FiniteElement<dim,spacedim>*> fe_list;
   std::vector<unsigned int>              multiplicities;
@@ -2818,7 +2820,7 @@ FESystem<dim,spacedim>::compute_restriction_is_additive_flags (const FiniteEleme
 
   fe_list.push_back (&fe4);
   multiplicities.push_back (N4);
-  
+
   fe_list.push_back (&fe5);
   multiplicities.push_back (N5);
   return compute_restriction_is_additive_flags (fe_list, multiplicities);
@@ -3045,7 +3047,7 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
   fe_list.push_back (&fe4);
   multiplicities.push_back (N4);
-  
+
   return compute_nonzero_components (fe_list, multiplicities);
 }
 
@@ -3078,10 +3080,10 @@ FESystem<dim,spacedim>::compute_nonzero_components (const FiniteElement<dim,spac
 
   fe_list.push_back (&fe4);
   multiplicities.push_back (N4);
-  
+
   fe_list.push_back (&fe5);
   multiplicities.push_back (N5);
-  
+
   return compute_nonzero_components (fe_list, multiplicities);
 }
 
