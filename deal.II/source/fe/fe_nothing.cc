@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -123,7 +123,8 @@ FE_Nothing<dim>::get_data (const UpdateFlags  /*flags*/,
                 // Create a default data object.  Normally we would then
                 // need to resize things to hold the appropriate numbers
                 // of dofs, but in this case all data fields are empty.
-  typename Mapping<dim>::InternalDataBase* data = new typename Mapping<dim>::InternalDataBase();
+  typename Mapping<dim>::InternalDataBase* data
+    = new typename FiniteElement<dim>::InternalDataBase();
   return data;
 }
 

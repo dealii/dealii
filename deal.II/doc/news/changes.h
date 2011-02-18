@@ -78,6 +78,12 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: It wasn't possible to use the FE_Nothing element inside an FESystem
+object and hand the result over to an FEValues object. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/02/18)
+</li>
+
 <li> New: There is now a function DataOutBase::write_visit_record that does
 the equivalent for VisIt that DataOutBase::write_pvtu_record does for ParaView:
 generate a file that contains a list of all other VTK or VTU files of which the
