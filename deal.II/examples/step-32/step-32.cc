@@ -3623,9 +3623,8 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 
 				       // otherwise prepare for the
 				       // next time step
-      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution (old_stokes_solution);
-      old_old_stokes_solution.block(0).reinit(old_stokes_solution.block(0),false,true);
-      old_old_stokes_solution.block(1).reinit(old_stokes_solution.block(1),false,true);
+      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
+      old_old_stokes_solution      = old_stokes_solution;
       old_stokes_solution          = stokes_solution;
       old_old_temperature_solution = old_temperature_solution;
       old_temperature_solution     = temperature_solution;
