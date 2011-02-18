@@ -31,15 +31,17 @@
 #include <grid/grid_tools.h>
 #include <grid/grid_refinement.h>
 
-#include <dofs/dof_handler.h>
 #include <dofs/dof_renumbering.h>
-#include <dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
+#include <dofs/dof_accessor.h>
 
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
+
+#include <hp/dof_handler.h>
+#include <hp/fe_collection.h>
+#include <hp/fe_values.h>
 
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
@@ -56,7 +58,7 @@ template <int dim>
 class StokesProblem
 {
   public:
-    StokesProblem (const unsigned int degree);
+    StokesProblem (const unsigned int stokes_degree);
     void run ();
 
   private:
@@ -66,16 +68,17 @@ class StokesProblem
     void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
 
-    const unsigned int   degree;
+    const unsigned int    stokes_degree;
 
-    Triangulation<dim>   triangulation;
-    FESystem<dim>        fe;
-    DoFHandler<dim>      dof_handler;
+    Triangulation<dim>    triangulation;
+    FESystem<dim>         stokes_fe;
+    hp::FECollection<dim> fe_collection;
+    hp::DoFHandler<dim>   dof_handler;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix      constraints;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+    SparsityPattern       sparsity_pattern;
+    SparseMatrix<double>  system_matrix;
 
     Vector<double> solution;
     Vector<double> system_rhs;
@@ -106,7 +109,7 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
 	  ExcIndexRange (component, 0, this->n_components));
 
   if (component == 1)
-    return std::sin(2*numbers::PI*p[0]);
+    return std::sin(numbers::PI*p[0]);
   
   return 0;
 }
@@ -163,14 +166,16 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-StokesProblem<dim>::StokesProblem (const unsigned int degree)
+StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree)
                 :
-                degree (degree),
+                stokes_degree (stokes_degree),
                 triangulation (Triangulation<dim>::maximum_smoothing),
-                fe (FE_Q<dim>(degree+1), dim,
-                    FE_Q<dim>(degree), 1),
+                stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
+			   FE_Q<dim>(stokes_degree), 1),
                 dof_handler (triangulation)
-{}
+{
+  fe_collection.push_back (stokes_fe);
+}
 
 
 
@@ -180,7 +185,7 @@ void StokesProblem<dim>::setup_dofs ()
 {
   system_matrix.clear ();
 
-  dof_handler.distribute_dofs (fe);
+  dof_handler.distribute_dofs (fe_collection);
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
   std::vector<unsigned int> block_component (dim+1,0);
@@ -200,19 +205,18 @@ void StokesProblem<dim>::setup_dofs ()
 					      component_mask);
   }
 
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    if (constraints.is_constrained(i))
+      std::cout << i << ' ' << constraints.get_inhomogeneity(i) << std::endl;
+  
+  
   constraints.close ();
-
-  std::vector<unsigned int> dofs_per_block (2);
-  DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);
-  const unsigned int n_u = dofs_per_block[0],
-                     n_p = dofs_per_block[1];
 
   std::cout << "   Number of active cells: "
             << triangulation.n_active_cells()
             << std::endl
             << "   Number of degrees of freedom: "
             << dof_handler.n_dofs()
-            << " (" << n_u << '+' << n_p << ')'
             << std::endl;
 
   {
@@ -237,17 +241,19 @@ void StokesProblem<dim>::assemble_system ()
   system_matrix=0;
   system_rhs=0;
 
-  QGauss<dim>   quadrature_formula(degree+2);
+  QGauss<dim>          stokes_quadrature(stokes_degree+2);
+  hp::QCollection<dim> q_collection;
+  q_collection.push_back (stokes_quadrature);
+  
+  hp::FEValues<dim> hp_fe_values (fe_collection, q_collection,
+				  update_values    |
+				  update_quadrature_points  |
+				  update_JxW_values |
+				  update_gradients);
 
-  FEValues<dim> fe_values (fe, quadrature_formula,
-                           update_values    |
-                           update_quadrature_points  |
-                           update_JxW_values |
-                           update_gradients);
+  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
 
-  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
-
-  const unsigned int   n_q_points      = quadrature_formula.size();
+  const unsigned int   n_q_points      = stokes_quadrature.size();
 
   FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       local_rhs (dofs_per_cell);
@@ -255,8 +261,6 @@ void StokesProblem<dim>::assemble_system ()
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
   const RightHandSide<dim>          right_hand_side;
-  std::vector<Vector<double> >      rhs_values (n_q_points,
-                                                Vector<double>(dim+1));
 
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
@@ -265,17 +269,17 @@ void StokesProblem<dim>::assemble_system ()
   std::vector<double>                  div_phi_u   (dofs_per_cell);
   std::vector<double>                  phi_p       (dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
-      fe_values.reinit (cell);
+      hp_fe_values.reinit (cell);
+
+      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
+      
       local_matrix = 0;
       local_rhs = 0;
-
-      right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-                                        rhs_values);
 
       for (unsigned int q=0; q<n_q_points; ++q)
 	{
@@ -287,22 +291,11 @@ void StokesProblem<dim>::assemble_system ()
 	    }
 
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      for (unsigned int j=0; j<=i; ++j)
-		{
-		  local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
-					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j])
-				       * fe_values.JxW(q);
-
-		}
-
-	      const unsigned int component_i =
-		fe.system_to_component_index(i).first;
-	      local_rhs(i) += fe_values.shape_value(i,q) *
-			      rhs_values[q](component_i) *
-			      fe_values.JxW(q);
-	    }
+	    for (unsigned int j=0; j<=i; ++j)
+	      local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
+				    - div_phi_u[i] * phi_p[j]
+				    - phi_p[i] * div_phi_u[j])
+				   * fe_values.JxW(q);
 	}
 
 
@@ -311,9 +304,9 @@ void StokesProblem<dim>::assemble_system ()
 	  local_matrix(i,j) = local_matrix(j,i);
 
       cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global (local_matrix, local_rhs,
+      constraints.distribute_local_to_global (local_matrix,
 					      local_dof_indices,
-					      system_matrix, system_rhs);
+					      system_matrix);
     }
 }
 
@@ -346,12 +339,13 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
   data_component_interpretation
     .push_back (DataComponentInterpretation::component_is_scalar);
 
-  DataOut<dim> data_out;
+  DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
+
   data_out.add_data_vector (solution, solution_names,
-			    DataOut<dim>::type_dof_data,
+			    DataOut<dim,hp::DoFHandler<dim> >::type_dof_data,
 			    data_component_interpretation);
-  data_out.build_patches ();
+  data_out.build_patches (stokes_fe.degree);
 
   std::ostringstream filename;
   filename << "solution-"
@@ -373,7 +367,7 @@ StokesProblem<dim>::refine_mesh ()
   std::vector<bool> component_mask (dim+1, false);
   component_mask[dim] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss<dim-1>(degree+1),
+                                      QGauss<dim-1>(stokes_degree+1),
                                       typename FunctionMap<dim>::type(),
                                       solution,
                                       estimated_error_per_cell,
@@ -399,7 +393,7 @@ void StokesProblem<dim>::run ()
       if (cell->face(f)->center()[dim-1] == 1)
 	cell->face(f)->set_all_boundary_indicators(1);
   
-  triangulation.refine_global (4-dim);
+  triangulation.refine_global (3-dim);
 
   for (unsigned int refinement_cycle = 0; refinement_cycle<6;
        ++refinement_cycle)
