@@ -108,6 +108,7 @@ namespace EquationData
   const double specific_heat         = 1250;    /* J / K / kg */  //??
   const double radiogenic_heating    = 7.4e-12; /* W / kg     */  //??
 
+
   const double R0      = 6371000.-2890000.;     /* m          */
   const double R1      = 6371000.-  35000.;     /* m          */
 
@@ -137,6 +138,44 @@ namespace EquationData
     const double r = p.norm();
     return -(1.245e-6 * r + 7.714e13/r/r) * p / p.norm();
   }
+
+
+
+  template <int dim>
+  double adiabatic_pressure (const Point<dim> &p)
+  {
+				     // the static, adiabatic pressure
+				     // satisfies
+				     //    dP/dr = -g rho
+
+				     // assuming a constant density,
+				     // we can integrate the pressure
+				     // equation in depth to get that
+				     // the adiabatic pressure equals
+				     //   P(r) = rho_0 \int_r^{R_1} g(r) dr
+				     //
+				     // using the model for the
+				     // gravity vector above, this
+				     // yields the following formula:
+    const double r = p.norm();
+    return reference_density * (1./2 * 1.245e-6 * (R1*R1 - r*r) - 7.714e13 * (1./R1 - 1./r));
+  }
+
+
+  template <int dim>
+  double adiabatic_temperature (const Point<dim> &p)
+  {
+				     // the static, adiabatic
+				     // temperature satisfies
+				     //    dT/dr = -T alpha/c_P g
+
+				     // let's assume constant gravity,
+				     // then we get by integration
+    const double r = p.norm();
+
+    return T1 * std::exp(-expansion_coefficient * 9.81 / specific_heat * (r-R1));
+  }
+
 
 
   template <int dim>
@@ -2958,7 +2997,8 @@ template <int dim>
 class BoussinesqFlowProblem<dim>::Postprocessor : public DataPostprocessor<dim>
 {
   public:
-    Postprocessor (const unsigned int partition);
+    Postprocessor (const unsigned int partition,
+		   const double       minimal_pressure);
 
     virtual
     void
@@ -2981,13 +3021,17 @@ class BoussinesqFlowProblem<dim>::Postprocessor : public DataPostprocessor<dim>
 
   private:
     const unsigned int partition;
+    const double       minimal_pressure;
 };
 
 
 template <int dim>
-BoussinesqFlowProblem<dim>::Postprocessor::Postprocessor (const unsigned int partition)
+BoussinesqFlowProblem<dim>::Postprocessor::
+Postprocessor (const unsigned int partition,
+	       const double       minimal_pressure)
 		:
-		partition (partition)
+		partition (partition),
+		minimal_pressure (minimal_pressure)
 {}
 
 
@@ -3000,6 +3044,8 @@ BoussinesqFlowProblem<dim>::Postprocessor::get_names() const
   solution_names.push_back ("T");
   solution_names.push_back ("friction_heating");
   solution_names.push_back ("partition");
+  solution_names.push_back ("non_adiabatic_pressure");
+  solution_names.push_back ("non_adiabatic_temperature");
   return solution_names;
 }
 
@@ -3008,7 +3054,7 @@ template <int dim>
 unsigned int
 BoussinesqFlowProblem<dim>::Postprocessor::n_output_variables() const
 {
-  return dim + 1 + 1 + 1 + 1;
+  return dim + 1 + 1 + 1 + 1 + 1 + 1;
 }
 
 
@@ -3025,6 +3071,8 @@ get_data_component_interpretation () const
   interpretation.push_back (DataComponentInterpretation::component_is_scalar);
   interpretation.push_back (DataComponentInterpretation::component_is_scalar);
   interpretation.push_back (DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back (DataComponentInterpretation::component_is_scalar);
+  interpretation.push_back (DataComponentInterpretation::component_is_scalar);
 
   return interpretation;
 }
@@ -3034,7 +3082,7 @@ template <int dim>
 UpdateFlags
 BoussinesqFlowProblem<dim>::Postprocessor::get_needed_update_flags() const
 {
-  return update_values | update_gradients;
+  return update_values | update_gradients | update_q_points;
 }
 
 
@@ -3045,7 +3093,7 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
 				   const std::vector<std::vector<Tensor<1,dim> > > &duh,
 				   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
 				   const std::vector<Point<dim> >                  &/*normals*/,
-				   const std::vector<Point<dim> >                  &/*evaluation_points*/,
+				   const std::vector<Point<dim> >                  &evaluation_points,
 				   std::vector<Vector<double> >                    &computed_quantities) const
 {
   const unsigned int n_quadrature_points = uh.size();
@@ -3062,20 +3110,28 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
 	  = (uh[q](d) *  EquationData::year_in_seconds * 100);
 
 				       // pressure
-      computed_quantities[q](dim) = uh[q](dim) *
-				    EquationData::pressure_scaling;
+      const double pressure = (uh[q](dim)-minimal_pressure) * EquationData::pressure_scaling;
+      computed_quantities[q](dim) = pressure;
 
 				       // temperature
-      computed_quantities[q](dim+1) = uh[q](dim+1);
+      const double temperature = uh[q](dim+1);
+      computed_quantities[q](dim+1) = temperature;
 
 				       // friction heating
       Tensor<2,dim> grad_u;
       for (unsigned int d=0; d<dim; ++d)
 	grad_u[d] = duh[q][d];
       const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
-      computed_quantities[q](dim+2) = 2 * EquationData::eta * strain_rate * strain_rate;
+      computed_quantities[q](dim+2) = 2 * EquationData::eta *
+				      strain_rate * strain_rate;
 
       computed_quantities[q](dim+3) = partition;
+
+      computed_quantities[q](dim+4) = pressure -
+				      EquationData::adiabatic_pressure (evaluation_points[q]);
+
+      computed_quantities[q](dim+5) = temperature -
+				      EquationData::adiabatic_temperature (evaluation_points[q]);
     }
 }
 
@@ -3171,11 +3227,6 @@ void BoussinesqFlowProblem<dim>::output_results ()
   joint_solution.reinit (joint_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
   {
-    //double minimal_pressure = stokes_solution.block(1)(0);
-    //for (unsigned int i=0; i<stokes_solution.block(1).size(); ++i)
-    //  minimal_pressure = std::min<double> (stokes_solution.block(1)(i),
-    //					   minimal_pressure);
-
     std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
     std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
     std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
@@ -3228,7 +3279,8 @@ void BoussinesqFlowProblem<dim>::output_results ()
   locally_relevant_joint_solution = joint_solution;
 
   Postprocessor postprocessor (Utilities::System::
-			       get_this_mpi_process(MPI_COMM_WORLD));
+			       get_this_mpi_process(MPI_COMM_WORLD),
+			       stokes_solution.block(1).minimal_value());
 
   DataOut<dim> data_out;
   data_out.attach_dof_handler (joint_dof_handler);
@@ -3255,11 +3307,18 @@ void BoussinesqFlowProblem<dim>::output_results ()
 			     Utilities::int_to_string(i, 4) +
 			     ".vtu");
       const std::string
-	master_filename = ("solution-" +
-			   Utilities::int_to_string (out_index, 5) +
-			   ".pvtu");
-      std::ofstream master (master_filename.c_str());
-      data_out.write_pvtu_record (master, filenames);
+	pvtu_master_filename = ("solution-" +
+				Utilities::int_to_string (out_index, 5) +
+				".pvtu");
+      std::ofstream pvtu_master (pvtu_master_filename.c_str());
+      data_out.write_pvtu_record (pvtu_master, filenames);
+
+      const std::string
+	visit_master_filename = ("solution-" +
+				 Utilities::int_to_string (out_index, 5) +
+				 ".visit");
+      std::ofstream visit_master (visit_master_filename.c_str());
+      data_out.write_visit_record (visit_master, filenames);
     }
 
   computing_timer.exit_section ();
@@ -3564,7 +3623,7 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 
 				       // otherwise prepare for the
 				       // next time step
-      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution (stokes_rhs);
+      TrilinosWrappers::MPI::BlockVector old_old_stokes_solution (old_stokes_solution);
       old_old_stokes_solution.block(0).reinit(old_stokes_solution.block(0),false,true);
       old_old_stokes_solution.block(1).reinit(old_stokes_solution.block(1),false,true);
       old_stokes_solution          = stokes_solution;
