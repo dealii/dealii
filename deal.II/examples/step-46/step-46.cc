@@ -185,6 +185,7 @@ StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree,
                 dof_handler (triangulation)
 {
   fe_collection.push_back (stokes_fe);
+  fe_collection.push_back (elasticity_fe);
 }
 
 
@@ -249,8 +250,11 @@ void StokesProblem<dim>::assemble_system ()
   system_rhs=0;
 
   QGauss<dim>          stokes_quadrature(stokes_degree+2);
+  QGauss<dim>          elasticity_quadrature(elasticity_degree+2);
+
   hp::QCollection<dim> q_collection;
   q_collection.push_back (stokes_quadrature);
+  q_collection.push_back (elasticity_quadrature);
 
   hp::FEValues<dim> hp_fe_values (fe_collection, q_collection,
 				  update_values    |
