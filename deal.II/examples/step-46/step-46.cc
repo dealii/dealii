@@ -110,7 +110,7 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
 
   if (component == 1)
     return std::sin(numbers::PI*p[0]);
-  
+
   return 0;
 }
 
@@ -205,11 +205,6 @@ void StokesProblem<dim>::setup_dofs ()
 					      component_mask);
   }
 
-  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
-    if (constraints.is_constrained(i))
-      std::cout << i << ' ' << constraints.get_inhomogeneity(i) << std::endl;
-  
-  
   constraints.close ();
 
   std::cout << "   Number of active cells: "
@@ -244,7 +239,7 @@ void StokesProblem<dim>::assemble_system ()
   QGauss<dim>          stokes_quadrature(stokes_degree+2);
   hp::QCollection<dim> q_collection;
   q_collection.push_back (stokes_quadrature);
-  
+
   hp::FEValues<dim> hp_fe_values (fe_collection, q_collection,
 				  update_values    |
 				  update_quadrature_points  |
@@ -277,7 +272,7 @@ void StokesProblem<dim>::assemble_system ()
       hp_fe_values.reinit (cell);
 
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
-      
+
       local_matrix = 0;
       local_rhs = 0;
 
@@ -392,10 +387,10 @@ void StokesProblem<dim>::run ()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->face(f)->center()[dim-1] == 1)
 	cell->face(f)->set_all_boundary_indicators(1);
-  
+
   triangulation.refine_global (3-dim);
 
-  for (unsigned int refinement_cycle = 0; refinement_cycle<6;
+  for (unsigned int refinement_cycle = 0; refinement_cycle<1;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
