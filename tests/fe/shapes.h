@@ -51,7 +51,7 @@ plot_shape_functions(Mapping<dim>& mapping,
   deallog.push(fname);
 
   fe.reinit(c);
-  
+
   unsigned int k=0;
   for (unsigned int mz=0;mz<=((dim>2) ? div : 0) ;++mz)
     {
@@ -60,7 +60,7 @@ plot_shape_functions(Mapping<dim>& mapping,
 	  for (unsigned int mx=0;mx<=div;++mx)
 	    {
 	      deallog << q.point(k);
-	  
+
 	      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		{
 		  deallog << " " << fe.shape_value(i,k) + 1.;
@@ -131,20 +131,20 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 
   sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);
-  
+
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
     {
       if (!c->face(f)->has_children())
 	{
 	  fe.reinit(c, f);
-  
+
 	  unsigned int k=0;
 	  for (unsigned int my=0;my<=((dim>2) ? div : 0) ;++my)
 	    {
 	      for (unsigned int mx=0;mx<=div;++mx)
 		{
 		  deallog << fe.quadrature_point(k);
-		  
+
 		  for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		    {
 		      deallog << " " << fe.shape_value(i,k) + 1.;
@@ -180,14 +180,14 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 	  for (unsigned int s=0;s<GeometryInfo<dim>::max_children_per_face; ++s)
 	    {
 	      sub.reinit(c, f, s);
-	      
+
 	      unsigned int k=0;
 	      for (unsigned int my=0;my<=((dim>2) ? div : 0) ;++my)
 		{
 		  for (unsigned int mx=0;mx<=div;++mx)
 		    {
 		      deallog << sub.quadrature_point(k);
-		      
+
 		      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 			{
 			  deallog << " " << sub.shape_value(i,k) + 1.;
@@ -209,7 +209,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 				  const Tensor<2,dim> s1 = sub.shape_2nd_derivative(i,k),
 						      s2 = sub.shape_2nd_derivative_component(i,k,c);
 				  Assert (s1 == s2, ExcInternalError());
-				}       
+				}
 			      else
 				Assert ((sub.shape_value_component(i,k,c) == 0) &&
 					(sub.shape_grad_component(i,k,c) == Tensor<1,dim>()) &&
@@ -222,7 +222,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 		    }
 		  deallog << std::endl;
 		}
-	      deallog << std::endl;	      
+	      deallog << std::endl;
 	    }
 	}
     }
@@ -276,7 +276,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
                      (fe_values.shape_value_component(i,x,c) == 0)),
                     ExcInternalError());
       };
-        
+
                                    // check gradients
   for (unsigned int x=0; x<q.size(); ++x)
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -352,7 +352,7 @@ void test_compute_functions (const Mapping<dim> &mapping,
 
   const UpdateFlags update_all = (update_values | update_gradients |
                                   update_second_derivatives);
-  
+
                                    // first check this for FEValues
                                    // objects
   if (true)
