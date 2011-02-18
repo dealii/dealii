@@ -299,9 +299,13 @@ void StokesProblem<dim>::assemble_system ()
 	  local_matrix(i,j) = local_matrix(j,i);
 
       cell->get_dof_indices (local_dof_indices);
-      constraints.distribute_local_to_global (local_matrix,
+
+				       // local_rhs==0, but need to do
+				       // this here because of
+				       // boundary values
+      constraints.distribute_local_to_global (local_matrix, local_rhs,
 					      local_dof_indices,
-					      system_matrix);
+					      system_matrix, system_rhs);
     }
 }
 
@@ -390,7 +394,7 @@ void StokesProblem<dim>::run ()
 
   triangulation.refine_global (3-dim);
 
-  for (unsigned int refinement_cycle = 0; refinement_cycle<1;
+  for (unsigned int refinement_cycle = 0; refinement_cycle<6;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
