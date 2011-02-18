@@ -199,7 +199,17 @@ void StokesProblem<dim>::setup_dofs ()
   for (typename hp::DoFHandler<dim>::active_cell_iterator
 	 cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
-    cell->set_active_fe_index (0);
+    if (((cell->center()[0] < 0)
+	 &&
+	 (cell->center()[1] > 0.5))
+	||
+	((cell->center()[0] >= 0)
+	 &&
+	 (cell->center()[1] > -0.5)))
+      cell->set_active_fe_index (0);
+//TODO: doesn't work right now due to domination issues
+    // else
+    //   cell->set_active_fe_index (1);
 
   dof_handler.distribute_dofs (fe_collection);
   DoFRenumbering::Cuthill_McKee (dof_handler);
