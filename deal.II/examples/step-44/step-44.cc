@@ -357,25 +357,6 @@ namespace Parameters
 				   // @sect3{General tools}
 namespace AdditionalTools
 {
-    template <int dim>
-	    SymmetricTensor<4,dim> outer_product_T23 (const SymmetricTensor<2,dim> & A,
-						      const SymmetricTensor<2,dim> & B)
-    {
-	SymmetricTensor<4,dim> A_ik_B_jl;
-
-	for (unsigned int i=0; i<dim; ++i) {
-	    for (unsigned int j=i; j<dim; ++j) {
-		for (unsigned int k=0; k<dim; ++k) {
-		    for (unsigned int l=k; k<dim; ++k) {
-			A_ik_B_jl[i][j][k][l] += A[i][k] * B[j][l];
-		    }
-		}
-	    }
-	}
-
-	return A_ik_B_jl;
-    }
-
     template <typename MatrixType>
 	    void extract_submatrix(const std::vector< unsigned int > &row_index_set,
 				   const std::vector< unsigned int > &column_index_set,
@@ -390,13 +371,16 @@ namespace AdditionalTools
 
 	for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row) {
 	    const unsigned int row = row_index_set[sub_row];
-	    Assert (row<=matrix.m(), ExcInternalError());
+	    Assert (row<=matrix.m(), ExcIndexRange(row, 0, matrix.m()));
+//	    Assert (row <= m(), ExcIndexRange(row, 0, m()));
 
 	    for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col) {
 		const unsigned int col = column_index_set[sub_col];
-		Assert (col<=matrix.n(), ExcInternalError());
+		Assert (col<=matrix.n(), ExcIndexRange(col, 0, matrix.n()));
+//		Assert (col <= n(), ExcIndexRange(col, 0, n()));
 
 		sub_matrix(sub_row,sub_col) = matrix(row, col);
+//		sub_matrix(sub_row,sub_col) = matrix.el(row, col);
 	    }
 	}
     }
@@ -408,17 +392,21 @@ namespace AdditionalTools
 				   FullMatrix< double >  &matrix)
     {
 	const unsigned int n_rows_submatrix = row_index_set.size();
-	Assert (n_rows_submatrix<=sub_matrix.m(), ExcInternalError());
+	Assert (n_rows_submatrix<=sub_matrix.m(), ExcIndexRange(n_rows_submatrix, 0, sub_matrix.m()));
+//	Assert (n_rows_submatrix <= m(), ExcIndexRange(n_rows_submatrix, 0, m()));
 	const unsigned int n_cols_submatrix = column_index_set.size();
-	Assert (n_cols_submatrix<=sub_matrix.n(), ExcInternalError());
+	Assert (n_cols_submatrix<=sub_matrix.n(), ExcIndexRange(n_cols_submatrix, 0, sub_matrix.n()));
+//	Assert (n_cols_submatrix <= n(), ExcIndexRange(n_cols_submatrix, 0, n()));
 
 	for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row) {
 	    const unsigned int row = row_index_set[sub_row];
-	    Assert (row<=matrix.m(), ExcInternalError());
+	    Assert (row<=matrix.m(), ExcIndexRange(row, 0, matrix.m()));
+//	    Assert (row <= m(), ExcIndexRange(row, 0, m()));
 
 	    for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col) {
 		const unsigned int col = column_index_set[sub_col];
-		Assert (col<=matrix.n(), ExcInternalError());
+		Assert (col<=matrix.n(), ExcIndexRange(col, 0, matrix.n()));
+//		Assert (col <= n(), ExcIndexRange(col, 0, n()));
 
 		matrix(row, col) = sub_matrix(sub_row, sub_col);
 
@@ -916,6 +904,8 @@ private:
     void solve_linear_system (BlockVector <double> & newton_update);
 
     /// \brief Error measurement
+    void get_error_res (const BlockVector <double> & residual, BlockVector <double> & error_res);
+    void get_error_update (const BlockVector <double> & newton_update, BlockVector <double> & error_update);
     double get_error_dil (void);
 
     // Solution
@@ -970,10 +960,9 @@ private:
     // === Stiffness matrix setup ====
     ConstraintMatrix constraints; // Matrix to keep track of all constraints
     BlockSparsityPattern sparsity_pattern; // Sparsity pattern for the stiffness matrix
-    BlockSparseMatrix <double> system_matrix; // Global stiffness matrix
-    BlockVector <double> system_rhs; // Holds the right hand side vector
+    BlockSparseMatrix <double> tangent_matrix; // Global stiffness matrix
+    BlockVector <double> residual; // Holds the residual vector
     BlockVector <double> solution_n; // Holds the solution vector: Total displacement over all time-steps
-    BlockVector <double> soln_error; // Holds the error vector
 };
 
 				   // @sect3{Implementation of the <code>Solid</code> class}
@@ -1096,9 +1085,28 @@ template <int dim>
 	    << "\n\t Number of active cells: " << triangulation.n_active_cells()
 	    << "\n\t Number of degrees of freedom: " << dof_handler_ref.n_dofs()
 	    << std::endl;
+	    
+    // the global system matrix will have the following structure
+    //      | K'_uu |   K_up    |     0     |         | dU_u |         | dR_u |
+    // K =  | K_pu  |   K_tt^-1 |   K_pt^-1 | , dU =  | dU_p | , dR =  | dR_p |
+    //      |   0   |   K_tp    |   K_tt    |         | dU_t |         | dR_t |
+    // reflect this structure in the sparsity pattern
+    Table<2,DoFTools::Coupling> coupling (n_components, n_components);
+    for (unsigned int ii = 0; ii < n_components; ++ii) {
+        for (unsigned int jj = ii; jj < n_components; ++jj) {
+            if ((ii < p_component) && (jj == t_component)) {
+            	coupling[jj][ii] = DoFTools::none;
+            	coupling[ii][jj] = DoFTools::none;
+            }
+            else {
+            	coupling[ii][jj] = DoFTools::always;
+            	coupling[jj][ii] = DoFTools::always;
+            }	
+        }
+    }
 
     // Setup system matrix
-    system_matrix.clear ();
+    tangent_matrix.clear ();
     {
 	const unsigned int n_dofs_u = dofs_per_block[u_dof];
 	const unsigned int n_dofs_p = dofs_per_block[p_dof];
@@ -1120,38 +1128,20 @@ template <int dim>
         csp.collect_sizes();
 
         DoFTools::make_sparsity_pattern (dof_handler_ref, csp, constraints, false);
+//        DoFTools::make_sparsity_pattern (dof_handler_ref, coupling, csp, constraints, false);
         sparsity_pattern.copy_from (csp);
     }
+
     
-    // the global system matrix will have the following structure
-    //      | K'_uu |   K_up    |     0     |         | dU_u |         | dR_u |
-    // K =  | K_pu  |   K_tt^-1 |   K_pt^-1 | , dU =  | dU_p | , dR =  | dR_p |
-    //      |   0   |   K_tp    |   K_tt    |         | dU_t |         | dR_t |
-    // reflect this structure in the sparsity pattern
-    Table<2,DoFTools::Coupling> coupling (n_components, n_components);
-    for (unsigned int ii = 0; ii < n_components; ++ii) {
-        for (unsigned int jj = 0; jj < n_components; ++jj) {
-            if( (ii < p_component) && (jj == t_component)) {
-                coupling[ii][jj] = DoFTools::none;
-                coupling[jj][ii] = DoFTools::none;
-            } else {
-                coupling[ii][jj] = DoFTools::always;
-            }
-        }
-    }
-    
-    system_matrix.reinit (sparsity_pattern);
+    tangent_matrix.reinit (sparsity_pattern);
 
     // Setup storage vectors
-    system_rhs.reinit (dofs_per_block);
-    system_rhs.collect_sizes ();
+    residual.reinit (dofs_per_block);
+    residual.collect_sizes ();
 
     solution_n.reinit (dofs_per_block);
     solution_n.collect_sizes ();
     solution_n.block(t_dof) = 1.0; // Dilatation is 1 in the initial configuration
-
-    soln_error.reinit (dofs_per_block);
-    soln_error.collect_sizes ();
 
     // Set up the quadrature point history
     setup_qph ();
@@ -1298,8 +1288,15 @@ template <int dim>
 	    << "Timestep " << time.get_timestep()
 	    << std::endl;
 
+    // Newton update vector
     BlockVector <double> newton_update (dofs_per_block);
     newton_update.collect_sizes ();
+    
+    // Solution error vectors
+    BlockVector <double> soln_error_res (dofs_per_block); // Holds the true residual vector
+    BlockVector <double> soln_error_update (dofs_per_block); // Holds the update error vector
+    soln_error_res.collect_sizes ();
+    soln_error_update .collect_sizes ();
 
     double res_u = 0.0, res_f = 0.0;
     double res_u_0 = 1.0, res_f_0 = 1.0;
@@ -1310,46 +1307,17 @@ template <int dim>
 		<< "Newton iteration: " << it_nr
 		<< std::endl;
 
-	system_matrix = 0.0;
-	system_rhs = 0.0;
+	tangent_matrix = 0.0;
+	residual = 0.0;
 
 	// Check residual
-	assemble_system_K (); // Assemble stiffness matrix
-	assemble_system_F (); // Assemble RHS
 	make_constraints (it_nr, constraints); // Make boundary conditions
-	constraints.condense (system_matrix, system_rhs); // Apply BC's
-
-	solve_linear_system (newton_update);
-	constraints.distribute(newton_update); // Populate the constrained DOF's with their values
-
-	// Definition of residual for Newton's method:
-	// Newton's method: f(x + dx) = f(x) + f'(x).dx + ..... = 0
-	//              so: 0 = R + K.dU
-	// Sparsematrix residual: Mx = b
-	//                        r = b-Mx
-	//                  i.e.: r = -R - K.dU ~ 0
-	system_matrix.residual (soln_error, newton_update, system_rhs);
-	res_u = newton_update.block(u_dof).l2_norm();
-	res_f = soln_error.block(u_dof).l2_norm();
-
+	assemble_system_F (); // Assemble RHS
+	get_error_res(residual, soln_error_res);
 	// Residual scaling factors
+	res_f = soln_error_res.block(u_dof).l2_norm();
 	if (it_nr == 0) res_f_0 = res_f;
-	if (it_nr == 0)  res_u_0 = res_u;
-	std::cout
-		<< "Nonlinear system error: "
-		<< std::endl << std::scientific
-		<< " Solution update \t ||dU||: " << newton_update.l2_norm()
-                << "\t ||dU_u||: " << newton_update.block(u_dof).l2_norm()
-                << "\t ||dU_p||: " << newton_update.block(p_dof).l2_norm()
-                << "\t ||dU_t||: " << newton_update.block(t_dof).l2_norm()
-		<< std::endl;
-	std::cout << std::scientific
-		<< " Residual     \t ||dF||: " << soln_error.l2_norm()
-                << "\t ||dR_u||: " << soln_error.block(u_dof).l2_norm()
-                << "\t ||dR_p||: " << soln_error.block(p_dof).l2_norm()
-                << "\t ||dR_t||: " << soln_error.block(t_dof).l2_norm()
-		<< std::endl;
-
+	
 	// Check for solution convergence
 	if (   it_nr > 0
 	    && res_u/res_u_0 <= parameters.tol_u
@@ -1358,7 +1326,7 @@ template <int dim>
 	    std::cout
 		    << std::endl
 		    << "Solution for timestep " << time.get_timestep()
-		    << " converged on Newton iteration " << it_nr << "."
+		    << " converged on Newton iteration " << it_nr-1 << "."
 		    << std::endl
 		    << "Relative displacement error: " << res_u/res_u_0
 		    << "\t Relative force error: " << res_f/res_f_0
@@ -1368,13 +1336,61 @@ template <int dim>
 //	    timer.leave_subsection();
 	    return;
 	}
+	
+	// No convergence -> continue with calculations
+	assemble_system_K (); // Assemble stiffness matrix
+	constraints.condense (tangent_matrix, residual); // Apply BC's
+	solve_linear_system (newton_update);
+	constraints.distribute(newton_update); // Populate the constrained DOF's with their values
 
-	// Current solution state unacceptable. Update and continue iterating.
+	// Newton update error
+	get_error_update(newton_update, soln_error_update);
+	res_u = soln_error_update.block(u_dof).l2_norm();
+
+	// Residual scaling factors
+	if (it_nr == 0) res_u_0 = res_u;
+	std::cout
+		<< "Nonlinear system error: "
+		<< std::endl << std::scientific
+		<< " Solution update \t ||dU||: " << soln_error_update.l2_norm()
+                << "\t ||dU_u||: " << soln_error_update.block(u_dof).l2_norm()
+                << "\t ||dU_p||: " << soln_error_update.block(p_dof).l2_norm()
+                << "\t ||dU_t||: " << soln_error_update.block(t_dof).l2_norm()
+		<< std::endl;
+	std::cout << std::scientific
+		<< " Residual     \t ||dF||: " << soln_error_res.l2_norm()
+                << "\t ||dR_u||: " << soln_error_res.block(u_dof).l2_norm()
+                << "\t ||dR_p||: " << soln_error_res.block(p_dof).l2_norm()
+                << "\t ||dR_t||: " << soln_error_res.block(t_dof).l2_norm()
+		<< std::endl;
+	std::cout << std::scientific
+		<< " Relative displacement error: " << res_u/res_u_0
+	    	<< "\t Relative force error: " << res_f/res_f_0
+	    	<< "\t Dilatation error: " << get_error_dil()
+		<< std::endl;
+
+	// Update and continue iterating
 	solution_delta += newton_update; // Update current solution
 	update_qph_incremental (solution_delta); // Update quadrature point information
     }
 
     throw(ExcMessage("No convergence in nonlinear solver!"));
+}
+
+template <int dim>
+        void Solid<dim>::get_error_res (const BlockVector <double> & residual, BlockVector <double> & error_res)
+{   
+    for (unsigned int i=0; i < dof_handler_ref.n_dofs(); ++i)
+    	if (!constraints.is_constrained(i)) 
+    		error_res(i) = residual(i);
+}
+
+template <int dim>
+        void Solid<dim>::get_error_update (const BlockVector <double> & newton_update, BlockVector <double> & error_update)
+{   
+    for (unsigned int i=0; i < dof_handler_ref.n_dofs(); ++i)
+    	if (!constraints.is_constrained(i)) 
+    		error_update(i) = newton_update(i);
 }
 
 template <int dim>
@@ -1435,18 +1451,18 @@ template <int dim>
         assemble_SC();
 
 	// K'uu du = Ru − Kup Ktp^-1 (Rt − Ktt Kpt^{-1} Rp)
-	system_matrix.block(p_dof, t_dof).vmult(A.block(t_dof), system_rhs.block(p_dof));
-	system_matrix.block(t_dof, t_dof).vmult (B.block(t_dof), A.block(t_dof));
-	A.block(t_dof).equ(1.0, system_rhs.block(t_dof), -1.0, B.block(t_dof));
-	system_matrix.block(p_dof, t_dof).Tvmult(A.block(p_dof), A.block(t_dof));
-	system_matrix.block(u_dof, p_dof).vmult(A.block(u_dof), A.block(p_dof));
-	system_rhs.block(u_dof) -= A.block(u_dof);
+	tangent_matrix.block(p_dof, t_dof).vmult(A.block(t_dof), residual.block(p_dof));
+	tangent_matrix.block(t_dof, t_dof).vmult (B.block(t_dof), A.block(t_dof));
+	A.block(t_dof).equ(1.0, residual.block(t_dof), -1.0, B.block(t_dof));
+	tangent_matrix.block(p_dof, t_dof).Tvmult(A.block(p_dof), A.block(t_dof));
+	tangent_matrix.block(u_dof, p_dof).vmult(A.block(u_dof), A.block(p_dof));
+	residual.block(u_dof) -= A.block(u_dof);
 
 	timer.enter_subsection("Linear solver");
 	if (parameters.type_lin == "CG")
 	{
-	    const int solver_its = system_matrix.block(u_dof, u_dof).m() * parameters.max_iterations_lin;
-	    const double tol_sol = parameters.tol_lin * system_rhs.block(u_dof).l2_norm();
+	    const int solver_its = tangent_matrix.block(u_dof, u_dof).m() * parameters.max_iterations_lin;
+	    const double tol_sol = parameters.tol_lin * residual.block(u_dof).l2_norm();
 
 	    SolverControl solver_control (solver_its , tol_sol);
 
@@ -1455,11 +1471,11 @@ template <int dim>
 
 	    // SSOR -> much better than Jacobi for symmetric systems
 	    PreconditionSSOR <SparseMatrix<double> > preconditioner;
-	    preconditioner.initialize (system_matrix.block(u_dof, u_dof), parameters.ssor_relaxation);
+	    preconditioner.initialize (tangent_matrix.block(u_dof, u_dof), parameters.ssor_relaxation);
 
-	    solver_CG.solve (system_matrix.block(u_dof, u_dof),
+	    solver_CG.solve (tangent_matrix.block(u_dof, u_dof),
 			     newton_update.block(u_dof),
-			     system_rhs.block(u_dof),
+			     residual.block(u_dof),
 			     preconditioner);
 
 	    std::cout
@@ -1470,9 +1486,9 @@ template <int dim>
 	else if (parameters.type_lin == "Direct")
 	{
 	    SparseDirectUMFPACK  A_direct;
-	    A_direct.initialize(system_matrix.block(u_dof, u_dof));
+	    A_direct.initialize(tangent_matrix.block(u_dof, u_dof));
 	    A_direct.vmult (newton_update.block(u_dof),
-			    system_rhs.block(u_dof));
+			    residual.block(u_dof));
 	}
 	else throw (ExcMessage("Linear solver type not implemented"));
 	timer.leave_subsection();
@@ -1482,20 +1498,20 @@ template <int dim>
     // Postprocess for dp
     {
 	// dp = Ktp^{-1} ( Rt − Ktt Kpt^{-1} (Rp − Kpu du) )
-	system_matrix.block(p_dof, u_dof).vmult (A.block(p_dof), newton_update.block(u_dof));
-	B.block(p_dof).equ(1.0, system_rhs.block(p_dof), -1.0, A.block(p_dof));
-	system_matrix.block(p_dof, t_dof).vmult(A.block(t_dof), B.block(p_dof));
-	system_matrix.block(t_dof, t_dof).vmult(B.block(t_dof), A.block(t_dof));
-	A.block(t_dof).equ (1.0, system_rhs.block(t_dof), -1.0, B.block(t_dof));
-	system_matrix.block(p_dof, t_dof).Tvmult (newton_update.block(p_dof), A.block(t_dof));
+	tangent_matrix.block(p_dof, u_dof).vmult (A.block(p_dof), newton_update.block(u_dof));
+	B.block(p_dof).equ(1.0, residual.block(p_dof), -1.0, A.block(p_dof));
+	tangent_matrix.block(p_dof, t_dof).vmult(A.block(t_dof), B.block(p_dof));
+	tangent_matrix.block(t_dof, t_dof).vmult(B.block(t_dof), A.block(t_dof));
+	A.block(t_dof).equ (1.0, residual.block(t_dof), -1.0, B.block(t_dof));
+	tangent_matrix.block(p_dof, t_dof).Tvmult (newton_update.block(p_dof), A.block(t_dof));
     }
 
     // Postprocess for dt
     {
 	// dt = Ktt^{-1} (Rt − Ktp dp)
-	system_matrix.block(t_dof, p_dof).vmult (A.block(t_dof), newton_update.block(p_dof));
-	system_rhs.block(t_dof) -= A.block(t_dof);
-	system_matrix.block(p_dof, p_dof).vmult (newton_update.block(t_dof), system_rhs.block(t_dof));
+	tangent_matrix.block(t_dof, p_dof).vmult (A.block(t_dof), newton_update.block(p_dof));
+	residual.block(t_dof) -= A.block(t_dof);
+	tangent_matrix.block(p_dof, p_dof).vmult (newton_update.block(t_dof), residual.block(t_dof));
     }
     timer.leave_subsection();
 }
@@ -1507,7 +1523,7 @@ template <int dim>
     timer.enter_subsection("Assemble system matrix");
     std::cout << "Assemble system matrix..."<< std::endl;
 
-    system_matrix = 0.0; // Clear the matrix
+    tangent_matrix = 0.0; // Clear the matrix
 
     const UpdateFlags uf_cell ( update_values | update_gradients | update_JxW_values  );
 
@@ -1531,7 +1547,7 @@ template <int dim>
     // Add the local contribution to the system matrix
     for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (data.local_dof_indices[i],
+	    tangent_matrix.add (data.local_dof_indices[i],
 			       data.local_dof_indices[j],
 			       data.cell_matrix(i,j));
 }
@@ -1636,7 +1652,7 @@ template <int dim>
     timer.enter_subsection("Assemble system RHS");
     std::cout << "Assemble system RHS..."<< std::endl;
 
-    system_rhs  = 0.0; // Clear the vector
+    residual  = 0.0; // Clear the vector
 
     const UpdateFlags uf_cell ( update_values | update_gradients | update_JxW_values );
     const UpdateFlags uf_face ( update_values | update_normal_vectors | update_JxW_values);
@@ -1664,7 +1680,7 @@ template <int dim>
 {
     // Add the local contribution to the system RHS vector
     for (unsigned int i=0; i<dofs_per_cell; ++i) {
-	system_rhs(data.local_dof_indices[i]) += data.cell_rhs(i);
+	residual(data.local_dof_indices[i]) += data.cell_rhs(i);
     }
 }
 
@@ -1800,7 +1816,7 @@ template <int dim>
     // Add the local contribution to the system matrix
     for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (data.local_dof_indices[i],
+	    tangent_matrix.add (data.local_dof_indices[i],
 			       data.local_dof_indices[j],
 			       data.cell_matrix(i,j));
 }
@@ -1853,9 +1869,10 @@ template <int dim>
     // K_tt^-1: Nothing exists in the original K_pp subblock, so we can just add this contribution as is.
 
     // Extract element data from the system matrix
+    
     AdditionalTools::extract_submatrix(data.local_dof_indices,
 				       data.local_dof_indices,
-				       system_matrix,
+				       tangent_matrix,
 				       data.K_orig);
     AdditionalTools::extract_submatrix(element_indices_p,
 				       element_indices_u,
