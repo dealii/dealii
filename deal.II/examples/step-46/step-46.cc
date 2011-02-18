@@ -330,6 +330,8 @@ void StokesProblem<dim>::solve ()
   SparseDirectUMFPACK direct_solver;
   direct_solver.initialize (system_matrix);
   direct_solver.vmult (solution, system_rhs);
+
+  constraints.distribute (solution);
 }
 
 
