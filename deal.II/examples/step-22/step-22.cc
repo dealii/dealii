@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2008, 2009, 2010 by the deal.II authors */
+/*    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -43,7 +43,6 @@
 #include <fe/fe_q.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
 
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
