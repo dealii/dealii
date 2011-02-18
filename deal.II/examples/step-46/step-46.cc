@@ -106,7 +106,7 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
 	  ExcIndexRange (component, 0, this->n_components));
 
   if (component == 0)
-    return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
+    return 1;
   return 0;
 }
 
@@ -192,6 +192,11 @@ void StokesProblem<dim>::setup_dofs ()
     component_mask[dim] = false;
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     constraints);
+    VectorTools::interpolate_boundary_values (dof_handler,
+					      0,
+					      ZeroFunction<dim>(dim+1),
+					      constraints,
+					      component_mask);
     VectorTools::interpolate_boundary_values (dof_handler,
 					      1,
 					      BoundaryValues<dim>(),
@@ -291,8 +296,7 @@ void StokesProblem<dim>::assemble_system ()
 		{
 		  local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
 					- div_phi_u[i] * phi_p[j]
-					- phi_p[i] * div_phi_u[j]
-					+ phi_p[i] * phi_p[j])
+					- phi_p[i] * div_phi_u[j])
 				       * fe_values.JxW(q);
 
 		}
@@ -388,31 +392,15 @@ StokesProblem<dim>::refine_mesh ()
 template <int dim>
 void StokesProblem<dim>::run ()
 {
-  {
-    std::vector<unsigned int> subdivisions (dim, 1);
-    subdivisions[0] = 4;
-
-    const Point<dim> bottom_left = (dim == 2 ?
-				    Point<dim>(-2,-1) :
-				    Point<dim>(-2,0,-1));
-    const Point<dim> top_right   = (dim == 2 ?
-				    Point<dim>(2,0) :
-				    Point<dim>(2,1,0));
-
-    GridGenerator::subdivided_hyper_rectangle (triangulation,
-					       subdivisions,
-					       bottom_left,
-					       top_right);
-  }
+  GridGenerator::hyper_cube (triangulation, -1, 1);
 
   for (typename Triangulation<dim>::active_cell_iterator
 	 cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->center()[dim-1] == 0)
+      if (cell->face(f)->center()[dim-1] == 1)
 	cell->face(f)->set_all_boundary_indicators(1);
-
-
+  
   triangulation.refine_global (4-dim);
 
   for (unsigned int refinement_cycle = 0; refinement_cycle<6;
