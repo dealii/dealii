@@ -63,7 +63,7 @@ int main ()
 				     // exclude one of the 6 faces
 				     // from the surface mesh
 				     // extraction
-    for (typename Triangulation<dim>::active_cell_iterator
+    for (Triangulation<dim>::active_cell_iterator
 	   cell = volume_mesh.begin_active();
 	 cell != volume_mesh.end(); ++cell)
       {
@@ -99,7 +99,7 @@ int main ()
 				     // of the mesh to 1 to force
 				     // straight line refinement, then
 				     // refine
-    for (typename Triangulation<dim-1,dim>::active_cell_iterator
+    for (Triangulation<dim-1,dim>::active_cell_iterator
 	   cell = boundary_mesh.begin_active();
 	 cell != boundary_mesh.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim-1>::faces_per_cell; ++f)
