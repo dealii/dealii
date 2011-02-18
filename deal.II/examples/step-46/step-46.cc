@@ -105,8 +105,9 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
   Assert (component < this->n_components,
 	  ExcIndexRange (component, 0, this->n_components));
 
-  if (component == 0)
-    return 1;
+  if (component == 1)
+    return std::sin(2*numbers::PI*p[0]);
+  
   return 0;
 }
 
@@ -192,11 +193,6 @@ void StokesProblem<dim>::setup_dofs ()
     component_mask[dim] = false;
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     constraints);
-    VectorTools::interpolate_boundary_values (dof_handler,
-					      0,
-					      ZeroFunction<dim>(dim+1),
-					      constraints,
-					      component_mask);
     VectorTools::interpolate_boundary_values (dof_handler,
 					      1,
 					      BoundaryValues<dim>(),
