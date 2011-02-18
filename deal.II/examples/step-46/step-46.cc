@@ -36,6 +36,7 @@
 #include <dofs/dof_accessor.h>
 
 #include <fe/fe_q.h>
+#include <fe/fe_nothing.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 
@@ -58,7 +59,8 @@ template <int dim>
 class StokesProblem
 {
   public:
-    StokesProblem (const unsigned int stokes_degree);
+    StokesProblem (const unsigned int stokes_degree,
+		   const unsigned int elasticity_degree);
     void run ();
 
   private:
@@ -69,9 +71,11 @@ class StokesProblem
     void refine_mesh ();
 
     const unsigned int    stokes_degree;
+    const unsigned int    elasticity_degree;
 
     Triangulation<dim>    triangulation;
     FESystem<dim>         stokes_fe;
+    FESystem<dim>         elasticity_fe;
     hp::FECollection<dim> fe_collection;
     hp::DoFHandler<dim>   dof_handler;
 
@@ -90,7 +94,7 @@ template <int dim>
 class BoundaryValues : public Function<dim>
 {
   public:
-    BoundaryValues () : Function<dim>(dim+1) {}
+    BoundaryValues () : Function<dim>(dim+1+dim) {}
 
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
@@ -166,12 +170,18 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree)
+StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree,
+				   const unsigned int elasticity_degree)
                 :
                 stokes_degree (stokes_degree),
+		elasticity_degree (elasticity_degree),
                 triangulation (Triangulation<dim>::maximum_smoothing),
                 stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
-			   FE_Q<dim>(stokes_degree), 1),
+			   FE_Q<dim>(stokes_degree), 1,
+			   FE_Nothing<dim>(), dim),
+                elasticity_fe (FE_Nothing<dim>(), dim,
+			       FE_Nothing<dim>(), 1,
+			       FE_Q<dim>(elasticity_degree), dim),
                 dof_handler (triangulation)
 {
   fe_collection.push_back (stokes_fe);
@@ -185,17 +195,19 @@ void StokesProblem<dim>::setup_dofs ()
 {
   system_matrix.clear ();
 
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+	 cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    cell->set_active_fe_index (0);
+
   dof_handler.distribute_dofs (fe_collection);
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
-  std::vector<unsigned int> block_component (dim+1,0);
-  block_component[dim] = 1;
-  DoFRenumbering::component_wise (dof_handler, block_component);
-
   {
     constraints.clear ();
-    std::vector<bool> component_mask (dim+1, true);
-    component_mask[dim] = false;
+    std::vector<bool> component_mask (dim+1+dim, false);
+    for (unsigned int d=0; d<dim; ++d)
+      component_mask[d] = true;
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     constraints);
     VectorTools::interpolate_boundary_values (dof_handler,
@@ -331,12 +343,17 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 {
   std::vector<std::string> solution_names (dim, "velocity");
   solution_names.push_back ("pressure");
+  for (unsigned int d=0; d<dim; ++d)
+    solution_names.push_back ("displacement");
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
     (dim, DataComponentInterpretation::component_is_part_of_vector);
   data_component_interpretation
     .push_back (DataComponentInterpretation::component_is_scalar);
+  for (unsigned int d=0; d<dim; ++d)
+    data_component_interpretation
+      .push_back (DataComponentInterpretation::component_is_part_of_vector);
 
   DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.attach_dof_handler (dof_handler);
@@ -363,7 +380,7 @@ StokesProblem<dim>::refine_mesh ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
-  std::vector<bool> component_mask (dim+1, false);
+  std::vector<bool> component_mask (dim+1+dim, false);
   component_mask[dim] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       QGauss<dim-1>(stokes_degree+1),
@@ -384,15 +401,15 @@ template <int dim>
 void StokesProblem<dim>::run ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-
   for (typename Triangulation<dim>::active_cell_iterator
 	 cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->center()[dim-1] == 1)
+      if (cell->face(f)->at_boundary()
+	  &&
+	  (cell->face(f)->center()[dim-1] == 1))
 	cell->face(f)->set_all_boundary_indicators(1);
-
-  triangulation.refine_global (3-dim);
+  triangulation.refine_global (2);
 
   for (unsigned int refinement_cycle = 0; refinement_cycle<6;
        ++refinement_cycle)
@@ -424,7 +441,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      StokesProblem<2> flow_problem(1);
+      StokesProblem<2> flow_problem(1, 1);
       flow_problem.run ();
     }
   catch (std::exception &exc)
