@@ -3,21 +3,20 @@
 
 
 The main emphasis in this example is the handling of locally refined
-grids. The approach to adaptivity chosen in deal.II us to use grids in which
+grids. The approach to adaptivity chosen in deal.II is to use grids in which
 neighboring cells may be refined a different number of times. This then
 results in nodes on the interfaces of cells which belong to one
 side, but are unbalanced on the other. The common term for these is
 &ldquo;hanging nodes&rdquo;.
 
-
-
-To guarantee that the global solution is continuous at these nodes as
-well, we have to state some additional constraints on the values of
-the solution at these nodes. In the program below, we will show how we
-can get these constraints from the library, and how to use them in the
-solution of the linear system of equations.
-
-
+To guarantee that the global solution is continuous at these nodes as well, we
+have to state some additional constraints on the values of the solution at
+these nodes. In the program below, we will show how we can get these
+constraints from the library, and how to use them in the solution of the
+linear system of equations. Before going over the details of the program
+below, you may want to take a look at the @ref constraints documentation
+module that explains how these constraints can be computed and what classes in
+deal.II work on them.
 
 The locally refined grids are produced using an error estimator class
 which estimates the energy error with respect to the Laplace
@@ -31,7 +30,7 @@ variation or discontinuities. Since it was developed by Kelly and
 co-workers, we often refer to it as the &ldquo;Kelly refinement
 indicator&rdquo; in the library, documentation, and mailing list. The
 class that implements it is called
-<code>KellyErrorEstimator</code>. Although the error estimator (and
+KellyErrorEstimator. Although the error estimator (and
 its
 implementation in the deal.II library) is capable of handling variable
 coefficients in the equation, we will not use this feature since we
