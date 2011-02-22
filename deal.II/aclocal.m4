@@ -6189,14 +6189,14 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
 [
   AC_MSG_CHECKING([for Trilinos version])
-  DEAL_II_TRILINOS_VERSION_MAJOR=`cat $DEAL_II_TRILINOS_DIR/include/Trilinos_version.h \
+  DEAL_II_TRILINOS_VERSION_MAJOR=`cat $DEAL_II_TRILINOS_INCDIR/Trilinos_version.h \
                                | grep "#define TRILINOS_MAJOR_VERSION" \
                                | perl -pi -e 's/.*VERSION\s+//g;'`
-  DEAL_II_TRILINOS_VERSION_MINOR=`cat $DEAL_II_TRILINOS_DIR/include/Trilinos_version.h \
+  DEAL_II_TRILINOS_VERSION_MINOR=`cat $DEAL_II_TRILINOS_INCDIR/Trilinos_version.h \
                                | grep "#define TRILINOS_MAJOR_MINOR_VERSION" \
                                | perl -pi -e 's/.*VERSION\s+\d?\d(\d\d)\d\d/\1/g;' \
 			       | perl -pi -e 's/0(\d)/\1/g;'`
-  DEAL_II_TRILINOS_VERSION_SUBMINOR=`cat $DEAL_II_TRILINOS_DIR/include/Trilinos_version.h \
+  DEAL_II_TRILINOS_VERSION_SUBMINOR=`cat $DEAL_II_TRILINOS_INCDIR/Trilinos_version.h \
                                | grep "#define TRILINOS_MAJOR_MINOR_VERSION" \
                                | perl -pi -e 's/.*VERSION\s+\d?\d\d\d(\d\d)/\1/g;' \
 			       | perl -pi -e 's/0(\d)/\1/g;'`
@@ -6204,6 +6204,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MAJOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MINOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_SUBMINOR)
+  AC_SUBST(DEAL_II_TRILINOS_LIBPREFIX)
 ])
 
 
@@ -6312,6 +6313,10 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
   if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${shared_lib_suffix} ; then
     AC_MSG_RESULT(yes)
     DEAL_II_TRILINOS_SHARED=yes
+  elif test -f $DEAL_II_TRILINOS_LIBDIR/libtrilinos_epetra${shared_lib_suffix} ; then
+    AC_MSG_RESULT(yes)
+    DEAL_II_TRILINOS_SHARED=yes
+    DEAL_II_TRILINOS_LIBPREFIX="trilinos_"
   else
     AC_MSG_RESULT(no)
   fi
@@ -6320,6 +6325,10 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
   if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${static_lib_suffix} ; then
     AC_MSG_RESULT(yes)
     DEAL_II_TRILINOS_STATIC=yes
+  elif test -f $DEAL_II_TRILINOS_LIBDIR/libtrilinos_epetra${static_lib_suffix} ; then
+    AC_MSG_RESULT(yes)
+    DEAL_II_TRILINOS_STATIC=yes
+    DEAL_II_TRILINOS_LIBPREFIX="libtrilinos_"
   else
     AC_MSG_RESULT(no)
   fi
@@ -7155,7 +7164,7 @@ AC_DEFUN(DEAL_II_WITH_ZLIB, dnl
       AC_CHECK_HEADER(zlib.h,
         [
           DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-l$zlib)
-          AC_DEFINE(HAVE_LIBZ)
+          AC_DEFINE(HAVE_LIBZ,[],"")
         ])
     ])
 ])

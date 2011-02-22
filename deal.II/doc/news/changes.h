@@ -29,6 +29,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: On Debian, the Trilinos packages use a different layout
+of include files and library names. The <code>./configure</code>
+script can now deal with this.
+<br>
+(Walter Landry, 2011/02/22)
+
 <li> Improved: Linking the deal.II libraries on file systems that
 are mounted remotely from a file server took painfully long. This
 is now fixed by linking everything on the local file system

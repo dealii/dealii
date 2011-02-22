@@ -73,6 +73,7 @@ DEAL_II_TRILINOS_STATIC = @DEAL_II_TRILINOS_STATIC@
 DEAL_II_TRILINOS_VERSION_MAJOR    = @DEAL_II_TRILINOS_VERSION_MAJOR@
 DEAL_II_TRILINOS_VERSION_MINOR    = @DEAL_II_TRILINOS_VERSION_MINOR@
 DEAL_II_TRILINOS_VERSION_SUBMINOR = @DEAL_II_TRILINOS_VERSION_SUBMINOR@
+DEAL_II_TRILINOS_LIBPREFIX = @DEAL_II_TRILINOS_LIBPREFIX@
 
 USE_CONTRIB_MUMPS  = @USE_CONTRIB_MUMPS@
 DEAL_II_MUMPS_DIR  = @DEAL_II_MUMPS_DIR@
@@ -207,25 +208,25 @@ endif
 # sync.
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   DEAL_II_TRILINOS_LIBS = \
-		stratimikosamesos \
-		stratimikosaztecoo \
-		stratimikosifpack \
-		stratimikosml \
-		stratimikos \
-		ml \
-		amesos \
-		belos \
-		ifpack \
-                aztecoo \
-		rtop \
-		sacado \
-		thyra \
-		thyraepetra \
-		thyraepetraext \
-		epetraext \
-		epetra \
-		teuchos \
-		triutils
+		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosamesos \
+		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosaztecoo \
+		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosifpack \
+		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosml \
+		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikos \
+		$(DEAL_II_TRILINOS_LIBPREFIX)ml \
+		$(DEAL_II_TRILINOS_LIBPREFIX)amesos \
+		$(DEAL_II_TRILINOS_LIBPREFIX)belos \
+		$(DEAL_II_TRILINOS_LIBPREFIX)ifpack \
+                $(DEAL_II_TRILINOS_LIBPREFIX)aztecoo \
+		$(DEAL_II_TRILINOS_LIBPREFIX)rtop \
+		$(DEAL_II_TRILINOS_LIBPREFIX)sacado \
+		$(DEAL_II_TRILINOS_LIBPREFIX)thyra \
+		$(DEAL_II_TRILINOS_LIBPREFIX)thyraepetra \
+		$(DEAL_II_TRILINOS_LIBPREFIX)thyraepetraext \
+		$(DEAL_II_TRILINOS_LIBPREFIX)epetraext \
+		$(DEAL_II_TRILINOS_LIBPREFIX)epetra \
+		$(DEAL_II_TRILINOS_LIBPREFIX)teuchos \
+		$(DEAL_II_TRILINOS_LIBPREFIX)triutils
 
   ifeq ($(enable-shared),yes)
     lib-contrib-trilinos = \
