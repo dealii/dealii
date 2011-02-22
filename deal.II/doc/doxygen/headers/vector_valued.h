@@ -555,7 +555,7 @@ scalar_product (const Tensor<2,dim> &u,
  * @endcode
  *
  * So if, again, this is not the code we use in step-8, what do
- * we do there? The answer rests on the finite element we use. There, we use the
+ * we do there? The answer rests on the finite element we use. In step-8, we use the
  * following element:
  * @code
  *   FESystem<dim> finite_element (FE_Q<dim>(1), dim);
@@ -565,7 +565,8 @@ scalar_product (const Tensor<2,dim> &u,
  * "primitive" element: an element that may be vector-valued but where each
  * shape function has exactly one non-zero component. In other words: if the
  * $x$-component of a displacement shape function is nonzero, then the $y$-
- * and $z$-components must be zero and so on. What this means is that also
+ * and $z$-components must be zero and similarly for the other components.
+ * What this means is that also
  * derived quantities based on shape functions inherit this sparsity property.
  * For example: the divergence
  * $\mathrm{div}\ \Phi(x,y,z)=\partial_x\varphi_x(x,y,z) +
