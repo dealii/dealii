@@ -34,7 +34,7 @@
  *   <li>Complex-valued solutions consisting of real and imaginary parts, as
  *       discussed for example in step-29.
  * </ul>
- * 
+ *
  * This page gives an overview of how to implement such vector-valued problems
  * efficiently in deal.II.
  *
@@ -218,7 +218,7 @@
  * cells; this is done using the FE_DGQ class. The combined element will then
  * be described by
  * @code
- *   FESystem<dim> finite_element (FERaviartThomas<dim>(1), 1,
+ *   FESystem<dim> finite_element (FE_RaviartThomas<dim>(1), 1,
  *                                 FE_DGQ<dim>(1),          1);
  * @endcode
  * i.e. we combine a single copy of the Raviart-Thomas element with a single
@@ -245,7 +245,7 @@
  *
  *
  * @anchor VVAssembling
- * <h3>Assembling linear systems</h3> 
+ * <h3>Assembling linear systems</h3>
  *
  * The next step is to assemble the linear system. How to do this for the
  * simple case of a scalar problem has been shown in many tutorial programs,
@@ -261,7 +261,7 @@
   const FEValuesExtractors::Scalar pressure (dim);
 
   ...
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -273,8 +273,8 @@
 
       right_hand_side.value_list (fe_values.get_quadrature_points(),
                                   rhs_values);
-      
-      for (unsigned int q=0; q<n_q_points; ++q) 
+
+      for (unsigned int q=0; q<n_q_points; ++q)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -292,7 +292,7 @@
                               rhs_values[q] *
                               fe_values.JxW(q);
           }
- * @endcode 
+ * @endcode
  *
  * So here's what is happening:
  * <ul>
@@ -412,7 +412,7 @@
       const FEValuesExtractors::Vector displacements (0);
 
       ...
-      
+
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
@@ -420,20 +420,20 @@
 	      = fe_values[displacements].gradient (i,q_point);
 	    const double phi_i_div
 	      = fe_values[displacements].divergence (i,q_point);
-	  
-	    for (unsigned int j=0; j<dofs_per_cell; ++j) 
+
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      {
 		const Tensor<2,dim> phi_j_grad
 		  = fe_values[displacements].gradient (j,q_point);
 		const double phi_j_div
 		  = fe_values[displacements].divergence (j,q_point);
 
-		cell_matrix(i,j) 
+		cell_matrix(i,j)
 		  +=  (lambda_values[q_point] *
 		       phi_i_div * phi_j_div
 		       +
 		       mu_values[q_point] *
-		       scalar_product(phi_i_grad, phi_j_grad)		       
+		       scalar_product(phi_i_grad, phi_j_grad)
 		       +
 		       mu_values[q_point] *
 		       scalar_product(phi_i_grad, transpose(phi_j_grad))
@@ -442,7 +442,7 @@
 		      fe_values.JxW(q_point);
 	      }
 	  }
- * @endcode 
+ * @endcode
  *
  * The scalar product between two tensors used in this bilinear form is
  * implemented as follows:
@@ -459,14 +459,14 @@ scalar_product (const Tensor<2,dim> &u,
       tmp += u[i][j] * v[i][j];
   return tmp;
 }
- * @endcode 
+ * @endcode
  *
  * Now, this is not the code used in step-8. In fact,
  * if one used the above code over the one implemented in that program,
  * it would run about 8 per cent slower. It can be improved (bringing
  * down the penalty to about 4 per cent) by taking a close look at the
  * bilinear form. In fact, we can transform it as follows:
-@f{eqnarray*} 
+@f{eqnarray*}
   a({\mathbf u}, {\mathbf v})
   &=&
   \left(
@@ -492,7 +492,7 @@ scalar_product (const Tensor<2,dim> &u,
   \sum_{i,j}
   \left(
     \mu \partial_i u_j, \frac 12[\partial_i v_j + \partial_j v_i]
-  \right)_\Omega  
+  \right)_\Omega
   \\
   &=&
   \left(
@@ -533,15 +533,15 @@ scalar_product (const Tensor<2,dim> &u,
 	      = fe_values[displacements].symmetric_gradient (i,q_point);
 	    const double phi_i_div
 	      = fe_values[displacements].divergence (i,q_point);
-	  
-	    for (unsigned int j=0; j<dofs_per_cell; ++j) 
+
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      {
 		const SymmetricTensor<2,dim> phi_j_symmgrad
 		  = fe_values[displacements].symmetric_gradient (j,q_point);
 		const double phi_j_div
 		  = fe_values[displacements].divergence (j,q_point);
 
-		cell_matrix(i,j) 
+		cell_matrix(i,j)
 		  +=  (phi_i_div * phi_j_div *
 		       lambda_values[q_point]
 		       +
@@ -552,7 +552,7 @@ scalar_product (const Tensor<2,dim> &u,
 		      fe_values.JxW(q_point));
 	      }
 	  }
- * @endcode 
+ * @endcode
  *
  * So if, again, this is not the code we use in step-8, what do
  * we do there? The answer rests on the finite element we use. There, we use the
@@ -674,7 +674,7 @@ scalar_product (const Tensor<2,dim> &u,
   =
   \left(
   \begin{array}{c} F \\ G \end{array}
-  \right).  
+  \right).
 @f}
  * What this system means, of course, is
 @f{eqnarray*}
@@ -725,16 +725,16 @@ scalar_product (const Tensor<2,dim> &u,
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
     tmp += system_rhs.block(0);
-    
+
 
     SolverControl solver_control (solution.block(0).size(),
                                   1e-8*tmp.l2_norm());
     SolverCG<> cg (solver_control, vector_memory);
-  
+
     cg.solve (system_matrix.block(0,0),
               solution.block(0),
 	      tmp,
-              PreconditionIdentity());        
+              PreconditionIdentity());
  * @endcode
  *
  * What's happening here is that we allocate a temporary vector with as many
@@ -767,7 +767,7 @@ scalar_product (const Tensor<2,dim> &u,
  * @code
   std::vector<Vector<double> > local_solution_values (n_q_points,
                                                       Vector<double> (dim+1));
- 
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -800,8 +800,8 @@ scalar_product (const Tensor<2,dim> &u,
        Tensor<1,dim> velocity;
        for (unsigned int d=0; d<dim; ++d)
          velocity[d] = local_solution_values[q](d);
-	 
-       ... do something with this velocity ...				  
+
+       ... do something with this velocity ...
  * @endcode
  * Note how we convert from a dealii::Vector (which is simply a collection
  * of vector elements) into a <code>Tensor@<1,dim@></code> because the
@@ -815,7 +815,7 @@ scalar_product (const Tensor<2,dim> &u,
   std::vector<Tensor<1,dim> > local_velocity_values (n_q_points);
 
   const FEValuesExtractors::Vector velocities (0);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -842,7 +842,7 @@ scalar_product (const Tensor<2,dim> &u,
   std::vector<double> local_pressure_values (n_q_points);
 
   const FEValuesExtractors::Scalar pressure (dim);
-  
+
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -924,7 +924,7 @@ scalar_product (const Tensor<2,dim> &u,
   data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
-  data_out.build_patches (); 
+  data_out.build_patches ();
  * @endcode
  * In other words, we here create an array of <code>dim+1</code> elements in
  * which we store which elements of the finite element are vectors and which
@@ -936,8 +936,8 @@ scalar_product (const Tensor<2,dim> &u,
  * Visualization programs like Visit and Paraview will then offer to show
  * these <code>dim</code> components as vector fields, rather than as
  * individual scalar fields.
- * 
- * 
+ *
+ *
  * @ingroup feall feaccess
  */
- 
+
