@@ -270,7 +270,7 @@ class Timer
  *
  * Use of this class could be as follows:
  * @code
- *   TimerOuput timer (std::cout, TimerOutput::summary,
+ *   TimerOutput timer (std::cout, TimerOutput::summary,
  *                     TimerOutput::wall_times);
  *
  *   timer.enter_subsection ("Setup dof system");
