@@ -31,14 +31,11 @@
 
 void test()
 {
-  
-
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
-
 
   CompressedSimpleSparsityPattern csp(2*numprocs);
   for (unsigned int i=0;i<numprocs*2;++i)
@@ -88,8 +85,8 @@ int main(int argc, char *argv[])
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("petsc_01").c_str());
-//      deallog.attach(logfile);
-//      deallog.depth_console(0);
+      deallog.attach(logfile);
+      deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
 
       test();
