@@ -1090,6 +1090,92 @@ class VectorTools
      ConstraintMatrix& constraints,
      const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
+
+				     /**
+				      * Compute constraints that correspond to
+				      * boundary conditions of the form
+				      * $\vec{n}^T\vec{u}=\vec{n}^T\vec{f}$,
+				      * i.e. the normal components of $u$
+				      * and $f$ shall coincide.
+				      *
+				      * If the ConstraintMatrix @p constraints
+				      * contained values or other
+				      * constraints before, the new ones are
+				      * added or the old ones overwritten,
+				      * if a node of the boundary part to be
+				      * used was already in the list of
+				      * constraints. This is handled by
+				      * using inhomogeneous constraints. Please
+				      * note that when combining adaptive meshes
+				      * and this kind of constraints, the
+				      * Dirichlet conditions should be set
+				      * first, and then completed by hanging
+				      * node constraints, in order to make sure
+				      * that the discretization remains
+				      * consistent. See the discussion on
+				      * conflicting constraints in the
+				      * module on @ref constraints .
+				      *
+				      * This function is explecitly written to
+				      * use with the FE_RaviartThomas elements.
+				      * Thus it throws an exception, if it is
+				      * called with other finite elements.
+				      *
+				      * The second argument of this function
+				      * denotes the first vector component in
+				      * the finite element that corresponds to
+				      * the vector function that you want to
+				      * constrain. Vectors are implicitly
+				      * assumed to have exactly
+				      * <code>dim</code> components that are
+				      * ordered in the same way as we
+				      * usually order the coordinate directions,
+				      * i.e. $x$-, $y$-, and finally
+				      * $z$-component.
+				      *
+				      * The parameter @p boundary_component
+				      * corresponds to the number
+				      * @p boundary_indicator of the face. 255
+				      * is an illegal value, since it is
+				      * reserved for interior faces.
+				      *
+				      * The last argument is denoted to compute
+				      * the normal vector $\vec{n}$ at the
+				      * boundary points.
+				      *
+				      * <h4>Computing constraints</h4>
+				      *
+				      * To compute the constraints we use
+				      * interpolation operator proposed
+				      * in Brezzi, Fortin (Mixed and Hybrid
+				      * (Finite Element Methods, Springer,
+				      * 1991) on every face located at the
+				      * boundary.
+				      *
+				      * @ingroup constraints
+				      */
+   template<int dim>
+   static void project_boundary_values_div_conforming (const DoFHandler<dim>& dof_handler,
+     const unsigned int first_vector_component,
+     const Function<dim>& boundary_function,
+     const unsigned char boundary_component,
+     ConstraintMatrix& constraints,
+     const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
+
+				     /**
+				      * Same as above for the hp-namespace.
+				      *
+				      * @ingroup constraints
+				      */
+   template<int dim>
+   static void project_boundary_values_div_conforming (const hp::DoFHandler<dim>& dof_handler,
+     const unsigned int first_vector_component,
+     const Function<dim>& boundary_function,
+     const unsigned char boundary_component,
+     ConstraintMatrix& constraints,
+     const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
+   
+   
 				     /**
 				      * Compute the constraints that
 				      * correspond to boundary conditions of

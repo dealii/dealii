@@ -37,6 +37,7 @@
 #include <dofs/dof_tools.h>
 #include <fe/fe.h>
 #include <fe/fe_nedelec.h>
+#include <fe/fe_raviart_thomas.h>
 #include <fe/fe_tools.h>
 #include <fe/fe_values.h>
 #include <fe/fe_nedelec.h>
@@ -2650,12 +2651,12 @@ namespace internals {
     					            // faces.
     template<int dim, typename cell_iterator>
     void
-    compute_face_projection (const cell_iterator& cell,
-                             const unsigned int face,
-                             hp::FEValues<dim>& hp_fe_values,
-                             const Function<dim>& boundary_function,
-                             const unsigned int first_vector_component,
-                             std::vector<double>& dof_values)
+    compute_face_projection_curl_conforming (const cell_iterator& cell,
+                                             const unsigned int face,
+                                             hp::FEValues<dim>& hp_fe_values,
+                                             const Function<dim>& boundary_function,
+                                             const unsigned int first_vector_component,
+                                             std::vector<double>& dof_values)
     {
       hp_fe_values.reinit (cell, cell->active_fe_index ()
                                  * GeometryInfo<dim>::faces_per_cell + face);
@@ -3183,9 +3184,10 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // boundary function on
                                                    // the edge.
                   internals::VectorTools
-                    ::compute_face_projection (cell, face, fe_face_values,
-                                               boundary_function,
-                                               first_vector_component, dof_values);
+                    ::compute_face_projection_curl_conforming (cell, face, fe_face_values,
+                                                               boundary_function,
+                                                               first_vector_component,
+                                                               dof_values);
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
 
@@ -3318,10 +3320,10 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                        // on the interior of
                                                        // the face.
                       internals::VectorTools
-                        ::compute_face_projection (cell, face, fe_face_values,
-                                                   boundary_function,
-                                                   first_vector_component,
-                                                   dof_values);
+                        ::compute_face_projection_curl_conforming (cell, face, fe_face_values,
+                                                                   boundary_function,
+                                                                   first_vector_component,
+                                                                   dof_values);
 
                                                        // Mark the projected
                                                        // degrees of
@@ -3349,6 +3351,8 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
               constraints.add_line (dof);
               constraints.set_inhomogeneity (dof, computed_constraints[dof]);
             }
+        
+        break;
       }
 
       default:
@@ -3416,10 +3420,10 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                     dof_values[dof] = 0.0;
 
                   internals::VectorTools
-                    ::compute_face_projection (cell, face, fe_face_values,
-                                               boundary_function,
-                                               first_vector_component,
-                                               dof_values);
+                    ::compute_face_projection_curl_conforming (cell, face, fe_face_values,
+                                                               boundary_function,
+                                                               first_vector_component,
+                                                               dof_values);
                   face_dof_indices.resize (dofs_per_face);
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
@@ -3521,10 +3525,10 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                   if (degree > 0)
                     {
                       internals::VectorTools
-                        ::compute_face_projection (cell, face, fe_face_values,
-                                                   boundary_function,
-                                                   first_vector_component,
-                                                   dof_values);
+                        ::compute_face_projection_curl_conforming (cell, face, fe_face_values,
+                                                                   boundary_function,
+                                                                   first_vector_component,
+                                                                   dof_values);
 
                       for (unsigned int dof = GeometryInfo<dim>::lines_per_face * superdegree;
                            dof < dofs_per_face; ++dof)
@@ -3551,6 +3555,470 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
     }
 }
 
+
+namespace internals {
+  namespace VectorTools {
+    					            // This function computes the
+    					            // projection of the boundary
+    					            // function on the boundary
+    					            // in 2d.
+    template <typename cell_iterator>
+    void
+    compute_face_projection_div_conforming (const cell_iterator& cell,
+                                            const unsigned int face,
+                                            const FEFaceValues<2>& fe_values,
+                                            const unsigned int first_vector_component,
+                                            const Function<2>& boundary_function,
+                                            const std::vector<Tensor<2, 2> >& jacobians,
+                                            ConstraintMatrix& constraints)
+    {
+    					            // Compute the intergral over
+    					            // the product of the normal
+    					            // components of the boundary
+    					            // function times the normal
+    					            // components of the shape
+    					            // functions supported on the
+    					            // boundary.
+      const FEValuesExtractors::Vector vec (first_vector_component);
+      const FiniteElement<2>& fe = cell->get_fe ();
+      const std::vector<Point<2> >& normals = fe_values.get_normal_vectors ();
+      const unsigned int
+        face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1, 1, 0, 0};
+      std::vector<Vector<double> >
+        values (fe_values.n_quadrature_points, Vector<double> (2));
+      Vector<double> dof_values (fe.dofs_per_face);
+      
+                                    // Get the values of the
+                                    // boundary function at the
+                                    // quadrature points.
+      {
+        const std::vector<Point<2> >&
+          quadrature_points = fe_values.get_quadrature_points ();
+        
+        boundary_function.vector_value_list (quadrature_points, values);
+      }
+      
+      for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+      {
+        double tmp = 0.0;
+        
+        for (unsigned int d = 0; d < 2; ++d)
+          tmp += normals[q_point][d] * values[q_point] (d);
+        
+        tmp *= fe_values.JxW (q_point)
+            * std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
+                         * jacobians[q_point][0][face_coordinate_direction[face]]
+                         + jacobians[q_point][1][face_coordinate_direction[face]]
+                         * jacobians[q_point][1][face_coordinate_direction[face]]);
+        
+        for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+          dof_values (i) += tmp * (normals[q_point]
+                         * fe_values[vec].value (fe.face_to_cell_index (i, face), q_point));
+      }
+      
+      std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
+      
+      cell->face (face)->get_dof_indices (face_dof_indices, cell->active_fe_index ());
+      
+                                    // Copy the computed values
+                                    // in the ConstraintMatrix only,
+                                    // if the degree of freedom is
+                                    // not already constrained.
+      for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+        if (!(constraints.is_constrained (face_dof_indices[i])))
+        {
+          constraints.add_line (face_dof_indices[i]);
+          
+          if (std::abs (dof_values (i)) > 1e-14)
+            constraints.set_inhomogeneity (face_dof_indices[i], dof_values (i));
+        }
+    }
+    
+                                    // dummy implementation of above
+                                    // function for all other
+                                    // dimensions
+    template<int dim, typename cell_iterator>
+    void
+    compute_face_projection_div_conforming (const cell_iterator&,
+                                            const unsigned int,
+                                            const FEFaceValues<dim>&,
+                                            const unsigned int,
+                                            const Function<dim>&,
+                                            const std::vector<Tensor<2, dim> >&,
+                                            ConstraintMatrix&)
+    {
+      Assert (false, ExcNotImplemented ());
+    }
+    
+    					            // This function computes the
+    					            // projection of the boundary
+    					            // function on the boundary
+    					            // in 3d.
+    template<typename cell_iterator>
+    void
+    compute_face_projection_div_conforming (const cell_iterator& cell,
+                                            const unsigned int face,
+                                            const FEFaceValues<3>& fe_values,
+                                            const unsigned int first_vector_component,
+                                            const Function<3>& boundary_function,
+                                            const std::vector<Tensor<2, 3> >& jacobians,
+                                            std::vector<double>& dof_values,
+                                            std::vector<unsigned int>& projected_dofs)
+    {
+    					            // Compute the intergral over
+    					            // the product of the normal
+    					            // components of the boundary
+    					            // function times the normal
+    					            // components of the shape
+    					            // functions supported on the
+    					            // boundary.
+      const FEValuesExtractors::Vector vec (first_vector_component);
+      const FiniteElement<3>& fe = cell->get_fe ();
+      const std::vector<Point<3> >& normals = fe_values.get_normal_vectors ();
+      const unsigned int
+        face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2] = {{1, 2},
+                                                                          {1, 2},
+                                                                          {2, 0},
+                                                                          {2, 0},
+                                                                          {0, 1},
+                                                                          {0, 1}}; 
+      std::vector<Vector<double> >
+        values (fe_values.n_quadrature_points, Vector<double> (3));
+      Vector<double> dof_values_local (fe.dofs_per_face);
+      
+      {
+        const std::vector<Point<3> >&
+          quadrature_points = fe_values.get_quadrature_points ();
+        
+        boundary_function.vector_value_list (quadrature_points, values);
+      }
+      
+      for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
+      {
+        double tmp = 0.0;
+        
+        for (unsigned int d = 0; d < 3; ++d)
+          tmp += normals[q_point][d] * values[q_point] (d);
+        
+        tmp *= fe_values.JxW (q_point)
+            * std::sqrt ((jacobians[q_point][0][face_coordinate_directions[face][0]]
+                          * jacobians[q_point][0][face_coordinate_directions[face][0]]
+                          + jacobians[q_point][1][face_coordinate_directions[face][0]]
+                          * jacobians[q_point][1][face_coordinate_directions[face][0]]
+                          + jacobians[q_point][2][face_coordinate_directions[face][0]]
+                          * jacobians[q_point][2][face_coordinate_directions[face][0]])
+                         * (jacobians[q_point][0][face_coordinate_directions[face][1]]
+                            * jacobians[q_point][0][face_coordinate_directions[face][1]]
+                            + jacobians[q_point][1][face_coordinate_directions[face][1]]
+                            * jacobians[q_point][1][face_coordinate_directions[face][1]]
+                            + jacobians[q_point][2][face_coordinate_directions[face][1]]
+                            * jacobians[q_point][2][face_coordinate_directions[face][1]]));
+        
+        for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+          dof_values_local (i) += tmp * (normals[q_point]
+                               * fe_values[vec].value (fe.face_to_cell_index (i, face), q_point));
+      }
+      
+      std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
+      
+      cell->face (face)->get_dof_indices (face_dof_indices, cell->active_fe_index ());
+      
+      for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
+        if (projected_dofs[face_dof_indices[i]] < fe.degree)
+        {
+          dof_values[face_dof_indices[i]] = dof_values_local (i);
+          projected_dofs[face_dof_indices[i]] = fe.degree;
+        }
+    }
+    
+                                    // dummy implementation of above
+                                    // function for all other
+                                    // dimensions
+    template<int dim, typename cell_iterator>
+    void
+    compute_face_projection_div_conforming (const cell_iterator&,
+                                            const unsigned int,
+                                            const FEFaceValues<dim>&,
+                                            const unsigned int,
+                                            const Function<dim>&,
+                                            const std::vector<Tensor<2, dim> >&,
+                                            std::vector<double>&,
+                                            std::vector<unsigned int>&)
+    {
+      Assert (false, ExcNotImplemented ());
+    }
+  }
+}
+
+
+template <int dim>
+void
+VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_handler,
+                                                     const unsigned int first_vector_component,
+                                                     const Function<dim>& boundary_function,
+                                                     const unsigned char boundary_component,
+                                                     ConstraintMatrix& constraints,
+                                                     const Mapping<dim>& mapping)
+{
+                                                   // Interpolate the normal components
+                                                   // of the boundary functions. Since
+                                                   // the Raviart-Thomas elements are
+                                                   // constructed from a Lagrangian
+                                                   // basis, it suffices to compute
+                                                   // the integral over the product
+                                                   // of the normal components of the
+                                                   // boundary function times the
+                                                   // normal components of the shape
+                                                   // functions supported on the
+                                                   // boundary.
+  const FiniteElement<dim>& fe = dof_handler.get_fe ();
+  QGauss<dim - 1> face_quadrature (fe.degree + 1);
+  FEFaceValues<dim> fe_face_values (mapping, fe, face_quadrature, update_JxW_values |
+                                                                  update_normal_vectors |
+                                                                  update_quadrature_points |
+                                                                  update_values);
+  hp::FECollection<dim> fe_collection (fe);
+  hp::MappingCollection<dim> mapping_collection (mapping);
+  hp::QCollection<dim> quadrature_collection;
+  
+  for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+    quadrature_collection.push_back (QProjector<dim>::project_to_face (face_quadrature,
+                                                                       face));
+  
+  hp::FEValues<dim> fe_values (mapping_collection, fe_collection, quadrature_collection,
+                               update_jacobians);
+  
+  switch (dim)
+  {
+    case 2:
+    {
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
+           cell != dof_handler.end (); ++cell)
+        if (cell->at_boundary ())
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face (face)->boundary_indicator () == boundary_component)
+            {
+                                                   // this is only
+                                                   // implemented, if the
+                                                   // FE is a Raviart-Thomas
+                                                   // element
+              typedef FiniteElement<dim> FEL;
+              
+              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                           typename FEL::ExcInterpolationNotImplemented ());
+              fe_values.reinit (cell, face + cell->active_fe_index ()
+                                           * GeometryInfo<dim>::faces_per_cell);
+              
+              const std::vector<Tensor<2, dim> >&
+                jacobians = fe_values.get_present_fe_values ().get_jacobians ();
+              
+              fe_face_values.reinit (cell, face);
+              internals::VectorTools::compute_face_projection_div_conforming (cell, face,
+                                                                              fe_face_values,
+                                                                              first_vector_component,
+                                                                              boundary_function,
+                                                                              jacobians,
+                                                                              constraints);
+            }
+      
+      break;
+    }
+    
+    case 3:
+    {
+                                                   // In three dimensions the
+                                                   // edges between two faces
+                                                   // are treated twice. 
+                                                   // Therefore we store the
+                                                   // computed values in a
+                                                   // vector and copy them over
+                                                   // in the ConstraintMatrix
+                                                   // after all values have been
+                                                   // computed.
+                                                   // If we have two values for
+                                                   // one edge, we choose the one,
+                                                   // which was computed with the
+                                                   // higher order element.
+                                                   // If both elements are of the
+                                                   // same order, we just keep the
+                                                   // first value and do not
+                                                   // compute a second one.
+      const unsigned int& n_dofs = dof_handler.n_dofs ();
+      std::vector<double> dof_values (n_dofs);
+      std::vector<unsigned int> projected_dofs (n_dofs);
+      
+      for (unsigned int dof = 0; dof < n_dofs; ++dof)
+        projected_dofs[dof] = 0;
+      
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
+           cell != dof_handler.end (); ++cell)
+        if (cell->at_boundary ())
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face (face)->boundary_indicator () == boundary_component)
+            {
+                                                   // this is only
+                                                   // implemented, if the
+                                                   // FE is a Raviart-Thomas
+                                                   // element
+              typedef FiniteElement<dim> FEL;
+              
+              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                           typename FEL::ExcInterpolationNotImplemented ());
+              fe_values.reinit (cell, face + cell->active_fe_index ()
+                                           * GeometryInfo<dim>::faces_per_cell);
+              
+              const std::vector<Tensor<2, dim> >&
+                jacobians = fe_values.get_present_fe_values ().get_jacobians ();
+              
+              fe_face_values.reinit (cell, face);
+              internals::VectorTools::compute_face_projection_div_conforming (cell, face,
+                                                                              fe_face_values,
+                                                                              first_vector_component,
+                                                                              boundary_function,
+                                                                              jacobians, dof_values,
+                                                                              projected_dofs);
+            }
+      
+      for (unsigned int dof = 0; dof < n_dofs; ++dof)
+        if ((projected_dofs[dof] != 0) && !(constraints.is_constrained (dof)))
+        {
+          constraints.add_line (dof);
+          
+          if (std::abs (dof_values[dof]) > 1e-14)
+            constraints.set_inhomogeneity (dof, dof_values[dof]);
+        }
+      
+      break;
+    }
+    
+    default:
+      Assert (false, ExcNotImplemented ());
+  }
+}
+
+
+template <int dim>
+void
+VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& dof_handler,
+                                                     const unsigned int first_vector_component,
+                                                     const Function<dim>& boundary_function,
+                                                     const unsigned char boundary_component,
+                                                     ConstraintMatrix& constraints,
+                                                     const hp::MappingCollection<dim, dim>& mapping_collection)
+{
+  const hp::FECollection<dim>& fe_collection = dof_handler.get_fe ();
+  hp::QCollection<dim - 1> face_quadrature_collection;
+  hp::QCollection<dim> quadrature_collection;
+  
+  for (unsigned int i = 0; i < fe_collection.size (); ++i)
+  {
+  	const QGauss<dim - 1> quadrature (fe_collection[i].degree + 1);
+  	
+    face_quadrature_collection.push_back (quadrature);
+    
+    for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+      quadrature_collection.push_back (QProjector<dim>::project_to_face (quadrature,
+                                                                         face));
+  }
+  
+  hp::FEFaceValues<dim> fe_face_values (mapping_collection, fe_collection,
+                                        face_quadrature_collection, update_JxW_values |
+                                                                    update_normal_vectors |
+                                                                    update_quadrature_points |
+                                                                    update_values);
+  hp::FEValues<dim> fe_values (mapping_collection, fe_collection, quadrature_collection,
+                               update_jacobians);
+  
+  switch (dim)
+  {
+    case 2:
+    {
+      for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
+           cell != dof_handler.end (); ++cell)
+        if (cell->at_boundary ())
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face (face)->boundary_indicator () == boundary_component)
+            {
+                                                   // this is only
+                                                   // implemented, if the
+                                                   // FE is a Raviart-Thomas
+                                                   // element
+              typedef FiniteElement<dim> FEL;
+              
+              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                           typename FEL::ExcInterpolationNotImplemented ());
+              fe_values.reinit (cell, face + cell->active_fe_index ()
+                                           * GeometryInfo<dim>::faces_per_cell);
+              
+              const std::vector<Tensor<2, dim> >&
+                jacobians = fe_values.get_present_fe_values ().get_jacobians ();
+              
+              fe_face_values.reinit (cell, face);
+              internals::VectorTools::compute_face_projection_div_conforming (cell, face,
+                                                                              fe_face_values.get_present_fe_values (),
+                                                                              first_vector_component,
+                                                                              boundary_function,
+                                                                              jacobians,
+                                                                              constraints);
+            }
+      
+      break;
+    }
+    
+    case 3:
+    {
+      const unsigned int& n_dofs = dof_handler.n_dofs ();
+      std::vector<double> dof_values (n_dofs);
+      std::vector<unsigned int> projected_dofs (n_dofs);
+      
+      for (unsigned int dof = 0; dof < n_dofs; ++dof)
+        projected_dofs[dof] = 0;
+      
+      for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
+           cell != dof_handler.end (); ++cell)
+        if (cell->at_boundary ())
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
+            if (cell->face (face)->boundary_indicator () == boundary_component)
+            {
+                                                   // this is only
+                                                   // implemented, if the
+                                                   // FE is a Raviart-Thomas
+                                                   // element
+              typedef FiniteElement<dim> FEL;
+              
+              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                           typename FEL::ExcInterpolationNotImplemented ());
+              fe_values.reinit (cell, face + cell->active_fe_index ()
+                                           * GeometryInfo<dim>::faces_per_cell);
+              
+              const std::vector<Tensor<2, dim> >&
+                jacobians = fe_values.get_present_fe_values ().get_jacobians ();
+              
+              fe_face_values.reinit (cell, face);
+              internals::VectorTools::compute_face_projection_div_conforming (cell, face,
+                                                                              fe_face_values.get_present_fe_values (),
+                                                                              first_vector_component,
+                                                                              boundary_function,
+                                                                              jacobians, dof_values,
+                                                                              projected_dofs);
+            }
+      
+      for (unsigned int dof = 0; dof < n_dofs; ++dof)
+        if ((projected_dofs[dof] != 0) && !(constraints.is_constrained (dof)))
+        {
+          constraints.add_line (dof);
+          
+          if (std::abs (dof_values[dof]) > 1e-14)
+            constraints.set_inhomogeneity (dof, dof_values[dof]);
+        }
+      
+      break;
+    }
+    
+    default:
+      Assert (false, ExcNotImplemented ());
+  }
+}
 
 
 template <int dim, template <int, int> class DH, int spacedim>

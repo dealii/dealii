@@ -652,6 +652,22 @@ void VectorTools::project_boundary_values_curl_conforming<deal_II_dimension>
  ConstraintMatrix&,
  const hp::MappingCollection<deal_II_dimension>&);
 template
+void VectorTools::project_boundary_values_div_conforming<deal_II_dimension>
+(const DoFHandler<deal_II_dimension>&,
+ const unsigned int,
+ const Function<deal_II_dimension>&,
+ const unsigned char,
+ ConstraintMatrix&,
+ const Mapping<deal_II_dimension>&);
+template
+void VectorTools::project_boundary_values_div_conforming<deal_II_dimension>
+(const hp::DoFHandler<deal_II_dimension>&,
+ const unsigned int,
+ const Function<deal_II_dimension>&,
+ const unsigned char,
+ ConstraintMatrix&,
+ const hp::MappingCollection<deal_II_dimension>&);
+template
 void
 VectorTools::compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
 						 const unsigned int     first_vector_component,
