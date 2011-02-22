@@ -38,6 +38,7 @@
 #include <fe/fe.h>
 #include <fe/fe_nedelec.h>
 #include <fe/fe_raviart_thomas.h>
+#include <fe/fe_system.h>
 #include <fe/fe_tools.h>
 #include <fe/fe_values.h>
 #include <fe/fe_nedelec.h>
@@ -3404,13 +3405,19 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
-                                                   // this is only
+                                                   // This is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
-                                                   // element
-                  typedef FiniteElement<dim> FEL;
-                  AssertThrow (dynamic_cast<const FE_Nedelec<dim> *> (&cell->get_fe ()) != 0,
-                               typename FEL::ExcInterpolationNotImplemented ());
+                                                   // element. If the FE is
+                                                   // a FESystem we cannot
+                                                   // check this.
+                  if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+                  {
+                    typedef FiniteElement<dim> FEL;
+                    
+                    AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
+                                 typename FEL::ExcInterpolationNotImplemented ());
+                  }
 
                   const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
 
@@ -3476,13 +3483,19 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
-                                                   // this is only
+                                                   // This is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
-                                                   // element
-                  typedef FiniteElement<dim> FEL;
-                  AssertThrow (dynamic_cast<const FE_Nedelec<dim> *> (&cell->get_fe ()) != 0,
-                               typename FEL::ExcInterpolationNotImplemented ());
+                                                   // element. If the FE is
+                                                   // a FESystem we cannot
+                                                   // check this.
+                  if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+                  {
+                    typedef FiniteElement<dim> FEL;
+                    
+                    AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
+                                 typename FEL::ExcInterpolationNotImplemented ());
+                  }
 
                   const unsigned int superdegree = cell->get_fe ().degree;
                   const unsigned int degree = superdegree - 1;
@@ -3798,14 +3811,20 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face (face)->boundary_indicator () == boundary_component)
             {
-                                                   // this is only
+                                                   // This is only
                                                    // implemented, if the
                                                    // FE is a Raviart-Thomas
-                                                   // element
-              typedef FiniteElement<dim> FEL;
+                                                   // element. If the FE is
+                                                   // a FESystem we cannot
+                                                   // check this.
+              if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+              {
+                typedef FiniteElement<dim> FEL;
+                
+                AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                             typename FEL::ExcInterpolationNotImplemented ());
+              }
               
-              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
-                           typename FEL::ExcInterpolationNotImplemented ());
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
               
@@ -3856,14 +3875,20 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face (face)->boundary_indicator () == boundary_component)
             {
-                                                   // this is only
+                                                   // This is only
                                                    // implemented, if the
                                                    // FE is a Raviart-Thomas
-                                                   // element
-              typedef FiniteElement<dim> FEL;
+                                                   // element. If the FE is
+                                                   // a FESystem we cannot
+                                                   // check this.
+              if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+              {
+                typedef FiniteElement<dim> FEL;
+                
+                AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                             typename FEL::ExcInterpolationNotImplemented ());
+              }
               
-              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
-                           typename FEL::ExcInterpolationNotImplemented ());
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
               
@@ -3939,14 +3964,20 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face (face)->boundary_indicator () == boundary_component)
             {
-                                                   // this is only
+                                                   // This is only
                                                    // implemented, if the
                                                    // FE is a Raviart-Thomas
-                                                   // element
-              typedef FiniteElement<dim> FEL;
+                                                   // element. If the FE is
+                                                   // a FESystem we cannot
+                                                   // check this.
+              if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+              {
+                typedef FiniteElement<dim> FEL;
+                
+                AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                             typename FEL::ExcInterpolationNotImplemented ());
+              }
               
-              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
-                           typename FEL::ExcInterpolationNotImplemented ());
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
               
@@ -3980,14 +4011,20 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face (face)->boundary_indicator () == boundary_component)
             {
-                                                   // this is only
+                                                   // This is only
                                                    // implemented, if the
                                                    // FE is a Raviart-Thomas
-                                                   // element
-              typedef FiniteElement<dim> FEL;
+                                                   // element. If the FE is
+                                                   // a FESystem we cannot
+                                                   // check this.
+              if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+              {
+                typedef FiniteElement<dim> FEL;
+                
+                AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
+                             typename FEL::ExcInterpolationNotImplemented ());
+              }
               
-              AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
-                           typename FEL::ExcInterpolationNotImplemented ());
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
               
