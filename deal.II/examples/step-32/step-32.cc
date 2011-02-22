@@ -117,7 +117,16 @@ namespace EquationData
 
   const double year_in_seconds  = 60*60*24*365.2425;
 
-  const double pressure_scaling = eta / (R1-R0);
+//TODO: document in intro.dox
+				   // scale not by R1-R0, but by a
+				   // typical length scale, say 10km,
+				   // of variation ("plume
+				   // diameter"). this choice also
+				   // roughly equilibrates the sizes
+				   // of the velocity and pressure
+				   // components of the solution
+				   // vectors
+  const double pressure_scaling = eta / 10000;
 
 
   double density (const double temperature)
@@ -3212,25 +3221,25 @@ void BoussinesqFlowProblem<dim>::output_results ()
     double my_cells_error = 0.0;
     QGauss<1>      q_base(stokes_degree+1);
     QIterated<dim> err_quadrature(q_base, 2);
-    
+
     const unsigned int n_q_points =  err_quadrature.size();
     FEValues<dim> fe_values (stokes_fe,  err_quadrature, update_JxW_values | update_gradients);
     const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
     const FEValuesExtractors::Vector velocities (0);
 
     std::vector<unsigned int> local_dof_indices (fe_values.dofs_per_cell);
-    
-    
+
+
     typename DoFHandler<dim>::active_cell_iterator
       cell = stokes_dof_handler.begin_active(),
       endc = stokes_dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() == 
+      if (cell->subdomain_id() ==
 	  Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
 	{
 	  fe_values.reinit (cell);
 	  cell->get_dof_indices(local_dof_indices);
-	  
+
 	  double cell_error = 0.0;
 	  for (unsigned int q = 0; q < n_q_points; ++q)
 	    {
