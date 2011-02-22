@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2005, 2006, 2007, 2008, 2010 by the deal.II authors */
+/*    Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -1126,6 +1126,26 @@ void MixedLaplaceProblem<dim>::compute_errors () const
                                  // the solution. See the step-7
                                  // tutorial program for more
                                  // information on this.
+				 //
+				 // Note that we output the <code>dim+1</code>
+				 // components of the solution vector as a
+				 // collection of individual scalars
+				 // here. Most visualization programs will
+				 // then only offer to visualize them
+				 // individually, rather than allowing us to
+				 // plot the flow field as a vector
+				 // field. However, as explained in the
+				 // corresponding function of step-22 or the
+				 // @ref VVOutput "Generating graphical output"
+				 // section of the @ref vector_valued module,
+				 // instructing the DataOut class to identify
+				 // components of the FESystem object as
+				 // elements of a <code>dim</code>-dimensional
+				 // vector is not actually very difficult and
+				 // will then allow us to show results as
+				 // vector plots. We skip this here for
+				 // simplicity and refer to the links above
+				 // for more information.
 template <int dim>
 void MixedLaplaceProblem<dim>::output_results () const
 {
