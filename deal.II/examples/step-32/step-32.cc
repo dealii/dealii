@@ -3206,13 +3206,6 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
   computing_timer.enter_section ("Postprocessing");
-  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-
-  KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
-                                      QGauss<dim-1>(temperature_degree+1),
-                                      typename FunctionMap<dim>::type(),
-                                      temperature_solution,
-                                      estimated_error_per_cell);
 
   const FESystem<dim> joint_fe (stokes_fe, 1,
                                 temperature_fe, 1);
