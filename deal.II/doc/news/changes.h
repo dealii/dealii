@@ -84,6 +84,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existant SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
+<br>
+(Timo Heister, 2011/02/23)
+</li>
+
 <li> Fixed: It wasn't possible to use the FE_Nothing element inside an FESystem
 object and hand the result over to an FEValues object. This is now fixed.
 <br>
