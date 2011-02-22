@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,6 +48,7 @@
  *  <li> @ref VVAlternative "An alternative approach"
  *  <li> @ref VVBlockSolvers "Block solvers"
  *  <li> @ref VVExtracting "Extracting data from solutions"
+ *  <li> @ref VVOutput "Generating graphical output"
  * </ol> </td> </tr> </table>
  *
  *
@@ -180,7 +181,7 @@
  * Once we have settled on this description, we need to find a way to describe
  * the vector-valued finite element space from which we draw solution and test
  * functions. This is where the FESystem class comes in: it composes
- * vector-valued finite element spaces from simpler one. For example, if we
+ * vector-valued finite element spaces from simpler ones. For example, if we
  * were to attempt to use $Q_1$ elements for all <code>dim</code> components
  * of $\mathbf u$ and the one pressure component $p$, we could use the
  * following object:
@@ -236,7 +237,7 @@
  * represent scalar fields (e.g. temperature, pressure, concentration) and/or
  * if any of its components are parts of vector fields (velocities,
  * displacements) or tensors (e.g. stresses). As a consequence, the FEValues
- * objects we use below to evaluate finite element shape functions at
+ * object we use below to evaluate finite element shape functions at
  * quadrature points only knows that it has a finite element with a number
  * of vector components, but doesn't know how to group them. We will show
  * how to give these components a logical connection using the
@@ -251,10 +252,10 @@
  * starting with step-3. Here we will show how to do it for
  * vector problems.
  *
- * How to do this is possibly best explained by showing an example
+ * The whole concept is probably best explained by showing an example
  * illustrating how the local contribution of a cell to the weak form of above
- * mixed Laplace equations could be assembled. This is essentially how @ref
- * step_20 "step-20" does it:
+ * mixed Laplace equations could be assembled. This is essentially how
+ * step-20 does it:
  * @code
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
@@ -312,8 +313,8 @@
  *        and right hand side vector. Recall that the cell contributions
  *        to the bilinear form (i.e. neglecting boundary terms) looked as
  *        follows, based on shape functions
- *        $V_i=\left(\begin{array}{c}\mathbf v_i q_i\end{array}\right),
- *         V_j=\left(\begin{array}{c}\mathbf v_j q_j\end{array}\right)$:
+ *        $V_i=\left(\begin{array}{c}\mathbf v_i \\ q_i\end{array}\right),
+ *         V_j=\left(\begin{array}{c}\mathbf v_j \\ q_j\end{array}\right)$:
           @f{eqnarray*}
             (\mathbf v_i, \mathbf v_j)
 	    -
@@ -330,8 +331,9 @@
 				    fe_values[pressure].value (j, q)
                                     -
 				    fe_values[pressure].value (i, q) *
-				    fe_values[velocities].divergence (j, q)) *
-                                    fe_values.JxW(q);
+				    fe_values[velocities].divergence (j, q)
+				   ) *
+                                   fe_values.JxW(q);
  *        @endcode
  *        The similarities are pretty obvious.
  *
@@ -371,7 +373,7 @@
  * Other examples of using extractors and views are shown in tutorial programs
  * step-21,
  * step-22,
- * step-31 and a few other programs.
+ * step-31 and several other programs.
  *
  *
  * @anchor VVAlternative
@@ -404,7 +406,7 @@
  * parameters. Given our discussions above, the obvious way to implement this
  * bilinear form would be as follows, using an extractor object that interprets
  * all <code>dim</code> components of the finite element as single vector,
- * rather than disjoint components:
+ * rather than disjoint scalar components:
  *
  * @code
       const FEValuesExtractors::Vector displacements (0);
@@ -427,14 +429,15 @@
 		  = fe_values[displacements].divergence (j,q_point);
 
 		cell_matrix(i,j) 
-		  +=  (phi_i_div * phi_j_div *
-		       lambda_values[q_point]
+		  +=  (lambda_values[q_point] *
+		       phi_i_div * phi_j_div
 		       +
-		       scalar_product(phi_i_grad, phi_j_grad) *
-		       mu_values[q_point]
+		       mu_values[q_point] *
+		       scalar_product(phi_i_grad, phi_j_grad)		       
 		       +
-		       scalar_product(phi_i_grad, transpose(phi_j_grad)) *
-		       mu_values[q_point])
+		       mu_values[q_point] *
+		       scalar_product(phi_i_grad, transpose(phi_j_grad))
+		      )
 		      *
 		      fe_values.JxW(q_point);
 	      }
@@ -861,7 +864,7 @@ scalar_product (const Tensor<2,dim> &u,
  * Likewise, to extract the gradients of scalar components,
  * FEValuesViews::Scalar::get_function_gradients and
  * FEValuesViews::Scalar::get_function_hessians do the job.
- * For vector-(tensor-)valued quantities, there are functions
+ * For vector- (tensor-)valued quantities, there are functions
  * FEValuesViews::Vector::get_function_gradients and
  * FEValuesViews::Vector::get_function_hessians, and in
  * addition
@@ -874,6 +877,67 @@ scalar_product (const Tensor<2,dim> &u,
  * FEValuesViews::Scalar::get_function_laplacians and
  * FEValuesViews::Vector::get_function_laplacians.
  *
+ *
+ * @anchor VVOutput
+ * <h3>Generating graphical output</h3>
+ *
+ * As mentioned above, an FESystem object may hold multiple vector components,
+ * but it doesn't have a notion what they actually mean. As an example, take
+ * the object
+ * @code
+ *   FESystem<dim> finite_element (FE_Q<dim>(1), dim+1);
+ * @endcode
+ * It has <code>dim+1</code> vector components, but what do they mean? Are they
+ * the <code>dim</code> components of a velocity vector plus one pressure? Are
+ * they the pressure plus the <code>dim</code> velocity components? Or are
+ * they a collection of scalars?
+ *
+ * The point is that the FESystem class doesn't care. The <i>interpretation</i>
+ * of what the components mean is up to the person who uses the element later,
+ * for example in assembling a linear form, or in extracting data solution
+ * components for a linearized system in the next Newton step. In almost
+ * all cases, this interpretation happens at the place where it is needed.
+ *
+ * There is one case where one has to be explicit, however, and that is in
+ * generating graphical output. The reason is that many file formats for
+ * visualization want data that represents vectors (e.g. velocities,
+ * displacements, etc) to be stored separately from scalars (pressures,
+ * densities, etc), and there often is no way to group a bunch of scalars into
+ * a vector field from within a visualization program.
+ *
+ * To achieve this, we need to let the DataOut class and friends know which
+ * components of the FESystem form vectors (with <code>dim</code> components)
+ * and which are scalars. This is shown, for example, in step-22 where we
+ * generate output as follows:
+ * @code
+  std::vector<std::string> solution_names (dim, "velocity");
+  solution_names.push_back ("pressure");
+
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    data_component_interpretation
+    (dim, DataComponentInterpretation::component_is_part_of_vector);
+  data_component_interpretation
+    .push_back (DataComponentInterpretation::component_is_scalar);
+
+  DataOut<dim> data_out;
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (solution, solution_names,
+			    DataOut<dim>::type_dof_data,
+			    data_component_interpretation);
+  data_out.build_patches (); 
+ * @endcode
+ * In other words, we here create an array of <code>dim+1</code> elements in
+ * which we store which elements of the finite element are vectors and which
+ * are scalars; the array is filled with <code>dim</code> copies of
+ * DataComponentInterpretation::component_is_part_of_vector and a single
+ * trailing element of DataComponentInterpretation::component_is_scalar . The
+ * array is then given as an extra argument to DataOut::add_data_vector to
+ * explain how the data in the given solution vector is to be interpreted.
+ * Visualization programs like Visit and Paraview will then offer to show
+ * these <code>dim</code> components as vector fields, rather than as
+ * individual scalar fields.
+ * 
+ * 
  * @ingroup feall feaccess
  */
  
