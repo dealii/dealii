@@ -58,8 +58,8 @@ void test()
   
   mat.compress();
 
-//  std::vector<unsigned int> rows(1,1);
-//    mat.clear_rows(rows);
+  std::vector<unsigned int> rows(1,1);
+  mat.clear_rows(rows);
   
 //    mat.write_ascii();
   if (myid==0)
