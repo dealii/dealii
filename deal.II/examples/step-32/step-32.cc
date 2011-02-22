@@ -152,7 +152,7 @@ namespace EquationData
 				     // we can integrate the pressure
 				     // equation in depth to get that
 				     // the adiabatic pressure equals
-				     //   P(r) = rho_0 \int_r^{R_1} g(r) dr
+				     //   $P(r) = rho_0 \int_r^{R_1} g(r) dr$
 				     //
 				     // using the model for the
 				     // gravity vector above, this
@@ -167,7 +167,7 @@ namespace EquationData
   {
 				     // the static, adiabatic
 				     // temperature satisfies
-				     //    dT/dr = -T alpha/c_P g
+				     //    $dT/dr = -T alpha/c_P g$
 
 				     // let's assume constant gravity,
 				     // then we get by integration
