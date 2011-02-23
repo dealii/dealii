@@ -158,7 +158,9 @@ namespace internal
                                            // take it
           if ((domination == FiniteElementDomination::this_element_dominates)
               ||
-              (domination == FiniteElementDomination::either_element_can_dominate))
+              (domination == FiniteElementDomination::either_element_can_dominate)
+              ||
+              (domination == FiniteElementDomination::no_requirements))
             break;
         }
 

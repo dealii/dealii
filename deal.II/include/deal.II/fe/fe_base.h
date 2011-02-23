@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -111,6 +111,17 @@ namespace FiniteElementDomination
 				    * options open until we get to the
 				    * second base element.
 				    *
+				    * Finally, the code
+				    * no_requirements exists for cases
+				    * where elements impose no
+				    * continuity requirements. The
+				    * case is primarily meant for
+				    * FE_Nothing which is an element
+				    * that has no degrees of freedom
+				    * in a subdomain. It could also be
+				    * used by discontinuous elements,
+				    * for example.
+				    *
 				    * More details on domination can be found
 				    * in the @ref hp_paper "hp paper".
 				    */
@@ -119,7 +130,8 @@ namespace FiniteElementDomination
 	this_element_dominates,
 	other_element_dominates,
 	neither_element_dominates,
-	either_element_can_dominate
+	either_element_can_dominate,
+        no_requirements
   };
 
 
@@ -231,13 +243,13 @@ class FiniteElementData
 					    * system.
 					    */
 	  unknown = 0x00,
-	  
+
 					   /**
 					    * Discontinuous
 					    * elements. See above!
 					    */
 	  L2 = 0x01,
-	  
+
 					   /**
 					    * Conformity with the
 					    * space
@@ -247,7 +259,7 @@ class FiniteElementData
 					    * field)
 					    */
 	  Hcurl = 0x02,
-	  
+
 					   /**
 					    * Conformity with the
 					    * space
@@ -257,7 +269,7 @@ class FiniteElementData
 					    * field)
 					    */
 	  Hdiv = 0x04,
-	  
+
 					   /**
 					    * Conformity with the
 					    * space
@@ -265,7 +277,7 @@ class FiniteElementData
 					    * (continuous)
 					    */
 	  H1 = Hcurl | Hdiv,
-	  
+
 					   /**
 					    * Conformity with the
 					    * space
@@ -282,7 +294,7 @@ class FiniteElementData
 				      * parameter <tt>dim</tt>
 				      */
     static const unsigned int dimension = dim;
-    
+
 				     /**
 				      * Number of degrees of freedom on
 				      * a vertex.
@@ -318,22 +330,22 @@ class FiniteElementData
 				      * First index of dof on a line.
 				      */
     const unsigned int first_line_index;
-    
+
 				     /**
 				      * First index of dof on a quad.
 				      */
     const unsigned int first_quad_index;
-    
+
 				     /**
 				      * First index of dof on a hexahedron.
 				      */
     const unsigned int first_hex_index;
-    
+
 				     /**
 				      * First index of dof on a line for face data.
 				      */
     const unsigned int first_face_line_index;
-    
+
 				     /**
 				      * First index of dof on a quad for face data.
 				      */
@@ -349,7 +361,7 @@ class FiniteElementData
 				      * face.
 				      */
     const unsigned int dofs_per_face;
-    
+
 				     /**
 				      * Total number of degrees of freedom
 				      * on a cell. This is the
@@ -392,7 +404,7 @@ class FiniteElementData
 				      * element multiplicities.
 				      */
     const unsigned int blocks;
-    
+
 				     /**
 				      * Maximal polynomial degree of a
 				      * shape function in a single
@@ -404,7 +416,7 @@ class FiniteElementData
 				      * Indicate the space this element conforms to.
 				      */
     const Conformity conforming_space;
-    
+
     				     /**
 				      * Default
 				      * constructor. Constructs an
@@ -506,7 +518,7 @@ class FiniteElementData
 				      */
     template <int structdim>
     unsigned int n_dofs_per_object () const;
-    
+
     				     /**
 				      * Number of components.
 				      */
@@ -534,7 +546,7 @@ class FiniteElementData
 				      * the constructor.
 				      */
     bool is_primitive () const;
-    
+
 				     /**
 				      * Maximal polynomial degree of a
 				      * shape function in a single
@@ -564,14 +576,14 @@ class FiniteElementData
 				      * ordering of indices on a face,
 				      * return the index of the same
 				      * degree of freedom on the cell.
-				      * 
+				      *
 				      */
     unsigned int face_to_cell_index (const unsigned int face_index,
 				     const unsigned int face,
 				     const bool face_orientation = true,
 				     const bool face_flip        = false,
 				     const bool face_rotation    = false) const;
-    
+
 				     /**
 				      * @deprecated This function is
 				      * just a special version of
@@ -611,7 +623,7 @@ class FiniteElementData
 				      *
 				      */
     unsigned int face_to_equivalent_cell_index (const unsigned int index) const;
-    
+
 				     /**
 				      * Comparison operator.
 				      */
@@ -628,7 +640,7 @@ class FiniteElementData
 				      * for details.
 				      */
     void set_primitivity(const bool value);
-    
+
   private:
 				     /**
 				      * Store whether all shape
@@ -674,7 +686,7 @@ namespace FiniteElementDomination
 		return this_element_dominates;
 	      else
 		return neither_element_dominates;
-	      
+
 	case other_element_dominates:
 	      if ((d2 == other_element_dominates) ||
 		  (d2 == either_element_can_dominate))
@@ -686,6 +698,7 @@ namespace FiniteElementDomination
 	      return neither_element_dominates;
 
 	case either_element_can_dominate:
+        case no_requirements:
 	      return d2;
 
 	default:
@@ -700,7 +713,7 @@ namespace FiniteElementDomination
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_dofs_per_vertex () const
 {
   return dofs_per_vertex;
@@ -710,7 +723,7 @@ FiniteElementData<dim>::n_dofs_per_vertex () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_dofs_per_line () const
 {
   return dofs_per_line;
@@ -720,7 +733,7 @@ FiniteElementData<dim>::n_dofs_per_line () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_dofs_per_quad () const
 {
   return dofs_per_quad;
@@ -730,7 +743,7 @@ FiniteElementData<dim>::n_dofs_per_quad () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_dofs_per_hex () const
 {
   return dofs_per_hex;
@@ -740,7 +753,7 @@ FiniteElementData<dim>::n_dofs_per_hex () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_dofs_per_face () const
 {
   return dofs_per_face;
@@ -750,7 +763,7 @@ FiniteElementData<dim>::n_dofs_per_face () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_dofs_per_cell () const
 {
   return dofs_per_cell;
@@ -784,7 +797,7 @@ FiniteElementData<dim>::n_dofs_per_object () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_components () const
 {
   return components;
@@ -792,7 +805,7 @@ FiniteElementData<dim>::n_components () const
 
 
 
-template <int dim>  
+template <int dim>
 inline
 bool
 FiniteElementData<dim>::is_primitive () const
@@ -801,7 +814,7 @@ FiniteElementData<dim>::is_primitive () const
 }
 
 
-template <int dim>  
+template <int dim>
 inline
 void
 FiniteElementData<dim>::set_primitivity (const bool value)
@@ -812,7 +825,7 @@ FiniteElementData<dim>::set_primitivity (const bool value)
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::n_blocks () const
 {
   return blocks;
@@ -822,7 +835,7 @@ FiniteElementData<dim>::n_blocks () const
 
 template <int dim>
 inline
-unsigned int 
+unsigned int
 FiniteElementData<dim>::tensor_degree () const
 {
   return degree;

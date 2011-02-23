@@ -181,10 +181,7 @@ FiniteElementDomination::Domination
 FE_Nothing<dim> ::
 compare_for_face_domination (const FiniteElement<dim> & fe_other) const
 {
-  if(dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
-    return FiniteElementDomination::either_element_can_dominate;
-  else
-    return FiniteElementDomination::this_element_dominates;
+  return FiniteElementDomination::no_requirements;
 }
 
 
