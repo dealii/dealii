@@ -86,6 +86,9 @@ class StokesProblem
 
     Vector<double> solution;
     Vector<double> system_rhs;
+
+    const double lambda;
+    const double mu;
 };
 
 
@@ -182,7 +185,9 @@ StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree,
                 elasticity_fe (FE_Nothing<dim>(), dim,
 			       FE_Nothing<dim>(), 1,
 			       FE_Q<dim>(elasticity_degree), dim),
-                dof_handler (triangulation)
+                dof_handler (triangulation),
+		lambda (1),
+		mu (1)
 {
   fe_collection.push_back (stokes_fe);
   fe_collection.push_back (elasticity_fe);
@@ -207,9 +212,8 @@ void StokesProblem<dim>::setup_dofs ()
 	 &&
 	 (cell->center()[1] > -0.5)))
       cell->set_active_fe_index (0);
-//TODO: doesn't work right now due to domination issues
-    // else
-    //   cell->set_active_fe_index (1);
+    else
+      cell->set_active_fe_index (1);
 
   dof_handler.distribute_dofs (fe_collection);
   DoFRenumbering::Cuthill_McKee (dof_handler);
@@ -259,10 +263,10 @@ void StokesProblem<dim>::assemble_system ()
   system_matrix=0;
   system_rhs=0;
 
-  QGauss<dim>          stokes_quadrature(stokes_degree+2);
-  QGauss<dim>          elasticity_quadrature(elasticity_degree+2);
+  const QGauss<dim> stokes_quadrature(stokes_degree+2);
+  const QGauss<dim> elasticity_quadrature(elasticity_degree+2);
 
-  hp::QCollection<dim> q_collection;
+  hp::QCollection<dim>  q_collection;
   q_collection.push_back (stokes_quadrature);
   q_collection.push_back (elasticity_quadrature);
 
@@ -272,23 +276,26 @@ void StokesProblem<dim>::assemble_system ()
 				  update_JxW_values |
 				  update_gradients);
 
-  const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
+  const unsigned int   stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
+  const unsigned int   elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
 
-  const unsigned int   n_q_points      = stokes_quadrature.size();
+  FullMatrix<double>   local_matrix;
+  Vector<double>       local_rhs;
 
-  FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       local_rhs (dofs_per_cell);
-
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices;
 
   const RightHandSide<dim>          right_hand_side;
 
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
+  const FEValuesExtractors::Vector displacements (dim+1);
 
-  std::vector<SymmetricTensor<2,dim> > phi_grads_u (dofs_per_cell);
-  std::vector<double>                  div_phi_u   (dofs_per_cell);
-  std::vector<double>                  phi_p       (dofs_per_cell);
+  std::vector<SymmetricTensor<2,dim> > stokes_phi_grads_u (stokes_dofs_per_cell);
+  std::vector<double>                  stokes_div_phi_u   (stokes_dofs_per_cell);
+  std::vector<double>                  stokes_phi_p       (stokes_dofs_per_cell);
+
+  std::vector<Tensor<2,dim> >          elasticity_phi_grad (elasticity_dofs_per_cell);
+  std::vector<double>                  elasticity_phi_div  (elasticity_dofs_per_cell);
 
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -299,31 +306,69 @@ void StokesProblem<dim>::assemble_system ()
 
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
-      local_matrix = 0;
-      local_rhs = 0;
+      local_matrix.reinit (cell->get_fe().dofs_per_cell,
+			   cell->get_fe().dofs_per_cell);
+      local_rhs.reinit (cell->get_fe().dofs_per_cell);
 
-      for (unsigned int q=0; q<n_q_points; ++q)
+      if (cell->active_fe_index() == 0)
 	{
-	  for (unsigned int k=0; k<dofs_per_cell; ++k)
-	    {
-	      phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
-	      div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-	      phi_p[k]       = fe_values[pressure].value (k, q);
-	    }
+	  const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+	  Assert (dofs_per_cell == stokes_dofs_per_cell,
+		  ExcInternalError());
 
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<=i; ++j)
-	      local_matrix(i,j) += (phi_grads_u[i] * phi_grads_u[j]
-				    - div_phi_u[i] * phi_p[j]
-				    - phi_p[i] * div_phi_u[j])
-				   * fe_values.JxW(q);
+	  for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+	    {
+	      for (unsigned int k=0; k<dofs_per_cell; ++k)
+		{
+		  stokes_phi_grads_u[k] = fe_values[velocities].symmetric_gradient (k, q);
+		  stokes_div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+		  stokes_phi_p[k]       = fe_values[pressure].value (k, q);
+		}
+
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  local_matrix(i,j) += (stokes_phi_grads_u[i] * stokes_phi_grads_u[j]
+					- stokes_div_phi_u[i] * stokes_phi_p[j]
+					- stokes_phi_p[i] * stokes_div_phi_u[j])
+				       * fe_values.JxW(q);
+	    }
+	}
+      else
+	{
+	  const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+	  Assert (dofs_per_cell == elasticity_dofs_per_cell,
+		  ExcInternalError());
+
+	  for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+	    {
+	      for (unsigned int k=0; k<dofs_per_cell; ++k)
+		{
+		  elasticity_phi_grad[k] = fe_values[displacements].gradient (k, q);
+		  elasticity_phi_div[k]  = fe_values[displacements].divergence (k, q);
+		}
+
+	    for (unsigned int i=0; i<dofs_per_cell; ++i)
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		{
+		  local_matrix(i,j)
+		    +=  (lambda *
+			 elasticity_phi_div[i] * elasticity_phi_div[j]
+			 +
+			 mu *
+			 scalar_product(elasticity_phi_grad[i], elasticity_phi_grad[j])
+			 +
+			 mu *
+			 scalar_product(elasticity_phi_grad[i], transpose(elasticity_phi_grad[j]))
+		      )
+		      *
+		      fe_values.JxW(q);
+		  }
+	      }
 	}
 
 
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	for (unsigned int j=i+1; j<dofs_per_cell; ++j)
-	  local_matrix(i,j) = local_matrix(j,i);
-
+      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+      local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
 				       // local_rhs==0, but need to do
@@ -394,10 +439,17 @@ StokesProblem<dim>::refine_mesh ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
+  const QGauss<dim-1> stokes_quadrature(stokes_degree+2);
+  const QGauss<dim-1> elasticity_quadrature(elasticity_degree+2);
+
+  hp::QCollection<dim-1> face_q_collection;
+  face_q_collection.push_back (stokes_quadrature);
+  face_q_collection.push_back (elasticity_quadrature);
+
   std::vector<bool> component_mask (dim+1+dim, false);
   component_mask[dim] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
-                                      QGauss<dim-1>(stokes_degree+1),
+                                      face_q_collection,
                                       typename FunctionMap<dim>::type(),
                                       solution,
                                       estimated_error_per_cell,
