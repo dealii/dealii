@@ -698,6 +698,11 @@ namespace FiniteElementDomination
 	      return neither_element_dominates;
 
 	case either_element_can_dominate:
+	      if (d2 == no_requirements)
+		return either_element_can_dominate;
+	      else
+		return d2;
+
         case no_requirements:
 	      return d2;
 

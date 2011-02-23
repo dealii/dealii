@@ -2499,7 +2499,7 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 	      ExcNotImplemented());
 
       FiniteElementDomination::Domination
-	domination = FiniteElementDomination::either_element_can_dominate;
+	domination = FiniteElementDomination::no_requirements;
 
 				       // loop over all base elements and do
 				       // some sanity checks
@@ -2515,8 +2515,10 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 					   // for this pair of base elements,
 					   // check who dominates and combine
 					   // with previous result
-	  domination = domination & (this->base_element(b)
-				     .compare_for_face_domination (fe_sys_other->base_element(b)));
+	  const FiniteElementDomination::Domination
+	    base_domination = (this->base_element(b)
+			       .compare_for_face_domination (fe_sys_other->base_element(b)));
+	  domination = domination & base_domination;
 	}
 
 				       // if we've gotten here, then we've
