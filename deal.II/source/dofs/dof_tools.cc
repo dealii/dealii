@@ -2747,6 +2747,18 @@ namespace internal
 		      break;
 		    }
 
+		    case FiniteElementDomination::no_requirements:
+							   // there
+							   // are no
+							   // continuity
+							   // requirements
+							   // between
+							   // the two
+							   // elements. record
+							   // no
+							   // constraints
+			  break;
+
 		    default:
 							   // we shouldn't get here
 			  Assert (false, ExcInternalError());
