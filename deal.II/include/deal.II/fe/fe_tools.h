@@ -101,6 +101,15 @@ namespace FETools
       get (const unsigned int degree) const = 0;
 
 				       /**
+					* Create a FiniteElement from a
+					* quadrature formula (currently only
+					* implemented for FE_Q) and return a
+					* pointer to it.
+					*/
+
+      virtual FiniteElement<dim,spacedim>*
+      get (const Quadrature<1> &quad) const = 0;
+				       /**
 					* Virtual destructor doing
 					* nothing but making the
 					* compiler happy.
@@ -134,6 +143,15 @@ namespace FETools
 					*/
       virtual FiniteElement<FE::dimension,FE::dimension>*
       get (const unsigned int degree) const;
+
+				       /**
+					* Create a FiniteElement from a
+					* quadrature formula (currently only
+					* implemented for FE_Q) and return a
+					* pointer to it.
+					*/
+      virtual FiniteElement<FE::dimension,FE::dimension>*
+      get (const Quadrature<1> &quad) const;
   };
 
 				   /**

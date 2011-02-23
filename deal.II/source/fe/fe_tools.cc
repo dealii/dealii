@@ -53,6 +53,37 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace FETools
+{
+				// Not implemented in the general case.
+  template <class FE>
+  FiniteElement<FE::dimension, FE::dimension>*
+  FEFactory<FE>::get (const Quadrature<1> &quad) const
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
+
+				// Specializations for FE_Q.
+  template <>
+  FiniteElement<1, 1>*
+  FEFactory<FE_Q<1, 1> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q<1>(quad);
+  }
+  template <>
+  FiniteElement<2, 2>*
+  FEFactory<FE_Q<2, 2> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q<2>(quad);
+  }
+  template <>
+  FiniteElement<3, 3>*
+  FEFactory<FE_Q<3, 3> >::get (const Quadrature<1> &quad) const
+  {
+    return new FE_Q<3>(quad);
+  }
+}
 
 namespace
 {
@@ -2149,16 +2180,15 @@ namespace FETools
 	    else
 	      {
 		unsigned int position = name.find('(');
-		const std::string quadrature_name(name, 0, position-1);
-		name.erase(0,position);
+		const std::string quadrature_name(name, 0, position);
+		name.erase(0,position+1);
 		if (quadrature_name.compare("QGaussLobatto") == 0)
 		  {
 		    const std::pair<int,unsigned int> tmp
 		      = Utilities::get_integer_at_position (name, 0);
-		    name.erase(0, tmp.second+1);
-//TODO: Implement a get function taking Quadrature<1> in fe_tools.h.
-//return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
-		    AssertThrow (false, ExcNotImplemented());
+				// delete "))"
+		    name.erase(0, tmp.second+2);
+		    return fe_name_map.find(name_part)->second->get(QGaussLobatto<1>(tmp.first));
 		  }
 		else
 		  {
