@@ -2460,7 +2460,6 @@ GridGenerator::hyper_shell (Triangulation<3>& tria,
 				       //   == sqrt(pi/12)/(1-rho)
 				       // with solution rho=2r/(1+r)
       const double r = inner_radius / outer_radius;
-      const double pi = numbers::PI;
       const double rho = 2*r/(1+r);
 
 				       // then this is the distance of the
