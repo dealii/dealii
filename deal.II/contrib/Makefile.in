@@ -54,7 +54,7 @@ endif
 ifneq ($(QMAKE),)
 parameter_gui:
 	@-cd parameter_gui ; \
-		$(QMAKE) -Wnone QMAKE_CXX=$(CXX) QMAKE_CXXFLAGS="$(CXXFLAGS.o)" QMAKE_CXXFLAGS_RELEASE="" && \
+		$(QMAKE) -Wnone && \
 		$(MAKE)
 else
 parameter_gui:
