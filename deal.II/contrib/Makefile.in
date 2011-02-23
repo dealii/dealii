@@ -55,6 +55,7 @@ ifneq ($(QMAKE),)
 parameter_gui:
 	@-cd parameter_gui ; \
 		$(QMAKE) -Wnone && \
+		$(PERL) -pi -e 's#^\t(\$$\(CXX\)|[/a-zA-Z]*(moc|rcc)|\$$\(LINK\))#\t\@echo \"===================================== parameter_gui/\$$\(<F\)\" \; \1#g;' Makefile ; \
 		$(MAKE)
 else
 parameter_gui:
