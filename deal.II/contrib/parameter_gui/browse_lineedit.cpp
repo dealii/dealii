@@ -1,105 +1,121 @@
+//---------------------------------------------------------------------------
+//
+//    Copyright (C) 2010, 2011 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 
 #include <QtGui>
 
 #include "browse_lineedit.h"
 
 
-BrowseLineEdit::BrowseLineEdit(const BrowseType  type, QWidget *parent)
-              : QFrame(parent, 0),
-                browse_type(type)
+namespace dealii
 {
-  line_editor = new QLineEdit;
-  connect(line_editor, SIGNAL(editingFinished()), this, SLOT(editing_finished()));
-
-  browse_button = new QPushButton("&Browse...");
-  connect(browse_button, SIGNAL(clicked()), this, SLOT(browse()));
-
-  setFocusPolicy (Qt::StrongFocus);
-
-  QHBoxLayout *layout = new QHBoxLayout;
-
-  layout->addWidget(line_editor);
-  layout->addWidget(browse_button);
-  setLayout(layout);
-
-  setAutoFillBackground(true);
-  setBackgroundRole(QPalette::Highlight);
-}
-
-
-
-
-QSize BrowseLineEdit::sizeHint() const
-{
-  QSize  size_line_editor   = line_editor->sizeHint(),
-         size_browse_button = browse_button->sizeHint();
-
-  int w = size_line_editor.rwidth() + size_browse_button.rwidth(),
-      h = qMax(size_line_editor.rheight(), size_browse_button.rheight());
-
-  return QSize (w, h);
-}
-
-
-
-QSize BrowseLineEdit::minimumSizeHint() const
-{
-  QSize  size_line_editor   = line_editor->minimumSizeHint(),
-         size_browse_button = browse_button->minimumSizeHint();
-
-  int w = size_line_editor.rwidth() + size_browse_button.rwidth(),
-      h = qMax(size_line_editor.rheight(), size_browse_button.rheight());
-
-  return QSize (w, h);
-}
-
-
-
-QString BrowseLineEdit::text() const
-{
-  return line_editor->text();
-}
-
-
-
-void BrowseLineEdit::setText(const QString &str)
-{
-  line_editor->setText(str);
-}
-
-
-
-void BrowseLineEdit::editing_finished()
-{
-  emit editingFinished();
-}
-
-
-
-void BrowseLineEdit::browse()
-{
-  QString  name = "";
-
-  switch (browse_type)
+  namespace ParameterGui
+  {
+    BrowseLineEdit::BrowseLineEdit(const BrowseType  type, QWidget *parent)
+                  : QFrame(parent, 0),
+                    browse_type(type)
     {
-      case file:
+      line_editor = new QLineEdit;
+      connect(line_editor, SIGNAL(editingFinished()), this, SLOT(editing_finished()));
+
+      browse_button = new QPushButton("&Browse...");
+      connect(browse_button, SIGNAL(clicked()), this, SLOT(browse()));
+
+      setFocusPolicy (Qt::StrongFocus);
+
+      QHBoxLayout *layout = new QHBoxLayout;
+
+      layout->addWidget(line_editor);
+      layout->addWidget(browse_button);
+      setLayout(layout);
+
+      setAutoFillBackground(true);
+      setBackgroundRole(QPalette::Highlight);
+    }
+
+
+
+
+    QSize BrowseLineEdit::sizeHint() const
+    {
+      QSize  size_line_editor   = line_editor->sizeHint(),
+             size_browse_button = browse_button->sizeHint();
+
+      int w = size_line_editor.rwidth() + size_browse_button.rwidth(),
+          h = qMax(size_line_editor.rheight(), size_browse_button.rheight());
+
+      return QSize (w, h);
+    }
+
+
+
+    QSize BrowseLineEdit::minimumSizeHint() const
+    {
+      QSize  size_line_editor   = line_editor->minimumSizeHint(),
+             size_browse_button = browse_button->minimumSizeHint();
+
+      int w = size_line_editor.rwidth() + size_browse_button.rwidth(),
+          h = qMax(size_line_editor.rheight(), size_browse_button.rheight());
+
+      return QSize (w, h);
+    }
+
+
+
+    QString BrowseLineEdit::text() const
+    {
+      return line_editor->text();
+    }
+
+
+
+    void BrowseLineEdit::setText(const QString &str)
+    {
+      line_editor->setText(str);
+    }
+
+
+
+    void BrowseLineEdit::editing_finished()
+    {
+      emit editingFinished();
+    }
+
+
+
+    void BrowseLineEdit::browse()
+    {
+      QString  name = "";
+
+      switch (browse_type)
         {
-          name = QFileDialog::getOpenFileName(this, tr("Open File"),
-                                              QDir::currentPath(),
-                                              tr("All Files (*.*)"));
-          break;
+          case file:
+            {
+              name = QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                  QDir::currentPath(),
+                                                  tr("All Files (*.*)"));
+              break;
+            };
+
+          case directory:
+            {
+              name = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                       QDir::homePath(),
+                                                       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+              break;
+            };
         };
 
-      case directory:
-        {
-          name = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                   QDir::homePath(),
-                                                   QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-          break;
-        };
-    };
-
-  if (!name.isEmpty() && !name.isNull())
-    line_editor->setText(name);
+      if (!name.isEmpty() && !name.isNull())
+        line_editor->setText(name);
+    }
+  }
 }
 

@@ -1,3 +1,13 @@
+//---------------------------------------------------------------------------
+//
+//    Copyright (C) 2010, 2011 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 
 #ifndef PARAMETERDELEGATE_H
 #define PARAMETERDELEGATE_H
@@ -9,88 +19,99 @@
 #include <QComboBox>
 #include <QFileDialog>
 
-#include <limits>
-#include <algorithm>
-
 #include "browse_lineedit.h"
 
 
+namespace dealii
+{
+/*! @addtogroup ParameterGui
+ *@{
+ */
+  namespace ParameterGui
+  {
 /**
  * The ParameterDelegate class implements special delegates for the QTreeWidget class used in the parameterGUI.
  * The QTreeWidget class provides some different standard delegates for editing parameters shown in the
  * tree structure. The ParameterDelegate class provides special editors for the different types of parameters defined in
- * the ParameterHandler class. For all parameter types based on strings as "Anything", "MultipleSelection" and
- * "List" a simple line editor will be shown up. In the case of integer and double type parameters the editor is a spin box and for
- * "Selection" type parameters a combo box will be shown up. For parameters of type "FileName" and "DirectoryName"
+ * the ParameterHandler class. For all parameter types based on strings as &quot;Anything&quot;, &quot;MultipleSelection&quot; and
+ * &quot;List&quot; a simple line editor will be shown up. In the case of integer and double type parameters the editor is a spin box and for
+ * &quot;Selection&quot; type parameters a combo box will be shown up. For parameters of type &quot;FileName&quot; and &quot;DirectoryName&quot;
  * the delegate shows a @ref BrowseLineEdit editor. The column of the tree structure with the parameter values has to be set
  * in the constructor.
  *
- * @ingroup gui
- * @author Martin Steigemann, Wolfgang Bangerth, December 2010
+ * @note This class is used in the graphical user interface for the @ref ParameterHandler class.
+ *       It is not compiled into the deal.II libraries and can not be used by applications using deal.II.
+ *
+ * @ingroup ParameterGui
+ * @author Martin Steigemann, Wolfgang Bangerth, 2010
  */
-class ParameterDelegate : public QItemDelegate
-{
-  Q_OBJECT
+    class ParameterDelegate : public QItemDelegate
+    {
+      Q_OBJECT
 
-  public:
+      public:
 				     /**
-				      * Constructor, the <tt>value_column</tt> specifies the column
+				      * Constructor, @p value_column specifies the column
 				      * of the parameter tree this delegate will be used on.
 				      */
-    ParameterDelegate (const int value_column, QObject *parent = 0);
+        ParameterDelegate (const int value_column, QObject *parent = 0);
 				     /**
 				      * This function creates the appropriate editor for the parameter
 				      * based on the <tt>index</tt>.
 				      */
-    QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                           const QModelIndex &index) const;
+        QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                               const QModelIndex &index) const;
 				     /**
 				      * Reimplemented from QItemDelegate.
 				      */
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+        QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 				     /**
 				      * Reimplemented from QItemDelegate.
 				      */
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+        void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 				     /**
 				      * Reimplemented from QItemDelegate.
 				      */
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+        void setEditorData(QWidget *editor, const QModelIndex &index) const;
 				     /**
 				      * Reimplemented from QItemDelegate.
 				      */
-    void setModelData(QWidget *editor, QAbstractItemModel *model,
-                      const QModelIndex &index) const;
+        void setModelData(QWidget *editor, QAbstractItemModel *model,
+                          const QModelIndex &index) const;
 
-  private slots:
+      private slots:
 				     /**
 				      * Reimplemented from QItemDelegate.
 				      */
-    void commit_and_close_editor();
+        void commit_and_close_editor();
 
-  private:
+      private:
 				     /**
 				      * The column this delegate will be used on.
 				      */
-    int value_column;
+        int value_column;
 				     /**
 				      * For parameters of type <tt>double</tt> a spin box
 				      * will be shown as editor. Any click on the spin box
 				      * will change the value about <tt>double_steps</tt>.
 				      */
-    double  double_steps;
+        double  double_steps;
 				     /**
 				      * For parameters of type <tt>integer</tt> a spin box
 				      * will be shown as editor. Any click on the spin box
 				      * will change the value about <tt>int_steps</tt>.
 				      */
-    unsigned int  int_steps;
+        unsigned int  int_steps;
 				     /**
 				      * For parameters of type <tt>double</tt> a spin box
 				      * will be shown as editor. The spin box will show
 				      * parameters with a precision of <tt>double_decimals</tt>.
 				      */
-    unsigned int  double_decimals;
-};
+        unsigned int  double_decimals;
+    };
+  }
+/**@}*/
+}
+
 
 #endif

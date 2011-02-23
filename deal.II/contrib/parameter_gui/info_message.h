@@ -1,3 +1,13 @@
+//---------------------------------------------------------------------------
+//
+//    Copyright (C) 2010, 2011 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 
 #ifndef INFOMESSAGE_H
 #define INFOMESSAGE_H
@@ -9,76 +19,90 @@
 #include <QLabel>
 
 
+namespace dealii
+{
+/*! @addtogroup ParameterGui
+ *@{
+ */
+  namespace ParameterGui
+  {
 /**
  * The InfoMessage class implements a special info message for the parameterGUI.
- * Besides showing a info message itself, the dialog shows a checkbox "Show this message again".
- * If the user unchecks this box, this is stored in the "settings.ini" file and will be reloaded
+ * Besides showing a info message itself, the dialog shows a checkbox &quot;Show this message again&quot;.
+ * If the user unchecks this box, this is stored in the &quot;settings.ini&quot; file and will be reloaded
  * the next time the user opens the parameterGUI. The intention of such a info message is the following.
- * The user should have some information on how using the GUI "at hand"
- * such as "how to edit parameter values?" for example. But after reading this message, the user knows it
- * and the message should not appear permanently.
+ * The user should have some information on how using the GUI &quot;at hand&quot;
+ * such as &quot;how to edit parameter values&quot; for example. But after reading this message, the user knows
+ * it and the message should not appear permanently.
  *
- * @ingroup gui
- * @author Martin Steigemann, Wolfgang Bangerth, December 2010
+ * @note This class is used in the graphical user interface for the @ref ParameterHandler class.
+ *       It is not compiled into the deal.II libraries and can not be used by applications using deal.II.
+ *
+ * @ingroup ParameterGui
+ * @author Martin Steigemann, Wolfgang Bangerth, 2010
  */
-class InfoMessage : public QDialog
-{
-  Q_OBJECT
+    class InfoMessage : public QDialog
+    {
+      Q_OBJECT
 
-  public:
+      public:
 				     /**
 				      * Constructor
 				      */
-    InfoMessage (QWidget *parent = 0);
+        InfoMessage (QWidget *parent = 0);
 				     /**
-				      * With this function the <tt>message</tt> which will be shown in the
+				      * With this function the @p message which will be shown in the
 				      * dialog can be set.
 				      */
-    void setInfoMessage(const QString &message);
+        void setInfoMessage(const QString &message);
 
-  public slots:
+      public slots:
 				     /**
 				      * Show the dialog with the <tt>message</tt>.
 				      */
-    void showMessage();
+        void showMessage();
 
-  protected:
+      protected:
 				     /**
 				      * Reimplemented from QDialog.
 				      */
-    void done(int r);
+        void done(int r);
 
-  private:
+      private:
 				     /**
 				      * This variable stores, if the <tt>message</tt> should be shown again the next time.
 				      */
-    bool show_again;
+        bool show_again;
 				     /**
 				      * The <tt>Ok</tt> button.
 				      */
-    QPushButton * ok;
+        QPushButton * ok;
 				     /**
 				      * The checkbox<tt>Show this message again</tt>.
 				      */
-    QCheckBox * again;
+        QCheckBox * again;
 				     /**
 				      * The <tt>message</tt> editor.
 				      */
-    QTextEdit * message;
+        QTextEdit * message;
 				     /**
 				      * An <tt>icon</tt> for the dialog.
 				      */
-    QLabel * icon;
+        QLabel * icon;
 #ifdef QT_SOFTKEYS_ENABLED
 				     /**
 				      * A action for pressing the <tt>Ok</tt> button.
 				      */
-    QAction *ok_action;
+        QAction * ok_action;
 #endif
 				     /**
 				      * An object for storing <tt>settings</tt> in a file.
 				      */
-    QSettings * settings;
-};
+        QSettings * settings;
+    };
+  }
+/**@}*/
+}
+
 
 #endif

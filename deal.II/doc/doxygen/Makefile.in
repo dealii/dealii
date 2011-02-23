@@ -36,6 +36,7 @@ deal.II deal.tag: tutorial \
           deal.dox \
 	  $D/include/deal.II/*/*.h \
 	  headers/*.h \
+	  $D/contrib/parameter_gui/*.h \
 	  $(addprefix tutorial/doxygen/, $(shell ls tutorial/doxygen/))
 	@echo "=== Generating reference documentation. " \
               "This can take several minutes..."
@@ -55,8 +56,8 @@ tutorial:
 
 deal.dox: Makefile $(shell echo images ../../examples/*/doc ../news/*.h)
 	@echo "=== Making $@"
-	@echo "INPUT=`echo headers $D/include/deal.II/* tutorial/doxygen ../news/*.h`" > $@
-	@echo "IMAGE_PATH=`echo images ../../examples/*/doc`" >> $@
+	@echo "INPUT=`echo headers $D/include/deal.II/* tutorial/doxygen ../news/*.h $D/contrib/parameter_gui`" > $@
+	@echo "IMAGE_PATH=`echo images ../../examples/*/doc $D/contrib/parameter_gui/images`" >> $@
 
 
 
