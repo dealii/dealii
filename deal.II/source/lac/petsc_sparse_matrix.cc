@@ -266,9 +266,9 @@ namespace PETScWrappers
 					 // Tell PETSc that we are not
 					 // planning on adding new entries
 					 // to the matrix. Generate errors
-					 // in debugmode.
-#if DEAL_II_PETSC_VERSION_LT(3,0,0)
+					 // in debug mode.
           int ierr;
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
 #ifdef DEBUG
 	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -277,7 +277,6 @@ namespace PETScWrappers
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif  
 #else
-          int ierr;
 #ifdef DEBUG
 	  ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -286,6 +285,22 @@ namespace PETScWrappers
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
 #endif
+
+					   // Tell PETSc to keep the
+					   // SparsityPattern entries even if
+					   // we delete a row with
+					   // clear_rows() which calls
+					   // MatZeroRows(). Otherwise one can
+					   // not write into that row
+					   // afterwards.
+#if DEAL_II_PETSC_VERSION_LT(3,1,0)
+	  ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#else
+	  ierr = MatSetOption (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#endif
+
       }
   }
 
