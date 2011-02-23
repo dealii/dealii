@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,37 @@
 
 
 // test that FE_Nothing works as intended
+
+// Create a mesh with hanging nodes and FEQ/FENothing interfaces in
+// several admissible configurations we'd like to check.  In 2D the
+// mesh looks like the following.
+//
+// +---------+----+----+
+// |         | 0  | 0  |
+// |    1    +----+----+
+// |         | 0  | 0  |
+// +----+----+----+----+
+// | 1  | 1  |         |
+// +----+----+    0    |
+// | 1  | 1  |         |
+// +----+----+---------+
+//
+// We then attempt to make hanging node constraints on this mesh.
+
+// Note: in 2d, DoF assignment should look like this:
+//
+// 6--------7+19--20---21
+// |         | 0  | 0  |
+// |    1    16---17---18
+// |         | 0  | 0  |
+// 4---14*--5+2--15*---3
+// | 1  | 1  |         |
+// 10---11-13+    0    |
+// | 1  | 1  |         |
+// 8----9--12+0--------1
+//
+// Dofs 14 and 15 should be constrained, but at one time only 14 was
+// constrained
 
 
 #include "../tests.h"
@@ -37,25 +68,6 @@
 
 
 #include <fstream>
-
-				// Create a mesh with hanging
-				// nodes and FEQ/FENothing interfaces
-				// in several admissible configurations
-                                // we'd like to check.  In 2D the mesh
-                                // looks like the following.
-                                //
-                                // +---------+----+----+
-                                // |         | 1  | 1  |
-                                // |    0    +----+----+
-                                // |         | 1  | 1  |
-                                // +----+----+----+----+
-                                // | 0  | 0  |         |
-                                // +----+----+    1    |
-                                // | 0  | 0  |         |
-                                // +----+----+---------+
-				//
-				// We then attempt to make hanging node
-				// constraints on this mesh.
 
 template <int dim>
 void test ()
@@ -102,10 +114,6 @@ void test ()
 
   hp::DoFHandler<dim>      dof_handler (triangulation);
 
-				   // loop over cells, and set cells
-				   // within a circle to be of type
-				   // FE_Nothing, while outside the
-				   // circle to be of type FE_Q(1)
   {
     typename hp::DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
@@ -121,7 +129,6 @@ void test ()
 
     dof_handler.distribute_dofs (fe_collection);
   }
-
 
   deallog << "   Number of active cells:       "
 	  << triangulation.n_active_cells()
@@ -143,6 +150,31 @@ void test ()
           << constraints.n_constraints()
           << std::endl;
 
+				   // the FE assignment is entirely
+				   // symmetric, so the number of
+				   // constraints must be even
+  Assert (constraints.n_constraints() % 2 == 0, ExcInternalError());
+
+  {
+    typename hp::DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
+
+    for(; cell != endc; cell++)
+      {
+	deallog << cell << ' ' << cell->active_fe_index() << std::endl
+		<< "   ";
+	std::vector<unsigned int> local_dof_indices (cell->get_fe().dofs_per_cell);
+	cell->get_dof_indices (local_dof_indices);
+
+	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+	  deallog << local_dof_indices[i]
+		  << (constraints.is_constrained(local_dof_indices[i]) ?
+		      "*" : "")
+		  << ' ';
+	deallog << std::endl;
+      }
+  }
 }
 
 
