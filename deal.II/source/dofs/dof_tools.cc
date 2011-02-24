@@ -2435,6 +2435,40 @@ namespace internal
 			  const unsigned int
 			    subface_fe_index = subface->nth_active_fe_index(0);
 
+							   // we sometime run
+							   // into the
+							   // situation where
+							   // for example on
+							   // one big cell we
+							   // have a FE_Q(1)
+							   // and on the
+							   // subfaces we have
+							   // a mixture of
+							   // FE_Q(1) and
+							   // FE_Nothing. In
+							   // that case, the
+							   // face domination
+							   // is
+							   // either_element_can_dominate
+							   // for the whole
+							   // collection of
+							   // subfaces, but on
+							   // the particular
+							   // subface between
+							   // FE_Q(1) and
+							   // FE_Nothing,
+							   // there are no
+							   // constraints that
+							   // we need to take
+							   // care of. in that
+							   // case, just
+							   // continue
+			  if (cell->get_fe().compare_for_face_domination
+			      (subface->get_fe(subface_fe_index))
+			      ==
+			      FiniteElementDomination::no_requirements)
+			    continue;
+			  
 							   // Same procedure as for the
 							   // mother cell. Extract the face
 							   // DoFs from the cell DoFs.
