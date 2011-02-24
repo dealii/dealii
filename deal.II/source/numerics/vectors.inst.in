@@ -711,6 +711,15 @@ void VectorTools::interpolate_boundary_values
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);
 
+template
+void VectorTools::interpolate_boundary_values
+(const Mapping<deal_II_dimension>    &,
+ const hp::DoFHandler<deal_II_dimension> &,
+ const unsigned char,
+ const Function<deal_II_dimension>   &,
+ ConstraintMatrix       &,
+ const std::vector<bool>    &);
+
 #if deal_II_dimension < 3
 template
 void VectorTools::interpolate_boundary_values
