@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -4171,116 +4171,130 @@ namespace FEValuesViews
 
 
   template <int dim, int spacedim>
-          inline
-          typename SymmetricTensor<2, dim, spacedim>::value_type
-          SymmetricTensor<2, dim, spacedim>::value (const unsigned int shape_function,
-                                                    const unsigned int q_point) const
+  inline
+  typename SymmetricTensor<2, dim, spacedim>::value_type
+  SymmetricTensor<2, dim, spacedim>::value (const unsigned int shape_function,
+					    const unsigned int q_point) const
   {
-      typedef FEValuesBase<dim,spacedim> FVB;
-      Assert (shape_function < fe_values.fe->dofs_per_cell,
-              ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-      Assert (fe_values.update_flags & update_values,
-              typename FVB::ExcAccessToUninitializedField());
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_values,
+	    typename FVB::ExcAccessToUninitializedField());
 
-                                // similar to the vector case where
-                                // we have more then one index and we need
-                                // to convert between unrolled and component
-                                // indexing for tensors
+				     // similar to the vector case where we
+				     // have more then one index and we need
+				     // to convert between unrolled and
+				     // component indexing for tensors
+    const int snc
+      = shape_function_data[shape_function].single_nonzero_component;
 
-      const int snc = shape_function_data[shape_function].single_nonzero_component;
-
-      if (snc == -2)
+    if (snc == -2)
       {
-                                    // shape function is zero for the
-                                    // selected components
-          return value_type();
+					 // shape function is zero for the
+					 // selected components
+	return value_type();
 
-      } else if (snc != -1)
-      {
-          value_type return_value;
-          const unsigned int comp =
-                  shape_function_data[shape_function].single_nonzero_component_index;
-          return_value[value_type::unrolled_to_component_indices(comp)]
-                  = fe_values.shape_values(snc,q_point);
-          return return_value;
       }
-      else
+    else if (snc != -1)
       {
-          value_type return_value;
-          for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
-              if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
-                  return_value[value_type::unrolled_to_component_indices(d)]
-                          = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
-          return return_value;
+	value_type return_value;
+	const unsigned int comp =
+	  shape_function_data[shape_function].single_nonzero_component_index;
+	return_value[value_type::unrolled_to_component_indices(comp)]
+	  = fe_values.shape_values(snc,q_point);
+	return return_value;
+      }
+    else
+      {
+	value_type return_value;
+	for (unsigned int d = 0; d < value_type::n_independent_components; ++d)
+	  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+	    return_value[value_type::unrolled_to_component_indices(d)]
+	      = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+	return return_value;
       }
   }
 
+  
   template <int dim, int spacedim>
-          inline
-          typename SymmetricTensor<2, dim, spacedim>::divergence_type
-          SymmetricTensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
-             const unsigned int q_point) const
+  inline
+  typename SymmetricTensor<2, dim, spacedim>::divergence_type
+  SymmetricTensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
+						const unsigned int q_point) const
   {
-      typedef FEValuesBase<dim,spacedim> FVB;
-      Assert (shape_function < fe_values.fe->dofs_per_cell,
-              ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
-      Assert (fe_values.update_flags & update_gradients,
-              typename FVB::ExcAccessToUninitializedField());
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+	    ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
+	    typename FVB::ExcAccessToUninitializedField());
 
-      const int snc = shape_function_data[shape_function].single_nonzero_component;
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-      if (snc == -2)
+    if (snc == -2)
       {
-                            // shape function is zero for the
-                            // selected components
-          return divergence_type();
-      } else if (snc != -1) {
-                            // have a single non-zero component when the
-                            // symmetric tensor is repsresented in unrolled form.
-                            // this implies we potentially have two non-zero
-                            // components when represented in component form!
-                            // we will only have one non-zero entry if the non-zero
-                            // component lies on the diagonal of the tensor.
-                            //
-                            // the divergence of a second-order tensor
-                            // is a first order tensor.
-                            //
-                            // assume the second-order tensor is A with componets A_{ij}.
-                            // then A_{ij} = A_{ji} and there is only one (if diagonal)
-                            // or two non-zero entries in the tensorial representation.
-                            // define the divergence as:
-                            // b_i := \dfrac{\partial A_{ij}}{\partial x_j}.
-                            //
-                            // Now, knowing the row ii and collumn jj of the non-zero entry
-                            // we compute the divergence as
-                            // b_ii = \dfrac{\partial A_{ij}}{\partial x_jj}  (no sum)
-                            // and if ii =! jj (not on a diagonal)
-                            // b_jj = \dfrac{\partial A_{ij}}{\partial x_ii}  (no sum)
+					 // shape function is zero for the
+					 // selected components
+	return divergence_type();
+      }
+    else if (snc != -1)
+      {
+					 // have a single non-zero component
+					 // when the symmetric tensor is
+					 // repsresented in unrolled form.
+					 // this implies we potentially have
+					 // two non-zero components when
+					 // represented in component form!  we
+					 // will only have one non-zero entry
+					 // if the non-zero component lies on
+					 // the diagonal of the tensor.
+					 //
+					 // the divergence of a second-order tensor
+					 // is a first order tensor.
+					 //
+					 // assume the second-order tensor is
+					 // A with componets A_{ij}.  then
+					 // A_{ij} = A_{ji} and there is only
+					 // one (if diagonal) or two non-zero
+					 // entries in the tensorial
+					 // representation.  define the
+					 // divergence as:
+					 // b_i := \dfrac{\partial A_{ij}}{\partial x_j}.
+					 //
+					 // Now, knowing the row ii and
+					 // collumn jj of the non-zero entry
+					 // we compute the divergence as
+					 // b_ii = \dfrac{\partial A_{ij}}{\partial x_jj}  (no sum)
+					 // and if ii =! jj (not on a diagonal)
+					 // b_jj = \dfrac{\partial A_{ij}}{\partial x_ii}  (no sum)
 
-          divergence_type return_value;
+	divergence_type return_value;
 
-                            // non-zero index in unrolled format
-          const unsigned int comp =
-            shape_function_data[shape_function].single_nonzero_component_index;
+					 // non-zero index in unrolled format
+	const unsigned int comp =
+	  shape_function_data[shape_function].single_nonzero_component_index;
 
-          const unsigned int ii = value_type::unrolled_to_component_indices(comp)[0];
-          const unsigned int jj = value_type::unrolled_to_component_indices(comp)[1];
+	const unsigned int ii = value_type::unrolled_to_component_indices(comp)[0];
+	const unsigned int jj = value_type::unrolled_to_component_indices(comp)[1];
 
-                            // value of the non-zero tensor component
-          const double A_ij = fe_values.shape_values(snc,q_point);
+					 // value of the non-zero tensor
+					 // component
+	const double A_ij = fe_values.shape_values(snc,q_point);
 
-                            // the gradient of the non-zero shape function
-          const Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
+					 // the gradient of the non-zero shape
+					 // function
+	const Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
 
-          return_value[ii] = A_ij * phi_grad[jj];
+	return_value[ii] = A_ij * phi_grad[jj];
 
-                            // if we are not on a diagonal
-          if (ii != jj)
-              return_value[jj] = A_ij * phi_grad[ii];
+					 // if we are not on a diagonal
+	if (ii != jj)
+	  return_value[jj] = A_ij * phi_grad[ii];
 
-          return return_value;
+	return return_value;
 
-      } else
+      }
+    else
       {
         Assert (false, ExcNotImplemented());
         divergence_type return_value;
