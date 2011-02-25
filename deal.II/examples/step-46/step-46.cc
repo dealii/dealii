@@ -204,11 +204,11 @@ void StokesProblem<dim>::setup_dofs ()
   for (typename hp::DoFHandler<dim>::active_cell_iterator
 	 cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
-    if (((cell->center()[0] < 0)
+    if (((std::fabs(cell->center()[0]) < 0.25)
 	 &&
 	 (cell->center()[1] > 0.5))
 	||
-	((cell->center()[0] >= 0)
+	((std::fabs(cell->center()[0]) >= 0.25)
 	 &&
 	 (cell->center()[1] > -0.5)))
       cell->set_active_fe_index (0);
@@ -231,6 +231,49 @@ void StokesProblem<dim>::setup_dofs ()
 					      constraints,
 					      component_mask);
   }
+
+				   // make sure velocity is zero at
+				   // the interface
+  {
+    std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
+    for (typename hp::DoFHandler<dim>::active_cell_iterator
+	   cell = dof_handler.begin_active();
+	 cell != dof_handler.end(); ++cell)
+      if (cell->active_fe_index() == 0)
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  if (not cell->at_boundary(f))
+	    {
+	      bool face_is_on_interface = false;
+
+	      if ((cell->neighbor(f)->has_children() == false)
+		  &&
+		  (cell->neighbor(f)->active_fe_index() == 1))
+		face_is_on_interface = true;
+	      else if (cell->neighbor(f)->has_children() == true)
+		{
+						   // neighbor does
+						   // have
+						   // children. see if
+						   // any of the cells
+						   // on the other
+						   // side are elastic
+		  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
+		    if (cell->neighbor_child_on_subface(f, sf)->active_fe_index() == 1)
+		      {
+			face_is_on_interface = true;
+			break;
+		      }
+		}
+
+	      if (face_is_on_interface)
+		{
+		  cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
+		  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
+		    constraints.add_line (local_face_dof_indices[i]);
+		}
+	    }
+  }
+
 
   constraints.close ();
 
@@ -475,7 +518,7 @@ void StokesProblem<dim>::run ()
 	  &&
 	  (cell->face(f)->center()[dim-1] == 1))
 	cell->face(f)->set_all_boundary_indicators(1);
-  triangulation.refine_global (2);
+  triangulation.refine_global (3);
 
   for (unsigned int refinement_cycle = 0; refinement_cycle<6;
        ++refinement_cycle)
