@@ -2340,7 +2340,7 @@ namespace internal
 						 // interfaces with
 						 // artificial cells
 		FiniteElementDomination::Domination
-		  mother_face_dominates = FiniteElementDomination::no_requirements;
+		  mother_face_dominates = FiniteElementDomination::either_element_can_dominate;
 
 		if (DoFHandlerSupportsDifferentFEs<DH>::value == true)
 		  for (unsigned int c=0; c<cell->face(face)->number_of_children(); ++c)
@@ -2997,18 +2997,6 @@ namespace internal
 			  Assert (false, ExcNotImplemented());
 			  break;
 			}
-
-			case FiniteElementDomination::no_requirements:
-							       // there
-							       // are no
-							       // continuity
-							       // requirements
-							       // between
-							       // the two
-							       // elements. record
-							       // no
-							       // constraints
-			      break;
 
 			default:
 							       // we shouldn't get
