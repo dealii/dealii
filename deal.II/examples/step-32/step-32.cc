@@ -61,7 +61,7 @@
 #include <fe/fe_dgq.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
+#include <fe/mapping_q.h>
 
 #include <numerics/vectors.h>
 #include <numerics/matrices.h>
@@ -405,6 +405,7 @@ namespace Assembly
     {
 	StokesPreconditioner (const FiniteElement<dim> &stokes_fe,
 			      const Quadrature<dim>    &stokes_quadrature,
+			      const Mapping<dim>       &mapping,
 			      const UpdateFlags         update_flags);
 	StokesPreconditioner (const StokesPreconditioner &data);
 
@@ -418,9 +419,10 @@ namespace Assembly
     StokesPreconditioner<dim>::
     StokesPreconditioner (const FiniteElement<dim> &stokes_fe,
 			  const Quadrature<dim>    &stokes_quadrature,
+			  const Mapping<dim>       &mapping,
 			  const UpdateFlags         update_flags)
 		    :
-		    stokes_fe_values (stokes_fe, stokes_quadrature,
+		    stokes_fe_values (mapping, stokes_fe, stokes_quadrature,
 				      update_flags),
 		    grads_phi_u (stokes_fe.dofs_per_cell),
 		    phi_p (stokes_fe.dofs_per_cell)
@@ -432,7 +434,8 @@ namespace Assembly
     StokesPreconditioner<dim>::
     StokesPreconditioner (const StokesPreconditioner &scratch)
 		    :
-		    stokes_fe_values (scratch.stokes_fe_values.get_fe(),
+		    stokes_fe_values (scratch.stokes_fe_values.get_mapping(),
+				      scratch.stokes_fe_values.get_fe(),
 				      scratch.stokes_fe_values.get_quadrature(),
 				      scratch.stokes_fe_values.get_update_flags()),
 		    grads_phi_u (scratch.grads_phi_u),
@@ -460,6 +463,7 @@ namespace Assembly
     struct StokesSystem : public StokesPreconditioner<dim>
     {
 	StokesSystem (const FiniteElement<dim> &stokes_fe,
+		      const Mapping<dim>       &mapping,
 		      const Quadrature<dim>    &stokes_quadrature,
 		      const UpdateFlags         stokes_update_flags,
 		      const FiniteElement<dim> &temperature_fe,
@@ -480,14 +484,16 @@ namespace Assembly
     template <int dim>
     StokesSystem<dim>::
     StokesSystem (const FiniteElement<dim> &stokes_fe,
+		  const Mapping<dim>       &mapping,
 		  const Quadrature<dim>    &stokes_quadrature,
 		  const UpdateFlags         stokes_update_flags,
 		  const FiniteElement<dim> &temperature_fe,
 		  const UpdateFlags         temperature_update_flags)
 		    :
 		    StokesPreconditioner<dim> (stokes_fe, stokes_quadrature,
+					       mapping,
 					       stokes_update_flags),
-		    temperature_fe_values (temperature_fe, stokes_quadrature,
+		    temperature_fe_values (mapping, temperature_fe, stokes_quadrature,
 					   temperature_update_flags),
 		    phi_u (stokes_fe.dofs_per_cell),
 		    grads_phi_u (stokes_fe.dofs_per_cell),
@@ -501,7 +507,8 @@ namespace Assembly
     StokesSystem (const StokesSystem<dim> &scratch)
 		    :
 		    StokesPreconditioner<dim> (scratch),
-		    temperature_fe_values (scratch.temperature_fe_values.get_fe(),
+		    temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
+					   scratch.temperature_fe_values.get_fe(),
 					   scratch.temperature_fe_values.get_quadrature(),
 					   scratch.temperature_fe_values.get_update_flags()),
 		    phi_u (scratch.phi_u),
@@ -516,6 +523,7 @@ namespace Assembly
     struct TemperatureMatrix
     {
 	TemperatureMatrix (const FiniteElement<dim> &temperature_fe,
+			   const Mapping<dim>       &mapping,
 			   const Quadrature<dim>    &temperature_quadrature);
 	TemperatureMatrix (const TemperatureMatrix &data);
 
@@ -528,9 +536,11 @@ namespace Assembly
     template <int dim>
     TemperatureMatrix<dim>::
     TemperatureMatrix (const FiniteElement<dim> &temperature_fe,
+		       const Mapping<dim>       &mapping,
 		       const Quadrature<dim>    &temperature_quadrature)
 		    :
-		    temperature_fe_values (temperature_fe, temperature_quadrature,
+		    temperature_fe_values (mapping,
+					   temperature_fe, temperature_quadrature,
 					   update_values    | update_gradients |
 					   update_JxW_values),
 		    phi_T (temperature_fe.dofs_per_cell),
@@ -542,7 +552,8 @@ namespace Assembly
     TemperatureMatrix<dim>::
     TemperatureMatrix (const TemperatureMatrix &scratch)
 		    :
-		    temperature_fe_values (scratch.temperature_fe_values.get_fe(),
+		    temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
+					   scratch.temperature_fe_values.get_fe(),
 					   scratch.temperature_fe_values.get_quadrature(),
 					   scratch.temperature_fe_values.get_update_flags()),
 		    phi_T (scratch.phi_T),
@@ -555,6 +566,7 @@ namespace Assembly
     {
 	TemperatureRHS (const FiniteElement<dim> &temperature_fe,
 			const FiniteElement<dim> &stokes_fe,
+			const Mapping<dim>       &mapping,
 			const Quadrature<dim>    &quadrature);
 	TemperatureRHS (const TemperatureRHS &data);
 
@@ -582,15 +594,18 @@ namespace Assembly
     TemperatureRHS<dim>::
     TemperatureRHS (const FiniteElement<dim> &temperature_fe,
 		    const FiniteElement<dim> &stokes_fe,
+		    const Mapping<dim>       &mapping,
 		    const Quadrature<dim>    &quadrature)
 		    :
-		    temperature_fe_values (temperature_fe, quadrature,
+		    temperature_fe_values (mapping,
+					   temperature_fe, quadrature,
 					   update_values    |
 					   update_gradients |
 					   update_hessians  |
 					   update_quadrature_points |
 					   update_JxW_values),
-		    stokes_fe_values (stokes_fe, quadrature,
+		    stokes_fe_values (mapping,
+				      stokes_fe, quadrature,
 				      update_values | update_gradients),
 		    phi_T (temperature_fe.dofs_per_cell),
 		    grad_phi_T (temperature_fe.dofs_per_cell),
@@ -613,10 +628,12 @@ namespace Assembly
     TemperatureRHS<dim>::
     TemperatureRHS (const TemperatureRHS &scratch)
 		    :
-		    temperature_fe_values (scratch.temperature_fe_values.get_fe(),
+		    temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
+					   scratch.temperature_fe_values.get_fe(),
 					   scratch.temperature_fe_values.get_quadrature(),
 					   scratch.temperature_fe_values.get_update_flags()),
-		    stokes_fe_values (scratch.stokes_fe_values.get_fe(),
+		    stokes_fe_values (scratch.stokes_fe_values.get_mapping(),
+				      scratch.stokes_fe_values.get_fe(),
 				      scratch.stokes_fe_values.get_quadrature(),
 				      scratch.stokes_fe_values.get_update_flags()),
 		    phi_T (scratch.phi_T),
@@ -923,9 +940,12 @@ class BoussinesqFlowProblem
     parallel::distributed::Triangulation<dim> triangulation;
     double                              global_Omega_diameter;
 
+    const MappingQ<dim>                 mapping;
+
     const unsigned int                  stokes_degree;
-    FESystem<dim>                       stokes_fe;
-    DoFHandler<dim> stokes_dof_handler;
+    const FESystem<dim>                 stokes_fe;
+
+    DoFHandler<dim>                     stokes_dof_handler;
     ConstraintMatrix                    stokes_constraints;
 
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
@@ -1159,13 +1179,15 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 		triangulation (MPI_COMM_WORLD,
 			       typename Triangulation<dim>::MeshSmoothing
-			       (Triangulation<dim>::smoothing_on_refinement | Triangulation<dim>::smoothing_on_coarsening
-			       )
-		),
+			       (Triangulation<dim>::smoothing_on_refinement |
+				Triangulation<dim>::smoothing_on_coarsening)),
+
+		mapping (4),
 
                 stokes_degree (1),
                 stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
 			   FE_Q<dim>(stokes_degree), 1),
+
 		stokes_dof_handler (triangulation),
 
 		temperature_degree (2),
@@ -1241,7 +1263,7 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 					   stokes_degree+1);
   const unsigned int n_q_points = quadrature_formula.size();
 
-  FEValues<dim> fe_values (stokes_fe, quadrature_formula, update_values);
+  FEValues<dim> fe_values (mapping, stokes_fe, quadrature_formula, update_values);
   std::vector<Tensor<1,dim> > velocity_values(n_q_points);
 
   const FEValuesExtractors::Vector velocities (0);
@@ -1294,7 +1316,7 @@ BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 					   temperature_degree);
   const unsigned int n_q_points = quadrature_formula.size();
 
-  FEValues<dim> fe_values (temperature_fe, quadrature_formula,
+  FEValues<dim> fe_values (mapping, temperature_fe, quadrature_formula,
                            update_values);
   std::vector<double> old_temperature_values(n_q_points);
   std::vector<double> old_old_temperature_values(n_q_points);
@@ -1550,7 +1572,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_quadrature_points |
 					 update_JxW_values);
-  FEValues<dim> fe_values (temperature_fe, quadrature, update_flags);
+  FEValues<dim> fe_values (mapping, temperature_fe, quadrature, update_flags);
 
   const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
 		     n_q_points    = fe_values.n_quadrature_points;
@@ -1937,8 +1959,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     std::set<unsigned char> no_normal_flux_boundaries;
     no_normal_flux_boundaries.insert (1);
     VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
-						     no_normal_flux_boundaries,
-						     stokes_constraints);
+    						     no_normal_flux_boundaries,
+    						     stokes_constraints,
+						     mapping);
     stokes_constraints.close ();
   }
   {
@@ -2189,6 +2212,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 			  _1),
 	 Assembly::Scratch::
 	 StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
+				    mapping,
 				    update_JxW_values |
 				    update_values |
 				    update_gradients),
@@ -2394,7 +2418,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 			  this,
 			  _1),
 	 Assembly::Scratch::
-	 StokesSystem<dim> (stokes_fe, quadrature_formula,
+	 StokesSystem<dim> (stokes_fe, mapping, quadrature_formula,
 			    (update_values    |
 			     update_quadrature_points  |
 			     update_JxW_values |
@@ -2521,7 +2545,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 			  this,
 			  _1),
 	 Assembly::Scratch::
-	 TemperatureMatrix<dim> (temperature_fe, quadrature_formula),
+	 TemperatureMatrix<dim> (temperature_fe, mapping, quadrature_formula),
 	 Assembly::CopyData::
 	 TemperatureMatrix<dim> (temperature_fe));
 
@@ -2806,7 +2830,8 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 			  this,
 			  _1),
 	 Assembly::Scratch::
-	 TemperatureRHS<dim> (temperature_fe, stokes_fe, quadrature_formula),
+	 TemperatureRHS<dim> (temperature_fe, stokes_fe, mapping,
+			      quadrature_formula),
 	 Assembly::CopyData::
 	 TemperatureRHS<dim> (temperature_fe));
 
@@ -2891,7 +2916,7 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-7*stokes_rhs.l2_norm());
+    SolverControl solver_control (stokes_matrix.m(), 1e-8*stokes_rhs.l2_norm());
     {
       PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
       SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
@@ -2901,6 +2926,8 @@ void BoussinesqFlowProblem<dim>::solve ()
 		   preconditioner);
     }
     stokes_constraints.distribute (distributed_stokes_solution);
+
+
 				     //stokes_solution = distributed_stokes_solution;
     stokes_solution.block(0).reinit(distributed_stokes_solution.block(0), false, true);
     stokes_solution.block(1).reinit(distributed_stokes_solution.block(1), false, true);
@@ -2910,6 +2937,20 @@ void BoussinesqFlowProblem<dim>::solve ()
           << " Reduced residual by "
 	  << solver_control.last_value()/solver_control.initial_value()
 	  << std::endl;
+
+    TrilinosWrappers::MPI::Vector tmp;
+    tmp.reinit (stokes_rhs.block(1));
+    pcout << "   Relative divergence residual: "
+	  << stokes_matrix.block(1,0).residual (tmp,
+						distributed_stokes_solution.block(0),
+						stokes_rhs.block(1))
+	  /
+      distributed_stokes_solution.block(0).l2_norm() / EquationData::pressure_scaling
+	  << std::endl;
+
+    pcout << "   Relative vector sizes: "
+	  << distributed_stokes_solution.block(0).linfty_norm() << ' '
+      	  << distributed_stokes_solution.block(1).linfty_norm() << std::endl;
   }
   computing_timer.exit_section();
 
@@ -3216,19 +3257,23 @@ void BoussinesqFlowProblem<dim>::output_results ()
 {
   computing_timer.enter_section ("Postprocessing");
 
-				   //calculate l2 divergence error
+				   //calculate l2 norm of divergence and
+				   //norm of gradient
   {
-    double my_cells_error = 0.0;
+    double my_cells_error[2] = {0, 0};
     QGauss<1>      q_base(stokes_degree+1);
     QIterated<dim> err_quadrature(q_base, 2);
 
     const unsigned int n_q_points =  err_quadrature.size();
-    FEValues<dim> fe_values (stokes_fe,  err_quadrature, update_JxW_values | update_gradients);
+    FEValues<dim> fe_values (mapping, stokes_fe,  err_quadrature,
+			     update_JxW_values | update_gradients);
     const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
     const FEValuesExtractors::Vector velocities (0);
 
     std::vector<unsigned int> local_dof_indices (fe_values.dofs_per_cell);
 
+    std::vector<double>         local_div (n_q_points);
+    std::vector<Tensor<2,dim> > local_grad (n_q_points);
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = stokes_dof_handler.begin_active(),
@@ -3240,31 +3285,32 @@ void BoussinesqFlowProblem<dim>::output_results ()
 	  fe_values.reinit (cell);
 	  cell->get_dof_indices(local_dof_indices);
 
+	  fe_values[velocities].get_function_divergences (stokes_solution,
+							  local_div);
+	  fe_values[velocities].get_function_gradients (stokes_solution,
+							local_grad);
+
 	  double cell_error = 0.0;
 	  for (unsigned int q = 0; q < n_q_points; ++q)
 	    {
-	      double tmp = 0;
-	      for (unsigned int i=0; i < dofs_per_cell; ++i)
-		{
-		  tmp +=
-		    fe_values[velocities].divergence(i, q)
-		    * stokes_solution(local_dof_indices[i]);
-		}
-	      cell_error += tmp * tmp * fe_values.JxW(q);
+	      my_cells_error[0] += local_div[q] * local_div[q] * fe_values.JxW(q);
+	      my_cells_error[1] += scalar_product(local_grad[q], local_grad[q]) * fe_values.JxW(q);
 	    }
-	  my_cells_error += cell_error; // = sqrt(cell_error)^2
 	}
 
-  double div_error = 0.0;
+    double div_error[2] = {0,0};
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Allreduce (&my_cells_error, &div_error, 1, MPI_DOUBLE,
-		 MPI_SUM, MPI_COMM_WORLD);
+    MPI_Allreduce (&my_cells_error, &div_error, 2, MPI_DOUBLE,
+		   MPI_SUM, MPI_COMM_WORLD);
 #else
-  div_error = my_cells_error;
+    div_error[0] = my_cells_error[0];
+    div_error[1] = my_cells_error[1];
 #endif
 
-  div_error = std::sqrt(div_error);
-  pcout << "> divergence error:" << div_error << std::endl;
+    div_error[0] = std::sqrt(div_error[0]);
+    div_error[1] = std::sqrt(div_error[1]);
+    pcout << "> ||divergence||=" << div_error[0] << std::endl;
+    pcout << "> || gradient ||=" << div_error[1] << std::endl;
   }
 
   const FESystem<dim> joint_fe (stokes_fe, 1,
@@ -3477,19 +3523,28 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
-				      QGauss<dim-1>(temperature_degree+1),
-				      typename FunctionMap<dim>::type(),
-				      temperature_solution,
- 				      estimated_error_per_cell,
-				      std::vector<bool>(),
-				      0,
-				      0,
-				      triangulation.locally_owned_subdomain());
+  				      QGauss<dim-1>(temperature_degree+1),
+  				      typename FunctionMap<dim>::type(),
+  				      temperature_solution,
+  				      estimated_error_per_cell,
+  				      std::vector<bool>(),
+  				      0,
+  				      0,
+  				      triangulation.locally_owned_subdomain());
 
   parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction (triangulation,
-				       estimated_error_per_cell,
-				       0.6, 0.2);
+  				       estimated_error_per_cell,
+  				       0.6, 0.1);
+
+    // for (typename Triangulation<dim>::active_cell_iterator
+    // 	   cell = triangulation.begin_active();
+    // 	 cell != triangulation.end(); ++cell)
+    //   if (!cell->is_ghost() && !cell->is_artificial())
+    // 	if ((cell->center()[1] > 0)
+    // 	    &&
+    // 	    (cell->center()[2] > 0))
+    // 	  cell->set_refine_flag();
 
 				   // limit maximum refinement level
   if (triangulation.n_levels() > max_grid_level)
