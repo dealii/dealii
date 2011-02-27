@@ -179,7 +179,7 @@ fill_fe_subface_values (const Mapping<dim> & /*mapping*/,
 template <int dim>
 FiniteElementDomination::Domination
 FE_Nothing<dim> ::
-compare_for_face_domination (const FiniteElement<dim> & fe_other) const
+compare_for_face_domination (const FiniteElement<dim> &) const
 {
   return FiniteElementDomination::no_requirements;
 }

@@ -58,7 +58,7 @@ namespace FETools
 				// Not implemented in the general case.
   template <class FE>
   FiniteElement<FE::dimension, FE::dimension>*
-  FEFactory<FE>::get (const Quadrature<1> &quad) const
+  FEFactory<FE>::get (const Quadrature<1> &) const
   {
     Assert(false, ExcNotImplemented());
     return 0;
