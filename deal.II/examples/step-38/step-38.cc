@@ -427,7 +427,7 @@ void LaplaceBeltramiProblem<spacedim>::assemble_system ()
   system_matrix = 0;
   system_rhs = 0;
 
-  const QGauss<dim>  quadrature_formula(2);
+  const QGauss<dim>  quadrature_formula(2*fe.degree);
   FEValues<dim,spacedim> fe_values (mapping, fe, quadrature_formula,
 				    update_values              |
 				    update_gradients           |
