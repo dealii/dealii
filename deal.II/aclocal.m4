@@ -6010,7 +6010,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
           USE_CONTRIB_TRILINOS=no
         else
 	  USE_CONTRIB_TRILINOS=yes
-          DEAL_II_TRILINOS_DIR="$withval"
+	  DEAL_II_TRILINOS_DIR="$withval"
 	  AC_MSG_RESULT($DEAL_II_TRILINOS_DIR)
 
           dnl Make sure that what was specified is actually correct
@@ -6026,17 +6026,23 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
      [
         dnl Take something from the environment variables, if it is there
         if test "x$TRILINOS_DIR" != "x" ; then
-  	  USE_CONTRIB_TRILINOS=yes
-          DEAL_II_TRILINOS_DIR="$TRILINOS_DIR"
-	  AC_MSG_RESULT($DEAL_II_TRILINOS_DIR)
+          dnl Special case when someone does --with-trilinos=no
+	  if test "x$withval" = "xno" ; then
+            AC_MSG_RESULT([explicitly disabled])
+            USE_CONTRIB_TRILINOS=no
+          else
+	    USE_CONTRIB_TRILINOS=yes
+	    DEAL_II_TRILINOS_DIR="$TRILINOS_DIR"
+	    AC_MSG_RESULT($DEAL_II_TRILINOS_DIR)
 
-          dnl Make sure that what this is actually correct
-          if test ! -d $DEAL_II_TRILINOS_DIR/include \
-               -o ! -d $DEAL_II_TRILINOS_DIR/lib ; then
-            AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_DIR environment variable does not point to a complete Trilinos installation])
+	    dnl Make sure that what this is actually correct
+	    if test ! -d $DEAL_II_TRILINOS_DIR/include \
+	         -o ! -d $DEAL_II_TRILINOS_DIR/lib ; then
+	      AC_MSG_ERROR([The path to Trilinos specified in the TRILINOS_DIR environment variable does not point to a complete Trilinos installation])
+	    fi
+	    DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
+	    DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
 	  fi
-	  DEAL_II_TRILINOS_INCDIR="$DEAL_II_TRILINOS_DIR/include"
-	  DEAL_II_TRILINOS_LIBDIR="$DEAL_II_TRILINOS_DIR/lib"
         else
 	  USE_CONTRIB_TRILINOS=no
           DEAL_II_TRILINOS_DIR=""
