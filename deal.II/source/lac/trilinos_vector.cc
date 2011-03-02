@@ -18,9 +18,10 @@
 
 #  include <lac/trilinos_sparse_matrix.h>
 #  include <lac/trilinos_block_vector.h>
-#  include <cmath>
 #  include <Epetra_Import.h>
 #  include <Epetra_Vector.h>
+
+#  include <cmath>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -240,12 +241,14 @@ namespace TrilinosWrappers
       Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
 			  v.block(0).vector_partitioner().Comm());
 
-      if (import_data == false)
-	vector.reset (new Epetra_FEVector (new_map));
-
-      Teuchos::RCP<Epetra_FEVector> actual_vec = (import_data == true) ?
-	Teuchos::rcp (new Epetra_FEVector (new_map), true) :
-	Teuchos::rcp (vector.get(), false);
+      std_cxx1x::shared_ptr<Epetra_FEVector> actual_vec;
+      if ( import_data == true )
+	actual_vec.reset (new Epetra_FEVector (new_map));
+      else
+	{
+	  vector.reset (new Epetra_FEVector (new_map));
+	  actual_vec = vector;
+	}
 
       TrilinosScalar* entries = (*actual_vec)[0];
       block_offset = 0;

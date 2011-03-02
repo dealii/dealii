@@ -39,6 +39,7 @@
 #    include <lac/trilinos_vector.h>
 #    include <lac/trilinos_block_vector.h>
 #  endif
+#  include "Teuchos_RCP.hpp"
 #  include "Epetra_SerialComm.h"
 #endif
 

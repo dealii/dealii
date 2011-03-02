@@ -27,7 +27,6 @@ typedef int MPI_Comm;
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-#  include <Teuchos_RCP.hpp>
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI

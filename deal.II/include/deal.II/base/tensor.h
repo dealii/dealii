@@ -65,7 +65,7 @@ class Tensor
 				      * the outside world.
 				      */
     static const unsigned int rank      = rank_;
-    
+
 				     /**
 				      * Type of stored objects. This
 				      * is a tensor of lower rank.
@@ -85,13 +85,13 @@ class Tensor
 				      * to zero.
 				      */
     Tensor ();
-    
+
 				     /**
 				      * Copy constructor, where the data is
 				      * copied from a C-style array.
 				      */
     Tensor (const array_type &initializer);
-    
+
 				     /**
 				      * Read-Write access operator.
 				      */
@@ -135,7 +135,7 @@ class Tensor
 				      *  Add another tensor.
 				      */
     Tensor<rank_,dim> & operator += (const Tensor<rank_,dim> &);
-    
+
 				     /**
 				      *  Subtract another tensor.
 				      */
@@ -196,7 +196,7 @@ class Tensor
 				      * contexts.
                                       */
     double norm_square () const;
-    
+
 				     /**
 				      * Fill a vector with all tensor elements.
 				      *
@@ -244,9 +244,9 @@ class Tensor
                     << "Invalid tensor index " << arg1);
 
                      /**
-                      * Read or write the data of this object to or 
+                      * Read or write the data of this object to or
                       * from a stream for the purpose of serialization
-                      */ 
+                      */
     template <class Archive>
     void serialize(Archive & ar, const unsigned int version);
 
@@ -306,7 +306,7 @@ typename Tensor<rank_,dim>::value_type&
 Tensor<rank_,dim>::operator[] (const unsigned int i)
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
-  
+
   return subtensor[i];
 }
 
@@ -317,7 +317,7 @@ const typename Tensor<rank_,dim>::value_type&
 Tensor<rank_,dim>::operator[] (const unsigned int i) const
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
-  
+
   return subtensor[i];
 }
 
@@ -416,7 +416,7 @@ Tensor<rank_,dim>
 Tensor<rank_,dim>::operator + (const Tensor<rank_,dim> &t) const
 {
   Tensor<rank_,dim> tmp(*this);
-  
+
   for (unsigned int i=0; i<dim; ++i)
     tmp.subtensor[i] += t.subtensor[i];
 
@@ -430,7 +430,7 @@ Tensor<rank_,dim>
 Tensor<rank_,dim>::operator - (const Tensor<rank_,dim> &t) const
 {
   Tensor<rank_,dim> tmp(*this);
-  
+
   for (unsigned int i=0; i<dim; ++i)
     tmp.subtensor[i] -= t.subtensor[i];
 
@@ -444,7 +444,7 @@ Tensor<rank_,dim>
 Tensor<rank_,dim>::operator - () const
 {
   Tensor<rank_,dim> tmp;
-  
+
   for (unsigned int i=0; i<dim; ++i)
     tmp.subtensor[i] = -subtensor[i];
 
@@ -493,11 +493,11 @@ Tensor<rank_,dim>::memory_consumption ()
 template <int rank_, int dim>
 template <class Archive>
 inline
-void 
+void
 Tensor<rank_,dim>::serialize(Archive & ar, const unsigned int)
 {
   ar & subtensor;
-}    
+}
 
 #endif // DOXYGEN
 /* ----------------- Non-member functions operating on tensors. ------------ */
@@ -924,7 +924,7 @@ void contract (Tensor<3,dim>       &dest,
 		      Assert (false,
 			      (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
 	      }
-	    
+
 	    break;
       case 2:
 	    switch (index2)
@@ -947,7 +947,7 @@ void contract (Tensor<3,dim>       &dest,
 		      Assert (false,
 			      (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
 	      }
-	    
+
 	    break;
       case 3:
 	    switch (index2)
@@ -970,7 +970,7 @@ void contract (Tensor<3,dim>       &dest,
 		      Assert (false,
 			      (typename Tensor<2,dim>::ExcInvalidTensorIndex (index2)));
 	      }
-	    
+
 	    break;
       default:
 	    Assert (false,
@@ -978,7 +978,7 @@ void contract (Tensor<3,dim>       &dest,
     }
 }
 
-   
+
 /**
  * Multiplication operator performing a contraction of the last index
  * of the first argument and the first index of the second
@@ -1322,7 +1322,7 @@ cross_product (Tensor<1,dim>       &dst,
 	       const Tensor<1,dim> &src)
 {
   Assert (dim==2, ExcInternalError());
-  
+
   dst[0] = src[1];
   dst[1] = -src[0];
 }
@@ -1346,7 +1346,7 @@ cross_product (Tensor<1,dim>       &dst,
 	       const Tensor<1,dim> &src2)
 {
   Assert (dim==3, ExcInternalError());
-  
+
   dst[0] = src1[1]*src2[2] - src1[2]*src2[1];
   dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
   dst[2] = src1[0]*src2[1] - src1[1]*src2[0];
@@ -1483,7 +1483,7 @@ double determinant (const Tensor<2,dim> &t)
 				   // for some algorithmic simplicity, we use
 				   // the expansion along the last row
   double det = 0;
-  
+
   for (unsigned int k=0; k<dim; ++k)
     {
       Tensor<2,dim-1> minor;
@@ -1496,7 +1496,7 @@ double determinant (const Tensor<2,dim> &t)
 
       det += t[dim-1][k] * cofactor;
     }
-  
+
   return std::pow (-1., static_cast<double>(dim)) * det;
 }
 
@@ -1535,7 +1535,7 @@ Tensor<2,dim>
 invert (const Tensor<2,dim> &t)
 {
   Tensor<2,dim> return_tensor;
-  switch (dim) 
+  switch (dim)
     {
       case 1:
 	    return_tensor[0][0] = 1.0/t[0][0];
@@ -1552,7 +1552,7 @@ invert (const Tensor<2,dim> &t)
 	return_tensor[1][1] = t[0][0]*t4;
 	break;
       }
-      
+
       case 3:
       {
 	const double t4 = t[0][0]*t[1][1],
@@ -1572,17 +1572,17 @@ invert (const Tensor<2,dim> &t)
 	return_tensor[2][0] = -(-t[1][0]*t[2][1]+t[1][1]*t[2][0])*t07;
 	return_tensor[2][1] = -(t[0][0]*t[2][1]-t01)*t07;
 	return_tensor[2][2] = (t4-t8)*t07;
-        
+
 	break;
       }
 
 					// if desired, take over the
 					// inversion of a 4x4 tensor
 					// from the FullMatrix
-       
+
       default:
 	    AssertThrow (false, ExcNotImplemented());
-    }    
+    }
   return return_tensor;
 }
 
