@@ -79,7 +79,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   number * luval = this->SparseMatrix<number>::val;
 
   const unsigned int N = this->m();
-  unsigned int jrow;
+  unsigned int jrow = 0;
   
   std::vector<unsigned int> iw (N, numbers::invalid_unsigned_int);
   
