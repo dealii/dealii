@@ -113,7 +113,7 @@ namespace Patterns
 					* bytes) of this object. To
 					* avoid unnecessary
 					* overhead, we do not force
-					* derivd classes to provide
+					* derived classes to provide
 					* this function as a virtual
 					* overloaded one, but rather
 					* try to cast the present
@@ -778,7 +778,7 @@ namespace Patterns
   {
     public:
 				       /**
-					* Constrcuctor.
+					* Constructor.
 					*/
       Bool ();
 
@@ -1044,10 +1044,10 @@ namespace Patterns
  *   which provides at run-time for program parameters such as time step
  *   sizes, geometries, right hand sides etc. The input for the program is
  *   given in files, streams or strings in memory using text like
- *   @verbatim
+ *   @code
  *     set Time step size = 0.3
  *     set Geometry       = [0,1]x[0,3]
- *   @endverbatim
+ *   @endcode
  *   Input may be sorted into subsection trees in order to give the input a
  *   logical structure.
  *
@@ -1165,21 +1165,22 @@ namespace Patterns
  *   <h3>Input files and special characters</h3>
  *
  *   For the first example above the input file would look like the following:
- *   @verbatim
+ *   @code
  *     ...
  *     subsection Nonlinear solver
  *       set Nonlinear method = Gradient
+ *       # this is a comment
  *       subsection Linear solver
  *         set Solver                        = CG
  *         set Maxmimum number of iterations = 30
  *       end
  *     end
  *     ...                       # other stuff
- *   @endverbatim
+ *   @endcode
  *   The words <tt>subsection</tt>, <tt>set</tt> and <tt>end</tt> may be either written in lowercase or uppercase
  *   letters. Leading and trailing whitespace is removed, multiple whitespace is condensed into
  *   only one. Since the latter applies also to the name of an entry, an entry name will not
- *   be recognised if in the declaration multiple whitespace is used.
+ *   be recognized if in the declaration multiple whitespace is used.
  *
  *   In entry names and values the following characters are not allowed: <tt>\#</tt>, <tt>{</tt>,
  *   <tt>}</tt>, <tt>|</tt>. Their use is reserved for the MultipleParameterLoop class.
@@ -1197,7 +1198,7 @@ namespace Patterns
  *   In order to read input you can use three possibilities: reading from an
  *   <tt>std::istream</tt> object, reading from a file of which the name is
  *   given and reading from a string in memory in which the lines are
- *   separated by <tt>@\n</tt> characters. These possibilites are used as
+ *   separated by <tt>@\n</tt> characters. These possibilities are used as
  *   follows:
  *   @code
  *     ParameterHandler prm;
@@ -1466,7 +1467,7 @@ namespace Patterns
  *
  *
  *   This is the input file (named "prmtest.prm"):
- *   @verbatim
+ *   @code
  *                                 # first declare the types of equations
  *     set Equation 1 = Poisson
  *     set Equation 2 = Navier-Stokes
@@ -1486,10 +1487,10 @@ namespace Patterns
  *         set Maximum number of iterations = 100
  *       end
  *     end
- *   @endverbatim
+ *   @endcode
  *
- *   And here is the ouput of the program:
- *   @verbatim
+ *   And here is the output of the program:
+ *   @code
  *     Line 8:
  *         The entry value
  *             Gauss-Seidel
@@ -1526,7 +1527,7 @@ namespace Patterns
  *       Problem: outfile=out
  *                eq1=Poisson, eq2=Navier-Stokes
  *                Matrix1=Sparse, Matrix2=Full
- *   @endverbatim
+ *   @endcode
  *
  *
  *
@@ -1644,7 +1645,7 @@ namespace Patterns
  *
  *
  *   @ingroup input
- *   @author Wolfgang Bangerth, October 1997, revised February 1998, 2010
+ *   @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011
  */
 class ParameterHandler : public Subscriptor
 {

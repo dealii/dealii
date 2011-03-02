@@ -1359,30 +1359,20 @@ void UltrasoundProblem<dim>::output_results () const
 				   // DataOut object accordingly.
   prm.enter_subsection("Output parameters");
 
-  const std::string output_file    = prm.get("Output file"),
-		    output_format  = prm.get("Output format");
+  const std::string output_file    = prm.get("Output file");
   data_out.parse_parameters(prm);
 
   prm.leave_subsection ();
 
-				   // Since the ParameterHandler
-				   // provides the output format
-				   // parameter as a string, we need
-				   // to convert it to a format flag
-				   // that can be understood by the
-				   // DataOut object.  The following
-				   // function takes care of this:
-  DataOutBase::OutputFormat  format = DataOutBase::parse_output_format(output_format);
-
-				   // Now we put together the filename
-				   // from the base name provided by
-				   // the ParameterHandler and the
-				   // suffix which is derived from the
-				   // format by the
-				   // DataOutBase::default_suffix
-				   // function:
+				   // Now we put together the filename from
+				   // the base name provided by the
+				   // ParameterHandler and the suffix which is
+				   // provided by the DataOut class (the
+				   // default suffix is set to the right type
+				   // that matches the one set in the .prm
+				   // file through parse_parameters()):
   const std::string filename = output_file +
-			       DataOutBase::default_suffix(format);
+			       data_out.default_suffix();
 
   std::ofstream output (filename.c_str());
 
@@ -1411,7 +1401,7 @@ void UltrasoundProblem<dim>::output_results () const
 				   // the output format without having to
 				   // re-compile this program:
   data_out.build_patches ();
-  data_out.write (output, format);
+  data_out.write (output);
 
   timer.stop ();
   deallog << "done (" 

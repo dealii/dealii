@@ -2425,7 +2425,12 @@ class DataOutInterface : private DataOutBase
 				      * the base class does; the only
 				      * exception being that if the parameter
 				      * is omitted, then the value for the
-				      * present default format is returned.
+				      * present default format is returned,
+				      * i.e. the correct suffix for the format
+				      * that was set through
+				      * set_default_format() or
+				      * parse_parameters() before calling this
+				      * function.
 				      */
     std::string
     default_suffix (const OutputFormat output_format = default_format) const;
