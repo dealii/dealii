@@ -52,8 +52,8 @@ namespace parallel
  *                                     // redistribute dofs,
  * dof_handler->distribute_dofs (fe);
  *                                     // and interpolate the solution
- * Vector<double> interpolate_solution(dof_handler->n_dofs());
- * soltrans.interpolate(solution, interpolated_solution);
+ * Vector<double> interpolated_solution(dof_handler->n_dofs());
+ * soltrans.interpolate(interpolated_solution);
  * @endverbatim
  * @ingroup distributed
  * @author Timo Heister, 2009
