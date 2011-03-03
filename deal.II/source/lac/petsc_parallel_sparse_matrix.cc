@@ -557,7 +557,10 @@ namespace PETScWrappers
 					   // MatZeroRows(). Otherwise one can
 					   // not write into that row
 					   // afterwards.
-#if DEAL_II_PETSC_VERSION_LT(3,1,0)
+#if DEAL_II_PETSC_VERSION_LT(3,0,0)
+	  ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS);
+	  AssertThrow (ierr == 0, ExcPETScError(ierr));
+#elif DEAL_II_PETSC_VERSION_LT(3,1,0)
 	  ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
 	  AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
