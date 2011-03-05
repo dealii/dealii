@@ -164,6 +164,38 @@ hp_vertex_dof_identities (const FiniteElement<dim> &fe_other) const
     }
 }
 
+
+template <int dim>
+FiniteElementDomination::Domination
+FE_Q_Hierarchical<dim>::
+compare_for_face_domination (const FiniteElement<dim> &fe_other) const
+{
+  if (const FE_Q_Hierarchical<dim> *fe_q_other
+      = dynamic_cast<const FE_Q_Hierarchical<dim>*>(&fe_other))
+    {
+      if (this->degree < fe_q_other->degree)
+	return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_q_other->degree)
+	return FiniteElementDomination::either_element_can_dominate;
+      else
+	return FiniteElementDomination::other_element_dominates;
+    }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != 0)
+    {
+				       // the FE_Nothing has no
+				       // degrees of freedom and it is
+				       // typically used in a context
+				       // where we don't require any
+				       // continuity along the
+				       // interface
+      return FiniteElementDomination::no_requirements;
+    }
+
+  Assert (false, ExcNotImplemented());
+  return FiniteElementDomination::neither_element_dominates;
+}
+
+
 //---------------------------------------------------------------------------
 // Auxiliary functions
 //---------------------------------------------------------------------------

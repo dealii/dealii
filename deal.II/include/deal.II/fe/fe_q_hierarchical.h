@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -351,6 +351,22 @@ class FE_Q_Hierarchical : public FE_Poly<TensorProductPolynomials<dim>,dim>
 				      * <tt>ExcInterpolationNotImplemented</tt>.
 				      */
     virtual void get_subface_interpolation_matrix (const FiniteElement<dim>& source, const unsigned int subface, FullMatrix<double>& matrix) const;
+
+				     /**
+				      * Return whether this element dominates
+				      * the one given as argument when they
+				      * meet at a common face,
+				      * whether it is the other way around,
+				      * whether neither dominates, or if
+				      * either could dominate.
+				      *
+				      * For a definition of domination, see
+				      * FiniteElementBase::Domination and in
+				      * particular the @ref hp_paper "hp paper".
+				      */
+    virtual
+    FiniteElementDomination::Domination
+    compare_for_face_domination (const FiniteElement<dim> &fe_other) const;
 
 				     /**
 				      * Determine an estimate for the

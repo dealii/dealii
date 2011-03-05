@@ -2266,34 +2266,6 @@ namespace internal
 		Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
 		       ExcNotImplemented());
 
-						 // check to see if the child elements
-						 // have no dofs on the
-						 // shared face.  if none of them do, we
-						 // we can simply continue to the next face.
-						 // if only some of them have dofs, while
-						 // others do not, then we don't know
-						 // what to do and throw an exception.
-						 //
-						 // ignore all
-						 // interfaces with
-						 // artificial cells
-		bool any_are_zero = false;
-		bool all_are_zero = true;
-
-		for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
-		  if (!cell->neighbor_child_on_subface(face, c)->is_artificial())
-		    {
-		      if (cell->neighbor_child_on_subface(face, c)->get_fe().dofs_per_face == 0)
-			any_are_zero = true;
-		      else
-			all_are_zero = false;
-		    }
-
-		if(all_are_zero)
-		  continue;
-
-		Assert( all_are_zero || !any_are_zero, ExcNotImplemented() );
-
 						 // so now we've found a
 						 // face of an active
 						 // cell that has
@@ -2998,6 +2970,12 @@ namespace internal
 			  break;
 			}
 
+			case FiniteElementDomination::no_requirements:
+			{
+							   // nothing to do here
+			  break;
+			}
+			
 			default:
 							       // we shouldn't get
 							       // here

@@ -223,11 +223,10 @@ FiniteElementDomination::Domination
 FE_DGP<dim,spacedim>::compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 {
 				   // check whether both are discontinuous
-				   // elements and both could dominate, see
-				   // the description of
+				   // elements, see the description of
 				   // FiniteElementDomination::Domination
   if (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0)
-    return FiniteElementDomination::either_element_can_dominate;
+    return FiniteElementDomination::no_requirements;
 
   Assert (false, ExcNotImplemented());
   return FiniteElementDomination::neither_element_dominates;

@@ -682,14 +682,16 @@ namespace FiniteElementDomination
       {
 	case this_element_dominates:
 	      if ((d2 == this_element_dominates) ||
-		  (d2 == either_element_can_dominate))
+		  (d2 == either_element_can_dominate) ||
+		  (d2 == no_requirements))
 		return this_element_dominates;
 	      else
 		return neither_element_dominates;
 
 	case other_element_dominates:
 	      if ((d2 == other_element_dominates) ||
-		  (d2 == either_element_can_dominate))
+		  (d2 == either_element_can_dominate) ||
+		  (d2 == no_requirements))
 		return other_element_dominates;
 	      else
 		return neither_element_dominates;
