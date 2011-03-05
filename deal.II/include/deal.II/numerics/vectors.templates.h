@@ -4163,9 +4163,9 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 					      first_vector_component]
 			= face_dofs[k];
 
-/*		  for (unsigned int d=0; d<dim; ++d)
+		  for (unsigned int d=0; d<dim; ++d)
 		    Assert (vector_dofs.dof_indices[d] < dof_handler.n_dofs(),
-		    ExcInternalError());*/
+			    ExcInternalError());
 
 						   // and enter the
 						   // (dofs,(normal_vector,cell))
