@@ -1184,7 +1184,7 @@ void UltrasoundProblem<dim>::assemble_system ()
 						   // component it
 						   // belongs.
 		  for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-		    cell_matrix(i,j) += ((fe.system_to_component_index(i).first) ? -1 : 1) * 
+		    cell_matrix(i,j) += ((fe.system_to_component_index(i).first == 0) ? -1 : 1) * 
 					fe_face_values.shape_value(i,q_point) *
 					fe_face_values.shape_value(j,q_point) *
 					c *
