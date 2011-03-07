@@ -58,13 +58,13 @@ template <class VECTOR> class FilteredMatrixBlock;
  * hand side vector (through apply_constraints()) and use this
  * object as matrix object in a linear solver. As linear solvers
  * should only use vmult() and residual() functions of a
- * matrix class, this class should be as a good a matrix as any other
+ * matrix class, this class should be as good a matrix as any other
  * for that purpose.
  *
  * Furthermore, also the precondition_Jacobi() function is
  * provided (since the computation of diagonal elements of the
  * filtered matrix $A_X$ is simple), so you can use this as a
- * preconditioner. Some other function useful for matrices are also
+ * preconditioner. Some other functions useful for matrices are also
  * available.
  *
  * A typical code snippet showing the above steps is as follows:
@@ -94,12 +94,13 @@ template <class VECTOR> class FilteredMatrixBlock;
  *   solver.solve (filtered_A, x, b, filtered_prec);
  * @endverbatim
  *
+ *
  * <h3>Connection to other classes</h3>
  *
  * The function MatrixTools::apply_boundary_values() does exactly
  * the same that this class does, except for the fact that that
- * function actually modifies the matrix. Due to this, it is only
- * possible to solve with a matrix onto which
+ * function actually modifies the matrix. Consequently, it is only
+ * possible to solve with a matrix to which
  * MatrixTools::apply_boundary_values() was applied for one right
  * hand side and one set of boundary values since the modification of
  * the right hand side depends on the original matrix.
@@ -194,10 +195,9 @@ template <class VECTOR> class FilteredMatrixBlock;
  *
  * <h3>Thread-safety</h3>
  *
- * The functions that operate as a matrix and do not change the
- * internal state of this object are synchronised and thus
- * threadsafe. You need not serialize calls to @p vmult or
- * @p residual therefore.
+ * The functions that operate as a matrix and do not change the internal state
+ * of this object are synchronised and thus threadsafe. Consequently, you do
+ * not need to serialize calls to @p vmult or @p residual .
  *
  * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007, 2008
  */
