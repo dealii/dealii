@@ -3352,7 +3352,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
               constraints.add_line (dof);
               constraints.set_inhomogeneity (dof, computed_constraints[dof]);
             }
-        
+
         break;
       }
 
@@ -3414,7 +3414,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
                   {
                     typedef FiniteElement<dim> FEL;
-                    
+
                     AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
                                  typename FEL::ExcInterpolationNotImplemented ());
                   }
@@ -3492,7 +3492,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
                   {
                     typedef FiniteElement<dim> FEL;
-                    
+
                     AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
                                  typename FEL::ExcInterpolationNotImplemented ());
                   }
@@ -3600,39 +3600,39 @@ namespace internals {
       std::vector<Vector<double> >
         values (fe_values.n_quadrature_points, Vector<double> (2));
       Vector<double> dof_values (fe.dofs_per_face);
-      
+
                                     // Get the values of the
                                     // boundary function at the
                                     // quadrature points.
       {
         const std::vector<Point<2> >&
           quadrature_points = fe_values.get_quadrature_points ();
-        
+
         boundary_function.vector_value_list (quadrature_points, values);
       }
-      
+
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
       {
         double tmp = 0.0;
-        
+
         for (unsigned int d = 0; d < 2; ++d)
           tmp += normals[q_point][d] * values[q_point] (d);
-        
+
         tmp *= fe_values.JxW (q_point)
             * std::sqrt (jacobians[q_point][0][face_coordinate_direction[face]]
                          * jacobians[q_point][0][face_coordinate_direction[face]]
                          + jacobians[q_point][1][face_coordinate_direction[face]]
                          * jacobians[q_point][1][face_coordinate_direction[face]]);
-        
+
         for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
           dof_values (i) += tmp * (normals[q_point]
                          * fe_values[vec].value (fe.face_to_cell_index (i, face), q_point));
       }
-      
+
       std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
-      
+
       cell->face (face)->get_dof_indices (face_dof_indices, cell->active_fe_index ());
-      
+
                                     // Copy the computed values
                                     // in the ConstraintMatrix only,
                                     // if the degree of freedom is
@@ -3641,12 +3641,12 @@ namespace internals {
         if (!(constraints.is_constrained (face_dof_indices[i])))
         {
           constraints.add_line (face_dof_indices[i]);
-          
+
           if (std::abs (dof_values (i)) > 1e-14)
             constraints.set_inhomogeneity (face_dof_indices[i], dof_values (i));
         }
     }
-    
+
                                     // dummy implementation of above
                                     // function for all other
                                     // dimensions
@@ -3662,7 +3662,7 @@ namespace internals {
     {
       Assert (false, ExcNotImplemented ());
     }
-    
+
     					            // This function computes the
     					            // projection of the boundary
     					            // function on the boundary
@@ -3694,25 +3694,25 @@ namespace internals {
                                                                           {2, 0},
                                                                           {2, 0},
                                                                           {0, 1},
-                                                                          {0, 1}}; 
+                                                                          {0, 1}};
       std::vector<Vector<double> >
         values (fe_values.n_quadrature_points, Vector<double> (3));
       Vector<double> dof_values_local (fe.dofs_per_face);
-      
+
       {
         const std::vector<Point<3> >&
           quadrature_points = fe_values.get_quadrature_points ();
-        
+
         boundary_function.vector_value_list (quadrature_points, values);
       }
-      
+
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points; ++q_point)
       {
         double tmp = 0.0;
-        
+
         for (unsigned int d = 0; d < 3; ++d)
           tmp += normals[q_point][d] * values[q_point] (d);
-        
+
         tmp *= fe_values.JxW (q_point)
             * std::sqrt ((jacobians[q_point][0][face_coordinate_directions[face][0]]
                           * jacobians[q_point][0][face_coordinate_directions[face][0]]
@@ -3726,16 +3726,16 @@ namespace internals {
                             * jacobians[q_point][1][face_coordinate_directions[face][1]]
                             + jacobians[q_point][2][face_coordinate_directions[face][1]]
                             * jacobians[q_point][2][face_coordinate_directions[face][1]]));
-        
+
         for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
           dof_values_local (i) += tmp * (normals[q_point]
                                * fe_values[vec].value (fe.face_to_cell_index (i, face), q_point));
       }
-      
+
       std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
-      
+
       cell->face (face)->get_dof_indices (face_dof_indices, cell->active_fe_index ());
-      
+
       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
         if (projected_dofs[face_dof_indices[i]] < fe.degree)
         {
@@ -3743,7 +3743,7 @@ namespace internals {
           projected_dofs[face_dof_indices[i]] = fe.degree;
         }
     }
-    
+
                                     // dummy implementation of above
                                     // function for all other
                                     // dimensions
@@ -3793,14 +3793,14 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
   hp::FECollection<dim> fe_collection (fe);
   hp::MappingCollection<dim> mapping_collection (mapping);
   hp::QCollection<dim> quadrature_collection;
-  
+
   for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
     quadrature_collection.push_back (QProjector<dim>::project_to_face (face_quadrature,
                                                                        face));
-  
+
   hp::FEValues<dim> fe_values (mapping_collection, fe_collection, quadrature_collection,
                                update_jacobians);
-  
+
   switch (dim)
   {
     case 2:
@@ -3820,17 +3820,17 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
               if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
               {
                 typedef FiniteElement<dim> FEL;
-                
+
                 AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
                              typename FEL::ExcInterpolationNotImplemented ());
               }
-              
+
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
-              
+
               const std::vector<Tensor<2, dim> >&
                 jacobians = fe_values.get_present_fe_values ().get_jacobians ();
-              
+
               fe_face_values.reinit (cell, face);
               internals::VectorTools::compute_face_projection_div_conforming (cell, face,
                                                                               fe_face_values,
@@ -3839,15 +3839,15 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
                                                                               jacobians,
                                                                               constraints);
             }
-      
+
       break;
     }
-    
+
     case 3:
     {
                                                    // In three dimensions the
                                                    // edges between two faces
-                                                   // are treated twice. 
+                                                   // are treated twice.
                                                    // Therefore we store the
                                                    // computed values in a
                                                    // vector and copy them over
@@ -3865,10 +3865,10 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
       const unsigned int& n_dofs = dof_handler.n_dofs ();
       std::vector<double> dof_values (n_dofs);
       std::vector<unsigned int> projected_dofs (n_dofs);
-      
+
       for (unsigned int dof = 0; dof < n_dofs; ++dof)
         projected_dofs[dof] = 0;
-      
+
       for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
            cell != dof_handler.end (); ++cell)
         if (cell->at_boundary ())
@@ -3884,17 +3884,17 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
               if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
               {
                 typedef FiniteElement<dim> FEL;
-                
+
                 AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
                              typename FEL::ExcInterpolationNotImplemented ());
               }
-              
+
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
-              
+
               const std::vector<Tensor<2, dim> >&
                 jacobians = fe_values.get_present_fe_values ().get_jacobians ();
-              
+
               fe_face_values.reinit (cell, face);
               internals::VectorTools::compute_face_projection_div_conforming (cell, face,
                                                                               fe_face_values,
@@ -3903,19 +3903,19 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
                                                                               jacobians, dof_values,
                                                                               projected_dofs);
             }
-      
+
       for (unsigned int dof = 0; dof < n_dofs; ++dof)
         if ((projected_dofs[dof] != 0) && !(constraints.is_constrained (dof)))
         {
           constraints.add_line (dof);
-          
+
           if (std::abs (dof_values[dof]) > 1e-14)
             constraints.set_inhomogeneity (dof, dof_values[dof]);
         }
-      
+
       break;
     }
-    
+
     default:
       Assert (false, ExcNotImplemented ());
   }
@@ -3934,18 +3934,18 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
   const hp::FECollection<dim>& fe_collection = dof_handler.get_fe ();
   hp::QCollection<dim - 1> face_quadrature_collection;
   hp::QCollection<dim> quadrature_collection;
-  
+
   for (unsigned int i = 0; i < fe_collection.size (); ++i)
   {
   	const QGauss<dim - 1> quadrature (fe_collection[i].degree + 1);
-  	
+
     face_quadrature_collection.push_back (quadrature);
-    
+
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
       quadrature_collection.push_back (QProjector<dim>::project_to_face (quadrature,
                                                                          face));
   }
-  
+
   hp::FEFaceValues<dim> fe_face_values (mapping_collection, fe_collection,
                                         face_quadrature_collection, update_JxW_values |
                                                                     update_normal_vectors |
@@ -3953,7 +3953,7 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
                                                                     update_values);
   hp::FEValues<dim> fe_values (mapping_collection, fe_collection, quadrature_collection,
                                update_jacobians);
-  
+
   switch (dim)
   {
     case 2:
@@ -3973,17 +3973,17 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
               if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
               {
                 typedef FiniteElement<dim> FEL;
-                
+
                 AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
                              typename FEL::ExcInterpolationNotImplemented ());
               }
-              
+
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
-              
+
               const std::vector<Tensor<2, dim> >&
                 jacobians = fe_values.get_present_fe_values ().get_jacobians ();
-              
+
               fe_face_values.reinit (cell, face);
               internals::VectorTools::compute_face_projection_div_conforming (cell, face,
                                                                               fe_face_values.get_present_fe_values (),
@@ -3992,19 +3992,19 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
                                                                               jacobians,
                                                                               constraints);
             }
-      
+
       break;
     }
-    
+
     case 3:
     {
       const unsigned int& n_dofs = dof_handler.n_dofs ();
       std::vector<double> dof_values (n_dofs);
       std::vector<unsigned int> projected_dofs (n_dofs);
-      
+
       for (unsigned int dof = 0; dof < n_dofs; ++dof)
         projected_dofs[dof] = 0;
-      
+
       for (typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
            cell != dof_handler.end (); ++cell)
         if (cell->at_boundary ())
@@ -4020,17 +4020,17 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
               if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
               {
                 typedef FiniteElement<dim> FEL;
-                
+
                 AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != 0,
                              typename FEL::ExcInterpolationNotImplemented ());
               }
-              
+
               fe_values.reinit (cell, face + cell->active_fe_index ()
                                            * GeometryInfo<dim>::faces_per_cell);
-              
+
               const std::vector<Tensor<2, dim> >&
                 jacobians = fe_values.get_present_fe_values ().get_jacobians ();
-              
+
               fe_face_values.reinit (cell, face);
               internals::VectorTools::compute_face_projection_div_conforming (cell, face,
                                                                               fe_face_values.get_present_fe_values (),
@@ -4039,19 +4039,19 @@ VectorTools::project_boundary_values_div_conforming (const hp::DoFHandler<dim>& 
                                                                               jacobians, dof_values,
                                                                               projected_dofs);
             }
-      
+
       for (unsigned int dof = 0; dof < n_dofs; ++dof)
         if ((projected_dofs[dof] != 0) && !(constraints.is_constrained (dof)))
         {
           constraints.add_line (dof);
-          
+
           if (std::abs (dof_values[dof]) > 1e-14)
             constraints.set_inhomogeneity (dof, dof_values[dof]);
         }
-      
+
       break;
     }
-    
+
     default:
       Assert (false, ExcNotImplemented ());
   }
@@ -4131,7 +4131,11 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 					     // where they are defined:
 	    const std::vector<Point<dim-1> > &
 	      unit_support_points = fe.get_unit_face_support_points();
-	    Quadrature<dim-1> aux_quad (unit_support_points);
+
+	    Assert (unit_support_points.size() == fe.dofs_per_face,
+		    ExcInternalError());
+
+	    const Quadrature<dim-1> aux_quad (unit_support_points);
 	    FEFaceValues<dim> fe_values (mapping, fe, aux_quad,
 					 update_normal_vectors);
 	    fe_values.reinit(cell, face_no);
