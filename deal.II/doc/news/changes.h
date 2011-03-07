@@ -84,6 +84,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Objects of type FE_Nothing could be generated with multiple vector components
+by passing an argument to the constructor. Yet, the FE_Nothing::get_name() function
+always just returned the string <code>FE_Nothing@<dim@>()</code> independently of the
+number of components. This is now fixed.
+<br>
+(WB, 2011/03/07)
+</li>
+
 <li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existant SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
 <br>
 (Timo Heister, 2011/02/23)

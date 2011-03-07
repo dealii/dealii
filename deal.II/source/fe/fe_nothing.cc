@@ -50,7 +50,10 @@ std::string
 FE_Nothing<dim>::get_name () const
 {
   std::ostringstream namebuf;
-  namebuf << "FE_Nothing<" << dim << ">()";
+  namebuf << "FE_Nothing<" << dim << ">(";
+  if (this->n_components() > 1)
+    namebuf << this->n_components();
+  namebuf << ")";
   return namebuf.str();
 }
 
