@@ -1962,21 +1962,30 @@ initialize_unit_face_support_points ()
   if (dim == 1)
     return;
 
-				   // if one of the base elements has
-				   // no support points, then it makes
-				   // no sense to define support
-				   // points for the composed element,
-				   // so return an empty array to
-				   // demonstrate that fact (note that
-				   // we ask whether the base element
-				   // has no support points at all,
+				   // if one of the base elements has no
+				   // support points, then it makes no sense
+				   // to define support points for the
+				   // composed element. In that case, return
+				   // an empty array to demonstrate that fact
+				   // (note that we ask whether the base
+				   // element has no support points at all,
 				   // not only none on the face!)
+				   //
+				   // on the other hand, if there is an
+				   // element that simply has no degrees of
+				   // freedom on the face at all, then we
+				   // don't care whether it has support points
+				   // or not. this is, for example, the case
+				   // for the stable Stokes element Q(p)^dim
+				   // \times DGP(p-1).
   for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
-    if (!base_element(base_el).has_support_points())
+    if (!base_element(base_el).has_support_points()
+	&&
+	(base_element(base_el).dofs_per_face > 0))
       {
 	this->unit_face_support_points.resize(0);
 	return;
-      };
+      }
 
 
 				   // generate unit face support points
@@ -1994,7 +2003,7 @@ initialize_unit_face_support_points ()
 
       this->unit_face_support_points[i]
 	= base_element(base_i).unit_face_support_points[index_in_base];
-    };
+    }
 }
 
 
