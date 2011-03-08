@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,7 +16,7 @@
 // element that consists of only a single set of vector components
 // (i.e. it has dim components)
 //
-// like no_flux_04 but apply the constraints to a vector field to see
+// like no_flux_03 but apply the constraints to a vector field to see
 // whether the result looks alright
 
 #include "../tests.h"
@@ -43,7 +43,7 @@ class RadialFunction : public Function<dim>
 {
   public:
     RadialFunction() : Function<dim> (dim) {}
-    
+
     virtual void vector_value (const Point<dim> &p,
 			       Vector<double> &v) const
       {
@@ -80,7 +80,7 @@ void test (const Triangulation<dim>& tr,
 
   std::set<unsigned char> boundary_ids;
   boundary_ids.insert (0);
-      
+
   ConstraintMatrix cm;
   VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm);
   cm.close ();
@@ -97,14 +97,14 @@ void test (const Triangulation<dim>& tr,
   for (unsigned int i=0; i<v.size(); ++i)
     if (std::fabs (v(i)) < 1e-12)
       v(i) = 0;
-  
+
   DataOut<dim> data_out;
   data_out.attach_dof_handler (dh);
 
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
     (dim, DataComponentInterpretation::component_is_part_of_vector);
-  
+
   data_out.add_data_vector (v, "x",
 			    DataOut<dim>::type_dof_data,
 			    data_component_interpretation);
@@ -123,7 +123,7 @@ void test_hyper_sphere()
 
   static const HyperBallBoundary<dim> boundary;
   tr.set_boundary (0, boundary);
-  
+
   tr.refine_global(2);
 
   for (unsigned int degree=1; degree<6-dim; ++degree)
@@ -138,7 +138,7 @@ int main()
 {
   std::ofstream logfile ("no_flux_04/output");
   deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
   deallog.threshold_double(1.e-12);
