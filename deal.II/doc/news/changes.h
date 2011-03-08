@@ -84,6 +84,15 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: FESystem::get_unit_face_support_points would refuse to return
+anything if one of the base elements did not have support points. This
+condition has been relaxed: it now only doesn't return anything if this
+base element has no support points and also has degrees of freedom on
+the face.
+<br>
+(WB, 2011/03/07)
+</li>
+
 <li> Fixed: Objects of type FE_Nothing could be generated with multiple vector components
 by passing an argument to the constructor. Yet, the FE_Nothing::get_name() function
 always just returned the string <code>FE_Nothing@<dim@>()</code> independently of the
