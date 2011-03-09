@@ -59,6 +59,7 @@
 
 #include <fe/fe_q.h>
 #include <fe/fe_dgq.h>
+#include <fe/fe_dgp.h>
 #include <fe/fe_system.h>
 #include <fe/fe_values.h>
 #include <fe/mapping_q.h>
@@ -928,9 +929,14 @@ class BoussinesqFlowProblem
 
 	unsigned int adaptive_refinement_interval;
 
-	double stabilization_alpha;
-	double stabilization_c_R;
-	double stabilization_beta;
+	double       stabilization_alpha;
+	double       stabilization_c_R;
+	double       stabilization_beta;
+
+	unsigned int stokes_velocity_degree;
+	bool         use_locally_conservative_discretization;
+
+	unsigned int temperature_degree;
     };
 
 
@@ -942,7 +948,6 @@ class BoussinesqFlowProblem
 
     const MappingQ<dim>                 mapping;
 
-    const unsigned int                  stokes_degree;
     const FESystem<dim>                 stokes_fe;
 
     DoFHandler<dim>                     stokes_dof_handler;
@@ -956,7 +961,6 @@ class BoussinesqFlowProblem
     TrilinosWrappers::MPI::BlockVector  stokes_rhs;
 
 
-    const unsigned int                  temperature_degree;
     FE_Q<dim>                           temperature_fe;
     DoFHandler<dim>                     temperature_dof_handler;
     ConstraintMatrix                    temperature_constraints;
@@ -1044,7 +1048,10 @@ BoussinesqFlowProblem<dim>::Parameters::Parameters ()
 		adaptive_refinement_interval (10),
 		stabilization_alpha (2),
 		stabilization_c_R (0.11),
-		stabilization_beta (0.078)
+		stabilization_beta (0.078),
+		stokes_velocity_degree (2),
+		use_locally_conservative_discretization (true),
+		temperature_degree (2)
 {}
 
 
@@ -1096,6 +1103,25 @@ declare_parameters (ParameterHandler &prm)
 		       "and 0.078 for 3d.");
   }
   prm.leave_subsection ();
+
+  prm.enter_subsection ("Discretization");
+  {
+    prm.declare_entry ("Stokes velocity polynomial degree", "2",
+		       Patterns::Integer (1),
+		       "The polynomial degree to use for the velocity variables "
+		       "in the Stokes system.");
+    prm.declare_entry ("Temperature polynomial degree", "2",
+		       Patterns::Integer (1),
+		       "The polynomial degree to use for the temperature variable.");
+    prm.declare_entry ("Use locally conservative discretization", "true",
+		       Patterns::Bool (),
+		       "Whether to use a Stokes discretization that is locally "
+		       "conservative at the expense of a larger number of degrees "
+		       "of freedom, or to go with a cheaper discretization "
+		       "that does not locally conserve mass (although it is "
+		       "globally conservative.");
+  }
+  prm.leave_subsection ();
 }
 
 
@@ -1119,6 +1145,15 @@ parse_parameters (ParameterHandler &prm)
     stabilization_alpha = prm.get_double ("alpha");
     stabilization_c_R   = prm.get_double ("c_R");
     stabilization_beta  = prm.get_double ("beta");
+  }
+  prm.leave_subsection ();
+
+  prm.enter_subsection ("Discretization");
+  {
+    stokes_velocity_degree = prm.get_integer ("Stokes velocity polynomial degree");
+    temperature_degree     = prm.get_integer ("Temperature polynomial degree");
+    use_locally_conservative_discretization
+      = prm.get_bool ("Use locally conservative discretization");
   }
   prm.leave_subsection ();
 }
@@ -1184,14 +1219,20 @@ BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
 
 		mapping (4),
 
-                stokes_degree (1),
-                stokes_fe (FE_Q<dim>(stokes_degree+1), dim,
-			   FE_Q<dim>(stokes_degree), 1),
+                stokes_fe (FE_Q<dim>(parameters.stokes_velocity_degree),
+			   dim,
+			   (parameters.use_locally_conservative_discretization
+			    ?
+			    static_cast<const FiniteElement<dim> &>
+			    (FE_DGP<dim>(parameters.stokes_velocity_degree-1))
+			    :
+			    static_cast<const FiniteElement<dim> &>
+			    (FE_Q<dim>(parameters.stokes_velocity_degree-1))),
+			   1),
 
 		stokes_dof_handler (triangulation),
 
-		temperature_degree (2),
-		temperature_fe (temperature_degree),
+		temperature_fe (parameters.temperature_degree),
                 temperature_dof_handler (triangulation),
 
                 time_step (0),
@@ -1260,7 +1301,7 @@ template <int dim>
 double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 {
   const QIterated<dim> quadrature_formula (QTrapez<1>(),
-					   stokes_degree+1);
+					   parameters.stokes_velocity_degree);
   const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (mapping, stokes_fe, quadrature_formula, update_values);
@@ -1313,7 +1354,7 @@ std::pair<double,double>
 BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
 {
   const QIterated<dim> quadrature_formula (QTrapez<1>(),
-					   temperature_degree);
+					   parameters.temperature_degree);
   const unsigned int n_q_points = quadrature_formula.size();
 
   FEValues<dim> fe_values (mapping, temperature_fe, quadrature_formula,
@@ -1568,7 +1609,7 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 {
   assemble_temperature_matrix ();
 
-  QGauss<dim> quadrature(temperature_degree+2);
+  QGauss<dim> quadrature(parameters.temperature_degree+2);
   UpdateFlags update_flags = UpdateFlags(update_values   |
 					 update_quadrature_points |
 					 update_JxW_values);
@@ -2187,7 +2228,7 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 {
   stokes_preconditioner_matrix = 0;
 
-  const QGauss<dim> quadrature_formula(stokes_degree+2);
+  const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree+1);
 
   typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
@@ -2394,7 +2435,7 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 
   stokes_rhs=0;
 
-  const QGauss<dim> quadrature_formula(stokes_degree+2);
+  const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree+1);
 
   typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
@@ -2521,7 +2562,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
   temperature_mass_matrix = 0;
   temperature_stiffness_matrix = 0;
 
-  const QGauss<dim> quadrature_formula(temperature_degree+2);
+  const QGauss<dim> quadrature_formula(parameters.temperature_degree+2);
 
   typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
@@ -2802,7 +2843,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 
   temperature_rhs = 0;
 
-  const QGauss<dim> quadrature_formula(temperature_degree+2);
+  const QGauss<dim> quadrature_formula(parameters.temperature_degree+2);
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
@@ -2964,7 +3005,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				     // size in 3d
     double scaling = (dim==3)?0.25:1.0;
     double local_time_step = scaling/(1.6*dim*std::sqrt(1.*dim)) /
-			     temperature_degree *
+			     parameters.temperature_degree *
 			     GridTools::minimal_cell_diameter(triangulation) /
 			     std::max(1e-10,maximal_velocity);
 
@@ -3261,7 +3302,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
 				   //norm of gradient
   {
     double my_cells_error[2] = {0, 0};
-    QGauss<1>      q_base(stokes_degree+1);
+    QGauss<1>      q_base(parameters.stokes_velocity_degree);
     QIterated<dim> err_quadrature(q_base, 2);
 
     const unsigned int n_q_points =  err_quadrature.size();
@@ -3523,7 +3564,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
   KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
-  				      QGauss<dim-1>(temperature_degree+1),
+  				      QGauss<dim-1>(parameters.temperature_degree+1),
   				      typename FunctionMap<dim>::type(),
   				      temperature_solution,
   				      estimated_error_per_cell,
@@ -3639,17 +3680,18 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
       {
 	parameter_file.close ();
 
-	std::cerr << "*** Input parameter file <"
-		  << parameter_filename << "> not found. Creating a"
-		  << std::endl
-		  << "*** template file of the same name."
-		  << std::endl;
+	std::ostringstream message;
+	message << "Input parameter file <"
+		<< parameter_filename << "> not found. Creating a"
+		<< std::endl
+		<< "template file of the same name."
+		<< std::endl;
 
 	std::ofstream parameter_out (parameter_filename.c_str());
 	prm.print_parameters (parameter_out,
 			      ParameterHandler::Text);
 
-	std::exit (1);
+	AssertThrow (false, ExcMessage (message.str().c_str()));
       }
 
     const bool success = prm.read_input (parameter_file);
@@ -3765,11 +3807,11 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 				 // This is copied verbatim from step-31:
 int main (int argc, char *argv[])
 {
+  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+
   try
     {
       deallog.depth_console (0);
-
-      Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
       std::string parameter_filename;
       if (argc>=2)
