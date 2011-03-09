@@ -84,6 +84,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a new function ConditionalOStream::get_stream().
+<br>
+(WB, 2011/03/09)
+</li>
+
 <li> Fixed: FESystem::get_unit_face_support_points would refuse to return
 anything if one of the base elements did not have support points. This
 condition has been relaxed: it now only doesn't return anything if this

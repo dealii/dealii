@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -113,6 +113,12 @@ class ConditionalOStream
 				      */
     bool is_active() const;
 
+				     /**
+				      * Return a reference to the stream
+				      * currently in use.
+				      */
+    std::ostream & get_stream () const;
+    
     				     /**
 				      * Output a constant something through
 				      * this stream. This function must be @p
@@ -179,6 +185,14 @@ ConditionalOStream::operator<< (std::ostream& (*p) (std::ostream&)) const
     output_stream << p;
 
   return *this;
+}
+
+
+inline
+std::ostream &
+ConditionalOStream::get_stream () const
+{
+  return output_stream;
 }
 
 

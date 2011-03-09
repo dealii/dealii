@@ -70,10 +70,6 @@
 #include <numerics/error_estimator.h>
 #include <numerics/solution_transfer.h>
 
-#include <fstream>
-#include <iostream>
-#include <limits>
-
 				 // This is the only include file that is new:
 				 // We use an IndexSet to describe the
 				 // %parallel partitioning of vectors and
@@ -84,8 +80,11 @@
 #include <distributed/solution_transfer.h>
 #include <distributed/grid_refinement.h>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
+#include <limits>
+#include <locale>
 #include <string>
 
 
@@ -1944,6 +1943,11 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
                      n_p = stokes_dofs_per_block[1],
 		     n_T = temperature_dof_handler.n_dofs();
 
+  				       // print dof numbers with 1000s
+				       // separator since they are frequently
+				       // large
+  std::locale s = pcout.get_stream().getloc();
+  pcout.get_stream().imbue(std::locale(""));
   pcout << "Number of active cells: "
 	<< triangulation.n_global_active_cells()
 	<< " (on "
@@ -1955,6 +1959,7 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
 	<< " (" << n_u << '+' << n_p << '+'<< n_T <<')'
 	<< std::endl
 	<< std::endl;
+  pcout.get_stream().imbue(s);
 
 
 
