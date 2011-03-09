@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009 by the deal.II authors
+ * Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2011 by the deal.II authors
  *
  * This file is subject to QPL and may not be  distributed
  * without copyright and license information. Please refer
@@ -83,7 +83,7 @@ void first_grid ()
                                    // there, we will also see how to
                                    // write programs in an essentially
                                    // dimension independent way.
-  
+
                                    // Next, we want to fill the
                                    // triangulation with a single cell
                                    // for a square domain. The
@@ -121,7 +121,7 @@ void second_grid ()
                                    // object for a triangulation of a
                                    // two-dimensional domain:
   Triangulation<2> triangulation;
-  
+
                                    // We then fill it with a ring
                                    // domain. The center of the ring
                                    // shall be the point (1,0), and
@@ -163,7 +163,9 @@ void second_grid ()
                                    // associate this boundary object
                                    // with that part of the boundary
                                    // that has the "boundary
-                                   // indicator" zero. By default, all
+                                   // indicator" zero. By default (at
+                                   // least in 2d and 3d, the 1d case
+                                   // is slightly different), all
                                    // boundary parts have this number,
                                    // but you can change this number
                                    // for some parts of the
@@ -181,7 +183,7 @@ void second_grid ()
                                    // boundary is implied.
   const HyperShellBoundary<2> boundary_description(center);
   triangulation.set_boundary (0, boundary_description);
-  
+
                                    // In order to demonstrate how to
                                    // write a loop over all cells, we
                                    // will refine the grid in five
@@ -267,7 +269,7 @@ void second_grid ()
                                              // to the next cell.
             const double distance_from_center
               = center.distance (cell->vertex(v));
-            
+
             if (std::fabs(distance_from_center - inner_radius) < 1e-10)
               {
                 cell->set_refine_flag ();
@@ -288,8 +290,8 @@ void second_grid ()
                                        // refinement all at once:
       triangulation.execute_coarsening_and_refinement ();
     }
-  
-  
+
+
                                    // Finally, after these five
                                    // iterations of refinement, we
                                    // want to again write the
@@ -339,7 +341,7 @@ void second_grid ()
                                  // isn't much to do here, only to
                                  // call the two subfunctions, which
                                  // produce the two grids.
-int main () 
+int main ()
 {
   first_grid ();
   second_grid ();
