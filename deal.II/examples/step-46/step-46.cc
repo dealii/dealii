@@ -220,16 +220,25 @@ void StokesProblem<dim>::setup_dofs ()
 
   {
     constraints.clear ();
-    std::vector<bool> component_mask (dim+1+dim, false);
-    for (unsigned int d=0; d<dim; ++d)
-      component_mask[d] = true;
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     constraints);
+
+    std::vector<bool> velocity_mask (dim+1+dim, false);
+    for (unsigned int d=0; d<dim; ++d)
+      velocity_mask[d] = true;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      1,
 					      BoundaryValues<dim>(),
 					      constraints,
-					      component_mask);
+					      velocity_mask);
+    std::vector<bool> elasticity_mask (dim+1+dim, false);
+    for (unsigned int d=dim+1; d<dim+1+dim; ++d)
+      elasticity_mask[d] = true;
+    VectorTools::interpolate_boundary_values (dof_handler,
+					      0,
+					      ZeroFunction<dim>(dim+1+dim),
+					      constraints,
+					      elasticity_mask);
   }
 
 				   // make sure velocity is zero at
