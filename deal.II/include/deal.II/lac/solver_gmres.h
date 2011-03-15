@@ -121,7 +121,7 @@ namespace internal
  *
  * The AdditionalData structure contains the number of temporary
  * vectors used. The size of the Arnoldi basis is this number minus
- * three. Addinitonally, it allows you to choose bet right or left
+ * three. Additionally, it allows you to choose between right or left
  * preconditioning. The default is left preconditioning. Finally it
  * includes a flag indicating whether or not the default residual is
  * used as stopping criterion.
