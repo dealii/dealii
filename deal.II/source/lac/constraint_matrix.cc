@@ -2466,5 +2466,11 @@ ONLY_MATRIX_FUNCTIONS(SparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(SparseMatrix<double>);
 ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<float> >);
 ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
+ONLY_MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
+ONLY_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
+ONLY_MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
+ONLY_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
+ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
+ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 
 DEAL_II_NAMESPACE_CLOSE
