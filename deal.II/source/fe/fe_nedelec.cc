@@ -2394,10 +2394,10 @@ const
       for (unsigned int i = 0; i < p_min; ++i)
         for (unsigned int j = 0; j < p_min - 1; ++j)
           {
-            identities.push_back (std::make_pair ((i + 1) * (q + 1) + j,
-                                                  (i + 1) * (p + 1) + j));
-            identities.push_back (std::make_pair (i + (j + q + 2) * q,
-                                                  i + (j + p + 2) * p));
+            identities.push_back (std::make_pair (i * (q - 1) + j,
+                                                  i * (p - 1) + j));
+            identities.push_back (std::make_pair (i + (j + q - 1) * q,
+                                                  i + (j + p - 1) * p));
           }
 
       return identities;
