@@ -161,6 +161,7 @@ deg (p)
       default:
         Assert (false, ExcNotImplemented ());
     }
+
 }
 
 
@@ -2599,15 +2600,16 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                                 (dof, quadrature_point, 1);
               }
 
-          if (deg > 0)
+          if (source_fe.degree > 1)
             {
               const std::vector<Polynomials::Polynomial<double> >&
                 legendre_polynomials
-                  = Polynomials::Legendre::generate_complete_basis (deg);
-              FullMatrix<double> system_matrix_inv (deg, deg);
+                  = Polynomials::Legendre::generate_complete_basis (source_fe.degree - 1);
+              FullMatrix<double> system_matrix_inv (source_fe.degree - 1,
+                                                    source_fe.degree - 1);
 
               {
-                FullMatrix<double> assembling_matrix (deg,
+                FullMatrix<double> assembling_matrix (source_fe.degree - 1,
                                                       n_edge_quadrature_points);
 
                 for (unsigned int q_point = 0;
@@ -2616,20 +2618,20 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                     const double weight
                       = std::sqrt (edge_quadrature.weight (q_point));
 
-                    for (unsigned int i = 0; i < deg; ++i)
+                    for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
                       assembling_matrix (i, q_point) = weight
                                                        * legendre_polynomials[i + 1].value
                                                          (edge_quadrature_points[q_point] (0));
                   }
 
-                FullMatrix<double> system_matrix (deg, deg);
+                FullMatrix<double> system_matrix (source_fe.degree - 1, source_fe.degree - 1);
 
                 assembling_matrix.mTmult (system_matrix, assembling_matrix);
                 system_matrix_inv.invert (system_matrix);
               }
 
-              Vector<double> solution (deg);
-              Vector<double> system_rhs (deg);
+              Vector<double> solution (source_fe.degree - 1);
+              Vector<double> system_rhs (source_fe.degree - 1);
 
               for (unsigned int dof = 0; dof < this->dofs_per_face; ++dof)
                 {
@@ -2651,7 +2653,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                                 * source_fe.shape_value_component
                                                   (0, quadrature_point_1, 1));
 
-                      for (unsigned int i = 0; i < deg; ++i)
+                      for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
                         system_rhs (i) += tmp
                                        * legendre_polynomials[i + 1].value
                                          (edge_quadrature_points[q_point] (0));
@@ -2659,7 +2661,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
 
                   system_matrix_inv.vmult (solution, system_rhs);
 
-                  for (unsigned int i = 0; i < deg; ++i)
+                  for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
                     if (std::abs (solution (i)) > 1e-14)
                       interpolation_matrix (i + 1, dof) = solution (i);
                 }
@@ -2702,15 +2704,16 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                   }
               }
 
-          if (deg > 0)
+          if (source_fe.degree > 1)
             {
               const std::vector<Polynomials::Polynomial<double> >&
                 legendre_polynomials
-                  = Polynomials::Legendre::generate_complete_basis (deg);
-              FullMatrix<double> system_matrix_inv (deg, deg);
+                  = Polynomials::Legendre::generate_complete_basis (source_fe.degree - 1);
+              FullMatrix<double> system_matrix_inv (source_fe.degree - 1,
+                                                    source_fe.degree - 1);
 
               {
-                FullMatrix<double> assembling_matrix (deg,
+                FullMatrix<double> assembling_matrix (source_fe.degree - 1,
                                                       n_edge_quadrature_points);
 
                 for (unsigned int q_point = 0;
@@ -2719,21 +2722,21 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                     const double weight
                       = std::sqrt (edge_quadrature.weight (q_point));
 
-                    for (unsigned int i = 0; i < deg; ++i)
+                    for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
                       assembling_matrix (i, q_point) = weight
                                                        * legendre_polynomials[i + 1].value
                                                          (edge_quadrature_points[q_point] (0));
                   }
 
-                FullMatrix<double> system_matrix (deg, deg);
+                FullMatrix<double> system_matrix (source_fe.degree - 1, source_fe.degree - 1);
 
                 assembling_matrix.mTmult (system_matrix, assembling_matrix);
                 system_matrix_inv.invert (system_matrix);
               }
 
-              FullMatrix<double> solution (deg,
+              FullMatrix<double> solution (source_fe.degree - 1,
                                            GeometryInfo<dim>::lines_per_face);
-              FullMatrix<double> system_rhs (deg,
+              FullMatrix<double> system_rhs (source_fe.degree - 1,
                                              GeometryInfo<dim>::lines_per_face);
               Vector<double> tmp (GeometryInfo<dim>::lines_per_face);
 
@@ -2786,7 +2789,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                                   quadrature_point_1, 0));
                         }
 
-                      for (unsigned int i = 0; i < deg; ++i)
+                      for (unsigned int i = 0; i < source_fe.degree - 1; ++i)
                         {
                           const double L_i
                             = legendre_polynomials[i + 1].value
@@ -2802,7 +2805,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
 
                   for (unsigned int i = 0;
                        i < GeometryInfo<dim>::lines_per_face; ++i)
-                    for (unsigned int j = 0; j < deg; ++j)
+                    for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
                       if (std::abs (solution (j, i)) > 1e-14)
                         interpolation_matrix (i * source_fe.degree + j + 1,
                                               dof) = solution (j, i);
@@ -2814,28 +2817,30 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
               const std::vector<Polynomials::Polynomial<double> >&
                 lobatto_polynomials
                   = Polynomials::Lobatto::generate_complete_basis
-                    (this->degree);
+                    (source_fe.degree);
               const unsigned int n_boundary_dofs
                 = GeometryInfo<dim>::lines_per_face * source_fe.degree;
               const unsigned int& n_quadrature_points = quadrature.size ();
 
               {
-                FullMatrix<double> assembling_matrix (deg * this->degree,
-                                                      n_quadrature_points);
+                FullMatrix<double>
+                  assembling_matrix (source_fe.degree * (source_fe.degree - 1),
+                                     n_quadrature_points);
 
                 for (unsigned int q_point = 0; q_point < n_quadrature_points;
                      ++q_point)
                   {
-                    const double weight = quadrature.weight (q_point);
+                    const double weight = std::sqrt (quadrature.weight (q_point));
 
-                    for (unsigned int i = 0; i <= deg; ++i)
+                    for (unsigned int i = 0; i < source_fe.degree; ++i)
                       {
                         const double L_i = weight
                                            * legendre_polynomials[i].value
                                              (quadrature_points[q_point] (0));
 
-                        for (unsigned int j = 0; j < deg; ++j)
-                          assembling_matrix (i * deg + j, q_point)
+                        for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
+                          assembling_matrix (i * (source_fe.degree - 1) + j,
+                                             q_point)
                             = L_i * lobatto_polynomials[j + 2].value
                                     (quadrature_points[q_point] (1));
                       }
@@ -2878,7 +2883,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                                       quadrature_points[q_point] (1), 0.0);
 
                       for (unsigned int i = 0; i < 2; ++i)
-                        for (unsigned int j = 0; j <= deg; ++j)
+                        for (unsigned int j = 0; j < source_fe.degree; ++j)
                           {
                             tmp (0) -= interpolation_matrix
                                        ((i + 2) * source_fe.degree + j, dof)
@@ -2894,40 +2899,44 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
 
                       tmp *= quadrature.weight (q_point);
 
-                      for (unsigned int i = 0; i <= deg; ++i)
+                      for (unsigned int i = 0; i < source_fe.degree; ++i)
                         {
                           const double L_i_0 = legendre_polynomials[i].value
                                                (quadrature_points[q_point] (0));
                           const double L_i_1 = legendre_polynomials[i].value
                                                (quadrature_points[q_point] (1));
 
-                          for (unsigned int j = 0; j < deg; ++j)
+                          for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
                             {
-                              system_rhs (i * deg + j, 0) += tmp (0) * L_i_0
-                                                          * lobatto_polynomials[j + 2].value
-                                                            (quadrature_points[q_point] (1));
-                              system_rhs (i * deg + j, 1) += tmp (1) * L_i_1
-                                                          * lobatto_polynomials[j + 2].value
-                                                            (quadrature_points[q_point] (0));
+                              system_rhs (i * (source_fe.degree - 1) + j, 0)
+                                += tmp (0) * L_i_0
+                                           * lobatto_polynomials[j + 2].value
+                                             (quadrature_points[q_point] (1));
+                              system_rhs (i * (source_fe.degree - 1) + j, 1)
+                                += tmp (1) * L_i_1
+                                           * lobatto_polynomials[j + 2].value
+                                             (quadrature_points[q_point] (0));
                             }
                         }
                     }
 
                   system_matrix_inv.mmult (solution, system_rhs);
 
-                  for (unsigned int i = 0; i <= deg; ++i)
-                    for (unsigned int j = 0; j < deg; ++j)
+                  for (unsigned int i = 0; i < source_fe.degree; ++i)
+                    for (unsigned int j = 0; j < source_fe.degree - 1; ++j)
                       {
-                        if (std::abs (solution (i * deg + j, 0)) > 1e-14)
-                          interpolation_matrix (i * deg + j + n_boundary_dofs,
-                                                dof) = solution (i * deg + j,
-                                                                 0);
+                        if (std::abs (solution (i * (source_fe.degree - 1) + j, 0))
+                              > 1e-14)
+                          interpolation_matrix (i * (source_fe.degree - 1)
+                                                  + j + n_boundary_dofs, dof)
+                            = solution (i * (source_fe.degree - 1) + j, 0);
 
-                        if (std::abs (solution (i * deg + j, 1)) > 1e-14)
-                          interpolation_matrix (i + (j + deg)
+                        if (std::abs (solution (i * (source_fe.degree - 1) + j, 1))
+                              > 1e-14)
+                          interpolation_matrix (i + (j + source_fe.degree - 1)
                                                   * source_fe.degree
                                                   + n_boundary_dofs, dof)
-                            = solution (i * deg + j, 1);
+                            = solution (i * (source_fe.degree - 1) + j, 1);
                       }
                 }
             }
