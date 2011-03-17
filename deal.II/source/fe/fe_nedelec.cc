@@ -2491,13 +2491,14 @@ const
         for (unsigned int j = 0; j < deg; ++j)
           {
             interpolation_matrix
-              (i + (j + GeometryInfo<2>::lines_per_cell) * source_fe.degree,
-               i + (j + GeometryInfo<2>::lines_per_cell) * this->degree)
+            ((i + GeometryInfo<dim>::lines_per_face) * (source_fe.degree - 1)
+             + j + GeometryInfo<dim>::lines_per_face,
+             (i + GeometryInfo<dim>::lines_per_face) * deg + j
+             + GeometryInfo<dim>::lines_per_face)
               = 1.0;
             interpolation_matrix
-              ((i * (source_fe.degree - 1)
-               + GeometryInfo<2>::lines_per_cell) * source_fe.degree + j,
-               (i * deg + GeometryInfo<2>::lines_per_cell) * this->degree)
+            (i + (j + GeometryInfo<dim>::lines_per_face) * source_fe.degree,
+             i + (j + GeometryInfo<dim>::lines_per_face) * this->degree)
               = 1.0;
           }
       }
