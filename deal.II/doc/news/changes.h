@@ -29,6 +29,11 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: Corrections in the creation of the face and subface
+interpolation matrices in the class FE_Nedelec.
+<br>
+(Markus Buerg, 2011/03/17)
+
 <li> Fixed: On Debian, the Trilinos packages use a different layout
 of include files and library names. The <code>./configure</code>
 script can now deal with this.
