@@ -148,9 +148,9 @@ namespace FEValuesExtractors
 
 				   /**
 				    * Extractor for a vector of
-				    * <code>dim</code> components of a
+				    * <code>spacedim</code> components of a
 				    * vector-valued element. The value of
-				    * <code>dim</code> is defined by the
+				    * <code>spacedim</code> is defined by the
 				    * FEValues object the extractor is applied
 				    * to.
 				    *
@@ -159,6 +159,29 @@ namespace FEValuesExtractors
 				    * documentation of the namespace
 				    * FEValuesExtractors and in the @ref
 				    * vector_valued module.
+				    *
+				    * Note that in the current context, a
+				    * vector is meant in the sense physics
+				    * uses it: it has <code>spacedim</code>
+				    * components that behave in specific ways
+				    * under coordinate system
+				    * transformations. Examples include
+				    * velocity or displacement fields. This is
+				    * opposed to how mathematics uses the word
+				    * "vector" (and how we use this word in
+				    * other contexts in the library, for
+				    * example in the Vector class), where it
+				    * really stands for a collection of
+				    * numbers. An example of this latter use
+				    * of the word could be the set of
+				    * concentrations of chemical species in a
+				    * flame; however, these are really just a
+				    * collection of scalar variables, since
+				    * they do not change if the coordinate
+				    * system is rotated, unlike the components
+				    * of a velocity vector, and consequently,
+				    * this class should not be used for this
+				    * context.
 				    *
 				    * @ingroup feaccess vector_valued
 				    */
@@ -499,10 +522,33 @@ namespace FEValuesViews
 
 				   /**
 				    * A class representing a view to a set of
-				    * <code>dim</code> components forming a
+				    * <code>spacedim</code> components forming a
 				    * vector part of a vector-valued finite
 				    * element. Views are discussed in the
 				    * @ref vector_valued module.
+				    *
+				    * Note that in the current context, a
+				    * vector is meant in the sense physics
+				    * uses it: it has <code>spacedim</code>
+				    * components that behave in specific ways
+				    * under coordinate system
+				    * transformations. Examples include
+				    * velocity or displacement fields. This is
+				    * opposed to how mathematics uses the word
+				    * "vector" (and how we use this word in
+				    * other contexts in the library, for
+				    * example in the Vector class), where it
+				    * really stands for a collection of
+				    * numbers. An example of this latter use
+				    * of the word could be the set of
+				    * concentrations of chemical species in a
+				    * flame; however, these are really just a
+				    * collection of scalar variables, since
+				    * they do not change if the coordinate
+				    * system is rotated, unlike the components
+				    * of a velocity vector, and consequently,
+				    * this class should not be used for this
+				    * context.
 				    *
 				    * @ingroup feaccess vector_valued
 				    */
