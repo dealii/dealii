@@ -375,6 +375,20 @@
  * step-22,
  * step-31 and several other programs.
  *
+ * @note In the current context, when we talk about a vector (for example in
+ * extracting the velocity components above), we mean the word in the sense
+ * physics uses it: it has <code>spacedim</code> components that behave in
+ * specific ways under coordinate system transformations. Examples include
+ * velocity or displacement fields. This is opposed to how mathematics uses
+ * the word "vector" (and how we use this word in other contexts in the
+ * library, for example in the Vector class), where it really stands for a
+ * collection of numbers. An example of this latter use of the word could be
+ * the set of concentrations of chemical species in a flame; however, these
+ * are really just a collection of scalar variables, since they do not change
+ * if the coordinate system is rotated, unlike the components of a velocity
+ * vector, and consequently, this FEValuesExtractors::Vector class should not
+ * be used for this case.
+ *
  *
  * @anchor VVAlternative
  * <h3>An alternative approach</h3>
