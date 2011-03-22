@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -311,7 +311,7 @@ namespace Functions
 					 // If we found one in this cell, keep looking in the same cell
 	for (unsigned int p=first_outside; p<np; ++p) 
 	  if (point_flags[p] == false) {
-	    Point<dim> qpoint =  mapping.transform_real_to_unit_cell(cell, points[p]);
+	    Point<dim> qpoint =  mapping.transform_real_to_unit_cell(cells[c], points[p]);
 	    if (GeometryInfo<dim>::is_inside_unit_cell(qpoint))
 	      {
 		point_flags[p] = true;
