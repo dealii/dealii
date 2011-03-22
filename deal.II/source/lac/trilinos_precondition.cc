@@ -578,6 +578,7 @@ namespace TrilinosWrappers
       additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes (domain_map,
 						   constant_modes_dimension);
+    std::vector<double> dummy (constant_modes_dimension);
 
     if (constant_modes_dimension > 1)
       {
@@ -609,8 +610,16 @@ namespace TrilinosWrappers
 	parameter_list.set("null space: type", "pre-computed");
 	parameter_list.set("null space: dimension",
 			   distributed_constant_modes.NumVectors());
-	parameter_list.set("null space: vectors",
-			   distributed_constant_modes.Values());
+	if (my_size > 0)
+	  parameter_list.set("null space: vectors",
+			     distributed_constant_modes.Values());
+				// We need to set a valid pointer to data even
+				// if there is no data on the current
+				// processor. Therefore, pass a dummy in that
+				// case
+	else
+	  parameter_list.set("null space: vectors",
+			     &dummy[0]);
       }
 
     initialize (matrix, parameter_list);
