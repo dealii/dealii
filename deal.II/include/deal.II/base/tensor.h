@@ -1321,7 +1321,7 @@ void
 cross_product (Tensor<1,dim>       &dst,
 	       const Tensor<1,dim> &src)
 {
-  Assert (dim==2, ExcInternalError());
+  Assert (dim==2, ExcImpossibleInDim(dim));
 
   dst[0] = src[1];
   dst[1] = -src[0];
@@ -1345,7 +1345,7 @@ cross_product (Tensor<1,dim>       &dst,
 	       const Tensor<1,dim> &src1,
 	       const Tensor<1,dim> &src2)
 {
-  Assert (dim==3, ExcInternalError());
+  Assert (dim==3, ExcImpossibleInDim(dim));
 
   dst[0] = src1[1]*src2[2] - src1[2]*src2[1];
   dst[1] = src1[2]*src2[0] - src1[0]*src2[2];
