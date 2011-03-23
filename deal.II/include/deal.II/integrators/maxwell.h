@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,7 +26,32 @@ DEAL_II_NAMESPACE_OPEN
 namespace LocalIntegrators
 {
 /**
- * @brief Local integrators related to curl operators and their traces.
+ * @brief Local integrators related to curl operators and their
+ * traces.
+ *
+ * We use the following conventions for curl
+ * operators. First, in three space dimensions
+ *
+ * @f[
+ * \nabla\times \mathbf u = \begin{pmatrix}
+ *   \partial_3 u_2 - \partial 2 u_3 \\
+ *   \partial_1 u_3 - \partial 3 u_1 \\
+ *   \partial_2 u_1 - \partial 1 u_2
+ * \end{pmatrix}
+ * @f]
+ *
+ * In two space dimensions, the curl is obtained by extending a vector
+ * <b>u</b> to $(u_1, u_2, 0)^T$ and a scalar <i>p</i> to $(0,0,p)^T$.
+ * Computing the nonzero components, we obtain the scalar
+ * curl of a vector function and the vector curl of a scalar
+ * function. The current implementation exchanges the sign and we have:
+ *
+ * @f[
+ *  \nabla \times \mathbf u = \partial_1 u_2 - \partial 2 u_1
+ *  \nabla \times p = \begin{pmatrix}
+ *    \partial_2 p \\ -\partial_1 p
+ *  \end{pmatrix}
+ * @f]
  *
  * @ingroup Integrators
  * @author Guido Kanschat
@@ -34,13 +59,88 @@ namespace LocalIntegrators
  */
   namespace Maxwell
   {
-				     /**
-				      * The curl-curl operator
-				      * @f[
-				      * \int_Z \nabla\!\times\! u \cdot
-				      * \nabla\!\times\! v \,dx
-				      * @f]
-				      */
+/**
+ * Auxiliary function. Given the tensors of <tt>dim</tt> second derivatives,
+ * compute the curl of the curl of a vector function. The result in
+ * two dimensions is:
+ * @f[
+ * \nabla\times\nabla\times \mathbf u = \brgin{pmatrix}
+ * \partial_1\partial_2 u_2 - \partial_2^2 u_1 \\
+ * \partial_1\partial_2 u_1 - \partial_1^2 u_2
+ * \end{pmatrix}
+ * @f]
+ *
+ * @note The third tensor argument is not used in two dimensions and
+ * can for instance duplicate one of the previous.
+ *
+ * @author Guido Kanschat
+ * @date 2011
+ */
+    template <int dim>
+    Tensor<1,dim>
+    curl_curl (
+      const Tensor<2,dim>& h0,
+      const Tensor<2,dim>& h1,
+      const Tensor<2,dim>& h2)
+    {
+      Tensor<1,dim> result;
+      switch (dim)
+	{
+	  case 2:
+		result[0] = h1[0][1]-h0[1][1];
+		result[1] = h0[0][1]-h1[0][0];
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+	}
+      return result;
+    }
+
+/**
+ * Auxiliary function. Given <tt>dim</tt> tensors of first
+ * derivatives and a normal vector, compute the tangential curl
+ * @f[
+ * \mathbf n \times \nabla \times u.
+ * @f]
+ *
+ * @note The third tensor argument is not used in two dimensions and
+ * can for instance duplicate one of the previous.
+ *
+ * @author Guido Kanschat
+ * @date 2011
+ */
+    template <int dim>
+    Tensor<1,dim>
+    tangential_curl (
+      const Tensor<1,dim>& g0,
+      const Tensor<1,dim>& g1,
+      const Tensor<1,dim>& g2,
+      const Tensor<1,dim>& normal)
+    {
+      Tensor<1,dim> result;
+      
+      switch (dim)
+	{
+	  case 2:
+		result[0] = normal[1] * (g1[0]-g0[1]);
+		result[1] =-normal[0] * (g1[0]-g0[1]);
+		break;
+	  default:
+		Assert(false, ExcNotImplemented());
+	}
+      return result;
+    }
+    
+/**
+ * The curl-curl operator
+ * @f[
+ * \int_Z \nabla\!\times\! u \cdot
+ * \nabla\!\times\! v \,dx
+ * @f]
+ *
+ * @author Guido Kanschat
+ * @date 2011
+ */
     template <int dim>
     void curl_curl_matrix (
       FullMatrix<double>& M,
@@ -82,16 +182,17 @@ namespace LocalIntegrators
 	}
     }
     
-    				     /**
-				      * The curl operator
-				      * @f[
-				      * \int_Z \nabla\!\times\! u \cdot v \,dx.
-				      * @f]
-				      *
-				      * This is the standard curl
-				      * operator in 3D and the scalar
-				      * curl in 2D.
-				      */
+/**
+ * The curl operator
+ * @f[
+ * \int_Z \nabla\!\times\! u \cdot v \,dx.
+ * @f]
+ *
+ * This is the standard curl operator in 3D and the scalar curl in 2D.
+  *
+ * @author Guido Kanschat
+ * @date 2011
+*/
     template <int dim>
     void curl_matrix (
       FullMatrix<double>& M,
