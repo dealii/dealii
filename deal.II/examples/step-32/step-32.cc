@@ -305,7 +305,7 @@ namespace LinearSolvers
       void solve_A(TrilinosWrappers::MPI::Vector &dst,
 		  const TrilinosWrappers::MPI::Vector &src) const
 	{
-	  SolverControl cn(5000, src.l2_norm()*1e-4);
+	  SolverControl cn(5000, src.l2_norm()*1e-2);
 	  TrilinosWrappers::SolverCG solver(cn);
 	  solver.solve(stokes_matrix->block(0,0), dst, src, a_preconditioner);
 	}
@@ -3710,7 +3710,7 @@ void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
 			      Point<dim>(),
 			      EquationData::R0,
 			      EquationData::R1,
-			      96,
+			      (dim==3) ? 96 : 12,
 			      true);
   static HyperShellBoundary<dim> boundary;
   triangulation.set_boundary (0, boundary);
