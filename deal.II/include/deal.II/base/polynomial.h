@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -390,11 +390,7 @@ namespace Polynomials
  * Legendre polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
  * Constructing a Legendre polynomial of degree <tt>p</tt>, the coefficients
- * will be computed by the three-term recursion formula.  The
- * coefficients are stored in a static data vector to be available
- * when needed next time. Since the recursion is performed for the
- * interval $[-1,1]$, the polynomials are shifted to $[0,1]$ by the
- * <tt>scale</tt> and <tt>shift</tt> functions of <tt>Polynomial</tt>, afterwards.
+ * will be computed by the three-term recursion formula.
  *
  * @author Guido Kanschat, 2000
  */
@@ -446,6 +442,15 @@ namespace Polynomials
 
                                        /**
                                         * Compute coefficients recursively.
+					* The coefficients are stored in a
+					* static data vector to be available
+					* when needed next time. Since the
+					* recursion is performed for the
+					* interval $[-1,1]$, the polynomials
+					* are shifted to $[0,1]$ by the
+					* <tt>scale</tt> and <tt>shift</tt>
+					* functions of <tt>Polynomial</tt>,
+					* afterwards.
                                         */
       static void compute_coefficients (const unsigned int p);
 
