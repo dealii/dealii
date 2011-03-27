@@ -380,7 +380,7 @@ namespace internal
 /**
  *  Triangulations denote a hierarchy of levels of elements which together
  *  form a @p dim -dimensional manifold in @p spacedim spatial dimensions
- *  (if spacedim is not specified it takes the default value @ spacedim=dim).
+ *  (if spacedim is not specified it takes the default value @p spacedim=dim).
  *
  *  Thus, for example, an object of type @p Triangulation<1,1> (or simply
  *  @p Triangulation<1> since @p spacedim==dim by default) is used to represent
