@@ -541,7 +541,7 @@ FILTER_SOURCE_FILES    = YES
 # then you must also enable this option. If you don't then doxygen will produce
 # a warning and turn it on anyway
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body
 # of functions and classes directly in the documentation.
