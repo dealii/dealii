@@ -64,7 +64,7 @@ namespace LocalIntegrators
  * compute the curl of the curl of a vector function. The result in
  * two dimensions is:
  * @f[
- * \nabla\times\nabla\times \mathbf u = \brgin{pmatrix}
+ * \nabla\times\nabla\times \mathbf u = \begin{pmatrix}
  * \partial_1\partial_2 u_2 - \partial_2^2 u_1 \\
  * \partial_1\partial_2 u_1 - \partial_1^2 u_2
  * \end{pmatrix}
