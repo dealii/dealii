@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,11 +16,11 @@
  *
  * @image html logo200.png
  *
- * This is the main page for class and function documentation in
- * deal.II. Documentation on other aspects of deal.II can be found
- * elsewhere. In particular, there are
- * <a href="../tutorial/index.html">tutorial programs on the use of
- * this library</a>.
+ * This is the main starting page for the deal.II class and function
+ * documentation.  Documentation on other aspects, such as the build system,
+ * can be found elsewhere. In addition, there are <a
+ * href="../tutorial/index.html">tutorial programs on the use of this
+ * library</a>.
  *
  * Many of the classes in the deal.II library can be grouped into
  * modules (see the <a href="modules.html">Modules page</a> or the
