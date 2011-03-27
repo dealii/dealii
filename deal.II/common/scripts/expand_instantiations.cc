@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -117,6 +117,30 @@ skip_space (std::string &in)
 }
 
 
+std::string remove_comments (std::string line)
+{
+  const std::string::size_type double_slash_comment = line.find ("//");
+  if (double_slash_comment != std::string::npos)
+    line.erase (double_slash_comment, std::string::npos);
+
+  const std::string::size_type slash_star_comment_begin = line.find ("/*");
+  if (slash_star_comment_begin != std::string::npos)
+    {
+      const std::string::size_type slash_star_comment_end = line.find ("*/");
+      if (slash_star_comment_end == std::string::npos)
+	{
+	  std::cerr << "The program can currently only handle /* block */"
+		    << "comments that start and end within the same line."
+		    << std::endl;
+	  std::exit (1);
+	}
+      line.erase (slash_star_comment_begin,
+		  slash_star_comment_end - slash_star_comment_begin + 2);
+    }
+
+  return line;
+}
+
 
 // read the whole file specified by the stream given as argument into a string
 // for simpler parsing, and return it
@@ -128,11 +152,8 @@ std::string read_whole_file (std::istream &in)
       std::string line;
       getline (in, line);
 
-      if (line.find ("//") != 0)
-	{
-	  whole_file += line;
-	  whole_file += '\n';
-	}
+      whole_file += remove_comments (line);
+      whole_file += '\n';
     }
 				   // substitute tabs by spaces, multiple
 				   // spaces by single ones
