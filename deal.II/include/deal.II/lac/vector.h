@@ -958,18 +958,18 @@ class Vector : public Subscriptor
 				      */
     std::size_t memory_consumption () const;
 				     //@}
-	
+
                      /**
                       * Write the data of this object to
                       * a stream for the purpose of serialization.
-                      */ 
+                      */
     template <class Archive>
     void save (Archive & ar, const unsigned int version) const;
 
                      /**
-                      * Read the data of this object 
+                      * Read the data of this object
                       * from a stream for the purpose of serialization.
-                      */    
+                      */
     template <class Archive>
     void load (Archive & ar, const unsigned int version);
 
@@ -1494,7 +1494,7 @@ Vector<Number>::save (Archive & ar, const unsigned int) const
                                      // forward to serialization
                                      // function in the base class.
   ar &  static_cast<const Subscriptor &>(*this);
-  
+
   ar & vec_size & max_vec_size ;
   ar & boost::serialization::make_array(val, max_vec_size);
 }
@@ -1510,9 +1510,9 @@ Vector<Number>::load (Archive & ar, const unsigned int)
                                      // forward to serialization
                                      // function in the base class.
   ar &  static_cast<Subscriptor &>(*this);
-  
+
   ar & vec_size & max_vec_size ;
-  
+
   val = new Number[max_vec_size];
   ar & boost::serialization::make_array(val, max_vec_size);
 }
@@ -1550,7 +1550,7 @@ inline
 std::ostream&
 operator << (std::ostream& os, const Vector<number>& v)
 {
-  v.print(os);  
+  v.print(os);
   return os;
 }
 
@@ -1563,7 +1563,7 @@ LogStream&
 operator << (LogStream& os, const Vector<number>& v)
 {
   v.print(os);
-  return os;  
+  return os;
 }
 
 

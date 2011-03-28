@@ -408,7 +408,7 @@ SparseDirectMA27::~SparseDirectMA27()
 					 // avoid compiler warnings
 //TODO:[WB] Should t be used to trace errors?
         ssize_t t = write (detached_mode_data->server_client_pipe[1], "7", 1);
-	t = 0;
+	(void)t;
                                          // then also delete data
         delete detached_mode_data;
         detached_mode_data = 0;
@@ -462,7 +462,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 				       // warnings
 //TODO:[WB] Use t to trace errors?      
       int t = pipe(detached_mode_data->server_client_pipe);
-      t = pipe(detached_mode_data->client_server_pipe);      
+      (void)t;      
 
                                        // fflush(NULL) is said to be a
                                        // good idea before fork()

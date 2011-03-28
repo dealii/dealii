@@ -103,7 +103,6 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
 					   // into the matrix for the
 					   // diagonal block
 	  BlockList::const_iterator row = additional_data.block_list->begin(block);
-	  BlockList::const_iterator end = additional_data.block_list->end(block);
 	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
 	    {
 //TODO:[GK] Optimize here
@@ -173,7 +172,6 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
       x_cell.reinit(bs);
 				       // Collect off-diagonal parts
       BlockList::const_iterator row = additional_data.block_list->begin(block);
-      BlockList::const_iterator end = additional_data.block_list->end(block);
       for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
 	{
 	  b_cell(row_cell) = src(*row);
