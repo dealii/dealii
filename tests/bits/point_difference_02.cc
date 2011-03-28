@@ -42,6 +42,8 @@ template<int dim>
 class MySquareFunction : public Function<dim>
 {
   public:
+    MySquareFunction () : Function<dim> () {}
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
       {	return (component+1)*p.square()+1; }
@@ -56,6 +58,8 @@ template<int dim>
 class MyExpFunction : public Function<dim>
 {
   public:
+    MyExpFunction () : Function<dim> () {}
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component) const
       {	return std::exp (p(0)); }
