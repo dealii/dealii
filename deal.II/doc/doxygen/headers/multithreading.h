@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1095,12 +1095,11 @@
  * <h3>Thread-based parallelism</h3>
  *
  * Even though tasks are a higher-level way to describe things, there are
- * cases where they are poorly suited to a task. The main reason for not
- * using tasks even for computations that are independent are listed in the
- * section on
+ * cases that are poorly suited to a task (for a discussion of some of
+ * these cases see
  * @ref MTHow "How scheduling tasks works and when task-based programming is not efficient"
- * above. Primarily, jobs that are not able to fully utilize the CPU are bad
- * fits for tasks as discussed above.
+ * above). Generally, jobs that are not able to fully utilize the CPU are bad
+ * fits for tasks and good fits for threads.
  *
  * In a case like this, you can resort to explicitly start threads, rather
  * than tasks, using pretty much the same syntax as above. For example, if you
@@ -1131,15 +1130,12 @@
  * @endcode
  *
  * Here, Threads::new_thread starts the given function that writes to the
- * output file on a new thread that can run in %parallel to everything
- * else. Note that this function is actually pretty well parallelized: both
- * DataOut::build_patches() and KellyErrorEstimator::estimate() already use
- * WorkStream and will therefore utilize pretty much all available compute
- * resources. In %parallel to the KellyErrorEstimator::estimate() function, the
- * DataOut::write_vtk() function will run on a separate thread, independent of
- * the scheduler that takes care of the tasks, but that is not a problem
- * because writing lots of data to a file is not something that will keep a
- * CPU very busy.
+ * output file on a new thread that can run in %parallel to everything else:
+ * In %parallel to the KellyErrorEstimator::estimate() function, the
+ * DataOut::write_vtk() function will run on a separate thread. This execution
+ * is independent of the scheduler that takes care of tasks, but that is
+ * not a problem because writing lots of data to a file is not something that
+ * will keep a CPU very busy.
  *
  * Creating threads works pretty much the same way as tasks, i.e. you can wait
  * for the termination of a thread using Threads::Thread::join(), query the
