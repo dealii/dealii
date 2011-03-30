@@ -3062,9 +3062,9 @@ void BoussinesqFlowProblem<dim>::solve ()
 
 				// extract temperature range
     std::vector<double> temperature (2), global_temperature (2);
-    temperature[0] = distributed_temperature_solution.trilinos_vector()[0][0],
-      temperature[1] = temperature[0];
-    for (unsigned int i=1; i<distributed_temperature_solution.local_size(); ++i)
+    temperature[0] = std::numeric_limits<double>::max(),
+      temperature[1] = -std::numeric_limits<double>::max();
+    for (unsigned int i=0; i<distributed_temperature_solution.local_size(); ++i)
       {
 	temperature[0] = std::min<double> (temperature[0],
 					   distributed_temperature_solution.trilinos_vector()[0][i]);
