@@ -1848,7 +1848,6 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   AssertThrow (vec.vector_partitioner().IsOneToOne(),
 	       ExcMessage ("Distribute does not work on vectors with overlapping parallel partitioning."));
 
-
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
@@ -2008,12 +2007,8 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 			  it->entries[i].second);
 	  vec(it->line) = new_value;
 	}
+      vec.block(block).compress(Insert);
     }
-
-				   // force every processor to write something
-  unsigned int idx = vec.block(0).local_range().first;
-  vec(idx) = vec(idx);
-  vec.compress ();
 }
 
 #endif

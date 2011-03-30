@@ -1142,7 +1142,8 @@ namespace TrilinosWrappers
     Assert (vector.get() != 0,
 	    ExcMessage("Vector has not been constructed properly."));
 
-    if (fast == false || local_range() != v.local_range())
+    if (fast == false ||
+	vector_partitioner().SameAs(v.vector_partitioner())==false)
       vector.reset (new Epetra_FEVector(*v.vector));
   }
 
