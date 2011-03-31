@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1019,7 +1019,28 @@ double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 
 
 template <>
+double TriaAccessor<1,1,2>::extent_in_direction(const unsigned int axis) const
+{
+  Assert (axis == 0, ExcIndexRange (axis, 0, 1));
+
+  return this->diameter();
+}
+
+
+template <>
 double TriaAccessor<2,2,2>::extent_in_direction(const unsigned int axis) const
+{
+  const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
+				    {0,1}};/// Lines along y-axis
+
+  Assert (axis < 2, ExcIndexRange (axis, 0, 2));
+
+  return std::max(this->line(lines[axis][0])->diameter(),
+		  this->line(lines[axis][1])->diameter());
+}
+
+template <>
+double TriaAccessor<2,2,3>::extent_in_direction(const unsigned int axis) const
 {
   const unsigned int lines[2][2] = {{2,3}, /// Lines along x-axis, see GeometryInfo
 				    {0,1}};/// Lines along y-axis

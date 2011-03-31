@@ -29,6 +29,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: Added some instantiations to make anisotropic refinement work 
+in codimension one.
+<br>
+(Luca Heltai, 2011/03/31)
+
+<ol>
 <li> Fixed: Corrections in the creation of the face and subface
 interpolation matrices in the class FE_Nedelec.
 <br>

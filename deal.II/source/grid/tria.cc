@@ -8944,11 +8944,17 @@ namespace internal
 	void
 	prevent_distorted_boundary_cells (const Triangulation<1,spacedim> &);
 
+	
 	template <int dim, int spacedim>
 	static
 	void
 	prevent_distorted_boundary_cells (Triangulation<dim,spacedim> &triangulation)
 	  {
+					     // If the codimension is
+					     // one, we cannot perform
+					     // this check yet.
+	    if(spacedim>dim) return;
+	    
 	    for (typename Triangulation<dim,spacedim>::cell_iterator
 		   cell=triangulation.begin(); cell!=triangulation.end(); ++cell)
 	      if (cell->at_boundary() &&
