@@ -138,6 +138,11 @@ namespace LocalIntegrators
 		result[0] = normal[1] * (g1[0]-g0[1]);
 		result[1] =-normal[0] * (g1[0]-g0[1]);
 		break;
+	  case 3:
+		result[0] = normal[2]*(g2[1]-g0[2])+normal[1]*(g1[0]-g0[1]);
+		result[1] = normal[0]*(g0[2]-g1[0])+normal[2]*(g2[1]-g1[2]);
+		result[2] = normal[1]*(g1[0]-g2[1])+normal[0]*(g0[2]-g2[0]);
+		break;
 	  default:
 		Assert(false, ExcNotImplemented());
 	}
