@@ -34,9 +34,9 @@ namespace LocalIntegrators
  *
  * @f[
  * \nabla\times \mathbf u = \begin{pmatrix}
- *   \partial_3 u_2 - \partial 2 u_3 \\
- *   \partial_1 u_3 - \partial 3 u_1 \\
- *   \partial_2 u_1 - \partial 1 u_2
+ *   \partial_3 u_2 - \partial_2 u_3 \\
+ *   \partial_1 u_3 - \partial_3 u_1 \\
+ *   \partial_2 u_1 - \partial_1 u_2
  * \end{pmatrix}
  * @f]
  *
@@ -45,9 +45,9 @@ namespace LocalIntegrators
  * Computing the nonzero components, we obtain the scalar
  * curl of a vector function and the vector curl of a scalar
  * function. The current implementation exchanges the sign and we have:
- *
  * @f[
  *  \nabla \times \mathbf u = \partial_1 u_2 - \partial 2 u_1
+ *  \qquad
  *  \nabla \times p = \begin{pmatrix}
  *    \partial_2 p \\ -\partial_1 p
  *  \end{pmatrix}
@@ -62,12 +62,20 @@ namespace LocalIntegrators
 /**
  * Auxiliary function. Given the tensors of <tt>dim</tt> second derivatives,
  * compute the curl of the curl of a vector function. The result in
- * two dimensions is:
+ * two and three dimensions is:
  * @f[
  * \nabla\times\nabla\times \mathbf u = \begin{pmatrix}
  * \partial_1\partial_2 u_2 - \partial_2^2 u_1 \\
  * \partial_1\partial_2 u_1 - \partial_1^2 u_2
  * \end{pmatrix}
+ *
+ * \nabla\times\nabla\times \mathbf u = \begin{pmatrix}
+ * \partial_1\partial_2 u_2 + \partial_1\partial_3 u_3
+ * - (\partial_2^2+\partial_3^2) u_1 \\
+ * \partial_2\partial_3 u_3 + \partial_2\partial_1 u_1
+ * - (\partial_3^2+\partial_1^2) u_2 \\
+ * \partial_3\partial_1 u_1 + \partial_3\partial_2 u_2
+ * - (\partial_1^2+\partial_2^2) u_3
  * @f]
  *
  * @note The third tensor argument is not used in two dimensions and
@@ -89,6 +97,11 @@ namespace LocalIntegrators
 	  case 2:
 		result[0] = h1[0][1]-h0[1][1];
 		result[1] = h0[0][1]-h1[0][0];
+		break;
+	  case 3:
+		result[0] = h1[0][1]+h2[0][2]-h0[1][1]-h0[2][2];
+		result[1] = h2[1][2]+h0[1][0]-h1[2][2]-h1[0][0];
+		result[2] = h0[2][0]+h1[2][1]-h2[0][0]-h2[1][1];
 		break;
 	  default:
 		Assert(false, ExcNotImplemented());

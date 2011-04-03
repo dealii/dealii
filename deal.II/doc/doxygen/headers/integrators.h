@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,10 @@
  * on finite element meshes in MeshWorker and actual implementations
  * of the integration of cell and face terms for concrete problems in
  * LocalIntegrators.
+ *
+ * @note Documentation on coding conventions, relations between
+ * classes, and details of the implementation is found in the
+ * documentation of namespaces in this module.
  *
  * <h3>Integration on finite element meshes</h3>
  *
