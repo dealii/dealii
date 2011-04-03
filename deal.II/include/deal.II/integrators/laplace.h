@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,6 +77,7 @@ namespace LocalIntegrators
  * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed
  * with compute_penalty().
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2008, 2009, 2010
  */
@@ -120,6 +121,10 @@ namespace LocalIntegrators
  * <tt>Dinput</tt>, respectively. <i>g</i> is the inhomogeneous
  * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
  * penalty parameter.
+ *
+ * @ingroup Integrators
+ * @author Guido Kanschat
+ * @date 2008, 2009, 2010
  */
       template <int dim>
       void nitsche_residual (
@@ -217,6 +222,7 @@ namespace LocalIntegrators
  * the same on both sides. If factors differ, note that the penalty
  * parameter has to be computed accordingly.
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2008, 2009, 2010
  */

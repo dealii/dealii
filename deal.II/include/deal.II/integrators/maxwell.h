@@ -151,6 +151,7 @@ namespace LocalIntegrators
  * \nabla\!\times\! v \,dx
  * @f]
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2011
  */
@@ -203,6 +204,7 @@ namespace LocalIntegrators
  *
  * This is the standard curl operator in 3D and the scalar curl in 2D.
   *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2011
 */

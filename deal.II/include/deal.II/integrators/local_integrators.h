@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,12 +31,8 @@ DEAL_II_NAMESPACE_OPEN
  * functions for computing cell matrices and cell residuals for the
  * Laplacian operator, as well as functions for the weak boundary
  * conditions by Nitsche or the interior penalty discontinuous
- * Galerkin method. The namespace Maxwell would do the same for
+ * Galerkin method. The namespace Maxwell does the same for
  * curl-curl type problems.
- *
- * There is a namespace Differential containing general
- * first order differential operators like divergence, gradient and
- * curl, and their traces on faces.
  *
  * The namespace L2 contains functions for mass matrices and
  * <i>L<sup>2</sup></i>-inner products.
@@ -141,7 +137,7 @@ void MatrixIntegrator<dim>::cell(
   typename MeshWorker::IntegrationInfo<dim>& info)
 {
   Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0));
-  Differential::div_primal_matrix(dinfo.matrix(1,false).matrix, info.fe_values(0), info.fe_values(1));
+  Divergence::cell_matrix(dinfo.matrix(1,false).matrix, info.fe_values(0), info.fe_values(1));
   L2::cell_matrix(dinfo.matrix(2,false).matrix, info.fe_values(1));
 }
  * @endcode
