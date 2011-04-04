@@ -226,7 +226,7 @@ namespace MeshWorker
  * automatically by the loop.
  * Most of the work in this loop is done in cell_action(), which also
  * receives most of the parameters of this function. See the
- * documentation there for mor details.
+ * documentation there for more details.
  *
  * If you don't want anything to be done on cells, interior or boundary faces
  * to happen, simply pass the Null pointer to one of the function
