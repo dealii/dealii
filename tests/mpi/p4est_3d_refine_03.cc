@@ -1,0 +1,106 @@
+//---------------------------------------------------------------------------
+//    $Id: p4est_3d_refine_02.cc 23327 2011-02-11 03:19:07Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 2009, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+// refine  a 3d cell that is not marked once (currently a bug in p4est):
+/*
+#17 0x00007fffebfde43b in sc_abort_verbose (
+    filename=0x7fffec2ef7c8 "/scratch/p4estbuild/p4est-0.3.1.55-67fe1/src/p4est_bits.c", lineno=756, msg=0x7fffec2efc07 "Assertion 'q->level > 0'")
+    at /scratch/p4estbuild/p4est-0.3.1.55-67fe1/sc/src/sc.c:603
+#18 0x00007fffec2a2d4b in p8est_quadrant_parent (q=0x834670, r=0x833a50)
+    at /scratch/p4estbuild/p4est-0.3.1.55-67fe1/src/p4est_bits.c:756
+#19 0x00007fffec29e46c in p4est_correct_partition (p4est=0x835b40, 
+    num_quadrants_in_proc=0x834750)
+    at /scratch/p4estbuild/p4est-0.3.1.55-67fe1/src/p4est.c:2430
+#20 0x00007fffec29ddaf in p8est_partition_ext (p4est=0x835b40, 
+    partition_for_coarsening=1, weight_fn=0)
+    at /scratch/p4estbuild/p4est-0.3.1.55-67fe1/src/p4est.c:2293
+#21 0x00007ffff68a73c7 in dealii::parallel::distributed::Triangulation<3, 3>::execute_coarsening_and_refinement (this=0x7fffffffb7d0)
+    at /scratch/deal-trunk/deal.II/source/distributed/tria.cc:2612
+#22 0x0000000000410e6b in test<3> () at p4est_3d_refine_03.cc:64
+#23 0x000000000040c6e5 in main (argc=1, argv=0x7fffffffdd98)
+    at p4est_3d_refine_02.cc:106
+    */
+    
+#include "../tests.h"
+#include "coarse_grid_common.h"
+#include <base/logstream.h>
+#include <base/tensor.h>
+#include <grid/tria.h>
+#include <distributed/tria.h>
+#include <grid/tria_accessor.h>
+#include <grid/grid_generator.h>
+#include <grid/grid_out.h>
+#include <grid/grid_tools.h>
+#include <base/utilities.h>
+
+#include <fstream>
+#include <ostream>
+
+template<int dim>
+void test()
+{
+  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+
+      parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+      GridGenerator::hyper_cube(tr);
+      
+      tr.execute_coarsening_and_refinement ();
+
+      unsigned int checksum = tr.get_checksum ();
+      if (myid == 0)
+	{
+	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+	  deallog << "Checksum: "
+		  << checksum
+		  << std::endl;
+	}
+
+  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+    deallog << "OK" << std::endl;
+}
+
+
+int main(int argc, char *argv[])
+{
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Init (&argc,&argv);
+#else
+  (void)argc;
+  (void)argv;
+#endif
+
+  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+
+
+  deallog.push(Utilities::int_to_string(myid));
+
+  if (myid == 0)
+    {
+      std::ofstream logfile(output_file_for_mpi("p4est_3d_refine_03").c_str());
+      deallog.attach(logfile);
+      deallog.depth_console(0);
+      deallog.threshold_double(1.e-10);
+
+      deallog.push("3d");
+      test<3>();
+      deallog.pop();
+    }
+  else
+    test<3>();
+
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Finalize();
+#endif
+}
