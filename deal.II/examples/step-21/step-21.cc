@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -497,9 +497,27 @@ double f_saturation (const double S,
                                  // @sect3{Linear solvers and preconditioners}
 
                                  // The linear solvers we use are also
-                                 // completely analogous to the ones used in
-                                 // step-20. The following classes are
-                                 // therefore copied verbatim from there.
+                                 // completely analogous to the ones
+                                 // used in step-20. The following
+                                 // classes are therefore copied
+                                 // verbatim from there. There is a
+                                 // single change: if the size of a
+                                 // linear system is small, i.e. when
+                                 // the mesh is very coarse, then it
+                                 // is sometimes not sufficient to set
+                                 // a maximum of
+                                 // <code>src.size()</code> CG
+                                 // iterations before the solver in
+                                 // the <code>vmult()</code> function
+                                 // converges. (This is, of course, a
+                                 // result of numerical round-off,
+                                 // since we know that on paper, the
+                                 // CG method converges in at most
+                                 // <code>src.size()</code> steps.) As
+                                 // a consequence, we set the maximum
+                                 // number of iterations equal to the
+                                 // maximum of the size of the linear
+                                 // system and 200.
 template <class Matrix>
 class InverseMatrix : public Subscriptor
 {
@@ -526,7 +544,8 @@ template <class Matrix>
 void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                    const Vector<double> &src) const
 {
-  SolverControl solver_control (src.size(), 1e-8*src.l2_norm());
+  SolverControl solver_control (std::max(src.size(), 200U),
+				1e-8*src.l2_norm());
   SolverCG<>    cg (solver_control);
 
   dst = 0;
