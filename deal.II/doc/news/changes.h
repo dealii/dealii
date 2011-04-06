@@ -95,6 +95,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: In step-21, the inner iteration would sometimes not converge for
+very coarse meshes because of numerical roundoff. This is now fixed by allowing
+more than <code>rhs.size()</code> CG iterations if the number of degrees of freedom
+is very small.
+<br>
+(Jichao Yin, WB, 2011/04/06)
+</li>
+
 <li> New: There is now a new function ConditionalOStream::get_stream().
 <br>
 (WB, 2011/03/09)
