@@ -186,14 +186,14 @@ converges very rapidly (typically in 3 steps) and with the quadratic
 convergence order expected from a Newton method.
 
 
-<h3> Auto-Differentiation </h3>
+<h3> Automatic differentiation </h3>
 
 Since computing the Jacobian matrix $\mathbf R'(\mathbf W^k)$ is a
 terrible beast, we use an automatic differentiation package, Sacado,
 to do this.  Sacado is a package within the <a
 href="http://trilinos.sandia.gov" target="_top">Trilinos</a> framework
 and offers a C++ template class <code>Sacado::Fad::DFad</code>
-(<code>Fad</code> standing for "floating point automatic
+(<code>Fad</code> standing for "forward automatic
 differentiation") that supports basic arithmetic operators and
 functions such as <code> sqrt, sin, cos, pow, </code> etc. In order to
 use this feature, one declares a collection of variables of this type
