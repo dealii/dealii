@@ -203,17 +203,33 @@ variables are used in an algorithm, and as the variables are used,
 their sensitivities with respect to the degrees of freedom are
 continuously updated.
 
-One can imagine that for the full Jacobian,
+One can imagine that for the full Jacobian matrix as a whole,
 this could be prohibitively expensive: the number of independent variables are
 the $\mathbf W^k$, the dependent variables the elements of the vector $\mathbf
 R(\mathbf W^k)$. Both of these vectors can easily have tens of thousands of
 elements or more.  However, it is important to note that not all elements of
 $\mathbf R$ depend on all elements of $\mathbf W^k$: in fact, an entry in
 $\mathbf R$ only depends on an element of $\mathbf W^k$ if the two
-corresponding shape functions overlap and couple in the weak form. This means
-that it is enough if we do not use the
-Sacado type for the entire matrix computation, but only element by element.
+corresponding shape functions overlap and couple in the weak form.
 
+Specifically, it is wise to define a minimum set of
+independent AD variables that the residual on the current cell may possibly
+depend on: on every element, we define those variables as
+independent that correspond to the degrees of freedom defined on this
+cell (or, if we have to compute jump terms between cells, that
+correspond to degrees of freedom defined on either of the two adjacent
+cells), and the dependent variables are the elements of the local
+residual vector. Not doing this, i.e. defining <i>all</i> elements of
+$\mathbf W^k$ as independent, will result a very expensive computation
+of a lot of zeros: the elements of the local residual vector are
+independent of almost all elements of the solution vector, and
+consequently their derivatives are zero; however, trying to compute
+these zeros can easily take 90% or more of the compute time of the
+entire program in an experiment inadvertantly made by a student a few
+years after this program was first written.
+
+
+Coming back to the question of computing the Jacobian automatically:
 The author has used this approach side by side with a hand coded Jacobian for
 the incompressible Navier-Stokes problem and found the Sacado approach to be
 just as fast as using a hand coded Jacobian, but infinitely simpler and less
