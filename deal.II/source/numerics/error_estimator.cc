@@ -154,9 +154,9 @@ namespace internal
 					  * the faces of the current and
 					  * potentially of neighbor cells.
 					  */
-	dealii::hp::FEFaceValues<dim>    fe_face_values_cell;
-	dealii::hp::FEFaceValues<dim>    fe_face_values_neighbor;
-	dealii::hp::FESubfaceValues<dim> fe_subface_values;
+	dealii::hp::FEFaceValues<dim,spacedim>    fe_face_values_cell;
+	dealii::hp::FEFaceValues<dim,spacedim>    fe_face_values_neighbor;
+	dealii::hp::FESubfaceValues<dim,spacedim> fe_subface_values;
 
 					 /**
 					  * A vector to store the jump
@@ -192,18 +192,18 @@ namespace internal
 					  * index of the solution
 					  * vector.
 					  */
-	std::vector<std::vector<std::vector<Tensor<1,dim> > > > psi;
+	std::vector<std::vector<std::vector<Tensor<1,spacedim> > > > psi;
 
 					 /**
 					  * The same vector for a neighbor cell
 					  */
-	std::vector<std::vector<std::vector<Tensor<1,dim> > > > neighbor_psi;
+	std::vector<std::vector<std::vector<Tensor<1,spacedim> > > > neighbor_psi;
 
 					 /**
 					  * The normal vectors of the finite
 					  * element function on one face
 					  */
-	std::vector<Point<dim> > normal_vectors;
+	std::vector<Point<spacedim> > normal_vectors;
 
 					 /**
 					  * Two arrays needed for the
@@ -238,9 +238,9 @@ namespace internal
 					  * the KellyErrorEstimator::estimate()
 					  * function.
 					  */
-	const typename FunctionMap<dim>::type *neumann_bc;
+	const typename FunctionMap<DH::space_dimension>::type *neumann_bc;
 	const std::vector<bool>                component_mask;
-	const Function<dim>                   *coefficients;
+	const Function<DH::space_dimension>                   *coefficients;
 
 					 /**
 					  * Constructor.
@@ -253,9 +253,9 @@ namespace internal
 		      const unsigned int n_solution_vectors,
 		      const types::subdomain_id_t subdomain_id,
 		      const unsigned int material_id,
-		      const typename FunctionMap<DH::dimension>::type *neumann_bc,
+		      const typename FunctionMap<DH::space_dimension>::type *neumann_bc,
 		      const std::vector<bool>                component_mask,
-		      const Function<DH::dimension>                   *coefficients);
+		      const Function<DH::space_dimension>                   *coefficients);
 
 					 /**
 					  * Resize the arrays so that they fit the
@@ -277,9 +277,9 @@ namespace internal
 		  const unsigned int n_solution_vectors,
 		  const types::subdomain_id_t subdomain_id,
 		  const unsigned int material_id,
-		  const typename FunctionMap<DH::dimension>::type *neumann_bc,
+		  const typename FunctionMap<DH::space_dimension>::type *neumann_bc,
 		  const std::vector<bool>                component_mask,
-		  const Function<DH::dimension>         *coefficients)
+		  const Function<DH::space_dimension>         *coefficients)
 		    :
 		    finite_element (fe),
 		    face_quadratures (face_quadratures),
@@ -305,13 +305,13 @@ namespace internal
 			 (face_quadratures.max_n_quadrature_points(),
 			  std::vector<double> (fe.n_components()))),
 		    psi (n_solution_vectors,
-			 std::vector<std::vector<Tensor<1,dim> > >
+			 std::vector<std::vector<Tensor<1,spacedim> > >
 			 (face_quadratures.max_n_quadrature_points(),
-			  std::vector<Tensor<1,dim> > (fe.n_components()))),
+			  std::vector<Tensor<1,spacedim> > (fe.n_components()))),
 		    neighbor_psi (n_solution_vectors,
-				  std::vector<std::vector<Tensor<1,dim> > >
+				  std::vector<std::vector<Tensor<1,spacedim> > >
 				  (face_quadratures.max_n_quadrature_points(),
-				   std::vector<Tensor<1,dim> > (fe.n_components()))),
+				   std::vector<Tensor<1,spacedim> > (fe.n_components()))),
 		    normal_vectors (face_quadratures.max_n_quadrature_points()),
 		    coefficient_values1 (face_quadratures.max_n_quadrature_points()),
 		    coefficient_values (face_quadratures.max_n_quadrature_points(),
@@ -414,8 +414,8 @@ namespace internal
 				 std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
 				 const typename DH::active_cell_iterator &cell,
 				 const unsigned int                       face_no,
-				 dealii::hp::FEFaceValues<DH::dimension> &fe_face_values_cell,
-				 dealii::hp::FEFaceValues<DH::dimension> &fe_face_values_neighbor)
+				 dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_cell,
+				 dealii::hp::FEFaceValues<DH::dimension, DH::space_dimension> &fe_face_values_neighbor)
     {
       const unsigned int dim = DH::dimension;
 
@@ -625,8 +625,8 @@ namespace internal
 				   std::map<typename DH::face_iterator,std::vector<double> > &local_face_integrals,
 				   const typename DH::active_cell_iterator    &cell,
 				   const unsigned int                          face_no,
-				   dealii::hp::FEFaceValues<DH::dimension>    &fe_face_values,
-				   dealii::hp::FESubfaceValues<DH::dimension> &fe_subface_values)
+				   dealii::hp::FEFaceValues<DH::dimension,DH::space_dimension>    &fe_face_values,
+				   dealii::hp::FESubfaceValues<DH::dimension, DH::space_dimension> &fe_subface_values)
     {
       const unsigned int dim = DH::dimension;
 
@@ -1435,11 +1435,11 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>      &mapping,
           const DH                &dof_handler,
           const Quadrature<dim-1> &quadrature,
-          const typename FunctionMap<dim>::type &neumann_bc,
+          const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<dim>     *coefficients,
+          const Function<DH::space_dimension>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1458,17 +1458,17 @@ void
 KellyErrorEstimator<dim,spacedim>::
 estimate (const DH                &dof_handler,
           const Quadrature<dim-1> &quadrature,
-          const typename FunctionMap<dim>::type &neumann_bc,
+          const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<dim>     *coefficients,
+          const Function<DH::space_dimension>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solution,
+  estimate(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
 }
@@ -1481,11 +1481,11 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>      &mapping,
           const DH                &dof_handler,
           const hp::QCollection<dim-1> &quadrature,
-          const typename FunctionMap<dim>::type &neumann_bc,
+          const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<dim>     *coefficients,
+          const Function<DH::space_dimension>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1504,17 +1504,17 @@ void
 KellyErrorEstimator<dim, spacedim>::
 estimate (const DH                &dof_handler,
           const hp::QCollection<dim-1> &quadrature,
-          const typename FunctionMap<dim>::type &neumann_bc,
+          const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<dim>     *coefficients,
+          const Function<DH::space_dimension>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solution,
+  estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
 	   error, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
 }
@@ -1529,11 +1529,11 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>                  &mapping,
           const DH                            &dof_handler,
           const hp::QCollection<dim-1>        &face_quadratures,
-          const typename FunctionMap<dim>::type &neumann_bc,
+          const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
           const std::vector<bool>                  &component_mask_,
-          const Function<dim>                 *coefficients,
+          const Function<DH::space_dimension>                 *coefficients,
           const unsigned int                   ,
           const types::subdomain_id_t          subdomain_id_,
           const unsigned int                   material_id)
@@ -1573,7 +1573,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   Assert (solutions.size() == errors.size(),
 	  ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
 
-  for (typename FunctionMap<dim>::type::const_iterator i=neumann_bc.begin();
+  for (typename FunctionMap<DH::space_dimension>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components,
             ExcInvalidBoundaryFunction());
@@ -1706,11 +1706,11 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>                  &mapping,
           const DH                            &dof_handler,
           const Quadrature<dim-1>             &quadrature,
-          const typename FunctionMap<dim>::type &neumann_bc,
+          const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
           const std::vector<bool>                  &component_mask,
-          const Function<dim>                 *coefficients,
+          const Function<DH::space_dimension>                 *coefficients,
           const unsigned int                   n_threads,
           const types::subdomain_id_t          subdomain_id,
           const unsigned int                   material_id)
@@ -1728,17 +1728,17 @@ template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void KellyErrorEstimator<dim, spacedim>::estimate (const DH                            &dof_handler,
 					 const Quadrature<dim-1>             &quadrature,
-					 const typename FunctionMap<dim>::type &neumann_bc,
+					 const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 					 const std::vector<const InputVector *> &solutions,
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
-					 const Function<dim>                 *coefficients,
+					 const Function<DH::space_dimension>                 *coefficients,
 					 const unsigned int                   n_threads,
                                          const types::subdomain_id_t subdomain_id,
                                          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
+  estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
 }
@@ -1749,17 +1749,17 @@ template <int dim, int spacedim>
 template <typename InputVector, class DH>
 void KellyErrorEstimator<dim, spacedim>::estimate (const DH                            &dof_handler,
 					 const hp::QCollection<dim-1>             &quadrature,
-					 const typename FunctionMap<dim>::type &neumann_bc,
+					 const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 					 const std::vector<const InputVector *> &solutions,
 					 std::vector<Vector<float>*>              &errors,
 					 const std::vector<bool>                  &component_mask,
-					 const Function<dim>                 *coefficients,
+					 const Function<DH::space_dimension>                 *coefficients,
 					 const unsigned int                   n_threads,
                                          const types::subdomain_id_t subdomain_id,
                                          const unsigned int       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  estimate(StaticMappingQ1<dim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
+  estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
 	   errors, component_mask, coefficients, n_threads,
            subdomain_id, material_id);
 }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -329,11 +329,11 @@ class KellyErrorEstimator
     static void estimate (const Mapping<dim, spacedim>      &mapping,
 			  const DH                &dof,
 			  const Quadrature<dim-1> &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const InputVector       &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
-			  const Function<dim>     *coefficients   = 0,
+			  const Function<DH::space_dimension>     *coefficients   = 0,
 			  const unsigned int       n_threads = numbers::invalid_unsigned_int,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
@@ -346,11 +346,11 @@ class KellyErrorEstimator
     template <typename InputVector, class DH>
     static void estimate (const DH                &dof,
 			  const Quadrature<dim-1> &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const InputVector       &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
-			  const Function<dim>     *coefficients   = 0,
+			  const Function<DH::space_dimension>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
@@ -386,11 +386,11 @@ class KellyErrorEstimator
     static void estimate (const Mapping<dim, spacedim>          &mapping,
 			  const DH                    &dof,
 			  const Quadrature<dim-1>     &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
-			  const Function<dim>         *coefficients   = 0,
+			  const Function<DH::space_dimension>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
@@ -403,11 +403,11 @@ class KellyErrorEstimator
     template <typename InputVector, class DH>
     static void estimate (const DH                    &dof,
 			  const Quadrature<dim-1>     &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
-			  const Function<dim>         *coefficients   = 0,
+			  const Function<DH::space_dimension>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
@@ -423,11 +423,11 @@ class KellyErrorEstimator
     static void estimate (const Mapping<dim, spacedim>      &mapping,
 			  const DH                &dof,
 			  const hp::QCollection<dim-1> &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const InputVector       &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
-			  const Function<dim>     *coefficients   = 0,
+			  const Function<DH::space_dimension>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
@@ -442,11 +442,11 @@ class KellyErrorEstimator
     template <typename InputVector, class DH>
     static void estimate (const DH                &dof,
 			  const hp::QCollection<dim-1> &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const InputVector       &solution,
 			  Vector<float>           &error,
 			  const std::vector<bool> &component_mask = std::vector<bool>(),
-			  const Function<dim>     *coefficients   = 0,
+			  const Function<DH::space_dimension>     *coefficients   = 0,
 			  const unsigned int       n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int       material_id = numbers::invalid_unsigned_int);
@@ -462,11 +462,11 @@ class KellyErrorEstimator
     static void estimate (const Mapping<dim, spacedim>          &mapping,
 			  const DH                    &dof,
 			  const hp::QCollection<dim-1> &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
-			  const Function<dim>         *coefficients   = 0,
+			  const Function<DH::space_dimension>         *coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
@@ -481,11 +481,11 @@ class KellyErrorEstimator
     template <typename InputVector, class DH>
     static void estimate (const DH                    &dof,
 			  const hp::QCollection<dim-1> &quadrature,
-			  const typename FunctionMap<dim>::type &neumann_bc,
+			  const typename FunctionMap<DH::space_dimension>::type &neumann_bc,
 			  const std::vector<const InputVector *> &solutions,
 			  std::vector<Vector<float>*> &errors,
 			  const std::vector<bool>     &component_mask = std::vector<bool>(),
-			  const Function<dim>         *coefficients   = 0,
+			  const Function<DH::space_dimension>*coefficients   = 0,
 			  const unsigned int           n_threads = multithread_info.n_default_threads,
                           const types::subdomain_id_t subdomain_id = types::invalid_subdomain_id,
                           const unsigned int           material_id = numbers::invalid_unsigned_int);
