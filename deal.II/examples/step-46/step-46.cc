@@ -315,6 +315,8 @@ void FluidStructureProblem<dim>::assemble_system ()
   system_matrix=0;
   system_rhs=0;
 
+  const double viscosity = 2;
+
   const QGauss<dim> stokes_quadrature(stokes_degree+2);
   const QGauss<dim> elasticity_quadrature(elasticity_degree+2);
 
@@ -327,6 +329,16 @@ void FluidStructureProblem<dim>::assemble_system ()
 				  update_quadrature_points  |
 				  update_JxW_values |
 				  update_gradients);
+
+  const QGauss<dim-1> face_quadrature(std::max (stokes_degree+2,
+						elasticity_degree+2));
+
+  FEFaceValues<dim> stokes_fe_face_values (stokes_fe, face_quadrature,
+					   update_JxW_values |
+					   update_normal_vectors |
+					   update_gradients);
+  FEFaceValues<dim> elasticity_fe_face_values (elasticity_fe, face_quadrature,
+					       update_values);
 
   const unsigned int   stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
   const unsigned int   elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
@@ -348,6 +360,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 
   std::vector<Tensor<2,dim> >          elasticity_phi_grad (elasticity_dofs_per_cell);
   std::vector<double>                  elasticity_phi_div  (elasticity_dofs_per_cell);
+  std::vector<Tensor<1,dim> >          elasticity_phi  (elasticity_dofs_per_cell);
 
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -379,7 +392,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  local_matrix(i,j) += (stokes_phi_grads_u[i] * stokes_phi_grads_u[j]
+		  local_matrix(i,j) += (2 * viscosity * stokes_phi_grads_u[i] * stokes_phi_grads_u[j]
 					- stokes_div_phi_u[i] * stokes_phi_p[j]
 					- stokes_phi_p[i] * stokes_div_phi_u[j])
 				       * fe_values.JxW(q);
@@ -418,7 +431,6 @@ void FluidStructureProblem<dim>::assemble_system ()
 	      }
 	}
 
-
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
       local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
@@ -429,6 +441,64 @@ void FluidStructureProblem<dim>::assemble_system ()
       constraints.distribute_local_to_global (local_matrix, local_rhs,
 					      local_dof_indices,
 					      system_matrix, system_rhs);
+
+				       // see about face terms
+      if (cell->active_fe_index() == 0)
+					 // we are on a fluid cell
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  if (cell->at_boundary(f) == false)
+	    {
+	      if ((cell->neighbor(f)->level() == cell->level())
+		  &&
+		  (cell->neighbor(f)->has_children() == false))
+		{
+						   // cells are on same level
+		  if (cell->neighbor(f)->active_fe_index() == 0)
+						     // neighbor is also a fluid cell
+		    continue;
+
+						   // same size
+						   // neighbors;
+						   // neighbor is
+						   // solids cell
+		  stokes_fe_face_values.reinit (cell, f);
+		  elasticity_fe_face_values.reinit (cell->neighbor(f),
+						    cell->neighbor_of_neighbor(f));
+
+		  local_matrix.reinit (stokes_dofs_per_cell,
+				       elasticity_dofs_per_cell);
+		  for (unsigned int q=0; q<face_quadrature.size(); ++q)
+		    {
+		      const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
+
+		      for (unsigned int k=0; k<dofs_per_cell; ++k)
+			{
+			  stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
+			  elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
+			}
+
+		      for (unsigned int i=0; i<stokes_dofs_per_cell; ++i)
+			for (unsigned int j=0; j<elasticity_dofs_per_cell; ++j)
+			  local_matrix(i,j) += (2 * viscosity *
+						contract(stokes_phi_grads_u[i],
+							 normal_vector) *
+						elasticity_phi[j] *
+						stokes_fe_face_values.JxW(q));
+		    }
+		}
+	      else if ((cell->neighbor(f)->level() == cell->level())
+		       &&
+		       (cell->neighbor(f)->has_children() == true))
+		{
+						   // neighbor has children
+		}
+	      else
+		{
+						   // neighbor is coarser
+		  if (cell->active_fe_index() == cell->neighbor(f)->active_fe_index())
+		    continue;
+		}
+	    }
     }
 }
 
