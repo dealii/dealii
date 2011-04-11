@@ -29,21 +29,6 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> Fixed: Added some instantiations to make KellyErrorEstimator and SolutionTransfer
-work in  codimension one. Fixed some dim in spacedim.
-<br>
-(Luca Heltai, 2011/04/11)
-
-<li> Fixed: Added some instantiations to make anisotropic refinement work 
-in codimension one.
-<br>
-(Luca Heltai, 2011/03/31)
-
-<ol>
-<li> Fixed: Corrections in the creation of the face and subface
-interpolation matrices in the class FE_Nedelec.
-<br>
-(Markus Buerg, 2011/03/17)
 
 <li> Fixed: On Debian, the Trilinos packages use a different layout
 of include files and library names. The <code>./configure</code>
@@ -100,6 +85,21 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Added some instantiations to make KellyErrorEstimator and SolutionTransfer
+work in  codimension one. Fixed some dim in spacedim.
+<br>
+(Luca Heltai, 2011/04/11)
+
+<li> Fixed: Added some instantiations to make anisotropic refinement work 
+in codimension one.
+<br>
+(Luca Heltai, 2011/03/31)
+
+<li> Fixed: Corrections in the creation of the face and subface
+interpolation matrices in the class FE_Nedelec.
+<br>
+(Markus Buerg, 2011/03/17)
+
 <li> Fixed: In step-21, the inner iteration would sometimes not converge for
 very coarse meshes because of numerical roundoff. This is now fixed by allowing
 more than <code>rhs.size()</code> CG iterations if the number of degrees of freedom
