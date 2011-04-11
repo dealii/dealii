@@ -56,10 +56,10 @@ using namespace dealii;
 
 
 template <int dim>
-class StokesProblem
+class FluidStructureProblem
 {
   public:
-    StokesProblem (const unsigned int stokes_degree,
+    FluidStructureProblem (const unsigned int stokes_degree,
 		   const unsigned int elasticity_degree);
     void run ();
 
@@ -173,7 +173,7 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree,
+FluidStructureProblem<dim>::FluidStructureProblem (const unsigned int stokes_degree,
 				   const unsigned int elasticity_degree)
                 :
                 stokes_degree (stokes_degree),
@@ -197,7 +197,7 @@ StokesProblem<dim>::StokesProblem (const unsigned int stokes_degree,
 
 
 template <int dim>
-void StokesProblem<dim>::setup_dofs ()
+void FluidStructureProblem<dim>::setup_dofs ()
 {
   system_matrix.clear ();
 
@@ -310,7 +310,7 @@ void StokesProblem<dim>::setup_dofs ()
 
 
 template <int dim>
-void StokesProblem<dim>::assemble_system ()
+void FluidStructureProblem<dim>::assemble_system ()
 {
   system_matrix=0;
   system_rhs=0;
@@ -436,7 +436,7 @@ void StokesProblem<dim>::assemble_system ()
 
 
 template <int dim>
-void StokesProblem<dim>::solve ()
+void FluidStructureProblem<dim>::solve ()
 {
   SparseDirectUMFPACK direct_solver;
   direct_solver.initialize (system_matrix);
@@ -450,7 +450,7 @@ void StokesProblem<dim>::solve ()
 
 template <int dim>
 void
-StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
+FluidStructureProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 {
   std::vector<std::string> solution_names (dim, "velocity");
   solution_names.push_back ("pressure");
@@ -487,7 +487,7 @@ StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
 
 template <int dim>
 void
-StokesProblem<dim>::refine_mesh ()
+FluidStructureProblem<dim>::refine_mesh ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -516,7 +516,7 @@ StokesProblem<dim>::refine_mesh ()
 
 
 template <int dim>
-void StokesProblem<dim>::run ()
+void FluidStructureProblem<dim>::run ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   for (typename Triangulation<dim>::active_cell_iterator
