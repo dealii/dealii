@@ -60,7 +60,7 @@ class FluidStructureProblem
 {
   public:
     FluidStructureProblem (const unsigned int stokes_degree,
-		   const unsigned int elasticity_degree);
+			   const unsigned int elasticity_degree);
     void run ();
 
   private:
@@ -559,7 +559,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      StokesProblem<2> flow_problem(1, 1);
+      FluidStructureProblem<2> flow_problem(1, 1);
       flow_problem.run ();
     }
   catch (std::exception &exc)
