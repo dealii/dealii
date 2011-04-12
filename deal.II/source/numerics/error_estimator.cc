@@ -1008,11 +1008,11 @@ KellyErrorEstimator<1,spacedim>::
 estimate (const Mapping<1,spacedim>      &mapping,
           const DH   &dof_handler,
           const Quadrature<0> &quadrature,
-          const FunctionMap<1>::type &neumann_bc,
+          const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<1>     *coefficients,
+          const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1032,11 +1032,11 @@ void
 KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const Quadrature<0> &quadrature,
-          const FunctionMap<1>::type &neumann_bc,
+          const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<1>     *coefficients,
+          const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1054,11 +1054,11 @@ void
 KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const Quadrature<0> &quadrature,
-          const FunctionMap<1>::type &neumann_bc,
+          const typename FunctionMap<spacedim>::type &neumann_bc,
           const std::vector<const InputVector*> &solutions,
           std::vector<Vector<float>*> &errors,
           const std::vector<bool> &component_mask,
-          const Function<1>     *coefficients,
+          const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1077,11 +1077,11 @@ KellyErrorEstimator<1,spacedim>::
 estimate (const Mapping<1,spacedim>      &mapping,
           const DH   &dof_handler,
           const hp::QCollection<0> &quadrature,
-          const FunctionMap<1>::type &neumann_bc,
+          const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<1>     *coefficients,
+          const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1100,11 +1100,11 @@ void
 KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const hp::QCollection<0> &quadrature,
-          const FunctionMap<1>::type &neumann_bc,
+          const typename FunctionMap<spacedim>::type &neumann_bc,
           const InputVector       &solution,
           Vector<float>           &error,
           const std::vector<bool> &component_mask,
-          const Function<1>     *coefficients,
+          const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1122,11 +1122,11 @@ void
 KellyErrorEstimator<1,spacedim>::
 estimate (const DH   &dof_handler,
           const hp::QCollection<0> &quadrature,
-          const FunctionMap<1>::type &neumann_bc,
+          const typename FunctionMap<spacedim>::type &neumann_bc,
           const std::vector<const InputVector*> &solutions,
           std::vector<Vector<float>*> &errors,
           const std::vector<bool> &component_mask,
-          const Function<1>     *coefficients,
+          const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
           const unsigned int       material_id)
@@ -1145,11 +1145,11 @@ void KellyErrorEstimator<1,spacedim>::
 estimate (const Mapping<1,spacedim>                    &/*mapping*/,
           const DH                            &/*dof_handler*/,
           const hp::QCollection<0>            &,
-          const FunctionMap<1>::type          &/*neumann_bc*/,
+          const typename FunctionMap<spacedim>::type          &/*neumann_bc*/,
           const std::vector<const InputVector *> &/*solutions*/,
           std::vector<Vector<float>*>            &/*errors*/,
           const std::vector<bool>                &/*component_mask_*/,
-          const Function<1>                   */*coefficient*/,
+          const Function<spacedim>                   */*coefficient*/,
           const unsigned int,
           const types::subdomain_id_t          /*subdomain_id*/,
           const unsigned int                   /*material_id*/)
@@ -1165,11 +1165,11 @@ void KellyErrorEstimator<1,spacedim>::
 estimate (const Mapping<1,spacedim>                    &mapping,
           const DH                 &dof_handler,
           const Quadrature<0>                 &,
-          const FunctionMap<1>::type          &neumann_bc,
+          const typename FunctionMap<spacedim>::type          &neumann_bc,
           const std::vector<const InputVector *> &solutions,
           std::vector<Vector<float>*>              &errors,
           const std::vector<bool>                  &component_mask_,
-          const Function<1>                   *coefficient,
+          const Function<spacedim>                   *coefficient,
           const unsigned int,
           const types::subdomain_id_t         subdomain_id_,
           const unsigned int                  material_id)
@@ -1208,7 +1208,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   Assert (neumann_bc.find(255) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
-  for (FunctionMap<1>::type::const_iterator i=neumann_bc.begin();
+  for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components, ExcInvalidBoundaryFunction());
 
@@ -1245,7 +1245,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 	  (coefficient->n_components == 1),
 	  ExcInvalidCoefficient());
 
-  for (FunctionMap<1>::type::const_iterator i=neumann_bc.begin();
+  for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components,
             ExcInvalidBoundaryFunction());
@@ -1262,10 +1262,10 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 				   // need several auxiliary fields,
 				   // depending on the way we get it
 				   // (see below)
-  std::vector<std::vector<std::vector<Tensor<1,1> > > >
+  std::vector<std::vector<std::vector<Tensor<1,spacedim> > > >
     gradients_here (n_solution_vectors,
-		    std::vector<std::vector<Tensor<1,1> > >(2, std::vector<Tensor<1,1> >(n_components)));
-  std::vector<std::vector<std::vector<Tensor<1,1> > > >
+		    std::vector<std::vector<Tensor<1,spacedim> > >(2, std::vector<Tensor<1,spacedim> >(n_components)));
+  std::vector<std::vector<std::vector<Tensor<1,spacedim> > > >
     gradients_neighbor (gradients_here);
   std::vector<Vector<double> >
     grad_neighbor (n_solution_vectors, Vector<double>(n_components));

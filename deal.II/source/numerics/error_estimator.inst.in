@@ -84,7 +84,7 @@ estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>       
           const unsigned int           , \
 	  const unsigned int);\
  
-#if deal_II_dimension == 2
+#if deal_II_dimension == 2 || deal_II_dimension == 1
 
 #define INSTANTIATE_CODIM(InputVector,DH,Q)	\
 template    \
