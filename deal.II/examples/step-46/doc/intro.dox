@@ -2,11 +2,14 @@
 <h1>Introduction</h1>
 
 This program deals with the problem of coupling different physics in different
-parts of the domain. Specifically, let us consider the following situation:
+parts of the domain. Specifically, let us consider the following
+situation that couples a Stokes fluid with an elastic solid (these two
+problems were previously discussed separately in step-22 and step-8,
+where you may want to read up on the individual equations):
 
 - In a part $\Omega_f$ of $\Omega$, we have a fluid flowing that satisfies the
   time independent Stokes equations (in the form that involves the strain
-  tensor): 
+  tensor):
   @f{align*}
     -2\eta\nabla \cdot \varepsilon(\mathbf v) + \nabla p &= 0,
           \qquad \qquad && \text{in}\ \Omega_f\\
@@ -38,7 +41,7 @@ parts of the domain. Specifically, let us consider the following situation:
   It deforms in reaction to the forces exerted by the
   fluid flowing along the boundary of the solid. We assume this deformation to
   be so small that it has no feedback effect on the fluid, i.e. the coupling
-  is only in one direction. For simplicity, we will assume that the 
+  is only in one direction. For simplicity, we will assume that the
   solid's external boundary is clamped, i.e.
   @f{align*}
     \mathbf u = \mathbf 0 \qquad\qquad
@@ -53,7 +56,7 @@ parts of the domain. Specifically, let us consider the following situation:
   @f}
   secondly, the forces on the solid equal the normal strain from the fluid,
   @f{align*}
-    (C \varepsilon(\mathbf u)) \mathbf n = 
+    (C \varepsilon(\mathbf u)) \mathbf n =
     (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n \qquad\qquad
      \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
   @f}
@@ -71,9 +74,16 @@ the solid and the effect this has on the fluid): this is, after all, just a
 tutorial program intended to demonstrate techniques, not to solve actual
 problems. Furthermore, we will make the assumption that the interface between
 the subdomains is aligned with cell faces.
-  
+
 
 <h3>The general idea</h3>
+
+Before going into more details let us state the obvious: this is a
+problem with multiple solution variables; for this, you will probably
+want to read the @ref vector_valued documentation module first which
+presents the basic philosophical framework in which we address
+problems with more than one solution variable. But back to the problem
+at hand:
 
 The fundamental idea to implement these sort of problems in deal.II goes as
 follows: in the problem formulation, the velocity and pressure variables
@@ -97,3 +107,72 @@ Note that this is indeed a linear function space with obvious norm. Since no
 confusion is possible in practice, we will henceforth omit the tilde again to
 denote the extension of a function to the whole domain and simply refer by
 $\mathbf v, p$ to both the original and the extended function.
+
+For discretization, we need finite dimensional subspaces $V_h,P_h$ of
+$V, P$. For Stokes, we know from step-22 that an appropriate choice is
+$Q_{p+1}^d\times Q_P$ but this only holds for that part of the domain
+occupied by the fluid. For the extended field, let's use the following
+subspaces defined on the triangulation $\mathbb T$:
+@f{align*}
+  V_h
+   &= \{{\mathbf v}_h \quad | \quad
+       \forall K \in {\mathbb T}:
+       {\mathbf v}_h|_K \in Q_{p+1}^d\  \text{if}\ K\subset {\Omega_f}, \quad
+       {\mathbf v}_h|_{\Omega_f}\ \text{is continuous}, \quad
+       {\mathbf v}_h|_K = 0\ \text{if}\ K\subset {\Omega_s}\}
+   && \subset V
+  \\
+  P_h
+  &= \{ p_h \quad | \quad
+       \forall K \in {\mathbb T}:
+       p_h|_K \in Q_p\  \text{if}\ K\subset {\Omega_f}}, \quad
+       p_h|_{\Omega_f}\ \text{is continuous}, \quad
+       p_h|_K = 0\ \text{if}\ K\subset {\Omega_s}}\ \}
+   && \subset P.
+@f}
+In other words, on $\Omega_f$ we choose the usual discrete spaces but
+we keep the (discontinuous) extension by zero. The point to make is
+that we now need a description of a finite element space for functions
+that are zero on a cell &mdash; and this is where the FE_Nothing class
+comes in: it describes a finite dimensional function space of
+functions that are constant zero. A particular property of this
+peculiar linear vector space is that it has no degrees of freedom: it
+isn't just finite dimensional, it is in fact zero dimensional, and
+consequently for objects of this type, FiniteElement::dofs_per_cell
+will return zero. For discussion below, let us give this space a
+proper symbol:
+@f[
+  Z = \{ \varphi: \varphi(x)=0 \}.
+@f]
+The symbol $Z$ reminds of the fact that functions in this space are
+zero. Obviously, we choose $Z_h=Z$.
+
+This entire discussion above can be repeated for the variables we use to
+describe the elasticity equation. Here, for the extended variables, we
+have
+@f{align*}
+  \tilde {\mathbf u} &\in U
+   = \{\tilde {\mathbf u}|_{\Omega_s} \in H^1(\Omega_f)^d, \quad
+       \tilde {\mathbf u}|_{\Omega_f} \in Z(\Omega_s)^d \},
+@f}
+and we will typically use a finite element space of the kind
+@f{align*}
+  U_h
+   &= \{{\mathbf u}_h \quad | \quad
+       \forall K \in {\mathbb T}:
+       {\mathbf u}_h|_K \in Q_r^d\  \text{if}\ K\subset {\Omega_s}, \quad
+       {\mathbf u}_h|_{\Omega_f}\ \text{is continuous}, \quad
+       {\mathbf u}_h|_K \in Z^d\ \text{if}\ K\subset {\Omega_f}\}
+   && \subset U
+@f}
+of polynomial degree $r$.
+
+So to sum up, we are going to look for a discrete vector-valued
+solution $y_h = \{\mathbf v_h, p_h, \mathbf u_h\}$ in the following
+space:
+@f{align*}
+  Y_h = \{
+      & y_h = \{\mathbf v_h, p_h, \mathbf u_h\} : \\
+      & y_h|_{\Omega_f} \in Q_{p+1}^d \times Q_p \times Z^d, \\
+      & y_h|_{\Omega_f} \in Z^d \times Z \times Q_r^d \}.
+@f}
