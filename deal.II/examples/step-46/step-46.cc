@@ -480,8 +480,8 @@ void FluidStructureProblem<dim>::assemble_system ()
 		      for (unsigned int i=0; i<stokes_dofs_per_cell; ++i)
 			for (unsigned int j=0; j<elasticity_dofs_per_cell; ++j)
 			  local_matrix(i,j) += (2 * viscosity *
-						contract(stokes_phi_grads_u[i],
-							 normal_vector) *
+						(stokes_phi_grads_u[i] *
+						 normal_vector) *
 						elasticity_phi[j] *
 						stokes_fe_face_values.JxW(q));
 		    }

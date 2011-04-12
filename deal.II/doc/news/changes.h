@@ -85,12 +85,17 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now an operator* for the multiplication of a <code>SymmetricTensor@<2,dim@></code>
+and a <code>Tensor@<1,dim@></code>.
+<br>
+(Wolfgang Bangerth, 2011/04/12)
+
 <li> Fixed: Added some instantiations to make KellyErrorEstimator and SolutionTransfer
 work in  codimension one. Fixed some dim in spacedim.
 <br>
 (Luca Heltai, 2011/04/11)
 
-<li> Fixed: Added some instantiations to make anisotropic refinement work 
+<li> Fixed: Added some instantiations to make anisotropic refinement work
 in codimension one.
 <br>
 (Luca Heltai, 2011/03/31)
