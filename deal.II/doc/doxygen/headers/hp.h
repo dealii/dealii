@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,9 +14,9 @@
 /**
  * @defgroup hp hp finite element support
  *
- * Classes and functions that have to do with hp finite elements. The
- * step-27 tutorial program gives an overview of how to
- * use the classes in this namespace.
+ * Classes and functions that have to do with hp finite elements. The step-27
+ * tutorial program gives an overview of how to use the classes in this
+ * namespace. A slightly more exotic application is given in step-46.
  *
  * The hp namespace implements the algorithms and data structures used for
  * the hp framework in deal.II. An overview over the details of how these
