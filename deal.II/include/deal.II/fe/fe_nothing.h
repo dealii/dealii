@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  * |    0    +----+----+
  * |         | 1  |    |
  * +---------+----+----+
- * @encode
+ * @endcode
  * Here, 0 denotes an FE_Nothing cell, and 1 denotes some other
  * element type.  The library has no difficulty computing the necessary
  * hanging node constraints in these cases (i.e. no constraint).  
