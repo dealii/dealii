@@ -91,7 +91,7 @@ interaction model would have to take into account the finite deformation of
 the solid and the effect this has on the fluid): this is, after all, just a
 tutorial program intended to demonstrate techniques, not to solve actual
 problems. Furthermore, we will make the assumption that the interface between
-the subdomains is aligned with cell faces.
+the subdomains is aligned with coarse mesh cell faces.
 
 
 <h3>The general idea</h3>
@@ -343,15 +343,15 @@ solid cell is refined, yielding the following code:
     for (typename hp::DoFHandler<dim>::active_cell_iterator
 	   cell = dof_handler.begin_active();
 	 cell != dof_handler.end(); ++cell)
-      if (cell->active_fe_index() == 0)
+      if (cell_is_in_fluid_domain (cell))
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (not cell->at_boundary(f))
+	  if (!cell->at_boundary(f))
 	    {
 	      bool face_is_on_interface = false;
 
 	      if ((cell->neighbor(f)->has_children() == false)
 		  &&
-		  (cell->neighbor(f)->active_fe_index() == 1))
+		  (cell_is_in_solid_domain (cell->neighbor(f))))
 		face_is_on_interface = true;
 	      else if (cell->neighbor(f)->has_children() == true)
 		{
@@ -362,7 +362,7 @@ solid cell is refined, yielding the following code:
 						   // on the other
 						   // side are elastic
 		  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
-		    if (cell->neighbor_child_on_subface(f, sf)->active_fe_index() == 1)
+		    if (cell_is_in_solid_domain (cell->neighbor_child_on_subface(f, sf)))
 		      {
 			face_is_on_interface = true;
 			break;
@@ -377,3 +377,23 @@ solid cell is refined, yielding the following code:
 		}
 	    }
 @endcode
+Note that there are cases where this may yield incorrect results:
+notably, once we find a solid neighbor child to a current fluid cell,
+we assume that all neighbor children on the common face are in the
+solid subdomain. But that need not be so; consider, for example, the
+following mesh:
+@code
++---------+----+----+
+|         | f  |    |
+|    f    +----+----+
+|         | s  |    |
++---------+----+----+
+@endcode
+
+In this case, we would set all velocity degrees of freedom on the
+right face of the left cell to zero, which is incorrect for the top
+degree of freedom on that face. That said, that can only happen if the
+fluid and solid subdomains do not coincide with a set of complete
+coarse mesh cells &mdash; but this is a contradiction to the
+assumption stated at the end of the first section of this
+introduction.
