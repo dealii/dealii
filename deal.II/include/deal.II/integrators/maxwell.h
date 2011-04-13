@@ -76,6 +76,7 @@ namespace LocalIntegrators
  * - (\partial_3^2+\partial_1^2) u_2 \\
  * \partial_3\partial_1 u_1 + \partial_3\partial_2 u_2
  * - (\partial_1^2+\partial_2^2) u_3
+ * \end{pmatrix}
  * @f]
  *
  * @note The third tensor argument is not used in two dimensions and
