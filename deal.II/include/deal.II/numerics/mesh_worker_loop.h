@@ -77,8 +77,10 @@ namespace MeshWorker
  * @param cell_worker defines the local action on each cell.
  * @param boundary_worker defines the local action on boundary faces
  * @param face_worker defines the local action on interior faces.
- * @param cells_first determines, whether faces or cells are to be
- * dealt with first.
+ * @param cells_first determines, whether, on a given cell, face or cell
+ *        integrals are to be  dealt with first. Note that independent of the
+ *        value of this flag, cell and face integrals of a given cell are
+ *        all taken care of before moving to the next cell.
  * @param unique_faces_only determines, that a face between two cells
  * of the same level is processed only from the cell which is less
  * than its neighbor. If this parameter is <tt>false</tt> these faces
