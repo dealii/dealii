@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,49 +22,52 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Definition of a finite element with zero degrees of freedom.  This
- * class is useful (in the context of an hp method) to represent empty
- * cells in the triangulation on which no degrees of freedom should
- * be allocated.  Thus a triangulation may be divided into two regions:
- * an active region where normal elements are used, and an inactive
- * region where FE_Nothing elements are used.  The hp::DoFHandler will
- * therefore assign no degrees of freedom to the FE_Nothing cells, and
- * this subregion is therefore implicitly deleted from the computation.
+ * Definition of a finite element with zero degrees of freedom.  This class is
+ * useful (in the context of an hp method) to represent empty cells in the
+ * triangulation on which no degrees of freedom should be allocated, or to
+ * describe a field that is extended by zero to a part of the domain where we
+ * don't need it.  Thus a triangulation may be divided into two regions: an
+ * active region where normal elements are used, and an inactive region where
+ * FE_Nothing elements are used.  The hp::DoFHandler will therefore assign no
+ * degrees of freedom to the FE_Nothing cells, and this subregion is therefore
+ * implicitly deleted from the computation. step-46 shows a use case for this
+ * element.
  *
  * Note that some care must be taken that the resulting mesh topology
  * continues to make sense when FE_Nothing elements are introduced.
  * This is particularly true when dealing with hanging node constraints,
  * because the library makes some basic assumptions about the nature
  * of those constraints.  The following geometries are acceptable:
- *
+ * @code
  * +---------+----+----+
  * |         | 0  |    |
  * |    1    +----+----+
  * |         | 0  |    |
  * +---------+----+----+
- *
+ * @endcode
+ * @code
  * +---------+----+----+
  * |         | 1  |    |
  * |    0    +----+----+
  * |         | 1  |    |
  * +---------+----+----+
- *
+ * @encode
  * Here, 0 denotes an FE_Nothing cell, and 1 denotes some other
  * element type.  The library has no difficulty computing the necessary
  * hanging node constraints in these cases (i.e. no constraint).  
  * However, the following geometry is NOT acceptable (at least 
  * in the current implementation):
- *
+ * @code
  * +---------+----+----+
  * |         | 0  |    |
  * |    1    +----+----+
  * |         | 1  |    |
  * +---------+----+----+
- * 
+ * @endcode
  * The distinction lies in the mixed nature of the child faces,
  * a case we have not implemented as of yet.
  *
- * @author Joshua White
+ * @author Joshua White, Wolfgang Bangerth
  */
 template <int dim>
 class FE_Nothing : public FiniteElement<dim>
