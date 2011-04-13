@@ -125,9 +125,9 @@ subspaces defined on the triangulation $\mathbb T$:
   P_h
   &= \{ p_h \quad | \quad
        \forall K \in {\mathbb T}:
-       p_h|_K \in Q_p\  \text{if}\ K\subset {\Omega_f}}, \quad
+       p_h|_K \in Q_p\  \text{if}\ K\subset {\Omega_f}, \quad
        p_h|_{\Omega_f}\ \text{is continuous}, \quad
-       p_h|_K = 0\ \text{if}\ K\subset {\Omega_s}}\ \}
+       p_h|_K = 0\ \text{if}\ K\subset {\Omega_s}\ \}
    && \subset P.
 @f}
 In other words, on $\Omega_f$ we choose the usual discrete spaces but
@@ -176,3 +176,8 @@ space:
       & y_h|_{\Omega_f} \in Q_{p+1}^d \times Q_p \times Z^d, \\
       & y_h|_{\Omega_f} \in Z^d \times Z \times Q_r^d \}.
 @f}
+
+
+
+<h3>Implementation</h3>
+
