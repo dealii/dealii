@@ -64,16 +64,18 @@ where you may want to read up on the individual equations):
 A weak formulation of this problem looks like this: Find $y = \{\mathbf v, p,
 \mathbf u\} \in Y \subset H^1(\Omega_f)^d \times L_2(\Omega_f) \times
 H^1(\Omega_s)^d$ so that
-@f[
+@f{multline*}
 	2 \eta (\varepsilon(\mathbf a), \varepsilon(\mathbf v))_{\Omega_f}
 	- (\nabla \cdot \mathbf a, p)_{\Omega_f}
 	- (q, \nabla \cdot \mathbf v)_{\Omega_f}
+	\\
 	+ (\varepsilon(\mathbf b), C \varepsilon(\mathbf u))_{\Omega_s}
-	- (\mathbf b, 
+	\\
+	- (\mathbf b,
            (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n)_{\Gamma_i}
 	=
 	0,
-@f]
+@f}
 for all test functions $\mathbf a, q, \mathbf b$.
 Note that $Y$ is only a subspace of the spaces listed above to accomodate for
 the various Dirichlet boundary conditions.
@@ -232,13 +234,146 @@ approach of extending the functions by zero to the entire domain and then
 mapping the problem on to the hp framework makes sense:
 
 - It makes things uniform: On all cells, the number of vector components is
-  the same. ... partitioning, counting, ...
+  the same (here, <code>2*dim+1</code>). This makes all sorts of
+  things possible since a uniform description allows for code
+  re-use. For example, counting degrees of freedom per vector
+  component (DoFTools::count_dofs_per_component), sorting degrees of
+  freedom by component (DoFRenumbering::component_wise), subsequent
+  partitioning of matrices and vectors into blocks and many other
+  functions work as they always did without the need to add special
+  logic to them that describes cases where some of the variables only
+  live on parts of the domain. Consequently, you have all sorts of
+  tools already available to you in programs like the current one that
+  weren't originally written for the multiphysics case but work just
+  fine in the current context.
 
 - It allows for easy graphical output: All graphical output formats we support
-  require that ...
+  require that each field in the output is defined on all nodes of the
+  mesh. But given that now all solution components live everywhere,
+  our existing DataOut routines work as they always did, and produce
+  graphical output suitable for visualization -- the fields will
+  simply be extended by zero, a value that can easily be filtered out
+  by visualization programs if not desired.
 
 - There is essentially no cost: The trick with the FE_Nothing does not add any
   degrees of freedom to the overall problem, nor do we ever have to handle a
   shape function that belongs to these components &mdash; the FE_Nothing has
   no degrees of freedom, not does it have shape functions, all it does is take
   up vector components.
+
+
+<h3> Specifics of the implementation </h3>
+
+More specifically, in the program we have to address the following
+points:
+- Implementing the bilinear form, and in particular dealing with the
+  interface term.
+- Implementing Dirichlet boundary conditions on the external and
+  internal parts of the boundaryies
+  $\partial\Omega_f,\partial\Omega_s$.
+
+Let us first discuss implementing the bilinear form, which at the
+discrete level we recall to be
+@f{multline*}
+	2 \eta (\varepsilon(\mathbf a_h), \varepsilon(\mathbf v_h))_{\Omega_f}
+	- (\nabla \cdot \mathbf a_h, p_h)_{\Omega_f}
+	- (q_h, \nabla \cdot \mathbf v_h)_{\Omega_f}
+	\\
+	+ (\varepsilon(\mathbf b_h), C \varepsilon(\mathbf u_h))_{\Omega_s}
+	\\
+	- (\mathbf b_h,
+           (2 \eta \varepsilon(\mathbf v_h) + p \mathbf 1) \mathbf n)_{\Gamma_i}
+	=
+	0,
+@f}
+Given that we have extended the fields by zero, we could in principle
+write the integrals over subdomains to the entire domain $\Omega$,
+though it is little additional effort to first ask whether a cell is
+part of the elastic or fluid region before deciding which terms to
+integrate. Actually integrating these terms is not very difficult; for
+the Stokes equations, the relevant steps have been shown in step-22,
+whereas for the elasticity equation we take essentially the form shown
+in the @ref vector_valued module (rather than the one from step-8).
+
+The term that is of more interest is the interface term,
+@f[
+	(\mathbf b_h,
+           (2 \eta \varepsilon(\mathbf v_h) + p \mathbf 1) \mathbf n)_{\Gamma_i}.
+@f]
+Based on our assumption that the interface $\Gamma_i$ coincides with
+cell boundaries, this can in fact be written as a set of face
+integrals. If we denote the velocity, pressure and displacement
+components of shape function $\psi_i\in Y_h$ using the extractor
+notation $\psi_i[\mathbf v],\psi_i[p], \psi_i[\mathbf u]$, then the
+term above yields the following contribution to the global matrix
+entry $i,j$:
+@f[
+	\sum_K (\psi_i[\mathbf u],
+           (2 \eta \varepsilon(\psi_j[\mathbf v]) + \psi_j[p] \mathbf 1)
+	   \mathbf n)_{\partial K \cap \Gamma_i}.
+@f]
+Although it isn't immediately obvious, this term presents a slight
+complication: while $\psi_i[\mathbf u]$ and $\mathbf n$ are evaluate
+on the solid side of the interface (they are test functions for the
+displacement and the normal vector to $\Omega_s$, respectively, we
+need to evaluate $\psi_j[\mathbf v],\psi_j[p]$ on the fluid
+side of the interface since they correspond to the stress/force
+exerted by the fluid. In other words, in our implementation, we will
+need FEFaceValue objects for both sides of the interface. To make
+things slightly worse, we may also have to deal with the fact that one
+side or the other may be refined, leaving us with the need to
+integrate over parts of a face. Take a look at the implementation
+below on how to deal with this.
+
+The second difficulty is that while we know how to enforce a zero
+velocity or stress on the external boundary (using
+VectorTools::interpolate_boundary_values, called with an appropriate
+component mask and setting different boundary indicators for solid and
+fluid external boundaries), we now also needed the velocity to be zero
+on the interior interface, i.e. $\mathbf v|_{\Gamma_i}=0$. At the time
+of writing this, there is no function in deal.II that handles this
+part, but it isn't particularly difficult to implement by hand:
+essentially, we just have to loop over all cells, and if it is a fluid
+cell and its neighbor is a solid cell, then add constraints that
+ensure that the velocity degrees of freedom on this face are
+zero. Some care is necessary to deal with the case that the adjacent
+solid cell is refined, yielding the following code:
+@code
+    std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
+    for (typename hp::DoFHandler<dim>::active_cell_iterator
+	   cell = dof_handler.begin_active();
+	 cell != dof_handler.end(); ++cell)
+      if (cell->active_fe_index() == 0)
+	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	  if (not cell->at_boundary(f))
+	    {
+	      bool face_is_on_interface = false;
+
+	      if ((cell->neighbor(f)->has_children() == false)
+		  &&
+		  (cell->neighbor(f)->active_fe_index() == 1))
+		face_is_on_interface = true;
+	      else if (cell->neighbor(f)->has_children() == true)
+		{
+						   // neighbor does
+						   // have
+						   // children. see if
+						   // any of the cells
+						   // on the other
+						   // side are elastic
+		  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
+		    if (cell->neighbor_child_on_subface(f, sf)->active_fe_index() == 1)
+		      {
+			face_is_on_interface = true;
+			break;
+		      }
+		}
+
+	      if (face_is_on_interface)
+		{
+		  cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
+		  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
+		    constraints.add_line (local_face_dof_indices[i]);
+		}
+	    }
+@endcode
