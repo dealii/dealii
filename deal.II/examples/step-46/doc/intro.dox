@@ -61,6 +61,22 @@ where you may want to read up on the individual equations):
      \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
   @f}
 
+A weak formulation of this problem looks like this: Find $y = \{\mathbf v, p,
+\mathbf u\} \in Y \subset H^1(\Omega_f)^d \times L_2(\Omega_f) \times
+H^1(\Omega_s)^d$ so that
+@f[
+	2 \eta (\varepsilon(\mathbf a), \varepsilon(\mathbf v))_{\Omega_f}
+	- (\nabla \cdot \mathbf a, p)_{\Omega_f}
+	- (q, \nabla \cdot \mathbf v)_{\Omega_f}
+	+ (\varepsilon(\mathbf b), C \varepsilon(\mathbf u))_{\Omega_s}
+	- (\mathbf b, 
+           (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n)_{\Gamma_i}
+	=
+	0,
+@f]
+for all test functions $\mathbf a, q, \mathbf b$.
+Note that $Y$ is only a subspace of the spaces listed above to accomodate for
+the various Dirichlet boundary conditions.
 
 This sort of coupling is of course possible by simply having two Triangulation
 and two DoFHandler objects, one each for each of the two subdomains. On the
@@ -181,3 +197,48 @@ space:
 
 <h3>Implementation</h3>
 
+So how do we implement this sort of thing? First, we realize that the discrete
+space $Y_h$ essentially calls for two different finite elements: First, on the
+fluid subdomain, we need the element $Q_{p+1}^d \times Q_p \times Z^d$ which
+in deal.II is readily implemented by
+@code
+  FESystem<dim> (FE_Q<dim>(p+1), dim,
+		 FE_Q<dim>(p), 1,
+		 FE_Nothing<dim>(), dim),
+@endcode
+where <code>FE_Nothing</code> implements the space of functions that are
+always zero. Second, on the solid subdomain, we need the element
+$\in Z^d \times Z \times Q_r^d$, which we get using
+@code
+  FESystem<dim> (FE_Nothing<dim>(), dim,
+		 FE_Nothing<dim>(), 1,
+		 FE_Q<dim>(r), dim),
+@endcode
+
+The next step is that we associate each of these two elements with the cells
+that occupy each of the two subdomains. For this we realize that in a sense
+the two elements are just variations of each other in that they have the same
+number of vector components but have different polynomial degrees &mdash; this
+smells very much like what one would do in $hp$ finite element methods, and it
+is exactly what we are going to do here: we are going to (ab)use the classes
+and facilities of the hp namespace to assign different elements to different
+cells. In other words, we will use collect the two finite elements in an
+hp::FECollection, will integrate with an appropriate hp::QCollection using an
+hp::FEValues object, and our DoF handler will be of type hp::DoFHandler. You
+may wish to take a look at step-27 for an overview of all of these concepts.
+
+Before going on describing the testcase, let us clarify a bit <i>why</i> this
+approach of extending the functions by zero to the entire domain and then
+mapping the problem on to the hp framework makes sense:
+
+- It makes things uniform: On all cells, the number of vector components is
+  the same. ... partitioning, counting, ...
+
+- It allows for easy graphical output: All graphical output formats we support
+  require that ...
+
+- There is essentially no cost: The trick with the FE_Nothing does not add any
+  degrees of freedom to the overall problem, nor do we ever have to handle a
+  shape function that belongs to these components &mdash; the FE_Nothing has
+  no degrees of freedom, not does it have shape functions, all it does is take
+  up vector components.
