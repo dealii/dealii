@@ -451,8 +451,7 @@
 		       +
 		       mu_values[q_point] *
 		       scalar_product(phi_i_grad, transpose(phi_j_grad))
-		      )
-		      *
+		      ) *
 		      fe_values.JxW(q_point);
 	      }
 	  }
@@ -561,8 +560,7 @@ scalar_product (const Tensor<2,dim> &u,
 		       +
 		       2 *
 		       (phi_i_symmgrad * phi_j_symmgrad) *
-		       mu_values[q_point])
-		      *
+		       mu_values[q_point]) *
 		      fe_values.JxW(q_point));
 	      }
 	  }
