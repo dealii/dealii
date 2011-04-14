@@ -377,6 +377,17 @@ solid cell is refined, yielding the following code:
 		}
 	    }
 @endcode
+
+The call <code>constraints.add_line(t)</code> tells the
+ConstraintMatrix to start a new constraint for degree of freedom
+<code>t</code> of the form $x_t=\sum_{l=0}^{N-1} c_{tl} x_l +
+b_t$. Typically, one would then proceed to set individual coefficients
+$c_{tl}$ to nonzero values (using ConstraintMatrix::add_entry) or set
+$b_t$ to something nonzero (using
+ConstraintMatrix::set_inhomogeneity); doing nothing as above, funny as
+it looks, simply leaves the constraint to be $x_t=0$, which is exactly
+what we need in the current context.
+
 Note that there are cases where this may yield incorrect results:
 notably, once we find a solid neighbor child to a current fluid cell,
 we assume that all neighbor children on the common face are in the
