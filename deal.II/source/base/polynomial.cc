@@ -991,7 +991,7 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                      // already exist?
     if (  (recursive_coefficients.size() < k+1) ||
           ((recursive_coefficients.size() >= k+1) &&
-           (recursive_coefficients[k] == 0)) )
+           (recursive_coefficients[k].get() == 0)) )
                                            // no, then generate the
                                            // respective coefficients
       {
