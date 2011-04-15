@@ -128,3 +128,23 @@ degrees of freedom with respect to the degrees of freedom to the coarser
 matching face. This can use the same facilities the finite element classes
 already provide for computing constraints based on hanging nodes. We leave
 implementing this as an exercise, however.
+
+@note The functions above make one assumption, namely that the degrees of
+freedom on one face matche one-to-one to the corresponding other face. This is
+sometimes difficult to establish, especially in 3d. For example, consider a
+long string of cube cells where we want to match the far left face with the
+far right face for periodicity. If the cells are all undistorted cubes, then
+everything will work as expected. But imagine we have twisted our cells so
+that the string as a whole now has a 90 degree twist; in that case, the
+coordinate systems of the far left and far right face are also rotated
+relative to each other, and the first DoF on the far left face will no longer
+be at the same location as the first DoF on the far right face. To make things
+a bit worse, the 3d case also allows for pathological cases where mesh cells
+are no longer orientable in the standard order (see the 
+@ref GlossFaceOrientation "Face orientation" glossary entry), making matching
+coordinate systems difficult. Ultimately, whether you will encounter these
+cases depends on the kind of mesh you have: if your coarse mesh is just the
+unit cube or a subdivided hyper rectangle, you are definitely on the safe
+side. In other cases, if in doubt, verify the locations of degrees of freedom
+by printing the kind of information we have used in the tutorial's own
+implementation.
