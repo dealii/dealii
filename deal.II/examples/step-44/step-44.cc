@@ -1002,8 +1002,13 @@ void Solid<dim>::run (void)
     
     BlockVector <double> solution_delta (dofs_per_block);
     solution_delta.collect_sizes ();
+<<<<<<< .mine
+
+    while (time.current() <= time.end()) {
+=======
     
     while (time.current() <= time.end()) {
+>>>>>>> .r23597
 	solution_delta = 0.0;
 	
 	// Solve step and update total solution vector
@@ -1336,6 +1341,11 @@ void Solid<dim>::solve_nonlinear_timestep (BlockVector <double> & solution_delta
 	// in the K_pt block and K_tt^{-1} in the K_pp block
         assemble_SC();
 	
+
+        // Do the static condensation to make K'_uu, and put K_pt^{-1}
+        // in the K_pt block and K_tt^{-1} in the K_pp block
+        assemble_SC();
+
 	constraints.condense (tangent_matrix, residual); // Apply BC's
 	solve_linear_system (newton_update);
 	constraints.distribute(newton_update); // Populate the constrained DOF's with their values
@@ -1443,6 +1453,10 @@ void Solid<dim>::solve_linear_system (BlockVector <double> & newton_update)
     
     // Solve for du
     {
+<<<<<<< .mine
+
+=======
+>>>>>>> .r23597
 	// K'uu du = Ru − Kup Ktp^-1 (Rt − Ktt Kpt^{-1} Rp)
 	tangent_matrix.block(p_dof, t_dof).vmult(A.block(t_dof), residual.block(p_dof));
 	tangent_matrix.block(t_dof, t_dof).vmult (B.block(t_dof), A.block(t_dof));
