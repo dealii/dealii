@@ -204,16 +204,16 @@ namespace Polynomials
 				                        *  Test for equality of two polynomials.
 				                        */
       bool operator == (const Polynomial<number> & p)  const;
-    
+
                                        /**
                                         * Print coefficients.
                                         */
       void print(std::ostream& out) const;
-      
+
                                        /**
-                                        * Write or read the data of this object to or 
+                                        * Write or read the data of this object to or
                                         * from a stream for the purpose of serialization.
-                                        */ 
+                                        */
       template <class Archive>
       void serialize (Archive & ar, const unsigned int version);
 
@@ -605,7 +605,20 @@ namespace Polynomials
      static const std::vector<double> &
      get_coefficients (const unsigned int p);
 
-     static std::vector<const std::vector<double> *> recursive_coefficients;
+                                       /**
+                                        * Vector with already computed
+                                        * coefficients. For each degree of the
+                                        * polynomial, we keep one pointer to
+                                        * the list of coefficients; we do so
+                                        * rather than keeping a vector of
+                                        * vectors in order to simplify
+                                        * programming multithread-safe. In
+                                        * order to avoid memory leak, we use a
+                                        * shared_ptr in order to correctly
+                                        * free the memory of the vectors when
+                                        * the global destructor is called.
+                                        */
+    static std::vector<std_cxx1x::shared_ptr<const std::vector<double> > > recursive_coefficients;
    };
 }
 
@@ -646,7 +659,7 @@ namespace Polynomials
 
     return value;
   }
-  
+
 
 
   template <typename number>

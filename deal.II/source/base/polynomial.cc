@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -211,7 +211,7 @@ namespace Polynomials
   }
 
   template <typename number >
-  bool 
+  bool
   Polynomial<number>::operator == (const Polynomial<number> & p)  const
   {
     return (p.coefficients == coefficients);
@@ -959,9 +959,8 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<const std::vector<double> *>
-  Hierarchical::recursive_coefficients(
-     20, static_cast<const std::vector<double>*>(0));
+  std::vector<std_cxx1x::shared_ptr<const std::vector<double> > >
+  Hierarchical::recursive_coefficients(20);
 
 
 
@@ -996,7 +995,7 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                            // no, then generate the
                                            // respective coefficients
       {
-        recursive_coefficients.resize (k+1, 0);
+        recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
@@ -1018,8 +1017,10 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
 
                                              // now make these arrays
                                              // const
-            recursive_coefficients[0] = c0;
-            recursive_coefficients[1] = c1;
+            recursive_coefficients[0] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(c0);
+            recursive_coefficients[1] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(c1);
           }
         else if (k==2)
           {
@@ -1035,7 +1036,8 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
             (*c2)[1] =  -4.*a;
             (*c2)[2] =   4.*a;
 
-            recursive_coefficients[2] = c2;
+            recursive_coefficients[2] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(c2);
           }
         else
           {
@@ -1078,7 +1080,8 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                              // created vector to the
                                              // const pointer in the
                                              // coefficients array
-            recursive_coefficients[k] = ck;
+            recursive_coefficients[k] =
+	      std_cxx1x::shared_ptr<const std::vector<double> >(ck);
           };
       };
   }
@@ -1094,16 +1097,9 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
 
                                    // then get a pointer to the array
                                    // of coefficients. do that in a MT
-                                     // safe way
-    coefficients_lock.acquire ();
-    const std::vector<double> *p = recursive_coefficients[k];
-    coefficients_lock.release ();
-
-                                   // return the object pointed
-                                   // to. since this object does not
-                                   // change any more once computed,
-                                   // this is MT safe
-    return *p;
+				   // safe way
+    Threads::ThreadMutex::ScopedLock lock (coefficients_lock);
+    return *recursive_coefficients[k];
   }
 
 
