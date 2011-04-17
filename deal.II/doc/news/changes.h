@@ -85,6 +85,12 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Under some conditions, FEFaceValues applied to an FESystem element
+that contained elements of type FE_Nothing would receive an erroneous
+exception. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/04/17)
+
 <li> New: There is now an operator* for the multiplication of a <code>SymmetricTensor@<2,dim@></code>
 and a <code>Tensor@<1,dim@></code>.
 <br>

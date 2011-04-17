@@ -1092,29 +1092,6 @@ compute_fill (const Mapping<dim,spacedim>                      &mapping,
 		    };
 		};
         };
-
-      if (fe_data.is_first_cell())
-	{
-					   // delete FEValuesDatas that
-					   // are not needed any more
-	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
-	    {
-					       // Pointer needed to get
-					       // the update flags of the
-					       // base element
-	      typename Mapping<dim,spacedim>::InternalDataBase &base_fe_data=
-		fe_data.get_fe_data(base_no);
-
-					       // compute update flags ...
-	      UpdateFlags base_flags_each(
-		dim_1==dim ?
-		mapping_data.update_each | base_fe_data.update_each :
-		mapping_data.update_flags | base_fe_data.update_flags);
-
-	      if (base_flags_each==update_default)
-		fe_data.delete_fe_values_data(base_no);
-	    }
-	}
     }
 
   if (fe_data.compute_hessians && cell_similarity != CellSimilarity::translation)

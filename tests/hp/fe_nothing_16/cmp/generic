@@ -1,0 +1,10 @@
+
+DEAL::i=0, q=0, value=0
+DEAL::i=0, q=1, value=0
+DEAL::i=1, q=0, value=0
+DEAL::i=1, q=1, value=0
+DEAL::i=2, q=0, value=0
+DEAL::i=2, q=1, value=0
+DEAL::i=3, q=0, value=0
+DEAL::i=3, q=1, value=0
+DEAL::OK
