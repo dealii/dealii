@@ -471,11 +471,10 @@ void FluidStructureProblem<dim>::assemble_system ()
 		    {
 		      const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
 
-		      for (unsigned int k=0; k<dofs_per_cell; ++k)
-			{
-			  stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
-			  elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
-			}
+		      for (unsigned int k=0; k<stokes_dofs_per_cell; ++k)
+			stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
+		      for (unsigned int k=0; k<elasticity_dofs_per_cell; ++k)
+			elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
 
 		      for (unsigned int i=0; i<stokes_dofs_per_cell; ++i)
 			for (unsigned int j=0; j<elasticity_dofs_per_cell; ++j)
