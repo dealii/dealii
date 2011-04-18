@@ -370,9 +370,11 @@ void FluidStructureProblem<dim>::assemble_system ()
   const unsigned int   elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
 
   FullMatrix<double>   local_matrix;
+  FullMatrix<double>   local_interface_matrix (elasticity_dofs_per_cell,
+					       stokes_dofs_per_cell);
   Vector<double>       local_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<unsigned int> local_dof_indices, neighbor_dof_indices;
 
   const RightHandSide<dim>          right_hand_side;
 
@@ -461,6 +463,13 @@ void FluidStructureProblem<dim>::assemble_system ()
       local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
+      				       // local_rhs==0, but need to do
+				       // this here because of
+				       // boundary values
+      constraints.distribute_local_to_global (local_matrix, local_rhs,
+					      local_dof_indices,
+					      system_matrix, system_rhs);
+
 				       // see about face terms
       if (cell_is_in_fluid_domain (cell))
 					 // we are on a fluid cell
@@ -484,8 +493,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 		  elasticity_fe_face_values.reinit (cell->neighbor(f),
 						    cell->neighbor_of_neighbor(f));
 
-		  local_matrix.reinit (stokes_dofs_per_cell,
-				       elasticity_dofs_per_cell);
+		  local_interface_matrix = 0;
 		  for (unsigned int q=0; q<face_quadrature.size(); ++q)
 		    {
 		      const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
@@ -495,13 +503,18 @@ void FluidStructureProblem<dim>::assemble_system ()
 		      for (unsigned int k=0; k<elasticity_dofs_per_cell; ++k)
 			elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
 
-		      for (unsigned int i=0; i<stokes_dofs_per_cell; ++i)
-			for (unsigned int j=0; j<elasticity_dofs_per_cell; ++j)
-			  local_matrix(i,j) += (2 * viscosity *
-						(stokes_phi_grads_u[i] *
-						 normal_vector) *
-						elasticity_phi[j] *
-						stokes_fe_face_values.JxW(q));
+		      for (unsigned int i=0; i<elasticity_dofs_per_cell; ++i)
+			for (unsigned int j=0; j<stokes_dofs_per_cell; ++j)
+			  local_interface_matrix(i,j) += (2 * viscosity *
+			                                  (stokes_phi_grads_u[j] *
+			                                  normal_vector) *
+			                                  elasticity_phi[i] *
+			                                  stokes_fe_face_values.JxW(q));
+			  
+			  
+			  neighbor_dof_indices.resize (elasticity_dofs_per_cell);
+			cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
+		      //constraints.distribute_local_to_global();
 		    }
 		}
 	      else if ((cell->neighbor(f)->level() == cell->level())
@@ -517,13 +530,6 @@ void FluidStructureProblem<dim>::assemble_system ()
 		    continue;
 		}
 	    }
-				       // local_rhs==0, but need to do
-				       // this here because of
-				       // boundary values
-      constraints.distribute_local_to_global (local_matrix, local_rhs,
-					      local_dof_indices,
-					      system_matrix, system_rhs);
-
     }
 }
 
