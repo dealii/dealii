@@ -64,6 +64,13 @@ class FluidStructureProblem
     void run ();
 
   private:
+    static bool
+    cell_is_in_fluid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
+
+    static bool
+    cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
+
+
     void setup_dofs ();
     void assemble_system ();
     void solve ();
@@ -197,6 +204,25 @@ FluidStructureProblem<dim>::FluidStructureProblem (const unsigned int stokes_deg
 
 
 template <int dim>
+bool
+FluidStructureProblem<dim>::
+cell_is_in_fluid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
+{
+  return (cell->active_fe_index() == 0);
+}
+
+
+template <int dim>
+bool
+FluidStructureProblem<dim>::
+cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
+{
+  return (cell->active_fe_index() == 1);
+}
+
+
+
+template <int dim>
 void FluidStructureProblem<dim>::setup_dofs ()
 {
   system_matrix.clear ();
@@ -248,15 +274,15 @@ void FluidStructureProblem<dim>::setup_dofs ()
     for (typename hp::DoFHandler<dim>::active_cell_iterator
 	   cell = dof_handler.begin_active();
 	 cell != dof_handler.end(); ++cell)
-      if (cell->active_fe_index() == 0)
+      if (cell_is_in_fluid_domain (cell))
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	  if (not cell->at_boundary(f))
+	  if (!cell->at_boundary(f))
 	    {
 	      bool face_is_on_interface = false;
 
 	      if ((cell->neighbor(f)->has_children() == false)
 		  &&
-		  (cell->neighbor(f)->active_fe_index() == 1))
+		  (cell_is_in_solid_domain (cell->neighbor(f))))
 		face_is_on_interface = true;
 	      else if (cell->neighbor(f)->has_children() == true)
 		{
@@ -267,7 +293,7 @@ void FluidStructureProblem<dim>::setup_dofs ()
 						   // on the other
 						   // side are elastic
 		  for (unsigned int sf=0; sf<cell->face(f)->n_children(); ++sf)
-		    if (cell->neighbor_child_on_subface(f, sf)->active_fe_index() == 1)
+		    if (cell_is_in_solid_domain (cell->neighbor_child_on_subface(f, sf)))
 		      {
 			face_is_on_interface = true;
 			break;
@@ -375,7 +401,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 			   cell->get_fe().dofs_per_cell);
       local_rhs.reinit (cell->get_fe().dofs_per_cell);
 
-      if (cell->active_fe_index() == 0)
+      if (cell_is_in_fluid_domain (cell))
 	{
 	  const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 	  Assert (dofs_per_cell == stokes_dofs_per_cell,
@@ -436,7 +462,7 @@ void FluidStructureProblem<dim>::assemble_system ()
       cell->get_dof_indices (local_dof_indices);
 
 				       // see about face terms
-      if (cell->active_fe_index() == 0)
+      if (cell_is_in_fluid_domain (cell))
 					 // we are on a fluid cell
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	  if (cell->at_boundary(f) == false)
@@ -446,7 +472,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 		  (cell->neighbor(f)->has_children() == false))
 		{
 						   // cells are on same level
-		  if (cell->neighbor(f)->active_fe_index() == 0)
+		  if (cell_is_in_fluid_domain (cell->neighbor(f)))
 						     // neighbor is also a fluid cell
 		    continue;
 
