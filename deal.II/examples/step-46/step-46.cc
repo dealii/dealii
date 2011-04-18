@@ -435,13 +435,6 @@ void FluidStructureProblem<dim>::assemble_system ()
       local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
-				       // local_rhs==0, but need to do
-				       // this here because of
-				       // boundary values
-      constraints.distribute_local_to_global (local_matrix, local_rhs,
-					      local_dof_indices,
-					      system_matrix, system_rhs);
-
 				       // see about face terms
       if (cell->active_fe_index() == 0)
 					 // we are on a fluid cell
@@ -498,6 +491,13 @@ void FluidStructureProblem<dim>::assemble_system ()
 		    continue;
 		}
 	    }
+				       // local_rhs==0, but need to do
+				       // this here because of
+				       // boundary values
+      constraints.distribute_local_to_global (local_matrix, local_rhs,
+					      local_dof_indices,
+					      system_matrix, system_rhs);
+
     }
 }
 
