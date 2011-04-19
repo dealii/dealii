@@ -313,7 +313,7 @@ entry $i,j$:
 	   \mathbf n)_{\partial K \cap \Gamma_i}.
 @f]
 Although it isn't immediately obvious, this term presents a slight
-complication: while $\psi_i[\mathbf u]$ and $\mathbf n$ are evaluate
+complication: while $\psi_i[\mathbf u]$ and $\mathbf n$ are evaluated
 on the solid side of the interface (they are test functions for the
 displacement and the normal vector to $\Omega_s$, respectively, we
 need to evaluate $\psi_j[\mathbf v],\psi_j[p]$ on the fluid
@@ -323,7 +323,18 @@ need FEFaceValue objects for both sides of the interface. To make
 things slightly worse, we may also have to deal with the fact that one
 side or the other may be refined, leaving us with the need to
 integrate over parts of a face. Take a look at the implementation
-below on how to deal with this.
+below on how to deal with this. 
+
+As an additional complication, the matrix entries that result from this term
+need to be added to the sparsity pattern of the matrix somehow. This, however,
+is not too difficult: the term couples degrees of freedom from two adjacent
+cells along a face, which is exactly the kind of thing one would do in
+discontinuous Galerkin schemes for which the function
+DoFTools::make_flux_sparsity_pattern was written. In the current context it
+computes a superset of matrix entries compared to the usual
+DoFTools::make_sparsity_pattern: it will also add the ones for faces where the
+solution is discontinuous, which is exactlty the case at the interface between
+the two subdomains.
 
 The second difficulty is that while we know how to enforce a zero
 velocity or stress on the external boundary (using
