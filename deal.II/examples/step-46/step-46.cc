@@ -323,7 +323,7 @@ void FluidStructureProblem<dim>::setup_dofs ()
     CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
 					 dof_handler.n_dofs());
 
-    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
+    DoFTools::make_flux_sparsity_pattern (dof_handler, csp, constraints, false);
     sparsity_pattern.copy_from (csp);
   }
 
@@ -505,16 +505,22 @@ void FluidStructureProblem<dim>::assemble_system ()
 
 		      for (unsigned int i=0; i<elasticity_dofs_per_cell; ++i)
 			for (unsigned int j=0; j<stokes_dofs_per_cell; ++j)
-			  local_interface_matrix(i,j) += (2 * viscosity *
-			                                  (stokes_phi_grads_u[j] *
-			                                  normal_vector) *
+			  local_interface_matrix(i,j) += ((2 * viscosity *
+			                                   (stokes_phi_grads_u[j] *
+			                                    normal_vector)
+							   +
+							   stokes_phi_p[j] *
+							   normal_vector) *
 			                                  elasticity_phi[i] *
 			                                  stokes_fe_face_values.JxW(q));
-			  
-			  
-			  neighbor_dof_indices.resize (elasticity_dofs_per_cell);
-			cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
-		      //constraints.distribute_local_to_global();
+
+
+		      neighbor_dof_indices.resize (elasticity_dofs_per_cell);
+		      cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
+		      constraints.distribute_local_to_global(local_interface_matrix,
+							     neighbor_dof_indices,
+							     local_dof_indices,
+							     system_matrix);
 		    }
 		}
 	      else if ((cell->neighbor(f)->level() == cell->level())
