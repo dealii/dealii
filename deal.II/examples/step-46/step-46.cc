@@ -377,6 +377,12 @@ void FluidStructureProblem<dim>::assemble_system ()
 					   update_gradients);
   FEFaceValues<dim> elasticity_fe_face_values (elasticity_fe, face_quadrature,
 					       update_values);
+  FESubfaceValues<dim> stokes_fe_subface_values (stokes_fe, face_quadrature,
+						 update_JxW_values |
+						 update_normal_vectors |
+						 update_gradients);
+  FESubfaceValues<dim> elasticity_fe_subface_values (elasticity_fe, face_quadrature,
+						     update_values);
 
   const unsigned int   stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
   const unsigned int   elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
@@ -386,7 +392,8 @@ void FluidStructureProblem<dim>::assemble_system ()
 					       stokes_dofs_per_cell);
   Vector<double>       local_rhs;
 
-  std::vector<unsigned int> local_dof_indices, neighbor_dof_indices;
+  std::vector<unsigned int> local_dof_indices;
+  std::vector<unsigned int> neighbor_dof_indices (stokes_dofs_per_cell);
 
   const RightHandSide<dim>          right_hand_side;
 
@@ -471,8 +478,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 	      }
 	}
 
-      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
-      local_dof_indices.resize (dofs_per_cell);
+      local_dof_indices.resize (cell->get_fe().dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
 
       				       // local_rhs==0, but need to do
@@ -483,50 +489,83 @@ void FluidStructureProblem<dim>::assemble_system ()
 					      system_matrix, system_rhs);
 
 				       // see about face terms
-      if (cell_is_in_fluid_domain (cell))
-					 // we are on a fluid cell
+      if (cell_is_in_solid_domain (cell))
+					 // we are on a solid cell
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	  if (cell->at_boundary(f) == false)
 	    {
 	      if ((cell->neighbor(f)->level() == cell->level())
 		  &&
-		  (cell->neighbor(f)->has_children() == false))
+		  (cell->neighbor(f)->has_children() == false)
+		  && 
+		  cell_is_in_fluid_domain (cell->neighbor(f)))
 		{
-						   // cells are on same level
-		  if (cell_is_in_fluid_domain (cell->neighbor(f)))
-						     // neighbor is also a fluid cell
-		    continue;
-
 						   // same size
 						   // neighbors;
 						   // neighbor is
-						   // solids cell
-		  stokes_fe_face_values.reinit (cell, f);
-		  elasticity_fe_face_values.reinit (cell->neighbor(f),
-						    cell->neighbor_of_neighbor(f));
+						   // fluid cell
+		  elasticity_fe_face_values.reinit (cell, f);
+		  stokes_fe_face_values.reinit (cell->neighbor(f),
+						cell->neighbor_of_neighbor(f));
 
 		  assemble_interface_term (elasticity_fe_face_values, stokes_fe_face_values,
 					   elasticity_phi, stokes_phi_grads_u, stokes_phi_p,
 					   local_interface_matrix);
 
-                  neighbor_dof_indices.resize (elasticity_dofs_per_cell);
 		  cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
 		  constraints.distribute_local_to_global(local_interface_matrix,
-							 neighbor_dof_indices,
-					                 local_dof_indices,
+							 local_dof_indices,
+					                 neighbor_dof_indices,
 					                 system_matrix);
 		}
 	      else if ((cell->neighbor(f)->level() == cell->level())
 		       &&
 		       (cell->neighbor(f)->has_children() == true))
 		{
-						   // neighbor has children
+						   // neighbor has children. loop over 
+						   // the cells adjacent to the commone
+						   // interface and see which subdomain
+						   // they belong to
+	          for (unsigned int subface=0; subface<cell->face(f)->n_children(); ++subface)
+		    if (cell_is_in_fluid_domain (cell->neighbor_child_on_subface (f, subface)))
+		      {
+			elasticity_fe_subface_values.reinit (cell, 
+							     f,
+							     subface);
+			stokes_fe_face_values.reinit (cell->neighbor_child_on_subface (f, subface),
+						      cell->neighbor_of_neighbor(f));
+
+			assemble_interface_term (elasticity_fe_subface_values, stokes_fe_face_values,
+						 elasticity_phi, stokes_phi_grads_u, stokes_phi_p,
+			                         local_interface_matrix);
+
+			cell->neighbor_child_on_subface (f, subface)->get_dof_indices (neighbor_dof_indices);
+			constraints.distribute_local_to_global(local_interface_matrix,
+							       local_dof_indices,
+					                       neighbor_dof_indices,
+					                       system_matrix);
+		      }
 		}
-	      else
+	      else if (cell->neighbor_is_coarser(f)
+		       &&
+		       cell_is_in_fluid_domain(cell->neighbor(f)))
 		{
 						   // neighbor is coarser
-		  if (cell->active_fe_index() == cell->neighbor(f)->active_fe_index())
-		    continue;
+		  elasticity_fe_face_values.reinit (cell, f);
+		  stokes_fe_subface_values.reinit (cell->neighbor(f),
+						   cell->neighbor_of_coarser_neighbor(f).first,
+						   cell->neighbor_of_coarser_neighbor(f).second);
+
+		  assemble_interface_term (elasticity_fe_face_values, stokes_fe_subface_values,
+					   elasticity_phi, stokes_phi_grads_u, stokes_phi_p,
+			                   local_interface_matrix);
+
+		  cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
+		  constraints.distribute_local_to_global(local_interface_matrix,
+							 local_dof_indices,
+					                 neighbor_dof_indices,
+					                 system_matrix);
+		  
 		}
 	    }
     }
@@ -613,7 +652,7 @@ FluidStructureProblem<dim>::output_results (const unsigned int refinement_cycle)
   data_out.add_data_vector (solution, solution_names,
 			    DataOut<dim,hp::DoFHandler<dim> >::type_dof_data,
 			    data_component_interpretation);
-  data_out.build_patches (stokes_fe.degree);
+  data_out.build_patches ();
 
   std::ostringstream filename;
   filename << "solution-"
