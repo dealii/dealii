@@ -73,6 +73,12 @@ class FluidStructureProblem
 
     void setup_dofs ();
     void assemble_system ();
+    void assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
+				  const FEFaceValuesBase<dim>          &stokes_fe_face_values,
+				  std::vector<Tensor<1,dim> >          &elasticity_phi,
+				  std::vector<SymmetricTensor<2,dim> > &stokes_phi_grads_u,
+				  std::vector<double>                  &stokes_phi_p,
+				  FullMatrix<double>                   &local_interface_matrix) const;
     void solve ();
     void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
@@ -94,6 +100,7 @@ class FluidStructureProblem
     Vector<double> solution;
     Vector<double> system_rhs;
 
+    const double viscosity;
     const double lambda;
     const double mu;
 };
@@ -193,6 +200,7 @@ FluidStructureProblem<dim>::FluidStructureProblem (const unsigned int stokes_deg
 			       FE_Nothing<dim>(), 1,
 			       FE_Q<dim>(elasticity_degree), dim),
                 dof_handler (triangulation),
+                viscosity (2),
 		lambda (1),
 		mu (1)
 {
@@ -340,8 +348,6 @@ void FluidStructureProblem<dim>::assemble_system ()
 {
   system_matrix=0;
   system_rhs=0;
-
-  const double viscosity = 2;
 
   const QGauss<dim> stokes_quadrature(stokes_degree+2);
   const QGauss<dim> elasticity_quadrature(elasticity_degree+2);
@@ -493,35 +499,16 @@ void FluidStructureProblem<dim>::assemble_system ()
 		  elasticity_fe_face_values.reinit (cell->neighbor(f),
 						    cell->neighbor_of_neighbor(f));
 
-		  local_interface_matrix = 0;
-		  for (unsigned int q=0; q<face_quadrature.size(); ++q)
-		    {
-		      const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
+		  assemble_interface_term (elasticity_fe_face_values, stokes_fe_face_values,
+					   elasticity_phi, stokes_phi_grads_u, stokes_phi_p,
+					   local_interface_matrix);
 
-		      for (unsigned int k=0; k<stokes_dofs_per_cell; ++k)
-			stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
-		      for (unsigned int k=0; k<elasticity_dofs_per_cell; ++k)
-			elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
-
-		      for (unsigned int i=0; i<elasticity_dofs_per_cell; ++i)
-			for (unsigned int j=0; j<stokes_dofs_per_cell; ++j)
-			  local_interface_matrix(i,j) += -((2 * viscosity *
-			                                   (stokes_phi_grads_u[j] *
-			                                    normal_vector)
-							   +
-							   stokes_phi_p[j] *
-							   normal_vector) *
-			                                  elasticity_phi[i] *
-			                                  stokes_fe_face_values.JxW(q));
-
-
-		      neighbor_dof_indices.resize (elasticity_dofs_per_cell);
-		      cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
-		      constraints.distribute_local_to_global(local_interface_matrix,
-							     neighbor_dof_indices,
-							     local_dof_indices,
-							     system_matrix);
-		    }
+                  neighbor_dof_indices.resize (elasticity_dofs_per_cell);
+		  cell->neighbor(f)->get_dof_indices (neighbor_dof_indices);
+		  constraints.distribute_local_to_global(local_interface_matrix,
+							 neighbor_dof_indices,
+					                 local_dof_indices,
+					                 system_matrix);
 		}
 	      else if ((cell->neighbor(f)->level() == cell->level())
 		       &&
@@ -541,9 +528,50 @@ void FluidStructureProblem<dim>::assemble_system ()
 
 
 
+template <int dim>
+void
+FluidStructureProblem<dim>::assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
+						     const FEFaceValuesBase<dim>          &stokes_fe_face_values,
+						     std::vector<Tensor<1,dim> >          &elasticity_phi,
+						     std::vector<SymmetricTensor<2,dim> > &stokes_phi_grads_u,
+						     std::vector<double>                  &stokes_phi_p,
+						     FullMatrix<double>                   &local_interface_matrix) const
+{
+  Assert (stokes_fe_face_values.n_quadrature_points ==
+          elasticity_fe_face_values.n_quadrature_points,
+	  ExcInternalError());
+
+  const FEValuesExtractors::Vector velocities (0);
+  const FEValuesExtractors::Scalar pressure (dim);
+  const FEValuesExtractors::Vector displacements (dim+1);
+
+  local_interface_matrix = 0;
+  for (unsigned int q=0; q<elasticity_fe_face_values.n_quadrature_points; ++q)
+  {
+    const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
+
+    for (unsigned int k=0; k<stokes_fe_face_values.dofs_per_cell; ++k)
+      stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
+    for (unsigned int k=0; k<elasticity_fe_face_values.dofs_per_cell; ++k)
+      elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
+
+    for (unsigned int i=0; i<elasticity_fe_face_values.dofs_per_cell; ++i)
+      for (unsigned int j=0; j<stokes_fe_face_values.dofs_per_cell; ++j)
+	local_interface_matrix(i,j) += -((2 * viscosity *
+	                                 (stokes_phi_grads_u[j] *
+	                                 normal_vector)
+					 +
+					 stokes_phi_p[j] *
+					 normal_vector) *
+					 elasticity_phi[i] *
+					 stokes_fe_face_values.JxW(q));
+  }
+}
+
 
 template <int dim>
-void FluidStructureProblem<dim>::solve ()
+void
+FluidStructureProblem<dim>::solve ()
 {
   SparseDirectUMFPACK direct_solver;
   direct_solver.initialize (system_matrix);
