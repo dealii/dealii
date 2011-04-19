@@ -1,2 +1,72 @@
+<a name="Results"></a>
 <h1>Results</h1>
 
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+An obvious place to improve the program would be to use a more
+sophisticated solver &mdash; in particular one that scales well and
+will also work for realistic 3d problems. This shouldn't actually be
+too hard to achieve here, because of the one-way coupling from fluid
+into solid. To this end, assume we had re-ordered degrees of freedom
+in such a way that we first have all velocity and pressure degrees of
+freedom, and then all displacements (this is easily possible using
+DoFRenumbering::component_wise). Then the system matrix could be split
+into the following block form:
+@f[
+  A_\text{global}
+  =
+  \begin{pmatrix}
+    A_{\text{fluid}} & 0 \\
+    B & A_{\text{solid}}
+  \end{pmatrix}
+@f]
+where $A_{\text{fluid}}$ is the Stokes matrix, $A_{\text{solid}}$
+results from the elasticity equations, and $B$ is the matrix that
+comes from the interface condition. Now notice that the matrix
+@f[
+  A_\text{global}^{-1}
+  =
+  \begin{pmatrix}
+    A_{\text{fluid}}^{-1} & 0 \\
+    -A_\text{solid}^{-1} B
+      A_\text{fluid}^{-1} & A_{\text{solid}}^{-1}
+  \end{pmatrix}
+@f]
+is the inverse of $A_\text{global}$. Applying this matrix requires
+only one solve with $A_\text{fluid}$ and $A_\text{solid}$ each since
+@f[
+  \begin{pmatrix}
+    p_x \\ p_y
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    A_{\text{fluid}}^{-1} & 0 \\
+    X & A_{\text{solid}}^{-1}
+  \end{pmatrix}
+  \begin{pmatrix}
+    x \\ y
+  \end{pmatrix}
+@f]
+can be computed as $p_x = A_{\text{fluid}}^{-1} x$ followed by
+$p_y = A_{\text{solid}}^{-1} (y-Bp_x)$.
+
+One can therefore expect that
+@f[
+  \widetilde{A_\text{global}^{-1}}
+  =
+  \begin{pmatrix}
+    \widetilde{A_{\text{fluid}}^{-1}} & 0 \\
+    -\widetilde{A_\text{solid}^{-1}} B
+      \widetilde{A_\text{fluid}^{-1}} & \widetilde{A_{\text{solid}}^{-1}}
+  \end{pmatrix}
+@f]
+would be a good preconditioner if $\widetilde{A_{\text{fluid}}^{-1}}
+\approx A_{\text{fluid}}^{-1}, \widetilde{A_{\text{solid}}^{-1}}
+\approx A_{\text{solid}}^{-1}$. That means, we only need good
+preconditioners for Stokes and the elasticity equations
+separately. These are well known, however: for Stokes, we can use the
+preconditioner discussed in the results section of step-22; for
+elasticity, a good preconditioner would be a single V-cycle of a
+geometric or algebraic multigrid.

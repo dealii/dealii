@@ -323,7 +323,7 @@ need FEFaceValue objects for both sides of the interface. To make
 things slightly worse, we may also have to deal with the fact that one
 side or the other may be refined, leaving us with the need to
 integrate over parts of a face. Take a look at the implementation
-below on how to deal with this. 
+below on how to deal with this.
 
 As an additional complication, the matrix entries that result from this term
 need to be added to the sparsity pattern of the matrix somehow. This, however,
@@ -419,3 +419,27 @@ fluid and solid subdomains do not coincide with a set of complete
 coarse mesh cells &mdash; but this is a contradiction to the
 assumption stated at the end of the first section of this
 introduction.
+
+
+
+<h3>The testcase</h3>
+
+We will consider the following situation as a testcase:
+
+@image html step-46.layout.png
+
+The fixed boundary at the bottom implies $\mathbf u=0$, and we also
+prescribe Dirichlet conditions for the flow at the top so that we get
+inflow at the left and outflow at the right. At the left and right
+boundaries, no boundary conditions are imposed explicitly for the
+flow, yielding the implicit no-stress condition $(2\eta
+\varepsilon(\mathbf v) + p \mathbf 1) \cdot \mathbf n = 0$.
+The conditions on the interface between the two domains has been
+discussed above already.
+
+This program is primarily intended to show how to deal with different
+physics in different parts of the domain, and how to implement such
+models in deal.II. As a consequence, we won't bother coming up with a
+good solver: we'll just use the SparseDirectUMFPACK class which always
+works, even if not with optimal complexity. We will, however, comment
+on possible other solvers in the <a href="#Results">results</a> section.
