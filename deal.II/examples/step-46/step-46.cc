@@ -71,6 +71,7 @@ class FluidStructureProblem
     cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
 
 
+    void setup_subdomains ();
     void setup_dofs ();
     void assemble_system ();
     void assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
@@ -235,20 +236,6 @@ void FluidStructureProblem<dim>::setup_dofs ()
 {
   system_matrix.clear ();
 
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-	 cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
-    if (((std::fabs(cell->center()[0]) < 0.25)
-	 &&
-	 (cell->center()[1] > 0.5))
-	||
-	((std::fabs(cell->center()[0]) >= 0.25)
-	 &&
-	 (cell->center()[1] > -0.5)))
-      cell->set_active_fe_index (0);
-    else
-      cell->set_active_fe_index (1);
-
   dof_handler.distribute_dofs (fe_collection);
   DoFRenumbering::Cuthill_McKee (dof_handler);
 
@@ -341,6 +328,25 @@ void FluidStructureProblem<dim>::setup_dofs ()
   system_rhs.reinit (dof_handler.n_dofs());
 }
 
+
+template <int dim>
+void
+FluidStructureProblem<dim>::setup_subdomains ()
+{
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+         cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    if (((std::fabs(cell->center()[0]) < 0.25)
+         &&
+         (cell->center()[1] > 0.5))
+	||
+	((std::fabs(cell->center()[0]) >= 0.25)
+	 &&
+	 (cell->center()[1] > -0.5)))
+      cell->set_active_fe_index (0);
+    else
+      cell->set_active_fe_index (1);
+}
 
 
 template <int dim>
@@ -624,6 +630,8 @@ template <int dim>
 void
 FluidStructureProblem<dim>::refine_mesh ()
 {
+  Vector<float> stokes_estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> elasticity_estimated_error_per_cell (triangulation.n_active_cells());
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
   const QGauss<dim-1> stokes_quadrature(stokes_degree+2);
@@ -633,15 +641,30 @@ FluidStructureProblem<dim>::refine_mesh ()
   face_q_collection.push_back (stokes_quadrature);
   face_q_collection.push_back (elasticity_quadrature);
 
-  std::vector<bool> component_mask (dim+1+dim, false);
-  component_mask[dim] = true;
+  std::vector<bool> stokes_component_mask (dim+1+dim, false);
+  for (unsigned int d=0; d<dim; ++d)
+    stokes_component_mask[d] = true;
   KellyErrorEstimator<dim>::estimate (dof_handler,
                                       face_q_collection,
                                       typename FunctionMap<dim>::type(),
                                       solution,
-                                      estimated_error_per_cell,
-                                      component_mask);
+                                      stokes_estimated_error_per_cell,
+                                      stokes_component_mask);
 
+  std::vector<bool> elasticity_component_mask (dim+1+dim, false);
+  for (unsigned int d=0; d<dim; ++d)
+    elasticity_component_mask[dim+1+d] = true;
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+                                      face_q_collection,
+                                      typename FunctionMap<dim>::type(),
+                                      solution,
+                                      elasticity_estimated_error_per_cell,
+                                      elasticity_component_mask);
+
+  stokes_estimated_error_per_cell /= stokes_estimated_error_per_cell.linfty_norm();
+  elasticity_estimated_error_per_cell /= elasticity_estimated_error_per_cell.linfty_norm();
+  estimated_error_per_cell += stokes_estimated_error_per_cell;
+  estimated_error_per_cell += elasticity_estimated_error_per_cell;
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                    estimated_error_per_cell,
                                                    0.3, 0.0);
@@ -672,6 +695,7 @@ void FluidStructureProblem<dim>::run ()
       if (refinement_cycle > 0)
         refine_mesh ();
 
+      setup_subdomains ();
       setup_dofs ();
 
       std::cout << "   Assembling..." << std::endl << std::flush;
