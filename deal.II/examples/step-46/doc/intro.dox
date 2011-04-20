@@ -437,9 +437,94 @@ flow, yielding the implicit no-stress condition $(2\eta
 The conditions on the interface between the two domains has been
 discussed above already.
 
+For simplicity, we choose the material parameters to be $\eta=\lambda=\mu=1$.
+
+
+<h4>Linear solvers</h4>
+
 This program is primarily intended to show how to deal with different
 physics in different parts of the domain, and how to implement such
 models in deal.II. As a consequence, we won't bother coming up with a
 good solver: we'll just use the SparseDirectUMFPACK class which always
 works, even if not with optimal complexity. We will, however, comment
 on possible other solvers in the <a href="#Results">results</a> section.
+
+<h4>Mesh refinement</h4>
+
+One of the trickier aspects of this program is how to estimate the
+error. Because it works on almost any program, we'd like to use the
+KellyErrorEstimator, and we can relatively easily do that here as well using
+code like the following:
+@code
+  Vector<float> stokes_estimated_error_per_cell (triangulation.n_active_cells());
+  Vector<float> elasticity_estimated_error_per_cell (triangulation.n_active_cells());
+
+  std::vector<bool> stokes_component_mask (dim+1+dim, false);
+  for (unsigned int d=0; d<dim; ++d)
+    stokes_component_mask[d] = true;
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+                                      face_q_collection,
+                                      typename FunctionMap<dim>::type(),
+                                      solution,
+                                      stokes_estimated_error_per_cell,
+                                      stokes_component_mask);
+
+  std::vector<bool> elasticity_component_mask (dim+1+dim, false);
+  for (unsigned int d=0; d<dim; ++d)
+    elasticity_component_mask[dim+1+d] = true;
+  KellyErrorEstimator<dim>::estimate (dof_handler,
+                                      face_q_collection,
+                                      typename FunctionMap<dim>::type(),
+                                      solution,
+                                      elasticity_estimated_error_per_cell,
+                                      elasticity_component_mask);
+@endcode
+This gives us two sets of error indicators for each cell. We would then
+somehow combine them into one for mesh refinement, for example using something
+like the following (note that we normalize the squared error indicator in the
+two vectors because error quantities have physical units that do not match in
+the current situation, leading to error indicators that may differ by orders
+of magnitude between the two subdomains):
+@code
+  stokes_estimated_error_per_cell /= stokes_estimated_error_per_cell.l2_norm();
+  elasticity_estimated_error_per_cell /= elasticity_estimated_error_per_cell.l2_norm();
+
+  Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  estimated_error_per_cell += stokes_estimated_error_per_cell;
+  estimated_error_per_cell += elasticity_estimated_error_per_cell;
+@endcode
+(In the code, we actually weigh the error indicators 4:1 in favor of the ones
+computed on the Stokes subdomain since refinement is otherwise heavily biased
+towards the elastic subdomain, but this is just a technicality.)
+
+While this principle is sound, it doesn't quite work as expected. The reason
+is that the KellyErrorEstimator class computes error indicators by integrating
+the jump in the solution's gradient around the faces of each cell. This jump
+is likely to be very large at the locations where the solution is
+discontinuous and extended by zero; it also doesn't become smaller as the mesh
+is refined. The KellyErrorEstimator class can't just ignore the interface
+because it essentially only sees an hp::DoFHandler where the element type
+changes from one cell to another &mdash; precisely the thing that the
+hp::DoFHandler was designed for, the interface in the current program looks no
+different than the interfaces in step-27, for example, and certainly no less
+legitimate. Be that as it may, the end results is that there is a layer of
+cells on both sides of the interface between the two subdomains where error
+indicators are irrationally large. Consequently, most of the mesh refinement
+is focused on the interface.
+
+This clearly wouldn't happen if we had a refinement indicator that actually
+understood something about the problem and simply ignore the interface between
+subdomains when integrating jump terms. 
+On the other hand, this program is
+about showing how to represent problems where we have different physics in
+different subdomains, not about the peculiarities of the KellyErrorEstimator,
+and so we resort to the big hammer called "heuristics": we simply set the
+error indicators of cells at the interface to zero. This cuts off the spikes
+in the error indicators. At first sight one would also think that it prevents
+the mesh from being refined at the interface, but the requirement that
+neighboring cells may only differ by one level of refinement will still lead
+to a reasonably refined mesh.
+
+While this is clearly a suboptimal solution, it works for now and leaves room
+for future improvement.
+

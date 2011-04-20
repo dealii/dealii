@@ -188,8 +188,9 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 template <int dim>
-FluidStructureProblem<dim>::FluidStructureProblem (const unsigned int stokes_degree,
-				   const unsigned int elasticity_degree)
+FluidStructureProblem<dim>::
+FluidStructureProblem (const unsigned int stokes_degree,
+		       const unsigned int elasticity_degree)
                 :
                 stokes_degree (stokes_degree),
 		elasticity_degree (elasticity_degree),
@@ -329,6 +330,7 @@ void FluidStructureProblem<dim>::setup_dofs ()
 }
 
 
+
 template <int dim>
 void
 FluidStructureProblem<dim>::setup_subdomains ()
@@ -347,6 +349,7 @@ FluidStructureProblem<dim>::setup_subdomains ()
     else
       cell->set_active_fe_index (1);
 }
+
 
 
 template <int dim>
@@ -371,17 +374,21 @@ void FluidStructureProblem<dim>::assemble_system ()
   const QGauss<dim-1> face_quadrature(std::max (stokes_degree+2,
 						elasticity_degree+2));
 
-  FEFaceValues<dim> stokes_fe_face_values (stokes_fe, face_quadrature,
-					   update_JxW_values |
-					   update_normal_vectors |
-					   update_gradients);
-  FEFaceValues<dim> elasticity_fe_face_values (elasticity_fe, face_quadrature,
-					       update_values);
-  FESubfaceValues<dim> stokes_fe_subface_values (stokes_fe, face_quadrature,
+  FEFaceValues<dim>    stokes_fe_face_values (stokes_fe,
+					      face_quadrature,
+					      update_JxW_values |
+					      update_normal_vectors |
+					      update_gradients);
+  FEFaceValues<dim>    elasticity_fe_face_values (elasticity_fe,
+						  face_quadrature,
+						  update_values);
+  FESubfaceValues<dim> stokes_fe_subface_values (stokes_fe,
+						 face_quadrature,
 						 update_JxW_values |
 						 update_normal_vectors |
 						 update_gradients);
-  FESubfaceValues<dim> elasticity_fe_subface_values (elasticity_fe, face_quadrature,
+  FESubfaceValues<dim> elasticity_fe_subface_values (elasticity_fe,
+						     face_quadrature,
 						     update_values);
 
   const unsigned int   stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
@@ -395,7 +402,7 @@ void FluidStructureProblem<dim>::assemble_system ()
   std::vector<unsigned int> local_dof_indices;
   std::vector<unsigned int> neighbor_dof_indices (stokes_dofs_per_cell);
 
-  const RightHandSide<dim>          right_hand_side;
+  const RightHandSide<dim>         right_hand_side;
 
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
@@ -700,10 +707,65 @@ FluidStructureProblem<dim>::refine_mesh ()
                                       elasticity_estimated_error_per_cell,
                                       elasticity_component_mask);
 
-  stokes_estimated_error_per_cell /= stokes_estimated_error_per_cell.linfty_norm();
-  elasticity_estimated_error_per_cell /= elasticity_estimated_error_per_cell.linfty_norm();
+  stokes_estimated_error_per_cell /= 0.25 * stokes_estimated_error_per_cell.l2_norm();
+  elasticity_estimated_error_per_cell /= elasticity_estimated_error_per_cell.l2_norm();
   estimated_error_per_cell += stokes_estimated_error_per_cell;
   estimated_error_per_cell += elasticity_estimated_error_per_cell;
+
+  {
+    unsigned int cell_index = 0;
+    for (typename hp::DoFHandler<dim>::active_cell_iterator
+	   cell = dof_handler.begin_active();
+	 cell != dof_handler.end(); ++cell, ++cell_index)
+      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+	if (cell_is_in_solid_domain (cell))
+	  {
+	    if ((cell->at_boundary(f) == false)
+		&&
+		(((cell->neighbor(f)->level() == cell->level())
+		  &&
+		  (cell->neighbor(f)->has_children() == false)
+		  && 
+		  cell_is_in_fluid_domain (cell->neighbor(f)))
+		 ||
+		 ((cell->neighbor(f)->level() == cell->level())
+		  &&
+		  (cell->neighbor(f)->has_children() == true)
+		  &&
+		  (cell_is_in_fluid_domain (cell->neighbor_child_on_subface
+					    (f, 0))))
+		 ||
+		 (cell->neighbor_is_coarser(f)
+		  &&
+		  cell_is_in_fluid_domain(cell->neighbor(f)))
+		))
+	      estimated_error_per_cell(cell_index) = 0;
+	  }
+	else
+	  {
+	    if ((cell->at_boundary(f) == false)
+		&&
+		(((cell->neighbor(f)->level() == cell->level())
+		  &&
+		  (cell->neighbor(f)->has_children() == false)
+		  && 
+		  cell_is_in_solid_domain (cell->neighbor(f)))
+		 ||
+		 ((cell->neighbor(f)->level() == cell->level())
+		  &&
+		  (cell->neighbor(f)->has_children() == true)
+		  &&
+		  (cell_is_in_solid_domain (cell->neighbor_child_on_subface
+					    (f, 0))))
+		 ||
+		 (cell->neighbor_is_coarser(f)
+		  &&
+		  cell_is_in_solid_domain(cell->neighbor(f)))
+		))
+	      estimated_error_per_cell(cell_index) = 0;
+	  }
+  }	  
+  
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                    estimated_error_per_cell,
                                                    0.3, 0.0);

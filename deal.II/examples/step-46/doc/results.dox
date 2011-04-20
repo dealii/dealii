@@ -1,9 +1,99 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
+When running the program, you should get output like the following:
+@code
+Refinement cycle 0
+   Number of active cells: 64
+   Number of degrees of freedom: 531
+   Assembling...
+   Solving...
+Refinement cycle 1
+   Number of active cells: 184
+   Number of degrees of freedom: 1565
+   Assembling...
+   Solving...
+Refinement cycle 2
+   Number of active cells: 568
+   Number of degrees of freedom: 4849
+   Assembling...
+   Solving...
+Refinement cycle 3
+   Number of active cells: 1528
+   Number of degrees of freedom: 11605
+   Assembling...
+   Solving...
+Refinement cycle 4
+   Number of active cells: 3628
+   Number of degrees of freedom: 22309
+   Assembling...
+   Solving...
+Refinement cycle 5
+   Number of active cells: 8440
+   Number of degrees of freedom: 45139
+   Assembling...
+   Solving...
+@endcode
+
+The results are easily visualized:
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr valign="top">
+    <td valign="top" align="center">
+      @image html step-46.velocity-magnitude.png
+
+      <p align="center">
+        Magnitude of the fluid velocity
+      </p>
+    </td>
+
+    <td valign="top" align="center">
+      @image html step-46.pressure.png
+
+      <p align="center">
+        Fluid pressure. The dynamic range has been truncated to cut off the
+        pressure singularities at the top left and right corners of the domain
+        as well as the top corners of the solid that forms re-entrant corners
+        into the fluid domain.
+      </p>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td valign="top" align="center">
+      @image html step-46.velocity.png
+
+      <p align="center">
+        Fluid velocity.
+      </p>
+    </td>
+
+    <td valign="top" align="center">
+      @image html step-46.displacement.png
+
+      <p align="center">
+        Solid displacement.
+      </p>
+    </td>
+  </tr>
+</table>
+
+In all figures, we have applied a mask to only show the original field, not
+the one extended by zero: for example, to plot the pressure, we have selected
+that part of the domain where the magnitude of the velocity is greater than
+$10^{-7}$.
+
+The plots are easily interpreted: as the flow drives down on the left side and
+up on the right side of the upright part of the solid, it produces a shear
+force that pulls the left side down and the right side up. An additional part
+force comes from the pressure, which bears down on the left side of the top
+and pulls up on the right side. Both forces yield a net torque on the solid
+that bends it to the left, as confirmed by the plot of the displacement
+vectors.
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
+
+<h4>Linear solvers and preconditioners</h4>
 
 An obvious place to improve the program would be to use a more
 sophisticated solver &mdash; in particular one that scales well and
@@ -70,3 +160,14 @@ separately. These are well known, however: for Stokes, we can use the
 preconditioner discussed in the results section of step-22; for
 elasticity, a good preconditioner would be a single V-cycle of a
 geometric or algebraic multigrid.
+
+
+<h4>Refinement indicators</h4>
+
+As mentioned in the introduction, the refinement indicator we use for this
+program is rather ad hoc. A better one would understand that the jump in the
+gradient of the solution across the interface is not indicative of the error
+but to be expected and ignore the interface when integrating the jump
+terms. Nevertheless, this is not what the KellyErrorEstimator class
+does. Consequently, an obvious possibility for improving the program would be
+to implement a better refinement criterion.
