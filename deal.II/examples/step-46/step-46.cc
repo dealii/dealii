@@ -130,8 +130,16 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
   Assert (component < this->n_components,
 	  ExcIndexRange (component, 0, this->n_components));
 
-  if (component == 1)
-    return std::sin(numbers::PI*p[0]);
+  if (component == dim-1)
+    switch (dim)
+      {
+	case 2:
+	      return std::sin(numbers::PI*p[0]);
+	case 3:
+	      return std::sin(numbers::PI*p[0]) * std::sin(numbers::PI*p[1]);
+	default:
+	      Assert (false, ExcNotImplemented());
+      }
 
   return 0;
 }
@@ -340,11 +348,11 @@ FluidStructureProblem<dim>::setup_subdomains ()
        cell != dof_handler.end(); ++cell)
     if (((std::fabs(cell->center()[0]) < 0.25)
          &&
-         (cell->center()[1] > 0.5))
+         (cell->center()[dim-1] > 0.5))
 	||
 	((std::fabs(cell->center()[0]) >= 0.25)
 	 &&
-	 (cell->center()[1] > -0.5)))
+	 (cell->center()[dim-1] > -0.5)))
       cell->set_active_fe_index (0);
     else
       cell->set_active_fe_index (1);
@@ -786,9 +794,9 @@ void FluidStructureProblem<dim>::run ()
 	  &&
 	  (cell->face(f)->center()[dim-1] == 1))
 	cell->face(f)->set_all_boundary_indicators(1);
-  triangulation.refine_global (3);
+  triangulation.refine_global (5-dim);
 
-  for (unsigned int refinement_cycle = 0; refinement_cycle<6;
+  for (unsigned int refinement_cycle = 0; refinement_cycle<10-2*dim;
        ++refinement_cycle)
     {
       std::cout << "Refinement cycle " << refinement_cycle << std::endl;
