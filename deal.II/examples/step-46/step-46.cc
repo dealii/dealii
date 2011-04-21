@@ -512,7 +512,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 	      if ((cell->neighbor(f)->level() == cell->level())
 		  &&
 		  (cell->neighbor(f)->has_children() == false)
-		  && 
+		  &&
 		  cell_is_in_fluid_domain (cell->neighbor(f)))
 		{
 						   // same size
@@ -537,14 +537,14 @@ void FluidStructureProblem<dim>::assemble_system ()
 		       &&
 		       (cell->neighbor(f)->has_children() == true))
 		{
-						   // neighbor has children. loop over 
+						   // neighbor has children. loop over
 						   // the cells adjacent to the commone
 						   // interface and see which subdomain
 						   // they belong to
 	          for (unsigned int subface=0; subface<cell->face(f)->n_children(); ++subface)
 		    if (cell_is_in_fluid_domain (cell->neighbor_child_on_subface (f, subface)))
 		      {
-			elasticity_fe_subface_values.reinit (cell, 
+			elasticity_fe_subface_values.reinit (cell,
 							     f,
 							     subface);
 			stokes_fe_face_values.reinit (cell->neighbor_child_on_subface (f, subface),
@@ -580,7 +580,7 @@ void FluidStructureProblem<dim>::assemble_system ()
 							 local_dof_indices,
 					                 neighbor_dof_indices,
 					                 system_matrix);
-		  
+
 		}
 	    }
     }
@@ -733,7 +733,7 @@ FluidStructureProblem<dim>::refine_mesh ()
 		(((cell->neighbor(f)->level() == cell->level())
 		  &&
 		  (cell->neighbor(f)->has_children() == false)
-		  && 
+		  &&
 		  cell_is_in_fluid_domain (cell->neighbor(f)))
 		 ||
 		 ((cell->neighbor(f)->level() == cell->level())
@@ -756,7 +756,7 @@ FluidStructureProblem<dim>::refine_mesh ()
 		(((cell->neighbor(f)->level() == cell->level())
 		  &&
 		  (cell->neighbor(f)->has_children() == false)
-		  && 
+		  &&
 		  cell_is_in_solid_domain (cell->neighbor(f)))
 		 ||
 		 ((cell->neighbor(f)->level() == cell->level())
@@ -772,8 +772,8 @@ FluidStructureProblem<dim>::refine_mesh ()
 		))
 	      estimated_error_per_cell(cell_index) = 0;
 	  }
-  }	  
-  
+  }
+
   GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                    estimated_error_per_cell,
                                                    0.3, 0.0);
