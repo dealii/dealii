@@ -1,6 +1,9 @@
 <a name="Results"></a>
 <h1>Results</h1>
 
+<h3>2d results</h3>
+
+
 When running the program, you should get output like the following:
 @code
 Refinement cycle 0
@@ -43,7 +46,7 @@ The results are easily visualized:
       @image html step-46.velocity-magnitude.png
 
       <p align="center">
-        Magnitude of the fluid velocity
+        Magnitude of the fluid velocity.
       </p>
     </td>
 
@@ -89,6 +92,81 @@ force comes from the pressure, which bears down on the left side of the top
 and pulls up on the right side. Both forces yield a net torque on the solid
 that bends it to the left, as confirmed by the plot of the displacement
 vectors.
+
+
+<h3>3d results</h3>
+
+By changing the dimension of the <code>FluidStructureProblem</code>
+class in <code>main()</code> to 3, we can also run the same problem
+3d. You'd get output along the following lines:
+@code
+Refinement cycle 0
+   Number of active cells: 64
+   Number of degrees of freedom: 1951
+   Assembling...
+   Solving...
+Refinement cycle 1
+   Number of active cells: 288
+   Number of degrees of freedom: 8670
+   Assembling...
+   Solving...
+Refinement cycle 2
+   Number of active cells: 1632
+   Number of degrees of freedom: 45615
+   Assembling...
+   Solving...
+Refinement cycle 3
+   Number of active cells: 8184
+   Number of degrees of freedom: 230015
+   Assembling...
+   Solving...
+@endcode
+You'll notice that the big bottleneck is the solver:
+SparseDirectUmfpack needs approximately 8 hours to solve the last
+iteration of this problem
+on a 2010 workstation (the second to last iteration took only 6
+minutes). Clearly a better solver is needed here, a topic
+discussed below.
+
+The results can also be visualized and yield some good pictures:
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr valign="top">
+    <td valign="top" align="center">
+      @image html step-46.3d.velocity.png
+
+      <p align="center">
+        Vectors of the fluid velocity and magnitude of the
+        displacement of the solid part.
+      </p>
+    </td>
+
+    <td valign="top" align="center">
+      @image html step-46.3d.streamlines.png
+
+      <p align="center">
+        Streamlines of the velocity, with the mesh superimposed.
+      </p>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td valign="top" align="center" colspan="2">
+      @image html step-46.3d.displacement.png
+
+      <p align="center">
+        Solid displacement.
+      </p>
+    </td>
+  </tr>
+</table>
+
+In addition to the lack of a good solver, the mesh is a bit
+unbalanced: mesh refinement heavily favors the fluid subdomain (in 2d,
+it was the other way around, prompting us to weigh the fluid error
+indicators higher). Clearly, some tweaking of the relative importance
+of error indicators in the two subdomains is important if one wanted
+to go on doing more 3d computations.
+
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>

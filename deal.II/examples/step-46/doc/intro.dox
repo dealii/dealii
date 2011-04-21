@@ -437,7 +437,11 @@ flow, yielding the implicit no-stress condition $(2\eta
 The conditions on the interface between the two domains has been
 discussed above already.
 
-For simplicity, we choose the material parameters to be $\eta=\lambda=\mu=1$.
+For simplicity, we choose the material parameters to be
+$\eta=\lambda=\mu=1$. In the results section below, we will also show
+a 3d simulation that can be obtained from the same program. The
+boundary conditions and geometry are defined nearly analogously to the
+2d situation above.
 
 
 <h4>Linear solvers</h4>
@@ -448,6 +452,7 @@ models in deal.II. As a consequence, we won't bother coming up with a
 good solver: we'll just use the SparseDirectUMFPACK class which always
 works, even if not with optimal complexity. We will, however, comment
 on possible other solvers in the <a href="#Results">results</a> section.
+
 
 <h4>Mesh refinement</h4>
 
@@ -514,7 +519,7 @@ is focused on the interface.
 
 This clearly wouldn't happen if we had a refinement indicator that actually
 understood something about the problem and simply ignore the interface between
-subdomains when integrating jump terms. 
+subdomains when integrating jump terms.
 On the other hand, this program is
 about showing how to represent problems where we have different physics in
 different subdomains, not about the peculiarities of the KellyErrorEstimator,
