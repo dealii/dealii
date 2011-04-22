@@ -11,6 +11,8 @@
 /*    further information on this license.                        */
 
 
+                                 // @sect3{Include files}
+
 
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
@@ -27,11 +29,8 @@
 #include <grid/grid_generator.h>
 #include <grid/tria_accessor.h>
 #include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_tools.h>
 #include <grid/grid_refinement.h>
 
-#include <dofs/dof_renumbering.h>
 #include <dofs/dof_tools.h>
 #include <dofs/dof_accessor.h>
 
@@ -45,7 +44,6 @@
 #include <hp/fe_values.h>
 
 #include <numerics/vectors.h>
-#include <numerics/matrices.h>
 #include <numerics/data_out.h>
 #include <numerics/error_estimator.h>
 
@@ -246,7 +244,6 @@ void FluidStructureProblem<dim>::setup_dofs ()
   system_matrix.clear ();
 
   dof_handler.distribute_dofs (fe_collection);
-  DoFRenumbering::Cuthill_McKee (dof_handler);
 
   {
     constraints.clear ();
@@ -813,9 +810,10 @@ void FluidStructureProblem<dim>::run ()
       std::cout << "   Solving..." << std::flush;
       solve ();
 
+      std::cout << "   Writing output..." << std::flush;
       output_results (refinement_cycle);
 
-      std::cout << std::endl;
+      std::cout << std::endl << std::endl;
     }
 }
 
