@@ -4285,9 +4285,9 @@ namespace FEValuesViews
       }
     else if (snc != -1)
       {
-					 // have a single non-zero component
+					 // we have a single non-zero component
 					 // when the symmetric tensor is
-					 // repsresented in unrolled form.
+					 // represented in unrolled form.
 					 // this implies we potentially have
 					 // two non-zero components when
 					 // represented in component form!  we
@@ -4299,43 +4299,48 @@ namespace FEValuesViews
 					 // is a first order tensor.
 					 //
 					 // assume the second-order tensor is
-					 // A with componets A_{ij}.  then
+					 // A with components A_{ij}.  then
 					 // A_{ij} = A_{ji} and there is only
 					 // one (if diagonal) or two non-zero
 					 // entries in the tensorial
 					 // representation.  define the
 					 // divergence as:
-					 // b_i := \dfrac{\partial A_{ij}}{\partial x_j}.
+					 // b_i := \dfrac{\partial phi_{ij}}{\partial x_j}.
+					 // (which is incidentally also
+					 // b_j := \dfrac{\partial phi_{ij}}{\partial x_i}).
+					 // In both cases, a sum is implied.
 					 //
-					 // Now, knowing the row ii and
-					 // collumn jj of the non-zero entry
-					 // we compute the divergence as
-					 // b_ii = \dfrac{\partial A_{ij}}{\partial x_jj}  (no sum)
-					 // and if ii =! jj (not on a diagonal)
-					 // b_jj = \dfrac{\partial A_{ij}}{\partial x_ii}  (no sum)
-
-	divergence_type return_value;
-
-					 // non-zero index in unrolled format
+					 // Now, we know the nonzero component
+					 // in unrolled form: it is indicated
+					 // by 'snc'. we can figure out which
+					 // tensor components belong to this:
 	const unsigned int comp =
 	  shape_function_data[shape_function].single_nonzero_component_index;
-
 	const unsigned int ii = value_type::unrolled_to_component_indices(comp)[0];
 	const unsigned int jj = value_type::unrolled_to_component_indices(comp)[1];
 
-					 // value of the non-zero tensor
-					 // component
-	const double A_ij = fe_values.shape_values(snc,q_point);
-
-					 // the gradient of the non-zero shape
-					 // function
+					 // given the form of the divergence
+					 // above, if ii=jj there is only a
+					 // single nonzero component of the
+					 // full tensor and the gradient
+					 // equals
+					 // b_ii := \dfrac{\partial phi_{ii,ii}}{\partial x_ii}.
+					 // all other entries of 'b' are zero
+					 //
+					 // on the other hand, if ii!=jj, then
+					 // there are two nonzero entries in
+					 // the full tensor and
+					 // b_ii := \dfrac{\partial phi_{ii,jj}}{\partial x_ii}.
+					 // b_jj := \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
+					 // again, all other entries of 'b' are
+					 // zero
 	const Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
 
-	return_value[ii] = A_ij * phi_grad[jj];
+	divergence_type return_value;
+	return_value[ii] = phi_grad[jj];
 
-					 // if we are not on a diagonal
 	if (ii != jj)
-	  return_value[jj] = A_ij * phi_grad[ii];
+	  return_value[jj] = phi_grad[ii];
 
 	return return_value;
 

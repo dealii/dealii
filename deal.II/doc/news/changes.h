@@ -85,6 +85,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The function FEValuesViews::SymmetricTensor::divergence had a bug.
+This is now fixed.
+<br>
+(Wolfgang Bangerth, Feifei Cheng, Venkat Vallala 2011/04/21)
+
 <li> Fixed: Under some conditions, FEFaceValues applied to an FESystem element
 that contained elements of type FE_Nothing would receive an erroneous
 exception. This is now fixed.
