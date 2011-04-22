@@ -471,23 +471,23 @@ void FluidStructureProblem<dim>::assemble_system ()
 		  elasticity_phi_div[k]  = fe_values[displacements].divergence (k, q);
 		}
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		{
-		  local_matrix(i,j)
-		    +=  (lambda *
-			 elasticity_phi_div[i] * elasticity_phi_div[j]
-			 +
-			 mu *
-			 scalar_product(elasticity_phi_grad[i], elasticity_phi_grad[j])
-			 +
-			 mu *
-			 scalar_product(elasticity_phi_grad[i], transpose(elasticity_phi_grad[j]))
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  {
+		    local_matrix(i,j)
+		      +=  (lambda *
+			   elasticity_phi_div[i] * elasticity_phi_div[j]
+			   +
+			   mu *
+			   scalar_product(elasticity_phi_grad[i], elasticity_phi_grad[j])
+			   +
+			   mu *
+			   scalar_product(elasticity_phi_grad[i], transpose(elasticity_phi_grad[j]))
 		      )
 		      *
 		      fe_values.JxW(q);
 		  }
-	      }
+	    }
 	}
 
       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -604,25 +604,25 @@ FluidStructureProblem<dim>::assemble_interface_term (const FEFaceValuesBase<dim>
 
   local_interface_matrix = 0;
   for (unsigned int q=0; q<elasticity_fe_face_values.n_quadrature_points; ++q)
-  {
-    const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
+    {
+      const Tensor<1,dim> normal_vector = stokes_fe_face_values.normal_vector(q);
 
-    for (unsigned int k=0; k<stokes_fe_face_values.dofs_per_cell; ++k)
-      stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
-    for (unsigned int k=0; k<elasticity_fe_face_values.dofs_per_cell; ++k)
-      elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
+      for (unsigned int k=0; k<stokes_fe_face_values.dofs_per_cell; ++k)
+	stokes_phi_grads_u[k] = stokes_fe_face_values[velocities].symmetric_gradient (k, q);
+      for (unsigned int k=0; k<elasticity_fe_face_values.dofs_per_cell; ++k)
+	elasticity_phi[k] = elasticity_fe_face_values[displacements].value (k,q);
 
-    for (unsigned int i=0; i<elasticity_fe_face_values.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<stokes_fe_face_values.dofs_per_cell; ++j)
-	local_interface_matrix(i,j) += -((2 * viscosity *
-	                                 (stokes_phi_grads_u[j] *
-	                                 normal_vector)
-					 +
-					 stokes_phi_p[j] *
-					 normal_vector) *
-					 elasticity_phi[i] *
-					 stokes_fe_face_values.JxW(q));
-  }
+      for (unsigned int i=0; i<elasticity_fe_face_values.dofs_per_cell; ++i)
+	for (unsigned int j=0; j<stokes_fe_face_values.dofs_per_cell; ++j)
+	  local_interface_matrix(i,j) += -((2 * viscosity *
+					    (stokes_phi_grads_u[j] *
+					     normal_vector)
+					    +
+					    stokes_phi_p[j] *
+					    normal_vector) *
+					   elasticity_phi[i] *
+					   stokes_fe_face_values.JxW(q));
+    }
 }
 
 
