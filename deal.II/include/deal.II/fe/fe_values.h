@@ -1002,6 +1002,23 @@ namespace FEValuesViews
 				    * element. Views are discussed in the
 				    * @ref vector_valued module.
 				    *
+				    * This class allows to query the
+				    * value and divergence of
+				    * (components of) shape functions
+				    * and solutions representing
+				    * symmetric tensors. The
+				    * divergence of a symmetric tensor
+				    * $S_{ij}, 0\le i,j<\text{dim}$ is
+				    * defined as
+				    * $d_i = \sum_j \frac{\partial S_{ij}{\partial x_j},
+				    * 0\le i<\text{dim}$,
+				    * which due to the symmetry of the tensor is also
+				    * $d_i = \sum_j \frac{\partial S_{ji}{\partial x_j}$.
+				    * In other words, it due to the symmetry
+				    * of $S$ it does not matter whether
+				    * we apply the nabla operator by row
+				    * or by column to get the divergence.
+				    *
 				    * @ingroup feaccess vector_valued
 				    *
 				    * @author Andrew McBride, 2009
@@ -1028,6 +1045,11 @@ namespace FEValuesViews
 					* of the finite element representing a symmetric second-order
 					* tensor, the divergence of
 					* course is a * <code>Tensor@<1,dim@></code>.
+					*
+					* See the general discussion
+					* of this class for a
+					* definition of the
+					* divergence.
 					*/
       typedef Tensor<1, spacedim> divergence_type;
 
@@ -1085,6 +1107,11 @@ namespace FEValuesViews
 					* this view, for the shape function
 					* and quadrature point selected by the
 					* arguments.
+					*
+					* See the general discussion
+					* of this class for a
+					* definition of the
+					* divergence.
 					*/
       divergence_type
       divergence(const unsigned int shape_function,
@@ -1129,6 +1156,11 @@ namespace FEValuesViews
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
 					* of course.
+					*
+					* See the general discussion
+					* of this class for a
+					* definition of the
+					* divergence.
 					*/
       template <class InputVector>
       void get_function_divergences(const InputVector& fe_function,
@@ -2584,7 +2616,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 
 				     /// @name Geometry of the cell
 				     //@{
-    
+
 				     /**
 				      * Position of the <tt>i</tt>th
 				      * quadrature point in real space.
@@ -2710,7 +2742,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
     void transform (std::vector<Tensor<1,spacedim> >& transformed,
 		    const std::vector<Tensor<1,dim> >& original,
 		    MappingType mapping) const;
-    
+
     				     /**
 				      * @deprecated Use
 				      * normal_vector() instead.
@@ -2781,7 +2813,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 
 				     /// @name Access to the raw data
 				     //@{
-    
+
 				     /**
 				      * Constant reference to the
 				      * selected mapping object.
@@ -4262,7 +4294,7 @@ namespace FEValuesViews
       }
   }
 
-  
+
   template <int dim, int spacedim>
   inline
   typename SymmetricTensor<2, dim, spacedim>::divergence_type
