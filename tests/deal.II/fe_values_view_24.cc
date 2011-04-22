@@ -45,7 +45,7 @@ void test (const Triangulation<dim>& tr,
 
   Vector<double> fe_function(dof.n_dofs());
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
-    fe_function(i) = (i+1)*(i+2);
+    fe_function(i) = i+1;
   
   const QGauss<dim> quadrature(2);
   FEValues<dim> fe_values (fe, quadrature,
@@ -63,19 +63,13 @@ void test (const Triangulation<dim>& tr,
   std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
   dof.begin_active()->get_dof_indices (local_dof_indices);
   
-  for (unsigned int q=0; q<quadrature.size(); ++q)
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
     {
-      Tensor<1,dim> div_alt;
-      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	div_alt += fe_values[extractor].divergence (i,q) *
-		   fe_function(local_dof_indices[i]);
+      deallog << "i=" << i << std::endl;
       
-      deallog << "q_point=" << q << std::endl
-	      << "   method 1: " << divergences[q] << std::endl
-	      << "   method 2: " << div_alt << std::endl
-	      << std::endl;
-      Assert ((divergences[q] - div_alt).norm() <= divergences[q].norm(),
-	      ExcInternalError());
+      for (unsigned int q=0; q<quadrature.size(); ++q)
+	deallog << "  q_point=" << q << std::endl
+		<< "    div= " << fe_values[extractor].divergence (i,q) << std::endl;
     }
 }
 
@@ -98,7 +92,7 @@ void test_hyper_sphere()
 
 int main()
 {
-  std::ofstream logfile ("fe_values_view_23/output");
+  std::ofstream logfile ("fe_values_view_24/output");
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);
