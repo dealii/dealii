@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2544,6 +2544,10 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * For a typical use of this
 				      * function, see the @ref step_28
 				      * "step-28" tutorial program.
+				      *
+				      * See the @ref GlossMaterialId
+				      * "glossary" for more
+				      * information.
 				      */
     unsigned char material_id () const;
 
@@ -2554,6 +2558,10 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * For a typical use of this
 				      * function, see the @ref step_28
 				      * "step-28" tutorial program.
+				      *
+				      * See the @ref GlossMaterialId
+				      * "glossary" for more
+				      * information.
 				      */
     void set_material_id (const unsigned char new_material_id) const;
 
@@ -2562,6 +2570,10 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * cell and all its children (and
 				      * grand-children, and so on) to
 				      * the given value.
+				      *
+				      * See the @ref GlossMaterialId
+				      * "glossary" for more
+				      * information.
 				      */
     void recursively_set_material_id (const unsigned char new_material_id) const;
 				     /**

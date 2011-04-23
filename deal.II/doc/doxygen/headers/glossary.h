@@ -666,6 +666,10 @@ Article{BK07,
  * consequently, which value the coefficient should have on this particular
  * cell. The material id is inherited from mother to child cell upon mesh
  * refinement.
+ *
+ * The material id is set and queried using the CellAccessor::material_id,
+ * CellAccessor::set_material_id and CellAccessor::recursively_set_material_id
+ * functions.
  * </dd>
  *
  *
