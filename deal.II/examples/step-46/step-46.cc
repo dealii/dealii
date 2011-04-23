@@ -92,6 +92,12 @@ class FluidStructureProblem
     void run ();
 
   private:
+    enum
+    {
+	  fluid_domain_id,
+	  solid_domain_id
+    };
+    
     static bool
     cell_is_in_fluid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
 
@@ -189,7 +195,7 @@ StokesBoundaryValues<dim>::value (const Point<dim>  &p,
 template <int dim>
 void
 StokesBoundaryValues<dim>::vector_value (const Point<dim> &p,
-				   Vector<double>   &values) const
+					 Vector<double>   &values) const
 {
   for (unsigned int c=0; c<this->n_components; ++c)
     values(c) = StokesBoundaryValues<dim>::value (p, c);
@@ -270,7 +276,7 @@ bool
 FluidStructureProblem<dim>::
 cell_is_in_fluid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
-  return (cell->material_id() == 0);
+  return (cell->material_id() == fluid_domain_id);
 }
 
 
@@ -279,7 +285,7 @@ bool
 FluidStructureProblem<dim>::
 cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
-  return (cell->material_id() == 1);
+  return (cell->material_id() == solid_domain_id);
 }
 
 
@@ -312,9 +318,9 @@ FluidStructureProblem<dim>::make_grid ()
 	((std::fabs(cell->center()[0]) >= 0.25)
 	 &&
 	 (cell->center()[dim-1] > -0.5)))
-      cell->set_material_id (0);
+      cell->set_material_id (fluid_domain_id);
     else
-      cell->set_material_id (1);
+      cell->set_material_id (solid_domain_id);
 }
 
 
