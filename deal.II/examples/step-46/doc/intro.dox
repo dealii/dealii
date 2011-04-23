@@ -444,6 +444,32 @@ boundary conditions and geometry are defined nearly analogously to the
 2d situation above.
 
 
+<h4>Identifying which subdomain a cell is in</h4>
+
+In the program, we need a way to identify which part of the domain a cell is
+in. There are many different ways of doing this. A typical way would be to use
+the @ref GlossSubdomainId "subdomain_id" tag available with each cell, though
+this field has a special meaning in %parallel computations. An alternative
+is the @ref GlossMaterialId "material_id" field also available with
+every cell. It has the additional advantage that it is inherited from the
+mother to the child cell upon mesh refinement; in other words, we would set
+the material id once upon creating the mesh and it will be correct for all
+active cells even after several refinement cycles. We therefore go with this
+alternative: we define an <code>enum</code> with symbolic names for
+material_id numbers and will use them to identify which part of the domain a
+cell is on.
+
+Secondly, we use an object of type hp::DoFHandler. This class needs to know
+which cells will use the Stokes and which the elasticity finite element. At
+the beginning of each refinement cycle we will therefore have to walk over
+all cells and set the (in hp parlance) active FE index to whatever is
+appropriate in the current situation. While we can use symbolic names for the
+material id, the active FE index is in fact a number that will frequently be
+used to index into collections of objects (e.g. of type hp::FECollection and
+hp::QCollection); that means that the active FE index actually has to have
+value zero for the fluid and one for the elastic part of the domain.
+
+
 <h4>Linear solvers</h4>
 
 This program is primarily intended to show how to deal with different
