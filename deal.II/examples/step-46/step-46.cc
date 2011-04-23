@@ -287,8 +287,9 @@ cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell
 template <int dim>
 void
 FluidStructureProblem<dim>::make_grid ()
-{  
-  GridGenerator::subdivided_hyper_cube (triangulation, 1, -1, 1);
+{
+// not quite what we want...  
+  GridGenerator::subdivided_hyper_cube (triangulation, 4, -1, 1);
   for (typename Triangulation<dim>::active_cell_iterator
 	 cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
@@ -298,7 +299,7 @@ FluidStructureProblem<dim>::make_grid ()
 	  (cell->face(f)->center()[dim-1] == 1))
 	cell->face(f)->set_all_boundary_indicators(1);
 
-  triangulation.refine_global (5-dim);
+  triangulation.refine_global (3-dim);
 }
 
 
