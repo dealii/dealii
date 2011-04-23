@@ -270,7 +270,7 @@ bool
 FluidStructureProblem<dim>::
 cell_is_in_fluid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
-  return (cell->active_fe_index() == 0);
+  return (cell->material_id() == 0);
 }
 
 
@@ -279,7 +279,7 @@ bool
 FluidStructureProblem<dim>::
 cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell)
 {
-  return (cell->active_fe_index() == 1);
+  return (cell->material_id() == 1);
 }
 
 
@@ -300,14 +300,9 @@ FluidStructureProblem<dim>::make_grid ()
 	cell->face(f)->set_all_boundary_indicators(1);
 
   triangulation.refine_global (3-dim);
-}
 
 
-template <int dim>
-void
-FluidStructureProblem<dim>::setup_subdomains ()
-{
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
+  for (typename Triangulation<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
     if (((std::fabs(cell->center()[0]) < 0.25)
@@ -317,9 +312,26 @@ FluidStructureProblem<dim>::setup_subdomains ()
 	((std::fabs(cell->center()[0]) >= 0.25)
 	 &&
 	 (cell->center()[dim-1] > -0.5)))
-      cell->set_active_fe_index (0);
+      cell->set_material_id (0);
     else
+      cell->set_material_id (1);
+}
+
+
+
+template <int dim>
+void
+FluidStructureProblem<dim>::setup_subdomains ()
+{
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+         cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    if (cell_is_in_fluid_domain(cell))
+      cell->set_active_fe_index (0);
+    else if (cell_is_in_solid_domain(cell))
       cell->set_active_fe_index (1);
+    else
+      Assert (false, ExcNotImplemented());
 }
 
 
