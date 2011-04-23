@@ -83,8 +83,21 @@ or also writing the first term a sum over components:
   \right)_\Omega.
 @f]
 
+@note As written, the equations above are generally considered to be the right
+description for the displacement of three-dimensional objects if the
+displacement is small and we can assume that <a
+href="http://en.wikipedia.org/wiki/Hookes_law">Hooke's law</a> is valid. In
+that case, the indices $i,j,k,l$ above all run over the set $\{1,2,3\}$ (or,
+in the C++ source, over $\{0,1,2\}$). However, as is, the program runs in 2d,
+and while the equations above also make mathematical sense in that case, they
+would only describe a truly two-dimensional solid. In particular, they are not
+the appropriate description of an $x-y$ cross-section of a body infinite in
+the $z$ direction, as many other two-dimensional equations are. For a
+description of such cases, see for example the wikipedia article on <a
+href="http://en.wikipedia.org/wiki/Antiplane_shear">antiplane shear</a>.
 
-How do we now assemble the matrix for such an equation? A very long answer
+But let's get back to the original problem.
+How do we assemble the matrix for such an equation? A very long answer
 with a number of different alternatives is given in the documentation of the
 @ref vector_valued module. Historically, the solution shown below was the only
 one available in the early years of the library. It turns out to also be the
