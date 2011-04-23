@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -657,6 +657,16 @@ Article{BK07,
  * <dt class="glossary">@anchor GlossLagrange <b>Lagrange elements</b></dt>
  * <dd>Finite elements based on Lagrangian interpolation at
  * @ref GlossSupport "support points".</dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
+ * <dd>Each cell of a triangulation has associated with it a property called
+ * "material id". It is commonly used in problems with heterogenous
+ * coefficients to identify which part of the domain a cell is in and,
+ * consequently, which value the coefficient should have on this particular
+ * cell. The material id is inherited from mother to child cell upon mesh
+ * refinement.
+ * </dd>
  *
  *
  * <dt class="glossary">@anchor mg_paper <b>%Multigrid paper</b></dt>
