@@ -13,6 +13,12 @@
 
                                  // @sect3{Include files}
 
+				 // The include files for this program are the
+				 // same as for many others before. The only
+				 // new one is the one that declares
+				 // FE_Nothing as discussed in the
+				 // introduction. The ones in the hp directory
+				 // have already been discussed in step-27.
 
 #include <base/quadrature_lib.h>
 #include <base/logstream.h>
@@ -52,7 +58,31 @@
 
 using namespace dealii;
 
+                                 // @sect3{The <code>FluidStructureProblem</code> class template}
 
+				 // This is the main class. It is, if you
+				 // want, a combination of step-8 and step-22
+				 // in that it has member variables that
+				 // either address the global problem (the
+				 // Triangulation and hp::DoFHandler objects,
+				 // as well as the hp::FECollection and
+				 // various linear algebra objects) or that
+				 // pertain to either the elasticity or Stokes
+				 // sub-problems. The general structure of the
+				 // class, however, is like that of most of
+				 // the other programs implementing stationary
+				 // problems.
+				 //
+				 // There are a few helper functions
+				 // (<code>cell_is_in_fluid_domain,
+				 // cell_is_in_solid_domain</code>) of
+				 // self-explanatory nature and a few
+				 // functions (<code>make_grid,
+				 // setup_subdomains,
+				 // assemble_interface_terms</code>) that have
+				 // been broken out of other functions and
+				 // will be discussed as we get to their
+				 // implementation.
 template <int dim>
 class FluidStructureProblem
 {
@@ -69,6 +99,7 @@ class FluidStructureProblem
     cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
 
 
+    void make_grid ();
     void setup_subdomains ();
     void setup_dofs ();
     void assemble_system ();
@@ -96,21 +127,33 @@ class FluidStructureProblem
     SparsityPattern       sparsity_pattern;
     SparseMatrix<double>  system_matrix;
 
-    Vector<double> solution;
-    Vector<double> system_rhs;
+    Vector<double>        solution;
+    Vector<double>        system_rhs;
 
-    const double viscosity;
-    const double lambda;
-    const double mu;
+    const double          viscosity;
+    const double          lambda;
+    const double          mu;
 };
 
 
+                                 // @sect3{Boundary values and right hand side}
 
+				 // The following classes do as their names
+				 // suggest. The boundary values for the
+				 // velocity are $\mathbf u=(0, \sin(\pi
+				 // x))^T$ in 2d and $\mathbf u=(0, 0,
+				 // \sin(\pi x)\sin(\pi y))^T$ in 3d,
+				 // respectively. The remaining boundary
+				 // conditions for this problem are all
+				 // homogenous and have been discussed in the
+				 // introduction. The right hand side forcing
+				 // term is zero for both the fluid and the
+				 // solid.
 template <int dim>
-class BoundaryValues : public Function<dim>
+class StokesBoundaryValues : public Function<dim>
 {
   public:
-    BoundaryValues () : Function<dim>(dim+1+dim) {}
+    StokesBoundaryValues () : Function<dim>(dim+1+dim) {}
 
     virtual double value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
@@ -122,7 +165,7 @@ class BoundaryValues : public Function<dim>
 
 template <int dim>
 double
-BoundaryValues<dim>::value (const Point<dim>  &p,
+StokesBoundaryValues<dim>::value (const Point<dim>  &p,
 			    const unsigned int component) const
 {
   Assert (component < this->n_components,
@@ -145,11 +188,11 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
 
 template <int dim>
 void
-BoundaryValues<dim>::vector_value (const Point<dim> &p,
+StokesBoundaryValues<dim>::vector_value (const Point<dim> &p,
 				   Vector<double>   &values) const
 {
   for (unsigned int c=0; c<this->n_components; ++c)
-    values(c) = BoundaryValues<dim>::value (p, c);
+    values(c) = StokesBoundaryValues<dim>::value (p, c);
 }
 
 
@@ -189,8 +232,11 @@ RightHandSide<dim>::vector_value (const Point<dim> &p,
 
 
 
+                                 // @sect3{The <code>FluidStructureProblem</code> implementation}
 
-
+				 // Let's now get to the implementation of the
+				 // primary class of this program. The first
+				 // few functions are the constructor and
 
 
 template <int dim>
@@ -239,12 +285,51 @@ cell_is_in_solid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell
 
 
 template <int dim>
+void
+FluidStructureProblem<dim>::make_grid ()
+{  
+  GridGenerator::subdivided_hyper_cube (triangulation, 1, -1, 1);
+  for (typename Triangulation<dim>::active_cell_iterator
+	 cell = triangulation.begin_active();
+       cell != triangulation.end(); ++cell)
+    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+      if (cell->face(f)->at_boundary()
+	  &&
+	  (cell->face(f)->center()[dim-1] == 1))
+	cell->face(f)->set_all_boundary_indicators(1);
+
+  triangulation.refine_global (5-dim);
+}
+
+
+template <int dim>
+void
+FluidStructureProblem<dim>::setup_subdomains ()
+{
+  for (typename hp::DoFHandler<dim>::active_cell_iterator
+         cell = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    if (((std::fabs(cell->center()[0]) < 0.25)
+         &&
+         (cell->center()[dim-1] > 0.5))
+	||
+	((std::fabs(cell->center()[0]) >= 0.25)
+	 &&
+	 (cell->center()[dim-1] > -0.5)))
+      cell->set_active_fe_index (0);
+    else
+      cell->set_active_fe_index (1);
+}
+
+
+
+template <int dim>
 void FluidStructureProblem<dim>::setup_dofs ()
 {
   system_matrix.clear ();
 
   dof_handler.distribute_dofs (fe_collection);
-
+  
   {
     constraints.clear ();
     DoFTools::make_hanging_node_constraints (dof_handler,
@@ -255,7 +340,7 @@ void FluidStructureProblem<dim>::setup_dofs ()
       velocity_mask[d] = true;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      1,
-					      BoundaryValues<dim>(),
+					      StokesBoundaryValues<dim>(),
 					      constraints,
 					      velocity_mask);
     std::vector<bool> elasticity_mask (dim+1+dim, false);
@@ -332,27 +417,6 @@ void FluidStructureProblem<dim>::setup_dofs ()
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
-}
-
-
-
-template <int dim>
-void
-FluidStructureProblem<dim>::setup_subdomains ()
-{
-  for (typename hp::DoFHandler<dim>::active_cell_iterator
-         cell = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
-    if (((std::fabs(cell->center()[0]) < 0.25)
-         &&
-         (cell->center()[dim-1] > 0.5))
-	||
-	((std::fabs(cell->center()[0]) >= 0.25)
-	 &&
-	 (cell->center()[dim-1] > -0.5)))
-      cell->set_active_fe_index (0);
-    else
-      cell->set_active_fe_index (1);
 }
 
 
@@ -782,16 +846,7 @@ FluidStructureProblem<dim>::refine_mesh ()
 template <int dim>
 void FluidStructureProblem<dim>::run ()
 {
-  GridGenerator::hyper_cube (triangulation, -1, 1);
-  for (typename Triangulation<dim>::active_cell_iterator
-	 cell = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-      if (cell->face(f)->at_boundary()
-	  &&
-	  (cell->face(f)->center()[dim-1] == 1))
-	cell->face(f)->set_all_boundary_indicators(1);
-  triangulation.refine_global (5-dim);
+  make_grid ();
 
   for (unsigned int refinement_cycle = 0; refinement_cycle<10-2*dim;
        ++refinement_cycle)
@@ -804,16 +859,16 @@ void FluidStructureProblem<dim>::run ()
       setup_subdomains ();
       setup_dofs ();
 
-      std::cout << "   Assembling..." << std::endl << std::flush;
+      std::cout << "   Assembling..." << std::endl;
       assemble_system ();
 
-      std::cout << "   Solving..." << std::flush;
+      std::cout << "   Solving..." << std::endl;
       solve ();
 
-      std::cout << "   Writing output..." << std::flush;
+      std::cout << "   Writing output..." << std::endl;
       output_results (refinement_cycle);
 
-      std::cout << std::endl << std::endl;
+      std::cout << std::endl;
     }
 }
 
