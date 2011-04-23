@@ -78,7 +78,7 @@ using namespace dealii;
 				 // cell_is_in_solid_domain</code>) of
 				 // self-explanatory nature and a few
 				 // functions (<code>make_grid,
-				 // setup_subdomains,
+				 // set_active_fe_indices,
 				 // assemble_interface_terms</code>) that have
 				 // been broken out of other functions and
 				 // will be discussed as we get to their
@@ -106,7 +106,7 @@ class FluidStructureProblem
 
 
     void make_grid ();
-    void setup_subdomains ();
+    void set_active_fe_indices ();
     void setup_dofs ();
     void assemble_system ();
     void assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_face_values,
@@ -327,7 +327,7 @@ FluidStructureProblem<dim>::make_grid ()
 
 template <int dim>
 void
-FluidStructureProblem<dim>::setup_subdomains ()
+FluidStructureProblem<dim>::set_active_fe_indices ()
 {
   for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();
@@ -345,8 +345,7 @@ FluidStructureProblem<dim>::setup_subdomains ()
 template <int dim>
 void FluidStructureProblem<dim>::setup_dofs ()
 {
-  system_matrix.clear ();
-
+  set_active_fe_indices ();
   dof_handler.distribute_dofs (fe_collection);
   
   {
@@ -875,7 +874,6 @@ void FluidStructureProblem<dim>::run ()
       if (refinement_cycle > 0)
         refine_mesh ();
 
-      setup_subdomains ();
       setup_dofs ();
 
       std::cout << "   Assembling..." << std::endl;
