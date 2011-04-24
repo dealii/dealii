@@ -1010,10 +1010,10 @@ namespace FEValuesViews
 				    * divergence of a symmetric tensor
 				    * $S_{ij}, 0\le i,j<\text{dim}$ is
 				    * defined as
-				    * $d_i = \sum_j \frac{\partial S_{ij}{\partial x_j},
+				    * $d_i = \sum_j \frac{\partial S_{ij}}{\partial x_j},
 				    * 0\le i<\text{dim}$,
 				    * which due to the symmetry of the tensor is also
-				    * $d_i = \sum_j \frac{\partial S_{ji}{\partial x_j}$.
+				    * $d_i = \sum_j \frac{\partial S_{ji}}{\partial x_j}$.
 				    * In other words, it due to the symmetry
 				    * of $S$ it does not matter whether
 				    * we apply the nabla operator by row
