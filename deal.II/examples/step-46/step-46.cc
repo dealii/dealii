@@ -295,7 +295,7 @@ void
 FluidStructureProblem<dim>::make_grid ()
 {
 // not quite what we want...  
-  GridGenerator::subdivided_hyper_cube (triangulation, 4, -1, 1);
+  GridGenerator::subdivided_hyper_cube (triangulation, 8, -1, 1);
   for (typename Triangulation<dim>::active_cell_iterator
 	 cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
@@ -304,8 +304,6 @@ FluidStructureProblem<dim>::make_grid ()
 	  &&
 	  (cell->face(f)->center()[dim-1] == 1))
 	cell->face(f)->set_all_boundary_indicators(1);
-
-  triangulation.refine_global (3-dim);
 
 
   for (typename Triangulation<dim>::active_cell_iterator

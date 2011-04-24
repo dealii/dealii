@@ -1374,6 +1374,21 @@ class Triangulation : public Subscriptor
         void
         copy_notification (const Triangulation<dim, spacedim> &old_tria,
 			   const Triangulation<dim, spacedim> &new_tria);
+
+                                         /**
+                                          * At the end of a call to
+                                          * create_triangulation() the
+                                          * Triangulation class calls this
+                                          * method on all objects derived from
+                                          * this class and registered with the
+                                          * current Triangulation object. By
+                                          * default this method does nothing,
+                                          * a different behavior has to be
+                                          * implemented in derived classes.
+                                          */
+        virtual
+        void
+        create_notification (const Triangulation<dim, spacedim> &tria);
     };
 
 				     /**

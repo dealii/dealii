@@ -9592,7 +9592,7 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     }
 
   compute_number_cache (*this, levels.size(), number_cache);
-
+  
 				   // now verify that there are indeed
 				   // no distorted cells. as per the
 				   // documentation of this class, we
@@ -9640,98 +9640,106 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     much bigger than the minimal data required, but it makes the code more readable.
 
   */
-  if (dim < spacedim) {
-
-    Table<2,bool> correct(GeometryInfo< dim >::faces_per_cell,
-			  GeometryInfo< dim >::faces_per_cell);
-    switch (dim)
-      {
-	case 1:
+  if (dim < spacedim)
+    {
+      Table<2,bool> correct(GeometryInfo< dim >::faces_per_cell,
+			    GeometryInfo< dim >::faces_per_cell);
+      switch (dim)
 	{
-	  bool values [][2] = {{false,true},
-			       {true,false} };
-	  for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
-	    for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)
-	      correct(i,j) = ( values[i][j]);
-	  break;
-	}
-	case 2:
-	{
-	  bool values [][4]= {{false,true ,true , false},
-			      {true ,false,false, true },
-			      {true ,false,false, true },
-			      {false,true ,true , false} };
-	  for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
-	    for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)
-	      correct(i,j) = ( values[i][j]);
-	  break;
-	}
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
-
-
-    std::list<active_cell_iterator> this_round, next_round;
-    active_cell_iterator neighbor;
-
-    this_round.push_back (begin_active());
-    begin_active()->set_direction_flag (true);
-    begin_active()->set_user_flag ();
-
-    while (this_round.size() > 0)
-      {
-	for ( typename std::list<active_cell_iterator>::iterator cell = this_round.begin();
-	      cell != this_round.end(); ++cell)
+	  case 1:
 	  {
-	    for (unsigned int i = 0; i < GeometryInfo< dim >::faces_per_cell; ++i)
-	      {
-		if ( !((*cell)->face(i)->at_boundary()) )
-		  {
-		    neighbor = (*cell)->neighbor(i);
-
-		    unsigned int cf = (*cell)->face_index(i);
-		    unsigned int j = 0;
-		    while(neighbor->face_index(j) != cf)
-		      {++j;}
-
-		    if ( (correct(i,j) && !(*cell)->direction_flag())
-			 ||
-			 (!correct(i,j) && (*cell)->direction_flag()) )
-		      {
-			if (neighbor->user_flag_set() == false)
-			  {
-			    neighbor->set_direction_flag (false);
-			    neighbor->set_user_flag ();
-			    next_round.push_back (neighbor);
-			  }
-			else
-			  Assert (neighbor->direction_flag() == false,
-				  ExcNonOrientableTriangulation());
-
-		      }
-		  }
-	      }
+	    bool values [][2] = {{false,true},
+				 {true,false} };
+	    for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
+	      for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)
+		correct(i,j) = ( values[i][j]);
+	    break;
 	  }
+	  case 2:
+	  {
+	    bool values [][4]= {{false,true ,true , false},
+				{true ,false,false, true },
+				{true ,false,false, true },
+				{false,true ,true , false} };
+	    for (unsigned int i=0; i< GeometryInfo< dim >::faces_per_cell; ++i)
+	      for (unsigned int j=0; j< GeometryInfo< dim >::faces_per_cell; ++j)
+		correct(i,j) = ( values[i][j]);
+	    break;
+	  }
+	  default:
+		Assert (false, ExcNotImplemented());
+	}
 
-					 // Before we quit let's check
-					 // that if the triangulation
-					 // is disconnected that we
-					 // still get all cells
-      if (next_round.size() == 0)
-	for (active_cell_iterator cell = begin_active();
-	     cell != end(); ++cell)
-	  if (cell->user_flag_set() == false)
+
+      std::list<active_cell_iterator> this_round, next_round;
+      active_cell_iterator neighbor;
+
+      this_round.push_back (begin_active());
+      begin_active()->set_direction_flag (true);
+      begin_active()->set_user_flag ();
+
+      while (this_round.size() > 0)
+	{
+	  for ( typename std::list<active_cell_iterator>::iterator cell = this_round.begin();
+		cell != this_round.end(); ++cell)
 	    {
-	      next_round.push_back (cell);
-	      cell->set_direction_flag (true);
-	      cell->set_user_flag ();
-	      break;
+	      for (unsigned int i = 0; i < GeometryInfo< dim >::faces_per_cell; ++i)
+		{
+		  if ( !((*cell)->face(i)->at_boundary()) )
+		    {
+		      neighbor = (*cell)->neighbor(i);
+
+		      unsigned int cf = (*cell)->face_index(i);
+		      unsigned int j = 0;
+		      while(neighbor->face_index(j) != cf)
+			{++j;}
+
+		      if ( (correct(i,j) && !(*cell)->direction_flag())
+			   ||
+			   (!correct(i,j) && (*cell)->direction_flag()) )
+			{
+			  if (neighbor->user_flag_set() == false)
+			    {
+			      neighbor->set_direction_flag (false);
+			      neighbor->set_user_flag ();
+			      next_round.push_back (neighbor);
+			    }
+			  else
+			    Assert (neighbor->direction_flag() == false,
+				    ExcNonOrientableTriangulation());
+
+			}
+		    }
+		}
 	    }
 
-      this_round = next_round;
-      next_round.clear();
+					   // Before we quit let's check
+					   // that if the triangulation
+					   // is disconnected that we
+					   // still get all cells
+	  if (next_round.size() == 0)
+	    for (active_cell_iterator cell = begin_active();
+		 cell != end(); ++cell)
+	      if (cell->user_flag_set() == false)
+		{
+		  next_round.push_back (cell);
+		  cell->set_direction_flag (true);
+		  cell->set_user_flag ();
+		  break;
+		}
+
+	  this_round = next_round;
+	  next_round.clear();
+	}
     }
-  }
+
+				   // inform all listeners that the
+				   // triangulation has been created
+  typename std::list<RefinementListener *>::iterator
+    ref_listener = refinement_listeners.begin (),
+    end_listener = refinement_listeners.end ();
+  for (; ref_listener != end_listener; ++ref_listener)
+    (*ref_listener)->create_notification (*this);
 }
 
 
@@ -14492,6 +14500,13 @@ template<int dim, int spacedim>
 void Triangulation<dim, spacedim>::
 RefinementListener::copy_notification (const Triangulation<dim, spacedim> &,
 				       const Triangulation<dim, spacedim> &)
+{}
+
+
+
+template<int dim, int spacedim>
+void Triangulation<dim, spacedim>::
+RefinementListener::create_notification (const Triangulation<dim, spacedim> &)
 {}
 
 

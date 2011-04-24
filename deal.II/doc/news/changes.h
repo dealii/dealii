@@ -85,6 +85,15 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: If Triangulation::create_triangulation is called after an
+hp::DoFHandler object is attached to the triangulation object, setting active
+FE indices leads to a crash. The problem did not happen if the mesh was
+refined before setting the FE indices. This is now fixed. In the process, the
+Triangulation::RefinementListener::create_notification function was
+introduced.
+<br>
+(Wolfgang Bangerth, 2011/04/22)
+
 <li> Fixed: The function FEValuesViews::SymmetricTensor::divergence had a bug.
 This is now fixed.
 <br>

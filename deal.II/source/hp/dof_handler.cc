@@ -3984,7 +3984,9 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::post_refinement_notification (const Triangulation<dim,spacedim> &tria)
+  void
+  DoFHandler<dim,spacedim>::
+  post_refinement_notification (const Triangulation<dim,spacedim> &tria)
   {
     Assert (has_children.size () == levels.size (), ExcInternalError ());
 
@@ -4067,6 +4069,18 @@ namespace hp
     has_children.clear ();
   }
 
+
+  template<int dim, int spacedim>
+  void
+  DoFHandler<dim,spacedim>::
+  create_notification (const Triangulation<dim,spacedim> &tria)
+  {
+				     // do the same here as needs to be done
+				     // in the post_refinement hook
+    post_refinement_notification (tria);
+  }
+
+  
 
   template<int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear_space ()
