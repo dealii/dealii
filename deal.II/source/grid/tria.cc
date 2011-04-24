@@ -9495,7 +9495,9 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
 
 
 template <int dim, int spacedim>
-void Triangulation<dim, spacedim>::copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
+void
+Triangulation<dim, spacedim>::
+copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 {
   Assert (vertices.size() == 0, ExcTriangulationNotEmpty());
   Assert (levels.size () == 0, ExcTriangulationNotEmpty());
@@ -9519,7 +9521,9 @@ void Triangulation<dim, spacedim>::copy_triangulation (const Triangulation<dim, 
 
   levels.reserve (old_tria.levels.size());
   for (unsigned int level=0; level<old_tria.levels.size(); ++level)
-    levels.push_back (new internal::Triangulation::TriaLevel<dim>(*old_tria.levels[level]));
+    levels.push_back (new
+		      internal::Triangulation::
+		      TriaLevel<dim>(*old_tria.levels[level]));
 
   number_cache = old_tria.number_cache;
 
