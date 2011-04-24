@@ -428,6 +428,15 @@ We will consider the following situation as a testcase:
 
 @image html step-46.layout.png
 
+As discussed at the top of this document, we need to assume in a few places
+that a cell is either entirely in the fluid or solid part of the domain and,
+furthermore, that all children of an inactive cell also belong to the same
+subdomain. This can definitely be ensured if the coarse mesh already
+subdivides the mesh into solid and fluid coarse mesh cells; given the geometry
+outlined above, we can do that by using an $8\times 8$ coarse mesh,
+conveniently provided by the GridGenerator::subdivided_hyper_rectangle
+function.
+
 The fixed boundary at the bottom implies $\mathbf u=0$, and we also
 prescribe Dirichlet conditions for the flow at the top so that we get
 inflow at the left and outflow at the right. At the left and right
