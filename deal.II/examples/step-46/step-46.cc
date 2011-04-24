@@ -76,13 +76,22 @@ using namespace dealii;
 				 // There are a few helper functions
 				 // (<code>cell_is_in_fluid_domain,
 				 // cell_is_in_solid_domain</code>) of
-				 // self-explanatory nature and a few
-				 // functions (<code>make_grid,
-				 // set_active_fe_indices,
+				 // self-explanatory nature (operating on the
+				 // symbolic names for the two subdomains that
+				 // will be used as material_ids for cells
+				 // belonging to the subdomains, as explained
+				 // in the introduction) and a few functions
+				 // (<code>make_grid, set_active_fe_indices,
 				 // assemble_interface_terms</code>) that have
-				 // been broken out of other functions and
-				 // will be discussed as we get to their
-				 // implementation.
+				 // been broken out of other functions that
+				 // can be found in many of the other tutorial
+				 // programs and that will be discussed as we
+				 // get to their implementation.
+				 //
+				 // The final set of variables
+				 // (<code>viscosity, lambda, eta</code>)
+				 // describes the material properties used for
+				 // the two physics models.
 template <int dim>
 class FluidStructureProblem
 {
@@ -172,7 +181,7 @@ class StokesBoundaryValues : public Function<dim>
 template <int dim>
 double
 StokesBoundaryValues<dim>::value (const Point<dim>  &p,
-			    const unsigned int component) const
+				  const unsigned int component) const
 {
   Assert (component < this->n_components,
 	  ExcIndexRange (component, 0, this->n_components));
