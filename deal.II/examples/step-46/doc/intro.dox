@@ -384,7 +384,8 @@ solid cell is refined, yielding the following code:
 		{
 		  cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
 		  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
-		    constraints.add_line (local_face_dof_indices[i]);
+		    if (stokes_fe.face_system_to_component_index(i).first < dim)
+ 		      constraints.add_line (local_face_dof_indices[i]);
 		}
 	    }
 @endcode
@@ -397,7 +398,9 @@ $c_{tl}$ to nonzero values (using ConstraintMatrix::add_entry) or set
 $b_t$ to something nonzero (using
 ConstraintMatrix::set_inhomogeneity); doing nothing as above, funny as
 it looks, simply leaves the constraint to be $x_t=0$, which is exactly
-what we need in the current context.
+what we need in the current context. The call to
+FiniteElement::face_system_to_component_index makes sure that we only set
+boundary values to zero for velocity but not pressure components.
 
 Note that there are cases where this may yield incorrect results:
 notably, once we find a solid neighbor child to a current fluid cell,

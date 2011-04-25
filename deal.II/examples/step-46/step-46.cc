@@ -481,7 +481,8 @@ FluidStructureProblem<dim>::setup_dofs ()
 		{
 		  cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
 		  for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
-		    constraints.add_line (local_face_dof_indices[i]);
+		    if (stokes_fe.face_system_to_component_index(i).first < dim)
+		      constraints.add_line (local_face_dof_indices[i]);
 		}
 	    }
   }
