@@ -130,12 +130,10 @@ Refinement cycle 2
    Assembling...
    Solving...
 @endcode
-You'll notice that the big bottleneck is the solver:
-SparseDirectUmfpack needs approximately 8 hours to solve the last
-iteration of this problem
-on a 2010 workstation (the second to last iteration took only 6
-minutes). Clearly a better solver is needed here, a topic
-discussed below.
+You'll notice that the big bottleneck is the solver: SparseDirectUmfpack needs
+approximately 8 hours and some 42 GB of memory to solve the last iteration of
+this problem on a 2010 workstation (the second to last iteration took only 6
+minutes). Clearly a better solver is needed here, a topic discussed below.
 
 The results can also be visualized and yield some good pictures:
 
