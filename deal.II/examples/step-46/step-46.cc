@@ -106,7 +106,7 @@ class FluidStructureProblem
 	  fluid_domain_id,
 	  solid_domain_id
     };
-    
+
     static bool
     cell_is_in_fluid_domain (const typename hp::DoFHandler<dim>::cell_iterator &cell);
 
@@ -420,7 +420,7 @@ FluidStructureProblem<dim>::setup_dofs ()
 {
   set_active_fe_indices ();
   dof_handler.distribute_dofs (fe_collection);
-  
+
   {
     constraints.clear ();
     DoFTools::make_hanging_node_constraints (dof_handler,
@@ -930,7 +930,7 @@ assemble_interface_term (const FEFaceValuesBase<dim>          &elasticity_fe_fac
 	  ExcInternalError());
   const unsigned int n_face_quadrature_points
     = elasticity_fe_face_values.n_quadrature_points;
-  
+
   const FEValuesExtractors::Vector velocities (0);
   const FEValuesExtractors::Scalar pressure (dim);
   const FEValuesExtractors::Vector displacements (dim+1);
@@ -1090,7 +1090,7 @@ FluidStructureProblem<dim>::refine_mesh ()
 				   // vector that contains error indicators
 				   // for all cells:
   stokes_estimated_error_per_cell
-    *= 4 . / stokes_estimated_error_per_cell.l2_norm();
+    *= 4. / stokes_estimated_error_per_cell.l2_norm();
   elasticity_estimated_error_per_cell
     *= 1. / elasticity_estimated_error_per_cell.l2_norm();
 
