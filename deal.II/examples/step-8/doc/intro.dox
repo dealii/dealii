@@ -92,9 +92,15 @@ in the C++ source, over $\{0,1,2\}$). However, as is, the program runs in 2d,
 and while the equations above also make mathematical sense in that case, they
 would only describe a truly two-dimensional solid. In particular, they are not
 the appropriate description of an $x-y$ cross-section of a body infinite in
-the $z$ direction, as many other two-dimensional equations are. For a
-description of such cases, see for example the wikipedia article on <a
-href="http://en.wikipedia.org/wiki/Antiplane_shear">antiplane shear</a>.
+the $z$ direction; this is in contrast to many other two-dimensional equations
+that can be obtained by assuming that the body has infinite extent in
+$z$-direction and that the solution function does not depend on the $z$
+coordinate. On the other hand, there are equations for two-dimensional models
+of elasticity; see for example the wikipedia article on <a
+href="http://en.wikipedia.org/wiki/Infinitesimal_strain_theory#Special_cases">plane
+strain</a>, <a
+href="http://en.wikipedia.org/wiki/Antiplane_shear">antiplane shear</a> and <a
+href="http://en.wikipedia.org/wiki/Plane_stress#Plane_stress">plan stress</a>.
 
 But let's get back to the original problem.
 How do we assemble the matrix for such an equation? A very long answer
