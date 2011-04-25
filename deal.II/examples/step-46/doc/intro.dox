@@ -366,9 +366,9 @@ solid cell is refined, yielding the following code:
 		face_is_on_interface = true;
 	      else if (cell->neighbor(f)->has_children() == true)
 		{
-						   // neighbor does
+						   // The neighbor does
 						   // have
-						   // children. see if
+						   // children. See if
 						   // any of the cells
 						   // on the other
 						   // side are elastic
