@@ -55,7 +55,7 @@ void test()
 	    if (myid==0 && (ind==4 || ind==5 || ind==6 || ind== 8))
 	      cell->set_refine_flag();
 	    if (myid==1 && (ind==0 || ind==2 || ind==10))
-	      cell->set_refine_flag();
+	    cell->set_refine_flag();
 	  }
 
       tr.execute_coarsening_and_refinement ();
