@@ -669,135 +669,198 @@ DoFTools::dof_couplings_from_component_couplings
 }
 
 
-
-// TODO: look whether one can employ collective add operations in sparsity
-// pattern in this function.
-template <class DH, class SparsityPattern>
-void
-DoFTools::make_flux_sparsity_pattern (
-  const DH                &dof,
-  SparsityPattern         &sparsity,
-  const Table<2,Coupling> &int_mask,
-  const Table<2,Coupling> &flux_mask)
+template <int dim, int spacedim>
+std::vector<Table<2,DoFTools::Coupling> >
+DoFTools::dof_couplings_from_component_couplings
+(const hp::FECollection<dim,spacedim> &fe,
+ const Table<2,Coupling> &component_couplings)
 {
-  const unsigned int n_dofs = dof.n_dofs();
-  const FiniteElement<DH::dimension> &fe = dof.get_fe();
-  const unsigned int n_comp = fe.n_components();
+  std::vector<Table<2,DoFTools::Coupling> > return_value (fe.size());
+  for (unsigned int i=0; i<fe.size(); ++i)
+    return_value[i]
+      = dof_couplings_from_component_couplings(fe[i], component_couplings);
 
-  Assert (sparsity.n_rows() == n_dofs,
-	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
-  Assert (sparsity.n_cols() == n_dofs,
-	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
-  Assert (int_mask.n_rows() == n_comp,
-	  ExcDimensionMismatch (int_mask.n_rows(), n_comp));
-  Assert (int_mask.n_cols() == n_comp,
-	  ExcDimensionMismatch (int_mask.n_cols(), n_comp));
-  Assert (flux_mask.n_rows() == n_comp,
-	  ExcDimensionMismatch (flux_mask.n_rows(), n_comp));
-  Assert (flux_mask.n_cols() == n_comp,
-	  ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
+  return return_value;
+}
 
-  const unsigned int total_dofs = fe.dofs_per_cell;
-  std::vector<unsigned int> dofs_on_this_cell(total_dofs);
-  std::vector<unsigned int> dofs_on_other_cell(total_dofs);
-  Table<2,bool> support_on_face(
-    total_dofs, GeometryInfo<DH::dimension>::faces_per_cell);
+  
 
-  typename DH::active_cell_iterator cell = dof.begin_active(),
-				    endc = dof.end();
 
-  const Table<2,Coupling>
-    int_dof_mask  = dof_couplings_from_component_couplings(fe, int_mask),
-    flux_dof_mask = dof_couplings_from_component_couplings(fe, flux_mask);
-
-  for (unsigned int i=0; i<total_dofs; ++i)
-    for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell;++f)
-      support_on_face(i,f) = fe.has_support_on_face(i,f);
-
-				   // Clear user flags because we will
-				   // need them. But first we save
-				   // them and make sure that we
-				   // restore them later such that at
-				   // the end of this function the
-				   // Triangulation will be in the
-				   // same state as it was at the
-				   // beginning of this function.
-  std::vector<bool> user_flags;
-  dof.get_tria().save_user_flags(user_flags);
-  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
-
-  for (; cell!=endc; ++cell)
+namespace internal
+{
+  namespace DoFTools
+  {
+				     // implementation of the same function in
+				     // namespace DoFTools for non-hp
+				     // DoFHandlers
+    template <class DH, class SparsityPattern>
+    void
+    make_flux_sparsity_pattern (const DH                &dof,
+				SparsityPattern         &sparsity,
+				const Table<2,dealii::DoFTools::Coupling> &int_mask,
+				const Table<2,dealii::DoFTools::Coupling> &flux_mask)
     {
-      cell->get_dof_indices (dofs_on_this_cell);
-				       // make sparsity pattern for this cell
-      for (unsigned int i=0; i<total_dofs; ++i)
-	for (unsigned int j=0; j<total_dofs; ++j)
-	  if (int_dof_mask(i,j) != none)
-	    sparsity.add (dofs_on_this_cell[i],
-			  dofs_on_this_cell[j]);
+      const FiniteElement<DH::dimension> &fe = dof.get_fe();
 
-				       // Loop over all interior neighbors
-      for (unsigned int face = 0;
-	   face < GeometryInfo<DH::dimension>::faces_per_cell;
-	   ++face)
+      std::vector<unsigned int> dofs_on_this_cell(fe.dofs_per_cell);
+      std::vector<unsigned int> dofs_on_other_cell(fe.dofs_per_cell);
+
+      const Table<2,dealii::DoFTools::Coupling>
+	int_dof_mask  = dealii::DoFTools::dof_couplings_from_component_couplings(fe, int_mask),
+	flux_dof_mask = dealii::DoFTools::dof_couplings_from_component_couplings(fe, flux_mask);
+
+      Table<2,bool> support_on_face(fe.dofs_per_cell,
+				    GeometryInfo<DH::dimension>::faces_per_cell);
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell;++f)
+	  support_on_face(i,f) = fe.has_support_on_face(i,f);
+
+      typename DH::active_cell_iterator cell = dof.begin_active(),
+					endc = dof.end();
+      for (; cell!=endc; ++cell)
 	{
-	  const typename DH::face_iterator
-            cell_face = cell->face(face);
-	  if (cell_face->user_flag_set ())
-	    continue;
+	  cell->get_dof_indices (dofs_on_this_cell);
+					   // make sparsity pattern for this cell
+	  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+	      if (int_dof_mask(i,j) != dealii::DoFTools::none)
+		sparsity.add (dofs_on_this_cell[i],
+			      dofs_on_this_cell[j]);
 
-	  if (cell->at_boundary (face) )
+					   // Loop over all interior neighbors
+	  for (unsigned int face = 0;
+	       face < GeometryInfo<DH::dimension>::faces_per_cell;
+	       ++face)
 	    {
-	      for (unsigned int i=0; i<total_dofs; ++i)
-		{
-		  const bool i_non_zero_i = support_on_face (i, face);
-		  for (unsigned int j=0; j<total_dofs; ++j)
-		    {
-		      const bool j_non_zero_i = support_on_face (j, face);
-
-		      if (flux_dof_mask(i,j) == always)
-                        sparsity.add (dofs_on_this_cell[i],
-                                      dofs_on_this_cell[j]);
-		      if (flux_dof_mask(i,j) == nonzero
-			  && i_non_zero_i && j_non_zero_i)
-			sparsity.add (dofs_on_this_cell[i],
-				      dofs_on_this_cell[j]);
-		    }
-		}
-	    }
-	  else
-	    {
-	      typename DH::cell_iterator
-		neighbor = cell->neighbor(face);
-					       // Refinement edges are taken care of
-					       // by coarser cells
-	      if (cell->neighbor_is_coarser(face))
+	      const typename DH::face_iterator
+		cell_face = cell->face(face);
+	      if (cell_face->user_flag_set ())
 		continue;
 
-	      typename DH::face_iterator cell_face = cell->face(face);
-	      const unsigned int
-                neighbor_face = cell->neighbor_of_neighbor(face);
-
-	      if (cell_face->has_children())
+	      if (cell->at_boundary (face) )
 		{
-		  for (unsigned int sub_nr = 0;
-		       sub_nr != cell_face->n_children();
-		       ++sub_nr)
+		  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 		    {
-		      const typename DH::cell_iterator
-                        sub_neighbor
-			= cell->neighbor_child_on_subface (face, sub_nr);
+		      const bool i_non_zero_i = support_on_face (i, face);
+		      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+			{
+			  const bool j_non_zero_i = support_on_face (j, face);
 
-		      sub_neighbor->get_dof_indices (dofs_on_other_cell);
-		      for (unsigned int i=0; i<total_dofs; ++i)
+			  if ((flux_dof_mask(i,j) == dealii::DoFTools::always)
+			      ||
+			      (flux_dof_mask(i,j) == dealii::DoFTools::nonzero
+			       &&
+			       i_non_zero_i
+			       &&
+			       j_non_zero_i))
+			    sparsity.add (dofs_on_this_cell[i],
+					  dofs_on_this_cell[j]);
+			}
+		    }
+		}
+	      else
+		{
+		  typename DH::cell_iterator
+		    neighbor = cell->neighbor(face);
+						   // Refinement edges are taken care of
+						   // by coarser cells
+		  if (cell->neighbor_is_coarser(face))
+		    continue;
+
+		  typename DH::face_iterator cell_face = cell->face(face);
+		  const unsigned int
+		    neighbor_face = cell->neighbor_of_neighbor(face);
+
+		  if (cell_face->has_children())
+		    {
+		      for (unsigned int sub_nr = 0;
+			   sub_nr != cell_face->n_children();
+			   ++sub_nr)
+			{
+			  const typename DH::cell_iterator
+			    sub_neighbor
+			    = cell->neighbor_child_on_subface (face, sub_nr);
+
+			  sub_neighbor->get_dof_indices (dofs_on_other_cell);
+			  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+			    {
+			      const bool i_non_zero_i = support_on_face (i, face);
+			      const bool i_non_zero_e = support_on_face (i, neighbor_face);
+			      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+				{
+				  const bool j_non_zero_i = support_on_face (j, face);
+				  const bool j_non_zero_e = support_on_face (j, neighbor_face);
+
+				  if (flux_dof_mask(i,j) == dealii::DoFTools::always)
+				    {
+				      sparsity.add (dofs_on_this_cell[i],
+						    dofs_on_other_cell[j]);
+				      sparsity.add (dofs_on_other_cell[i],
+						    dofs_on_this_cell[j]);
+				      sparsity.add (dofs_on_this_cell[i],
+						    dofs_on_this_cell[j]);
+				      sparsity.add (dofs_on_other_cell[i],
+						    dofs_on_other_cell[j]);
+				    }
+				  else if (flux_dof_mask(i,j) == dealii::DoFTools::nonzero)
+				    {
+				      if (i_non_zero_i && j_non_zero_e)
+					sparsity.add (dofs_on_this_cell[i],
+						      dofs_on_other_cell[j]);
+				      if (i_non_zero_e && j_non_zero_i)
+					sparsity.add (dofs_on_other_cell[i],
+						      dofs_on_this_cell[j]);
+				      if (i_non_zero_i && j_non_zero_i)
+					sparsity.add (dofs_on_this_cell[i],
+						      dofs_on_this_cell[j]);
+				      if (i_non_zero_e && j_non_zero_e)
+					sparsity.add (dofs_on_other_cell[i],
+						      dofs_on_other_cell[j]);
+				    }
+
+				  if (flux_dof_mask(j,i) == dealii::DoFTools::always)
+				    {
+				      sparsity.add (dofs_on_this_cell[j],
+						    dofs_on_other_cell[i]);
+				      sparsity.add (dofs_on_other_cell[j],
+						    dofs_on_this_cell[i]);
+				      sparsity.add (dofs_on_this_cell[j],
+						    dofs_on_this_cell[i]);
+				      sparsity.add (dofs_on_other_cell[j],
+						    dofs_on_other_cell[i]);
+				    }
+				  else if (flux_dof_mask(j,i) == dealii::DoFTools::nonzero)
+				    {
+				      if (j_non_zero_i && i_non_zero_e)
+					sparsity.add (dofs_on_this_cell[j],
+						      dofs_on_other_cell[i]);
+				      if (j_non_zero_e && i_non_zero_i)
+					sparsity.add (dofs_on_other_cell[j],
+						      dofs_on_this_cell[i]);
+				      if (j_non_zero_i && i_non_zero_i)
+					sparsity.add (dofs_on_this_cell[j],
+						      dofs_on_this_cell[i]);
+				      if (j_non_zero_e && i_non_zero_e)
+					sparsity.add (dofs_on_other_cell[j],
+						      dofs_on_other_cell[i]);
+				    }
+				}
+			    }
+			  sub_neighbor->face(neighbor_face)->set_user_flag ();
+			}
+		    }
+		  else
+		    {
+		      neighbor->get_dof_indices (dofs_on_other_cell);
+		      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 			{
 			  const bool i_non_zero_i = support_on_face (i, face);
 			  const bool i_non_zero_e = support_on_face (i, neighbor_face);
-			  for (unsigned int j=0; j<total_dofs; ++j)
+			  for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
 			    {
 			      const bool j_non_zero_i = support_on_face (j, face);
-			      const bool j_non_zero_e  =support_on_face (j, neighbor_face);
-			      if (flux_dof_mask(i,j) == always)
+			      const bool j_non_zero_e = support_on_face (j, neighbor_face);
+			      if (flux_dof_mask(i,j) == dealii::DoFTools::always)
 				{
 				  sparsity.add (dofs_on_this_cell[i],
 						dofs_on_other_cell[j]);
@@ -808,7 +871,7 @@ DoFTools::make_flux_sparsity_pattern (
 				  sparsity.add (dofs_on_other_cell[i],
 						dofs_on_other_cell[j]);
 				}
-			      if (flux_dof_mask(i,j) == nonzero)
+			      if (flux_dof_mask(i,j) == dealii::DoFTools::nonzero)
 				{
 				  if (i_non_zero_i && j_non_zero_e)
 				    sparsity.add (dofs_on_this_cell[i],
@@ -824,7 +887,7 @@ DoFTools::make_flux_sparsity_pattern (
 						  dofs_on_other_cell[j]);
 				}
 
-			      if (flux_dof_mask(j,i) == always)
+			      if (flux_dof_mask(j,i) == dealii::DoFTools::always)
 				{
 				  sparsity.add (dofs_on_this_cell[j],
 						dofs_on_other_cell[i]);
@@ -835,7 +898,7 @@ DoFTools::make_flux_sparsity_pattern (
 				  sparsity.add (dofs_on_other_cell[j],
 						dofs_on_other_cell[i]);
 				}
-			      if (flux_dof_mask(j,i) == nonzero)
+			      if (flux_dof_mask(j,i) == dealii::DoFTools::nonzero)
 				{
 				  if (j_non_zero_i && i_non_zero_e)
 				    sparsity.add (dofs_on_this_cell[j],
@@ -852,84 +915,262 @@ DoFTools::make_flux_sparsity_pattern (
 				}
 			    }
 			}
-		      sub_neighbor->face(neighbor_face)->set_user_flag ();
+		      neighbor->face(neighbor_face)->set_user_flag ();
 		    }
-		}
-              else
-                {
-		  neighbor->get_dof_indices (dofs_on_other_cell);
-		  for (unsigned int i=0; i<total_dofs; ++i)
-		    {
-		      const bool i_non_zero_i = support_on_face (i, face);
-		      const bool i_non_zero_e = support_on_face (i, neighbor_face);
-		      for (unsigned int j=0; j<total_dofs; ++j)
-			{
-			  const bool j_non_zero_i = support_on_face (j, face);
-			  const bool j_non_zero_e = support_on_face (j, neighbor_face);
-			  if (flux_dof_mask(i,j) == always)
-			    {
-			      sparsity.add (dofs_on_this_cell[i],
-					    dofs_on_other_cell[j]);
-			      sparsity.add (dofs_on_other_cell[i],
-					    dofs_on_this_cell[j]);
-			      sparsity.add (dofs_on_this_cell[i],
-					    dofs_on_this_cell[j]);
-			      sparsity.add (dofs_on_other_cell[i],
-					    dofs_on_other_cell[j]);
-			    }
-			  if (flux_dof_mask(i,j) == nonzero)
-			    {
-			      if (i_non_zero_i && j_non_zero_e)
-				sparsity.add (dofs_on_this_cell[i],
-					      dofs_on_other_cell[j]);
-			      if (i_non_zero_e && j_non_zero_i)
-				sparsity.add (dofs_on_other_cell[i],
-					      dofs_on_this_cell[j]);
-			      if (i_non_zero_i && j_non_zero_i)
-				sparsity.add (dofs_on_this_cell[i],
-					      dofs_on_this_cell[j]);
-			      if (i_non_zero_e && j_non_zero_e)
-				sparsity.add (dofs_on_other_cell[i],
-					      dofs_on_other_cell[j]);
-			    }
-
-			  if (flux_dof_mask(j,i) == always)
-			    {
-			      sparsity.add (dofs_on_this_cell[j],
-					    dofs_on_other_cell[i]);
-			      sparsity.add (dofs_on_other_cell[j],
-					    dofs_on_this_cell[i]);
-			      sparsity.add (dofs_on_this_cell[j],
-					    dofs_on_this_cell[i]);
-			      sparsity.add (dofs_on_other_cell[j],
-					    dofs_on_other_cell[i]);
-			    }
-			  if (flux_dof_mask(j,i) == nonzero)
-			    {
-			      if (j_non_zero_i && i_non_zero_e)
-				sparsity.add (dofs_on_this_cell[j],
-					      dofs_on_other_cell[i]);
-			      if (j_non_zero_e && i_non_zero_i)
-				sparsity.add (dofs_on_other_cell[j],
-					      dofs_on_this_cell[i]);
-			      if (j_non_zero_i && i_non_zero_i)
-				sparsity.add (dofs_on_this_cell[j],
-					      dofs_on_this_cell[i]);
-			      if (j_non_zero_e && i_non_zero_e)
-				sparsity.add (dofs_on_other_cell[j],
-					      dofs_on_other_cell[i]);
-			    }
-			}
-		    }
-		  neighbor->face(neighbor_face)->set_user_flag ();
 		}
 	    }
 	}
     }
 
-  				   // finally restore the user flags
+
+				     // implementation of the same function in
+				     // namespace DoFTools for non-hp
+				     // DoFHandlers
+    template <int dim, int spacedim, class SparsityPattern>
+    void
+    make_flux_sparsity_pattern (const dealii::hp::DoFHandler<dim,spacedim> &dof,
+				SparsityPattern                           &sparsity,
+				const Table<2,dealii::DoFTools::Coupling> &int_mask,
+				const Table<2,dealii::DoFTools::Coupling> &flux_mask)
+    {
+				       // while the implementation above is
+				       // quite optimized and caches a lot of
+				       // data (see e.g. the int/flux_dof_mask
+				       // tables), this is no longer practical
+				       // for the hp version since we would
+				       // have to have it for all combinations
+				       // of elements in the
+				       // hp::FECollection. consequently, the
+				       // implementation here is simpler and
+				       // probably less efficient but at least
+				       // readable...
+
+      const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe();
+
+      std::vector<unsigned int> dofs_on_this_cell(dealii::DoFTools::max_dofs_per_cell(dof));
+      std::vector<unsigned int> dofs_on_other_cell(dealii::DoFTools::max_dofs_per_cell(dof));
+
+      const std::vector<Table<2,dealii::DoFTools::Coupling> >
+	int_dof_mask
+	= dealii::DoFTools::dof_couplings_from_component_couplings(fe, int_mask);
+
+      typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator
+	cell = dof.begin_active(),
+	endc = dof.end();
+      for (; cell!=endc; ++cell)
+	{
+	  dofs_on_this_cell.resize (cell->get_fe().dofs_per_cell);
+	  cell->get_dof_indices (dofs_on_this_cell);
+					   // make sparsity pattern for this cell
+	  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+	    for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
+	      if (int_dof_mask[cell->active_fe_index()](i,j) != dealii::DoFTools::none)
+		sparsity.add (dofs_on_this_cell[i],
+			      dofs_on_this_cell[j]);
+
+					   // Loop over all interior neighbors
+	  for (unsigned int face = 0;
+	       face < GeometryInfo<dim>::faces_per_cell;
+	       ++face)
+	    {
+	      const typename dealii::hp::DoFHandler<dim,spacedim>::face_iterator
+		cell_face = cell->face(face);
+	      if (cell_face->user_flag_set ())
+		continue;
+
+	      if (cell->at_boundary (face) )
+		{
+		  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+		    for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
+		      if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
+				     cell->get_fe().system_to_component_index(j).first)
+			   == dealii::DoFTools::always)
+			  ||
+			  (flux_mask(cell->get_fe().system_to_component_index(i).first,
+				     cell->get_fe().system_to_component_index(j).first)
+			   == dealii::DoFTools::nonzero))
+			sparsity.add (dofs_on_this_cell[i],
+				      dofs_on_this_cell[j]);
+		}
+	      else
+		{
+		  typename dealii::hp::DoFHandler<dim,spacedim>::cell_iterator
+		    neighbor = cell->neighbor(face);
+						   // Refinement edges are taken care of
+						   // by coarser cells
+		  if (cell->neighbor_is_coarser(face))
+		    continue;
+
+		  typename dealii::hp::DoFHandler<dim,spacedim>::face_iterator
+		    cell_face = cell->face(face);
+		  const unsigned int
+		    neighbor_face = cell->neighbor_of_neighbor(face);
+
+		  if (cell_face->has_children())
+		    {
+		      for (unsigned int sub_nr = 0;
+			   sub_nr != cell_face->n_children();
+			   ++sub_nr)
+			{
+			  const typename dealii::hp::DoFHandler<dim,spacedim>::cell_iterator
+			    sub_neighbor
+			    = cell->neighbor_child_on_subface (face, sub_nr);
+
+			  dofs_on_other_cell.resize (sub_neighbor->get_fe().dofs_per_cell);
+			  sub_neighbor->get_dof_indices (dofs_on_other_cell);
+			  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+			    {
+			      for (unsigned int j=0; j<sub_neighbor->get_fe().dofs_per_cell;
+				   ++j)
+				{
+				  if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
+						 sub_neighbor->get_fe().system_to_component_index(j).first)
+				       == dealii::DoFTools::always)
+				      ||
+				      (flux_mask(cell->get_fe().system_to_component_index(i).first,
+						 sub_neighbor->get_fe().system_to_component_index(j).first)
+				       == dealii::DoFTools::nonzero))
+				    {
+				      sparsity.add (dofs_on_this_cell[i],
+						    dofs_on_other_cell[j]);
+				      sparsity.add (dofs_on_other_cell[i],
+						    dofs_on_this_cell[j]);
+				      sparsity.add (dofs_on_this_cell[i],
+						    dofs_on_this_cell[j]);
+				      sparsity.add (dofs_on_other_cell[i],
+						    dofs_on_other_cell[j]);
+				    }
+
+				  if ((flux_mask(sub_neighbor->get_fe().system_to_component_index(j).first,
+						 cell->get_fe().system_to_component_index(i).first)
+				       == dealii::DoFTools::always)
+				      ||
+				      (flux_mask(sub_neighbor->get_fe().system_to_component_index(j).first,
+						 cell->get_fe().system_to_component_index(i).first)
+				       == dealii::DoFTools::nonzero))
+				    {
+				      sparsity.add (dofs_on_this_cell[j],
+						    dofs_on_other_cell[i]);
+				      sparsity.add (dofs_on_other_cell[j],
+						    dofs_on_this_cell[i]);
+				      sparsity.add (dofs_on_this_cell[j],
+						    dofs_on_this_cell[i]);
+				      sparsity.add (dofs_on_other_cell[j],
+						    dofs_on_other_cell[i]);
+				    }
+				}
+			    }
+			  sub_neighbor->face(neighbor_face)->set_user_flag ();
+			}
+		    }
+		  else
+		    {
+		      dofs_on_other_cell.resize (neighbor->get_fe().dofs_per_cell);
+		      neighbor->get_dof_indices (dofs_on_other_cell);
+		      for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+			{
+			  for (unsigned int j=0; j<neighbor->get_fe().dofs_per_cell; ++j)
+			    {
+			      if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
+					     neighbor->get_fe().system_to_component_index(j).first)
+				   == dealii::DoFTools::always)
+				  ||
+				  (flux_mask(cell->get_fe().system_to_component_index(i).first,
+					     neighbor->get_fe().system_to_component_index(j).first)
+				   == dealii::DoFTools::nonzero))
+				{
+				  sparsity.add (dofs_on_this_cell[i],
+						dofs_on_other_cell[j]);
+				  sparsity.add (dofs_on_other_cell[i],
+						dofs_on_this_cell[j]);
+				  sparsity.add (dofs_on_this_cell[i],
+						dofs_on_this_cell[j]);
+				  sparsity.add (dofs_on_other_cell[i],
+						dofs_on_other_cell[j]);
+				}
+
+			      if ((flux_mask(neighbor->get_fe().system_to_component_index(j).first,
+					     cell->get_fe().system_to_component_index(i).first)
+				   == dealii::DoFTools::always)
+				  ||
+				  (flux_mask(neighbor->get_fe().system_to_component_index(j).first,
+					     cell->get_fe().system_to_component_index(i).first)
+				   == dealii::DoFTools::nonzero))
+				{
+				  sparsity.add (dofs_on_this_cell[j],
+						dofs_on_other_cell[i]);
+				  sparsity.add (dofs_on_other_cell[j],
+						dofs_on_this_cell[i]);
+				  sparsity.add (dofs_on_this_cell[j],
+						dofs_on_this_cell[i]);
+				  sparsity.add (dofs_on_other_cell[j],
+						dofs_on_other_cell[i]);
+				}
+			    }
+			}
+		      neighbor->face(neighbor_face)->set_user_flag ();
+		    }
+		}
+	    }
+	}
+    }
+    
+  }
+}
+
+
+
+template <class DH, class SparsityPattern>
+void
+DoFTools::
+make_flux_sparsity_pattern (const DH                &dof,
+			    SparsityPattern         &sparsity,
+			    const Table<2,Coupling> &int_mask,
+			    const Table<2,Coupling> &flux_mask)
+{
+				   // do the error checking and frame code
+				   // here, and then pass on to more
+				   // specialized functions in the internal
+				   // namespace
+  const unsigned int n_dofs = dof.n_dofs();
+  const unsigned int n_comp = dof.get_fe().n_components();
+
+  Assert (sparsity.n_rows() == n_dofs,
+	  ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
+  Assert (sparsity.n_cols() == n_dofs,
+	  ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
+  Assert (int_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (int_mask.n_rows(), n_comp));
+  Assert (int_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (int_mask.n_cols(), n_comp));
+  Assert (flux_mask.n_rows() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_rows(), n_comp));
+  Assert (flux_mask.n_cols() == n_comp,
+	  ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
+
+  
+				   // Clear user flags because we will
+				   // need them. But first we save
+				   // them and make sure that we
+				   // restore them later such that at
+				   // the end of this function the
+				   // Triangulation will be in the
+				   // same state as it was at the
+				   // beginning of this function.
+  std::vector<bool> user_flags;
+  dof.get_tria().save_user_flags(user_flags);
+  const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
+
+  internal::DoFTools::make_flux_sparsity_pattern (dof, sparsity,
+						  int_mask, flux_mask);
+  
+				   // finally restore the user flags
   const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).load_user_flags(user_flags);
 }
+
+
+
+
 
 
 

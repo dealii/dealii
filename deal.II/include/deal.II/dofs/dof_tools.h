@@ -178,27 +178,40 @@ class DoFTools
   public:
 				     /**
 				      * The flags used in tables by certain
-				      * <tt>make_*_pattern</tt>
-				      * functions to determine whether
-				      * two components of the solution
-				      * couple in the interior of mesh
-				      * cells or at the boundary.
+				      * <tt>make_*_pattern</tt> functions to
+				      * describe whether two components of the
+				      * solution couple in the bilinear forms
+				      * corresponding to cell or face
+				      * terms. An example of using these flags
+				      * is shown in the introduction of
+				      * step-46.
+				      *
+				      * In the descriptions of the individual
+				      * elements below, remember that these
+				      * flags are used as elements of tables
+				      * of size FiniteElement::n_components
+				      * times FiniteElement::n_components
+				      * where each element indicates whether
+				      * two components do or do not couple.
 				      */
     enum Coupling
     {
 					   /**
-                                            * The two components do not
+                                            * Two components do not
                                             * couple.
                                             */
 	  none,
 					   /**
-                                            * The two components do couple.
+                                            * Two components do couple.
                                             */
 	  always,
                                            /**
-                                            * The two components couple only
-                                            * if their shape functions can be
-                                            * nonzero on this face.
+                                            * Two components couple only
+                                            * if their shape functions are
+                                            * both nonzero on a given
+                                            * face. This flag is only used
+                                            * when computing integrals over
+                                            * faces of cells.
                                             */
 	  nonzero
     };
@@ -2084,6 +2097,21 @@ class DoFTools
     dof_couplings_from_component_couplings (const FiniteElement<dim,spacedim> &fe,
 					    const Table<2,Coupling> &component_couplings);
 
+				     /**
+				      * Same function as above for a
+				      * collection of finite elements,
+				      * returning a collection of tables.
+				      *
+				      * The function currently treats
+				      * DoFTools::Couplings::nonzero the same
+				      * as DoFTools::Couplings::always .
+				      */
+    template <int dim, int spacedim>
+    static
+    std::vector<Table<2,Coupling> >
+    dof_couplings_from_component_couplings (const hp::FECollection<dim,spacedim> &fe,
+					    const Table<2,Coupling> &component_couplings);
+    
 				     /**
 				      * Exception
 				      */

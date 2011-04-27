@@ -137,6 +137,12 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
      const ConstraintMatrix &constraints,
      const bool, const unsigned int);
 
+    template void
+    DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
+    (const hp::DoFHandler<deal_II_dimension> &dof,
+     SP    &,
+     const Table<2,Coupling>&,
+     const Table<2,Coupling>&);
 #endif
 
 #if deal_II_dimension < 3

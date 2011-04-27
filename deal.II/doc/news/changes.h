@@ -85,6 +85,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The version of DoFTools::make_flux_sparsity_pattern that takes
+the coupling masks is now also available for hp::DoFHandler objects.
+<br>
+(Wolfgang Bangerth, 2011/04/27)
+
 <li> Fixed: If Triangulation::create_triangulation is called after an
 hp::DoFHandler object is attached to the triangulation object, setting active
 FE indices leads to a crash. The problem did not happen if the mesh was
