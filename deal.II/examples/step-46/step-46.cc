@@ -501,15 +501,36 @@ FluidStructureProblem<dim>::setup_dofs ()
             << dof_handler.n_dofs()
             << std::endl;
 
-				   // The rest of this function is standard:
-				   // Create a sparsity pattern and use it to
-				   // initialize the matrix; then also set
-				   // vectors to their correct sizes.
+				   // In the rest of this function we create a
+				   // sparsity pattern as discussed
+				   // extensively in the introduction, and use
+				   // it to initialize the matrix; then also
+				   // set vectors to their correct sizes:
   {
     CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
 					 dof_handler.n_dofs());
 
-    DoFTools::make_flux_sparsity_pattern (dof_handler, csp, constraints, false);
+    Table<2,DoFTools::Coupling> cell_coupling (fe_collection.n_components(),
+					       fe_collection.n_components());
+    Table<2,DoFTools::Coupling> face_coupling (fe_collection.n_components(),
+					       fe_collection.n_components());
+
+    for (unsigned int c=0; c<fe_collection.n_components(); ++c)
+      for (unsigned int d=0; d<fe_collection.n_components(); ++d)
+	{
+	  if (((c<dim+1) && (d<dim+1)
+	       && !((c==dim) && (d==dim)))
+	      ||
+	      ((c>=dim+1) && (d>=dim+1)))
+	    cell_coupling[c][d] = DoFTools::Coupling::always;
+
+	  if ((c>=dim+1) && (d<dim+1))
+	    face_coupling[c][d] = DoFTools::Coupling::always;
+	}
+    
+    DoFTools::make_flux_sparsity_pattern (dof_handler, csp,
+					  cell_coupling, face_coupling);
+    constraints.condense (csp);
     sparsity_pattern.copy_from (csp);
   }
 
