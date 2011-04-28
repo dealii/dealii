@@ -239,12 +239,31 @@ One can therefore expect that
 @f]
 would be a good preconditioner if $\widetilde{A_{\text{fluid}}^{-1}}
 \approx A_{\text{fluid}}^{-1}, \widetilde{A_{\text{solid}}^{-1}}
-\approx A_{\text{solid}}^{-1}$. That means, we only need good
-preconditioners for Stokes and the elasticity equations
-separately. These are well known, however: for Stokes, we can use the
-preconditioner discussed in the results section of step-22; for
-elasticity, a good preconditioner would be a single V-cycle of a
-geometric or algebraic multigrid.
+\approx A_{\text{solid}}^{-1}$.
+
+That means, we only need good preconditioners for Stokes and the
+elasticity equations separately. These are well known, however: for
+Stokes, we can use the preconditioner discussed in the results section
+of step-22; for elasticity, a good preconditioner would be a single
+V-cycle of a geometric or algebraic multigrid. There are more open
+questions, however: For an "optimized" solver block-triangular
+preconditioner built from two sub-preconditioners, one point that
+often comes up is that, when choosing parameters for the
+sub-preconditioners, values that work well when solving the two
+problems separately may not be optimal when combined into a
+multiphysics preconditioner.  In particular, when solving just a solid
+or fluid mechanics problem separately, the balancing act between the
+number of iterations to convergence and the cost of applying the
+preconditioner on a per iteration basis may lead one to choose an
+expensive preconditioner for the Stokes problem and a cheap
+preconditioner for the elasticity problem (or vice versa).  When
+combined, however, there is the additional constraint that you want
+the two sub-preconditioners to converge at roughly the same rate, or
+else the cheap one may drive up the global number of iterations while
+the expensive one drives up the cost-per-iteration. For example, while a single AMG
+V-cycle is a good approach for elasticity by itself, when combined
+into a multiphysics problem there may be an incentive to using a full
+W-cycle or multiple cycles to help drive down the total solve time.
 
 
 <h4>Refinement indicators</h4>
