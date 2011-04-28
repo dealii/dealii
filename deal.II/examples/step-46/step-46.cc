@@ -522,10 +522,10 @@ FluidStructureProblem<dim>::setup_dofs ()
 	       && !((c==dim) && (d==dim)))
 	      ||
 	      ((c>=dim+1) && (d>=dim+1)))
-	    cell_coupling[c][d] = DoFTools::Coupling::always;
+	    cell_coupling[c][d] = DoFTools::always;
 
 	  if ((c>=dim+1) && (d<dim+1))
-	    face_coupling[c][d] = DoFTools::Coupling::always;
+	    face_coupling[c][d] = DoFTools::always;
 	}
     
     DoFTools::make_flux_sparsity_pattern (dof_handler, csp,
