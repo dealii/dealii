@@ -242,7 +242,7 @@ would be a good preconditioner if $\widetilde{A_{\text{fluid}}^{-1}}
 \approx A_{\text{solid}}^{-1}$.
 
 That means, we only need good preconditioners for Stokes and the
-elasticity equations separately. These are well known, however: for
+elasticity equations separately. These are well known: for
 Stokes, we can use the preconditioner discussed in the results section
 of step-22; for elasticity, a good preconditioner would be a single
 V-cycle of a geometric or algebraic multigrid. There are more open
