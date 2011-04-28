@@ -85,6 +85,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: DoFTools is now a namespace. It has long been a class that
+had only public, static member functions, making the end result semantically
+exactly equivalent to a namespace, which is also how it was used. This is
+now also reflected in the actual code.
+<br>
+(Wolfgang Bangerth, 2011/04/27)
+
 <li> New: The version of DoFTools::make_flux_sparsity_pattern that takes
 the coupling masks is now also available for hp::DoFHandler objects.
 <br>
