@@ -727,7 +727,7 @@ namespace DoFTools
 					     // make sparsity pattern for this cell
 	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-		if (int_dof_mask(i,j) != Coupling::none)
+		if (int_dof_mask(i,j) != none)
 		  sparsity.add (dofs_on_this_cell[i],
 				dofs_on_this_cell[j]);
 
@@ -750,9 +750,9 @@ namespace DoFTools
 			  {
 			    const bool j_non_zero_i = support_on_face (j, face);
 
-			    if ((flux_dof_mask(i,j) == Coupling::always)
+			    if ((flux_dof_mask(i,j) == always)
 				||
-				(flux_dof_mask(i,j) == Coupling::nonzero
+				(flux_dof_mask(i,j) == nonzero
 				 &&
 				 i_non_zero_i
 				 &&
@@ -795,7 +795,7 @@ namespace DoFTools
 				    const bool j_non_zero_i = support_on_face (j, face);
 				    const bool j_non_zero_e = support_on_face (j, neighbor_face);
 
-				    if (flux_dof_mask(i,j) == Coupling::always)
+				    if (flux_dof_mask(i,j) == always)
 				      {
 					sparsity.add (dofs_on_this_cell[i],
 						      dofs_on_other_cell[j]);
@@ -806,7 +806,7 @@ namespace DoFTools
 					sparsity.add (dofs_on_other_cell[i],
 						      dofs_on_other_cell[j]);
 				      }
-				    else if (flux_dof_mask(i,j) == Coupling::nonzero)
+				    else if (flux_dof_mask(i,j) == nonzero)
 				      {
 					if (i_non_zero_i && j_non_zero_e)
 					  sparsity.add (dofs_on_this_cell[i],
@@ -822,7 +822,7 @@ namespace DoFTools
 							dofs_on_other_cell[j]);
 				      }
 
-				    if (flux_dof_mask(j,i) == Coupling::always)
+				    if (flux_dof_mask(j,i) == always)
 				      {
 					sparsity.add (dofs_on_this_cell[j],
 						      dofs_on_other_cell[i]);
@@ -833,7 +833,7 @@ namespace DoFTools
 					sparsity.add (dofs_on_other_cell[j],
 						      dofs_on_other_cell[i]);
 				      }
-				    else if (flux_dof_mask(j,i) == Coupling::nonzero)
+				    else if (flux_dof_mask(j,i) == nonzero)
 				      {
 					if (j_non_zero_i && i_non_zero_e)
 					  sparsity.add (dofs_on_this_cell[j],
@@ -864,7 +864,7 @@ namespace DoFTools
 			      {
 				const bool j_non_zero_i = support_on_face (j, face);
 				const bool j_non_zero_e = support_on_face (j, neighbor_face);
-				if (flux_dof_mask(i,j) == Coupling::always)
+				if (flux_dof_mask(i,j) == always)
 				  {
 				    sparsity.add (dofs_on_this_cell[i],
 						  dofs_on_other_cell[j]);
@@ -875,7 +875,7 @@ namespace DoFTools
 				    sparsity.add (dofs_on_other_cell[i],
 						  dofs_on_other_cell[j]);
 				  }
-				if (flux_dof_mask(i,j) == Coupling::nonzero)
+				if (flux_dof_mask(i,j) == nonzero)
 				  {
 				    if (i_non_zero_i && j_non_zero_e)
 				      sparsity.add (dofs_on_this_cell[i],
@@ -891,7 +891,7 @@ namespace DoFTools
 						    dofs_on_other_cell[j]);
 				  }
 
-				if (flux_dof_mask(j,i) == Coupling::always)
+				if (flux_dof_mask(j,i) == always)
 				  {
 				    sparsity.add (dofs_on_this_cell[j],
 						  dofs_on_other_cell[i]);
@@ -902,7 +902,7 @@ namespace DoFTools
 				    sparsity.add (dofs_on_other_cell[j],
 						  dofs_on_other_cell[i]);
 				  }
-				if (flux_dof_mask(j,i) == Coupling::nonzero)
+				if (flux_dof_mask(j,i) == nonzero)
 				  {
 				    if (j_non_zero_i && i_non_zero_e)
 				      sparsity.add (dofs_on_this_cell[j],
@@ -968,7 +968,7 @@ namespace DoFTools
 					     // make sparsity pattern for this cell
 	    for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
-		if (int_dof_mask[cell->active_fe_index()](i,j) != Coupling::none)
+		if (int_dof_mask[cell->active_fe_index()](i,j) != none)
 		  sparsity.add (dofs_on_this_cell[i],
 				dofs_on_this_cell[j]);
 
@@ -988,11 +988,11 @@ namespace DoFTools
 		      for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
 			if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
 				       cell->get_fe().system_to_component_index(j).first)
-			     == Coupling::always)
+			     == always)
 			    ||
 			    (flux_mask(cell->get_fe().system_to_component_index(i).first,
 				       cell->get_fe().system_to_component_index(j).first)
-			     == Coupling::nonzero))
+			     == nonzero))
 			  sparsity.add (dofs_on_this_cell[i],
 					dofs_on_this_cell[j]);
 		  }
@@ -1029,11 +1029,11 @@ namespace DoFTools
 				  {
 				    if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
 						   sub_neighbor->get_fe().system_to_component_index(j).first)
-					 == Coupling::always)
+					 == always)
 					||
 					(flux_mask(cell->get_fe().system_to_component_index(i).first,
 						   sub_neighbor->get_fe().system_to_component_index(j).first)
-					 == Coupling::nonzero))
+					 == nonzero))
 				      {
 					sparsity.add (dofs_on_this_cell[i],
 						      dofs_on_other_cell[j]);
@@ -1047,11 +1047,11 @@ namespace DoFTools
 
 				    if ((flux_mask(sub_neighbor->get_fe().system_to_component_index(j).first,
 						   cell->get_fe().system_to_component_index(i).first)
-					 == Coupling::always)
+					 == always)
 					||
 					(flux_mask(sub_neighbor->get_fe().system_to_component_index(j).first,
 						   cell->get_fe().system_to_component_index(i).first)
-					 == Coupling::nonzero))
+					 == nonzero))
 				      {
 					sparsity.add (dofs_on_this_cell[j],
 						      dofs_on_other_cell[i]);
@@ -1077,11 +1077,11 @@ namespace DoFTools
 			      {
 				if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
 					       neighbor->get_fe().system_to_component_index(j).first)
-				     == Coupling::always)
+				     == always)
 				    ||
 				    (flux_mask(cell->get_fe().system_to_component_index(i).first,
 					       neighbor->get_fe().system_to_component_index(j).first)
-				     == Coupling::nonzero))
+				     == nonzero))
 				  {
 				    sparsity.add (dofs_on_this_cell[i],
 						  dofs_on_other_cell[j]);
@@ -1095,11 +1095,11 @@ namespace DoFTools
 
 				if ((flux_mask(neighbor->get_fe().system_to_component_index(j).first,
 					       cell->get_fe().system_to_component_index(i).first)
-				     == Coupling::always)
+				     == always)
 				    ||
 				    (flux_mask(neighbor->get_fe().system_to_component_index(j).first,
 					       cell->get_fe().system_to_component_index(i).first)
-				     == Coupling::nonzero))
+				     == nonzero))
 				  {
 				    sparsity.add (dofs_on_this_cell[j],
 						  dofs_on_other_cell[i]);

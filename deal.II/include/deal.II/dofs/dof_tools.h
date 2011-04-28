@@ -2167,10 +2167,10 @@ namespace DoFTools
   Coupling operator |= (Coupling& c1,
 			const Coupling c2)
   {
-    if (c2 == Coupling::always)
-      c1 = Coupling::always;
-    else if (c1 != Coupling::always && c2 == Coupling::nonzero)
-      return c1 = Coupling::nonzero;
+    if (c2 == always)
+      c1 = always;
+    else if (c1 != always && c2 == nonzero)
+      return c1 = nonzero;
     return c1;
   }
 
@@ -2184,11 +2184,11 @@ namespace DoFTools
   Coupling operator | (const Coupling c1,
 		       const Coupling c2)
   {
-    if (c1 == Coupling::always || c2 == Coupling::always)
-      return Coupling::always;
-    if (c1 == Coupling::nonzero || c2 == Coupling::nonzero)
-      return Coupling::nonzero;
-    return Coupling::none;
+    if (c1 == always || c2 == always)
+      return always;
+    if (c1 == nonzero || c2 == nonzero)
+      return nonzero;
+    return none;
   }
 
 
