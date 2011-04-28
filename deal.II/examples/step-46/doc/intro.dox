@@ -64,9 +64,9 @@ where you may want to read up on the individual equations):
   first, we have no slip boundary conditions for the fluid,
   @f{align*}
     \mathbf v = \mathbf 0 \qquad\qquad
-     \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f;
+     \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
   @f}
-  secondly, the forces on the solid equal the normal strain from the fluid,
+  Secondly, the forces (traction) on the solid equal the normal stress from the fluid,
   @f{align*}
     (C \varepsilon(\mathbf u)) \mathbf n =
     (2 \eta \varepsilon(\mathbf v) + p \mathbf 1) \mathbf n \qquad\qquad
