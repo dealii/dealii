@@ -199,7 +199,7 @@ into the following block form:
 @f]
 where $A_{\text{fluid}}$ is the Stokes matrix, $A_{\text{solid}}$
 results from the elasticity equations, and $B$ is the matrix that
-comes from the interface condition. Now notice that the matrix
+comes from the interface conditions. Now notice that the matrix
 @f[
   A_\text{global}^{-1}
   =
@@ -218,7 +218,8 @@ only one solve with $A_\text{fluid}$ and $A_\text{solid}$ each since
   =
   \begin{pmatrix}
     A_{\text{fluid}}^{-1} & 0 \\
-    X & A_{\text{solid}}^{-1}
+    -A_\text{solid}^{-1} B
+      A_\text{fluid}^{-1} & A_{\text{solid}}^{-1}
   \end{pmatrix}
   \begin{pmatrix}
     x \\ y
@@ -275,3 +276,31 @@ but to be expected and ignore the interface when integrating the jump
 terms. Nevertheless, this is not what the KellyErrorEstimator class
 does. Consequently, an obvious possibility for improving the program would be
 to implement a better refinement criterion.
+
+
+<h4>Verification</h4>
+
+The results above are purely qualitative as there is no evidence that our
+scheme in fact converges. An obvious thing to do would therefore be to add
+some quantitative measures to check that the scheme at least converges to
+<i>something</i>. For example, we could output for each refinement cycle the
+deflection of the top right corner of the part of the solid that protrudes
+into the fluid subdomain. Or we could compute the net force vector or torque
+the fluid exerts on the solid.
+
+
+<h4>Better models</h4>
+
+In reality, most fluid structure interaction problems are so that the movement
+of the solid does affect the flow of the fluid. For example, the forces of the
+air around an air foil cause it to flex and to change its shape. Likewise, a
+flag flaps in the wind, completely changing its shape.
+
+Such problems where the coupling goes both ways are typically handled in an
+Arbitrary Lagrangian Eulerian (ALE) framework, in which the displacement of
+the solid is extended into the fluid domain in some smooth way, rather than by
+zero as we do here. The extended displacement field is then used to deform the
+mesh on which we compute the fluid flow. Furthermore, the boundary conditions
+for the fluid on the interface are no longer that the velocity is zero;
+rather, in a time dependent program, the fluid velocity must be equal to the
+time derivative of the displacement along the interface.

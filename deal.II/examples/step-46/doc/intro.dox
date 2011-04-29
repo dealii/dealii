@@ -73,9 +73,11 @@ where you may want to read up on the individual equations):
      \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
   @f}
 
-A weak formulation of this problem looks like this: Find $y = \{\mathbf v, p,
+We get a weak formulation of this problem by following our usual rule of
+multiplying from the left by a test function and integrating over the
+domain. It then looks like this: Find $y = \{\mathbf v, p,
 \mathbf u\} \in Y \subset H^1(\Omega_f)^d \times L_2(\Omega_f) \times
-H^1(\Omega_s)^d$ so that
+H^1(\Omega_s)^d$ such that
 @f{multline*}
 	2 \eta (\varepsilon(\mathbf a), \varepsilon(\mathbf v))_{\Omega_f}
 	- (\nabla \cdot \mathbf a, p)_{\Omega_f}
@@ -110,7 +112,7 @@ the subdomains is aligned with coarse mesh cell faces.
 
 Before going into more details let us state the obvious: this is a
 problem with multiple solution variables; for this, you will probably
-want to read the @ref vector_valued documentation module first which
+want to read the @ref vector_valued documentation module first, which
 presents the basic philosophical framework in which we address
 problems with more than one solution variable. But back to the problem
 at hand:
@@ -133,7 +135,14 @@ appears a useful set of function spaces:
   = \{\tilde p|_{\Omega_f} \in L_2(\Omega_f), \quad
        \tilde p|_{\Omega_s} = 0 \}.
 @f}
-Note that this is indeed a linear function space with obvious norm. Since no
+(Since this is not important for the current discussion, we have omitted the
+question of boundary values from the choice of function spaces; this question
+also affects whether we can choose $L_2$ for the pressure or whether we have
+to choose the space $L_{2,0}(\Omega_f)=\{q\in L_2(\Omega_f): \int_{\Omega_f} q
+= 0\}$ for the pressure. None of these questions are relevant to the following
+discussion, however.)
+
+Note that these are indeed a linear function spaces with obvious norm. Since no
 confusion is possible in practice, we will henceforth omit the tilde again to
 denote the extension of a function to the whole domain and simply refer by
 $\mathbf v, p$ to both the original and the extended function.
@@ -204,7 +213,7 @@ space:
   Y_h = \{
       & y_h = \{\mathbf v_h, p_h, \mathbf u_h\} : \\
       & y_h|_{\Omega_f} \in Q_{p+1}^d \times Q_p \times Z^d, \\
-      & y_h|_{\Omega_f} \in Z^d \times Z \times Q_r^d \}.
+      & y_h|_{\Omega_s} \in Z^d \times Z \times Q_r^d \}.
 @f}
 
 
@@ -548,8 +557,8 @@ inflow at the left and outflow at the right. At the left and right
 boundaries, no boundary conditions are imposed explicitly for the
 flow, yielding the implicit no-stress condition $(2\eta
 \varepsilon(\mathbf v) + p \mathbf 1) \cdot \mathbf n = 0$.
-The conditions on the interface between the two domains has been
-discussed above already.
+The conditions on the interface between the two domains has already been
+discussed above.
 
 For simplicity, we choose the material parameters to be
 $\eta=\lambda=\mu=1$. In the results section below, we will also show
@@ -640,7 +649,8 @@ of magnitude between the two subdomains):
 @endcode
 (In the code, we actually weigh the error indicators 4:1 in favor of the ones
 computed on the Stokes subdomain since refinement is otherwise heavily biased
-towards the elastic subdomain, but this is just a technicality.)
+towards the elastic subdomain, but this is just a technicality. The factor 4
+has been determined heuristically to work reasonably well.)
 
 While this principle is sound, it doesn't quite work as expected. The reason
 is that the KellyErrorEstimator class computes error indicators by integrating
