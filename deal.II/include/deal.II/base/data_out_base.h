@@ -1633,7 +1633,7 @@ class DataOutBase
  * Tecplot API at build time. To write Tecplot binary files directly
  * make sure that the TECHOME environment variable points to the
  * Tecplot installation directory, and that the files
- * @$TECHOME/include/TECIO.h and @$TECHOME/lib/tecio.a are readable.
+ * \$TECHOME/include/TECIO.h and \$TECHOME/lib/tecio.a are readable.
  * If these files are not availabe (or in the case of 1D) this
  * function will simply call write_tecplot() and thus larger ASCII
  * data files will be produced rather than more efficient Tecplot
