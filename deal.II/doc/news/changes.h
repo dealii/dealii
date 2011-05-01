@@ -30,6 +30,16 @@ inconvenience this causes.
 
 <ol>
 
+<li> New: The new tutorial program step-46 shows how to couple different
+models defined on subsets of
+the domain, in this case Stokes flow around an elastic solid. The
+trick here is that variables (here the flow velocity and pressure,
+and the solid displacement) do not live on the entire domain, but
+only on a part. The point of the program is how to represent this in
+source code.
+<br>
+(Wolfgang Bangerth, 2011/04/30)
+
 <li> Fixed: On Debian, the Trilinos packages use a different layout
 of include files and library names. The <code>./configure</code>
 script can now deal with this.

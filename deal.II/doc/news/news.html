@@ -33,6 +33,20 @@
 
     <dl>
       <dt>
+          <strong>2011/04/30: step-46 demonstrates coupling different models
+          on different parts of the domain</strong>
+      </dt>
+      <dd>
+          step-46 shows how to couple different models defined on subsets of
+          the domain, in this case Stokes flow around an elastic solid. The
+          trick here is that variables (here the flow velocity and pressure,
+          and the solid displacement) do not live on the entire domain, but
+          only on a part. The point of the program is how to represent this in
+          source code.
+      </dd>
+
+
+      <dt>
           <strong style="color:red">2011/01/09: Version 7.0 released</strong>
       </dt>
       <dd>
