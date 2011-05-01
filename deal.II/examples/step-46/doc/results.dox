@@ -197,9 +197,12 @@ into the following block form:
     B & A_{\text{solid}}
   \end{pmatrix}
 @f]
-where $A_{\text{fluid}}$ is the Stokes matrix, $A_{\text{solid}}$
-results from the elasticity equations, and $B$ is the matrix that
-comes from the interface conditions. Now notice that the matrix
+where $A_{\text{fluid}}$ is the Stokes matrix for velocity and pressure (it
+could be further subdivided into a $2\times 2$ matrix as in step-22, though
+this is immaterial for the current purpose),
+$A_{\text{solid}}$ results from the elasticity equations for the
+displacements, and $B$ is the matrix that comes from the interface
+conditions. Now notice that the matrix
 @f[
   A_\text{global}^{-1}
   =
@@ -274,8 +277,21 @@ program is rather ad hoc. A better one would understand that the jump in the
 gradient of the solution across the interface is not indicative of the error
 but to be expected and ignore the interface when integrating the jump
 terms. Nevertheless, this is not what the KellyErrorEstimator class
-does. Consequently, an obvious possibility for improving the program would be
-to implement a better refinement criterion.
+does. Another, bigger question, is whether this kind of estimator is a good
+strategy in the first place: for example, if we want to have maximal accuracy
+in one particular aspect of the displacement (e.g. the displacement at the top
+right corner of the solid), then is it appropriate to scale the error
+indicators for fluid and solid to the same magnitude? Maybe it is necessary to
+solve the fluid problem with more accuracy than the solid because the fluid
+solution directly affects the solids solution? Maybe the other way around?
+
+Consequently, an obvious possibility for improving the program would be to
+implement a better refinement criterion. There is some literature on this
+topic; one of a variety of possible starting points would be the paper by
+Thomas Wick on "Adaptive finite elements for monolithic fluid-structure
+interaction on a prolongated domain: Applied to an heart valve simulation",
+Proceedings of the Computer Methods in Mechanics Conference 2011 (CMM-2011),
+9-12 May 2011, Warszaw, Poland.
 
 
 <h4>Verification</h4>
