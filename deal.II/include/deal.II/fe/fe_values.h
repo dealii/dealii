@@ -392,8 +392,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -413,8 +412,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -434,8 +432,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -458,8 +455,7 @@ namespace FEValuesViews
 					* selected the last time the
 					* <tt>reinit</tt> function of
 					* the FEValues object was
-					* called, at the quadrature
-					* points. The Laplacians are
+					* called. The Laplacians are
 					* the trace of the Hessians.
 					*
 					* This function is the
@@ -778,8 +774,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -799,8 +794,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -821,12 +815,11 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_gradients
+					* FEValuesBase::get_function_symmetric_gradients
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
@@ -844,12 +837,11 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_gradients
+					* FEValuesBase::get_function_divergences
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
@@ -867,12 +859,11 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_gradients
+					* FEValuesBase::get_function_curls
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
@@ -890,8 +881,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -914,8 +904,7 @@ namespace FEValuesViews
 					* selected the last time the
 					* <tt>reinit</tt> function of
 					* the FEValues object was
-					* called, at the quadrature
-					* points. The Laplacians are
+					* called. The Laplacians are
 					* the trace of the Hessians.
 					*
 					* This function is the
@@ -1155,8 +1144,7 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* This function is the equivalent of
 					* the
@@ -1176,12 +1164,11 @@ namespace FEValuesViews
 					* quadrature points of the cell, face
 					* or subface selected the last time
 					* the <tt>reinit</tt> function of the
-					* FEValues object was called, at the
-					* quadrature points.
+					* FEValues object was called.
 					*
 					* There is no equivalent function such
 					* as
-					* FEValuesBase::get_function_gradients
+					* FEValuesBase::get_function_divergences
 					* in the FEValues classes but the
 					* information can be obtained from
 					* FEValuesBase::get_function_gradients,
