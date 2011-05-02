@@ -108,10 +108,11 @@ namespace internal
  * A namespace in which we declare "extractors", i.e. classes that when used
  * as subscripts in operator[] expressions on FEValues, FEFaceValues, and
  * FESubfaceValues objects extract certain components of a vector-valued
- * element. There are extractors for single scalar components,
- * vector components consisting of <code>dim</code> elements,
- * and second order symmetric tensors consisting
- * of <code>(dim*dim + dim)/2</code> components
+ * element. The result of applying an extractor to these objects is an object
+ * with corresponding type from the namespace FEValuesViews. There are
+ * extractors for single scalar components, vector components consisting of
+ * <code>dim</code> elements, and second order symmetric tensors consisting of
+ * <code>(dim*dim + dim)/2</code> components
  *
  * See the description of the @ref vector_valued module for examples how to
  * use the features of this namespace.
@@ -122,8 +123,12 @@ namespace FEValuesExtractors
 {
 				   /**
 				    * Extractor for a single scalar component
-				    * of a vector-valued element. The concept
-				    * of extractors is defined in the
+				    * of a vector-valued element. The result
+				    * of applying an object of this type to an
+				    * FEValues, FEFaceValues or
+				    * FESubfaceValues object is of type
+				    * FEValuesViews::Scalar. The concept of
+				    * extractors is defined in the
 				    * documentation of the namespace
 				    * FEValuesExtractors and in the @ref
 				    * vector_valued module.
@@ -152,7 +157,10 @@ namespace FEValuesExtractors
 				    * vector-valued element. The value of
 				    * <code>spacedim</code> is defined by the
 				    * FEValues object the extractor is applied
-				    * to.
+				    * to. The result of applying an object of
+				    * this type to an FEValues, FEFaceValues
+				    * or FESubfaceValues object is of type
+				    * FEValuesViews::Vector.
 				    *
 				    * The concept of
 				    * extractors is defined in the
@@ -204,17 +212,19 @@ namespace FEValuesExtractors
 
 
 				   /**
-				    * Extractor for a symmetric tensor
-				    * of a rank specified by the
-				    * template argument. For a second
-				    * order symmetric tensor, this
-				    * represents a collection of
+				    * Extractor for a symmetric tensor of a
+				    * rank specified by the template
+				    * argument. For a second order symmetric
+				    * tensor, this represents a collection of
 				    * <code>(dim*dim + dim)/2</code>
 				    * components of a vector-valued
-				    * element. The value of
-				    * <code>dim</code> is defined by
-				    * the FEValues object the
-				    * extractor is applied to.
+				    * element. The value of <code>dim</code>
+				    * is defined by the FEValues object the
+				    * extractor is applied to. The result of
+				    * applying an object of this type to an
+				    * FEValues, FEFaceValues or
+				    * FESubfaceValues object is of type
+				    * FEValuesViews::SymmetricTensor.
 				    *
 				    * The concept of
 				    * extractors is defined in the
@@ -253,7 +263,10 @@ namespace FEValuesExtractors
  * object. A view represents only a certain part of the whole: whereas the
  * FEValues object represents <i>all</i> values, gradients, or second
  * derivatives of all components of a vector-valued element, views restrict
- * the attention to only a single component or a subset of components.
+ * the attention to only a single component or a subset of components. You
+ * typically get objects of classes defined in this namespace by applying
+ * FEValuesExtractors objects to a FEValues, FEFaceValues or FESubfaceValues
+ * objects using the square bracket operator.
  *
  * There are classes that present views for single scalar components,
  * vector components consisting of <code>dim</code> elements, and
@@ -271,7 +284,13 @@ namespace FEValuesViews
 				    * A class representing a view to a single
 				    * scalar component of a possibly
 				    * vector-valued finite element. Views are
-				    * discussed in the @ref vector_valued module.
+				    * discussed in the @ref vector_valued
+				    * module.
+				    *
+				    * You get an object of this type if you
+				    * apply a FEValuesExtractors::Scalar to an
+				    * FEValues, FEFaceValues or
+				    * FESubfaceValues object.
 				    *
 				    * @ingroup feaccess vector_valued
 				    */
@@ -549,6 +568,11 @@ namespace FEValuesViews
 				    * of a velocity vector, and consequently,
 				    * this class should not be used for this
 				    * context.
+				    *
+				    * You get an object of this type if you
+				    * apply a FEValuesExtractors::Vector to an
+				    * FEValues, FEFaceValues or
+				    * FESubfaceValues object.
 				    *
 				    * @ingroup feaccess vector_valued
 				    */
@@ -1018,6 +1042,12 @@ namespace FEValuesViews
 				    * of $S$ it does not matter whether
 				    * we apply the nabla operator by row
 				    * or by column to get the divergence.
+				    *
+				    * You get an object of this type if you
+				    * apply a
+				    * FEValuesExtractors::SymmetricTensor to
+				    * an FEValues, FEFaceValues or
+				    * FESubfaceValues object.
 				    *
 				    * @ingroup feaccess vector_valued
 				    *
