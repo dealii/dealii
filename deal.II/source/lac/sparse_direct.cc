@@ -1603,6 +1603,27 @@ sort_arrays (const SparseMatrix<number> &matrix)
 template <typename number>
 void
 SparseDirectUMFPACK::
+sort_arrays (const SparseMatrixEZ<number> &matrix)
+{
+                                   //same thing for SparseMatrixEZ
+  for (unsigned int row=0; row<matrix.m(); ++row)
+    {
+      long int cursor = Ap[row];
+      while ((cursor < Ap[row+1]-1) &&
+             (Ai[cursor] > Ai[cursor+1]))
+        {
+          std::swap (Ai[cursor], Ai[cursor+1]);
+          std::swap (Ax[cursor], Ax[cursor+1]);
+          ++cursor;
+        }
+    }
+}
+
+
+
+template <typename number>
+void
+SparseDirectUMFPACK::
 sort_arrays (const BlockSparseMatrix<number> &matrix)
 {
                                    // the case for block matrices is a
@@ -1691,13 +1712,13 @@ factorize (const Matrix &matrix)
                                    // anyway. people are supposed to provide
                                    // accurate sparsity patterns.
   Ap.resize (N+1);
-  Ai.resize (matrix.get_sparsity_pattern().n_nonzero_elements());
-  Ax.resize (matrix.get_sparsity_pattern().n_nonzero_elements());
+  Ai.resize (matrix.n_nonzero_elements());
+  Ax.resize (matrix.n_nonzero_elements());
 
                                    // first fill row lengths array
   Ap[0] = 0;
   for (unsigned int row=1; row<=N; ++row)
-    Ap[row] = Ap[row-1] + matrix.get_sparsity_pattern().row_length(row-1);
+    Ap[row] = Ap[row-1] + matrix.get_row_length(row-1);
   Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
           ExcInternalError());
   
@@ -2028,6 +2049,8 @@ void SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
 
 InstantiateUMFPACK(SparseMatrix<double>);
 InstantiateUMFPACK(SparseMatrix<float>);
+InstantiateUMFPACK(SparseMatrixEZ<double>);
+InstantiateUMFPACK(SparseMatrixEZ<float>);
 InstantiateUMFPACK(BlockSparseMatrix<double>);
 InstantiateUMFPACK(BlockSparseMatrix<float>);
 

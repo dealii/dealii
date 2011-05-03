@@ -749,15 +749,21 @@ class SparseMatrix : public virtual Subscriptor
 				      */
     unsigned int n () const;
 
-				     /**
-				      * Return the number of nonzero
-				      * elements of this
-				      * matrix. Actually, it returns
-				      * the number of entries in the
-				      * sparsity pattern; if any of
-				      * the entries should happen to
-				      * be zero, it is counted anyway.
-				      */
+                                     /**
+                                      * Return the number of entries
+                                      * in a specific row.
+                                      */
+    unsigned int get_row_length (const unsigned int row) const;
+
+                                     /**
+                                      * Return the number of nonzero
+                                      * elements of this
+                                      * matrix. Actually, it returns
+                                      * the number of entries in the
+                                      * sparsity pattern; if any of
+                                      * the entries should happen to
+                                      * be zero, it is counted anyway.
+                                      */
     unsigned int n_nonzero_elements () const;
 
 				     /**

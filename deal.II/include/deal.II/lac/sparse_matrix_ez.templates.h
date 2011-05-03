@@ -385,6 +385,32 @@ SparseMatrixEZ<number>::memory_consumption() const
 }
 
 
+
+template <typename number>
+unsigned int
+SparseMatrixEZ<number>::get_row_length (const unsigned int row) const
+{
+    return row_info[row].length;
+}
+
+
+
+template <typename number>
+unsigned int
+SparseMatrixEZ<number>::n_nonzero_elements() const
+{
+  typename std::vector<RowInfo>::const_iterator row = row_info.begin();
+  const typename std::vector<RowInfo>::const_iterator endrow = row_info.end();
+
+                                   // Add up entries actually used
+  unsigned int used = 0;
+  for (; row != endrow ; ++ row)
+      used += row->length;
+  return used;
+}
+
+
+
 template <typename number>
 void
 SparseMatrixEZ<number>::compute_statistics(

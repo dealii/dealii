@@ -216,6 +216,16 @@ SparseMatrix<number>::empty () const
 
 template <typename number>
 unsigned int
+SparseMatrix<number>::get_row_length (const unsigned int row) const
+{
+  Assert (cols != 0, ExcNotInitialized());
+  return cols->row_length(row);
+}
+
+
+
+template <typename number>
+unsigned int
 SparseMatrix<number>::n_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());

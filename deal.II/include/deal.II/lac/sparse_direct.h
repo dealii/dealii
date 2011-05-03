@@ -21,6 +21,7 @@
 #include <base/thread_management.h>
 #include <lac/vector.h>
 #include <lac/sparse_matrix.h>
+#include <lac/sparse_matrix_ez.h>
 #include <lac/block_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_MUMPS
@@ -1241,12 +1242,16 @@ class SparseDirectUMFPACK : public Subscriptor
                                       * Make sure that the arrays Ai
                                       * and Ap are sorted in each
                                       * row. UMFPACK wants it this
-                                      * way. We need to have two
+                                      * way. We need to have three
                                       * versions of this function, one
-                                      * for the usual SparseMatrix and
+                                      * for the usual SparseMatrix, one
+                                      * for the SparseMatrixEZ, and
                                       * one for the BlockSparseMatrix
                                       * classes
                                       */
+    template <typename number>
+    void sort_arrays (const SparseMatrixEZ<number> &);
+
     template <typename number>
     void sort_arrays (const SparseMatrix<number> &);
     

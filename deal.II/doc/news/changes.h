@@ -30,6 +30,11 @@ inconvenience this causes.
 
 <ol>
 
+<li> New: The SparseDirectUMFPACK class can now also deal with matrices
+provided in SparseMatrixEZ format.
+<br>
+(Martin Genet, 2011/05/04)
+
 <li> New: The new tutorial program step-46 shows how to couple different
 models defined on subsets of
 the domain, in this case Stokes flow around an elastic solid. The

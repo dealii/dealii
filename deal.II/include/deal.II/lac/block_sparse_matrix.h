@@ -192,6 +192,12 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      */
     bool empty () const;
 
+                                     /**
+                                      * Return the number of entries
+                                      * in a specific row.
+                                      */
+    unsigned int get_row_length (const unsigned int row) const;
+
 				     /**
 				      * Return the number of nonzero
 				      * elements of this

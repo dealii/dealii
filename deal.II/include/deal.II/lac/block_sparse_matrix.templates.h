@@ -129,6 +129,15 @@ BlockSparseMatrix<number>::empty () const
 
 template <typename number>
 unsigned int
+BlockSparseMatrix<number>::get_row_length (const unsigned int row) const
+{
+  return sparsity_pattern->row_length(row);
+}
+
+
+
+template <typename number>
+unsigned int
 BlockSparseMatrix<number>::n_nonzero_elements () const
 {
   return sparsity_pattern->n_nonzero_elements ();

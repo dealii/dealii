@@ -451,6 +451,18 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     unsigned int n () const;
 
+                                     /**
+                                      * Return the number of entries
+                                      * in a specific row.
+                                      */
+    unsigned int get_row_length (const unsigned int row) const;
+
+                     /**
+                      * Return the number of nonzero
+                      * elements of this matrix.
+                      */                     
+    unsigned int n_nonzero_elements () const;
+    
 				     /**
 				      * Set the element <tt>(i,j)</tt> to
 				      * @p value. Allocates the entry,
