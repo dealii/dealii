@@ -329,7 +329,11 @@ class SparseMatrixEZ : public Subscriptor
 				      * the STL container classes.
 				      */
     typedef number value_type;
-    
+
+/**
+ * @name Constructors and initalization
+ */
+//@{
 				     /**
 				      * Constructor. Initializes an
 				      * empty matrix of dimension zero
@@ -427,7 +431,11 @@ class SparseMatrixEZ : public Subscriptor
 				      * its sparsity pattern.
 				      */
     void clear ();
-    
+//@}
+/**
+ * @name Information on the matrix
+ */
+//@{
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if
@@ -462,8 +470,50 @@ class SparseMatrixEZ : public Subscriptor
                       * elements of this matrix.
                       */                     
     unsigned int n_nonzero_elements () const;
-    
+
 				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object.
+				      */
+    std::size_t memory_consumption () const;
+
+				     /**
+				      * Print statistics. If @p full
+				      * is @p true, prints a
+				      * histogram of all existing row
+				      * lengths and allocated row
+				      * lengths. Otherwise, just the
+				      * relation of allocated and used
+				      * entries is shown.
+				      */
+    template <class STREAM>
+    void print_statistics (STREAM& s, bool full = false);
+
+				     /**
+				      * Compute numbers of entries.
+				      *
+				      * In the first three arguments,
+				      * this function returns the
+				      * number of entries used,
+				      * allocated and reserved by this
+				      * matrix.
+				      *
+				      * If the final argument is true,
+				      * the number of entries in each
+				      * line is printed as well.
+				      */
+    void compute_statistics (unsigned int& used,
+			     unsigned int& allocated,
+			     unsigned int& reserved,
+			     std::vector<unsigned int>& used_by_line,
+			     const bool compute_by_line) const;
+//@}
+/**
+ * @name Modifying entries
+ */
+//@{
+                     /**
 				      * Set the element <tt>(i,j)</tt> to
 				      * @p value. Allocates the entry,
 				      * if it does not exist and
@@ -610,7 +660,7 @@ class SparseMatrixEZ : public Subscriptor
     template <class MATRIX>
     SparseMatrixEZ<number> &
     copy_from (const MATRIX &source);
-    
+
 				     /**
 				      * Add @p matrix scaled by
 				      * @p factor to this matrix.
@@ -625,7 +675,11 @@ class SparseMatrixEZ : public Subscriptor
     template <class MATRIX>
     void add (const number factor,
 	      const MATRIX &matrix);
-
+//@}
+/**
+ * @name Entry Access
+ */
+//@{
 				     /**
 				      * Return the value of the entry
 				      * (i,j).  This may be an
@@ -654,7 +708,11 @@ class SparseMatrixEZ : public Subscriptor
 				      */
     number el (const unsigned int i,
 	       const unsigned int j) const;
-
+//@}
+/**
+ * @name Multiplications
+ */
+//@{
 				     /**
 				      * Matrix-vector multiplication:
 				      * let $dst = M*src$ with $M$
@@ -697,12 +755,20 @@ class SparseMatrixEZ : public Subscriptor
     template <typename somenumber>
     void Tvmult_add (Vector<somenumber>       &dst,
 		     const Vector<somenumber> &src) const;
-  
+//@}
+/**
+ * @name Matrix norms
+ */
+//@{
 				     /**
 				      * Frobenius-norm of the matrix.
 				      */
     number l2_norm () const;
-
+//@}
+/**
+ * @name Preconditioning methods
+ */
+//@{
 				     /**
 				      * Apply the Jacobi
 				      * preconditioner, which
@@ -766,7 +832,11 @@ class SparseMatrixEZ : public Subscriptor
     void conjugate_add (const MATRIXA& A,
 			const MATRIXB& B,
 			const bool transpose = false);
-    
+//@}
+/**
+ * @name Iterators
+ */
+//@{
 				     /**
 				      * STL-like iterator with the
 				      * first existing entry.
@@ -793,7 +863,11 @@ class SparseMatrixEZ : public Subscriptor
 				      * different from <tt>end()</tt>!
 				      */
     const_iterator end (const unsigned int r) const;
-    
+//@}
+/**
+ * @name Input/Output
+ */
+//@{
 				     /**
 				      * Print the matrix to the given
 				      * stream, using the format
@@ -876,46 +950,7 @@ class SparseMatrixEZ : public Subscriptor
 				      * more.
 				      */
     void block_read (std::istream &in);
-
-
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    std::size_t memory_consumption () const;
-
-				     /**
-				      * Print statistics. If @p full
-				      * is @p true, prints a
-				      * histogram of all existing row
-				      * lengths and allocated row
-				      * lengths. Otherwise, just the
-				      * relation of allocated and used
-				      * entries is shown.
-				      */
-    template <class STREAM>
-    void print_statistics (STREAM& s, bool full = false);
-
-				     /**
-				      * Compute numbers of entries.
-				      *
-				      * In the first three arguments,
-				      * this function returns the
-				      * number of entries used,
-				      * allocated and reserved by this
-				      * matrix.
-				      *
-				      * If the final argument is true,
-				      * the number of entries in each
-				      * line is printed as well.
-				      */
-    void compute_statistics (unsigned int& used,
-			     unsigned int& allocated,
-			     unsigned int& reserved,
-			     std::vector<unsigned int>& used_by_line,
-			     const bool compute_by_line) const;
-			     
+//@}
     
     				     /** @addtogroup Exceptions
 				      * @{ */

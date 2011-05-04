@@ -546,7 +546,7 @@ class SparseMatrix : public virtual Subscriptor
     };
 
 /**
- * @name Constructors and initalization.
+ * @name Constructors and initalization
  */
 //@{
 				     /**

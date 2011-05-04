@@ -71,6 +71,10 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     typedef typename BaseClass::iterator        iterator;
     typedef typename BaseClass::const_iterator  const_iterator;
 
+/**
+ * @name Constructors and initalization
+ */
+//@{
     				     /**
 				      * Constructor; initializes the
 				      * matrix to be empty, without
@@ -182,7 +186,12 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      * set to zero by this function.
 				      */
     virtual void reinit (const BlockSparsityPattern &sparsity);
+//@}
 
+/**
+ * @name Information on the matrix
+ */
+//@{
 				     /**
 				      * Return whether the object is
 				      * empty. It is empty if either
@@ -218,6 +227,33 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 				      */
     unsigned int n_actually_nonzero_elements (const double threshold = 0.0) const;
 
+                                     /**
+                                      * Return a (constant) reference
+                                      * to the underlying sparsity
+                                      * pattern of this matrix.
+                                      *
+                                      * Though the return value is
+                                      * declared <tt>const</tt>, you
+                                      * should be aware that it may
+                                      * change if you call any
+                                      * nonconstant function of
+                                      * objects which operate on it.
+                                      */
+    const BlockSparsityPattern &
+    get_sparsity_pattern () const;
+
+                                     /**
+                                      * Determine an estimate for the
+                                      * memory consumption (in bytes)
+                                      * of this object.
+                                      */
+    std::size_t memory_consumption () const;
+//@}
+
+/**
+ * @name Multiplications
+ */
+//@{
 				     /**
 				      * Matrix-vector multiplication:
 				      * let $dst = M*src$ with $M$
@@ -308,7 +344,12 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     template <typename nonblock_number>
     void Tvmult (Vector<nonblock_number>       &dst,
                  const Vector<nonblock_number> &src) const;
+//@}
 
+/**
+ * @name Preconditioning methods
+ */
+//@{
 				     /**
 				      * Apply the Jacobi
 				      * preconditioner, which
@@ -340,7 +381,12 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
     void precondition_Jacobi (Vector<number2>       &dst,
 			      const Vector<number2> &src,
 			      const number           omega = 1.) const;
+//@}
 
+/**
+ * @name Input/Output
+ */
+//@{
 				     /**
 				      * Print the matrix in the usual
 				      * format, i.e. as a matrix and
@@ -388,30 +434,8 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 			  const unsigned int  width       = 0,
 			  const char         *zero_string = " ",
 			  const double        denominator = 1.) const;
-
-				     /**
-				      * Return a (constant) reference
-				      * to the underlying sparsity
-				      * pattern of this matrix.
-				      *
-				      * Though the return value is
-				      * declared <tt>const</tt>, you
-				      * should be aware that it may
-				      * change if you call any
-				      * nonconstant function of
-				      * objects which operate on it.
-				      */
-    const BlockSparsityPattern &
-    get_sparsity_pattern () const;
-
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object.
-				      */
-    std::size_t memory_consumption () const;
-
-      				     /** @addtogroup Exceptions
+//@}
+    				     /** @addtogroup Exceptions
 				      * @{ */
 
                                      /**
@@ -419,6 +443,7 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
                                       */
     DeclException0 (ExcBlockDimensionMismatch);
 				     //@}
+
   private:
     				     /**
 				      * Pointer to the block sparsity
