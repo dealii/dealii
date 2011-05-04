@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,21 +28,20 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Transfers a discrete FE function (like a solution vector) by interpolation
- * while refining and/or coarsening a grid. During interpolation the
- * vector is reinitialized to the new size and filled with the interpolated
- * values. This class is used in the step-15,
- * step-31, and step-33 tutorial programs.
+ * This class implements the transfer of a discrete FE function
+ * (e.g. a solution vector) from one mesh to another that is obtained
+ * by the first by a single refinement and/or coarsening step. During
+ * interpolation the vector is reinitialized to the new size and
+ * filled with the interpolated values. This class is used in the
+ * step-15, step-31, and step-33 tutorial programs.
  *
  * <h3>Usage</h3>
  *
- * As the interpolation while
- * coarsening is much more complicated to organize
- * (see further documentation below) than interpolation while pure refinement,
- * @p SolutionTransfer offers two possible usages.
+ * This class implements the algorithms in two different ways:
+
  * <ul>
- * <li> If the grid will only be purely refined
- * (i.e. not locally coarsened) then use @p SolutionTransfer as follows
+ * <li> If the grid will only be refined
+ * (i.e. no cells are coarsened) then use @p SolutionTransfer as follows:
  * @verbatim
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
  *                                     // flag some cells for refinement, e.g.
@@ -86,8 +85,8 @@ DEAL_II_NAMESPACE_OPEN
  * This is used in several of the tutorial programs, for example
  * step-31.
  *
- * <li> If the grid will be refined AND coarsened
- * then use @p SolutionTransfer as follows
+ * <li> If the grid has cells that will be coarsened,
+ * then use @p SolutionTransfer as follows:
  * @verbatim
  * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
  *                                     // flag some cells for refinement
@@ -130,7 +129,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Implementation</h3>
  *
  * <ul>
- * <li> Solution transfer while pure refinement. Assume that we have got a
+ * <li> Solution transfer with only refinement. Assume that we have got a
  * solution vector on the current (original) grid.
  * Each entry of this vector belongs to one of the
  * DoFs of the discretisation. If we now refine the grid then the calling of
@@ -150,7 +149,7 @@ DEAL_II_NAMESPACE_OPEN
  * The <tt>refine_interpolate(in,out)</tt> function can be called multiple times for
  * arbitrary many discrete functions (solution vectors) on the original grid.
  *
- * <li> Solution transfer while coarsening and refinement. After
+ * <li> Solution transfer with coarsening and refinement. After
  * calling Triangulation::prepare_coarsening_and_refinement the
  * coarsen flags of either all or none of the children of a
  * (father-)cell are set. While coarsening
