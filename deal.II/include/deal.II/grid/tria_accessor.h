@@ -450,6 +450,24 @@ class TriaAccessorBase
 				      *  Return the index of the
 				      *  element presently pointed to
 				      *  on the present level.
+				      *
+				      * Note that these indices are not
+				      * globally unique for cells (though they
+				      * may be for faces or edges). Rather, a
+				      * cell is identified by its refinement
+				      * level and index within this refinement
+				      * level, the latter piece of information
+				      * being what this function
+				      * returns. Consequently, there may be
+				      * multiple cells on different refinement
+				      * levels but with the same index within
+				      * their level.
+				      *
+				      * Similarly, the index returned by this
+				      * function is not a contiguous set of
+				      * numbers of each level: going from cell
+				      * to cell, some of the indices in a
+				      * level may be unused.
 				      */
     int index () const;
 
