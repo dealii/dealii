@@ -770,7 +770,7 @@ namespace TrilinosWrappers
   {
 				      // Extract local indices in
 				      // the matrix.
-    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LRID(j);
+    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LCID(j);
     TrilinosScalar value = 0.;
 
 				      // If the data is not on the
@@ -844,7 +844,7 @@ namespace TrilinosWrappers
   {
 				      // Extract local indices in
 				      // the matrix.
-    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LRID(j);
+    int trilinos_i = matrix->LRID(i), trilinos_j = matrix->LCID(j);
     TrilinosScalar value = 0.;
 
 				      // If the data is not on the

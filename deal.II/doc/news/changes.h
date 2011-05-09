@@ -100,6 +100,12 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The TrilinosWrappers::SparseMatrix::operator() and
+TrilinosWrappers::SparseMatrix::el() functions sometimes produced
+wrong results for rectangular matrices. This is now fixed.
+<br>
+(Habib Talavatifard, Wolfgang Bangerth 2011/05/09)
+
 <li> Changed: DoFTools is now a namespace. It has long been a class that
 had only public, static member functions, making the end result semantically
 exactly equivalent to a namespace, which is also how it was used. This is
