@@ -1330,7 +1330,7 @@ namespace TrilinosWrappers
 	  {
 	    matrix->ExtractMyRowView (i, num_entries, values, indices);
 	    for (int j=0; j<num_entries; ++j)
-	      out << "(" << matrix->GRID(i) << "," << indices[matrix->GCID(j)] << ") "
+	      out << "(" << matrix->GRID(i) << "," << matrix->GCID(indices[j]) << ") "
 		  << values[j] << std::endl;
 	  }
       }

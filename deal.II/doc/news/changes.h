@@ -100,6 +100,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The TrilinosWrappers::SparseMatrix::print() function
+didn't get column indices right. This is now fixed.
+<br>
+(Habib Talavatifard, Wolfgang Bangerth 2011/05/10)
+
 <li> Fixed: The TrilinosWrappers::SparseMatrix::operator() and
 TrilinosWrappers::SparseMatrix::el() functions sometimes produced
 wrong results for rectangular matrices. This is now fixed.
