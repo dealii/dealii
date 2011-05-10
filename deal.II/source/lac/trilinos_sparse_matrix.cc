@@ -849,18 +849,13 @@ namespace TrilinosWrappers
 
 				      // If the data is not on the
 				      // present processor, we can't
-				      // continue. Just print out
-				      // zero.
-
-				      // TODO: Is this reasonable? Or
-				      // should we retain the assert
-				      // call?
+				      // continue. Just print out zero
+				      // as discussed in the
+				      // documentation of this
+				      // function. if you want error
+				      // checking, use operator().
     if ((trilinos_i == -1 ) || (trilinos_j == -1))
-      {
-	return 0.;
-	//Assert (false, ExcAccessToNonLocalElement(i, j, local_range().first,
-	//				  local_range().second));
-      }
+      return 0.;
     else
     {
 				      // Check whether the matrix
