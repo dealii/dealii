@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1586,6 +1586,29 @@ namespace TrilinosWrappers
                                         * slow compared to an optimal
                                         * solution, since the sparsity
                                         * of the matrix is not used.
+                                        * On the other hand, if you
+                                        * want to be sure the entry
+                                        * exists, you should use
+                                        * operator() instead.
+					*
+					* The lack of error checking
+					* in this function can also
+					* yield surprising results if
+					* you have a parallel
+					* matrix. In that case, just
+					* because you get a zero
+					* result from this function
+					* does not mean that either
+					* the entry does not exist in
+					* the sparsity pattern or that
+					* it does but has a value of
+					* zero. Rather, it could also
+					* be that it simply isn't
+					* stored on the current
+					* processor; in that case, it
+					* may be stored on a different
+					* processor, and possibly so
+					* with a nonzero value.
                                         */
       TrilinosScalar el (const unsigned int i,
 			 const unsigned int j) const;
