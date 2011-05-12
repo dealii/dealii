@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 // check GridTools::transform with the mesh used in the "Possibilities for
 // extensions" section of step-38. The test exists because the function
-// originall did not allow application to meshes that were already refined.
+// originally did not allow application to meshes that were already refined.
 
 
 #include "../tests.h"
