@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
       (const DoFHandler<deal_II_dimension>&,
       const Function<deal_II_dimension>&,
       VEC&);
-      
+
   template 
     void VectorTools::interpolate
     (const Mapping<deal_II_dimension>&,
@@ -251,6 +251,22 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
      const Quadrature<deal_II_dimension>&,
      const VEC&,
      const unsigned int);
+
+#if deal_II_dimension < 3
+  template
+    double VectorTools::compute_mean_value<deal_II_dimension>
+    (const Mapping<deal_II_dimension,deal_II_dimension+1>&,
+     const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+     const Quadrature<deal_II_dimension>&,
+     const VEC&,
+     const unsigned int);
+  template
+    double VectorTools::compute_mean_value<deal_II_dimension>
+    (const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+     const Quadrature<deal_II_dimension>&,
+     const VEC&,
+     const unsigned int);
+#endif
 
   template
     void VectorTools::project

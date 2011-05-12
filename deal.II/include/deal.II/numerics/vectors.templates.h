@@ -5243,9 +5243,9 @@ VectorTools::compute_mean_value (const Mapping<dim, spacedim>    &mapping,
   Assert (component < dof.get_fe().n_components(),
 	  ExcIndexRange(component, 0, dof.get_fe().n_components()));
 
-  FEValues<dim> fe(mapping, dof.get_fe(), quadrature,
-		   UpdateFlags(update_JxW_values
-			       | update_values));
+  FEValues<dim,spacedim> fe(mapping, dof.get_fe(), quadrature,
+			    UpdateFlags(update_JxW_values
+					| update_values));
 
   typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
   std::vector<Vector<double> > values(quadrature.size(),
@@ -5298,7 +5298,7 @@ VectorTools::compute_mean_value (const DoFHandler<dim,spacedim> &dof,
 				 const unsigned int     component)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  return compute_mean_value(StaticMappingQ1<dim>::mapping, dof, quadrature, v, component);
+  return compute_mean_value(StaticMappingQ1<dim,spacedim>::mapping, dof, quadrature, v, component);
 }
 
 DEAL_II_NAMESPACE_CLOSE
