@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sstream>
+#include <iostream>
 
 #ifdef HAVE_STD_NUMERIC_LIMITS
 #  include <limits>
