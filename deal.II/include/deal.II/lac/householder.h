@@ -285,6 +285,9 @@ Householder<number>::least_squares (BlockVector<number2>& dst,
   v_aux = *aux;
 				   // Compute solution
   this->backward(v_dst, v_aux);
+                                   //copy the result back 
+                                   //to the BlockVector
+  dst = v_dst;
 
   mem.free(aux);
   
