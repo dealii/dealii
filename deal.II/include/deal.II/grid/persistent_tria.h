@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,8 +100,8 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup grid
  * @author Wolfgang Bangerth, 1999
  */
-template <int dim>
-class PersistentTriangulation : public Triangulation<dim> 
+template <int dim, int spacedim=dim>
+class PersistentTriangulation : public Triangulation<dim, spacedim> 
 {
   public:    
 				     /**
@@ -109,6 +109,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * in function templates.
 				      */
     static const unsigned int dimension = dim;
+    static const unsigned int spacedimension = spacedim;
     
 				     /**
 				      * Build up the triangulation from the
@@ -124,7 +125,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * be used upon reconstruction of the
 				      * grid.
 				      */
-    PersistentTriangulation (const Triangulation<dim> &coarse_grid);
+    PersistentTriangulation (const Triangulation<dim, spacedim> &coarse_grid);
 
 				     /**
 				      * Copy constructor. This operation
@@ -134,7 +135,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * as well as the pointer to the
 				      * coarse grid are copied, however.
 				      */
-    PersistentTriangulation (const PersistentTriangulation<dim> &old_tria);
+    PersistentTriangulation (const PersistentTriangulation<dim, spacedim> &old_tria);
     
 				     /**
 				      * Destructor.
@@ -215,14 +216,14 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * be used upon reconstruction of the
 				      * grid.
 				      */
-    virtual void copy_triangulation (const Triangulation<dim> &tria);
+    virtual void copy_triangulation (const Triangulation<dim, spacedim> &tria);
 
 				     /**
 				      * Throw an error, since this function
 				      * is not useful in the context of this
 				      * class.
 				      */
-    virtual void create_triangulation (const std::vector<Point<dim> >    &vertices,
+    virtual void create_triangulation (const std::vector<Point<spacedim> >    &vertices,
 				       const std::vector<CellData<dim> > &cells,
 				       const SubCellData                 &subcelldata);
 
@@ -235,7 +236,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * class.
 				      */
     virtual void create_triangulation_compatibility (
-      const std::vector<Point<dim> >    &vertices,
+      const std::vector<Point<spacedim> >    &vertices,
       const std::vector<CellData<dim> > &cells,
       const SubCellData                 &subcelldata);
 
@@ -282,7 +283,7 @@ class PersistentTriangulation : public Triangulation<dim>
 				      * This grid shall be used as coarse
 				      * grid.
 				      */
-    SmartPointer<const Triangulation<dim>,PersistentTriangulation<dim> > coarse_grid;
+    SmartPointer<const Triangulation<dim,spacedim>,PersistentTriangulation<dim,spacedim> > coarse_grid;
     
     				     /**
 				      * Vectors holding the refinement and

@@ -30,6 +30,11 @@ inconvenience this causes.
 
 <ol>
 
+<li> New: The PersistentTriangulation class now works also in
+the codimension one case.
+<br>
+(Luca Heltai, 2011/05/16)
+
 <li> New: The SparseDirectUMFPACK class can now also deal with matrices
 provided in SparseMatrixEZ format.
 <br>

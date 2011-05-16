@@ -20,28 +20,32 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim>
+template <int dim, int spacedim>
 const unsigned int
-PersistentTriangulation<dim>::dimension;
+PersistentTriangulation<dim,spacedim>::dimension;
+
+template <int dim, int spacedim>
+const unsigned int
+PersistentTriangulation<dim,spacedim>::spacedimension;
 
 
-template <int dim>
-PersistentTriangulation<dim>::
-PersistentTriangulation (const Triangulation<dim> &coarse_grid)
+template <int dim, int spacedim>
+PersistentTriangulation<dim,spacedim>::
+PersistentTriangulation (const Triangulation<dim,spacedim> &coarse_grid)
                 :
 		coarse_grid (&coarse_grid, typeid(*this).name())
 {}
 
 
 
-template <int dim>
-PersistentTriangulation<dim>::
-PersistentTriangulation (const PersistentTriangulation<dim> &old_tria)
+template <int dim, int spacedim>
+PersistentTriangulation<dim,spacedim>::
+PersistentTriangulation (const PersistentTriangulation<dim,spacedim> &old_tria)
                 :
 						 // default initialize
 						 // tria, i.e. it will be
 						 // empty on first use
-		Triangulation<dim> (),
+		Triangulation<dim,spacedim> (),
                 coarse_grid (old_tria.coarse_grid),
                 refine_flags (old_tria.refine_flags),
                 coarsen_flags (old_tria.coarsen_flags)
@@ -51,15 +55,15 @@ PersistentTriangulation (const PersistentTriangulation<dim> &old_tria)
 
 
 
-template <int dim>
-PersistentTriangulation<dim>::~PersistentTriangulation ()
+template <int dim, int spacedim>
+PersistentTriangulation<dim,spacedim>::~PersistentTriangulation ()
 {}
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
+PersistentTriangulation<dim,spacedim>::execute_coarsening_and_refinement ()
 {
 				   // first save flags
   refine_flags.push_back (std::vector<bool>());
@@ -71,14 +75,14 @@ PersistentTriangulation<dim>::execute_coarsening_and_refinement ()
 				   // this function throws an
 				   // exception, that's fine since it
 				   // is the last call here
-  Triangulation<dim>::execute_coarsening_and_refinement ();
+  Triangulation<dim,spacedim>::execute_coarsening_and_refinement ();
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::restore ()
+PersistentTriangulation<dim,spacedim>::restore ()
 {
 				   // for each of the previous
 				   // refinement sweeps
@@ -88,9 +92,9 @@ PersistentTriangulation<dim>::restore ()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::restore (const unsigned int step)
+PersistentTriangulation<dim,spacedim>::restore (const unsigned int step)
 {
 
   if (step==0)
@@ -98,7 +102,7 @@ PersistentTriangulation<dim>::restore (const unsigned int step)
 				     // this will yield an error if
 				     // the underlying triangulation
 				     // was not empty
-    Triangulation<dim>::copy_triangulation (*coarse_grid);
+    Triangulation<dim,spacedim>::copy_triangulation (*coarse_grid);
   else
 				     // for each of the previous
 				     // refinement sweeps
@@ -109,24 +113,24 @@ PersistentTriangulation<dim>::restore (const unsigned int step)
       this->load_refine_flags  (refine_flags[step-1]);
       this->load_coarsen_flags (coarsen_flags[step-1]);
 
-      Triangulation<dim>::execute_coarsening_and_refinement ();
+      Triangulation<dim,spacedim>::execute_coarsening_and_refinement ();
     }
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 unsigned int
-PersistentTriangulation<dim>::n_refinement_steps() const
+PersistentTriangulation<dim,spacedim>::n_refinement_steps() const
 {
   return refine_flags.size();
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_grid)
+PersistentTriangulation<dim,spacedim>::copy_triangulation (const Triangulation<dim,spacedim> &old_grid)
 {
   this->clear ();
   coarse_grid  = &old_grid;
@@ -136,9 +140,9 @@ PersistentTriangulation<dim>::copy_triangulation (const Triangulation<dim> &old_
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim> >    &,
+PersistentTriangulation<dim,spacedim>::create_triangulation (const std::vector<Point<spacedim> >    &,
 						    const std::vector<CellData<dim> > &,
 						    const SubCellData                 &)
 {
@@ -147,10 +151,10 @@ PersistentTriangulation<dim>::create_triangulation (const std::vector<Point<dim>
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::create_triangulation_compatibility (
-  const std::vector<Point<dim> >    &,
+PersistentTriangulation<dim,spacedim>::create_triangulation_compatibility (
+  const std::vector<Point<spacedim> >    &,
   const std::vector<CellData<dim> > &,
   const SubCellData                 &)
 {
@@ -159,9 +163,9 @@ PersistentTriangulation<dim>::create_triangulation_compatibility (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::write_flags(std::ostream &out) const
+PersistentTriangulation<dim,spacedim>::write_flags(std::ostream &out) const
 {
   const unsigned int n_flag_levels=refine_flags.size();
 
@@ -184,9 +188,9 @@ PersistentTriangulation<dim>::write_flags(std::ostream &out) const
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::read_flags(std::istream &in)
+PersistentTriangulation<dim,spacedim>::read_flags(std::istream &in)
 {
   Assert(refine_flags.size()==0 && coarsen_flags.size()==0,
 	 ExcFlagsNotCleared());
@@ -218,9 +222,9 @@ PersistentTriangulation<dim>::read_flags(std::istream &in)
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-PersistentTriangulation<dim>::clear_flags()
+PersistentTriangulation<dim,spacedim>::clear_flags()
 {
   refine_flags.clear();
   coarsen_flags.clear();
@@ -228,11 +232,11 @@ PersistentTriangulation<dim>::clear_flags()
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 std::size_t
-PersistentTriangulation<dim>::memory_consumption () const
+PersistentTriangulation<dim,spacedim>::memory_consumption () const
 {
-  return (Triangulation<dim>::memory_consumption () +
+  return (Triangulation<dim,spacedim>::memory_consumption () +
 	  MemoryConsumption::memory_consumption (coarse_grid) +
 	  MemoryConsumption::memory_consumption (refine_flags) +
 	  MemoryConsumption::memory_consumption (coarsen_flags));
@@ -243,6 +247,8 @@ PersistentTriangulation<dim>::memory_consumption () const
 template class PersistentTriangulation<1>;
 template class PersistentTriangulation<2>;
 template class PersistentTriangulation<3>;
+template class PersistentTriangulation<1,2>;
+template class PersistentTriangulation<2,3>;
 
 DEAL_II_NAMESPACE_CLOSE
 
