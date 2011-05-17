@@ -42,7 +42,7 @@ void test ()
 				   // Try to project a point on the
 				   // surface 
   for(unsigned int i=0; i<dim; ++i)
-    p[i] = .5;
+    p[i] = .2;
   
   Point<dim-1> q =
     mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
@@ -58,7 +58,7 @@ int main ()
 {
   std::ofstream logfile("mapping_03/output");
   deallog.attach(logfile);
-  deallog.depth_console(0);
+  deallog.depth_console(3);
 
   test<2> ();
   test<3> ();
