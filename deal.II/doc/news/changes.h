@@ -30,10 +30,11 @@ inconvenience this causes.
 
 <ol>
 
-<li> New: The PersistentTriangulation class now works also in
-the codimension one case.
+<li> Changed: The version of BOOST we ship with deal.II has been upgraded
+to 1.46.1. BOOST now also resides in the directory <code>contrib/boost-1.46.1</code>
+instead of an unversioned directory.
 <br>
-(Luca Heltai, 2011/05/16)
+(WB, 2011/05/16)
 
 <li> New: The SparseDirectUMFPACK class can now also deal with matrices
 provided in SparseMatrixEZ format.
@@ -105,6 +106,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The PersistentTriangulation class now works also in
+the codimension one case.
+<br>
+(Luca Heltai, 2011/05/16)
+
 <li> Fixed: The TrilinosWrappers::SparseMatrix::print() function
 didn't get column indices right. This is now fixed.
 <br>
