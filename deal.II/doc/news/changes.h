@@ -30,6 +30,15 @@ inconvenience this causes.
 
 <ol>
 
+<li> New: Mapping<dim,spacedim>::transform_real_to_unit_cell  now
+works also in the codimension one case, where it performs the normal
+projection of the point on the codimension one surface.
+<br> (Luca Heltai, 2011/05/17)
+
+<li> New: The PersistentTriangulation class now works also in
+the codimension one case.
+<br> (Luca Heltai, 2011/05/16)
+
 <li> Changed: Traditionally, include directories were set through the
 <code>-I</code> flag in make files in such a way that one would do
 @code
