@@ -4330,7 +4330,7 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_BIND_COMPILER_BUG, dnl
   if test "x$GXX" = "xyes" ; then
     AC_MSG_CHECKING(for boost::bind compiler internal error)
     AC_LANG(C++)
-    CXXFLAGS="$CXXFLAGSO -I./contrib/boost/include"
+    CXXFLAGS="$CXXFLAGSO $BOOST_INCLUDE_DIR"
     AC_TRY_COMPILE(
       [
 #include <complex>
@@ -4376,7 +4376,7 @@ AC_DEFUN(DEAL_II_CHECK_BOOST_GRAPH_COMPILER_BUG, dnl
   if test "x$GXX" = "xyes" ; then
     AC_MSG_CHECKING(for boost::graph compiler internal error)
     AC_LANG(C++)
-    CXXFLAGS="$CXXFLAGSO -I./contrib/boost/include"
+    CXXFLAGS="$CXXFLAGSO $BOOST_INCLUDE_DIR"
     AC_TRY_COMPILE(
       [
 #include <boost/graph/adjacency_list.hpp>
