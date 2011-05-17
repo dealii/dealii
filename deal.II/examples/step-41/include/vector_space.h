@@ -1,14 +1,14 @@
 #ifndef VECTOR_SPACE_H
 #define VECTOR_SPACE_H
 
-#include <base/parameter_handler.h>
-#include <fe/fe_tools.h>
-#include <grid/persistent_tria.h>
-#include <multigrid/mg_dof_handler.h>
-#include <base/smartpointer.h>
-#include <fe/mapping.h>
-#include <dofs/dof_constraints.h>
-#include <numerics/solution_transfer.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/grid/persistent_tria.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/dofs/dof_constraints.h>
+#include <deal.II/numerics/solution_transfer.h>
 
 using namespace dealii;
 

@@ -13,10 +13,10 @@
 #ifndef __deal2__pointer_matrix_h
 #define __deal2__pointer_matrix_h
 
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 

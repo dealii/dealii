@@ -12,14 +12,14 @@
 #ifndef __deal2__fe_raviart_thomas_h
 #define __deal2__fe_raviart_thomas_h
 
-#include <base/config.h>
-#include <base/table.h>
-#include <base/polynomials_raviart_thomas.h>
-#include <base/polynomial.h>
-#include <base/tensor_product_polynomials.h>
-#include <base/geometry_info.h>
-#include <fe/fe.h>
-#include <fe/fe_poly_tensor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_poly_tensor.h>
 
 #include <vector>
 

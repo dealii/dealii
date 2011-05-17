@@ -14,9 +14,9 @@
 #define __deal2__block_vector_templates_h
 
 
-#include <base/config.h>
-#include <lac/block_vector.h>
-#include <lac/trilinos_block_vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 #include <cmath>
 #include <algorithm>
 

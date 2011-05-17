@@ -13,13 +13,13 @@
 #ifndef __deal2__timer_h
 #define __deal2__timer_h
 
-#include <base/config.h>
-#include <base/conditional_ostream.h>
-#include <base/thread_management.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/thread_management.h>
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #include <mpi.h>
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 #endif
 
 #include <string>

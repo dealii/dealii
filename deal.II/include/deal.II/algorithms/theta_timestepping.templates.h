@@ -10,10 +10,10 @@
 //
 //---------------------------------------------------------------------------
 
-#include <algorithms/theta_timestepping.h>
+#include <deal.II/algorithms/theta_timestepping.h>
 
-#include <base/parameter_handler.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 

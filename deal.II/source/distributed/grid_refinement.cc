@@ -13,22 +13,22 @@
 
 
 
-#include <base/utilities.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 
 #ifdef DEAL_II_USE_P4EST
 
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria.h>
 
-#include <distributed/grid_refinement.h>
+#include <deal.II/distributed/grid_refinement.h>
 
 #include <numeric>
 #include <algorithm>

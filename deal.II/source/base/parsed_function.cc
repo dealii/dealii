@@ -10,8 +10,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#include <base/parsed_function.h>
-#include <base/utilities.h>
+#include <deal.II/base/parsed_function.h>
+#include <deal.II/base/utilities.h>
 
 #include <cstdio>
 

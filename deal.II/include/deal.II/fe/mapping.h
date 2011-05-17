@@ -13,12 +13,12 @@
 #define __deal2__mapping_h
 
 
-#include <base/config.h>
-#include <base/tensor.h>
-#include <base/vector_slice.h>
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_update_flags.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_update_flags.h>
 
 #include <cmath>
 

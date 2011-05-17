@@ -11,11 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/utilities.h>
-#include <base/logstream.h>
-#include <grid/grid_tools.h>
-#include <fe/fe_values.h>
-#include <numerics/fe_field_function.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/numerics/fe_field_function.h>
 
 
 DEAL_II_NAMESPACE_OPEN

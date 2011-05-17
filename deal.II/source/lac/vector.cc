@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/vector.templates.h>
+#include <deal.II/lac/vector.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

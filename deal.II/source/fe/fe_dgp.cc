@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/fe_dgp.h>
-#include <fe/fe_tools.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_tools.h>
 
 #include <sstream>
 

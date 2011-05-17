@@ -17,28 +17,28 @@
 				 // of the following include files there
 				 // already. Consequently, we will not explain
 				 // their meaning here again.
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
-#include <lac/full_matrix.h>
-#include <lac/vector.h>
-#include <lac/solver_control.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/sparse_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
-#include <numerics/data_out.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
 
 #include <fstream>
 #include <iostream>

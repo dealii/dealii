@@ -13,15 +13,15 @@
 #ifndef __deal2__fe_function_h
 #define __deal2__fe_function_h
 
-#include <base/function.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <fe/mapping_q1.h>
-#include <base/function.h>
-#include <base/point.h>
-#include <base/tensor.h>
+#include <deal.II/base/function.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
 
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

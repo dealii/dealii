@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/event.h>
+#include <deal.II/base/event.h>
 
 DEAL_II_NAMESPACE_OPEN
 

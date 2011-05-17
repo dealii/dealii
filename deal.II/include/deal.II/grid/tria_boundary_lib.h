@@ -14,8 +14,8 @@
 #define __deal2__tria_boundary_lib_h
 
 
-#include <base/config.h>
-#include <grid/tria_boundary.h>
+#include <deal.II/base/config.h>
+#include <deal.II/grid/tria_boundary.h>
 
 DEAL_II_NAMESPACE_OPEN
 

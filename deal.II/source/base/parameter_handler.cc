@@ -11,11 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/parameter_handler.h>
-#include <base/logstream.h>
-#include <base/path_search.h>
-#include <base/memory_consumption.h>
-#include <base/utilities.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/path_search.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/utilities.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>

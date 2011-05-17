@@ -13,10 +13,10 @@
 #ifndef __deal2__tria_objects_h
 #define __deal2__tria_objects_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/geometry_info.h>
-#include <grid/tria_object.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/grid/tria_object.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

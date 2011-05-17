@@ -15,7 +15,7 @@
 #ifndef __deal2__arpack_solver_h
 #define __deal2__arpack_solver_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_ARPACK
 

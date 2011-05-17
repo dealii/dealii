@@ -12,17 +12,17 @@
 #ifndef __deal2__fe_base_h
 #define __deal2__fe_base_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/point.h>
-#include <base/tensor.h>
-#include <base/table.h>
-#include <base/vector_slice.h>
-#include <base/geometry_info.h>
-#include <lac/full_matrix.h>
-#include <fe/fe_update_flags.h>
-#include <fe/mapping.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
 
 #include <string>
 #include <vector>

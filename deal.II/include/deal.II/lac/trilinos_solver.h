@@ -14,14 +14,14 @@
 #define __deal2__trilinos_solver_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <base/std_cxx1x/shared_ptr.h>
-#  include <lac/exceptions.h>
-#  include <lac/solver_control.h>
-#  include <lac/vector.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/solver_control.h>
+#  include <deal.II/lac/vector.h>
 
 #  include <Epetra_LinearProblem.h>
 #  include <AztecOO.h>

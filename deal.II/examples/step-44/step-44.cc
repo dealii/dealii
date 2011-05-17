@@ -10,43 +10,43 @@
 /*    to the file deal.II/doc/license.html for the  text  and       */
 /*    further information on this license.                          */
 
-#include <base/function.h>
-#include <base/parameter_handler.h>
-#include <base/point.h>
-#include <base/quadrature_lib.h>
-#include <base/symmetric_tensor.h>
-#include <base/tensor.h>
-#include <base/timer.h>
-#include <base/work_stream.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/work_stream.h>
 
-#include <dofs/dof_constraints.h>
-#include <dofs/dof_renumbering.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_constraints.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
-#include <grid/grid_in.h>
-#include <grid/tria.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
-#include <fe/fe_dgp_monomial.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <fe/fe_tools.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <fe/mapping_q_eulerian.h>
+#include <deal.II/fe/mapping_q_eulerian.h>
 
-#include <lac/block_sparse_matrix.h>
-#include <lac/block_vector.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/full_matrix.h>
-#include <lac/precondition.h>
-#include <lac/solver_cg.h>
-#include <lac/sparse_direct.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_direct.h>
 
-#include <numerics/data_out.h>
-#include <numerics/vectors.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vectors.h>
 
 #include <math.h>
 #include <iostream>

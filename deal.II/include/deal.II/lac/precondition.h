@@ -15,11 +15,11 @@
 
 // This file contains simple preconditioners.
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <base/template_constraints.h>
-#include <lac/tridiagonal_matrix.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/lac/tridiagonal_matrix.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 

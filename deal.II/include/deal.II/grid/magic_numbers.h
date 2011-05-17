@@ -13,7 +13,7 @@
 #ifndef __deal2__magic_numbers_h
 #define __deal2__magic_numbers_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
 

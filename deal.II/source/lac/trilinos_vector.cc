@@ -12,12 +12,12 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <lac/trilinos_sparse_matrix.h>
-#  include <lac/trilinos_block_vector.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_block_vector.h>
 #  include <Epetra_Import.h>
 #  include <Epetra_Vector.h>
 

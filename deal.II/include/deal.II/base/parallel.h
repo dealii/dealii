@@ -14,14 +14,14 @@
 #define __deal2__parallel_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/template_constraints.h>
-#include <base/synchronous_iterator.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/synchronous_iterator.h>
 
-#include <base/std_cxx1x/tuple.h>
-#include <base/std_cxx1x/bind.h>
-#include <base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
+#include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx1x/function.h>
 
 #include <cstddef>
 

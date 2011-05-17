@@ -13,7 +13,7 @@
 #ifndef __deal2__function_map_h
 #define __deal2__function_map_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN

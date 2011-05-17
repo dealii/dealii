@@ -20,8 +20,8 @@
 // everytime we use a point.
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 #include <vector>
 
 #include <cmath>

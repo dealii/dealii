@@ -14,11 +14,11 @@
 #define __deal2__tria_accessor_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/geometry_info.h>
-#include <grid/tria_iterator_base.h>
-#include <grid/tria_iterator_selector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/grid/tria_iterator_base.h>
+#include <deal.II/grid/tria_iterator_selector.h>
 
 
 namespace std

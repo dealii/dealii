@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/conditional_ostream.h>
+#include <deal.II/base/conditional_ostream.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -13,9 +13,9 @@
 #ifndef __deal2__fe_collection_h
 #define __deal2__fe_collection_h
 
-#include <base/config.h>
-#include <base/std_cxx1x/shared_ptr.h>
-#include <fe/fe.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
 

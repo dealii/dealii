@@ -13,16 +13,16 @@
 #ifndef __deal2__matrix_block_h
 #define __deal2__matrix_block_h
 
-#include <base/config.h>
-#include <base/named_data.h>
-#include <base/smartpointer.h>
-#include <base/std_cxx1x/shared_ptr.h>
-#include <base/memory_consumption.h>
-#include <base/mg_level_object.h>
-#include <lac/block_indices.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/named_data.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/lac/block_indices.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/full_matrix.h>
 
 
 DEAL_II_NAMESPACE_OPEN

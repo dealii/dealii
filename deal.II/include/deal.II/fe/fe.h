@@ -12,9 +12,9 @@
 #ifndef __deal2__fe_h
 #define __deal2__fe_h
 
-#include <base/config.h>
-#include <base/geometry_info.h>
-#include <fe/fe_base.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/fe/fe_base.h>
 
 
 DEAL_II_NAMESPACE_OPEN

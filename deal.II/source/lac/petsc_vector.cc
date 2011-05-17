@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
 

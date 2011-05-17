@@ -14,11 +14,11 @@
 #define __deal2__error_estimator_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/function.h>
-#include <base/multithread_info.h>
-#include <dofs/function_map.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/dofs/function_map.h>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN

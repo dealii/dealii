@@ -30,6 +30,24 @@ inconvenience this causes.
 
 <ol>
 
+<li> Changed: Traditionally, include directories were set through the
+<code>-I</code> flag in make files in such a way that one would do
+@code
+  #include <base/quadrature.h>
+@encode
+In preparation for future changes that will make possible installing
+header files in a directory under <code>/usr/include</code> it seemed
+useful to install everything under <code>/usr/include/deal.II</code>
+and include them as
+@code
+  #include <deal.II/base/quadrature.h>
+@encode
+This change has been made throughout the library and tutorial programs.
+However, the old way of using include directories will continue to work
+for at least one release for backward compatibility.
+<br>
+(WB, 2011/05/16)
+
 <li> Changed: The version of BOOST we ship with deal.II has been upgraded
 to 1.46.1. BOOST now also resides in the directory <code>contrib/boost-1.46.1</code>
 instead of an unversioned directory.

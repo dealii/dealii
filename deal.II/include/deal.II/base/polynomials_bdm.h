@@ -13,14 +13,14 @@
 #define __deal2__polynomials_BDM_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/tensor.h>
-#include <base/point.h>
-#include <base/polynomial.h>
-#include <base/polynomial_space.h>
-#include <base/table.h>
-#include <base/thread_management.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/thread_management.h>
 
 #include <vector>
 

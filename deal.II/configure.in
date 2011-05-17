@@ -848,8 +848,8 @@ AH_BOTTOM(
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
 
-#include <base/numbers.h>
-#include <base/types.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/types.h>
 
 /**
  * If the compiler supports the upcoming C++1x standard, allow us to refer

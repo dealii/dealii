@@ -18,10 +18,10 @@
  * used by Multigrid.
  */
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN

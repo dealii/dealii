@@ -10,11 +10,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <algorithms/newton.h>
+#include <deal.II/algorithms/newton.h>
 
-#include <base/parameter_handler.h>
-#include <base/logstream.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <iomanip>
 

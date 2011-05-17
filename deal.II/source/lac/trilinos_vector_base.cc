@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <lac/trilinos_vector_base.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/trilinos_vector_base.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 

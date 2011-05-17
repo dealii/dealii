@@ -13,8 +13,8 @@
 #ifndef __deal2__vector_slice_h
 #define __deal2__vector_slice_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

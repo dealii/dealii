@@ -11,21 +11,21 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/memory_consumption.h>
-#include <base/table.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/table.h>
 
-#include <grid/tria.h>
-#include <grid/tria_levels.h>
-#include <grid/tria_faces.h>
-#include <grid/tria_boundary.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <base/geometry_info.h>
-#include <grid/grid_tools.h>
-#include <grid/magic_numbers.h>
-#include <fe/mapping_q1.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_levels.h>
+#include <deal.II/grid/tria_faces.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/magic_numbers.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
 
 #include <algorithm>
 #include <numeric>
@@ -34,7 +34,7 @@
 #include <cmath>
 #include <functional>
 
-#include <base/std_cxx1x/array.h>
+#include <deal.II/base/std_cxx1x/array.h>
 
 DEAL_II_NAMESPACE_OPEN
 

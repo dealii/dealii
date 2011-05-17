@@ -14,24 +14,24 @@
 				 // files are probably well-known by
 				 // now and need no further
 				 // explanation.
-#include <base/quadrature_lib.h>
-#include <base/convergence_table.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/convergence_table.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
 				 // This is the only new one: in it,
 				 // we declare the <code>MappingQ</code> class
 				 // which we will use for polynomial
 				 // mappings of arbitrary order:
-#include <fe/mapping_q.h>
+#include <deal.II/fe/mapping_q.h>
 
 				 // And this again is C++:
 #include <iostream>

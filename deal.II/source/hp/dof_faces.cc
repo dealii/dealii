@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <hp/dof_faces.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/hp/dof_faces.h>
 
 DEAL_II_NAMESPACE_OPEN
 

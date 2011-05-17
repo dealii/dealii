@@ -12,10 +12,10 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/geometry_info.h>
-#include <base/quadrature.h>
-#include <base/qprojector.h>
-#include <base/memory_consumption.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/memory_consumption.h>
 
 #include <cmath>
 #include <cstdlib>

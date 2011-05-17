@@ -11,9 +11,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/vector_slice.h>
-#include <base/memory_consumption.h>
-#include <lac/block_sparsity_pattern.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/vector_view.h>
+#include <deal.II/lac/vector_view.h>
 
 DEAL_II_NAMESPACE_OPEN
 

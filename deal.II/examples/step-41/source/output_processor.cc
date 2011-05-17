@@ -1,7 +1,7 @@
 #include "../include/output_processor.templates.h"
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/vector.h>
 
 template <>
 void OutputProcessor<deal_II_dimension,Vector<double> >::dump_vector (const Vector<double> &rhs, 

@@ -14,12 +14,12 @@
 #define __deal2__dof_renumbering_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/point.h>
-#include <dofs/dof_handler.h>
-#include <hp/dof_handler.h>
-#include <multigrid/mg_dof_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 

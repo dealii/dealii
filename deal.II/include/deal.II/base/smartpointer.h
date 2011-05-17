@@ -13,8 +13,8 @@
 #define __deal2__smartpointer_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
 
 DEAL_II_NAMESPACE_OPEN
 

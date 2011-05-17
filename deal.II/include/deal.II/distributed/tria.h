@@ -14,13 +14,13 @@
 #define __deal2__distributed_tria_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <base/template_constraints.h>
-#include <grid/tria.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/grid/tria.h>
 
-#include <base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx1x/function.h>
 
 #include <vector>
 #include <list>

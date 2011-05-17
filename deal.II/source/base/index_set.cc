@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <base/index_set.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/index_set.h>
 #include <list>
 
 #ifdef DEAL_II_USE_TRILINOS

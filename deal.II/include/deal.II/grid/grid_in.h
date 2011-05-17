@@ -14,9 +14,9 @@
 #define __deal2__grid_in_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/smartpointer.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/smartpointer.h>
 #include <iostream>
 #include <vector>
 #include <string>

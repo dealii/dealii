@@ -13,10 +13,10 @@
 #define __deal2__mapping_q_h
 
 
-#include <base/config.h>
-#include <base/table.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
 
 DEAL_II_NAMESPACE_OPEN
 

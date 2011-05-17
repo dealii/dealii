@@ -15,16 +15,16 @@
 #define __deal2__sparse_matrix_templates_h
 
 
-#include <base/config.h>
-#include <base/template_constraints.h>
-#include <base/parallel.h>
-#include <base/thread_management.h>
-#include <base/multithread_info.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/vector_memory.h>
 
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
@@ -40,7 +40,7 @@
 #include <cmath>
 #include <vector>
 #include <numeric>
-#include <base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx1x/bind.h>
 
 
 

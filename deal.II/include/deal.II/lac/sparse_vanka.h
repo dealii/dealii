@@ -15,9 +15,9 @@
 
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <base/multithread_info.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/multithread_info.h>
 
 #include <vector>
 #include <map>

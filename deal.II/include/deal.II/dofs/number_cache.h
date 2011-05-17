@@ -13,8 +13,8 @@
 #ifndef __deal2__number_cache_h
 #define __deal2__number_cache_h
 
-#include <base/config.h>
-#include <base/index_set.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/index_set.h>
 
 #include <vector>
 

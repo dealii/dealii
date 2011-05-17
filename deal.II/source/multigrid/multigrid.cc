@@ -13,17 +13,17 @@
 
 
 
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
-#include <multigrid/mg_transfer.h>
-#include <multigrid/mg_transfer_block.h>
-#include <multigrid/mg_transfer_component.h>
-#include <multigrid/mg_smoother.h>
-#include <multigrid/mg_transfer.templates.h>
-#include <multigrid/mg_transfer_block.templates.h>
-#include <multigrid/mg_transfer_component.templates.h>
-#include <multigrid/multigrid.templates.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_block.h>
+#include <deal.II/multigrid/mg_transfer_component.h>
+#include <deal.II/multigrid/mg_smoother.h>
+#include <deal.II/multigrid/mg_transfer.templates.h>
+#include <deal.II/multigrid/mg_transfer_block.templates.h>
+#include <deal.II/multigrid/mg_transfer_component.templates.h>
+#include <deal.II/multigrid/multigrid.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

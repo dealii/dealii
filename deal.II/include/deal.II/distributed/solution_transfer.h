@@ -13,9 +13,9 @@
 #ifndef __deal2__distributed_solution_transfer_h
 #define __deal2__distributed_solution_transfer_h
 
-#include <base/config.h>
-#include <distributed/tria.h>
-#include <dofs/dof_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <vector>
 

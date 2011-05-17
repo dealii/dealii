@@ -9,7 +9,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/sparse_mic.templates.h>
+#include <deal.II/lac/sparse_mic.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

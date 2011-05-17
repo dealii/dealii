@@ -14,8 +14,8 @@
 #define __deal2__path_search_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 #include <string>
 #include <fstream>
@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  * e.g. meshes. Then, you use the find() method to obtain a full path
  * name and you can open the file.
  * @code
- * #include <base/path_search.h>
+ * #include <deal.II/base/path_search.h>
  *
  DEAL_II_NAMESPACE_OPEN
  * PathSearch search("MESH");

@@ -14,14 +14,14 @@
 #define __deal2__work_stream_h
 
 
-#include <base/config.h>
-#include <base/multithread_info.h>
-#include <base/template_constraints.h>
-#include <base/std_cxx1x/function.h>
-#include <base/std_cxx1x/bind.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx1x/bind.h>
 
 #if DEAL_II_USE_MT == 1
-#  include <base/thread_management.h>
+#  include <deal.II/base/thread_management.h>
 #  include <tbb/pipeline.h>
 #endif
 

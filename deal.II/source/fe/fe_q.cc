@@ -11,13 +11,13 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/quadrature.h>
-#include <base/qprojector.h>
-#include <base/template_constraints.h>
-#include <fe/fe_q.h>
-#include <fe/fe_nothing.h>
-#include <fe/fe_tools.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <vector>
 #include <iostream>

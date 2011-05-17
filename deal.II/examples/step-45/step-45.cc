@@ -17,29 +17,29 @@
 				 // one critical for the current program is
 				 // the one that contains the ConstraintMatrix
 				 // in the <code>lac/</code> directory:
-#include <base/function.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <lac/constraint_matrix.h>
-#include <lac/precondition.h>
-#include <lac/solver_cg.h>
-#include <lac/solver_control.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 
-#include <grid/grid_generator.h>
-#include <grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <numerics/data_out.h>
-#include <numerics/vectors.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vectors.h>
 
 #include <fstream>
 

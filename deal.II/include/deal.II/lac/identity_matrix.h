@@ -14,8 +14,8 @@
 #define __deal2__identity_matrix_h
 
 
-#include <base/config.h>
-#include <lac/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -14,9 +14,9 @@
 #define __deal2__block_sparse_matrix_ez_templates_h
 
 
-#include <base/config.h>
-#include <base/memory_consumption.h>
-#include <lac/block_sparse_matrix_ez.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/block_sparse_matrix_ez.h>
 
 DEAL_II_NAMESPACE_OPEN
 

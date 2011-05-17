@@ -11,11 +11,11 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/tensor.h>
-#include <base/point.h>
-#include <base/function_lib.h>
-#include <base/function_bessel.h>
-#include <lac/vector.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/base/function_bessel.h>
+#include <deal.II/lac/vector.h>
 
 #include <cmath>
 

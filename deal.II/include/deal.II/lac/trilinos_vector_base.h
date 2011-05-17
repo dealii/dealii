@@ -14,15 +14,15 @@
 #define __deal2__trilinos_vector_base_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#include <base/utilities.h>
-#  include <base/std_cxx1x/shared_ptr.h>
-#  include <base/subscriptor.h>
-#  include <lac/exceptions.h>
-#  include <lac/vector.h>
+#include <deal.II/base/utilities.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/vector.h>
 
 #  include <vector>
 #  include <utility>

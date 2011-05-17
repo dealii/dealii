@@ -14,10 +14,10 @@
 #define __deal2__hp_dof_faces_h
 
 
-#include <base/config.h>
-#include <dofs/dof_levels.h>
-#include <hp/dof_objects.h>
-#include <hp/fe_collection.h>
+#include <deal.II/base/config.h>
+#include <deal.II/dofs/dof_levels.h>
+#include <deal.II/hp/dof_objects.h>
+#include <deal.II/hp/fe_collection.h>
 
 #include <vector>
 

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/geometry_info.h>
-#include <base/tensor.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/tensor.h>
 
 DEAL_II_NAMESPACE_OPEN
 

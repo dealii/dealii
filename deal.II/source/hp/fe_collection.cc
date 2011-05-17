@@ -11,8 +11,8 @@
 //
 //----------------------------  fe_collection.cc  ---------------------------
 
-#include <base/memory_consumption.h>
-#include <hp/fe_collection.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/hp/fe_collection.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -16,30 +16,30 @@
 				 // The following header files are unchanged 
 				 // from step-7 and have been discussed before:
 
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
 
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vectors.h>
 
 #include <fstream>
 
@@ -48,7 +48,7 @@
 				 // ParameterHandler class that we
 				 // will use to read our parameters
 				 // from a configuration file:
-#include <base/parameter_handler.h>
+#include <deal.II/base/parameter_handler.h>
 
 				 // For solving the linear system,
 				 // we'll use the sparse
@@ -63,7 +63,7 @@
 				 // by giving the <code>
 				 // --with-umfpack</code> switch when
 				 // configuring the library:
-#include <lac/sparse_direct.h>
+#include <deal.II/lac/sparse_direct.h>
 
 				 // The FESystem class allows us to
 				 // stack several FE-objects to one
@@ -71,14 +71,14 @@
 				 // element field. The necessary
 				 // declarations for this class are
 				 // provided in this header file:
-#include <fe/fe_system.h>
+#include <deal.II/fe/fe_system.h>
 
 				 // Finally, include the header file
 				 // that declares the Timer class that
 				 // we will use to determine how much
 				 // time each of the operations of our
 				 // program takes:
-#include <base/timer.h>
+#include <deal.II/base/timer.h>
 
 				 // As the last step at the beginning
 				 // of this program, we make

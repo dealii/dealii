@@ -14,9 +14,9 @@
 #define __deal2__mg_dof_accessor_h
 
 
-#include <base/config.h>
-#include <dofs/dof_accessor.h>
-#include <multigrid/mg_dof_iterator_selector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/multigrid/mg_dof_iterator_selector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

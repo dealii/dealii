@@ -15,53 +15,53 @@
 				 // which in turn will include the
 				 // necessary files for
 				 // SparsityPattern and Vector classes.
-#include <lac/sparse_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/precondition_block.h>
-#include <lac/block_vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/precondition_block.h>
+#include <deal.II/lac/block_vector.h>
 
 				 // Include files for setting up the
 				 // mesh
-#include <grid/grid_generator.h>
-#include <grid/grid_refinement.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
 
 				 // Include files for FiniteElement
 				 // classes and DoFHandler.
-#include <fe/fe_q.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_dgq.h>
-#include <dofs/dof_tools.h>
-#include <multigrid/mg_dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
 
 				 // The include files for using the
 				 // MeshWorker framework
-#include <numerics/mesh_worker.h>
-#include <numerics/mesh_worker_info.h>
-#include <numerics/mesh_worker_assembler.h>
-#include <numerics/mesh_worker_loop.h>
+#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/numerics/mesh_worker_assembler.h>
+#include <deal.II/numerics/mesh_worker_loop.h>
 
 				 // The include file for local
 				 // integrators associated with the
 				 // Laplacian
-#include <integrators/laplace.h>
+#include <deal.II/integrators/laplace.h>
 
 				 // Support for multigrid methods
-#include <multigrid/mg_tools.h>
-#include <multigrid/multigrid.h>
-#include <multigrid/mg_matrix.h>
-#include <multigrid/mg_transfer.h>
-#include <multigrid/mg_coarse.h>
-#include <multigrid/mg_smoother.h>
+#include <deal.II/multigrid/mg_tools.h>
+#include <deal.II/multigrid/multigrid.h>
+#include <deal.II/multigrid/mg_matrix.h>
+#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_coarse.h>
+#include <deal.II/multigrid/mg_smoother.h>
 
 				 // Finally, we take our exact
 				 // solution from the library as well
 				 // as quadrature and additional tools.
-#include <base/function_lib.h>
-#include <base/quadrature_lib.h>
-#include <numerics/vectors.h>
-#include <numerics/data_out.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <iostream>
 #include <fstream>

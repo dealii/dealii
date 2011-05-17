@@ -12,12 +12,12 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/trilinos_block_sparse_matrix.h>
+#include <deal.II/lac/trilinos_block_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <lac/block_sparse_matrix.h>
-#  include <lac/block_sparsity_pattern.h>
+#  include <deal.II/lac/block_sparse_matrix.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -14,8 +14,8 @@
 #define __deal2__subscriptor_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 #include <typeinfo>
 #include <map>

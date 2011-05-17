@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/polynomial_space.h>
-#include <base/exceptions.h>
-#include <base/table.h>
+#include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/table.h>
 
 DEAL_II_NAMESPACE_OPEN
 

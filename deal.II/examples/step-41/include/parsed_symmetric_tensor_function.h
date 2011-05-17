@@ -14,14 +14,14 @@
 #ifndef PARSED_SYMMETRIC_TENSOR_FUNCTION_H
 #define PARSED_SYMMETRIC_TENSOR_FUNCTION_H
 
-#include <base/parameter_handler.h>
-#include <base/function.h>
-#include <base/function_parser.h>
-#include <base/point.h>
-#include <base/tensor.h>
-#include <base/symmetric_tensor.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 using namespace dealii;
 

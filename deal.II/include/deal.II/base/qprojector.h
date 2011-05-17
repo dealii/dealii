@@ -14,8 +14,8 @@
 #define __deal2__qprojector_h
 
 
-#include <base/quadrature.h>
-#include <base/geometry_info.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/geometry_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup Quadrature */

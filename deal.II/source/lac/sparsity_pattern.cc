@@ -11,13 +11,13 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/vector_slice.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparsity_tools.h>
-#include <lac/full_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 
 #include <iostream>
 #include <iomanip>

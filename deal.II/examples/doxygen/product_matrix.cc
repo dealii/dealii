@@ -12,10 +12,10 @@
 
 // See documentation of ProductMatrix for documentation of this example
 
-#include <base/logstream.h>
-#include <lac/matrix_lib.h>
-#include <lac/full_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/matrix_lib.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 using namespace dealii;
 

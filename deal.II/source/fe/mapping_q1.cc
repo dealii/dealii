@@ -11,16 +11,16 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/tensor.h>
-#include <base/quadrature.h>
-#include <base/qprojector.h>
-#include <base/memory_consumption.h>
-#include <lac/full_matrix.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <cmath>
 #include <algorithm>

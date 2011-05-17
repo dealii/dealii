@@ -12,25 +12,25 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/quadrature_lib.h>
-#include <base/thread_management.h>
-#include <base/multithread_info.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_tools.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <hp/fe_values.h>
-#include <fe/mapping_q1.h>
-#include <hp/q_collection.h>
-#include <hp/fe_collection.h>
-#include <hp/mapping_collection.h>
-#include <numerics/derivative_approximation.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/numerics/derivative_approximation.h>
 
 #include <cmath>
 

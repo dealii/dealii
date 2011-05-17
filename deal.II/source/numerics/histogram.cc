@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <lac/vector.h>
-#include <numerics/histogram.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/numerics/histogram.h>
 #include <algorithm>
 #include <cmath>
 

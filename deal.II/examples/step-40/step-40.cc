@@ -19,30 +19,30 @@
 				 // previous programs. In particular, all of
 				 // the following should already be familiar
 				 // friends:
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/solver_cg.h>
-#include <lac/constraint_matrix.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/petsc_solver.h>
-#include <lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_precondition.h>
 
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
-#include <fe/fe_q.h>
-#include <numerics/vectors.h>
-#include <numerics/data_out.h>
-#include <numerics/error_estimator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/error_estimator.h>
 
 				 // The following, however, will be new or be
 				 // used in new roles. Let's walk through
@@ -53,7 +53,7 @@
 				 // current MPI universe, or the number within
 				 // this universe the processor this job runs
 				 // on is:
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 				 // The next one provides a class,
 				 // ConditionOStream that allows us to write
 				 // code that would output things to a stream
@@ -69,7 +69,7 @@
 				 // the same every time -- and consequently it
 				 // should be simple enough to put it into the
 				 // statements that generate output itself.
-#include <base/conditional_ostream.h>
+#include <deal.II/base/conditional_ostream.h>
 				 // After these preliminaries, here is where
 				 // it becomes more interesting. As mentioned
 				 // in the @ref distributed module, one of the
@@ -102,13 +102,13 @@
 				 // $[0,N)$. IndexSet is a class that stores
 				 // subsets of this set in an efficient
 				 // format:
-#include <base/index_set.h>
+#include <deal.II/base/index_set.h>
 				 // The next header file is necessary for a
 				 // single function,
 				 // SparsityTools::distribute_sparsity_pattern. The
 				 // role of this function will be explained
 				 // below.
-#include <lac/sparsity_tools.h>
+#include <deal.II/lac/sparsity_tools.h>
 				 // The final two, new header files provide
 				 // the class
 				 // parallel::distributed::Triangulation that
@@ -119,8 +119,8 @@
 				 // parallel::distributed::GridRefinement that
 				 // offers functions that can adaptively
 				 // refine such distributed meshes:
-#include <distributed/tria.h>
-#include <distributed/grid_refinement.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_refinement.h>
 
 #include <fstream>
 #include <iostream>

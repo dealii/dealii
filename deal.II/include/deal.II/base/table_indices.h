@@ -14,8 +14,8 @@
 #define __deal2__table_indices_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 // we only need output streams, but older compilers did not provide
 // them in a separate include file

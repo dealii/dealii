@@ -14,14 +14,14 @@
 #define __deal2__precondition_block_templates_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/logstream.h>
-#include <base/memory_consumption.h>
-#include <lac/householder.h>
-#include <lac/precondition_block.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/householder.h>
+#include <deal.II/lac/precondition_block.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 

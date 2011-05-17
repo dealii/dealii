@@ -13,12 +13,12 @@
 #ifndef __deal2__mesh_worker_assembler_h
 #define __deal2__mesh_worker_assembler_h
 
-#include <base/named_data.h>
-#include <base/smartpointer.h>
-#include <base/mg_level_object.h>
-#include <lac/block_vector.h>
-#include <numerics/mesh_worker_info.h>
-#include <multigrid/mg_constrained_dofs.h>
+#include <deal.II/base/named_data.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
 
 
 DEAL_II_NAMESPACE_OPEN

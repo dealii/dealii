@@ -13,13 +13,13 @@
 #ifndef __deal2__mesh_worker_info_h
 #define __deal2__mesh_worker_info_h
 
-#include <base/config.h>
-#include <base/quadrature_lib.h>
-#include <base/std_cxx1x/shared_ptr.h>
-#include <dofs/block_info.h>
-#include <fe/fe_values.h>
-#include <numerics/mesh_worker.h>
-#include <numerics/mesh_worker_vector_selector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/dofs/block_info.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/numerics/mesh_worker_vector_selector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

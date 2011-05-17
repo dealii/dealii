@@ -16,7 +16,7 @@
 // namespace LocalIntegrators. There is no necessity to include it
 // anywhere in a C++ code. Only doxygen will make use of it.
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
 

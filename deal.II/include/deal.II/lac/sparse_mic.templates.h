@@ -12,9 +12,9 @@
 #define __deal2__sparse_mic_templates_h
 
 
-#include <base/memory_consumption.h>
-#include <lac/sparse_mic.h>
-#include <lac/vector.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/sparse_mic.h>
+#include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -13,13 +13,13 @@
 #ifndef __deal2__mapping_collection_h
 #define __deal2__mapping_collection_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe.h>
 
 #include <vector>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 

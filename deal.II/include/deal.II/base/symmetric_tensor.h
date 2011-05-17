@@ -14,8 +14,8 @@
 #define __deal2__symmetric_tensor_h
 
 
-#include <base/tensor.h>
-#include <base/table_indices.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/table_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
 

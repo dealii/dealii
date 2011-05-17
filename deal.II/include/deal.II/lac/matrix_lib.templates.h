@@ -13,9 +13,9 @@
 #ifndef __deal2__matrix_lib_templates_h
 #define __deal2__matrix_lib_templates_h
 
-#include <lac/matrix_lib.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
+#include <deal.II/lac/matrix_lib.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

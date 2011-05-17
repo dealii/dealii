@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/timer.h>
-#include <base/exceptions.h>
-#include <base/utilities.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/utilities.h>
 #include <sstream>
 #include <iostream>
 #include <iomanip>

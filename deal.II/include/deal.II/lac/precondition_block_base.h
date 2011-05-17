@@ -14,13 +14,13 @@
 #define __deal2__precondition_block_base_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <base/memory_consumption.h>
-#include <lac/householder.h>
-#include <lac/lapack_full_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/householder.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <vector>
 

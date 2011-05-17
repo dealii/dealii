@@ -14,8 +14,8 @@
 #define __deal2__sparse_matrix_ez_templates_h
 
 
-#include <lac/sparse_matrix_ez.h>
-#include <lac/vector.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/vector.h>
 
 #include <iostream>
 #include <iomanip>

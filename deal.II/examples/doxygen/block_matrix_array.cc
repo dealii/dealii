@@ -12,14 +12,14 @@
 
 // See documentation of BlockMatrixArray for documentation of this example
 
-#include <base/logstream.h>
-#include <lac/block_matrix_array.h>
-#include <lac/full_matrix.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/precondition.h>
-#include <lac/solver_cg.h>
-#include <lac/solver_gmres.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_matrix_array.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
 
 #include <iostream>
 #include <fstream>

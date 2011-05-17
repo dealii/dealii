@@ -14,13 +14,13 @@
 #define __deal2__tensor_function_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <base/function.h>
-#include <base/point.h>
-#include <base/function_time.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/function_time.h>
 
 #include <vector>
 

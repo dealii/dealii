@@ -14,9 +14,9 @@
 
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/geometry_info.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/geometry_info.h>
 
 #include <vector>
 
@@ -44,8 +44,8 @@ namespace PETScWrappers
 }
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 #include <vector>
 #include <string>
 

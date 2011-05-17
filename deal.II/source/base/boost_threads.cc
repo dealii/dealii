@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #if (DEAL_II_USE_MT == 1) && !defined(DEAL_II_CAN_USE_CXX1X)
 

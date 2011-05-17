@@ -14,7 +14,7 @@
 #define __deal2__numbers_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 #include <complex>
 
 DEAL_II_NAMESPACE_OPEN

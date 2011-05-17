@@ -1,7 +1,7 @@
-#include <base/geometry_info.h>
-#include <base/quadrature_lib.h>
-#include <base/polynomial.h>
-#include <base/polynomials_nedelec.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomials_nedelec.h>
 #include <iostream>
 #include <iomanip>
 

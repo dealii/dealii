@@ -13,7 +13,7 @@
 #define __deal2__fe_poly_h
 
 
-#include <fe/fe.h>
+#include <deal.II/fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
 

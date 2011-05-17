@@ -13,9 +13,9 @@
 #ifndef __deal2__tria_faces_h
 #define __deal2__tria_faces_h
 
-#include <base/config.h>
-#include <grid/tria_object.h>
-#include <grid/tria_objects.h>
+#include <deal.II/base/config.h>
+#include <deal.II/grid/tria_object.h>
+#include <deal.II/grid/tria_objects.h>
 
 DEAL_II_NAMESPACE_OPEN
 

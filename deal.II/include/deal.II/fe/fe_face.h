@@ -12,9 +12,9 @@
 #ifndef __deal2__fe_face_h
 #define __deal2__fe_face_h
 
-#include <base/config.h>
-#include <base/tensor_product_polynomials.h>
-#include <fe/fe_poly_face.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/fe/fe_poly_face.h>
 
 DEAL_II_NAMESPACE_OPEN
 

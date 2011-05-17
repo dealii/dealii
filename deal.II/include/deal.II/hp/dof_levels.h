@@ -14,8 +14,8 @@
 #define __deal2__hp_dof_levels_h
 
 
-#include <base/config.h>
-#include <hp/dof_objects.h>
+#include <deal.II/base/config.h>
+#include <deal.II/hp/dof_objects.h>
 
 #include <vector>
 

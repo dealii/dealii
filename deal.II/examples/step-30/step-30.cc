@@ -15,27 +15,27 @@
 				 // been covered in previous examples
 				 // and will thus not be further
 				 // commented on.
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <fe/fe_values.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <numerics/data_out.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_dgq.h>
-#include <lac/solver_richardson.h>
-#include <lac/precondition_block.h>
-#include <numerics/derivative_approximation.h>
-#include <base/timer.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/precondition_block.h>
+#include <deal.II/numerics/derivative_approximation.h>
+#include <deal.II/base/timer.h>
 
 				 // And this again is C++:
 #include <iostream>

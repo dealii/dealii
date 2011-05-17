@@ -13,15 +13,15 @@
 #ifndef __deal2__hp_fe_values_h
 #define __deal2__hp_fe_values_h
 
-#include <base/config.h>
-#include <fe/fe.h>
-#include <hp/fe_collection.h>
-#include <hp/q_collection.h>
-#include <hp/mapping_collection.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/config.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <map>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 

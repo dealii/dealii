@@ -12,43 +12,43 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/function.h>
-#include <base/quadrature.h>
-#include <base/thread_management.h>
-#include <base/work_stream.h>
-#include <base/multithread_info.h>
-#include <base/geometry_info.h>
-#include <base/quadrature.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
-#include <grid/tria_iterator.h>
-#include <grid/geometry_info.h>
-#include <hp/fe_values.h>
-#include <hp/mapping_collection.h>
-#include <numerics/matrices.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/work_stream.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/geometry_info.h>
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_PETSC
-#  include <lac/petsc_parallel_sparse_matrix.h>
-#  include <lac/petsc_sparse_matrix.h>
-#  include <lac/petsc_parallel_vector.h>
-#  include <lac/petsc_vector.h>
-#  include <lac/petsc_parallel_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-#  include <lac/trilinos_sparse_matrix.h>
-#  include <lac/trilinos_vector.h>
-#  include <lac/trilinos_block_sparse_matrix.h>
-#  include <lac/trilinos_block_vector.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_block_vector.h>
 #endif
 
 #include <algorithm>

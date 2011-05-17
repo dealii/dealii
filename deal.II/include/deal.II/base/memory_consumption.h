@@ -14,8 +14,8 @@
 #define __deal2__memory_consumption_h
 
 
-#include <base/config.h>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #include <string>
 #include <complex>

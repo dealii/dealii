@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/fe_face.h>
-#include <fe/fe_poly_face.templates.h>
+#include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_poly_face.templates.h>
 #include <sstream>
 
 DEAL_II_NAMESPACE_OPEN

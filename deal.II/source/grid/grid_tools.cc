@@ -13,23 +13,23 @@
 
 
 
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary.h>
-#include <grid/grid_tools.h>
-#include <grid/intergrid_map.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparsity_tools.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_dgq.h>
-#include <fe/mapping_q1.h>
-#include <hp/mapping_collection.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/intergrid_map.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <cmath>
 #include <numeric>

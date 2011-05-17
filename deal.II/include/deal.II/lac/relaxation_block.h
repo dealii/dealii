@@ -13,11 +13,11 @@
 #ifndef __deal2__relaxation_block_h
 #define __deal2__relaxation_block_h
 
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
-#include <lac/precondition_block_base.h>
-#include <lac/block_list.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/precondition_block_base.h>
+#include <deal.II/lac/block_list.h>
 
 #include <vector>
 #include <set>

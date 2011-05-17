@@ -11,42 +11,42 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/quadrature_lib.h>
-#include <base/qprojector.h>
-#include <base/thread_management.h>
-#include <base/utilities.h>
-#include <lac/full_matrix.h>
-#include <lac/householder.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
-#include <lac/constraint_matrix.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <fe/fe_tools.h>
-#include <fe/fe.h>
-#include <fe/fe_q.h>
-#include <fe/fe_q_hierarchical.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_dgp_monomial.h>
-#include <fe/fe_dgp_nonparametric.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_system.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_cartesian.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <hp/dof_handler.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/householder.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_dgp_nonparametric.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/hp/dof_handler.h>
 
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
-#include <base/index_set.h>
+#include <deal.II/base/index_set.h>
 
 #include <iostream>
 

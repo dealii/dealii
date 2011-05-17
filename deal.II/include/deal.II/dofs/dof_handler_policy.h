@@ -15,9 +15,9 @@
 
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/template_constraints.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <vector>
 #include <map>

@@ -14,10 +14,10 @@
 #define __deal2__data_out_stack_h
 
 
-#include <base/config.h>
-#include <base/data_out_base.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
 
 #include <string>
 #include <vector>

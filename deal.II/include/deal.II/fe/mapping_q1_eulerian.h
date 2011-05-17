@@ -12,9 +12,9 @@
 #ifndef __deal2__mapping_q1_eulerian_h
 #define __deal2__mapping_q1_eulerian_h
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/fe/mapping_q1.h>
 
 DEAL_II_NAMESPACE_OPEN
 

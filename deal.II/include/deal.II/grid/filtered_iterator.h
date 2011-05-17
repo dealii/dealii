@@ -14,9 +14,9 @@
 #define __deal2__filtered_iterator_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <grid/tria_iterator_base.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/grid/tria_iterator_base.h>
 
 DEAL_II_NAMESPACE_OPEN
 

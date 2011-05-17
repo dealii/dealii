@@ -14,10 +14,10 @@
 #ifndef __deal2__gradient_estimator_h
 #define __deal2__gradient_estimator_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <fe/fe_update_flags.h>
-#include <fe/mapping.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN

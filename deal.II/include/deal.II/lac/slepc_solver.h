@@ -16,15 +16,15 @@
 #define __deal2__slepc_solver_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_SLEPC
 
-#  include <base/std_cxx1x/shared_ptr.h>
-#  include <lac/exceptions.h>
-#  include <lac/solver_control.h>
-#  include <lac/petsc_matrix_base.h>
-#  include <lac/slepc_spectral_transformation.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/solver_control.h>
+#  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/slepc_spectral_transformation.h>
 
 #  include <petscksp.h>
 #  include <slepceps.h>

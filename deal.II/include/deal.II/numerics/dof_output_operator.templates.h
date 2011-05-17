@@ -10,8 +10,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <numerics/dof_output_operator.h>
-#include <numerics/data_out.h>
+#include <deal.II/numerics/dof_output_operator.h>
+#include <deal.II/numerics/data_out.h>
 
 DEAL_II_NAMESPACE_OPEN
 

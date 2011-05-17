@@ -19,35 +19,35 @@
 				 // files are as used there, or at least as
 				 // used already in previous tutorial
 				 // programs:
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/function_parser.h>
-#include <base/parameter_handler.h>
-#include <base/utilities.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/lac/full_matrix.h>
 
 				 // PETSc appears here because SLEPc
 				 // depends on this library:
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/petsc_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 
 				 // And then we need to actually
 				 // import the interfaces for solvers
 				 // that SLEPc provides:
-#include <lac/slepc_solver.h>
+#include <deal.II/lac/slepc_solver.h>
 
 				 // We also need some standard C++:
 #include <fstream>

@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/polynomials_adini.h>
+#include <deal.II/base/polynomials_adini.h>
 
 #define ENTER_COEFFICIENTS(koefs,z,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)	\
   koefs(0, z)= a0; koefs(1, z)=a1; koefs(2, z)=a2; koefs(3, z)=a3; koefs( 4, z)=a4 ; koefs( 5, z)=a5 ; \

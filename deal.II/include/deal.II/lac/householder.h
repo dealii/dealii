@@ -15,9 +15,9 @@
 
 
 #include <cmath>
-#include <base/config.h>
-#include <lac/full_matrix.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <vector>
 

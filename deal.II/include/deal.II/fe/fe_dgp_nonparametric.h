@@ -12,10 +12,10 @@
 #ifndef __deal2__fe_dgp_nonparametric_h
 #define __deal2__fe_dgp_nonparametric_h
 
-#include <base/config.h>
-#include <base/polynomial.h>
-#include <base/polynomial_space.h>
-#include <fe/fe.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomial_space.h>
+#include <deal.II/fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -13,12 +13,12 @@
 #ifndef __deal2__petsc_parallel_sparse_matrix_h
 #define __deal2__petsc_parallel_sparse_matrix_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <lac/exceptions.h>
-#  include <lac/petsc_matrix_base.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_matrix_base.h>
 #  include <vector>
 
 DEAL_II_NAMESPACE_OPEN

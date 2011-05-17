@@ -1,21 +1,21 @@
 #include "../include/vector_space.h"
 #include "../include/utilities.h"
-#include <base/logstream.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_in.h>
-#include <grid/grid_out.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <fe/mapping_cartesian.h>
-#include <fe/mapping_q.h>
-#include <fe/fe.h>
-#include <base/utilities.h>
-#include <dofs/dof_renumbering.h>
-#include <dofs/dof_tools.h>
-#include <numerics/solution_transfer.h>
-#include <numerics/vectors.h>
-#include <grid/grid_tools.h>
-#include <grid/grid_refinement.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/numerics/solution_transfer.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_refinement.h>
 
 using namespace std;
 

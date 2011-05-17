@@ -14,8 +14,8 @@
 #define __deal2__data_out_faces_h
 
 
-#include <base/config.h>
-#include <numerics/data_out.h>
+#include <deal.II/base/config.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <string>
 #include <vector>

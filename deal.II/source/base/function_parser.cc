@@ -11,10 +11,10 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/function_parser.h>
-#include <base/utilities.h>
-#include <base/point.h>
-#include <lac/vector.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/point.h>
+#include <deal.II/lac/vector.h>
 
 #ifndef DEAL_II_DISABLE_PARSER
 #  include <functionparser/fparser.h>

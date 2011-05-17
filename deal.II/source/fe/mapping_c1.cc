@@ -12,10 +12,10 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary.h>
-#include <fe/mapping_c1.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/fe/mapping_c1.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN

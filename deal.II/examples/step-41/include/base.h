@@ -1,16 +1,16 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <base/function.h>
-#include <base/logstream.h>
-#include <base/utilities.h>
-#include <base/parsed_function.h>
-#include <base/timer.h>
-#include <grid/grid_tools.h>
-#include <grid/grid_generator.h>
-#include <numerics/data_out.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/parsed_function.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/numerics/data_out.h>
 
-#include <grid/filtered_iterator.h>
+#include <deal.II/grid/filtered_iterator.h>
 
 #include "vector_space.h"
 #include "domain.h"

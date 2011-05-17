@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/parallel.h>
+#include <deal.II/base/parallel.h>
 
 
 DEAL_II_NAMESPACE_OPEN

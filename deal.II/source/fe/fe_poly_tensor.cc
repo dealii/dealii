@@ -11,14 +11,14 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/qprojector.h>
-#include <base/polynomials_bdm.h>
-#include <base/polynomials_raviart_thomas.h>
-#include <base/polynomials_abf.h>
-#include <base/polynomials_nedelec.h>
-#include <fe/fe_poly_tensor.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_cartesian.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_abf.h>
+#include <deal.II/base/polynomials_nedelec.h>
+#include <deal.II/fe/fe_poly_tensor.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -14,18 +14,18 @@
 #define __deal2__solver_selector_h
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <lac/solver.h>
-#include <lac/vector.h>
-#include <lac/vector_memory.h>
-#include <lac/solver_control.h>
-#include <lac/solver_cg.h>
-#include <lac/solver_bicgstab.h>
-#include <lac/solver_gmres.h>
-#include <lac/vector_memory.h>
-#include <lac/solver_richardson.h>
-#include <lac/precondition.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/precondition.h>
 
 DEAL_II_NAMESPACE_OPEN
 

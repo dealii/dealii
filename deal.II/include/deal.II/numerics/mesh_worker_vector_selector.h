@@ -13,10 +13,10 @@
 #ifndef __deal2__mesh_worker_vector_selector_h
 #define __deal2__mesh_worker_vector_selector_h
 
-#include <base/named_data.h>
-#include <base/tensor.h>
-#include <base/smartpointer.h>
-#include <base/mg_level_object.h>
+#include <deal.II/base/named_data.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/mg_level_object.h>
 
 DEAL_II_NAMESPACE_OPEN
 

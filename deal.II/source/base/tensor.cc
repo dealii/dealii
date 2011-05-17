@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/tensor.h>
+#include <deal.II/base/tensor.h>
 #include <cmath>
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

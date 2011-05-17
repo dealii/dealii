@@ -13,9 +13,9 @@
 #ifndef __deal2__operator_h
 #define __deal2__operator_h
 
-#include <base/config.h>
-#include <base/named_data.h>
-#include <base/event.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/named_data.h>
+#include <deal.II/base/event.h>
 
 #include <fstream>
 

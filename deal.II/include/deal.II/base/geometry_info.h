@@ -14,9 +14,9 @@
 #define __deal2__geometry_info_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/point.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
 
 DEAL_II_NAMESPACE_OPEN
 

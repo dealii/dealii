@@ -14,11 +14,11 @@
 #define __deal2__grid_tools_H
 
 
-#include <base/config.h>
-#include <fe/mapping.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
+#include <deal.II/base/config.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 #include <list>
 

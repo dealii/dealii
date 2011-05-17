@@ -15,14 +15,14 @@
 #define __deal2__constraint_matrix_templates_h
 
 
-#include <lac/constraint_matrix.h>
+#include <deal.II/lac/constraint_matrix.h>
 
-#include <base/table.h>
-#include <lac/full_matrix.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/block_sparse_matrix.h>
+#include <deal.II/base/table.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 
 #include <iomanip>
 

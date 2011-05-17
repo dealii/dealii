@@ -13,8 +13,8 @@
 #define __deal2__fe_poly_tensor_h
 
 
-#include <lac/full_matrix.h>
-#include <fe/fe.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
 

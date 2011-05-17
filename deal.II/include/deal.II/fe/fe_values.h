@@ -13,25 +13,25 @@
 #define __deal2__fe_values_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/point.h>
-#include <base/tensor.h>
-#include <base/symmetric_tensor.h>
-#include <base/vector_slice.h>
-#include <base/quadrature.h>
-#include <base/table.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <hp/dof_handler.h>
-#include <fe/fe.h>
-#include <fe/fe_update_flags.h>
-#include <fe/mapping.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/table.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <algorithm>
 #include <memory>

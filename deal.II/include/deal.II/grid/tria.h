@@ -14,12 +14,12 @@
 #define __deal2__tria_h
 
 
-#include <base/config.h>
-#include <base/point.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <base/geometry_info.h>
-#include <grid/tria_iterator_selector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/grid/tria_iterator_selector.h>
 
 #include <vector>
 #include <list>

@@ -14,7 +14,7 @@
 #define __deal2__job_identifier_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN

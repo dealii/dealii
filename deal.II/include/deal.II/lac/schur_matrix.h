@@ -13,12 +13,12 @@
 #ifndef __deal2__schur_matrix_h
 #define __deal2__schur_matrix_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <base/logstream.h>
-#include <lac/vector_memory.h>
-#include <lac/block_vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/block_vector.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

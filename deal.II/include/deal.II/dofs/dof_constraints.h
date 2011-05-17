@@ -13,4 +13,4 @@
 
 // this is just referring to the new location and name of the file for
 // backwards compatibility.
-#include <lac/constraint_matrix.h>
+#include <deal.II/lac/constraint_matrix.h>

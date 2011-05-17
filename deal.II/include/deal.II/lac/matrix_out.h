@@ -13,10 +13,10 @@
 #ifndef __deal2__matrix_out_h
 #define __deal2__matrix_out_h
 
-#include <base/config.h>
-#include <base/data_out_base.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 

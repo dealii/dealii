@@ -17,10 +17,10 @@
 /*----------------------------   time-dependent.h     ---------------------------*/
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
 
 #include <vector>
 #include <utility>

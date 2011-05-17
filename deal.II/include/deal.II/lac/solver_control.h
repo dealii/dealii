@@ -14,8 +14,8 @@
 #define __deal2__solver_control_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <vector>
 

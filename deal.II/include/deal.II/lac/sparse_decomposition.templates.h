@@ -13,9 +13,9 @@
 #define __deal2__sparse_decomposition_templates_h
 
 
-#include <base/memory_consumption.h>
-#include <base/template_constraints.h>
-#include <lac/sparse_decomposition.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/lac/sparse_decomposition.h>
 #include <algorithm>
 #include <cstring>
 

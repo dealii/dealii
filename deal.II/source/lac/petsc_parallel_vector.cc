@@ -12,11 +12,11 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
 #  include <cmath>
 #  include <algorithm>
 

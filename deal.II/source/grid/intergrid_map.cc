@@ -12,18 +12,18 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <base/smartpointer.h>
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe.h>
-#include <grid/tria_accessor.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/intergrid_map.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/intergrid_map.h>
 
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
 

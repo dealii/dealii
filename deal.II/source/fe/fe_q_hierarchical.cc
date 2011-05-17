@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/fe_q_hierarchical.h>
-#include <fe/fe_nothing.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_nothing.h>
 
 #include <cmath>
 #include <sstream>

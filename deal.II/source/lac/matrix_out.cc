@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/matrix_out.h>
+#include <deal.II/lac/matrix_out.h>
 
 DEAL_II_NAMESPACE_OPEN
 

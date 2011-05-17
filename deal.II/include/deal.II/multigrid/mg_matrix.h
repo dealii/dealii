@@ -13,12 +13,12 @@
 #ifndef __deal2__mg_matrix_h
 #define __deal2__mg_matrix_h
 
-#include <lac/vector.h>
-#include <lac/pointer_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <multigrid/mg_base.h>
-#include <base/mg_level_object.h>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 

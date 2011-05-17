@@ -14,12 +14,12 @@
 #define __deal2__solver_bicgstab_h
 
 
-#include <base/config.h>
-#include <base/logstream.h>
-#include <lac/solver.h>
-#include <lac/solver_control.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/solver_control.h>
 #include <cmath>
-#include <base/subscriptor.h>
+#include <deal.II/base/subscriptor.h>
 
 DEAL_II_NAMESPACE_OPEN
 

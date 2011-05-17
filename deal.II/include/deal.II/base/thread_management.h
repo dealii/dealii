@@ -14,18 +14,18 @@
 #define __deal2__thread_management_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/template_constraints.h>
-#include <base/std_cxx1x/tuple.h>
-#include <base/std_cxx1x/function.h>
-#include <base/std_cxx1x/shared_ptr.h>
-#include <base/std_cxx1x/bind.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
+#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/bind.h>
 
 #if (DEAL_II_USE_MT == 1)
-#  include <base/std_cxx1x/thread.h>
-#  include <base/std_cxx1x/mutex.h>
-#  include <base/std_cxx1x/condition_variable.h>
+#  include <deal.II/base/std_cxx1x/thread.h>
+#  include <deal.II/base/std_cxx1x/mutex.h>
+#  include <deal.II/base/std_cxx1x/condition_variable.h>
 #endif
 
 #include <iterator>

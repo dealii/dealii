@@ -12,8 +12,8 @@
 //----------------------------  hp_fe_values.cc  ---------------------------
 
 
-#include <hp/fe_values.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 
 DEAL_II_NAMESPACE_OPEN
 

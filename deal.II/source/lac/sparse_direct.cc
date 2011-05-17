@@ -12,12 +12,12 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/sparse_direct.h>
-#include <base/memory_consumption.h>
-#include <base/thread_management.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <iostream>
 #include <list>

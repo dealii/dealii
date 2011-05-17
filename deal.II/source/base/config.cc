@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 #include <cmath>
 #include <limits>
 #include <complex>

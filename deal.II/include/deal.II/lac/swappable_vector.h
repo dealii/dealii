@@ -14,9 +14,9 @@
 #define __deal2__swappable_vector_h
 
 
-#include <base/config.h>
-#include <base/thread_management.h>
-#include <lac/vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/vector.h>
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN

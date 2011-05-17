@@ -15,17 +15,17 @@
 
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/thread_management.h>
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparse_matrix_ez.h>
-#include <lac/block_sparse_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_MUMPS
-#  include <base/utilities.h>
+#  include <deal.II/base/utilities.h>
 #  include <dmumps_c.h>
 #endif 
 

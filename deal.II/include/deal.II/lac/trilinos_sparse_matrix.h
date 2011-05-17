@@ -14,16 +14,16 @@
 #define __deal2__trilinos_sparse_matrix_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <base/std_cxx1x/shared_ptr.h>
-#  include <base/subscriptor.h>
-#  include <base/index_set.h>
-#  include <lac/full_matrix.h>
-#  include <lac/exceptions.h>
-#  include <lac/trilinos_vector_base.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/trilinos_vector_base.h>
 
 #  include <vector>
 #  include <cmath>

@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/thread_management.h>
-#include <base/subscriptor.h>
-#include <base/logstream.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/logstream.h>
 
 #include <typeinfo>
 #include <string>

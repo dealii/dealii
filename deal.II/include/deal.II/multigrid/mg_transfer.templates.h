@@ -14,13 +14,13 @@
 #ifndef __deal2__mg_transfer_templates_h
 #define __deal2__mg_transfer_templates_h
 
-#include <lac/sparse_matrix.h>
-#include <grid/tria_iterator.h>
-#include <fe/fe.h>
-#include <multigrid/mg_base.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_tools.h>
-#include <multigrid/mg_transfer.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/multigrid/mg_tools.h>
+#include <deal.II/multigrid/mg_transfer.h>
 
 #include <algorithm>
 

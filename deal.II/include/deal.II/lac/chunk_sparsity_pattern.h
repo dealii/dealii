@@ -14,12 +14,12 @@
 #define __deal2__chunk_sparsity_pattern_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/vector_slice.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/vector_slice.h>
 
-#include <lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <vector>
 #include <iostream>

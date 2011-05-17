@@ -12,12 +12,12 @@
 #ifndef __deal2__block_matrix_array_h
 #define __deal2__block_matrix_array_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/table.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/table.h>
 
-#include <lac/pointer_matrix.h>
-#include <lac/vector_memory.h>
+#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <vector>
 #include <map>

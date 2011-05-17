@@ -13,7 +13,7 @@
 #ifndef __deal2__lac_exceptions_h
 #define __deal2__lac_exceptions_h
 
-#include <base/exceptions.h>
+#include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

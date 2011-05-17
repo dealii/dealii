@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/sparse_vanka.templates.h>
+#include <deal.II/lac/sparse_vanka.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

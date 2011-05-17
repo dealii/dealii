@@ -12,35 +12,35 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/multithread_info.h>
-#include <base/thread_management.h>
-#include <base/quadrature_lib.h>
-#include <base/table.h>
-#include <base/template_constraints.h>
-#include <base/utilities.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/trilinos_sparsity_pattern.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/vector.h>
-#include <lac/constraint_matrix.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/intergrid_map.h>
-#include <grid/grid_tools.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <fe/fe_tools.h>
-#include <hp/fe_collection.h>
-#include <dofs/dof_tools.h>
-#include <numerics/vectors.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/intergrid_map.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/numerics/vectors.h>
 
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <algorithm>
 #include <numeric>

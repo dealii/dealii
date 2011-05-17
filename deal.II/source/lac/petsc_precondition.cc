@@ -12,14 +12,14 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_precondition.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <base/utilities.h>
-#  include <lac/petsc_matrix_base.h>
-#  include <lac/petsc_vector_base.h>
-#  include <lac/petsc_solver.h>
+#  include <deal.II/base/utilities.h>
+#  include <deal.II/lac/petsc_matrix_base.h>
+#  include <deal.II/lac/petsc_vector_base.h>
+#  include <deal.II/lac/petsc_solver.h>
 #  include <petscconf.h>
 #  include <cmath>
 

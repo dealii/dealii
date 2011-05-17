@@ -15,8 +15,8 @@
 #define __deal2__quadrature_selector_h
 
 
-#include <base/quadrature.h>
-#include <base/exceptions.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/exceptions.h>
 
 #include <string>
 

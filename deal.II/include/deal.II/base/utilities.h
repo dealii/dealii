@@ -13,8 +13,8 @@
 #ifndef __deal2__utilities_h
 #define __deal2__utilities_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 #include <vector>
 #include <utility>

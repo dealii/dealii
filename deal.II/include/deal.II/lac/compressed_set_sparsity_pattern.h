@@ -14,9 +14,9 @@
 #define __deal2__compressed_set_sparsity_pattern_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/exceptions.h>
 
 #include <vector>
 #include <algorithm>

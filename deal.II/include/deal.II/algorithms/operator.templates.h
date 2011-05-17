@@ -10,7 +10,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <algorithms/operator.h>
+#include <deal.II/algorithms/operator.h>
 
 DEAL_II_NAMESPACE_OPEN
 

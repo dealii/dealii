@@ -14,18 +14,18 @@
 #define __deal2__petsc_vector_base_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <base/subscriptor.h>
-#  include <lac/exceptions.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/exceptions.h>
 
 #  include <vector>
 #  include <utility>
 
 #  include <petscvec.h>
-#  include <base/index_set.h>
+#  include <deal.II/base/index_set.h>
 
 DEAL_II_NAMESPACE_OPEN
 

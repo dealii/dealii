@@ -14,15 +14,15 @@
 #define __deal2__multigrid_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <numerics/data_out.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <multigrid/mg_base.h>
-#include <base/mg_level_object.h>
-#include <multigrid/mg_dof_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 

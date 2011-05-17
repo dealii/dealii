@@ -10,9 +10,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/fe_dg_vector.h>
-#include <fe/fe_tools.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/fe/fe_dg_vector.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/base/quadrature_lib.h>
 
 DEAL_II_NAMESPACE_OPEN
 

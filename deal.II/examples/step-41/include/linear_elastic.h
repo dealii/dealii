@@ -1,18 +1,18 @@
 #ifndef LINEARELASTIC
 #define LINEARELASTIC
 
-#include <base/logstream.h>
-#include <base/parameter_handler.h>
-#include <base/parsed_function.h>
-#include <lac/vector.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <lac/filtered_matrix.h>
-#include <lac/precondition.h>
-#include <lac/sparse_ilu.h>
-#include <lac/solver_cg.h>
-#include <lac/sparse_direct.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/parsed_function.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/filtered_matrix.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/sparse_ilu.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/dofs/dof_tools.h>
 
 
 #include "parsed_symmetric_tensor_function.h"

@@ -13,17 +13,17 @@
 				 // The first few includes are just
 				 // like in the previous program, so
 				 // do not require additional comments:
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
 				 // However, the next file is new. We need
 				 // this include file for the association of
 				 // degrees of freedom ("DoF"s) to vertices,
 				 // lines, and cells:
-#include <dofs/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 
 				 // The following include contains the
 				 // description of the bilinear finite
@@ -38,28 +38,28 @@
 				 // general, i.e. also the quadratic, cubic,
 				 // etc versions, and not only for 2d but also
 				 // 1d and 3d.)
-#include <fe/fe_q.h>
+#include <deal.II/fe/fe_q.h>
 				 // In the following file, several
 				 // tools for manipulating degrees of
 				 // freedom can be found:
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_tools.h>
 				 // We will use a sparse matrix to
 				 // visualize the pattern of nonzero
 				 // entries resulting from the
 				 // distribution of degrees of freedom
 				 // on the grid. That class can be
 				 // found here:
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 				 // We will also need to use an
 				 // intermediate sparsity patter
 				 // structure, which is found in this
 				 // file:
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 
 				 // We will want to use a special
 				 // algorithm to renumber degrees of
 				 // freedom. It is declared here:
-#include <dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_renumbering.h>
 
 				 // And this is again needed for C++ output:
 #include <fstream>

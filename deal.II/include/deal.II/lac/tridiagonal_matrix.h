@@ -13,9 +13,9 @@
 #ifndef __deal2__tridiagonal_matrix_h
 #define __deal2__tridiagonal_matrix_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/lapack_support.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/lapack_support.h>
 
 #include <vector>
 #include <iomanip>

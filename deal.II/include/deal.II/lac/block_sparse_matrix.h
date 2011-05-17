@@ -14,13 +14,13 @@
 #define __deal2__block_sparse_matrix_h
 
 
-#include <base/config.h>
-#include <base/table.h>
-#include <lac/block_matrix_base.h>
-#include <lac/block_vector.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
+#include <deal.II/lac/block_matrix_base.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/exceptions.h>
 
 #include <cmath>
 

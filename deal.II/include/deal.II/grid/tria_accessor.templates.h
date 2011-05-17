@@ -14,16 +14,16 @@
 #define __deal2__tria_accessor_templates_h
 
 
-#include <base/config.h>
-#include <base/geometry_info.h>
-#include <base/template_constraints.h>
-#include <grid/tria.h>
-#include <grid/tria_levels.h>
-#include <grid/tria_faces.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.templates.h>
-#include <distributed/tria.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_levels.h>
+#include <deal.II/grid/tria_faces.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.templates.h>
+#include <deal.II/distributed/tria.h>
 
 #include <cmath>
 

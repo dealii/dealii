@@ -14,9 +14,9 @@
 #define __deal2__tria_iterator_templates_h
 
 
-#include <base/config.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
+#include <deal.II/base/config.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -14,17 +14,17 @@
 #define __deal2__trilinos_vector_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <base/std_cxx1x/shared_ptr.h>
-#  include <base/subscriptor.h>
-#  include <base/index_set.h>
-#  include <base/utilities.h>
-#  include <lac/exceptions.h>
-#  include <lac/vector.h>
-#  include <lac/trilinos_vector_base.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/base/utilities.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/trilinos_vector_base.h>
 
 #  include "Epetra_Map.h"
 #  include "Epetra_LocalMap.h"

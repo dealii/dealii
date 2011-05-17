@@ -11,19 +11,19 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/utilities.h>
-#include <base/quadrature.h>
-#include <base/quadrature_lib.h>
-#include <base/qprojector.h>
-#include <base/table.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe.h>
-#include <fe/mapping.h>
-#include <fe/fe_abf.h>
-#include <fe/fe_values.h>
-#include <fe/fe_tools.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/table.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/fe_abf.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_tools.h>
 
 #ifdef HAVE_STD_STRINGSTREAM
 #  include <sstream>

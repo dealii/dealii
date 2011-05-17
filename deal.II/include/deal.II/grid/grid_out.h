@@ -15,11 +15,11 @@
 
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/point.h>
-#include <grid/tria.h>
-#include <fe/mapping.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/fe/mapping.h>
 
 #include <string>
 

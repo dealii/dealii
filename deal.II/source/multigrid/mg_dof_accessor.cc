@@ -12,17 +12,17 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/tria_iterator_base.h>
-#include <dofs/dof_levels.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_dof_handler.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_iterator.templates.h>
-#include <fe/fe.h>
+#include <deal.II/grid/tria_iterator_base.h>
+#include <deal.II/dofs/dof_levels.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_iterator.templates.h>
+#include <deal.II/fe/fe.h>
 
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 

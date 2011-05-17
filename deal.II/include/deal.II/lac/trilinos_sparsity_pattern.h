@@ -14,19 +14,19 @@
 #define __deal2__trilinos_sparsity_pattern_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <base/subscriptor.h>
-#  include <base/index_set.h>
-#  include <lac/exceptions.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/lac/exceptions.h>
 
 #  include <vector>
 #  include <cmath>
 #  include <memory>
 
-#  include <base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #  include <Epetra_FECrsGraph.h>
 #  include <Epetra_Map.h>

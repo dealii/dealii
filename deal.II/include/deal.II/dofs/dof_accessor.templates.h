@@ -14,15 +14,15 @@
 #define __deal2__dof_accessor_templates_h
 
 
-#include <base/config.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_levels.h>
-#include <dofs/dof_faces.h>
-#include <hp/dof_levels.h>
-#include <hp/dof_faces.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_iterator.templates.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_levels.h>
+#include <deal.II/dofs/dof_faces.h>
+#include <deal.II/hp/dof_levels.h>
+#include <deal.II/hp/dof_faces.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_iterator.templates.h>
 
 #include <vector>
 

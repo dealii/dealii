@@ -14,8 +14,8 @@
 #define __deal2__auto_derivative_function_h
 
 
-#include <base/exceptions.h>
-#include <base/function.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 
 DEAL_II_NAMESPACE_OPEN
 

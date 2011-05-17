@@ -14,7 +14,7 @@
 #define __deal2__template_constraints_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
 

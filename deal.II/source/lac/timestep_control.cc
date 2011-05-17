@@ -10,8 +10,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <algorithms/timestep_control.h>
-#include <base/parameter_handler.h>
+#include <deal.II/algorithms/timestep_control.h>
+#include <deal.II/base/parameter_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
 

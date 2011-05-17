@@ -15,7 +15,7 @@
 
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -13,12 +13,12 @@
 #define __deal2__sparse_matrix_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/identity_matrix.h>
-#include <lac/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -14,8 +14,8 @@
 #define __deal2__shifted_matrix_h
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
 
 DEAL_II_NAMESPACE_OPEN
 

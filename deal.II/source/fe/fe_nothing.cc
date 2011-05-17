@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/fe_nothing.h>
+#include <deal.II/fe/fe_nothing.h>
 
 DEAL_II_NAMESPACE_OPEN
 

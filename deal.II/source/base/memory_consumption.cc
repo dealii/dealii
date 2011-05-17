@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
+#include <deal.II/base/memory_consumption.h>
 
 DEAL_II_NAMESPACE_OPEN
 

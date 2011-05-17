@@ -14,14 +14,14 @@
 #define __deal2__block_matrix_base_h
 
 
-#include <base/config.h>
-#include <base/table.h>
-#include <base/smartpointer.h>
-#include <base/memory_consumption.h>
-#include <lac/block_indices.h>
-#include <lac/exceptions.h>
-#include <lac/full_matrix.h>
-#include <lac/matrix_iterator.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/block_indices.h>
+#include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/matrix_iterator.h>
 
 #include <cmath>
 

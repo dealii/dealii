@@ -14,35 +14,35 @@
 				 // a rather long list of include
 				 // files which you are probably
 				 // already used to by now:
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/logstream.h>
-#include <base/table_handler.h>
-#include <lac/vector.h>
-#include <lac/sparse_matrix.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/constraint_matrix.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_q.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/table_handler.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
 
 				 // Just this one is new: it declares
 				 // a class
 				 // <code>CompressedSparsityPattern</code>,
 				 // which we will use and explain
 				 // further down below.
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 
 				 // We will make use of the std::find
 				 // algorithm of the C++ standard

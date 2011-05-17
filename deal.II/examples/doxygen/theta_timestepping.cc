@@ -12,13 +12,13 @@
 
 // See documentation of ThetaTimestepping for documentation of this example
 
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
 
-#include <numerics/operator.h>
-#include <numerics/theta_timestepping.h>
-#include <numerics/operator.h>
+#include <deal.II/numerics/operator.h>
+#include <deal.II/numerics/theta_timestepping.h>
+#include <deal.II/numerics/operator.h>
 
 #include <iostream>
 

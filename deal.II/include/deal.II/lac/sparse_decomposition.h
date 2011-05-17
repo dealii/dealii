@@ -14,8 +14,8 @@
 #ifndef __deal2__sparse_decomposition_h
 #define __deal2__sparse_decomposition_h
 
-#include <base/config.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 #include <cmath>
 

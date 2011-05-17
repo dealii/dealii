@@ -12,15 +12,15 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/grid_out.h>
-#include <base/parameter_handler.h>
-#include <base/point.h>
-#include <base/quadrature.h>
-#include <base/qprojector.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <fe/mapping.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/fe/mapping.h>
 
 #include <cstring>
 #include <iomanip>

@@ -12,11 +12,11 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <grid/tria_objects.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/grid/tria_objects.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
 
 #include <algorithm>
 #include <functional>

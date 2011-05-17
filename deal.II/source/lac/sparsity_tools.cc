@@ -11,18 +11,18 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/exceptions.h>
-#include <lac/exceptions.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparsity_tools.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <algorithm>
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-#include <base/utilities.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #endif
 
 #ifdef DEAL_II_USE_METIS

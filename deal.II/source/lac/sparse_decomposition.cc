@@ -9,7 +9,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/sparse_decomposition.templates.h>
+#include <deal.II/lac/sparse_decomposition.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

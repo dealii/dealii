@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/exceptions.h>
-#include <base/memory_consumption.h>
-#include <dofs/dof_faces.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/dofs/dof_faces.h>
 
 DEAL_II_NAMESPACE_OPEN
 

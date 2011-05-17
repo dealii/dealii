@@ -14,13 +14,13 @@
 #ifndef __deal2__constraint_matrix_h
 #define __deal2__constraint_matrix_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/index_set.h>
-#include <base/subscriptor.h>
-#include <base/template_constraints.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
 
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 #include <map>

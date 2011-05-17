@@ -13,10 +13,10 @@
 #define __deal2__mapping_cartesian_h
 
 
-#include <base/config.h>
-#include <base/table.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
 #include <cmath>
-#include <fe/mapping.h>
+#include <deal.II/fe/mapping.h>
 
 DEAL_II_NAMESPACE_OPEN
 

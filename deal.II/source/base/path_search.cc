@@ -11,9 +11,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/path_search.h>
-#include <base/logstream.h>
-#include <base/utilities.h>
+#include <deal.II/base/path_search.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 
 #include <iostream>
 #include <cstdio>

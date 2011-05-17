@@ -13,7 +13,7 @@
 #ifndef __deal2__assemble_flags_h
 #define __deal2__assemble_flags_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 /**
  * The enum type given to the constructors of LocalAssembleBase objects, 
  * telling those objects which data to assemble on each mesh cell. 

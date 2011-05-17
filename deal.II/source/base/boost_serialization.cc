@@ -11,7 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #include "../../contrib/boost-1.46.1/libs/serialization/src/basic_archive.cpp"
 #include "../../contrib/boost-1.46.1/libs/serialization/src/basic_iarchive.cpp"

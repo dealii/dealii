@@ -18,12 +18,12 @@
 				 // classes which handle
 				 // triangulations and enumeration of
 				 // degrees of freedom:
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
 				 // And this is the file in which the
 				 // functions are declared that
 				 // create grids:
-#include <grid/grid_generator.h>
+#include <deal.II/grid/grid_generator.h>
 
 				 // The next three files contain classes which
 				 // are needed for loops over all cells and to
@@ -33,34 +33,34 @@
 				 // cells; the last one is new and provides
 				 // information about the degrees of freedom
 				 // local to a cell:
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
 
 				 // In this file contains the description of
 				 // the Lagrange interpolation finite element:
-#include <fe/fe_q.h>
+#include <deal.II/fe/fe_q.h>
 
 				 // And this file is needed for the
 				 // creation of sparsity patterns of
 				 // sparse matrices, as shown in
 				 // previous examples:
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_tools.h>
 
 				 // The next two file are needed for
 				 // assembling the matrix using
 				 // quadrature on each cell. The
 				 // classes declared in them will be
 				 // explained below:
-#include <fe/fe_values.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/base/quadrature_lib.h>
 
 				 // The following three include files
 				 // we need for the treatment of
 				 // boundary values:
-#include <base/function.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
+#include <deal.II/base/function.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
 
 				 // We're now almost to the end. The second to
 				 // last group of include files is for the
@@ -77,16 +77,16 @@
 				 // program, we use the identity
 				 // preconditioner which does nothing, but we
 				 // need to include the file anyway):
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
 
 				 // Finally, this is for output to a
 				 // file and to the console:
-#include <numerics/data_out.h>
+#include <deal.II/numerics/data_out.h>
 #include <fstream>
 #include <iostream>
 

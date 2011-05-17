@@ -13,9 +13,9 @@
 #define __deal2__block_list_h
 
 
-#include <base/subscriptor.h>
-#include <base/template_constraints.h>
-#include <fe/fe.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/fe/fe.h>
 
 #include <vector>
 

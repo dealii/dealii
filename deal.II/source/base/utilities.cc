@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/utilities.h>
-#include <base/exceptions.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/exceptions.h>
 
 #include <fstream>
 #include <iomanip>
@@ -36,9 +36,9 @@
 #ifdef DEAL_II_USE_TRILINOS
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <Epetra_MpiComm.h>
-#    include <lac/vector_memory.h>
-#    include <lac/trilinos_vector.h>
-#    include <lac/trilinos_block_vector.h>
+#    include <deal.II/lac/vector_memory.h>
+#    include <deal.II/lac/trilinos_vector.h>
+#    include <deal.II/lac/trilinos_block_vector.h>
 #  endif
 #  include "Teuchos_RCP.hpp"
 #  include "Epetra_SerialComm.h"

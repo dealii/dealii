@@ -16,10 +16,10 @@
 
 /*----------------------------   boundary-function.h     ---------------------------*/
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/point.h>
-#include <grid/tria.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 

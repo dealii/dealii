@@ -13,12 +13,12 @@
 #ifndef __deal2__mesh_worker_loop_h
 #define __deal2__mesh_worker_loop_h
 
-#include <base/config.h>
-#include <base/std_cxx1x/function.h>
-#include <base/work_stream.h>
-#include <base/template_constraints.h>
-#include <grid/tria.h>
-#include <numerics/mesh_worker_info.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/work_stream.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/numerics/mesh_worker_info.h>
 
 #define DEAL_II_MESHWORKER_PARALLEL 1
 

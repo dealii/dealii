@@ -12,13 +12,13 @@
 //---------------------------------------------------------------------------
 
 
-#include <fe/mapping_q1_eulerian.h>
-#include <lac/vector.h>
-#include <lac/petsc_vector.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe.h>
+#include <deal.II/fe/mapping_q1_eulerian.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
 

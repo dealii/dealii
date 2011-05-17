@@ -13,10 +13,10 @@
 #ifndef __deal2__mg_constraints_h
 #define __deal2__mg_constraints_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
 
-#include <multigrid/mg_tools.h>
+#include <deal.II/multigrid/mg_tools.h>
 
 #include <vector>
 #include <set>

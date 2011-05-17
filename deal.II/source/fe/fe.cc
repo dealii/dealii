@@ -12,16 +12,16 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <fe/mapping.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <base/quadrature.h>
-#include <base/qprojector.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_boundary.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/tria_boundary.h>
 
 #include <algorithm>
 #include <functional>

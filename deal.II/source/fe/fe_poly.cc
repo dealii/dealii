@@ -11,13 +11,13 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/qprojector.h>
-#include <base/tensor_product_polynomials.h>
-#include <base/polynomials_p.h>
-#include <fe/fe_poly.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/polynomials_p.h>
+#include <deal.II/fe/fe_poly.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <fe/fe_poly.templates.h>
+#include <deal.II/fe/fe_poly.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

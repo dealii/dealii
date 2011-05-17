@@ -18,7 +18,7 @@
  * Here, the deal.II exception handling is located.
  */
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #include <exception>
 

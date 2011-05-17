@@ -13,10 +13,10 @@
 #define __deal2__sparse_ilu_h
 
 
-#include <base/config.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparse_decomposition.h>
-#include <lac/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_decomposition.h>
+#include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

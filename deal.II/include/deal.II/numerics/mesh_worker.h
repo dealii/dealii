@@ -13,12 +13,12 @@
 #ifndef __deal2__mesh_worker_h
 #define __deal2__mesh_worker_h
 
-#include <base/config.h>
-#include <base/std_cxx1x/function.h>
-#include <base/geometry_info.h>
-#include <lac/matrix_block.h>
-#include <lac/block_vector.h>
-#include <numerics/mesh_worker_vector_selector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/lac/matrix_block.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/numerics/mesh_worker_vector_selector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,7 +11,7 @@
 //
 //----------------------------------------------------------------------
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #include <iostream>
 
@@ -32,7 +32,7 @@ extern "C" {
 #ifdef DEAL_II_USE_MUMPS
 #  include <base/utilities.h>
 #  include <dmumps_c.h>
-#endif 
+#endif
 
 #ifdef DEAL_II_USE_PETSC
 #  include <petscversion.h>
@@ -48,11 +48,11 @@ int main()
 #ifdef HAVE_LIBBLAS
   std::cout << "dealii-feature: BLAS=yes" << std::endl;
 #endif
-  
+
 #ifdef HAVE_LIBLAPACK
   std::cout << "dealii-feature: LAPACK=yes" << std::endl;
 #endif
-  
+
 #ifdef HAVE_LIBUMFPACK
   std::cout << "dealii-feature: UMFPACK="
 	    << UMFPACK_MAIN_VERSION << '.'
@@ -69,7 +69,7 @@ int main()
 #  else
   std::cout << "dealii-feature: MPI="
 	    << MPI_VERSION << '.'
-	    << MPI_SUBVERSION << std::endl;  
+	    << MPI_SUBVERSION << std::endl;
 #  endif
 #endif
 
@@ -105,7 +105,7 @@ int main()
 	    << SLEPC_VERSION_SUBMINOR << "-p"
 	    << SLEPC_VERSION_PATCH << std::endl;
 #endif
-  
+
 #if defined(HAVE_HSL_MA27) || defined(HAVE_HSL_MA47)
   std::cout << "dealii-feature: HSL=";
 #ifdef HAVE_HSL_MA27

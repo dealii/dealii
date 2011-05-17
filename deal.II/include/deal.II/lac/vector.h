@@ -14,11 +14,11 @@
 #define __deal2__vector_h
 
 
-#include <base/config.h>
-#include <base/logstream.h>
-#include <base/exceptions.h>
-#include <base/parallel.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/subscriptor.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>

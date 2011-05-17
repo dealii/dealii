@@ -13,27 +13,27 @@
 #ifndef __deal2__mg_transfer_block_h
 #define __deal2__mg_transfer_block_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
-#include <lac/block_vector.h>
+#include <deal.II/lac/block_vector.h>
 #ifdef DEAL_PREFER_MATRIX_EZ
-#  include <lac/sparse_matrix_ez.h>
-#  include <lac/block_sparse_matrix_ez.h>
+#  include <deal.II/lac/sparse_matrix_ez.h>
+#  include <deal.II/lac/block_sparse_matrix_ez.h>
 #else
-#  include <lac/sparsity_pattern.h>
-#  include <lac/block_sparsity_pattern.h>
+#  include <deal.II/lac/sparsity_pattern.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
 #endif
-#include <lac/vector_memory.h>
-#include <lac/block_matrix_array.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/block_matrix_array.h>
 
-#include <multigrid/mg_base.h>
-#include <base/mg_level_object.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/base/mg_level_object.h>
 
 
 
-#include <dofs/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 
 DEAL_II_NAMESPACE_OPEN

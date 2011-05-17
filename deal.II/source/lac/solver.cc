@@ -11,12 +11,12 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/solver.h>
-#include <lac/vector_memory.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

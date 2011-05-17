@@ -11,13 +11,13 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/path_search.h>
-#include <base/utilities.h>
+#include <deal.II/base/path_search.h>
+#include <deal.II/base/utilities.h>
 
-#include <grid/grid_in.h>
-#include <grid/tria.h>
-#include <grid/grid_reordering.h>
-#include <grid/grid_tools.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <map>
 #include <algorithm>

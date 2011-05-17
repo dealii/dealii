@@ -11,23 +11,23 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/logstream.h>
-#include <base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/function.h>
 
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/block_indices.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_transfer_component.h>
-#include <multigrid/mg_transfer_component.templates.h>
-#include <multigrid/mg_tools.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_indices.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/multigrid/mg_transfer_component.h>
+#include <deal.II/multigrid/mg_transfer_component.templates.h>
+#include <deal.II/multigrid/mg_tools.h>
 
 #include <algorithm>
 #include <numeric>

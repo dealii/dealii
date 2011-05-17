@@ -14,11 +14,11 @@
 #define __deal2__petsc_precondition_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <lac/exceptions.h>
+#  include <deal.II/lac/exceptions.h>
 #  include <petscpc.h>
 
 DEAL_II_NAMESPACE_OPEN

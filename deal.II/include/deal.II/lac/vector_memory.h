@@ -14,11 +14,11 @@
 #define __deal2__vector_memory_h
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <base/logstream.h>
-#include <base/thread_management.h>
-#include <lac/vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 #include <iostream>

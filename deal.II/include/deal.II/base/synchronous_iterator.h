@@ -14,10 +14,10 @@
 #define __deal2__synchronous_iterator_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
-#include <base/std_cxx1x/tuple.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
 
 #include <iterator>
 

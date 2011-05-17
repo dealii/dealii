@@ -11,11 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/quadrature.h>
-#include <base/quadrature_lib.h>
-#include <base/template_constraints.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_tools.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_tools.h>
 
 
 #include <iostream>

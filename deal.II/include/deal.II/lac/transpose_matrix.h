@@ -14,8 +14,8 @@
 #define __deal2__transpose_matrix_h
 
 
-#include <base/subscriptor.h>
-#include <lac/pointer_matrix.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/pointer_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 

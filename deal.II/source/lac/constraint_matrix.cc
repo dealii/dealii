@@ -12,30 +12,30 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/constraint_matrix.h>
-#include <lac/constraint_matrix.templates.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/constraint_matrix.templates.h>
 
-#include <base/memory_consumption.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/block_vector.h>
-#include <lac/block_sparse_matrix.h>
-#include <lac/sparse_matrix_ez.h>
-#include <lac/block_sparse_matrix_ez.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/petsc_block_sparse_matrix.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/petsc_parallel_block_vector.h>
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_parallel_block_sparse_matrix.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_block_sparse_matrix.h>
-#include <lac/matrix_block.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/block_sparse_matrix_ez.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_block_sparse_matrix.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#include <deal.II/lac/matrix_block.h>
 
 #include <algorithm>
 #include <numeric>

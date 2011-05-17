@@ -12,14 +12,14 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_solver.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <base/conditional_ostream.h>
-#  include <lac/trilinos_sparse_matrix.h>
-#  include <lac/trilinos_vector_base.h>
-#  include <lac/trilinos_precondition.h>
+#  include <deal.II/base/conditional_ostream.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_vector_base.h>
+#  include <deal.II/lac/trilinos_precondition.h>
 
 #  include <cmath>
 

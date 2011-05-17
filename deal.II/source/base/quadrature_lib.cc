@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/quadrature_lib.h>
-#include <base/geometry_info.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/geometry_info.h>
 #include <cmath>
 
 #ifdef HAVE_STD_NUMERIC_LIMITS

@@ -14,11 +14,11 @@
 #define __deal2__full_matrix_h
 
 
-#include <base/config.h>
-#include <base/numbers.h>
-#include <base/table.h>
-#include <lac/exceptions.h>
-#include <lac/identity_matrix.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/table.h>
+#include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/identity_matrix.h>
 
 #include <vector>
 #include <iomanip>

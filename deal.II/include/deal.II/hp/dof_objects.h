@@ -13,9 +13,9 @@
 #ifndef __deal2__hp_dof_objects_h
 #define __deal2__hp_dof_objects_h
 
-#include <base/config.h>
-#include <hp/fe_collection.h>
-#include <hp/dof_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/dof_handler.h>
 
 #include <vector>
 

@@ -13,11 +13,11 @@
 #ifndef __deal2__intergrid_map_h
 #define __deal2__intergrid_map_h
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
 DEAL_II_NAMESPACE_OPEN
 

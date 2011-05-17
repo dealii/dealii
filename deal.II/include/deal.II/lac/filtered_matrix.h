@@ -15,12 +15,12 @@
 
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <base/thread_management.h>
-#include <base/memory_consumption.h>
-#include <lac/pointer_matrix.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/vector_memory.h>
 #include <vector>
 #include <algorithm>
 

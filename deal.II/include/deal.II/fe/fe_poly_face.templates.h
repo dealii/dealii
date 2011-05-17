@@ -10,10 +10,10 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/qprojector.h>
-#include <base/polynomial_space.h>
-#include <fe/fe_values.h>
-#include <fe/fe_poly_face.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/polynomial_space.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_poly_face.h>
 
 
 DEAL_II_NAMESPACE_OPEN

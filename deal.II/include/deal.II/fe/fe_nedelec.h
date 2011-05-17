@@ -12,16 +12,16 @@
 #ifndef __deal2__fe_nedelec_h
 #define __deal2__fe_nedelec_h
 
-#include <base/config.h>
-#include <base/table.h>
-#include <base/tensor.h>
-#include <base/tensor_base.h>
-#include <base/polynomials_nedelec.h>
-#include <base/polynomial.h>
-#include <base/tensor_product_polynomials.h>
-#include <base/geometry_info.h>
-#include <fe/fe.h>
-#include <fe/fe_poly_tensor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_base.h>
+#include <deal.II/base/polynomials_nedelec.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_poly_tensor.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/block_sparse_matrix_ez.h>
-#include <lac/block_sparse_matrix_ez.templates.h>
+#include <deal.II/lac/block_sparse_matrix_ez.h>
+#include <deal.II/lac/block_sparse_matrix_ez.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

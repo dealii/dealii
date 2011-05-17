@@ -19,8 +19,8 @@
                                  // from the library (one for input and output
                                  // of graphical data, one for parameter
                                  // handling), and a few C++ standard headers:
-#include <base/data_out_base.h>
-#include <base/parameter_handler.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/parameter_handler.h>
 
 #include <list>
 #include <iostream>

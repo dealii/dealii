@@ -15,4 +15,4 @@
  * @deprecated This file has moved to <tt>lac/algorithms</tt>
  */
 
-#include <algorithms/timestep_control.h>
+#include <deal.II/algorithms/timestep_control.h>

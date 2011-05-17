@@ -14,9 +14,9 @@
 #define __deal2__persistent_tria_h
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <grid/tria.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/grid/tria.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

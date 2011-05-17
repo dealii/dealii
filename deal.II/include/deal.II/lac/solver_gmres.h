@@ -15,14 +15,14 @@
 
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/logstream.h>
-#include <lac/householder.h>
-#include <lac/solver.h>
-#include <lac/solver_control.h>
-#include <lac/full_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/householder.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 #include <cmath>

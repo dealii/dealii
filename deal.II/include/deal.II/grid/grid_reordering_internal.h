@@ -14,8 +14,8 @@
 #define __deal2__grid_reordering_internal_h
 
 
-#include <base/config.h>
-#include <grid/tria.h>
+#include <deal.II/base/config.h>
+#include <deal.II/grid/tria.h>
 
 #include <map>
 #include <vector>

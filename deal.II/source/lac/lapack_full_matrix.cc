@@ -11,12 +11,12 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/lapack_full_matrix.h>
-#include <lac/lapack_templates.h>
-#include <lac/lapack_support.h>
-#include <lac/full_matrix.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/lapack_templates.h>
+#include <deal.II/lac/lapack_support.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
 
 #include <iostream>
 #include <iomanip>

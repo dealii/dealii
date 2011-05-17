@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/job_identifier.h>
+#include <deal.II/base/job_identifier.h>
 #include <ctime>
 
 #if HAVE_GETHOSTNAME

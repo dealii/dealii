@@ -14,9 +14,9 @@
 #define __deal2__block_indices_h
 
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/exceptions.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

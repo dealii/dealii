@@ -11,19 +11,19 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/template_constraints.h>
-#include <lac/vector.h>
-#include <lac/block_vector_base.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria.h>
 
 #include <numeric>
 #include <algorithm>

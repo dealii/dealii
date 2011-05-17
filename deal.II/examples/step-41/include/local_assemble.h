@@ -2,14 +2,14 @@
 #define LOCAL_ASSEMBLE_STANDARD
 
 #include "local_assemble_base.h"
-#include <base/logstream.h>
-#include <base/smartpointer.h>
-#include <fe/fe_values.h>
-#include <fe/fe.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe.h>
 
 #include <fstream>
 #include <iostream>
-#include <base/parameter_handler.h>
+#include <deal.II/base/parameter_handler.h>
 
 
 template <int dim, typename DH=MGDoFHandler<dim> >

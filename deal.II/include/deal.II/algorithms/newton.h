@@ -13,9 +13,9 @@
 #ifndef __deal2__newton_h
 #define __deal2__newton_h
 
-#include <base/smartpointer.h>
-#include <lac/solver_control.h>
-#include <algorithms/operator.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/algorithms/operator.h>
 
 DEAL_II_NAMESPACE_OPEN
 

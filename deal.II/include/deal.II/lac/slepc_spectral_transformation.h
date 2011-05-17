@@ -16,12 +16,12 @@
 #define __deal2__slepc_spectral_transformation_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_SLEPC
 
-#  include <base/std_cxx1x/shared_ptr.h>
-#  include <lac/exceptions.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/lac/exceptions.h>
 
 #  include <petscksp.h>
 #  include <slepceps.h>

@@ -12,13 +12,13 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_precondition.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <lac/vector.h>
-#  include <lac/sparse_matrix.h>
-#  include <lac/trilinos_sparse_matrix.h>
+#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/sparse_matrix.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
 
 #  include <Ifpack.h>
 #  include <Ifpack_Chebyshev.h>

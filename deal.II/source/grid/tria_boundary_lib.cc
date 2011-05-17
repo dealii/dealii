@@ -12,11 +12,11 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <base/tensor.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/base/tensor.h>
 #include <cmath>
 
 

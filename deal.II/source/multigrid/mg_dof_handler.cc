@@ -11,20 +11,20 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/memory_consumption.h>
-#include <lac/sparse_matrix.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_levels.h>
-#include <dofs/dof_faces.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <grid/tria_levels.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria.h>
-#include <base/geometry_info.h>
-#include <fe/fe.h>
-#include <base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_levels.h>
+#include <deal.II/dofs/dof_faces.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/grid/tria_levels.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/base/exceptions.h>
 
 #include <algorithm>
 

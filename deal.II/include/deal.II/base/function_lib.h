@@ -13,9 +13,9 @@
 #define __deal2__function_lib_h
 
 
-#include <base/config.h>
-#include <base/function.h>
-#include <base/point.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/point.h>
 
 DEAL_II_NAMESPACE_OPEN
 

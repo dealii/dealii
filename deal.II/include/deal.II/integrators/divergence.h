@@ -13,13 +13,13 @@
 #define __deal2__integrators_divergence_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/quadrature.h>
-#include <lac/full_matrix.h>
-#include <fe/mapping.h>
-#include <fe/fe_values.h>
-#include <numerics/mesh_worker_info.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/numerics/mesh_worker_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

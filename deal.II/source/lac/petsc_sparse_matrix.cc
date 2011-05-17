@@ -12,14 +12,14 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <lac/petsc_vector.h>
-#  include <lac/sparsity_pattern.h>
-#  include <lac/compressed_sparsity_pattern.h>
-#  include <lac/compressed_simple_sparsity_pattern.h>
+#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/sparsity_pattern.h>
+#  include <deal.II/lac/compressed_sparsity_pattern.h>
+#  include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 

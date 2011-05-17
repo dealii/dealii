@@ -14,14 +14,14 @@
 #define __deal2__dof_tools_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/table.h>
-#include <base/index_set.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/function_map.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/function_map.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe.h>
 
 #include <vector>
 #include <set>

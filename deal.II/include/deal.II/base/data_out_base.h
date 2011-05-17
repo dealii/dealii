@@ -14,11 +14,11 @@
 #define __deal2__data_out_base_h
 
 
-#include <base/config.h>
-#include <base/point.h>
-#include <base/table.h>
-#include <base/geometry_info.h>
-#include <base/std_cxx1x/tuple.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/std_cxx1x/tuple.h>
 
 #include <vector>
 #include <string>

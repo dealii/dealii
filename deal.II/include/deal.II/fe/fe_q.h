@@ -12,9 +12,9 @@
 #ifndef __deal2__fe_q_h
 #define __deal2__fe_q_h
 
-#include <base/config.h>
-#include <base/tensor_product_polynomials.h>
-#include <fe/fe_poly.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/fe/fe_poly.h>
 
 DEAL_II_NAMESPACE_OPEN
 

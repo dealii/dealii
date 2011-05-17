@@ -14,13 +14,13 @@
 #define __deal2__lapack_full_matrix_h
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <base/table.h>
-#include <lac/lapack_support.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/table.h>
+#include <deal.II/lac/lapack_support.h>
+#include <deal.II/lac/vector_memory.h>
 
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 #include <vector>
 #include <complex>
 

@@ -12,18 +12,18 @@
 //----------------------------  hp_dof_handler.cc  ------------------------
 
 
-#include <base/memory_consumption.h>
-#include <hp/dof_handler.h>
-#include <hp/dof_objects.h>
-#include <hp/dof_levels.h>
-#include <hp/dof_faces.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_levels.h>
-#include <grid/tria.h>
-#include <grid/geometry_info.h>
-#include <fe/fe.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/dof_objects.h>
+#include <deal.II/hp/dof_levels.h>
+#include <deal.II/hp/dof_faces.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_levels.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/geometry_info.h>
+#include <deal.II/fe/fe.h>
 
 #include <set>
 #include <algorithm>

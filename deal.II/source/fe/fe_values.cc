@@ -12,21 +12,21 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <base/quadrature.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_boundary.h>
-#include <dofs/dof_accessor.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_values.h>
-#include <fe/fe.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe.h>
 
 #include <iomanip>
 

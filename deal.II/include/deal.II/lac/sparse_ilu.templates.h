@@ -13,9 +13,9 @@
 
 
 
-#include <base/config.h>
-#include <lac/vector.h>
-#include <lac/sparse_ilu.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_ilu.h>
 
 #include <algorithm>
 #include <cmath>

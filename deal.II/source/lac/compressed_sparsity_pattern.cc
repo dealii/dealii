@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 
 #include <iostream>
 #include <iomanip>

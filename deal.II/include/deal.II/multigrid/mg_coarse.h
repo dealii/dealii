@@ -14,10 +14,10 @@
 #define __deal2__mg_coarse_h
 
 
-#include <lac/full_matrix.h>
-#include <lac/matrix_lib.h>
-#include <lac/householder.h>
-#include <multigrid/mg_base.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/matrix_lib.h>
+#include <deal.II/lac/householder.h>
+#include <deal.II/multigrid/mg_base.h>
 
 DEAL_II_NAMESPACE_OPEN
 

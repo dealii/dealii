@@ -10,7 +10,7 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#include <numerics/data_postprocessor.h>
+#include <deal.II/numerics/data_postprocessor.h>
 
 DEAL_II_NAMESPACE_OPEN
 

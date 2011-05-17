@@ -11,8 +11,8 @@
 #ifndef __deal2__sparse_mic_h
 #define __deal2__sparse_mic_h
 
-#include <lac/sparse_matrix.h>
-#include <lac/sparse_decomposition.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_decomposition.h>
 
 DEAL_II_NAMESPACE_OPEN
 

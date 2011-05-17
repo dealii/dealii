@@ -14,13 +14,13 @@
 #define __deal2__solver_cg_h
 
 
-#include <base/config.h>
-#include <lac/tridiagonal_matrix.h>
-#include <lac/solver.h>
-#include <lac/solver_control.h>
-#include <base/exceptions.h>
-#include <base/logstream.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/tridiagonal_matrix.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/subscriptor.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN

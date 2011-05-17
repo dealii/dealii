@@ -14,16 +14,16 @@
 #define __deal2__petsc_matrix_base_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <base/subscriptor.h>
-#  include <lac/full_matrix.h>
-#  include <lac/exceptions.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/exceptions.h>
 
 #  include <petscmat.h>
-#  include <base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #  include <vector>
 #  include <cmath>

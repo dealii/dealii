@@ -13,10 +13,10 @@
 #ifndef __deal2__mg_level_object_h
 #define __deal2__mg_level_object_h
 
-#include <base/subscriptor.h>
+#include <deal.II/base/subscriptor.h>
 #include <vector>
 
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 

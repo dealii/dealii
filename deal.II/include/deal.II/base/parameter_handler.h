@@ -14,10 +14,10 @@
 #define __deal2__parameter_handler_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>

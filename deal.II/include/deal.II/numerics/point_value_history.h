@@ -14,19 +14,19 @@
 #ifndef __dealii__point_value_history_h
 #define __dealii__point_value_history_h
 
-#include <dofs/dof_handler.h>
-#include <base/point.h>
-#include <lac/vector.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/base/point.h>
+#include <deal.II/lac/vector.h>
 
-#include <dofs/dof_accessor.h>
-#include <base/exceptions.h>
-#include <base/quadrature_lib.h>
-#include <fe/fe_q.h>
-#include <fe/mapping.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_values.h>
-#include <base/smartpointer.h>
-#include <base/utilities.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/utilities.h>
 
 #include <vector>
 #include <iostream>
@@ -102,7 +102,7 @@ namespace internal
  * Following is a little code snippet that shows a common usage of this class:
  *
  * @code
- * #include <numerics/point_value_history.h>
+ * #include <deal.II/numerics/point_value_history.h>
  * //....
  *
  * //... code to setup Triangulation, perform any refinement necessary

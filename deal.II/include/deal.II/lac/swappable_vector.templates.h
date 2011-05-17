@@ -14,8 +14,8 @@
 #define __deal2__swappable_vector_templates_h
 
 
-#include <base/memory_consumption.h>
-#include <lac/swappable_vector.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/swappable_vector.h>
 #include <fstream>
 
 DEAL_II_NAMESPACE_OPEN

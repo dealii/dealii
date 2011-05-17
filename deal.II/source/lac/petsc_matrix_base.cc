@@ -12,14 +12,14 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_matrix_base.h>
+#include <deal.II/lac/petsc_matrix_base.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <lac/petsc_full_matrix.h>
-#  include <lac/petsc_sparse_matrix.h>
-#  include <lac/petsc_parallel_sparse_matrix.h>
-#  include <lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_full_matrix.h>
+#  include <deal.II/lac/petsc_sparse_matrix.h>
+#  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#  include <deal.II/lac/petsc_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

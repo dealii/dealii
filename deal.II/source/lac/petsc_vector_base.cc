@@ -12,13 +12,13 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/petsc_vector_base.h>
+#include <deal.II/lac/petsc_vector_base.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <base/memory_consumption.h>
-#  include <lac/petsc_vector.h>
-#  include <lac/petsc_parallel_vector.h>
+#  include <deal.II/base/memory_consumption.h>
+#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <cmath>
 
 DEAL_II_NAMESPACE_OPEN

@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/memory_consumption.h>
-#include <grid/persistent_tria.h>
-#include <grid/magic_numbers.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/grid/persistent_tria.h>
+#include <deal.II/grid/magic_numbers.h>
 #include <iostream>
 
 DEAL_II_NAMESPACE_OPEN

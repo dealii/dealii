@@ -13,9 +13,9 @@
 #ifndef __deal2__time_step_control_h
 #define __deal2__time_step_control_h
 
-#include <base/subscriptor.h>
-#include <base/smartpointer.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector_memory.h>
 #include <cstdio>
 
 DEAL_II_NAMESPACE_OPEN

@@ -1,10 +1,10 @@
 #ifndef __deal2__local_assemble_base_h
 #define __deal2__local_assemble_base_h
 
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/fe/fe_values.h>
 #include "assemble_flags.h"
 
 #include <fstream>

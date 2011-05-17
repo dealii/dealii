@@ -15,5 +15,5 @@
  * @deprecated This file has moved to <tt>lac/algorithms</tt>
  */
 
-#include <algorithms/operator.h>
-#include <numerics/dof_output_operator.h>
+#include <deal.II/algorithms/operator.h>
+#include <deal.II/numerics/dof_output_operator.h>

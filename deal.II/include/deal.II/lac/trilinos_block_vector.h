@@ -14,14 +14,14 @@
 #define __deal2__trilinos_block_vector_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <lac/trilinos_vector.h>
-#  include <lac/block_indices.h>
-#  include <lac/block_vector_base.h>
-#  include <lac/exceptions.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/block_indices.h>
+#  include <deal.II/lac/block_vector_base.h>
+#  include <deal.II/lac/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

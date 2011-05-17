@@ -14,9 +14,9 @@
 #ifndef __deal2__polynomials_adini_h
 #define __deal2__polynomials_adini_h
 
-#include <base/point.h>
-#include <base/tensor.h>
-#include <base/table.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/table.h>
 
 DEAL_II_NAMESPACE_OPEN
 

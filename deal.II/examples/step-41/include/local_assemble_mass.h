@@ -3,12 +3,12 @@
 
 #include "local_assemble.h"
 
-#include <base/logstream.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <fe/fe_values.h>
-#include <fe/fe.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe.h>
 
 template <int dim, typename DH>
 class LocalAssembleMass : 

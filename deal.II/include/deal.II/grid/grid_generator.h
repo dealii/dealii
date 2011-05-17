@@ -14,11 +14,11 @@
 #define __deal2__grid_generator_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/point.h>
-#include <base/table.h>
-#include <grid/tria.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
+#include <deal.II/grid/tria.h>
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN

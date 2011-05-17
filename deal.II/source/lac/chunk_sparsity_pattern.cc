@@ -11,11 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/chunk_sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/full_matrix.h>
+#include <deal.II/lac/chunk_sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
 
 
 DEAL_II_NAMESPACE_OPEN

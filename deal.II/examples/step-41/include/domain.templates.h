@@ -1,13 +1,13 @@
 #include "domain.h"
-#include <base/logstream.h>
-#include <base/utilities.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_in.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/grid_tools.h>
-#include <numerics/vectors.h>
-#include <fe/fe.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/fe/fe.h>
 
 using namespace std;
 

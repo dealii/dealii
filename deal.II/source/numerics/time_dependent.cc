@@ -12,14 +12,14 @@
 //---------------------------------------------------------------------------
 
 
-#include <numerics/time_dependent.h>
-#include <base/memory_consumption.h>
-#include <base/thread_management.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_refinement.h>
-#include <lac/vector.h>
+#include <deal.II/numerics/time_dependent.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/lac/vector.h>
 
 #include <functional>
 #include <algorithm>

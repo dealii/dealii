@@ -14,8 +14,8 @@
 #define __deal2__dof_objects_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

@@ -13,18 +13,18 @@
 #ifndef __deal2__my_tools_h
 #define __deal2__my_tools_h
 
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <multigrid/mg_base.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <fe/fe.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <dofs/dof_constraints.h>
+#include <deal.II/dofs/dof_constraints.h>
 #include "assemble_flags.h"
 #include "local_assemble.h"
 #include "vector_space.h"

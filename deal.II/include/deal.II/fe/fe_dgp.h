@@ -12,9 +12,9 @@
 #ifndef __deal2__fe_dgp_h
 #define __deal2__fe_dgp_h
 
-#include <base/config.h>
-#include <base/polynomial_space.h>
-#include <fe/fe_poly.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/polynomial_space.h>
+#include <deal.II/fe/fe_poly.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/precondition_block.templates.h>
-#include <lac/sparse_matrix_ez.h>
+#include <deal.II/lac/precondition_block.templates.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
 
 DEAL_II_NAMESPACE_OPEN
 

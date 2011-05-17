@@ -15,36 +15,36 @@
                                  // First a standard set of deal.II
                                  // includes. Nothing special to comment on
                                  // here:
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/parameter_handler.h>
-#include <base/function_parser.h>
-#include <base/utilities.h>
-#include <base/conditional_ostream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/conditional_ostream.h>
 
-#include <lac/vector.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_in.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_in.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_values.h>
-#include <fe/fe_system.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
 
-#include <numerics/data_out.h>
-#include <numerics/vectors.h>
-#include <numerics/solution_transfer.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/solution_transfer.h>
 
                                  // Then, as mentioned in the introduction, we
                                  // use various Trilinos packages as linear
@@ -57,10 +57,10 @@
                                  // preconditioners and solvers, we include
                                  // them similarly as deal.II linear algebra
                                  // structures.
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_precondition.h>
-#include <lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_solver.h>
 
 
                                  // Sacado is the automatic differentiation

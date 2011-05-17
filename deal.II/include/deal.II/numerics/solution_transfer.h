@@ -17,11 +17,11 @@
 /*----------------------------   solutiontransfer.h     ----------------------*/
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
-#include <base/exceptions.h>
-#include <dofs/dof_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <vector>
 

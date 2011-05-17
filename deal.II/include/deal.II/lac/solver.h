@@ -12,9 +12,9 @@
 #ifndef __deal2__solver_h
 #define __deal2__solver_h
 
-#include <base/config.h>
-#include <base/subscriptor.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 

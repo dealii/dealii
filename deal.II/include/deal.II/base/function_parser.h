@@ -18,9 +18,9 @@
 
 //TODO: Update to latest version of fparser library from http://warp.povusers.org/FunctionParser/
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/function.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <vector>
 #include <map>
 

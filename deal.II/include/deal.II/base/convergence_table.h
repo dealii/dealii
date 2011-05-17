@@ -14,8 +14,8 @@
 #define __deal2__convergence_table_h
 
 
-#include <base/config.h>
-#include <base/table_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
 

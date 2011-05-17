@@ -3,24 +3,24 @@
 
 #include <fstream>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_constraints.h>
-#include <lac/block_vector.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_constraints.h>
+#include <deal.II/lac/block_vector.h>
 
-#include <grid/grid_refinement.h>
-#include <grid/tria.h>
-#include <grid/filtered_iterator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/filtered_iterator.h>
 
-// #include <numerics/error_estimator.h>
-#include <base/function.h>
-#include <numerics/solution_transfer.h>
-#include <numerics/data_out.h>
+// #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/base/function.h>
+#include <deal.II/numerics/solution_transfer.h>
+#include <deal.II/numerics/data_out.h>
 
-#include <base/convergence_table.h>
-#include <base/logstream.h>
-#include <base/config.h>
+#include <deal.II/base/convergence_table.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/config.h>
 
-#include <base/parameter_handler.h>
+#include <deal.II/base/parameter_handler.h>
 
 #include "vector_space.h"
 #include <map>

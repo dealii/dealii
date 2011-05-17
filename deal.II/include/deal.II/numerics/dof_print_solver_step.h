@@ -13,11 +13,11 @@
 #ifndef __deal2__dof_print_solver_step_h
 #define __deal2__dof_print_solver_step_h
 
-#include <base/config.h>
-#include <base/logstream.h>
-#include <lac/solver_control.h>
-#include <lac/vector_memory.h>
-#include <numerics/data_out.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <sstream>
 #include <iomanip>

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <base/memory_consumption.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/base/memory_consumption.h>
 
 #include <algorithm>
 #include <cmath>

@@ -11,9 +11,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include <numerics/mesh_worker_vector_selector.h>
-#include <base/vector_slice.h>
-#include <fe/fe_values.h>
+#include <deal.II/numerics/mesh_worker_vector_selector.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/fe/fe_values.h>
 
 DEAL_II_NAMESPACE_OPEN
 

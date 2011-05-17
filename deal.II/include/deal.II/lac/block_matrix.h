@@ -14,10 +14,10 @@
 #define __deal2__block_matrix_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/smartpointer.h>
-#include <lac/block_vector.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

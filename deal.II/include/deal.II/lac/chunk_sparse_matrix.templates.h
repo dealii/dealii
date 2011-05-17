@@ -14,10 +14,10 @@
 #define __deal2__chunk_sparse_matrix_templates_h
 
 
-#include <base/template_constraints.h>
-#include <lac/chunk_sparse_matrix.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/lac/chunk_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
 
 
 // we only need output streams, but older compilers did not provide
@@ -36,8 +36,8 @@
 #include <vector>
 #include <numeric>
 
-#include <base/thread_management.h>
-#include <base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/multithread_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/matrix_lib.templates.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/matrix_lib.templates.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 DEAL_II_NAMESPACE_OPEN
 

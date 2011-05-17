@@ -14,15 +14,15 @@
 #define __deal2__petsc_vector_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_PETSC
 
-#  include <base/subscriptor.h>
-#  include <lac/exceptions.h>
-#  include <lac/petsc_vector_base.h>
-#  include <lac/petsc_parallel_vector.h>
-#  include <lac/vector.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_vector_base.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

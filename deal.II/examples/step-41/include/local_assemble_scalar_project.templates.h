@@ -1,5 +1,5 @@
 #include "../include/local_assemble_scalar_project.h"
-#include <base/quadrature_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
 template <int dim>
 LocalAssembleScalarProject<dim>::LocalAssembleScalarProject() : 

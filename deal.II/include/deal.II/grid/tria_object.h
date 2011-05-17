@@ -14,9 +14,9 @@
 #define __deal2__tria_object_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/geometry_info.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/geometry_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

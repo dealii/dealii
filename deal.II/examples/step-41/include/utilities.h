@@ -1,13 +1,13 @@
 #ifndef UTILITIES_HLT
 #define UTILITIES_HLT
 
-#include <base/utilities.h>
-#include <grid/grid_tools.h>
-#include <lac/vector_memory.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/block_vector.h>
-#include <lac/block_sparse_matrix.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 
 using namespace dealii;
 

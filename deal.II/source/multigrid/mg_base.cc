@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <multigrid/mg_base.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/multigrid/mg_base.h>
 
 
 DEAL_II_NAMESPACE_OPEN

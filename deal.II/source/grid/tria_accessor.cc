@@ -12,15 +12,15 @@
 //---------------------------------------------------------------------------
 
 
-#include <grid/tria.h>
-#include <grid/tria_levels.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_accessor.templates.h>
-#include <grid/tria_iterator.templates.h>
-#include <base/geometry_info.h>
-#include <grid/grid_tools.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_levels.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_accessor.templates.h>
+#include <deal.II/grid/tria_iterator.templates.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <cmath>
 

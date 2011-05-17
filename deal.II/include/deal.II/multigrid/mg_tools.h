@@ -13,10 +13,10 @@
 #ifndef __deal2__mg_tools_h
 #define __deal2__mg_tools_h
 
-#include <base/config.h>
-#include <base/index_set.h>
-#include <dofs/dof_tools.h>
-#include <multigrid/mg_dof_handler.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
 
 #include <vector>
 #include <set>

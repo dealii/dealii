@@ -1,16 +1,16 @@
 #include "../include/output_processor.h"
 
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/utilities.h>
 
-#include <grid/grid_tools.h>
+#include <deal.II/grid/grid_tools.h>
 
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <fe/mapping_q.h>
-#include <fe/fe.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/fe.h>
 
 template <int dim, typename VECTOR>
 OutputProcessor<dim,VECTOR>::OutputProcessor (const unsigned int n_mpi, 

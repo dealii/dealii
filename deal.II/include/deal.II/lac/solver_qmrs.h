@@ -13,12 +13,12 @@
 #ifndef __deal2__solver_qmrs_h
 #define __deal2__solver_qmrs_h
 
-#include <base/config.h>
-#include <lac/solver.h>
-#include <lac/solver_control.h>
-#include <base/logstream.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/base/logstream.h>
 #include <cmath>
-#include <base/subscriptor.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <cmath>
 

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/exceptions.h>
-#include <base/logstream.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
 #include <string>
 #include <cstdlib>
 #include <iostream>

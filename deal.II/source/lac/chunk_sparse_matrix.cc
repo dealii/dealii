@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/chunk_sparse_matrix.templates.h>
-#include <lac/block_vector.h>
+#include <deal.II/lac/chunk_sparse_matrix.templates.h>
+#include <deal.II/lac/block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 #include "chunk_sparse_matrix.inst"

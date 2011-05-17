@@ -11,26 +11,26 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_P4EST
 
-#include <lac/vector.h>
-#include <lac/petsc_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/block_vector.h>
-#include <lac/petsc_block_vector.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_block_vector.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 
-#include <distributed/solution_transfer.h>
-#include <distributed/tria.h>
-#include <dofs/dof_tools.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
+#include <deal.II/distributed/solution_transfer.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
-#include <base/std_cxx1x/bind.h>
+#include <deal.II/base/std_cxx1x/bind.h>
 
 DEAL_II_NAMESPACE_OPEN
 

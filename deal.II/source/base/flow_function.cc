@@ -12,10 +12,10 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/tensor.h>
-#include <base/point.h>
-#include <base/flow_function.h>
-#include <lac/vector.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/flow_function.h>
+#include <deal.II/lac/vector.h>
 
 #include <cmath>
 

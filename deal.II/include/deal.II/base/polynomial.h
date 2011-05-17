@@ -15,10 +15,10 @@
 
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #include <vector>
 

@@ -14,11 +14,11 @@
 #define __deal2__tria_levels_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 #include <vector>
-#include <grid/tria_object.h>
-#include <base/point.h>
-#include <grid/tria_objects.h>
+#include <deal.II/grid/tria_object.h>
+#include <deal.II/base/point.h>
+#include <deal.II/grid/tria_objects.h>
 
 DEAL_II_NAMESPACE_OPEN
 

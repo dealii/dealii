@@ -16,28 +16,28 @@
 				 // been treated in previous examples,
 				 // so we won't explain what is in
 				 // them again.
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/constraint_matrix.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <numerics/matrices.h>
-#include <numerics/error_estimator.h>
-#include <numerics/data_out.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/data_out.h>
 
 				 // In this example, we will not use the
 				 // numeration scheme which is used per
@@ -46,7 +46,7 @@
 				 // algorithm. As has already been explained
 				 // in step-2, the necessary functions are
 				 // declared in the following file:
-#include <dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_renumbering.h>
 				 // Then we will show a little trick
 				 // how we can make sure that objects
 				 // are not deleted while they are
@@ -54,7 +54,7 @@
 				 // deal.II has the SmartPointer
 				 // helper class, which is declared in
 				 // this file:
-#include <base/smartpointer.h>
+#include <deal.II/base/smartpointer.h>
 				 // Next, we will want to use the function
 				 // VectorTools::integrate_difference()
 				 // mentioned in the introduction, and we are
@@ -62,13 +62,13 @@
 				 // collects all important data during a run
 				 // and prints it at the end as a table. These
 				 // comes from the following two files:
-#include <numerics/vectors.h>
-#include <base/convergence_table.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/base/convergence_table.h>
 				 // And finally, we need to use the
 				 // FEFaceValues class, which is
 				 // declared in the same file as the
 				 // FEValues class:
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_values.h>
 
 				 // We need one more include from standard
 				 // C++, which is necessary when we try to

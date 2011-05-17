@@ -13,12 +13,12 @@
 #define __deal2__mapping_q1_h
 
 
-#include <base/config.h>
-#include <base/table.h>
-#include <base/qprojector.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/mapping.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/mapping.h>
 
 #include <cmath>
 

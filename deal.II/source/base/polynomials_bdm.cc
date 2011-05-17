@@ -11,8 +11,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/polynomials_bdm.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <iostream>
 #include <iomanip>
 

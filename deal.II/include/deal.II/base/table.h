@@ -13,11 +13,11 @@
 #ifndef __deal2__table_h
 #define __deal2__table_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
-#include <base/table_indices.h>
-#include <base/memory_consumption.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/table_indices.h>
+#include <deal.II/base/memory_consumption.h>
 
 #include <cstddef>
 #include <algorithm>

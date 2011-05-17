@@ -14,4 +14,4 @@
 // This class was moved to the base library. Therefore, we provide
 // this file for compatibility reasons only.
 
-#include <base/geometry_info.h>
+#include <deal.II/base/geometry_info.h>

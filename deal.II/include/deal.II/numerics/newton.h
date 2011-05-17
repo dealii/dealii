@@ -15,4 +15,4 @@
  * @deprecated This file has moved to <tt>lac/algorithms</tt>
  */
 
-#include <algorithms/newton.h>
+#include <deal.II/algorithms/newton.h>

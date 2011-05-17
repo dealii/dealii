@@ -13,7 +13,7 @@
 #ifndef __deal2__event_h
 #define __deal2__event_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #include <vector>
 #include <string>

@@ -14,18 +14,18 @@
 #define __deal2__vector_templates_h
 
 
-#include <base/template_constraints.h>
-#include <base/numbers.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
 
 #ifdef DEAL_II_USE_PETSC
-#  include <lac/petsc_vector.h>
-#  include <lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_vector.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-#  include <lac/trilinos_vector.h>
+#  include <deal.II/lac/trilinos_vector.h>
 #endif
 
 #include <cmath>

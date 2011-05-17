@@ -14,8 +14,8 @@
 #define __deal2__quadrature_lib_h
 
 
-#include <base/config.h>
-#include <base/quadrature.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/quadrature.h>
 
 DEAL_II_NAMESPACE_OPEN
 

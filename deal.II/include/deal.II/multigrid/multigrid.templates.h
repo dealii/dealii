@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 #ifndef __deal2__multigrid_templates_h
 #define __deal2__multigrid_templates_h
-#include <multigrid/multigrid.h>
+#include <deal.II/multigrid/multigrid.h>
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 #include <iostream>
 

@@ -14,12 +14,12 @@
 #define __deal2__sparse_vanka_templates_h
 
 
-#include <base/memory_consumption.h>
-#include <base/thread_management.h>
-#include <lac/sparse_vanka.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/lac/sparse_vanka.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <algorithm>
 #include <map>

@@ -14,52 +14,52 @@
                                  // First the usual list of header files that
                                  // have already been used in previous example
                                  // programs:
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/logstream.h>
-#include <base/conditional_ostream.h>
-#include <base/utilities.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_parallel_vector.h>
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/petsc_solver.h>
-#include <lac/petsc_precondition.h>
-#include <lac/constraint_matrix.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_tools.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <dofs/dof_renumbering.h>
-#include <fe/fe_values.h>
-#include <fe/fe_system.h>
-#include <fe/fe_q.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <numerics/error_estimator.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/error_estimator.h>
 
 				 // And here the only two new things among the
 				 // header files: an include file in which
 				 // symmetric tensors of rank 2 and 4 are
 				 // implemented, as introduced in the
 				 // introduction:
-#include <base/symmetric_tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 
                                  // And a header that implements filters for
                                  // iterators looping over all cells. We will
                                  // use this when selecting only those cells
                                  // for output that are owned by the present
                                  // process in a %parallel program:
-#include <grid/filtered_iterator.h>
+#include <deal.II/grid/filtered_iterator.h>
 
                                  // This is then simply C++ again:
 #include <fstream>

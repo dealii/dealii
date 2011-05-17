@@ -10,8 +10,8 @@
 //
 //---------------------------------------------------------------------------
 
-#include <numerics/mesh_worker.h>
-#include <lac/block_indices.h>
+#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/lac/block_indices.h>
 
 DEAL_II_NAMESPACE_OPEN
 

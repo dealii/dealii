@@ -15,15 +15,15 @@
 
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/smartpointer.h>
-#include <base/index_set.h>
-#include <dofs/block_info.h>
-#include <dofs/dof_iterator_selector.h>
-#include <dofs/number_cache.h>
-#include <dofs/function_map.h>
-#include <dofs/dof_handler_policy.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/dofs/block_info.h>
+#include <deal.II/dofs/dof_iterator_selector.h>
+#include <deal.II/dofs/number_cache.h>
+#include <deal.II/dofs/function_map.h>
+#include <deal.II/dofs/dof_handler_policy.h>
 
 #include <vector>
 #include <map>

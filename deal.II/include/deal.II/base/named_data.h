@@ -13,9 +13,9 @@
 #ifndef __deal2__named_data_h
 #define __deal2__named_data_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
 
 #include <vector>
 #include <algorithm>

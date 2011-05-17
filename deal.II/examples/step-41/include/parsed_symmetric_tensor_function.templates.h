@@ -12,7 +12,7 @@
  *
  */
 #include "../include/parsed_symmetric_tensor_function.h"
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 
 template <int rank, int dim>
   void ParsedSymmetricTensorFunction<rank, dim>::value_list(const std::vector< Point<dim> > &points,

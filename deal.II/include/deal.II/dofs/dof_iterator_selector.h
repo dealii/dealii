@@ -13,7 +13,7 @@
 #ifndef __deal2__dof_iterators_h
 #define __deal2__dof_iterators_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 
 DEAL_II_NAMESPACE_OPEN

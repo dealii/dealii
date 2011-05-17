@@ -12,10 +12,10 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/logstream.h>
-#include <base/job_identifier.h>
-#include <base/memory_consumption.h>
-#include <base/thread_management.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/job_identifier.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/thread_management.h>
 
 // include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
 // as well (strange), so include that, too.

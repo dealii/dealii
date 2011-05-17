@@ -14,14 +14,14 @@
 #define __deal2__sparsity_tools_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 #include <vector>
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #include <mpi.h>
-#include <base/index_set.h>
+#include <deal.II/base/index_set.h>
 #endif
 
 DEAL_II_NAMESPACE_OPEN

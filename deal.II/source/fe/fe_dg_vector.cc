@@ -10,11 +10,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <fe/fe_dg_vector.templates.h>
-#include <base/polynomials_abf.h>
-#include <base/polynomials_bdm.h>
-#include <base/polynomials_nedelec.h>
-#include <base/polynomials_raviart_thomas.h>
+#include <deal.II/fe/fe_dg_vector.templates.h>
+#include <deal.II/base/polynomials_abf.h>
+#include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_nedelec.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
 
 DEAL_II_NAMESPACE_OPEN
 

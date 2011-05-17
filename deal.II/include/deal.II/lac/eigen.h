@@ -14,15 +14,15 @@
 #define __deal2__eigen_h
 
 
-#include <base/config.h>
-#include <lac/shifted_matrix.h>
-#include <lac/solver.h>
-#include <lac/solver_control.h>
-#include <lac/solver_cg.h>
-#include <lac/solver_gmres.h>
-#include <lac/solver_minres.h>
-#include <lac/vector_memory.h>
-#include <lac/precondition.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/shifted_matrix.h>
+#include <deal.II/lac/solver.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_minres.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/precondition.h>
 
 #include <cmath>
 

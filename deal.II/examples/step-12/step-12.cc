@@ -14,23 +14,23 @@
 				 // been covered in previous examples
 				 // and will thus not be further
 				 // commented on:
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <lac/vector.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <fe/fe_values.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <numerics/data_out.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/mapping_q1.h>
 				 // Here the discontinuous finite
 				 // elements are defined. They are
 				 // used in the same way as all other
@@ -41,7 +41,7 @@
 				 // classes at all: the are passed to
 				 // <code>DoFHandler</code> and <code>FEValues</code>
 				 // objects, and that is about it.
-#include <fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgq.h>
 				 // We are going to use the simplest
 				 // possible solver, called Richardson
 				 // iteration, that represents a
@@ -52,18 +52,18 @@
 				 // the special block matrix structure
 				 // of system matrices arising from DG
 				 // discretizations.
-#include <lac/solver_richardson.h>
-#include <lac/precondition_block.h>
+#include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/precondition_block.h>
 				 // We are going to use gradients as
 				 // refinement indicator.
-#include <numerics/derivative_approximation.h>
+#include <deal.II/numerics/derivative_approximation.h>
 
 				 // Here come the new include files
 				 // for using the MeshWorker framework:
-#include <numerics/mesh_worker.h>
-#include <numerics/mesh_worker_info.h>
-#include <numerics/mesh_worker_assembler.h>
-#include <numerics/mesh_worker_loop.h>
+#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/numerics/mesh_worker_assembler.h>
+#include <deal.II/numerics/mesh_worker_loop.h>
 
 				 // Like in all programs, we finish
 				 // this section by including the

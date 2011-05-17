@@ -14,8 +14,8 @@
 #define __deal2__lapack_support_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
 

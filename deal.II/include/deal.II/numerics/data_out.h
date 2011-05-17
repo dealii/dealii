@@ -15,19 +15,19 @@
 
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <base/data_out_base.h>
-#include <dofs/dof_handler.h>
-#include <fe/mapping.h>
-#include <hp/q_collection.h>
-#include <hp/fe_collection.h>
-#include <hp/mapping_collection.h>
-#include <hp/fe_values.h>
-#include <numerics/data_postprocessor.h>
-#include <numerics/data_component_interpretation.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/fe_values.h>
+#include <deal.II/numerics/data_postprocessor.h>
+#include <deal.II/numerics/data_component_interpretation.h>
 
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -13,9 +13,9 @@
 #ifndef __deal2__block_info_h
 #define __deal2__block_info_h
 
-#include <base/subscriptor.h>
-#include <base/memory_consumption.h>
-#include <lac/block_indices.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/lac/block_indices.h>
 
 #include <iomanip>
 

@@ -10,9 +10,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include <lac/block_matrix_array.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
+#include <deal.II/lac/block_matrix_array.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

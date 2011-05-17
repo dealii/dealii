@@ -14,7 +14,7 @@
 #define __deal2__tria_iterator_selector_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 DEAL_II_NAMESPACE_OPEN
 

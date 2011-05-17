@@ -13,10 +13,10 @@
 #ifndef __deal2__matrix_lib_h
 #define __deal2__matrix_lib_h
 
-#include <base/subscriptor.h>
-#include <lac/vector_memory.h>
-#include <lac/pointer_matrix.h>
-#include <lac/solver_richardson.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/solver_richardson.h>
 
 DEAL_II_NAMESPACE_OPEN
 

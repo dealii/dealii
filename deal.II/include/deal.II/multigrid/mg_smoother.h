@@ -14,12 +14,12 @@
 #define __deal2__mg_smoother_h
 
 
-#include <base/config.h>
-#include <base/smartpointer.h>
-#include <lac/pointer_matrix.h>
-#include <lac/vector_memory.h>
-#include <multigrid/mg_base.h>
-#include <base/mg_level_object.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/base/mg_level_object.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

@@ -14,9 +14,9 @@
 #ifndef __deal2__parsed_function_h
 #define __deal2__parsed_function_h
 
-#include <base/auto_derivative_function.h>
-#include <base/function_parser.h>
-#include <base/parameter_handler.h>
+#include <deal.II/base/auto_derivative_function.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/parameter_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
 

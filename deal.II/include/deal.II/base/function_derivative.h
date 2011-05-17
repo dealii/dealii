@@ -13,10 +13,10 @@
 #ifndef __deal2__function_derivative_h
 #define __deal2__function_derivative_h
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/function.h>
-#include <base/auto_derivative_function.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/auto_derivative_function.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -14,14 +14,14 @@
 #define __deal2__trilinos_precondition_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_USE_TRILINOS
 
-#  include <base/subscriptor.h>
-#  include <base/std_cxx1x/shared_ptr.h>
+#  include <deal.II/base/subscriptor.h>
+#  include <deal.II/base/std_cxx1x/shared_ptr.h>
 
-#  include <lac/trilinos_vector_base.h>
+#  include <deal.II/lac/trilinos_vector_base.h>
 
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <Epetra_MpiComm.h>

@@ -15,4 +15,4 @@
  * @deprecated This file has moved to <tt>lac/algorithms</tt>
  */
 
-#include <algorithms/theta_timestepping.h>
+#include <deal.II/algorithms/theta_timestepping.h>

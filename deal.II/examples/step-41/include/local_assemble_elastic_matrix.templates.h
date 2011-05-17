@@ -1,5 +1,5 @@
 #include "../include/local_assemble_elastic_matrix.h"
-#include <base/quadrature_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
 template <int dim>
 LocalAssembleElasticMatrix<dim>::LocalAssembleElasticMatrix() : 

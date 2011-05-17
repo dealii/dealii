@@ -11,9 +11,9 @@
 //
 //---------------------------------------------------------------------------
 
-#include <base/polynomials_raviart_thomas.h>
-#include <base/quadrature_lib.h>
-#include <base/thread_management.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/thread_management.h>
 #include <iostream>
 #include <iomanip>
 

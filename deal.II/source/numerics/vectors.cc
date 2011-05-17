@@ -11,10 +11,10 @@
 //
 //---------------------------------------------------------------------------
 
-#include <dofs/dof_handler.h>
-#include <hp/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/hp/dof_handler.h>
 
-#include<numerics/vectors.templates.h>
+#include<deal.II/numerics/vectors.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

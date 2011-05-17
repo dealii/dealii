@@ -15,11 +15,11 @@
 
 
 
-#include <base/subscriptor.h>
-#include <base/tensor.h>
-#include <lac/vector.h>
-#include <fe/fe_update_flags.h>
-#include <numerics/data_component_interpretation.h>
+#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/numerics/data_component_interpretation.h>
 
 #include <vector>
 #include <string>

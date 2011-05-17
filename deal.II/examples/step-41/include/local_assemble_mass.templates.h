@@ -1,7 +1,7 @@
 #include "../include/local_assemble_mass.h"
 #include "utilities.h"
-#include <base/quadrature_lib.h>
-#include <base/function.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
 
 template <int dim, typename DH>
 LocalAssembleMass<dim, DH>::LocalAssembleMass() : 

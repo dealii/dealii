@@ -28,12 +28,12 @@
 //    array of nodes.
 //////////////////////////////////////////////////////////////////////
 
-#include <base/data_out_base.h>
-#include <base/utilities.h>
-#include <base/parameter_handler.h>
-#include <base/thread_management.h>
-#include <base/memory_consumption.h>
-#include <base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #include <cstring>
 #include <algorithm>

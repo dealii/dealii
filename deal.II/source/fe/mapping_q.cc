@@ -12,19 +12,19 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/utilities.h>
-#include <base/polynomial.h>
-#include <base/quadrature.h>
-#include <base/quadrature_lib.h>
-#include <base/memory_consumption.h>
-#include <base/tensor_product_polynomials.h>
-#include <lac/full_matrix.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_tools.h>
-#include <fe/mapping_q.h>
-#include <fe/fe_q.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <numeric>
 #include <memory>

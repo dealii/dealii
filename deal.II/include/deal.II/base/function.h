@@ -14,10 +14,10 @@
 #define __deal2__function_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/function_time.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function_time.h>
+#include <deal.II/base/subscriptor.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

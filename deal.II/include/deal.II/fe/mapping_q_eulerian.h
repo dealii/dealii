@@ -13,14 +13,14 @@
 #ifndef __deal2__mapping_q_eulerian_h
 #define __deal2__mapping_q_eulerian_h
 
-#include <base/smartpointer.h>
-#include <base/thread_management.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_q.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
 
 
 DEAL_II_NAMESPACE_OPEN

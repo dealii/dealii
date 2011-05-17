@@ -14,12 +14,12 @@
 #define __deal2__vectors_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/quadrature_lib.h>
-#include <dofs/function_map.h>
-#include <fe/mapping_q.h>
-#include <hp/mapping_collection.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/dofs/function_map.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/hp/mapping_collection.h>
 
 #include <map>
 #include <vector>

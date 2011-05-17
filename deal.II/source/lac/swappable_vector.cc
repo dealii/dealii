@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-#include <lac/swappable_vector.templates.h>
+#include <deal.II/lac/swappable_vector.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

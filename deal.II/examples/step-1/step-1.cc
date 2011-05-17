@@ -13,23 +13,23 @@
                                  // The most fundamental class in the
                                  // library is the Triangulation
                                  // class, which is declared here:
-#include <grid/tria.h>
+#include <deal.II/grid/tria.h>
                                  // We need the following two includes
                                  // for loops over cells and/or faces:
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
                                  // Here are some functions to
                                  // generate standard grids:
-#include <grid/grid_generator.h>
+#include <deal.II/grid/grid_generator.h>
                                  // We would like to use boundaries
                                  // which are not straight lines, so
                                  // we import some classes which
                                  // predefine some boundary
                                  // descriptions:
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria_boundary_lib.h>
                                  // Output of grids in various
                                  // graphics formats:
-#include <grid/grid_out.h>
+#include <deal.II/grid/grid_out.h>
 
                                  // This is needed for C++ output:
 #include <fstream>

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <base/table_handler.h>
-#include <base/table.h>
+#include <deal.II/base/table_handler.h>
+#include <deal.II/base/table.h>
 
 #include <sstream>
 #include <iostream>

@@ -2,18 +2,18 @@
 #define LOCAL_ASSEMBLE_SCALAR_PROJECT
 
 #include "local_assemble.h"
-#include <base/parsed_function.h>
+#include <deal.II/base/parsed_function.h>
 
-#include <base/logstream.h>
-#include <base/smartpointer.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <fe/fe_values.h>
-#include <fe/fe.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe.h>
 
 #include <fstream>
 #include <iostream>
-#include <base/parameter_handler.h>
+#include <deal.II/base/parameter_handler.h>
 
 
 template <int dim>

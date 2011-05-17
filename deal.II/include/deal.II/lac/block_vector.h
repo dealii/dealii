@@ -14,10 +14,10 @@
 #define __deal2__block_vector_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <lac/block_indices.h>
-#include <lac/block_vector_base.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/lac/block_indices.h>
+#include <deal.II/lac/block_vector_base.h>
 
 #include <cstdio>
 #include <vector>

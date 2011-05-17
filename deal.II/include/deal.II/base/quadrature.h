@@ -14,9 +14,9 @@
 #define __deal2__quadrature_h
 
 
-#include <base/config.h>
-#include <base/point.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/subscriptor.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

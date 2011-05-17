@@ -14,7 +14,7 @@
 #define __deal2__std_cxx1x_mutex_h
 
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef DEAL_II_CAN_USE_CXX1X
 

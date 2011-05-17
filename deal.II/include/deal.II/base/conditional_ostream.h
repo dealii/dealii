@@ -13,7 +13,7 @@
 #ifndef __deal2__conditional_ostream_h
 #define __deal2__conditional_ostream_h
 
-#include <base/config.h>
+#include <deal.II/base/config.h>
 
 #ifdef HAVE_STD_OSTREAM_HEADER
 #  include <ostream>

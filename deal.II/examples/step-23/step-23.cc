@@ -17,30 +17,30 @@
 				 // We start with the usual assortment
 				 // of include files that we've seen
 				 // in so many of the previous tests:
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/logstream.h>
 
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/constraint_matrix.h>
 
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <numerics/data_out.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <fstream>
 #include <iostream>
@@ -69,7 +69,7 @@
 				 // code. However, we're too lazy to
 				 // do that here, so simply use a
 				 // library function:
-#include <numerics/vectors.h>
+#include <deal.II/numerics/vectors.h>
 
 				 // In a very similar vein, we are
 				 // also too lazy to write the code to
@@ -85,7 +85,7 @@
 				 // and
 				 // MatrixTools::create_laplace_matrix
 				 // functions. They are declared here:
-#include <numerics/matrices.h>
+#include <deal.II/numerics/matrices.h>
 
 				 // Finally, here is an include file
 				 // that contains all sorts of tool
@@ -107,7 +107,7 @@
 				 // consists of three digits even if
 				 // we are still in the single or
 				 // double digit time steps.
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 
 				 // The last step is as in all
 				 // previous programs:

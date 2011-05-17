@@ -14,9 +14,9 @@
 #define __deal2__sparsity_pattern_h
 
 
-#include <base/config.h>
-#include <base/exceptions.h>
-#include <base/subscriptor.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/subscriptor.h>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 

@@ -12,8 +12,8 @@
 //----------------------------  hp_dof_levels.cc  ------------------------
 
 
-#include <base/memory_consumption.h>
-#include <hp/dof_levels.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/hp/dof_levels.h>
 
 DEAL_II_NAMESPACE_OPEN
 
