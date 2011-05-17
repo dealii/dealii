@@ -98,6 +98,11 @@
  * identified with individual C++ statements, but often they more
  * generally coincide with entire code blocks.
  *
+ * @todo The following does not seem to be about task based, but
+ * rather thread based parallelism. I am not yet sufficiently familiar
+ * with the content of this page to remove it with confidence,
+ * though. GK
+ * 
  * The point here is this: To exploit the independence of tasks 2 and 3, we
  * could start two threads and run each task on its own thread; we would then
  * wait for the two threads to finish (an operation called "joining a thread")
