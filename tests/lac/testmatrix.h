@@ -1,12 +1,12 @@
 // $Id$
 
 #include "../tests.h"
-#include <base/exceptions.h>
+#include <deal.II/base/exceptions.h>
 #include <iostream>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
-#include <lac/sparse_matrix_ez.h>
-#include <lac/vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/vector.h>
 
 
 /**

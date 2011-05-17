@@ -18,7 +18,7 @@
 // rectangular case, sorted
 
 #include "../tests.h"
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 
 

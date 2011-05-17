@@ -14,7 +14,7 @@
 // check serialization for Hierarchical
 
 #include "serialization.h"
-#include <base/polynomial.h>
+#include <deal.II/base/polynomial.h>
 #include <boost/serialization/vector.hpp>
 
 void test ()

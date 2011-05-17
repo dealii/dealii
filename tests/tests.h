@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,12 +16,12 @@
 
 // common definitions used in all the tests
 
-#include <base/config.h>
-#include <base/job_identifier.h>
-#include <base/logstream.h>
-#include <base/exceptions.h>
-#include <base/utilities.h>
-#include <base/thread_management.h>
+#include <deal.II/base/config.h>
+#include <deal.II/base/job_identifier.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/thread_management.h>
 #include <cmath>
 #include <iostream>
 #include <fstream>

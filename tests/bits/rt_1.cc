@@ -16,17 +16,17 @@
 // January 2005. Check this
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_raviart_thomas.h>	
-#include <fe/fe_values.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_raviart_thomas.h>	
+#include <deal.II/fe/fe_values.h>
 #include <iomanip>
 #include <fstream>
 

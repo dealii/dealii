@@ -16,8 +16,8 @@
 // have inhomogeneities in the constraints
 
 #include "../tests.h"
-#include <lac/constraint_matrix.h>
-#include <base/logstream.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <iomanip>

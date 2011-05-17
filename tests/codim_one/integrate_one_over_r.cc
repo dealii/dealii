@@ -17,12 +17,12 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
-#include <base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 
 // all include files needed for the program
-#include <base/quadrature_lib.h>
-#include <base/geometry_info.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/geometry_info.h>
 
 
 #include <fstream>

@@ -19,11 +19,11 @@
 
 #include "../tests.h"
 
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/petsc_sparse_matrix.h>    
-#include <lac/petsc_parallel_sparse_matrix.h>    
-#include <base/logstream.h>
-#include <base/utilities.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>    
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>    
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 
 #include <fstream>
 //#include <mpi.h>

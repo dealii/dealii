@@ -6,20 +6,20 @@
 #include "../tests.h"
 #include <fstream>
 
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
 
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <fe/fe_values.h>
-#include <fe/fe_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_tools.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
 
-#include <grid/grid_generator.h>
+#include <deal.II/grid/grid_generator.h>
 
 
 // Call this function with a system consisting of several copies of

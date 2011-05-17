@@ -15,8 +15,8 @@
 // vtu file format
 
 #include "../tests.h"
-#include <base/data_out_base.h>
-#include <base/logstream.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/logstream.h>
 
 #include <vector>
 #include <iomanip>

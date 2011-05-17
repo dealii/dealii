@@ -20,11 +20,11 @@
 // testsuite anyway working on a real matrix
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/sparse_direct.h>
-#include <lac/solver_bicgstab.h>
-#include <lac/vector_memory.h>
-#include <lac/precondition.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/precondition.h>
 #include <iomanip>
 #include <fstream>
 

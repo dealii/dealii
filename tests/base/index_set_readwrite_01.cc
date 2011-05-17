@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <stdlib.h>
 
-#include <base/index_set.h>
+#include <deal.II/base/index_set.h>
 
 
 void test ()

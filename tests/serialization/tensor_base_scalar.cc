@@ -15,7 +15,7 @@
 
 #include "serialization.h"
 #include "../tests.h"
-#include <base/tensor.h>
+#include <deal.II/base/tensor.h>
 
 
 void test ()

@@ -14,12 +14,12 @@
 
 #include "../tests.h"
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
-#include <lac/full_matrix.h>
-#include <lac/lapack_full_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparse_matrix_ez.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
 
 #include <fstream>
 

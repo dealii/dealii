@@ -15,7 +15,7 @@
 // and reading them back through the matrix itself
 
 #include "../tests.h"
-#include <lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>    
 #include <fstream>
 #include <iomanip>
 

@@ -18,9 +18,9 @@
 #include <fstream>
 #include <cmath>
 
-#include <base/logstream.h>
-#include <base/polynomial.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/quadrature_lib.h>
 
 using namespace Polynomials;
 

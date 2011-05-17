@@ -18,9 +18,9 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <hp/q_collection.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/hp/q_collection.h>
 
 #include <fstream>
 

@@ -16,9 +16,9 @@
 // check if assignment from a normal vector works correctly and updates the ghost values
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <base/index_set.h>
-#include <lac/trilinos_vector.h>    
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/trilinos_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

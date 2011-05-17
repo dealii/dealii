@@ -13,13 +13,13 @@
 
 #include "../tests.h"
 #include "../bits/dof_tools_common.h"
-#include <lac/constraint_matrix.h>
-#include <base/function.h>
-#include <base/quadrature_lib.h>
-#include <numerics/vectors.h>
-#include <lac/vector.h>
-#include <dofs/dof_tools.h>
-#include <numerics/data_out.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/numerics/data_out.h>
 
 // check an abort in FEPolyTensor when used with RaviartThomas
 // elements, when computing some sort of edge directions. This is the

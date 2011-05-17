@@ -19,7 +19,7 @@
 // operator= in the iterator/reference class
 
 #include "../tests.h"
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <iomanip>
 #include <fstream>
 

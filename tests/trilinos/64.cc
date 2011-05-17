@@ -16,11 +16,11 @@
 
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_sparse_matrix.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <Epetra_Map.h>
 #include <Epetra_Comm.h>
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iostream>

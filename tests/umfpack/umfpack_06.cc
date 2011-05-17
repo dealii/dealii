@@ -21,10 +21,10 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <lac/block_sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/vector.h>
-#include <lac/sparse_direct.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/sparse_direct.h>
 
 
 void test ()

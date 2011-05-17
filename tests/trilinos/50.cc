@@ -15,9 +15,9 @@
 // check TrilinosWrappers::Vector::operator = (Vector<T>) with T!=TrilinosScalar
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_vector.h>
-#include <lac/vector.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>

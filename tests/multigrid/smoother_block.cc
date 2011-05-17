@@ -13,12 +13,12 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/mg_level_object.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <lac/block_matrix_array.h>
-#include <multigrid/mg_block_smoother.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/block_matrix_array.h>
+#include <deal.II/multigrid/mg_block_smoother.h>
 #include <fstream>
 #include <iomanip>
 #include <iomanip>

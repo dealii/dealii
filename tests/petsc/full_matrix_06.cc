@@ -15,7 +15,7 @@
 // check PETScWrappers::FullMatrix::l1_norm
 
 #include "../tests.h"
-#include <lac/petsc_full_matrix.h>    
+#include <deal.II/lac/petsc_full_matrix.h>    
 #include <fstream>
 #include <iostream>
 

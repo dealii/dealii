@@ -16,7 +16,7 @@
 // yield the same result for all chunk sizes, of course
 
 #include "../tests.h"
-#include <lac/chunk_sparse_matrix.h>    
+#include <deal.II/lac/chunk_sparse_matrix.h>    
 #include <fstream>
 #include <iomanip>
 

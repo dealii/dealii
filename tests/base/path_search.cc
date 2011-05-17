@@ -12,8 +12,8 @@
 //-----------------------------------------------------------------------------
 
 #include "../tests.h"
-#include <base/path_search.h>
-#include <base/logstream.h>
+#include <deal.II/base/path_search.h>
+#include <deal.II/base/logstream.h>
 
 int main()
 {

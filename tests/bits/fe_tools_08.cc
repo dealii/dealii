@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "fe_tools_common.h"
-#include <lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 // check
 //   FETools::extrapolate(5)

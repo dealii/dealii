@@ -14,11 +14,11 @@
 // plot PolynomialsBDM on the reference cell
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/job_identifier.h>
-#include <base/tensor.h>
-#include <base/polynomials_bdm.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/job_identifier.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <vector>
 #include <iomanip>

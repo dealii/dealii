@@ -15,10 +15,10 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/identity_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/identity_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iomanip>

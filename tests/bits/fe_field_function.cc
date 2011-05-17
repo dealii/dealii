@@ -18,15 +18,15 @@
 #include <fstream>
 
 // all include files you need here
-#include <numerics/fe_field_function.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <base/function_lib.h>
-#include <base/quadrature_lib.h>
-#include <numerics/vectors.h>
+#include <deal.II/numerics/fe_field_function.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/numerics/vectors.h>
 
 double abs_zero(double a) {
     if( std::abs(a) < 1e-10)

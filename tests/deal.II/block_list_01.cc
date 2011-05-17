@@ -12,15 +12,15 @@
 //----------------------------------------------------------------------
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_q.h>
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
-#include <lac/block_list.h>
+#include <deal.II/lac/block_list.h>
 
 using namespace dealii;
 

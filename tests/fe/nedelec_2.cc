@@ -6,20 +6,20 @@
 // are ok
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_tools.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_cartesian.h>
-#include <numerics/data_out.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/numerics/data_out.h>
 
 #include <vector>
 #include <fstream>

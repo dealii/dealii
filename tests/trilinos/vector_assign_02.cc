@@ -20,8 +20,8 @@
 // wrote the test to make sure it works this way, let's keep it then...
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_vector.h>    
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

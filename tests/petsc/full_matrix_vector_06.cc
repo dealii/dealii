@@ -15,8 +15,8 @@
 // check FullMatrix::matrix_norm_square
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>
-#include <lac/petsc_full_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_full_matrix.h>
 #include <fstream>
 #include <iostream>
 #include <vector>

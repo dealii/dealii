@@ -13,8 +13,8 @@
 
 
 #include "../tests.h"
-#include <base/vector_slice.h>
-#include <base/logstream.h>
+#include <deal.II/base/vector_slice.h>
+#include <deal.II/base/logstream.h>
 
 #include <vector>
 #include <fstream>

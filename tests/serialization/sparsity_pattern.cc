@@ -15,7 +15,7 @@
 
 #include "serialization.h"
 #include "../lac/testmatrix.h"
-#include <lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 
 void test ()

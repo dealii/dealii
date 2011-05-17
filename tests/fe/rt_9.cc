@@ -15,21 +15,21 @@
 // test, except that we use a library function to build the mass matrix
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/vector_memory.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparsity_pattern.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
-#include <fe/fe_raviart_thomas.h>
-#include <numerics/matrices.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/numerics/matrices.h>
 
 #include <vector>
 #include <fstream>

@@ -18,16 +18,16 @@
 #include "../tests.h"
 #include "mesh_3d.h"
 
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_reordering.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <fstream>
 

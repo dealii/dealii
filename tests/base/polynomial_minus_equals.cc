@@ -10,8 +10,8 @@
 
 // check on the Polynomial::operator -=
 
-#include <base/logstream.h>
-#include <base/polynomial.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/polynomial.h>
 
 #include <iostream>
 #include <vector>

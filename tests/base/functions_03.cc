@@ -14,11 +14,11 @@
 // Checking the PillowFunction
 
 #include "../tests.h"
-#include <base/data_out_base.h>
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/function_lib.h>
-#include <lac/vector.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 #include <iomanip>

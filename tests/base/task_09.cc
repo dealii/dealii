@@ -23,8 +23,8 @@
 #include <fstream>
 #include <unistd.h>
 
-#include <base/thread_management.h>
-#include <base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/multithread_info.h>
 
 
 void test ()

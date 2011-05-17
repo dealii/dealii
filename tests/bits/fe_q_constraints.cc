@@ -22,30 +22,30 @@
 // after the distribution of the hanging node constraints.       
 
 #include "../tests.h"
-#include <fe/fe_q.h>
+#include <deal.II/fe/fe_q.h>
 
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/function_lib.h>
-#include <base/polynomial.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/base/polynomial.h>
 
-#include <numerics/vectors.h>
+#include <deal.II/numerics/vectors.h>
 
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_refinement.h>
-#include <grid/grid_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/grid_out.h>
 
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 #include <fstream>
 #include <iomanip>

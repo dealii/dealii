@@ -15,7 +15,7 @@
 // check PETScWrappers::Vector::operator() in set, and later in add-mode
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

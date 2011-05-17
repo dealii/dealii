@@ -16,36 +16,36 @@
 #include "../tests.h"
 #include "../lib/test_grids.h"
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
-#include <lac/matrix_block.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
+#include <deal.II/lac/matrix_block.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_renumbering.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_system.h>
-#include <fe/fe_values.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
 
-#include <numerics/mesh_worker_info.h>
-#include <numerics/mesh_worker_assembler.h>
-#include <numerics/mesh_worker_loop.h>
+#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/numerics/mesh_worker_assembler.h>
+#include <deal.II/numerics/mesh_worker_loop.h>
 
-#include <integrators/l2.h>
-#include <integrators/divergence.h>
-#include <integrators/laplace.h>
-#include <integrators/maxwell.h>
-#include <integrators/elasticity.h>
+#include <deal.II/integrators/l2.h>
+#include <deal.II/integrators/divergence.h>
+#include <deal.II/integrators/laplace.h>
+#include <deal.II/integrators/maxwell.h>
+#include <deal.II/integrators/elasticity.h>
 
 using namespace LocalIntegrators;
 

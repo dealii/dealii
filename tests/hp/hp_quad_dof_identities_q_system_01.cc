@@ -16,10 +16,10 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <hp/fe_collection.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <fstream>
 

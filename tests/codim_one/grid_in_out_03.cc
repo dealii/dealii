@@ -17,12 +17,12 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/persistent_tria.h>
-#include <grid/grid_in.h>
-#include <grid/grid_out.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/persistent_tria.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 
 #include <string>
 

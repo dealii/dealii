@@ -16,12 +16,12 @@
 #include "../tests.h"
 #include "../lib/test_grids.h"
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_nedelec.h>
+#include <deal.II/fe/fe_nedelec.h>
 
 
 int main()

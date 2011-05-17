@@ -12,8 +12,8 @@
 //-----------------------------------------------------------------------------
 
 #include "../tests.h"
-#include <base/parameter_handler.h>
-#include <base/logstream.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/logstream.h>
 #include <memory>
 
 int main()

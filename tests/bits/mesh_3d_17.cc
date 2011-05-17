@@ -17,14 +17,14 @@
 // assertion was wrong. make sure it works now.
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_reordering.h>
-#include <grid/grid_in.h>
-#include <grid/grid_out.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
 
 #include <fstream>
 #include <iomanip>

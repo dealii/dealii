@@ -17,8 +17,8 @@
 // tests
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <iomanip>
 #include <fstream>
 

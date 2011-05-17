@@ -15,7 +15,7 @@
 // like _01, except that we use operator[] instead of operator*
 
 #include "../tests.h"
-#include <lac/block_vector.h>
+#include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iomanip>
 

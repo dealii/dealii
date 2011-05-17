@@ -18,9 +18,9 @@
 // as they would result from a Laplace operator in 1D.
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/full_matrix.h>
 #include <fstream>
 #include <iostream>
 

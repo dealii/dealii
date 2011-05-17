@@ -24,8 +24,8 @@
 // malloc calls have been performed
 
 #include "../tests.h"
-#include <lac/petsc_parallel_sparse_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <fstream>
 #include <cstdlib>
 

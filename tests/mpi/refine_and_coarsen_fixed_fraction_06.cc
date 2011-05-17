@@ -15,19 +15,19 @@
 // like _04 but with indicators and a mesh that matches step-32
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/tensor.h>
-#include <grid/tria.h>
-#include <lac/vector.h>
-#include <distributed/tria.h>
-#include <distributed/grid_refinement.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_tools.h>
-#include <base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/base/utilities.h>
 
 
 #include <fstream>

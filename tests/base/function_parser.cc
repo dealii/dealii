@@ -19,10 +19,10 @@
 #include <fstream>
 #include <iomanip>
 #include <map>
-#include <base/logstream.h>
-#include <base/point.h>
-#include <lac/vector.h>
-#include <base/function_parser.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/point.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/base/function_parser.h>
 
 
 int main () 

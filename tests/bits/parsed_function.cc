@@ -19,14 +19,14 @@
 #include <fstream>
 #include <iomanip>
 #include <map>
-#include <base/logstream.h>
-#include <base/point.h>
-#include <lac/vector.h>
-#include <base/parsed_function.h>
-#include <base/parameter_handler.h>
-#include <base/utilities.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/point.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/base/parsed_function.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
 
 template <int dim> 
 void Test() {

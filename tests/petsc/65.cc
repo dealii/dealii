@@ -16,7 +16,7 @@
 
 
 #include "../tests.h"
-#include <lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 #include <fstream>
 #include <iostream>

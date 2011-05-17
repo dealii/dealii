@@ -18,34 +18,34 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <base/quadrature_lib.h>
-#include <base/function.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
 
-#include <fe/fe_q_hierarchical.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <dofs/dof_tools.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <lac/full_matrix.h>
-#include <lac/pointer_matrix.h>
-#include <lac/block_matrix_array.h>
-#include <lac/block_sparse_matrix.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/block_vector.h>
-#include <lac/vector.h>
-#include <lac/solver_cg.h>
-#include <lac/sparse_ilu.h>
-#include <lac/precondition.h>
-#include <lac/solver_control.h>
-#include <lac/vector_memory.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/block_matrix_array.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparse_ilu.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/vector_memory.h>
 
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
 
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
 
 
 

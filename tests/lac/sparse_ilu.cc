@@ -22,10 +22,10 @@
 #include <iomanip>
 #include <cstdlib>
 #include "testmatrix.h"
-#include <base/logstream.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparse_ilu.h>
-#include <lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_ilu.h>
+#include <deal.II/lac/vector.h>
 
 //TODO:[WB] find test that is less sensitive to floating point accuracy
 

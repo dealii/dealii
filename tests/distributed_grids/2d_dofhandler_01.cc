@@ -16,20 +16,20 @@
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <base/logstream.h>
-#include <base/tensor.h>
-#include <grid/tria.h>
-#include <distributed/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
 
-#include <fe/fe_q.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <fstream>
 

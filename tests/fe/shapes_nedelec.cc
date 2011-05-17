@@ -5,8 +5,8 @@
 
 #include "../tests.h"
 #include "shapes.h"
-#include <fe/fe_nedelec.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/mapping_q1.h>
 #include <fstream>
 #include <string>
 

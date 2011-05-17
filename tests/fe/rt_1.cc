@@ -16,8 +16,8 @@
 // Plots are gnuplot compatible if lines with desired prefix are selected.
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <vector>
 #include <fstream>

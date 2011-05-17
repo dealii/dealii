@@ -26,19 +26,19 @@
 */
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
-#include <grid/grid_tools.h>
-#include <grid/grid_refinement.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgq.h>
 
-#include <numerics/vectors.h>
-#include <numerics/solution_transfer.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/solution_transfer.h>
 
 #include <fstream>
 

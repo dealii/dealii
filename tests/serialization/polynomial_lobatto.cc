@@ -14,7 +14,7 @@
 // check serialization for Polynomial
 
 #include "serialization.h"
-#include <base/polynomial.h>
+#include <deal.II/base/polynomial.h>
 #include <boost/serialization/vector.hpp>
 
 

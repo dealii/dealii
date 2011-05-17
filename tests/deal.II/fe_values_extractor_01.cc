@@ -15,7 +15,7 @@
 // test that the FEValuesExtractors are copyable
 
 #include "../tests.h"
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <fstream>
 

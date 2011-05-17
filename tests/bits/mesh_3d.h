@@ -12,10 +12,10 @@
 //----------------------------  mesh_3d.h  ---------------------------
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_reordering.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_reordering.h>
 
 
 // generate two cubes that are attached to each other in a way so that

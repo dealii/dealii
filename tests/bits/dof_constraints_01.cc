@@ -15,19 +15,19 @@
 // check DoFConstraints::distribute_local_to_global for matrices
 
 #include "../tests.h"
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_tools.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <lac/constraint_matrix.h>
-#include <fe/fe_q.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/fe/fe_q.h>
 #include <fstream>
 #include <iomanip>
 

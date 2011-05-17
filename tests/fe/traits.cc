@@ -16,13 +16,13 @@
 #include <iostream>
 #include <fstream>
 
-#include <base/logstream.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_q.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_system.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_system.h>
 
 
 template <int dim>

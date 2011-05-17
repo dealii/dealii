@@ -13,7 +13,7 @@
 
 // Provide scratch data objects with no contents for the MeshWorker::loop()
 
-#include <numerics/mesh_worker_info.h>
+#include <deal.II/numerics/mesh_worker_info.h>
 
 class EmptyInfo
 {

@@ -15,7 +15,7 @@
 // this program used to fail at one point in time.
 
 #include "../tests.h"
-#include <lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <fstream>
 
 int main ()

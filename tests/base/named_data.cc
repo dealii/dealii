@@ -13,8 +13,8 @@
 
 
 #include "../tests.h"
-#include <base/named_data.h>
-#include <base/logstream.h>
+#include <deal.II/base/named_data.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <boost/shared_ptr.hpp>

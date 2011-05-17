@@ -15,8 +15,8 @@
 // check GeometryInfo::cell_to_child and back
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/geometry_info.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/geometry_info.h>
 
 #include <fstream>
 #include <cstdlib>

@@ -19,9 +19,9 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/constraint_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 
 #include <fstream>
 #include <iomanip>

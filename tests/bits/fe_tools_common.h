@@ -15,21 +15,21 @@
 // common framework for the various fe_tools_*.cc tests
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <lac/constraint_matrix.h>
-#include <lac/vector.h>
-#include <fe/fe_q.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_system.h>
-#include <fe/fe_tools.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_tools.h>
 
 #include <fstream>
 #include <iomanip>

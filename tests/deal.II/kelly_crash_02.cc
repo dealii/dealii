@@ -32,13 +32,13 @@ char logname[] = "kelly_crash_02/output";
 #include "../tests.h"
 
 
-#include <base/logstream.h>
-#include <base/utilities.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
 #include <fstream>
 

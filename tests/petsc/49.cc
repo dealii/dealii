@@ -15,8 +15,8 @@
 // check PETScWrappers::Vector::operator = (Vector<PetscVector>)
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>
-#include <lac/vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>

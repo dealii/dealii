@@ -15,8 +15,8 @@
 // check Utilities::System::calculate_collective_mpi_min_max_avg()
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 #include <fstream>
 
 void print_it(Utilities::System::MinMaxAvg & result)

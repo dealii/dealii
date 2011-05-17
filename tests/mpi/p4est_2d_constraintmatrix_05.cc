@@ -17,17 +17,17 @@
 // correctly
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/function.h>
-#include <numerics/vectors.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/function.h>
+#include <deal.II/numerics/vectors.h>
 
-#include <grid/tria.h>
-#include <distributed/tria.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <lac/trilinos_vector.h>
-#include <fe/fe_q.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/fe/fe_q.h>
 
 
 template<int dim>

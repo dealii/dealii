@@ -14,8 +14,8 @@
 // check inversion of rank-4 tensor
 
 #include "../tests.h"
-#include <base/symmetric_tensor.h>
-#include <base/logstream.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <iomanip>
 #include <cstdlib>

@@ -14,12 +14,12 @@
 // Check automatic differentiation
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/function_lib.h>
-#include <base/auto_derivative_function.h>
-#include <base/function_derivative.h>
-#include <lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/base/auto_derivative_function.h>
+#include <deal.II/base/function_derivative.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 #include <iomanip>

@@ -15,19 +15,19 @@
 // a un-hp-ified version of hp/step-2
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
-#include <hp/dof_handler.h>
+#include <deal.II/hp/dof_handler.h>
 
-#include <fe/fe_q.h>
-#include <dofs/dof_tools.h>
-#include <lac/sparse_matrix.h>
-#include <dofs/dof_renumbering.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/dofs/dof_renumbering.h>
 
 #include <fstream>
 

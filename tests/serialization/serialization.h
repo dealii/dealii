@@ -14,7 +14,7 @@
 // common include file for all serialization tests
 
 #include "../tests.h"
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <sstream>

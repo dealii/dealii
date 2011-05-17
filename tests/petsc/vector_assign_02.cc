@@ -20,7 +20,7 @@
 // wrote the test to make sure it works this way, let's keep it then...
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

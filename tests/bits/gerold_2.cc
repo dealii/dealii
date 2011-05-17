@@ -18,20 +18,20 @@
 // trips over that
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 
-#include <lac/sparsity_pattern.h>
-#include <lac/sparsity_tools.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <fstream>
 #include <iomanip>
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
-#include <grid/grid_in.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
 
 template <int dim>

@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 // check
 //   DoFTools::distribute_cell_to_dof_vector

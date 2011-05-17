@@ -13,10 +13,10 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <distributed/tria.h>
-#include <grid/tria.h>
-#include <grid/grid_out.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_out.h>
 #include <fstream>
 #include <iterator>
 #include <iomanip>

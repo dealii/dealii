@@ -17,23 +17,23 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 // all include files needed for the program
 
-#include <base/exceptions.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_in.h>
-#include <grid/grid_out.h>
-#include <fe/mapping.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <base/quadrature_lib.h>
-#include <base/function_lib.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
 
 #include <fstream>
 #include <string>

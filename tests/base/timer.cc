@@ -13,8 +13,8 @@
 
 
 #include "../tests.h"
-#include <base/timer.h>
-#include <base/logstream.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <cmath>
 #include <iomanip>

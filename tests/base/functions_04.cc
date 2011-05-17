@@ -14,14 +14,14 @@
 // Plot flow functions in library and check their consistency
 
 #include "../tests.h"
-#include <base/data_out_base.h>
-#include <base/logstream.h>
-#include <base/job_identifier.h>
-#include <base/quadrature_lib.h>
-#include <base/function_lib.h>
-#include <base/auto_derivative_function.h>
-#include <base/flow_function.h>
-#include <lac/vector.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/job_identifier.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/base/auto_derivative_function.h>
+#include <deal.II/base/flow_function.h>
+#include <deal.II/lac/vector.h>
 
 #include <vector>
 #include <iomanip>

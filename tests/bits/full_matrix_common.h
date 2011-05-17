@@ -15,9 +15,9 @@
 // common framework for the various full_matrix_*.cc tests
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
 
 #include <fstream>
 #include <iostream>

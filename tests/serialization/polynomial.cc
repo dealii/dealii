@@ -15,7 +15,7 @@
 
 #include "serialization.h"
 #include <boost/serialization/vector.hpp>
-#include <base/polynomial.h>
+#include <deal.II/base/polynomial.h>
 
 
 void test ()

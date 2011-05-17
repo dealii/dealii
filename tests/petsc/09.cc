@@ -15,7 +15,7 @@
 // check PETScWrappers::SparseMatrix::operator *=
 
 #include "../tests.h"
-#include <lac/petsc_sparse_matrix.h>    
+#include <deal.II/lac/petsc_sparse_matrix.h>    
 #include <fstream>
 #include <iostream>
 

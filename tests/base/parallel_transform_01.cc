@@ -17,8 +17,8 @@
 #include <iomanip>
 #include <fstream>
 
-#include <base/parallel.h>
-#include <lac/vector.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/lac/vector.h>
 #include <boost/lambda/lambda.hpp>
 
 

@@ -14,7 +14,7 @@
 // check serialization for Quadrature
 
 #include "serialization.h"
-#include <base/quadrature.h>
+#include <deal.II/base/quadrature.h>
 #include <boost/serialization/vector.hpp>
 
 void test ()

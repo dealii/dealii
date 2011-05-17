@@ -16,16 +16,16 @@
 // numbering.
 
 #include "../tests.h"
-#include <base/geometry_info.h>
-#include <dofs/dof_handler.h>
-#include <grid/tria.h>
-#include <grid/tria_boundary.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_generator.h>
-#include <base/logstream.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <iomanip>

@@ -17,14 +17,14 @@
 
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <grid/tria_boundary.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <fstream>
 #include <iomanip>

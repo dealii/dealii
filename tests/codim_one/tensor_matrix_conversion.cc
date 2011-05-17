@@ -16,12 +16,12 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 // all include files you need here
 
-#include<lac/full_matrix.h>
-#include<base/tensor.h>
+#include<deal.II/lac/full_matrix.h>
+#include<deal.II/base/tensor.h>
 
 std::ofstream logfile("tensor_matrix_conversion/output");
 

@@ -15,7 +15,7 @@
 // test SparsityPattern::iterator
 
 #include "../tests.h"
-#include <lac/sparsity_pattern.h>    
+#include <deal.II/lac/sparsity_pattern.h>    
 #include <fstream>
 #include <iomanip>
 

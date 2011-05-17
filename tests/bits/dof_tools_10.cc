@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <fe/mapping_q.h>
+#include <deal.II/fe/mapping_q.h>
 
 // check
 //   DoFTools::map_dofs_to_support_points (const Mapping<dim> &,

@@ -14,8 +14,8 @@
 // Test if block indices are handled properly
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/block_indices.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_indices.h>
 
 #include <fstream>
 

@@ -15,8 +15,8 @@
 // like _01, except that we use operator[] instead of operator*
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_block_vector.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 #include <fstream>
 #include <iostream>
 

@@ -13,8 +13,8 @@
 
 
 #include "../tests.h"
-#include <lac/lapack_full_matrix.h>
-#include <lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/full_matrix.h>
 #include <fstream>
 
 // A.fill() produced an ExcIndexRange(r,0,m()) exception with

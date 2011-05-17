@@ -15,16 +15,16 @@
 
 #include "../tests.h"
 #include "empty_info.h"
-#include <numerics/mesh_worker.h>
-#include <numerics/mesh_worker_assembler.h>
-#include <numerics/mesh_worker_loop.h>
+#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/numerics/mesh_worker_assembler.h>
+#include <deal.II/numerics/mesh_worker_loop.h>
 
-#include <base/std_cxx1x/function.h>
-#include <base/logstream.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_dgp.h>
-#include <lac/block_vector.h>
+#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/lac/block_vector.h>
 
 #include <fstream>
 #include <iomanip>

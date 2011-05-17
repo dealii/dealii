@@ -18,18 +18,18 @@
 // (unused vertices, unused faces). Check that all this works now.
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_renumbering.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <fstream>
 #include <iomanip>

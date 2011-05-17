@@ -17,9 +17,9 @@
 // classes: PolynomialsBDM, PolynomialsRaviartThomas
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/polynomials_bdm.h>
-#include <base/polynomials_raviart_thomas.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/polynomials_bdm.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
 
 #include <vector>
 #include <iomanip>

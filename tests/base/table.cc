@@ -20,8 +20,8 @@
 #include <iomanip>
 #include <cstdlib>
 
-#include <base/logstream.h>
-#include <base/table.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/table.h>
 
 const int entries[] = { 11,12,13,21,
                         22,23,31,32,

@@ -14,7 +14,7 @@
 // check serialization for Tensor<1,dim>
 
 #include "serialization.h"
-#include <base/point.h>
+#include <deal.II/base/point.h>
 
 
 void test ()

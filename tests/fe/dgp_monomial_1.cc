@@ -18,8 +18,8 @@
 // storing them in a table
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <fe/fe_dgp_monomial.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe_dgp_monomial.h>
 
 #include <fstream>
 #include <string>

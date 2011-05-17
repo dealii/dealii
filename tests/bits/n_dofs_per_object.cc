@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 // check
 //   FiniteElement::n_dofs_per_object

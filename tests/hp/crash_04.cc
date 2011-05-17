@@ -16,14 +16,14 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <hp/dof_handler.h>
-#include <fe/fe_dgq.h>
-#include <numerics/derivative_approximation.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/numerics/derivative_approximation.h>
 
 #include <fstream>
 

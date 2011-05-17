@@ -20,8 +20,8 @@
 #include <fstream>
 #include <cmath>
 
-#include <base/logstream.h>
-#include <base/polynomial.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/polynomial.h>
 
 
 using namespace Polynomials;

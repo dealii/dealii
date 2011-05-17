@@ -5,17 +5,17 @@
 */
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_handler.h>
-#include <grid/intergrid_map.h>
-#include <fe/fe_q.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/intergrid_map.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <fstream>
 

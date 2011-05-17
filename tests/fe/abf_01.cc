@@ -16,42 +16,42 @@
 // Plots are gnuplot compatible if lines with desired prefix are selected.
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #define PRECISION 2
 
 #include <fstream>
 
-#include <grid/grid_generator.h>
-#include <grid/grid_in.h>
-#include <grid/grid_out.h>
-#include <grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria_boundary_lib.h>
 
-#include <fe/mapping_q.h>
+#include <deal.II/fe/mapping_q.h>
 
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <lac/vector.h>
-#include <lac/solver_cg.h>
-#include <lac/precondition.h>
-#include <lac/vector_memory.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
 
-#include <base/function.h>
-#include <base/quadrature_lib.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_system.h>
-#include <fe/fe.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_abf.h>
-#include <fe/fe_dgq.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_abf.h>
+#include <deal.II/fe/fe_dgq.h>
 
 
 

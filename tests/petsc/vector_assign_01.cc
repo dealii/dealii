@@ -21,7 +21,7 @@
 // this was fixed 2004-04-05, and this test checks that it works
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

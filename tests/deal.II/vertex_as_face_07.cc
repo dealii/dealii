@@ -16,16 +16,16 @@
 // compared to _06, we now test for an hp DoFHandler
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/grid_generator.h>
 
-#include <fe/fe_system.h>
-#include <fe/fe_q.h>
-#include <hp/dof_handler.h>
-#include <hp/fe_collection.h>
-#include <dofs/dof_accessor.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/dofs/dof_accessor.h>
 
 #include <fstream>
 

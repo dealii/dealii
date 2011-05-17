@@ -15,10 +15,10 @@
 // TrilinosWrappers::SparseMatrix::print got column indices wrong
 
 #include "../tests.h"
-#include <base/utilities.h>
-#include <base/index_set.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_sparsity_pattern.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <fstream>
 #include <iostream>
 #include <vector>

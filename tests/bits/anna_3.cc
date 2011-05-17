@@ -20,20 +20,20 @@
 // University of Basel
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_system.h>		
-#include <fe/fe_q.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_base.h>
-#include <dofs/dof_tools.h>
-#include <dofs/dof_renumbering.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_system.h>		
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_base.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/dofs/dof_renumbering.h>
 #include <iomanip>
 #include <fstream>
 

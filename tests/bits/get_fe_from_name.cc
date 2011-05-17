@@ -14,9 +14,9 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
-#include <fe/fe.h>
-#include <fe/fe_tools.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_tools.h>
 
 class Test {
 public:

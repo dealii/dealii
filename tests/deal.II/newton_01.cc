@@ -12,10 +12,10 @@
 //-----------------------------------------------------------------------------
 
 #include "../tests.h"
-#include <numerics/operator.h>
-#include <numerics/newton.h>
-#include <numerics/vectors.h>
-#include <base/named_data.h>
+#include <deal.II/numerics/operator.h>
+#include <deal.II/numerics/newton.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/base/named_data.h>
 
 
 //test computing square root of 2 with newton's method

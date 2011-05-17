@@ -15,8 +15,8 @@
 // check PetscScalar
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/petsc_vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/petsc_vector.h>
 
 #include <fstream>
 

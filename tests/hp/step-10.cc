@@ -16,25 +16,25 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 std::ofstream logfile("step-10/output");
 
 
-#include <base/quadrature_lib.h>
-#include <base/convergence_table.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria.h>
-#include <grid/grid_out.h>
-#include <hp/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_q.h>
-#include <hp/fe_values.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/convergence_table.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/hp/fe_values.h>
 
-#include <fe/mapping_q.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <iostream>
 #include <fstream>

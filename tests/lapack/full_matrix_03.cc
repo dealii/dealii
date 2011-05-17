@@ -14,10 +14,10 @@
 // Tests SVD of LAPACKFullMatrix by comparing to vmult of FullMatrix
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/lapack_full_matrix.h>
-#include <lac/full_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iostream>

@@ -16,9 +16,9 @@
 // in non-symmetric form. here make sure that we can abbreviate the contraction 
 
 #include "../tests.h"
-#include <base/symmetric_tensor.h>
-#include <base/tensor.h>
-#include <base/logstream.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <iomanip>
 

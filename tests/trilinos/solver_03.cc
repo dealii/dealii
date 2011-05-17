@@ -15,18 +15,18 @@
 
 
 #include "../tests.h" 
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 #include "../lac/testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <base/logstream.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_vector.h>
-#include <lac/trilinos_solver.h>
-#include <lac/trilinos_precondition.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>

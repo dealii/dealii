@@ -17,7 +17,7 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <iomanip>
 #include <limits>

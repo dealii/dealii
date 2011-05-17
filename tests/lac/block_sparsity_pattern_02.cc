@@ -18,8 +18,8 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/block_sparsity_pattern.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 
 #include <iomanip>
 #include <fstream>

@@ -24,14 +24,14 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_q.h>
-#include <grid/grid_in.h>
-#include <lac/vector.h>
-#include <numerics/data_out.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/numerics/data_out.h>
 
 std::ofstream logfile("data_out_02/output");
 

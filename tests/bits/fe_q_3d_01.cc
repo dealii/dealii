@@ -18,7 +18,7 @@
 
 
 #include "../tests.h"
-#include <fe/fe_q.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <fstream>
 #include <iomanip>

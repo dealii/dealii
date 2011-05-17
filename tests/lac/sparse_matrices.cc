@@ -16,17 +16,17 @@
 
 #include "../tests.h"
 #include "testmatrix.h"
-#include <base/logstream.h>
-#include <lac/sparse_matrix.h>
-#include <lac/block_sparse_matrix.h>
-#include <lac/sparse_matrix_ez.h>
-#include <lac/vector.h>
-#include <lac/solver_richardson.h>
-#include <lac/precondition.h>
-#include <lac/precondition_block.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/precondition_block.h>
 
-#include <lac/sparse_matrix_ez.templates.h>
-#include <lac/precondition_block.templates.h>
+#include <deal.II/lac/sparse_matrix_ez.templates.h>
+#include <deal.II/lac/precondition_block.templates.h>
 
 #include <fstream>
 #include <cstdio>

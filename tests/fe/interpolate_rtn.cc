@@ -12,10 +12,10 @@
 //----------------------------------------------------------------------
 
 #include "interpolate_common.h"
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <fstream>
 

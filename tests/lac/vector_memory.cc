@@ -13,9 +13,9 @@
 
 #include "../tests.h"
 
-#include <base/exceptions.h>
-#include <lac/vector_memory.h>
-#include <lac/vector.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 

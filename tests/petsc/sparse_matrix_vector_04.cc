@@ -15,8 +15,8 @@
 // check SparseMatrix::Tvmult_add
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>
-#include <lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
 #include <fstream>
 #include <iostream>
 #include <vector>

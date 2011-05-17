@@ -15,8 +15,8 @@
 // check copy constructor TrilinosWrappers::Vector::Vector(Vector) 
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_vector.h>    
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

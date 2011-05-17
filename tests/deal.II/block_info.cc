@@ -12,12 +12,12 @@
 //----------------------------------------------------------------------
 
 #include "../tests.h"
-#include <dofs/block_info.h>
-#include <multigrid/mg_dof_handler.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
+#include <deal.II/dofs/block_info.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <fstream>
 
 

@@ -16,8 +16,8 @@
 // incidentally also uncovered a bug in Patterns::Integer::match
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/parameter_handler.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
 void check (const char *p)

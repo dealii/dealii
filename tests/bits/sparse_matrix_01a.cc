@@ -18,7 +18,7 @@
 // since sometime in the first half of 2010).
 
 #include "../tests.h"
-#include <lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>    
 #include <fstream>
 #include <iomanip>
 

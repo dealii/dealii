@@ -17,8 +17,8 @@
 // function
 
 #include "../tests.h"
-#include <lac/block_sparsity_pattern.h>
-#include <lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 

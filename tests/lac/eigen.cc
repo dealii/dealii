@@ -18,13 +18,13 @@
 #include <iomanip>
 #include <iomanip>
 #include "testmatrix.h"
-#include <base/logstream.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <lac/vector_memory.h>
-#include <lac/solver_control.h>
-#include <lac/eigen.h>
-#include <lac/precondition.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/eigen.h>
+#include <deal.II/lac/precondition.h>
 
 int main()
 {

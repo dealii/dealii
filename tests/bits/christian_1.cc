@@ -14,23 +14,23 @@
 // check intergrid transfer
 
 #include "../tests.h"
-#include <base/function_derivative.h>
-#include <base/quadrature_lib.h>
-#include <lac/vector.h>
-#include <grid/grid_generator.h>
-#include <fe/fe.h>
-#include <fe/fe_q.h>
-#include <dofs/dof_handler.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_tools.h>
-#include <numerics/data_out.h>
-#include <numerics/vectors.h>
-#include <numerics/data_out_stack.h>
+#include <deal.II/base/function_derivative.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/data_out_stack.h>
 #include <fstream>
 #include <iomanip>
 
-#include <grid/intergrid_map.h>
-#include <dofs/dof_handler.h>
+#include <deal.II/grid/intergrid_map.h>
+#include <deal.II/dofs/dof_handler.h>
 
 namespace DoFToolsEx
 {

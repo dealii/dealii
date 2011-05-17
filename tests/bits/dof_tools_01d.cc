@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 
 // check
 //   DoFTools::

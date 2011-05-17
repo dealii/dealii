@@ -15,9 +15,9 @@
 // check SparsityPattern::copy_from(CompressedSparsityPattern)
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <iomanip>
 #include <fstream>
 

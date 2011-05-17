@@ -16,12 +16,12 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 
 #include <fstream>
 #include <iomanip>

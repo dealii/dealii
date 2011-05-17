@@ -15,9 +15,9 @@
 // other way round
 
 #include "../tests.h"
-#include <base/symmetric_tensor.h>
-#include <base/logstream.h>
-#include <lac/vector.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
 #include <fstream>
 #include <iomanip>
 

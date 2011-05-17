@@ -15,7 +15,7 @@
 // check ChunkSparseMatrix::operator /=
 
 #include "../tests.h"
-#include <lac/chunk_sparse_matrix.h>    
+#include <deal.II/lac/chunk_sparse_matrix.h>    
 #include <fstream>
 
 

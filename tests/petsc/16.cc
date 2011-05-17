@@ -16,7 +16,7 @@
 // writing and overwriting the same elements
 
 #include "../tests.h"
-#include <lac/petsc_vector.h>    
+#include <deal.II/lac/petsc_vector.h>    
 #include <fstream>
 #include <iostream>
 #include <vector>

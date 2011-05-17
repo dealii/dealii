@@ -1,7 +1,7 @@
 // $Id$
 
 #include "../tests.h"
-#include <multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_base.h>
 
 /**
  * Generator for system matrix and right hand side.

@@ -15,20 +15,20 @@
 // create and print a bunch of ConstrainMatrices
 
 #include "../tests.h"
-#include <dofs/dof_handler.h>
-#include <grid/tria.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
-#include <grid/tria_boundary.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <lac/sparse_matrix.h>
-#include <base/parameter_handler.h>
-#include <dofs/dof_accessor.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_tools.h>
-#include <grid/grid_out.h>
-#include <base/logstream.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/base/parameter_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <cmath>

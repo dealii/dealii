@@ -15,8 +15,8 @@
 // check ChunkSparseMatrix::Tvmult_add
 
 #include "../tests.h"
-#include <lac/vector.h>
-#include <lac/chunk_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/chunk_sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>

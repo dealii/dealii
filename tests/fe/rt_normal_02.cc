@@ -19,32 +19,32 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 #define PRECISION 2
 
 #include <fstream>
 
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <fe/mapping_q.h>
-#include <fe/mapping_q1_eulerian.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_q1_eulerian.h>
 
-#include <numerics/vectors.h>
-#include <numerics/data_out.h>
-#include <lac/vector.h>
-#include <base/function.h>
-#include <base/quadrature.h>
-#include <base/quadrature_lib.h>
-#include <lac/constraint_matrix.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <fe/fe_system.h>
-#include <fe/fe.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_dgq.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_dgq.h>
 
 std::ofstream logfile ("rt_normal_02/output");
 

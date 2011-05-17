@@ -13,9 +13,9 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/matrix_out.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/matrix_out.h>
+#include <deal.II/lac/full_matrix.h>
 #include <fstream>
 #include <iomanip>
 

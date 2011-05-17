@@ -16,7 +16,7 @@
 // instantiates that class, to make sure it still compiles
 
 #include "../tests.h"
-#include <lac/solver_selector.h>
+#include <deal.II/lac/solver_selector.h>
 #include <fstream>
 
 // instantiation here

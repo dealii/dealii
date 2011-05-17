@@ -18,15 +18,15 @@
 #include <iomanip>
 #include <fstream>
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
 
-#include <fe/fe_tools.h>
+#include <deal.II/fe/fe_tools.h>
 
 
 template <typename number>

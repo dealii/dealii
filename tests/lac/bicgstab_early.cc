@@ -21,12 +21,12 @@
 #include <iomanip>
 #include <iomanip>
 #include "testmatrix.h"
-#include <base/logstream.h>
-#include <lac/sparse_matrix.h>
-#include <lac/sparse_ilu.h>
-#include <lac/solver_bicgstab.h>
-#include <lac/vector.h>
-#include <lac/precondition.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_ilu.h>
+#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/precondition.h>
 
 
 int main()

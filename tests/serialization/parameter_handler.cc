@@ -15,7 +15,7 @@
 // check serialization for Parameter_handler
 
 #include "serialization.h"
-#include <base/parameter_handler.h>
+#include <deal.II/base/parameter_handler.h>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/serialization/vector.hpp>
 

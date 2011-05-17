@@ -19,10 +19,10 @@
 #include <fstream>
 #include <sstream>
 
-#include <base/logstream.h>
-#include <fe/fe.h>
-#include <fe/fe_tools.h>
-#include <base/quadrature.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_tools.h>
+#include <deal.II/base/quadrature.h>
 
 template <int dim>
 void test_fe(const char* name)

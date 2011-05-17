@@ -13,11 +13,11 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/matrix_lib.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/matrix_lib.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <fstream>
 #include <iomanip>

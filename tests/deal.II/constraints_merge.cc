@@ -15,8 +15,8 @@
 // merge and print a bunch of ConstrainMatrices
 
 #include "../tests.h"
-#include <lac/constraint_matrix.h>
-#include <base/logstream.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <iomanip>

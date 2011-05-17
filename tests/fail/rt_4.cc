@@ -15,8 +15,8 @@
 // Just output the prolongation matrices of the RT element
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <fstream>
 #include <string>

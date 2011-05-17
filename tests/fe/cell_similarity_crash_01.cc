@@ -21,12 +21,12 @@
 // invalidate the stored cell once mesh refinement happens.
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_values.h>
-#include <fe/fe_q.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <fstream>
 

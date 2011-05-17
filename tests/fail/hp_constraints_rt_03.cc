@@ -18,7 +18,7 @@ char logname[] = "hp_constraints_rt_03/output";
 
 
 #include "../hp/hp_constraints_common.h"
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 
 template <int dim>

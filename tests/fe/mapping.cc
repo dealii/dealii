@@ -4,21 +4,21 @@
 // Shows the shape functions implemented and computes the area of cells.
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <grid/tria_boundary_lib.h>
-#include <fe/mapping_cartesian.h>
-#include <fe/mapping_q1.h>
-#include <fe/mapping_q.h>
-#include <fe/fe_q.h>
-#include <fe/fe_values.h>
-#include <fe/fe.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe.h>
 #include <vector>
 #include <fstream>
 #include <iomanip>

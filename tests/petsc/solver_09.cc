@@ -24,12 +24,12 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <base/logstream.h>
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/petsc_vector.h>
-#include <lac/petsc_solver.h>
-#include <lac/petsc_precondition.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>

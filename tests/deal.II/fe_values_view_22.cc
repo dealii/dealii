@@ -12,25 +12,25 @@
 //----------------------------------------------------------------------
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
-#include <lac/block_vector.h>
-#include <lac/full_matrix.h>
-#include <lac/block_sparse_matrix.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_renumbering.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_system.h>
-#include <fe/fe_values.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <fe/fe_q.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/fe_q.h>
 
 #include <fstream>
 #include <iostream>

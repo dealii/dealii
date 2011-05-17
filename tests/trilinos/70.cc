@@ -15,9 +15,9 @@
 // check TrilinosScalar
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <base/logstream.h>
-#include <lac/trilinos_vector.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <fstream>
 

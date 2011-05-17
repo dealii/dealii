@@ -15,8 +15,8 @@
 // Test correct handling of ghost elements in PETScWrappers::mpi::vectors
 
 #include "../tests.h"
-#include <lac/petsc_parallel_vector.h>
-#include <base/index_set.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/base/index_set.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>

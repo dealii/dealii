@@ -19,7 +19,7 @@
 #include <fstream>
 #include <cmath>
 
-#include <base/work_stream.h>
+#include <deal.II/base/work_stream.h>
 
 
 struct ScratchData

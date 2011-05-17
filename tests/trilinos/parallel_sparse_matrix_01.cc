@@ -24,9 +24,9 @@
 // malloc calls have been performed
 
 #include "../tests.h" 
-#include <base/utilities.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/compressed_sparsity_pattern.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <fstream>
 #include <cstdlib>
 

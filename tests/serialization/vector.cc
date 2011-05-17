@@ -14,7 +14,7 @@
 // check serialization for Vector
 
 #include "serialization.h"
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 #include <boost/serialization/vector.hpp>
 
 void test ()

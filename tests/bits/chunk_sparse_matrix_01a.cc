@@ -17,7 +17,7 @@
 // ChunkSparseMatrix::el() returns zero and operator() throws an exception
 
 #include "../tests.h"
-#include <lac/chunk_sparse_matrix.h>    
+#include <deal.II/lac/chunk_sparse_matrix.h>    
 #include <fstream>
 #include <iomanip>
 

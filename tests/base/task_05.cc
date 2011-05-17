@@ -25,7 +25,7 @@
 #include <fstream>
 #include <unistd.h>
 
-#include <base/thread_management.h>
+#include <deal.II/base/thread_management.h>
 
 
 int test (int i) 

@@ -32,16 +32,16 @@
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <base/logstream.h>
-#include <base/tensor.h>
-#include <grid/tria.h>
-#include <distributed/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_in.h>
-#include <grid/intergrid_map.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/intergrid_map.h>
 
 #include <fstream>
 #include <cstdlib>

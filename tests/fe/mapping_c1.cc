@@ -5,15 +5,15 @@
 // C1-ness of the C1-mapping
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <grid/tria.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_q.h>
-#include <fe/mapping_c1.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_c1.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <algorithm>
 #include <fstream>

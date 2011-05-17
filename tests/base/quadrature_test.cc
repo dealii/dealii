@@ -21,9 +21,9 @@
 #include <iomanip>
 #include <fstream>
 
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/qprojector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/qprojector.h>
 #include <cmath>
 
 template <int dim>

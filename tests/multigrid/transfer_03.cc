@@ -16,26 +16,26 @@
 
 //TODO:[GK] Add checks for RT again!
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/mg_level_object.h>
-#include <lac/vector.h>
-#include <lac/block_vector.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_renumbering.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
-#include <multigrid/mg_transfer.h>
-#include <multigrid/mg_tools.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_tools.h>
 
 #include <fstream>
 #include <iomanip>

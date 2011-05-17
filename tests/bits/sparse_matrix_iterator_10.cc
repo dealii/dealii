@@ -18,8 +18,8 @@
 // instead of the prefix form
 
 #include "../tests.h"
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 

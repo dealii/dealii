@@ -17,18 +17,18 @@
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <distributed/tria.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <lac/constraint_matrix.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <base/utilities.h>
-#include <base/index_set.h>
-#include <lac/trilinos_vector.h>
-#include <numerics/data_out.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/numerics/data_out.h>
 
 
 template <int dim>

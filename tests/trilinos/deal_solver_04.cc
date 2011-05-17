@@ -15,24 +15,24 @@
 
 
 #include "../tests.h" 
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 #include "../lac/testmatrix.h"
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <base/logstream.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_vector.h>
-#include <lac/solver_control.h>
-#include <lac/solver_cg.h>
-#include <lac/solver_gmres.h>
-#include <lac/solver_bicgstab.h>
-#include <lac/solver_richardson.h>
-#include <lac/solver_qmrs.h>
-#include <lac/solver_minres.h>
-#include <lac/precondition.h>
-#include <lac/vector_memory.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_bicgstab.h>
+#include <deal.II/lac/solver_richardson.h>
+#include <deal.II/lac/solver_qmrs.h>
+#include <deal.II/lac/solver_minres.h>
+#include <deal.II/lac/precondition.h>
+#include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
 template<class SOLVER, class MATRIX, class VECTOR, class PRECONDITION>

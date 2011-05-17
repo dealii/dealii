@@ -19,10 +19,10 @@
 #include <iomanip>
 #include <cstdlib>
 
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/eigen.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/eigen.h>
 
 const double entries[9] = { 11,12,13,21,22,23,31,32,33 };
 

@@ -17,13 +17,13 @@
 #include <iomanip>
 #include <fstream>
 
-#include <fe/fe_q.h>
-#include <dofs/dof_handler.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <dofs/dof_accessor.h>
-#include <grid/grid_generator.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/grid_generator.h>
 
 
 

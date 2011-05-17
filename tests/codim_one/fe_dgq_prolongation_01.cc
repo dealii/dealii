@@ -15,7 +15,7 @@
 // matrices for FE_DGQ<dim-1,dim> were not computed at all
 
 #include "../tests.h"
-#include <fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgq.h>
 
 
 #include <fstream>

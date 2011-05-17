@@ -15,32 +15,32 @@
 // is deformed to represent a quarter of a ring
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <base/numbers.h>
-#include <base/convergence_table.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_refinement.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_values.h>
-#include <fe/mapping.h>
-#include <fe/mapping_q1.h>
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
-#include <numerics/data_out.h>
-#include <fe/fe_system.h>
-#include <fe/fe_q.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/numbers.h>
+#include <deal.II/base/convergence_table.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/matrices.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
 #include <fstream>
 #include <iostream>
 
-#include <fe/mapping_q_eulerian.h>
+#include <deal.II/fe/mapping_q_eulerian.h>
 
 
 // .... IMPOSED DISPLACEMENT

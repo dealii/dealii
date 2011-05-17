@@ -18,13 +18,13 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
-#include <base/function_lib.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_q.h>
-#include <numerics/vectors.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/numerics/vectors.h>
 
 #include <string>
 

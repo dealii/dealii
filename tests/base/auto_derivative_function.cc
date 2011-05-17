@@ -17,11 +17,11 @@
 
 
 #include "../tests.h"
-#include <base/point.h>
-#include <base/auto_derivative_function.h>
-#include <base/convergence_table.h>
-#include <base/logstream.h>
-#include <lac/vector.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/auto_derivative_function.h>
+#include <deal.II/base/convergence_table.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
 
 #include <iomanip>
 #include <cmath>

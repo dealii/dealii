@@ -20,9 +20,9 @@
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
 
 #include "../tests.h"
-#include <lac/sparse_matrix.h>
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/petsc_vector.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <fstream>
 #include <iostream>
 

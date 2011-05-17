@@ -15,8 +15,8 @@
 // vectors
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/petsc_block_vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/petsc_block_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>

@@ -16,9 +16,9 @@
 // entered blocks using print_latex.
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/block_matrix_array.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_matrix_array.h>
+#include <deal.II/lac/full_matrix.h>
 #include <iomanip>
 #include <fstream>
 

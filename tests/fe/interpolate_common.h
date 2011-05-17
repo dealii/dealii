@@ -12,10 +12,10 @@
 //----------------------------------------------------------------------
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/function.h>
-#include <lac/vector.h>
-#include <fe/fe.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/function.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/fe/fe.h>
 
 #include <iomanip>
 

@@ -16,7 +16,7 @@
 
 
 #include "../tests.h"
-#include <base/conditional_ostream.h>
+#include <deal.II/base/conditional_ostream.h>
 #include <fstream>
 #include <iomanip>
 #include <limits>

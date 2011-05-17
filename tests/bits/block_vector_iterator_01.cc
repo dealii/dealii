@@ -15,7 +15,7 @@
 // make sure that block vector iterator allows reading and writing correctly
 
 #include "../tests.h"
-#include <lac/block_vector.h>
+#include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iomanip>
 

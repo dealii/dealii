@@ -18,10 +18,10 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <hp/mapping_collection.h>
-#include <fe/mapping_q.h>
-#include <fe/mapping_q1.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <fstream>
 

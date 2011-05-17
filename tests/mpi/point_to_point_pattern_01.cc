@@ -15,8 +15,8 @@
 // check if mpi is working
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/utilities.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
 
 #include <fstream>
 //#include <mpi.h>

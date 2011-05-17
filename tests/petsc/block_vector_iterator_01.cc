@@ -15,7 +15,7 @@
 // make sure that block vector iterator allows reading and writing correctly
 
 #include "../tests.h"
-#include <lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
 #include <fstream>
 #include <iostream>
 

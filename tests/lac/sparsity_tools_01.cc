@@ -17,8 +17,8 @@
 // to trip over that
 
 #include "../tests.h"
-#include <lac/sparsity_tools.h>
-#include <lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/sparsity_pattern.h>
 
 #include <iomanip>
 #include <fstream>

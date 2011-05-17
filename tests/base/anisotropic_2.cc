@@ -20,8 +20,8 @@
 #include <fstream>
 #include <cmath>
 
-#include <base/logstream.h>
-#include <base/tensor_product_polynomials.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 
 
 using namespace Polynomials;

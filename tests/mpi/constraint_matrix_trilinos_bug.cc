@@ -19,28 +19,28 @@
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <base/logstream.h>
-#include <base/tensor.h>
-#include <base/function.h>
-#include <numerics/vectors.h>
-#include <grid/filtered_iterator.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/function.h>
+#include <deal.II/numerics/vectors.h>
+#include <deal.II/grid/filtered_iterator.h>
 
-#include <grid/tria.h>
-#include <distributed/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_out.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <grid/tria_boundary_lib.h>
-#include <numerics/data_out.h>
-#include <lac/trilinos_vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/lac/trilinos_vector.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <fstream>
 #include <sstream>

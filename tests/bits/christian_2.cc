@@ -14,11 +14,11 @@
 // check one aspect of DataOutStack in 2+1d
 
 #include "../tests.h"
-#include <lac/vector.h>
-#include <grid/grid_generator.h>
-#include <fe/fe_q.h>
-#include <dofs/dof_handler.h>
-#include <numerics/data_out_stack.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/numerics/data_out_stack.h>
 #include <fstream>
 #include <iomanip>
 

@@ -24,9 +24,9 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/tridiagonal_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/tridiagonal_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iomanip>

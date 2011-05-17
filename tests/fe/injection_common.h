@@ -18,19 +18,19 @@
 // cells, or the other way around. test this
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/full_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/full_matrix.h>
 
-#include <fe/fe_abf.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_dgp_monomial.h>
-#include <fe/fe_dgp_nonparametric.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_q.h>
-#include <fe/fe_q_hierarchical.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_system.h>
+#include <deal.II/fe/fe_abf.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgp_monomial.h>
+#include <deal.II/fe/fe_dgp_nonparametric.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <fstream>
 #include <vector>

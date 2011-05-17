@@ -15,19 +15,19 @@
 // right place.
 
 #include "../tests.h"
-#include <numerics/mesh_worker.h>
-#include <numerics/mesh_worker_assembler.h>
-#include <numerics/mesh_worker_loop.h>
+#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/numerics/mesh_worker_assembler.h>
+#include <deal.II/numerics/mesh_worker_loop.h>
 
-#include <base/std_cxx1x/function.h>
-#include <base/logstream.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/sparse_matrix.h>
-#include <grid/grid_generator.h>
-#include <dofs/dof_tools.h>
-#include <fe/mapping_q1.h>
-#include <fe/fe_q.h>
-#include <fe/fe_dgp.h>
+#include <deal.II/base/std_cxx1x/function.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgp.h>
 
 #include <fstream>
 #include <iomanip>

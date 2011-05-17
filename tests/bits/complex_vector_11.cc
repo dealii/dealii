@@ -15,7 +15,7 @@
 // check Vector<std::complex<double> >::size()
 
 #include "../tests.h"
-#include <lac/vector.h>    
+#include <deal.II/lac/vector.h>    
 #include <fstream>
 #include <iomanip>
 

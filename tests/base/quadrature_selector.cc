@@ -19,9 +19,9 @@
 #include "../tests.h"
 #include <fstream>
 
-#include <base/logstream.h>
-#include <base/quadrature_lib.h>
-#include <base/quadrature_selector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/quadrature_selector.h>
 #include <string>
 #include <cmath>
 

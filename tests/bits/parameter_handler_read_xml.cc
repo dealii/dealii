@@ -15,8 +15,8 @@
 // check ParameterHandler::read_input_from_xml
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/parameter_handler.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/parameter_handler.h>
 #include <fstream>
 
 

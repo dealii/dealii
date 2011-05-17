@@ -22,7 +22,7 @@
 #include <iomanip>
 #include <fstream>
 
-#include <base/thread_management.h>
+#include <deal.II/base/thread_management.h>
 
 struct X
 {

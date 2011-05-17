@@ -14,8 +14,8 @@
 // test the determinant code for n>3
 
 #include "../tests.h"
-#include <base/tensor.h>
-#include <base/logstream.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/logstream.h>
 #include <fstream>
 #include <iomanip>
 

@@ -23,24 +23,24 @@
 
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
-#include <dofs/dof_handler.h>
-#include <dofs/dof_accessor.h>
-#include <dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_renumbering.h>
 
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
 
-#include <grid/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
 
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
-#include <numerics/point_value_history.h>
+#include <deal.II/numerics/point_value_history.h>
 
 #include <fstream>
 

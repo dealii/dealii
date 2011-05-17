@@ -17,8 +17,8 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/constraint_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/constraint_matrix.h>
 
 #include <fstream>
 

@@ -19,15 +19,15 @@
 
 #include "../tests.h"
 
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_out.h>
-#include <grid/grid_tools.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_q.h>
-#include <lac/constraint_matrix.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/lac/constraint_matrix.h>
 
 
 int main ()

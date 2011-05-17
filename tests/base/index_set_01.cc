@@ -19,7 +19,7 @@
 #include <fstream>
 #include <cmath>
 
-#include <base/index_set.h>
+#include <deal.II/base/index_set.h>
 
 
 void test ()

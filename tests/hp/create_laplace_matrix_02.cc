@@ -26,25 +26,25 @@
 
 
 #include "../tests.h"
-#include <base/quadrature_lib.h>
-#include <base/logstream.h>
-#include <base/function_lib.h>
-#include <lac/sparse_matrix.h>
-#include <lac/vector.h>
-#include <grid/tria.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria_accessor.h>
-#include <grid/grid_generator.h>
-#include <hp/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <dofs/dof_constraints.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <fe/mapping_q.h>
-#include <hp/mapping_collection.h>
-#include <hp/fe_collection.h>
-#include <hp/q_collection.h>
-#include <numerics/matrices.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/function_lib.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/dofs/dof_constraints.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/hp/mapping_collection.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/numerics/matrices.h>
 
 #include <fstream>
 

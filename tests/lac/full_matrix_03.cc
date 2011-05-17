@@ -20,10 +20,10 @@
 #include <iomanip>
 #include <cstdlib>
 
-#include <base/logstream.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <lac/eigen.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/eigen.h>
 
 const double entries_A[9] = { 1,2,3,4,5,6,7,8,9 };
 const double entries_B[9] = { 2,1,1,1,2,3,2,1,2 };

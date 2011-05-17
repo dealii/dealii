@@ -14,7 +14,7 @@
 // check serialization for SymmetricTensor<2,dim>
 
 #include "serialization.h"
-#include <base/symmetric_tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 
 
 void test ()

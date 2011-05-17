@@ -13,8 +13,8 @@
 
 
 #include "../tests.h"
-#include <lac/petsc_sparse_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
 
 #include <fstream>
 #include <iostream>

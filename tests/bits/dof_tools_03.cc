@@ -13,8 +13,8 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <lac/constraint_matrix.h>
-#include <lac/vector.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/vector.h>
 
 // check
 //   DoFTools::

@@ -16,7 +16,7 @@
 // element
 
 #include "../tests.h"
-#include <fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <vector>
 #include <fstream>

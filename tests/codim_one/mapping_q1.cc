@@ -17,16 +17,16 @@
 
 #include "../tests.h"
 #include <fstream>
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 // all include files you need here
 
-#include <grid/tria.h>
-#include <grid/grid_in.h>
-#include <grid/grid_out.h>
-#include <fe/mapping.h>
-#include <fe/mapping_q1.h>
-#include <base/quadrature_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <fstream>
 #include <string>

@@ -16,21 +16,21 @@
 #include <iostream>
 #include <fstream>
 
-#include <base/logstream.h>
-#include <base/polynomials_raviart_thomas.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/polynomials_raviart_thomas.h>
 
-#include <grid/tria_iterator.h>
-#include <dofs/dof_accessor.h>
-#include <fe/fe_q.h>
-#include <fe/fe_q_hierarchical.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_dgp.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/fe_nedelec.h>
-#include <fe/fe_bdm.h>
-#include <fe/fe_dg_vector.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_bdm.h>
+#include <deal.II/fe/fe_dg_vector.h>
 
-#include <fe/fe_system.h>
+#include <deal.II/fe/fe_system.h>
 
 //TODO: Find support_on_face problems for test-no. > 7
 //TODO: Check support_on_face in 3D

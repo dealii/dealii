@@ -18,19 +18,19 @@
 // one uses a mesh of the 747 nacelle
 
 #include "../tests.h"
-#include <dofs/dof_handler.h>
-#include <grid/tria.h>
-#include <grid/tria_boundary.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_out.h>
-#include <grid/grid_in.h>
-#include <grid/grid_generator.h>
-#include <base/logstream.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/base/logstream.h>
 
-// #include <fe/fe_q.h>
-// #include <numerics/data_out.h>
+// #include <deal.II/fe/fe_q.h>
+// #include <deal.II/numerics/data_out.h>
 
 
 #include <fstream>

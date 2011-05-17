@@ -18,9 +18,9 @@
 // result doesn't change
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <fe/fe_dgq.h>
-#include <fe/fe_tools.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_tools.h>
 
 #include <fstream>
 #include <string>

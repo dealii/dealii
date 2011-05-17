@@ -18,13 +18,13 @@
  */
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/mg_level_object.h>
-#include <lac/vector.h>
-#include <lac/full_matrix.h>
-#include <multigrid/mg_base.h>
-#include <multigrid/multigrid.h>
-#include <multigrid/mg_matrix.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/mg_level_object.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/multigrid.h>
+#include <deal.II/multigrid/mg_matrix.h>
 
 #include <fstream>
 

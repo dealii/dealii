@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "dof_tools_common.h"
-#include <lac/vector.h>
+#include <deal.II/lac/vector.h>
 
 // check
 //   FE::hp_constraints_are_implemented

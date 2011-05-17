@@ -20,8 +20,8 @@
 
 #include "../tests.h"
 #include "data_out_common.h"
-#include <lac/sparsity_pattern.h>
-#include <numerics/data_out_rotation.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/numerics/data_out_rotation.h>
 
 
 std::string output_file_name = "data_out_rotation_04/output";

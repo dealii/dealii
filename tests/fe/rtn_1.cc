@@ -15,12 +15,12 @@
 // Show the shape functions in support points
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/qprojector.h>
-#include <grid/grid_generator.h>
-#include <fe/fe_raviart_thomas.h>
-#include <fe/mapping_cartesian.h>
-#include <fe/fe_values.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/fe/fe_values.h>
 
 #include <vector>
 #include <fstream>

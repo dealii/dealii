@@ -14,7 +14,7 @@
 // check serialization for Table<5, int>
 
 #include "serialization.h"
-#include <base/table.h>
+#include <deal.II/base/table.h>
 #include <boost/serialization/vector.hpp>
 
 void test ()

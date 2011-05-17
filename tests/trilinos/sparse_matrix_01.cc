@@ -20,9 +20,9 @@
 // this testcase is reduced from one contributed by Habib Talavatifard
 
 #include "../tests.h"
-#include <base/utilities.h>
-#include <lac/trilinos_sparse_matrix.h>
-#include <lac/trilinos_sparsity_pattern.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <fstream>
 #include <iostream>
 

@@ -18,14 +18,14 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <fe/fe_q_hierarchical.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/dofs/dof_tools.h>
 
-#include <lac/block_sparse_matrix.h>
-#include <lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
 
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
 
 
 

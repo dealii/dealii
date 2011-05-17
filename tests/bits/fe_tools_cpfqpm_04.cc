@@ -13,7 +13,7 @@
 
 #include "../tests.h"
 #include "fe_tools_common.h"
-#include <base/quadrature_lib.h>
+#include <deal.II/base/quadrature_lib.h>
 
 // check
 //   FETools::compute_projection_from_quadrature_points_matrix

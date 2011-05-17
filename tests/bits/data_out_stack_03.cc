@@ -14,17 +14,17 @@
 // Output a field constant in time
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <dofs/dof_handler.h>
-#include <grid/grid_generator.h>
-#include <fe/fe_q.h>
-#include <lac/vector.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/lac/vector.h>
 
-#include <numerics/data_out_stack.h>
+#include <deal.II/numerics/data_out_stack.h>
 #include <fstream>
 #include <iomanip>
 
-#include <base/logstream.h>
+#include <deal.II/base/logstream.h>
 
 
 

@@ -13,14 +13,14 @@
 
 
 #include "../tests.h"
-#include <grid/tria_boundary.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
-#include <grid/grid_out.h>
-#include <base/logstream.h>
+#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/base/logstream.h>
 #include <cmath>
 #include <cstdlib>
 

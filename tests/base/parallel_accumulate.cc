@@ -17,7 +17,7 @@
 #include <iomanip>
 #include <fstream>
 
-#include <base/parallel.h>
+#include <deal.II/base/parallel.h>
 
 
 int sum (const int begin,

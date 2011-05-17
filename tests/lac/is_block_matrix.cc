@@ -13,14 +13,14 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/block_sparse_matrix.h>
-#include <lac/sparsity_pattern.h>
-#include <lac/compressed_sparsity_pattern.h>
-#include <lac/compressed_simple_sparsity_pattern.h>
-#include <lac/compressed_set_sparsity_pattern.h>
-#include <lac/block_sparsity_pattern.h>
-#include <lac/block_sparse_matrix_ez.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/compressed_set_sparsity_pattern.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/block_sparse_matrix_ez.h>
 
 #include <fstream>
 #include <iomanip>

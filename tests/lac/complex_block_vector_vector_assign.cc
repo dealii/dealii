@@ -14,8 +14,8 @@
 // check assignment between block vectors and regular vectors
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/block_vector.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_vector.h>
 #include <fstream>
 #include <iomanip>
 #include <vector>

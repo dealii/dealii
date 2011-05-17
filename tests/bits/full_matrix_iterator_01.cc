@@ -15,7 +15,7 @@
 // like sparse_matrix_iterator_12, but for FullMatrix
 
 #include "../tests.h"
-#include <lac/full_matrix.h>
+#include <deal.II/lac/full_matrix.h>
 #include <fstream>
 #include <iomanip>
 

@@ -14,13 +14,13 @@
 
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/grid_tools.h>
-#include <dofs/dof_handler.h>
-#include <hp/dof_handler.h>
-#include <multigrid/mg_dof_handler.h>
-#include <multigrid/mg_dof_accessor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <fstream>
 

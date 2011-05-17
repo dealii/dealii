@@ -16,19 +16,19 @@
 
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <base/tensor.h>
-#include <distributed/tria.h>
-#include <grid/tria_accessor.h>
-#include <grid/tria_iterator.h>
-#include <grid/grid_generator.h>
-#include <grid/intergrid_map.h>
-#include <base/utilities.h>
-#include <dofs/dof_handler.h>
-#include <dofs/dof_tools.h>
-#include <fe/fe_system.h>
-#include <fe/fe_q.h>
-#include <fe/fe_dgq.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/intergrid_map.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
 
 #include <fstream>
 #include <numeric>
