@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,11 +31,11 @@
 #      define UINTMAX_C(x) x ## ULL
 #    endif
 
-#    include "../contrib/boost/libs/thread/src/pthread/once.cpp"
-#    include "../contrib/boost/libs/thread/src/pthread/thread.cpp"
+#    include "../contrib/boost-1.46.1/libs/thread/src/pthread/once.cpp"
+#    include "../contrib/boost-1.46.1/libs/thread/src/pthread/thread.cpp"
 #  else
-#    include "../contrib/boost/libs/thread/src/win32/once.cpp"
-#    include "../contrib/boost/libs/thread/src/win32/thread.cpp"
+#    include "../contrib/boost-1.46.1/libs/thread/src/win32/once.cpp"
+#    include "../contrib/boost-1.46.1/libs/thread/src/win32/thread.cpp"
 #  endif
 
 #endif
