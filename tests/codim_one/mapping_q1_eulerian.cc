@@ -3,7 +3,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005, 2009, 2010 by the deal.II authors 
+//    Copyright (C) 2005, 2009, 2010, 2011 by the deal.II authors 
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -66,14 +66,17 @@ void test(std::string filename) {
     endc=tria.end() ;
   Point<spacedim> real;
   Point<dim> unit;
+  double eps = 1e-10;
   for(;cell!=endc;++cell)
     {
       deallog<<cell<< std::endl;	
       for(unsigned int q=0; q<quad.size(); ++q)
 	{
 	  real = mapping.transform_unit_to_real_cell(cell, quad.point(q));
-	  // unit = mapping.transform_real_to_unit_cell(cell, real);
+	  unit = mapping.transform_real_to_unit_cell(cell, real);
 	  deallog<<quad.point(q)<< " -> " << real << std::endl;
+	  if( (unit-quad.point(q)).norm()>eps)
+	    deallog<<quad.point(q)<< " ->-> " << unit << std::endl;
 	}
     }	   
     

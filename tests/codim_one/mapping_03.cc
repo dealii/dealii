@@ -30,13 +30,13 @@
 
 
 template <int dim>
-void test ()
+void test (unsigned int degree)
 {
   Triangulation<dim-1, dim> mesh;
   GridGenerator::hyper_cube(mesh);
 
   QGauss<dim-1> quadrature(dim == 2 ? 3 : 2);
-  MappingQ<dim-1,dim> mapping(1);
+  MappingQ<dim-1,dim> mapping(degree);
   Point<dim> p;
 
 				   // Try to project a point on the
@@ -47,7 +47,7 @@ void test ()
   Point<dim-1> q =
     mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
 
-  deallog << "P: " << p
+  deallog << "Mapping Q("<< degree<< "): P: " << p
 	  << ", on unit: " << q << endl;
   
 }
@@ -60,8 +60,11 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(3);
 
-  test<2> ();
-  test<3> ();
+  test<2> (1);
+  test<2> (2);
+  
+  test<3> (1);
+  test<3> (2);
 
   return 0;
 }
