@@ -1355,7 +1355,13 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
                &*mdata);
 
   compute_mapping_support_points(cell, p_data->mapping_support_points);
-
+				   // If this should be Q1, ignore all
+				   // other support points.
+  if(p_data->shape_values.size()<p_data->mapping_support_points.size())
+    p_data->mapping_support_points.resize
+      (GeometryInfo<dim>::vertices_per_cell);
+  
+  
   return this->transform_unit_to_real_cell_internal(*p_data);
 }
 
@@ -1389,6 +1395,12 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
       std::vector<Point<spacedim> > &points = mdata->mapping_support_points;
       compute_mapping_support_points (cell, points);
+				       // If this is a q1 mapping,
+				       // then only use the support
+				       // points on the vertices.
+      if(mdata->shape_values.size()<points.size())
+	points.resize(GeometryInfo<dim>::vertices_per_cell);
+      
 
       this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
     }

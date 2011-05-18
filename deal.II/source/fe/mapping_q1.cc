@@ -1459,6 +1459,15 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
 				   // points
   compute_mapping_support_points(cell, mdata->mapping_support_points);
 
+				   // Mapping support points can be
+				   // bigger than necessary. If this
+				   // is the case, force them to be
+				   // Q1.
+  if(mdata->mapping_support_points.size() > mdata->shape_values.size())
+    mdata->mapping_support_points.resize
+      (GeometryInfo<dim>::vertices_per_cell);
+  
+
   return transform_unit_to_real_cell_internal(*mdata);
 }
 
@@ -1509,14 +1518,15 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 					      | update_transformation_gradients,
 					      point_quadrature)));
 
-  MappingQ1<dim,spacedim>::compute_mapping_support_points (cell,
-							   mdata->mapping_support_points);
-
-// compute_mapping_support_points (cell, mdata->mapping_support_points);
-  
-  Assert(mdata->mapping_support_points.size() ==
-         GeometryInfo<dim>::vertices_per_cell,
+  compute_mapping_support_points (cell, mdata->mapping_support_points);
+				   // The support points have to be at
+				   // least as many as there are
+				   // vertices.
+  Assert(mdata->mapping_support_points.size() >=
+	 GeometryInfo<dim>::vertices_per_cell,
 	 ExcInternalError());
+				   // Ignore non vertex support points.
+  mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
 
 				   // perform the newton iteration.
   transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
