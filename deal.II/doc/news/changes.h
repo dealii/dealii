@@ -30,27 +30,18 @@ inconvenience this causes.
 
 <ol>
 
-<li> New: Mapping<dim,spacedim>::transform_real_to_unit_cell  now
-works also in the codimension one case, where it performs the normal
-projection of the point on the codimension one surface.
-<br> (Luca Heltai, 2011/05/17)
-
-<li> New: The PersistentTriangulation class now works also in
-the codimension one case.
-<br> (Luca Heltai, 2011/05/16)
-
 <li> Changed: Traditionally, include directories were set through the
 <code>-I</code> flag in make files in such a way that one would do
 @code
   #include <base/quadrature.h>
-@encode
+@endcode
 In preparation for future changes that will make possible installing
 header files in a directory under <code>/usr/include</code> it seemed
 useful to install everything under <code>/usr/include/deal.II</code>
 and include them as
 @code
   #include <deal.II/base/quadrature.h>
-@encode
+@endcode
 This change has been made throughout the library and tutorial programs.
 However, the old way of using include directories will continue to work
 for at least one release for backward compatibility.
@@ -133,6 +124,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Mapping<dim,spacedim>::transform_real_to_unit_cell  now
+works also in the codimension one case, where it performs the normal
+projection of the point on the codimension one surface.
+<br> (Luca Heltai, 2011/05/17)
+
 <li> New: The PersistentTriangulation class now works also in
 the codimension one case.
 <br>
