@@ -84,13 +84,13 @@ int main ()
   deallog.attach(logfile);
   deallog.depth_console(0);
   
-  test<1,1>(1);
-  test<2,2>(1);
-  test<3,3>(1);
+   test<1,1>(1);
+   test<2,2>(1);
+   test<3,3>(1);
 
-  test<1,1>(2);
-  test<2,2>(2);
-  test<3,3>(2);
+   test<1,1>(2);
+   test<2,2>(2);
+   test<3,3>(2);
   return 0;
 }
                   
