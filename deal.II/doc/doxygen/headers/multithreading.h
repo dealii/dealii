@@ -98,16 +98,12 @@
  * identified with individual C++ statements, but often they more
  * generally coincide with entire code blocks.
  *
- * @todo The following does not seem to be about task based, but
- * rather thread based parallelism. I am not yet sufficiently familiar
- * with the content of this page to remove it with confidence,
- * though. GK
- * 
- * The point here is this: To exploit the independence of tasks 2 and 3, we
- * could start two threads and run each task on its own thread; we would then
- * wait for the two threads to finish (an operation called "joining a thread")
- * and go on with statement 4. As discussed in more detail below, code to
- * achieve this would look like this:
+ * The point here is this: If we wanted to use threads to exploit the
+ * independence of tasks 2 and 3, we would start two threads and run each of
+ * tasks 2 and 3 on its own thread; we would then wait for the two threads to
+ * finish (an operation called "joining a thread") and go on with statement
+ * 4. Code to achieve this would look like this (the actual syntax is
+ * explained in more detail below):
  * @code
    dof_handler.distribute_dofs (fe);
 
@@ -125,7 +121,7 @@
  * But what if
  * your computer has only one processor core, or if we have two but there is
  * already a different part of the program running in %parallel to the code
- * above? In that case, we could of course still start new threads, but the
+ * above? In that case, the code above would still start new threads, but the
  * program is not going to run faster since no additional compute resources
  * are available; rather, the program will run slower since threads have to be
  * created and destroyed, and the operating system has to schedule threads to
