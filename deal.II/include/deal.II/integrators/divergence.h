@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -34,6 +34,34 @@ namespace LocalIntegrators
  */
   namespace Divergence
   {
+/**
+ * Auxiliary function. Computes the grad-dic-operator from a set of
+ * Hessians.
+ *
+ * @note The third tensor argument is not used in two dimensions and
+ * can for instance duplicate one of the previous.
+ *
+ * @author Guido Kanschat
+ * @date 2011
+ */
+    template <int dim>
+    Tensor<1,dim>
+    grad_div(
+      const Tensor<2,dim>& h0,
+      const Tensor<2,dim>& h1,
+      const Tensor<2,dim>& h2)
+    {
+      Tensor<1,dim> result;
+      for (unsigned int d=0;d<dim;++d)
+	{
+	  result[d] += h0[d][0];
+	  if (dim >=2) result[d] += h1[d][1];
+	  if (dim >=3) result[d] += h2[d][2];
+	}
+      return result;
+    }
+    
+    
 /**
  * Cell matrix for divergence. The derivative is on the trial function.
  *

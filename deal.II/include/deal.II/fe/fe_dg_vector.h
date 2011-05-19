@@ -15,6 +15,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
+#include <deal.II/base/polynomials_nedelec.h>
+#include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/geometry_info.h>
@@ -189,6 +191,98 @@ class FE_DGVector
     Table<3, double> interior_weights;    
 };
 
+
+
+/**
+ * A vector-valued DG element based on the polynomials space of FE_Nedelec.
+ *
+ * @ingroup fe
+ * @author Guido Kanschat
+ * @date 2011
+ */
+template <int dim, int spacedim=dim>
+class FE_DGNedelec : public FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>
+{
+public:
+  /**
+   * Constructor for the N&eacute;d&eacute;lec
+   * element of degree @p p.
+   */
+  FE_DGNedelec (const unsigned int p);
+  
+  /**
+   * Return a string that uniquely
+   * identifies a finite
+   * element. This class returns
+   * <tt>FE_DGNedelec<dim>(degree)</tt>, with
+   * @p dim and @p degree
+   * replaced by appropriate
+   * values.
+   */
+  virtual std::string get_name () const;
+};
+
+
+
+/**
+ * A vector-valued DG element based on the polynomials space of FE_RaviartThomas.
+ *
+ * @ingroup fe
+ * @author Guido Kanschat
+ * @date 2011
+ */
+template <int dim, int spacedim=dim>
+class FE_DGRaviartThomas : public FE_DGVector<PolynomialsRaviartThomas<dim>, dim, spacedim>
+{
+public:
+  /**
+   * Constructor for the N&eacute;d&eacute;lec
+   * element of degree @p p.
+   */
+  FE_DGRaviartThomas (const unsigned int p);
+  
+  /**
+   * Return a string that uniquely
+   * identifies a finite
+   * element. This class returns
+   * <tt>FE_DGRaviartThomas<dim>(degree)</tt>, with
+   * @p dim and @p degree
+   * replaced by appropriate
+   * values.
+   */
+  virtual std::string get_name () const;
+};
+
+
+
+/**
+ * A vector-valued DG element based on the polynomials space of FE_BDM.
+ *
+ * @ingroup fe
+ * @author Guido Kanschat
+ * @date 2011
+ */
+template <int dim, int spacedim=dim>
+class FE_DGBDM : public FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>
+{
+public:
+  /**
+   * Constructor for the N&eacute;d&eacute;lec
+   * element of degree @p p.
+   */
+  FE_DGBDM (const unsigned int p);
+  
+  /**
+   * Return a string that uniquely
+   * identifies a finite
+   * element. This class returns
+   * <tt>FE_DGBDM<dim>(degree)</tt>, with
+   * @p dim and @p degree
+   * replaced by appropriate
+   * values.
+   */
+  virtual std::string get_name () const;
+};
 
 
 DEAL_II_NAMESPACE_CLOSE

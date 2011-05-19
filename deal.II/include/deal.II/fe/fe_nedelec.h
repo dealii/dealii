@@ -152,14 +152,15 @@ template <int dim, int spacedim> class MappingQ;
  * @date 2009, 2010, 2011
  */
 template <int dim>
-class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
+class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim>
+{
    public:
 				     /**
 				      * Constructor for the N&eacute;d&eacute;lec
 				      * element of degree @p p.
 				      */
       FE_Nedelec (const unsigned int p);
-
+      
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
@@ -292,9 +293,16 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 				      * needed within the constructor to
 				      * be passed to the constructor of
 				      * @p FiniteElementData.
+				      *
+				      * If the optional argument
+				      * <tt>dg</tt> is true, the
+				      * vector returned will have all
+				      * degrees of freedom assigned to
+				      * the cell, none on the faces
+				      * and edges.
 				      */
     static std::vector<unsigned int>
-    get_dpo_vector (const unsigned int degree);
+      get_dpo_vector (const unsigned int degree, bool dg=false);
 
 				     /**
 				      * Initialize the @p
@@ -378,7 +386,6 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim> {
 	std::vector<std::vector<Tensor<2, dim> > > shape_gradients;
     };
 
-    const unsigned int deg;
 				     /**
 				      * These are the factors
 				      * multiplied to a function in

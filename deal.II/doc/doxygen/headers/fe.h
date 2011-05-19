@@ -120,12 +120,57 @@
  * Mapping base class (see the @ref mapping module) in conjunction with the
  * FEValues class (see the @ref feaccess module).
  *
- * The FESystem class is different since it doesn't describe shape functions
- * itself, but assembles a vector-valued finite element from other finite
- * element objects. This functionality is described step-8, step-17 and other
+ * <h3>Vector-valued finite elements</h3>
+ *
+ * deal.II provides two different kinds of vector valued
+ * elements. First, there is a group of genuine vector elements,
+ * usually distinguished by the fact, that each vector component
+ * consists of a different set of anisotropic polynomials. These
+ * elements are typically associated with differential
+ * forms. Currently, they are
+ *
+ * <ul>
+ * <li> FE_ABF
+ * <li> FE_BDM, FE_DGBDM
+ * <li> FE_Nedelec, FE_DGNedelec
+ * <li> FE_RaviartThomas, FE_DGRaviartThomas
+ * </ul>
+ *
+ * Additionally, deal.II offers a mechanism to create a vector element
+ * from existing scalar or vector elements. The FESystem class is
+ * responsible for this: it doesn't describe shape functions itself, but
+ * assembles a vector-valued finite element from other finite element
+ * objects. This functionality is described step-8, step-17 and other
  * tutorial programs after that.
- * 
- * @ingroup feall
+ *
+ * @note Support  for the implementation of  vector-valued elements is
+ * provided  by  the  class  FE_TensorPoly. Typically,  a  new  vector
+ * element should be derived from this class.
+ *
+ * <h3>Discontinuous Galerkin</h3>
+ *
+ * For each finite element conforming to any space of weakly
+ * differentiable functions like <i>H<sup>1</sup></i> or
+ * <i>H<sup>curl</sup></i>, we can define an analogue DG space by
+ * simply assigning all degrees of freedom on vertices, edges or faces
+ * to the interior of the cell. This is to be understood in the
+ * topological sense. The interpolation operator for such a degree of
+ * freedom would still be on the boundary.  While not done so
+ * consistently, we provide quite a few of these elements, plus those,
+ * which have no conforming counterparts, like FE_DGP. Here is a list of the current DG elements:
+ * <ul>
+ * <li> scalar: FE_DGP, FE_DGQ
+ * <li> scalar, different shape functions: FE_DGPMonomial, FE_DGPNonparametric, FE_DGQArbitraryNodes
+ * <li> vector-valued:  FE_DGBDM, FE_DGNedelec, FE_DGRaviartThomas
+ * </ul> 
+ *
+ * @note The implementation of vector valued DG elements is supported
+ * by the class FE_DG_Vector, in the way, that only the vector
+ * polynomial space has to be provided. The actual class derived from
+ * this only has to implement a constructor and
+ * FiniteElement::get_name().
+ *
+ *  @ingroup feall
  */
 
 
