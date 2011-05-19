@@ -75,16 +75,16 @@ void test_fe_datas()
     {
 				   // Vector DG elements
       fe_datas.push_back(
-	new FE_DGVector<PolynomialsRaviartThomas<dim>,dim>(0, mapping_raviart_thomas));
+	new FE_DGRaviartThomas<dim>(0));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(
-	new FE_DGVector<PolynomialsRaviartThomas<dim>,dim>(1, mapping_raviart_thomas));
+	new FE_DGRaviartThomas<dim>(1));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(
-	new FE_DGVector<PolynomialsNedelec<dim>,dim>(0, mapping_nedelec));
+	new FE_DGNedelec<dim>(0));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(
-	new FE_DGVector<PolynomialsNedelec<dim>,dim>(1, mapping_nedelec));
+	new FE_DGNedelec<dim>(1));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 
 				       // Hdiv elements
@@ -113,10 +113,10 @@ void test_fe_datas()
   if (dim==2)
     {
       fe_datas.push_back(
-	new FE_DGVector<PolynomialsBDM<dim>,dim>(1, mapping_bdm));
+	new FE_DGBDM<dim>(1));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       fe_datas.push_back(
-	new FE_DGVector<PolynomialsBDM<dim>,dim>(2, mapping_bdm));
+	new FE_DGBDM<dim>(2));
       deallog << (*fe_datas.rbegin())->get_name() << std::endl;
       
       fe_datas.push_back(new FE_BDM<dim>(1));
