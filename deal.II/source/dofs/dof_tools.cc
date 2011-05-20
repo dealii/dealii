@@ -67,6 +67,20 @@ namespace DoFTools
     Assert (sparsity.n_cols() == n_dofs,
 	    ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
+				     // If we have a distributed::Triangulation only
+				     // allow locally_owned subdomain. Not setting a
+				     // subdomain is also okay, because we skip ghost
+				     // cells in the loop below.
+    Assert (
+      (dof.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      ||
+      (subdomain_id == types::invalid_subdomain_id)
+      ||
+      (subdomain_id == dof.get_tria().locally_owned_subdomain()),
+      ExcMessage ("For parallel::distributed::Triangulation objects and "
+		  "associated DoF handler objects, asking for any subdomain other "
+		  "than the locally owned one does not make sense."));
+
     std::vector<unsigned int> dofs_on_this_cell;
     dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
     typename DH::active_cell_iterator cell = dof.begin_active(),
@@ -121,6 +135,20 @@ namespace DoFTools
 	    ExcDimensionMismatch(couplings.n_rows(), dof.get_fe().n_components()));
     Assert (couplings.n_cols() == dof.get_fe().n_components(),
 	    ExcDimensionMismatch(couplings.n_cols(), dof.get_fe().n_components()));
+
+				     // If we have a distributed::Triangulation only
+				     // allow locally_owned subdomain. Not setting a
+				     // subdomain is also okay, because we skip ghost
+				     // cells in the loop below.
+    Assert (
+      (dof.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      ||
+      (subdomain_id == types::invalid_subdomain_id)
+      ||
+      (subdomain_id == dof.get_tria().locally_owned_subdomain()),
+      ExcMessage ("For parallel::distributed::Triangulation objects and "
+		  "associated DoF handler objects, asking for any subdomain other "
+		  "than the locally owned one does not make sense."));
 
     const hp::FECollection<DH::dimension,DH::space_dimension> fe_collection (dof.get_fe());
 
@@ -238,13 +266,13 @@ namespace DoFTools
 
 
     const std::list<std::pair<typename DH::cell_iterator,
-			      typename DH::cell_iterator> >
+      typename DH::cell_iterator> >
       cell_list
       = GridTools::get_finest_common_cells (dof_row, dof_col);
 
 
     typename std::list<std::pair<typename DH::cell_iterator,
-				 typename DH::cell_iterator> >
+      typename DH::cell_iterator> >
       ::const_iterator
       cell_iter = cell_list.begin();
 
@@ -495,12 +523,26 @@ namespace DoFTools
 			      SparsityPattern &sparsity,
 			      const ConstraintMatrix &constraints,
 			      const bool              keep_constrained_dofs,
-			      const types::subdomain_id_t subdomain_id)
+                              const types::subdomain_id_t subdomain_id)
   {
     const unsigned int n_dofs = dof.n_dofs();
 
     AssertDimension (sparsity.n_rows(), n_dofs);
     AssertDimension (sparsity.n_cols(), n_dofs);
+
+                                     // If we have a distributed::Triangulation only
+                                     // allow locally_owned subdomain. Not setting a
+                                     // subdomain is also okay, because we skip ghost
+                                     // cells in the loop below.
+    Assert (
+      (dof.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      ||
+      (subdomain_id == types::invalid_subdomain_id)
+      ||
+      (subdomain_id == dof.get_tria().locally_owned_subdomain()),
+      ExcMessage ("For parallel::distributed::Triangulation objects and "
+		  "associated DoF handler objects, asking for any subdomain other "
+		  "than the locally owned one does not make sense."));
 
     std::vector<unsigned int> dofs_on_this_cell;
     std::vector<unsigned int> dofs_on_other_cell;
@@ -522,9 +564,13 @@ namespace DoFTools
 				     // current cell is owned by the calling
 				     // processor. Otherwise, just continue.
     for (; cell!=endc; ++cell)
-      if ((subdomain_id == types::invalid_subdomain_id)
-	  ||
-	  (subdomain_id == cell->subdomain_id()))
+      if (((subdomain_id == types::invalid_subdomain_id)
+	   ||
+	   (subdomain_id == cell->subdomain_id()))
+          &&
+          !cell->is_artificial()
+          &&
+          !cell->is_ghost())
 	{
 	  const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
 	  dofs_on_this_cell.resize (n_dofs_on_this_cell);
@@ -722,208 +768,209 @@ namespace DoFTools
 	typename DH::active_cell_iterator cell = dof.begin_active(),
 					  endc = dof.end();
 	for (; cell!=endc; ++cell)
-	  {
-	    cell->get_dof_indices (dofs_on_this_cell);
-					     // make sparsity pattern for this cell
-	    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-		if (int_dof_mask(i,j) != none)
-		  sparsity.add (dofs_on_this_cell[i],
-				dofs_on_this_cell[j]);
+          if (!cell->is_ghost() && !cell->is_artificial())
+	    {
+	      cell->get_dof_indices (dofs_on_this_cell);
+					       // make sparsity pattern for this cell
+	      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+		for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+		  if (int_dof_mask(i,j) != none)
+		    sparsity.add (dofs_on_this_cell[i],
+				  dofs_on_this_cell[j]);
 
-					     // Loop over all interior neighbors
-	    for (unsigned int face = 0;
-		 face < GeometryInfo<DH::dimension>::faces_per_cell;
-		 ++face)
-	      {
-		const typename DH::face_iterator
-		  cell_face = cell->face(face);
-		if (cell_face->user_flag_set ())
-		  continue;
+					       // Loop over all interior neighbors
+	      for (unsigned int face = 0;
+		   face < GeometryInfo<DH::dimension>::faces_per_cell;
+		   ++face)
+		{
+		  const typename DH::face_iterator
+		    cell_face = cell->face(face);
+		  if (cell_face->user_flag_set ())
+		    continue;
 
-		if (cell->at_boundary (face) )
-		  {
-		    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-		      {
-			const bool i_non_zero_i = support_on_face (i, face);
-			for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-			  {
-			    const bool j_non_zero_i = support_on_face (j, face);
+		  if (cell->at_boundary (face) )
+		    {
+		      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+			{
+			  const bool i_non_zero_i = support_on_face (i, face);
+			  for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+			    {
+			      const bool j_non_zero_i = support_on_face (j, face);
 
-			    if ((flux_dof_mask(i,j) == always)
-				||
-				(flux_dof_mask(i,j) == nonzero
-				 &&
-				 i_non_zero_i
-				 &&
-				 j_non_zero_i))
-			      sparsity.add (dofs_on_this_cell[i],
-					    dofs_on_this_cell[j]);
-			  }
-		      }
-		  }
-		else
-		  {
-		    typename DH::cell_iterator
-		      neighbor = cell->neighbor(face);
-						     // Refinement edges are taken care of
-						     // by coarser cells
-		    if (cell->neighbor_is_coarser(face))
-		      continue;
+			      if ((flux_dof_mask(i,j) == always)
+				  ||
+				  (flux_dof_mask(i,j) == nonzero
+				   &&
+				   i_non_zero_i
+				   &&
+				   j_non_zero_i))
+				sparsity.add (dofs_on_this_cell[i],
+					      dofs_on_this_cell[j]);
+			    }
+			}
+		    }
+		  else
+		    {
+		      typename DH::cell_iterator
+			neighbor = cell->neighbor(face);
+						       // Refinement edges are taken care of
+						       // by coarser cells
+		      if (cell->neighbor_is_coarser(face))
+			continue;
 
-		    typename DH::face_iterator cell_face = cell->face(face);
-		    const unsigned int
-		      neighbor_face = cell->neighbor_of_neighbor(face);
+		      typename DH::face_iterator cell_face = cell->face(face);
+		      const unsigned int
+			neighbor_face = cell->neighbor_of_neighbor(face);
 
-		    if (cell_face->has_children())
-		      {
-			for (unsigned int sub_nr = 0;
-			     sub_nr != cell_face->n_children();
-			     ++sub_nr)
-			  {
-			    const typename DH::cell_iterator
-			      sub_neighbor
-			      = cell->neighbor_child_on_subface (face, sub_nr);
+		      if (cell_face->has_children())
+			{
+			  for (unsigned int sub_nr = 0;
+			       sub_nr != cell_face->n_children();
+			       ++sub_nr)
+			    {
+			      const typename DH::cell_iterator
+				sub_neighbor
+				= cell->neighbor_child_on_subface (face, sub_nr);
 
-			    sub_neighbor->get_dof_indices (dofs_on_other_cell);
-			    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-			      {
-				const bool i_non_zero_i = support_on_face (i, face);
-				const bool i_non_zero_e = support_on_face (i, neighbor_face);
-				for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-				  {
-				    const bool j_non_zero_i = support_on_face (j, face);
-				    const bool j_non_zero_e = support_on_face (j, neighbor_face);
+			      sub_neighbor->get_dof_indices (dofs_on_other_cell);
+			      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+				{
+				  const bool i_non_zero_i = support_on_face (i, face);
+				  const bool i_non_zero_e = support_on_face (i, neighbor_face);
+				  for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+				    {
+				      const bool j_non_zero_i = support_on_face (j, face);
+				      const bool j_non_zero_e = support_on_face (j, neighbor_face);
 
-				    if (flux_dof_mask(i,j) == always)
-				      {
-					sparsity.add (dofs_on_this_cell[i],
-						      dofs_on_other_cell[j]);
-					sparsity.add (dofs_on_other_cell[i],
-						      dofs_on_this_cell[j]);
-					sparsity.add (dofs_on_this_cell[i],
-						      dofs_on_this_cell[j]);
-					sparsity.add (dofs_on_other_cell[i],
-						      dofs_on_other_cell[j]);
-				      }
-				    else if (flux_dof_mask(i,j) == nonzero)
-				      {
-					if (i_non_zero_i && j_non_zero_e)
+				      if (flux_dof_mask(i,j) == always)
+					{
 					  sparsity.add (dofs_on_this_cell[i],
 							dofs_on_other_cell[j]);
-					if (i_non_zero_e && j_non_zero_i)
 					  sparsity.add (dofs_on_other_cell[i],
 							dofs_on_this_cell[j]);
-					if (i_non_zero_i && j_non_zero_i)
 					  sparsity.add (dofs_on_this_cell[i],
 							dofs_on_this_cell[j]);
-					if (i_non_zero_e && j_non_zero_e)
 					  sparsity.add (dofs_on_other_cell[i],
 							dofs_on_other_cell[j]);
-				      }
+					}
+				      else if (flux_dof_mask(i,j) == nonzero)
+					{
+					  if (i_non_zero_i && j_non_zero_e)
+					    sparsity.add (dofs_on_this_cell[i],
+							  dofs_on_other_cell[j]);
+					  if (i_non_zero_e && j_non_zero_i)
+					    sparsity.add (dofs_on_other_cell[i],
+							  dofs_on_this_cell[j]);
+					  if (i_non_zero_i && j_non_zero_i)
+					    sparsity.add (dofs_on_this_cell[i],
+							  dofs_on_this_cell[j]);
+					  if (i_non_zero_e && j_non_zero_e)
+					    sparsity.add (dofs_on_other_cell[i],
+							  dofs_on_other_cell[j]);
+					}
 
-				    if (flux_dof_mask(j,i) == always)
-				      {
-					sparsity.add (dofs_on_this_cell[j],
-						      dofs_on_other_cell[i]);
-					sparsity.add (dofs_on_other_cell[j],
-						      dofs_on_this_cell[i]);
-					sparsity.add (dofs_on_this_cell[j],
-						      dofs_on_this_cell[i]);
-					sparsity.add (dofs_on_other_cell[j],
-						      dofs_on_other_cell[i]);
-				      }
-				    else if (flux_dof_mask(j,i) == nonzero)
-				      {
-					if (j_non_zero_i && i_non_zero_e)
+				      if (flux_dof_mask(j,i) == always)
+					{
 					  sparsity.add (dofs_on_this_cell[j],
 							dofs_on_other_cell[i]);
-					if (j_non_zero_e && i_non_zero_i)
 					  sparsity.add (dofs_on_other_cell[j],
 							dofs_on_this_cell[i]);
-					if (j_non_zero_i && i_non_zero_i)
 					  sparsity.add (dofs_on_this_cell[j],
 							dofs_on_this_cell[i]);
-					if (j_non_zero_e && i_non_zero_e)
 					  sparsity.add (dofs_on_other_cell[j],
 							dofs_on_other_cell[i]);
-				      }
-				  }
-			      }
-			    sub_neighbor->face(neighbor_face)->set_user_flag ();
-			  }
-		      }
-		    else
-		      {
-			neighbor->get_dof_indices (dofs_on_other_cell);
-			for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-			  {
-			    const bool i_non_zero_i = support_on_face (i, face);
-			    const bool i_non_zero_e = support_on_face (i, neighbor_face);
-			    for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-			      {
-				const bool j_non_zero_i = support_on_face (j, face);
-				const bool j_non_zero_e = support_on_face (j, neighbor_face);
-				if (flux_dof_mask(i,j) == always)
-				  {
-				    sparsity.add (dofs_on_this_cell[i],
-						  dofs_on_other_cell[j]);
-				    sparsity.add (dofs_on_other_cell[i],
-						  dofs_on_this_cell[j]);
-				    sparsity.add (dofs_on_this_cell[i],
-						  dofs_on_this_cell[j]);
-				    sparsity.add (dofs_on_other_cell[i],
-						  dofs_on_other_cell[j]);
-				  }
-				if (flux_dof_mask(i,j) == nonzero)
-				  {
-				    if (i_non_zero_i && j_non_zero_e)
+					}
+				      else if (flux_dof_mask(j,i) == nonzero)
+					{
+					  if (j_non_zero_i && i_non_zero_e)
+					    sparsity.add (dofs_on_this_cell[j],
+							  dofs_on_other_cell[i]);
+					  if (j_non_zero_e && i_non_zero_i)
+					    sparsity.add (dofs_on_other_cell[j],
+							  dofs_on_this_cell[i]);
+					  if (j_non_zero_i && i_non_zero_i)
+					    sparsity.add (dofs_on_this_cell[j],
+							  dofs_on_this_cell[i]);
+					  if (j_non_zero_e && i_non_zero_e)
+					    sparsity.add (dofs_on_other_cell[j],
+							  dofs_on_other_cell[i]);
+					}
+				    }
+				}
+			      sub_neighbor->face(neighbor_face)->set_user_flag ();
+			    }
+			}
+		      else
+			{
+			  neighbor->get_dof_indices (dofs_on_other_cell);
+			  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+			    {
+			      const bool i_non_zero_i = support_on_face (i, face);
+			      const bool i_non_zero_e = support_on_face (i, neighbor_face);
+			      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+				{
+				  const bool j_non_zero_i = support_on_face (j, face);
+				  const bool j_non_zero_e = support_on_face (j, neighbor_face);
+				  if (flux_dof_mask(i,j) == always)
+				    {
 				      sparsity.add (dofs_on_this_cell[i],
 						    dofs_on_other_cell[j]);
-				    if (i_non_zero_e && j_non_zero_i)
 				      sparsity.add (dofs_on_other_cell[i],
 						    dofs_on_this_cell[j]);
-				    if (i_non_zero_i && j_non_zero_i)
 				      sparsity.add (dofs_on_this_cell[i],
 						    dofs_on_this_cell[j]);
-				    if (i_non_zero_e && j_non_zero_e)
 				      sparsity.add (dofs_on_other_cell[i],
 						    dofs_on_other_cell[j]);
-				  }
+				    }
+				  if (flux_dof_mask(i,j) == nonzero)
+				    {
+				      if (i_non_zero_i && j_non_zero_e)
+					sparsity.add (dofs_on_this_cell[i],
+						      dofs_on_other_cell[j]);
+				      if (i_non_zero_e && j_non_zero_i)
+					sparsity.add (dofs_on_other_cell[i],
+						      dofs_on_this_cell[j]);
+				      if (i_non_zero_i && j_non_zero_i)
+					sparsity.add (dofs_on_this_cell[i],
+						      dofs_on_this_cell[j]);
+				      if (i_non_zero_e && j_non_zero_e)
+					sparsity.add (dofs_on_other_cell[i],
+						      dofs_on_other_cell[j]);
+				    }
 
-				if (flux_dof_mask(j,i) == always)
-				  {
-				    sparsity.add (dofs_on_this_cell[j],
-						  dofs_on_other_cell[i]);
-				    sparsity.add (dofs_on_other_cell[j],
-						  dofs_on_this_cell[i]);
-				    sparsity.add (dofs_on_this_cell[j],
-						  dofs_on_this_cell[i]);
-				    sparsity.add (dofs_on_other_cell[j],
-						  dofs_on_other_cell[i]);
-				  }
-				if (flux_dof_mask(j,i) == nonzero)
-				  {
-				    if (j_non_zero_i && i_non_zero_e)
+				  if (flux_dof_mask(j,i) == always)
+				    {
 				      sparsity.add (dofs_on_this_cell[j],
 						    dofs_on_other_cell[i]);
-				    if (j_non_zero_e && i_non_zero_i)
 				      sparsity.add (dofs_on_other_cell[j],
 						    dofs_on_this_cell[i]);
-				    if (j_non_zero_i && i_non_zero_i)
 				      sparsity.add (dofs_on_this_cell[j],
 						    dofs_on_this_cell[i]);
-				    if (j_non_zero_e && i_non_zero_e)
 				      sparsity.add (dofs_on_other_cell[j],
 						    dofs_on_other_cell[i]);
-				  }
-			      }
-			  }
-			neighbor->face(neighbor_face)->set_user_flag ();
-		      }
-		  }
-	      }
-	  }
+				    }
+				  if (flux_dof_mask(j,i) == nonzero)
+				    {
+				      if (j_non_zero_i && i_non_zero_e)
+					sparsity.add (dofs_on_this_cell[j],
+						      dofs_on_other_cell[i]);
+				      if (j_non_zero_e && i_non_zero_i)
+					sparsity.add (dofs_on_other_cell[j],
+						      dofs_on_this_cell[i]);
+				      if (j_non_zero_i && i_non_zero_i)
+					sparsity.add (dofs_on_this_cell[j],
+						      dofs_on_this_cell[i]);
+				      if (j_non_zero_e && i_non_zero_e)
+					sparsity.add (dofs_on_other_cell[j],
+						      dofs_on_other_cell[i]);
+				    }
+				}
+			    }
+			  neighbor->face(neighbor_face)->set_user_flag ();
+			}
+		    }
+		}
+            }
       }
         
 
@@ -4336,22 +4383,16 @@ namespace DoFTools
   dof_indices_with_subdomain_association (const DH           &dof_handler,
 					  const types::subdomain_id_t subdomain)
   {
-#ifdef DEAL_II_USE_P4EST
-				     // if the DoFHandler is distributed, the
-				     // only thing we can usefully ask is for
-				     // its locally owned subdomain
-    Assert ((dynamic_cast<const parallel::distributed::
-	     Triangulation<DH::dimension,DH::space_dimension>*>
-	     (&dof_handler.get_tria()) == 0)
-	    ||
-	    (subdomain ==
-	     dynamic_cast<const parallel::distributed::
-	     Triangulation<DH::dimension,DH::space_dimension>*>
-	     (&dof_handler.get_tria())->locally_owned_subdomain()),
-	    ExcMessage ("For parallel::distributed::Triangulation objects and "
-			"associated DoF handler objects, asking for any subdomain other "
-			"than the locally owned one does not make sense."));
-#endif
+
+				     // If we have a distributed::Triangulation only
+				     // allow locally_owned subdomain.
+    Assert (
+      (dof_handler.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      ||
+      (subdomain == dof_handler.get_tria().locally_owned_subdomain()),
+      ExcMessage ("For parallel::distributed::Triangulation objects and "
+		  "associated DoF handler objects, asking for any subdomain other "
+		  "than the locally owned one does not make sense."));
 
     IndexSet index_set (dof_handler.n_dofs());
 
