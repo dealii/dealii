@@ -71,6 +71,12 @@ class BlockList :
     void add(unsigned int block,
 	     const std::vector<unsigned int>& indices,
 	     const std::vector<bool>& selected_indices);
+
+				     /**
+				      * Just set up the correct size
+				      * and assign indices to blocks later.
+				      */
+    void initialize(unsigned int n_blocks);
     
 				     /**
 				      * Set up all index sets using an
@@ -302,6 +308,14 @@ BlockList::add(
 	  == index_sets[block].end())
 	index_sets[block].push_back(k);
     }
+}
+
+
+inline
+void
+BlockList::initialize(unsigned int n_blocks)
+{
+  index_sets.resize(n_blocks);
 }
 
 
