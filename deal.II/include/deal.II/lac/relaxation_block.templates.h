@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/full_matrix.h>
+#include <lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -193,6 +194,36 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
 
 template <class MATRIX, typename inverse_type>
 template <typename number2>
+void RelaxationBlockJacobi<MATRIX,inverse_type>::step (
+  Vector<number2>       &dst,
+  const Vector<number2> &src) const
+{
+  GrowingVectorMemory<Vector<number2> > mem;
+  typename VectorMemory<Vector<number2> >::Pointer aux = mem;
+  aux->reinit(dst, false);
+  *aux = dst;
+  this->do_step(dst, *aux, src, false);
+}
+
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
+void RelaxationBlockJacobi<MATRIX,inverse_type>::Tstep (
+  Vector<number2>       &dst,
+  const Vector<number2> &src) const
+{
+  GrowingVectorMemory<Vector<number2> > mem;
+  typename VectorMemory<Vector<number2> >::Pointer aux = mem;
+  aux->reinit(dst, false);
+  *aux = dst;
+  this->do_step(dst, *aux, src, true);
+}
+
+
+//----------------------------------------------------------------------//
+
+template <class MATRIX, typename inverse_type>
+template <typename number2>
 void RelaxationBlockSOR<MATRIX,inverse_type>::step (
   Vector<number2>       &dst,
   const Vector<number2> &src) const
@@ -210,6 +241,8 @@ void RelaxationBlockSOR<MATRIX,inverse_type>::Tstep (
   this->do_step(dst, dst, src, true);
 }
 
+
+//----------------------------------------------------------------------//
 
 template <class MATRIX, typename inverse_type>
 template <typename number2>

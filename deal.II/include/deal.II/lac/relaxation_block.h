@@ -234,6 +234,88 @@ class RelaxationBlock :
 
 
 /**
+ * Block Jacobi (additive Schwarz) method with possibly overlapping blocks.
+ *
+ * This class implements the step() and Tstep() functions expected by
+ * SolverRelaxation and MGSmootherRelaxation. They perform an
+ * additive Schwarz method on the blocks provided in the
+ * BlockList of AdditionalData. Differing from PreconditionBlockJacobi,
+ * these blocks may be of varying size, non-contiguous, and
+ * overlapping. On the other hand, this class does not implement the
+ * preconditioner interface expected by Solver objects.
+ *
+ * @ingroup Preconditioners
+ * @author Guido Kanschat
+ * @date 2010
+ */
+template<class MATRIX, typename inverse_type = typename MATRIX::value_type>
+class RelaxationBlockJacobi : public virtual Subscriptor,
+			     protected RelaxationBlock<MATRIX, inverse_type>
+{
+  public:
+				     /**
+				      * Default constructor.
+				      */
+//    RelaxationBlockJacobi();
+
+				     /**
+				      * Define number type of matrix.
+				      */
+    typedef typename MATRIX::value_type number;
+
+				     /**
+				      * Make type publicly available.
+				      */
+    using RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
+
+				     /**
+				      * Make initialization function
+				      * publicly available.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::initialize;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::clear;
+
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::empty;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::size;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse_householder;
+				     /**
+				      * Make function of base class public again.
+				      */
+    using RelaxationBlock<MATRIX, inverse_type>::inverse_svd;
+				     /**
+				      * Perform one step of the Jacobi
+				      * iteration.
+				      */
+    template <typename number2>
+    void step (Vector<number2>& dst, const Vector<number2>& rhs) const;
+
+				     /**
+				      * Perform one step of the
+				      * Jacobi iteration.
+				      */
+    template <typename number2>
+    void Tstep (Vector<number2>& dst, const Vector<number2>& rhs) const;
+};
+
+
+/**
  * Block Gauss-Seidel method with possibly overlapping blocks.
  *
  * This class implements the step() and Tstep() functions expected by
