@@ -124,6 +124,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: The class RelaxationBlockJacobi has been added to the relaxation classes.
+<br> (GK, 2011/05/19)
+
+<li> New: discontinuous Galerkin versions of vector-valued elements have been
+implemented: FE_DGBDM, FE_DGNedelec, and FE_DGRaviartThomas.
+<br> (GK, 2011/05/19)
+
 <li> New: Mapping<dim,spacedim>::transform_real_to_unit_cell  now
 works also in the codimension one case, where it performs the normal
 projection of the point on the codimension one surface.
