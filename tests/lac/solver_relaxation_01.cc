@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998 - 2005, 2010 by the deal.II authors
+//    Copyright (C) 1998 - 2005, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -48,7 +48,8 @@ check_solve( SOLVER& solver, const MATRIX& A,
 
 int main()
 {
-  std::ofstream logfile("solver_relaxation_01/output");
+  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
