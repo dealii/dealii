@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1562,7 +1562,7 @@ class SparsityPattern : public Subscriptor
 				      * case the more flexible
 				      * constructors or reinit
 				      * versions are called. Its value
-				      * is more or less meaningsless
+				      * is more or less meaningless
 				      * after compress() has been
 				      * called.
 				      */
