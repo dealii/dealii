@@ -953,7 +953,7 @@ namespace TrilinosWrappers
 			const VectorBase   &V,
 			const bool          transpose_left)
     {
-      const bool use_vector = V.size() == inputright.m() ? true : false;
+      const bool use_vector = (V.size() == inputright.m() ? true : false);
       if (transpose_left == false)
 	{
 	  Assert (inputleft.n() == inputright.m(),
