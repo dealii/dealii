@@ -15,7 +15,7 @@
 
 #include <deal.II/lac/relaxation_block.h>
 #include <deal.II/lac/full_matrix.h>
-#include <lac/vector_memory.h>
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -56,15 +56,15 @@ RelaxationBlock<MATRIX,inverse_type>::initialize (
   const AdditionalData parameters)
 {
   Assert (parameters.invert_diagonal, ExcNotImplemented());
-  
+
   clear();
 //  Assert (M.m() == M.n(), ExcNotQuadratic());
   A = &M;
   additional_data = parameters;
-  
+
   this->reinit(additional_data.block_list->size(), 0, additional_data.same_diagonal,
 	       additional_data.inversion);
-  
+
   if (parameters.invert_diagonal)
     invert_diagblocks();
 }
@@ -159,16 +159,16 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const bool backward) const
 {
   Assert (additional_data.invert_diagonal, ExcNotImplemented());
-  
+
   const MATRIX &M=*this->A;
   Vector<number2> b_cell, x_cell;
-  
+
   const unsigned int n_blocks = additional_data.block_list->size();
   for (unsigned int bi=0;bi<n_blocks;++bi)
     {
       const unsigned int block = backward ? (n_blocks - bi - 1) : bi;
       const unsigned int bs = additional_data.block_list->block_size(block);
-      
+
       b_cell.reinit(bs);
       x_cell.reinit(bs);
 				       // Collect off-diagonal parts

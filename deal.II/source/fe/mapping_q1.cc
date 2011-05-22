@@ -21,7 +21,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <fe/mapping_q1_eulerian.h>
+#include <deal.II/fe/mapping_q1_eulerian.h>
 
 #include <cmath>
 #include <algorithm>
@@ -1466,7 +1466,7 @@ MappingQ1<dim,spacedim>::transform_unit_to_real_cell (
   if(mdata->mapping_support_points.size() > mdata->shape_values.size())
     mdata->mapping_support_points.resize
       (GeometryInfo<dim>::vertices_per_cell);
-  
+
 
   return transform_unit_to_real_cell_internal(*mdata);
 }
@@ -1547,15 +1547,15 @@ transform_real_to_unit_cell_internal
   const unsigned int n_shapes=mdata.shape_values.size();
   Assert(n_shapes!=0, ExcInternalError());
   Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
-  
+
   std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
   Assert(points.size()==n_shapes, ExcInternalError());
 
-  
+
 				   // Newton iteration to solve
 				   // f(x)=p(x)-p=0
 				   // x_{n+1}=x_n-[f'(x)]^{-1}f(x)
-      
+
 				   // The start value is set to be the
 				   // center of the unit cell.
 
@@ -1629,7 +1629,7 @@ transform_real_to_unit_cell_internal
 				       // by the cell.
       for(unsigned int i=0;i<dim; ++i)
 	p_unit[i] -= d[i];
-	  
+
 				       // shape values and derivatives
 				       // at new p_unit point
       compute_shapes(std::vector<Point<dim> > (1, p_unit), mdata);
