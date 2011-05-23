@@ -230,7 +230,7 @@ namespace mg
  * @date 2003, 2009, 2010
  */
 template<class RELAX, class VECTOR>
-class SmootherRelaxation : public MGSmoother<VECTOR>
+class SmootherRelaxation : public MGLevelObject<RELAX>, public MGSmoother<VECTOR>
 {
   public:
 				     /**
@@ -281,11 +281,6 @@ class SmootherRelaxation : public MGSmoother<VECTOR>
 // 		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
 				     /**
-				      * Empty all vectors.
-				      */
-    void clear ();
-
-				     /**
 				      * The actual smoothing method.
 				      */
     virtual void smooth (const unsigned int level,
@@ -296,13 +291,6 @@ class SmootherRelaxation : public MGSmoother<VECTOR>
 				      * Memory used by this object.
 				      */
     std::size_t memory_consumption () const;
-
-  private:
- 				     /**
-				      * Object containing relaxation
-				      * methods.
-				      */
-    MGLevelObject<RELAX> smoothers;
 };
 }
 
@@ -762,14 +750,6 @@ namespace mg
   
   
   template <class RELAX, class VECTOR>
-  inline void
-  SmootherRelaxation<RELAX, VECTOR>::clear ()
-  {
-    smoothers.clear();
-  }
-  
-  
-  template <class RELAX, class VECTOR>
   template <class MATRIX2>
   inline void
   SmootherRelaxation<RELAX, VECTOR>::initialize (
@@ -779,10 +759,10 @@ namespace mg
     const unsigned int min = m.get_minlevel();
     const unsigned int max = m.get_maxlevel();
     
-    smoothers.resize(min, max);
+    this->resize(min, max);
     
     for (unsigned int i=min;i<=max;++i)
-      smoothers[i].initialize(m[i], data);
+      (*this)[i].initialize(m[i], data);
   }
 
   
@@ -801,10 +781,10 @@ namespace mg
     Assert (data.get_maxlevel() == max,
 	    ExcDimensionMismatch(data.get_maxlevel(), max));
     
-    smoothers.resize(min, max);
+    this->resize(min, max);
     
     for (unsigned int i=min;i<=max;++i)
-      smoothers[i].initialize(m[i], data[i]);
+      (*this)[i].initialize(m[i], data[i]);
   }
 
   
@@ -815,7 +795,7 @@ namespace mg
     VECTOR& u,
     const VECTOR& rhs) const
   {
-    unsigned int maxlevel = smoothers.get_maxlevel();
+    unsigned int maxlevel = this->get_maxlevel();
     unsigned int steps2 = this->steps;
 
     if (this->variable)
@@ -830,9 +810,9 @@ namespace mg
     for (unsigned int i=0; i<steps2; ++i)
       {
 	if (T)
-	  smoothers[level].Tstep(u, rhs);
+	  (*this)[level].Tstep(u, rhs);
 	else
-	  smoothers[level].step(u, rhs);
+	  (*this)[level].step(u, rhs);
 	if (this->symmetric)
 	  T = !T;
       }
@@ -846,7 +826,8 @@ namespace mg
   memory_consumption () const
   {
     return sizeof(*this)
-      + smoothers.memory_consumption()
+      -sizeof(MGLevelObject<RELAX>)
+      + MGLevelObject<RELAX>::memory_consumption()
       + this->mem->memory_consumption();
   }
 }
