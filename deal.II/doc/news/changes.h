@@ -29,6 +29,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Removed: The <code>./configure</code> script allowed configuring
+for the GNU Scientific Library (GSL) in version 7.0 but didn't actually
+use any of the GSL functions. The corresponding code has therefore been
+removed again.
+<br>
+(WB, 2011/05/22)
+
 
 <li> Changed: Traditionally, include directories were set through the
 <code>-I</code> flag in make files in such a way that one would do

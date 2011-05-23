@@ -382,9 +382,6 @@
    information that can be printed out in the exception class */
 #undef HAVE_GLIBC_STACKTRACE
 
-/* Define to 1 if you have the <gsl_sf.h> header file. */
-#undef HAVE_GSL_SF_H
-
 /* Availability of the MA27 algorithm from HSL */
 #undef HAVE_HSL_MA27
 
@@ -397,14 +394,8 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `jn' function. */
-#undef HAVE_JN
-
 /* Defined if deal.II was configured with BLAS support */
 #undef HAVE_LIBBLAS
-
-/* Define to 1 if you have the `gsl' library (-lgsl). */
-#undef HAVE_LIBGSL
 
 /* Defined if deal.II was configured with LAPACK support */
 #undef HAVE_LIBLAPACK

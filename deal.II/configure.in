@@ -617,7 +617,6 @@ DEAL_II_CONFIGURE_TECPLOT
 AC_SUBST(TECPLOT_INCLUDE_DIR)
 
 DEAL_II_CONFIGURE_NETCDF
-DEAL_II_CONFIGURE_GSL
 
 DEAL_II_CONFIGURE_METIS
 AC_SUBST(USE_CONTRIB_METIS)
@@ -658,7 +657,7 @@ AC_CHECK_FUNCS([dgeqrf_ sgeqrf_ dormqr_ sormqr_ dorgqr_ sorgqr_ dtrtrs_ strtrs_]
 AC_CHECK_FUNCS([dgetrs_ sgetrs_ dstev_ sstev_ dsygv_ ssygv_])
 dnl Singular value decomposition
 AC_CHECK_FUNCS([dgesvd_ sgesvd_ dgesdd_ sgesdd_ dgelsd_ sgelsd_])
-dnl Check Bessel functions in GNU libc and GSL
+dnl Check Bessel functions in GNU libc
 AC_CHECK_FUNCS([jn])
 
 dnl -------------------------------------------------------------
