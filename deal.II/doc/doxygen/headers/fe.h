@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006, 2007, 2008 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -144,7 +144,7 @@
  * tutorial programs after that.
  *
  * @note Support  for the implementation of  vector-valued elements is
- * provided  by  the  class  FE_TensorPoly. Typically,  a  new  vector
+ * provided  by  the  class  FE_PolyTensor. Typically,  a  new  vector
  * element should be derived from this class.
  *
  * <h3>Discontinuous Galerkin</h3>
@@ -165,7 +165,7 @@
  * </ul> 
  *
  * @note The implementation of vector valued DG elements is supported
- * by the class FE_DG_Vector, in the way, that only the vector
+ * by the class FE_DGVector, in the way, that only the vector
  * polynomial space has to be provided. The actual class derived from
  * this only has to implement a constructor and
  * FiniteElement::get_name().

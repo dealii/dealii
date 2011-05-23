@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,7 @@ template <int dim, int spacedim> class MappingQ;
  * PolynomialsNedelec. Note that the dimension of the polynomial space
  * and the argument <tt>dim</tt> must coincide.
  *
- * @ingroup fe
+ * @ingroup febase
  * @author Guido Kanschat
  * @date 2010
  */

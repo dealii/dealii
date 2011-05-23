@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,9 +17,6 @@
 #include <deal.II/fe/fe.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-/*!@addtogroup febase */
-/*@{*/
 
 /**
  * This class gives a unified framework for the implementation of
@@ -109,8 +106,9 @@ DEAL_II_NAMESPACE_OPEN
  * @endverbatim
  *
  * @see PolynomialsBDM, PolynomialsRaviartThomas
- *
- * @author Guido Kanschat, 2005
+ * @ingroup febase
+ * @author Guido Kanschat
+ * @date 2005
  **/
 template <class POLY, int dim, int spacedim=dim>
 class FE_PolyTensor : public FiniteElement<dim,spacedim>
@@ -363,8 +361,6 @@ class FE_PolyTensor : public FiniteElement<dim,spacedim>
 				      */
     mutable std::vector<Tensor<3,dim> > cached_grad_grads;
 };
-
-/*@}*/
 
 DEAL_II_NAMESPACE_CLOSE
 
