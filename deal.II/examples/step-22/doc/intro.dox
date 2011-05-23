@@ -503,7 +503,7 @@ matrix. So here's what we're going to do: if in 2d, we use the
 ultimate preconditioner, namely a direct sparse LU decomposition of
 the matrix. This is implemented using the SparseDirectUMFPACK class
 that uses the UMFPACK direct solver to compute the decomposition. To
-use it, you will have to specify the <code>--enable-umfpack</code>
+use it, you will have to specify the <code>--with-umfpack</code>
 switch when configuring the deal.II library, see the <a
 href="../../readme.html#optional-software">ReadMe file</a> for
 instructions. With this, the inner solver converges in one iteration.
