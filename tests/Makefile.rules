@@ -251,7 +251,7 @@ update: $(tests:%=%/update)
 
 clean:
 	-rm -f Makefile.depend Makefile.*tests */obj.$(OBJEXT) \
-		*/obj.g.$(OBJEXT) */output *~ */*.vtu */*.pvtu \
+		*/obj.g.$(OBJEXT) */output *~ */*.vtu */*.pvtu */*visit \
 		*/status */OK
 
 distclean: clean
