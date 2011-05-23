@@ -1840,14 +1840,14 @@ SparseDirectUMFPACK::clear ()
 template <class Matrix>
 void SparseDirectUMFPACK::factorize (const Matrix &)
 {
-  Assert(false, ExcNeedsUMFPACK());
+  AssertThrow(false, ExcNeedsUMFPACK());
 }
 
 
 void
 SparseDirectUMFPACK::solve (Vector<double> &) const
 {
-  Assert(false, ExcNeedsUMFPACK());
+  AssertThrow(false, ExcNeedsUMFPACK());
 }
 
 
@@ -1856,7 +1856,7 @@ void
 SparseDirectUMFPACK::solve (const Matrix   &,
                             Vector<double> &)
 {
-  Assert(false, ExcNeedsUMFPACK());
+  AssertThrow(false, ExcNeedsUMFPACK());
 }
 
 
