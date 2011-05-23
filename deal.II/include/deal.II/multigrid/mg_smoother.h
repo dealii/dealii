@@ -281,6 +281,11 @@ class SmootherRelaxation : public MGLevelObject<RELAX>, public MGSmoother<VECTOR
 // 		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
 
 				     /**
+				      * Empty all vectors.
+				      */
+    void clear ();
+
+				     /**
 				      * The actual smoothing method.
 				      */
     virtual void smooth (const unsigned int level,
@@ -747,6 +752,14 @@ namespace mg
     const bool transpose)
 		  : MGSmoother<VECTOR>(steps, variable, symmetric, transpose)
   {}
+  
+  
+  template <class RELAX, class VECTOR>
+  inline void
+  SmootherRelaxation<RELAX, VECTOR>::clear ()
+  {
+    MGLevelObject<RELAX>::clear();
+  }
   
   
   template <class RELAX, class VECTOR>
