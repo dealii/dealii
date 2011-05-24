@@ -572,9 +572,6 @@ int main (int argc, char **argv)
 	problem.run ();
       }
 
-				       // ...and then unitialize the
-				       // SLEPc work space when the
-				       // job is done:
       SlepcFinalize ();
     }
 
