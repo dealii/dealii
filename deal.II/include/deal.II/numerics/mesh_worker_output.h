@@ -52,7 +52,9 @@ namespace MeshWorker
 					  * the space coordinates of
 					  * the points.
 					  */
-	void initialize(unsigned int dim, unsigned int n_vectors, unsigned int n_points);
+	void initialize (const unsigned int dim, 
+			 const unsigned int n_vectors, 
+		         const unsigned int n_points);
 
 					 /**
 					  * Set the stream #os to
@@ -61,7 +63,7 @@ namespace MeshWorker
 					  * this function, data goes
 					  * to #deallog.
 					  */
-	void initialize_stream(std::ostream& stream);
+	void initialize_stream (std::ostream& stream);
 
 					 /**
 					  * Initialize the local data
@@ -102,20 +104,30 @@ namespace MeshWorker
       private:
 					 /**
 					  * Write the object T either
-					  * to the stream #os, if the
-					  * pointer is nonzero, or to
+					  * to the stream #os, if initialize_stream
+					  * has been called, or to
 					  * #deallog if no pointer has
 					  * been set.
 					  */
 	template<typename T>
 	void write(const T& t) const;
 
+					 /**
+					  * Write an end-of-line marker either
+					  * to the stream #os, if initialize_stream
+					  * has been called, or to
+					  * #deallog if no pointer has
+					  * been set.
+					  */
         void write_endl () const;
 
 	unsigned int patch_dimension;
 	unsigned int n_vectors;
 	unsigned int n_points;
 
+	/**
+	 * Stream to which output is to be written. Set by initialize_stream().
+	 */
 	std::ostream* os;
     };
 
@@ -131,6 +143,7 @@ namespace MeshWorker
 	(*os) << d;
     }
 
+
     inline void
     GnuplotPatch::write_endl() const
     {
@@ -140,6 +153,7 @@ namespace MeshWorker
 	(*os) << std::endl;
     }
 
+
     inline
     GnuplotPatch::GnuplotPatch()
 		    :
@@ -148,7 +162,9 @@ namespace MeshWorker
 
 
     inline void
-    GnuplotPatch::initialize(unsigned int dim, unsigned int np, unsigned int nv)
+    GnuplotPatch::initialize (const unsigned int dim,
+			      const unsigned int np,
+			      const unsigned int nv)
     {
       patch_dimension = dim;
       n_vectors = nv;
@@ -157,7 +173,7 @@ namespace MeshWorker
 
 
     inline void
-    GnuplotPatch::initialize_stream(std::ostream& stream)
+    GnuplotPatch::initialize_stream (std::ostream& stream)
     {
       os = &stream;
     }
