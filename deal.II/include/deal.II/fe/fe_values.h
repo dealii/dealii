@@ -603,6 +603,12 @@ namespace FEValuesViews
 					* of the finite element, the
 					* symmetrized gradient is a
 					* <code>SymmetricTensor@<2,spacedim@></code>.
+					*
+					* The symmetric gradient of a vector
+					* field $\mathbf v$ is defined as
+					* $\varepsilon(\mathbf v)=\frac 12
+					* (\nabla \mathbf v + \nabla \mathbf
+					* v^T)$.
 					*/
       typedef dealii::SymmetricTensor<2,spacedim> symmetric_gradient_type;
 
@@ -817,8 +823,14 @@ namespace FEValuesViews
 					* the <tt>reinit</tt> function of the
 					* FEValues object was called.
 					*
-					* There is no equivalent function such
-					* as
+					* The symmetric gradient of a vector
+					* field $\mathbf v$ is defined as
+					* $\varepsilon(\mathbf v)=\frac 12
+					* (\nabla \mathbf v + \nabla \mathbf
+					* v^T)$.
+					*
+					* @note There is no equivalent
+					* function such as
 					* FEValuesBase::get_function_symmetric_gradients
 					* in the FEValues classes but the
 					* information can be obtained from
@@ -826,8 +838,9 @@ namespace FEValuesViews
 					* of course.
 					*/
       template <class InputVector>
-      void get_function_symmetric_gradients (const InputVector& fe_function,
-		    std::vector<symmetric_gradient_type>& symmetric_gradients) const;
+      void
+      get_function_symmetric_gradients (const InputVector& fe_function,
+					std::vector<symmetric_gradient_type>& symmetric_gradients) const;
 
 				       /**
 					* Return the divergence of the selected
