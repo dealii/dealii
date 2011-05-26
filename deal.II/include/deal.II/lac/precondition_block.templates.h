@@ -99,7 +99,6 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const std::vector<unsigned int>& inverse_permutation,
   const AdditionalData parameters)
 {
-  
   const unsigned int bsize = parameters.block_size;
   
   clear();
@@ -110,11 +109,18 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   blocksize=bsize;
   relaxation = parameters.relaxation;
   const unsigned int nblocks = A->m()/bsize;
-  this->reinit(nblocks, blocksize, parameters.same_diagonal);
+  this->reinit(nblocks, blocksize, parameters.same_diagonal,
+	       parameters.inversion);
+
+  set_permutation(permutation, inverse_permutation);
   
   if (parameters.invert_diagonal)
-    invert_permuted_diagblocks(permutation, inverse_permutation);
-  
+    {
+      if (permutation.size() == M.m())
+	invert_permuted_diagblocks(permutation, inverse_permutation);
+      else
+	invert_diagblocks();
+    }
 }
 
 template <class MATRIX, typename inverse_type>
@@ -124,10 +130,12 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 {
   Assert (A!=0, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
-
+  
   const MATRIX &M=*A;
   Assert (this->inverses_ready()==0, ExcInverseMatricesAlreadyExist());
-
+  AssertDimension (permutation.size(), M.m());
+  AssertDimension (inverse_permutation.size(), M.m());
+  
   FullMatrix<inverse_type> M_cell(blocksize);
 
   if (this->same_diagonal())
@@ -236,11 +244,18 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
   Assert (this->A!=0, ExcNotInitialized());
   
   const MATRIX &M=*this->A;
-  const bool permuted = (permutation.size() != 0);
-  if (permuted)
-    {
-      Assert (permutation.size() == M.m(), ExcDimensionMismatch(permutation.size(), M.m()));
-    }
+  
+  if (permutation.size() != 0)
+    Assert (permutation.size() == M.m() || permutation.size() == this->size(),
+	    ExcMessage("Permutation vector size must be equal to either the number of blocks or the dimension of the system"));
+  
+  const bool permuted = (permutation.size() == M.m());
+  const bool cell_permuted = (permutation.size() == this->size());
+
+//   deallog << "Permutation " << permutation.size();
+//   if (permuted) deallog << " point";
+//   if (cell_permuted) deallog << " block";
+//   deallog << std::endl;
   
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
@@ -251,23 +266,29 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
 				       // blocks.
 				       // row, column are the global numbering
 				       // of the unkowns.
-  unsigned int row, row_cell, block_start=0;
+  unsigned int row, row_cell;
   number2 b_cell_row;
 				   // The diagonal block if the
 				   // inverses were not precomputed
   FullMatrix<number> M_cell(this->blocksize);
 
 				   // Loop over all blocks
-  for (unsigned int cell=0; cell < this->size(); ++cell)
+  for (unsigned int rawcell=0; rawcell < this->size(); ++rawcell)
     {
+      const unsigned int cell = cell_permuted ? permutation[rawcell] : rawcell;
+      const unsigned int block_start = cell*this->blocksize;
       const unsigned int permuted_block_start = permuted
 						? permutation[block_start]
-						:block_start;
+						: block_start;
+
+//       deallog << std::endl << cell << '-' << block_start
+// 	      << '-' << permuted_block_start << (permuted ? 't' : 'f') << '\t';
       
       for (row = permuted_block_start, row_cell = 0;
 	   row_cell < this->blocksize;
 	   ++row_cell, ++row)
 	{
+// 	  deallog << ' ' << row;
 	  const typename MATRIX::const_iterator row_end = M.end(row);
 	  typename MATRIX::const_iterator entry = M.begin(row);
 	  
@@ -278,12 +299,11 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
 	      const unsigned int inverse_permuted_column = permuted
 							   ? inverse_permutation[column]
 							   : column;
-	      
 	      b_cell_row -= entry->value() * prev(column);
 //TODO:[GK] Find out if this is really once column and once permuted 
 	      if (!this->inverses_ready()
 		  && inverse_permuted_column >= block_start
-		  && column < block_start + this->blocksize)
+		  && inverse_permuted_column < block_start + this->blocksize)
 		{
 		  const unsigned int column_cell = column - block_start;
 		  if (transpose_diagonal)
@@ -312,8 +332,6 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
 	   row_cell<this->blocksize;
 	   ++row_cell, ++row)
 	dst(row) = prev(row) + this->relaxation*x_cell(row_cell);
-      
-      block_start+=this->blocksize;
     }
 }
 
@@ -329,12 +347,14 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
   Assert (this->A!=0, ExcNotInitialized());
   
   const MATRIX &M=*this->A;
-  const bool permuted = (permutation.size() != 0);
-  if (permuted)
-    {
-      Assert (permutation.size() == M.m(), ExcDimensionMismatch(permutation.size(), M.m()));
-    }
 
+  if (permutation.size() != 0)
+    Assert (permutation.size() == M.m() || permutation.size() == this->size(),
+	    ExcMessage("Permutation vector size must be equal to either the number of blocks or the dimension of the system"));
+  
+  const bool permuted = (permutation.size() == M.m());
+  const bool cell_permuted = (permutation.size() == this->size());
+  
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
 				       // cell_row, cell_column are the
@@ -345,18 +365,18 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
 				       // row, column are the global numbering
 				       // of the unkowns.
   unsigned int row, row_cell;
-  unsigned int block_end=this->blocksize * this->size();
   number2 b_cell_row;
 
   FullMatrix<number> M_cell(this->blocksize);
-  for (unsigned int cell=this->size(); cell!=0 ;)
+  for (unsigned int rawcell=this->size(); rawcell!=0 ;)
     {
-      --cell;
-      const unsigned int block_start = block_end - this->blocksize;
-				       // Collect upper triangle
-      const unsigned int permuted_block_start = (permutation.size() != 0)
+      --rawcell;
+      const unsigned int cell = cell_permuted ? permutation[rawcell] : rawcell;
+      const unsigned int block_start = cell*this->blocksize;
+      const unsigned int block_end = block_start + this->blocksize;
+      const unsigned int permuted_block_start = permuted
 						? permutation[block_start]
-						:block_start;
+						: block_start;
       for (row = permuted_block_start, row_cell = 0;
 	   row_cell<this->blocksize;
 	   ++row_cell, ++row)
@@ -410,8 +430,6 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
 	   row_cell<this->blocksize;
 	   ++row_cell, ++row)
 	dst(row) = prev(row) + this->relaxation*x_cell(row_cell);
-      block_end = block_start;
-      
     }
 }
 
