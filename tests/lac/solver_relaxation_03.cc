@@ -10,7 +10,8 @@
 //
 //----------------------------------------------------------------------
 
-// Compare preconditioned Richardson with block relaxation. All output diffs
+// Compare preconditioned Richardson with block relaxation in
+// different permutation modes. All output diffs
 // should be zero.
 
 #include "../tests.h"
@@ -73,9 +74,13 @@ int main()
       testproblem.five_point_structure(structure);
       structure.compress();
       SparseMatrix<double>  A(structure);
-      testproblem.five_point(A);
+      testproblem.five_point(A, true);
+
+				       // The permutation vectors;
+      std::vector<unsigned int> perm(dim);
+      std::vector<unsigned int> iperm(dim);
       
-      for (unsigned int blocksize = 2; blocksize < 32; blocksize <<= 1)
+      for (unsigned int blocksize = 4; blocksize < 32; blocksize <<= 1)
 	{
 	  deallog << "Block size " << blocksize << std::endl;
 
@@ -83,30 +88,68 @@ int main()
 	  BlockList blist;
 	  blist.initialize(n_blocks);
 	  std::vector<unsigned int> indices(blocksize);
+
+					   // The permutation vectors;
+	  std::vector<unsigned int> bperm(n_blocks);
+	  std::vector<unsigned int> ibperm(n_blocks);
 	  
 	  for (unsigned int block=0;block<n_blocks;++block)
 	    {
+	      bperm[block] = n_blocks-block-1;
 	      for (unsigned int i=0;i<blocksize;++i)
 		indices[i] = i+block*blocksize;
 	      blist.add(block, indices);
 	    }
+					   // Currently, bperm is just
+					   // the inversion.
+					   // Now swap the last two
+					   // and cyclically exchange
+					   // the first three
+	  unsigned int swap=bperm[n_blocks-1];
+	  bperm[n_blocks-1] = bperm[n_blocks-2];
+	  bperm[n_blocks-2] = swap;
+
+	  swap = bperm[0];
+	  bperm[0] = bperm[1];
+	  bperm[1] = bperm[2];
+	  bperm[2] = swap;
+
+	  for (unsigned int block=0;block<n_blocks;++block)
+	    {
+	      ibperm[bperm[block]] = block;
+	      for (unsigned int i=0;i<blocksize;++i)
+		perm[i+block*blocksize] = i+bperm[block]*blocksize;
+	    }
+
+	  for (unsigned int i=0;i<dim;++i)
+	    iperm[perm[i]] = i;
+
+	  deallog << "Size " << bperm.size() << std::endl;
 	  
 	  RelaxationBlock<SparseMatrix<double>,double>::AdditionalData relax_data(blist, 0.8);
 	  PreconditionBlock<SparseMatrix<double>,double>::AdditionalData prec_data(blocksize, 0.8);
 	  
 	  PreconditionBlockJacobi<SparseMatrix<double>,double> prec_jacobi;
-	  prec_jacobi.initialize(A, prec_data);
+	  prec_jacobi.initialize(A, perm, iperm, prec_data);
 	  PreconditionBlockSOR<SparseMatrix<double>,double> prec_sor;
-	  prec_sor.initialize(A, prec_data);
+	  prec_sor.initialize(A, perm, iperm, prec_data);
 	  PreconditionBlockSSOR<SparseMatrix<double>,double> prec_ssor;
-	  prec_ssor.initialize(A, prec_data);
+	  prec_ssor.initialize(A, perm, iperm, prec_data);
+	  
+	  PreconditionBlockJacobi<SparseMatrix<double>,double> prec_bjacobi;
+	  prec_bjacobi.initialize(A, bperm, ibperm, prec_data);
+	  PreconditionBlockSOR<SparseMatrix<double>,double> prec_bsor;
+	  prec_bsor.initialize(A, bperm, ibperm, prec_data);
+	  PreconditionBlockSSOR<SparseMatrix<double>,double> prec_bssor;
+	  prec_bssor.initialize(A, bperm, ibperm, prec_data);
 
-	  RelaxationBlockJacobi<SparseMatrix<double>,double> relax_jacobi;
-	  relax_jacobi.initialize(A, relax_data);
-	  RelaxationBlockSOR<SparseMatrix<double>,double> relax_sor;
-	  relax_sor.initialize(A, relax_data);
-	  RelaxationBlockSSOR<SparseMatrix<double>,double> relax_ssor;
-	  relax_ssor.initialize(A, relax_data);
+// 	  RelaxationBlockSOR<SparseMatrix<double>,double> relax_sor;
+// 	  relax_sor.set_permutation(bperm,ibperm);
+// 	  relax_sor.initialize(A, relax_data);
+	  
+// 	  RelaxationBlockSSOR<SparseMatrix<double>,double> relax_ssor;
+// 	  relax_sor.set_permutation(bperm,ibperm);
+// 	  relax_ssor.initialize(A, relax_data);
 	  
 	  Vector<double>  f(dim);
 	  Vector<double>  u(dim);
@@ -123,7 +166,7 @@ int main()
 	      r1 = check_solve(rich,A,u,f,prec_jacobi);
 	      r2 = check_solve(relax,A,u,f,prec_jacobi);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
-	      r2 = check_solve(relax,A,u,f,relax_jacobi);
+	      r2 = check_solve(relax,A,u,f,prec_bjacobi);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      deallog.pop();
 	      
@@ -131,7 +174,7 @@ int main()
 	      r1 = check_solve(rich,A,u,f,prec_sor);
 	      r2 = check_solve(relax,A,u,f,prec_sor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
-	      r2 = check_solve(relax,A,u,f,relax_sor);
+	      r2 = check_solve(relax,A,u,f,prec_bsor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      deallog.pop();
 	      
@@ -139,9 +182,10 @@ int main()
 	      r1 = check_solve(rich,A,u,f,prec_ssor);
 	      r2 = check_solve(relax,A,u,f,prec_ssor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
-	      r2 = check_solve(relax,A,u,f,relax_ssor);
+	      r2 = check_solve(relax,A,u,f,prec_bssor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      deallog.pop();
+	      
 	    }
 	  catch (std::exception& e)
 	    {
