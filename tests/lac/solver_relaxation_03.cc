@@ -140,6 +140,9 @@ int main()
 	  prec_bjacobi.initialize(A, bperm, ibperm, prec_data);
 	  PreconditionBlockSOR<SparseMatrix<double>,double> prec_bsor;
 	  prec_bsor.initialize(A, bperm, ibperm, prec_data);
+	  PreconditionBlockSOR<SparseMatrix<double>,double> prec_bsor2;
+	  prec_bsor2.initialize(A, prec_data);
+	  prec_bsor2.set_permutation(bperm, ibperm);
 	  PreconditionBlockSSOR<SparseMatrix<double>,double> prec_bssor;
 	  prec_bssor.initialize(A, bperm, ibperm, prec_data);
 
@@ -175,6 +178,8 @@ int main()
 	      r2 = check_solve(relax,A,u,f,prec_sor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      r2 = check_solve(relax,A,u,f,prec_bsor);
+	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
+	      r2 = check_solve(relax,A,u,f,prec_bsor2);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      deallog.pop();
 	      
