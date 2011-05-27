@@ -156,9 +156,10 @@ didn't get column indices right. This is now fixed.
 
 <li> Fixed: The TrilinosWrappers::SparseMatrix::operator() and
 TrilinosWrappers::SparseMatrix::el() functions sometimes produced
-wrong results for rectangular matrices. This is now fixed.
+wrong results for rectangular matrices. The same is true for
+TrilinosWrappers::SparsityPattern::exists(). This is now fixed.
 <br>
-(Habib Talavatifard, Wolfgang Bangerth 2011/05/09)
+(Habib Talavatifard, Wolfgang Bangerth 2011/05/09, 2011/05/27)
 
 <li> Changed: DoFTools is now a namespace. It has long been a class that
 had only public, static member functions, making the end result semantically

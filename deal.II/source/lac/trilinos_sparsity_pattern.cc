@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -417,7 +417,7 @@ namespace TrilinosWrappers
   {
 				      // Extract local indices in
 				      // the matrix.
-    int trilinos_i = graph->LRID(i), trilinos_j = graph->LRID(j);
+    int trilinos_i = graph->LRID(i), trilinos_j = graph->LCID(j);
 
 				      // If the data is not on the
 				      // present processor, we throw
