@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1128,7 +1128,7 @@ namespace TrilinosWrappers
                                         * Epetra_CrsGraph data that stores
                                         * the sparsity pattern.
                                         */
-      const Epetra_CrsGraph & trilinos_sparsity_pattern () const;
+      const Epetra_FECrsGraph & trilinos_sparsity_pattern () const;
 
                                        /**
                                         * Return a const reference to the
@@ -1640,10 +1640,10 @@ namespace TrilinosWrappers
 
 
   inline
-  const Epetra_CrsGraph &
+  const Epetra_FECrsGraph &
   SparsityPattern::trilinos_sparsity_pattern () const
   {
-    return static_cast<const Epetra_CrsGraph&>(*graph);
+    return *graph;
   }
 
 

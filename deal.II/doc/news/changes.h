@@ -131,6 +131,14 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: The TrilinosWrappers::SparsityPattern::trilinos_sparsity_pattern()
+function returned a reference to an object of kind Epetra_CrsMatrix. However, the
+actual object pointed to is of derived class Epetra_FECrsMatrix. The function
+has now been changed to return a reference to the latter type. Since derived
+references can be assigned to references to base, this change should not
+result in any incompatibilities.
+<br>
+(Wolfgang Bangerth 2011/05/27)
 
 <li> New: The class RelaxationBlockJacobi has been added to the relaxation classes.
 <br> (GK, 2011/05/19)
