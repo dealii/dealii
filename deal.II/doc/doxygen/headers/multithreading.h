@@ -414,7 +414,7 @@
          *out = *in_1 + *in_2;
  * @endcode
  * The next C++ standard will contain a more elegant way to achieve the
- * same effect shown above using the Boost Lambda library, through a
+ * same effect shown above using the Boost library, through a
  * mechanism known as <i>lambda expressions</i> and <i>closures</i>.
  *
  * Note also that we have made sure that no CPU ever gets a chunk of
@@ -486,21 +486,21 @@
                               Vector       &dst) const
     {
       parallel::transform (dst.begin(), dst.end(),
-                           boost::bind (&SparseMatrix::vmult_one_row,
+                           std_cxx1x::bind (&SparseMatrix::vmult_one_row,
 			                this,
-					boost::cref(src),
-					boost::ref(dst),
-					_1),
+					std_cxx1x::cref(src),
+					std_cxx1x::ref(dst),
+					std_cxx1x::_1),
 			   200);
     }
  * @endcode
  * Note how we use <a
- * href="http://www.boost.org/doc/libs/1_37_0/libs/bind/bind.html">boost::bind</a>
+ * href="http://www.boost.org/doc/libs/1_37_0/libs/bind/bind.html">std_cxx1x::bind</a>
  * to <i>bind</i> certain arguments to the <code>vmult_one_row</code>
  * function, leaving one argument open and thus allowing the
  * parallel::transform function to consider the passed function argument as
  * unary. Also note that we need to make the source and destination vectors as
- * (const) references to prevent boost::bind from passing them by value
+ * (const) references to prevent std_cxx1x::bind from passing them by value
  * (implying a copy for <code>src</code> and writing the result into a
  * temporary copy of <code>dst</code>, neither of which is what we desired).
  * Finally, notice the grainsize of a minimum of 200 rows of a matrix that
@@ -542,11 +542,11 @@
                               Vector       &dst) const
     {
        parallel::apply_to_subranges (0, n_rows(),
-				     boost::bind (vmult_on_subrange,
+				     std_cxx1x::bind (vmult_on_subrange,
 						  this,
-						  _1, _2,
-						  boost::cref(src),
-						  boost::ref(dst)),
+						  std_cxx1x::_1, std_cxx1x::_2,
+						  std_cxx1x::cref(src),
+						  std_cxx1x::ref(dst)),
 				     200);
     }
  * @endcode
@@ -617,10 +617,10 @@
       return
         std::sqrt
 	(parallel::accumulate_from_subranges (0, n_rows(),
-				              boost::bind (mat_norm_sqr_on_subrange,
+				              std_cxx1x::bind (mat_norm_sqr_on_subrange,
 						           this,
-						           _1, _2,
-						           boost::cref(x)),
+						           std_cxx1x::_1, std_cxx1x::_2,
+						           std_cxx1x::cref(x)),
 				              200));
     }
  * @endcode
@@ -993,19 +993,20 @@
      // ...is the same as:
      WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
-		      boost::bind(&MyClass<dim>::assemble_on_one_cell, *this, _1, _2, _3),
-		      boost::bind(&MyClass<dim>::copy_local_to_global, *this, _1),
+		      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell, *this,
+		                  std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
+		      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global, *this, std_cxx1x::_1),
 		      per_task_data);
  * @endcode
- * Note how <code>boost::bind</code> produces a function object that takes three
+ * Note how <code>std_cxx1x::bind</code> produces a function object that takes three
  * arguments by binding the member function to the <code>*this</code>
- * object. <code>_1, _2</code> and <code>_3</code> are placeholders for the first,
+ * object. <code>std_cxx1x::_1, std_cxx1x::_2</code> and <code>std_cxx1x::_3</code> are placeholders for the first,
  * second and third argument that can be specified later on. In other words, for
  * example if <code>p</code> is the result of the first call to
- * <code>boost::bind</code>, then the call <code>p(cell, scratch_data,
+ * <code>std_cxx1x::bind</code>, then the call <code>p(cell, scratch_data,
  * per_task_data)</code> will result in executing
  * <code>this-@>assemble_on_one_cell (cell, scratch_data, per_task_data)</code>,
- * i.e. <code>boost::bind</code> has bound the object to the function pointer
+ * i.e. <code>std_cxx1x::bind</code> has bound the object to the function pointer
  * but left the three arguments open for later.
  *
  * Similarly, let us assume that <code>MyClass::assemble_on_one_cell</code>
@@ -1027,22 +1028,22 @@
  * @code
      WorkStream::run (dof_handler.begin_active(),
 	              dof_handler.end(),
-		      boost::bind(&MyClass<dim>::assemble_on_one_cell,
+		      std_cxx1x::bind(&MyClass<dim>::assemble_on_one_cell,
 		                  *this,
 				  current_solution,
-				  _1,
-				  _2,
- 				  _3,
+				  std_cxx1x::_1,
+				  std_cxx1x::_2,
+ 				  std_cxx1x::_3,
 				  previous_time+time_step),
-		      boost::bind(&MyClass<dim>::copy_local_to_global,
-		                  *this, _1),
+		      std_cxx1x::bind(&MyClass<dim>::copy_local_to_global,
+		                  *this, std_cxx1x::_1),
 		      per_task_data);
  * @endcode
  * Here, we bind the object, the linearization point argument, and the
  * current time argument to the function before we hand it off to
  * WorkStream::run(). WorkStream::run() will then simply call the
  * function with the cell and scratch and per task objects which will be filled
- * in at the positions indicated by <code>_1, _2</code> and <code>_3</code>.
+ * in at the positions indicated by <code>std_cxx1x::_1, std_cxx1x::_2</code> and <code>std_cxx1x::_3</code>.
  *
  * To see the WorkStream class used in practice on tasks like the ones
  * outlined above, take a look at the step-32, step-35 or step-37
