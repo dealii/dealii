@@ -250,7 +250,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
     MeshWorker::integration_loop<dim, dim> (
       dof.begin(l), dof.end(l),
       dof_info, info_box,
-      std_cxx1x::bind(&OutputCreator<dim>::cell, &matrix_integrator, _1, _2),
+      std_cxx1x::bind(&OutputCreator<dim>::cell, &matrix_integrator, std_cxx1x::_1, std_cxx1x::_2),
       0,
       0,
       assembler);

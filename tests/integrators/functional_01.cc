@@ -96,9 +96,9 @@ test_mesh(MGDoFHandler<dim>& mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
     (dofs.begin_active(), dofs.end(),
      dof_info, info_box,
-     std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
-     std_cxx1x::bind (&Local<dim>::bdry, local, _1, _2),
-     std_cxx1x::bind (&Local<dim>::face, local, _1, _2, _3, _4),
+     std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
+     std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
+     std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
      assembler, true);
 
   deallog << "  Results";
@@ -111,9 +111,9 @@ test_mesh(MGDoFHandler<dim>& mgdofs)
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, EmptyInfoBox>
     (mgdofs.begin(), mgdofs.end(),
      mg_dof_info, info_box,
-     std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
-     std_cxx1x::bind (&Local<dim>::bdry, local, _1, _2),
-     std_cxx1x::bind (&Local<dim>::face, local, _1, _2, _3, _4),
+     std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
+     std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
+     std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
      assembler, true);
 
   deallog << "MGResults";

@@ -146,9 +146,9 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   MeshWorker::integration_loop<dim, dim>
     (dofs.begin_active(), dofs.end(),
      dof_info, info_box,
-     std_cxx1x::bind (&Local<dim>::cell, local, _1, _2),
-       std_cxx1x::bind (&Local<dim>::bdry, local, _1, _2),
-       std_cxx1x::bind (&Local<dim>::face, local, _1, _2, _3, _4),
+     std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
+       std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
+       std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
        assembler, true);
   
   for (unsigned int i=0;i<v.size();++i)
