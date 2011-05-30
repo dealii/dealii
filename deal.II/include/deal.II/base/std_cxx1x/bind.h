@@ -23,8 +23,16 @@
 DEAL_II_NAMESPACE_OPEN
 // in boost, the placeholders _1, _2, ... are in the global namespace. in
 // C++0x, they are in namespace std::placeholders, which makes them awkward to
-// use. import them into the deal.II namespace
-using namespace std::placeholders;
+// use. import them into the deal.II::std_cxx1x namespace instead and do them
+// same below if we use boost instead.
+namespace std_cxx1x
+{
+  using namespace std::placeholders;
+  using std::bind;
+  using std::ref;
+  using std::cref;
+  using std::reference_wrapper;
+}
 DEAL_II_NAMESPACE_CLOSE
 
 #else
@@ -38,6 +46,18 @@ namespace std_cxx1x
   using boost::ref;
   using boost::cref;
   using boost::reference_wrapper;
+  
+  // now also import the _1, _2 placeholders from the global namespace
+  // into the current one as suggested above
+  using ::_1;
+  using ::_2;
+  using ::_3;
+  using ::_4;
+  using ::_5;
+  using ::_6;
+  using ::_7;
+  using ::_8;
+  using ::_9;
 }
 DEAL_II_NAMESPACE_CLOSE
 

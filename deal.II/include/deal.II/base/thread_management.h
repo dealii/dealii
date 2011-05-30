@@ -2155,7 +2155,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1));
   }
 
 				   /**
@@ -2172,7 +2172,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1));
   }
 
 
@@ -2209,7 +2209,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2));
   }
 
 				   /**
@@ -2226,7 +2226,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2));
   }
 
 
@@ -2265,7 +2265,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2,Arg3> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3));
   }
 
 				   /**
@@ -2283,7 +2283,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1,Arg2,Arg3> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3));
   }
 
 
@@ -2323,7 +2323,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4));
   }
 
 				   /**
@@ -2341,7 +2341,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4));
   }
 
 
@@ -2382,7 +2382,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5));
   }
 
 				   /**
@@ -2401,7 +2401,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5));
   }
 
 
@@ -2442,7 +2442,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6));
   }
 
 				   /**
@@ -2462,7 +2462,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6));
   }
 
 
@@ -2507,7 +2507,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6, _7));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6, std_cxx1x::_7));
   }
 
 				   /**
@@ -2529,7 +2529,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6, std_cxx1x::_7));
   }
 
 
@@ -2578,7 +2578,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6, _7, _8));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6, std_cxx1x::_7, std_cxx1x::_8));
   }
 
 				   /**
@@ -2602,7 +2602,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6, std_cxx1x::_7, std_cxx1x::_8));
   }
 
 
@@ -2651,7 +2651,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::ref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6, std_cxx1x::_7, std_cxx1x::_8, std_cxx1x::_9));
   }
 
 				   /**
@@ -2675,7 +2675,7 @@ namespace Threads
   {
     return
       std_cxx1x::function<typename internal::fun_ptr<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> >::type>
-      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), _1, _2, _3, _4, _5, _6, _7, _8, _9));
+      (std_cxx1x::bind(fun_ptr, std_cxx1x::cref(c), std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4, std_cxx1x::_5, std_cxx1x::_6, std_cxx1x::_7, std_cxx1x::_8, std_cxx1x::_9));
   }
 
 

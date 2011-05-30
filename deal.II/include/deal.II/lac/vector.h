@@ -1163,7 +1163,7 @@ Vector<Number> & Vector<Number>::operator = (const Number s)
     parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  set_subrange<Number>,
-						  s, _1, _2, std_cxx1x::ref(*this)),
+						  s, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
     internal::Vector::set_subrange<Number>(s, 0U, vec_size, *this);
@@ -1202,7 +1202,7 @@ Vector<Number>::operator = (const Vector<Number>& v)
     parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  copy_subrange<Number>,
-						  std_cxx1x::cref(v), _1, _2,
+						  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
 						  std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
@@ -1225,7 +1225,7 @@ Vector<Number>::operator = (const Vector<Number2>& v)
     parallel::apply_to_subranges (0U, vec_size,
 				  std_cxx1x::bind(&internal::Vector::template
 						  copy_subrange_ext<Number2,Number>,
-						  std_cxx1x::cref(v), _1, _2,
+						  std_cxx1x::cref(v), std_cxx1x::_1, std_cxx1x::_2,
 						  std_cxx1x::ref(*this)),
 				  internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)

@@ -19,11 +19,19 @@
 #ifdef DEAL_II_CAN_USE_CXX1X
 
 #  include <tuple>
+DEAL_II_NAMESPACE_OPEN
+namespace std_cxx1x
+{
+  using std::tuple;
+  using std::get;
+  using std::tuple_size;
+  using std::tuple_element;
+}
+DEAL_II_NAMESPACE_CLOSE
 
 #else
 
 #include <boost/tuple/tuple.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {

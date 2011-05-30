@@ -19,11 +19,18 @@
 #ifdef DEAL_II_CAN_USE_CXX1X
 
 #  include <condition_variable>
+DEAL_II_NAMESPACE_OPEN
+namespace std_cxx1x
+{
+  using std::condition_variable;
+  using std::unique_lock;
+  using std::adopt_lock;
+}
+DEAL_II_NAMESPACE_CLOSE
 
 #else
 
 #  include <boost/thread/condition_variable.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {

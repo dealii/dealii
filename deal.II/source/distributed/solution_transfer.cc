@@ -109,9 +109,9 @@ namespace parallel
 				     (get_data_size() * input_vectors.size()),
 				     std_cxx1x::bind(&SolutionTransfer<dim, VECTOR, DH>::pack_callback,
 						     ptr,
-						     _1,
-						     _2,
-						     _3));
+						     std_cxx1x::_1,
+						     std_cxx1x::_2,
+						     std_cxx1x::_3));
     }
 
 
@@ -145,9 +145,9 @@ namespace parallel
       tria->notify_ready_to_unpack(offset,
 				   std_cxx1x::bind(&SolutionTransfer<dim, VECTOR, DH>::unpack_callback,
 						   this,
-						   _1,
-						   _2,
-						   _3,
+						   std_cxx1x::_1,
+						   std_cxx1x::_2,
+						   std_cxx1x::_3,
 						   std_cxx1x::ref(all_out)));
 
       for (typename std::vector<VECTOR*>::iterator it=all_out.begin();

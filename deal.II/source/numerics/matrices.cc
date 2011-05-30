@@ -611,7 +611,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mappi
 		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (&internal::MatrixCreator::
 				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				    _1, &matrix, (Vector<double>*)0),
+				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
 		   assembler_data,
 		   copy_data);
 }
@@ -662,7 +662,7 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mappi
 		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind(&internal::MatrixCreator::
 				   copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				   _1, &matrix, &rhs_vector),
+				   std_cxx1x::_1, &matrix, &rhs_vector),
 		   assembler_data,
 		   copy_data);
 }
@@ -713,7 +713,7 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim
 		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (&internal::MatrixCreator::
 				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				    _1, &matrix, (Vector<double>*)0),
+				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
 		   assembler_data,
 		   copy_data);
 }
@@ -763,7 +763,7 @@ void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim
 		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (&internal::MatrixCreator::
 				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				    _1, &matrix, &rhs_vector),
+				    std_cxx1x::_1, &matrix, &rhs_vector),
 		   assembler_data,
 		   copy_data);
 }
@@ -1686,7 +1686,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
 		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (copy_local_to_global,
-				    _1, &matrix, (Vector<double>*)0),
+				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
 		   assembler_data,
 		   copy_data);
 }
@@ -1741,7 +1741,7 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
 		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (copy_local_to_global,
-				    _1, &matrix, &rhs_vector),
+				    std_cxx1x::_1, &matrix, &rhs_vector),
 		   assembler_data,
 		   copy_data);
 }
@@ -1797,7 +1797,7 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,space
 		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (copy_local_to_global,
-				    _1, &matrix, (Vector<double>*)0),
+				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
 		   assembler_data,
 		   copy_data);
 }
@@ -1852,7 +1852,7 @@ void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,space
 		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
 		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
 		   std_cxx1x::bind (copy_local_to_global,
-				    _1, &matrix, &rhs_vector),
+				    std_cxx1x::_1, &matrix, &rhs_vector),
 		   assembler_data,
 		   copy_data);
 }

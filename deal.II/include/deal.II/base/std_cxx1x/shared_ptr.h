@@ -19,11 +19,17 @@
 #ifdef DEAL_II_CAN_USE_CXX1X
 
 #  include <memory>
+DEAL_II_NAMESPACE_OPEN
+namespace std_cxx1x
+{
+  using std::shared_ptr;
+  using std::enable_shared_from_this;
+}
+DEAL_II_NAMESPACE_CLOSE
 
 #else
 
 #include <boost/shared_ptr.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {

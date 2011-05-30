@@ -504,10 +504,10 @@ void DataOutRotation<dim,DH>::build_patches (const unsigned int n_patches_per_ci
   WorkStream::run (&all_cells[0],
 		   &all_cells[0]+all_cells.size(),
 		   std_cxx1x::bind(&DataOutRotation<dim,DH>::build_one_patch,
-				   *this, _1, _2, _3),
+				   *this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
 		   std_cxx1x::bind(&internal::DataOutRotation
 				   ::append_patch_to_list<dim,DH::space_dimension>,
-				   _1, std_cxx1x::ref(this->patches)),
+				   std_cxx1x::_1, std_cxx1x::ref(this->patches)),
 		   thread_data,
 		   new_patches);
 }

@@ -19,11 +19,16 @@
 #ifdef DEAL_II_CAN_USE_CXX1X
 
 #  include <mutex>
+DEAL_II_NAMESPACE_OPEN
+namespace std_cxx1x
+{
+  using std::mutex;
+}
+DEAL_II_NAMESPACE_CLOSE
 
 #else
 
 #  include <boost/thread/mutex.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {

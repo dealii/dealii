@@ -647,7 +647,7 @@ MatrixFree<number,Transformation>::Tvmult_add (Vector<number2>       &dst,
 				 // three arguments (in the first case) or one
 				 // argument (in the second), which is what
 				 // the WorkStream::run function expects. The
-				 // placeholders <code>_1, _2, _3</code> in
+				 // placeholders <code>_1, std_cxx1x::_2, _3</code> in
 				 // the local vmult specify variable input
 				 // values, given by the chunk information,
 				 // scratch data and copy data that the
@@ -680,10 +680,10 @@ MatrixFree<number,Transformation>::vmult_add (Vector<number2>       &dst,
   WorkStream::run (matrix_sizes.chunks.begin(), matrix_sizes.chunks.end(),
 		   std_cxx1x::bind(&MatrixFree<number,Transformation>::
 				   template local_vmult<number2>,
-				   this, _1, _2, _3, boost::cref(src)),
+				   this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, boost::cref(src)),
 		   std_cxx1x::bind(&MatrixFree<number,Transformation>::
 				   template copy_local_to_global<number2>,
-				   this, _1, boost::ref(dst)),
+				   this, std_cxx1x::_1, boost::ref(dst)),
 		   WorkStreamData::ScratchData<number>(),
 		   WorkStreamData::CopyData<number>(),
 		   2*multithread_info.n_default_threads,1);

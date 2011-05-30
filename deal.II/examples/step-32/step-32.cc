@@ -2185,7 +2185,7 @@ copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPrec
 				 // <code>std_cxx1x::bind</code> to create a
 				 // function object that is compatible with
 				 // the WorkStream class. It uses placeholders
-				 // <code>_1, _2, _3</code> for the local
+				 // <code>_1, std_cxx1x::_2, _3</code> for the local
 				 // assembly function that specify cell,
 				 // scratch data, and copy data, as well as
 				 // the placeholder <code>_1</code> for the
@@ -2249,13 +2249,13 @@ BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  local_assemble_stokes_preconditioner,
 			  this,
-			  _1,
-			  _2,
-			  _3),
+			  std_cxx1x::_1,
+			  std_cxx1x::_2,
+			  std_cxx1x::_3),
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  copy_local_to_global_stokes_preconditioner,
 			  this,
-			  _1),
+			  std_cxx1x::_1),
 	 Assembly::Scratch::
 	 StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
 				    mapping,
@@ -2456,13 +2456,13 @@ void BoussinesqFlowProblem<dim>::assemble_stokes_system ()
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  local_assemble_stokes_system,
 			  this,
-			  _1,
-			  _2,
-			  _3),
+			  std_cxx1x::_1,
+			  std_cxx1x::_2,
+			  std_cxx1x::_3),
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  copy_local_to_global_stokes_system,
 			  this,
-			  _1),
+			  std_cxx1x::_1),
 	 Assembly::Scratch::
 	 StokesSystem<dim> (stokes_fe, mapping, quadrature_formula,
 			    (update_values    |
@@ -2583,13 +2583,13 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_matrix ()
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  local_assemble_temperature_matrix,
 			  this,
-			  _1,
-			  _2,
-			  _3),
+			  std_cxx1x::_1,
+			  std_cxx1x::_2,
+			  std_cxx1x::_3),
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  copy_local_to_global_temperature_matrix,
 			  this,
-			  _1),
+			  std_cxx1x::_1),
 	 Assembly::Scratch::
 	 TemperatureMatrix<dim> (temperature_fe, mapping, quadrature_formula),
 	 Assembly::CopyData::
@@ -2868,13 +2868,13 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 			  this,
 			  global_T_range,
 			  maximal_velocity,
-			  _1,
-			  _2,
-			  _3),
+			  std_cxx1x::_1,
+			  std_cxx1x::_2,
+			  std_cxx1x::_3),
 	 std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			  copy_local_to_global_temperature_rhs,
 			  this,
-			  _1),
+			  std_cxx1x::_1),
 	 Assembly::Scratch::
 	 TemperatureRHS<dim> (temperature_fe, stokes_fe, mapping,
 			      quadrature_formula),

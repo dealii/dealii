@@ -19,11 +19,16 @@
 #ifdef DEAL_II_CAN_USE_CXX1X
 
 #  include <functional>
+DEAL_II_NAMESPACE_OPEN
+namespace std_cxx1x
+{
+  using std::function;
+}
+DEAL_II_NAMESPACE_CLOSE
 
 #else
 
 #include <boost/function.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {

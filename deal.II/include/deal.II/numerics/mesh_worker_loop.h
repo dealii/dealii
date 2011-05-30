@@ -262,9 +262,10 @@ namespace MeshWorker
 				     // Loop over all cells
 #ifdef DEAL_II_MESHWORKER_PARALLEL
     WorkStream::run(begin, end,
- 		    std_cxx1x::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>, _1, _3, _2,
+ 		    std_cxx1x::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>, 
+				    std_cxx1x::_1, std_cxx1x::_3, std_cxx1x::_2,
 				    cell_worker, boundary_worker, face_worker, cells_first, true),
- 		    std_cxx1x::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, _1, &assembler),
+ 		    std_cxx1x::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx1x::_1, &assembler),
  		    info, dof_info);
 #else
     for (ITERATOR cell = begin; cell != end; ++cell)

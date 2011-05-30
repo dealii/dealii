@@ -638,7 +638,7 @@ SparseMatrix<number>::vmult (OutVector& dst,
   parallel::apply_to_subranges (0U, m(),
 				std_cxx1x::bind (&internal::SparseMatrix::vmult_on_subrange
 						 <number,InVector,OutVector>,
-						 _1, _2,
+						 std_cxx1x::_1, std_cxx1x::_2,
 						 val,
 						 cols->rowstart,
 						 cols->colnums,
@@ -693,7 +693,7 @@ SparseMatrix<number>::vmult_add (OutVector& dst,
   parallel::apply_to_subranges (0U, m(),
 				std_cxx1x::bind (&internal::SparseMatrix::vmult_on_subrange
 						 <number,InVector,OutVector>,
-						 _1, _2,
+						 std_cxx1x::_1, std_cxx1x::_2,
 						 val,
 						 cols->rowstart,
 						 cols->colnums,
@@ -781,7 +781,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber>& v) const
     parallel::accumulate_from_subranges<number>
     (std_cxx1x::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
 		      <number,Vector<somenumber> >,
-		      _1, _2,
+		      std_cxx1x::_1, std_cxx1x::_2,
 		      val, cols->rowstart, cols->colnums,
 		      std_cxx1x::cref(v)),
      0, m(),
@@ -846,7 +846,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
     parallel::accumulate_from_subranges<number>
     (std_cxx1x::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
 		      <number,Vector<somenumber> >,
-		      _1, _2,
+		      std_cxx1x::_1, std_cxx1x::_2,
 		      val, cols->rowstart, cols->colnums,
 		      std_cxx1x::cref(u),
 		      std_cxx1x::cref(v)),
@@ -1254,7 +1254,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
     std::sqrt (parallel::accumulate_from_subranges<number>
 	       (std_cxx1x::bind (&internal::SparseMatrix::residual_sqr_on_subrange
 				 <number,Vector<somenumber>,Vector<somenumber> >,
-				 _1, _2,
+				 std_cxx1x::_1, std_cxx1x::_2,
 				 val, cols->rowstart, cols->colnums,
 				 std_cxx1x::cref(u),
 				 std_cxx1x::cref(b),

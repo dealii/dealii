@@ -1636,9 +1636,9 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   WorkStream::run (dof_handler.begin_active(),
 		   static_cast<typename DH::active_cell_iterator>(dof_handler.end()),
 		   std_cxx1x::bind (&internal::estimate_one_cell<dim,spacedim,InputVector,DH>,
-				    _1, _2, _3, std_cxx1x::ref(solutions)),
+				    std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::ref(solutions)),
 		   std_cxx1x::bind (&internal::copy_local_to_global<DH>,
-				    _1, std_cxx1x::ref(face_integrals)),
+				    std_cxx1x::_1, std_cxx1x::ref(face_integrals)),
 		   parallel_data,
 		   sample_local_face_integrals);
 

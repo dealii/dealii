@@ -363,10 +363,10 @@ void DataOutFaces<dim,DH>::build_patches (const Mapping<DH::dimension> &mapping,
   WorkStream::run (&all_faces[0],
 		   &all_faces[0]+all_faces.size(),
 		   std_cxx1x::bind(&DataOutFaces<dim,DH>::build_one_patch,
-				   *this, _1, _2, _3),
+				   *this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3),
 		   std_cxx1x::bind(&internal::DataOutFaces::
 				   append_patch_to_list<dim,DH::space_dimension>,
-				   _1, std_cxx1x::ref(this->patches)),
+				   std_cxx1x::_1, std_cxx1x::ref(this->patches)),
 		   thread_data,
 		   sample_patch);
 }

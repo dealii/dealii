@@ -21,7 +21,39 @@ inconvenience this causes.
 </p>
 
 <ol>
-  <li>
+<li> Changed: deal.II has a namespace std_cxx1x that was used to
+import classes from BOOST that are part of the upcoming C++ 1x standard. On
+the other hand, if your compiler supported a sufficiently large subset
+of C++ 1x, we had code that simply did
+@code
+  namespace std_cxx1x = std;
+@endcode
+allowing you to refer to everything that was part of the compiler's namespace 
+<code>std</code> under the alternative name. This turned out to be untenable
+in connection to the changed outlined below for _1, _2, etc. Consequently,
+if the compiler used supports C++ 1x, we now selectively import elements of the
+compiler's namespace std into namespace std_cxx1x as well. This may lead to
+incompatibilities if you are already using elements of the C++ 1x
+standard by refering to them through the std_cxx1x namespace and these elements
+are not on the list of selectively imported ones.
+<br>
+(Wolfgang Bangerth, 2011/05/29)
+
+<li> Changed: Previously, placeholder arguments like _1, _2, etc that are used
+in conjunction with the std_cxx1x::bind function could be referenced as if
+they are part of the global namespace. This was achieved by importing the
+corresponding elements of namespace std::placeholders into the global namespace
+if your compiler supported this part of the C++ 1x standard, or otherwise using
+the BOOST counterparts which are already in the global namespace. However,
+this leads to a conflict if one has a C++ 1x enabled compiler (e.g. GCC 4.6)
+<i>and</i> #includes certain BOOST headers, since the importation of symbols
+into the global namespace now leads to ambiguous names. The only solution to
+the problem is to not import names into the global namespace, but rather 
+import the names from either BOOST or namespace std into the deal.II namespace
+std_cxx1x. The downside is that all code that uses _1, _2, etc needs to be
+changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
+<br>
+(Wolfgang Bangerth, 2011/05/29)
 </ol>
 
 
@@ -34,7 +66,7 @@ for the GNU Scientific Library (GSL) in version 7.0 but didn't actually
 use any of the GSL functions. The corresponding code has therefore been
 removed again.
 <br>
-(WB, 2011/05/22)
+(Wolfgang Bangerth, 2011/05/22)
 
 
 <li> Changed: Traditionally, include directories were set through the
@@ -53,13 +85,13 @@ This change has been made throughout the library and tutorial programs.
 However, the old way of using include directories will continue to work
 for at least one release for backward compatibility.
 <br>
-(WB, 2011/05/16)
+(Wolfgang Bangerth, 2011/05/16)
 
 <li> Changed: The version of BOOST we ship with deal.II has been upgraded
 to 1.46.1. BOOST now also resides in the directory <code>contrib/boost-1.46.1</code>
 instead of an unversioned directory.
 <br>
-(WB, 2011/05/16)
+(Wolfgang Bangerth, 2011/05/16)
 
 <li> New: The SparseDirectUMFPACK class can now also deal with matrices
 provided in SparseMatrixEZ format.
