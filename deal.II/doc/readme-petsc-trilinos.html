@@ -232,6 +232,35 @@ make install
 	variables <code>TRILINOS_INCDIR, TRILINOS_LIBDIR</code>.
       </p>
 
+      <h3>Dealing with other Trilinos packages</h3>
+
+      <p>
+	In the commands configuring Trilinos shown above, we have assumed a
+	particular subset of Trilinos libraries that deal.II interfaces
+	with. However, Trilinos has many more packages that deal.II doesn't
+	use, and you can add many more <code>-D
+	Trilinos_ENABLE_XXX:BOOL=ON</code> flags for
+	package <code>XXX</code>. Most of the time, no harm is done by doing
+	so, but there are cases where some of the packages deal.II does
+	interact with also interacts with package <code>XXX</code> if the
+	latter was enabled in Trilinos. One example is that Trilinos' ML
+	package (which we use) uses Trilinos' Zoltan package if Zoltan is
+	enable, but not if Zoltan is not enabled. That means that
+	the <code>libml.so</code> library may or may not depend on
+	a <code>libzoltan.so</code> library.
+      </p>
+
+      <p>
+	Unfortunately, Trilinos' configuration framework does not record this
+	in <code>libml.so</code>, and it is also something that is difficult
+	for the deal.II configuration framework to find out after the
+	fact. Consequently, deal.II's Makefiles rely on the fact
+	that <i>only</i> the Trilinos packages listed above were enabled. If
+	that isn't the case, you may get linker warnings. The only way to
+	solve this problem is to add the additional Trilinos libraries at the
+	appropriate place in the list of <code>DEAL_II_TRILINOS_LIBS</code>
+	libraries in <code>common/Make.global_options</code> by hand.
+      </p>
     <hr>
 
     <address>
