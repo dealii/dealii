@@ -3019,6 +3019,34 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      */
     std::auto_ptr<const CellIteratorBase> present_cell;
 
+    /**
+     * A signal connection we use to ensure we get informed whenever the
+     * triangulation changes. We need to know about that because it
+     * invalidates all cell iterators and, as part of that, the
+     * 'present_cell' iterator we keep around between subsequent
+     * calls to reinit() in order to compute the cell similarity.
+     */
+    boost::signals2::connection tria_listener;
+    
+    /**
+     * A function that is connected to the triangulation in
+     * order to reset the stored 'present_cell' iterator to an invalid
+     * one whenever the triangulation is changed and the iterator consequently
+     * becomes invalid.
+     */
+    void invalidate_present_cell ();
+    
+    /**
+     * This function is called by the various reinit() functions in derived
+     * classes. Given the cell indicated by the argument, test whether
+     * we have to throw away the previously stored present_cell argument
+     * because it would require us to compare cells from different
+     * triangulations. In checking all this, also make sure that we have
+     * tria_listener connected to the triangulation to which we will set
+     * present_cell right after calling this function.
+     */
+    void maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::active_cell_iterator &cell);
+    
 				     /**
 				      * Storage for the mapping object.
 				      */

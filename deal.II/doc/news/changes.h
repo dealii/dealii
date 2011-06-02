@@ -175,6 +175,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: If an FEValues object was kept around until after the triangulation
+on which it works has been refined or coarsened, and is then reinitialized
+with a cell from the refined triangulation, it could compute wrong results or
+crash outright. This has now been fixed.
+<br>
+(Wolfgang Bangerth 2011/06/02)
+
 <li> Changed: The TrilinosWrappers::SparsityPattern::trilinos_sparsity_pattern()
 function returned a reference to an object of kind Epetra_CrsMatrix. However, the
 actual object pointed to is of derived class Epetra_FECrsMatrix. The function

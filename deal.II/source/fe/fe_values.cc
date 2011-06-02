@@ -1703,6 +1703,8 @@ FEValuesBase<dim,spacedim>::~FEValuesBase ()
       mapping_data=0;
       delete tmp1;
     }
+    
+  tria_listener.disconnect ();
 }
 
 
@@ -3237,6 +3239,53 @@ FEValuesBase<dim,spacedim>::compute_update_flags (const UpdateFlags update_flags
 }
 
 
+template <int dim, int spacedim>
+void
+FEValuesBase< dim, spacedim >::invalidate_present_cell ()
+{
+  // if there is no present cell, then we shouldn't be
+  // connected via a signal to a triangulation
+  Assert (present_cell.get() != 0, ExcInternalError());
+  present_cell.reset ();
+}
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase< dim, spacedim >::
+maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::active_cell_iterator &cell)
+{
+  if (present_cell.get() != 0)
+  {
+    if (&cell->get_triangulation() !=
+        &static_cast<const typename Triangulation<dim,spacedim>::cell_iterator>(*present_cell)
+	->get_triangulation())
+      {
+	// the triangulations for the previous cell and the current cell
+	// do not match. disconnect from the previous triangulation and
+	// connect to the current one; also invalidate the previous
+	// cell because we shouldn't be comparing cells from different
+	// triangulations
+	tria_listener.disconnect ();
+	invalidate_present_cell();
+	tria_listener = 
+	  cell->get_triangulation().signals.post_refinement.connect
+	  (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+			    std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+      }
+  }
+  else
+  {
+    // if this FEValues has never been set to any cell at all, then
+    // at least subscribe to the triangulation to get notified of
+    // changes
+    tria_listener = 
+    cell->get_triangulation().signals.post_refinement.connect
+    (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
+		      std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
+  }
+}
+
 
 template <int dim, int spacedim>
 inline
@@ -3246,7 +3295,7 @@ FEValuesBase<dim,spacedim>::check_cell_similarity
 {
 				   // case that there has not been any cell
 				   // before
-  if (&*this->present_cell == 0)
+  if (this->present_cell.get() == 0)
     cell_similarity = CellSimilarity::none;
   else
 				     // in MappingQ, data can have been
@@ -3376,6 +3425,7 @@ FEValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_it
 	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 	  typename FEVB::ExcFEDontMatch());
 
+  this->maybe_invalidate_previous_present_cell (cell);
   check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
@@ -3410,6 +3460,7 @@ FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cel
 	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 	  typename FEVB::ExcFEDontMatch());
 
+  this->maybe_invalidate_previous_present_cell (cell);
   check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
@@ -3451,6 +3502,7 @@ FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_
 //	  static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
 //	  typename FEValuesBase<dim,spacedim>::ExcFEDontMatch());
 
+  this->maybe_invalidate_previous_present_cell (cell);
   check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
@@ -3477,6 +3529,7 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
 {
 				   // no FE in this cell, so no assertion
 				   // necessary here
+  this->maybe_invalidate_previous_present_cell (cell);
   check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
@@ -3657,6 +3710,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
@@ -3693,6 +3747,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,space
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
@@ -3733,6 +3788,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedi
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
@@ -3758,6 +3814,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spaced
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
 
@@ -3905,6 +3962,7 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spaced
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
@@ -3947,6 +4005,7 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,sp
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
@@ -3983,6 +4042,7 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spac
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::template
      CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
@@ -4012,6 +4072,7 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename Triangulation<dim,spa
 				   // destroyed and also that this
 				   // object gets destroyed in the
 				   // destruction of this class
+  this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
     (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
 
