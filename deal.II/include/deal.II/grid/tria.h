@@ -19,10 +19,14 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/grid/tria_iterator_selector.h>
+
+#include <boost/signals2.hpp>
 
 #include <vector>
 #include <list>
+#include <map>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1124,7 +1128,119 @@ namespace internal
  *   cells. This issue is discussed extensively in
  *   @ref GlossDistorted "distorted cells".
  *
+ * 
+ *   <h3>Getting notice when a triangulation changes</h3>
+ * 
+ *   There are cases where one object would like to know whenever a triangulation
+ *   is being refined, copied, or modified in a number of other ways. This
+ *   could of course be achieved if, in your user code, you tell every
+ *   such object whenever you are about to refine the triangulation, but this
+ *   will get tedious and is error prone. The Triangulation class implements
+ *   a more elegant way to achieve this: signals.
+ * 
+ *   In essence, a signal is an object (a member of the Triangulation class)
+ *   that another object can connect to. A connection is in essence that 
+ *   the connecting object passes a function object taking a certain number
+ *   and kind of arguments. Whenever the owner of the signal wants to
+ *   indicate a certain kind of event, it 'triggers' the signal, which in
+ *   turn means that all connections of the signal are triggered: in other
+ *   word, the function objects are executed and can take the action that
+ *   is necessary.
+ * 
+ *   As a simple example, the following code will print something to the
+ *   output every time the triangulation has just been refined:
+ *   @code
+ *     void f() {
+ *       std::cout << "Triangulation has been refined." << std::endl;
+ *     }
+ * 
+ *     void f() {
+ *       Triangulation<dim> triangulation;
+ *       // fill it somehow
+ *       triangulation.signals.post_refinement (&f);
+ *       triangulation.refine_global (2);
+ *   @endcode
+ *   This code will produce output twice, once for each refinement cycle.
+ * 
+ *   A more interesting application would be the following, akin to what
+ *   the FEValues class does. This class stores a pointer to a triangulation
+ *   and also an iterator to the cell last handled (so that it can compare
+ *   the current cell with the previous one and, for example, decide that
+ *   there is no need to re-compute the Jacobian matrix if the new cell
+ *   is a simple translation of the previous one). However, whenever the
+ *   triangulation is modified, the iterator to the previously handled
+ *   cell needs to be invalidated since it now no longer points to any 
+ *   useful cell (or, at the very least, points to something that may not
+ *   necessarily resemble the cells previously handled). The code would
+ *   look something like this (the real code has some more error checking
+ *   and has to handle the case that subsequent cells might actually belong to
+ *   different triangulation, but that is of no concern to us here):
+ *   @code
+ *     template <int dim>
+ *     class FEValues {
+ *         Triangulation<dim>::active_cell_iterator current_cell, previous_cell;
+ *       public:
+ *         void reinit (Triangulation<dim>::active_cell_iterator &cell);
+ *         void invalidate_previous_cell ();
+ *     };
+ * 
+ *     template <int dim>
+ *     void 
+ *     FEValues<dim>::reinit (Triangulation<dim>::active_cell_iterator &cell) {
+ *       if (previous_cell.status() != valid)
+ *         {
+ *           // previous_cell has not been set. set it now, and register
+ *           // with the triangulation that we want to be informed about
+ *           // mesh refinement
+ *           previous_cell = current_cell;
+ *           previous_cell.get_tria().signals.post_refinement
+ *             .connect (std_cxx1x::bind (&FEValues<dim>::invalidate_previous_cell,
+ *                                        std_cxx1x::ref (*this)));
+ *         }
+ *       else
+ *         previous_cell = current_cell;
+ * 
+ *       current_cell = cell;
+ *       ... do something with the cell...
+ *     }
  *
+ * 
+ *     template <int dim>
+ *     void 
+ *     FEValues<dim>::invalidate_previous_cell () {
+ *       previous_cell = Triangulation<dim>::active_cell_iterator();
+ *     }
+ *   @endcode
+ *   Here, whenever the triangulation is refined, it triggers the post-refinement
+ *   signal which calls the function object attached to it. This function object
+ *   is the member function <code>FEValues<dim>::invalidate_previous_cell</code>
+ *   where we have bound the single argument (the <code>this</code> pointer of
+ *   a member function that otherwise takes no arguments) to the <code>this</code>
+ *   pointer of the FEValues object. Note how here there is no need for the code
+ *   that owns the triangulation and the FEValues object to inform the latter if
+ *   the former is refined. (In practice, the function would want to connect to 
+ *   some of the other signals that the triangulation offers as well, in particular
+ *   to creation and deletion signals.)
+ *
+ *   The Triangulation class has a variety of signals that indicate different
+ *   actions by which the triangulation can modify itself and potentially
+ *   require follow-up action elsewhere:
+ *   - creation: This signal is triggered whenever the
+ *     Triangulation::create_triangulation is called
+ *   - pre-refinement: This signal is triggered at the beginning
+ *     of execution of the Triangulation::execute_coarsening_and_refinement
+ *     function (which is itself called by other functions such as 
+ *     Triangulation::refine_global). At the time this signal is triggered,
+ *     the triangulation is still unchanged.
+ *   - post-refinement: This signal is triggered at the end
+ *     of execution of the Triangulation::execute_coarsening_and_refinement
+ *     function when the triangulation has reached its final state
+ *   - copy: This signal is triggered whenever the triangulation owning
+ *     the signal is copied by another triangulation using
+ *     Triangulation::copy_triangulation (i.e. it is triggered on the <i>old</i>
+ *     triangulation, but the new one is passed as a argument).
+ * 
+ * 
  *   <h3>Technical details</h3>
  *
  *   <h4>Algorithms for mesh regularization and smoothing upon refinement</h4>
@@ -1280,6 +1396,7 @@ class Triangulation : public Subscriptor
 
 	  maximum_smoothing                  = 0xffff ^ allow_anisotropic_smoothing
     };
+    
 
     typedef typename IteratorSelector::CellAccessor         cell_accessor;
     typedef typename IteratorSelector::FaceAccessor         face_accessor;
@@ -1311,18 +1428,13 @@ class Triangulation : public Subscriptor
 				      *  Triangulation,
 				      *  can be derived from
 				      *  RefinementListener.
-				      *  If these classes add theirself to
-				      *  the refinement listener list by
-				      *  calling add_refinement_listener(),
-				      *  they will then be informed about
-				      *  the beginning of the refinement
-				      *  by a call of pre_refinement_notification()
-				      *  and about the end of the refinement
-				      *  process by a call of
-				      *  post_refinement_notification().
-				      *  Both methods are called in the method
-				      *  execute_coarsening_and_refinement().
-				      *  For an example see hp::DoFHandler().
+				      *  
+				      * @note The use of this class has been
+				      * superceded by the signals mechanism.
+				      * See the general documentation of the
+				      * Triangulation class for more information.
+				      * 
+				      * @deprecated
 				      */
     class RefinementListener
     {
@@ -1331,6 +1443,13 @@ class Triangulation : public Subscriptor
                                           * Destructor. Does nothing, but is
                                           * declared virtual because this
                                           * class also has virtual functions.
+					  *  
+					  * @note The use of this class has been
+					  * superceded by the signals mechanism.
+					  * See the general documentation of the
+					  * Triangulation class for more information.
+					  * 
+					  * @deprecated
                                           */
         virtual ~RefinementListener ();
 
@@ -1340,6 +1459,13 @@ class Triangulation : public Subscriptor
                                           * calls this method on all objects
                                           * derived from this class and
                                           * registered with the triangulation.
+					  *  
+					  * @note The use of this class has been
+					  * superceded by the signals mechanism.
+					  * See the general documentation of the
+					  * Triangulation class for more information.
+					  * 
+					  * @deprecated
                                           */
         virtual
         void
@@ -1351,6 +1477,13 @@ class Triangulation : public Subscriptor
                                           * calls this method on all objects
                                           * derived from this class and
                                           * registered with the triangulation.
+					  *  
+					  * @note The use of this class has been
+					  * superceded by the signals mechanism.
+					  * See the general documentation of the
+					  * Triangulation class for more information.
+					  * 
+					  * @deprecated
                                           */
         virtual
         void
@@ -1369,6 +1502,13 @@ class Triangulation : public Subscriptor
                                           * method does nothing, a different
                                           * behavior has to be implemented in
                                           * derived classes.
+					  *  
+					  * @note The use of this class has been
+					  * superceded by the signals mechanism.
+					  * See the general documentation of the
+					  * Triangulation class for more information.
+					  * 
+					  * @deprecated
                                           */
         virtual
         void
@@ -1385,6 +1525,13 @@ class Triangulation : public Subscriptor
                                           * default this method does nothing,
                                           * a different behavior has to be
                                           * implemented in derived classes.
+					  *  
+					  * @note The use of this class has been
+					  * superceded by the signals mechanism.
+					  * See the general documentation of the
+					  * Triangulation class for more information.
+					  * 
+					  * @deprecated
                                           */
         virtual
         void
@@ -1677,15 +1824,19 @@ class Triangulation : public Subscriptor
 				      *  functionality of this
 				      *  function.
 				      *
-				      *  Note, that the list of
-				      *  RefinementListeners is not
-				      *  copied. However, each
-				      *  RefinementListener is notified of the
-				      *  copy operation through the
-				      *  RefinementListener::copy_notification()
-				      *  function, so it might subscribe to the
-				      *  new Triangulation as well, if that is
-				      *  desired.
+				      *  @note Calling this function triggers 
+				      *  the 'copy' signal on old_tria, i.e.
+				      *  the triangulation being copied <i>from</i>.
+				      *  See the section on signals in the
+				      *  general documentation for more information.
+				      * 
+				      *  @note The list of connections to
+				      *  signals is not copied from the old 
+				      *  to the new triangulation since
+				      *  these connections were established
+				      *  to monitor how the old triangulation
+				      *  changes, not how any triangulation
+				      *  it may be copied to changes.
 				      */
     virtual void copy_triangulation (const Triangulation<dim, spacedim> &old_tria);
 
@@ -1761,6 +1912,11 @@ class Triangulation : public Subscriptor
 				      * probably unwise.
 				      *
 				      * @note This function is used in step-14 .
+				      *
+				      * @note This function triggers the create 
+				      * signal after doing its work. See the
+				      * section on signals in the general
+				      * documentation of this class.
 				      *
 				      * @note The check for distorted
 				      * cells is only done if
@@ -1860,6 +2016,14 @@ class Triangulation : public Subscriptor
 				      * that happens, and you may not get the
 				      * actual number of refinement steps in
 				      * that case.
+				      *
+				      * @note This function triggers the pre- 
+				      * and post-refinement signals before 
+				      * and after doing each individual refinement 
+				      * cycle (i.e. more than once if
+				      * times > 1) . See the
+				      * section on signals in the general
+				      * documentation of this class.
 				      */
     void refine_global (const unsigned int times);
 
@@ -1873,14 +2037,6 @@ class Triangulation : public Subscriptor
 				      * user flags for internal purposes. They
 				      * will therefore be overwritten by
 				      * undefined content.
-				      *
-				      * If the boundary description is
-				      * sufficiently irregular, it can
-				      * happen that some of the
-				      * children produced by mesh
-				      * refinement are distorted (see
-				      * the extensive discussion on
-				      * @ref GlossDistorted "distorted cells").
 				      *
 				      * To allow user programs to fix
 				      * up these cells if that is
@@ -1905,7 +2061,21 @@ class Triangulation : public Subscriptor
                                       * See the general docs for more
                                       * information.
 				      *
-				      * Note that this function is
+				      * @note This function triggers the pre- 
+				      * and post-refinement signals before 
+				      * and after doing its work. See the
+				      * section on signals in the general
+				      * documentation of this class.
+				      * 
+				      * @note If the boundary description is
+				      * sufficiently irregular, it can
+				      * happen that some of the
+				      * children produced by mesh
+				      * refinement are distorted (see
+				      * the extensive discussion on
+				      * @ref GlossDistorted "distorted cells").
+				      *
+				      * @note This function is
 				      * <tt>virtual</tt> to allow
 				      * derived classes to insert
 				      * hooks, such as saving
@@ -1969,6 +2139,12 @@ class Triangulation : public Subscriptor
 				      * still need them afterwards.
 				      */
     bool prepare_coarsening_and_refinement ();
+                                     /** @} */
+    
+				     /**
+				      *  @name Keeping up with what happens to a triangulation
+				      */
+				     /** @{ */
 
 				     /**
 				      *  Add a
@@ -1977,9 +2153,16 @@ class Triangulation : public Subscriptor
 				      *  Triangulation allows other
 				      *  classes to be informed when
 				      *  the Triangulation is refined.
+				      *  
+				      * @note The use of this function has been
+				      * superceded by the signals mechanism.
+				      * See the general documentation of the
+				      * Triangulation class for more information.
+				      * 
+				      * @deprecated
 				      */
     void add_refinement_listener (RefinementListener &listener) const;
-
+    
 				     /**
 				      *  Remove a
 				      *  RefinementListener. When some
@@ -1988,8 +2171,36 @@ class Triangulation : public Subscriptor
 				      *  the listener should be
 				      *  removed from the
 				      *  Triangulation.
+				      *  
+				      * @note The use of this function has been
+				      * superceded by the signals mechanism.
+				      * See the general documentation of the
+				      * Triangulation class for more information.
+				      * 
+				      * @deprecated
 				      */
     void remove_refinement_listener (RefinementListener &listener) const;
+
+    /**
+     * A structure that has boost::signal objects for a number of actions that a 
+     * triangulation can do to itself. See the general documentation of the
+     * Triangulation class for more information and for documentation of
+     * the semantics of the member functions.
+     * 
+     * For documentation on signals, see http://www.boost.org/doc/libs/release/libs/signals2 .
+     **/
+    struct Signals 
+    {
+      boost::signals2::signal<void ()> create;
+      boost::signals2::signal<void ()> pre_refinement;
+      boost::signals2::signal<void ()> post_refinement;
+      boost::signals2::signal<void (const Triangulation<dim, spacedim> &original_tria)> copy;
+    };
+    
+    /**
+     * Signals for the various actions that a triangulation can do to itself.
+     */
+    mutable Signals signals;    
 
 				     /*@}*/
 
@@ -3417,13 +3628,21 @@ class Triangulation : public Subscriptor
 				      */
     internal::Triangulation::NumberCache<dim> number_cache;
 
-				     /**
-				      *  List of RefinementListeners,
-				      *  which want to be informed if the
-				      *  Triangulation is refined.
-				      */
-    mutable std::list<RefinementListener *> refinement_listeners;
-
+    /**
+     * A map that correlates each refinement listener that has been added
+     * through the outdated RefinementListener interface via
+     * add_refinement_listener(), with the new-style boost::signal
+     * connections for each of the member function. We need to keep this
+     * list around so that we can later terminate the connection again 
+     * when someone calls remove_refinement_listener().
+     * 
+     * The data type is a multimap since, although this would be weird, 
+     * the same object may add itself multiple times as a listener.
+     */
+    mutable
+    std::multimap<const RefinementListener*, std::vector<boost::signals2::connection> > 
+    refinement_listener_map;
+    
 				     // make a couple of classes
 				     // friends
     template <int,int,int> friend class TriaAccessorBase;

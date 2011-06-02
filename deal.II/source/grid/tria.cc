@@ -9529,11 +9529,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 
 				   // inform RefinementListeners of old_tria of
 				   // the copy operation
-  typename std::list<RefinementListener *>::iterator ref_listener =
-    old_tria.refinement_listeners.begin (),
-    end_listener = old_tria.refinement_listeners.end ();
-  for (; ref_listener != end_listener; ++ref_listener)
-    (*ref_listener)->copy_notification (old_tria, *this);
+  old_tria.signals.copy (*this);
 
 				   // note that we need not copy the
 				   // subscriptor!
@@ -9735,11 +9731,7 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
 
 				   // inform all listeners that the
 				   // triangulation has been created
-  typename std::list<RefinementListener *>::iterator
-    ref_listener = refinement_listeners.begin (),
-    end_listener = refinement_listeners.end ();
-  for (; ref_listener != end_listener; ++ref_listener)
-    (*ref_listener)->create_notification (*this);
+  signals.create();
 }
 
 
@@ -12438,12 +12430,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
 
 				   // Inform RefinementListeners
                                    // about beginning of refinement.
-  typename std::list<RefinementListener *>::iterator ref_listener =
-    refinement_listeners.begin (),
-    end_listener = refinement_listeners.end ();
-  for (; ref_listener != end_listener; ++ref_listener)
-    (*ref_listener)->pre_refinement_notification (*this);
-
+  signals.pre_refinement();
+  
   execute_coarsening();
 
   const DistortedCellList
@@ -12462,9 +12450,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
 
 				   // Inform RefinementListeners
                                    // about end of refinement.
-  for (ref_listener = refinement_listeners.begin ();
-       ref_listener != end_listener; ++ref_listener)
-    (*ref_listener)->post_refinement_notification (*this);
+  signals.post_refinement();
 
   AssertThrow (cells_with_distorted_children.distorted_cells.size() == 0,
 	       cells_with_distorted_children);
@@ -14515,7 +14501,36 @@ template<int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::add_refinement_listener (RefinementListener &listener) const
 {
-  refinement_listeners.push_back (&listener);
+  // in this compatibility mode with the old-style refinement listeners, an 
+  // external class presents itself as one that may or may not have 
+  // overloaded all of the functions that the RefinementListener
+  // class has. consequently, we need to connect each of its functions
+  // to the relevant signals. for those functions that haven't been
+  // overloaded, that means that triggering the signal yields a call
+  // to the function in the RefinementListener base class which simply
+  // does nothing
+  std::vector<boost::signals2::connection> connections;
+  
+  connections.push_back 
+  (signals.create.connect (std_cxx1x::bind (&RefinementListener::create_notification,
+					    std_cxx1x::ref(listener),
+					    std_cxx1x::cref(*this))));
+  connections.push_back 
+  (signals.copy.connect (std_cxx1x::bind (&RefinementListener::copy_notification,
+					  std_cxx1x::ref(listener),
+					  std_cxx1x::cref(*this),
+					  std_cxx1x::_1)));
+  connections.push_back 
+  (signals.pre_refinement.connect (std_cxx1x::bind (&RefinementListener::pre_refinement_notification,
+						    std_cxx1x::ref(listener),
+						    std_cxx1x::cref(*this))));
+  connections.push_back 
+  (signals.post_refinement.connect (std_cxx1x::bind (&RefinementListener::post_refinement_notification,
+                                                    std_cxx1x::ref(listener),
+						    std_cxx1x::cref(*this))));
+  
+  // now push the set of connections into the map
+  refinement_listener_map.insert (std::make_pair(&listener, connections));
 }
 
 
@@ -14524,12 +14539,18 @@ template<int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &listener) const
 {
-  typename std::list<RefinementListener *>::iterator p =
-    std::find (refinement_listeners.begin (),
-	       refinement_listeners.end (),
-	       &listener);
-  Assert (p != refinement_listeners.end (), ExcInternalError ());
-  refinement_listeners.erase (p);
+  Assert (refinement_listener_map.find (&listener) != refinement_listener_map.end(),
+	  ExcMessage("You try to remove a refinement listener that does "
+	    "not appear to have been added previously."));
+  
+  // get the element of the map, and terminate these
+  // connections. then erase the element from the list
+  std::vector<boost::signals2::connection> connections
+  = refinement_listener_map.find(&listener)->second;
+  for (unsigned int i=0; i<connections.size(); ++i)
+    connections[i].disconnect ();
+  
+  refinement_listener_map.erase (refinement_listener_map.find (&listener));
 }
 
 

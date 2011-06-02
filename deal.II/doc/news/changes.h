@@ -61,13 +61,25 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> New/deprecated: The Triangulation class offers ways to get informed 
+whenever the triangulation changes. Previously, the mechanism doing this
+was through the Triangulation::RefinementListener class. This has been
+deprecated and has been superceded by a BOOST signals based mechanism
+that is generally more powerful and does not rely on overloading
+particular virtual functions inherited from a base class. 
+
+While the old mechanism should continue to work, you should consider
+upgrading. For more information on the signals mechanism, see the 
+documentation of the Triangulation class.
+<br>
+(Wolfgang Bangerth, 2011/06/01)
+
 <li> Removed: The <code>./configure</code> script allowed configuring
 for the GNU Scientific Library (GSL) in version 7.0 but didn't actually
 use any of the GSL functions. The corresponding code has therefore been
 removed again.
 <br>
 (Wolfgang Bangerth, 2011/05/22)
-
 
 <li> Changed: Traditionally, include directories were set through the
 <code>-I</code> flag in make files in such a way that one would do
