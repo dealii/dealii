@@ -1055,7 +1055,11 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   dnl On some systems with gcc 4.5.0, we can compile the code
   dnl above but it will throw an exception when run. So test
-  dnl that as well.
+  dnl that as well. The test will only be successful if we have
+  dnl libpthread available, so link it in for this test. If 
+  dnl multithreading is requested, it will be added later on,
+  dnl so there is no need to do this here.
+  CXXFLAGS="$1 -lpthread"
   AC_MSG_CHECKING(whether std::thread actually works)
   AC_TRY_RUN(
        [#include <thread>
@@ -1064,6 +1068,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
        )
+  CXXFLAGS="$1"
 
   AC_MSG_CHECKING(for std::mutex)
   AC_TRY_COMPILE(
