@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,7 @@
 //---------------------  fe_q_constraints.cc  --------------------------
 
 
-// This file implements a simple test procedure for the algorithm,
+// This file implements a simple test procedure for the algorithm
 // which constructs the constraint matrices for FE_Q<3> elements 
 // of arbitrary order. After interpolating a polynomial with the 
 // degree of the ansatzspace, the hanging node constraints are   
@@ -104,7 +104,6 @@ class TestFEQConstraints
     
     void refine_grid_random ();
     void make_grid_and_dofs ();
-    void output_grid () const;
     
     void test ();
     
@@ -170,15 +169,6 @@ void TestFEQConstraints<dim>::make_grid_and_dofs ()
 
 
 template <int dim>
-void TestFEQConstraints<dim>::output_grid () const
-{
-  std::ofstream output ("test_feq3.eps");
-  GridOut grid_out;
-  grid_out.write_eps (triangulation, output);
-}
-
-
-template <int dim>
 void TestFEQConstraints<dim>::test ()
 {
   TestFunction<dim> test_function (p_order);
@@ -240,7 +230,6 @@ template <int dim>
 void TestFEQConstraints<dim>::run () 
 {
   make_grid_and_dofs ();
-//  output_grid ();
   test ();
 }
 
