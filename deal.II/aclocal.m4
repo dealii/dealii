@@ -389,7 +389,17 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
   dnl First the flags for gcc compilers
   if test "$GXX" = yes ; then
     CXXFLAGSO="$CXXFLAGSO -O2 -funroll-loops -funroll-all-loops -fstrict-aliasing -Wuninitialized -felide-constructors -ftemplate-depth-128"
-    CXXFLAGSG="$CXXFLAGSG -DDEBUG -pedantic -Wall -W -Wpointer-arith -Wwrite-strings -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
+    CXXFLAGSG="$CXXFLAGSG -DDEBUG -Wall -W -Wpointer-arith -Wwrite-strings -Wsynth -Wsign-compare -Wswitch -ftemplate-depth-128"
+
+    dnl gcc 4.4 has an interesting problem in that it doesn't
+    dnl care for one of BOOST signals2's header files and produces
+    dnl dozens of pages of error messages of the form
+    dnl   warning: invoking macro BOOST_PP_CAT argument 1: empty macro arguments are undefined in ISO C90 and ISO C++98
+    dnl This can be avoided by not using -pedantic for this compiler.
+    dnl For all other versions, we use this flag, however.
+    if test $GXX_VERSION != gcc4.4 ; then
+      CXXFLAGS="$CXXFLAGS -pedantic"
+    fi
 
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
