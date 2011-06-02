@@ -3045,7 +3045,8 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
      * tria_listener connected to the triangulation to which we will set
      * present_cell right after calling this function.
      */
-    void maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::active_cell_iterator &cell);
+    void
+    maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
     
 				     /**
 				      * Storage for the mapping object.

@@ -3253,7 +3253,7 @@ FEValuesBase< dim, spacedim >::invalidate_present_cell ()
 template <int dim, int spacedim>
 void
 FEValuesBase< dim, spacedim >::
-maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::active_cell_iterator &cell)
+maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
   if (present_cell.get() != 0)
   {
