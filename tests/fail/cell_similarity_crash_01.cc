@@ -67,7 +67,7 @@ void test()
 
 int main()
 {
-  std::ofstream logfile ("cell_similarity_01/output");
+  std::ofstream logfile ("cell_similarity_crash_01/output");
   deallog << std::setprecision (4);
 
   deallog.attach(logfile);
