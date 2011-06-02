@@ -241,7 +241,7 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  unsigned int ref_level[] = {5, 4, 3, 3, 2, 2};
+  unsigned int ref_level[] = {4,3,2};
     
 				   // Initialise the random generator with an
 				   // arbitrary number. This should ensure
