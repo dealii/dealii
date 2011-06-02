@@ -1607,7 +1607,19 @@ namespace hp
 			"this class does not currently support this."));
 
     create_active_fe_table ();
-    tria.add_refinement_listener (*this);
+    
+    tria_listeners.push_back
+    (tria.signals.pre_refinement
+     .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::pre_refinement_action,
+				std_cxx1x::ref(*this))));
+    tria_listeners.push_back
+    (tria.signals.post_refinement
+     .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
+				std_cxx1x::ref(*this))));
+    tria_listeners.push_back
+    (tria.signals.create
+     .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::post_refinement_action,
+				std_cxx1x::ref(*this))));
   }
 
 
@@ -1616,8 +1628,10 @@ namespace hp
   {
                                      // unsubscribe as a listener to refinement
                                      // of the underlying triangulation
-    tria->remove_refinement_listener (*this);
-
+    for (unsigned int i=0; i<tria_listeners.size(); ++i)
+      tria_listeners[i].disconnect ();
+    tria_listeners.clear ();
+    
                                      // ...and release allocated memory
     clear ();
   }
@@ -3894,7 +3908,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::pre_refinement_notification (const Triangulation<dim,spacedim> &tria)
+  void DoFHandler<dim,spacedim>::pre_refinement_action ()
   {
     create_active_fe_table ();
 
@@ -3905,13 +3919,13 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int cells_on_level = tria.n_raw_cells(i);
+	const unsigned int cells_on_level = tria->n_raw_cells(i);
 	std::vector<bool> *has_children_level =
           new std::vector<bool> (cells_on_level);
 
                                          // Check for each cell, if it has children.
-	std::transform (tria.levels[i]->cells.refinement_cases.begin (),
-			tria.levels[i]->cells.refinement_cases.end (),
+	std::transform (tria->levels[i]->cells.refinement_cases.begin (),
+			tria->levels[i]->cells.refinement_cases.end (),
 			has_children_level->begin (),
 			std::bind2nd (std::not_equal_to<unsigned char>(),
 				      static_cast<unsigned char>(RefinementCase<dim>::no_refinement)));
@@ -3923,7 +3937,7 @@ namespace hp
 
 
   template <>
-  void DoFHandler<1>::pre_refinement_notification (const Triangulation<1> &tria)
+  void DoFHandler<1>::pre_refinement_action ()
   {
     create_active_fe_table ();
 
@@ -3934,7 +3948,7 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int cells_on_level = tria.n_raw_cells (i);
+	const unsigned int cells_on_level = tria->n_raw_cells (i);
 	std::vector<bool> *has_children_level =
           new std::vector<bool> (cells_on_level);
 
@@ -3944,8 +3958,8 @@ namespace hp
                                          // 1d (as there is only one choice
                                          // anyway). use the 'children' vector
                                          // instead
-	std::transform (tria.levels[i]->cells.children.begin (),
-			tria.levels[i]->cells.children.end (),
+	std::transform (tria->levels[i]->cells.children.begin (),
+			tria->levels[i]->cells.children.end (),
 			has_children_level->begin (),
 			std::bind2nd (std::not_equal_to<int>(), -1));
 
@@ -3956,7 +3970,7 @@ namespace hp
 
 
   template <>
-  void DoFHandler<1,2>::pre_refinement_notification (const Triangulation<1,2> &tria)
+  void DoFHandler<1,2>::pre_refinement_action ()
   {
     create_active_fe_table ();
 
@@ -3967,13 +3981,13 @@ namespace hp
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
-	const unsigned int lines_on_level = tria.n_raw_lines(i);
+	const unsigned int lines_on_level = tria->n_raw_lines(i);
 	std::vector<bool> *has_children_level =
           new std::vector<bool> (lines_on_level);
 
                                          // Check for each cell, if it has children.
-	std::transform (tria.levels[i]->cells.children.begin (),
-			tria.levels[i]->cells.children.end (),
+	std::transform (tria->levels[i]->cells.children.begin (),
+			tria->levels[i]->cells.children.end (),
 			has_children_level->begin (),
 			std::bind2nd (std::not_equal_to<int>(), -1));
 
@@ -3985,8 +3999,7 @@ namespace hp
 
   template<int dim, int spacedim>
   void
-  DoFHandler<dim,spacedim>::
-  post_refinement_notification (const Triangulation<dim,spacedim> &tria)
+  DoFHandler<dim,spacedim>::post_refinement_action ()
   {
     Assert (has_children.size () == levels.size (), ExcInternalError ());
 
@@ -3994,12 +4007,12 @@ namespace hp
                                      // new level may appear. If that happened
                                      // it is appended to the DoFHandler
                                      // levels.
-    if (levels.size () < tria.n_levels ())
+    if (levels.size () < tria->n_levels ())
       levels.push_back (new internal::hp::DoFLevel<dim>);
 
                                      // Coarsening can lead to the loss
                                      // of levels. Hence remove them.
-    while (levels.size () > tria.n_levels ())
+    while (levels.size () > tria->n_levels ())
       {
 	delete levels[levels.size ()-1];
 	levels.pop_back ();
@@ -4009,7 +4022,7 @@ namespace hp
                                      // vectors. use zero indicator to
                                      // extend
     for (unsigned int i=0; i<levels.size(); ++i)
-      levels[i]->active_fe_indices.resize (tria.n_raw_cells(i), 0);
+      levels[i]->active_fe_indices.resize (tria->n_raw_cells(i), 0);
 
                                      // if a finite element collection
                                      // has already been set, then
@@ -4069,18 +4082,6 @@ namespace hp
     has_children.clear ();
   }
 
-
-  template<int dim, int spacedim>
-  void
-  DoFHandler<dim,spacedim>::
-  create_notification (const Triangulation<dim,spacedim> &tria)
-  {
-				     // do the same here as needs to be done
-				     // in the post_refinement hook
-    post_refinement_notification (tria);
-  }
-
-  
 
   template<int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear_space ()

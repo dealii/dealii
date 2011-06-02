@@ -74,8 +74,7 @@ namespace hp
  * @ingroup hp
  */
   template <int dim, int spacedim=dim>
-  class DoFHandler : public Subscriptor,
-                     protected Triangulation<dim,spacedim>::RefinementListener
+  class DoFHandler : public Subscriptor
   {
       typedef internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
     public:
@@ -1125,17 +1124,17 @@ namespace hp
       void create_active_fe_table ();
 
                                        /**
-                                        *  Methods of the
-                                        *  RefinementListener coming
-                                        *  from the Triangulation.
-                                        *  Here they are used to
+                                        *  Functions that will be triggered 
+					*  through signals whenever the 
+					*  triangulation is modified.
+					* 
+					*  Here they are used to
                                         *  administrate the the
                                         *  active_fe_fields during the
                                         *  spatial refinement.
                                         */
-      virtual void pre_refinement_notification (const Triangulation<dim,spacedim> &tria);
-      virtual void post_refinement_notification (const Triangulation<dim,spacedim> &tria);
-      virtual void create_notification (const Triangulation<dim,spacedim> &tria);
+      void pre_refinement_action ();
+      void post_refinement_action ();
       
 
 				       /**
@@ -1291,6 +1290,13 @@ namespace hp
                                         */
       std::vector<std::vector<bool> *> has_children;
 
+      /**
+       * A list of connections with which this object connects
+       * to the triangulation to get information about when the
+       * triangulation changes.
+       */
+      std::vector<boost::signals2::connection> tria_listeners;
+      
                                        /**
                                         * Make accessor objects friends.
                                         */
