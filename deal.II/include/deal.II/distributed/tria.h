@@ -534,17 +534,11 @@ namespace parallel
 					  * A flag that indicates
 					  * whether refinement of a
 					  * triangulation is currently
-					  * in progress. We need this
-					  * flag because the
-					  * refinement_notification()
-					  * function is called from
-					  * Triangulation::execute_coarsening_and_refinement(),
-					  * but
-					  * refinement_notification()
-					  * itself also calls
-					  * Triangulation::execute_coarsening_and_refinement()
-					  * and therefore gets called
-					  * recursively again. While the
+					  * in progress. This flag is
+					  * used to disambiguate whether
+					  * a call to execute_coarsening_and_triangulation
+					  * came from the outside or
+					  * through a recursive call. While the
 					  * first time we want to take
 					  * over work to copy things
 					  * from a refined p4est, the
