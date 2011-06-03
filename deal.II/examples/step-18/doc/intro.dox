@@ -554,6 +554,7 @@ The program text will reveal more about how to implement this situation, and
 the results section will show what displacement pattern comes out of this
 simulation.
 
+
 <h3>Possible directions for extensions</h3>
 
 The program as is does not really solve an equation that has many applications
@@ -563,7 +564,9 @@ more interesting experiments, and that indeed was the initial motivation for
 writing it. Here are some suggestions of what the program is missing and in
 what direction it may be extended:
 
-<h5>Plasticity models</h5> The most obvious extension is to use a more
+<h5>Plasticity models</h5>
+
+ The most obvious extension is to use a more
 realistic material model for large-scale quasistatic deformation. The natural
 choice for this would be plasticity, in which a nonlinear relationship between
 stress and strain replaces equation <a href="#step-18.stress-strain">[stress-strain]</a>. Plasticity
@@ -596,7 +599,9 @@ elastoplasticity: I. Mixed displacement-pressure formulation&rdquo;
 pp. 3559-3586, 2004).
 
 
-<h5>Stabilization issues</h5> The formulation we have chosen, i.e. using
+<h5>Stabilization issues</h5> 
+
+The formulation we have chosen, i.e. using
 piecewise (bi-, tri-)linear elements for all components of the displacement
 vector, and treating the stress as a variable dependent on the displacement is
 appropriate for most materials. However, this so-called displacement-based
@@ -627,7 +632,9 @@ elasticity&rdquo; (Computer Methods in Applied Mechanics and Engineering, vol. 1
 pp. 1093-1112, 2005).
 
 
-<h5>Refinement during timesteps</h5> In the present form, the program
+<h5>Refinement during timesteps</h5> 
+
+In the present form, the program
 only refines the initial mesh a number of times, but then never again. For any
 kind of realistic simulation, one would want to extend this so that the mesh
 is refined and coarsened every few time steps instead. This is not hard to do,
@@ -658,7 +665,9 @@ different kind of problem, giving indications on how to approach the problem
 for time-dependent adaptivity as well.
 
 
-<h5>Ensuring mesh regularity</h5> At present, the program makes no attempt
+<h5>Ensuring mesh regularity</h5>
+
+At present, the program makes no attempt
 to make sure that a cell, after moving its vertices at the end of the time
 step, still has a valid geometry (i.e. that its Jacobian determinant is
 positive and bounded away from zero everywhere). It is, in fact, not very hard
@@ -671,21 +680,7 @@ sophisticated version definitely should employ some sort of heuristic defining
 what amount of deformation of cells is acceptable, and what isn't.
 
 
-<h3>Compiling the program</h3>
-
-Finally, just to remind everyone: the program runs in 3d (see the definition
-of the <code>elastic_problem</code> variable in <code>main()</code>, unlike almost
-all of the other example programs. While the compiler doesn't care what
-dimension it compiles for, the linker has to know which library to link with.
-And as explained in other places, this requires slight changes to the Makefile
-compared to the other tutorial programs. In particular, everywhere where the
-2d versions of libraries are mentioned, one needs to change this to 3d,
-although this is already done in the distributed version of the Makefile.
-Conversely, if you want to run the program in 2d (after making the necessary
-changes to accommodate for a 2d geometry), you have to change the Makefile
-back to allow for 2d.
-
-There is an additional caveat: PETSc appears not to co-operate well when using
+@note PETSc appears not to co-operate well when using
 threads and the program crashes when deal.II is compiled in its usual mode
 supporting multithreading. The program can therefore only be compiled and run
 if multithreading is disabled upon configuration of deal.II using the
