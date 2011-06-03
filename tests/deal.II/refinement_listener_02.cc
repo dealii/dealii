@@ -77,11 +77,6 @@ void test ()
 
   GridGenerator::hyper_cube(tria_2);
 
-  // RefinementListener<dim> rl_1 ("tria_1");
-  // RefinementListener<dim> rl_2 ("tria_2");
-  // tria_1.add_refinement_listener (rl_1);
-  // tria_2.add_refinement_listener (rl_2);
-
   boost::signals2::connection connections_1[4]
     = {tria_1.signals.pre_refinement
        .connect (std_cxx1x::bind (&pre_refinement_notification<dim,dim>,
