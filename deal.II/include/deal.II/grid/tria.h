@@ -1239,6 +1239,12 @@ namespace internal
  *     the signal is copied by another triangulation using
  *     Triangulation::copy_triangulation (i.e. it is triggered on the <i>old</i>
  *     triangulation, but the new one is passed as a argument).
+ *   - clear: This signal is triggered whenever the Trianagultion::clear 
+ *     function is called.
+ *   - any_change: This is a catch-all signal that is triggered whenever the
+ *     create, post_refinement, or clear signals are triggered. In effect, it
+ *     can be used to indicate to an object connected to the signal that the
+ *     triangulation has been changed, whatever the exact cause of the change.
  * 
  * 
  *   <h3>Technical details</h3>
@@ -2195,6 +2201,8 @@ class Triangulation : public Subscriptor
       boost::signals2::signal<void ()> pre_refinement;
       boost::signals2::signal<void ()> post_refinement;
       boost::signals2::signal<void (const Triangulation<dim, spacedim> &original_tria)> copy;
+      boost::signals2::signal<void ()> clear;
+      boost::signals2::signal<void ()> any_change;
     };
     
     /**

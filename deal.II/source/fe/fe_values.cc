@@ -3269,7 +3269,7 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
 	tria_listener.disconnect ();
 	invalidate_present_cell();
 	tria_listener = 
-	  cell->get_triangulation().signals.post_refinement.connect
+	  cell->get_triangulation().signals.any_change.connect
 	  (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
 			    std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
       }

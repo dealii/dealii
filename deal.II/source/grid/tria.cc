@@ -9384,6 +9384,11 @@ Triangulation (const MeshSmoothing smooth_grid,
 				   // possible components
   for (unsigned int i=0;i<255;++i)
     boundary[i] = &straight_boundary;
+  
+  // connect the any_change signal to the other signals
+  signals.create.connect (signals.any_change);
+  signals.post_refinement.connect (signals.any_change);
+  signals.clear.connect (signals.any_change);
 }
 
 
@@ -9417,6 +9422,7 @@ template <int dim, int spacedim>
 void Triangulation<dim, spacedim>::clear ()
 {
   clear_despite_subscriptions();
+  signals.clear();
 }
 
 
