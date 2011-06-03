@@ -41,7 +41,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
@@ -2447,6 +2447,7 @@ namespace internals {
                              const unsigned int first_vector_component,
                              std::vector<double>& dof_values)
     {
+      const double tol = 0.5 * cell->get_fe ().degree * 1e-13 / cell->face (face)->line (line)->diameter ();
       const unsigned int dim = 3;
 
       hp_fe_values.reinit
@@ -2504,17 +2505,18 @@ namespace internals {
           Point<dim> shifted_reference_point_1 = reference_quadrature_points[q_point];
           Point<dim> shifted_reference_point_2 = reference_quadrature_points[q_point];
 
-          shifted_reference_point_1 (edge_coordinate_direction[face][line]) += 1e-13;
-          shifted_reference_point_2 (edge_coordinate_direction[face][line]) -= 1e-13;
+          shifted_reference_point_1 (edge_coordinate_direction[face][line]) += tol;
+          shifted_reference_point_2 (edge_coordinate_direction[face][line]) -= tol;
           tangentials[q_point]
-            = (2e13 *
+            = (0.5 *
                (fe_values.get_mapping ()
                 .transform_unit_to_real_cell (cell,
                                               shifted_reference_point_1)
                 -
                 fe_values.get_mapping ()
                 .transform_unit_to_real_cell (cell,
-                                              shifted_reference_point_2)));
+                                              shifted_reference_point_2))
+               / tol);
           tangentials[q_point]
             /= std::sqrt (tangentials[q_point].square ());
 
@@ -2675,6 +2677,7 @@ namespace internals {
         {
           case 2:
           {
+          	const double tol = 0.5 * cell->get_fe ().degree * 1e-13 / cell->face (face)->diameter ();
             const std::vector<Point<dim> >&
               quadrature_points = fe_values.get_quadrature_points ();
             std::vector<Point<dim> >
@@ -2715,18 +2718,19 @@ namespace internals {
                   = reference_quadrature_points[q_point];
 
                 shifted_reference_point_1 (face_coordinate_direction[face])
-                  += 1e-13;
+                  += tol;
                 shifted_reference_point_2 (face_coordinate_direction[face])
-                  -= 1e-13;
+                  -= tol;
                 tangentials[q_point]
-                  = 2e13
+                  = 0.5
                     * (fe_values.get_mapping ()
                        .transform_unit_to_real_cell (cell,
                                                      shifted_reference_point_1)
                        -
                        fe_values.get_mapping ()
                        .transform_unit_to_real_cell (cell,
-                                                     shifted_reference_point_2));
+                                                     shifted_reference_point_2)
+                    / tol);
                 tangentials[q_point]
                   /= std::sqrt (tangentials[q_point].square ());
           				                         // Compute the mean
@@ -3169,6 +3173,13 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
+                	                               // if the FE is a
+                	                               // FE_Nothing object
+                	                               // there is no work to
+                	                               // do
+                  if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
+                    return;
+                  
                                                    // this is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3198,12 +3209,14 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // if the degree of
                                                    // freedom is not
                                                    // already constrained.
+                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
+                  
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (!(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > 1e-14)
+                        if (std::abs (dof_values[dof]) > tol)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3234,14 +3247,23 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
         std::vector<double> computed_constraints (n_dofs);
       	std::vector<int> projected_dofs (n_dofs);
 
-      	for (unsigned int dof = 0; dof < n_dofs; ++dof)
+      	for (unsigned int dof = 0; dof < n_dofs; ++dof) {
+      	  computed_constraints[dof] = 0.0;
       	  projected_dofs[dof] = -1;
+      	}
 
         for (; cell != dof_handler.end (); ++cell)
           if (cell->at_boundary ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
+                	                               // if the FE is a
+                	                               // FE_Nothing object
+                	                               // there is no work to
+                	                               // do
+                  if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
+                    return;
+                  
                                                    // this is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3337,8 +3359,10 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // Store the computed
                                                    // values in the global
                                                    // vector.
+                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
+                  
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                    if (std::abs (dof_values[dof]) > 1e-14)
+                    if (std::abs (computed_constraints[face_dof_indices[dof]] - dof_values[dof]) > tol)
                       computed_constraints[face_dof_indices[dof]] = dof_values[dof];
                 }
 
@@ -3405,6 +3429,13 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
+                	                               // if the FE is a
+                	                               // FE_Nothing object
+                	                               // there is no work to
+                	                               // do
+                  if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
+                    return;
+                  
                                                    // This is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3435,12 +3466,14 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                   cell->face (face)->get_dof_indices (face_dof_indices,
                                                       cell->active_fe_index ());
 
+                  const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
+                  
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (!(constraints.is_constrained (face_dof_indices[dof])))
                       {
                         constraints.add_line (face_dof_indices[dof]);
 
-                        if (std::abs (dof_values[dof]) > 1e-14)
+                        if (std::abs (dof_values[dof]) > tol)
                           constraints.set_inhomogeneity (face_dof_indices[dof], dof_values[dof]);
                       }
                 }
@@ -3475,14 +3508,23 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
         std::vector<double> computed_constraints (n_dofs);
       	std::vector<int> projected_dofs (n_dofs);
 
-      	for (unsigned int dof = 0; dof < n_dofs; ++dof)
+      	for (unsigned int dof = 0; dof < n_dofs; ++dof) {
+      	  computed_constraints[dof] = 0.0;
       	  projected_dofs[dof] = -1;
+      	}
 
         for (; cell != dof_handler.end (); ++cell)
           if (cell->at_boundary ())
             for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
               if (cell->face (face)->boundary_indicator () == boundary_component)
                 {
+                	                               // if the FE is a
+                	                               // FE_Nothing object
+                	                               // there is no work to
+                	                               // do
+                  if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
+                    return;
+                  
                                                    // This is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3548,8 +3590,10 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                         projected_dofs[face_dof_indices[dof]] = degree;
                     }
 
+                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
+                  
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
-                    if (std::abs (dof_values[dof]) > 1e-14)
+                    if (std::abs (computed_constraints[face_dof_indices[dof]] - dof_values[dof]) > tol)
                       computed_constraints[face_dof_indices[dof]] = dof_values[dof];
                 }
 
@@ -3811,6 +3855,13 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
             if (cell->face (face)->boundary_indicator () == boundary_component)
             {
+                	                               // if the FE is a
+                	                               // FE_Nothing object
+                	                               // there is no work to
+                	                               // do
+                  if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
+                    return;
+                  
                                                    // This is only
                                                    // implemented, if the
                                                    // FE is a Raviart-Thomas
@@ -4072,10 +4123,7 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 		      "to imposing Dirichlet values on the vector-valued "
 		      "quantity."));
 
-  const FiniteElement<dim> &fe = dof_handler.get_fe();
-
-  std::vector<unsigned int> face_dofs (fe.dofs_per_face);
-  std::vector<Point<spacedim> >  dof_locations  (fe.dofs_per_face);
+  std::vector<unsigned int> face_dofs;
 
 				   // have a map that stores normal
 				   // vectors for each vector-dof
@@ -4120,10 +4168,12 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 	if (boundary_ids.find(cell->face(face_no)->boundary_indicator())
 	    != boundary_ids.end())
 	  {
+	  	const FiniteElement<dim>& fe = cell->get_fe ();
 	    typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
 					     // get the indices of the
 					     // dofs on this cell...
+        face_dofs.resize (fe.dofs_per_face);
 	    face->get_dof_indices (face_dofs, cell->active_fe_index());
 
 					     // ...and the normal
