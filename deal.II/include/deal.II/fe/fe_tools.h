@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -683,8 +683,8 @@ namespace FETools
 				    * vector of values of this function at
 				    * quadrature points as given by the
 				    * second argument. In a sense, this
-				    * function does the opposite of the @p
-				    * compute_projection_from_quadrature_points_matrix
+				    * function does the opposite of the
+				    * FETools::compute_projection_from_quadrature_points_matrix
 				    * function.
 				    */
   template <int dim, int spacedim>
