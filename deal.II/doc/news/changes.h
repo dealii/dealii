@@ -71,6 +71,14 @@ particular virtual functions inherited from a base class.
 While the old mechanism should continue to work, you should consider
 upgrading. For more information on the signals mechanism, see the 
 documentation of the Triangulation class.
+
+In addition to the change above, the new implementation now offers two
+more signals one can subscribe to: Triangulation::Signals::clead for
+when the triangulation is cleared, and Triangulation::Signals::any_change
+that can be used for any operation that changes the mesh. Furthermore,
+in a change from previous behavior, the Triangulations::Signal::create 
+signal is now also triggered when another triangulation is copied to
+the one that owns the signal.
 <br>
 (Wolfgang Bangerth, 2011/06/01)
 

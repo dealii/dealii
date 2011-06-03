@@ -9536,6 +9536,9 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 				   // inform RefinementListeners of old_tria of
 				   // the copy operation
   old_tria.signals.copy (*this);
+				   // also inform all listeners that the
+				   // triangulation has been created
+  signals.create();
 
 				   // note that we need not copy the
 				   // subscriptor!

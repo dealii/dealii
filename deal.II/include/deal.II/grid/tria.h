@@ -1226,7 +1226,8 @@ namespace internal
  *   actions by which the triangulation can modify itself and potentially
  *   require follow-up action elsewhere:
  *   - creation: This signal is triggered whenever the
- *     Triangulation::create_triangulation is called
+ *     Triangulation::create_triangulation or Triangulation::copy_triangulation
+ *     is called
  *   - pre-refinement: This signal is triggered at the beginning
  *     of execution of the Triangulation::execute_coarsening_and_refinement
  *     function (which is itself called by other functions such as 
@@ -1833,6 +1834,8 @@ class Triangulation : public Subscriptor
 				      *  @note Calling this function triggers 
 				      *  the 'copy' signal on old_tria, i.e.
 				      *  the triangulation being copied <i>from</i>.
+				      *  It also triggers the 'create' signal of
+				      *  the current triangulation.
 				      *  See the section on signals in the
 				      *  general documentation for more information.
 				      * 
