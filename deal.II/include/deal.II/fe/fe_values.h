@@ -3027,7 +3027,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
      * calls to reinit() in order to compute the cell similarity.
      */
     boost::signals2::connection tria_listener;
-    
+
     /**
      * A function that is connected to the triangulation in
      * order to reset the stored 'present_cell' iterator to an invalid
@@ -3035,7 +3035,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
      * becomes invalid.
      */
     void invalidate_present_cell ();
-    
+
     /**
      * This function is called by the various reinit() functions in derived
      * classes. Given the cell indicated by the argument, test whether
@@ -3047,7 +3047,7 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
      */
     void
     maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell);
-    
+
 				     /**
 				      * Storage for the mapping object.
 				      */
@@ -4154,7 +4154,7 @@ namespace FEValuesViews
               }
            }
         }
-}
+  }
 
   template <int dim, int spacedim>
   inline
