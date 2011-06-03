@@ -2677,7 +2677,6 @@ namespace internals {
         {
           case 2:
           {
-          	const double tol = 0.5 * cell->get_fe ().degree * 1e-13 / cell->face (face)->diameter ();
             const std::vector<Point<dim> >&
               quadrature_points = fe_values.get_quadrature_points ();
             std::vector<Point<dim> >
@@ -2718,19 +2717,18 @@ namespace internals {
                   = reference_quadrature_points[q_point];
 
                 shifted_reference_point_1 (face_coordinate_direction[face])
-                  += tol;
+                  += 1e-13;
                 shifted_reference_point_2 (face_coordinate_direction[face])
-                  -= tol;
+                  -= 1e-13;
                 tangentials[q_point]
-                  = 0.5
+                  = 2e13
                     * (fe_values.get_mapping ()
                        .transform_unit_to_real_cell (cell,
                                                      shifted_reference_point_1)
                        -
                        fe_values.get_mapping ()
                        .transform_unit_to_real_cell (cell,
-                                                     shifted_reference_point_2)
-                    / tol);
+                                                     shifted_reference_point_2));
                 tangentials[q_point]
                   /= std::sqrt (tangentials[q_point].square ());
           				                         // Compute the mean
@@ -3209,7 +3207,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // if the degree of
                                                    // freedom is not
                                                    // already constrained.
-                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
+                  const double tol = 1e-13;
                   
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (!(constraints.is_constrained (face_dof_indices[dof])))
@@ -3359,7 +3357,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // Store the computed
                                                    // values in the global
                                                    // vector.
-                  const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
+                  const double tol = 0.5 * superdegree * 1e-13 / cell->face (face)->diameter ();
                   
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (std::abs (computed_constraints[face_dof_indices[dof]] - dof_values[dof]) > tol)
