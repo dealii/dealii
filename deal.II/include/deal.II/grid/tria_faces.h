@@ -33,7 +33,7 @@ namespace internal
  * the TriaFaces classes store the information belonging to the faces of a
  * triangualtion seperately from the TriaLevel classes.
  *
- * This general template is only provided to enable a specialisation below.
+ * This general template is only provided to enable a specialization below.
  *
  * @author Tobias Leicht, 2006
  */
