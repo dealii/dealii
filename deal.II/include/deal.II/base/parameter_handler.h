@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2083,17 +2083,19 @@ class ParameterHandler : public Subscriptor
 				      */
     std::size_t memory_consumption () const;
 
-                         /**
-                      * Write the data of this object to
-                      * a stream for the purpose of serialization.
-                      */
+				     /**
+				      * Write the data of this object to a
+				      * stream for the purpose of
+				      * serialization.
+				      */
    template <class Archive>
    void save (Archive & ar, const unsigned int version) const;
 
-                         /**
-                      * Read the data of this object
-                      * from a stream for the purpose of serialization.
-                      */
+				     /**
+				      * Read the data of this object from a
+				      * stream for the purpose of
+				      * serialization.
+				      */
    template <class Archive>
    void load (Archive & ar, const unsigned int version);
 
