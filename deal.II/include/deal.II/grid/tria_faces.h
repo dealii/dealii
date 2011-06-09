@@ -17,6 +17,7 @@
 #include <deal.II/grid/tria_object.h>
 #include <deal.II/grid/tria_objects.h>
 
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -69,6 +70,14 @@ namespace internal
 					  * Of course this returns 0.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
 
 /**
@@ -90,6 +99,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
     
 /**
@@ -118,7 +135,43 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
+
+    
+    
+    template <class Archive>
+    void 
+    TriaFaces<1>::serialize (Archive & ar,
+			     const unsigned int)
+    {}
+
+
+
+    template <class Archive>
+    void 
+    TriaFaces<2>::serialize (Archive & ar,
+			     const unsigned int)
+    {
+      ar & lines;
+    }
+    
+
+
+    template <class Archive>
+    void 
+    TriaFaces<3>::serialize (Archive & ar,
+			     const unsigned int)
+    {
+      ar & quads & lines;
+    }
   }
 }
 

@@ -747,9 +747,30 @@ Article{JK10,
  * class provide non-primitive finite elements because there, each
  * vector-value shape function may have several non-zero components.</dd>
  *
+ *
  * <dt class="glossary">@anchor GlossReferenceCell <b>Reference cell</b></dt>
  * <dd>The hypercube [0,1]<sup>dim</sup>, on which all parametric finite
- * element shape functions are defined.</dd>
+ * element shape functions are defined. Many properties of the reference
+ * cell are described by the GeometryInfo class.</dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossSerialization <b>Serialization</b></dt>
+ 
+ * <dd>The term "serialization" refers to the process of writing the state of
+ * an object to a stream and later retrieve it again. A typical use case is to
+ * save the state of a program to disk for possible later resurrection, often
+ * in the context of checkpoint/restart strategies for long running
+ * computations or on computers that aren't very reliable (e.g. on very large
+ * clusters where individual nodes occasionally fail and then bring down an
+ * entire MPI job). In either case, one wants to occasionally save the state
+ * of the program so that, upon failure, one can restart it at that point
+ * rather than having to run it again from the beginning.
+ *
+ * deal.II implements serialization facilities by implementing the necessary
+ * interfaces for the <a
+ * href="http://www.boost.org/doc/libs/1_46_1/libs/serialization/doc/index.html"
+ * target="_top">BOOST serialization</a> library. See there for examples on
+ * how to save and restore objects. </dd>
  *
  *
  * <dt class="glossary">@anchor GlossShape <b>Shape functions</b></dt>

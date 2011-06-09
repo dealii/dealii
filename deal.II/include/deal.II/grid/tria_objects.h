@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/tria_object.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -183,7 +184,8 @@ namespace internal
 					  * </code>.
 					  */
 	template <int dim, int spacedim>
-	typename dealii::Triangulation<dim,spacedim>::raw_line_iterator next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria);
+	typename dealii::Triangulation<dim,spacedim>::raw_line_iterator 
+	next_free_single_line (const dealii::Triangulation<dim,spacedim> &tria);
 
 					 /**
 					  * Return an iterator to the
@@ -193,7 +195,8 @@ namespace internal
 					  * </code>.
 					  */
 	template <int dim, int spacedim>
-	typename dealii::Triangulation<dim,spacedim>::raw_line_iterator next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria);
+	typename dealii::Triangulation<dim,spacedim>::raw_line_iterator 
+	next_free_pair_line (const dealii::Triangulation<dim,spacedim> &tria);
 	
 					 /**
 					  * Return an iterator to the
@@ -204,7 +207,8 @@ namespace internal
 					  * </code>.
 					  */
 	template <int dim, int spacedim>
-	typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria);
+	typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator 
+	next_free_single_quad (const dealii::Triangulation<dim,spacedim> &tria);
 
 					 /**
 					  * Return an iterator to the
@@ -214,7 +218,8 @@ namespace internal
 					  * </code>.
 					  */
 	template <int dim, int spacedim>
-	typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria);
+	typename dealii::Triangulation<dim,spacedim>::raw_quad_iterator 
+	next_free_pair_quad (const dealii::Triangulation<dim,spacedim> &tria);
 	
 					 /**
 					  * Return an iterator to the
@@ -224,8 +229,9 @@ namespace internal
 					  * <code>G=Hexahedron</code>.
 					  */
 	template <int dim, int spacedim>
-	typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
-									     const unsigned int               level);
+	typename dealii::Triangulation<dim,spacedim>::raw_hex_iterator 
+	next_free_hex (const dealii::Triangulation<dim,spacedim> &tria,
+		       const unsigned int               level);
 
 					 /**
 					  *  Clear all the data contained in this object.
@@ -318,6 +324,14 @@ namespace internal
                                           */
         std::size_t memory_consumption () const;
 
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
+
                                          /**
                                           *  Exception
                                           */
@@ -376,17 +390,35 @@ namespace internal
 					  * The data type storing user
 					  * pointers or user indices.
 					  */
-	union UserData
+	struct UserData
 	{
-					     /// The entry used as user pointer.
-	    void* p;
-					     /// The entry used as user index.
-	    unsigned int i;
-					     /// Default constructor
+	    union Data 
+	    {
+						 /// The entry used as user
+						 /// pointer.
+		void* p;
+						 /// The entry used as user
+						 /// index.
+		unsigned int i;
+						 /// Default constructor
+	    };
+	    Data data;
+
+					     /**
+					      * Default constructor.
+					      */
 	    UserData()
 	      {
-		p = 0;
+		data.p = 0;
 	      }
+
+					     /**
+					      * Write the data of this object
+					      * to a stream for the purpose of
+					      * serialization.
+					      */
+	    template <class Archive>
+	    void serialize (Archive & ar, const unsigned int version);
 	};
 
 					 /**
@@ -431,7 +463,7 @@ namespace internal
  * additionaly contains a bool-vector of the face-orientations.
  */
     
-    class TriaObjectsHex: public TriaObjects<TriaObject<3> >
+    class TriaObjectsHex : public TriaObjects<TriaObject<3> >
     {
       public:
 					 /**
@@ -537,6 +569,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;	    
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
 
 
@@ -614,6 +654,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;	    
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
     
 //----------------------------------------------------------------------//
@@ -621,7 +669,8 @@ namespace internal
     template<typename G>
     inline
     bool
-    TriaObjects<G>::face_orientation(const unsigned int, const unsigned int) const
+    TriaObjects<G>::
+    face_orientation(const unsigned int, const unsigned int) const
     {
       return true;
     }
@@ -638,7 +687,7 @@ namespace internal
       user_data_type = data_pointer;
 #endif
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
-      return user_data[i].p;
+      return user_data[i].data.p;
     }
     
 
@@ -653,7 +702,7 @@ namespace internal
       user_data_type = data_pointer;
 #endif
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
-      return user_data[i].p;
+      return user_data[i].data.p;
     }
     
 
@@ -668,7 +717,7 @@ namespace internal
       user_data_type = data_index;
 #endif
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
-      return user_data[i].i;
+      return user_data[i].data.i;
     }
     
     
@@ -678,7 +727,7 @@ namespace internal
     TriaObjects<G>::clear_user_data (const unsigned int i)
     {
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
-      user_data[i].i = 0;
+      user_data[i].data.i = 0;
     }
     
     
@@ -700,7 +749,7 @@ namespace internal
       user_data_type = data_index;
 #endif
       Assert(i<user_data.size(), ExcIndexRange(i,0,user_data.size()));
-      return user_data[i].i;
+      return user_data[i].data.i;
     }
     
     
@@ -710,7 +759,7 @@ namespace internal
     {
       user_data_type = data_unknown;
       for (unsigned int i=0;i<user_data.size();++i)
-	user_data[i].p = 0;
+	user_data[i].data.p = 0;
     }
 
 
@@ -720,12 +769,61 @@ namespace internal
     {
       user_flags.assign(user_flags.size(),false);
     }
+
+
+    template<typename G>
+    template <class Archive>
+    void
+    TriaObjects<G>::UserData::serialize (Archive & ar,
+					 const unsigned int)
+    {
+				       // serialize this as an integer
+      ar & data.i;
+    }
     
+    
+
+    template <typename G>
+    template <class Archive>
+    void TriaObjects<G>::serialize(Archive & ar,
+				   const unsigned int)
+    {
+      ar & cells & children;
+      ar & refinement_cases;
+      ar & used;
+      ar & user_flags;
+      ar & material_id;
+      ar & next_free_single & next_free_pair & reverse_order_next_free_single;
+      ar & user_data & user_data_type;
+    }
+
+
+    template <class Archive>
+    void TriaObjectsHex::serialize(Archive & ar,
+				   const unsigned int version)
+    {
+      this->TriaObjects<TriaObject<3> >::serialize (ar, version);
+      
+      ar & face_orientations & face_flips & face_rotations;
+    }
+
+
+    template <class Archive>
+    void TriaObjectsQuad3D::serialize(Archive & ar,
+				      const unsigned int version)
+    {
+      this->TriaObjects<TriaObject<2> >::serialize (ar, version);
+      
+      ar & line_orientations;
+    }
+
+
 //----------------------------------------------------------------------//
 
     inline
     bool
-    TriaObjectsHex::face_orientation(const unsigned int cell, const unsigned int face) const
+    TriaObjectsHex::face_orientation(const unsigned int cell,
+				     const unsigned int face) const
     {
       Assert (cell < face_orientations.size() / GeometryInfo<3>::faces_per_cell,
 	      ExcIndexRange(0, cell, face_orientations.size() / GeometryInfo<3>::faces_per_cell));

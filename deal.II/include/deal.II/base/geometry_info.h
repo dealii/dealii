@@ -17,6 +17,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
+#include <lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -282,6 +283,12 @@ class RefinementCase : public RefinementPossibilities<dim>
 {
   public:
 				     /**
+				      * Default constructor. Initialize the
+				      * refinement case with no_refinement.
+				      */
+    RefinementCase ();
+    
+				     /**
 				      * Constructor. Take and store a
 				      * value indicating a particular
 				      * refinement from the list of
@@ -381,6 +388,14 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      */
     static std::size_t memory_consumption ();
 
+    /**
+     * Read or write the data of this object to or 
+     * from a stream for the purpose of serialization
+     */ 
+    template <class Archive>
+    void serialize(Archive & ar,
+		   const unsigned int version);
+
 				     /**
 				      * Exception.
 				      */
@@ -398,7 +413,6 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      */
     unsigned char value : (dim > 0 ? dim : 1);
 };
-
 
 
 namespace internal
@@ -2366,7 +2380,17 @@ RefinementCase<3>::cut_axis (const unsigned int i)
 
 template <int dim>
 inline
-RefinementCase<dim>::RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refinement_case)
+RefinementCase<dim>::RefinementCase ()
+		:
+		value (RefinementPossibilities<dim>::no_refinement)
+{}
+
+
+
+template <int dim>
+inline
+RefinementCase<dim>::
+RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refinement_case)
 		:
 		value (refinement_case)
 {
@@ -2447,6 +2471,19 @@ RefinementCase<dim>::memory_consumption ()
   return sizeof(RefinementCase<dim>);
 }
 
+
+
+template <int dim>
+template <class Archive>
+void RefinementCase<dim>::serialize (Archive &ar,
+				     const unsigned int)
+{
+  // serialization can't deal with bitfields, so copy from/to a full sized 
+  // unsigned char
+  unsigned char uchar_value = value;
+  ar & uchar_value;
+  value = uchar_value;
+}
 
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,8 @@
 #include <deal.II/grid/tria_object.h>
 #include <deal.II/base/point.h>
 #include <deal.II/grid/tria_objects.h>
+
+#include <boost/serialization/utility.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -202,6 +204,14 @@ namespace internal
                                           */
         std::size_t memory_consumption () const;
 
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
+
                                          /**
                                           *  Exception
                                           */
@@ -252,6 +262,14 @@ namespace internal
         void monitor_memory (const unsigned int true_dimension) const;
         std::size_t memory_consumption () const;
 
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
+
                                          /**
                                           *  Exception
                                           */
@@ -269,6 +287,34 @@ namespace internal
                         << arg2 << ", which is not as expected.");
     };
 
+    
+    
+    template <int dim>
+    template <class Archive>
+    void TriaLevel<dim>::serialize(Archive & ar,
+				   const unsigned int)
+    {
+      ar & refine_flags & coarsen_flags;
+      ar & neighbors;
+      ar & subdomain_ids;
+      ar & parents;
+      ar & direction_flags;
+      ar & cells;
+    }
+
+
+
+    template <class Archive>
+    void TriaLevel<3>::serialize(Archive & ar,
+				 const unsigned int)
+    {
+      ar & refine_flags & coarsen_flags;
+      ar & neighbors;
+      ar & subdomain_ids;
+      ar & parents;
+      ar & direction_flags;
+      ar & cells;
+    }
 
   }
 }

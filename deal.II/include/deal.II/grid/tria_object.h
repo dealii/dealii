@@ -99,6 +99,14 @@ namespace internal
                                           * of this object.
                                           */
         static std::size_t memory_consumption ();
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
 	
       protected:
                                          /**
@@ -196,7 +204,16 @@ namespace internal
     {
       return sizeof(TriaObject<structdim>);
     }
-    
+
+
+    template <int structdim>
+    template <class Archive>
+    void TriaObject<structdim>::serialize(Archive & ar,
+					  const unsigned int)
+    {
+      ar & faces;
+    }
+
     
   }
 }

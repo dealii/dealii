@@ -21,12 +21,17 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/grid/tria_iterator_selector.h>
+#include <deal.II/grid/tria_faces.h>
+#include <deal.II/grid/tria_levels.h>
 
 #include <boost/signals2.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/split_member.hpp>
 
 #include <vector>
 #include <list>
 #include <map>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -258,6 +263,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+	
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize (Archive & ar, 
+			const unsigned int version);
     };
 
 
@@ -315,6 +328,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize (Archive & ar, 
+			const unsigned int version);
     };
 
 //TODO: Replace boundary[255] by a std::vector so we can use constructor of SmartPointer
@@ -373,6 +394,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize (Archive & ar, 
+			const unsigned int version);
     };
   }
 }
@@ -1227,7 +1256,8 @@ namespace internal
  *   require follow-up action elsewhere:
  *   - creation: This signal is triggered whenever the
  *     Triangulation::create_triangulation or Triangulation::copy_triangulation
- *     is called
+ *     is called. This signal is also triggered when loading a
+ *     triangulation from an archive via Triangulation::load.
  *   - pre-refinement: This signal is triggered at the beginning
  *     of execution of the Triangulation::execute_coarsening_and_refinement
  *     function (which is itself called by other functions such as
@@ -1241,11 +1271,58 @@ namespace internal
  *     Triangulation::copy_triangulation (i.e. it is triggered on the <i>old</i>
  *     triangulation, but the new one is passed as a argument).
  *   - clear: This signal is triggered whenever the Triangulation::clear
- *     function is called.
+ *     function is called. This signal is also triggered when loading a
+ *     triangulation from an archive via Triangulation::load as the previous
+ *     content of the triangulation is first destroyed.
  *   - any_change: This is a catch-all signal that is triggered whenever the
  *     create, post_refinement, or clear signals are triggered. In effect, it
  *     can be used to indicate to an object connected to the signal that the
  *     triangulation has been changed, whatever the exact cause of the change.
+ *
+ *
+ *   <h3>Serializing (loading or storing) triangulations</h3>
+ *
+ *   Like many other classes in deal.II, the Triangulation class can stream
+ *   its contents to an archive using BOOST's serialization facilities. The
+ *   data so stored can later be retrieved again from the archive to restore
+ *   the contents of this object. This facility is frequently used to save the
+ *   state of a program to disk for possible later resurrection, often in the
+ *   context of checkpoint/restart strategies for long running computations or
+ *   on computers that aren't very reliable (e.g. on very large clusters where
+ *   individual nodes occasionally fail and then bring down an entire MPI
+ *   job).
+ *
+ *   For technical reasons, writing and restoring a Triangulation object is
+ *   not-trivial. The primary reason is that unlike many other objects,
+ *   triangulations rely on many other objects to which they store pointers or
+ *   with which they interace; for example, triangulations store pointers to
+ *   objects describing boundaries and manifolds, and they have signals that
+ *   store pointers to other objects so they can be notified of changes in the
+ *   triangulation (see the section on signals in this introduction). As
+ *   objects that are re-loaded at a later time do not usually end up at the
+ *   same location in memory as they were when they were saved, dealing with
+ *   pointers to other objects is difficult.
+ *
+ *   For these reasons, saving a triangulation to an archive does not store
+ *   all information, but only certain parts. More specifically, the
+ *   information that is stored is everything that defines the mesh such as
+ *   vertex locations, vertex indices, how vertices are connected to cells,
+ *   boundary indicators, subdomain ids, material ids, etc. On the other hand,
+ *   the following information is not stored:
+ *   - signals
+ *   - pointers to boundary objects previously set using
+ *     Triangulation::set_boundary
+ *   On the other hand, since these are objects that are usually set in
+ *   user code, they can typically easily be set again in that part of your
+ *   code in which you re-load triangulations.
+ *
+ *   In a sense, this approach to serialization means that re-loading a
+ *   triangulation is more akin to calling the
+ *   Triangulation::create_triangulation function and filling it with some
+ *   additional content, as that function also does not touch the signals and
+ *   boundary objects that belong to this triangulation. In keeping with this
+ *   analogy, the Triangulation::load function also triggers the same kinds of
+ *   signal as Triangulation::create_triangulation.
  *
  *
  *   <h3>Technical details</h3>
@@ -2995,8 +3072,7 @@ class Triangulation : public Subscriptor
 				      *  iterators with past-the-end or
 				      *  before-the-beginning states.
 				      */
-    raw_hex_iterator
-    end_hex () const;
+    raw_hex_iterator    end_hex () const;
 
 				     /**
 				      * Return an iterator which is the first
@@ -3026,8 +3102,7 @@ class Triangulation : public Subscriptor
 				      *  Return an iterator pointing to the
 				      *  last hex, used or not.
 				      */
-    raw_hex_iterator
-    last_raw_hex () const;
+    raw_hex_iterator    last_raw_hex () const;
 
 				     /**
 				      *  Return an iterator pointing to the
@@ -3391,6 +3466,50 @@ class Triangulation : public Subscriptor
     virtual std::size_t memory_consumption () const;
 
 				     /**
+				      * Write the data of this object to a
+				      * stream for the purpose of
+				      * serialization.
+				      *
+				      * @note This function does not save
+				      * <i>all</i> member variables of the
+				      * current triangulation. Rather, only
+				      * certain kinds of information are
+				      * stored. For more information see the
+				      * general documentation of this class.
+				      */
+    template <class Archive>
+    void save (Archive & ar, const unsigned int version) const;
+
+				     /**
+				      * Read the data of this object from a
+				      * stream for the purpose of
+				      * serialization. Throw away the previous
+				      * content.
+				      *
+				      * @note This function does not reset
+				      * <i>all</i> member variables of the
+				      * current triangulation to the ones of
+				      * the triangulation that was previously
+				      * stored to an archive. Rather, only
+				      * certain kinds of information are
+				      * loaded. For more information see the
+				      * general documentation of this class.
+				      *
+				      * @note This function calls the
+				      * Triangulation::clear() function and
+				      * consequently triggers the "clear"
+				      * signal. After loading all data from
+				      * the archive, it then triggers the
+				      * "create" signal. For more information
+				      * on signals, see the general
+				      * documentation of this class.
+				      */
+    template <class Archive>
+    void load (Archive & ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+				     /**
 				      *  @name Exceptions
 				      */
 				     /*@{*/
@@ -3595,7 +3714,7 @@ class Triangulation : public Subscriptor
     SmartPointer<const Boundary<dim,spacedim>,Triangulation<dim,spacedim> > boundary[255];
 
 				     /**
-				      *  Collection of ly
+				      *  Collection of manifold
 				      *  objects. We only need 255
 				      *  objects rather than 256,
 				      *  since the indicator 255 is
@@ -3670,6 +3789,45 @@ class Triangulation : public Subscriptor
 
 #ifndef DOXYGEN
 
+namespace internal
+{
+  namespace Triangulation
+  {
+    template <class Archive>
+    void NumberCache<1>::serialize (Archive & ar, 
+				    const unsigned int)
+    {
+      ar & n_levels;
+      ar & n_lines & n_lines_level;
+      ar & n_active_lines & n_active_lines_level;
+    }
+
+    
+    template <class Archive>
+    void NumberCache<2>::serialize (Archive & ar, 
+				    const unsigned int version)
+    {
+      this->NumberCache<1>::serialize (ar, version);
+      
+      ar & n_quads & n_quads_level;
+      ar & n_active_quads & n_active_quads_level;
+    }
+    
+
+    template <class Archive>
+    void NumberCache<3>::serialize (Archive & ar, 
+				    const unsigned int version)
+    {
+      this->NumberCache<2>::serialize (ar, version);
+      
+      ar & n_hexes & n_hexes_level;
+      ar & n_active_hexes & n_active_hexes_level;
+    }
+    
+  }
+}
+
+
 template <int dim, int spacedim>
 inline
 bool
@@ -3709,6 +3867,67 @@ Triangulation<dim, spacedim>::get_vertices () const
   return vertices;
 }
 
+
+template <int dim, int spacedim>
+template <class Archive>
+void
+Triangulation<dim,spacedim>::save (Archive & ar, 
+				   const unsigned int) const
+{
+				   // as discussed in the documentation, do
+				   // not store the signals as well as
+				   // boundary and manifold descrption
+				   // but everything else
+  ar & smooth_grid;
+  ar & levels;
+  ar & faces;
+  ar & vertices;
+  ar & vertices_used;
+  
+  ar & anisotropic_refinement;
+  ar & number_cache;
+
+  ar & check_for_distorted_cells;
+}
+
+
+
+template <int dim, int spacedim>
+template <class Archive>
+void
+Triangulation<dim,spacedim>::load (Archive & ar, 
+				   const unsigned int)
+{
+				   // clear previous content. this also calls
+				   // the respective signal
+  clear ();
+  
+				   // as discussed in the documentation, do
+				   // not store the signals as well as
+				   // boundary and manifold descrption
+				   // but everything else
+  ar & smooth_grid;
+  ar & levels;
+  ar & faces;
+  ar & vertices;
+  ar & vertices_used;
+  
+  ar & anisotropic_refinement;
+  ar & number_cache;
+
+  bool my_check_for_distorted_cells;
+  ar & my_check_for_distorted_cells;
+
+  Assert (my_check_for_distorted_cells == check_for_distorted_cells,
+	  ExcMessage ("The triangulation loaded into here must have the "
+		      "same setting with regard to reporting distorted "
+		      "cell as the one previously stored."));
+
+				   // trigger the create signal to indicate
+				   // that new content has been imported into
+				   // the triangulation
+  signals.create();
+}
 
 
 /* -------------- declaration of explicit specializations ------------- */
