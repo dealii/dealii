@@ -518,7 +518,7 @@ TechReport{BBHK11,
   institution =  {Institute for Applied Mathematics and Computational Science,
                   Texas A&M University},
   year = 	 2010,
-  number = 	 {2011-187, submitted}
+  number = 	 {2011-187, accepted for publication in ACM Trans. Math. Softw.}
 }
  * @endcode
  *
