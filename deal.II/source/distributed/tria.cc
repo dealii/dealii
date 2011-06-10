@@ -1816,7 +1816,7 @@ namespace parallel
       // initialize p4est. do this in a separate function since it has
       // to happen only once, even if we have triangulation objects
       // for several different space dimensions
-      internal::p4est::InitFinalize::do_initialize ();
+      dealii::internal::p4est::InitFinalize::do_initialize ();
 
       number_cache.n_locally_owned_active_cells
 	.resize (Utilities::System::get_n_mpi_processes (mpi_communicator));
@@ -1873,7 +1873,7 @@ namespace parallel
 
       setup_coarse_cell_to_p4est_tree_permutation ();
 
-      copy_new_triangulation_to_p4est (internal::int2type<dim>());
+      copy_new_triangulation_to_p4est (dealii::internal::int2type<dim>());
 
       try
 	{
@@ -1901,13 +1901,13 @@ namespace parallel
 
       if (parallel_forest != 0)
 	{
-	  internal::p4est::functions<dim>::destroy (parallel_forest);
+	  dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
 	  parallel_forest = 0;
 	}
 
       if (connectivity != 0)
 	{
-	  internal::p4est::functions<dim>::connectivity_destroy (connectivity);
+	  dealii::internal::p4est::functions<dim>::connectivity_destroy (connectivity);
 	  connectivity = 0;
 	}
 
@@ -1942,7 +1942,7 @@ namespace parallel
     {
       Assert (parallel_forest != 0,
 	      ExcMessage ("Can't produce output when no forest is created yet."));
-      internal::p4est::functions<dim>::
+      dealii::internal::p4est::functions<dim>::
 	vtk_write_file (parallel_forest, 0, file_basename);
     }
 
@@ -1954,7 +1954,7 @@ namespace parallel
     {
       Assert (parallel_forest != 0,
 	      ExcMessage ("Can't produce a check sum when no forest is created yet."));
-      return internal::p4est::functions<dim>::checksum (parallel_forest);
+      return dealii::internal::p4est::functions<dim>::checksum (parallel_forest);
     }
 
 
@@ -1977,7 +1977,7 @@ namespace parallel
 
     template <>
     void
-    Triangulation<2,2>::copy_new_triangulation_to_p4est (internal::int2type<2>)
+    Triangulation<2,2>::copy_new_triangulation_to_p4est (dealii::internal::int2type<2>)
     {
       const unsigned int dim = 2, spacedim = 2;
       Assert (this->n_cells(0) > 0, ExcInternalError());
@@ -1998,7 +1998,7 @@ namespace parallel
       get_vertex_to_cell_mappings (*this,
 				   vertex_touch_count,
 				   vertex_to_cell);
-      const internal::p4est::types<2>::locidx
+      const dealii::internal::p4est::types<2>::locidx
 	num_vtt = std::accumulate (vertex_touch_count.begin(),
 				   vertex_touch_count.end(),
 				   0);
@@ -2018,7 +2018,7 @@ namespace parallel
 	;
 
       connectivity
-	= internal::p4est::functions<2>::
+	= dealii::internal::p4est::functions<2>::
 	connectivity_new ((set_vertex_info == true ? this->n_vertices() : 0),
 			  this->n_cells(0),
 			  this->n_vertices(),
@@ -2037,7 +2037,7 @@ namespace parallel
 				       // now create a forest out of the
 				       // connectivity data structure
       parallel_forest
-	= internal::p4est::functions<2>::
+	= dealii::internal::p4est::functions<2>::
 	new_forest (mpi_communicator,
 		    connectivity,
 		    /* minimum initial number of quadrants per tree */ 0,
@@ -2055,7 +2055,7 @@ namespace parallel
 				// dim template argument, but let spacedim open
     template <>
     void
-    Triangulation<2,3>::copy_new_triangulation_to_p4est (internal::int2type<2>)
+    Triangulation<2,3>::copy_new_triangulation_to_p4est (dealii::internal::int2type<2>)
     {
       const unsigned int dim = 2, spacedim = 3;
       Assert (this->n_cells(0) > 0, ExcInternalError());
@@ -2076,7 +2076,7 @@ namespace parallel
       get_vertex_to_cell_mappings (*this,
 				   vertex_touch_count,
 				   vertex_to_cell);
-      const internal::p4est::types<2>::locidx
+      const dealii::internal::p4est::types<2>::locidx
 	num_vtt = std::accumulate (vertex_touch_count.begin(),
 				   vertex_touch_count.end(),
 				   0);
@@ -2096,7 +2096,7 @@ namespace parallel
 	;
 
       connectivity
-	= internal::p4est::functions<2>::
+	= dealii::internal::p4est::functions<2>::
 	connectivity_new ((set_vertex_info == true ? this->n_vertices() : 0),
 			  this->n_cells(0),
 			  this->n_vertices(),
@@ -2115,7 +2115,7 @@ namespace parallel
 				       // now create a forest out of the
 				       // connectivity data structure
       parallel_forest
-	= internal::p4est::functions<2>::
+	= dealii::internal::p4est::functions<2>::
 	new_forest (mpi_communicator,
 		    connectivity,
 		    /* minimum initial number of quadrants per tree */ 0,
@@ -2130,7 +2130,7 @@ namespace parallel
 
     template <>
     void
-    Triangulation<3,3>::copy_new_triangulation_to_p4est (internal::int2type<3>)
+    Triangulation<3,3>::copy_new_triangulation_to_p4est (dealii::internal::int2type<3>)
     {
       const int dim = 3, spacedim = 3;
       Assert (this->n_cells(0) > 0, ExcInternalError());
@@ -2151,7 +2151,7 @@ namespace parallel
       get_vertex_to_cell_mappings (*this,
 				   vertex_touch_count,
 				   vertex_to_cell);
-      const internal::p4est::types<2>::locidx
+      const dealii::internal::p4est::types<2>::locidx
 	num_vtt = std::accumulate (vertex_touch_count.begin(),
 				   vertex_touch_count.end(),
 				   0);
@@ -2165,7 +2165,7 @@ namespace parallel
       get_edge_to_cell_mappings (*this,
 				 edge_touch_count,
 				 edge_to_cell);
-      const internal::p4est::types<2>::locidx
+      const dealii::internal::p4est::types<2>::locidx
 	num_ett = std::accumulate (edge_touch_count.begin(),
 				   edge_touch_count.end(),
 				   0);
@@ -2181,7 +2181,7 @@ namespace parallel
 	;
 
       connectivity
-	= internal::p4est::functions<3>::
+	= dealii::internal::p4est::functions<3>::
 	connectivity_new ((set_vertex_info == true ? this->n_vertices() : 0),
 			  this->n_cells(0),
 			  this->n_active_lines(),
@@ -2271,7 +2271,7 @@ namespace parallel
 				       // now create a forest out of the
 				       // connectivity data structure
       parallel_forest
-	= internal::p4est::functions<3>::
+	= dealii::internal::p4est::functions<3>::
 	new_forest (mpi_communicator,
 		    connectivity,
 		    /* minimum initial number of quadrants per tree */ 0,
@@ -2303,14 +2303,14 @@ namespace parallel
       bool mesh_changed = false;
 
 				       // query p4est for the ghost cells
-      typename internal::p4est::types<dim>::ghost * ghostlayer;
-      ghostlayer = internal::p4est::functions<dim>::ghost_new (parallel_forest,
+      typename dealii::internal::p4est::types<dim>::ghost * ghostlayer;
+      ghostlayer = dealii::internal::p4est::functions<dim>::ghost_new (parallel_forest,
 							       (dim == 2
 								?
-								typename internal::p4est::types<dim>::
+								typename dealii::internal::p4est::types<dim>::
 								balance_type(P4EST_BALANCE_CORNER)
 								:
-								typename internal::p4est::types<dim>::
+								typename dealii::internal::p4est::types<dim>::
 								balance_type(P8EST_BALANCE_CORNER)));
 
       Assert (ghostlayer, ExcInternalError());
@@ -2356,11 +2356,11 @@ namespace parallel
 						   // this cell.
 
 
-		  typename internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-		  typename internal::p4est::types<dim>::tree *tree =
+		  typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+		  typename dealii::internal::p4est::types<dim>::tree *tree =
 		    init_tree(cell->index());
 
-		  internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+		  dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
 		  match_tree_recursively<dim,spacedim> (*tree, cell,
 							p4est_coarse_cell,
@@ -2374,7 +2374,7 @@ namespace parallel
 					   // iterate over every ghostquadrant,
 					   // find corresponding deal coarsecell
 					   // and recurse.
-	  typename internal::p4est::types<dim>::quadrant * quadr;
+	  typename dealii::internal::p4est::types<dim>::quadrant * quadr;
 	  unsigned int ghost_owner=0;
 
 	  for (unsigned int g_idx=0;g_idx<ghostlayer->ghosts.elem_count;++g_idx)
@@ -2382,7 +2382,7 @@ namespace parallel
 	      while (g_idx >= (unsigned int)ghostlayer->proc_offsets[ghost_owner+1])
 		++ghost_owner;
 
-	      quadr = static_cast<typename internal::p4est::types<dim>::quadrant *>
+	      quadr = static_cast<typename dealii::internal::p4est::types<dim>::quadrant *>
 		      ( sc_array_index(&ghostlayer->ghosts, g_idx) );
 
 	      unsigned int coarse_cell_index =
@@ -2391,8 +2391,8 @@ namespace parallel
 	      const typename Triangulation<dim,spacedim>::cell_iterator
 		cell (this, 0U, coarse_cell_index);
 
-	      typename internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-	      internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
+	      typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+	      dealii::internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
 
 	      match_quadrant_recursively<dim,spacedim> (p4est_coarse_cell, cell, *quadr,
 							*parallel_forest, ghost_owner);
@@ -2499,7 +2499,7 @@ namespace parallel
 
       }
 
-      internal::p4est::functions<dim>::ghost_destroy (ghostlayer);
+      dealii::internal::p4est::functions<dim>::ghost_destroy (ghostlayer);
 
       this->smooth_grid = save_smooth;
     }
@@ -2570,11 +2570,11 @@ namespace parallel
 	      ExcInternalError());
       parallel_forest->user_pointer = &refine_and_coarsen_list;
 
-      internal::p4est::functions<dim>::
+      dealii::internal::p4est::functions<dim>::
 	refine (parallel_forest, /* refine_recursive */ false,
 		&RefineAndCoarsenList<dim,spacedim>::refine_callback,
 		/*init_callback=*/NULL);
-      internal::p4est::functions<dim>::
+      dealii::internal::p4est::functions<dim>::
 	coarsen (parallel_forest, /* coarsen_recursive */ false,
 		 &RefineAndCoarsenList<dim,spacedim>::coarsen_callback,
 		 /*init_callback=*/NULL);
@@ -2588,15 +2588,15 @@ namespace parallel
       parallel_forest->user_pointer = this;
 
 				       // enforce 2:1 hanging node condition
-      internal::p4est::functions<dim>::
+      dealii::internal::p4est::functions<dim>::
 	balance (parallel_forest,
 						  /* face and corner balance */
 		 (dim == 2
 		  ?
-		  typename internal::p4est::types<dim>::
+		  typename dealii::internal::p4est::types<dim>::
 		  balance_type(P4EST_BALANCE_FULL)
 		  :
-		  typename internal::p4est::types<dim>::
+		  typename dealii::internal::p4est::types<dim>::
 		  balance_type(P8EST_BALANCE_FULL)),
 		 /*init_callback=*/NULL);
 
@@ -2609,7 +2609,7 @@ namespace parallel
 
 				       // partition the new mesh between
 				       // all processors
-      internal::p4est::functions<dim>::
+      dealii::internal::p4est::functions<dim>::
 	partition (parallel_forest,
                    /* prepare coarsening */ 1,
 		   /* weight_callback */ NULL);
@@ -2769,11 +2769,11 @@ namespace parallel
 		  == false)
 	    continue;
 
-	  typename internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-	  typename internal::p4est::types<dim>::tree *tree =
+	  typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+	  typename dealii::internal::p4est::types<dim>::tree *tree =
 	    init_tree(cell->index());
 
-	  internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
+	  dealii::internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
 
 					   // parent_cell is not correct here,
 					   // but is only used in a refined
@@ -2796,7 +2796,7 @@ namespace parallel
 
 					   // and release the data
 	  void * userptr = parallel_forest->user_pointer;
-	  internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
+	  dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
 	  parallel_forest->user_pointer = userptr;
 	}
     }
@@ -2842,8 +2842,8 @@ namespace parallel
     std::size_t
     Triangulation<dim,spacedim>::memory_consumption_p4est () const
     {
-      return internal::p4est::functions<dim>::forest_memory_used(parallel_forest)
-	+ internal::p4est::functions<dim>::connectivity_memory_used(connectivity);
+      return dealii::internal::p4est::functions<dim>::forest_memory_used(parallel_forest)
+	+ dealii::internal::p4est::functions<dim>::connectivity_memory_used(connectivity);
     }
 
 
@@ -2875,7 +2875,7 @@ namespace parallel
 
 				       // realloc user_data in p4est
       void * userptr = parallel_forest->user_pointer;
-      internal::p4est::functions<dim>::reset_data (parallel_forest,
+      dealii::internal::p4est::functions<dim>::reset_data (parallel_forest,
 						   attached_data_size+sizeof(CellStatus),
 						   NULL, NULL);
       parallel_forest->user_pointer = userptr;
@@ -2895,11 +2895,11 @@ namespace parallel
 		  == false)
 	    continue;
 
-	  typename internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-	  typename internal::p4est::types<dim>::tree *tree =
+	  typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+	  typename dealii::internal::p4est::types<dim>::tree *tree =
 	    init_tree(cell->index());
 
-	  internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+	  dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
 	  attach_mesh_data_recursively<dim,spacedim>(*tree,
 						     cell,
