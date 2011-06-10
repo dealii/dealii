@@ -5728,7 +5728,7 @@ namespace DoFTools
 			"zero or equal to the number of components in the finite "
 			"element."));
 
-    const unsigned int        n_components = DoFTools::n_components(dof);
+    const unsigned int n_components = DoFTools::n_components (dof);
 
 				     // set the component mask to either
 				     // the original value or a vector
@@ -5753,8 +5753,9 @@ namespace DoFTools
 	  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
 	  typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
-	  if (face->boundary_indicator () == 0)
-					     // face is of the right component
+
+					     // if face is on the boundary
+	  if (face->at_boundary ())
 	    {
 					       // get indices and physical
 					       // location on this face
