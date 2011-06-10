@@ -426,6 +426,13 @@ DoFTools::count_dofs_with_subdomain_association<hp::DoFHandler<deal_II_dimension
 
 #if deal_II_dimension < 3
 template
+void
+DoFTools::extract_boundary_dofs<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+  (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+   const std::vector<bool>                  &,
+   std::vector<bool>                        &,
+   const std::set<unsigned char> &);
+template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,

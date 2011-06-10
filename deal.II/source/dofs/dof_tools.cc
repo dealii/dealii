@@ -750,7 +750,7 @@ namespace DoFTools
 				  const Table<2,Coupling> &int_mask,
 				  const Table<2,Coupling> &flux_mask)
       {
-	const FiniteElement<DH::dimension> &fe = dof.get_fe();
+	const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof.get_fe();
 
 	std::vector<unsigned int> dofs_on_this_cell(fe.dofs_per_cell);
 	std::vector<unsigned int> dofs_on_other_cell(fe.dofs_per_cell);
@@ -1210,13 +1210,13 @@ namespace DoFTools
 				     // beginning of this function.
     std::vector<bool> user_flags;
     dof.get_tria().save_user_flags(user_flags);
-    const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).clear_user_flags ();
+    const_cast<Triangulation<DH::dimension,DH::space_dimension> &>(dof.get_tria()).clear_user_flags ();
 
     internal::make_flux_sparsity_pattern (dof, sparsity,
 					  int_mask, flux_mask);
   
 				     // finally restore the user flags
-    const_cast<Triangulation<DH::dimension> &>(dof.get_tria()).load_user_flags(user_flags);
+    const_cast<Triangulation<DH::dimension,DH::space_dimension> &>(dof.get_tria()).load_user_flags(user_flags);
   }
 
 
@@ -3406,7 +3406,7 @@ namespace DoFTools
     Vector<double>       &dof_data,
     const unsigned int    component)
   {
-    const Triangulation<DH::dimension> &tria = dof_handler.get_tria();
+    const Triangulation<DH::dimension,DH::space_dimension> &tria = dof_handler.get_tria();
 
     Assert (cell_data.size()==tria.n_active_cells(),
 	    ExcWrongSize (cell_data.size(), tria.n_active_cells()));
@@ -3745,6 +3745,7 @@ namespace DoFTools
     Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
+    const unsigned int spacedim=DH::space_dimension;
 
 				     // let's see whether we have to
 				     // check for certain boundary
@@ -3788,7 +3789,7 @@ namespace DoFTools
 	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	       != boundary_indicators.end()))
 	    {
-	      const FiniteElement<DH::dimension> &fe = cell->get_fe();
+	      const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
 	      const unsigned int dofs_per_face = fe.dofs_per_face;
 	      face_dof_indices.resize (dofs_per_face);
@@ -3913,7 +3914,7 @@ namespace DoFTools
 	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	       != boundary_indicators.end()))
 	    {
-	      const FiniteElement<DH::dimension> &fe = cell->get_fe();
+	      const FiniteElement<DH::dimension, DH::space_dimension> &fe = cell->get_fe();
 
 	      const unsigned int dofs_per_cell = fe.dofs_per_cell;
 	      cell_dof_indices.resize (dofs_per_cell);
