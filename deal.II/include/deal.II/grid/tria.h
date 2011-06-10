@@ -1442,16 +1442,6 @@ class Triangulation : public Subscriptor
     static const StraightBoundary<dim,spacedim> straight_boundary;
 
 				     /**
-				      * Default boundary object to be
-				      * used in the codimension 1
-				      * case.  This is used for those
-				      * boundaries for which no
-				      * boundary object has been
-				      * explicitly set using
-				      * set_boundary().
-				      */
-    static const StraightBoundary<spacedim,spacedim> straight_manifold_description;
-				     /**
 				      * Declare some symbolic names
 				      * for mesh smoothing
 				      * algorithms. The meaning of
@@ -3712,17 +3702,6 @@ class Triangulation : public Subscriptor
 				      *  associated with a boundary.
 				      */
     SmartPointer<const Boundary<dim,spacedim>,Triangulation<dim,spacedim> > boundary[255];
-
-				     /**
-				      *  Collection of manifold
-				      *  objects. We only need 255
-				      *  objects rather than 256,
-				      *  since the indicator 255 is
-				      *  reserved for interior faces
-				      *  and can thus never be
-				      *  associated with a boundary.
-				      */
-    SmartPointer<const Boundary<spacedim,spacedim>,Triangulation<dim,spacedim> > manifold_description[255];
 
 				     /**
 				      * Flag indicating whether
