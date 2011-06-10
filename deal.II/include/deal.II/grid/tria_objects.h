@@ -380,6 +380,11 @@ namespace internal
 					  * Counter for next_free_pair_* functions
 					  */
 	unsigned int next_free_pair;
+
+					 /**
+					  * Bool flag for next_free_single_* functions
+					  */
+	bool reverse_order_next_free_single;
 	
 					 /**
 					  * The data type storing user
@@ -730,6 +735,7 @@ namespace internal
     inline
     TriaObjects<G>::TriaObjects()
 		    :
+		    reverse_order_next_free_single (false),
 		    user_data_type(data_unknown)
     {}    
     
@@ -788,7 +794,7 @@ namespace internal
       ar & used;
       ar & user_flags;
       ar & material_id;
-      ar & next_free_single & next_free_pair;
+      ar & next_free_single & next_free_pair & reverse_order_next_free_single;
       ar & user_data & user_data_type;
     }
 
