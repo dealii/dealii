@@ -289,7 +289,6 @@ class IndexSet
 				      */
     void block_read(std::istream & in);
 
-
 #ifdef DEAL_II_USE_TRILINOS
 				     /**
 				      * Given an MPI communicator,
@@ -364,10 +363,10 @@ class IndexSet
 		    << "The global index " << arg1
 		    << " is not an element of this set.");
 		    
-                         /**
-                      * Write or read the data of this object to or 
-                      * from a stream for the purpose of serialization
-                      */ 
+    /**
+     * Write or read the data of this object to or 
+     * from a stream for the purpose of serialization
+     */ 
     template <class Archive>
     void serialize (Archive & ar, const unsigned int version);
 
@@ -430,17 +429,16 @@ class IndexSet
 	  }
 
 	std::size_t memory_consumption () const
-	  {
-	    return sizeof(Range);
-	  }
+	{
+	  return sizeof(Range);
+	}
 	  
-                         /**
-                      * Write or read the data of this object to or 
-                      * from a stream for the purpose of serialization
-                      */ 
-    template <class Archive>
-    void serialize (Archive & ar, const unsigned int version);
-
+	  /**
+	   * Write or read the data of this object to or 
+	   * from a stream for the purpose of serialization
+	   */ 
+	  template <class Archive>
+	  void serialize (Archive & ar, const unsigned int version);
     };
 
 				     /**
@@ -909,6 +907,8 @@ IndexSet::print (STREAM &out) const
   out << "}" << std::endl;
 }
 
+
+
 template <class Archive>
 inline
 void
@@ -916,7 +916,9 @@ IndexSet::Range::serialize (Archive & ar, const unsigned int)
 {
   ar & begin & end & nth_index_in_set;
 }
-   
+
+
+
 template <class Archive>
 inline
 void
