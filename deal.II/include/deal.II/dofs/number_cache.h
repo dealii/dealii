@@ -33,6 +33,9 @@ namespace internal
 				      */
     struct NumberCache
     {
+      /** 
+       * Default constructor.
+       */
 	NumberCache ();
 
 					 /**
@@ -91,7 +94,28 @@ namespace internal
 					  * locally_owned_dofs.
 					  */
 	std::vector<IndexSet> locally_owned_dofs_per_processor;
+	
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize (Archive & ar, 
+			const unsigned int version);      
     };
+    
+    
+    template <class Archive>
+    void 
+    NumberCache::serialize (Archive & ar, 
+			    const unsigned int version)
+    {
+      ar & n_global_dofs & n_locally_owned_dofs;
+      ar & locally_owned_dofs;
+      ar & n_locally_owned_dofs_per_processor;
+      ar & locally_owned_dofs_per_processor;
+    }
+
   }
 }
 

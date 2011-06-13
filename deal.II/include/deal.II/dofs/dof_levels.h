@@ -18,6 +18,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/dofs/dof_objects.h>
 #include <vector>
+#include <../contrib/boost-1.46.1/libs/serialization/example/demo_dll_a.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -117,6 +118,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
     
 /**
@@ -141,6 +150,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+      	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
 
 
@@ -166,6 +183,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+	
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
     };
 
 
@@ -191,8 +216,52 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+    
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);      
     };
 
+    
+    
+    template <class Archive>
+    void DoFLevel<0>::serialize (Archive &ar,
+				 const unsigned int)
+    {
+      ar & cell_dof_indices_cache;
+    }
+    
+
+    
+    template <class Archive>
+    void DoFLevel<1>::serialize (Archive &ar,
+				 const unsigned int version)
+    {
+      this->DoFLevel<0>::serialize (ar, version);
+      ar & lines;
+    }    
+
+    
+    template <class Archive>
+    void DoFLevel<2>::serialize (Archive &ar,
+				 const unsigned int version)
+    {
+      this->DoFLevel<0>::serialize (ar, version);
+      ar & quads;
+    }
+
+    
+    template <class Archive>
+    void DoFLevel<3>::serialize (Archive &ar,
+				 const unsigned int version)
+    {
+      this->DoFLevel<0>::serialize (ar, version);
+      ar & hexes;
+    }    
   }
 }
 

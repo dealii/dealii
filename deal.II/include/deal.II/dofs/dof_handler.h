@@ -25,6 +25,8 @@
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler_policy.h>
 
+#include <boost/serialization/split_member.hpp>
+
 #include <vector>
 #include <map>
 #include <set>
@@ -137,8 +139,34 @@ namespace internal
  * <tt>renumber_dofs(vector<unsigned int>)</tt> function with the array, which
  * converts old into new degree of freedom indices.
  *
+ * 
+ * <h3>Serializing (loading or storing) DoFHandler objects</h3>
+ *
+ * Like many other classes in deal.II, the DoFHandler class can stream
+ * its contents to an archive using BOOST's serialization facilities. The
+ * data so stored can later be retrieved again from the archive to restore
+ * the contents of this object. This facility is frequently used to save the
+ * state of a program to disk for possible later resurrection, often in the
+ * context of checkpoint/restart strategies for long running computations or
+ * on computers that aren't very reliable (e.g. on very large clusters where
+ * individual nodes occasionally fail and then bring down an entire MPI
+ * job).
+ *
+ * The model for doing so is similar for the DoFHandler class as it is for
+ * the Triangulation class (see the section in the general documentation of
+ * that class). In particular, the load() function does not exactly restore
+ * the same state as was stored previously using the save() function. Rather,
+ * the function assumes that you load data into a DoFHandler object that is
+ * already associated with a triangulation that has a content that matches
+ * the one that was used when the data was saved. Likewise, the load() function
+ * assumes that the current object is already associated with a finite element
+ * object that matches the one that was associated with it when data was
+ * saved; the latter can be achieved by calling DoFHandler::distribute_dofs()
+ * using the same kind of finite element before re-loading data from the
+ * serialization archive.
+ *
  * @ingroup dofs
- * @author Wolfgang Bangerth, 1998
+ * @author Wolfgang Bangerth
  */
 template <int dim, int spacedim=dim>
 class DoFHandler  :  public Subscriptor
@@ -1193,6 +1221,24 @@ class DoFHandler  :  public Subscriptor
 				      */
     virtual std::size_t memory_consumption () const;
 
+				     /**
+				      * Write the data of this object to a
+				      * stream for the purpose of
+				      * serialization.
+				      */
+   template <class Archive>
+   void save (Archive & ar, const unsigned int version) const;
+
+				     /**
+				      * Read the data of this object from a
+				      * stream for the purpose of
+				      * serialization.
+				      */
+   template <class Archive>
+   void load (Archive & ar, const unsigned int version);
+
+   BOOST_SERIALIZATION_SPLIT_MEMBER()
+    
     				     /**
 				      * @todo Replace by ExcInternalError.
 				      */
@@ -1443,6 +1489,67 @@ DoFHandler<dim,spacedim>::block_info () const
 }
 
 
+template <int dim, int spacedim>
+template <class Archive>
+void DoFHandler<dim,spacedim>::save (Archive & ar,
+				     const unsigned int) const
+{
+  ar & block_info_object;
+  ar & vertex_dofs;
+  ar & number_cache;
+  ar & levels;
+  ar & faces;
+  
+  // write out the number of triangulation cells and later check
+  // during loading that this number is indeed correct; same with something that
+  // identifies the FE and the policy
+  unsigned int n_cells = tria->n_cells();
+  std::string  fe_name = selected_fe->get_name();
+  std::string  policy_name = typeid(*policy).name();
+  
+  ar & n_cells & fe_name & policy_name;
+}
+
+
+template <int dim, int spacedim>
+template <class Archive>
+void DoFHandler<dim,spacedim>::load (Archive & ar,
+				     const unsigned int)
+{
+  ar & block_info_object;
+  ar & vertex_dofs;
+  ar & number_cache;
+  
+  // boost::serialization can restore pointers just fine, but if the
+  // pointer object still points to something useful, that object is
+  // not destroyed and we end up with a memory leak. consequently,
+  // first delete previous content before re-loading stuff
+  for (unsigned int i=0; i<levels.size(); ++i)
+    delete levels[i];
+  levels.resize (0);
+  delete faces;
+  faces = 0;
+  
+  ar & levels;
+  ar & faces;
+
+  // these are the checks that correspond to the last block in the save() function
+  unsigned int n_cells;
+  std::string  fe_name;
+  std::string  policy_name;
+  
+  ar & n_cells & fe_name & policy_name;  
+
+  AssertThrow (n_cells == tria->n_cells(), 
+	       ExcMessage ("The object being loaded into does not match the triangulation "
+	                   "that has been stored previously."));
+  AssertThrow (fe_name == selected_fe->get_name(),
+	       ExcMessage ("The finite element associated with this DoFHandler does not match "
+	                   "the one that was associated with the DoFHandler previously stored."));
+  AssertThrow (policy_name == typeid(*policy).name(),
+	       ExcMessage ("The policy associated with this DoFHandler does not match "
+	                   "the one that was associated with the DoFHandler previously stored."));
+}
 
 
 #endif // DOXYGEN

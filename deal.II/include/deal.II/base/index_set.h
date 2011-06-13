@@ -393,6 +393,23 @@ class IndexSet
 
 	unsigned int nth_index_in_set;
 
+	/**
+	 * Default constructor. Since there is no useful choice for
+	 * a default constructed interval, this constructor simply
+	 * creates something that resembles an invalid range. We
+	 * need this constructor for serialization purposes, but the
+	 * invalid range should be filled with something read from
+	 * the archive before it is used, so we should hopefully
+	 * never get to see an invalid range in the wild.
+	 **/
+	Range ();
+	
+	/**
+	 * Constructor. Create a half-open interval with the given indices.
+	 *
+	 * @param i1 Left end point of the interval.
+	 * @param i2 First index greater than the last index of the indicated range.
+	 **/
 	Range (const unsigned int i1,
 	       const unsigned int i2);
 
@@ -508,13 +525,20 @@ class IndexSet
 /* ------------------ inline functions ------------------ */
 
 inline
+IndexSet::Range::Range ()
+		:
+		begin(numbers::invalid_unsigned_int),
+		end(numbers::invalid_unsigned_int)
+{}
+
+
+inline
 IndexSet::Range::Range (const unsigned int i1,
 			const unsigned int i2)
 		:
 		begin(i1),
 		end(i2)
 {}
-
 
 
 inline

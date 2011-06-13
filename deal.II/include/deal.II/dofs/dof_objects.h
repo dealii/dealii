@@ -165,6 +165,14 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
+
+	/**
+	 * Read or write the data of this object to or 
+	 * from a stream for the purpose of serialization
+	 */ 
+	template <class Archive>
+	void serialize(Archive & ar,
+		       const unsigned int version);
 	
                                          /**
                                           * Make the DoFHandler and
@@ -230,6 +238,15 @@ namespace internal
       return dofs[obj_index * dof_handler.get_fe()
                   .template n_dofs_per_object<dim>() + local_index];
     }    
+
+
+    template <int dim>
+    template <class Archive>
+    void DoFObjects<dim>::serialize(Archive & ar,
+				    const unsigned int)
+    {
+      ar & dofs;
+    }
 
   }
 }

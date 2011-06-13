@@ -189,6 +189,14 @@ class BlockInfo : public Subscriptor
 				      */
     std::size_t memory_consumption () const;
 
+    /**
+     * Read or write the data of this object to or 
+     * from a stream for the purpose of serialization
+     */ 
+    template <class Archive>
+    void serialize (Archive & ar, 
+		    const unsigned int version);
+    
   private:
 				     /**
 				      * @brief The block structure
@@ -320,6 +328,18 @@ BlockInfo::memory_consumption () const
 	  MemoryConsumption::memory_consumption (levels) +
 	  MemoryConsumption::memory_consumption (bi_local) +
 	  MemoryConsumption::memory_consumption (base_elements));
+}
+
+
+template <class Archive>
+void BlockInfo::serialize (Archive & ar, 
+			   const unsigned int version)
+{
+  ar & bi_global;
+  ar & levels;
+  ar & bi_local;
+  ar & base_elements;
+  ar & local_renumbering;
 }
 
 

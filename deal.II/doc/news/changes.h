@@ -61,6 +61,12 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> New: The Triangulation and DoFHandler classes, together with many
+smaller classes can now be serialized, i.e. their data can be written
+to an output stream and later retrieved to restore the state of the program.
+<br>
+(Wolfgang Bangerth, 2011/06/13)
+
 <li> New/deprecated: The Triangulation class offers ways to get informed 
 whenever the triangulation changes. Previously, the mechanism doing this
 was through the Triangulation::RefinementListener class. This has been
