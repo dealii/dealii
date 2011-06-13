@@ -38,7 +38,7 @@ bool operator == (const Triangulation<dim,spacedim> &t1,
   typename Triangulation<dim,spacedim>::cell_iterator
     c1 = t1.begin(),
     c2 = t2.begin();
-  for (; c1 != t1.end(); ++c1, ++c2)
+  for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
     {
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 	{
@@ -80,6 +80,19 @@ bool operator == (const Triangulation<dim,spacedim> &t1,
       if (c1->user_flag_set() != c2->user_flag_set())
 	return false;
     }
+
+  // also check the order of raw iterators as they contain
+  // something about the history of the triangulation
+  typename Triangulation<dim,spacedim>::cell_iterator
+    r1 = t1.begin_raw(),
+    r2 = t2.begin_raw();
+  for (; (r1 != t1.end()) && (r2 != t2.end()); ++r1, ++r2)
+  {
+    if (r1->level() != r2->level())
+      return false;
+    if (r1->index() != r2->index())
+      return false;
+  }
 
   return true;
 }
