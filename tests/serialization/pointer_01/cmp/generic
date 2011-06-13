@@ -1,6 +1,9 @@
-JobId unknown Mon Jun 13 12:54:54 2011
+
 DEAL::Default constructor. Object number 1
 DEAL::Serializing object number 1 via N5boost7archive13text_oarchiveE
 DEAL::22 serialization::archive 9 0 1 0
 0
 
+DEAL::Default constructor. Object number 2
+DEAL::Serializing object number 2 via N5boost7archive13text_iarchiveE
+DEAL::OK
