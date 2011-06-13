@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/dofs/dof_objects.h>
 #include <vector>
-#include <../contrib/boost-1.46.1/libs/serialization/example/demo_dll_a.hpp>
+
 
 DEAL_II_NAMESPACE_OPEN
 
