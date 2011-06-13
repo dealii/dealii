@@ -1,4 +1,4 @@
-//----------------------------  pointer_03.cc  ---------------------------
+//----------------------------  pointer_04.cc  ---------------------------
 //    $Id$
 //    Version: $Name$
 //
@@ -9,10 +9,14 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  pointer_03.cc  ---------------------------
+//----------------------------  pointer_04.cc  ---------------------------
 
 // test what happens when serializing two objects that have pointers to the
 // same common object. the two objects here are the members of a std::pair
+//
+// compared to the _03 test, the object pointed to here is an automatic object
+// on the stack; boost::serialization can't know that and must create a new
+// object on the heap which we later have to destroy by hand
 
 #include "serialization.h"
 
@@ -77,8 +81,8 @@ bool compare (const std::pair<T*,T*> &t1,
 void test ()
 {
   {
-    C *p = new C();
-    std::pair<C*,C*> pair_1 = {p, p};
+    C c;
+    std::pair<C*,C*> pair_1 = {&c, &c};
     std::pair<C*,C*> pair_2;
   
     verify (pair_1, pair_2);
@@ -93,17 +97,18 @@ void test ()
     Assert (object_number == 3, ExcInternalError());
 
 				     // destroy the newly created object. this
-				     // must succeed
+				     // must succeed and would likely throw
+				     // some sort of error if the object
+				     // pointed to was on the stack (like 'c')
+				     // rather than on the heap
     delete pair_2.first;
-    
-    delete p;
   }
 }
 
 
 int main ()
 {
-  std::ofstream logfile("pointer_03/output");
+  std::ofstream logfile("pointer_04/output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
   deallog.depth_console(0);
