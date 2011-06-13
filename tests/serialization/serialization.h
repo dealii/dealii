@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,23 @@
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+
+
+// compare objects for equality and pointers for equality of the object
+// pointed to
+template <typename T>
+bool compare (T t1,
+	      T t2)
+{
+  return t1 == t2;
+}
+
+template <typename T>
+bool compare (T *t1,
+	      T *t2)
+{
+  return *t1 == *t2;
+}
 
 
 template <typename T>
@@ -45,7 +62,7 @@ void verify (const T &t1,
 
     ia >> t2;
 
-    Assert (t1 == t2, ExcInternalError());
+    Assert (compare (t1, t2), ExcInternalError());
   }
 }
 
