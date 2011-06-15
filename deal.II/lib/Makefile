@@ -1,5 +1,4 @@
 # $Id$
-# Copyright W. Bangerth, University of Heidelberg, 2002
 
 D = ..
 
@@ -139,7 +138,7 @@ endif
 
 ######################### CLEAN TARGETS ###################
 # clean everything
-clean: clean-objects clean-bin
+clean: clean-objects
 
 # only clean object files, not libraries and executables
 clean-objects:  clean-debug clean-optimized \
@@ -156,14 +155,12 @@ clean-contrib:
 	-rm contrib/*/*.$(OBJEXT)
 	-rm -r contrib/tbb/*debug
 	-rm -r contrib/tbb/*release
-	-rm libtbb*
-
-clean-bin:
-	-rm bin/detached_ma27
-	-rm bin/dealii_parameter_gui
 
 distclean: clean
 	-rm -f lib* bin/*
+	-rm bin/detached_ma27
+	-rm bin/dealii_parameter_gui
+	-rm libtbb*
 
 .PHONY: clean clean-objects
 .PHONY: clean-base clean-lac clean-1d clean-2d clean-3d

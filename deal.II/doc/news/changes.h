@@ -61,6 +61,15 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Changed: Doing <code>make clean</code> was supposed to only remove object
+files but not libraries; however, it also removed the TBB libraries and a
+few executables. This has now been changed: <code>make clean</code> now only
+removes stuff that isn't needed to run executables, i.e. it leaves the TBB
+and other libraries alone. As before, the target <code>make distclean</code>
+is responsible for removing everything.
+<br>
+(Max Jensen, Wolfgang Bangerth, 2011/06/14)
+
 <li> New: The Triangulation and DoFHandler classes, together with many
 smaller classes can now be serialized, i.e. their data can be written
 to an output stream and later retrieved to restore the state of the program.
