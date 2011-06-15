@@ -879,8 +879,9 @@ template <int dim>
 class BoussinesqFlowProblem
 {
   public:
-    BoussinesqFlowProblem ();
-    void run (const std::string parameter_filename);
+    struct Parameters;
+    BoussinesqFlowProblem (BoussinesqFlowProblem<dim>::Parameters & parameters);
+    void run ();
 
   private:
     void setup_dofs ();
@@ -911,9 +912,10 @@ class BoussinesqFlowProblem
 		      const double                        global_T_variation,
 		      const double                        cell_diameter) const;
 
+  public:
     struct Parameters
     {
-	Parameters ();
+	Parameters (const std::string & parameter_filename);
 
 	static void declare_parameters (ParameterHandler &prm);
 	void parse_parameters (ParameterHandler &prm);
@@ -938,9 +940,9 @@ class BoussinesqFlowProblem
 	unsigned int temperature_degree;
     };
 
-
+  private:
+    Parameters                          & parameters;
     ConditionalOStream                  pcout;
-    Parameters                          parameters;
 
     parallel::distributed::Triangulation<dim> triangulation;
     double                              global_Omega_diameter;
@@ -1039,7 +1041,7 @@ class BoussinesqFlowProblem
 
 				 // @sect4{BoussinesqFlowProblem::Parameters}
 template <int dim>
-BoussinesqFlowProblem<dim>::Parameters::Parameters ()
+BoussinesqFlowProblem<dim>::Parameters::Parameters (const std::string & parameter_filename)
 		:
 		end_time (1e8),
 		initial_global_refinement (2),
@@ -1051,8 +1053,35 @@ BoussinesqFlowProblem<dim>::Parameters::Parameters ()
 		stokes_velocity_degree (2),
 		use_locally_conservative_discretization (true),
 		temperature_degree (2)
-{}
+{
+    ParameterHandler prm;
+    BoussinesqFlowProblem<dim>::Parameters::declare_parameters (prm);
+ 
+    std::ifstream parameter_file (parameter_filename.c_str());
 
+    if (!parameter_file)
+      {
+	parameter_file.close ();
+
+	std::ostringstream message;
+	message << "Input parameter file <"
+		<< parameter_filename << "> not found. Creating a"
+		<< std::endl
+		<< "template file of the same name."
+		<< std::endl;
+
+	std::ofstream parameter_out (parameter_filename.c_str());
+	prm.print_parameters (parameter_out,
+			      ParameterHandler::Text);
+
+	AssertThrow (false, ExcMessage (message.str().c_str()));
+      }
+
+    const bool success = prm.read_input (parameter_file);
+    AssertThrow (success, ExcMessage ("Invalid input parameter file."));
+
+    parse_parameters (prm);
+}
 
 
 template <int dim>
@@ -1204,8 +1233,9 @@ parse_parameters (ParameterHandler &prm)
  				 // program which shows us wallclock times
  				 // (as opposed to CPU times).
 template <int dim>
-BoussinesqFlowProblem<dim>::BoussinesqFlowProblem ()
+BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (Parameters & parameters_)
                 :
+		parameters (parameters_),
 		pcout (std::cout,
 		       (Utilities::System::
 			get_this_mpi_process(MPI_COMM_WORLD)
@@ -3673,39 +3703,8 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
 				 // <code>VectorTools::project</code>, the
 				 // rest is as before.
 template <int dim>
-void BoussinesqFlowProblem<dim>::run (const std::string parameter_filename)
+void BoussinesqFlowProblem<dim>::run ()
 {
-  {
-    ParameterHandler prm;
-    Parameters::declare_parameters (prm);
-
-    std::ifstream parameter_file (parameter_filename.c_str());
-
-    if (!parameter_file)
-      {
-	parameter_file.close ();
-
-	std::ostringstream message;
-	message << "Input parameter file <"
-		<< parameter_filename << "> not found. Creating a"
-		<< std::endl
-		<< "template file of the same name."
-		<< std::endl;
-
-	std::ofstream parameter_out (parameter_filename.c_str());
-	prm.print_parameters (parameter_out,
-			      ParameterHandler::Text);
-
-	AssertThrow (false, ExcMessage (message.str().c_str()));
-      }
-
-    const bool success = prm.read_input (parameter_file);
-    AssertThrow (success, ExcMessage ("Invalid input parameter file."));
-
-    parameters.parse_parameters (prm);
-  }
-
-
   GridGenerator::hyper_shell (triangulation,
 			      Point<dim>(),
 			      EquationData::R0,
@@ -3825,8 +3824,9 @@ int main (int argc, char *argv[])
 	parameter_filename = "step-32.prm";
 
       const int dim = 3;
-      BoussinesqFlowProblem<dim> flow_problem;
-      flow_problem.run (parameter_filename);
+      BoussinesqFlowProblem<dim>::Parameters  parameters(parameter_filename);
+      BoussinesqFlowProblem<dim> flow_problem (parameters);
+      flow_problem.run ();
     }
   catch (std::exception &exc)
     {
