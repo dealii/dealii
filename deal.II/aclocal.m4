@@ -1066,9 +1066,9 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   dnl On some systems with gcc 4.5.0, we can compile the code
   dnl above but it will throw an exception when run. So test
   dnl that as well. The test will only be successful if we have
-  dnl libpthread available, so link it in for this test. If 
-  dnl multithreading is requested, it will be added later on,
-  dnl so there is no need to do this here.
+  dnl libpthread available, so link it in for this test. If
+  dnl multithreading is requested, it will be added to CXXFLAGS
+  dnl later on so there is no need to do this here.
   CXXFLAGS="$1 -lpthread"
   AC_MSG_CHECKING(whether std::thread actually works)
   AC_TRY_RUN(
@@ -1098,6 +1098,9 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
   CXXFLAGS="${OLD_CXXFLAGS}"
 
+  dnl If the above classes and operations are all defined then we can
+  dnl use the corresponding flag in CXXFLAGS* to switch on support and
+  dnl correspondingly use the C++ classes instead of the BOOST classes
   AC_MSG_CHECKING(whether C++1x support is complete enough)
   if test "x$all_cxx1x_available" = "xyes" ; then
     AC_MSG_RESULT(yes)
