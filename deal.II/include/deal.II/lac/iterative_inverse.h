@@ -48,7 +48,7 @@ DEAL_II_NAMESPACE_OPEN
  * Vector<double> b;
  * GrowingVectorMemory<Vector<double> > mem;
 
- * ReductionControl inner_control (10, 1.e-30, 1.e-2)
+ * ReductionControl inner_control (10, 1.e-30, 1.e-2);
  * PreconditionSSOR <SparseMatrix<double> > inner_precondition;
  * inner_precondition.initialize (A, 1.2);
  *
