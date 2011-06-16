@@ -4112,7 +4112,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   OLD_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS=""-std=c++0x""
 
-  all_cxx1x_available=yes
+  all_cxx1x_classes_available=yes
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for std::array" >&5
 $as_echo_n "checking for std::array... " >&6; }
@@ -4132,7 +4132,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4155,7 +4155,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4180,7 +4180,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4206,7 +4206,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4229,7 +4229,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4253,7 +4253,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4278,7 +4278,7 @@ if ac_fn_cxx_try_run "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
@@ -4305,7 +4305,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
@@ -4328,16 +4328,16 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; all_cxx1x_available=no
+$as_echo "no" >&6; }; all_cxx1x_classes_available=no
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
   CXXFLAGS="${OLD_CXXFLAGS}"
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++1x support is complete enough" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++1x support is complete enough" >&5
 $as_echo_n "checking whether C++1x support is complete enough... " >&6; }
-  if test "x$all_cxx1x_available" = "xyes" ; then
+  if test "x$all_cxx1x_classes_available" = "xyes" ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
@@ -4347,6 +4347,68 @@ $as_echo "yes" >&6; }
 
 $as_echo "#define DEAL_II_CAN_USE_CXX1X 1" >>confdefs.h
 
+
+
+                OLD_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGSG"
+
+    extra_cxx1x_features_available=yes
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for auto typed variables" >&5
+$as_echo_n "checking for auto typed variables... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <vector>
+int
+main ()
+{
+
+           std::vector<int> v;
+	   auto i = v.begin();
+	   *i;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; extra_cxx1x_features_available=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for range-based for" >&5
+$as_echo_n "checking for range-based for... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <vector>
+int
+main ()
+{
+
+           std::vector<int> v;
+	   for (std::vector<int>::iterator i : v)
+	     *i;
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; extra_cxx1x_features_available=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    CXXFLAGS="${OLD_CXXFLAGS}"
   else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }

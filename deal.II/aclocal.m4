@@ -1006,14 +1006,14 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   OLD_CXXFLAGS="$CXXFLAGS"
   CXXFLAGS="$1"
 
-  all_cxx1x_available=yes
+  all_cxx1x_classes_available=yes
 
   AC_MSG_CHECKING(for std::array)
   AC_TRY_COMPILE(
        [#include <array>],
        [ std::array<int,3> p; p[0];],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   AC_MSG_CHECKING(for std::condition_variable)
@@ -1021,7 +1021,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [#include <condition_variable> ],
        [ std::condition_variable c; c.notify_all()],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   AC_MSG_CHECKING(for std::function and std::bind)
@@ -1031,7 +1031,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [ std::function<void (int)>
             g = std::bind (f, std::placeholders::_1, 1.1) ;],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   dnl Make sure we don't run into GCC bug 35569
@@ -1043,7 +1043,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
          using namespace std::placeholders;
          bind(multiplies<int>(),4,_1)(5); ;],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   AC_MSG_CHECKING(for std::shared_ptr)
@@ -1051,7 +1051,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [#include <memory>],
        [ std::shared_ptr<int> p(new int(3))],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   AC_MSG_CHECKING(for std::thread)
@@ -1060,7 +1060,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
         void f(int); ],
        [ std::thread t(f,1); t.join();],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   dnl On some systems with gcc 4.5.0, we can compile the code
@@ -1076,7 +1076,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
         void f(int) {}
         int main() { std::thread t(f,1); t.join(); } ],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
   CXXFLAGS="$1"
 
@@ -1085,7 +1085,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [#include <mutex> ],
        [ std::mutex m; m.lock();],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   AC_MSG_CHECKING(for std::tuple)
@@ -1093,7 +1093,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [#include <tuple>],
        [ std::tuple<int,double,char> p(1,1.1,'a')],
        [ AC_MSG_RESULT(yes) ],
-       [ AC_MSG_RESULT(no); all_cxx1x_available=no ]
+       [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
 
   CXXFLAGS="${OLD_CXXFLAGS}"
@@ -1102,7 +1102,7 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
   dnl use the corresponding flag in CXXFLAGS* to switch on support and
   dnl correspondingly use the C++ classes instead of the BOOST classes
   AC_MSG_CHECKING(whether C++1x support is complete enough)
-  if test "x$all_cxx1x_available" = "xyes" ; then
+  if test "x$all_cxx1x_classes_available" = "xyes" ; then
     AC_MSG_RESULT(yes)
 
     CXXFLAGSG="$CXXFLAGSG $1"
@@ -1110,6 +1110,45 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
 
     AC_DEFINE(DEAL_II_CAN_USE_CXX1X, 1,
               [Defined if the compiler we use supports the upcoming C++1x standard.])
+
+
+    dnl Also test for a couple C++1x things that we don't use in the library
+    dnl but that users may want to use in their applications and that we
+    dnl might want to test in the testsuite
+    OLD_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGSG"
+
+    extra_cxx1x_features_available=yes
+
+    AC_MSG_CHECKING(for auto typed variables)
+    AC_TRY_COMPILE(
+         [#include <vector>],
+         [
+           std::vector<int> v;
+	   auto i = v.begin();
+	   *i;
+         ],
+         [ AC_MSG_RESULT(yes) ],
+         [ AC_MSG_RESULT(no); extra_cxx1x_features_available=no ]
+         )
+
+    AC_MSG_CHECKING(for range-based for)
+    AC_TRY_COMPILE(
+         [#include <vector>],
+         [
+           std::vector<int> v;
+	   for (std::vector<int>::iterator i : v)
+	     *i;
+         ],
+         [ AC_MSG_RESULT(yes) ],
+         [ AC_MSG_RESULT(no); extra_cxx1x_features_available=no ]
+         )
+
+    CXXFLAGS="${OLD_CXXFLAGS}"
+
+    dnl Right now, do nothing with this information since we don't
+    dnl have any compiler that gets all this right (gcc 4.5 included)
+    dnl and that we could use to test these features.
   else
     AC_MSG_RESULT(no)
   fi
