@@ -68,7 +68,7 @@ class RelaxationBlock :
 				      * Parameters for block
 				      * relaxation methods.
 				      */
-    class AdditionalData
+    class AdditionalData : public Subscriptor
     {
       public:
 					 /**
@@ -79,16 +79,30 @@ class RelaxationBlock :
 					 /**
 					  * Constructor.
 					  */
+	AdditionalData (const double relaxation = 1.,
+			const bool invert_diagonal = true,
+			const bool same_diagonal = false);
+
+					 /**
+					  * @deprecated Since the
+					  * BlockList is now a data
+					  * member of this class, it
+					  * is not recommended anymore
+					  * to generate it independently.
+					  *
+					  * Constructor.
+					  */
 	AdditionalData (const BlockList& block_list,
 			const double relaxation = 1.,
 			const bool invert_diagonal = true,
 			const bool same_diagonal = false);
 
+
 					 /**
-					  * Pointer to the DoFHandler
-					  * providing the cells.
+					  * The mapping from indices
+					  * to blocks.
 					  */
-	SmartPointer<const BlockList, typename RelaxationBlock<MATRIX, inverse_type>::AdditionalData> block_list;
+	BlockList block_list;
 
 					 /**
 					  * Relaxation parameter.
@@ -137,7 +151,7 @@ class RelaxationBlock :
 				      * may be provided.
 				      */
     void initialize (const MATRIX& A,
-		     const AdditionalData parameters);
+		     const AdditionalData& parameters);
 
 				     /**
 				      * Deletes the inverse diagonal
@@ -229,7 +243,7 @@ class RelaxationBlock :
 				     /**
 				      * Control information.
 				      */
-    AdditionalData additional_data;
+    SmartPointer<const AdditionalData, RelaxationBlock<MATRIX,inverse_type> > additional_data;
 };
 
 

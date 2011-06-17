@@ -34,12 +34,27 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData ()
 template <class MATRIX, typename inverse_type>
 inline
 RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
+  const double relaxation,
+  const bool invert_diagonal,
+  const bool same_diagonal)
+		:
+		relaxation(relaxation),
+		invert_diagonal(invert_diagonal),
+		same_diagonal(same_diagonal),
+		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
+		threshold(0.)
+{}
+
+
+template <class MATRIX, typename inverse_type>
+inline
+RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
   const BlockList& bl,
   const double relaxation,
   const bool invert_diagonal,
   const bool same_diagonal)
 		:
-		block_list(&bl),
+		block_list(bl),
 		relaxation(relaxation),
 		invert_diagonal(invert_diagonal),
 		same_diagonal(same_diagonal),
@@ -53,19 +68,19 @@ inline
 void
 RelaxationBlock<MATRIX,inverse_type>::initialize (
   const MATRIX& M,
-  const AdditionalData parameters)
+  const AdditionalData& parameters)
 {
   Assert (parameters.invert_diagonal, ExcNotImplemented());
-
+  
   clear();
 //  Assert (M.m() == M.n(), ExcNotQuadratic());
   A = &M;
-  additional_data = parameters;
-
-  this->reinit(additional_data.block_list->size(), 0, additional_data.same_diagonal,
-	       additional_data.inversion);
-
-  if (parameters.invert_diagonal)
+  additional_data = &parameters;
+  
+  this->reinit(additional_data->block_list.size(), 0, additional_data->same_diagonal,
+	       additional_data->inversion);
+  
+  if (additional_data->invert_diagonal)
     invert_diagblocks();
 }
 
@@ -76,7 +91,6 @@ void
 RelaxationBlock<MATRIX,inverse_type>::clear ()
 {
   A = 0;
-  additional_data.block_list = 0;
   PreconditionBlockBase<inverse_type>::clear ();
 }
 
@@ -95,15 +109,15 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
     }
   else
     {
-      for (unsigned int block=0;block<additional_data.block_list->size();++block)
+      for (unsigned int block=0;block<additional_data->block_list.size();++block)
 	{
-	  const unsigned int bs = additional_data.block_list->block_size(block);
+	  const unsigned int bs = additional_data->block_list.block_size(block);
 	  M_cell.reinit(bs, bs);
 
 					   // Copy rows for this block
 					   // into the matrix for the
 					   // diagonal block
-	  BlockList::const_iterator row = additional_data.block_list->begin(block);
+	  BlockList::const_iterator row = additional_data->block_list.begin(block);
 	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
 	    {
 //TODO:[GK] Optimize here
@@ -111,7 +125,7 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
 		   entry != M.end(*row); ++entry)
 		{
 		  const unsigned int column = entry->column();
-		  const unsigned int col_cell = additional_data.block_list->local_index(block, column);
+		  const unsigned int col_cell = additional_data->block_list.local_index(block, column);
 		  if (col_cell != numbers::invalid_unsigned_int)
 		    M_cell(row_cell, col_cell) = entry->value();
 		}
@@ -137,7 +151,7 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
 	      case PreconditionBlockBase<inverse_type>::svd:
 		    this->inverse_svd(block).reinit(bs, bs);
 		    this->inverse_svd(block) = M_cell;
-		    this->inverse_svd(block).compute_inverse_svd(additional_data.threshold);
+		    this->inverse_svd(block).compute_inverse_svd(additional_data->threshold);
 		    break;
 	      default:
 		    Assert(false, ExcNotImplemented());
@@ -158,21 +172,21 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const Vector<number2> &src,
   const bool backward) const
 {
-  Assert (additional_data.invert_diagonal, ExcNotImplemented());
+  Assert (additional_data->invert_diagonal, ExcNotImplemented());
 
   const MATRIX &M=*this->A;
   Vector<number2> b_cell, x_cell;
 
-  const unsigned int n_blocks = additional_data.block_list->size();
+  const unsigned int n_blocks = additional_data->block_list.size();
   for (unsigned int bi=0;bi<n_blocks;++bi)
     {
       const unsigned int block = backward ? (n_blocks - bi - 1) : bi;
-      const unsigned int bs = additional_data.block_list->block_size(block);
+      const unsigned int bs = additional_data->block_list.block_size(block);
 
       b_cell.reinit(bs);
       x_cell.reinit(bs);
 				       // Collect off-diagonal parts
-      BlockList::const_iterator row = additional_data.block_list->begin(block);
+      BlockList::const_iterator row = additional_data->block_list.begin(block);
       for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
 	{
 	  b_cell(row_cell) = src(*row);
@@ -183,9 +197,9 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
 				       // Apply inverse diagonal
       this->inverse_vmult(block, x_cell, b_cell);
 				       // Store in result vector
-      row=additional_data.block_list->begin(block);
+      row=additional_data->block_list.begin(block);
       for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
-	dst(*row) = prev(*row) + additional_data.relaxation * x_cell(row_cell);
+	dst(*row) = prev(*row) + additional_data->relaxation * x_cell(row_cell);
     }
 }
 
