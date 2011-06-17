@@ -85,20 +85,22 @@ int main()
 	  deallog << "Block size " << blocksize << std::endl;
 
 	  const unsigned int n_blocks = dim/blocksize;
-	  BlockList blist;
-	  blist.initialize(n_blocks);
 	  std::vector<unsigned int> indices(blocksize);
 
+	  RelaxationBlock<SparseMatrix<double>,double>::AdditionalData relax_data(0.8);
+	  PreconditionBlock<SparseMatrix<double>,double>::AdditionalData prec_data(blocksize, 0.8);
+	  
 					   // The permutation vectors;
 	  std::vector<unsigned int> bperm(n_blocks);
 	  std::vector<unsigned int> ibperm(n_blocks);
 	  
+	  relax_data.block_list.initialize(n_blocks);
 	  for (unsigned int block=0;block<n_blocks;++block)
 	    {
 	      bperm[block] = n_blocks-block-1;
 	      for (unsigned int i=0;i<blocksize;++i)
 		indices[i] = i+block*blocksize;
-	      blist.add(block, indices);
+	      relax_data.block_list.add(block, indices);
 	    }
 					   // Currently, bperm is just
 					   // the inversion.
@@ -125,9 +127,6 @@ int main()
 	    iperm[perm[i]] = i;
 
 	  deallog << "Size " << bperm.size() << std::endl;
-	  
-	  RelaxationBlock<SparseMatrix<double>,double>::AdditionalData relax_data(blist, 0.8);
-	  PreconditionBlock<SparseMatrix<double>,double>::AdditionalData prec_data(blocksize, 0.8);
 	  
 	  PreconditionBlockJacobi<SparseMatrix<double>,double> prec_jacobi;
 	  prec_jacobi.initialize(A, perm, iperm, prec_data);
