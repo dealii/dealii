@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -85,8 +85,8 @@ check_vmult_quadratic(std::vector<double>& residuals,
   PreconditionBlockSOR<MATRIX, float> block_sor;
   block_sor.initialize(A, data);
   PreconditionBlockSOR<MATRIX, float> block_psor;
-  block_psor.initialize(A, data);
   block_psor.set_permutation(perm, iperm);
+  block_psor.initialize(A, data);
   
   f = 1.;
 
