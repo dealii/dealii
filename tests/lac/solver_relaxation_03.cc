@@ -145,13 +145,16 @@ int main()
 	  PreconditionBlockSSOR<SparseMatrix<double>,double> prec_bssor;
 	  prec_bssor.initialize(A, bperm, ibperm, prec_data);
 
-// 	  RelaxationBlockSOR<SparseMatrix<double>,double> relax_sor;
-// 	  relax_sor.set_permutation(bperm,ibperm);
-// 	  relax_sor.initialize(A, relax_data);
+	  relax_data.order.resize(1);
+	  relax_data.order[0].resize(bperm.size());
+	  for (unsigned int i=0;i<bperm.size();++i)
+	    relax_data.order[0][i] = bperm[i];
 	  
-// 	  RelaxationBlockSSOR<SparseMatrix<double>,double> relax_ssor;
-// 	  relax_sor.set_permutation(bperm,ibperm);
-// 	  relax_ssor.initialize(A, relax_data);
+ 	  RelaxationBlockSOR<SparseMatrix<double>,double> relax_sor;
+ 	  relax_sor.initialize(A, relax_data);
+	  
+	  RelaxationBlockSSOR<SparseMatrix<double>,double> relax_ssor;
+	  relax_ssor.initialize(A, relax_data);
 	  
 	  Vector<double>  f(dim);
 	  Vector<double>  u(dim);
@@ -180,6 +183,8 @@ int main()
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      r2 = check_solve(relax,A,u,f,prec_bsor2);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
+	      r2 = check_solve(relax,A,u,f,relax_sor);
+	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      deallog.pop();
 	      
 	      deallog.push("SSOR  ");
@@ -187,6 +192,8 @@ int main()
 	      r2 = check_solve(relax,A,u,f,prec_ssor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      r2 = check_solve(relax,A,u,f,prec_bssor);
+	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
+	      r2 = check_solve(relax,A,u,f,relax_ssor);
 	      deallog << "diff " << std::fabs(r1-r2)/r1 << std::endl;
 	      deallog.pop();
 	      

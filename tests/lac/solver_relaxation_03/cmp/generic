@@ -21,8 +21,14 @@ DEAL:SOR   ::diff 0
 DEAL:SOR   :Relaxation::Starting value 32.00
 DEAL:SOR   :Relaxation::Failure step 10 value 24.60
 DEAL:SOR   ::diff 0
+DEAL:SOR   :Relaxation::Starting value 32.00
+DEAL:SOR   :Relaxation::Failure step 10 value 24.60
+DEAL:SOR   ::diff 0
 DEAL:SSOR  :Richardson::Starting value 32.00
 DEAL:SSOR  :Richardson::Failure step 10 value 21.41
+DEAL:SSOR  :Relaxation::Starting value 32.00
+DEAL:SSOR  :Relaxation::Failure step 10 value 21.41
+DEAL:SSOR  ::diff 0
 DEAL:SSOR  :Relaxation::Starting value 32.00
 DEAL:SSOR  :Relaxation::Failure step 10 value 21.41
 DEAL:SSOR  ::diff 0
@@ -50,8 +56,14 @@ DEAL:SOR   ::diff 0
 DEAL:SOR   :Relaxation::Starting value 32.00
 DEAL:SOR   :Relaxation::Failure step 10 value 23.66
 DEAL:SOR   ::diff 0
+DEAL:SOR   :Relaxation::Starting value 32.00
+DEAL:SOR   :Relaxation::Failure step 10 value 23.66
+DEAL:SOR   ::diff 0
 DEAL:SSOR  :Richardson::Starting value 32.00
 DEAL:SSOR  :Richardson::Failure step 10 value 19.22
+DEAL:SSOR  :Relaxation::Starting value 32.00
+DEAL:SSOR  :Relaxation::Failure step 10 value 19.22
+DEAL:SSOR  ::diff 0
 DEAL:SSOR  :Relaxation::Starting value 32.00
 DEAL:SSOR  :Relaxation::Failure step 10 value 19.22
 DEAL:SSOR  ::diff 0
@@ -79,8 +91,14 @@ DEAL:SOR   ::diff 0
 DEAL:SOR   :Relaxation::Starting value 32.00
 DEAL:SOR   :Relaxation::Failure step 10 value 22.95
 DEAL:SOR   ::diff 0
+DEAL:SOR   :Relaxation::Starting value 32.00
+DEAL:SOR   :Relaxation::Failure step 10 value 22.95
+DEAL:SOR   ::diff 0
 DEAL:SSOR  :Richardson::Starting value 32.00
 DEAL:SSOR  :Richardson::Failure step 10 value 17.41
+DEAL:SSOR  :Relaxation::Starting value 32.00
+DEAL:SSOR  :Relaxation::Failure step 10 value 17.41
+DEAL:SSOR  ::diff 0
 DEAL:SSOR  :Relaxation::Starting value 32.00
 DEAL:SSOR  :Relaxation::Failure step 10 value 17.41
 DEAL:SSOR  ::diff 0
