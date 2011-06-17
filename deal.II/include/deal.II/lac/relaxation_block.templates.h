@@ -177,29 +177,39 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const MATRIX &M=*this->A;
   Vector<number2> b_cell, x_cell;
 
+  const bool permutation_empty = additional_data->order.size() == 0;
+  const unsigned int n_permutations = (permutation_empty)
+				      ? 1U : additional_data->order.size();
   const unsigned int n_blocks = additional_data->block_list.size();
-  for (unsigned int bi=0;bi<n_blocks;++bi)
+  
+  for (unsigned int perm=0; perm<n_permutations;++perm)
     {
-      const unsigned int block = backward ? (n_blocks - bi - 1) : bi;
-      const unsigned int bs = additional_data->block_list.block_size(block);
-
-      b_cell.reinit(bs);
-      x_cell.reinit(bs);
-				       // Collect off-diagonal parts
-      BlockList::const_iterator row = additional_data->block_list.begin(block);
-      for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+      for (unsigned int bi=0;bi<n_blocks;++bi)
 	{
-	  b_cell(row_cell) = src(*row);
-	  for (typename MATRIX::const_iterator entry = M.begin(*row);
-	       entry != M.end(*row); ++entry)
-	    b_cell(row_cell) -= entry->value() * prev(entry->column());
+	  unsigned int block = backward ? (n_blocks - bi - 1) : bi;
+	  if (!permutation_empty)
+	    block = additional_data->order[perm][block];
+	  
+	  const unsigned int bs = additional_data->block_list.block_size(block);
+	  
+	  b_cell.reinit(bs);
+	  x_cell.reinit(bs);
+					   // Collect off-diagonal parts
+	  BlockList::const_iterator row = additional_data->block_list.begin(block);
+	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+	    {
+	      b_cell(row_cell) = src(*row);
+	      for (typename MATRIX::const_iterator entry = M.begin(*row);
+		   entry != M.end(*row); ++entry)
+		b_cell(row_cell) -= entry->value() * prev(entry->column());
+	    }
+					   // Apply inverse diagonal
+	  this->inverse_vmult(block, x_cell, b_cell);
+					   // Store in result vector
+	  row=additional_data->block_list.begin(block);
+	  for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+	    dst(*row) = prev(*row) + additional_data->relaxation * x_cell(row_cell);
 	}
-				       // Apply inverse diagonal
-      this->inverse_vmult(block, x_cell, b_cell);
-				       // Store in result vector
-      row=additional_data->block_list.begin(block);
-      for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
-	dst(*row) = prev(*row) + additional_data->relaxation * x_cell(row_cell);
     }
 }
 

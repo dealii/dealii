@@ -135,6 +135,41 @@ class RelaxationBlock :
 					  * call to LAPACKFullMatrix::compute_inverse_svd().
 					  */
 	double threshold;
+
+					 /**
+					  * The order in which blocks
+					  * should be traversed. This
+					  * vector can initiate
+					  * several modes of
+					  * execution:
+					  *
+					  * <ol>
+					  * <li>If the length of the
+					  * vector is zero, then the
+					  * relaxation method will be
+					  * exectued from first to
+					  * last block.
+					  * <li> If the length is one,
+					  * then the inner vector must
+					  * have the same size as
+					  * the number of blocks. The
+					  * relaxation method is
+					  * applied in the order given
+					  * in this vector.
+					  * <li> If the outer vector
+					  * has length greater one,
+					  * then the relaxation method
+					  * is applied several times,
+					  * each time in the order
+					  * given by the inner vector
+					  * of the corresponding
+					  * index. This mode can for
+					  * instance be used for ADI
+					  * methods and similar
+					  * direction sweeps.
+					  * </ol>
+					  */
+	std::vector<std::vector<unsigned int> > order;
     };
 
 				     /**

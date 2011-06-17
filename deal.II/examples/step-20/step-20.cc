@@ -34,6 +34,7 @@
 				 // inverse of a matrix by calling an
 				 // iterative solver.
 #include <deal.II/lac/iterative_inverse.h>
+#include <lac/schur_matrix.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -726,86 +727,6 @@ void MixedLaplaceProblem<dim>::assemble_system ()
                                  // rather only comment on
                                  // implementational aspects.
 
-
-                                 // @sect4{The <code>SchurComplement</code> class template}
-
-                                 // The next class is the Schur
-                                 // complement class. Its rationale
-                                 // has also been discussed in length
-                                 // in the introduction. The only
-                                 // things we would like to note is
-                                 // that the class, too, is derived
-                                 // from the <code>Subscriptor</code> class and
-                                 // that as mentioned above it stores
-                                 // pointers to the entire block
-                                 // matrix and the inverse of the mass
-                                 // matrix block using
-                                 // <code>SmartPointer</code> objects.
-                                 //
-                                 // The <code>vmult</code> function requires
-                                 // two temporary vectors that we do
-                                 // not want to re-allocate and free
-                                 // every time we call this
-                                 // function. Since here, we have full
-                                 // control over the use of these
-                                 // vectors (unlike above, where a
-                                 // class called by the <code>vmult</code>
-                                 // function required these vectors,
-                                 // not the <code>vmult</code> function
-                                 // itself), we allocate them
-                                 // directly, rather than going
-                                 // through the <code>VectorMemory</code>
-                                 // mechanism. However, again, these
-                                 // member variables do not carry any
-                                 // state between successive calls to
-                                 // the member functions of this class
-                                 // (i.e., we never care what values
-                                 // they were set to the last time a
-                                 // member function was called), we
-                                 // mark these vectors as <code>mutable</code>.
-                                 //
-                                 // The rest of the (short)
-                                 // implementation of this class is
-                                 // straightforward if you know the
-                                 // order of matrix-vector
-                                 // multiplications performed by the
-                                 // <code>vmult</code> function:
-class SchurComplement : public Subscriptor
-{
-  public:
-    SchurComplement (const BlockSparseMatrix<double> &A,
-                     const IterativeInverse<Vector<double> > &Minv);
-
-    void vmult (Vector<double>       &dst,
-                const Vector<double> &src) const;
-
-  private:
-    const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const IterativeInverse<Vector<double> > > m_inverse;
-    
-    mutable Vector<double> tmp1, tmp2;
-};
-
-
-SchurComplement::SchurComplement (const BlockSparseMatrix<double> &A,
-                                  const IterativeInverse<Vector<double> > &Minv)
-                :
-                system_matrix (&A),
-                m_inverse (&Minv),
-                tmp1 (A.block(0,0).m()),
-                tmp2 (A.block(0,0).m())
-{}
-
-
-void SchurComplement::vmult (Vector<double>       &dst,
-                             const Vector<double> &src) const
-{
-  system_matrix->block(0,1).vmult (tmp1, src);
-  m_inverse->vmult (tmp2, tmp1);
-  system_matrix->block(1,0).vmult (dst, tmp2);
-}
-
-
                                  // @sect4{The <code>ApproximateSchurComplement</code> class template}
 
                                  // The third component of our solver
@@ -901,7 +822,14 @@ void MixedLaplaceProblem<dim>::solve ()
   m_inverse.solver.select("cg");
   static ReductionControl inner_control(1000, 0., 1.e-13);
   m_inverse.solver.set_control(inner_control);
-  
+
+  SchurComplement<IterativeInverse<Vector<double> >,
+    SparseMatrix<double>,
+    SparseMatrix<double>,
+    SparseMatrix<double> >
+  schur_complement (m_inverse, system_matrix.block(1,0),
+		    system_matrix.block(1,0));
+
   Vector<double> tmp (solution.block(0).size());
 
                                    // Now on to the first
@@ -925,8 +853,6 @@ void MixedLaplaceProblem<dim>::solve ()
     schur_rhs -= system_rhs.block(1);
 
     
-    SchurComplement
-      schur_complement (system_matrix, m_inverse);
     
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
