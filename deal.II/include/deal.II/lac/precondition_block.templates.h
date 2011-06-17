@@ -88,7 +88,12 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
 	       parameters.inversion);
   
   if (parameters.invert_diagonal)
-    invert_diagblocks();
+    {
+      if (permutation.size() == M.m())
+	invert_permuted_diagblocks(permutation, inverse_permutation);
+      else
+	invert_diagblocks();
+    }
 }
 
 
@@ -99,28 +104,8 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const std::vector<unsigned int>& inverse_permutation,
   const AdditionalData parameters)
 {
-  const unsigned int bsize = parameters.block_size;
-  
-  clear();
-  Assert (M.m() == M.n(), ExcNotQuadratic());
-  A = &M;
-  Assert (bsize>0, ExcIndexRange(bsize, 1, M.m()));
-  Assert (A->m()%bsize==0, ExcWrongBlockSize(bsize, A->m()));
-  blocksize=bsize;
-  relaxation = parameters.relaxation;
-  const unsigned int nblocks = A->m()/bsize;
-  this->reinit(nblocks, blocksize, parameters.same_diagonal,
-	       parameters.inversion);
-
   set_permutation(permutation, inverse_permutation);
-  
-  if (parameters.invert_diagonal)
-    {
-      if (permutation.size() == M.m())
-	invert_permuted_diagblocks(permutation, inverse_permutation);
-      else
-	invert_diagblocks();
-    }
+  initialize(M, parameters);
 }
 
 template <class MATRIX, typename inverse_type>
@@ -539,6 +524,12 @@ void PreconditionBlock<MATRIX,inverse_type>::set_permutation (
   const std::vector<unsigned int>& i)
 {
   Assert (p.size() == i.size(), ExcDimensionMismatch(p.size(), i.size()));
+
+  if (this->inverses_ready())
+    {
+      AssertDimension(p.size(), this->size());
+    }
+  
   permutation.resize(p.size());
   inverse_permutation.resize(p.size());
   for (unsigned int k=0;k<p.size();++k)

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -199,11 +199,50 @@ class PreconditionBlock
 		     const AdditionalData parameters);
 
 				     /**
-				      * Set the permutation and its
-				      * inverse. These vectors are
-				      * copied into private data, so
-				      * they can be reused or deleted
-				      * after a call to this function.
+				      * Set either the permutation of
+				      * rows or the permutation of
+				      * blocks, depending on the size
+				      * of the vector.
+				      *
+				      * If the size of the permutation
+				      * vectors is equal to the
+				      * dimension of the linear
+				      * system, it is assumed that
+				      * rows are permuted
+				      * individually. In this case,
+				      * set_permutation() must be
+				      * called before initialize(),
+				      * since the diagonal blocks are
+				      * built from the permuted
+				      * entries of the matrix.
+				      *
+				      * If the size of the permutation
+				      * vector is not equal to the
+				      * dimension of the system, the
+				      * diagonal blocks are computed
+				      * from the unpermuted
+				      * entries. Instead, the
+				      * relaxation methods step() and
+				      * Tstep() are executed applying
+				      * the blocks in the order given
+				      * by the permutation
+				      * vector. They will throw an
+				      * exception if length of this
+				      * vector is not equal to the
+				      * number of blocks.
+				      *
+				      * @note Permutation of blocks
+				      * can only be applied to the
+				      * relaxation operators step()
+				      * and Tstep(), not to the
+				      * preconditioning operators
+				      * vmult() and Tvmult().
+				      *
+				      * @note It is safe to call
+				      * set_permutation() before
+				      * initialize(), while the other
+				      * order is only admissible for
+				      * block permutation.
 				      */
     void set_permutation(const std::vector<unsigned int>& permutation,
 			 const std::vector<unsigned int>& inverse_permutation);
