@@ -51,6 +51,20 @@ for (deal_II_dimension : DIMENSIONS)
       const bool                       );
 
 
+    template
+    void
+    GridGenerator::merge_triangulations (const Triangulation<deal_II_dimension,deal_II_dimension> &triangulation_1,
+		      const Triangulation<deal_II_dimension,deal_II_dimension> &triangulation_2,
+		      Triangulation<deal_II_dimension,deal_II_dimension>       &result);
+
+#if deal_II_dimension < 3
+    template
+    void
+    GridGenerator::merge_triangulations (const Triangulation<deal_II_dimension,deal_II_dimension+1> &triangulation_1,
+		      const Triangulation<deal_II_dimension,deal_II_dimension+1> &triangulation_2,
+		      Triangulation<deal_II_dimension,deal_II_dimension+1>       &result);
+#endif
+    
 #if deal_II_dimension > 1
   template void
     GridGenerator::

@@ -2685,6 +2685,59 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
 
 
 
+template <int dim, int spacedim>
+void
+GridGenerator::
+merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
+		      const Triangulation<dim, spacedim> &triangulation_2,
+		      Triangulation<dim, spacedim>       &result)
+{
+  Assert (triangulation_1.n_levels() == 1,
+	  ExcMessage ("The input triangulations must be coarse meshes."));
+  Assert (triangulation_2.n_levels() == 1,
+	  ExcMessage ("The input triangulations must be coarse meshes."));
+  
+  // get the union of the set of vertices
+  std::vector<Point<spacedim> > vertices = triangulation_1.get_vertices();
+  vertices.insert (vertices.end(),
+		   triangulation_2.get_vertices().begin(),
+		   triangulation_2.get_vertices().end());
+  
+  // now form the union of the set of cells
+  std::vector<CellData<dim> > cells;
+  cells.reserve (triangulation_1.n_cells() + triangulation_2.n_cells());
+  for (typename Triangulation<dim,spacedim>::cell_iterator
+    cell = triangulation_1.begin(); cell != triangulation_1.end(); ++cell)
+  {
+    CellData<dim> this_cell;
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      this_cell.vertices[v] = cell->vertex_index(v);
+    this_cell.material_id = cell->material_id();
+    cells.push_back (this_cell);
+  }
+  
+  // now do the same for the other other mesh. note that we have to 
+  // translate the vertex indices
+  for (typename Triangulation<dim,spacedim>::cell_iterator
+    cell = triangulation_2.begin(); cell != triangulation_2.end(); ++cell)
+  {
+    CellData<dim> this_cell;
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      this_cell.vertices[v] = cell->vertex_index(v) + triangulation_1.n_vertices();
+    this_cell.material_id = cell->material_id();
+    cells.push_back (this_cell);
+  }
+  
+  // throw out duplicated vertices from the two meshes
+  // and create the triangulation
+  SubCellData subcell_data;
+  std::vector<unsigned int> considered_vertices;
+  GridTools::delete_duplicated_vertices (vertices, cells, subcell_data, considered_vertices);
+  result.clear ();
+  result.create_triangulation (vertices, cells, subcell_data);
+}
+
+
 
 // make the following function inline. this is so that it becomes marked
 // internal/weak for the linker and we don't get multiply defined errors

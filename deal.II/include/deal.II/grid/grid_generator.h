@@ -50,7 +50,7 @@ template <typename number> class SparseMatrix;
  * @ingroup grid
  * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan
  * Nauber, Joerg Weimar, Yaqi Wang, Luca Heltai, 1998, 1999, 2000, 2001, 2002,
- * 2003, 2006, 2007, 2008.
+ * 2003, 2006, 2007, 2008, 2009, 2010, 2011.
  */
 class GridGenerator
 {
@@ -772,6 +772,55 @@ class GridGenerator
 			 const double         r);
 
 				     /**
+				      * Given the two triangulations
+				      * specified as the first two
+				      * arguments, create the
+				      * triangulation that contains
+				      * the cells of both
+				      * triangulation and store it in
+				      * the third parameter. Previous
+				      * content of @p result will be
+				      * deleted.
+				      * 
+				      * This function is most often used 
+				      * to compose meshes for more
+				      * complicated geometries if the
+				      * geometry can be composed of
+				      * simpler parts for which functions
+				      * exist to generate coarse meshes.
+				      * For example, the channel mesh used
+				      * in step-35 could in principle be
+				      * created using a mesh created by the 
+				      * GridGenerator::hyper_cube_with_cylindrical_hole
+				      * function and several rectangles,
+				      * and merging them using the current
+				      * function. The rectangles will
+				      * have to be translated to the
+				      * right for this, a task that can
+				      * be done using the GridTools::shift
+				      * function (other tools to transform
+				      * individual mesh building blocks are
+				      * GridTools::transform, GridTools::rotate,
+				      * and GridTools::scale).
+				      * 
+				      * @note The two input triangulations
+				      * must be coarse meshes that have
+				      * no refined cells. 
+				      * 
+				      * @note for a related operation
+				      * on refined meshes when both
+				      * meshes are derived from the
+				      * same coarse mesh, see
+				      * GridTools::create_union_triangulation .
+				      */
+    template <int dim, int spacedim>
+    static
+    void
+    merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
+			  const Triangulation<dim, spacedim> &triangulation_2,
+			  Triangulation<dim, spacedim>       &result);
+
+                                     /**
 				      * This function transformes the
 				      * @p Triangulation @p tria
 				      * smoothly to a domain that is

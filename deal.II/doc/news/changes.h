@@ -198,6 +198,12 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The new function GridGenerator::merge_triangulations can be used to compose
+coarse meshes from simpler ones by merging their cells into a single
+triangulation object.
+<br>
+(Wolfgang Bangerth 2011/06/17)
+
 <li> Fixed: If an FEValues object was kept around until after the triangulation
 on which it works has been refined or coarsened, and is then reinitialized
 with a cell from the refined triangulation, it could compute wrong results or
