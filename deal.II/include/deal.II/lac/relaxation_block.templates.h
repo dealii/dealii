@@ -173,7 +173,7 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const bool backward) const
 {
   Assert (additional_data->invert_diagonal, ExcNotImplemented());
-
+  
   const MATRIX &M=*this->A;
   Vector<number2> b_cell, x_cell;
 
@@ -181,15 +181,22 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const unsigned int n_permutations = (permutation_empty)
 				      ? 1U : additional_data->order.size();
   const unsigned int n_blocks = additional_data->block_list.size();
+
+  if (!permutation_empty)
+    for (unsigned int i=0;i<additional_data->order.size();++i)
+      AssertDimension(additional_data->order[i].size(), this->size());
   
   for (unsigned int perm=0; perm<n_permutations;++perm)
     {
       for (unsigned int bi=0;bi<n_blocks;++bi)
 	{
-	  unsigned int block = backward ? (n_blocks - bi - 1) : bi;
-	  if (!permutation_empty)
-	    block = additional_data->order[perm][block];
-	  
+	  const unsigned int raw_block = backward ? (n_blocks - bi - 1) : bi;
+	  const unsigned int block = permutation_empty
+				     ? raw_block
+				     : (backward
+					? (additional_data->order[n_permutations-1-perm][raw_block])
+					: (additional_data->order[perm][raw_block]));
+
 	  const unsigned int bs = additional_data->block_list.block_size(block);
 	  
 	  b_cell.reinit(bs);
@@ -274,8 +281,8 @@ void RelaxationBlockSSOR<MATRIX,inverse_type>::step (
   Vector<number2>       &dst,
   const Vector<number2> &src) const
 {
-  this->do_step(dst, dst, src, true);
   this->do_step(dst, dst, src, false);
+  this->do_step(dst, dst, src, true);
 }
 
 
@@ -285,8 +292,8 @@ void RelaxationBlockSSOR<MATRIX,inverse_type>::Tstep (
   Vector<number2>       &dst,
   const Vector<number2> &src) const
 {
-  this->do_step(dst, dst, src, false);
   this->do_step(dst, dst, src, true);
+  this->do_step(dst, dst, src, false);
 }
 
 
