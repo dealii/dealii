@@ -753,10 +753,43 @@ class GridTools
 				      * content of @p result will be
 				      * deleted.
 				      *
-				      * The function assumes that the
-				      * two input triangulations are
-				      * derived from the same coarse
-				      * grid.
+				      * @note This function is intended
+				      * to create an adaptively refined
+				      * triangulation that contains the
+				      * <i>most refined cells</i> from
+				      * two input triangulations that
+				      * were derived from the <i>same </i>
+				      * coarse grid by adaptive refinement.
+				      * This is an operation sometimes
+				      * needed when one solves for two
+				      * variables of a coupled problem
+				      * on separately refined meshes on
+				      * the same domain (for example
+				      * because these variables have
+				      * boundary layers in different places)
+				      * but then needs to compute something
+				      * that involves both variables or
+				      * wants to output the result into a
+				      * single file. In both cases, in
+				      * order not to lose information,
+				      * the two solutions can not be
+				      * interpolated onto the respectively
+				      * other mesh because that may be
+				      * coarser than the ones on which
+				      * the variable was computed. Rather, 
+				      * one needs to have a mesh for the
+				      * domain that is at least as fine
+				      * as each of the two initial meshes.
+				      * This function computes such a mesh.
+				      * 
+				      * @note If you want to create
+				      * a mesh that is the merger of
+				      * two other coarse meshes, for
+				      * example in order to compose a mesh
+				      * for a complicated geometry from
+				      * meshes for simpler geometries,
+				      * take a look at
+				      * GridGenerator::merge_triangulations .
 				      */
     template <int dim, int spacedim>
     static
