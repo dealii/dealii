@@ -72,11 +72,6 @@ class RelaxationBlock :
     {
       public:
 					 /**
-					  * Default constructor
-					  */
-	AdditionalData ();
-
-					 /**
 					  * Constructor.
 					  */
 	AdditionalData (const double relaxation = 1.,

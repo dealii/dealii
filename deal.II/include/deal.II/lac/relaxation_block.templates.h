@@ -21,18 +21,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <class MATRIX, typename inverse_type>
 inline
-RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData ()
-		:
-		relaxation(1.),
-		invert_diagonal(true),
-		same_diagonal(false),
-		inversion(PreconditionBlockBase<inverse_type>::gauss_jordan),
-		threshold(0.)
-{}
-
-
-template <class MATRIX, typename inverse_type>
-inline
 RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
   const double relaxation,
   const bool invert_diagonal,
