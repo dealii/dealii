@@ -387,10 +387,16 @@ namespace Polynomials
 
 
 /**
- * Legendre polynomials of arbitrary degree on <tt>[0,1]</tt>.
- *
+ * Legendre polynomials of arbitrary degree.
  * Constructing a Legendre polynomial of degree <tt>p</tt>, the coefficients
  * will be computed by the three-term recursion formula.
+ *
+ * @note The polynomials defined by this class differ in two aspects by what
+ * is usually referred to as Legendre polynomials: (i) This classes defines
+ * them on the reference interval $[0,1]$, rather than the commonly used
+ * interval $[-1,1]$. (ii) The polynomials have been scaled in such a way that
+ * they are orthonormal, not just orthogonal; consequently, the polynomials do
+ * not necessarily have boundary values equal to one.
  *
  * @author Guido Kanschat, 2000
  */
