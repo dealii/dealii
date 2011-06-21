@@ -807,7 +807,19 @@ class GridGenerator
 				      * must be coarse meshes that have
 				      * no refined cells. 
 				      * 
-				      * @note for a related operation
+				      * @note The function copies the material ids
+				      * of the cells of the two input
+				      * triangulations into the output
+				      * triangulation but it currently makes
+				      * no attempt to do the same for boundary
+				      * ids. In other words, if the two
+				      * coarse meshes have anything but
+				      * the default boundary indicators,
+				      * then you will currently have to set
+				      * boundary indicators again by hand
+				      * in the output triangulation.
+				      * 
+				      * @note For a related operation
 				      * on refined meshes when both
 				      * meshes are derived from the
 				      * same coarse mesh, see
