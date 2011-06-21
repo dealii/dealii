@@ -778,8 +778,6 @@ namespace DoFTools
 				    * This is for the case where you
 				    * have fluxes but constraints as
 				    * well.
-				    * Not implemented for
-				    * hp::DoFHandler.
 				    *
 				    * @ingroup constraints
 				    */
