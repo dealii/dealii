@@ -145,13 +145,21 @@ namespace parallel
 				    * std::transform does. The difference is
 				    * that the function can run in parallel
 				    * when deal.II is configured to use
-				    * multiple threads. In that case, the last
-				    * argument denotes the minimum number each
-				    * thread can work on; the number must be
+				    * multiple threads.
+				    * 
+				    * If running in parallel, the iterator range
+				    * is split into several chunks that are
+				    * each packaged up as a task and given to
+				    * the Threading Building Blocks scheduler
+				    * to work on as compute resources are
+				    * available. The function returns once all
+				    * chunks have been worked on. The last
+				    * argument denotes the minimum number of
+				    * elements of the iterator range per
+				    * task; the number must be
 				    * large enough to amortize the startup
-				    * cost of new threads, and small enough to
-				    * ensure that (i) threads will be started
-				    * at all, and (ii) threads can be
+				    * cost of new tasks, and small enough to
+				    * ensure that tasks can be
 				    * reasonably load balanced.
 				    *
 				    * For a discussion of the kind of
@@ -201,13 +209,21 @@ namespace parallel
 				    * std::transform does. The difference is
 				    * that the function can run in parallel
 				    * when deal.II is configured to use
-				    * multiple threads. In that case, the last
-				    * argument denotes the minimum number each
-				    * thread can work on; the number must be
+				    * multiple threads.
+				    * 
+				    * If running in parallel, the iterator range
+				    * is split into several chunks that are
+				    * each packaged up as a task and given to
+				    * the Threading Building Blocks scheduler
+				    * to work on as compute resources are
+				    * available. The function returns once all
+				    * chunks have been worked on. The last
+				    * argument denotes the minimum number of
+				    * elements of the iterator range per
+				    * task; the number must be
 				    * large enough to amortize the startup
-				    * cost of new threads, and small enough to
-				    * ensure that (i) threads will be started
-				    * at all, and (ii) threads can be
+				    * cost of new tasks, and small enough to
+				    * ensure that tasks can be
 				    * reasonably load balanced.
 				    *
 				    * For a discussion of the kind of
@@ -261,13 +277,21 @@ namespace parallel
 				    * std::transform does. The difference is
 				    * that the function can run in parallel
 				    * when deal.II is configured to use
-				    * multiple threads. In that case, the last
-				    * argument denotes the minimum number each
-				    * thread can work on; the number must be
+				    * multiple threads.
+				    * 
+				    * If running in parallel, the iterator range
+				    * is split into several chunks that are
+				    * each packaged up as a task and given to
+				    * the Threading Building Blocks scheduler
+				    * to work on as compute resources are
+				    * available. The function returns once all
+				    * chunks have been worked on. The last
+				    * argument denotes the minimum number of
+				    * elements of the iterator range per
+				    * task; the number must be
 				    * large enough to amortize the startup
-				    * cost of new threads, and small enough to
-				    * ensure that (i) threads will be started
-				    * at all, and (ii) threads can be
+				    * cost of new tasks, and small enough to
+				    * ensure that tasks can be
 				    * reasonably load balanced.
 				    *
 				    * For a discussion of the kind of
@@ -372,7 +396,7 @@ namespace parallel
 				    *     parallel::apply_to_subranges
 				    *        (0, A.n_rows(),
 				    *         std_cxx1x::bind (&mat_vec_on_subranges,
-				    *                          _1, _2,
+				    *                          std_cxx1x::_1, std_cxx1x::_2,
 				    *                          std_cxx1x::cref(A),
 				    *                          std_cxx1x::cref(x),
 				    *                          std_cxx1x::ref(y)),
@@ -589,7 +613,7 @@ namespace parallel
 				    *       (parallel::accumulate_from_subranges<double>
 				    *        (0, A.n_rows(),
 				    *         std_cxx1x::bind (&mat_norm_sqr_on_subranges,
-				    *                          _1, _2,
+				    *                          std_cxx1x::_1, std_cxx1x::_2,
 				    *                          std_cxx1x::cref(A),
 				    *                          std_cxx1x::cref(x)),
 				    *         50);
@@ -633,7 +657,7 @@ namespace parallel
 				    * available CPU resources, the result may
 				    * also be $a+c+b$ or any other
 				    * permutation; because floating point
-				    * addition does not commute (as oppose, of
+				    * addition does not commute (as opposed, of
 				    * course, to addition of real %numbers),
 				    * the result of invoking this function
 				    * several times may differ on the order of
