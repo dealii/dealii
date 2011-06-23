@@ -440,17 +440,37 @@ general approach to this would go like this:
   for example, if you have a QGauss(2) quadrature formula (i.e. 4 points per
   cell in 2d, 8 points in 3d), then one would use a finite element of kind
   FE_DGQ(1), i.e. bi-/tri-linear functions as these have 4 degrees of freedom
-  per cell in 2d and 8 in 3d. There are functions that can make this
-  conversion from individual points to a global field simpler; the following
-  piece of pseudo-code should help if you use a QGauss(2) quadrature formula
-  (the prefix <code>history_</code> indicates that we work with quantities
-  related to the history variables defined in the quadrature points):
+  per cell in 2d and 8 in 3d. 
+
+- There are functions that can make this conversion from individual points to 
+  a global field simpler. The following piece of pseudo-code should help if 
+  you use a QGauss(2) quadrature formula. Note that the multiplication by the 
+  projection matrix below takes a vector of scalar components, i.e., we can only
+  convert one set of scalars at a time from the quadrature points to the degrees
+  of freedom and vice versa. So we need to store each component of stress separately, 
+  which requires <code>dim*dim</code> vectors. We'll store this set of vectors in a 2D array to
+  make it easier to read off components in the same way you would the stress tensor. 
+  Thus, we'll loop over the components of stress on each cell and store
+  these values in the global history field. (The prefix <code>history_</code> 
+  indicates that we work with quantities related to the history variables defined 
+  in the quadrature points.)  
   @code
     FE_DGQ<dim>     history_fe (1);
     DoFHandler<dim> history_dof_handler (triangulation);
     history_dof_handler.distribute_dofs (history_fe);
 
-    Vector<double>  history_field (history_dof_handler.n_dofs());
+    std::vector< std::vector< Vector<double> > > 
+                 history_field (dim, std::vector< Vector<double> >(dim)),
+                 local_history_values_at_qpoints (dim, std::vector< Vector<double> >(dim)),
+                 local_history_fe_values (dim, std::vector< Vector<double> >(dim));
+    
+    for (unsigned int i=0; i<dim; i++)
+      for (unsigned int j=0; j<dim; j++)
+      {
+        history_field[i][j].reinit(history_dof_handler.n_dofs());
+	local_history_values_at_qpoints[i][j].reinit(quadrature.size());
+	local_history_fe_values[i][j].reinit(history_fe.dofs_per_cell);
+      }
 
     FullMatrix<double> qpoint_to_dof_matrix (history_fe.dofs_per_cell,
                                              quadrature.size());
@@ -459,22 +479,42 @@ general approach to this would go like this:
 	       quadrature, quadrature,
 	       qpoint_to_dof_matrix);
 
-    Vector<double> local_history_values_at_qpoints (quadrature.size());
-    Vector<double> local_history_fe_values (fe.dofs_per_cell);
-    for (cell=...)
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),                                                   
+                                                   endc = dof_handler.end(),
+                                                   dg_cell = history_dof_handler.begin_active();
+
+    for (; cell!=endc; ++cell, ++dg_cell)
       {
-        ...collect values from quadrature points into
-             local_history_values_at_qpoints...
-        qpoint_to_dof_matrix.vmult (local_history_fe_values,
-                                    local_history_values_at_qpoints);
-        cell->set_dof_values (local_history_fe_values,
-                              history_field);
+
+        PointHistory<dim> *local_quadrature_points_history
+	       = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+          
+        Assert (local_quadrature_points_history >=
+                    &quadrature_point_history.front(),
+		    ExcInternalError());
+        Assert (local_quadrature_points_history <
+                    &quadrature_point_history.back(),
+		    ExcInternalError());
+
+        for (unsigned int i=0; i<dim; i++)
+          for (unsigned int j=0; j<dim; j++)
+          {	
+            for (unsigned int q=0; q<quadrature.size(); ++q)
+              local_history_values_at_qpoints[i][j](q) 
+                       = local_quadrature_points_history[q].old_stress[i][j];
+ 
+            qpoint_to_dof_matrix.vmult (local_history_fe_values[i][j],
+                                        local_history_values_at_qpoints[i][j]);
+
+            dg_cell->set_dof_values (local_history_fe_values[i][j],
+                                     history_field[i][j]);
+          }
       }
   @endcode
 
 - Now that we have a global field, we can refine the mesh and transfer the
   history_field vector as usual using the SolutionTransfer class. This will
-  interpolate everything from the old to the new mesh.
+  interpolate everything from the old to the new mesh. 
 
 - In a final step, we have to get the data back from the now interpolated
   global field to the quadrature points on the new mesh. The following code
@@ -487,16 +527,34 @@ general approach to this would go like this:
 	       quadrature,
 	       dof_to_qpoint_matrix);
 
-    Vector<double> local_history_values_at_qpoints (quadrature.size());
-    Vector<double> local_history_fe_values (fe.dofs_per_cell);
-    for (cell=...)
-      {
-        cell->set_get_values (history_field,
-	                      local_history_fe_values);
-        dof_to_qpoint_matrix.vmult (local_history_values_at_qpoints,
-                                    local_history_fe_values);
-        ...put values back from local_history_values_at_qpoints
-             quadrature points into...
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                   endc = dof_handler.end(),
+                                                   dg_cell = history_dof_handler.begin_active();
+  
+    for (; cell != endc; ++cell, ++dg_cell)
+    {
+      PointHistory<dim> *local_quadrature_points_history
+	     = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
+          
+      Assert (local_quadrature_points_history >=
+                  &quadrature_point_history.front(),
+		  ExcInternalError());
+      Assert (local_quadrature_points_history <
+                  &quadrature_point_history.back(),
+		  ExcInternalError());
+    
+      for (unsigned int i=0; i<dim; i++)
+        for (unsigned int j=0; j<dim; j++)
+        {	
+          dg_cell->get_dof_values (history_field[i][j],
+	                           local_history_fe_values[i][j]);
+
+          dof_to_qpoint_matrix.vmult (local_history_values_at_qpoints[i][j],
+                                      local_history_fe_values[i][j]);
+
+          for (unsigned int q=0; q<quadrature.size(); ++q)
+            local_quadrature_points_history[q].old_stress[i][j] 
+                       = local_history_values_at_qpoints[i][j](q);
       }
   @endcode
 
