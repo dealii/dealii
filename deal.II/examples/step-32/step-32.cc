@@ -1056,7 +1056,7 @@ BoussinesqFlowProblem<dim>::Parameters::Parameters (const std::string & paramete
 {
     ParameterHandler prm;
     BoussinesqFlowProblem<dim>::Parameters::declare_parameters (prm);
- 
+
     std::ifstream parameter_file (parameter_filename.c_str());
 
     if (!parameter_file)
@@ -3180,7 +3180,7 @@ template <int dim>
 unsigned int
 BoussinesqFlowProblem<dim>::Postprocessor::n_output_variables() const
 {
-  return dim + 1 + 1 + 1 + 1 + 1 + 1;
+  return get_names().size();
 }
 
 
