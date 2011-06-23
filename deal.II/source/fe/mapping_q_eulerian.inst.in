@@ -17,6 +17,7 @@ for (deal_II_dimension : DIMENSIONS)
     template class MappingQEulerian<deal_II_dimension, Vector<double> >;
 #ifdef DEAL_II_USE_PETSC
     template class MappingQEulerian<deal_II_dimension, PETScWrappers::Vector>;
+    template class MappingQEulerian<deal_II_dimension, PETScWrappers::MPI::Vector>;
 #endif
 
 #if deal_II_dimension != 3
@@ -26,6 +27,8 @@ for (deal_II_dimension : DIMENSIONS)
 #  ifdef DEAL_II_USE_PETSC
     template class MappingQEulerian<deal_II_dimension,
 				    PETScWrappers::Vector, deal_II_dimension+1>;
+    template class MappingQEulerian<deal_II_dimension,
+				    PETScWrappers::MPI::Vector, deal_II_dimension+1>;
 #  endif
 
 #endif
