@@ -64,9 +64,9 @@ void test()
       DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
       ConstraintMatrix cm;
-      DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm);
+      DoFTools::make_hanging_node_constraints (dofh, cm);
       ConstraintMatrix cm2(dof_set);
-      DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm2);
+      DoFTools::make_hanging_node_constraints (dofh, cm2);
 
       if (myid==0)
 	{

@@ -61,9 +61,9 @@ void test()
   DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
   ConstraintMatrix cm;
-  DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm);
+  DoFTools::make_hanging_node_constraints (dofh, cm);
   ConstraintMatrix cm2(dof_set);
-  DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm2);
+  DoFTools::make_hanging_node_constraints (dofh, cm2);
 
   {
     std::ofstream file((std::string("p4est_2d_constraintmatrix_01/dat.") + Utilities::int_to_string(myid)).c_str());

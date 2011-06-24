@@ -57,7 +57,7 @@ void test()
 
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
-  VectorTools::interpolate(* static_cast<DoFHandler<dim>* >(&dofh),
+  VectorTools::interpolate(dofh,
 			   ConstantFunction<dim> (1.),
 			   x_ref);
   x_ref.compress();
@@ -69,7 +69,7 @@ void test()
 				// anything
   x1 = x_ref;
   ConstraintMatrix cm(relevant_set);
-  DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm);
+  DoFTools::make_hanging_node_constraints (dofh, cm);
   cm.distribute(x1);
 
   x1 -= x_ref;

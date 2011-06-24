@@ -86,7 +86,7 @@ void test()
   x_rel.compress();
   
   ConstraintMatrix cm(relevant_set);
-  DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm);
+  DoFTools::make_hanging_node_constraints (dofh, cm);
 
 				   //x.print(std::cout);
   cm.distribute(x);

@@ -197,7 +197,7 @@ void test()
   TrilinosWrappers::MPI::Vector x;
   x.reinit(owned_set, MPI_COMM_WORLD);
 
-  VectorTools::interpolate(* static_cast<DoFHandler<dim>* >(&dofh),
+  VectorTools::interpolate(dofh,
 			   TemperatureInitialValues<dim>(),
 			   x);
   x.compress();
@@ -286,12 +286,12 @@ void test()
       x_rel.compress();
   
       ConstraintMatrix cm(relevant_set);
-      DoFTools::make_hanging_node_constraints (* static_cast<DoFHandler<dim>* >(&dofh), cm);
+      DoFTools::make_hanging_node_constraints (dofh, cm);
 /*  std::vector<bool> velocity_mask (dim+1, true);
   
     velocity_mask[dim] = false;
 				    
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(dofh),
+    VectorTools::interpolate_boundary_values (dofh,
     0,
     ZeroFunction<dim>(1),
     cm,
@@ -307,7 +307,7 @@ void test()
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
   
-  VectorTools::interpolate(* static_cast<DoFHandler<dim>* >(&dofh),
+  VectorTools::interpolate(dofh,
 			   TemperatureInitialValues<dim>(),
 			   x_ref);
   x_ref.compress();

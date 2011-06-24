@@ -62,7 +62,7 @@ void test()
 
        const IndexSet set
 	 = DoFTools::dof_indices_with_subdomain_association
-	 (static_cast<const DoFHandler<dim>&>(dofh),
+	 (dofh,
 	  tr.locally_owned_subdomain());
 
        deallog << set.n_elements() << std::endl;

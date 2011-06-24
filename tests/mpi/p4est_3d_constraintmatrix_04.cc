@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -59,7 +59,7 @@ void test ()
   IndexSet locally_relevant (dof.n_dofs());
   DoFTools::extract_locally_relevant_dofs (dof, locally_relevant);
   ConstraintMatrix constraints (locally_relevant);
-  DoFTools::make_hanging_node_constraints (static_cast<const DoFHandler<dim>&>(dof), constraints);
+  DoFTools::make_hanging_node_constraints (dof, constraints);
   constraints.close();
 
 				// print out constraints for each
