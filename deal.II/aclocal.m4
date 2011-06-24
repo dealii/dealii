@@ -1701,9 +1701,8 @@ AC_DEFUN(DEAL_II_CHECK_RPATH,
   AC_MSG_CHECKING([whether compiler understands option -Wl,-rpath])
   AC_LINK_IFELSE(
    [ AC_LANG_PROGRAM([[]],[[]])],
-     dnl Note the 'space' at the end of the string!
    [ AC_MSG_RESULT(yes)
-     LD_PATH_OPTION="-Wl,-rpath "
+     LD_PATH_OPTION="-Wl,-rpath,"
      DEAL_II_LD_UNDERSTANDS_RPATH=yes
    ],
    [ AC_MSG_RESULT(no)

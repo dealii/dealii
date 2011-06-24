@@ -28,7 +28,7 @@ of C++ 1x, we had code that simply did
 @code
   namespace std_cxx1x = std;
 @endcode
-allowing you to refer to everything that was part of the compiler's namespace 
+allowing you to refer to everything that was part of the compiler's namespace
 <code>std</code> under the alternative name. This turned out to be untenable
 in connection to the changed outlined below for _1, _2, etc. Consequently,
 if the compiler used supports C++ 1x, we now selectively import elements of the
@@ -48,7 +48,7 @@ the BOOST counterparts which are already in the global namespace. However,
 this leads to a conflict if one has a C++ 1x enabled compiler (e.g. GCC 4.6)
 <i>and</i> #includes certain BOOST headers, since the importation of symbols
 into the global namespace now leads to ambiguous names. The only solution to
-the problem is to not import names into the global namespace, but rather 
+the problem is to not import names into the global namespace, but rather
 import the names from either BOOST or namespace std into the deal.II namespace
 std_cxx1x. The downside is that all code that uses _1, _2, etc needs to be
 changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
@@ -61,6 +61,12 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: On Mac OS X, linking with some external libraries such as Trilinos
+sometimes failed due to a misconfiguration of linker flags. This should now be
+fixed.
+<br>
+(Praveen C, Martin Kronbichler, Wolfgang Bangerth, 2011/06/23)
+
 <li> Changed: Doing <code>make clean</code> was supposed to only remove object
 files but not libraries; however, it also removed the TBB libraries and a
 few executables. This has now been changed: <code>make clean</code> now only
@@ -76,22 +82,22 @@ to an output stream and later retrieved to restore the state of the program.
 <br>
 (Wolfgang Bangerth, 2011/06/13)
 
-<li> New/deprecated: The Triangulation class offers ways to get informed 
+<li> New/deprecated: The Triangulation class offers ways to get informed
 whenever the triangulation changes. Previously, the mechanism doing this
 was through the Triangulation::RefinementListener class. This has been
 deprecated and has been superceded by a BOOST signals based mechanism
 that is generally more powerful and does not rely on overloading
-particular virtual functions inherited from a base class. 
+particular virtual functions inherited from a base class.
 
 While the old mechanism should continue to work, you should consider
-upgrading. For more information on the signals mechanism, see the 
+upgrading. For more information on the signals mechanism, see the
 documentation of the Triangulation class.
 
 In addition to the change above, the new implementation now offers two
 more signals one can subscribe to: Triangulation::Signals::clead for
 when the triangulation is cleared, and Triangulation::Signals::any_change
 that can be used for any operation that changes the mesh. Furthermore,
-in a change from previous behavior, the Triangulations::Signal::create 
+in a change from previous behavior, the Triangulations::Signal::create
 signal is now also triggered when another triangulation is copied to
 the one that owns the signal.
 <br>
