@@ -58,7 +58,7 @@ void test()
   dofh.distribute_dofs (fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
-  PETScWrappers::MPI::Vector x (MPI_COMM_WORLD,dof.n_dofs(),owned_set.size());
+  PETScWrappers::MPI::Vector x (MPI_COMM_WORLD,dofh.n_dofs(),owned_set.n_elements());
 
   VectorTools::interpolate(dofh,
 			   ConstantFunction<dim>(1),
@@ -75,12 +75,8 @@ void test()
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
+  PetscInitialize(&argc,&argv,0,0);
+
 
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
 
@@ -107,7 +103,5 @@ int main(int argc, char *argv[])
       test<3>();
     }
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Finalize();
-#endif
+  PetscFinalize();
 }
