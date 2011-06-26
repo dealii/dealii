@@ -1168,7 +1168,10 @@ namespace TrilinosWrappers
       dynamic_cast<const Epetra_MpiComm*>(&vector_partitioner().Comm())->GetMpiComm(),
       double_mode,
       result);
-    Assert(result.max-result.min<1e-5,  ExcTrilinosError(0));
+    Assert(result.max-result.min<1e-5,
+	   ExcMessage ("Not all processors agree whether the last operation on "
+		       "this vector was an addition or a set operation. This will "
+		       "prevent the compress() operation from succeeding."));
 
 #  endif
 #endif
