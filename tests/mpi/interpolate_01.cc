@@ -12,8 +12,10 @@
 //---------------------------------------------------------------------------
 
 
-// check VectorTools::interpolate had trouble when one involved processor had
-// no locally owned cells
+// we got an email saying that VectorTools::interpolate had trouble
+// when one involved processor had no locally owned cells and would
+// deadlock. but it turns out that it works. there's never anything
+// wrong with having too many tests, though.
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
@@ -60,15 +62,17 @@ void test()
 
   IndexSet owned_set = dofh.locally_owned_dofs();
   TrilinosWrappers::MPI::Vector x;
+
   x.reinit(owned_set, MPI_COMM_WORLD);
 
   VectorTools::interpolate(dofh,
 			   ConstantFunction<dim>(1),
 			   x);
+  const double norm = x.l2_norm();
   if (myid == 0)
     deallog << dofh.n_locally_owned_dofs() << ' ' << dofh.n_dofs()
 	    << std::endl
-	    << x.l2_norm()
+	    << norm
 	    << std::endl;
 }
 
@@ -89,7 +93,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("interpolate_boundary_values_01").c_str());
+      std::ofstream logfile(output_file_for_mpi("interpolate_01").c_str());
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
@@ -106,7 +110,7 @@ int main(int argc, char *argv[])
       test<2>();
       test<3>();
     }
-  
+
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
   MPI_Finalize();
 #endif
