@@ -1,0 +1,13 @@
+
+DEAL::Checking ConstraintMatrix::merge with localized lines
+DEAL::Number of local lines: 20
+DEAL::Checking with open objects
+    99999890 99999993:  2.0
+    99999890: 1.4e+02
+    99999993 99999892:  0.50
+    99999993: 2.0
+DEAL::Checking with closed objects
+    99999890 99999892:  1.0
+    99999890: 1.5e+02
+    99999993 99999892:  0.50
+    99999993: 2.0
