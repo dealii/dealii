@@ -171,6 +171,9 @@ void ConstraintMatrix::add_selected_constraints
   (const ConstraintMatrix &constraints,
    const IndexSet         &filter)
 {
+  if (constraints.n_constraints() == 0)
+    return;
+
   Assert (filter.size() > constraints.lines.back().line,
 	  ExcMessage ("Filter needs to be larger than constraint matrix size."));
   for (std::vector<ConstraintLine>::const_iterator line=constraints.lines.begin();
@@ -545,9 +548,8 @@ void
 ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 			 const MergeConflictBehavior merge_conflict_behavior)
 {
-				   //TODO: this doesn't work with IndexSets yet. [TH]
-  AssertThrow(local_lines.size()==0, ExcNotImplemented());
-  AssertThrow(other_constraints.local_lines.size()==0, ExcNotImplemented());
+  AssertThrow(local_lines == other_constraints.local_lines,
+	      ExcNotImplemented());
 
 				   // store the previous state with
 				   // respect to sorting
@@ -584,7 +586,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 					   // constrained, or if we won't take
 					   // the constraint from the other
 					   // object, then simply copy it over
-	  if (!other_constraints.is_constrained(line->entries[i].first)
+	  if (other_constraints.is_constrained(line->entries[i].first) == false
 	      ||
 	      ((merge_conflict_behavior != right_object_wins)
 	       &&
@@ -615,7 +617,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 							      j->second*weight));
 
 	      line->inhomogeneity += other_constraints.get_inhomogeneity(line->entries[i].first) *
-				     line->entries[i].second;
+				     weight;
 	    }
 	}
 				       // finally exchange old and
@@ -630,7 +632,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
   for (std::vector<ConstraintLine>::const_iterator
 	 line=other_constraints.lines.begin();
        line!=other_constraints.lines.end(); ++line)
-    if (!is_constrained(line->line))
+    if (is_constrained(line->line) == false)
       lines.push_back (*line);
     else
       {
@@ -665,15 +667,17 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
 	  }
       }
 
-				   // if the object was sorted before,
-				   // then make sure it is so
-				   // afterwards as well. otherwise
-				   // leave everything in the unsorted
-				   // state
+				// update the lines cache
   unsigned int counter = 0;
   for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
        line!=lines.end(); ++line, ++counter)
-    lines_cache[line->line] = counter;
+    lines_cache[calculate_line_index(line->line)] = counter;
+
+				   // if the object was sorted before,
+				   // then make sure it is so
+				   // afterward as well. otherwise
+				   // leave everything in the unsorted
+				   // state
   if (object_was_sorted == true)
     close ();
 }
