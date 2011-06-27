@@ -514,7 +514,7 @@ namespace MemoryConsumption
   template <typename T>
   std::size_t memory_consumption (const std::vector<T> &v)
   {
-    unsigned int mem = sizeof(std::vector<T>);
+    std::size_t mem = sizeof(std::vector<T>);
     const unsigned int n = v.size();
     for (unsigned int i=0; i<n; ++i)
       mem += memory_consumption(v[i]);
@@ -527,7 +527,7 @@ namespace MemoryConsumption
   template <typename T, int N>
   std::size_t memory_consumption (const T (&v)[N])
   {
-    unsigned int mem = 0;
+    std::size_t mem = 0;
     for (unsigned int i=0; i<N; ++i)
       mem += memory_consumption(v[i]);
     return mem;
