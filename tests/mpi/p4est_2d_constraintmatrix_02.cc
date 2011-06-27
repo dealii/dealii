@@ -40,7 +40,6 @@ template<int dim>
 void test()
 {
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 

@@ -49,7 +49,6 @@ test (const unsigned int degree)
   GridGenerator::hyper_cube(tr, 0., 1.);
 
   DoFHandler<dim> dof(tr);
-  typename DoFHandler<dim>::cell_iterator c = dof.begin();
   dof.distribute_dofs(fe_rt);
 
   QTrapez<1> q_trapez;

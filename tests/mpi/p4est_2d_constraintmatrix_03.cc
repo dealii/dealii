@@ -94,14 +94,13 @@ template<int dim>
 void test()
 {
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   const double R0      = 6371000.-2890000.;
   const double R1      = 6371000.-  35000.;
 
-  
+
   GridGenerator::hyper_shell (tr,
 			      Point<dim>(),
 			      R0,
@@ -111,7 +110,7 @@ void test()
   static HyperShellBoundary<dim> boundary;
   tr.set_boundary (0, boundary);
   tr.set_boundary (1, boundary);
-  
+
   tr.refine_global (1);
   for (unsigned int step=0; step<20;++step)
         {
@@ -125,7 +124,7 @@ void test()
 
          tr.execute_coarsening_and_refinement ();
         }
- 
+
   DoFHandler<dim> dofh(tr);
 
   static FESystem<dim> fe (FE_Q<dim>(1+1), dim,
@@ -134,7 +133,7 @@ void test()
   dofh.distribute_dofs (fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
-  
+
   IndexSet dof_set;
   DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
@@ -150,27 +149,27 @@ void test()
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
   x_rel = 0;
   x_rel.compress();
-  
+
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
   std::vector<bool> velocity_mask (dim+1, true);
-  
+
   velocity_mask[dim] = false;
-				    
+
   VectorTools::interpolate_boundary_values (dofh,
 					      0,
 					      ZeroFunction<dim>(dim+1),
 					      cm,
-					      velocity_mask);				   
+					      velocity_mask);
 
     std::set<unsigned char> no_normal_flux_boundaries;
     no_normal_flux_boundaries.insert (1);
 
-				     
+
     VectorTools::compute_no_normal_flux_constraints (dofh, 0,
 						     no_normal_flux_boundaries,
 						     cm);
-				     
+
     cm.close ();
 
     cm.distribute(x);
@@ -188,7 +187,7 @@ void test()
     for (unsigned int i=0; i<dim; ++i)
       data_component_interpretation[i]
 	= DataComponentInterpretation::component_is_part_of_vector;
-    
+
     data_out.add_data_vector(x_rel, joint_solution_names,
 			     DataOut<dim>::type_dof_data,
 			     data_component_interpretation);
@@ -203,16 +202,16 @@ void test()
     TrilinosWrappers::Vector x_dub;
     x_dub.reinit(dof_set.size());
     x_dub = x_rel;
-  
+
     if (myid==0)
       {
 	std::ofstream file((std::string("p4est_2d_constraintmatrix_03/dat.") + Utilities::int_to_string(myid)).c_str());
 	file << "**** proc " << myid << std::endl;
 	x_dub.print(file);
       }
-    
+
     MPI_Barrier(MPI_COMM_WORLD);
-  
+
     if (myid==0)
       {
 	cat_file((std::string("p4est_2d_constraintmatrix_03/dat.") + Utilities::int_to_string(0)).c_str());

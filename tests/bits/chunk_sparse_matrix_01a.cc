@@ -62,10 +62,9 @@ void test (const unsigned int chunk_size)
 					   // chunk_size>1, then this isn't
 					   // necessarily true
           bool exc_thrown = false;
-          double d;
           try
             {
-              d = m(i,j);
+              m(i,j);
             }
           catch (const std::exception &)
             {

@@ -37,7 +37,7 @@ pre_refinement_notification (const std::string &prefix,
   deallog << prefix << ' ' << "Pre-refinement: " << tria.n_active_cells() << std::endl;
 }
 
-    
+
 template <int dim, int spacedim>
 void
 post_refinement_notification (const std::string &prefix,
@@ -46,7 +46,7 @@ post_refinement_notification (const std::string &prefix,
   deallog << prefix << ' ' << "Post-refinement: " << tria.n_active_cells() << std::endl;
 }
 
-    
+
 template <int dim, int spacedim>
 void
 copy_notification (const std::string &prefix,
@@ -58,7 +58,7 @@ copy_notification (const std::string &prefix,
 	  << new_tria.n_active_cells() << std::endl;
 }
 
-    
+
 template <int dim, int spacedim>
 void
 create_notification (const std::string &prefix,
@@ -115,8 +115,8 @@ void test ()
 				  std_cxx1x::_1,
 				  std_cxx1x::cref(tria_2)))
   };
-  
-  
+
+
 
 				   // this should print the create note
   GridGenerator::hyper_cube(tria_1);
@@ -134,6 +134,8 @@ void test ()
     connections_1[i].disconnect ();
 
   tria_1.refine_global (2);
+
+  (void)connections_2;
 }
 
 

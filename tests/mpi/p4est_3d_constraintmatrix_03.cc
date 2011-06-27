@@ -113,21 +113,6 @@ double
 TemperatureInitialValues<dim>::value (const Point<dim>  &p,
 				      const unsigned int) const
 {
-  const double r = p.norm();
-  const double h = R1-R0;
-
-  const double s = (r-R0)/h;
-// see http://www.wolframalpha.com/input/?i=plot+(sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))),+x%3D-1+to+1,+y%3D-1+to+1
-
-  double s_mod = s*0.95 + 0.05*sin(6.0*atan2(p(0),p(1)));
-//alternative:    http://www.wolframalpha.com/input/?i=plot+atan((sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))-0.5)*10)/pi%2B0.5,+x%3D-1+to+1,+y%3D-1+to+1
-//    s_mod = atan((s_mod-0.5)*10.0)/dealii::numbers::PI+0.5;
-
-//    return T1+(T0-T1)*(1.0-s_mod);
-
-				   //old:
-//    return T1+(T0-T1)*((1-s)*(1-s)); //old
-//    return T1+(T0-T1)*((1-s)); //linear
   return p(0)*T1+p(1)*(T0-T1); //simple
 }
 
@@ -145,9 +130,6 @@ TemperatureInitialValues<dim>::vector_value (const Point<dim> &p,
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
-
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
 

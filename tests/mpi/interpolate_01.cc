@@ -50,7 +50,6 @@ template<int dim>
 void test()
 {
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
 				   // create a mesh so that all but one
 				   // processor are empty
@@ -80,10 +79,11 @@ void test()
 int main(int argc, char *argv[])
 {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Init (&argc,&argv);
+  Utilities::System::MPI_InitFinalize mpi (argc, argv);
 #else
   (void)argc;
   (void)argv;
+  compile_time_error;
 #endif
 
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
@@ -110,8 +110,4 @@ int main(int argc, char *argv[])
       test<2>();
       test<3>();
     }
-
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  MPI_Finalize();
-#endif
 }

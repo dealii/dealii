@@ -95,7 +95,6 @@ template<int dim>
 void test()
 {
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
   
@@ -175,8 +174,8 @@ void test()
     x_rel = x;
 
 				     //l2_norm() not possible for ghosted vectors...
-    double a=0;//x_test.l2_norm();
-    double b=0;//x_rel.l2_norm();
+    //double a=0;//x_test.l2_norm();
+    //double b=0;//x_rel.l2_norm();
     
 /*    if (myid==0)
       deallog << a << " vs " << b << std::endl;

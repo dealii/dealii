@@ -114,21 +114,6 @@ double
 TemperatureInitialValues<dim>::value (const Point<dim>  &p,
 				      const unsigned int) const
 {
-  const double r = p.norm();
-  const double h = R1-R0;
-
-  const double s = (r-R0)/h;
-// see http://www.wolframalpha.com/input/?i=plot+(sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))),+x%3D-1+to+1,+y%3D-1+to+1
-
-  double s_mod = s*0.95 + 0.05*sin(6.0*atan2(p(0),p(1)));
-//alternative:    http://www.wolframalpha.com/input/?i=plot+atan((sqrt(x^2%2By^2)*0.95%2B0.05*sin(6*atan2(x,y))-0.5)*10)/pi%2B0.5,+x%3D-1+to+1,+y%3D-1+to+1
-//    s_mod = atan((s_mod-0.5)*10.0)/dealii::numbers::PI+0.5;
-
-//    return T1+(T0-T1)*(1.0-s_mod);
-
-				   //old:
-//    return T1+(T0-T1)*((1-s)*(1-s)); //old
-//    return T1+(T0-T1)*((1-s)); //linear
   return p(0)*T1+p(1)*(T0-T1); //simple
 }
 
@@ -146,15 +131,12 @@ TemperatureInitialValues<dim>::vector_value (const Point<dim> &p,
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
-
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
 
 //  GridGenerator::hyper_cube(tr);
-  
-  
+
+
   GridGenerator::hyper_shell (tr,
 			      Point<dim>(),
 			      R0,
@@ -164,7 +146,7 @@ void test()
   static HyperShellBoundary<dim> boundary;
 //  tr.set_boundary (0, boundary);
 // tr.set_boundary (1, boundary);
-  
+
   tr.refine_global (3);
   if (1)
     for (unsigned int step=0; step<5;++step)
@@ -172,22 +154,22 @@ void test()
 	typename Triangulation<dim>::active_cell_iterator
 	  cell = tr.begin_active(),
 	  endc = tr.end();
-      
+
 	for (; cell!=endc; ++cell)
 	  if (std::rand()%42==1)
 	    cell->set_refine_flag ();
-      
+
 	tr.execute_coarsening_and_refinement ();
       }
- 
+
   DoFHandler<dim> dofh(tr);
 
   static FE_Q<dim> fe(2);
-  
+
   dofh.distribute_dofs (fe);
 
   IndexSet owned_set = dofh.locally_owned_dofs();
-  
+
   IndexSet dof_set;
   DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
@@ -204,14 +186,14 @@ void test()
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
   x_rel = x;
-  
+
   for (unsigned int steps=0;steps<3;++steps)
-    { 
+    {
       {
 	typename Triangulation<dim>::active_cell_iterator
 	  cell = tr.begin_active(),
 	  endc = tr.end();
-	
+
 	for (; cell!=endc; ++cell)
 	  if (!cell->is_artificial() && !cell->is_ghost())
 	    {
@@ -219,7 +201,7 @@ void test()
 		cell->set_refine_flag ();
 	      else if (std::rand()%7==1)
 		cell->set_coarsen_flag ();
-	    }	
+	    }
       }
       for (typename Triangulation<dim>::cell_iterator
 	     cell = tr.begin();
@@ -227,7 +209,7 @@ void test()
 	{
 	  if (!cell->has_children())
 	    continue;
-	  
+
 	  bool coarsen_me = false;
 	  for (unsigned int i=0;i<cell->n_children();++i)
 	    if (cell->child(i)->coarsen_flag_set())
@@ -257,22 +239,22 @@ void test()
 
 
 
-	
+
       parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
 	trans(dofh);
       tr.prepare_coarsening_and_refinement();
-	
+
 
       trans.prepare_for_coarsening_and_refinement(x_rel);
-	
-      tr.execute_coarsening_and_refinement ();	
+
+      tr.execute_coarsening_and_refinement ();
 
       static FE_Q<dim> fe(1);
-  
+
       dofh.distribute_dofs (fe);
 
       owned_set = dofh.locally_owned_dofs();
-  
+
       DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
       DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
@@ -280,17 +262,17 @@ void test()
       x.reinit(owned_set, MPI_COMM_WORLD);
 
       trans.interpolate(x);
-      
+
       x_rel.reinit(relevant_set, MPI_COMM_WORLD);
       x_rel = 0;
       x_rel.compress();
-  
+
       ConstraintMatrix cm(relevant_set);
       DoFTools::make_hanging_node_constraints (dofh, cm);
 /*  std::vector<bool> velocity_mask (dim+1, true);
-  
+
     velocity_mask[dim] = false;
-				    
+
     VectorTools::interpolate_boundary_values (dofh,
     0,
     ZeroFunction<dim>(1),
@@ -306,27 +288,27 @@ void test()
 
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
-  
+
   VectorTools::interpolate(dofh,
 			   TemperatureInitialValues<dim>(),
 			   x_ref);
   x_ref.compress();
-  
+
   x_ref -= x;
   double err = x_ref.linfty_norm();
   if (err>1.0e-12)
     if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
       deallog << "err:" << err << std::endl;
-  
+
 //	x_rel=x_ref; //uncomment to output error
-  
+
   std::vector<std::string> solution_names(1,"T");
-  
+
   FilteredDataOut<dim> data_out (tr.locally_owned_subdomain());
   data_out.attach_dof_handler (dofh);
-  
+
   data_out.add_data_vector(x_rel, solution_names);
-  
+
   data_out.build_patches (1);
   const std::string filename = ("p4est_2d_constraintmatrix_04/solution." +
 				Utilities::int_to_string
@@ -334,7 +316,7 @@ void test()
 				".d2");
   std::ofstream output (filename.c_str());
   data_out.write_deal_II_intermediate (output);
-  
+
   tr.set_boundary (0);
   tr.set_boundary (1);
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)

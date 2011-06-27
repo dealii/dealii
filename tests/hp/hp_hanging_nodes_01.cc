@@ -61,13 +61,13 @@ int generate_grid (Triangulation<dim> &tria)
       p1(d) = 0;
       p2(d) = (d == 0) ? 2.0 : 1.0;
       sub_div.push_back ( (d == 0) ? 2 : 1);
-    }  
+    }
   GridGenerator::subdivided_hyper_rectangle (tria, sub_div, p1, p2, true);
 
 				   // Refine the first cell.
   tria.begin_active ()->set_refine_flag ();
   tria.execute_coarsening_and_refinement ();
-  
+
   return (0);
 }
 
@@ -99,19 +99,19 @@ void test_constraints (hp::FECollection<dim> &fe_coll)
       cell->set_active_fe_index (fe_indx);
       ++fe_indx;
     }
-  
+
 				   // Distribute DoFs;
   dof_handler.distribute_dofs (fe_coll);
   deallog << "DoFs: " << dof_handler.n_dofs () << std::endl;
-  
+
 				   // Create the constraints.
   ConstraintMatrix constraint_matrix;
-  
+
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   constraint_matrix);
 
 				   // Output the constraints
-  constraint_matrix.print (deallog.get_file_stream ());  
+  constraint_matrix.print (deallog.get_file_stream ());
 }
 
 
@@ -133,16 +133,14 @@ void test_constraints_old (FiniteElement<dim> &fe)
 				   // active_fe_indices to
 				   // the different cells.
   DoFHandler<dim> dof_handler (tria);
-  typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active (),
-						 endc = dof_handler.end ();
-  
+
 				   // Distribute DoFs;
   dof_handler.distribute_dofs (fe);
   deallog << "DoFs: " << dof_handler.n_dofs () << std::endl;
-  
+
 				   // Create the constraints.
   ConstraintMatrix constraint_matrix;
-  
+
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   constraint_matrix);
 
@@ -150,15 +148,15 @@ void test_constraints_old (FiniteElement<dim> &fe)
   constraint_matrix.print (deallog.get_file_stream ());
 }
 
-int main () 
+int main ()
 {
   std::ofstream logfile("hp_hanging_nodes_01/output");
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   FE_Q<2> fe_1 (1);
   FE_Q<2> fe_2 (2);
   FE_Q<2> fe_3 (3);
@@ -169,8 +167,8 @@ int main ()
   fe_coll2.push_back (fe_2);
 
   fe_coll2.push_back (fe_2);
-  fe_coll2.push_back (fe_3); 
-  
+  fe_coll2.push_back (fe_3);
+
   test_constraints<2> (fe_coll2);
 
   test_constraints_old<2> (fe_1);
