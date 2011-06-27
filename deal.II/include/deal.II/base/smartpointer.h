@@ -124,7 +124,7 @@ class SmartPointer
 				      * subscription.
 				      */
     ~SmartPointer();
-    
+
 				     /**
 				      * Assignment operator for normal
 				      * pointers. The pointer
@@ -132,7 +132,7 @@ class SmartPointer
 				      * automatically and unsubscribes
 				      * to an old one if it exists. It
 				      * will not try to subscribe to a
-				      * null-pointer, but stilll
+				      * null-pointer, but still
 				      * delete the old subscription.
 				      */
     SmartPointer<T,P> & operator= (T *tt);
@@ -161,12 +161,12 @@ class SmartPointer
 				      * and set the pointer to zero.
 				      */
     void clear ();
-    
+
 				     /**
 				      * Conversion to normal pointer.
 				      */
     operator T* () const;
-    
+
 				     /**
 				      * Dereferencing operator. This
 				      * operator throws an
@@ -174,7 +174,7 @@ class SmartPointer
 				      * pointer is a null pointer.
 				      */
     T& operator * () const;
-    
+
 				     /**
 				      * Dereferencing operator. This
 				      * operator throws an
@@ -230,7 +230,7 @@ class SmartPointer
 				      * by the object pointed to.
 				      */
     std::size_t memory_consumption () const;
-    
+
   private:
 				     /**
 				      * Pointer to the object we want
@@ -343,7 +343,7 @@ SmartPointer<T,P> & SmartPointer<T,P>::operator = (T *tt)
 				   // requested
   if (t == tt)
     return *this;
-  
+
   if (t != 0)
     t->unsubscribe(id);
   t = tt;
@@ -365,7 +365,7 @@ SmartPointer<T,P>::operator = (const SmartPointer<T,Q>& tt)
 				   // the same, then this is a no-op
   if (&tt == this)
     return *this;
-  
+
   if (t != 0)
     t->unsubscribe(id);
   t = static_cast<T*>(tt);
@@ -386,7 +386,7 @@ SmartPointer<T,P>::operator = (const SmartPointer<T,P>& tt)
 				   // the same, then this is a no-op
   if (&tt == this)
     return *this;
-  
+
   if (t != 0)
     t->unsubscribe(id);
   t = static_cast<T*>(tt);
@@ -448,7 +448,7 @@ void SmartPointer<T,P>::swap (T *&tt)
 {
   if (t != 0)
     t->unsubscribe (id);
-  
+
   std::swap (t, tt);
 
   if (t != 0)
