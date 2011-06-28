@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -203,7 +202,9 @@ namespace parallel
 				    * An algorithm that performs the action
 				    * <code>*out++ = predicate(*in1++, *in2++)</code>
 				    * where the <code>in1</code> iterator
-				    * ranges over the given input range.
+				    * ranges over the given input
+				    * range, using the parallel for
+				    * operator of tbb.
 				    *
 				    * This algorithm does pretty much what
 				    * std::transform does. The difference is
