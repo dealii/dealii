@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2009 by Michael Rapson and the deal.II authors
 //

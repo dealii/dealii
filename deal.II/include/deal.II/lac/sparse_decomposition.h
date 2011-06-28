@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff

@@ -1,6 +1,5 @@
 //----------------------------  fe_collection.h  ---------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2006 by the deal.II authors
 //

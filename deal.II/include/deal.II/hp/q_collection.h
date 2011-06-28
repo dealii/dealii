@@ -1,6 +1,5 @@
 //----------------------------  q_collection.h  ----------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //

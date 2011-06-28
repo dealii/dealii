@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //    Author: Toby D. Young, Polish Academy of Sciences, 2009
 //
 //    Copyright (C) 2009 by the deal.II authors

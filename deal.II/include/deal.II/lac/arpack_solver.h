@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //    Authors: Bärbel Janssen, University of Heidelberg, 
 //    Agnieszka Miedler, TU Berlin, 2010
 //

@@ -1,6 +1,5 @@
 //----------------------------  hp_dof_levels.h  ------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2003, 2006, 2008 by the deal.II authors
 //
