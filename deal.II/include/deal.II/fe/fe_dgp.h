@@ -34,8 +34,11 @@ template <int dim, int spacedim> class MappingQ;
  * DGP space has only three unknowns for each quadrilateral, it is
  * immediately clear that this element can not be continuous.
  *
- * The basis functions for this element are chosen to form a Legendre
- * basis on the unit square. Thus, the mass matrix is diagonal, if the
+ * The basis functions used in this element for the space described above
+ * are chosen to form a Legendre basis on the unit square. As a consequence,
+ * the first basis function of this element is always the function that
+ * is constant and equal to one.  As a result of the orthogonality of
+ * the basis functions, the mass matrix is diagonal if the
  * grid cells are parallelograms. Note that this is in contrast to the
  * FE_DGPMonomial class that actually uses the monomial basis listed
  * above as basis functions.
@@ -43,10 +46,25 @@ template <int dim, int spacedim> class MappingQ;
  * The shape functions are defined in the class PolynomialSpace. The
  * polynomials used inside PolynomialSpace are Polynomials::Legendre
  * up to degree <tt>p</tt> given in FE_DGP. For the ordering of the
- * basis functions, refer to PolynomialSpace, remebering that the
+ * basis functions, refer to PolynomialSpace, remembering that the
  * Legendre polynomials are ordered by ascending degree.
  *
- * This class if partially implemented for the codimension one case
+ * @note This element is not defined by finding shape functions within
+ * the given function space that interpolate a particular set of points.
+ * Consequently, there are no support points to which a given function
+ * could be interpolated; finding a finite element function that approximates
+ * a given function is therefore only possible through projection, rather
+ * than interpolation. Secondly, the shape functions of this element do not
+ * jointly add up to one. As a consequence of this, adding or subtracting
+ * a constant value -- such as one would do to make a function have mean
+ * value zero -- can not be done by simply subtracting the constant value
+ * from each degree of freedom. Rather, one needs to use the fact that the
+ * first basis function is constant equal to one and simply subtract the
+ * constant from the value of the degree of freedom corresponding to this
+ * first shape function on each cell.
+ *
+ * 
+ * @note This class is only partially implemented for the codimension one case
  * (<tt>spacedim != dim </tt>), since no passage of information
  * between meshes of different refinement level is possible because
  * the embedding and projection matrices are not computed in the class
