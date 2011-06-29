@@ -10908,7 +10908,9 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 $as_echo_n "checking whether Sacado_cmath.hpp is C++11 compatible... " >&6; }
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-Sacado_cmath.hpp
+
+        #include <Sacado_cmath.hpp>
+
 int
 main ()
 {

@@ -6550,7 +6550,10 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
     CXX_FLAGS_SAVED="$CXXFLAGS"
     CXXFLAGS="$CXXFLAGSG -I$DEAL_II_TRILINOS_INCDIR"
     AC_MSG_CHECKING([whether Sacado_cmath.hpp is C++11 compatible])
-    AC_TRY_COMPILE([Sacado_cmath.hpp],
+    AC_TRY_COMPILE(
+      [
+        #include <Sacado_cmath.hpp>
+      ],
       [;],
       [
         AC_MSG_RESULT([yes])
