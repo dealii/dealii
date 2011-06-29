@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1949,7 +1949,7 @@ class VectorTools
 				      * called in a preconditioner and
 				      * generates updates with mean value
 				      * zero. The mean value is computed as
-				      * the mean value of the degree of
+				      * the mean value of the degrees of
 				      * freedom values as given by the input
 				      * vector; they are not weighted by the
 				      * area of cells, i.e. the mean is
@@ -1961,8 +1961,8 @@ class VectorTools
 				      * however.
 				      *
 				      * Apart from the vector @p v to operate
-				      * on, this function takes a bit
-				      * vector. This has a true entry for
+				      * on, this function takes a boolean mask
+				      * that has a true entry for
 				      * every component for which the mean
 				      * value shall be computed and later
 				      * subtracted. The argument is used to
@@ -1971,6 +1971,34 @@ class VectorTools
 				      * pressure, and avoid touching all other
 				      * components of the vector, such as the
 				      * velocity components.
+				      *
+				      * @note In the context of using this
+				      * function to filter out the kernel of
+				      * an operator (such as the null space of
+				      * the Stokes operator that consists of
+				      * the constant pressures), this function
+				      * only makes sense for finite elements
+				      * for which the null space indeed
+				      * consists of the vector
+				      * $(1,1,\ldots,1)^T$. This is the case
+				      * for example for the usual Lagrange
+				      * elements where the sum of all shape
+				      * functions equals the function that is
+				      * constant one. However, it is not true
+				      * for some other functions: for example,
+				      * for the FE_DGP element (another valid
+				      * choice for the pressure in Stokes
+				      * discretizations), the first shape
+				      * function on each cell is constant
+				      * while further elements are $L_2$
+				      * orthogonal to it (on the reference
+				      * cell); consequently, the sum of all
+				      * shape functions is not equal to one,
+				      * and the vector that is associated with
+				      * the constant mode is not equal to
+				      * $(1,1,\ldots,1)^T$. For such elements,
+				      * a different procedure has to be used
+				      * when subtracting the mean value.
 				      */
     static void subtract_mean_value(Vector<double>          &v,
 				    const std::vector<bool> &p_select);
