@@ -6543,6 +6543,27 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_HEADER_FILES, dnl
   echo "#undef HAVE_INTTYPES_H" >> confdefs.h
   echo "#endif" >> confdefs.h
 
+  dnl Sacado_cmath.hpp does things that aren't compatible
+  dnl with the -std=c++0x flag of GCC, see deal.II FAQ.
+  dnl Test whether that is indeed the case
+  if test -f $DEAL_II_TRILINOS_INCDIR/Sacado_cmath.hpp ; then
+    CXX_FLAGS_SAVED="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGSG -I$DEAL_II_TRILINOS_INCDIR"
+    AC_MSG_CHECKING([whether Sacado_cmath.hpp is C++11 compatible])
+    AC_TRY_COMPILE([Sacado_cmath.hpp],
+      [;],
+      [
+        AC_MSG_RESULT([yes])
+      ],
+      [
+        AC_MSG_RESULT([no])
+        AC_MSG_ERROR([*** Your Trilinos installation is not compatible with the C++ standard selected for this compiler. See the deal.II FAQ page for a solution. ***])
+      ])
+  else
+    AC_MSG_ERROR([File $DEAL_II_TRILINOS_INCDIR/Sacado_cmath.hpp not found.])
+  fi
+
+  dnl Now just check that all headers we need are in fact there
   AC_CHECK_HEADERS([Amesos.h \
                     Epetra_CrsGraph.h \
                     Epetra_CrsMatrix.h \

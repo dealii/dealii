@@ -10901,7 +10901,40 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   echo "#undef HAVE_INTTYPES_H" >> confdefs.h
   echo "#endif" >> confdefs.h
 
-  for ac_header in Amesos.h \
+        if test -f $DEAL_II_TRILINOS_INCDIR/Sacado_cmath.hpp ; then
+    CXX_FLAGS_SAVED="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGSG -I$DEAL_II_TRILINOS_INCDIR"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether Sacado_cmath.hpp is C++11 compatible" >&5
+$as_echo_n "checking whether Sacado_cmath.hpp is C++11 compatible... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+Sacado_cmath.hpp
+int
+main ()
+{
+;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        as_fn_error $? "*** Your Trilinos installation is not compatible with the C++ standard selected for this compiler. See the deal.II FAQ page for a solution. ***" "$LINENO" 5
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  else
+    as_fn_error $? "File $DEAL_II_TRILINOS_INCDIR/Sacado_cmath.hpp not found." "$LINENO" 5
+  fi
+
+    for ac_header in Amesos.h \
                     Epetra_CrsGraph.h \
                     Epetra_CrsMatrix.h \
                     Epetra_Import.h \
