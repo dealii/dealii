@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007, 2008 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,10 +12,9 @@
 //----------------------------------------------------------------------
 
 
-// no normal flux constraints on a hyper cube for all faces
-// this caused ExcMessage (\"Cycle in constraints detected!\")"
-// in 3d with a higher order mapping.
-// TH: change mapping to order <4 and it works.
+// no normal flux constraints on a hyper cube for all faces this caused
+// ExcMessage (\"Cycle in constraints detected!\")" in 3d with a higher order
+// mapping.  to make things even weirder, mappings of order <4 work.
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -33,28 +32,6 @@
 #include <fstream>
 
 
-template<int dim>
-void test (const Triangulation<dim>& tr,
-		      const FiniteElement<dim>& fe)
-{
-  DoFHandler<dim> dof(tr);
-  dof.distribute_dofs(fe);
-
-      deallog << "FE=" << fe.get_name()
-	      << std::endl;
-
-      std::set<unsigned char> boundary_ids;
-      boundary_ids.insert (0);
-
-      ConstraintMatrix cm;
-      const MappingQ<dim>                 mapping(4);
-      VectorTools::compute_no_normal_flux_constraints (dof, 0, boundary_ids, cm, mapping);
-      cm.close();
-      
-
-      cm.print (deallog.get_file_stream ());
-}
-
 
 template<int dim>
 void test_hyper_cube()
@@ -62,13 +39,26 @@ void test_hyper_cube()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
   
-  tr.refine_global(0);
+  FESystem<dim> fe (FE_Q<dim>(2), dim);
 
-  for (unsigned int degree=1; degree<4; ++degree)
-    {
-      FESystem<dim> fe (FE_Q<dim>(degree), dim);
-      test(tr, fe);
-    }
+  DoFHandler<dim> dof(tr);
+  dof.distribute_dofs(fe);
+
+  deallog << "FE=" << fe.get_name()
+	  << std::endl;
+
+  std::set<unsigned char> boundary_ids;
+  boundary_ids.insert (0);
+
+  ConstraintMatrix cm;
+  const MappingQ<dim> mapping(4);
+  VectorTools::compute_no_normal_flux_constraints (dof, 0,
+						   boundary_ids, cm,
+						   mapping);
+  cm.close();
+      
+
+  cm.print (deallog.get_file_stream ());
 }
 
 
