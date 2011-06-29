@@ -912,21 +912,21 @@ struct GeometryInfo<0>
  *
  * The ordering of vertices and faces (lines) in 2d is defined by
  *
- * N1) vertices are numbered in lexicographic ordering
+ * - Vertices are numbered in lexicographic ordering
  *
- * N2) faces (lines in 2d): first the two faces with normals in x-
- * and then y-direction. For each two faces: first the face with
- * normal in negative coordinate direction, then the one with normal
- * in positive direction, i.e. the faces are ordered according to
- * their normals pointing in -x, x, -y, y direction.
+ * - Faces (lines in 2d): first the two faces with normals in x-
+ *   and then y-direction. For each two faces: first the face with
+ *   normal in negative coordinate direction, then the one with normal
+ *   in positive direction, i.e. the faces are ordered according to
+ *   their normals pointing in -x, x, -y, y direction.
  *
- * N3) the direction of a line is represented by the direction of
- * point 0 towards point 1 and is always in one of the coordinate
- * directions
+ * - The direction of a line is represented by the direction of
+ *   point 0 towards point 1 and is always in one of the coordinate
+ *   directions
  *
- * N4) face lines in 3d are ordered, such that the induced 2d local
- * coordinate system (x,y) implies (right hand rule) a normal in
- * face normal direction, see N2/.
+ * - Face lines in 3d are ordered, such that the induced 2d local
+ *   coordinate system (x,y) implies (right hand rule) a normal in
+ *   face normal direction, see N2/.
  *
  * The resulting numbering of vertices and faces (lines) in 2d as
  * well as the directions of lines is shown in the following.
@@ -1007,9 +1007,9 @@ struct GeometryInfo<0>
  * <h4>Vertices</h4>
  *
  * The ordering of vertices in 3d is defined by the same rules as in
- * the 2d case, i.e.
+ * the 2d case. In particular, the following is still true:
  *
- * N1) vertices are numbered in lexicographic ordering.
+ * - Vertices are numbered in lexicographic ordering.
  *
  * Hence, the vertices are numbered as follows
  * @verbatim
@@ -1036,12 +1036,12 @@ struct GeometryInfo<0>
  *
  * Here, the same holds as for the vertices:
  *
- * N4) line ordering in 3d:
- * <ul>
+ * - Line ordering in 3d:
+ *   <ul>
  *   <li>first the lines of face (z=0) in 2d line ordering,
  *   <li>then the lines of face (z=1) in 2d line ordering,
  *   <li>finally the lines in z direction in lexicographic ordering
- * </ul>
+ *   </ul>
  * @verbatim
  *       *---7---*        *---7---*
  *      /|       |       /       /|
@@ -1054,7 +1054,7 @@ struct GeometryInfo<0>
  *   |/       /       |       |/
  *   *---2---*        *---2---*
  * @endverbatim
- * As in 2d lines are directed in coordinate directions, see N3.
+ * As in 2d lines are directed in coordinate directions.
  * @verbatim
  *       *--->---*        *--->---*
  *      /|       |       /       /|
@@ -1085,7 +1085,7 @@ struct GeometryInfo<0>
  *
  * The numbering of faces in 3d is defined by a rule analogous to 2d:
  *
- * N2a) faces (quads in 3d): first the two faces with normals in x-,
+ * - Faces (quads in 3d): first the two faces with normals in x-,
  * then y- and z-direction. For each two faces: first the face with
  * normal in negative coordinate direction, then the one with normal
  * in positive direction, i.e. the faces are ordered according to
