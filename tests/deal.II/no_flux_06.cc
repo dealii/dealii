@@ -28,6 +28,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vectors.h>
+#include <deal.II/numerics/vectors.templates.h>
 
 #include <fstream>
 
@@ -37,7 +38,7 @@ template<int dim>
 void test_hyper_cube()
 {
   Triangulation<dim> tr;
-  GridGenerator::hyper_cube(tr);
+  GridGenerator::hyper_rectangle(tr, Point<dim>(), Point<dim>(1,1,1), true);
   
   FESystem<dim> fe (FE_Q<dim>(2), dim);
 
@@ -48,8 +49,9 @@ void test_hyper_cube()
 	  << std::endl;
 
   std::set<unsigned char> boundary_ids;
-  boundary_ids.insert (0);
-
+  boundary_ids.insert (1);
+  boundary_ids.insert (3);
+  
   ConstraintMatrix cm;
   const MappingQ<dim> mapping(4);
   VectorTools::compute_no_normal_flux_constraints (dof, 0,

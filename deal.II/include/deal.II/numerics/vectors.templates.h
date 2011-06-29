@@ -2285,7 +2285,7 @@ namespace internal
 			constraints.add_entry (dof_indices.dof_indices[1],
 					       dof_indices.dof_indices[0],
 					       -constraining_vector[0]/constraining_vector[1]);
-
+		      
 		      if (std::fabs (constraining_vector[2]/constraining_vector[1])
 			  > std::numeric_limits<double>::epsilon())
 			constraints.add_entry (dof_indices.dof_indices[1],
@@ -4165,12 +4165,12 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 	if (boundary_ids.find(cell->face(face_no)->boundary_indicator())
 	    != boundary_ids.end())
 	  {
-	  	const FiniteElement<dim>& fe = cell->get_fe ();
+	    const FiniteElement<dim>& fe = cell->get_fe ();
 	    typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
 					     // get the indices of the
 					     // dofs on this cell...
-        face_dofs.resize (fe.dofs_per_face);
+	    face_dofs.resize (fe.dofs_per_face);
 	    face->get_dof_indices (face_dofs, cell->active_fe_index());
 
 					     // ...and the normal
@@ -4218,12 +4218,73 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 		    Assert (vector_dofs.dof_indices[d] < dof_handler.n_dofs(),
 			    ExcInternalError());
 
-						   // and enter the
+						   // we need the normal
+						   // vector on this face. we
+						   // know that it is a vector
+						   // of length 1 but at least
+						   // with higher order
+						   // mappings it isn't always
+						   // possible to guarantee
+						   // that each component is
+						   // exact up to zero
+						   // tolerance. in
+						   // particular, as shown in
+						   // the deal.II/no_flux_06
+						   // test, if we just take
+						   // the normal vector as
+						   // given by the fe_values
+						   // object, we can get
+						   // entries in the normal
+						   // vectors of the unit cube
+						   // that have entries up to
+						   // several times 1e-14.
+						   //
+						   // the problem with this is
+						   // that this later yields
+						   // constraints that are
+						   // circular (e.g., in the
+						   // testcase, we get
+						   // constraints of the form
+						   //
+						   // x22 =  2.93099e-14*x21 + 2.93099e-14*x23
+						   // x21 = -2.93099e-14*x22 + 2.93099e-14*x21
+						   //
+						   // in both of these
+						   // constraints, the small
+						   // numbers should be zero
+						   // and the constraints
+						   // should simply be
+						   //    x22 = x21 = 0
+						   //
+						   // to achieve this, we
+						   // utilize that we know
+						   // that the normal vector
+						   // has (or should have)
+						   // length 1 and that we can
+						   // simply set small
+						   // elements to zero
+						   // (without having to check
+						   // that they are small
+						   // *relative to something
+						   // else*). we do this and
+						   // then normalize the
+						   // length of the vector
+						   // back to one, just to be
+						   // on the safe side
+		  Point<dim> normal_vector = fe_values.normal_vector(i);
+		  Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
+			  ExcInternalError());
+		  for (unsigned int d=0; d<dim; ++d)
+		    if (std::fabs(normal_vector[d]) < 1e-13)
+		      normal_vector[d] = 0;
+		  normal_vector /= normal_vector.norm();
+
+						   // now enter the
 						   // (dofs,(normal_vector,cell))
 						   // entry into the map
 		  dof_to_normals_map
 		    .insert (std::make_pair (vector_dofs,
-					     std::make_pair (fe_values.normal_vector(i),
+					     std::make_pair (normal_vector,
 							     cell)));
 		}
 	  }
@@ -4355,7 +4416,7 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 					     // then construct constraints
 					     // from this:
 	    const internal::VectorTools::VectorDoFTuple<dim> &
-	      dof_indices = same_dof_range[0]->first;
+	      dof_indices = same_dof_range[0]->first;	      
 	    internal::VectorTools::add_constraint (dof_indices, normal,
 						   constraints);
 
