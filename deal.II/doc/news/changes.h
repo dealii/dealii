@@ -21,6 +21,10 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> Removed: deal.II no longer supports Trilinos versions prior to 10.0.
+<br>
+(Wolfgang Bangerth, 2011/06/29)
+
 <li> Changed: deal.II has a namespace std_cxx1x that was used to
 import classes from BOOST that are part of the upcoming C++ 1x standard. On
 the other hand, if your compiler supported a sufficiently large subset
@@ -61,6 +65,14 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: deal.II can link with Trilinos but previously it required a
+very specific set of Trilinos sub-libraries; if Trilinos had been compiled
+with a larger set of sub-libraries, linking would sometimes fail. This
+has now been made more generic and deal.II obtains the proper set of
+libraries from Trilinos.
+<br>
+(Wolfgang Bangerth, 2011/06/29)
+
 <li> Fixed: On Mac OS X, linking with some external libraries such as Trilinos
 sometimes failed due to a misconfiguration of linker flags. This should now be
 fixed.

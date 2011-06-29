@@ -202,31 +202,10 @@ ifeq ($(USE_CONTRIB_METIS),yes)
 endif
 
 # List all trilinos libraries that we want to link with. These must be sorted
-# in dependency order to allow for static linking where the order on the
-# command line matters. Note that we check the availability of all these
-# libraries in aclocal.m4; the two lists should therefore be kept in
-# sync.
+# in dependency order for linking. Fortunately, we can get the set of
+# libraries from Trilinos's cmake files.
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
-  DEAL_II_TRILINOS_LIBS = \
-		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosamesos \
-		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosaztecoo \
-		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosifpack \
-		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikosml \
-		$(DEAL_II_TRILINOS_LIBPREFIX)stratimikos \
-		$(DEAL_II_TRILINOS_LIBPREFIX)ml \
-		$(DEAL_II_TRILINOS_LIBPREFIX)amesos \
-		$(DEAL_II_TRILINOS_LIBPREFIX)belos \
-		$(DEAL_II_TRILINOS_LIBPREFIX)ifpack \
-                $(DEAL_II_TRILINOS_LIBPREFIX)aztecoo \
-		$(DEAL_II_TRILINOS_LIBPREFIX)rtop \
-		$(DEAL_II_TRILINOS_LIBPREFIX)sacado \
-		$(DEAL_II_TRILINOS_LIBPREFIX)thyra \
-		$(DEAL_II_TRILINOS_LIBPREFIX)thyraepetra \
-		$(DEAL_II_TRILINOS_LIBPREFIX)thyraepetraext \
-		$(DEAL_II_TRILINOS_LIBPREFIX)epetraext \
-		$(DEAL_II_TRILINOS_LIBPREFIX)epetra \
-		$(DEAL_II_TRILINOS_LIBPREFIX)teuchos \
-		$(DEAL_II_TRILINOS_LIBPREFIX)triutils
+  DEAL_II_TRILINOS_LIBS = $(addprefix $(DEAL_II_TRILINOS_LIBPREFIX), @DEAL_II_TRILINOS_LIBS@)
 
   ifeq ($(enable-shared),yes)
     lib-contrib-trilinos = \

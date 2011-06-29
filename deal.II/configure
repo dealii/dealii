@@ -650,6 +650,7 @@ DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR
 DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR
 DEAL_II_EXPAND_TRILINOS_MPI_VECTOR
 DEAL_II_EXPAND_TRILINOS_VECTOR
+DEAL_II_TRILINOS_LIBS
 DEAL_II_TRILINOS_LIBPREFIX
 DEAL_II_TRILINOS_VERSION_SUBMINOR
 DEAL_II_TRILINOS_VERSION_MINOR
@@ -10628,6 +10629,11 @@ $as_echo_n "checking for Trilinos version... " >&6; }
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_TRILINOS_VERSION_MAJOR.$DEAL_II_TRILINOS_VERSION_MINOR.$DEAL_II_TRILINOS_VERSION_SUBMINOR" >&5
 $as_echo "$DEAL_II_TRILINOS_VERSION_MAJOR.$DEAL_II_TRILINOS_VERSION_MINOR.$DEAL_II_TRILINOS_VERSION_SUBMINOR" >&6; }
 
+          if test "$DEAL_II_TRILINOS_VERSION_MAJOR" -lt 10 ; then
+    as_fn_error $? "Trilinos versions prior to 10.0 are no longer supported with deal.II." "$LINENO" 5
+  fi
+
+
 
 
 
@@ -10781,6 +10787,16 @@ $as_echo "no" >&6; }
       LDFLAGS="$LDFLAGS $LD_PATH_OPTION$DEAL_II_TRILINOS_LIBDIR"
     fi
   fi
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the set of Trilinos libraries" >&5
+$as_echo_n "checking for the set of Trilinos libraries... " >&6; }
+
+        DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
+    | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_TRILINOS_LIBS" >&5
+$as_echo "$DEAL_II_TRILINOS_LIBS" >&6; }
+
 
 
   OLD_CXXFLAGS="$CXXFLAGS"

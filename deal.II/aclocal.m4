@@ -6214,6 +6214,7 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS, dnl
     DEAL_II_CONFIGURE_TRILINOS_VERSION
     DEAL_II_CHECK_TRILINOS_MPI_CONSISTENCY
     DEAL_II_CHECK_TRILINOS_SHARED_STATIC
+    DEAL_II_CHECK_TRILINOS_LIBS
     DEAL_II_CHECK_TRILINOS_WARNINGS
     DEAL_II_CHECK_TRILINOS_HEADER_FILES
 
@@ -6263,6 +6264,15 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
                                | perl -pi -e 's/.*VERSION\s+\d?\d\d\d(\d\d)/\1/g;' \
 			       | perl -pi -e 's/0(\d)/\1/g;'`
   AC_MSG_RESULT([$DEAL_II_TRILINOS_VERSION_MAJOR.$DEAL_II_TRILINOS_VERSION_MINOR.$DEAL_II_TRILINOS_VERSION_SUBMINOR])
+
+  dnl Verify that we have at least Trilinos 10. This is the
+  dnl version where Trilinos started using cmake, which allow
+  dnl us to figure out which libraries Trilinos has built
+  dnl and in which order they need to be linked
+  if test "$DEAL_II_TRILINOS_VERSION_MAJOR" -lt 10 ; then
+    AC_MSG_ERROR([Trilinos versions prior to 10.0 are no longer supported with deal.II.])
+  fi
+
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MAJOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MINOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_SUBMINOR)
@@ -6419,6 +6429,28 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
       LDFLAGS="$LDFLAGS $LD_PATH_OPTION$DEAL_II_TRILINOS_LIBDIR"
     fi
   fi
+])
+
+
+
+dnl ------------------------------------------------------------
+dnl Figure out which libraries Trilinos has built and that we
+dnl need to link against. Also make sure we know their order
+dnl
+dnl Usage: DEAL_II_CHECK_TRILINOS_LIBS
+dnl
+dnl ------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_TRILINOS_LIBS, dnl
+[
+  AC_MSG_CHECKING(for the set of Trilinos libraries)
+
+  dnl Trilinos' cmake invokation stores the set of libraries
+  dnl in a special file for consumption of cmake at a later
+  dnl time. We'll simply grep through it
+  DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
+    | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+  AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
+  AC_SUBST(DEAL_II_TRILINOS_LIBS)
 ])
 
 
