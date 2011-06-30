@@ -266,8 +266,7 @@ IndexSet::block_read(std::istream & in)
   ranges.resize(n_ranges, Range(0,0));
   if (n_ranges)
     in.read(reinterpret_cast<char*>(&*ranges.begin()),
-	    reinterpret_cast<char*>(&*ranges.end())
-	    - reinterpret_cast<char*>(&*ranges.begin()));
+	    ranges.size() * sizeof(Range));
 }
 
 
