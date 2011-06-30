@@ -410,7 +410,7 @@ namespace DoFRenumbering
       for (int i=0; i<n; ++i)
 	{
 	  Assert (std::find (perm.begin(), perm.end(), i)
-		  != inverse_perm.end(),
+		  != perm.end(),
 		  ExcInternalError());
 	  Assert (std::find (inverse_perm.begin(), inverse_perm.end(), i)
 		  != inverse_perm.end(),
