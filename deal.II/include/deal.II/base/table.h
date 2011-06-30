@@ -2181,7 +2181,7 @@ typename std::vector<T>::const_pointer
 TableBase<N,T>::data () const
 {
   if (values.size() == 0)
-    return 0;
+    return typename std::vector<T>::const_pointer();
   else
     return &values[0];
 }
