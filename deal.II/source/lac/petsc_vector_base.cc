@@ -1156,7 +1156,7 @@ namespace PETScWrappers
 				     // generate an error for not ghosted
 				     // vectors
     if (!ghosted)
-	throw ExcInternalError();
+      AssertThrow (false, ExcInternalError());
 
     int ierr;
 

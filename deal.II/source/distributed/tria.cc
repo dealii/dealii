@@ -1374,7 +1374,7 @@ namespace
 	      break;
 	    }
 	    default:
-		  throw ExcInternalError();
+		  AssertThrow (false, ExcInternalError());
 	  }
       }
   }
