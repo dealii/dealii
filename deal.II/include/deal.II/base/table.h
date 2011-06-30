@@ -2168,6 +2168,8 @@ inline
 typename std::vector<T>::reference
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
+  Assert (position(indices) < values.size(),
+	  ExcIndexRange (position(indices), 0, values.size()));
   return values[position(indices)];
 }
 
@@ -2178,7 +2180,10 @@ inline
 typename std::vector<T>::const_pointer
 TableBase<N,T>::data () const
 {
-  return &values[0];
+  if (values.size() == 0)
+    return 0;
+  else
+    return &values[0];
 }
 
 
