@@ -249,8 +249,7 @@ IndexSet::block_write(std::ostream & out) const
 	    sizeof(n_ranges));
   if (ranges.empty() == false)
     out.write (reinterpret_cast<const char*>(&*ranges.begin()),
-	       reinterpret_cast<const char*>(&*ranges.end())
-	       - reinterpret_cast<const char*>(&*ranges.begin()));
+	       ranges.size() * sizeof(Range));
   Assert (out, ExcIO());
 }
 
