@@ -1339,6 +1339,7 @@ namespace Threads
 					  */
 	void join ()
 	  {
+	    Assert (thread.joinable(), ExcInternalError());
 	    thread.join ();
 	  }
 
