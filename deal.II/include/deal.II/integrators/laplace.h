@@ -28,6 +28,7 @@ namespace LocalIntegrators
 /**
  * @brief Local integrators related to the Laplacian and its DG formulations
  *
+ * @ingroup Integrators
  * @author Guido Kanschat
  * @date 2010
  */
