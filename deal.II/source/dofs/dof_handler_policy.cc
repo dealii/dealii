@@ -1133,12 +1133,12 @@ namespace internal
 			tr->get_communicator());
 
 	const unsigned int
-	  shift = std::accumulate( &number_cache
-				   .n_locally_owned_dofs_per_processor[0],
-				   &number_cache
-				   .n_locally_owned_dofs_per_processor
-				   [tr->locally_owned_subdomain()],
-				   0 );
+	  shift = std::accumulate (number_cache
+				   .n_locally_owned_dofs_per_processor.begin(),
+				   number_cache
+				   .n_locally_owned_dofs_per_processor.begin()
+				   + tr->locally_owned_subdomain(),
+				   0);
 	for (std::vector<unsigned int>::iterator it=renumbering.begin();
 	     it!=renumbering.end(); ++it)
 	  if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
@@ -1155,11 +1155,11 @@ namespace internal
 					 // now a little bit of
 					 // housekeeping
 	number_cache.n_global_dofs
-	  = std::accumulate( &number_cache
-			     .n_locally_owned_dofs_per_processor[0],
-			     &number_cache
-			     .n_locally_owned_dofs_per_processor[n_cpus],
-			     0 );
+	  = std::accumulate (number_cache
+			     .n_locally_owned_dofs_per_processor.begin(),
+			     number_cache
+			     .n_locally_owned_dofs_per_processor.end(),
+			     0);
 
 	number_cache.locally_owned_dofs = IndexSet(number_cache.n_global_dofs);
 	number_cache.locally_owned_dofs
@@ -1539,11 +1539,11 @@ namespace internal
 	    }
 
 	  number_cache.n_global_dofs
-	    = std::accumulate( &number_cache
-			       .n_locally_owned_dofs_per_processor[0],
-			       &number_cache
-			       .n_locally_owned_dofs_per_processor[n_cpus],
-			       0 );
+	    = std::accumulate (number_cache
+			       .n_locally_owned_dofs_per_processor.begin(),
+			       number_cache
+			       .n_locally_owned_dofs_per_processor.end(),
+			       0);
 
 	  tr->load_user_flags(user_flags);
 	}
