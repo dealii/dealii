@@ -759,7 +759,25 @@ namespace Polynomials
                                        // no, then generate the
                                        // respective coefficients
       {
-        recursive_coefficients.resize (k+1);
+					 // make sure that there is enough
+					 // space in the array for the
+					 // coefficients, so we have to resize
+					 // it to size k+1
+	
+					 // but it's more complicated than
+					 // that: we call this function
+					 // recursively, so if we simply
+					 // resize it to k+1 here, then
+					 // compute the coefficients for
+					 // degree k-1 by calling this
+					 // function recursively, then it will
+					 // reset the size to k -- not enough
+					 // for what we want to do below. the
+					 // solution therefore is to only
+					 // resize the size if we are going to
+					 // *increase* it
+	if (recursive_coefficients.size() < k+1)
+	  recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
@@ -995,7 +1013,25 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
                                            // no, then generate the
                                            // respective coefficients
       {
-        recursive_coefficients.resize (k+1);
+					 // make sure that there is enough
+					 // space in the array for the
+					 // coefficients, so we have to resize
+					 // it to size k+1
+	
+					 // but it's more complicated than
+					 // that: we call this function
+					 // recursively, so if we simply
+					 // resize it to k+1 here, then
+					 // compute the coefficients for
+					 // degree k-1 by calling this
+					 // function recursively, then it will
+					 // reset the size to k -- not enough
+					 // for what we want to do below. the
+					 // solution therefore is to only
+					 // resize the size if we are going to
+					 // *increase* it
+	if (recursive_coefficients.size() < k+1)
+	  recursive_coefficients.resize (k+1);
 
         if (k<=1)
           {
