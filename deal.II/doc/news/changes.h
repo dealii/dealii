@@ -216,6 +216,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a new function Threads::Thread::valid that can be used
+to query whether the thread object has been assigned a thread.
+<br>
+(Wolfgang Bangerth 2011/07/01)
+
 <li> New: The new function GridGenerator::merge_triangulations can be used to compose
 coarse meshes from simpler ones by merging their cells into a single
 triangulation object.

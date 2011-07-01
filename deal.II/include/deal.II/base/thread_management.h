@@ -1524,11 +1524,13 @@ namespace Threads
                                         * have used the default
                                         * constructor of this class
                                         * and have not assigned a
-                                        * thread object to it.
+                                        * thread object to it (i.e. if
+                                        * the valid() function would
+                                        * return false).
                                         */
       void join () const
 	{
-	  AssertThrow (thread_descriptor, ExcNoThread());
+	  AssertThrow (valid(), ExcNoThread());
 	  thread_descriptor->join ();
 	}
 
@@ -1544,6 +1546,18 @@ namespace Threads
 	{
 	  join ();
 	  return thread_descriptor->ret_val.get();
+	}
+
+				       /**
+					* Return true if this object
+					* has had a thread associated
+					* with it, either by using the
+					* non-default constructor or
+					* by assignment.
+					*/
+      bool valid () const
+	{
+	  return static_cast<bool>(thread_descriptor);
 	}
 
 
