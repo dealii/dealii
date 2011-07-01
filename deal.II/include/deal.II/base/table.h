@@ -1940,7 +1940,8 @@ TableBase<N,T>::operator = (const TableBase<N,T2>& m)
 {
   reinit (m.size());
   if (!empty())
-    std::copy (m.values.begin(), values.begin(), n_elements());
+    std::copy (m.values.begin(), m.values.begin() + n_elements(),
+	       values.begin());
 
   return *this;
 }
