@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1666,7 +1666,7 @@ void GridIn<2>::read_tecplot (std::istream &in)
 	  if (next_index==dim && structured)
 	    break;
 
-	  if (i==tecplot2deal[next_index])
+	  if ((next_index<dim) && (i==tecplot2deal[next_index]))
 	    {
 					       // we need this line, read it in
 	      for (unsigned int j=1; j<n_vertices+1; ++j)
