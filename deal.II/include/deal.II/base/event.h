@@ -234,7 +234,7 @@ namespace Algorithms
 
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
-    for (unsigned int i=0;i<flags.size();++i)
+    for (unsigned int i=0;i<event.flags.size();++i)
       flags[i] = flags[i] || event.flags[i];
 
     return *this;
@@ -257,7 +257,7 @@ namespace Algorithms
 
     if (flags.size() < event.flags.size())
       flags.resize(event.flags.size());
-    for (unsigned int i=0;i<flags.size();++i)
+    for (unsigned int i=0;i<event.flags.size();++i)
       if (event.flags[i]) flags[i] = false;
 
     return *this;
