@@ -3745,7 +3745,6 @@ namespace DoFTools
     Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
-    const unsigned int spacedim=DH::space_dimension;
 
 				     // let's see whether we have to
 				     // check for certain boundary
