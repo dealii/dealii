@@ -993,7 +993,8 @@ namespace internal
 
 					   // complete all sends, so that we can
 					   // safely destroy the buffers.
-	  MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+	  if (requests.size() > 0)
+	    MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 
 
 #ifdef DEBUG
