@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 // see if we can detach from threads. before r18272 we used to have a
 // bug where detached threads would write their return value into
-// release memory. the this test releases memory, allocates it again,
+// released memory. this test releases memory, allocates it again,
 // and makes sure nobody writes into it at undue times
 
 #include "../tests.h"
@@ -36,7 +36,7 @@ int worker ()
   return 42;
 }
 
-  
+
 
 int main()
 {
