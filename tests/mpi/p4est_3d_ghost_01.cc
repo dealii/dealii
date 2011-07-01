@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,19 +101,17 @@ void test()
 	  
 	}
 
-      write_vtk (tr, "p4est_3d_ghost_01", "1");
+      deallog << "Checksum: "
+	      << tr.get_checksum ()
+	      << std::endl;
       if (myid==0)
 	{
 	  std::ofstream file("p4est_3d_ghost_01/1.gpl");
 	  
 	  GridOut().write_gnuplot (tr, file);
 	}
-      
-
 
       deallog << "#global cells " << tr.n_global_active_cells() << std::endl;
-
-
     }
 
   deallog << "OK" << std::endl;

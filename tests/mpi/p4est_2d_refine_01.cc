@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -61,7 +61,9 @@ void test()
 	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 	}
 
-      write_vtk (tr, "p4est_2d_refine_01", "1");
+      deallog << "Checksum: "
+	      << tr.get_checksum ()
+	      << std::endl;
     }
 
 

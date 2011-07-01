@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,8 +65,6 @@ void test()
 	    }
 
 	  level++;
-//	  write_vtk (tr, "p4est_max_refine", Utilities::int_to_string(i,4).c_str());
-
 	}
     }
 
