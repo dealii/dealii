@@ -446,19 +446,19 @@ namespace LaplaceSolver
       = Threads::split_range<active_cell_iterator> (dof_handler.begin_active (),
 						    dof_handler.end (),
 						    n_threads);
-
-    Threads::ThreadMutex mutex;
-    Threads::ThreadGroup<> threads;
-    for (unsigned int thread=0; thread<n_threads; ++thread)
-      {
-	threads += Threads::spawn (*this, &Solver<dim>::assemble_matrix)
-		   (linear_system,
-		    thread_ranges[thread].first,
-		    thread_ranges[thread].second,
-		    mutex);
-      }
-    threads.join_all();
-
+    
+    {
+      Threads::ThreadMutex mutex;
+      for (unsigned int thread=0; thread<n_threads; ++thread)
+	{
+	  assemble_matrix
+	    (linear_system,
+	     thread_ranges[thread].first,
+	     thread_ranges[thread].second,
+	     mutex);
+	}
+    }
+    
     assemble_rhs (linear_system.rhs);
     linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
@@ -468,7 +468,6 @@ namespace LaplaceSolver
 					      *boundary_values,
 					      boundary_value_map);
 
-    threads.join_all ();
     linear_system.hanging_node_constraints.condense (linear_system.matrix);
 
     MatrixTools::apply_boundary_values (boundary_value_map,
@@ -1541,11 +1540,8 @@ namespace LaplaceSolver
   void
   WeightedResidual<dim>::solve_problem ()
   {
-    Threads::ThreadGroup<> threads;
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_primal_problem)();
-    threads.join_all ();
-    threads += Threads::spawn (*this, &WeightedResidual<dim>::solve_dual_problem)();
-    threads.join_all ();
+    solve_primal_problem();
+    solve_dual_problem();
   }
 
 
@@ -1684,16 +1680,14 @@ namespace LaplaceSolver
 			     .get_tria().n_active_cells());
 
     const unsigned int n_threads = multithread_info.n_default_threads;
-    Threads::ThreadGroup<> threads;
     for (unsigned int i=0; i<n_threads; ++i)
       {
-	threads += Threads::spawn (*this, &WeightedResidual<dim>::estimate_some)
-		   (primal_solution,
-		    dual_weights,
-		    n_threads, i,
-		    error_indicators,
-		    face_integrals);
-	threads.join_all();
+	estimate_some
+	  (primal_solution,
+	   dual_weights,
+	   n_threads, i,
+	   error_indicators,
+	   face_integrals);
       }
 
     unsigned int present_cell=0;
