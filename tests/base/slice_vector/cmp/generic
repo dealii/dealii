@@ -2,4 +2,3 @@
 DEAL::	0	1	2	0	1	2	3
 DEAL::	2	0	1
 DEAL::ExcIndexRange(length, 0, v.size()-start+1)
-DEAL::ExcIndexRange(i, 0, length)

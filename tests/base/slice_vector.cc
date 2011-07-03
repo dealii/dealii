@@ -56,9 +56,4 @@ int main()
   f(v);
 
   make_slice(v, 3, 5);
-
-				   // access an element beyond the end
-				   // to verify that we generate an
-				   // exception for that
-  (void) s[4];
 }
