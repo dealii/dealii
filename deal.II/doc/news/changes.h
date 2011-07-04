@@ -216,6 +216,20 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Under some circumstances, the Threads::Thread::join() could only be
+called once and would generate a system exception when called a second time.
+Since it is often useful to not track whether this function had already been
+called, this is now worked around in such a way that one can always call
+the function multiple times.
+<br>
+(Wolfgang Bangerth 2011/07/03)
+
+<li> New: The Threads::Thread::join() function can now also be called even
+if no thread has been assigned to this thread object. The function then simply
+does nothing.
+<br>
+(Wolfgang Bangerth 2011/07/03)
+
 <li> New: There is now a new function Threads::Thread::valid that can be used
 to query whether the thread object has been assigned a thread.
 <br>

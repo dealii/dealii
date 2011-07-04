@@ -1299,6 +1299,63 @@ namespace Threads
         return_value<RT> ret_val;
 
 					 /**
+					  * A bool variable that is initially
+					  * false, is set to true when a new
+					  * thread is started, and is set back
+					  * to false once join() has been
+					  * called.
+					  *
+					  * We use this variable to make sure
+					  * we can call join() twice on the
+					  * same thread. For some reason, the
+					  * C++ standard library throws a
+					  * std::system_error exception if one
+					  * tries to call std::thread::join
+					  * twice (and in fact, before the
+					  * second call, std::thread::joinable
+					  * returns false) but this is a
+					  * somewhat desirable thing to do
+					  * because one doesn't have to keep
+					  * track whether join() has been
+					  * called before. Using this
+					  * variable, whenever we have called
+					  * join() before, the variable is set
+					  * to true and we can skip over
+					  * calling std::thread::join() a
+					  * second time.
+					  *
+					  * Further, note that we need no
+					  * mutex for this variable: threads
+					  * can only be join from the thread
+					  * that created it
+					  * originally. Consequently,
+					  * everything that happens in a
+					  * function that does not create
+					  * threads (such as the join()
+					  * function below) looks atomic to
+					  * the outside world. Since we clear
+					  * and test thread_is_active in the
+					  * same function as we call
+					  * std::thread::join, these actions
+					  * are atomic and need no mutex. Of
+					  * course, two threads may call
+					  * join() on the same thread object
+					  * at the same time, but this action
+					  * is undefined anyway since they can
+					  * not both join the same thread.
+					  */
+	bool thread_is_active;
+
+					 /**
+					  * Default constructor.
+					  */
+	ThreadDescriptor ()
+			:
+			thread_is_active (false)
+	  {}
+	
+
+					 /**
 					  * Start the thread and let
 					  * it put its return value
 					  * into the ret_val object.
@@ -1330,6 +1387,7 @@ namespace Threads
 					     // and then start the
 					     // thread
 	    self = this->shared_from_this ();
+	    thread_is_active = true;
 	    thread = std_cxx1x::thread (thread_entry_point, function, this);
 	  }
 
@@ -1339,8 +1397,15 @@ namespace Threads
 					  */
 	void join ()
 	  {
-	    Assert (thread.joinable(), ExcInternalError());
-	    thread.join ();
+					     // see if the thread hasn't been
+					     // joined yet. if it has, then
+					     // join() is a no-op
+	    if (thread_is_active == true)
+	      {
+		Assert (thread.joinable(), ExcInternalError());
+		thread.join ();
+		thread_is_active = false;
+	      }
 	  }
 
       private:
@@ -1518,21 +1583,17 @@ namespace Threads
       Thread () {}
 
                                        /**
-                                        * Join the thread represented
-                                        * by this object, i.e. wait
-                                        * for it to finish. You can't
-                                        * call this function if you
-                                        * have used the default
-                                        * constructor of this class
-                                        * and have not assigned a
-                                        * thread object to it (i.e. if
-                                        * the valid() function would
-                                        * return false).
+                                        * Join the thread represented by this
+                                        * object, i.e. wait for it to
+                                        * finish. If you have used the default
+                                        * constructor of this class and have
+                                        * not assigned a thread object to it,
+                                        * then this function is a no-op.
                                         */
       void join () const
 	{
-	  AssertThrow (valid(), ExcNoThread());
-	  thread_descriptor->join ();
+	  if (thread_descriptor)
+	    thread_descriptor->join ();
 	}
 
                                        /**
@@ -1576,14 +1637,6 @@ namespace Threads
 	  return thread_descriptor == t.thread_descriptor;
 	}
 
-				       /** @addtogroup Exceptions
-					* @{ */
-
-                                       /**
-                                        * Exception
-                                        */
-      DeclException0 (ExcNoThread);
-				       //@}
     private:
                                        /**
                                         * Shared pointer to the object
