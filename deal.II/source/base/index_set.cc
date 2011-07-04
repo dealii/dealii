@@ -394,11 +394,13 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
       std::vector<unsigned int> indices;
       fill_index_vector(indices);
 
-      int * indices_ptr = reinterpret_cast<int*>(&indices[0]);
-
       return Epetra_Map (-1,
 			 n_elements(),
-			 indices_ptr,
+			 (n_elements() > 0
+			  ?
+			  reinterpret_cast<int*>(&indices[0])
+			  :
+			  0),
 			 0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 			 Epetra_MpiComm(communicator));
