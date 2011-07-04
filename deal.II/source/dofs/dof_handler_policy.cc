@@ -622,7 +622,7 @@ namespace internal
 				dofs.size() * sizeof(unsigned int));
 		    ptr += dofs.size() * sizeof(unsigned int);
 
-		    Assert (ptr == &buffer[buffer.size()],
+		    Assert (ptr == &buffer[0]+buffer.size(),
 			    ExcInternalError());
 
 		  }
@@ -1502,7 +1502,7 @@ namespace internal
 	  number_cache.locally_owned_dofs.block_write(oss);
 	  std::string oss_str=oss.str();
 	  std::vector<char> my_data(oss_str.begin(), oss_str.end());
-	  unsigned int my_size = my_data.size();
+	  unsigned int my_size = oss_str.size();
 
 					   // determine maximum size of IndexSet
 	  unsigned int max_size;
