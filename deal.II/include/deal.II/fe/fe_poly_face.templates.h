@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,6 @@ FE_PolyFace<POLY,dim,spacedim>::get_data (
   const Mapping<dim,spacedim>&,
   const Quadrature<dim>&) const
 {
-  Assert(false, ExcNotImplemented());
   return 0;
 }
 
@@ -127,15 +126,15 @@ FE_PolyFace<POLY,dim,spacedim>::get_face_data (
 				   // allocate memory
   if (flags & update_values)
     {
-      values.resize (this->dofs_per_cell);
-      data->shape_values.resize (this->dofs_per_cell,
+      values.resize (poly_space.n());
+      data->shape_values.resize (poly_space.n(),
 				 std::vector<double> (n_q_points));
       for (unsigned int i=0; i<n_q_points; ++i)
 	{
 	  poly_space.compute(quadrature.point(i),
 			     values, grads, grad_grads);
 	  
-	  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	  for (unsigned int k=0; k<poly_space.n(); ++k)
 	    data->shape_values[k][i] = values[k];
 	}
     }
@@ -180,7 +179,8 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_values
    FEValuesData<dim,spacedim>&,
    CellSimilarity::Similarity&) const
 {
-  Assert(false, ExcNotImplemented());
+				   // Do nothing, since we do not have
+				   // values in the interior
 }
 
 
@@ -190,7 +190,7 @@ void
 FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
   const Mapping<dim,spacedim>&,
   const typename Triangulation<dim,spacedim>::cell_iterator&,
-  const unsigned int,
+  const unsigned int face,
   const Quadrature<dim-1>& quadrature,
   typename Mapping<dim,spacedim>::InternalDataBase&,
   typename Mapping<dim,spacedim>::InternalDataBase& fedata,
@@ -205,12 +205,15 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_face_values (
   
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
   
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-    {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i];
-    }
+  const unsigned int foffset = fe_data.shape_values.size() * face;
+  if (flags & update_values)
+    for (unsigned int i=0; i<quadrature.size(); ++i)
+      {
+	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	  data.shape_values(k,i) = 0.;
+	for (unsigned int k=0; k<fe_data.shape_values.size(); ++k)
+	  data.shape_values(foffset+k,i) = fe_data.shape_values[k][i];
+      }
 }
 
 
@@ -219,7 +222,7 @@ void
 FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
   const Mapping<dim,spacedim>&,
   const typename Triangulation<dim,spacedim>::cell_iterator&,
-  const unsigned int,
+  const unsigned int face,
   const unsigned int subface,
   const Quadrature<dim-1>& quadrature,
   typename Mapping<dim,spacedim>::InternalDataBase&,
@@ -235,14 +238,18 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
 
   const UpdateFlags flags(fe_data.update_once | fe_data.update_each);
 
-  unsigned int offset = subface*quadrature.size();
-  for (unsigned int k=0; k<this->dofs_per_cell; ++k)
-    {
-      if (flags & update_values)
-        for (unsigned int i=0; i<quadrature.size(); ++i)
-	  data.shape_values(k,i) = fe_data.shape_values[k][i+offset];
-      
-    }
+  const unsigned int foffset = fe_data.shape_values.size() * face;
+  const unsigned int offset = subface*quadrature.size();
+
+  if (flags & update_values)
+    for (unsigned int i=0; i<quadrature.size(); ++i)
+      {
+	for (unsigned int k=0; k<this->dofs_per_cell; ++k)
+	  data.shape_values(k,i) = 0.;
+	for (unsigned int k=0; k<fe_data.shape_values.size(); ++k)
+	  data.shape_values(foffset+k,i) = fe_data.shape_values[k][i+offset];	
+      }
+  
   Assert (!(flags & update_gradients), ExcNotImplemented());
   Assert (!(flags & update_hessians), ExcNotImplemented());
 }
