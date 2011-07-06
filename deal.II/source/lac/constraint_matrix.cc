@@ -1843,6 +1843,8 @@ template<>
 void
 ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 {
+  Assert (sorted==true, ExcMatrixIsClosed());
+
 				   //TODO: not implemented yet, we need to fix
 				   //LocalRange() first to only include
 				   //"owned" indices. For this we need to keep
@@ -1928,6 +1930,8 @@ template<>
 void
 ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 {
+  Assert (sorted==true, ExcMatrixIsClosed());
+
   IndexSet my_indices (vec.size());
   for (unsigned int block=0; block<vec.n_blocks(); ++block)
     {
@@ -2030,6 +2034,8 @@ template<>
 void
 ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 {
+  Assert (sorted==true, ExcMatrixIsClosed());
+
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
@@ -2097,6 +2103,7 @@ template<>
 void
 ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector &/*vec*/) const
 {
+  Assert (sorted==true, ExcMatrixIsClosed());
   AssertThrow (false, ExcNotImplemented());
 }
 
