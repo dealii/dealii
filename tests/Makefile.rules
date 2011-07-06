@@ -84,7 +84,7 @@ ifndef OVERRIDE_OUTPUT_RULE
 %/output : %/exe
 	@echo =====Running======= $<
 	@echo Running > $(dir $@)/status
-	@$(ULIMIT) -t $(if $(ULIMIT_LIMIT),$(ULIMIT_LIMIT),600) ; \
+	@$(ULIMIT) -t $(if $(ULIMIT_LIMIT),$(ULIMIT_LIMIT),900) ; \
 	  export WALLTIME=3600 ; \
 	  ./$< ; \
 	  if test ! $$? = 0 ; then rm $@ ; false ; fi
