@@ -67,6 +67,7 @@ void test()
   x1 = x_ref;
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
+  cm.close ();
   cm.distribute(x1);
 
   x1 -= x_ref;
