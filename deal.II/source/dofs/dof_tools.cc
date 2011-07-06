@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace DoFTools
 {
-  
+
   template <class DH, class SparsityPattern>
   void
   make_sparsity_pattern (const DH               &dof,
@@ -732,14 +732,14 @@ namespace DoFTools
     return return_value;
   }
 
-  
+
 
 
   namespace internal
   {
-    namespace 
+    namespace
     {
-      
+
 				       // implementation of the same function in
 				       // namespace DoFTools for non-hp
 				       // DoFHandlers
@@ -972,7 +972,7 @@ namespace DoFTools
 		}
             }
       }
-        
+
 
 				       // implementation of the same function in
 				       // namespace DoFTools for non-hp
@@ -1166,14 +1166,14 @@ namespace DoFTools
 	  }
       }
     }
-    
+
   }
 
 
 
 
   template <class DH, class SparsityPattern>
-  void  
+  void
   make_flux_sparsity_pattern (const DH                &dof,
 			      SparsityPattern         &sparsity,
 			      const Table<2,Coupling> &int_mask,
@@ -1199,7 +1199,7 @@ namespace DoFTools
     Assert (flux_mask.n_cols() == n_comp,
 	    ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
 
-  
+
 				     // Clear user flags because we will
 				     // need them. But first we save
 				     // them and make sure that we
@@ -1214,7 +1214,7 @@ namespace DoFTools
 
     internal::make_flux_sparsity_pattern (dof, sparsity,
 					  int_mask, flux_mask);
-  
+
 				     // finally restore the user flags
     const_cast<Triangulation<DH::dimension,DH::space_dimension> &>(dof.get_tria()).load_user_flags(user_flags);
   }
@@ -2710,7 +2710,7 @@ namespace DoFTools
 			      ==
 			      FiniteElementDomination::no_requirements)
 			    continue;
-			  
+
 							   // Same procedure as for the
 							   // mother cell. Extract the face
 							   // DoFs from the cell DoFs.
@@ -3245,7 +3245,7 @@ namespace DoFTools
 							   // nothing to do here
 			  break;
 			}
-			
+
 			default:
 							       // we shouldn't get
 							       // here
@@ -4085,7 +4085,7 @@ namespace DoFTools
 
   template <int dim, int spacedim>
   void
-  
+
   extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
 			     std::vector<bool>              &selected_dofs)
   {
@@ -4470,6 +4470,10 @@ namespace DoFTools
 
   namespace internal
   {
+//TODO: why is this function so complicated? It would be nice to have
+// comments that explain why we can't just loop over all components
+// and count the entries in dofs_by_component that have this
+// component's index
     template <int dim, int spacedim>
     void
     resolve_components (const FiniteElement<dim,spacedim>&fe,
@@ -4509,18 +4513,78 @@ namespace DoFTools
 	    }
 	}
     }
+
+    template <int dim, int spacedim>
+    void
+    resolve_components (const hp::FECollection<dim,spacedim>&fe_collection,
+                        const std::vector<unsigned char> &dofs_by_component,
+                        const std::vector<unsigned int>  &target_component,
+                        const bool                        only_once,
+                        std::vector<unsigned int>        &dofs_per_component,
+                        unsigned int                     &component)
+    {
+      // assert that all elements in the collection have the same
+      // structure (base elements and multiplicity, components per base
+      // element) and then simply call the function above
+      for (unsigned int fe=1; fe<fe_collection.size(); ++fe)
+      {
+        Assert (fe_collection[fe].n_components() == fe_collection[0].n_components(),
+                ExcNotImplemented());
+        Assert (fe_collection[fe].n_base_elements() == fe_collection[0].n_base_elements(),
+                ExcNotImplemented());
+        for (unsigned int b=0;b<fe_collection[0].n_base_elements();++b)
+        {
+          Assert (fe_collection[fe].base_element(b).n_components() == fe_collection[0].base_element(b).n_components(),
+                  ExcNotImplemented());
+          Assert (fe_collection[fe].base_element(b).n_base_elements() == fe_collection[0].base_element(b).n_base_elements(),
+                  ExcNotImplemented());
+        }
+      }
+
+      resolve_components (fe_collection[0], dofs_by_component,
+                          target_component, only_once, dofs_per_component,
+                          component);
+    }
   }
 
 
-  template <int dim, int spacedim>
+  namespace internal
+  {
+    namespace {
+      /**
+       * Return true if the given element is primitive.
+       */
+      template <int dim, int spacedim>
+      bool all_elements_are_primitive (const FiniteElement<dim,spacedim> &fe)
+      {
+        return fe.is_primitive();
+      }
+
+
+      /**
+       * Return true if each element of the given element collection is primitive.
+       */
+      template <int dim, int spacedim>
+      bool all_elements_are_primitive (const dealii::hp::FECollection<dim,spacedim> &fe_collection)
+      {
+        for (unsigned int i=0; i<fe_collection.size(); ++i)
+          if (fe_collection[i].is_primitive() == false)
+            return false;
+
+        return true;
+      }
+    }
+  }
+
+  template <class DH>
   void
   count_dofs_per_component (
-    const DoFHandler<dim,spacedim>&     dof_handler,
+    const DH &     dof_handler,
     std::vector<unsigned int>& dofs_per_component,
     bool only_once,
     std::vector<unsigned int>  target_component)
   {
-    const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
+    const unsigned int n_components = dof_handler.get_fe().n_components();
 
     std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
 
@@ -4529,21 +4593,20 @@ namespace DoFTools
 				     // vector as identity.
     if (target_component.size()==0)
       {
-	target_component.resize(fe.n_components());
-	for (unsigned int i=0; i<fe.n_components(); ++i)
+	target_component.resize(n_components);
+	for (unsigned int i=0; i<n_components; ++i)
 	  target_component[i] = i;
       }
     else
-      Assert (target_component.size()==fe.n_components(),
+      Assert (target_component.size()==n_components,
 	      ExcDimensionMismatch(target_component.size(),
-				   fe.n_components()));
+				   n_components));
 
 
     const unsigned int max_component
       = *std::max_element (target_component.begin(),
 			   target_component.end());
     const unsigned int n_target_components = max_component + 1;
-    const unsigned int n_components = fe.n_components();
 
     AssertDimension (dofs_per_component.size(), n_target_components);
 
@@ -4567,7 +4630,8 @@ namespace DoFTools
 
 				     // next count what we got
     unsigned int component = 0;
-    internal::resolve_components(fe, dofs_by_component, target_component,
+    internal::resolve_components(dof_handler.get_fe(),
+                                 dofs_by_component, target_component,
 				 only_once, dofs_per_component, component);
     Assert (n_components == component, ExcInternalError());
 
@@ -4575,7 +4639,7 @@ namespace DoFTools
 				     // only valid if the finite element
 				     // is actually primitive, so
 				     // exclude other elements from this
-    Assert (!dof_handler.get_fe().is_primitive()
+    Assert ((internal::all_elements_are_primitive(dof_handler.get_fe()) == false)
 	    ||
 	    (std::accumulate (dofs_per_component.begin(),
 			      dofs_per_component.end(), 0U)
@@ -4585,8 +4649,8 @@ namespace DoFTools
 				     // reduce information from all CPUs
 #ifdef DEAL_II_USE_P4EST
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    if (const parallel::distributed::Triangulation<dim> * tria
-	= (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+    if (const parallel::distributed::Triangulation<dim,spacedim> * tria
+	= (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
 	   (&dof_handler.get_tria())))
       {
 	std::vector<unsigned int> local_dof_count = dofs_per_component;
@@ -4601,7 +4665,7 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
-  void  
+  void
   count_dofs_per_block (const DoFHandler<dim,spacedim>& dof_handler,
 			std::vector<unsigned int> &dofs_per_block,
 			std::vector<unsigned int>  target_block)

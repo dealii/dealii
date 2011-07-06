@@ -487,20 +487,36 @@ DoFTools::count_dofs_with_subdomain_association<MGDoFHandler<deal_II_dimension> 
 
 template
 void
-DoFTools::count_dofs_per_component<deal_II_dimension> (
+DoFTools::count_dofs_per_component<DoFHandler<deal_II_dimension> > (
   const DoFHandler<deal_II_dimension>&,
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
 
+template
+void
+DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension> > (
+  const hp::DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+
+
 #if deal_II_dimension < 3
-template void DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
-(const unsigned int level, const MGDoFHandler<deal_II_dimension, deal_II_dimension+1>&,
- const std::vector<bool>&, std::vector<bool>&, bool);
+template
+void
+DoFTools::count_dofs_per_component<DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
+  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
 
 template
 void
-DoFTools::count_dofs_per_component<deal_II_dimension, deal_II_dimension+1> (
-  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
+  const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  
+template 
+void 
+DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
+(const unsigned int level, const MGDoFHandler<deal_II_dimension, deal_II_dimension+1>&,
+ const std::vector<bool>&, std::vector<bool>&, bool);
+  
 #endif
 
 template

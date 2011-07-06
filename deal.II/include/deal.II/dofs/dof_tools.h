@@ -1580,9 +1580,9 @@ namespace DoFTools
 				    * targetted by target_components
 				    * are left untouched.
 				    */
-  template <int dim, int spacedim>
+  template <class DH>
   void
-  count_dofs_per_component (const DoFHandler<dim,spacedim>&     dof_handler,
+  count_dofs_per_component (const DH &     dof_handler,
 			    std::vector<unsigned int>& dofs_per_component,
 			    const bool vector_valued_once = false,
 			    std::vector<unsigned int>  target_component
@@ -2100,7 +2100,7 @@ namespace DoFTools
   std::vector<Table<2,Coupling> >
   dof_couplings_from_component_couplings (const hp::FECollection<dim,spacedim> &fe,
 					  const Table<2,Coupling> &component_couplings);
-    
+
 				   /**
 				    * Exception
 				    */

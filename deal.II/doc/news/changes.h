@@ -216,6 +216,11 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The function DoFTools::count_dofs_per_component now also works
+for objects of type hp::DoFHandler.
+<br>
+(Christian Goll, Wolfgang Bangerth 2011/07/06)
+
 <li> Fixed: Under some circumstances, the Threads::Thread::join() could only be
 called once and would generate a system exception when called a second time.
 Since it is often useful to not track whether this function had already been
