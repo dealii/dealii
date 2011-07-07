@@ -123,31 +123,6 @@
       Trilinos sub-packages.
       </p>
 
-      <h6>Trilinos up to and including version 9.0.x</h6>
-
-      <p>
-      Up to version 9.0, Trilinos was configured and built using autoconf and
-      related tools. Configuring and building Trilinos with a sequence of
-      commands like the following should do the trick:
-      <code>
-      <pre>
-cd trilinos-9.0.2
-mkdir build
-cd build
-../configure --enable-shared \
-      --with-cflags=-fPIC --with-cxxflags=-fPIC --with-fflags=-fPIC \
-      --enable-thyra --enable-stratimikos --enable-rtop --enable-teuchos \
-      --enable-sacado --enable-ml --enable-ifpack --enable-epetra \
-      --enable-belos --enable-aztecoo --enable-amesos \
-      --prefix=/home/bangerth/bin/trilinos-9.0.2
-make
-make install
-      </pre>
-      </code>
-      Obviously the path names in the first line and at the end of the
-      configure line need to be adjusted.
-      </p>
-
       <h6>Trilinos starting with version 10.0</h6>
 
       <p style="color: red">
@@ -156,7 +131,9 @@ make install
       </p>
 
       <p>
-      Starting with version 10.0, Trilinos uses cmake to configure and
+      Due to the entirely different build system, deal.II does no longer
+      support Trilinos versions prior to 10.0.
+      Starting with this version, Trilinos uses cmake to configure and
       build. This is a bit cumbersome because you first have to install a
       version of cmake that is at least a cmake 2.8 prerelease, and then enter
       the following slightly longish set of commands:
