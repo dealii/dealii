@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
  * IterativeInverse<Vector<double> > precondition;
  * precondition.initialize (A, inner_precondition);
  * precondition.solver.select("cg");
- * precondition.solver.control = inner_control;
+ * precondition.solver.set_control(inner_control);
  *
  * SolverControl outer_control(100, 1.e-16);
  * SolverRichardson<Vector<double> > outer_iteration;
