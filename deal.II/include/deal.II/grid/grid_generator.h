@@ -685,6 +685,39 @@ class GridGenerator
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0);
 
+    
+				     /**
+				      * Produce a quarter hyper-shell,
+				      * i.e. the space between two
+				      * circles in two space
+				      * dimensions and the region
+				      * between two spheres in 3d,
+				      * with given inner and outer
+				      * radius and a given number of
+				      * elements for this initial
+				      * triangulation. All components are
+				      * restricted to be positive, so the
+				      * opening angle is 90 degrees.
+				      *
+				      * If the number of
+				      * initial cells is zero (as is
+				      * the default), then it is
+				      * computed adaptively such that
+				      * the resulting elements have
+				      * the least aspect ratio.
+				      *
+				      * @note The triangulation needs to be
+				      * void upon calling this
+				      * function. Only implemented in 2d so far.
+				      */
+    template <int dim>
+    static void quarter_hyper_shell (Triangulation<dim>   &tria,
+				  const Point<dim>     &center,
+				  const double        inner_radius,
+				  const double        outer_radius,
+				  const unsigned int  n_cells = 0,
+				  const bool colorize = false);
+   
 				     /**
 				      * Produce a domain that is the space
 				      * between two cylinders in 3d, with
