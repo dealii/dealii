@@ -4649,6 +4649,9 @@ namespace DoFTools
 				     // reduce information from all CPUs
 #ifdef DEAL_II_USE_P4EST
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    const unsigned int dim = DH::dimension;
+    const unsigned int spacedim = DH::space_dimension;
+    
     if (const parallel::distributed::Triangulation<dim,spacedim> * tria
 	= (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
 	   (&dof_handler.get_tria())))
