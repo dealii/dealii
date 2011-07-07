@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -226,7 +226,12 @@ namespace PETScWrappers
       std::vector<unsigned int> ghostindices;
       ghostnodes.fill_index_vector(ghostindices);
       
-      const PetscInt * ptr= (const PetscInt*)(&(ghostindices[0]));
+      const PetscInt * ptr
+	= (ghostindices.size() > 0
+	   ?
+	   (const PetscInt*)(&(ghostindices[0]))
+	   :
+	   0);
 
       int ierr
 	= VecCreateGhost(communicator,
