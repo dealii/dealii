@@ -1094,15 +1094,16 @@ void DataOut<dim,DH>::build_patches (const Mapping<DH::dimension,DH::space_dimen
 
 
 				   // now build the patches in parallel
-  WorkStream::run (&all_cells[0],
-		   &all_cells[0]+all_cells.size(),
-		   std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
-				   *this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
-				   curved_cell_region),
-		   std_cxx1x::bind(&internal::DataOut::append_patch_to_list<dim,DH::space_dimension>,
-				   std_cxx1x::_1, std_cxx1x::ref(this->patches)),
-		   thread_data,
-		   sample_patch);
+  if (all_cells.size() > 0)
+    WorkStream::run (&all_cells[0],
+		     &all_cells[0]+all_cells.size(),
+		     std_cxx1x::bind(&DataOut<dim,DH>::build_one_patch,
+				     *this, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3,
+				     curved_cell_region),
+		     std_cxx1x::bind(&internal::DataOut::append_patch_to_list<dim,DH::space_dimension>,
+				     std_cxx1x::_1, std_cxx1x::ref(this->patches)),
+		     thread_data,
+		     sample_patch);
 }
 
 
