@@ -216,6 +216,13 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The 2d grid reordering algorithm that is used by all grid readers had
+a component that was quadratic in its complexity, sometimes leading to cases
+where reading in a mesh in debug mode could take minutes for just a few tens
+of thousands of cells. This has now been fixed.
+<br>
+(Wolfgang Bangerth 2011/07/07)
+
 <li> New: The function DoFTools::count_dofs_per_component now also works
 for objects of type hp::DoFHandler.
 <br>

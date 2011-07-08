@@ -266,48 +266,74 @@ namespace internal
     }
 
 
-    struct MQuad::MakeQuad : public std::binary_function<CellData<2>,
-		  std::vector<MSide>,
-		  MQuad>
+    namespace
     {
-	MQuad operator()(const CellData<2> &q,
-			 const std::vector<MSide> &elist) const
+				       /**
+					* A replacement for std::lower_bound
+					* if we know that the input sequence
+					* is in fact sorted. In that case, we
+					* can do a binary search.
+					*/
+      template<typename Iterator, typename T, typename Comp>
+      Iterator
+      lower_bound_in_sorted_array (Iterator first, Iterator last,
+				   const T& val, Comp comp)
+      {
+	unsigned int length = std::distance(first, last);
+	unsigned int half;
+	Iterator middle;
+
+	while (length > 0)
 	  {
-					     // compute the indices of the
-					     // four sides that bound this
-					     // quad
-	    unsigned int edges[4] = { numbers::invalid_unsigned_int,
-				      numbers::invalid_unsigned_int,
-				      numbers::invalid_unsigned_int,
-				      numbers::invalid_unsigned_int };
-
-	    unsigned int index = 0;
-	    for (std::vector<MSide>::const_iterator
-		   edge = elist.begin(); edge != elist.end(); ++edge, ++index)
-	      for (unsigned int i=0; i<4; ++i)
-						 // for each of the four
-						 // sides, find the place in
-						 // the list with the
-						 // corresponding line and
-						 // store it. shortcut the
-						 // comparison if it has
-						 // already been found
-		if ((edges[i] == numbers::invalid_unsigned_int)
-		    &&
-		    (MSide::SideSortLess()(*edge, quadside(q,i)) == false))
-		  edges[i] = index;
-
-	    for (unsigned int i=0; i<4; ++i)
-	      Assert (edges[i] != numbers::invalid_unsigned_int,
-		      ExcInternalError());
-
-	    return MQuad(q.vertices[0],q.vertices[1], q.vertices[2], q.vertices[3],
-			 edges[0], edges[1], edges[2], edges[3],
-			 q);
+	    half = length >> 1;
+	    middle = first;
+	    std::advance(middle, half);
+	    if (comp(*middle, val))
+	      {
+		first = middle;
+		++first;
+		length = length - half - 1;
+	      }
+	    else
+	      length = half;
 	  }
+	return first;
+      }
+    
 
-    };
+				       /**
+					* Create an MQuad object from the
+					* indices of the four vertices by
+					* looking up the indices of the four
+					* sides.
+					*/
+      MQuad build_quad_from_vertices(const CellData<2> &q,
+				     const std::vector<MSide> &elist)
+      {
+					 // compute the indices of the four
+					 // sides that bound this quad. note
+					 // that the incoming list elist is
+					 // sorted with regard to the
+					 // MSide::SideSortLess criterion
+	unsigned int edges[4] = { numbers::invalid_unsigned_int,
+				  numbers::invalid_unsigned_int,
+				  numbers::invalid_unsigned_int,
+				  numbers::invalid_unsigned_int };
 
+	for (unsigned int i=0; i<4; ++i)
+	  edges[i] = (lower_bound_in_sorted_array (elist.begin(),
+						   elist.end(),
+						   quadside(q,i),
+						   MSide::SideSortLess())
+		      -
+		      elist.begin());
+
+	return MQuad(q.vertices[0],q.vertices[1], q.vertices[2], q.vertices[3],
+		     edges[0], edges[1], edges[2], edges[3],
+		     q);
+      }
+    }
+    
 
 
     void
@@ -324,7 +350,6 @@ namespace internal
     {
 				       //Reserve some space
       sides.reserve(4*inquads.size());
-      mquads.reserve(inquads.size());
 
 				       //Insert all the sides into the side vector
       for (int i = 0;i<4;++i)
@@ -348,11 +373,16 @@ namespace internal
 				       // Swap trick to shrink the
 				       // side vector
       std::vector<MSide>(sides).swap(sides);
-
-				       //Assigns the correct sides to
-				       //each quads
-      std::transform(inquads.begin(),inquads.end(), std::back_inserter(mquads),
-		     std::bind2nd(MQuad::MakeQuad(),sides) );
+	
+				       // Now assign the correct sides to
+				       // each quads
+      mquads.reserve(inquads.size());
+      std::transform(inquads.begin(),
+		     inquads.end(),
+		     std::back_inserter(mquads),
+		     std_cxx1x::bind(build_quad_from_vertices,
+				     std_cxx1x::_1,
+				     std_cxx1x::cref(sides)) );
 
 				       // Assign the quads to their sides also.
       int qctr = 0;

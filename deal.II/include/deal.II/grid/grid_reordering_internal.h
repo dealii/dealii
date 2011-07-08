@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -142,22 +142,6 @@ namespace internal
 					  * data of this object.
 					  */
 	CellData<2>  original_cell_data;
-	
-					 /**
-					  * Makes an MQuad from the
-					  * given CellData and MSide
-					  * list.  Is derived from
-					  * binary_function to be
-					  * usable with STL
-					  * containers.
-					  *
-					  * Also assumes that the
-					  * edges listed present in
-					  * the CellData are already
-					  * present in the elist
-					  * vector.
-					  */ 
-	struct MakeQuad;
     };
 
 /**
