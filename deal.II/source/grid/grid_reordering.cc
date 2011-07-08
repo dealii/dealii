@@ -2,7 +2,7 @@
 //   grid_reordering.cc,v 1.27 2002/05/28 07:43:22 wolf Exp
 //   Version:
 //
-//   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //   This file is subject to QPL and may not be  distributed
 //   without copyright and license information. Please refer
@@ -273,27 +273,36 @@ namespace internal
 	MQuad operator()(const CellData<2> &q,
 			 const std::vector<MSide> &elist) const
 	  {
-					     //Assumes that the sides
-					     //are in the vector.. Bad
-					     //things will happen if
-					     //they are not!
+					     // compute the indices of the
+					     // four sides that bound this
+					     // quad
+	    unsigned int edges[4] = { numbers::invalid_unsigned_int,
+				      numbers::invalid_unsigned_int,
+				      numbers::invalid_unsigned_int,
+				      numbers::invalid_unsigned_int };
+
+	    unsigned int index = 0;
+	    for (std::vector<MSide>::const_iterator
+		   edge = elist.begin(); edge != elist.end(); ++edge, ++index)
+	      for (unsigned int i=0; i<4; ++i)
+						 // for each of the four
+						 // sides, find the place in
+						 // the list with the
+						 // corresponding line and
+						 // store it. shortcut the
+						 // comparison if it has
+						 // already been found
+		if ((edges[i] == numbers::invalid_unsigned_int)
+		    &&
+		    (MSide::SideSortLess()(*edge, quadside(q,i)) == false))
+		  edges[i] = index;
+
+	    for (unsigned int i=0; i<4; ++i)
+	      Assert (edges[i] != numbers::invalid_unsigned_int,
+		      ExcInternalError());
+
 	    return MQuad(q.vertices[0],q.vertices[1], q.vertices[2], q.vertices[3],
-			 std::distance(elist.begin(),
-				       std::lower_bound(elist.begin(), elist.end(),
-							quadside(q,0),
-							MSide::SideSortLess() )),
-			 std::distance(elist.begin(),
-				       std::lower_bound(elist.begin(), elist.end(),
-							quadside(q,1),
-							MSide::SideSortLess() )),
-			 std::distance(elist.begin(),
-				       std::lower_bound(elist.begin(), elist.end(),
-							quadside(q,2),
-							MSide::SideSortLess() )),
-			 std::distance(elist.begin(),
-				       std::lower_bound(elist.begin(), elist.end(),
-							quadside(q,3),
-							MSide::SideSortLess() )),
+			 edges[0], edges[1], edges[2], edges[3],
 			 q);
 	  }
 
@@ -595,7 +604,8 @@ GridReordering<2>::reorder_cells (std::vector<CellData<2> > &original_cells)
 
 template<>
 void
-GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells) {
+GridReordering<2,3>::reorder_cells (std::vector<CellData<2> > &original_cells)
+{
     GridReordering<2>::reorder_cells(original_cells);
 }
 
