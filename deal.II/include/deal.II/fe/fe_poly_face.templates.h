@@ -90,7 +90,8 @@ FE_PolyFace<POLY,dim,spacedim>::get_data (
   const Mapping<dim,spacedim>&,
   const Quadrature<dim>&) const
 {
-  return 0;
+  InternalData* data = new InternalData;
+  return data;
 }
 
 
