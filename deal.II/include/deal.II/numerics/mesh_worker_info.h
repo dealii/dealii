@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -138,6 +138,26 @@ namespace MeshWorker
 		  const DHFaceIterator& f,
 		  const unsigned int n,
 		  const unsigned int s);
+
+				       /**
+					* Switch to a new face of the
+					* same cell. Does not change
+					* #indices and does not reset
+					* data in LocalResults.
+					*/
+      template <class DHFaceIterator>
+      void set_face (const DHFaceIterator& f,
+		     const unsigned int n);
+				       /**
+					* Switch to a new subface of the
+					* same cell. Does not change
+					* #indices and does not reset
+					* data in LocalResults.
+					*/
+      template <class DHFaceIterator>
+      void set_subface (const DHFaceIterator& f,
+			const unsigned int n,
+			const unsigned int s);
 
       const BlockIndices& local_indices() const;
 
@@ -958,19 +978,32 @@ namespace MeshWorker
 
 
   template<int dim, int spacedim, typename number>
+  template <class DHFaceIterator>
+  inline void
+  DoFInfo<dim,spacedim,number>::set_face(
+    const DHFaceIterator& f,
+    unsigned int n)
+  {
+    face = static_cast<typename Triangulation<dim>::face_iterator> (f);
+    face_number = n;
+    sub_number = deal_II_numbers::invalid_unsigned_int;
+  }
+  
+  
+  template<int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
-  DoFInfo<dim,spacedim,number>::reinit(const DHCellIterator& c,
-				       const DHFaceIterator& f,
-				       unsigned int n)
+  DoFInfo<dim,spacedim,number>::reinit(
+    const DHCellIterator& c,
+    const DHFaceIterator& f,
+    unsigned int n)
   {
     if ((cell.state() != IteratorState::valid)
 	||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
     cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
-    face = static_cast<typename Triangulation<dim>::face_iterator> (f);
-    face_number = n;
-    sub_number = deal_II_numbers::invalid_unsigned_int;
+    set_face(f,n);
+    
     if (block_info)
       LocalResults<number>::reinit(block_info->local());
     else
@@ -979,20 +1012,34 @@ namespace MeshWorker
 
 
   template<int dim, int spacedim, typename number>
+  template <class DHFaceIterator>
+  inline void
+  DoFInfo<dim,spacedim,number>::set_subface(
+    const DHFaceIterator& f,
+    unsigned int n,
+    unsigned int s)
+  {
+    face = static_cast<typename Triangulation<dim>::face_iterator> (f);
+    face_number = n;
+    sub_number = s;
+  }
+  
+  
+  template<int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
-  DoFInfo<dim,spacedim,number>::reinit(const DHCellIterator& c,
-				       const DHFaceIterator& f,
-				       unsigned int n,
-				       const unsigned int s)
+  DoFInfo<dim,spacedim,number>::reinit(
+    const DHCellIterator& c,
+    const DHFaceIterator& f,
+    unsigned int n,
+    unsigned int s)
   {
     if (cell.state() != IteratorState::valid
 	|| cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
     cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
-    face = static_cast<typename Triangulation<dim>::face_iterator> (f);
-    face_number = n;
-    sub_number = s;
+    set_subface(f,n,s);
+    
     if (block_info)
       LocalResults<number>::reinit(block_info->local());
     else
