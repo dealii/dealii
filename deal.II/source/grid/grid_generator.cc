@@ -1767,13 +1767,8 @@ void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
   if (colorize)
   {
       Triangulation<2>::cell_iterator cell = tria.begin();
-      int i=0;
       for (;cell!=tria.end();++cell)
       {
-	std::cout << i++ << ": ";
-	for (int j=0;j<4;++j)
-	  std::cout << cell->face(j)->at_boundary();
-	std::cout << std::endl;
 	cell->face(2)->set_boundary_indicator(1);
       }
       tria.begin()->face(0)->set_boundary_indicator(3);
