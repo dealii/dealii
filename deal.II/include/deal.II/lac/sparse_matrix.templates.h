@@ -125,6 +125,22 @@ SparseMatrix<number>::~SparseMatrix ()
 
 
 
+namespace internal
+{
+  namespace SparseMatrix
+  {
+    template<typename T>
+    void zero_subrange (const unsigned int begin,
+			const unsigned int end,
+			T *dst)
+    {
+      std::memset (dst+begin,0,(end-begin)*sizeof(T));
+    }
+  }
+}
+
+
+
 template <typename number>
 SparseMatrix<number> &
 SparseMatrix<number>::operator = (const double d)
@@ -134,8 +150,31 @@ SparseMatrix<number>::operator = (const double d)
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->compressed || cols->empty(), SparsityPattern::ExcNotCompressed());
 
-  if (val != 0)
-    memset (&val[0], 0, cols->n_nonzero_elements()*sizeof(number));
+				// do initial zeroing of elements in
+				// parallel. Try to achieve a similar layout
+				// as when doing matrix-vector products, as on
+				// some NUMA systems, a memory block is
+				// assigned to memory banks where the first
+				// access is generated. For sparse matrices,
+				// the first operations is usually the
+				// operator=. The grain size is chosen to
+				// reflect the number of rows in
+				// minimum_parallel_grain_size, weighted by
+				// the number of nonzero entries per row on
+				// average.
+  const unsigned int matrix_size = cols->n_nonzero_elements();
+  const unsigned int grain_size =
+    internal::SparseMatrix::minimum_parallel_grain_size *
+    (cols->n_nonzero_elements()+m()) / m();
+  if (matrix_size>grain_size)
+    parallel::apply_to_subranges (0U, matrix_size,
+				  std_cxx1x::bind(&internal::SparseMatrix::template
+						  zero_subrange<number>,
+						  std_cxx1x::_1, std_cxx1x::_2,
+						  val),
+				  grain_size);
+  else if (matrix_size > 0)
+    memset (&val[0], 0, matrix_size*sizeof(number));
 
   return *this;
 }
@@ -1494,7 +1533,7 @@ SparseMatrix<number>::SOR (Vector<somenumber>& dst,
 	  if (col < row)
 	    s -= val[j] * dst(col);
 	}
-      
+
       Assert(val[cols->rowstart[row]]!= 0., ExcDivideByZero());
       dst(row) = s * om / val[cols->rowstart[row]];
     }
@@ -1721,7 +1760,7 @@ SparseMatrix<number>::SSOR (Vector<somenumber>& dst,
 {
 //TODO: Is this called anywhere? If so, multiplication with om(2-om)D is missing
   Assert(false, ExcNotImplemented());
-  
+
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
   Assert (cols->optimize_diagonal(),
