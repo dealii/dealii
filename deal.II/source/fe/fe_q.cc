@@ -69,107 +69,6 @@ namespace FE_Q_Helper
 	out[in[i]]=i;
       return out;
     }
-
-
-				     // given an integer N, compute its
-				     // integer square root (if it
-				     // exists, otherwise give up)
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    unsigned int int_sqrt (const unsigned int N)
-    {
-      for (unsigned int i=0; i<=N; ++i)
-	if (i*i == N)
-	  return i;
-      Assert (false, ExcInternalError());
-      return numbers::invalid_unsigned_int;
-    }
-
-
-				     // given an integer N, compute its
-				     // integer cube root (if it
-				     // exists, otherwise give up)
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    unsigned int int_cuberoot (const unsigned int N)
-    {
-      for (unsigned int i=0; i<=N; ++i)
-	if (i*i*i == N)
-	  return i;
-      Assert (false, ExcInternalError());
-      return numbers::invalid_unsigned_int;
-    }
-
-
-				     // given N, generate i=0...N-1
-				     // equidistant points in the
-				     // interior of the interval [0,1]
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    Point<1>
-    generate_unit_point (const unsigned int i,
-			 const unsigned int N,
-			 const dealii::internal::int2type<1>  )
-    {
-      Assert (i<N, ExcInternalError());
-      const double h = 1./(N-1);
-      return Point<1>(i*h);
-    }
-
-
-				     // given N, generate i=0...N-1
-				     // equidistant points in the domain
-				     // [0,1]^2
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    Point<2>
-    generate_unit_point (const unsigned int i,
-			 const unsigned int N,
-			 const dealii::internal::int2type<2>  )
-    {
-      Assert (i<N, ExcInternalError());
-      Assert (N>=4, ExcInternalError());
-
-      const unsigned int N1d = int_sqrt(N);
-      const double h = 1./(N1d-1);
-
-      return Point<2> (i%N1d * h,
-		       i/N1d * h);
-    }
-
-
-
-				     // given N, generate i=0...N-1
-				     // equidistant points in the domain
-				     // [0,1]^3
-#if defined(DEAL_II_ANON_NAMESPACE_BUG) && defined(DEAL_II_ANON_NAMESPACE_LINKAGE_BUG)
-    static
-#endif
-    inline
-    Point<3>
-    generate_unit_point (const unsigned int i,
-			 const unsigned int N,
-			 const dealii::internal::int2type<3>  )
-    {
-      Assert (i<N, ExcInternalError());
-      Assert (N>=8, ExcInternalError());
-
-      const unsigned int N1d = int_cuberoot(N);
-      const double h = 1./(N1d-1);
-
-      return Point<3> (i%N1d * h,
-		       (i/N1d)%N1d * h,
-		       i/(N1d*N1d) * h);
-    }
-
   }
 }
 
@@ -625,7 +524,7 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 
 				   // Fill prolongation matrices with
 				   // embedding operators
-  FETools::compute_embedding_matrices (*this, this->prolongation);
+  initialize_embedding ();
 
 				   // Fill restriction matrices
   initialize_restriction();
@@ -1134,26 +1033,37 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 				   // FE_Nothing
   if (const FE_Q<dim,spacedim> *fe_q_other = dynamic_cast<const FE_Q<dim,spacedim>*>(&fe_other))
     {
-				       // dofs are located along
-				       // lines, so two dofs are
-				       // identical if they are
-				       // located at identical
-				       // positions. note that for
-				       // elements of orders p and q,
-				       // nodes are located on edges
-				       // at locations (i+1)/p and
-				       // (j+1)/q, so we need to find
-				       // those combinations i,j for
-				       // which (i+1)/p == (j+1)/q,
-				       // i.e. (i+1)*q == (j+1)*p
+				       // dofs are located along lines, so two
+				       // dofs are identical if they are
+				       // located at identical positions. if
+				       // we had only equidistant points, we
+				       // could simple check for similarity
+				       // like (i+1)*q == (j+1)*p, but we
+				       // might have other support points
+				       // (e.g. Gauss-Lobatto
+				       // points). Therefore, read the points
+				       // in unit_support_points for the first
+				       // coordinate direction. We take the
+				       // lexicographic ordering of the points
+				       // in the first direction (i.e.,
+				       // x-direction), which we access
+				       // between index 1 and p-1 (index 0 and
+				       // p are vertex dofs).
       const unsigned int p = this->degree;
       const unsigned int q = fe_q_other->degree;
 
       std::vector<std::pair<unsigned int, unsigned int> > identities;
 
+      const std::vector<unsigned int> &index_map_inverse=
+	this->poly_space.get_numbering_inverse();
+      const std::vector<unsigned int> &index_map_inverse_other=
+	fe_q_other->poly_space.get_numbering_inverse();
+
       for (unsigned int i=0; i<p-1; ++i)
 	for (unsigned int j=0; j<q-1; ++j)
-	  if ((i+1)*q == (j+1)*p)
+	  if (std::fabs(this->unit_support_points[index_map_inverse[i+1]][0]-
+			fe_q_other->unit_support_points[index_map_inverse_other[j+1]][0])
+	      < 1e-14)
 	    identities.push_back (std::make_pair(i,j));
 
       return identities;
@@ -1187,26 +1097,35 @@ hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) cons
   if (const FE_Q<dim,spacedim> *fe_q_other = dynamic_cast<const FE_Q<dim,spacedim>*>(&fe_other))
     {
 				       // this works exactly like the line
-				       // case above, except that now we
-				       // have to have two indices i1, i2
-				       // and j1, j2 to characterize the
-				       // dofs on the face of each of the
-				       // finite elements. since they are
-				       // ordered in lexicographic order,
-				       // the rest is rather
-				       // straightforward
+				       // case above, except that now we have
+				       // to have two indices i1, i2 and j1,
+				       // j2 to characterize the dofs on the
+				       // face of each of the finite
+				       // elements. since they are ordered
+				       // lexicographically along the first
+				       // line and we have a tensor product,
+				       // the rest is rather straightforward
       const unsigned int p = this->degree;
       const unsigned int q = fe_q_other->degree;
 
       std::vector<std::pair<unsigned int, unsigned int> > identities;
 
+      const std::vector<unsigned int> &index_map_inverse=
+	this->poly_space.get_numbering_inverse();
+      const std::vector<unsigned int> &index_map_inverse_other=
+	fe_q_other->poly_space.get_numbering_inverse();
+
       for (unsigned int i1=0; i1<p-1; ++i1)
 	for (unsigned int i2=0; i2<p-1; ++i2)
 	  for (unsigned int j1=0; j1<q-1; ++j1)
 	    for (unsigned int j2=0; j2<q-1; ++j2)
-	      if (((i1+1)*q == (j1+1)*p)
+	      if ((std::fabs(this->unit_support_points[index_map_inverse[i1+1]][0]-
+			     fe_q_other->unit_support_points[index_map_inverse_other[j1+1]][0])
+		   < 1e-14)
 		  &&
-		  ((i2+1)*q == (j2+1)*p))
+		  (std::fabs(this->unit_support_points[index_map_inverse[i2+1]][0]-
+			     fe_q_other->unit_support_points[index_map_inverse_other[j2+1]][0])
+		   < 1e-14))
 		identities.push_back (std::make_pair(i1*(p-1)+i2,
 						     j1*(q-1)+j2));
 
@@ -1564,9 +1483,6 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 				   // value eps is used a threshold to
 				   // decide when certain evaluations of the
 				   // Lagrange polynomials are zero or one.
-  const std::vector<unsigned int> &index_map=
-    this->poly_space.get_numbering();
-
   const double eps = 1e-13*this->degree*this->degree*this->degree*this->degree*dim;
 
   unsigned n_ones = 0;
@@ -1586,9 +1502,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     for (unsigned int j=0; j<this->dofs_per_cell; ++j)
       {
-	const Point<dim> p_subcell
-	  = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-					      dealii::internal::int2type<dim>());
+	const Point<dim> p_subcell = this->unit_support_points[j];
 	const double
 	  subcell_value = this->poly_space.compute_value (i, p_subcell);
 
@@ -1629,9 +1543,7 @@ FE_Q<dim,spacedim>::initialize_embedding ()
 					     // generate a point on the
 					     // child cell and evaluate the
 					     // shape functions there
-	    const Point<dim> p_subcell
-	      = FE_Q_Helper::generate_unit_point (index_map[j], this->dofs_per_cell,
-						  dealii::internal::int2type<dim>());
+	    const Point<dim> p_subcell = this->unit_support_points[j];
 	    const Point<dim> p_cell =
 	      GeometryInfo<dim>::child_to_cell_coordinates (p_subcell, child,
 							    RefinementCase<dim>(ref+1));
