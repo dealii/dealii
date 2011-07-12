@@ -270,14 +270,41 @@ namespace internal
     {
 				       /**
 					* A replacement for std::lower_bound
-					* if we know that the input sequence
-					* is in fact sorted. In that case, we
-					* can do a binary search.
+					* which does a binary search for a
+					* position in a sorted array. The
+					* reason for this function is obscure:
+					* when using the GCC libstdc++
+					* function std::lower_bound,
+					* complexity is O(log(N)) as
+					* required. However, when using the
+					* debug version of the GCC libstdc++
+					* as we do when running the testsuite,
+					* then std::lower_bound tests whether
+					* the sequence is in fact partitioned
+					* with respect to the pivot 'value'
+					* (i.e. in essence that the sequence
+					* is sorted as required for binary
+					* search to work). However, verifying
+					* this means that the complexity of
+					* std::lower_bound jumps to O(N); we
+					* call this function O(N) times below,
+					* making the overall complexity
+					* O(N**2). The consequence is that a
+					* few tests with big meshes completely
+					* run off the wall time limit for
+					* tests and fail with the libstdc++
+					* debug mode
+					*
+					* Here, we know that the sequence is
+					* sorted, so we don't need the
+					* additional check
 					*/
       template<typename Iterator, typename T, typename Comp>
       Iterator
-      lower_bound_in_sorted_array (Iterator first, Iterator last,
-				   const T& val, Comp comp)
+      my_lower_bound (Iterator first,
+		      Iterator last,
+		      const T &value,
+		      Comp comp)
       {
 	unsigned int length = std::distance(first, last);
 	unsigned int half;
@@ -288,7 +315,7 @@ namespace internal
 	    half = length >> 1;
 	    middle = first;
 	    std::advance(middle, half);
-	    if (comp(*middle, val))
+	    if (comp(*middle, value))
 	      {
 		first = middle;
 		++first;
@@ -321,10 +348,10 @@ namespace internal
 				  numbers::invalid_unsigned_int };
 
 	for (unsigned int i=0; i<4; ++i)
-	  edges[i] = (lower_bound_in_sorted_array (elist.begin(),
-						   elist.end(),
-						   quadside(q,i),
-						   MSide::SideSortLess())
+	  edges[i] = (my_lower_bound (elist.begin(),
+				      elist.end(),
+				      quadside(q,i),
+				      MSide::SideSortLess())
 		      -
 		      elist.begin());
 
