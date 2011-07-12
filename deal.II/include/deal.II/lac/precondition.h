@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/vector_memory.h>
@@ -1336,7 +1337,7 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
 				       // line denotes the diagonal element,
 				       // which we need not check.
 	  pos_right_of_diagonal[row] =
-	    std::lower_bound (&colnums[*rowstart_ptr+1],
+	    Utilities::lower_bound (&colnums[*rowstart_ptr+1],
 			      &colnums[*(rowstart_ptr+1)],
 			      row)
 	    - colnums;

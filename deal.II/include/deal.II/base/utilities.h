@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <utility>
+#include <functional>
 #include <string>
 
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
@@ -172,6 +173,68 @@ namespace Utilities
   T
   fixed_power (const T t);
 
+				   /**
+				    * Optimized replacement for
+				    * <tt>std::lower_bound</tt> for
+				    * searching within the range of
+				    * column indices. Slashes
+				    * execution time by
+				    * approximately one half for the
+				    * present application, partly
+				    * because because the
+				    * binary search is replaced by a
+				    * linear search for small loop
+				    * lengths.
+				    *
+				    * Another reason for this function is
+				    * rather obscure:
+				    * when using the GCC libstdc++
+				    * function std::lower_bound,
+				    * complexity is O(log(N)) as
+				    * required. However, when using the
+				    * debug version of the GCC libstdc++
+				    * as we do when running the testsuite,
+				    * then std::lower_bound tests whether
+				    * the sequence is in fact partitioned
+				    * with respect to the pivot 'value'
+				    * (i.e. in essence that the sequence
+				    * is sorted as required for binary
+				    * search to work). However, verifying
+				    * this means that the complexity of
+				    * std::lower_bound jumps to O(N); we
+				    * call this function O(N) times below,
+				    * making the overall complexity
+				    * O(N**2). The consequence is that a
+				    * few tests with big meshes completely
+				    * run off the wall time limit for
+				    * tests and fail with the libstdc++
+				    * debug mode
+				    *
+				    * This function simply makes the
+				    * assumption that the sequence is
+				    * sorted, and we simply don't do the
+				    * additional check.
+				    */
+  template<typename Iterator, typename T>
+  Iterator
+  lower_bound (Iterator  first,
+	       Iterator  last,
+	       const T  &val);
+  
+
+				   /**
+				    * The same function as above, but taking
+				    * an argument that is used to compare
+				    * individual elements of the sequence of
+				    * objects pointed to by the iterators.
+				    */
+  template<typename Iterator, typename T, typename Comp>
+  Iterator
+  lower_bound (Iterator   first,
+	       Iterator   last,
+	       const T   &val,
+	       const Comp comp);
+    
 				   /**
 				    * Given a permutation vector (i.e. a
 				    * vector $p_0\ldots p_{N-1}$ where each
@@ -675,7 +738,167 @@ namespace Utilities
       }
   }
 
+
+
+  template<typename Iterator, typename T>
+  inline
+  Iterator
+  lower_bound (Iterator  first,
+	       Iterator  last,
+	       const T  &val)
+  {
+    return Utilities::lower_bound (first, last, val,
+				   std::less<T>());
+  }  
+
+
+
+  template<typename Iterator, typename T, typename Comp>
+  inline
+  Iterator
+  lower_bound (Iterator    first,
+	       Iterator    last,
+	       const T    &val,
+	       const Comp  comp)
+  {
+    unsigned int len = last-first;
+
+    if (len==0)
+      return first;
+
+    while (true)
+      {
+					 // if length equals 8 or less,
+					 // then do a rolled out
+					 // search. use a switch without
+					 // breaks for that and roll-out
+					 // the loop somehow
+	if (len < 8)
+	  {
+	    switch (len)
+	      {
+		case 7:
+		      if (!comp(*first, val))
+			return first;
+		      ++first;
+		case 6:
+		      if (!comp(*first, val))
+			return first;
+		      ++first;
+		case 5:
+		      if (!comp(*first, val))
+			return first;
+		      ++first;
+		case 4:
+		      if (!comp(*first, val))
+			return first;
+		      ++first;
+		case 3:
+		      if (!comp(*first, val))
+			return first;
+		      ++first;
+		case 2:
+		      if (!comp(*first, val))
+			return first;
+		      ++first;
+		case 1:
+		      if (!comp(*first, val))
+			return first;
+		      return first+1;
+		default:
+						       // indices seem
+						       // to not be
+						       // sorted
+						       // correctly!? or
+						       // did len
+						       // become==0
+						       // somehow? that
+						       // shouln't have
+						       // happened
+		      Assert (false, ExcInternalError());
+	      }
+	  }
+
+
+
+	const unsigned int half   = len >> 1;
+	const Iterator     middle = first + half;
+
+					 // if the value is larger than
+					 // that pointed to by the
+					 // middle pointer, then the
+					 // insertion point must be
+					 // right of it
+	if (comp(*middle, val))
+	  {
+	    first = middle + 1;
+	    len  -= half + 1;
+	  }
+	else
+	  len = half;
+      }
+  }  
 }
+
+				       /**
+					* A replacement for std::lower_bound
+					* which does a binary search for a
+					* position in a sorted array. The
+					* reason for this function is obscure:
+					* when using the GCC libstdc++
+					* function std::lower_bound,
+					* complexity is O(log(N)) as
+					* required. However, when using the
+					* debug version of the GCC libstdc++
+					* as we do when running the testsuite,
+					* then std::lower_bound tests whether
+					* the sequence is in fact partitioned
+					* with respect to the pivot 'value'
+					* (i.e. in essence that the sequence
+					* is sorted as required for binary
+					* search to work). However, verifying
+					* this means that the complexity of
+					* std::lower_bound jumps to O(N); we
+					* call this function O(N) times below,
+					* making the overall complexity
+					* O(N**2). The consequence is that a
+					* few tests with big meshes completely
+					* run off the wall time limit for
+					* tests and fail with the libstdc++
+					* debug mode
+					*
+					* Here, we know that the sequence is
+					* sorted, so we don't need the
+					* additional check
+					*/
+      template<typename Iterator, typename T, typename Comp>
+      Iterator
+      my_lower_bound (Iterator first,
+		      Iterator last,
+		      const T &value,
+		      Comp    &comp)
+      {
+	unsigned int length = std::distance(first, last);
+	unsigned int half;
+	Iterator middle;
+
+	while (length > 0)
+	  {
+	    half = length >> 1;
+	    middle = first;
+	    std::advance(middle, half);
+	    if (comp(*middle, value))
+	      {
+		first = middle;
+		++first;
+		length = length - half - 1;
+	      }
+	    else
+	      length = half;
+	  }
+	return first;
+      }
+    
 
 
 DEAL_II_NAMESPACE_CLOSE

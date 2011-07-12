@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/base/index_set.h>
 
@@ -463,9 +464,10 @@ CompressedSimpleSparsityPattern::Line::add (const unsigned int j)
 
 				   // do a binary search to find the place
 				   // where to insert:
-  std::vector<unsigned int>::iterator it = std::lower_bound(entries.begin(),
-							    entries.end(),
-							    j);
+  std::vector<unsigned int>::iterator
+    it = Utilities::lower_bound(entries.begin(),
+					  entries.end(),
+					  j);
 
 				   // If this entry is a duplicate, exit
 				   // immediately

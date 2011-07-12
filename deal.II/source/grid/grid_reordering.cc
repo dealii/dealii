@@ -14,6 +14,7 @@
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_reordering_internal.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/base/utilities.h>
 
 #include <algorithm>
 #include <set>
@@ -269,66 +270,6 @@ namespace internal
     namespace
     {
 				       /**
-					* A replacement for std::lower_bound
-					* which does a binary search for a
-					* position in a sorted array. The
-					* reason for this function is obscure:
-					* when using the GCC libstdc++
-					* function std::lower_bound,
-					* complexity is O(log(N)) as
-					* required. However, when using the
-					* debug version of the GCC libstdc++
-					* as we do when running the testsuite,
-					* then std::lower_bound tests whether
-					* the sequence is in fact partitioned
-					* with respect to the pivot 'value'
-					* (i.e. in essence that the sequence
-					* is sorted as required for binary
-					* search to work). However, verifying
-					* this means that the complexity of
-					* std::lower_bound jumps to O(N); we
-					* call this function O(N) times below,
-					* making the overall complexity
-					* O(N**2). The consequence is that a
-					* few tests with big meshes completely
-					* run off the wall time limit for
-					* tests and fail with the libstdc++
-					* debug mode
-					*
-					* Here, we know that the sequence is
-					* sorted, so we don't need the
-					* additional check
-					*/
-      template<typename Iterator, typename T, typename Comp>
-      Iterator
-      my_lower_bound (Iterator first,
-		      Iterator last,
-		      const T &value,
-		      Comp comp)
-      {
-	unsigned int length = std::distance(first, last);
-	unsigned int half;
-	Iterator middle;
-
-	while (length > 0)
-	  {
-	    half = length >> 1;
-	    middle = first;
-	    std::advance(middle, half);
-	    if (comp(*middle, value))
-	      {
-		first = middle;
-		++first;
-		length = length - half - 1;
-	      }
-	    else
-	      length = half;
-	  }
-	return first;
-      }
-    
-
-				       /**
 					* Create an MQuad object from the
 					* indices of the four vertices by
 					* looking up the indices of the four
@@ -348,10 +289,10 @@ namespace internal
 				  numbers::invalid_unsigned_int };
 
 	for (unsigned int i=0; i<4; ++i)
-	  edges[i] = (my_lower_bound (elist.begin(),
-				      elist.end(),
-				      quadside(q,i),
-				      MSide::SideSortLess())
+	  edges[i] = (Utilities::lower_bound (elist.begin(),
+							elist.end(),
+							quadside(q,i),
+							MSide::SideSortLess())
 		      -
 		      elist.begin());
 

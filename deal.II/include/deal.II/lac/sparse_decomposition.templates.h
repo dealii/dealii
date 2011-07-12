@@ -15,6 +15,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/template_constraints.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_decomposition.h>
 #include <algorithm>
 #include <cstring>
@@ -170,7 +171,7 @@ SparseLUDecomposition<number>::prebuild_lower_bound()
 
   for(unsigned int row=0; row<N; row++) {
     prebuilt_lower_bound[row]
-      = std::lower_bound (&column_numbers[rowstart_indices[row]+1],
+      = Utilities::lower_bound (&column_numbers[rowstart_indices[row]+1],
                           &column_numbers[rowstart_indices[row+1]],
                           row);
   }

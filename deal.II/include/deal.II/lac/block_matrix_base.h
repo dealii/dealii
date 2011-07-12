@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/block_indices.h>
@@ -2147,7 +2148,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 
       if (this->n_block_cols() > 1)
 	{
-	  const unsigned int * first_block = std::lower_bound (col_indices,
+	  const unsigned int * first_block = Utilities::lower_bound (col_indices,
 							       col_indices+n_cols,
 							       this->column_block_indices.block_start(1));
 

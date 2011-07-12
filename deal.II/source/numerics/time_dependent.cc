@@ -15,6 +15,7 @@
 #include <deal.II/numerics/time_dependent.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -766,7 +767,7 @@ void TimeStepBase_Tria<dim>::refine_grid (const RefinementData refinement_data)
       sorted_criteria = criteria;
       std::sort (sorted_criteria.begin(),
 		 sorted_criteria.end());
-      p_refinement_threshold = std::lower_bound (sorted_criteria.begin(),
+      p_refinement_threshold = Utilities::lower_bound (sorted_criteria.begin(),
 						 sorted_criteria.end(),
 						 static_cast<float>(refinement_threshold));
       p_coarsening_threshold = std::upper_bound (sorted_criteria.begin(),

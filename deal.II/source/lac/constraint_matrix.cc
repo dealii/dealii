@@ -1858,11 +1858,11 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
   const constraint_iterator begin_my_constraints =
-    std::lower_bound (lines.begin(),lines.end(),index_comparison);
+    Utilities::lower_bound (lines.begin(),lines.end(),index_comparison);
 
   index_comparison.line = vec.local_range().second;
   const constraint_iterator end_my_constraints
-    = std::lower_bound(lines.begin(),lines.end(),index_comparison);
+    = Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
 
 				   // Here we search all the indices that we
 				   // need to have read-access to - the
@@ -1940,13 +1940,13 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
       index_comparison.line = vec.block(block).local_range().first
 	+vec.get_block_indices().block_start(block);
       const constraint_iterator begin_my_constraints =
-	std::lower_bound (lines.begin(),lines.end(),index_comparison);
+	Utilities::lower_bound (lines.begin(),lines.end(),index_comparison);
 
       index_comparison.line = vec.block(block).local_range().second
 	+vec.get_block_indices().block_start(block);
 
       const constraint_iterator end_my_constraints
-	= std::lower_bound(lines.begin(),lines.end(),index_comparison);
+	= Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
 
 				   // Here we search all the indices that we
 				   // need to have read-access to - the local
@@ -1995,13 +1995,13 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
       index_comparison.line = vec.block(block).local_range().first
 	+vec.get_block_indices().block_start(block);
       const constraint_iterator begin_my_constraints =
-	std::lower_bound (lines.begin(),lines.end(),index_comparison);
+	Utilities::lower_bound (lines.begin(),lines.end(),index_comparison);
 
       index_comparison.line = vec.block(block).local_range().second
 	+vec.get_block_indices().block_start(block);
 
       const constraint_iterator end_my_constraints
-	= std::lower_bound(lines.begin(),lines.end(),index_comparison);
+	= Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
 
       for (constraint_iterator it = begin_my_constraints;
 	   it != end_my_constraints; ++it)
@@ -2040,11 +2040,11 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
   ConstraintLine index_comparison;
   index_comparison.line = vec.local_range().first;
   const constraint_iterator begin_my_constraints =
-    std::lower_bound (lines.begin(),lines.end(),index_comparison);
+    Utilities::lower_bound (lines.begin(),lines.end(),index_comparison);
 
   index_comparison.line = vec.local_range().second;
   const constraint_iterator end_my_constraints
-    = std::lower_bound(lines.begin(),lines.end(),index_comparison);
+    = Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
 
 				   // all indices we need to read from
   IndexSet my_indices (vec.size());

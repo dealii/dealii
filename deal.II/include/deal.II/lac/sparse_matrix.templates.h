@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,6 +19,7 @@
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -472,9 +473,9 @@ SparseMatrix<number>::add (const unsigned int  row,
 				   // find diagonal and add it if found
 	  Assert (this_cols[0] == row, ExcInternalError());
 	  const unsigned int * diag_pos =
-	    internals::SparsityPatternTools::optimized_lower_bound (col_indices,
-								    col_indices+n_cols,
-								    row);
+	    Utilities::lower_bound (col_indices,
+					      col_indices+n_cols,
+					      row);
 	  const unsigned int diag = diag_pos - col_indices;
 	  unsigned int post_diag = diag;
 	  if (diag != n_cols && *diag_pos == row)
@@ -1433,9 +1434,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
 				       // line denotes the diagonal element,
 				       // which we need not check.
       const unsigned int first_right_of_diagonal_index
-	= (internals::SparsityPatternTools::optimized_lower_bound (&cols->colnums[*rowstart_ptr+1],
-								   &cols->colnums[*(rowstart_ptr+1)],
-								   row)
+	= (Utilities::lower_bound (&cols->colnums[*rowstart_ptr+1],
+					     &cols->colnums[*(rowstart_ptr+1)],
+					     row)
 	   -
 	   &cols->colnums[0]);
 
@@ -1461,9 +1462,9 @@ SparseMatrix<number>::precondition_SSOR (Vector<somenumber>              &dst,
     {
       const unsigned int end_row = *(rowstart_ptr+1);
       const unsigned int first_right_of_diagonal_index
-	= (internals::SparsityPatternTools::optimized_lower_bound (&cols->colnums[*rowstart_ptr+1],
-								   &cols->colnums[end_row],
-								   static_cast<unsigned int>(row)) -
+	= (Utilities::lower_bound (&cols->colnums[*rowstart_ptr+1],
+					     &cols->colnums[end_row],
+					     static_cast<unsigned int>(row)) -
 	   &cols->colnums[0]);
       number s = 0;
       for (unsigned int j=first_right_of_diagonal_index; j<end_row; ++j)

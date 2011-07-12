@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 #define __deal2__index_set_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 
 #include <vector>
@@ -618,7 +619,7 @@ IndexSet::add_range (const unsigned int begin,
       if (ranges.size() == 0 || begin > ranges.back().end)
 	ranges.push_back(new_range);
       else
-	ranges.insert (std::lower_bound (ranges.begin(),
+	ranges.insert (Utilities::lower_bound (ranges.begin(),
 					 ranges.end(),
 					 new_range),
 		       new_range);
@@ -641,7 +642,7 @@ IndexSet::add_index (const unsigned int index)
   else if (index == ranges.back().end)
     ranges.back().end++;
   else
-    ranges.insert (std::lower_bound (ranges.begin(),
+    ranges.insert (Utilities::lower_bound (ranges.begin(),
 				     ranges.end(),
 				     new_range),
 		   new_range);
@@ -824,7 +825,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
     }
 
   std::vector<Range>::const_iterator 
-    p = std::lower_bound(range_begin, range_end, r,
+    p = Utilities::lower_bound(range_begin, range_end, r,
 			 Range::nth_index_compare);
 
   if (p != ranges.end())
@@ -870,7 +871,7 @@ IndexSet::index_within_set (const unsigned int n) const
     }
 
   std::vector<Range>::const_iterator 
-    p = std::lower_bound(range_begin, range_end, r,
+    p = Utilities::lower_bound(range_begin, range_end, r,
 			 Range::end_compare);
 
   Assert(p!=ranges.end(), ExcInternalError());

@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 #include <deal.II/base/vector_slice.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/full_matrix.h>
@@ -183,7 +184,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
       const unsigned int * const
 	original_last_before_side_diagonals
 	= (row > extra_off_diagonals ?
-	   std::lower_bound (original_row_start,
+	   Utilities::lower_bound (original_row_start,
 			     original_row_end,
 			     row-extra_off_diagonals) :
 	   original_row_start);
@@ -734,13 +735,13 @@ SparsityPattern::operator () (const unsigned int i,
 				   // top of this function, so it may
 				   // not be called for noncompressed
 				   // structures.
-  const unsigned int * const sorted_region_start = (diagonal_optimized ?
-						    &colnums[rowstart[i]+1] :
-						    &colnums[rowstart[i]]);
+  const unsigned int * sorted_region_start = (diagonal_optimized ?
+					      &colnums[rowstart[i]+1] :
+					      &colnums[rowstart[i]]);
   const unsigned int * const p
-    = internals::SparsityPatternTools::optimized_lower_bound (sorted_region_start,
-							      &colnums[rowstart[i+1]],
-							      j);
+    = Utilities::lower_bound<const unsigned int *> (sorted_region_start,
+					&colnums[rowstart[i+1]],
+					j);
   if ((p != &colnums[rowstart[i+1]])  &&  (*p == j))
     return (p - &colnums[0]);
   else

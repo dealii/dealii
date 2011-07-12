@@ -1325,7 +1325,7 @@ namespace internals
     for (unsigned int i=1; i<n_active_rows; ++i)
       Assert (total_row_indices[i-1] < total_row_indices[i], ExcInternalError());
 
-    pos = std::lower_bound (total_row_indices.begin(),
+    pos = Utilities::lower_bound (total_row_indices.begin(),
 			    total_row_indices.begin()+n_active_rows,
 			    row_value);
     if (pos->global_row == global_row)
@@ -1429,7 +1429,7 @@ namespace internals
     for (unsigned int i=1;i<num_blocks;++i)
       {
 	row_iterator first_block =
-	  std::lower_bound (block_indices,
+	  Utilities::lower_bound (block_indices,
 			    global_rows.total_row_indices.begin()+n_active_rows,
 			    Distributing(block_object.get_row_indices().block_start(i)));
 	block_starts[i] = first_block - global_rows.total_row_indices.begin();
@@ -1468,7 +1468,7 @@ namespace internals
     for (unsigned int i=1;i<num_blocks;++i)
       {
 	row_iterator first_block =
-	  std::lower_bound (col_indices,
+	  Utilities::lower_bound (col_indices,
 			    row_indices.end(),
 			    block_object.get_row_indices().block_start(i));
 	block_starts[i] = first_block - row_indices.begin();
@@ -2122,7 +2122,7 @@ make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
 	  else
 	    {
 	      std::vector<unsigned int>::iterator it =
-		std::lower_bound(active_dofs.begin(),
+		Utilities::lower_bound(active_dofs.begin(),
 				 active_dofs.end()-i+1,
 				 new_index);
 	      if (*it != new_index)

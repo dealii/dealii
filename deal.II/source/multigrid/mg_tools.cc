@@ -1710,7 +1710,7 @@ MGTools::apply_boundary_values (
 					       // element
 					       // (row,dof_number)
 	      const unsigned int *
-		p = std::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
+		p = Utilities::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
 				     &sparsity_colnums[sparsity_rowstart[row+1]],
 				     dof_number);
 
@@ -1957,14 +1957,14 @@ MGTools::apply_boundary_values (
 			p = &this_sparsity.get_column_numbers()
 			    [this_sparsity.get_rowstart_indices()[row]];
 		      else
-			p = std::lower_bound(&this_sparsity.get_column_numbers()
+			p = Utilities::lower_bound(&this_sparsity.get_column_numbers()
 					     [this_sparsity.get_rowstart_indices()[row]+1],
 					     &this_sparsity.get_column_numbers()
 					     [this_sparsity.get_rowstart_indices()[row+1]],
 					     block_index.second);
 		    }
 		  else
-		    p = std::lower_bound(&this_sparsity.get_column_numbers()
+		    p = Utilities::lower_bound(&this_sparsity.get_column_numbers()
 					 [this_sparsity.get_rowstart_indices()[row]],
 					 &this_sparsity.get_column_numbers()
 					 [this_sparsity.get_rowstart_indices()[row+1]],

@@ -62,7 +62,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
       ForwardIterator my_it = begin;
       unsigned int col = *my_it;
       std::vector<unsigned int>::iterator it =
-	std::lower_bound(entries.begin(), entries.end(), col);
+	Utilities::lower_bound(entries.begin(), entries.end(), col);
       while (*it == col)
 	{
 	  ++my_it;
@@ -80,7 +80,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 	    continue;
 				   // ok, it wasn't the very next one, do a
 				   // binary search to find the insert point
-	  it = std::lower_bound(it, entries.end(), col);
+	  it = Utilities::lower_bound(it, entries.end(), col);
 	  if (it == entries.end())
 	    break;
 	}
@@ -152,7 +152,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
   else {
 				   // do a binary search to find the place
 				   // where to insert:
-    it2 = std::lower_bound(entries.begin(), entries.end(), col);
+    it2 = Utilities::lower_bound(entries.begin(), entries.end(), col);
 
 				   // If this entry is a duplicate, continue
 				   // immediately Insert at the right place
@@ -184,13 +184,13 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 				   // search to the right (preferred search
 				   // direction)
       else if (col > *it) {
-      	it2 = std::lower_bound(it++, entries.end(), col);
+      	it2 = Utilities::lower_bound(it++, entries.end(), col);
 	if (*it2 != col)
 	  it = entries.insert(it2, col);
       }
 				   // search to the left
       else if (col < *it) {
-	it2 = std::lower_bound(entries.begin(), it, col);
+	it2 = Utilities::lower_bound(entries.begin(), it, col);
 	if (*it2 != col)
 	  it = entries.insert(it2, col);
       }
