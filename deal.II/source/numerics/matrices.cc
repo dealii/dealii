@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -72,31 +72,6 @@ namespace internal
 		int spacedim>
       struct Scratch
       {
-	  Scratch (const FiniteElement<dim,spacedim> &fe,
-		   const UpdateFlags         update_flags,
-		   const Function<spacedim> *coefficient,
-		   const Function<spacedim> *rhs_function,
-		   const Quadrature<dim>    &quadrature,
-		   const Mapping<dim,spacedim> &mapping)
-			  :
-			  fe_collection (fe),
-			  quadrature_collection (quadrature),
-			  mapping_collection (mapping),
-			  x_fe_values (mapping_collection,
-				       fe_collection,
-				       quadrature_collection,
-				       update_flags),
-			  coefficient_values(quadrature_collection.max_n_quadrature_points()),
-			  coefficient_vector_values (quadrature_collection.max_n_quadrature_points(),
-						     dealii::Vector<double> (fe_collection.n_components())),
-			  rhs_values(quadrature_collection.max_n_quadrature_points()),
-			  rhs_vector_values (quadrature_collection.max_n_quadrature_points(),
-					     dealii::Vector<double> (fe_collection.n_components())),
-			  coefficient (coefficient),
-			  rhs_function (rhs_function),
-			  update_flags (update_flags)
-	    {}
-
 	  Scratch (const ::dealii::hp::FECollection<dim,spacedim> &fe,
 		   const UpdateFlags         update_flags,
 		   const Function<spacedim> *coefficient,
@@ -140,9 +115,9 @@ namespace internal
 			  update_flags (data.update_flags)
 	    {}
 
-	  const ::dealii::hp::FECollection<dim,spacedim>      fe_collection;
-	  const ::dealii::hp::QCollection<dim>                quadrature_collection;
-	  const ::dealii::hp::MappingCollection<dim,spacedim> mapping_collection;
+	  const ::dealii::hp::FECollection<dim,spacedim>      &fe_collection;
+	  const ::dealii::hp::QCollection<dim>                &quadrature_collection;
+	  const ::dealii::hp::MappingCollection<dim,spacedim> &mapping_collection;
 
 	  ::dealii::hp::FEValues<dim,spacedim> x_fe_values;
 
@@ -593,12 +568,15 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mappi
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
+  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+  hp::QCollection<dim>                q_collection (q);
+  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
   internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
+    assembler_data (fe_collection,
 		    update_values | update_JxW_values |
 		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
 		    coefficient, /*rhs_function=*/0,
-		    q, mapping);
+		    q_collection, mapping_collection);
 
   internal::MatrixCreator::AssemblerData::CopyData copy_data;
   copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
@@ -645,12 +623,15 @@ void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mappi
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
+  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+  hp::QCollection<dim>                q_collection (q);
+  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
   internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
+    assembler_data (fe_collection,
 		    update_values |
 		    update_JxW_values | update_quadrature_points,
 		    coefficient, &rhs,
-		    q, mapping);
+		    q_collection, mapping_collection);
   internal::MatrixCreator::AssemblerData::CopyData copy_data;
   copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
 			 assembler_data.fe_collection.max_dofs_per_cell());
@@ -1664,12 +1645,15 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
+  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+  hp::QCollection<dim>                q_collection (q);
+  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
   internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
+    assembler_data (fe_collection,
 		    update_gradients  | update_JxW_values |
 		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
 		    coefficient, /*rhs_function=*/0,
-		    q, mapping);
+		    q_collection, mapping_collection);
   internal::MatrixCreator::AssemblerData::CopyData copy_data;
   copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
 			 assembler_data.fe_collection.max_dofs_per_cell());
@@ -1719,12 +1703,15 @@ void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &m
   Assert (matrix.n() == dof.n_dofs(),
 	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
+  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+  hp::QCollection<dim>                q_collection (q);
+  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
   internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
+    assembler_data (fe_collection,
 		    update_gradients  | update_values |
 		    update_JxW_values | update_quadrature_points,
 		    coefficient, &rhs,
-		    q, mapping);
+		    q_collection, mapping_collection);
   internal::MatrixCreator::AssemblerData::CopyData copy_data;
   copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
 			 assembler_data.fe_collection.max_dofs_per_cell());
@@ -2006,7 +1993,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					       // element
 					       // (row,dof_number)
 	      const unsigned int *
-		p = std::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
+		p = Utilities::optimized_lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
 				     &sparsity_colnums[sparsity_rowstart[row+1]],
 				     dof_number);
 
@@ -2304,14 +2291,14 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 			p = &this_sparsity.get_column_numbers()
 			    [this_sparsity.get_rowstart_indices()[row]];
 		      else
-			p = std::lower_bound(&this_sparsity.get_column_numbers()
+			p = Utilities::optimized_lower_bound(&this_sparsity.get_column_numbers()
 					     [this_sparsity.get_rowstart_indices()[row]+1],
 					     &this_sparsity.get_column_numbers()
 					     [this_sparsity.get_rowstart_indices()[row+1]],
 					     block_index.second);
 		    }
 		  else
-		    p = std::lower_bound(&this_sparsity.get_column_numbers()
+		    p = Utilities::optimized_lower_bound(&this_sparsity.get_column_numbers()
 					 [this_sparsity.get_rowstart_indices()[row]],
 					 &this_sparsity.get_column_numbers()
 					 [this_sparsity.get_rowstart_indices()[row+1]],
