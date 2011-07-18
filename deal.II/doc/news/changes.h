@@ -216,6 +216,12 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a class Threads::ThreadLocalStorage that allows threads
+to have their own copy of an object without having to fear interference from
+other threads in accessing this object.
+<br>
+(Wolfgang Bangerth 2011/07/07)
+
 <li> Fixed: The 2d grid reordering algorithm that is used by all grid readers had
 a component that was quadratic in its complexity, sometimes leading to cases
 where reading in a mesh in debug mode could take minutes for just a few tens
