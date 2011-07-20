@@ -65,6 +65,11 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: The function VectorTools::create_right_hand_side now also works for objects of type hp::DoFHandler with different finite elements.
+<br>
+(Daniel Gerecht, 2011/07/20)
+
+
 <li> Fixed: deal.II can link with Trilinos but previously it required a
 very specific set of Trilinos sub-libraries; if Trilinos had been compiled
 with a larger set of sub-libraries, linking would sometimes fail. This

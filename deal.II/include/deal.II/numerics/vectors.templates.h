@@ -1154,6 +1154,7 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,sp
 				    fe_values.shape_value(i,point) *
 				    weights[point];
 
+	      dofs.resize(dofs_per_cell);
 	      cell->get_dof_indices (dofs);
 
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1215,7 +1216,7 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,sp
 			      weights[point];
 			  }
 		}
-
+	      dofs.resize(dofs_per_cell);
 	      cell->get_dof_indices (dofs);
 
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
