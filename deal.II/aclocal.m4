@@ -1570,7 +1570,7 @@ AC_DEFUN(DEAL_II_DETERMINE_F77_BRAND, dnl
 
               dnl Now, this is a hard case, we have no more clues...
               F77_VERSION="UnknownF77"
-  	      AC_MSG_RESULT(F77 compiler is unkown. no flags set!)
+  	      AC_MSG_RESULT(F77 compiler is unknown. no flags set!)
             fi
           fi
         fi
