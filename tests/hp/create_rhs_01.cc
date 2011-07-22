@@ -57,7 +57,7 @@ void test ()
   hp::DoFHandler<2> hp_dof_handler2(triangulation);
 
 				   //set different fe for testing
-  typename  hp::DoFHandler<2>::active_cell_iterator
+  hp::DoFHandler<2>::active_cell_iterator
     cell=hp_dof_handler.begin_active(),endc = hp_dof_handler.end();
  
   for (; cell!=endc; ++cell)
