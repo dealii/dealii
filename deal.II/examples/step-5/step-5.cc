@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -810,151 +810,117 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				 // print the cycle number, and then
 				 // have to decide what to do with the
 				 // mesh. If this is not the first
-				 // cycle, we can simply refine the
-				 // existing mesh once globally. If
-				 // this is the first cycle, however,
-				 // we first have to generate a mesh:
+				 // cycle, we simply refine the
+				 // existing mesh once
+				 // globally. Before running through
+				 // these cycles, however,
+				 // we have to generate a mesh:
+
+				 // In previous examples, we have
+				 // already used some of the functions
+				 // from the
+				 // <code>GridGenerator</code>
+				 // class. Here we would like to read
+				 // a grid from a file where the cells
+				 // are stored and which may originate
+				 // from someone else, or may be the
+				 // product of a mesh generator tool.
+				 //
+				 // In order to read a grid from a
+				 // file, we generate an object of
+				 // data type GridIn and associate the
+				 // triangulation to it (i.e. we tell
+				 // it to fill our triangulation
+				 // object when we ask it to read the
+				 // file). Then we open the respective
+				 // file and initialize the
+				 // triangulation with the data in the
+				 // file:
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
+  GridIn<dim> grid_in;
+  grid_in.attach_triangulation (triangulation);
+  std::ifstream input_file("circle-grid.inp");
+				   // We would now like to read the
+				   // file. However, the input file is
+				   // only for a two-dimensional
+				   // triangulation, while this
+				   // function is a template for
+				   // arbitrary dimension. Since this
+				   // is only a demonstration program,
+				   // we will not use different input
+				   // files for the different
+				   // dimensions, but rather kill the
+				   // whole program if we are not in
+				   // 2D:
+  Assert (dim==2, ExcInternalError());
+				   // ExcInternalError is a globally
+				   // defined exception, which may be
+				   // thrown whenever something is
+				   // terribly wrong. Usually, one
+				   // would like to use more specific
+				   // exceptions, and particular in
+				   // this case one would of course
+				   // try to do something else if
+				   // <code>dim</code> is not equal to
+				   // two, e.g. create a grid using
+				   // library functions. Aborting a
+				   // program is usually not a good
+				   // idea and assertions should
+				   // really only be used for
+				   // exceptional cases which should
+				   // not occur, but might due to
+				   // stupidity of the programmer,
+				   // user, or someone else. The
+				   // situation above is not a very
+				   // clever use of Assert, but again:
+				   // this is a tutorial and it might
+				   // be worth to show what not to do,
+				   // after all.
+
+				   // So if we got past the assertion,
+				   // we know that dim==2, and we can
+				   // now actually read the grid. It
+				   // is in UCD (unstructured cell
+				   // data) format (but the ending of
+				   // the <code>UCD</code>-file is
+				   // <code>inp</code>), as supported
+				   // as input format by the AVS
+				   // Explorer (a visualization
+				   // program), for example:
+  grid_in.read_ucd (input_file);
+				   // If you like to use another input
+				   // format, you have to use an other
+				   // <code>grid_in.read_xxx</code>
+				   // function. (See the documentation
+				   // of the <code>GridIn</code> class
+				   // to find out what input formats
+				   // are presently supported.)
+
+				   // The grid in the file describes a
+				   // circle. Therefore we have to use
+				   // a boundary object which tells
+				   // the triangulation where to put
+				   // new points on the boundary when
+				   // the grid is refined. This works
+				   // in the same way as in the first
+				   // example. Note that the
+				   // HyperBallBoundary constructor
+				   // takes two parameters, the center
+				   // of the ball and the radius, but
+				   // that their default (the origin
+				   // and 1.0) are the ones which we
+				   // would like to use here.
+  static const HyperBallBoundary<dim> boundary;
+  triangulation.set_boundary (0, boundary);
+  
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle != 0)
 	triangulation.refine_global (1);
-      else
-	{
-					   // If this is the first
-					   // round, then we have no
-					   // grid yet, and we will
-					   // create it here. In
-					   // previous examples, we
-					   // have already used some
-					   // of the functions from
-					   // the <code>GridGenerator</code>
-					   // class. Here we would
-					   // like to read a grid from
-					   // a file where the cells
-					   // are stored and which may
-					   // originate from someone
-					   // else, or may be the
-					   // product of a mesh
-					   // generator tool.
-					   //
-					   // In order to read a grid
-					   // from a file, we generate
-					   // an object of data type
-					   // GridIn and associate the
-					   // triangulation to it
-					   // (i.e. we tell it to fill
-					   // our triangulation object
-					   // when we ask it to read
-					   // the file). Then we open
-					   // the respective file and
-					   // initialize the
-					   // triangulation with the
-					   // data in the file:
-	  GridIn<dim> grid_in;
-	  grid_in.attach_triangulation (triangulation);
-	  std::ifstream input_file("circle-grid.inp");
-					   // We would now like to
-					   // read the file. However,
-					   // the input file is only
-					   // for a two-dimensional
-					   // triangulation, while
-					   // this function is a
-					   // template for arbitrary
-					   // dimension. Since this is
-					   // only a demonstration
-					   // program, we will not use
-					   // different input files
-					   // for the different
-					   // dimensions, but rather
-					   // kill the whole program
-					   // if we are not in 2D:
-	  Assert (dim==2, ExcInternalError());
-					   // ExcInternalError is a
-					   // globally defined
-					   // exception, which may be
-					   // thrown whenever
-					   // something is terribly
-					   // wrong. Usually, one
-					   // would like to use more
-					   // specific exceptions, and
-					   // particular in this case
-					   // one would of course try
-					   // to do something else if
-					   // <code>dim</code> is not equal to
-					   // two, e.g. create a grid
-					   // using library
-					   // functions. Aborting a
-					   // program is usually not a
-					   // good idea and assertions
-					   // should really only be
-					   // used for exceptional
-					   // cases which should not
-					   // occur, but might due to
-					   // stupidity of the
-					   // programmer, user, or
-					   // someone else. The
-					   // situation above is not a
-					   // very clever use of
-					   // Assert, but again: this
-					   // is a tutorial and it
-					   // might be worth to show
-					   // what not to do, after
-					   // all.
-
-					   // So if we got past the
-					   // assertion, we know that
-					   // dim==2, and we can now
-					   // actually read the
-					   // grid. It is in UCD
-					   // (unstructured cell data)
-					   // format (but the ending
-					   // of the <code>UCD</code>-file is
-					   // <code>inp</code>), as supported
-					   // as input format by the
-					   // AVS Explorer (a
-					   // visualization program),
-					   // for example:
-	  grid_in.read_ucd (input_file);
-                                           // If you like to use
-                                           // another input format,
-                                           // you have to use an other
-                                           // <code>grid_in.read_xxx</code>
-                                           // function. (See the
-                                           // documentation of the
-                                           // <code>GridIn</code> class to find
-                                           // out what input formats
-                                           // are presently
-                                           // supported.)
-
-					   // The grid in the file
-					   // describes a
-					   // circle. Therefore we
-					   // have to use a boundary
-					   // object which tells the
-					   // triangulation where to
-					   // put new points on the
-					   // boundary when the grid
-					   // is refined. This works
-					   // in the same way as in
-					   // the first example. Note
-					   // that the
-					   // HyperBallBoundary
-					   // constructor takes two
-					   // parameters, the center
-					   // of the ball and the
-					   // radius, but that their
-					   // default (the origin and
-					   // 1.0) are the ones which
-					   // we would like to use
-					   // here.
-	  static const HyperBallBoundary<dim> boundary;
-	  triangulation.set_boundary (0, boundary);
-	}
 
 				       // Now that we have a mesh for
 				       // sure, we write some output
