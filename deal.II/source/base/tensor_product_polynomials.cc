@@ -141,9 +141,16 @@ TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
                                    // uni-directional derivatives at
                                    // the given point in each
                                    // co-ordinate direction
-  std::vector<std::vector<double> > v(dim, std::vector<double> (2));
-  for (unsigned int d=0; d<dim; ++d)
-    polynomials[indices[d]].value(p(d), v[d]);
+  double v [dim][2];
+  {
+    std::vector<double> tmp (2);
+    for (unsigned int d=0; d<dim; ++d)
+      {
+	polynomials[indices[d]].value (p(d), tmp);
+	v[d][0] = tmp[0];
+	v[d][1] = tmp[1];
+      }
+  }
 
   Tensor<1,dim> grad;
   for (unsigned int d=0; d<dim; ++d)
@@ -165,9 +172,17 @@ TensorProductPolynomials<dim>::compute_grad_grad (const unsigned int i,
   unsigned int indices[dim];
   compute_index (i, indices);
 
-  std::vector<std::vector<double> > v(dim, std::vector<double> (3));
-  for (unsigned int d=0; d<dim; ++d)
-    polynomials[indices[d]].value(p(d), v[d]);
+  double v [dim][3];
+  {
+    std::vector<double> tmp (3);
+    for (unsigned int d=0; d<dim; ++d)
+      {
+	polynomials[indices[d]].value (p(d), tmp);
+	v[d][0] = tmp[0];
+	v[d][1] = tmp[1];
+	v[d][2] = tmp[2];
+      }
+  }
 
   Tensor<2,dim> grad_grad;
   for (unsigned int d1=0; d1<dim; ++d1)
@@ -202,9 +217,9 @@ compute (const Point<dim>            &p,
          std::vector<Tensor<1,dim> > &grads,
          std::vector<Tensor<2,dim> > &grad_grads) const
 {
-  Assert (values.size()==n_tensor_pols || values.size()==0,
+  Assert (values.size()==n_tensor_pols    || values.size()==0,
           ExcDimensionMismatch2(values.size(), n_tensor_pols, 0));
-  Assert (grads.size()==n_tensor_pols|| grads.size()==0,
+  Assert (grads.size()==n_tensor_pols     || grads.size()==0,
           ExcDimensionMismatch2(grads.size(), n_tensor_pols, 0));
   Assert (grad_grads.size()==n_tensor_pols|| grad_grads.size()==0,
           ExcDimensionMismatch2(grad_grads.size(), n_tensor_pols, 0));
@@ -225,17 +240,25 @@ compute (const Point<dim>            &p,
     n_values_and_derivatives = 3;
 
 
-                                   // compute the values (and
-                                   // derivatives, if necessary) of
-                                   // all polynomials at this
-                                   // evaluation point
-  Table<2,std::vector<double> > v(dim, polynomials.size());
-  for (unsigned int d=0; d<dim; ++d)
-    for (unsigned int i=0; i<polynomials.size(); ++i)
-      {
-        v(d,i).resize (n_values_and_derivatives, 0.);
-        polynomials[i].value(p(d), v(d,i));
-      };
+                                   // compute the values (and derivatives, if
+                                   // necessary) of all polynomials at this
+                                   // evaluation point. to avoid many
+                                   // reallocation, use one std::vector for
+                                   // polynomial evaluation and store the
+                                   // result as Tensor<1,3> (that has enough
+                                   // fields for any evaluation of values and
+                                   // derivatives)
+  Table<2,Tensor<1,3> > v(dim, polynomials.size());
+  {
+    std::vector<double> tmp (n_values_and_derivatives);
+    for (unsigned int d=0; d<dim; ++d)
+      for (unsigned int i=0; i<polynomials.size(); ++i)
+	{
+	  polynomials[i].value(p(d), tmp);
+	  for (unsigned int e=0; e<n_values_and_derivatives; ++e)
+	    v(d,i)[e] = tmp[e];
+	};
+  }
 
   for (unsigned int i=0; i<n_tensor_pols; ++i)
     {
