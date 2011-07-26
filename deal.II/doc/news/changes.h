@@ -221,6 +221,22 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: Evaluation of Lagrangian basis functions has been made stable
+by exchanging polynomial evaluation from the standard form
+$a_n x^n+\ldots+a_1 x + a_0$ to a product of linear factors,
+$c (x - x_0) (x-x_1)\ldots (x-x_n)$. This ensures accurate evaluation up to
+very high order and avoids inaccuracies when using high order finite elements.
+<br>
+(Martin Kronbichler 2011/07/26)
+
+<li> Improved: The internal functions in the constructor of the FE_Q element
+have been improved for high order elements. Especially when the element is
+constructed for a 1D quadrature formula, the initialization is now much faster.
+E.g. the initialization up to order 12 in three dimension completes in less
+than a second, whereas it took hundreds of seconds before.
+<br>
+(Martin Kronbichler 2011/07/26)
+
 <li> New: There is now a class Threads::ThreadLocalStorage that allows threads
 to have their own copy of an object without having to fear interference from
 other threads in accessing this object.
