@@ -272,7 +272,7 @@ namespace Polynomials
 				 * product (x-x_0)*(x-x_1)*...*(x-x_n)/weight,
 				 * or not.
 				 */
-    bool is_lagrange_basis;
+    bool in_lagrange_product_form;
 
 				/**
 				 * If the polynomial is in Lagrange product
@@ -677,8 +677,8 @@ namespace Polynomials
   inline
   Polynomial<number>::Polynomial ()
     :
-    is_lagrange_basis (false),
-    lagrange_weight (1.)
+    in_lagrange_product_form (false),
+    lagrange_weight          (1.)
   {}
 
   template <typename number>
@@ -699,7 +699,7 @@ namespace Polynomials
   {
     Assert (coefficients.size() > 0, ExcEmptyObject());
 
-    if (is_lagrange_basis == false)
+    if (in_lagrange_product_form == false)
       {
                                      // Horner scheme
 	const unsigned int m=coefficients.size();
@@ -730,8 +730,13 @@ namespace Polynomials
   {
                                      // forward to serialization
                                      // function in the base class.
-    ar &  static_cast<Subscriptor &>(*this);
+    ar & static_cast<Subscriptor &>(*this);
     ar & coefficients;
+				// TODO: adjust tests for including these
+				// fields
+    //ar & in_lagrange_product_form;
+    //ar & lagrange_support_points;
+    //ar & lagrange_weight;
   }
 
 }

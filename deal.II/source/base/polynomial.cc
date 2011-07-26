@@ -47,9 +47,9 @@ namespace Polynomials
   template <typename number>
   Polynomial<number>::Polynomial (const std::vector<number> &a)
                   :
-		  coefficients      (a),
-		  is_lagrange_basis (false),
-		  lagrange_weight   (1.)
+		  coefficients             (a),
+		  in_lagrange_product_form (false),
+		  lagrange_weight          (1.)
   {}
 
 
@@ -57,9 +57,9 @@ namespace Polynomials
   template <typename number>
   Polynomial<number>::Polynomial (const unsigned int n)
                   :
-                  coefficients      (n+1, 0.),
-		  is_lagrange_basis (false),
-		  lagrange_weight   (1.)
+                  coefficients             (n+1, 0.),
+		  in_lagrange_product_form (false),
+		  lagrange_weight          (1.)
   {}
 
 
@@ -68,7 +68,7 @@ namespace Polynomials
   Polynomial<number>::Polynomial (const std::vector<Point<1> > &supp,
 				  const unsigned int            center)
                   :
-                  is_lagrange_basis (true)
+                  in_lagrange_product_form (true)
   {
     Assert (supp.size(), ExcEmptyObject());
     lagrange_support_points.reserve (supp.size()-1);
@@ -124,7 +124,7 @@ namespace Polynomials
 
 				// evaluate Lagrange polynomial and
 				// derivatives
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
 				// to compute the value and all derivatives of
 				// a polynomial of the form
@@ -270,7 +270,7 @@ namespace Polynomials
 				// to scale (x-x_0)*(x-x_1)*...*(x-x_n), scale
 				// support points by 1./factor and the weight
 				// likewise
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
 	number inv_fact = number(1.)/factor;
 	number accumulated_fact = 1.;
@@ -303,7 +303,7 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator *= (const double s)
   {
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
 	lagrange_weight *= s;
 	return *this;
@@ -323,7 +323,7 @@ namespace Polynomials
   {
 				// if we are in Lagrange form, just append the
 				// new points
-    if (is_lagrange_basis == true && p.is_lagrange_basis == true)
+    if (in_lagrange_product_form == true && p.in_lagrange_product_form == true)
       {
 	lagrange_weight *= p.lagrange_weight;
 	lagrange_support_points.insert (lagrange_support_points.end(),
@@ -333,9 +333,9 @@ namespace Polynomials
       }
 
 				// cannot retain Lagrange basis, recompute...
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
-	is_lagrange_basis = false;
+	in_lagrange_product_form = false;
 	lagrange_support_points.clear();
 	lagrange_weight = 1.;
       }
@@ -361,9 +361,9 @@ namespace Polynomials
   {
 				// Lagrange product form cannot reasonably be
 				// retained after polynomial addition
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
-	is_lagrange_basis = false;
+	in_lagrange_product_form = false;
 	lagrange_support_points.clear();
 	lagrange_weight = 1.;
       }
@@ -387,9 +387,9 @@ namespace Polynomials
   {
 				// Lagrange product form cannot reasonably be
 				// retained after polynomial subtraction
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
-	is_lagrange_basis = false;
+	in_lagrange_product_form = false;
 	lagrange_support_points.clear();
 	lagrange_weight = 1.;
       }
@@ -496,7 +496,7 @@ namespace Polynomials
 				// shift is simple for a polynomial in product
 				// form, (x-x_0)*(x-x_1)*...*(x-x_n). just add
 				// offset to all shifts
-    if (is_lagrange_basis == true)
+    if (in_lagrange_product_form == true)
       {
 	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
 	  lagrange_support_points[i] -= offset;
@@ -587,40 +587,41 @@ namespace Polynomials
   }
 // ------------------ class LagrangeEquidistant --------------- //
 
+  namespace internal
+  {
+    namespace LagrangeEquidistant
+    {
+      std::vector<Point<1> >
+      generate_unit_points (const unsigned int n)
+      {
+	std::vector<Point<1> > points (n+1);
+	const double one_over_n = 1./n;
+        for (unsigned int k=0;k<=n;++k)
+	  points[k](0) = static_cast<double>(k)*one_over_n;
+	return points;
+      }
+    }
+  }
+
+
+
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
                                             const unsigned int support_point)
+    :
+    Polynomial<double> (internal::LagrangeEquidistant::
+			generate_unit_points (n),
+			support_point)
   {
+				// For polynomial order up to 3, we have
+				// precomputed weights. Use these weights
+				// instead of the product form
     if (n <= 3)
       {
-        this->coefficients.resize(n+1);
+	this->in_lagrange_product_form = false;
+	this->lagrange_weight = 1.;
+	this->lagrange_support_points.clear();
+	Assert (this->coefficients.size() == n+1, ExcInternalError());
         compute_coefficients(n, support_point, this->coefficients);
-      }
-    else
-      {
-                                         // We have precomputed tables
-                                         // up to degree 3. For
-                                         // higher order, we have to
-                                         // compute by hand.
-
-                                         // Start with the constant one
-        this->coefficients.resize(1);
-        this->coefficients[0] = 1.;
-
-                                         // Then compute the Lagrange
-                                         // polynomial as the product
-                                         // of linear factors
-        std::vector<double> two (2, 1.);
-
-        for (unsigned int k=0;k<=n;++k)
-          {
-            if (k != support_point)
-              {
-                two[0] = -1.*k/n;
-                Polynomial<double> factor(two);
-                factor.scale(1.*n/(support_point - k));
-                (*this) *= factor;
-              }
-          }
       }
   }
 
