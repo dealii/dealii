@@ -590,7 +590,7 @@ namespace Polynomials
   LagrangeEquidistant::LagrangeEquidistant (const unsigned int n,
                                             const unsigned int support_point)
   {
-    if (n <= 10)
+    if (n <= 3)
       {
         this->coefficients.resize(n+1);
         compute_coefficients(n, support_point, this->coefficients);
@@ -598,7 +598,7 @@ namespace Polynomials
     else
       {
                                          // We have precomputed tables
-                                         // up to degree 10. For
+                                         // up to degree 3. For
                                          // higher order, we have to
                                          // compute by hand.
 
