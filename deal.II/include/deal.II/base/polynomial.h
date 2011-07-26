@@ -17,12 +17,12 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-template <int dim> class Point;
 
 /**
  * @addtogroup Polynomials
@@ -73,6 +73,19 @@ namespace Polynomials
                                         * polynomial of degree @p n.
                                         */
       Polynomial (const unsigned int n);
+
+				/**
+				 * Constructor for Lagrange polynomial and its
+				 * point of evaluation. The idea is to
+				 * construct $\prod_{i\neq j}
+				 * \frac{x-x_i}{x_j-x_i}$, where j is the
+				 * evaluation point specified as argument and
+				 * the support points contain all points
+				 * (including x_j, which will internally not
+				 * be stored).
+				 */
+    Polynomial (const std::vector<Point<1> > &lagrange_support_points,
+		const unsigned int            evaluation_point);
 
                                        /**
                                         * Default constructor creating
@@ -252,6 +265,30 @@ namespace Polynomials
                                         * of polynomials.
                                         */
       std::vector<number> coefficients;
+
+				/**
+				 * Stores whether the polynomial is in
+				 * Lagrange product form, i.e., constructed as a
+				 * product (x-x_0)*(x-x_1)*...*(x-x_n)/weight,
+				 * or not.
+				 */
+    bool is_lagrange_basis;
+
+				/**
+				 * If the polynomial is in Lagrange product
+				 * form, i.e., constructed as a product
+				 * (x-x_0)*(x-x_1)*...*(x-x_n)/weight, store
+				 * the shifts x_i
+				 */
+    std::vector<number> lagrange_support_points;
+
+				/**
+				 * If the polynomial is in Lagrange product
+				 * form, i.e., constructed as a product
+				 * (x-x_0)*(x-x_1)*...*(x-x_n)/weight, store
+				 * the weight
+				 */
+    number lagrange_weight;
   };
 
 
@@ -520,6 +557,7 @@ namespace Polynomials
   };
 
 
+
 /**
  * Hierarchical polynomials of arbitrary degree on <tt>[0,1]</tt>.
  *
@@ -627,6 +665,8 @@ namespace Polynomials
    };
 }
 
+
+
 /** @} */
 
 /* -------------------------- inline functions --------------------- */
@@ -636,6 +676,9 @@ namespace Polynomials
   template <typename number>
   inline
   Polynomial<number>::Polynomial ()
+    :
+    is_lagrange_basis (false),
+    lagrange_weight (1.)
   {}
 
   template <typename number>
@@ -655,14 +698,26 @@ namespace Polynomials
   Polynomial<number>::value (const number x) const
   {
     Assert (coefficients.size() > 0, ExcEmptyObject());
-    const unsigned int m=coefficients.size();
 
+    if (is_lagrange_basis == false)
+      {
                                      // Horner scheme
-    number value = coefficients.back();
-    for (int k=m-2; k>=0; --k)
-      value = value*x + coefficients[k];
-
-    return value;
+	const unsigned int m=coefficients.size();
+	number value = coefficients.back();
+	for (int k=m-2; k>=0; --k)
+	  value = value*x + coefficients[k];
+	return value;
+      }
+    else
+      {
+				// direct evaluation of Lagrange polynomial
+	const unsigned int m = lagrange_support_points.size();
+	number value = 1.;
+	for (unsigned int j=0; j<m; ++j)
+	  value *= x-lagrange_support_points[j];
+	value *= lagrange_weight;
+	return value;
+      }
   }
 
 

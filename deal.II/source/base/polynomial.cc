@@ -47,7 +47,9 @@ namespace Polynomials
   template <typename number>
   Polynomial<number>::Polynomial (const std::vector<number> &a)
                   :
-                  coefficients(a)
+		  coefficients      (a),
+		  is_lagrange_basis (false),
+		  lagrange_weight   (1.)
   {}
 
 
@@ -55,8 +57,59 @@ namespace Polynomials
   template <typename number>
   Polynomial<number>::Polynomial (const unsigned int n)
                   :
-                  coefficients(n+1, 0.)
+                  coefficients      (n+1, 0.),
+		  is_lagrange_basis (false),
+		  lagrange_weight   (1.)
   {}
+
+
+
+  template <typename number>
+  Polynomial<number>::Polynomial (const std::vector<Point<1> > &supp,
+				  const unsigned int            center)
+                  :
+                  is_lagrange_basis (true)
+  {
+    Assert (supp.size(), ExcEmptyObject());
+    lagrange_support_points.reserve (supp.size()-1);
+    AssertIndexRange (center, supp.size());
+    number tmp_lagrange_weight = 1.;
+    for (unsigned int i=0; i<supp.size(); ++i)
+      if (i!=center)
+	{
+	  lagrange_support_points.push_back(supp[i](0));
+	  tmp_lagrange_weight *= supp[center](0) - supp[i](0);
+	}
+    Assert (std::fabs(tmp_lagrange_weight) > std::numeric_limits<number>::min(),
+	    ExcMessage ("Underflow in computation of Lagrange denominator."));
+    Assert (std::fabs(tmp_lagrange_weight) < std::numeric_limits<number>::max(),
+	    ExcMessage ("Overflow in computation of Lagrange denominator."));
+    lagrange_weight = 1./tmp_lagrange_weight;
+
+				// also hold coefficients since we might
+				// perform some operations (like
+				// multiplication by another polynomial) that
+				// are difficult to do based on the product
+				// form only
+    coefficients.resize (lagrange_support_points.size()+1);
+    if (supp.size() == 1)
+      coefficients[0] = 1.;
+    else
+      {
+	coefficients[0] = -lagrange_support_points[0];
+	coefficients[1] = 1.;
+	for (unsigned int i=1; i<lagrange_support_points.size(); ++i)
+	  {
+	    coefficients[i+1] = 1.;
+	    for (unsigned int j=i; j>0; --j)
+	      coefficients[j] = (-lagrange_support_points[i]*coefficients[j] +
+				 coefficients[j-1]);
+	    coefficients[0] *= -lagrange_support_points[i];
+	  }
+      }
+    for (unsigned int i=0; i<lagrange_support_points.size()+1; ++i)
+      coefficients[i] *= lagrange_weight;
+  }
 
 
 
@@ -69,6 +122,86 @@ namespace Polynomials
     Assert (values.size() > 0, ExcZero());
     const unsigned int values_size=values.size();
 
+				// evaluate Lagrange polynomial and
+				// derivatives
+    if (is_lagrange_basis == true)
+      {
+				// to compute the value and all derivatives of
+				// a polynomial of the form
+				// (x-x_1)*(x-x_2)*...*(x-x_n), expand the
+				// derivatives like automatic differentiation
+				// does.
+	values[0] = 1.;
+	for (unsigned int d=1; d<values_size; ++d)
+	  values[d] = 0.;
+	const unsigned int n_supp = lagrange_support_points.size();
+	switch (values_size)
+	  {
+	  default:
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+
+				// multiply by (x-x_i) and compute action on
+				// all derivatives, too (inspired from
+				// automatic differentiation: implement the
+				// product rule for the old value and the new
+				// variable 'v', i.e., expand value v and
+				// derivative one). since we reuse a value
+				// from the next lower derivative, need to
+				// start from the highest derivative
+		for (unsigned int d=values_size-1; d>0; --d)
+		  values[d] = (values[d] * v +
+			       static_cast<number>(d) * values[d-1]);
+		values[0] *= v;
+	      }
+	    break;
+
+				// manually implement size 1 (values only),
+				// size 2 (value + first derivative), and size
+				// 3 (up to second derivative) since they
+				// might be called often. then, we can unroll
+				// the loop.
+	  case 1:
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+		values[0] *= v;
+	      }
+	    break;
+	  case 2:
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+		values[1] = values[1] * v + values[0];
+		values[0] *= v;
+	      }
+	    break;
+	  case 3:
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+		values[2] = values[2] * v + 2. * values[1];
+		values[1] = values[1] * v + values[0];
+		values[0] *= v;
+	      }
+	    break;
+	  }
+
+				// finally, multiply by the weight in the
+				// Lagrange denominator. Could be done instead
+				// of setting values[0] = 1 above, but that
+				// gives different accumulation of round-off
+				// errors (multiplication is not associative)
+				// compared to when we computed the weight,
+				// and hence a basis function might not be
+				// exactly one at the center point, which is
+				// nice to have
+	for (unsigned int d=0; d<values_size; ++d)
+	  values[d] *= lagrange_weight;
+
+	return;
+      }
 
                                      // if we only need the value, then
                                      // call the other function since
@@ -113,6 +246,7 @@ namespace Polynomials
   }
 
 
+
   template <typename number>
   void
   Polynomial<number>::scale (std::vector<number> &coefficients,
@@ -133,7 +267,22 @@ namespace Polynomials
   void
   Polynomial<number>::scale (const number factor)
   {
-    scale (coefficients, factor);
+				// to scale (x-x_0)*(x-x_1)*...*(x-x_n), scale
+				// support points by 1./factor and the weight
+				// likewise
+    if (is_lagrange_basis == true)
+      {
+	number inv_fact = number(1.)/factor;
+	number accumulated_fact = 1.;
+	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
+	  {
+	    lagrange_support_points[i] *= inv_fact;
+	    accumulated_fact *= factor;
+	  }
+	lagrange_weight *= accumulated_fact;
+      }
+    else
+      scale (coefficients, factor);
   }
 
 
@@ -154,6 +303,12 @@ namespace Polynomials
   Polynomial<number>&
   Polynomial<number>::operator *= (const double s)
   {
+    if (is_lagrange_basis == true)
+      {
+	lagrange_weight *= s;
+	return *this;
+      }
+
     for (typename std::vector<number>::iterator c = coefficients.begin();
          c != coefficients.end(); ++c)
       *c *= s;
@@ -161,10 +316,30 @@ namespace Polynomials
   }
 
 
+
   template <typename number>
   Polynomial<number>&
   Polynomial<number>::operator *= (const Polynomial<number>& p)
   {
+				// if we are in Lagrange form, just append the
+				// new points
+    if (is_lagrange_basis == true && p.is_lagrange_basis == true)
+      {
+	lagrange_weight *= p.lagrange_weight;
+	lagrange_support_points.insert (lagrange_support_points.end(),
+					p.lagrange_support_points.begin(),
+					p.lagrange_support_points.end());
+	return *this;
+      }
+
+				// cannot retain Lagrange basis, recompute...
+    if (is_lagrange_basis == true)
+      {
+	is_lagrange_basis = false;
+	lagrange_support_points.clear();
+	lagrange_weight = 1.;
+      }
+
                                      // Degree of the product
     unsigned int new_degree = this->degree() + p.degree();
 
@@ -172,17 +347,27 @@ namespace Polynomials
 
     for (unsigned int i=0; i<p.coefficients.size(); ++i)
       for (unsigned int j=0; j<this->coefficients.size(); ++j)
-      new_coefficients[i+j] += this->coefficients[j]*p.coefficients[i];
+	new_coefficients[i+j] += this->coefficients[j]*p.coefficients[i];
     this->coefficients = new_coefficients;
 
     return *this;
   }
 
 
+
   template <typename number>
   Polynomial<number>&
   Polynomial<number>::operator += (const Polynomial<number>& p)
   {
+				// Lagrange product form cannot reasonably be
+				// retained after polynomial addition
+    if (is_lagrange_basis == true)
+      {
+	is_lagrange_basis = false;
+	lagrange_support_points.clear();
+	lagrange_weight = 1.;
+      }
+
                                      // if necessary expand the number
                                      // of coefficients we store
     if (p.coefficients.size() > coefficients.size())
@@ -195,10 +380,20 @@ namespace Polynomials
   }
 
 
+
   template <typename number>
   Polynomial<number>&
   Polynomial<number>::operator -= (const Polynomial<number>& p)
   {
+				// Lagrange product form cannot reasonably be
+				// retained after polynomial subtraction
+    if (is_lagrange_basis == true)
+      {
+	is_lagrange_basis = false;
+	lagrange_support_points.clear();
+	lagrange_weight = 1.;
+      }
+
                                      // if necessary expand the number
                                      // of coefficients we store
     if (p.coefficients.size() > coefficients.size())
@@ -210,12 +405,15 @@ namespace Polynomials
     return *this;
   }
 
+
+
   template <typename number >
   bool
   Polynomial<number>::operator == (const Polynomial<number> & p)  const
   {
     return (p.coefficients == coefficients);
   }
+
 
 
   template <typename number>
@@ -289,12 +487,22 @@ namespace Polynomials
   }
 
 
+
   template <typename number>
   template <typename number2>
   void
   Polynomial<number>::shift (const number2 offset)
   {
-    shift (coefficients, offset);
+				// shift is simple for a polynomial in product
+				// form, (x-x_0)*(x-x_1)*...*(x-x_n). just add
+				// offset to all shifts
+    if (is_lagrange_basis == true)
+      {
+	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
+	  lagrange_support_points[i] -= offset;
+      }
+    else
+      shift (coefficients, offset);
   }
 
 
@@ -303,6 +511,8 @@ namespace Polynomials
   Polynomial<number>
   Polynomial<number>::derivative () const
   {
+				// no simple form possible for Lagrange
+				// polynomial on product form
     if (degree() == 0)
       return Monomial<number>(0, 0.);
 
@@ -314,10 +524,13 @@ namespace Polynomials
   }
 
 
+
   template <typename number>
   Polynomial<number>
   Polynomial<number>::primitive () const
   {
+				// no simple form possible for Lagrange
+				// polynomial on product form
     std::vector<number> newcoefficients (coefficients.size()+1);
     newcoefficients[0] = 0.;
     for (unsigned int i=0 ; i<coefficients.size() ; ++i)
@@ -325,6 +538,7 @@ namespace Polynomials
 
     return Polynomial<number> (newcoefficients);
   }
+
 
 
   template <typename number>
@@ -352,11 +566,13 @@ namespace Polynomials
   }
 
 
+
   template <typename number>
   Monomial<number>::Monomial (unsigned int n,
                               double coefficient)
                   : Polynomial<number>(make_vector(n, coefficient))
   {}
+
 
 
   template <typename number>
@@ -456,169 +672,6 @@ namespace Polynomials
           x=&x3[0];
           break;
         }
-        case 4:
-        {
-          static const double x4[25]=
-            {
-                  1.0, -25.0/3.0, 70.0/3.0, -80.0/3.0, 32.0/3.0,
-                  0.0, 16.0, -208.0/3.0, 96.0, -128.0/3.0,
-                  0.0, -12.0, 76.0, -128.0, 64.0,
-                  0.0, 16.0/3.0, -112.0/3.0, 224.0/3.0, -128.0/3.0,
-                  0.0, -1.0, 22.0/3.0, -16.0, 32.0/3.0
-            };
-          x=&x4[0];
-          break;
-        }
-        case 5:
-        {
-          static const double x5[36]=
-            {
-                  1.0, -137.0/12.0, 375.0/8.0, -2125.0/24.0, 625.0/8.0, -625.0/24.0,
-                  0.0, 25.0, -1925.0/12.0, 8875.0/24.0, -4375.0/12.0, 3125.0/24.0,
-                  0.0, -25.0, 2675.0/12.0, -7375.0/12.0, 8125.0/12.0, -3125.0/12.0,
-                  0.0, 50.0/3.0, -325.0/2.0, 6125.0/12.0, -625.0, 3125.0/12.0,
-                  0.0, -25.0/4.0, 1525.0/24.0, -5125.0/24.0, 6875.0/24.0, -3125.0/24.0,
-                  0.0, 1.0, -125.0/12.0, 875.0/24.0, -625.0/12.0, 625.0/24.0
-            };
-          x=&x5[0];
-          break;
-        }
-        case 6:
-        {
-          static const double x6[49]=
-            {
-                  1.0, -147.0/10.0, 406.0/5.0, -441.0/2.0, 315.0, -1134.0/5.0,
-                  324.0/5.0, 0.0, 36.0, -1566.0/5.0, 1044.0, -1674.0, 1296.0,
-                  -1944.0/5.0, 0.0, -45.0, 1053.0/2.0, -4149.0/2.0, 3699.0, -3078.0,
-                  972.0, 0.0, 40.0, -508.0, 2232.0, -4356.0, 3888.0, -1296.0, 0.0,
-                  -45.0/2.0, 297.0, -2763.0/2.0, 2889.0, -2754.0, 972.0, 0.0,
-                  36.0/5.0, -486.0/5.0, 468.0, -1026.0, 5184.0/5.0, -1944.0/5.0, 0.0,
-                  -1.0, 137.0/10.0, -135.0/2.0, 153.0, -162.0, 324.0/5.0
-            };
-          x=&x6[0];
-          break;
-        }
-        case 7:
-        {
-          static const double x7[64]=
-            {
-                  1.0, -363.0/20.0, 22981.0/180.0, -331681.0/720.0, 16807.0/18.0,
-                  -386561.0/360.0, 117649.0/180.0, -117649.0/720.0, 0.0, 49.0,
-                  -10927.0/20.0, 109417.0/45.0, -88837.0/16.0, 991613.0/144.0,
-                  -352947.0/80.0, 823543.0/720.0, 0.0, -147.0/2.0, 43071.0/40.0,
-                  -1347647.0/240.0, 170471.0/12.0, -151263.0/8.0, 1529437.0/120.0,
-                  -823543.0/240.0, 0.0, 245.0/3.0, -46501.0/36.0, 133427.0/18.0,
-                  -2926819.0/144.0, 4151329.0/144.0, -2941225.0/144.0,
-                  823543.0/144.0, 0.0, -245.0/4.0, 2009.0/2.0, -872935.0/144.0,
-                  52822.0/3.0, -1899191.0/72.0, 117649.0/6.0, -823543.0/144.0, 0.0,
-                  147.0/5.0, -9849.0/20.0, 45962.0/15.0, -444185.0/48.0,
-                  1159683.0/80.0, -2705927.0/240.0, 823543.0/240.0, 0.0, -49.0/6.0,
-                  49931.0/360.0, -634207.0/720.0, 98441.0/36.0, -319333.0/72.0,
-                  1294139.0/360.0, -823543.0/720.0, 0.0, 1.0, -343.0/20.0,
-                  9947.0/90.0, -16807.0/48.0, 84035.0/144.0, -117649.0/240.0,
-                  117649.0/720.0
-            };
-          x=&x7[0];
-          break;
-        }
-        case 8:
-        {
-          static const double x8[81]=
-            {
-                  1.0, -761.0/35.0, 59062.0/315.0, -4272.0/5.0, 34208.0/15.0,
-                  -18432.0/5.0, 53248.0/15.0, -65536.0/35.0, 131072.0/315.0, 0.0,
-                  64.0, -30784.0/35.0, 44672.0/9.0, -673792.0/45.0, 235520.0/9.0,
-                  -1196032.0/45.0, 131072.0/9.0, -1048576.0/315.0, 0.0, -112.0,
-                  9936.0/5.0, -587296.0/45.0, 1956992.0/45.0, -733184.0/9.0,
-                  3915776.0/45.0, -2228224.0/45.0, 524288.0/45.0, 0.0, 448.0/3.0,
-                  -128192.0/45.0, 102016.0/5.0, -1097728.0/15.0, 145408.0,
-                  -2441216.0/15.0, 1441792.0/15.0, -1048576.0/45.0, 0.0, -140.0,
-                  2764.0, -186496.0/9.0, 703552.0/9.0, -1466368.0/9.0, 1712128.0/9.0,
-                  -1048576.0/9.0, 262144.0/9.0, 0.0, 448.0/5.0, -9024.0/5.0,
-                  626048.0/45.0, -2443264.0/45.0, 5285888.0/45.0, -6406144.0/45.0,
-                  4063232.0/45.0, -1048576.0/45.0, 0.0, -112.0/3.0, 34288.0/45.0,
-                  -5984.0, 358784.0/15.0, -53248.0, 999424.0/15.0, -131072.0/3.0,
-                  524288.0/45.0, 0.0, 64.0/7.0, -6592.0/35.0, 67456.0/45.0,
-                  -274432.0/45.0, 124928.0/9.0, -802816.0/45.0, 3801088.0/315.0,
-                  -1048576.0/315.0, 0.0, -1.0, 726.0/35.0, -7504.0/45.0, 30944.0/45.0,
-                  -14336.0/9.0, 94208.0/45.0, -65536.0/45.0, 131072.0/315.0
-            };
-          x=&x8[0];
-          break;
-        }
-        case 9:
-        {
-          static const double x9[100]=
-            {
-                  1.0, -7129.0/280.0, 58635.0/224.0, -40707.0/28.0, 623295.0/128.0,
-                  -6589431.0/640.0, 885735.0/64.0, -5137263.0/448.0, 4782969.0/896.0,
-                  -4782969.0/4480.0, 0.0, 81.0, -373329.0/280.0, 10307331.0/1120.0,
-                  -5589243.0/160.0, 51221727.0/640.0, -4546773.0/40.0,
-                  31355019.0/320.0, -52612659.0/1120.0, 43046721.0/4480.0, 0.0,
-                  -162.0, 475389.0/140.0, -15190173.0/560.0, 18152829.0/160.0,
-                  -44529507.0/160.0, 33244587.0/80.0, -3720087.0/10.0,
-                  205667667.0/1120.0, -43046721.0/1120.0, 0.0, 252.0, -56601.0/10.0,
-                  1959363.0/40.0, -8776431.0/40.0, 91020753.0/160.0,
-                  -71035947.0/80.0, 16474671.0/20.0, -33480783.0/80.0,
-                  14348907.0/160.0, 0.0, -567.0/2.0, 526419.0/80.0, -4752351.0/80.0,
-                  89119521.0/320.0, -241241409.0/320.0, 195629337.0/160.0,
-                  -187598673.0/160.0, 196101729.0/320.0, -43046721.0/320.0, 0.0,
-                  1134.0/5.0, -21465.0/4.0, 795339.0/16.0, -3844017.0/16.0,
-                  215023653.0/320.0, -18009945.0/16.0, 35606547.0/32.0,
-                  -4782969.0/8.0, 43046721.0/320.0, 0.0, -126.0, 60381.0/20.0,
-                  -2276289.0/80.0, 22480173.0/160.0, -64448703.0/160.0,
-                  55447011.0/80.0, -28166373.0/40.0, 62178597.0/160.0,
-                  -14348907.0/160.0, 0.0, 324.0/7.0, -78327.0/70.0, 2989629.0/280.0,
-                  -2142531.0/40.0, 25043337.0/160.0, -22025277.0/80.0,
-                  80247591.0/280.0, -90876411.0/560.0, 43046721.0/1120.0, 0.0,
-                  -81.0/8.0, 275967.0/1120.0, -1328967.0/560.0, 7712091.0/640.0,
-                  -22878207.0/640.0, 20490003.0/320.0, -21789081.0/320.0,
-                  176969853.0/4480.0, -43046721.0/4480.0, 0.0, 1.0, -6849.0/280.0,
-                  265779.0/1120.0, -194643.0/160.0, 2337903.0/640.0, -531441.0/80.0,
-                  2302911.0/320.0, -4782969.0/1120.0, 4782969.0/4480.0
-            };
-          x=&x9[0];
-          break;
-        }
-        case 10:
-        {
-          static const double x10[121]=
-            {
-                  1.0, -7381.0/252.0, 177133.0/504.0, -10511875.0/4536.0,
-                  42711625.0/4536.0, -5369375.0/216.0, 4695625.0/108.0,
-                  -9453125.0/189.0, 6875000.0/189.0, -8593750.0/567.0,
-                  1562500.0/567.0, 0.0, 100.0, -121525.0/63.0, 1997825.0/126.0,
-                  -82992625.0/1134.0, 3775625.0/18.0, -20965625.0/54.0,
-                  4187500.0/9.0, -65937500.0/189.0, 3125000.0/21.0,
-                  -15625000.0/567.0, 0.0, -225.0, 153025.0/28.0, -2898075.0/56.0,
-                  33095875.0/126.0, -57981875.0/72.0, 56396875.0/36.0,
-                  -17546875.0/9.0, 94843750.0/63.0, -41406250.0/63.0, 7812500.0/63.0,
-                  0.0, 400.0, -654100.0/63.0, 20028950.0/189.0, -108434750.0/189.0,
-                  16686250.0/9.0, -33868750.0/9.0, 43625000.0/9.0, -242500000.0/63.0,
-                  325000000.0/189.0, -62500000.0/189.0, 0.0, -525.0, 168775.0/12.0,
-                  -1792225.0/12.0, 91073375.0/108.0, -102070625.0/36.0,
-                  107321875.0/18.0, -71281250.0/9.0, 19375000.0/3.0, -26562500.0/9.0,
-                  15625000.0/27.0, 0.0, 504.0, -13754.0, 149625.0, -7818625.0/9.0,
-                  27074375.0/9.0, -58608125.0/9.0, 80000000.0/9.0, -66875000.0/9.0,
-                  31250000.0/9.0, -6250000.0/9.0, 0.0, -350.0, 174025.0/18.0,
-                  -11544725.0/108.0, 34178875.0/54.0, -80666875.0/36.0,
-                  89384375.0/18.0, -62468750.0/9.0, 5937500.0, -76562500.0/27.0,
-                  15625000.0/27.0, 0.0, 1200.0/7.0, -100300.0/21.0, 1121950.0/21.0,
-                  -60659750.0/189.0, 10401250.0/9.0, -7831250.0/3.0,
-                  234625000.0/63.0, -205000000.0/63.0, 100000000.0/63.0,
-                  -62500000.0/189.0, 0.0, -225.0/4.0, 88325.0/56.0, -996675.0/56.0,
-                  54486625.0/504.0, -28405625.0/72.0, 32584375.0/36.0,
-                  -11828125.0/9.0, 73750000.0/63.0, -36718750.0/63.0, 7812500.0/63.0,
-                  0.0, 100.0/9.0, -6575.0/21.0, 4033825.0/1134.0, -24717625.0/1134.0,
-                  4341875.0/54.0, -10090625.0/54.0, 7437500.0/27.0,
-                  -47187500.0/189.0, 71875000.0/567.0, -15625000.0/567.0, 0.0, -1.0,
-                  7129.0/252.0, -162875.0/504.0, 1130750.0/567.0, -59375.0/8.0,
-                  1883125.0/108.0, -78125.0/3.0, 4531250.0/189.0, -781250.0/63.0,
-                  1562500.0/567.0
-            };
-          x=&x10[0];
-          break;
-        }
         default:
               Assert(false, ExcInternalError())
       }
@@ -637,7 +690,7 @@ namespace Polynomials
                                        // create constant polynomial
       return std::vector<Polynomial<double> >
         (1, Polynomial<double> (std::vector<double> (1,1.)));
-    else
+    else if (degree < 4)
       {
                                          // create array of Lagrange
                                          // polynomials
@@ -645,7 +698,22 @@ namespace Polynomials
         for (unsigned int i=0; i<=degree; ++i)
           v.push_back(LagrangeEquidistant(degree,i));
         return v;
-      };
+      }
+    else
+      {
+				// create polynomial as product of (x-x_i),
+				// which avoids cancellation
+	std::vector<Polynomial<double> > p;
+	p.reserve (degree+1);
+	std::vector<Point<1> > points (degree+1);
+	const double one_over_degree = 1./degree;
+        for (unsigned int k=0;k<=degree;++k)
+	  points[k](0) = static_cast<double>(k)*one_over_degree;
+
+	for (unsigned int k=0; k<=degree; ++k)
+	  p.push_back (Polynomial<double> (points, k));
+	return p;
+      }
   }
 
 
@@ -655,53 +723,11 @@ namespace Polynomials
   std::vector<Polynomial<double> >
   generate_complete_Lagrange_basis (const std::vector<Point<1> >& points)
   {
-    std::vector<Polynomial<double> > p(points.size());
-                                     // polynomials are built as
-                                     // products of linear
-                                     // factors. The coefficient in
-                                     // front of the linear term is
-                                     // always 1.
-    std::vector<double> linear(2, 1.);
-                                     // We start with a constant polynomial
-    std::vector<double> one(1, 1.);
+    std::vector<Polynomial<double> > p;
+    p.reserve (points.size());
 
-    for (unsigned int i=0;i<p.size();++i)
-      {
-                                         // Construct interpolation formula
-        p[i] = Polynomial<double>(one);
-        for (unsigned int k=0;k<points.size();++k)
-          if (k != i)
-            {
-              linear[0] = -points[k](0);
-              Polynomial<double> factor(linear);
-              factor *= 1./(points[i](0)-points[k](0));
-              p[i] *= factor;
-            }
-      }
-
-                                     // Since the previous operation
-                                     // is subject to round-off error
-                                     // amplification, we correct the
-                                     // polynomials here.
-    for (unsigned int i=0;i<p.size();++i)
-      {
-        for (unsigned int k=0;k<points.size();++k)
-          {
-            const double value = p[i].value(points[k](0));
-            Polynomial<double> q = p[k];
-            if (i==k)
-              {
-                q *= 1.-value;
-                p[i] += q;
-              }
-            else
-              {
-                q *= -value;
-                p[i] += q;
-              }
-          }
-      }
-
+    for (unsigned int i=0; i<points.size(); ++i)
+      p.push_back (Polynomial<double> (points, i));
     return p;
   }
 
@@ -763,7 +789,7 @@ namespace Polynomials
 					 // space in the array for the
 					 // coefficients, so we have to resize
 					 // it to size k+1
-	
+
 					 // but it's more complicated than
 					 // that: we call this function
 					 // recursively, so if we simply
@@ -1017,7 +1043,7 @@ std::vector<Polynomial<double> > Lobatto::generate_complete_basis (const unsigne
 					 // space in the array for the
 					 // coefficients, so we have to resize
 					 // it to size k+1
-	
+
 					 // but it's more complicated than
 					 // that: we call this function
 					 // recursively, so if we simply
