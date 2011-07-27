@@ -904,17 +904,14 @@ Step39<dim>::run(unsigned int n_steps)
   for (unsigned int s=0;s<n_steps;++s)
     {
       deallog << "Step " << s << std::endl;
-      if (s != 0)
+      if (estimates.block(0).size() == 0)
+	triangulation.refine_global(1);
+      else
 	{
-	  if (estimates.block(0).size() == 0)
-	    triangulation.refine_global(1);
-	  else
-	    {
-	      GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-								 estimates.block(0),
-								 0.5, 0.0);
-	      triangulation.execute_coarsening_and_refinement ();
-	    }
+	  GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
+							     estimates.block(0),
+							     0.5, 0.0);
+	  triangulation.execute_coarsening_and_refinement ();
 	}
       
       deallog << "Triangulation "
