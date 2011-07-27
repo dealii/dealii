@@ -51,7 +51,6 @@ template<int dim>
 void test()
 {
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
 				   // create a mesh so that all but one
 				   // processor are empty
