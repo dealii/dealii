@@ -95,7 +95,7 @@
 				 // scope:
 using namespace dealii;
 
-                                 // @sect3{The <code>LaplaceProblem</code> class}
+                                 // @sect3{The <code>Step3</code> class}
 
 				 // Instead of the procedural programming of
 				 // previous examples, we encapsulate
@@ -117,10 +117,10 @@ using namespace dealii;
                                  // i.e. all the functions that actually do
                                  // anything, are in the private section of
                                  // the class:
-class LaplaceProblem
+class Step3
 {
   public:
-    LaplaceProblem ();
+    Step3 ();
 
     void run ();
 
@@ -165,7 +165,7 @@ class LaplaceProblem
     Vector<double>       system_rhs;
 };
 
-                                 // @sect4{LaplaceProblem::LaplaceProblem}
+                                 // @sect4{Step3::Step3}
 
 				 // Here comes the constructor. It does not
 				 // much more than first to specify that we
@@ -183,15 +183,15 @@ class LaplaceProblem
 				 // distribute degree of freedom on the mesh
 				 // using the distribute_dofs() function.) All
 				 // the other member variables of the
-				 // LaplaceProblem class have a default
+				 // Step3 class have a default
 				 // constructor which does all we want.
-LaplaceProblem::LaplaceProblem () :
+Step3::Step3 () :
                 fe (1),
 		dof_handler (triangulation)
 {}
 
 
-                                 // @sect4{LaplaceProblem::make_grid}
+                                 // @sect4{Step3::make_grid}
 
                                  // Now, the first thing we've got to
 				 // do is to generate the
@@ -200,7 +200,7 @@ LaplaceProblem::LaplaceProblem () :
 				 // number each vertex with a degree
 				 // of freedom. We have seen this in
 				 // the previous examples before.
-void LaplaceProblem::make_grid ()
+void Step3::make_grid ()
 {
 				   // First create the grid and refine
 				   // all cells five times. Since the
@@ -236,7 +236,7 @@ void LaplaceProblem::make_grid ()
 				   // n_active_cells() and n_cells().
 }
 
-                                 // @sect4{LaplaceProblem::setup_system}
+                                 // @sect4{Step3::setup_system}
 
 				   // Next we enumerate all the degrees of
 				   // freedom and set up matrix and
@@ -251,7 +251,7 @@ void LaplaceProblem::make_grid ()
 				   // generating output, let us also take a
 				   // look at how many degrees of freedom are
 				   // generated:
-void LaplaceProblem::setup_system ()
+void Step3::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
   std::cout << "Number of degrees of freedom: "
@@ -308,7 +308,7 @@ void LaplaceProblem::setup_system ()
   system_rhs.reinit (dof_handler.n_dofs());
 }
 
-                                 // @sect4{LaplaceProblem::assemble_system}
+                                 // @sect4{Step3::assemble_system}
 
 
 				 // Now comes the difficult part:
@@ -366,7 +366,7 @@ void LaplaceProblem::setup_system ()
                                  // Using all this, we will assemble the
                                  // linear system for this problem in the
                                  // following function:
-void LaplaceProblem::assemble_system ()
+void Step3::assemble_system ()
 {
 				   // Ok, let's start: we need a quadrature
 				   // formula for the evaluation of the
@@ -733,7 +733,7 @@ void LaplaceProblem::assemble_system ()
 }
 
 
-                                 // @sect4{LaplaceProblem::solve}
+                                 // @sect4{Step3::solve}
 
                                  // The following function simply
 				 // solves the discretized
@@ -751,7 +751,7 @@ void LaplaceProblem::assemble_system ()
 				 // direct methods are no longer
 				 // usable and you are forced to use
 				 // methods like CG.
-void LaplaceProblem::solve ()
+void Step3::solve ()
 {
 				   // First, we need to have an object that
 				   // knows how to tell the CG algorithm when
@@ -791,7 +791,7 @@ void LaplaceProblem::solve ()
 }
 
 
-                                 // @sect4{LaplaceProblem::output_results}
+                                 // @sect4{Step3::output_results}
 
 				 // The last part of a typical finite
 				 // element program is to output the
@@ -803,7 +803,7 @@ void LaplaceProblem::solve ()
 				 // have no such postprocessing here,
 				 // but we would like to write the
 				 // solution to a file.
-void LaplaceProblem::output_results () const
+void Step3::output_results () const
 {
 				   // To write the output to a file,
 				   // we need an object which knows
@@ -854,17 +854,17 @@ void LaplaceProblem::output_results () const
 }
 
 
-                                 // @sect4{LaplaceProblem::run}
+                                 // @sect4{Step3::run}
 
 				 // Finally, the last function of this class
 				 // is the main function which calls all the
-				 // other functions of the <code>LaplaceProblem</code>
+				 // other functions of the <code>Step3</code>
 				 // class. The order in which this is done
 				 // resembles the order in which most finite
 				 // element programs work. Since the names are
 				 // mostly self-explanatory, there is not much
 				 // to comment about:
-void LaplaceProblem::run ()
+void Step3::run ()
 {
   make_grid ();
   setup_system();
@@ -887,7 +887,7 @@ void LaplaceProblem::run ()
 				 // what is done here as well:
 int main ()
 {
-  LaplaceProblem laplace_problem;
+  Step3 laplace_problem;
   laplace_problem.run ();
 
   return 0;
