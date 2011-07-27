@@ -5823,7 +5823,7 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
          #endif
         ],
         [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!]
+        [AC_MSG_ERROR([PETSc was built for MPI, but deal.II is not!]
         )])
       ;;
       3.*) dnl
@@ -5834,7 +5834,7 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
            compile error;
          #endif],
         [AC_MSG_RESULT(yes)],
-        [AC_MSG_ERROR([PETSc was not built for MPI, but deal.II is!])
+        [AC_MSG_ERROR([PETSc was built for MPI, but deal.II is not!])
         ])
       ;;
       *) dnl
