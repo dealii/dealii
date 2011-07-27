@@ -1,6 +1,6 @@
 //----------------------------  hp_hanging_node_constraints_02.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2005, 2006 by the deal.II authors
 //
@@ -53,7 +53,7 @@ std::ofstream logfile("hp_hanging_nodes_02/output");
 
 template <int dim>
 void run (bool random_p,
-	  unsigned int *indx) 
+	  unsigned int *indx)
 {
   Triangulation<dim>     triangulation;
   hp::FECollection<dim>              fe;
@@ -69,7 +69,7 @@ void run (bool random_p,
   fe.push_back (fe_2);
   fe.push_back (fe_3);
   fe.push_back (fe_4);
-  
+
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (5-dim);
   deallog << "Number of active cells: "
@@ -85,25 +85,25 @@ void run (bool random_p,
   typename hp::DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active (),
 						     endc = dof_handler.end ();
   if (random_p)
-    {      
+    {
       for (; cell != endc; ++cell)
-	{      
+	{
 	  cell->set_active_fe_index ((int)(4.0 * (double) random () / (double) RAND_MAX));
 	}
     }
   else
-    {      
-      unsigned int cell_no = 0;  
+    {
+      unsigned int cell_no = 0;
       for (; cell != endc; ++cell)
 	{
 	  if (cell_no >= triangulation.n_active_cells () / 2)
 	    cell->set_active_fe_index (1);
 	  else
 	    cell->set_active_fe_index (0);
-	}  
+	}
     }
 
-  
+
   dof_handler.distribute_dofs (fe);
   deallog << "Number of degrees of freedom: "
 	    << dof_handler.n_dofs()
@@ -123,6 +123,7 @@ void run (bool random_p,
 }
 
 
+
 template <int dim>
 void run_test (unsigned int *indx)
 {
@@ -132,20 +133,20 @@ void run_test (unsigned int *indx)
 
 
 
-int main () 
+int main ()
 {
   logfile.precision(2);
-  
+
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);  
+  deallog.threshold_double(1.e-10);
 
-  unsigned int index[] = 
+  unsigned int index[] =
     {
 	  1,2,3,4,5,6,7
     };
-  
-  
+
+
   deallog << "Testing Order 1" << std::endl;
   run_test<2> (&(index[0]));
   run_test<3> (&(index[0]));
@@ -157,6 +158,6 @@ int main ()
   deallog << "Testing Order 3" << std::endl;
   run_test<2> (&(index[2]));
   run_test<3> (&(index[2]));
-      
+
   return 0;
 }

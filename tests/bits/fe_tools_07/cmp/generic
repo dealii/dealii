@@ -243,7 +243,7 @@ DEAL::Checking DGQ2 against DGQ4 in 3d:
 DEAL::0 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 DEAL::Checking DGQ4 against DGQ2 in 3d:
-DEAL::1.3e-08 3.8e-10 0
+DEAL::0 0 0
 DEAL::0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 DEAL::Checking DGQ3 against DGQ3 in 1d:
 DEAL::0 0 0
