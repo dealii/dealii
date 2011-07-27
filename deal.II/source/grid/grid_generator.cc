@@ -1214,12 +1214,12 @@ GridGenerator::half_hyper_shell (Triangulation<1>&,
 }
 
 template <>
-void GridGenerator::quarter_hyper_shell (Triangulation<1>   &tria,
-				  const Point<1>     &center,
-				  const double        inner_radius,
-				  const double        outer_radius,
-				  const unsigned int  n_cells,
-				  const bool colorize)
+void GridGenerator::quarter_hyper_shell (Triangulation<1>&,
+					 const Point<1>&,
+					 const double,
+					 const double,
+					 const unsigned int,
+					 const bool)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -2692,12 +2692,12 @@ GridGenerator::half_hyper_shell (Triangulation<3>& tria,
 
 
 template <>
-void GridGenerator::quarter_hyper_shell (Triangulation<3>   &tria,
-				  const Point<3>     &center,
-				  const double        inner_radius,
-				  const double        outer_radius,
-				  const unsigned int  n_cells,
-				  const bool colorize)
+void GridGenerator::quarter_hyper_shell (Triangulation<3> &,
+					 const Point<3>&,
+					 const double,
+					 const double,
+					 const unsigned int,
+					 const bool)
 {
   Assert (false, ExcNotImplemented());
 }
