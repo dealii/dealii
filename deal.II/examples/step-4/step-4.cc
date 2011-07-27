@@ -55,10 +55,10 @@
 				 // into the global namespace:
 using namespace dealii;
 
-                                 // @sect3{The <code>LaplaceProblem</code> class template}
+                                 // @sect3{The <code>Step4</code> class template}
 
 				 // This is again the same
-				 // <code>LaplaceProblem</code> class as in the
+				 // <code>Step4</code> class as in the
 				 // previous example. The only
 				 // difference is that we have now
 				 // declared it as a class with a
@@ -75,14 +75,15 @@ using namespace dealii;
 				 // respectively. Apart from this,
 				 // everything is as before.
 template <int dim>
-class LaplaceProblem 
+class Step4 
 {
   public:
-    LaplaceProblem ();
+    Step4 ();
     void run ();
     
   private:
-    void make_grid_and_dofs ();
+    void make_grid ();
+    void setup_system();
     void assemble_system ();
     void solve ();
     void output_results () const;
@@ -236,7 +237,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
 
 
 
-                                 // @sect3{Implementation of the <code>LaplaceProblem</code> class}
+                                 // @sect3{Implementation of the <code>Step4</code> class}
 
                                  // Next for the implementation of the class
                                  // template that makes use of the functions
@@ -246,7 +247,7 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
                                  // the time we define the template
                                  // functions. Only later, the compiler will
                                  // find a declaration of
-                                 // <code>LaplaceProblem@<2@></code> (in the
+                                 // <code>Step4@<2@></code> (in the
                                  // <code>main</code> function, actually) and
                                  // compile the entire class with
                                  // <code>dim</code> replaced by 2, a process
@@ -260,16 +261,16 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
                                  //
                                  // In fact, the compiler will also find a
                                  // declaration
-                                 // <code>LaplaceProblem@<3@></code> in
+                                 // <code>Step4@<3@></code> in
                                  // <code>main()</code>. This will cause it to
                                  // again go back to the general
-                                 // <code>LaplaceProblem@<dim@></code>
+                                 // <code>Step4@<dim@></code>
                                  // template, replace all occurrences of
                                  // <code>dim</code>, this time by 3, and
                                  // compile the class a second time. Note that
                                  // the two instantiations
-                                 // <code>LaplaceProblem@<2@></code> and
-                                 // <code>LaplaceProblem@<3@></code> are
+                                 // <code>Step4@<2@></code> and
+                                 // <code>Step4@<3@></code> are
                                  // completely independent classes; their only
                                  // common feature is that they are both
                                  // instantiated from the same general
@@ -279,24 +280,24 @@ double BoundaryValues<dim>::value (const Point<dim> &p,
                                  // completely independently).
 
 
-                                 // @sect4{LaplaceProblem::LaplaceProblem}
+                                 // @sect4{Step4::Step4}
 
 				 // After this introduction, here is the
-				 // constructor of the <code>LaplaceProblem</code>
+				 // constructor of the <code>Step4</code>
 				 // class. It specifies the desired polynomial
 				 // degree of the finite elements and
 				 // associates the DoFHandler to the
 				 // triangulation just as in the previous
 				 // example program, step-3:
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem ()
+Step4<dim>::Step4 ()
 		:
                 fe (1),
 		dof_handler (triangulation)
 {}
 
 
-                                 // @sect4{LaplaceProblem::make_grid_and_dofs}
+                                 // @sect4{Step4::make_grid}
 
 				 // Grid creation is something inherently
 				 // dimension dependent. However, as long as
@@ -306,7 +307,7 @@ LaplaceProblem<dim>::LaplaceProblem ()
 				 // solve on the square $[-1,1]\times [-1,1]$
 				 // in 2D, or on the cube $[-1,1] \times
 				 // [-1,1] \times [-1,1]$ in 3D; both can be
-				 // termed <code>hyper_cube</code>, so we may
+				 // termed GridGenerator::hyper_cube(), so we may
 				 // use the same function in whatever
 				 // dimension we are. Of course, the functions
 				 // that create a hypercube in two and three
@@ -314,22 +315,8 @@ LaplaceProblem<dim>::LaplaceProblem ()
 				 // that is something you need not care
 				 // about. Let the library handle the
 				 // difficult things.
-				 //
-				 // Likewise, associating a degree of freedom
-				 // with each vertex is something which
-				 // certainly looks different in 2D and 3D,
-				 // but that does not need to bother you
-				 // either. This function therefore looks
-				 // exactly like in the previous example,
-				 // although it performs actions that in their
-				 // details are quite different if
-				 // <code>dim</code> happens to be 3. The only
-				 // significant difference from a user's
-				 // perspective is the number of cells
-				 // resulting, which is much higher in three
-				 // than in two space dimensions!
 template <int dim>
-void LaplaceProblem<dim>::make_grid_and_dofs ()
+void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (4);
@@ -340,7 +327,22 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 	    << "   Total number of cells: "
 	    << triangulation.n_cells()
 	    << std::endl;
+}
 
+                                 // @sect4{Step4::setup_system}
+
+				 // This function looks
+				 // exactly like in the previous example,
+				 // although it performs actions that in their
+				 // details are quite different if
+				 // <code>dim</code> happens to be 3. The only
+				 // significant difference from a user's
+				 // perspective is the number of cells
+				 // resulting, which is much higher in three
+				 // than in two space dimensions!
+template <int dim>
+void Step4<dim>::setup_system ()
+{
   dof_handler.distribute_dofs (fe);
 
   std::cout << "   Number of degrees of freedom: "
@@ -358,7 +360,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 }
 
 
-                                 // @sect4{LaplaceProblem::assemble_system}
+                                 // @sect4{Step4::assemble_system}
 
 				 // Unlike in the previous example, we
 				 // would now like to use a
@@ -391,7 +393,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 				 // don't have to care about most
 				 // things.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
+void Step4<dim>::assemble_system () 
 {  
   QGauss<dim>  quadrature_formula(2);
 
@@ -411,12 +413,12 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // presently on (previously, we only
 				   // required values and gradients of the
 				   // shape function from the
-				   // <code>FEValues</code> object, as well as
+				   // FEValues object, as well as
 				   // the quadrature weights,
-				   // <code>JxW</code>). We can tell the
-				   // <code>FEValues</code> object to do for
+				   // FEValues::JxW() ). We can tell the
+				   // FEValues object to do for
 				   // us by also giving it the
-				   // <code>update_quadrature_points</code>
+				   // #update_quadrature_points
 				   // flag:
   FEValues<dim> fe_values (fe, quadrature_formula, 
 			   update_values   | update_gradients |
@@ -551,7 +553,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				   // values in this example, unlike the one
 				   // before. This is a simple task, we only
 				   // have to replace the
-				   // <code>ZeroFunction</code> used there by
+				   // ZeroFunction used there by
 				   // an object of the class which describes
 				   // the boundary values we would like to use
 				   // (i.e. the <code>BoundaryValues</code>
@@ -568,7 +570,7 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 
-                                 // @sect4{LaplaceProblem::solve}
+                                 // @sect4{Step4::solve}
 
 				 // Solving the linear system of
 				 // equations is something that looks
@@ -578,7 +580,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // function is copied verbatim from the
 				 // previous example.
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void Step4<dim>::solve () 
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              solver (solver_control);
@@ -596,7 +598,7 @@ void LaplaceProblem<dim>::solve ()
 }
 
 
-                                 // @sect4{LaplaceProblem::output_results}
+                                 // @sect4{Step4::output_results}
 
 				 // This function also does what the
 				 // respective one did in step-3. No changes
@@ -625,7 +627,7 @@ void LaplaceProblem<dim>::solve ()
                                  // than 2 or 3, but we neglect this here for
                                  // the sake of brevity).
 template <int dim>
-void LaplaceProblem<dim>::output_results () const
+void Step4<dim>::output_results () const
 {
   DataOut<dim> data_out;
 
@@ -642,7 +644,7 @@ void LaplaceProblem<dim>::output_results () const
 
 
 
-                                 // @sect4{LaplaceProblem::run}
+                                 // @sect4{Step4::run}
 
                                  // This is the function which has the
 				 // top-level control over
@@ -650,11 +652,12 @@ void LaplaceProblem<dim>::output_results () const
 				 // additional output, it is the same
 				 // as for the previous example.
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void Step4<dim>::run () 
 {
   std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
   
-  make_grid_and_dofs();
+  make_grid();
+  setup_system ();
   assemble_system ();
   solve ();
   output_results ();
@@ -667,7 +670,7 @@ void LaplaceProblem<dim>::run ()
 				 // looks mostly like in step-3, but if you
 				 // look at the code below, note how we first
 				 // create a variable of type
-				 // <code>LaplaceProblem@<2@></code> (forcing
+				 // <code>Step4@<2@></code> (forcing
 				 // the compiler to compile the class template
 				 // with <code>dim</code> replaced by
 				 // <code>2</code>) and run a 2d simulation,
@@ -740,12 +743,12 @@ int main ()
 {
   deallog.depth_console (0);
   {
-    LaplaceProblem<2> laplace_problem_2d;
+    Step4<2> laplace_problem_2d;
     laplace_problem_2d.run ();
   }
   
   {
-    LaplaceProblem<3> laplace_problem_3d;
+    Step4<3> laplace_problem_3d;
     laplace_problem_3d.run ();
   }
   
