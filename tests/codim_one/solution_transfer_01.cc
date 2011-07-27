@@ -70,7 +70,7 @@ int main ()
 
   deallog << "Old values:" << std::endl;
   for (unsigned int i=0; i<solution.size(); i++)
-    deallog << solution(i) << endl;
+    deallog << solution(i) << std::endl;
 
 
 				   // Do some refinement
@@ -94,7 +94,7 @@ int main ()
 
   deallog << "New values:" << std::endl;
   for (unsigned int i=0; i<tmp.size(); i++)
-    deallog << tmp(i) << endl;
+    deallog << tmp(i) << std::endl;
 
   return 0;
 }

@@ -48,7 +48,7 @@ void test (unsigned int degree)
     mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
 
   deallog << "Mapping Q("<< degree<< "): P: " << p
-	  << ", on unit: " << q << endl;
+	  << ", on unit: " << q << std::endl;
   
 }
 
