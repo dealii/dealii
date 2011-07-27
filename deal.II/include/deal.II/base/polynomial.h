@@ -252,6 +252,15 @@ namespace Polynomials
       static void multiply (std::vector<number>& coefficients,
                             const number factor);
 
+				       /**
+					* Transforms polynomial form of
+					* product of linear factors into
+					* standard form, $\sum_i a_i
+					* x^i$. Deletes all data structures
+					* related to the product form.
+					*/
+      void transform_into_standard_form ();
+
                                        /**
                                         * Coefficients of the polynomial
                                         * $\sum_i a_i x^i$. This vector
@@ -266,29 +275,29 @@ namespace Polynomials
                                         */
       std::vector<number> coefficients;
 
-				/**
-				 * Stores whether the polynomial is in
-				 * Lagrange product form, i.e., constructed as a
-				 * product (x-x_0)*(x-x_1)*...*(x-x_n)/weight,
-				 * or not.
-				 */
-    bool in_lagrange_product_form;
+				       /**
+					* Stores whether the polynomial is in
+					* Lagrange product form, i.e.,
+					* constructed as a product $(x-x_0)
+					* (x-x_1) \ldots (x-x_n)/c$, or not.
+					*/
+      bool in_lagrange_product_form;
 
-				/**
-				 * If the polynomial is in Lagrange product
-				 * form, i.e., constructed as a product
-				 * (x-x_0)*(x-x_1)*...*(x-x_n)/weight, store
-				 * the shifts x_i
-				 */
-    std::vector<number> lagrange_support_points;
+				       /**
+					* If the polynomial is in Lagrange
+					* product form, i.e., constructed as a
+					* product $(x-x_0) (x-x_1) \ldots
+					* (x-x_n)/c$, store the shifts $x_i$.
+					*/
+      std::vector<number> lagrange_support_points;
 
-				/**
-				 * If the polynomial is in Lagrange product
-				 * form, i.e., constructed as a product
-				 * (x-x_0)*(x-x_1)*...*(x-x_n)/weight, store
-				 * the weight
-				 */
-    number lagrange_weight;
+				       /**
+					* If the polynomial is in Lagrange
+					* product form, i.e., constructed as a
+					* product $(x-x_0) (x-x_1) \ldots
+					* (x-x_n)/c$, store the weight c.
+					*/
+      number lagrange_weight;
   };
 
 
@@ -681,13 +690,22 @@ namespace Polynomials
     lagrange_weight          (1.)
   {}
 
+
+
   template <typename number>
   inline
   unsigned int
   Polynomial<number>::degree () const
   {
-    Assert (coefficients.size()>0, ExcEmptyObject());
-    return coefficients.size() - 1;
+    if (in_lagrange_product_form == true)
+      {
+	return lagrange_support_points.size();
+      }
+    else
+      {
+	Assert (coefficients.size()>0, ExcEmptyObject());
+	return coefficients.size() - 1;
+      }
   }
 
 
@@ -697,10 +715,10 @@ namespace Polynomials
   number
   Polynomial<number>::value (const number x) const
   {
-    Assert (coefficients.size() > 0, ExcEmptyObject());
-
     if (in_lagrange_product_form == false)
       {
+	Assert (coefficients.size() > 0, ExcEmptyObject());
+
                                      // Horner scheme
 	const unsigned int m=coefficients.size();
 	number value = coefficients.back();
@@ -732,11 +750,9 @@ namespace Polynomials
                                      // function in the base class.
     ar & static_cast<Subscriptor &>(*this);
     ar & coefficients;
-				// TODO: adjust tests for including these
-				// fields
-    //ar & in_lagrange_product_form;
-    //ar & lagrange_support_points;
-    //ar & lagrange_weight;
+    ar & in_lagrange_product_form;
+    ar & lagrange_support_points;
+    ar & lagrange_weight;
   }
 
 }
