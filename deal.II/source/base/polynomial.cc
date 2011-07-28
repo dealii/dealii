@@ -18,6 +18,9 @@
 #include <deal.II/base/thread_management.h>
 
 #include <cmath>
+#ifdef HAVE_STD_NUMERIC_LIMITS
+#  include <limits>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -83,10 +86,12 @@ namespace Polynomials
 	}
 
 				// check for underflow and overflow
+#ifdef HAVE_STD_NUMERIC_LIMITS
     Assert (std::fabs(tmp_lagrange_weight) > std::numeric_limits<number>::min(),
 	    ExcMessage ("Underflow in computation of Lagrange denominator."));
     Assert (std::fabs(tmp_lagrange_weight) < std::numeric_limits<number>::max(),
 	    ExcMessage ("Overflow in computation of Lagrange denominator."));
+#endif
     lagrange_weight = 1./tmp_lagrange_weight;
   }
 
