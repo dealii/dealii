@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1156,7 +1156,23 @@ class FullMatrix : public Table<2,number>
     void TmTmult (FullMatrix<number2>       &C,
 		  const FullMatrix<number2> &B,
 		  const bool                 adding=false) const;
-
+    
+				     /**
+				      * Add to the current matrix the
+				      * Schur complement <b>B
+				      * A<sup>-1</sup>
+				      * D</b>. Optionally, use the
+				      * transposes of the matrices
+				      * <b>B</b> and <b>D</b>. Note
+				      * that the argument for <b>A</b>
+				      * is already the inverse.
+				      */
+    void schur_complement(const FullMatrix<number>& Ainverse,
+			  const FullMatrix<number>& B,
+			  const FullMatrix<number>& D,
+			  const bool transpose_B = false,
+			  const bool transpose_D = false);
+    
 				     /**
 				      * Matrix-vector-multiplication.
 				      *

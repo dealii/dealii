@@ -880,6 +880,67 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
 }
 
 
+template <typename number>
+void
+FullMatrix<number>::schur_complement(
+  const FullMatrix<number>& Ainverse,
+  const FullMatrix<number>& B,
+  const FullMatrix<number>& D,
+  const bool transpose_B,
+  const bool transpose_D)
+{  
+  AssertDimension (m(), n());
+  AssertDimension (Ainverse.m(), Ainverse.n());
+
+  const unsigned int N = n();
+  const unsigned int M = Ainverse.n();
+  
+  if (transpose_B)
+    {
+      AssertDimension(B.m(), M);
+      AssertDimension(B.n(), N);
+    }
+  else
+    {
+      AssertDimension(B.n(), M);
+      AssertDimension(B.m(), N);
+    }
+  if (transpose_D)
+    {
+      AssertDimension(D.n(), M);
+      AssertDimension(D.m(), N);
+    }
+  else
+    {
+      AssertDimension(D.m(), M);
+      AssertDimension(D.n(), N);
+    }
+
+				   // For all entries of the product
+				   // AD
+  for (unsigned int i=0; i<M;++i)
+    for (unsigned int j=0; j<N;++j)
+      {
+					 // Compute the entry
+	number ADij = 0.;
+	if (transpose_D)
+	  for (unsigned int k=0;k<M;++k)
+	    ADij += Ainverse(i,k)*D(j,k);
+	else
+	  for (unsigned int k=0;k<M;++k)
+	    ADij += Ainverse(i,k)*D(k,j);
+				   // And add it to this after
+				   // multiplying with the right
+				   // factor from B
+  if (transpose_B)
+    for (unsigned int k=0;k<N;++k)
+      this->operator()(k,j) += ADij*B(i,k);
+  else
+    for (unsigned int k=0;k<N;++k)
+      this->operator()(k,j) += ADij*B(k,i);
+      }
+}
+    
 
 template <typename number>
 template <typename number2>
