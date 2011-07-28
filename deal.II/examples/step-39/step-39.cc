@@ -321,6 +321,153 @@ void Estimator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
   dinfo2.value(0) = dinfo1.value(0);
 }
 
+				 // Finally we have an integrator for
+				 // the error. Since the energy norm
+				 // for discontinuous Galerkin
+				 // problems not only involves the
+				 // difference of the gradient inside
+				 // the cells, but also the jump terms
+				 // across faces and at the boundary,
+				 // we cannot just use
+				 // VectorTools::integrate_difference().
+				 // Instead, we use the MeshWorker
+				 // interface to compute the error
+				 // ourselves.
+
+				 // There are several different ways
+				 // to define this energy norm, but
+				 // all of them are equivalent to each
+				 // other uniformly with mesh size
+				 // (some not uniformly with
+				 // polynomial degree). Here, we
+				 // choose
+				 // @f[
+				 // \|u\|_{1,h} = \sum_{K\in \mathbb
+				 // T_h} \|\nabla u\|_K^2
+				 // + \sum_{F \in F_h^i}
+				 // 4\sigma_F\|\{\!\{ u \mathbf
+				 // n\}\!\}\|^2_F
+				 // + \sum_{F \in F_h^b} 2\sigma_F\|u\|^2_F
+				 // @f]
+
+template <int dim>
+class ErrorIntegrator : public Subscriptor
+{
+  public:
+    static void cell(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
+    static void boundary(MeshWorker::DoFInfo<dim>& dinfo, typename MeshWorker::IntegrationInfo<dim>& info);
+    static void face(MeshWorker::DoFInfo<dim>& dinfo1,
+		     MeshWorker::DoFInfo<dim>& dinfo2,
+		     typename MeshWorker::IntegrationInfo<dim>& info1,
+		     typename MeshWorker::IntegrationInfo<dim>& info2);
+};
+
+				 // Here we have the integration on
+				 // cells. There is currently no good
+				 // interfce in MeshWorker that would
+				 // allow us to access values of
+				 // regular functions in the
+				 // quadrature points. Thus, we have
+				 // to create the vectors for the
+				 // exact function's values and
+				 // gradients inside the cell
+				 // integrator. After that, everything
+				 // is as before and we just add up
+				 // the squares of the differences.
+
+				 // Additionally to computing the error
+				 // in the energy norm, we use the
+				 // capability of the mesh worker to
+				 // compute two functionals at the
+				 // same time and compute the
+				 // <i>L<sup>2</sup></i>-error in the
+				 // same loop. Obviously, this one
+				 // does not have any jump terms and
+				 // only appears in the integration on
+				 // cells.
+template <int dim>
+void ErrorIntegrator<dim>::cell(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  typename MeshWorker::IntegrationInfo<dim>& info)
+{
+  const FEValuesBase<dim>& fe = info.fe_values();
+  std::vector<Tensor<1,dim> > exact_gradients(fe.n_quadrature_points);
+  std::vector<double> exact_values(fe.n_quadrature_points);
+  
+  exact_solution.gradient_list(fe.get_quadrature_points(), exact_gradients);
+  exact_solution.value_list(fe.get_quadrature_points(), exact_values);
+  
+  const std::vector<Tensor<1,dim> >& Duh = info.gradients[0][0];
+  const std::vector<double>& uh = info.values[0][0];
+
+  for (unsigned k=0;k<fe.n_quadrature_points;++k)
+    {
+      double sum = 0;
+      for (unsigned int d=0;d<dim;++d)
+	{
+	  const double diff = exact_gradients[k][d] - Duh[k][d];
+	  sum += diff*diff;
+	}
+      const double diff = exact_values[k] - uh[k];
+      dinfo.value(0) +=  sum * fe.JxW(k);
+      dinfo.value(1) +=  diff*diff * fe.JxW(k);
+    }
+  dinfo.value(0) = std::sqrt(dinfo.value(0));
+  dinfo.value(1) = std::sqrt(dinfo.value(1));
+}
+
+
+template <int dim>
+void ErrorIntegrator<dim>::boundary(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  typename MeshWorker::IntegrationInfo<dim>& info)
+{
+  const FEValuesBase<dim>& fe = info.fe_values();
+  
+  std::vector<double> exact_values(fe.n_quadrature_points);
+  exact_solution.value_list(fe.get_quadrature_points(), exact_values);
+  
+  const std::vector<double>& uh = info.values[0][0];
+  
+  const unsigned int deg = fe.get_fe().tensor_degree();
+  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
+  
+  for (unsigned k=0;k<fe.n_quadrature_points;++k)
+    {
+      const double diff = exact_values[k] - uh[k];
+      dinfo.value(0) += penalty * diff * diff * fe.JxW(k);
+    }
+  dinfo.value(0) = std::sqrt(dinfo.value(0));  
+}
+
+
+template <int dim>
+void ErrorIntegrator<dim>::face(
+  MeshWorker::DoFInfo<dim>& dinfo1,
+  MeshWorker::DoFInfo<dim>& dinfo2,
+  typename MeshWorker::IntegrationInfo<dim>& info1,
+  typename MeshWorker::IntegrationInfo<dim>& info2)
+{
+  const FEValuesBase<dim>& fe = info1.fe_values();
+  const std::vector<double>& uh1 = info1.values[0][0];
+  const std::vector<double>& uh2 = info2.values[0][0];
+  
+  const unsigned int deg = fe.get_fe().tensor_degree();
+  const double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
+  const double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
+  const double penalty = penalty1 + penalty2;
+  
+  for (unsigned k=0;k<fe.n_quadrature_points;++k)
+    {
+      double diff = uh1[k] - uh2[k];
+      dinfo1.value(0) += (penalty * diff*diff)
+			 * fe.JxW(k);
+    }
+  dinfo1.value(0) = std::sqrt(dinfo1.value(0));
+  dinfo2.value(0) = dinfo1.value(0);
+}
+
+
 
 				 // @sect3{The main class}
 
@@ -766,23 +913,6 @@ Step39<dim>::solve()
   solver.solve(matrix, solution, right_hand_side, preconditioner);
 }
 
-				 // Here we compare our finite element
-				 // solution with the (known) exact
-				 // solution and compute the mean
-				 // quadratic error of the gradient.
-template <int dim>
-void
-Step39<dim>::error()
-{
-  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+2;
-  Vector<double> cell_errors(triangulation.n_active_cells());
-  
-  QGauss<dim> quadrature(n_gauss_points);
-  VectorTools::integrate_difference(mapping, dof_handler, solution, exact_solution,
-				    cell_errors, quadrature, VectorTools::H1_seminorm);
-  deallog << "Error    " << cell_errors.l2_norm() << std::endl;
-}
-
 
 				 // Another clone of the assemble
 				 // function. The big difference to
@@ -865,6 +995,66 @@ Step39<dim>::estimate()
     &Estimator<dim>::face,
     assembler);
   return estimates.block(0).l2_norm();
+}
+
+				 // Here we compare our finite element
+				 // solution with the (known) exact
+				 // solution and compute the mean
+				 // quadratic error of the gradient
+				 // and the function itself. This
+				 // function is a clone of the
+				 // estimation function right above.
+
+				 // Since we compute the error in the
+				 // energy and the
+				 // <i>L<sup>2</sup></i>-norm,
+				 // respectively, our block vector
+				 // needs two blocks here.
+template <int dim>
+void
+Step39<dim>::error()
+{
+  BlockVector<double> errors(2);
+  errors.block(0).reinit(triangulation.n_active_cells());
+  errors.block(1).reinit(triangulation.n_active_cells());
+  unsigned int i=0;
+  for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+       cell != triangulation.end();++cell,++i)
+    cell->set_user_index(i);
+
+  MeshWorker::IntegrationInfoBox<dim> info_box;
+  const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+  info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
+
+  NamedData<Vector<double>* > solution_data;
+  solution_data.add(&solution, "solution");
+  
+  info_box.cell_selector.add("solution", true, true, false);
+  info_box.boundary_selector.add("solution", true, false, false);
+  info_box.face_selector.add("solution", true, false, false);
+  
+  info_box.add_update_flags_cell(update_quadrature_points);
+  info_box.add_update_flags_boundary(update_quadrature_points);
+  info_box.initialize(fe, mapping, solution_data);
+  
+  MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+  
+  MeshWorker::Assembler::CellsAndFaces<double> assembler;  
+  NamedData<BlockVector<double>* > out_data;
+  BlockVector<double>* est = &errors;
+  out_data.add(est, "cells");
+  assembler.initialize(out_data, false);
+  
+  MeshWorker::integration_loop<dim, dim> (
+    dof_handler.begin_active(), dof_handler.end(),
+    dof_info, info_box,
+    &ErrorIntegrator<dim>::cell,
+    &ErrorIntegrator<dim>::boundary,
+    &ErrorIntegrator<dim>::face,
+    assembler);
+
+  deallog << "energy-error: " << errors.block(0).l2_norm() << std::endl;
+  deallog << "L2-error:     " << errors.block(1).l2_norm() << std::endl;
 }
 
 
