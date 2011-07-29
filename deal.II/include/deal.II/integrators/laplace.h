@@ -321,8 +321,11 @@ namespace LocalIntegrators
     {
       const unsigned int normal1 = GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number];
       const unsigned int normal2 = GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number];
-      double penalty1 = deg1 * (deg1+1) / dinfo1.cell->extent_in_direction(normal1);
-      double penalty2 = deg2 * (deg2+1) / dinfo2.cell->extent_in_direction(normal2);
+      const unsigned int deg1sq = (deg1 == 0) ? 1 : deg1 * (deg1+1);
+      const unsigned int deg2sq = (deg2 == 0) ? 1 : deg2 * (deg2+1);
+      
+      double penalty1 = deg1sq / dinfo1.cell->extent_in_direction(normal1);
+      double penalty2 = deg2sq / dinfo2.cell->extent_in_direction(normal2);
       if (dinfo1.cell->has_children() ^ dinfo2.cell->has_children())
 	{
 	  Assert (dinfo1.face == dinfo2.face, ExcInternalError());
