@@ -92,7 +92,7 @@ namespace Polynomials
     Assert (std::fabs(tmp_lagrange_weight) < std::numeric_limits<number>::max(),
 	    ExcMessage ("Overflow in computation of Lagrange denominator."));
 #endif
-    lagrange_weight = 1./tmp_lagrange_weight;
+    lagrange_weight = static_cast<number>(1.)/tmp_lagrange_weight;
   }
 
 
@@ -164,7 +164,7 @@ namespace Polynomials
 	    for (unsigned int i=0; i<n_supp; ++i)
 	      {
 		const number v = x-lagrange_support_points[i];
-		values[2] = values[2] * v + 2. * values[1];
+		values[2] = values[2] * v + static_cast<number>(2) * values[1];
 		values[1] = values[1] * v + values[0];
 		values[0] *= v;
 	      }
@@ -220,7 +220,7 @@ namespace Polynomials
       {
         for (int k=m-2; k>=static_cast<int>(j); --k)
           a[k]+=x*a[k+1];
-        values[j]=j_faculty*a[j];
+        values[j]=static_cast<number>(j_faculty)*a[j];
 
         j_faculty*=j+1;
       }
@@ -276,7 +276,7 @@ namespace Polynomials
   Polynomial<number>::scale (std::vector<number> &coefficients,
                              const number         factor)
   {
-    double f = 1.;
+    number f = 1.;
     for (typename std::vector<number>::iterator c = coefficients.begin();
          c != coefficients.end(); ++c)
       {
@@ -616,7 +616,7 @@ namespace Polynomials
 
     std::vector<number> newcoefficients (q->coefficients.size()-1);
     for (unsigned int i=1 ; i<q->coefficients.size() ; ++i)
-      newcoefficients[i-1] = i * q->coefficients[i];
+      newcoefficients[i-1] = number(i) * q->coefficients[i];
 
     return Polynomial<number> (newcoefficients);
   }
@@ -643,7 +643,7 @@ namespace Polynomials
     std::vector<number> newcoefficients (q->coefficients.size()+1);
     newcoefficients[0] = 0.;
     for (unsigned int i=0 ; i<q->coefficients.size() ; ++i)
-      newcoefficients[i+1] = q->coefficients[i]/(i+1.);
+      newcoefficients[i+1] = q->coefficients[i]/number(i+1.);
 
     return Polynomial<number> (newcoefficients);
   }
@@ -654,11 +654,18 @@ namespace Polynomials
   void
   Polynomial<number>::print (std::ostream& out) const
   {
-    for (int i=degree();i>=0;--i)
+    if (in_lagrange_product_form == true)
       {
-        out << static_cast<double>(coefficients[i])
-            << " x^" << i << std::endl;
+	out << lagrange_weight;
+	for (unsigned int i=0; i<lagrange_support_points.size(); ++i)
+	  out << " (x-" << lagrange_support_points[i] << ")";
+	out << std::endl;
       }
+    else
+      for (int i=degree();i>=0;--i)
+	{
+	  out << coefficients[i] << " x^" << i << std::endl;
+	}
   }
 
 
