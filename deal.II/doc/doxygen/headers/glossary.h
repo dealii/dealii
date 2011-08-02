@@ -339,7 +339,9 @@
  * <dd>The <i>direction flag</i> is used in triangulations embedded in a
  * higher dimensional space to denote the orientation of cells and make the
  * manifold oriented. It is accessed using CellAccessor::direction_flag()
- * and set by the Triangulation class upon creation of a triangulation.
+ * and set by the Triangulation class upon creation of a triangulation. You
+ * can change all direction flags of a triangulation using the
+ * Triangulation::flip_all_direction_flags() function.
  *
  * The flag is necessary to make cases like this work: assume we have a
  * one-dimensional mesh embedded in a two-dimensional space,
@@ -755,7 +757,7 @@ Article{JK10,
  *
  *
  * <dt class="glossary">@anchor GlossSerialization <b>Serialization</b></dt>
- 
+
  * <dd>The term "serialization" refers to the process of writing the state of
  * an object to a stream and later retrieve it again. A typical use case is to
  * save the state of a program to disk for possible later resurrection, often
