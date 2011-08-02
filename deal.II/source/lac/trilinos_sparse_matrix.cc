@@ -1015,10 +1015,15 @@ namespace TrilinosWrappers
 				   // transposed matrix, let ML know it
       ML_Comm* comm;
       ML_Comm_Create(&comm);
+#ifdef ML_MPI
+      const Epetra_MpiComm *epcomm = dynamic_cast<const Epetra_MpiComm*>(&(inputleft.trilinos_matrix().Comm()));
+      // Get the MPI communicator, as it may not be MPI_COMM_W0RLD, and update the ML comm object
+      if (epcomm) ML_Comm_Set_UsrComm(comm,epcomm->Comm());
+#endif
       ML_Operator *A_ = ML_Operator_Create(comm);
-      ML_Operator *Anotrans_ = ML_Operator_Create(comm);
       ML_Operator *B_ = ML_Operator_Create(comm);
       ML_Operator *C_ = ML_Operator_Create(comm);
+      SparseMatrix transposed_mat;
 
       if (transpose_left == false)
 	ML_Operator_WrapEpetraCrsMatrix
@@ -1026,12 +1031,42 @@ namespace TrilinosWrappers
 	   false);
       else
 	{
-	  ML_Operator_WrapEpetraCrsMatrix
-	    (const_cast<Epetra_CrsMatrix*>(&inputleft.trilinos_matrix()),
-	     Anotrans_,false);
-	  ML_Operator_Transpose_byrow(Anotrans_,A_);
-	}
+				// create transposed matrix
+	  SparsityPattern sparsity_transposed (inputleft.domain_partitioner(),
+					       inputleft.range_partitioner());
+	  Assert (inputleft.domain_partitioner().LinearMap() == true,
+		  ExcMessage("Matrix must be partitioned contiguously between procs."));
+	  for (unsigned int i=0; i<inputleft.local_size(); ++i)
+	    {
+	      int num_entries, * indices;
+	      inputleft.trilinos_sparsity_pattern().ExtractMyRowView(i, num_entries,
+								     indices);
+	      Assert (num_entries >= 0, ExcInternalError());
+	      const unsigned int GID = inputleft.row_partitioner().GID(i);
+	      for (int j=0; j<num_entries; ++j)
+		sparsity_transposed.add (inputleft.col_partitioner().GID(indices[j]),
+					 GID);
+	    }
 
+	  sparsity_transposed.compress();
+	  transposed_mat.reinit (sparsity_transposed);
+	  for (unsigned int i=0; i<inputleft.local_size(); ++i)
+	    {
+	      int num_entries, * indices;
+	      double * values;
+	      inputleft.trilinos_matrix().ExtractMyRowView(i, num_entries,
+							   values, indices);
+	      Assert (num_entries >= 0, ExcInternalError());
+	      const unsigned int GID = inputleft.row_partitioner().GID(i);
+	      for (int j=0; j<num_entries; ++j)
+		transposed_mat.set (inputleft.col_partitioner().GID(indices[j]),
+				    GID, values[j]);
+	    }
+	  transposed_mat.compress();
+	  ML_Operator_WrapEpetraCrsMatrix
+	    (const_cast<Epetra_CrsMatrix*>(&transposed_mat.trilinos_matrix()),
+	     A_,false);
+	}
       ML_Operator_WrapEpetraCrsMatrix(mod_B.get(),B_,false);
 
 				   // We implement the multiplication by
@@ -1106,7 +1141,6 @@ namespace TrilinosWrappers
 				   // destroy allocated memory
       delete C_mat;
       ML_Operator_Destroy (&A_);
-      ML_Operator_Destroy (&Anotrans_);
       ML_Operator_Destroy (&B_);
       ML_Operator_Destroy (&C_);
       ML_Comm_Destroy (&comm);
