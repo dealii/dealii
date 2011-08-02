@@ -280,7 +280,8 @@ SparseMatrix<number>::n_actually_nonzero_elements (const double threshold) const
   Assert (cols != 0, ExcNotInitialized());
   Assert (threshold >= 0, ExcMessage ("Negative threshold!"));
   unsigned int nnz = 0;
-  for (unsigned int i=0; i<n_nonzero_elements(); ++i)
+  const unsigned int nnz_alloc = n_nonzero_elements();
+  for (unsigned int i=0; i<nnz_alloc; ++i)
     if (std::fabs(val[i]) > threshold)
       ++nnz;
   return nnz;
