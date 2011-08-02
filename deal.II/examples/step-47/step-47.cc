@@ -225,7 +225,7 @@ void LaplaceProblem<dim>::setup_system ()
 
 
   constraints.clear ();
-  DoFTools::make_constraints (dof_handler,
+  DoFTools::make_hanging_node_constraints (dof_handler,
 					   constraints);
   constraints.close ();
 
@@ -376,14 +376,19 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   Assert (cycle < 10, ExcNotImplemented());
 
-  std::string filename = "grid-";
+  std::string filename = "solution-";
   filename += ('0' + cycle);
-  filename += ".eps";
+  filename += ".vtk";
 
   std::ofstream output (filename.c_str());
 
-  GridOut grid_out;
-  grid_out.write_eps (triangulation, output);
+  DataOut<dim,hp::DoFHandler<dim> > data_out;
+
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (solution, "solution");
+  data_out.build_patches ();
+
+  data_out.write_vtk (output);
 }
 
 
@@ -423,19 +428,6 @@ void LaplaceProblem<dim>::run ()
       solve ();
       output_results (cycle);
     }
-
-  DataOutBase::EpsFlags eps_flags;
-  eps_flags.z_scaling = 4;
-
-  DataOut<dim,hp::DoFHandler<dim> > data_out;
-  data_out.set_flags (eps_flags);
-
-  data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "solution");
-  data_out.build_patches ();
-
-  std::ofstream output ("final-solution.eps");
-  data_out.write_eps (output);
 }
 
 
