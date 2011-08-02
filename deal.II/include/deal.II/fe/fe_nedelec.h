@@ -101,20 +101,19 @@ template <int dim, int spacedim> class MappingQ;
  * drop this first term.
  *
  * What this means for the present case: first the computation of
- * gradients of Nedelec shape functions is wrong. Second, you will not
- * notice this usually, for two reasons:
+ * gradients of Nedelec shape functions is wrong in general. Second,
+ * in the following two cases you will not notice this:
  *
- * The first reason is that the gradient of the Jacobian vanishes if
- * the cells are mapped by an affine mapping, to which the usual
- * bilinear mapping reduces if the cell is a parallelogram. Then the
- * gradient of the shape functions is computed exact, since the first
- * term is zero.
+ * - If the cell is a parallelogram, then the usual bi-/trilinear mapping
+ *   is in fact affine. In that case, the gradient of the Jacobian vanishes
+ *   and the gradient of the shape functions is computed exactly, since the
+ *   first term is zero.
  *
- * Second, with the Nedelec elements, you will usually want to compute
- * the curl, and extract and sum up the respective elements of the
- * full gradient tensor. However, the curl of the Jacobian vanishes,
- * so for the curl of shape functions the first term is irrelevant,
- * and the curl will be computed correctly as well.
+ * - With the Nedelec elements, you will usually want to compute
+ *   the curl, not the general derivative tensor. However, the curl of the
+ *   Jacobian vanishes, so for the curl of shape functions the first term
+ *   is irrelevant, and the curl will always be computed correctly even on
+ *   cells that are not parallelograms.
  *
  *
  * <h3>Interpolation</h3>
@@ -160,7 +159,7 @@ class FE_Nedelec : public FE_PolyTensor<PolynomialsNedelec<dim>, dim>
 				      * element of degree @p p.
 				      */
       FE_Nedelec (const unsigned int p);
-      
+
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
