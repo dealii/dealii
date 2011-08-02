@@ -28,6 +28,9 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vectors.h>
 #include <deal.II/numerics/matrices.h>
@@ -60,24 +63,26 @@ class LaplaceProblem
     void run ();
 
   private:
+    bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
+
     void setup_system ();
     void assemble_system ();
     void solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
-    Triangulation<dim>   triangulation;
+    Triangulation<dim>    triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    hp::DoFHandler<dim>   dof_handler;
+    hp::FECollection<dim> fe_collection;
 
-    ConstraintMatrix     hanging_node_constraints;
+    ConstraintMatrix      hanging_node_constraints;
 
-    SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
+    SparsityPattern       sparsity_pattern;
+    SparseMatrix<double>  system_matrix;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
+    Vector<double>        solution;
+    Vector<double>        system_rhs;
 };
 
 
@@ -139,9 +144,13 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem ()
 		:
-		dof_handler (triangulation),
-                fe (2)
-{}
+		dof_handler (triangulation)
+{
+  fe_collection.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
+					  FE_Nothing<dim>(), 1));
+  fe_collection.push_back (FESystem<dim> (FE_Q<dim>(1), 1,
+					  FE_Q<dim>(1), 1));
+}
 
 
 
@@ -154,9 +163,62 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 
 
 template <int dim>
+bool
+LaplaceProblem<dim>::
+interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const
+{
+  return false;
+}
+
+
+
+template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-  dof_handler.distribute_dofs (fe);
+				   // decide which element to use
+				   // where. to do so, we need to know
+				   // which elements are intersected
+				   // by the interface, or are at
+				   // least adjacent. to this end, in
+				   // a first step, loop over all
+				   // cells and record which vertices
+				   // are on cells that are
+				   // intersected
+  std::vector<bool> vertex_is_on_intersected_cell (triangulation.n_vertices(),
+						   false);
+  for (typename Triangulation<dim>::cell_iterator cell
+	 = triangulation.begin_active();
+       cell != triangulation.end(); ++cell)
+    if (interface_intersects_cell(cell))
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	vertex_is_on_intersected_cell[cell->vertex_index(v)] = true;
+
+				   // now loop over all cells
+				   // again. if one of the vertices of
+				   // a given cell is part of a cell
+				   // that is intersected, then we
+				   // need to use the enriched space
+				   // there. otherwise, use the normal
+				   // space
+  for (typename hp::DoFHandler<dim>::cell_iterator cell
+	 = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    {
+      bool use_enriched_space = false;
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	if (vertex_is_on_intersected_cell[cell->vertex_index(v)] == true)
+	  {
+	    use_enriched_space = true;
+	    break;
+	  }
+
+      if (use_enriched_space == false)
+	cell->set_active_fe_index(0);
+      else
+	cell->set_active_fe_index(1);
+    }
+
+  dof_handler.distribute_dofs (fe_collection);
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
@@ -165,8 +227,29 @@ void LaplaceProblem<dim>::setup_system ()
   hanging_node_constraints.clear ();
   DoFTools::make_hanging_node_constraints (dof_handler,
 					   hanging_node_constraints);
-
   hanging_node_constraints.close ();
+
+				   // now constrain those enriched
+				   // DoFs that are on cells that are
+				   // not intersected but that are
+				   // adjacent to cells that are
+  for (typename hp::DoFHandler<dim>::cell_iterator cell
+	 = dof_handler.begin_active();
+       cell != dof_handler.end(); ++cell)
+    if ((cell->active_fe_index() == 1)
+	&&
+	(interface_intersects_cell(cell) == false))
+				       // we are on an enriched cell
+				       // but it isn't
+				       // intersected. see which
+				       // vertices are not part of
+				       // intersected cells and
+				       // constrain these DoFs
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	if (vertex_is_on_intersected_cell[cell->vertex_index(v)] == false)
+	  hanging_node_constraints.add_line (cell->vertex_dof_index(v,1));
+  hanging_node_constraints.close();
+
 
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
@@ -184,32 +267,35 @@ void LaplaceProblem<dim>::assemble_system ()
 {
   const QGauss<dim>  quadrature_formula(3);
 
-  FEValues<dim> fe_values (fe, quadrature_formula,
-			   update_values    |  update_gradients |
-			   update_quadrature_points  |  update_JxW_values);
+  FEValues<dim> plain_fe_values (fe_collection[0], quadrature_formula,
+				 update_values    |  update_gradients |
+				 update_quadrature_points  |  update_JxW_values);
 
-  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
 
-  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  FullMatrix<double>   cell_matrix;
+  Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> local_dof_indices;
 
   const Coefficient<dim> coefficient;
   std::vector<double>    coefficient_values (n_q_points);
 
-  typename DoFHandler<dim>::active_cell_iterator
+  typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   for (; cell!=endc; ++cell)
     {
+      const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+      cell_rhs.reinit (dofs_per_cell);
+
       cell_matrix = 0;
       cell_rhs = 0;
 
-      fe_values.reinit (cell);
+      plain_fe_values.reinit (cell);
 
-      coefficient.value_list (fe_values.get_quadrature_points(),
+      coefficient.value_list (plain_fe_values.get_quadrature_points(),
 			      coefficient_values);
 
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
@@ -217,34 +303,26 @@ void LaplaceProblem<dim>::assemble_system ()
 	  {
 	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      cell_matrix(i,j) += (coefficient_values[q_point] *
-				   fe_values.shape_grad(i,q_point) *
-				   fe_values.shape_grad(j,q_point) *
-				   fe_values.JxW(q_point));
+				   plain_fe_values.shape_grad(i,q_point) *
+				   plain_fe_values.shape_grad(j,q_point) *
+				   plain_fe_values.JxW(q_point));
 
-	    cell_rhs(i) += (fe_values.shape_value(i,q_point) *
+	    cell_rhs(i) += (plain_fe_values.shape_value(i,q_point) *
 			    1.0 *
-			    fe_values.JxW(q_point));
+			    plain_fe_values.JxW(q_point));
 	  }
 
+      local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-	{
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    system_matrix.add (local_dof_indices[i],
-			       local_dof_indices[j],
-			       cell_matrix(i,j));
-
-	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	}
+      hanging_node_constraints.distribute_local_to_global (cell_matrix, cell_rhs,
+							   local_dof_indices,
+							   system_matrix, system_rhs);
     }
-
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
 
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
-					    ZeroFunction<dim>(),
+					    ZeroFunction<dim>(2),
 					    boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
 				      system_matrix,
@@ -349,7 +427,7 @@ void LaplaceProblem<dim>::run ()
   DataOutBase::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
 
-  DataOut<dim> data_out;
+  DataOut<dim,hp::DoFHandler<dim> > data_out;
   data_out.set_flags (eps_flags);
 
   data_out.attach_dof_handler (dof_handler);
