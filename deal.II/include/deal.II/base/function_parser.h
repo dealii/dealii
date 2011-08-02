@@ -20,6 +20,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/point.h>
 #include <vector>
 #include <map>
 
@@ -31,9 +33,6 @@ namespace fparser
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int> class Point;
-template <int, int> class Tensor;
-template <int dim> class Tensor<1,dim>;
 template <typename> class Vector;
 
 
@@ -59,23 +58,23 @@ template <typename> class Vector;
   // Define some constants that will be used by the function parser
   std::map<std::string> constants;
   constants["pi"] = numbers::PI;
-  
+
   // Define the variables that will be used inside the expressions
   std::string variables = "x,y,z";
- 
+
   // Define the expressions of the individual components of a
   // vector valued function with two components:
   std::vector<std::string> expressions(2);
   expressions[0] = "sin(2*pi*x)+sinh(pi*z)";
   expressions[1] = "sin(2*pi*y)*exp(x^2)";
-  
+
   // Generate an empty function for these two components.
   ParsedFunction<3> vector_function(2);
- 
+
   // And populate it with the newly created objects.
   vector_function.initialize(variables,
  			    expressions,
- 			    constants); 
+ 			    constants);
   @endverbatim
 
  * FunctionParser also provides an option to use <b>units</b> in expressions.
@@ -135,12 +134,12 @@ template <typename> class Vector;
  * For more information on this feature, please see
  * contrib/functionparser/fparser.txt
 
- 
- * 
- * See http://warp.povusers.org/FunctionParser/ for an
- * explanation on how the underlying library works. 
+
  *
- 
+ * See http://warp.povusers.org/FunctionParser/ for an
+ * explanation on how the underlying library works.
+ *
+
  From the fparser.txt file:
  @verbatim
 
@@ -182,9 +181,9 @@ template <typename> class Vector;
       example the following expression is valid: x*-y
       Note that the '=' comparison can be inaccurate due to floating point
       precision problems (eg. "sqrt(100)=10" probably returns 0, not 1).
-      
+
       The class supports these functions:
-      
+
       abs(A)    : Absolute value of A. If A is negative, returns -A otherwise
 		  returns A.
       acos(A)   : Arc-cosine of A. Returns the angle, measured in radians,
@@ -241,9 +240,9 @@ template <typename> class Vector;
     "x-1"
     "-sin(sqrt(x^2+y^2))"
     "sqrt(XCoord*XCoord + YCoord*YCoord)"
-    
+
     An example of a recursive function is the factorial function:
-    
+
     "if(n>1, n*eval(n-1), 1)"
 
   Note that a recursive call has some overhead, which makes it a bit slower
@@ -263,53 +262,53 @@ template <typename> class Vector;
  *
  * An example of time dependent scalar function is the following:
       @verbatim
-     
+
       // Empty constants object
       std::map<std::string> constants;
-      
+
       // Variables that will be used inside the expressions
       std::string variables = "x,y,t";
-      
+
       // Define the expression of the scalar time dependent function.
       std::string expression = "exp(y*x)*exp(-t)";
-      
+
       // Generate an empty scalar function
       FunctionParser<2> function;
-      
+
       // And populate it with the newly created objects.
       function.initialize(variables,
 			  expression,
 			  constants,
-			  true);	// This tells the parser that 
+			  true);	// This tells the parser that
 				 	// it is a time-dependent function
 					// and there is another variable
 					// to be taken into account (t).
- 
+
      @endverbatim
-     
+
  * The following is another example of how to instantiate a
  * vector valued function by using a single string:
      @verbatim
-     
+
       // Empty constants object
       std::map<std::string> constants;
-      
+
       // Variables that will be used inside the expressions
       std::string variables = "x,y";
-      
+
       // Define the expression of the vector valued  function.
       std::string expression = "cos(2*pi*x)*y^2; sin(2*pi*x)*exp(y)";
-      
+
       // Generate an empty vector valued function
       FunctionParser<2> function(2);
-      
+
       // And populate it with the newly created objects.
       function.initialize(variables,
 			  expression,
-			  constants);	
- 
+			  constants);
+
      @endverbatim
- *    
+ *
  *
  * @ingroup functions
  * @author Luca Heltai, 2005
@@ -333,8 +332,8 @@ class FunctionParser : public Function<dim>
 				      * exception is thrown.
 				      */
     FunctionParser (const unsigned int n_components = 1,
-		    const double       initial_time = 0.0); 
-  
+		    const double       initial_time = 0.0);
+
 				     /**
 				      * Destructor. Explicitly delete
 				      * the FunctionParser objects
@@ -342,14 +341,14 @@ class FunctionParser : public Function<dim>
 				      * component of the function).
 				      */
     ~FunctionParser();
-    
+
 				     /**
 				      * Type for the constant
 				      * map. Used by the initialize()
 				      * method.
 				      */
     typedef std::map<std::string, double> ConstMap;
-    
+
 				     /**
 				      * Iterator for the constants
 				      * map. Used by the initialize()
@@ -380,7 +379,7 @@ class FunctionParser : public Function<dim>
                                       * is different from dim (if this
                                       * function is not time-dependent) or
                                       * from dim+1 (if it is time-dependent).
-                                      * 
+                                      *
                                       * <b>expressions</b>: a list of strings
                                       * containing the expressions that will
                                       * be byte compiled by the internal
@@ -404,7 +403,7 @@ class FunctionParser : public Function<dim>
                                       * name is not valid (eg:
                                       * <tt>constants["sin"] = 1.5;</tt>) an
                                       * exception is thrown.
-                                      * 
+                                      *
                                       * <b>time_dependent</b>. If this is a
                                       * time dependent function, then the last
                                       * variable declared in <b>vars</b> is
@@ -448,7 +447,7 @@ class FunctionParser : public Function<dim>
                       const ConstMap                 &units,
                       const bool time_dependent = false,
                       const bool use_degrees = false);
-  
+
                                      /**
                                       * Initialize the function. Same as
                                       * above, but accepts a string rather
@@ -521,24 +520,24 @@ class FunctionParser : public Function<dim>
                                      /** @addtogroup Exceptions
                                       * @{ */
     DeclException2 (ExcParseError,
-                    int, char*, 
+                    int, char*,
                     << "Parsing Error at Column " << arg1
                     << ". The parser said: " << arg2);
-    
+
     DeclException2 (ExcInvalidExpressionSize,
-                    int, int, 
+                    int, int,
                     << "The number of components (" << arg1
-                    << ") is not equal to the number of expressions (" 
+                    << ") is not equal to the number of expressions ("
                     << arg2 << ").");
-    
+
                                      //@}
-  private: 
+  private:
 				     /**
 				      * A pointer to the actual
 				      * function parsers.
 				      */
     fparser::FunctionParser * fp;
-    
+
 				     /**
 				      * State of usability. This
 				      * variable is checked every time
@@ -547,7 +546,7 @@ class FunctionParser : public Function<dim>
 				      * in the initialize() methods.
 				      */
     bool initialized;
-    
+
 				     /**
 				      * Number of variables. If this
 				      * is also a function of time,
@@ -584,10 +583,10 @@ FunctionParser<dim>::default_variable_names ()
   return "";
 }
 
-	    
+
 
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
 
-  
+

@@ -17,12 +17,11 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_time.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/point.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
-template <int dim> class Point;
-template <int rank_, int dim> class Tensor;
-template <int dim> class Tensor<1,dim>;
 template <typename number> class Vector;
 
 /**
@@ -109,7 +108,7 @@ class Function : public FunctionTime,
 				      * template programming.
 				      */
     static const unsigned int dimension = dim;
-    
+
     				     /**
 				      * Number of vector components.
 				      */
@@ -126,7 +125,7 @@ class Function : public FunctionTime,
 				      */
     Function (const unsigned int n_components = 1,
 	      const double       initial_time = 0.0);
-    
+
 				     /**
 				      * Virtual destructor; absolutely
 				      * necessary in this case.
@@ -182,7 +181,7 @@ class Function : public FunctionTime,
                                       * to.
                                       */
     Function & operator= (const Function &f);
-    
+
 				     /**
 				      * Return the value of the
 				      * function at the given
@@ -208,7 +207,7 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_value (const Point<dim>   &p,
                                Vector<double>     &values) const;
-    
+
 				     /**
 				      * Set <tt>values</tt> to the point
 				      * values of the specified
@@ -245,7 +244,7 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				    std::vector<Vector<double> >   &values) const;
-    
+
 				     /**
 				      * For each component of the
 				      * function, fill a vector of
@@ -277,7 +276,7 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_gradient (const Point<dim>            &p,
                                   std::vector<Tensor<1,dim> > &gradients) const;
-    
+
 				     /**
 				      * Set <tt>gradients</tt> to the
 				      * gradients of the specified
@@ -290,7 +289,7 @@ class Function : public FunctionTime,
     virtual void gradient_list (const std::vector<Point<dim> > &points,
 				std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
-    
+
 				     /**
 				      * For each component of the
 				      * function, fill a vector of
@@ -306,12 +305,12 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_gradients (const std::vector<Point<dim> >            &points,
 				   std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
-      
+
 				     /**
 				      * Set <tt>gradients</tt> to the gradients of
 				      * the function at the <tt>points</tt>,
 				      * for all components.
-				      * It is assumed that <tt>gradients</tt> 
+				      * It is assumed that <tt>gradients</tt>
 				      * already has the right size, i.e.
 				      * the same size as the <tt>points</tt> array.
 				      *
@@ -338,7 +337,7 @@ class Function : public FunctionTime,
 				      */
     virtual void vector_laplacian (const Point<dim>   &p,
 				   Vector<double>     &values) const;
-    
+
 				     /**
 				      * Compute the Laplacian of one
 				      * component at a set of points.
@@ -396,13 +395,13 @@ class ZeroFunction : public Function<dim>
 				      * components is preset to one.
 				      */
     ZeroFunction (const unsigned int n_components = 1);
-    
+
 				     /**
 				      * Virtual destructor; absolutely
 				      * necessary in this case.
 				      */
     virtual ~ZeroFunction ();
-    
+
 				     /**
 				      * Return the value of the function
 				      * at the given point for one
@@ -443,7 +442,7 @@ class ZeroFunction : public Function<dim>
 				      */
     virtual void vector_value_list (const std::vector<Point<dim> > &points,
 				    std::vector<Vector<double> >   &values) const;
-    
+
 				     /**
 				      * Return the gradient of the function
 				      * at the given point, for the
@@ -460,7 +459,7 @@ class ZeroFunction : public Function<dim>
 				      */
     virtual void vector_gradient (const Point<dim>            &p,
                                   std::vector<Tensor<1,dim> > &gradients) const;
-    
+
 				     /**
 				      * Set <tt>gradients</tt> to the gradients of
 				      * the function at the <tt>points</tt>,
@@ -472,12 +471,12 @@ class ZeroFunction : public Function<dim>
     virtual void gradient_list (const std::vector<Point<dim> > &points,
 				std::vector<Tensor<1,dim> >    &gradients,
 				const unsigned int              component = 0) const;
-    
+
 				     /**
 				      * Set <tt>gradients</tt> to the gradients of
 				      * the function at the <tt>points</tt>,
 				      * for all components.
-				      * It is assumed that <tt>gradients</tt> 
+				      * It is assumed that <tt>gradients</tt>
 				      * already has the right size, i.e.
 				      * the same size as the <tt>points</tt> array.
 				      *
@@ -527,7 +526,7 @@ class ConstantFunction : public ZeroFunction<dim>
 				      */
     ConstantFunction (const double       value,
 		      const unsigned int n_components = 1);
-    
+
 				     /**
 				      * Virtual destructor; absolutely
 				      * necessary in this case.
@@ -656,8 +655,8 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				      * number of vector components.
 				      */
     ComponentSelectFunction (const std::pair<unsigned int, unsigned int> &selected,
-			     const unsigned int n_components);    
-    
+			     const unsigned int n_components);
+
     				     /**
 				      * Return the value of the function
 				      * at the given point for all

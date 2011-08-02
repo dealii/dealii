@@ -1607,7 +1607,7 @@ namespace hp
 			"this class does not currently support this."));
 
     create_active_fe_table ();
-    
+
     tria_listeners.push_back
     (tria.signals.pre_refinement
      .connect (std_cxx1x::bind (&DoFHandler<dim,spacedim>::pre_refinement_action,
@@ -1631,7 +1631,7 @@ namespace hp
     for (unsigned int i=0; i<tria_listeners.size(); ++i)
       tria_listeners[i].disconnect ();
     tria_listeners.clear ();
-    
+
                                      // ...and release allocated memory
     clear ();
   }

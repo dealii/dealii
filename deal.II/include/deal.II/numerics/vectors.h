@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/point.h>
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/hp/mapping_collection.h>
@@ -26,7 +27,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Point;
 template <int dim> class Function;
 template <int dim> class FunctionMap;
 template <int dim> class Quadrature;
@@ -1173,8 +1173,8 @@ class VectorTools
      const unsigned char boundary_component,
      ConstraintMatrix& constraints,
      const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
-   
-   
+
+
 				     /**
 				      * Compute the constraints that
 				      * correspond to boundary conditions of

@@ -12,24 +12,24 @@
 //---------------------------------------------------------------------------
 
 
-#include <deal.II/base/tensor.h>
+#include <base/tensor.h>
 #include <cmath>
-#include <deal.II/lac/vector.h>
+#include <lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 // storage for static variables
-template <int dim>
-const unsigned int Tensor<1,dim>::dimension;
+template <int dim, typename Number>
+const unsigned int Tensor<1,dim,Number>::dimension;
 
-template <int rank, int dim>
-const unsigned int Tensor<rank,dim>::dimension;
+template <int rank, int dim, typename Number>
+const unsigned int Tensor<rank,dim,Number>::dimension;
 
 
-template <int dim>
+template <int dim, typename Number>
 void
-Tensor<1,dim>::unroll (Vector<double> &result) const
+Tensor<1,dim,Number>::unroll (Vector<Number> &result) const
 {
   Assert (result.size()==dim,
           ExcDimensionMismatch(dim, result.size()));
@@ -40,12 +40,12 @@ Tensor<1,dim>::unroll (Vector<double> &result) const
 
 
 
-template <int rank_, int dim>
+template <int rank_, int dim, typename Number>
 void
-Tensor<rank_, dim>::unroll (Vector<double> &result) const
+Tensor<rank_, dim, Number>::unroll (Vector<Number> &result) const
 {
-  Assert(result.size()==std::pow(static_cast<double>(dim),rank_),
-	 ExcDimensionMismatch(static_cast<unsigned int>(std::pow(static_cast<double>(dim),rank_)),
+  Assert(result.size()==std::pow(static_cast<Number>(dim),rank_),
+	 ExcDimensionMismatch(static_cast<unsigned int>(std::pow(static_cast<Number>(dim),rank_)),
                               result.size()));
 
   unsigned index = 0;
@@ -54,40 +54,40 @@ Tensor<rank_, dim>::unroll (Vector<double> &result) const
 
 
 
-template <int rank_, int dim>
+template <int rank_, int dim, typename Number>
 void
-Tensor<rank_, dim>::unroll_recursion (Vector<double> &result,
-                                      unsigned int   &index) const
+Tensor<rank_, dim, Number>::unroll_recursion (Vector<Number> &result,
+					      unsigned int   &index) const
 {
   for (unsigned i=0; i<dim; ++i)
     {
       operator[](i).unroll_recursion(result, index);
-    }    
+    }
 }
 
 
 
-template<int dim>
+template<int dim, typename Number>
 void
-Tensor<1,dim>::unroll_recursion (Vector<double> &result,
-                                 unsigned int   &index) const
+Tensor<1,dim,Number>::unroll_recursion (Vector<Number> &result,
+					unsigned int   &index) const
 {
   for (unsigned i=0; i<dim; ++i)
-    result(index++) = operator[](i);  
+    result(index++) = operator[](i);
 }
 
 
-template class Tensor<1, 1>;
-template class Tensor<1, 2>;
-template class Tensor<1, 3>;
-template class Tensor<2, 1>;
-template class Tensor<2, 2>;
-template class Tensor<2, 3>;
-template class Tensor<3, 1>;
-template class Tensor<3, 2>;
-template class Tensor<3, 3>;
-template class Tensor<4, 1>;
-template class Tensor<4, 2>;
-template class Tensor<4, 3>;
+template class Tensor<1, 1, double>;
+template class Tensor<1, 2, double>;
+template class Tensor<1, 3, double>;
+template class Tensor<2, 1, double>;
+template class Tensor<2, 2, double>;
+template class Tensor<2, 3, double>;
+template class Tensor<3, 1, double>;
+template class Tensor<3, 2, double>;
+template class Tensor<3, 3, double>;
+template class Tensor<4, 1, double>;
+template class Tensor<4, 2, double>;
+template class Tensor<4, 3, double>;
 
 DEAL_II_NAMESPACE_CLOSE

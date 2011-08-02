@@ -102,6 +102,10 @@ code is written, without having to look up the exact definition of something.
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
   to make the connection to the STL classes clear.</li>
 
+<li> For classes with multiple template arguments, the dimension is usually
+  put before the data type specifier, i.e., we use Point<dim,number> and not
+  Point<number,dim>.
+
 <li> Each class has to have at least 200 pages of documentation ;-)</li>
 
 </ol>

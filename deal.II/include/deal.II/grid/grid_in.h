@@ -16,13 +16,13 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/base/point.h>
 #include <iostream>
 #include <vector>
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class Point;
 template <int dim, int space_dim> class Triangulation;
 template <int dim> class CellData;
 class SubCellData;

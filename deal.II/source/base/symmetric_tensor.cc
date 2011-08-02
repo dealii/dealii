@@ -18,10 +18,10 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <>
-SymmetricTensor<4,3>
-invert (const SymmetricTensor<4,3> &t)
+SymmetricTensor<4,3,double>
+invert<3,double> (const SymmetricTensor<4,3,double> &t)
 {
-  SymmetricTensor<4,3> tmp = t;
+  SymmetricTensor<4,3,double> tmp = t;
 
                                    // this function follows the exact same
                                    // scheme as the 2d case, except that
@@ -45,7 +45,7 @@ invert (const SymmetricTensor<4,3> &t)
   for (unsigned int i=0; i<N; ++i)
     diagonal_sum += std::fabs(tmp.data[i][i]);
   const double typical_diagonal_element = diagonal_sum/N;
-  
+
   unsigned int p[N];
   for (unsigned int i=0; i<N; ++i)
     p[i] = i;
@@ -68,7 +68,7 @@ invert (const SymmetricTensor<4,3> &t)
 				       // too small
       Assert(max > 1.e-16*typical_diagonal_element,
 	     ExcMessage("This tensor seems to be noninvertible"));
-      
+
 				       // row interchange
       if (r>j)
 	{
@@ -120,7 +120,7 @@ invert (const SymmetricTensor<4,3> &t)
   for (unsigned int i=3; i<6; ++i)
     for (unsigned int j=3; j<6; ++j)
       tmp.data[i][j] /= 4;
-  
+
   return tmp;
 }
 

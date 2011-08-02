@@ -18,6 +18,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/identity_matrix.h>
+#include <deal.II/base/tensor.h>
 
 #include <vector>
 #include <iomanip>
@@ -29,7 +30,6 @@ DEAL_II_NAMESPACE_OPEN
 // forward declarations
 template <typename number> class Vector;
 template <typename number> class LAPACKFullMatrix;
-template <int rank, int dim> class Tensor;
 
 
 /*! @addtogroup Matrix1

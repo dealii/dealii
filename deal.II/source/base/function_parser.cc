@@ -13,7 +13,6 @@
 
 #include <deal.II/base/function_parser.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/point.h>
 #include <deal.II/lac/vector.h>
 
 #ifndef DEAL_II_DISABLE_PARSER
@@ -38,7 +37,7 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
                 :
                 Function<dim>(n_components, initial_time),
                 fp (0)
-{ 
+{
   fp = new fparser::FunctionParser[n_components];
 }
 
@@ -64,7 +63,7 @@ void FunctionParser<dim>::initialize (const std::string                   &varia
                 constants,
                 std::map< std::string, double >(),
                 time_dependent,
-                use_degrees);  
+                use_degrees);
 }
 
 
@@ -104,7 +103,7 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
         }
 
 
-                       
+
 				       // Add the various constants to
 				       // the parser.
       std::map< std::string, double >::const_iterator
@@ -115,21 +114,21 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
 	  const bool success = fp[i].AddConstant(constant->first, constant->second);
 	  AssertThrow (success, ExcMessage("Invalid Constant Name"));
 	}
-      
-      const int ret_value = fp[i].Parse(expressions[i], 
-					variables, 
+
+      const int ret_value = fp[i].Parse(expressions[i],
+					variables,
 					use_degrees);
-      AssertThrow (ret_value == -1, 
+      AssertThrow (ret_value == -1,
 		   ExcParseError(ret_value, fp[i].ErrorMsg()));
-      
+
 				       // The fact that the parser did
 				       // not throw an error does not
 				       // mean that everything went
 				       // ok... we can still have
 				       // problems with the number of
 				       // variables...
-    } 
-    
+    }
+
 				   // Now we define how many variables
 				   // we expect to read in.  We
 				   // distinguish between two cases:
@@ -143,16 +142,16 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
 				   // parsed the variables string, if
 				   // none of this is the case, then
 				   // an exception is thrown.
-  if (time_dependent) 
+  if (time_dependent)
     n_vars = dim+1;
-  else 
+  else
     n_vars = dim;
-    
+
 				   // Let's check if the number of
 				   // variables is correct...
-  AssertThrow (n_vars == fp[0].NVars(), 
+  AssertThrow (n_vars == fp[0].NVars(),
 	       ExcDimensionMismatch(n_vars,fp[0].NVars()));
-    
+
 				   // Now set the initialization bit.
   initialized = true;
 }
@@ -172,7 +171,7 @@ void FunctionParser<dim>::initialize (const std::string &variables,
               Utilities::split_string_list (expression, ';'),
               constants,
               time_dependent,
-              use_degrees);  
+              use_degrees);
 }
 
 
@@ -199,19 +198,19 @@ void FunctionParser<dim>::initialize (const std::string &variables,
 
 template <int dim>
 double FunctionParser<dim>::value (const Point<dim>  &p,
-				   const unsigned int component) const 
+				   const unsigned int component) const
 {
   Assert (initialized==true, ExcNotInitialized());
   Assert (component < this->n_components,
 	  ExcIndexRange(component, 0, this->n_components));
-  
+
 				   // Statically allocate dim+1
 				   // double variables.
   double vars[dim+1];
-  
+
   for (unsigned int i=0; i<dim; ++i)
     vars[i] = p(i);
-  
+
 				   // We need the time variable only
 				   // if the number of variables is
 				   // different from the dimension. In
@@ -220,9 +219,9 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
 				   // have already been thrown
   if (dim != n_vars)
     vars[dim] = this->get_time();
-  
+
   double my_value = fp[component].Eval((double*)vars);
-  
+
   AssertThrow (fp[component].EvalError() == 0,
 	       ExcMessage(fp[component].ErrorMsg()));
   return my_value;
@@ -232,19 +231,19 @@ double FunctionParser<dim>::value (const Point<dim>  &p,
 
 template <int dim>
 void FunctionParser<dim>::vector_value (const Point<dim> &p,
-					Vector<double>   &values) const 
+					Vector<double>   &values) const
 {
   Assert (initialized==true, ExcNotInitialized());
   Assert (values.size() == this->n_components,
 	  ExcDimensionMismatch (values.size(), this->n_components));
-  
+
 				   // Statically allocates dim+1
 				   // double variables.
   double vars[dim+1];
-    
+
   for(unsigned int i=0; i<dim; ++i)
     vars[i] = p(i);
-    
+
 				   // We need the time variable only
 				   // if the number of variables is
 				   // different from the dimension. In
@@ -253,14 +252,14 @@ void FunctionParser<dim>::vector_value (const Point<dim> &p,
 				   // have already been thrown
   if(dim != n_vars)
     vars[dim] = this->get_time();
-    
+
   for(unsigned int component = 0; component < this->n_components;
       ++component)
     {
       values(component) = fp[component].Eval((double*)vars);
       AssertThrow(fp[component].EvalError() == 0,
 		  ExcMessage(fp[component].ErrorMsg()));
-    } 
+    }
 }
 
 #else
@@ -292,7 +291,7 @@ FunctionParser<dim>::initialize(const std::string &,
 
 template <int dim>
 double FunctionParser<dim>::value (
-  const Point<dim> &, unsigned int) const 
+  const Point<dim> &, unsigned int) const
 {
   Assert(false, ExcDisabled("parser"));
   return 0.;
@@ -301,7 +300,7 @@ double FunctionParser<dim>::value (
 
 template <int dim>
 void FunctionParser<dim>::vector_value (
-  const Point<dim>&, Vector<double>&) const 
+  const Point<dim>&, Vector<double>&) const
 {
   Assert(false, ExcDisabled("parser"));
 }

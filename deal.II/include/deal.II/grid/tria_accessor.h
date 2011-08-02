@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/point.h>
 #include <deal.II/grid/tria_iterator_base.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
@@ -27,8 +28,6 @@ namespace std
 }
 
 DEAL_II_NAMESPACE_OPEN
-
-template <int dim> class Point;
 
 template <int dim, int spacedim> class Triangulation;
 template <typename Accessor> class TriaRawIterator;

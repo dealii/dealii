@@ -17,6 +17,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/point.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -32,7 +33,6 @@ template<int dim, class T> class Table;
 class SparsityPattern;
 template <typename number> class Vector;
 template <int dim> class Function;
-template <int dim> class Point;
 template <int dim, int spacedim> class FiniteElement;
 template <int dim, int spacedim> class DoFHandler;
 namespace hp

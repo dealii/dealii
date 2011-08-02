@@ -1118,7 +1118,7 @@ namespace internal
 						       // FEFaceValues in 1d
 		      Assert (false, ExcNotImplemented());
 		      cross_product (boundary_forms[point],
-				     (face_no == 0 ? 1 : -1) * cell_normal);
+				     (face_no == 0 ? 1. : -1.) * cell_normal);
 		    }
 		  else if ( (dim==2) && (spacedim==3) )
 		    cross_product (boundary_forms[point],

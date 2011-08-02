@@ -17,6 +17,8 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 
 #include <vector>
 
@@ -24,8 +26,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class FullMatrix;
 template <typename number> class Vector;
-template <int rank, int dim> class SymmetricTensor;
-template <int rank, int dim> class Tensor;
 template <int dim> class Quadrature;
 template <int dim, int spacedim> class FiniteElement;
 template <int dim, int spacedim> class DoFHandler;

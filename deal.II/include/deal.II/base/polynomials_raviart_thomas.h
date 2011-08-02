@@ -59,7 +59,7 @@ class PolynomialsRaviartThomas
 				      * <i>Q<sub>k</sub></i> contained.
 				      */
     PolynomialsRaviartThomas (const unsigned int k);
-    
+
 				     /**
 				      * Computes the value and the
 				      * first and second derivatives
@@ -87,13 +87,13 @@ class PolynomialsRaviartThomas
     void compute (const Point<dim>            &unit_point,
                   std::vector<Tensor<1,dim> > &values,
                   std::vector<Tensor<2,dim> > &grads,
-                  std::vector<Tensor<3,dim> > &grad_grads) const;    
-    
+                  std::vector<Tensor<3,dim> > &grad_grads) const;
+
 				     /**
 				      * Returns the number of Raviart-Thomas polynomials.
 				      */
     unsigned int n () const;
-    
+
 				     /**
 				      * Returns the degree of the Raviart-Thomas
 				      * space, which is one less than
@@ -106,7 +106,7 @@ class PolynomialsRaviartThomas
 				      * which is <tt>RaviartThomas</tt>.
 				      */
     std::string name () const;
-    
+
 				     /**
 				      * Return the number of
 				      * polynomials in the space
@@ -117,14 +117,14 @@ class PolynomialsRaviartThomas
 				      * classes.
 				      */
     static unsigned int compute_n_pols(unsigned int degree);
-    
+
   private:
 				     /**
 				      * The degree of this object as
 				      * given to the constructor.
 				      */
     const unsigned int my_degree;
-    
+
 				     /**
 				      * An object representing the
 				      * polynomial space for a single
@@ -153,6 +153,7 @@ class PolynomialsRaviartThomas
 };
 
 
+
 template <int dim>
 inline unsigned int
 PolynomialsRaviartThomas<dim>::n() const
@@ -161,12 +162,14 @@ PolynomialsRaviartThomas<dim>::n() const
 }
 
 
+
 template <int dim>
 inline unsigned int
 PolynomialsRaviartThomas<dim>::degree() const
 {
   return my_degree;
 }
+
 
 
 template <int dim>

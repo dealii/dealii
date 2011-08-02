@@ -21,6 +21,19 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> Changed: The classes Tensor, SymmetricTensor and Point now have an
+additional template argument for the number type. While a default template
+value of double ensures that all old code is still valid, this
+change invalidates forward declarations of the form <code>template
+<int dim@> class Point</code> that might be present in user-defined header
+files. Now forward declarations need to specify the type as well, i.e.,
+<code>template <int dim, typename Number> class Point</code>. However,
+nothing changes if the full declarations in <code>deal.II/base/tensor.h,
+deal.II/base/symmetric_tensor.h</code> and <code>deal.II/base/point.h</code>
+are included.
+<br>
+(Martin Kronbichler, 2011/08/02)
+
 <li> Removed: deal.II no longer supports Trilinos versions prior to 10.0.
 <br>
 (Wolfgang Bangerth, 2011/06/29)
@@ -50,7 +63,7 @@ corresponding elements of namespace std::placeholders into the global namespace
 if your compiler supported this part of the C++ 1x standard, or otherwise using
 the BOOST counterparts which are already in the global namespace. However,
 this leads to a conflict if one has a C++ 1x enabled compiler (e.g. GCC 4.6)
-<i>and</i> #includes certain BOOST headers, since the importation of symbols
+<i>and</i> includes certain BOOST headers, since the importation of symbols
 into the global namespace now leads to ambiguous names. The only solution to
 the problem is to not import names into the global namespace, but rather
 import the names from either BOOST or namespace std into the deal.II namespace
@@ -65,7 +78,18 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
-<li> Fixed: The function VectorTools::create_right_hand_side now also works for objects of type hp::DoFHandler with different finite elements.
+<li> Extended: The classes Tensor, SymmetricTensor and Point now have an
+additional template argument for the number type. It is now possible to base
+these classes on any abstract data type that implements basic arithmetic
+operations, like <code>Tensor<1,dim,std::complex<double> ></code>. deal.II
+uses a default template argument <code>double</code> that ensures that all
+code using e.g. <code>Tensor<1,dim></code> remains valid.
+<br>
+(Martin Kronbichler, 2011/08/02)
+
+
+<li> Fixed: The function VectorTools::create_right_hand_side now also works
+for objects of type hp::DoFHandler with different finite elements.
 <br>
 (Daniel Gerecht, 2011/07/20)
 
@@ -383,12 +407,10 @@ more than <code>rhs.size()</code> CG iterations if the number of degrees of free
 is very small.
 <br>
 (Jichao Yin, WB, 2011/04/06)
-</li>
 
 <li> New: There is now a new function ConditionalOStream::get_stream().
 <br>
 (WB, 2011/03/09)
-</li>
 
 <li> Fixed: FESystem::get_unit_face_support_points would refuse to return
 anything if one of the base elements did not have support points. This
@@ -397,7 +419,6 @@ base element has no support points and also has degrees of freedom on
 the face.
 <br>
 (WB, 2011/03/07)
-</li>
 
 <li> Fixed: Objects of type FE_Nothing could be generated with multiple vector components
 by passing an argument to the constructor. Yet, the FE_Nothing::get_name() function
@@ -405,18 +426,15 @@ always just returned the string <code>FE_Nothing@<dim@>()</code> independently o
 number of components. This is now fixed.
 <br>
 (WB, 2011/03/07)
-</li>
 
 <li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existant SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
 <br>
 (Timo Heister, 2011/02/23)
-</li>
 
 <li> Fixed: It wasn't possible to use the FE_Nothing element inside an FESystem
 object and hand the result over to an FEValues object. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/02/18)
-</li>
 
 <li> New: There is now a function DataOutBase::write_visit_record that does
 the equivalent for VisIt that DataOutBase::write_pvtu_record does for ParaView:
@@ -424,25 +442,21 @@ generate a file that contains a list of all other VTK or VTU files of which the
 current parallel simulation consists.
 <br>
 (Wolfgang Bangerth, 2011/02/16)
-</li>
 
 <li> New: There is now a function TrilinosWrappers::VectorBase::minimal_value.
 <br>
 (Wolfgang Bangerth, 2011/02/16)
-</li>
 
 <li> Fixed: TableBase::operator= could not be compiled if the type of the
 elements of the table was <code>bool</code>. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/02/16)
-</li>
 
 <li> Improved: The GridGenerator::hyper_shell function generated meshes in 3d
 that are valid but of poor quality upon refinement. There is now an additional
 option to generate a coarse mesh of 96 cells that has a much better quality.
 <br>
 (Wolfgang Bangerth, 2011/02/12)
-</li>
 
 <li> Fixed: There are systems where the <code>libz</code> library is installed
 but the <code>zlib.h</code> header file is not available. Since the latter
@@ -450,7 +464,6 @@ condition was not tested, this would result in compiler errors. This is now
 fixed.
 <br>
 (Wolfgang Bangerth, 2011/02/09)
-</li>
 
 <li> Fixed: Prolongation and restriction matrices were not computed at all
 for elements of type FE_DGQ if <code>dim@<spacedim</code>. Consequently,
@@ -459,7 +472,6 @@ the DoFCellAccess::set_dof_values_by_interpolation function did not
 work either and simply returned zero results. This is now fixed.
 <br>
 (M. Sebastian Pauletti, Wolfgang Bangerth, 2011/02/09)
-</li>
 
 <li> Fixed: When refining a mesh with codimension one, edges were refined using
 the same manifold description as adjacent cells, but this ignored that a
@@ -467,63 +479,58 @@ boundary indicator might have been purposefully set for edges that are truly at
 the boundary of the mesh. For such edges, the boundary indicator is now honored.
 <br>
 (M. Sebastian Pauletti, Wolfgang Bangerth, 2011/02/09)
-</li>
 
 <li> Fixed: The functions VectorTools::compute_mean_value and
 VectorTools::integrate_difference now also work for distributed
 triangulations of type parallel::distributed::Triangulation.
 <br>
 (Wolfgang Bangerth, 2011/02/07)
-</li>
 
 <li> Changed: If the <code>libz</code> library was detected during library
 configuration, the function DataOutBase::write_vtu now writes data in compressed
 format, saving a good fraction of disk space (80-90% for big output files).
 <br>
 (Wolfgang Bangerth, 2011/01/28)
-</li>
 
 <li> New: Trilinos and PETSc vectors now have a function has_ghost_elements().
 <br>
 (Timo Heister, 2011/01/26)
-</li>
 
 <li> Changed: The TrilinosWrappers::MPI::BlockVector::compress function now takes an
 argument (with a default value) in exactly the same way as the
 TrilinosWrappers::MPI::Vector::compress function already did.
 <br>
 (Wolfgang Bangerth, 2011/01/21)
-</li>
 
 <li> Fixed: When calling DataOut::build_patches with a mapping, requesting more
 than one subdivision, and when <code>dim@<spacedim</code>, then some cells
 were not properly mapped. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/01/18)
-</li>
 
 <li> New: Restructured the internals of PETScWrappers::Precondition* to allow a
-PETSc PC object to exist without a solver. New: use Precondition*::vmult() to
+PETSc PC object to exist without a solver. New: use Precondition*::@vmult() to
 apply the preconditioner once. Preconditioners now have a default constructor
 and an initialize() function and are no longer initialized in the solver call,
 but in the constructor or initialize().
 <br>
 (Timo Heister, 2011/01/17)
-</li>
 
 <li> Fixed: Boundary conditions in the step-23 tutorial program are now
 applied correctly. Matrix columns get eliminated with the used method
 and introduce some contribution to the right hand side coming from
 inhomogeneous boundary values. The old implementation did not reset the
-matrix columns before applying new boundary values.<br>
+matrix columns before applying new boundary values.
+<br>
 (Martin Stoll, Martin Kronbichler, 2011/01/14)
-</li>
 
 <li> Extended: <code>base/tensor.h</code> has an additional collection of
 contractions between three tensors (<i>ie</i>. <code>contract3</code>).
 This can be useful for writing matrix/vector assembly in a more compact
-form than before.<br>
+form than before.
+<br>
 (Toby D. Young, 2011/01/12)
+
 </ol>
 
 
