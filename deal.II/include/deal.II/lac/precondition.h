@@ -57,10 +57,10 @@ class PreconditionIdentity : public Subscriptor
   public:
 
 				     /**
-				      * This function is only 
-                                      * present to 
+				      * This function is only
+                                      * present to
                                       * provide the interface of
-                                      * a precondtioner to be 
+                                      * a preconditioner to be
                                       * handed to a smoother.
                                       * This does nothing.
 				      */
@@ -115,10 +115,10 @@ class PreconditionIdentity : public Subscriptor
     void Tvmult_add (VECTOR&, const VECTOR&) const;
 
 				     /**
-				      * This function is only 
-                                      * present to 
+				      * This function is only
+                                      * present to
                                       * provide the interface of
-                                      * a precondtioner to be 
+                                      * a preconditioner to be
                                       * handed to a smoother.
                                       * This does nothing.
 				      */
@@ -219,10 +219,10 @@ class PreconditionRichardson : public Subscriptor
     void Tvmult_add (VECTOR&, const VECTOR&) const;
 
 				     /**
-				      * This function is only 
-				      * present to 
+				      * This function is only
+				      * present to
 				      * provide the interface of
-				      * a precondtioner to be 
+				      * a preconditioner to be
 				      * handed to a smoother.
 				      * This does nothing.
 				      */
