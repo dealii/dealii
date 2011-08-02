@@ -20,13 +20,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim, typename Number=double> class SymmetricTensor;
 
-template <int dim> SymmetricTensor<2,dim>
-unit_symmetric_tensor ();
-template <int dim> SymmetricTensor<4,dim>
-deviator_tensor ();
-template <int dim> SymmetricTensor<4,dim>
-identity_tensor ();
-
 template <int dim, typename Number> SymmetricTensor<2,dim,Number>
 unit_symmetric_tensor ();
 template <int dim, typename Number> SymmetricTensor<4,dim,Number>
@@ -42,6 +35,7 @@ template <int dim, typename Number> SymmetricTensor<2,dim,Number>
 deviator (const SymmetricTensor<2,dim,Number> &);
 template <int dim, typename Number> Number
 determinant (const SymmetricTensor<2,dim,Number> &);
+
 
 
 namespace internal
@@ -2573,6 +2567,7 @@ template <>
 SymmetricTensor<4,3,double>
 invert (const SymmetricTensor<4,3,double> &t);
 // this function is implemented in the .cc file for double data types
+
 
 
 /**
