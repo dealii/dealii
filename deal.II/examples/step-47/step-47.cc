@@ -76,7 +76,7 @@ class LaplaceProblem
     hp::DoFHandler<dim>   dof_handler;
     hp::FECollection<dim> fe_collection;
 
-    ConstraintMatrix      hanging_node_constraints;
+    ConstraintMatrix      constraints;
 
     SparsityPattern       sparsity_pattern;
     SparseMatrix<double>  system_matrix;
@@ -224,10 +224,10 @@ void LaplaceProblem<dim>::setup_system ()
   system_rhs.reinit (dof_handler.n_dofs());
 
 
-  hanging_node_constraints.clear ();
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   hanging_node_constraints);
-  hanging_node_constraints.close ();
+  constraints.clear ();
+  DoFTools::make_constraints (dof_handler,
+					   constraints);
+  constraints.close ();
 
 				   // now constrain those enriched
 				   // DoFs that are on cells that are
@@ -247,14 +247,14 @@ void LaplaceProblem<dim>::setup_system ()
 				       // constrain these DoFs
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 	if (vertex_is_on_intersected_cell[cell->vertex_index(v)] == false)
-	  hanging_node_constraints.add_line (cell->vertex_dof_index(v,1));
-  hanging_node_constraints.close();
+	  constraints.add_line (cell->vertex_dof_index(v,1));
+  constraints.close();
 
 
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
 
-  hanging_node_constraints.condense (c_sparsity);
+  constraints.condense (c_sparsity);
 
   sparsity_pattern.copy_from(c_sparsity);
 
@@ -314,9 +314,9 @@ void LaplaceProblem<dim>::assemble_system ()
 
       local_dof_indices.resize (dofs_per_cell);
       cell->get_dof_indices (local_dof_indices);
-      hanging_node_constraints.distribute_local_to_global (cell_matrix, cell_rhs,
-							   local_dof_indices,
-							   system_matrix, system_rhs);
+      constraints.distribute_local_to_global (cell_matrix, cell_rhs,
+					      local_dof_indices,
+					      system_matrix, system_rhs);
     }
 
   std::map<unsigned int,double> boundary_values;
@@ -346,7 +346,7 @@ void LaplaceProblem<dim>::solve ()
   solver.solve (system_matrix, solution, system_rhs,
 		preconditioner);
 
-  hanging_node_constraints.distribute (solution);
+  constraints.distribute (solution);
 }
 
 
