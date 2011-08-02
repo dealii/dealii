@@ -77,6 +77,22 @@ class Tensor
     typedef Tensor<rank_-1,dim,Number> value_type;
 
 				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the same
+				      * precision as the template argument to
+				      * this class. For std::complex<number>,
+				      * this corresponds to type number, and
+				      * it is equal to Number for all other
+				      * cases. See also the respective field
+				      * in Vector<Number>.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+
+				     /**
 				      * Declare an array type which
 				      * can be used to initialize an
 				      * object of this type
@@ -185,7 +201,7 @@ class Tensor
                                       * i.e. the square root of the sum of
                                       * squares of all entries.
                                       */
-    Number norm () const;
+    real_type norm () const;
 
                                      /**
                                       * Return the square of the
@@ -199,7 +215,7 @@ class Tensor
 				      * may also be useful in other
 				      * contexts.
                                       */
-    Number norm_square () const;
+    real_type norm_square () const;
 
 				     /**
 				      * Fill a vector with all tensor elements.
@@ -210,7 +226,8 @@ class Tensor
 				      * usual in C++, the rightmost
 				      * index of the tensor marches fastest.
 				      */
-    void unroll (Vector<Number> & result) const;
+    template <typename Number2>
+    void unroll (Vector<Number2> & result) const;
 
 
 				     /**
@@ -264,8 +281,9 @@ class Tensor
 				     /**
 				      * Help function for unroll.
 				      */
-    void unroll_recursion(Vector<Number> &result,
-			  unsigned int   &start_index) const;
+    template <typename Number2>
+    void unroll_recursion(Vector<Number2> &result,
+			  unsigned int    &start_index) const;
 
 				     // make the following class a
 				     // friend to this class. in principle,
@@ -295,6 +313,7 @@ Tensor<rank_,dim,Number>::Tensor ()
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
@@ -302,6 +321,7 @@ Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = Tensor<rank_-1,dim,Number>(initializer[i]);
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -315,6 +335,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 const typename Tensor<rank_,dim,Number>::value_type&
@@ -324,6 +345,7 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 
   return subtensor[i];
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -337,17 +359,19 @@ Tensor<rank_,dim,Number>::operator = (const Tensor<rank_,dim,Number> &t)
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number> &
 Tensor<rank_,dim,Number>::operator = (const Number d)
 {
-  Assert (d==0, ExcMessage ("Only assignment with zero is allowed"));
+  Assert (d==Number(0), ExcMessage ("Only assignment with zero is allowed"));
 
   for (unsigned int i=0; i<dim; ++i)
     subtensor[i] = 0;
   return *this;
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -361,6 +385,7 @@ Tensor<rank_,dim,Number>::operator == (const Tensor<rank_,dim,Number> &p) const
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 bool
@@ -368,6 +393,7 @@ Tensor<rank_,dim,Number>::operator != (const Tensor<rank_,dim,Number> &p) const
 {
   return !((*this) == p);
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -381,6 +407,7 @@ Tensor<rank_,dim,Number>::operator += (const Tensor<rank_,dim,Number> &p)
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number> &
@@ -390,6 +417,7 @@ Tensor<rank_,dim,Number>::operator -= (const Tensor<rank_,dim,Number> &p)
     subtensor[i] -= p.subtensor[i];
   return *this;
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -403,6 +431,7 @@ Tensor<rank_,dim,Number>::operator *= (const Number s)
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number> &
@@ -412,6 +441,7 @@ Tensor<rank_,dim,Number>::operator /= (const Number s)
     subtensor[i] /= s;
   return *this;
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -428,6 +458,7 @@ Tensor<rank_,dim,Number>::operator + (const Tensor<rank_,dim,Number> &t) const
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 Tensor<rank_,dim,Number>
@@ -440,6 +471,7 @@ Tensor<rank_,dim,Number>::operator - (const Tensor<rank_,dim,Number> &t) const
 
   return tmp;
 }
+
 
 
 template <int rank_, int dim, typename Number>
@@ -456,24 +488,57 @@ Tensor<rank_,dim,Number>::operator - () const
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
-Number Tensor<rank_,dim,Number>::norm () const
+typename Tensor<rank_,dim,Number>::real_type
+Tensor<rank_,dim,Number>::norm () const
 {
   return std::sqrt (norm_square());
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
-Number Tensor<rank_,dim,Number>::norm_square () const
+typename Tensor<rank_,dim,Number>::real_type
+Tensor<rank_,dim,Number>::norm_square () const
 {
-  Number s = 0;
+  real_type s = 0;
   for (unsigned int i=0; i<dim; ++i)
     s += subtensor[i].norm_square();
 
   return s;
 }
+
+
+
+template <int rank_, int dim, typename Number>
+template <typename Number2>
+inline
+void
+Tensor<rank_, dim, Number>::unroll (Vector<Number2> &result) const
+{
+  AssertDimension (result.size(),std::pow(static_cast<double>(dim),rank_));
+  unsigned index = 0;
+  unroll_recursion (result, index);
+}
+
+
+
+template <int rank_, int dim, typename Number>
+template <typename Number2>
+inline
+void
+Tensor<rank_, dim, Number>::unroll_recursion (Vector<Number2> &result,
+					      unsigned int    &index) const
+{
+  for (unsigned i=0; i<dim; ++i)
+    {
+      operator[](i).unroll_recursion(result, index);
+    }
+}
+
 
 
 template <int rank_, int dim, typename Number>
@@ -485,6 +550,7 @@ void Tensor<rank_,dim,Number>::clear ()
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 std::size_t
@@ -492,6 +558,7 @@ Tensor<rank_,dim,Number>::memory_consumption ()
 {
   return sizeof(Tensor<rank_,dim,Number>);
 }
+
 
 
 template <int rank_, int dim, typename Number>

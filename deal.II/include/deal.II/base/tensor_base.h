@@ -103,6 +103,22 @@ class Tensor<0,dim,Number>
     typedef Number value_type;
 
 				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the same
+				      * precision as the template argument to
+				      * this class. For std::complex<number>,
+				      * this corresponds to type number, and
+				      * it is equal to Number for all other
+				      * cases. See also the respective field
+				      * in Vector<Number>.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+
+				     /**
 				      * Constructor. Set to zero.
 				      */
     Tensor ();
@@ -221,7 +237,7 @@ class Tensor<0,dim,Number>
                                       * <tt>l<sub>2</sub></tt> norm of
                                       * the vector.
                                       */
-    Number norm () const;
+    real_type norm () const;
 
                                      /**
                                       * Return the square of the
@@ -235,7 +251,7 @@ class Tensor<0,dim,Number>
 				      * may also be useful in other
 				      * contexts.
                                       */
-    Number norm_square () const;
+    real_type norm_square () const;
 
 				     /**
 				      * Reset all values to zero.
@@ -344,6 +360,22 @@ class Tensor<1,dim,Number>
 				      */
 
     typedef Number value_type;
+
+				     /**
+				      * Declare a type that has holds
+				      * real-valued numbers with the same
+				      * precision as the template argument to
+				      * this class. For std::complex<number>,
+				      * this corresponds to type number, and
+				      * it is equal to Number for all other
+				      * cases. See also the respective field
+				      * in Vector<Number>.
+				      *
+				      * This typedef is used to
+				      * represent the return type of
+				      * norms.
+				      */
+    typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
 				     /**
 				      * Declare an array type which can
@@ -494,7 +526,7 @@ class Tensor<1,dim,Number>
                                       * <tt>l<sub>2</sub></tt> norm of
                                       * the vector.
                                       */
-    Number norm () const;
+    real_type norm () const;
 
                                      /**
                                       * Return the square of the
@@ -508,7 +540,7 @@ class Tensor<1,dim,Number>
 				      * may also be useful in other
 				      * contexts.
                                       */
-    Number norm_square () const;
+    real_type norm_square () const;
 
 				     /**
 				      * Reset all values to zero.
@@ -539,7 +571,8 @@ class Tensor<1,dim,Number>
 				      * usual in C++, the rightmost
 				      * index marches fastest.
 				      */
-    void unroll (Vector<Number> &result) const;
+    template <typename Number2>
+    void unroll (Vector<Number2> &result) const;
 
 				     /**
 				      * Determine an estimate for
@@ -596,8 +629,9 @@ class Tensor<1,dim,Number>
 				      * case, even if it should be
 				      * public for your compiler.
 				      */
-    void unroll_recursion (Vector<Number> &result,
-			   unsigned int   &start_index) const;
+    template <typename Number2>
+    void unroll_recursion (Vector<Number2> &result,
+			   unsigned int    &start_index) const;
 
   private:
 				     /**
@@ -810,18 +844,20 @@ Tensor<0,dim,Number> Tensor<0,dim,Number>::operator - () const
 
 template <int dim, typename Number>
 inline
-Number Tensor<0,dim,Number>::norm () const
+typename Tensor<0,dim,Number>::real_type
+Tensor<0,dim,Number>::norm () const
 {
-  return std::abs (value);
+  return numbers::NumberTraits<Number>::abs (value);
 }
 
 
 
 template <int dim, typename Number>
 inline
-Number Tensor<0,dim,Number>::norm_square () const
+typename Tensor<0,dim,Number>::real_type
+Tensor<0,dim,Number>::norm_square () const
 {
-  return value*value;
+  return numbers::NumberTraits<Number>::abs_square (value);
 }
 
 
@@ -832,6 +868,8 @@ void Tensor<0,dim,Number>::clear ()
 {
   value = 0;
 }
+
+
 
 template <int dim, typename Number>
 template <class Archive>
@@ -1125,7 +1163,8 @@ Tensor<1,dim,Number> Tensor<1,dim,Number>::operator - () const
 
 template <int dim, typename Number>
 inline
-Number Tensor<1,dim,Number>::norm () const
+typename Tensor<1,dim,Number>::real_type
+Tensor<1,dim,Number>::norm () const
 {
   return std::sqrt (norm_square());
 }
@@ -1134,13 +1173,42 @@ Number Tensor<1,dim,Number>::norm () const
 
 template <int dim, typename Number>
 inline
-Number Tensor<1,dim,Number>::norm_square () const
+typename Tensor<1,dim,Number>::real_type
+Tensor<1,dim,Number>::norm_square () const
 {
-  Number s = 0;
+  real_type s = 0;
   for (unsigned int i=0; i<dim; ++i)
-    s += values[i] * values[i];
+    s += numbers::NumberTraits<Number>::abs_square(values[i]);
 
   return s;
+}
+
+
+
+template <int dim, typename Number>
+template <typename Number2>
+inline
+void
+Tensor<1,dim,Number>::unroll (Vector<Number2> &result) const
+{
+  Assert (result.size()==dim,
+          ExcDimensionMismatch(dim, result.size()));
+
+  unsigned index = 0;
+  unroll_recursion (result,index);
+}
+
+
+
+template<int dim, typename Number>
+template <typename Number2>
+inline
+void
+Tensor<1,dim,Number>::unroll_recursion (Vector<Number2> &result,
+					unsigned int    &index) const
+{
+  for (unsigned i=0; i<dim; ++i)
+    result(index++) = operator[](i);
 }
 
 
