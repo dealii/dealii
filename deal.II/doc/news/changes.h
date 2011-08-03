@@ -87,13 +87,6 @@ code using e.g. <code>Tensor<1,dim></code> remains valid.
 <br>
 (Martin Kronbichler, 2011/08/02)
 
-
-<li> Fixed: The function VectorTools::create_right_hand_side now also works
-for objects of type hp::DoFHandler with different finite elements.
-<br>
-(Daniel Gerecht, 2011/07/20)
-
-
 <li> Fixed: deal.II can link with Trilinos but previously it required a
 very specific set of Trilinos sub-libraries; if Trilinos had been compiled
 with a larger set of sub-libraries, linking would sometimes fail. This
@@ -245,6 +238,18 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: The PETScWrapper::VectorBase class was rather generous in
+calling the PETSc <code>VecAssembleBegin/End</code> functions that incur
+communication in the %parallel case and are therefore causes of potential
+slowdowns. This has been improved.
+<br>
+(Wolfgang Bangerth, 2011/08/03)
+
+<li> Fixed: The function VectorTools::create_right_hand_side now also works
+for objects of type hp::DoFHandler with different finite elements.
+<br>
+(Daniel Gerecht, 2011/07/20)
+
 <li> Improved: Evaluation of Lagrangian basis functions has been made stable
 by exchanging polynomial evaluation from the standard form
 $a_n x^n+\ldots+a_1 x + a_0$ to a product of linear factors,

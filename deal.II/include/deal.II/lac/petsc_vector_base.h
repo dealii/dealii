@@ -906,7 +906,8 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator = (const PetscScalar &value) const
     {
-      if (vector.last_action != VectorBase::LastAction::insert)
+      // if the last action was an addition, we need to flush buffers
+      if (vector.last_action == VectorBase::LastAction::add)
         {
           int ierr;
           ierr = VecAssemblyBegin (vector);
@@ -937,7 +938,8 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator += (const PetscScalar &value) const
     {
-      if (vector.last_action != VectorBase::LastAction::add)
+      // if the last action was a set operation, we need to flush buffers      
+      if (vector.last_action == VectorBase::LastAction::insert)
         {
           int ierr;
           ierr = VecAssemblyBegin (vector);
@@ -945,9 +947,9 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          vector.last_action = VectorBase::LastAction::add;
         }
+
+      vector.last_action = VectorBase::LastAction::add;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI
@@ -979,7 +981,8 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator -= (const PetscScalar &value) const
     {
-      if (vector.last_action != VectorBase::LastAction::add)
+      // if the last action was a set operation, we need to flush buffers
+      if (vector.last_action == VectorBase::LastAction::insert)
         {
           int ierr;
           ierr = VecAssemblyBegin (vector);
@@ -987,11 +990,11 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          vector.last_action = VectorBase::LastAction::add;
         }
 
-                                       // we have to do above actions in any
+      vector.last_action = VectorBase::LastAction::add;
+
+	                               // we have to do above actions in any
                                        // case to be consistent with the MPI
                                        // communication model (see the
                                        // comments in the documentation of
@@ -1022,7 +1025,8 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator *= (const PetscScalar &value) const
     {
-      if (vector.last_action != VectorBase::LastAction::insert)
+      // if the last action was an addition, we need to flush buffers
+      if (vector.last_action == VectorBase::LastAction::add)
         {
           int ierr;
           ierr = VecAssemblyBegin (vector);
@@ -1030,9 +1034,9 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          vector.last_action = VectorBase::LastAction::insert;
         }
+
+      vector.last_action = VectorBase::LastAction::insert;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI
@@ -1066,7 +1070,8 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator /= (const PetscScalar &value) const
     {
-      if (vector.last_action != VectorBase::LastAction::insert)
+      // if the last action was a set operation, we need to flush buffers
+      if (vector.last_action == VectorBase::LastAction::insert)
         {
           int ierr;
           ierr = VecAssemblyBegin (vector);
@@ -1074,9 +1079,9 @@ namespace PETScWrappers
 
           ierr = VecAssemblyEnd (vector);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          vector.last_action = VectorBase::LastAction::insert;
         }
+
+      vector.last_action = VectorBase::LastAction::insert;
 
                                        // we have to do above actions in any
                                        // case to be consistent with the MPI

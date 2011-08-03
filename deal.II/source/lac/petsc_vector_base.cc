@@ -393,11 +393,22 @@ namespace PETScWrappers
   void
   VectorBase::compress ()
   {
+    // note that one may think that we only need to do something
+    // if in fact the state is anything but LastAction::none. but
+    // that's not true: one frequently gets into situations where
+    // only one processor (or a subset of processors) actually writes
+    // something into a vector, but we still need to call 
+    // VecAssemblyBegin/End on all processors, even those that are
+    // still in LastAction::none state
     int ierr;
     ierr = VecAssemblyBegin(vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
     ierr = VecAssemblyEnd(vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    // reset the last action field to indicate that we're back to
+    // a pristine state
+    last_action = VectorBase::LastAction::none;
   }
 
 
@@ -1110,7 +1121,8 @@ namespace PETScWrappers
 				    const PetscScalar  *values,
 				    const bool          add_values)
   {
-    if (last_action != VectorBase::LastAction::insert)
+    // if the last action was a set operation, we need to flush buffers
+    if (last_action == VectorBase::LastAction::insert)
       {
         int ierr;
         ierr = VecAssemblyBegin (vector);
@@ -1118,6 +1130,10 @@ namespace PETScWrappers
 
         ierr = VecAssemblyEnd (vector);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
+ 
+	// reset the last action field to indicate that we're back to
+	// a pristine state
+	last_action = VectorBase::LastAction::none;
       }
 
 				     // VecSetValues complains if we
@@ -1146,6 +1162,8 @@ namespace PETScWrappers
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
+    // set the mode here, independent of whether we have actually
+    // written elements or whether the list was empty
     last_action = LastAction::insert;
   }
 
