@@ -519,9 +519,8 @@ inline
 void
 Tensor<rank_, dim, Number>::unroll (Vector<Number2> &result) const
 {
-  AssertDimension (result.size(),
-		   static_cast<unsigned int>(std::pow(static_cast<double>(dim),
-						      rank_)));
+  AssertDimension (result.size(),(Utilities::fixed_power<rank_, unsigned int>(dim)));
+
   unsigned index = 0;
   unroll_recursion (result, index);
 }
