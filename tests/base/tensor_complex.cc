@@ -30,14 +30,22 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  std::complex<double> a[3][3] = {{{1,-1}, {2,0}, {3,0}},
-				  {{3,0}, {4,0}, {5,0}},
-				  {{6,0}, {7,0}, {8,3}}};
-  std::complex<double> b[3][3] = {{{24,-2}, {31,-2}, {37,6}},
-				  {{45,-3}, {57,0},  {69,15}},
-				  {{75,12}, {96,21}, {108,48}}};
+  double a_double[3][3][2] = {{{1,-1}, {2,0}, {3,0}},
+			      {{3,0}, {4,0}, {5,0}},
+			      {{6,0}, {7,0}, {8,3}}};
+  double b_double[3][3][2] = {{{24,-2}, {31,-2}, {37,6}},
+			      {{45,-3}, {57,0},  {69,15}},
+			      {{75,12}, {96,21}, {108,48}}};
 
   const unsigned int dim=3;
+  std::complex<double> a[dim][dim], b[dim][dim];
+  for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int e=0; e<dim; ++e)
+      {
+	a[d][e] = std::complex<double>(a_double[d][e][0],a_double[d][e][1]);
+	b[d][e] = std::complex<double>(b_double[d][e][0],b_double[d][e][1]);
+      }
+
   Tensor<2,dim,std::complex<double> > t(a);
   Tensor<2,dim,std::complex<double> > tt;
   Tensor<2,dim,std::complex<double> > result(b);
