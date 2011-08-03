@@ -12,7 +12,8 @@
 //---------------------------------------------------------------------------
 
 
-// SolutionTransfer locks up when a process has no locally owned cells
+// SolutionTransfer locked up when a process has no locally owned
+// cells. this was fixed with r24007
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
@@ -54,8 +55,8 @@ void test()
 
   GridGenerator::hyper_cube (tria,-1.0,1.0);
 
-  DoFHandler<2> dh(tria);
   FE_Q<2> fe(1);
+  DoFHandler<2> dh(tria);
 
   dh.distribute_dofs(fe);
 
@@ -84,22 +85,23 @@ void test()
 
   PETScWrappers::MPI::Vector  tmp(MPI_COMM_WORLD,dh.n_dofs(),dh.n_locally_owned_dofs());
 
-  std::cout<<"I WAS HERE"<<std::endl;
-
   soltrans.interpolate (tmp);
-
-  std::cout<<"I AM HERE"<<std::endl;
 
   solution.reinit(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
   solution = tmp;
   solution.update_ghost_values();
+
+				   // make sure no processor is
+				   // hanging
+  MPI_Barrier (MPI_COMM_WORLD);
+
+  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+    deallog << "OK" << std::endl;
 }
 
 
 int main(int argc, char *argv[])
 {
-  abort ();
-  
   PetscInitialize(&argc,&argv,0,0);
 
 
