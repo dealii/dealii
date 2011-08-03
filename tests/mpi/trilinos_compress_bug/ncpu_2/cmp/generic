@@ -1,3 +1,5 @@
 
 DEAL:0::numproc=2
+DEAL:0::before compress: 7.000
+DEAL:0::after compress: 7.000
 DEAL:0::OK
