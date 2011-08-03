@@ -13,6 +13,7 @@
 
 
 // document a bug in Trilinos regarding compress()
+// this fails in 10.6.4, but works in 10.4.2!
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
