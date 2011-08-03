@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_base.h>
+#include <deal.II/base/utilities.h>
 
 DEAL_II_NAMESPACE_OPEN
 template <int rank_, int dim, typename Number> class Tensor;
