@@ -21,6 +21,19 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> Changed: The PETScWrapper::VectorBase class tried to keep track of
+whether the last operation done on a vector was to add to an element or to
+write into one. If the previous such operation was of a different kind
+than the current one, we would flush buffers (see the description in
+@ref GlossCompress). However, trying to do this automatically turned
+out to be an endless source of hard-to-find bugs in %parallel programs.
+The scheme has therefore now been changed to the following: the class
+keeps track of the previous operation and if it differs from the
+current one, reports an error stating that the user needs to call
+PETScWrapper::VectorBase::compress() instead.
+<br>
+(Wolfgang Bangerth, 2011/08/03)
+
 <li> Changed: The classes Tensor, SymmetricTensor and Point now have an
 additional template argument for the number type. While a default template
 value of double ensures that all old code is still valid, this

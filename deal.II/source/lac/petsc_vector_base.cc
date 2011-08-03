@@ -1121,20 +1121,15 @@ namespace PETScWrappers
 				    const PetscScalar  *values,
 				    const bool          add_values)
   {
-    // if the last action was a set operation, we need to flush buffers
-    if (last_action == VectorBase::LastAction::insert)
-      {
-        int ierr;
-        ierr = VecAssemblyBegin (vector);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        ierr = VecAssemblyEnd (vector);
-        AssertThrow (ierr == 0, ExcPETScError(ierr));
- 
-	// reset the last action field to indicate that we're back to
-	// a pristine state
-	last_action = VectorBase::LastAction::none;
-      }
+    Assert ((last_action == (add_values ? 
+                             LastAction::add :
+                             LastAction::insert))
+            ||
+            (last_action == LastAction::none),
+	    internal::VectorReference::ExcWrongMode ((add_values ? 
+	                                              LastAction::add :
+	                                              LastAction::insert),
+				                     last_action));
 
 				     // VecSetValues complains if we
 				     // come with an empty
@@ -1153,9 +1148,7 @@ namespace PETScWrappers
 	const int * petsc_indices = (const int*)indices;
 #endif
 
-	InsertMode mode = ADD_VALUES;
-	if (!add_values)
-	  mode = INSERT_VALUES;
+	const InsertMode mode = (add_values ? ADD_VALUES : INSERT_VALUES);
 	const int ierr
 	  = VecSetValues (vector, n_elements, petsc_indices, values,
 			  mode);
@@ -1164,7 +1157,9 @@ namespace PETScWrappers
 
     // set the mode here, independent of whether we have actually
     // written elements or whether the list was empty
-    last_action = LastAction::insert;
+    last_action = (add_values ? 
+                   VectorBase::LastAction::add :
+                   VectorBase::LastAction::insert);
   }
 
 

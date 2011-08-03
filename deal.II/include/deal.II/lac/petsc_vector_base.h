@@ -172,6 +172,22 @@ namespace PETScWrappers
                         << " of a distributed vector, but only elements "
                         << arg2 << " through " << arg3
                         << " are stored locally and can be accessed.");
+	/**
+	 * Exception.
+	 */
+	DeclException2 (ExcWrongMode,
+			int, int,
+		        << "You tried to do a "
+			<< (arg1 == 1 ?
+			    "'set'" :
+			    (arg1 == 2 ?
+			     "'add'" : "???"))
+			<< " operation but the vector is currently in "
+			<< (arg2 == 1 ?
+			    "'set'" :
+			    (arg2 == 2 ?
+			     "'add'" : "???"))
+			<< " mode. You first have to call 'compress()'.");
 
       private:
                                          /**
@@ -906,16 +922,11 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator = (const PetscScalar &value) const
     {
-      // if the last action was an addition, we need to flush buffers
-      if (vector.last_action == VectorBase::LastAction::add)
-        {
-          int ierr;
-          ierr = VecAssemblyBegin (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          ierr = VecAssemblyEnd (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
+      Assert ((vector.last_action == VectorBase::LastAction::insert)
+              ||
+              (vector.last_action == VectorBase::LastAction::none),
+	      ExcWrongMode (VectorBase::LastAction::insert,
+			    vector.last_action));
 
 #ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
@@ -938,16 +949,11 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator += (const PetscScalar &value) const
     {
-      // if the last action was a set operation, we need to flush buffers      
-      if (vector.last_action == VectorBase::LastAction::insert)
-        {
-          int ierr;
-          ierr = VecAssemblyBegin (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          ierr = VecAssemblyEnd (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
+      Assert ((vector.last_action == VectorBase::LastAction::add)
+              ||
+              (vector.last_action == VectorBase::LastAction::none),
+	      ExcWrongMode (VectorBase::LastAction::add,
+			    vector.last_action));
 
       vector.last_action = VectorBase::LastAction::add;
 
@@ -981,16 +987,11 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator -= (const PetscScalar &value) const
     {
-      // if the last action was a set operation, we need to flush buffers
-      if (vector.last_action == VectorBase::LastAction::insert)
-        {
-          int ierr;
-          ierr = VecAssemblyBegin (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          ierr = VecAssemblyEnd (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
+      Assert ((vector.last_action == VectorBase::LastAction::add)
+              ||
+              (vector.last_action == VectorBase::LastAction::none),
+	      ExcWrongMode (VectorBase::LastAction::add,
+			    vector.last_action));
 
       vector.last_action = VectorBase::LastAction::add;
 
@@ -1025,16 +1026,11 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator *= (const PetscScalar &value) const
     {
-      // if the last action was an addition, we need to flush buffers
-      if (vector.last_action == VectorBase::LastAction::add)
-        {
-          int ierr;
-          ierr = VecAssemblyBegin (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          ierr = VecAssemblyEnd (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
+      Assert ((vector.last_action == VectorBase::LastAction::insert)
+              ||
+              (vector.last_action == VectorBase::LastAction::none),
+	      ExcWrongMode (VectorBase::LastAction::insert,
+			    vector.last_action));
 
       vector.last_action = VectorBase::LastAction::insert;
 
@@ -1070,16 +1066,11 @@ namespace PETScWrappers
     const VectorReference &
     VectorReference::operator /= (const PetscScalar &value) const
     {
-      // if the last action was a set operation, we need to flush buffers
-      if (vector.last_action == VectorBase::LastAction::insert)
-        {
-          int ierr;
-          ierr = VecAssemblyBegin (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-          ierr = VecAssemblyEnd (vector);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
-        }
+      Assert ((vector.last_action == VectorBase::LastAction::insert)
+              ||
+              (vector.last_action == VectorBase::LastAction::none),
+	      ExcWrongMode (VectorBase::LastAction::insert,
+			    vector.last_action));
 
       vector.last_action = VectorBase::LastAction::insert;
 
