@@ -38,7 +38,7 @@ void test ()
     locally_owned.add_range(0,9);
   else
     locally_owned.add_range(9,21);
-
+// 
   TrilinosWrappers::MPI::Vector test1(locally_owned);
   if (myid==0)
   {
@@ -56,8 +56,10 @@ void test ()
   }
   
   test1.compress(Add);
-  TrilinosWrappers::MPI::Vector test(locally_owned);
-  //  TrilinosWrappers::MPI::Vector test(test1);
+
+  //TrilinosWrappers::MPI::Vector test(test1.vector_partitioner()); // works
+  //TrilinosWrappers::MPI::Vector test(locally_owned); // works
+  TrilinosWrappers::MPI::Vector test(test1); // fails
 
   test = 0;
 
@@ -68,12 +70,15 @@ void test ()
     deallog << "before compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
       
    test.compress(Insert);
+  
   if (myid==0)
     deallog << "after compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
       
-
   // Trilinos produces a 0 instead of a 7 here. Why? 
-  Assert(test(locally_owned.nth_index_in_set(5)) == 7, ExcInternalError());
+  if (myid==0)
+  {
+    Assert(test(locally_owned.nth_index_in_set(5)) == 7, ExcInternalError());
+  }
 
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
