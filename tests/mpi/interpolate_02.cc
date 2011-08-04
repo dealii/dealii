@@ -78,14 +78,9 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  abort ();
-  
   PetscInitialize(&argc,&argv,0,0);
 
-
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-
-
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
