@@ -64,6 +64,8 @@ class LaplaceProblem
 
   private:
     bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
+    unsigned int compute_quadrature(Quadrature<dim> plain_quadrature, typename hp::DoFHandler<dim>::active_cell_iterator cell, std::vector<double> level_set_values);
+		void append_quadrature(Quadrature<dim> plain_quadrature, std::vector<Point<dim> > v);
 
     void setup_system ();
     void assemble_system ();
@@ -261,12 +263,12 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 
-
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
-  const QGauss<dim>  quadrature_formula(3);
+  const QGauss<dim>  quadrature_formula(2);
 
+	
   FEValues<dim> plain_fe_values (fe_collection[0], quadrature_formula,
 				 update_values    |  update_gradients |
 				 update_quadrature_points  |  update_JxW_values);
@@ -284,8 +286,15 @@ void LaplaceProblem<dim>::assemble_system ()
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
+
+	std::vector<double> level_set_values;
+	level_set_values.push_back(1);
+	level_set_values.push_back(1);
+	level_set_values.push_back(1);
+	level_set_values.push_back(-1);
   for (; cell!=endc; ++cell)
     {
+
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
       cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
       cell_rhs.reinit (dofs_per_cell);
@@ -330,8 +339,281 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_rhs);
 }
 
+// To integrate the enriched elements we have to find the geometrical decomposition
+// of the original element in subelements. The subelements are used to integrate
+// the elements on both sides of the discontinuity. The disontinuity line is approximated
+// by a piece-wise linear interpolation between the intersection of the discontinuity
+// with the edges of the elements. The vector level_set_values has the values of
+// the level set function at the vertices of the elements. From these values can be found 
+// by linear interpolation the intersections. There are three kind of decomposition that 
+// are considered.
+// Type 1: there is not cut. Type 2: a corner of the element is cut. Type 3: two corners are cut.
+
+	template <int dim>
+unsigned int LaplaceProblem<dim>::compute_quadrature ( Quadrature<dim> plain_quadrature,
+		typename hp::DoFHandler<dim>::active_cell_iterator cell,
+		std::vector<double> level_set_values                    )
+{
+
+	unsigned int type = 0;
+
+	// find the type of cut
+	int sign_ls[GeometryInfo<dim>::vertices_per_cell];
+	for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	{
+		if (level_set_values[v] > 0) sign_ls[v] = 1;
+		else if (level_set_values[v] < 0) sign_ls[v] = -1;
+		else sign_ls[v] = 0;
+	}
+
+	if ( sign_ls[0]==sign_ls[1] & sign_ls[0]==sign_ls[2] & sign_ls[0]==sign_ls[3] ) type =1;
+	else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 ) type = 2;
+
+	if (type == 1) return 1;
+
+	if (type==2)
+	{
+		const unsigned int   n_q_points    = plain_quadrature.size();
+
+		// loop over all subelements for integration
+		// in type 2 there are 5 subelements
+
+		Quadrature<dim> xfem_quadrature(5*n_q_points);
+		
+		std::vector<Point<dim> > v(GeometryInfo<dim>::vertices_per_cell);
+
+		unsigned int Pos = 100;
+		if (sign_ls[0]!=sign_ls[1] && sign_ls[0]!=sign_ls[2] && sign_ls[0]!=sign_ls[3]) Pos = 0;
+    else if (sign_ls[1]!=sign_ls[0] && sign_ls[1]!=sign_ls[2] && sign_ls[1]!=sign_ls[3]) Pos = 1;
+    else if (sign_ls[2]!=sign_ls[0] && sign_ls[2]!=sign_ls[1] && sign_ls[2]!=sign_ls[3]) Pos = 2;
+    else if (sign_ls[3]!=sign_ls[0] && sign_ls[3]!=sign_ls[1] && sign_ls[3]!=sign_ls[2]) Pos = 3;
+		else assert(0); // error message
+
+		std::cout << "Pos " << Pos << std::endl;
+
+		Point<dim> A(0,0);
+		Point<dim> B(0,0);
+		Point<dim> C(0,0);
+		Point<dim> D(0,0);
+		Point<dim> E(0,0);
+		Point<dim> F(0,0);
+
+		// Find cut coordinates
+
+		// deal.ii local coordinates
+
+		//    2-------3
+		//    |       |
+		//		|       |
+		//		|       |
+		//		0-------1
+
+		if (Pos == 0)
+		{
+			A[0] = 1. - level_set_values[1]/(level_set_values[1]-level_set_values[0]);
+			B[1] = 1. - level_set_values[2]/(level_set_values[2]-level_set_values[0]);
+			A(1) = 0.;
+			B(0) = 0.;
+			C(0) = 0.5*( A(0) + B(0) );
+			C(1) = 0.5*( A(1) + B(1) );
+			D(0) = 2./3. * C(0);
+			D(1) = 2./3. * C(1);
+			E(0) = 0.5*A(0);
+			E(1) = 0.;
+			F(0) = 0.;
+			F(1) = 0.5*B(1);
+		}
+		else if (Pos == 1)
+		{
+			A[0] = level_set_values[0]/(level_set_values[0]-level_set_values[1]);
+			B[1] = 1 - level_set_values[3]/(level_set_values[3]-level_set_values[1]);
+			A(1) = 0.;
+			B(0) = 1.;
+			C(0) = 0.5*( A(0) + B(0) );
+			C(1) = 0.5*( A(1) + B(1) );
+			D(0) = 2./3. * C(0);
+			D(1) = 2./3. * C(1);
+			E(0) = 0.5*A(0);
+			E(1) = 0.;
+			F(0) = 1.;
+			F(1) = 0.5*B(1);
+			}
+		else if (Pos == 2)
+		{
+			A[0] = 1 - level_set_values[3]/(level_set_values[3]-level_set_values[2]);
+			B[1] = level_set_values[0]/(level_set_values[0]-level_set_values[2]);
+			A(1) = 1.;
+			B(0) = 0.;
+			C(0) = 0.5*( A(0) + B(0) );
+			C(1) = 0.5*( A(1) + B(1) );
+			D(0) = 2./3. * C(0);
+			D(1) = 1./3. + 2./3. * C(1);
+			E(0) = 0.5* A(0);
+			E(1) = 0.;
+			F(0) = 0.;
+			F(1) = 0.5*( 1. + B(1) );
+			}
+		else if (Pos == 3)
+		{
+			A[0] = level_set_values[2]/(level_set_values[2]-level_set_values[3]);
+			B[1] = level_set_values[1]/(level_set_values[1]-level_set_values[3]);
+			A(1) = 1.;
+			B(0) = 1.;
+			C(0) = 0.5*( A(0) + B(0) );
+			C(1) = 0.5*( A(1) + B(1) );
+			D(0) = 1./3. + 2./3. * C(0);
+			D(1) = 1./3. + 2./3. * C(1);
+			E(0) = 0.5*( 1. + A(0) );
+			E(1) = 1.;
+			F(0) = 1.;
+			F(1) = 0.5*( 1. + B(1) );
+			}
+
+    Point<dim> v0(0,0);
+    Point<dim> v1(1,0);
+    Point<dim> v2(0,1);
+    Point<dim> v3(1,1);
+
+		/*
+		std::cout << A << std::endl;
+		std::cout << B << std::endl;
+		std::cout << C << std::endl;
+		std::cout << D << std::endl;
+		std::cout << E << std::endl;
+		std::cout << F << std::endl;
+		*/
+
+		Point<dim> subcell_vertices[10];
+		subcell_vertices[0] = v0;
+		subcell_vertices[1] = v1;
+		subcell_vertices[2] = v2;
+		subcell_vertices[3] = v3;
+		subcell_vertices[4] = A;
+		subcell_vertices[5] = B;
+		subcell_vertices[6] = C;
+		subcell_vertices[7] = D;
+		subcell_vertices[8] = E;
+		subcell_vertices[9] = F;
+
+		// lookup table for the decomposition
+
+		if (dim==2)
+		{
+			 unsigned int subcell_v_indices[4][5][4] = {
+				 {{0,8,9,7}, {9,7,5,6}, {8,4,7,6}, {5,6,2,3}, {4,1,6,3}},
+				 {{8,1,7,9}, {4,8,6,7}, {7,9,6,8}, {0,4,2,6}, {2,6,3,5}},
+				 {{7,9,8,3}, {4,6,8,7}, {6,5,7,9}, {0,6,2,4}, {0,1,6,5}},
+				 {{9,7,2,8}, {5,6,9,7}, {6,4,7,8}, {0,1,5,6}, {6,1,4,3}}
+			 };
+
+			 for (unsigned int subcell = 0; subcell<5; subcell++)
+			 {
+				 std::vector<Point<dim> > vertices;
+				 for (unsigned int i=0; i<4; i++)
+				 {
+					 vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
+					 //std::cout << "Pos       : " << Pos << std::endl;
+					 //std::cout << "subcell   : " << subcell << std::endl;
+					 //std::cout << "i         : " << i << std::endl;
+					 //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
+					 //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
+				 }
+				 std::cout << std::endl;
+				 // create quadrature rule
+				 append_quadrature( xfem_quadrature,
+							                vertices     ); 
+			 }
+
+		}
 
 
+		return 2;
+	}
+
+	return 100;
+
+}
+
+	template <int dim>
+void LaplaceProblem<dim>::append_quadrature ( Quadrature<dim> plain_quadrature,
+		                                          std::vector<Point<dim> >  v        )
+                                               
+{
+	// Project integration points into sub-elements.
+	// Map F1.
+	// The map F1 maps quadrature points from a reference element to a subelement of a reference element.
+	// To implement the action of this map the coordinates of the subelements have been calculated (A(0)...F(0),A(1)...F(1))
+	// the coordinates of the quadrature points are given by the bi-linear map defined by the form functions
+	// $x^\prime_i = \sum_j v^\prime \phi_j(x^hat_i)$, where the $\phi_j$ are the shape functions of the FEQ.
+
+	unsigned int n_v = GeometryInfo<dim>::vertices_per_cell;
+
+	std::vector<Point<dim> > q_points = plain_quadrature.get_points(); 
+	std::vector<Point<dim> > q_transf(q_points.size());
+	std::vector<double> W = plain_quadrature.get_weights(); 
+	std::vector<double> phi(n_v);
+	std::vector<double> dphi_dxi(n_v);
+	std::vector<double> dphi_deta(n_v);
+
+	for (unsigned int i=0; i<q_points.size(); i++)
+	{
+		double xi  = q_points[i](0);
+		double eta = q_points[i](1);
+
+		// Define shape functions on reference element
+		// we consider a bi-linear mapping
+		phi[0] = (1. - xi) * (1. - eta);
+		phi[1] = xi * (1. - eta);
+		phi[2] = (1. - xi) * eta;
+		phi[3] = xi * eta;
+
+		dphi_dxi[0] = (-1. + eta);
+		dphi_dxi[1] = (1. - eta);
+		dphi_dxi[2] = -eta;
+		dphi_dxi[3] = eta;
+
+		dphi_deta[0] = (-1. + xi);
+		dphi_deta[1] = -xi;
+		dphi_deta[2] = -xi;
+		dphi_deta[3] = xi;
+	}
+
+	const unsigned int   n_q_points    = plain_quadrature.size();
+
+	std::vector<double> JxW(n_q_points);
+
+	for ( unsigned int i = 1; i < n_q_points; i++)
+	{
+
+		double dx_dxi  = 0.;
+		double dx_deta = 0.;
+		double dy_dxi  = 0.;
+		double dy_deta = 0.;
+		// Calculate Jacobian of transformation
+		for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)
+		{
+			dx_dxi  += dphi_dxi[j]  * v[j](0);
+			dx_deta += dphi_deta[j] * v[j](0);
+			dy_dxi  += dphi_dxi[j]  * v[j](1);
+			dy_deta += dphi_deta[j] * v[j](1);
+		}
+
+		double detJ = dx_dxi * dy_deta - dx_deta * dy_dxi;
+		JxW[i] = W[i] * detJ;
+
+		// Map integration points from reference element to subcell of reference elemment
+		double x = 0.;
+		double y = 0.;
+		for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)
+		{
+			x += v[j](0) * phi[j];
+			y += v[j](1) * phi[j];
+		}
+		Point<dim> q_prime(x,y);
+		q_transf.push_back(q_prime);
+	}
+
+}
 
 
 template <int dim>

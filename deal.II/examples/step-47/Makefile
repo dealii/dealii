@@ -105,7 +105,7 @@ clean:
 # and write the string indicating what we do instead.
 ./%.g.$(OBJEXT) :
 	@echo "==============debug========= $(<F)  ->  $@"
-	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+	@$(CXX) -w $(CXXFLAGS.g) -c $< -o $@
 ./%.$(OBJEXT) :
 	@echo "==============optimized===== $(<F)  ->  $@"
 	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
