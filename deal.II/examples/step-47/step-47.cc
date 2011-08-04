@@ -288,12 +288,14 @@ void LaplaceProblem<dim>::assemble_system ()
     endc = dof_handler.end();
 
 	std::vector<double> level_set_values;
+	level_set_values.push_back(-1./2.);
 	level_set_values.push_back(1);
-	level_set_values.push_back(1);
-	level_set_values.push_back(1);
-	level_set_values.push_back(-1);
+	level_set_values.push_back(-1./2.);
+	level_set_values.push_back(1.);
   for (; cell!=endc; ++cell)
     {
+			compute_quadrature(quadrature_formula, cell, level_set_values);
+			assert(0);
 
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
       cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
@@ -366,8 +368,23 @@ unsigned int LaplaceProblem<dim>::compute_quadrature ( Quadrature<dim> plain_qua
 		else sign_ls[v] = 0;
 	}
 
+	// the sign of the level set function at the 4 nodes of the elements can be positive + or negative -
+	// depending on the sign of the level set function we have the folloing three classes of decomposition
+  // type 1: ++++, ----
+	// type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+
+	// type 3: +--+, ++--, +-+-, -++-, --++, -+-+
+
 	if ( sign_ls[0]==sign_ls[1] & sign_ls[0]==sign_ls[2] & sign_ls[0]==sign_ls[3] ) type =1;
 	else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 ) type = 2;
+	else type = 3;
+
+	unsigned int Pos = 100;
+	Point<dim> A(0,0);
+	Point<dim> B(0,0);
+	Point<dim> C(0,0);
+	Point<dim> D(0,0);
+	Point<dim> E(0,0);
+	Point<dim> F(0,0);
 
 	if (type == 1) return 1;
 
@@ -382,7 +399,6 @@ unsigned int LaplaceProblem<dim>::compute_quadrature ( Quadrature<dim> plain_qua
 		
 		std::vector<Point<dim> > v(GeometryInfo<dim>::vertices_per_cell);
 
-		unsigned int Pos = 100;
 		if (sign_ls[0]!=sign_ls[1] && sign_ls[0]!=sign_ls[2] && sign_ls[0]!=sign_ls[3]) Pos = 0;
     else if (sign_ls[1]!=sign_ls[0] && sign_ls[1]!=sign_ls[2] && sign_ls[1]!=sign_ls[3]) Pos = 1;
     else if (sign_ls[2]!=sign_ls[0] && sign_ls[2]!=sign_ls[1] && sign_ls[2]!=sign_ls[3]) Pos = 2;
@@ -390,13 +406,6 @@ unsigned int LaplaceProblem<dim>::compute_quadrature ( Quadrature<dim> plain_qua
 		else assert(0); // error message
 
 		std::cout << "Pos " << Pos << std::endl;
-
-		Point<dim> A(0,0);
-		Point<dim> B(0,0);
-		Point<dim> C(0,0);
-		Point<dim> D(0,0);
-		Point<dim> E(0,0);
-		Point<dim> F(0,0);
 
 		// Find cut coordinates
 
@@ -474,14 +483,12 @@ unsigned int LaplaceProblem<dim>::compute_quadrature ( Quadrature<dim> plain_qua
     Point<dim> v2(0,1);
     Point<dim> v3(1,1);
 
-		/*
 		std::cout << A << std::endl;
 		std::cout << B << std::endl;
 		std::cout << C << std::endl;
 		std::cout << D << std::endl;
 		std::cout << E << std::endl;
 		std::cout << F << std::endl;
-		*/
 
 		Point<dim> subcell_vertices[10];
 		subcell_vertices[0] = v0;
@@ -526,11 +533,56 @@ unsigned int LaplaceProblem<dim>::compute_quadrature ( Quadrature<dim> plain_qua
 
 		}
 
-
 		return 2;
 	}
 
-	return 100;
+	// Type three decomposition
+	// (+--+, ++--, +-+-, -++-, --++, -+-+)
+
+	if (type==3)
+	{
+		const unsigned int   n_q_points    = plain_quadrature.size();
+
+		// loop over all subelements for integration
+		// in type 2 there are 5 subelements
+
+		Quadrature<dim> xfem_quadrature(5*n_q_points);
+		
+		std::vector<Point<dim> > v(GeometryInfo<dim>::vertices_per_cell);
+
+		if ( sign_ls[0]==sign_ls[1] && sign_ls[2]==sign_ls[3] )
+		{
+			Pos = 0;
+			A(1) = level_set_values[0]/((level_set_values[0]-level_set_values[2]));
+			B(1) = level_set_values[1]/((level_set_values[1]-level_set_values[3]));
+		}
+		else if ( sign_ls[0]==sign_ls[2] && sign_ls[1]==sign_ls[3] )
+		{
+			Pos = 1;
+			A(0) = level_set_values[0]/((level_set_values[0]-level_set_values[1]));
+			B(0) = level_set_values[2]/((level_set_values[2]-level_set_values[3]));
+		}
+		else if ( sign_ls[0]==sign_ls[3] && sign_ls[1]==sign_ls[2] )
+		{
+			std::cout << "Error: the element has two cut lines and this is not allowed" << std::endl;
+			assert(0); 
+		}
+		else
+		{
+			std::cout << "Error: the level set function has not the right values" << std::endl;
+			assert(0);
+		}
+
+		std::cout << "Pos " << Pos << std::endl;
+		std::cout << A << std::endl;
+		std::cout << B << std::endl;
+
+		return 3;
+	}
+
+
+
+	return 0;
 
 }
 
