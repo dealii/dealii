@@ -229,48 +229,13 @@ interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cel
 template <int dim>
 void LaplaceProblem<dim>::setup_system ()
 {
-				   // decide which element to use
-				   // where. to do so, we need to know
-				   // which elements are intersected
-				   // by the interface, or are at
-				   // least adjacent. to this end, in
-				   // a first step, loop over all
-				   // cells and record which vertices
-				   // are on cells that are
-				   // intersected
-  std::vector<bool> vertex_is_on_intersected_cell (triangulation.n_vertices(),
-						   false);
-  for (typename Triangulation<dim>::cell_iterator cell
-	 = triangulation.begin_active();
-       cell != triangulation.end(); ++cell)
-    if (interface_intersects_cell(cell))
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	vertex_is_on_intersected_cell[cell->vertex_index(v)] = true;
-
-				   // now loop over all cells
-				   // again. if one of the vertices of
-				   // a given cell is part of a cell
-				   // that is intersected, then we
-				   // need to use the enriched space
-				   // there. otherwise, use the normal
-				   // space
   for (typename hp::DoFHandler<dim>::cell_iterator cell
 	 = dof_handler.begin_active();
        cell != dof_handler.end(); ++cell)
-    {
-      bool use_enriched_space = false;
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	if (vertex_is_on_intersected_cell[cell->vertex_index(v)] == true)
-	  {
-	    use_enriched_space = true;
-	    break;
-	  }
-
-      if (use_enriched_space == false)
-	cell->set_active_fe_index(0);
-      else
-	cell->set_active_fe_index(1);
-    }
+    if (interface_intersects_cell(cell) == false)
+      cell->set_active_fe_index(0);
+    else
+      cell->set_active_fe_index(1);
 
   dof_handler.distribute_dofs (fe_collection);
 
@@ -282,26 +247,6 @@ void LaplaceProblem<dim>::setup_system ()
 //TODO: fix this, it currently crashes
   // DoFTools::make_hanging_node_constraints (dof_handler,
   // 					   constraints);
-
-				   // now constrain those enriched
-				   // DoFs that are on cells that are
-				   // not intersected but that are
-				   // adjacent to cells that are
-  for (typename hp::DoFHandler<dim>::cell_iterator cell
-	 = dof_handler.begin_active();
-       cell != dof_handler.end(); ++cell)
-    if ((cell->active_fe_index() == 1)
-	&&
-	(interface_intersects_cell(cell) == false))
-				       // we are on an enriched cell
-				       // but it isn't
-				       // intersected. see which
-				       // vertices are not part of
-				       // intersected cells and
-				       // constrain these DoFs
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-	if (vertex_is_on_intersected_cell[cell->vertex_index(v)] == false)
-	  constraints.add_line (cell->vertex_dof_index(v,1,cell->active_fe_index()));
 
 //TODO: component 1 must satisfy zero boundary conditions
   constraints.close();
@@ -316,6 +261,7 @@ void LaplaceProblem<dim>::setup_system ()
 
   system_matrix.reinit (sparsity_pattern);
 }
+
 
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
@@ -377,32 +323,21 @@ void LaplaceProblem<dim>::assemble_system ()
 	}
       else
 	{
+//TODO: verify that the order of support points equals the order of vertices of the cells, as we use below
+//TODO: remove update_support_points and friends, since they aren't implemented anyway
 	  Assert (cell->active_fe_index() == 1, ExcInternalError());
+	  Assert (interface_intersects_cell(cell) == true, ExcInternalError());
 
-	  std::auto_ptr<FEValues<dim> > custom_fe_values;
+	  std::vector<double> level_set_values (GeometryInfo<dim>::vertices_per_cell);
+	  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+	    level_set_values[v] = level_set (cell->vertex(v));
 
-	  if (interface_intersects_cell(cell) == false)
-	    enriched_fe_values.reinit (cell);
-	  else
-	    {
-	      std::vector<double> level_set_values (GeometryInfo<dim>::vertices_per_cell);
-	      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-		level_set_values[v] = level_set (cell->vertex(v));
-
-	      custom_fe_values
-		.reset(new FEValues<dim> (fe_collection[1],
-					  compute_quadrature(quadrature_formula, cell,
-							     level_set_values).second,
-					  update_values    |  update_gradients |
-					  update_quadrature_points  |  update_JxW_values));
-	      custom_fe_values->reinit (cell);
-	    }
-
-	  FEValues<dim> &this_fe_values = ((interface_intersects_cell(cell) == false)
-					   ?
-					   enriched_fe_values
-					   :
-					   *custom_fe_values);
+	  FEValues<dim> this_fe_values (fe_collection[1],
+					compute_quadrature(quadrature_formula, cell,
+							   level_set_values).second,
+					update_values    |  update_gradients |
+					update_quadrature_points  |  update_JxW_values |
+					update_support_points);
 
 	  coefficient_values.resize (this_fe_values.n_quadrature_points);
 	  coefficient.value_list (this_fe_values.get_quadrature_points(),
@@ -420,8 +355,11 @@ void LaplaceProblem<dim>::assemble_system ()
 					   this_fe_values.JxW(q_point));
 		    else
 		      cell_matrix(i,j) += (coefficient_values[q_point] *
-					   this_fe_values.shape_grad(i,q_point) *
-					   (std::fabs(level_set(this_fe_values.quadrature_point(q_point))) *
+					   this_fe_values.shape_grad(i,q_point)
+					   *
+					   ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
+					     -
+					     std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(j).second))))*
 					    this_fe_values.shape_grad(j,q_point)
 					    +
 					    grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -438,7 +376,9 @@ void LaplaceProblem<dim>::assemble_system ()
 		  for (unsigned int j=0; j<dofs_per_cell; ++j)
 		    if (cell->get_fe().system_to_component_index(j).first == 0)
 		      cell_matrix(i,j) += (coefficient_values[q_point] *
-					   (std::fabs(level_set(this_fe_values.quadrature_point(q_point))) *
+					   ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
+					     -
+					     std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(i).second))))*
 					    this_fe_values.shape_grad(i,q_point)
 					    +
 					    grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -448,13 +388,17 @@ void LaplaceProblem<dim>::assemble_system ()
 					   this_fe_values.JxW(q_point));
 		    else
 		      cell_matrix(i,j) += (coefficient_values[q_point] *
-					   (std::fabs(level_set(this_fe_values.quadrature_point(q_point))) *
+					   ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
+					     -
+					     std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(i).second))))*
 					    this_fe_values.shape_grad(i,q_point)
 					    +
 					    grad_level_set(this_fe_values.quadrature_point(q_point)) *
 					    sign(level_set(this_fe_values.quadrature_point(q_point))) *
 					    this_fe_values.shape_value(i,q_point)) *
-					   (std::fabs(level_set(this_fe_values.quadrature_point(q_point))) *
+					   ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
+					     -
+					     std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(j).second))))*
 					    this_fe_values.shape_grad(j,q_point)
 					    +
 					    grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -462,7 +406,9 @@ void LaplaceProblem<dim>::assemble_system ()
 					    this_fe_values.shape_value(j,q_point)) *
 					   this_fe_values.JxW(q_point));
 
-		  cell_rhs(i) += (std::fabs(level_set(this_fe_values.quadrature_point(q_point))) *
+		  cell_rhs(i) += ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
+				   -
+				   std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(i).second))))*
 				  this_fe_values.shape_value(i,q_point) *
 				  1.0 *
 				  this_fe_values.JxW(q_point));
