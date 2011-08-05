@@ -10,7 +10,7 @@
 //
 //----------------------------  full_matrix_03.cc,v  ---------------------------
 
-//check method schur_complement of FullMatrix
+//check method FullMatrix::triple_prduct
 
 #include "../tests.h"
 #include <cmath>
@@ -61,7 +61,7 @@ void test (const unsigned int n, const unsigned int m)
 				   // Compare first Schur complement
 				   // with mmult.
   FullMatrix<double> S1(m,m);
-  S1.schur_complement(A, D, B, false, false);
+  S1.triple_product(A, D, B, false, false);
 
   FullMatrix<double> aux1(n,m);
   A.mmult(aux1,B);
@@ -73,7 +73,7 @@ void test (const unsigned int n, const unsigned int m)
 				   // Compare second Schur complement
 				   // with mmult
   FullMatrix<double> S2(n,n);
-  S2.schur_complement(C, B, D, false, false);
+  S2.triple_product(C, B, D, false, false);
 
   FullMatrix<double> aux3(m,n);
   C.mmult(aux3,D);
@@ -84,28 +84,28 @@ void test (const unsigned int n, const unsigned int m)
 
 				   // Check transpose versions
   aux2 = 0.;
-  aux2.schur_complement(A, Dt, B, true, false);
+  aux2.triple_product(A, Dt, B, true, false);
   aux2.add(-1., S1);
   diff(aux2);
   aux2 = 0.;
-  aux2.schur_complement(A, D, Bt, false, true);
+  aux2.triple_product(A, D, Bt, false, true);
   aux2.add(-1., S1);
   diff(aux2);
   aux2 = 0.;
-  aux2.schur_complement(A, Dt, Bt, true, true);
+  aux2.triple_product(A, Dt, Bt, true, true);
   aux2.add(-1., S1);
   diff(aux2);
   
   aux4 = 0.;
-  aux4.schur_complement(C, Bt, D, true, false);
+  aux4.triple_product(C, Bt, D, true, false);
   aux4.add(-1., S2);
   diff(aux4);
   aux4 = 0.;
-  aux4.schur_complement(C, B, Dt, false, true);
+  aux4.triple_product(C, B, Dt, false, true);
   aux4.add(-1., S2);
   diff(aux4);
   aux4 = 0.;
-  aux4.schur_complement(C, Bt, Dt, true, true);
+  aux4.triple_product(C, Bt, Dt, true, true);
   aux4.add(-1., S2);
   diff(aux4);
 }
