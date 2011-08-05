@@ -74,9 +74,6 @@ class LaplaceProblem
     void run ();
 
   private:
-    double level_set (const Point<dim> &p) const;
-    Tensor<1,dim> grad_level_set (const Point<dim> &p) const;
-
     bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
     std::pair<unsigned int, Quadrature<dim> > compute_quadrature(const Quadrature<dim> &plain_quadrature, const typename hp::DoFHandler<dim>::active_cell_iterator &cell, const std::vector<double> &level_set_values);
     void append_quadrature(const Quadrature<dim> &plain_quadrature,
@@ -89,6 +86,7 @@ class LaplaceProblem
     void solve ();
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
+    void compute_error () const;
 
     Triangulation<dim>    triangulation;
 
@@ -183,8 +181,7 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 
 template <int dim>
 double
-LaplaceProblem<dim>::
-level_set (const Point<dim> &p) const
+level_set (const Point<dim> &p)
 {
   return p.norm() - 0.5;
 }
@@ -193,8 +190,7 @@ level_set (const Point<dim> &p) const
 
 template <int dim>
 Tensor<1,dim>
-LaplaceProblem<dim>::
-grad_level_set (const Point<dim> &p) const
+grad_level_set (const Point<dim> &p)
 {
   return p / p.norm();
 }
@@ -336,11 +332,6 @@ void LaplaceProblem<dim>::assemble_system ()
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-  std::vector<double> level_set_values;
-  level_set_values.push_back(1.);
-  level_set_values.push_back(1.);
-  level_set_values.push_back(1.);
-  level_set_values.push_back(-3.);
   for (; cell!=endc; ++cell)
     {
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -691,7 +682,6 @@ LaplaceProblem<dim>::compute_quadrature (const Quadrature<dim> &plain_quadrature
 		{{7,9,8,3}, {4,6,8,7}, {6,5,7,9}, {0,6,2,4}, {0,1,6,5}}
 	  };
 
-	  std::cout << "Pos       : " << Pos << std::endl;
 	  for (unsigned int subcell = 0; subcell<5; subcell++)
 	    {
 					       //std::cout << "subcell   : " << subcell << std::endl;
@@ -940,6 +930,92 @@ void LaplaceProblem<dim>::refine_grid ()
 
 
 template <int dim>
+class Postprocessor : public DataPostprocessor<dim>
+{
+  public:
+    virtual
+    void
+    compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+				       const std::vector<std::vector<Tensor<1,dim> > > &duh,
+				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+				       const std::vector<Point<dim> >                  &normals,
+				       const std::vector<Point<dim> >                  &evaluation_points,
+				       std::vector<Vector<double> >                    &computed_quantities) const;
+
+    virtual std::vector<std::string> get_names () const;
+
+    virtual unsigned int n_output_variables() const;
+
+    virtual
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    get_data_component_interpretation () const;
+
+    virtual UpdateFlags get_needed_update_flags () const;
+};
+
+
+template <int dim>
+std::vector<std::string>
+Postprocessor<dim>::get_names() const
+{
+  std::vector<std::string> solution_names (1, "total_solution");
+  return solution_names;
+}
+
+
+template <int dim>
+unsigned int
+Postprocessor<dim>::n_output_variables() const
+{
+  return get_names().size();
+}
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+Postprocessor<dim>::
+get_data_component_interpretation () const
+{
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    interpretation (1,
+		    DataComponentInterpretation::component_is_scalar);
+  return interpretation;
+}
+
+
+template <int dim>
+UpdateFlags
+Postprocessor<dim>::get_needed_update_flags() const
+{
+  return update_values | update_q_points;
+}
+
+
+template <int dim>
+void
+Postprocessor<dim>::
+compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
+				   const std::vector<std::vector<Tensor<1,dim> > > &/*duh*/,
+				   const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+				   const std::vector<Point<dim> >                  &/*normals*/,
+				   const std::vector<Point<dim> >                  &evaluation_points,
+				   std::vector<Vector<double> >                    &computed_quantities) const
+{
+  const unsigned int n_quadrature_points = uh.size();
+  Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
+  Assert (uh[0].size() == 2,                                  ExcInternalError());
+  Assert (computed_quantities[0].size()==n_output_variables(),ExcInternalError());
+
+  for (unsigned int q=0; q<n_quadrature_points; ++q)
+    computed_quantities[q](0)
+      = (uh[q](0)
+	 +
+	 uh[q](1) * std::fabs(level_set(evaluation_points[q])));
+}
+
+
+
+template <int dim>
 void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 {
   Assert (cycle < 10, ExcNotImplemented());
@@ -950,13 +1026,68 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
   std::ofstream output (filename.c_str());
 
+  Postprocessor<dim> postprocessor;
   DataOut<dim,hp::DoFHandler<dim> > data_out;
 
   data_out.attach_dof_handler (dof_handler);
   data_out.add_data_vector (solution, "solution");
-  data_out.build_patches ();
+  data_out.add_data_vector (solution, postprocessor);
+  data_out.build_patches (5);
 
   data_out.write_vtk (output);
+}
+
+
+
+template <int dim>
+void LaplaceProblem<dim>::compute_error () const
+{
+  hp::QCollection<dim> q_collection;
+  q_collection.push_back (QGauss<dim>(2));
+  q_collection.push_back (QIterated<dim>(QGauss<1>(2), 4));
+
+  hp::FEValues<dim> hp_fe_values (fe_collection, q_collection,
+				  update_values | update_q_points | update_JxW_values);
+
+  double l2_error_square = 0;
+
+  std::vector<Vector<double> > solution_values;
+
+  typename hp::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+
+  for (; cell!=endc; ++cell)
+    {
+      hp_fe_values.reinit (cell);
+
+      const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
+
+      solution_values.resize (fe_values.n_quadrature_points,
+			      Vector<double>(2));
+      fe_values.get_function_values (solution,
+				     solution_values);
+
+      for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
+	{
+	  const double r = fe_values.quadrature_point(q).norm();
+	  const double exact_solution = (r < 0.5
+					 ?
+					 1./20 * (-1./4*r*r + 61./16)
+					 :
+					 1./4 * (1-r*r));
+	  const double local_error = (solution_values[q](0)
+				      +
+				      std::fabs(level_set(fe_values.quadrature_point(q))) *
+				      solution_values[q](1)
+				      -
+				      exact_solution);
+	  l2_error_square += local_error * local_error * fe_values.JxW(q);
+	}
+    }
+
+  std::cout << "   L2 error = " << std::sqrt (l2_error_square)
+	    << std::endl;
 }
 
 
@@ -979,7 +1110,8 @@ void LaplaceProblem<dim>::run ()
 	  triangulation.refine_global (3);
 	}
       else
-	refine_grid ();
+	triangulation.refine_global (1);
+//	refine_grid ();
 
 
       std::cout << "   Number of active cells:       "
@@ -994,6 +1126,7 @@ void LaplaceProblem<dim>::run ()
 
       assemble_system ();
       solve ();
+      compute_error ();
       output_results (cycle);
     }
 }
