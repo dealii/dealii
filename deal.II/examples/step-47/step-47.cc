@@ -64,8 +64,11 @@ class LaplaceProblem
 
   private:
     bool interface_intersects_cell (const typename Triangulation<dim>::cell_iterator &cell) const;
-    unsigned int compute_quadrature(const Quadrature<dim> &plain_quadrature, const typename hp::DoFHandler<dim>::active_cell_iterator &cell, const std::vector<double> &level_set_values);
-		void append_quadrature(Quadrature<dim> plain_quadrature, std::vector<Point<dim> > v);
+		std::pair<unsigned int, Quadrature<dim> > compute_quadrature(const Quadrature<dim> &plain_quadrature, const typename hp::DoFHandler<dim>::active_cell_iterator &cell, const std::vector<double> &level_set_values);
+		void append_quadrature(const Quadrature<dim> &plain_quadrature, 
+				                   const std::vector<Point<dim> > &v      , 
+													 std::vector<Point<dim> > &xfem_points, 
+													 std::vector<double>      &xfem_weights);
 
     void setup_system ();
     void assemble_system ();
@@ -288,13 +291,27 @@ void LaplaceProblem<dim>::assemble_system ()
     endc = dof_handler.end();
 
 	std::vector<double> level_set_values;
-	level_set_values.push_back(-1./2.);
-	level_set_values.push_back(1);
-	level_set_values.push_back(-1./2.);
 	level_set_values.push_back(1.);
+	level_set_values.push_back(1.);
+	level_set_values.push_back(1.);
+	level_set_values.push_back(-3.);
   for (; cell!=endc; ++cell)
     {
-			compute_quadrature(quadrature_formula, cell, level_set_values);
+			std::pair<unsigned int, Quadrature<dim> > type_and_quadrature = compute_quadrature(quadrature_formula, cell, level_set_values);
+
+			std::cout << "type : " << type_and_quadrature.first << std::endl;
+			std::vector<Point<dim> > points = type_and_quadrature.second.get_points();
+			std::vector<double> weights = type_and_quadrature.second.get_weights();
+			std::string filename = "points.dat";
+			std::ofstream output (filename.c_str());
+			output << "#xfem quadrature Points" << std::endl;
+			for (unsigned int i=0; i<points.size(); i++)
+				output << points[i] << std::endl;
+			std::string filename2 = "weights.dat";
+			std::ofstream output2 (filename2.c_str());
+			output2 << "#xfem Weights" << std::endl;
+			for (unsigned int i=0; i<weights.size(); i++)
+				output2 << weights[i] << std::endl;
 			assert(0);
 
       const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -380,6 +397,12 @@ void LaplaceProblem<dim>::assemble_system ()
 	else type = 3;
 
 	unsigned int Pos = 100;
+
+	Point<dim> v0(0,0);
+	Point<dim> v1(1,0);
+	Point<dim> v2(0,1);
+	Point<dim> v3(1,1);
+
 	Point<dim> A(0,0);
 	Point<dim> B(0,0);
 	Point<dim> C(0,0);
@@ -406,8 +429,6 @@ void LaplaceProblem<dim>::assemble_system ()
     else if (sign_ls[2]!=sign_ls[0] && sign_ls[2]!=sign_ls[1] && sign_ls[2]!=sign_ls[3]) Pos = 2;
     else if (sign_ls[3]!=sign_ls[0] && sign_ls[3]!=sign_ls[1] && sign_ls[3]!=sign_ls[2]) Pos = 3;
 		else assert(0); // error message
-
-		std::cout << "Pos " << Pos << std::endl;
 
 		// Find cut coordinates
 
@@ -442,9 +463,9 @@ void LaplaceProblem<dim>::assemble_system ()
 			B(0) = 1.;
 			C(0) = 0.5*( A(0) + B(0) );
 			C(1) = 0.5*( A(1) + B(1) );
-			D(0) = 2./3. * C(0);
+			D(0) = 1./3. + 2./3. * C(0);
 			D(1) = 2./3. * C(1);
-			E(0) = 0.5*A(0);
+			E(0) = 0.5*(1 + A(0));
 			E(1) = 0.;
 			F(0) = 1.;
 			F(1) = 0.5*B(1);
@@ -460,7 +481,7 @@ void LaplaceProblem<dim>::assemble_system ()
 			D(0) = 2./3. * C(0);
 			D(1) = 1./3. + 2./3. * C(1);
 			E(0) = 0.5* A(0);
-			E(1) = 0.;
+			E(1) = 1.;
 			F(0) = 0.;
 			F(1) = 0.5*( 1. + B(1) );
 			}
@@ -480,17 +501,43 @@ void LaplaceProblem<dim>::assemble_system ()
 			F(1) = 0.5*( 1. + B(1) );
 			}
 
-    Point<dim> v0(0,0);
-    Point<dim> v1(1,0);
-    Point<dim> v2(0,1);
-    Point<dim> v3(1,1);
+		//std::cout << A << std::endl;
+		//std::cout << B << std::endl;
+		//std::cout << C << std::endl;
+		//std::cout << D << std::endl;
+		//std::cout << E << std::endl;
+		//std::cout << F << std::endl;
 
-		std::cout << A << std::endl;
-		std::cout << B << std::endl;
-		std::cout << C << std::endl;
-		std::cout << D << std::endl;
-		std::cout << E << std::endl;
-		std::cout << F << std::endl;
+		std::string filename = "vertices.dat";
+		std::ofstream output (filename.c_str());
+		output << "#vertices of xfem subcells" << std::endl;
+		output << v0(0) << "   " << v0(1) << std::endl;
+		output << v1(0) << "   " << v1(1) << std::endl;
+		output << v3(0) << "   " << v3(1) << std::endl;
+		output << v2(0) << "   " << v2(1) << std::endl;
+		output << std::endl;
+		output << A(0) << "   " << A(1) << std::endl;
+		output << B(0) << "   " << B(1) << std::endl;
+		output << std::endl;
+		output << C(0) << "   " << C(1) << std::endl;
+		output << D(0) << "   " << D(1) << std::endl;
+		output << std::endl;
+		output << D(0) << "   " << D(1) << std::endl;
+		output << E(0) << "   " << E(1) << std::endl;
+		output << std::endl;
+		output << D(0) << "   " << D(1) << std::endl;
+		output << F(0) << "   " << F(1) << std::endl;
+		output << std::endl;
+
+		if (Pos==0)
+			output << v3(0) << "   " << v3(1) << std::endl;
+		else if (Pos==1)
+			output << v2(0) << "   " << v2(1) << std::endl;
+		else if (Pos==2)
+			output << v1(0) << "   " << v1(1) << std::endl;
+		else if (Pos==3)
+			output << v0(0) << "   " << v0(1) << std::endl;
+		output << C(0) << "   " << C(1) << std::endl;
 
 		Point<dim> subcell_vertices[10];
 		subcell_vertices[0] = v0;
@@ -504,35 +551,41 @@ void LaplaceProblem<dim>::assemble_system ()
 		subcell_vertices[8] = E;
 		subcell_vertices[9] = F;
 
+		std::vector<Point<dim> > xfem_points;
+		std::vector<double>      xfem_weights;
+
 		// lookup table for the decomposition
 
 		if (dim==2)
 		{
 			 unsigned int subcell_v_indices[4][5][4] = {
-				 {{0,8,9,7}, {9,7,5,6}, {8,4,7,6}, {5,6,2,3}, {4,1,6,3}},
-				 {{8,1,7,9}, {4,8,6,7}, {7,9,6,8}, {0,4,2,6}, {2,6,3,5}},
-				 {{7,9,8,3}, {4,6,8,7}, {6,5,7,9}, {0,6,2,4}, {0,1,6,5}},
-				 {{9,7,2,8}, {5,6,9,7}, {6,4,7,8}, {0,1,5,6}, {6,1,4,3}}
+				 {{0,8,9,7}, {9,7,5,6}, {8,4,7,6}, {5,6,2,3}, {6,4,3,1}},
+				 {{8,1,7,9}, {4,8,6,7}, {6,7,5,9}, {0,4,2,6}, {2,6,3,5}},
+				 {{9,7,2,8}, {5,6,9,7}, {6,4,7,8}, {0,1,5,6}, {6,1,4,3}},
+				 {{7,9,8,3}, {4,6,8,7}, {6,5,7,9}, {0,6,2,4}, {0,1,6,5}}
 			 };
 
+			 std::cout << "Pos       : " << Pos << std::endl;
 			 for (unsigned int subcell = 0; subcell<5; subcell++)
 			 {
+				 //std::cout << "subcell   : " << subcell << std::endl;
 				 std::vector<Point<dim> > vertices;
 				 for (unsigned int i=0; i<4; i++)
 				 {
 					 vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
-					 //std::cout << "Pos       : " << Pos << std::endl;
-					 //std::cout << "subcell   : " << subcell << std::endl;
 					 //std::cout << "i         : " << i << std::endl;
 					 //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
 					 //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
 				 }
-				 std::cout << std::endl;
+				 //std::cout << std::endl;
 				 // create quadrature rule
-				 append_quadrature( xfem_quadrature,
-							                vertices     );
+				 append_quadrature( plain_quadrature,
+							              vertices,
+														xfem_points,
+														xfem_weights);
+				 //initialize xfem_quadrature with quadrature points of all subelements
+				 xfem_quadrature.initialize(xfem_points, xfem_weights);
 			 }
-
 		}
 
 		return std::pair<unsigned int, Quadrature<dim> >(2, xfem_quadrature);
@@ -555,14 +608,18 @@ void LaplaceProblem<dim>::assemble_system ()
 		if ( sign_ls[0]==sign_ls[1] && sign_ls[2]==sign_ls[3] )
 		{
 			Pos = 0;
+			A(0) = 0.;
 			A(1) = level_set_values[0]/((level_set_values[0]-level_set_values[2]));
+			B(0) = 1.;
 			B(1) = level_set_values[1]/((level_set_values[1]-level_set_values[3]));
 		}
 		else if ( sign_ls[0]==sign_ls[2] && sign_ls[1]==sign_ls[3] )
 		{
 			Pos = 1;
 			A(0) = level_set_values[0]/((level_set_values[0]-level_set_values[1]));
+			A(1) = 0.;
 			B(0) = level_set_values[2]/((level_set_values[2]-level_set_values[3]));
+			B(1) = 1.;
 		}
 		else if ( sign_ls[0]==sign_ls[3] && sign_ls[1]==sign_ls[2] )
 		{
@@ -575,18 +632,60 @@ void LaplaceProblem<dim>::assemble_system ()
 			assert(0);
 		}
 
-		std::cout << "Pos " << Pos << std::endl;
-		std::cout << A << std::endl;
-		std::cout << B << std::endl;
+		//std::cout << "Pos " << Pos << std::endl;
+		//std::cout << A << std::endl;
+		//std::cout << B << std::endl;
+		std::string filename = "vertices.dat";
+		std::ofstream output (filename.c_str());
+		output << "#vertices of xfem subcells" << std::endl;
+		output << A(0) << "   " << A(1) << std::endl;
+		output << B(0) << "   " << B(1) << std::endl;
 
-//TODO: fill xfem_quadrature
+		//fill xfem_quadrature
+		Point<dim> subcell_vertices[6];
+		subcell_vertices[0] = v0;
+		subcell_vertices[1] = v1;
+		subcell_vertices[2] = v2;
+		subcell_vertices[3] = v3;
+		subcell_vertices[4] = A;
+		subcell_vertices[5] = B;
+	
+		std::vector<Point<dim> > xfem_points;
+		std::vector<double>      xfem_weights;
 
+		if (dim==2)
+		{
+			 unsigned int subcell_v_indices[2][2][4] = {
+				 {{0,1,4,5}, {4,5,2,3}},
+				 {{0,4,2,5}, {4,1,5,3}}
+			 };
+
+			 //std::cout << "Pos       : " << Pos << std::endl;
+			 for (unsigned int subcell = 0; subcell<2; subcell++)
+			 {
+				 //std::cout << "subcell   : " << subcell << std::endl;
+				 std::vector<Point<dim> > vertices;
+				 for (unsigned int i=0; i<4; i++)
+				 {
+					 vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
+					 //std::cout << "i         : " << i << std::endl;
+					 //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
+					 //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
+				 }
+				 //std::cout << std::endl;
+				 // create quadrature rule
+				 append_quadrature( plain_quadrature,
+							              vertices,
+														xfem_points,
+														xfem_weights);
+				 //initialize xfem_quadrature with quadrature points of all subelements
+				 xfem_quadrature.initialize(xfem_points, xfem_weights);
+			 }
+		}
 		return std::pair<unsigned int, Quadrature<dim> >(3, xfem_quadrature);
 	}
 
-
-
-	return 0;
+	return std::pair<unsigned int, Quadrature<dim> >(0, plain_quadrature);;
 
 }
 
@@ -598,8 +697,7 @@ void LaplaceProblem<dim>::append_quadrature ( const Quadrature<dim> &plain_quadr
 
 {
 	// Project integration points into sub-elements.
-	// Map F1.
-	// The map F1 maps quadrature points from a reference element to a subelement of a reference element.
+	// This maps quadrature points from a reference element to a subelement of a reference element.
 	// To implement the action of this map the coordinates of the subelements have been calculated (A(0)...F(0),A(1)...F(1))
 	// the coordinates of the quadrature points are given by the bi-linear map defined by the form functions
 	// $x^\prime_i = \sum_j v^\prime \phi_j(x^hat_i)$, where the $\phi_j$ are the shape functions of the FEQ.
@@ -639,7 +737,7 @@ void LaplaceProblem<dim>::append_quadrature ( const Quadrature<dim> &plain_quadr
 
 		grad_phi[0][1] = (-1. + xi);
 		grad_phi[1][1] = -xi;
-		grad_phi[2][1] = -xi;
+		grad_phi[2][1] = 1-xi;
 		grad_phi[3][1] = xi;
 
 		break;
@@ -655,23 +753,17 @@ void LaplaceProblem<dim>::append_quadrature ( const Quadrature<dim> &plain_quadr
 					   // Calculate Jacobian of transformation
 	  for (unsigned int d=0; d<dim; ++d)
 	    for (unsigned int e=0; e<dim; ++e)
+			{
 	      for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)
-		jacobian[d][e] += grad_phi[j][d] * v[j](e);
+				{
+		jacobian[d][e] += grad_phi[j][e] * v[j](d);
+				}
+			}
 
-/*
-
-	  for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)
-	    {
-	      dx_dxi  += dphi_dxi[j]  * v[j](0);
-	      dx_deta += dphi_deta[j] * v[j](0);
-	      dy_dxi  += dphi_dxi[j]  * v[j](1);
-	      dy_deta += dphi_deta[j] * v[j](1);
-	    }
-*/
 	  double detJ = determinant(jacobian);
 	  xfem_weights.push_back (W[i] * detJ);
 
-		// Map integration points from reference element to subcell of reference elemment
+		// Map integration points from reference element to subcell of reference element
 		Point<dim> q_prime;
 		for (unsigned int d=0; d<dim; ++d)
 		  for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)
