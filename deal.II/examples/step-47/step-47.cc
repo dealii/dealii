@@ -157,6 +157,18 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
 
 
+template <int dim>
+double exact_solution (const Point<dim> &p)
+{
+  const double r = p.norm();
+
+  return (r < 0.5
+	  ?
+	  1./20 * (-1./4*r*r + 61./16)
+	  :
+	  1./4 * (1-r*r));
+}
+
 
 template <int dim>
 LaplaceProblem<dim>::LaplaceProblem ()
@@ -959,6 +971,7 @@ std::vector<std::string>
 Postprocessor<dim>::get_names() const
 {
   std::vector<std::string> solution_names (1, "total_solution");
+  solution_names.push_back ("error");
   return solution_names;
 }
 
@@ -977,7 +990,7 @@ Postprocessor<dim>::
 get_data_component_interpretation () const
 {
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    interpretation (1,
+    interpretation (2,
 		    DataComponentInterpretation::component_is_scalar);
   return interpretation;
 }
@@ -1007,10 +1020,16 @@ compute_derived_quantities_vector (const std::vector<Vector<double> >           
   Assert (computed_quantities[0].size()==n_output_variables(),ExcInternalError());
 
   for (unsigned int q=0; q<n_quadrature_points; ++q)
-    computed_quantities[q](0)
-      = (uh[q](0)
-	 +
-	 uh[q](1) * std::fabs(level_set(evaluation_points[q])));
+    {
+      computed_quantities[q](0)
+	= (uh[q](0)
+	   +
+	   uh[q](1) * std::fabs(level_set(evaluation_points[q])));
+      computed_quantities[q](1)
+	= (computed_quantities[q](0)
+	   -
+	   exact_solution (evaluation_points[q]));
+    }
 }
 
 
@@ -1070,18 +1089,12 @@ void LaplaceProblem<dim>::compute_error () const
 
       for (unsigned int q=0; q<fe_values.n_quadrature_points; ++q)
 	{
-	  const double r = fe_values.quadrature_point(q).norm();
-	  const double exact_solution = (r < 0.5
-					 ?
-					 1./20 * (-1./4*r*r + 61./16)
-					 :
-					 1./4 * (1-r*r));
 	  const double local_error = (solution_values[q](0)
 				      +
 				      std::fabs(level_set(fe_values.quadrature_point(q))) *
 				      solution_values[q](1)
 				      -
-				      exact_solution);
+				      exact_solution (fe_values.quadrature_point(q)));
 	  l2_error_square += local_error * local_error * fe_values.JxW(q);
 	}
     }
