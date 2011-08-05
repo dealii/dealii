@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -78,6 +78,12 @@ namespace internal
   }
 }
 
+
+template <int dim, class DH>
+DataOutFaces<dim,DH>::DataOutFaces(const bool so)
+		:
+		surface_only(so)
+{}
 
 
 template <int dim, class DH>
@@ -382,7 +388,7 @@ DataOutFaces<dim,DH>::first_face ()
   typename DH::active_cell_iterator cell = this->dofs->begin_active();
   for (; cell != this->dofs->end(); ++cell)
     for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-      if (cell->face(f)->at_boundary())
+      if (!surface_only || cell->face(f)->at_boundary())
 	return FaceDescriptor(cell, f);
 
 				   // ups, triangulation has no
@@ -404,7 +410,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 				   // cell has more faces on the
 				   // boundary
   for (unsigned int f=face.second+1; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-    if (face.first->face(f)->at_boundary())
+    if (!surface_only || face.first->face(f)->at_boundary())
 				       // yup, that is so, so return it
       {
 	face.second = f;
@@ -429,7 +435,7 @@ DataOutFaces<dim,DH>::next_face (const FaceDescriptor &old_face)
 				       // check all the faces of this
 				       // active cell
       for (unsigned int f=0; f<GeometryInfo<DH::dimension>::faces_per_cell; ++f)
-	if (active_cell->face(f)->at_boundary())
+	if (!surface_only || active_cell->face(f)->at_boundary())
 	  {
 	    face.first  = active_cell;
 	    face.second = f;

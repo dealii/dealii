@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -60,15 +60,15 @@ namespace internal
 
 
 /**
- * This class generates output from faces of a triangulation rather
- * than from cells, as do for example the DataOut and
- * DataOut_Rotation() classes. It might be used to generate output
- * only for the surface of the triangulation (this is the default of
- * this class), or for another arbitrary set of faces. The output of
- * this class is a set of patches (as defined by the class
- * DataOutBase::Patch()), one for each face for which output is to
- * be generated. These patches can then be written in several
- * graphical data formats by the functions of the underlying classes.
+ * This class generates output from faces of a triangulation. It might
+ * be used to generate output only for the surface of the
+ * triangulation (this is the default of this class), or for all faces
+ * of active cells, as specified in the constructor.
+ * The output of this class is a set of
+ * patches (as defined by the class DataOutBase::Patch()), one for
+ * each face for which output is to be generated. These patches can
+ * then be written in several graphical data formats by the functions
+ * of the underlying classes.
  *
  * <h3>Interface</h3>
  *
@@ -81,11 +81,10 @@ namespace internal
  * <h3>Extending this class</h3>
  *
  * The sequence of faces to generate patches from is generated in the
- * same way as in the DataOut class, see there for a description
- * of the respective interface. For obvious reasons, the functions
- * generating the sequence of faces which shall be used to generate
- * output, are called @p first_face and @p next_face in this class,
- * rather than @p first_cell and @p next_cell.
+ * same way as in the DataOut class; see there for a description of
+ * the respective interface. The functions generating the sequence of
+ * faces which shall be used to generate output, are called
+ * first_face() and next_face().
  *
  * Since we need to initialize objects of type FEValues with the
  * faces generated from these functions, it is not sufficient that
@@ -111,8 +110,10 @@ namespace internal
  * applications certainly exist, for which the author is not
  * imaginative enough.
  *
+ * @todo Reimplement this whole class using actual FEFaceValues and MeshWorker.
+ *
  * @ingroup output
- * @author Wolfgang Bangerth, 2000
+ * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2011
  */
 template <int dim, class DH=DoFHandler<dim> >
 class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
@@ -127,6 +128,14 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
     typedef typename DataOut_DoFData<DH,DH::dimension-1,
 				     DH::dimension>::cell_iterator cell_iterator;
 
+				     /**
+				      * Constructor determining
+				      * whether a surface mesh
+				      * (default) or the whole wire
+				      * basket is written.
+				      */
+    DataOutFaces (const bool surface_only = true);
+    
                                      /**
 				      * This is the central function
 				      * of this class since it builds
@@ -215,34 +224,48 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
 				      * Return the first face which we
 				      * want output for. The default
 				      * implementation returns the
-				      * first active face on the
-				      * boundary, but you might want
-				      * to return another face in a
+				      * first face of an active cell
+				      * or the first such on the
+				      * boundary.
+				      *
+				      * For more general sets,
+				      * overload this function in a
 				      * derived class.
 				      */
     virtual FaceDescriptor first_face ();
     
 				     /**
 				      * Return the next face after
-				      * @p face which we want output
-				      * for.  If there are no more
-				      * face, <tt>dofs->end()</tt> shall be
+				      * which we want output
+				      * for. If there are no more
+				      * faces, <tt>dofs->end()</tt> is
 				      * returned as the first
 				      * component of the return value.
 				      *
 				      * The default implementation
-				      * returns the next active face
-				      * on the boundary, but you might
-				      * want to return other faces in
-				      * a derived class. Note that the
+				      * returns the next face of an
+				      * active cell, or the next such
+				      * on the boundary.
+				      *
+				      * This function traverses the
+				      * mesh cell by cell (active
+				      * only), and then through all
+				      * faces of the cell. As a
+				      * result, interior faces are
+				      * output twice.
+
+				      * This function can be
+				      * overloaded in a derived
+				      * class to select a different
+				      * set of faces. Note that the
 				      * default implementation assumes
 				      * that the given @p face is
 				      * active, which is guaranteed as
-				      * long as @p first_face is also
+				      * long as first_face() is also
 				      * used from the default
 				      * implementation. Overloading
 				      * only one of the two functions
-				      * might not be a good idea.
+				      * should be done with care.
 				      */
     virtual FaceDescriptor next_face (const FaceDescriptor &face);
 
@@ -260,6 +283,13 @@ class DataOutFaces : public DataOut_DoFData<DH,DH::dimension-1,
     DeclException0 (ExcCellNotActiveForCellData);
     
   private:
+				     /**
+				      * Parameter deciding between
+				      * surface meshes and full wire
+				      * basket.
+				      */
+    const bool surface_only;
+    
 				     /**
 				      * Build one patch. This function
 				      * is called in a WorkStream
