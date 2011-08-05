@@ -240,7 +240,8 @@ should be fixed now.
 <br>
 (Wolfgang Bangerth, 2011/01/18)
 
-<li> Extended: Several missing instantiations of functions for triangulations and DoF handlers embedded in higher dimensional space have been added.
+<li> Extended: Several missing instantiations of functions for triangulations
+and DoF handlers embedded in higher dimensional space have been added.
 <br>
 (Wolfgang Bangerth, 2011/01/15)
 </ol>
@@ -251,6 +252,12 @@ should be fixed now.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: The function FullMatrix::triple_product() adds triple products
+like Schur complements to existing matrices.
+<br>
+(Guido Kanschat, 2011/08/05)
+
 <li> Improved: The PETScWrapper::VectorBase class was rather generous in
 calling the PETSc <code>VecAssembleBegin/End</code> functions that incur
 communication in the %parallel case and are therefore causes of potential

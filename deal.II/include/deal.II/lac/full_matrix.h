@@ -1159,19 +1159,31 @@ class FullMatrix : public Table<2,number>
     
 				     /**
 				      * Add to the current matrix the
-				      * Schur complement <b>B
+				      * triple product <b>B
 				      * A<sup>-1</sup>
 				      * D</b>. Optionally, use the
 				      * transposes of the matrices
-				      * <b>B</b> and <b>D</b>. Note
-				      * that the argument for <b>A</b>
-				      * is already the inverse.
+				      * <b>B</b> and <b>D</b>. The
+				      * scaling factor scales the
+				      * whole product, which is
+				      * helpful when adding a multiple
+				      * of the triple product to the
+				      * matrix.
+				      *
+				      * This product was written with
+				      * the Schur complement
+				      * <b>B<sup>T</sup>
+				      * A<sup>-1</sup> D</b> in mind.
+				      * Note that in this case the
+				      * argument for <tt>A<tt> must be
+				      * the inverse of the matrix <b>A</b>.
 				      */
-    void schur_complement(const FullMatrix<number>& Ainverse,
-			  const FullMatrix<number>& B,
-			  const FullMatrix<number>& D,
-			  const bool transpose_B = false,
-			  const bool transpose_D = false);
+    void triple_product(const FullMatrix<number>& A,
+			const FullMatrix<number>& B,
+			const FullMatrix<number>& D,
+			const bool transpose_B = false,
+			const bool transpose_D = false,
+			const number scaling = number(1.));
     
 				     /**
 				      * Matrix-vector-multiplication.

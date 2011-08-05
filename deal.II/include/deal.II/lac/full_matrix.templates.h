@@ -882,62 +882,57 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
 
 template <typename number>
 void
-FullMatrix<number>::schur_complement(
-  const FullMatrix<number>& Ainverse,
+FullMatrix<number>::triple_product(
+  const FullMatrix<number>& A,
   const FullMatrix<number>& B,
   const FullMatrix<number>& D,
   const bool transpose_B,
-  const bool transpose_D)
+  const bool transpose_D,
+  const number scaling)
 {  
-  AssertDimension (m(), n());
-  AssertDimension (Ainverse.m(), Ainverse.n());
-
-  const unsigned int N = n();
-  const unsigned int M = Ainverse.n();
-  
   if (transpose_B)
     {
-      AssertDimension(B.m(), M);
-      AssertDimension(B.n(), N);
+      AssertDimension(B.m(), A.m());
+      AssertDimension(B.n(), m());
     }
   else
     {
-      AssertDimension(B.n(), M);
-      AssertDimension(B.m(), N);
+      AssertDimension(B.n(), A.m());
+      AssertDimension(B.m(), m());
     }
   if (transpose_D)
     {
-      AssertDimension(D.n(), M);
-      AssertDimension(D.m(), N);
+      AssertDimension(D.n(), A.n());
+      AssertDimension(D.m(), n());
     }
   else
     {
-      AssertDimension(D.m(), M);
-      AssertDimension(D.n(), N);
+      AssertDimension(D.m(), A.n());
+      AssertDimension(D.n(), n());
     }
 
 				   // For all entries of the product
 				   // AD
-  for (unsigned int i=0; i<M;++i)
-    for (unsigned int j=0; j<N;++j)
+  for (unsigned int i=0; i<A.m();++i)
+    for (unsigned int j=0; j<n();++j)
       {
 					 // Compute the entry
 	number ADij = 0.;
 	if (transpose_D)
-	  for (unsigned int k=0;k<M;++k)
-	    ADij += Ainverse(i,k)*D(j,k);
+	  for (unsigned int k=0;k<A.n();++k)
+	    ADij += A(i,k)*D(j,k);
 	else
-	  for (unsigned int k=0;k<M;++k)
-	    ADij += Ainverse(i,k)*D(k,j);
+	  for (unsigned int k=0;k<A.n();++k)
+	    ADij += A(i,k)*D(k,j);
 				   // And add it to this after
 				   // multiplying with the right
 				   // factor from B
-  if (transpose_B)
-    for (unsigned int k=0;k<N;++k)
-      this->operator()(k,j) += ADij*B(i,k);
-  else
-    for (unsigned int k=0;k<N;++k)
-      this->operator()(k,j) += ADij*B(k,i);
+	if (transpose_B)
+	  for (unsigned int k=0;k<m();++k)
+	    this->operator()(k,j) += scaling * ADij * B(i,k);
+	else
+	  for (unsigned int k=0;k<m();++k)
+	    this->operator()(k,j) += scaling * ADij * B(k,i);
       }
 }
     
