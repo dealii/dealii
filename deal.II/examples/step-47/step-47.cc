@@ -320,7 +320,7 @@ void LaplaceProblem<dim>::setup_system ()
 template <int dim>
 void LaplaceProblem<dim>::assemble_system ()
 {
-  const QGauss<dim>  quadrature_formula(2);
+  const QGauss<dim>  quadrature_formula(3);
 
 
   FEValues<dim> plain_fe_values (fe_collection[0], quadrature_formula,
@@ -716,7 +716,7 @@ LaplaceProblem<dim>::compute_quadrature (const Quadrature<dim> &plain_quadrature
 	    }
 	}
 
-      Assert (xfem_quadrature.size() == 20, ExcInternalError());
+      Assert (xfem_quadrature.size() == plain_quadrature.size() * 5, ExcInternalError());
       return std::pair<unsigned int, Quadrature<dim> >(2, xfem_quadrature);
     }
 
@@ -811,7 +811,7 @@ LaplaceProblem<dim>::compute_quadrature (const Quadrature<dim> &plain_quadrature
 	      xfem_quadrature.initialize(xfem_points, xfem_weights);
 	    }
 	}
-      Assert (xfem_quadrature.size() == 8, ExcInternalError());
+      Assert (xfem_quadrature.size() == plain_quadrature.size() * 2, ExcInternalError());
       return std::pair<unsigned int, Quadrature<dim> >(3, xfem_quadrature);
     }
 
