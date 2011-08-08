@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -235,14 +235,14 @@ namespace MeshWorker
       
 				       /**
 					* The number of quadrature
-					* points in #quadrature_values.
+					* points in quadrature_values().
 					*/
       unsigned int n_quadrature_points() const;
       
 				       /**
 					* The number of values in each
 					* quadrature point in
-					* #quadrature_values.
+					* quadrature_values().
 					*/
       unsigned int n_quadrature_values() const;
       
@@ -289,6 +289,17 @@ namespace MeshWorker
 					* inside the cell.
 					*/
       const MatrixBlock<FullMatrix<number> >& matrix(unsigned int i, bool external = false) const;
+      
+				       /**
+					* Access to the vector
+					* #quadrature_data of data
+					* in quadrature points,
+					* organized such that there is
+					* a vector for each point,
+					* containing one entry for
+					* each component.
+					*/
+      Table<2, number>& quadrature_values();
       
 				       /**
 					* Access the <i>i</i>th value
@@ -453,7 +464,7 @@ namespace MeshWorker
 					*
 					* Values in quadrature points.
 					*/
-      std::vector<std::vector<number> > quadrature_values;
+      Table<2, number> quadrature_data;
   };
 
 //----------------------------------------------------------------------//
@@ -552,7 +563,7 @@ namespace MeshWorker
   inline void
   LocalResults<number>::initialize_quadrature(unsigned int np, unsigned int nv)
   {
-    quadrature_values.resize(np, std::vector<number>(nv));
+    quadrature_data.reinit(np, nv);
   }
   
   
@@ -588,7 +599,7 @@ namespace MeshWorker
   unsigned int
   LocalResults<number>::n_quadrature_points() const
   {
-    return quadrature_values.size();
+    return quadrature_data.n_rows();
   }
 
   
@@ -597,8 +608,7 @@ namespace MeshWorker
   unsigned int
   LocalResults<number>::n_quadrature_values() const
   {
-    Assert(quadrature_values.size() != 0, ExcNotInitialized());
-    return quadrature_values[0].size();
+    return quadrature_data.n_cols();
   }
   
   
@@ -642,9 +652,16 @@ namespace MeshWorker
   number&
   LocalResults<number>::quadrature_value(unsigned int k, unsigned int i)
   {
-    AssertIndexRange(k,quadrature_values.size());
-    AssertIndexRange(i,quadrature_values[0].size());
-    return quadrature_values[k][i];
+    return quadrature_data(k,i);
+  }
+  
+  
+  template <typename number>
+  inline
+  Table<2, number>&
+  LocalResults<number>::quadrature_values()
+  {
+    return quadrature_data;
   }
   
   
@@ -688,9 +705,7 @@ namespace MeshWorker
   number
   LocalResults<number>::quadrature_value(unsigned int k, unsigned int i) const
   {
-    AssertIndexRange(k,quadrature_values.size());
-    AssertIndexRange(i,quadrature_values[0].size());
-    return quadrature_values[k][i];
+    return quadrature_data(k,i);
   }
 }
 

@@ -31,9 +31,7 @@ namespace MeshWorker
     for (unsigned int i=0;i<M2.size();++i)
       M2[i].matrix.reinit(bi.block_size(M2[i].row),
 			  bi.block_size(M2[i].column));
-    for (unsigned int k=0;k<quadrature_values.size();++k)
-      for (unsigned int i=0;i<quadrature_values[k].size();++i)
-	quadrature_values[k][i] = 0.;
+    quadrature_data.reset_values();
   }
 
 
@@ -46,7 +44,7 @@ namespace MeshWorker
 		       + MemoryConsumption::memory_consumption(R)
 		       + MemoryConsumption::memory_consumption(M1)
 		       + MemoryConsumption::memory_consumption(M2)
-		       + MemoryConsumption::memory_consumption(quadrature_values);
+		       + MemoryConsumption::memory_consumption(quadrature_data);
     return mem;
   }
 
