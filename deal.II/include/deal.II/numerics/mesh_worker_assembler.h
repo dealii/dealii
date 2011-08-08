@@ -101,13 +101,17 @@ namespace MeshWorker
 	void initialize(unsigned int n);
 					 /**
 					  * Initialize the local data
-					  * in the
-					  * DoFInfo
-					  * object used later for
-					  * assembling.
+					  * in the DoFInfo object used
+					  * later for assembling.
+					  *
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info, bool interior_face);
+	void initialize_info(DOFINFO& info, bool face);
 	
 					 /**
 					  * Assemble the local values
@@ -200,19 +204,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 					 /**
 					  * Assemble the local values
@@ -264,24 +263,17 @@ namespace MeshWorker
         void initialize(const ConstraintMatrix& constraints);
 					 /**
 					  * Initialize the local data
-					  * in the
-					  * DoFInfo
-					  * object used later for
-					  * assembling.
+					  * in the DoFInfo object used
+					  * later for assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 					 /**
 					  * Assemble the local residuals
@@ -352,19 +344,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 
 					 /**
@@ -455,19 +442,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 					 /**
 					  * Assemble the matrix
@@ -581,19 +563,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 					 /**
 					  * Assemble the matrix
@@ -793,19 +770,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 
 					 /**
@@ -937,19 +909,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info,
-			     bool interior_face) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 	
 					 /**
@@ -1072,18 +1039,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <class DOFINFO>
-	void initialize_info(DOFINFO& info, bool) const;
+	void initialize_info(DOFINFO& info, bool face) const;
 	
 					 /**
 					  * Assemble the matrix
@@ -1409,10 +1372,9 @@ namespace MeshWorker
     template <class MATRIX >
     template <class DOFINFO>
     inline void
-    MatrixSimple<MATRIX>::initialize_info(DOFINFO& info,
-					  bool interior_face) const
+    MatrixSimple<MATRIX>::initialize_info(DOFINFO& info, bool face) const
     {
-      info.initialize_matrices(1, interior_face);
+      info.initialize_matrices(1, face);
     }
 
 
@@ -1508,10 +1470,9 @@ namespace MeshWorker
     template <class MATRIX >
     template <class DOFINFO>
     inline void
-    MGMatrixSimple<MATRIX>::initialize_info(DOFINFO& info,
-					    bool interior_face) const
+    MGMatrixSimple<MATRIX>::initialize_info(DOFINFO& info, bool face) const
     {
-      info.initialize_matrices(1, interior_face);
+      info.initialize_matrices(1, face);
     }
 
 
@@ -1835,9 +1796,9 @@ namespace MeshWorker
     inline void
     MatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize_info(
       DOFINFO& info,
-      bool interior_face) const
+      bool face) const
     {
-      info.initialize_matrices(*matrices, interior_face);
+      info.initialize_matrices(*matrices, face);
     }
 
 
@@ -1957,9 +1918,9 @@ namespace MeshWorker
     inline void
     MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize_info(
       DOFINFO& info,
-      bool interior_face) const
+      bool face) const
     {
-      info.initialize_matrices(*matrices, interior_face);
+      info.initialize_matrices(*matrices, face);
     }
 
 
@@ -2117,10 +2078,10 @@ namespace MeshWorker
     template <class DOFINFO>
     inline void
     SystemSimple<MATRIX,VECTOR>::initialize_info(DOFINFO& info,
-						 bool interior_face) const
+						 bool face) const
     {
-      MatrixSimple<MATRIX>::initialize_info(info, interior_face);
-      ResidualSimple<VECTOR>::initialize_info(info, interior_face);
+      MatrixSimple<MATRIX>::initialize_info(info, face);
+      ResidualSimple<VECTOR>::initialize_info(info, face);
     }
 
 
