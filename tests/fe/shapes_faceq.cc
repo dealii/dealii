@@ -6,6 +6,8 @@
 #include "../tests.h"
 #include "shapes.h"
 #include <deal.II/fe/fe_face.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <fstream>
 #include <string>
@@ -30,8 +32,16 @@ void plot_FE_FaceQ_shape_functions()
   FE_FaceQ<dim> q3(3);
   plot_face_shape_functions(m, q3, "FaceQ3", update_values);
   
-  FE_FaceQ<dim> q4(4);
-  plot_face_shape_functions(m, q4, "FaceQ4", update_values);
+  FESystem<dim> sys0(q0,1);
+  plot_face_shape_functions(m, sys0, "System0", update_values);  
+
+  FE_DGQ<dim> dg0(0);
+  FESystem<dim> sys00(q0,1,dg0,1);
+  plot_face_shape_functions(m, sys00, "System0-0", update_values);  
+  
+  FE_DGQ<dim> dg1(1);
+  FESystem<dim> sys11(q1,1,dg1,1);
+  plot_face_shape_functions(m, sys11, "System1-1", update_values);  
 }
 
 
