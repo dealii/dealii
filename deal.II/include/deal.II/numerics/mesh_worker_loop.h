@@ -110,7 +110,8 @@ namespace MeshWorker
     dof_info.reset();
 
     dof_info.cell.reinit(cell);
-    info.cell.reinit(dof_info.cell);
+    if (integrate_cell)
+      info.cell.reinit(dof_info.cell);
 				     // Execute this, if cells
 				     // have to be dealt with
 				     // before faces
