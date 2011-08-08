@@ -2,7 +2,7 @@
 //    fe_data_test.cc,v 1.14 2003/11/28 11:52:35 guido Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,6 +29,7 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_dg_vector.h>
+#include <deal.II/fe/fe_face.h>
 
 #include <deal.II/fe/fe_system.h>
 
@@ -61,8 +62,6 @@ void test_fe_datas()
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FE_DGP<dim> (2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
-  fe_datas.push_back(new FE_DGP<dim> (4));
-  deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (2), 2));
   deallog << (*fe_datas.rbegin())->get_name() << std::endl;
   fe_datas.push_back(new FESystem<dim>(FE_Q<dim> (1), 2,
@@ -73,6 +72,13 @@ void test_fe_datas()
 				   // Check vector elements in 2d and higher only
   if (dim>1)
     {
+				       // Face elements
+      fe_datas.push_back(new FE_FaceQ<dim> (0));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FE_FaceQ<dim> (1));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
+      fe_datas.push_back(new FE_FaceQ<dim> (3));
+      deallog << (*fe_datas.rbegin())->get_name() << std::endl;
 				   // Vector DG elements
       fe_datas.push_back(
 	new FE_DGRaviartThomas<dim>(0));

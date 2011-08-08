@@ -100,9 +100,13 @@ plot_shape_functions(Mapping<dim>& mapping,
 
 template<int dim>
 inline void
-plot_face_shape_functions(Mapping<dim>& mapping,
-			  FiniteElement<dim>& finel,
-			  const char* name)
+plot_face_shape_functions(
+  Mapping<dim>& mapping,
+  FiniteElement<dim>& finel,
+  const char* name,
+  UpdateFlags uflags = UpdateFlags(update_values
+				   | update_gradients
+				   | update_second_derivatives))
 {
   Triangulation<dim> tr;
   DoFHandler<dim> dof(tr);
@@ -120,14 +124,8 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 
   QTrapez<1> q_trapez;
   QIterated<dim-1> q(q_trapez, div);
-  FEFaceValues<dim> fe(mapping, finel, q, UpdateFlags(update_values
-						      | update_gradients
-						      | update_second_derivatives
-						      | update_q_points));
-  FESubfaceValues<dim> sub(mapping, finel, q, UpdateFlags(update_values
-							  | update_gradients
-							  | update_second_derivatives
-							  | update_q_points));
+  FEFaceValues<dim> fe(mapping, finel, q, UpdateFlags(uflags | update_q_points));
+  FESubfaceValues<dim> sub(mapping, finel, q, UpdateFlags(uflags | update_q_points));
 
   sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);
@@ -147,28 +145,38 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 
 		  for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		    {
-		      deallog << " " << fe.shape_value(i,k) + 1.;
+		      if (uflags & update_values)
+			deallog << " " << fe.shape_value(i,k) + 1.;
 
 						       // some additional
 						       // checks
 		      for (unsigned int c=0; c<fe.get_fe().n_components(); ++c)
 			{
 			  if (fe.get_fe().system_to_component_index(i).first == c)
-			    Assert ((fe.shape_value(i,k) ==
-				     fe.shape_value_component(i,k,c))
-				    &&
-				    (fe.shape_grad(i,k) ==
-				     fe.shape_grad_component(i,k,c))
-				    &&
-				    (fe.shape_2nd_derivative(i,k) ==
-				     fe.shape_2nd_derivative_component(i,k,c)),
-				    ExcInternalError())
+			    {
+			      if (uflags & update_values)
+				Assert ((fe.shape_value(i,k) == fe.shape_value_component(i,k,c)),
+					ExcInternalError());
+			      if (uflags & update_gradients)
+				Assert((fe.shape_grad(i,k) == fe.shape_grad_component(i,k,c)),
+				       ExcInternalError());
+			      if (uflags & update_hessians)
+				Assert((fe.shape_2nd_derivative(i,k) == fe.shape_2nd_derivative_component(i,k,c)),
+				       ExcInternalError());
+			    }
 			  else
-			    Assert ((fe.shape_value_component(i,k,c) == 0) &&
-				    (fe.shape_grad_component(i,k,c) == Tensor<1,dim>()) &&
-				    (fe.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
-				    ExcInternalError());
-			};
+			    {
+			      if (uflags & update_values)
+				Assert ((fe.shape_value_component(i,k,c) == 0),
+					ExcInternalError());
+			      if (uflags & update_gradients)
+				Assert ((fe.shape_grad_component(i,k,c) == Tensor<1,dim>()),
+					ExcInternalError());
+			      if (uflags & update_hessians)
+				Assert ((fe.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
+					ExcInternalError());
+			    }
+			}
 		    }
 		  deallog << std::endl;
 		  k++;
@@ -190,31 +198,46 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 
 		      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 			{
-			  deallog << " " << sub.shape_value(i,k) + 1.;
-
+			  if (uflags & update_values)
+			    deallog << " " << sub.shape_value(i,k) + 1.;
+			  
 							   // some additional
 							   // checks
 			  for (unsigned int c=0; c<fe.get_fe().n_components(); ++c)
 			    {
 			      if (fe.get_fe().system_to_component_index(i).first == c)
 				{
-				  const double v1 = sub.shape_value(i,k),
-					       v2 = sub.shape_value_component(i,k,c);
-				  Assert (v1 == v2, ExcInternalError());
-
-				  const Tensor<1,dim> g1 = sub.shape_grad(i,k),
-						      g2 = sub.shape_grad_component(i,k,c);
-				  Assert (g1 == g2, ExcInternalError());
-
-				  const Tensor<2,dim> s1 = sub.shape_2nd_derivative(i,k),
-						      s2 = sub.shape_2nd_derivative_component(i,k,c);
-				  Assert (s1 == s2, ExcInternalError());
+				  if (uflags & update_values)
+				    {
+				      const double v1 = sub.shape_value(i,k),
+						   v2 = sub.shape_value_component(i,k,c);
+				      Assert (v1 == v2, ExcInternalError());
+				    }
+				  if (uflags & update_gradients)
+				    { 
+				      const Tensor<1,dim> g1 = sub.shape_grad(i,k),
+							  g2 = sub.shape_grad_component(i,k,c);
+				      Assert (g1 == g2, ExcInternalError());
+				    }
+				  if (uflags & update_hessians)
+				    {
+				      const Tensor<2,dim> s1 = sub.shape_2nd_derivative(i,k),
+							  s2 = sub.shape_2nd_derivative_component(i,k,c);
+				      Assert (s1 == s2, ExcInternalError());
+				    }
 				}
 			      else
-				Assert ((sub.shape_value_component(i,k,c) == 0) &&
-					(sub.shape_grad_component(i,k,c) == Tensor<1,dim>()) &&
-					(sub.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
-					ExcInternalError());
+				{
+				  if (uflags & update_values)
+				    Assert ((sub.shape_value_component(i,k,c) == 0),
+					    ExcInternalError());
+				  if (uflags & update_gradients)
+				    Assert ((sub.shape_grad_component(i,k,c) == Tensor<1,dim>()),
+					    ExcInternalError());
+				  if (uflags & update_hessians)
+				    Assert ((sub.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
+					    ExcInternalError());
+				}
 			    };
 			}
 		      deallog << std::endl;
@@ -231,9 +254,7 @@ plot_face_shape_functions(Mapping<dim>& mapping,
 
 
 template<>
-void plot_face_shape_functions (Mapping<1>&,
-				FiniteElement<1>&,
-				const char*)
+void plot_face_shape_functions (Mapping<1>&, FiniteElement<1>&, const char*, UpdateFlags)
 {}
 
 
