@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@ template <int dim, int spacedim>
 FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
 		:
                 FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim> (
-		  TensorProductPolynomials<dim-1>(Polynomials::Legendre::generate_complete_basis(degree)),
+		  TensorProductPolynomials<dim-1>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
 		  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
 		  std::vector<bool>(1,true))
 {}

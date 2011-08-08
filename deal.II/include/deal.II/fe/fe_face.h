@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,15 +20,27 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * @warning This class has not been tested
- *
  * A finite element, which is a tensor product polynomial on each face
- * and undefined in the interior of the cells.
+ * and undefined in the interior of the cells. The basis functions on
+ * the faces are from Polynomials::LagrangeEquidistant
  *
  * This finite element is the trace space of FE_RaviartThomas on the
  * faces and serves in hybridized methods.
  *
- * @author Guido Kanschat, 2009
+ * @note Since these are only finite elements on faces, only
+ * FEFaceValues and FESubfaceValues will be able to extract reasonable
+ * values from any face polynomial. In order to make the use of
+ * FESystem simpler, FEValues objects will not fail using this finite
+ * element space, but all shape function values extracted will equal
+ * to zero.
+ *
+ * @todo Polynomials::LagrangeEquidistant should be and will be
+ * replaced by Polynomials::LagrangeGaussLobatto as soon as such a
+ * polynomial set exists.
+ *
+ * @ingroup fe
+ * @author Guido Kanschat
+ * @date 2009, 2011
  */
 template <int dim, int spacedim=dim>
 class FE_FaceQ : public FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim>
