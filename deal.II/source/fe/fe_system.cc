@@ -865,7 +865,7 @@ FESystem<dim,spacedim>::get_subface_data (
 
 
 template <>
-typename Mapping<1,1>::InternalDataBase *
+Mapping<1,1>::InternalDataBase *
 FESystem<1,1>::get_face_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const
 {
   Assert (false, ExcNotImplemented ());
@@ -874,7 +874,7 @@ FESystem<1,1>::get_face_data (const UpdateFlags, const Mapping<1,1>&, const Quad
 
 
 template <>
-typename Mapping<1,1>::InternalDataBase *
+Mapping<1,1>::InternalDataBase *
 FESystem<1,1>::get_subface_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const
 {
   Assert (false, ExcNotImplemented ());
@@ -883,7 +883,7 @@ FESystem<1,1>::get_subface_data (const UpdateFlags, const Mapping<1,1>&, const Q
 
 
 template <>
-typename Mapping<1,2>::InternalDataBase *
+Mapping<1,2>::InternalDataBase *
 FESystem<1,2>::get_face_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const
 {
   Assert (false, ExcNotImplemented ());
@@ -892,7 +892,7 @@ FESystem<1,2>::get_face_data (const UpdateFlags, const Mapping<1,2>&, const Quad
 
 
 template <>
-typename Mapping<1,2>::InternalDataBase *
+Mapping<1,2>::InternalDataBase *
 FESystem<1,2>::get_subface_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const
 {
   Assert (false, ExcNotImplemented ());
