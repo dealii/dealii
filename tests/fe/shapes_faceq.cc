@@ -21,27 +21,23 @@ void plot_FE_FaceQ_shape_functions()
   MappingQ1<dim> m;
   
   FE_FaceQ<dim> q0(0);
-  plot_face_shape_functions(m, q0, "FaceQ0", update_values);
-  
   FE_FaceQ<dim> q1(1);
-  plot_face_shape_functions(m, q1, "FaceQ1", update_values);
-  
   FE_FaceQ<dim> q2(2);
-  plot_face_shape_functions(m, q2, "FaceQ2", update_values);
-  
   FE_FaceQ<dim> q3(3);
-  plot_face_shape_functions(m, q3, "FaceQ3", update_values);
-  
-  FESystem<dim> sys0(q0,1);
-  plot_face_shape_functions(m, sys0, "System0", update_values);  
-
   FE_DGQ<dim> dg0(0);
-  FESystem<dim> sys00(q0,1,dg0,1);
-  plot_face_shape_functions(m, sys00, "System0-0", update_values);  
-  
   FE_DGQ<dim> dg1(1);
+  FESystem<dim> sys0(q0,1);
+  FESystem<dim> sys1(q1,1);
+  FESystem<dim> sys00(q0,1,dg0,1);
   FESystem<dim> sys11(q1,1,dg1,1);
-  plot_face_shape_functions(m, sys11, "System1-1", update_values);  
+  plot_face_shape_functions(m, q0, "FaceQ0", update_values);
+  plot_face_shape_functions(m, q1, "FaceQ1", update_values);
+  plot_face_shape_functions(m, q2, "FaceQ2", update_values);
+  plot_face_shape_functions(m, q3, "FaceQ3", update_values);
+  plot_face_shape_functions(m, sys0, "System0", update_values);  
+  plot_face_shape_functions(m, sys1, "System1", update_values);  
+  plot_face_shape_functions(m, sys00, "System0-0", update_values);
+  plot_face_shape_functions(m, sys11, "System1-1", update_values);
 }
 
 
@@ -52,11 +48,11 @@ main()
   std::ofstream logfile(logname.c_str());
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
-  deallog.depth_console(0);
+//  deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
   plot_FE_FaceQ_shape_functions<2>();
-  plot_FE_FaceQ_shape_functions<3>();
+//  plot_FE_FaceQ_shape_functions<3>();
   
   return 0;
 }
