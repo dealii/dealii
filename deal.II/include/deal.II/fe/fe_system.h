@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -678,15 +678,20 @@ class FESystem : public FiniteElement<dim,spacedim>
 				      */
     virtual FiniteElement<dim,spacedim> * clone() const;
 
-				     /**
-				      * Prepare internal data
-				      * structures and fill in values
-				      * independent of the cell.
-				      */
     virtual typename Mapping<dim,spacedim>::InternalDataBase*
     get_data (const UpdateFlags      update_flags,
 	      const Mapping<dim,spacedim>    &mapping,
 	      const Quadrature<dim> &quadrature) const ;
+
+    virtual typename Mapping<dim,spacedim>::InternalDataBase*
+    get_face_data (const UpdateFlags      update_flags,
+		   const Mapping<dim,spacedim>    &mapping,
+		   const Quadrature<dim-1> &quadrature) const ;
+
+    virtual typename Mapping<dim,spacedim>::InternalDataBase*
+    get_subface_data (const UpdateFlags      update_flags,
+		      const Mapping<dim,spacedim>    &mapping,
+		      const Quadrature<dim-1> &quadrature) const ;
 
 				     /**
 				      * Implementation of the same
@@ -1261,6 +1266,22 @@ class FESystem : public FiniteElement<dim,spacedim>
 	std::vector<FEValuesData<dim,spacedim> *> base_fe_values_datas;
     };
 };
+
+template <>
+typename Mapping<1,1>::InternalDataBase*
+FESystem<1,1>::get_face_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const;
+
+template <>
+typename Mapping<1,1>::InternalDataBase*
+FESystem<1,1>::get_subface_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const;
+
+template <>
+typename Mapping<1,2>::InternalDataBase*
+FESystem<1,2>::get_face_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const;
+
+template <>
+typename Mapping<1,2>::InternalDataBase*
+FESystem<1,2>::get_subface_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const;
 
 
 
