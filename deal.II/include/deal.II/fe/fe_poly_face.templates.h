@@ -49,14 +49,14 @@ FE_PolyFace<POLY,dim,spacedim>::get_degree () const
 
 template <class POLY, int dim, int spacedim>
 UpdateFlags
-FE_PolyFace<POLY,dim,spacedim>::update_once (const UpdateFlags flags) const
+FE_PolyFace<POLY,dim,spacedim>::update_once (const UpdateFlags) const
 {
 				   // for this kind of elements, only
 				   // the values can be precomputed
 				   // once and for all. set this flag
 				   // if the values are requested at
 				   // all
-  return (update_default | (flags & update_values));
+  return update_default;
 }
 
 
@@ -65,8 +65,7 @@ template <class POLY, int dim, int spacedim>
 UpdateFlags
 FE_PolyFace<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 {
-  UpdateFlags out = update_default;
-
+  UpdateFlags out = flags & update_values;
   if (flags & update_gradients)
     out |= update_gradients | update_covariant_transformation;
   if (flags & update_hessians)
