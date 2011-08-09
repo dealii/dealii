@@ -42,8 +42,9 @@ different levels:
   name get a link to the modules this class is a member of if you want
   to learn more about its context.
 
-Let's come back to the tutorial, since this is the first step of
-it. Each tutorial program is subdivided into the following sections:
+Let's come back to the tutorial, since you are looking at the first program
+(or "step") of it. Each tutorial program is subdivided into the following
+sections:
 <ol>
   <li> <b>Introduction:</b> This is a discussion of what the program
        does, including the mathematical model, and
@@ -88,9 +89,10 @@ needed to run the code and produce the output that is discussed in the
 
 When learning the library, you need to play with it and see what
 happens. To this end, open the <code>examples/step-1/step-1.cc</code>
-source file with your favorite editor and modify it in some way (see,
-for example, the suggestions at the end of the results section of this
-program), save it and run it as above.
+source file with your favorite editor and modify it in some way, save it and
+run it as above. A few suggestions for possibly modifications are given at the
+end of the results section of this program, where we also provide a few links
+to other useful pieces of information.
 
 
 <h3> What this program does </h3>
