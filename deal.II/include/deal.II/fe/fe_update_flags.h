@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -267,7 +267,34 @@ enum UpdateFlags
 };
 
 
-
+/**
+ * Output operator which outputs update flags as a set of or'd text values.
+ *
+ * @ref UpdateFlags
+ */
+template <class STREAM>
+inline
+STREAM& operator << (STREAM& s, UpdateFlags u)
+{
+  s << " UpdateFlags|";
+  if (u & update_values)                       s << "values|";
+  if (u & update_gradients)                    s << "gradients|";
+  if (u & update_hessians)                     s << "hessians|";
+  if (u & update_quadrature_points)            s << "quadrature_points|";
+  if (u & update_JxW_values)                   s << "JxW_values|";
+  if (u & update_normal_vectors)               s << "normal_vectors|";
+  if (u & update_jacobians)                    s << "jacobians|";
+  if (u & update_inverse_jacobians)            s << "inverse_jacobians|";
+  if (u & update_jacobian_grads)               s << "jacobian_grads|";
+  if (u & update_covariant_transformation)     s << "covariant_transformation|";
+  if (u & update_contravariant_transformation) s << "contravariant_transformation|";
+  if (u & update_transformation_values)        s << "transformation_values|";
+  if (u & update_transformation_gradients)     s << "transformation_gradients|";
+  if (u & update_support_points)               s << "support_points|";
+  if (u & update_support_jacobians)            s << "support_jacobians|";
+  if (u & update_support_inverse_jacobians)    s << "support_inverse_jacobians|";
+  return s;
+}
 
 
 /**
@@ -277,6 +304,8 @@ enum UpdateFlags
  * <tt>operator |</tt> would be an integer which would in turn trigger
  * a compiler warning when we tried to assign it to an object of type
  * UpdateFlags.
+ *
+ * @ref UpdateFlags
  */
 inline
 UpdateFlags
@@ -293,6 +322,8 @@ operator | (UpdateFlags f1, UpdateFlags f2)
 /**
  * Global operator which sets the bits from the second argument also
  * in the first one.
+ *
+ * @ref UpdateFlags
  */
 inline
 UpdateFlags &
@@ -310,6 +341,8 @@ operator |= (UpdateFlags &f1, UpdateFlags f2)
  * <tt>operator &</tt> would be an integer which would in turn trigger
  * a compiler warning when we tried to assign it to an object of type
  * UpdateFlags.
+ *
+ * @ref UpdateFlags
  */
 inline
 UpdateFlags
@@ -324,6 +357,8 @@ operator & (UpdateFlags f1, UpdateFlags f2)
 /**
  * Global operator which clears all the bits in the first argument if
  * they are not also set in the second argument.
+ *
+ * @ref UpdateFlags
  */
 inline
 UpdateFlags &
