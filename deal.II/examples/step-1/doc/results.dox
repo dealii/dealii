@@ -70,7 +70,8 @@ bugs with a debugger is much faster, much more convenient, and more reliable
 because you don't have to recompile the program all the time and because you
 can inspect the values of variables and how they change.
 
-Rather than postponing learning how to use a debugger, here's the one piece of
+Rather than postponing learning how to use a debugger till you really can't
+see any other way to find a bug, here's the one piece of
 advice we will provide in this program: learn how to use a debugger as soon as
 possible. It will be time well invested. The deal.II Frequently Asked
 Questions (FAQ) page linked to from the top-level <a
