@@ -280,18 +280,20 @@ namespace LinearSolvers
 	const TrilinosWrappers::BlockSparseMatrix  &S,
 	const TrilinosWrappers::BlockSparseMatrix  &Spre,
 	const PreconditionerMp                     &Mppreconditioner,
-	const PreconditionerA                      &Apreconditioner)
+	const PreconditionerA                      &Apreconditioner,
+	const bool                                  do_solve_A_in = true)
 		  :
 		  stokes_matrix     (&S),
 		  stokes_preconditioner_matrix     (&Spre),
 		  mp_preconditioner (Mppreconditioner),
-		  a_preconditioner  (Apreconditioner)
+		  a_preconditioner  (Apreconditioner),
+		  do_solve_A        (do_solve_A_in)
 	{}
 
      void solve_S(TrilinosWrappers::MPI::Vector &dst,
 		  const TrilinosWrappers::MPI::Vector &src) const
 	{
-	  SolverControl cn(5000, 1e-5);//src.l2_norm()*1e-5);
+	  SolverControl cn(5000, 1e-5);
 
 	  TrilinosWrappers::SolverCG solver(cn);
 
@@ -321,7 +323,10 @@ namespace LinearSolvers
 	  utmp*=-1.0;
 	  utmp.add(src.block(0));
 
-	  solve_A(dst.block(0), utmp);
+	  if (do_solve_A == true)
+	    solve_A(dst.block(0), utmp);
+	  else
+	    a_preconditioner.vmult (dst.block(0), utmp);
 	}
 
     private:
@@ -329,6 +334,7 @@ namespace LinearSolvers
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_preconditioner_matrix;
       const PreconditionerMp &mp_preconditioner;
       const PreconditionerA  &a_preconditioner;
+      const bool do_solve_A;
   };
 }
 
@@ -892,6 +898,7 @@ class BoussinesqFlowProblem
     void assemble_temperature_system (const double maximal_velocity);
     void project_temperature_field ();
     double get_maximal_velocity () const;
+    double get_cfl_number () const;
     std::pair<double,double> get_extrapolated_temperature_range () const;
     void solve ();
     void output_results ();
@@ -1365,6 +1372,56 @@ double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
 #endif
 
   return max_velocity;
+}
+
+
+
+				// Similar function to before, but we now
+				// compute the cfl number, i.e., maximal
+				// velocity on a cell divided by the cell
+				// diameter
+template <int dim>
+double BoussinesqFlowProblem<dim>::get_cfl_number () const
+{
+  const QIterated<dim> quadrature_formula (QTrapez<1>(),
+					   parameters.stokes_velocity_degree);
+  const unsigned int n_q_points = quadrature_formula.size();
+
+  FEValues<dim> fe_values (mapping, stokes_fe, quadrature_formula, update_values);
+  std::vector<Tensor<1,dim> > velocity_values(n_q_points);
+
+  const FEValuesExtractors::Vector velocities (0);
+
+  double max_local_cfl = 0;
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = stokes_dof_handler.begin_active(),
+    endc = stokes_dof_handler.end();
+  for (; cell!=endc; ++cell)
+    if (cell->subdomain_id() ==
+	Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+      {
+	fe_values.reinit (cell);
+	fe_values[velocities].get_function_values (stokes_solution,
+						   velocity_values);
+
+	double max_local_velocity = 1e-10;
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  max_local_velocity = std::max (max_local_velocity,
+					 velocity_values[q].norm());
+	max_local_cfl = std::max(max_local_cfl,
+				 max_local_velocity / cell->diameter());
+      }
+
+  double max_cfl_number = 0.;
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Allreduce (&max_local_cfl, &max_cfl_number, 1, MPI_DOUBLE,
+		 MPI_MAX, MPI_COMM_WORLD);
+#else
+  max_cfl_number = max_local_cfl;
+#endif
+
+  return max_cfl_number;
 }
 
 
@@ -2971,11 +3028,6 @@ void BoussinesqFlowProblem<dim>::solve ()
   {
     pcout << "   Solving Stokes system... " << std::flush;
 
-    const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
-      TrilinosWrappers::PreconditionILU>
-      preconditioner (stokes_matrix, stokes_preconditioner_matrix,
-		      *Mp_preconditioner, *Amg_preconditioner);
-
     TrilinosWrappers::MPI::BlockVector
       distributed_stokes_solution (stokes_rhs);
 //    distributed_stokes_solution = stokes_solution;
@@ -2992,26 +3044,69 @@ void BoussinesqFlowProblem<dim>::solve ()
       if (stokes_constraints.is_constrained (i))
 	distributed_stokes_solution(i) = 0;
 
-    SolverControl solver_control (stokes_matrix.m(), 1e-8*stokes_rhs.l2_norm());
-    {
-      PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
-      SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
-	solver(solver_control, mem,
-	       SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(50, true));
-      solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
-		   preconditioner);
-    }
+
+    PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
+
+				// step 1: try if the simple and fast solver
+				// succeeds in 30 steps or less.
+    unsigned int n_iterations = 0;
+    double reduction = 0;
+    const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
+    SolverControl solver_control (30, solver_tolerance);
+
+    try
+      {
+	const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
+					  TrilinosWrappers::PreconditionILU>
+	  preconditioner (stokes_matrix, stokes_preconditioner_matrix,
+			  *Mp_preconditioner, *Amg_preconditioner,
+			  false);
+
+	SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+	  solver(solver_control, mem,
+		 SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
+		 AdditionalData(30, true));
+	solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
+		     preconditioner);
+
+	n_iterations = solver_control.last_step();
+	reduction = solver_control.last_value()/solver_control.initial_value();
+      }
+
+				// step 2: take the stronger solver in case
+				// the simple solver failed
+    catch (SolverControl::NoConvergence)
+      {
+	const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
+					  TrilinosWrappers::PreconditionILU>
+	  preconditioner (stokes_matrix, stokes_preconditioner_matrix,
+			  *Mp_preconditioner, *Amg_preconditioner,
+			  true);
+
+	SolverControl solver_control_refined (stokes_matrix.m(), solver_tolerance);
+	SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+	  solver(solver_control_refined, mem,
+		 SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
+		 AdditionalData(50, true));
+	solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
+		     preconditioner);
+
+	n_iterations = (solver_control.last_step() +
+			solver_control_refined.last_step());
+	reduction = (solver_control_refined.last_value()/
+		     std::max(solver_control.initial_value(),
+			      solver_control_refined.initial_value()));
+      }
+
+
     stokes_constraints.distribute (distributed_stokes_solution);
+    stokes_solution.block(0).reinit(distributed_stokes_solution.block(0),
+				    false, true);
+    stokes_solution.block(1).reinit(distributed_stokes_solution.block(1),
+				    false, true);
 
-
-				     //stokes_solution = distributed_stokes_solution;
-    stokes_solution.block(0).reinit(distributed_stokes_solution.block(0), false, true);
-    stokes_solution.block(1).reinit(distributed_stokes_solution.block(1), false, true);
-
-    pcout << solver_control.last_step()
-	  << " iterations."
-          << " Reduced residual by "
-	  << solver_control.last_value()/solver_control.initial_value()
+    pcout << n_iterations  << " iterations."
+          << " Reduced residual by " << reduction
 	  << std::endl;
 
     TrilinosWrappers::MPI::Vector tmp;
@@ -3034,25 +3129,18 @@ void BoussinesqFlowProblem<dim>::solve ()
   computing_timer.enter_section ("   Assemble temperature rhs");
   {
     old_time_step = time_step;
-    const double maximal_velocity = get_maximal_velocity();
+    old_time_step = time_step;
+    const double cfl_number = get_cfl_number();
+
 				     // we found out that we need
 				     // approximately a quarter the time step
 				     // size in 3d
     double scaling = (dim==3)?0.25:1.0;
-    double local_time_step = scaling/(1.6*dim*std::sqrt(1.*dim)) /
-			     parameters.temperature_degree *
-			     GridTools::minimal_cell_diameter(triangulation) /
-			     std::max(1e-10,maximal_velocity);
+    time_step = (scaling/(2.1*dim*std::sqrt(1.*dim)) /
+			(parameters.temperature_degree *
+			 cfl_number));
 
-				     // calculate the minimum allowed time step
-				     // size
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&local_time_step, &time_step, 1, MPI_DOUBLE,
-		   MPI_MIN, MPI_COMM_WORLD);
-#else
-    time_step = local_time_step;
-#endif
-
+    const double maximal_velocity = get_maximal_velocity();
     pcout << "   Maximal velocity: "
 	  << maximal_velocity * EquationData::year_in_seconds * 100
 	  << " cm/year"
