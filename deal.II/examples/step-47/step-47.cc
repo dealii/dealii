@@ -148,11 +148,11 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 
   for (unsigned int i=0; i<n_points; ++i)
     {
-      if (points[i].square() < 0.5*0.5)
-	values[i] = 20;
-      else
-	values[i] = 1;
-    }
+			if (points[i].square() < 0.5*0.5)
+				values[i] = 20;
+			else
+				values[i] = 1;
+		}
 }
 
 
@@ -316,6 +316,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				       plain_fe_values.shape_grad(j,q_point) *
 				       plain_fe_values.JxW(q_point));
 
+
 		cell_rhs(i) += (plain_fe_values.shape_value(i,q_point) *
 				1.0 *
 				plain_fe_values.JxW(q_point));
@@ -336,8 +337,9 @@ void LaplaceProblem<dim>::assemble_system ()
 					compute_quadrature(quadrature_formula, cell,
 							   level_set_values).second,
 					update_values    |  update_gradients |
-					update_quadrature_points  |  update_JxW_values |
-					update_support_points);
+					update_quadrature_points  |  update_JxW_values );
+
+	  this_fe_values.reinit (cell);
 
 	  coefficient_values.resize (this_fe_values.n_quadrature_points);
 	  coefficient.value_list (this_fe_values.get_quadrature_points(),
@@ -422,6 +424,7 @@ void LaplaceProblem<dim>::assemble_system ()
 					      system_matrix, system_rhs);
     }
 
+
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -431,6 +434,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				      system_matrix,
 				      solution,
 				      system_rhs);
+
 }
 
 // To integrate the enriched elements we have to find the geometrical decomposition
@@ -987,7 +991,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
   std::string filename = "solution-";
   filename += ('0' + cycle);
-  filename += ".vtk";
+  //filename += ".vtk";
+  filename += ".gmv";
 
   std::ofstream output (filename.c_str());
 
@@ -999,7 +1004,8 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
   data_out.add_data_vector (solution, postprocessor);
   data_out.build_patches (5);
 
-  data_out.write_vtk (output);
+  //data_out.write_vtk (output);
+  data_out.write_gmv (output);
 }
 
 
@@ -1055,18 +1061,19 @@ void LaplaceProblem<dim>::compute_error () const
 template <int dim>
 void LaplaceProblem<dim>::run ()
 {
-  for (unsigned int cycle=0; cycle<8; ++cycle)
+  for (unsigned int cycle=0; cycle<6; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
       if (cycle == 0)
 	{
 	  GridGenerator::hyper_ball (triangulation);
+		//GridGenerator::hyper_cube (triangulation, -1, 1);
 
 	  static const HyperBallBoundary<dim> boundary;
 	  triangulation.set_boundary (0, boundary);
 
-	  triangulation.refine_global (3);
+	  triangulation.refine_global (2);
 	}
       else
 	triangulation.refine_global (1);
