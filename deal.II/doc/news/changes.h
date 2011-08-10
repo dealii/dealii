@@ -252,6 +252,12 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
+a bug that led to an exception whenever we were computing constraints for
+vector fields located on edges shared between two faces of a 3d cell if those
+faces were not perpendicular. This is now fixed.
+<br>
+(Wolfgang Bangerth, Thomas Geenen, Timo Heister, 2011/08/10)
 
 <li> New: The function FullMatrix::triple_product() adds triple products
 like Schur complements to existing matrices.

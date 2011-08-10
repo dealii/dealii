@@ -2286,7 +2286,7 @@ namespace internal
 			constraints.add_entry (dof_indices.dof_indices[1],
 					       dof_indices.dof_indices[0],
 					       -constraining_vector[0]/constraining_vector[1]);
-		      
+
 		      if (std::fabs (constraining_vector[2]/constraining_vector[1])
 			  > std::numeric_limits<double>::epsilon())
 			constraints.add_entry (dof_indices.dof_indices[1],
@@ -3177,7 +3177,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                 	                               // do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
-                  
+
                                                    // this is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3208,7 +3208,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // freedom is not
                                                    // already constrained.
                   const double tol = 1e-13;
-                  
+
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (!(constraints.is_constrained (face_dof_indices[dof])))
                       {
@@ -3261,7 +3261,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                 	                               // do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
-                  
+
                                                    // this is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3358,7 +3358,7 @@ project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
                                                    // values in the global
                                                    // vector.
                   const double tol = 0.5 * superdegree * 1e-13 / cell->face (face)->diameter ();
-                  
+
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (std::abs (computed_constraints[face_dof_indices[dof]] - dof_values[dof]) > tol)
                       computed_constraints[face_dof_indices[dof]] = dof_values[dof];
@@ -3433,7 +3433,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                 	                               // do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
-                  
+
                                                    // This is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3465,7 +3465,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                                                       cell->active_fe_index ());
 
                   const double tol = 0.5 * cell->get_fe ().degree * 1e-13  / cell->face (face)->diameter ();
-                  
+
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (!(constraints.is_constrained (face_dof_indices[dof])))
                       {
@@ -3522,7 +3522,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                 	                               // do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
-                  
+
                                                    // This is only
                                                    // implemented, if the
                                                    // FE is a Nedelec
@@ -3589,7 +3589,7 @@ project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
                     }
 
                   const double tol = 0.5 * superdegree * 1e-13  / cell->face (face)->diameter ();
-                  
+
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
                     if (std::abs (computed_constraints[face_dof_indices[dof]] - dof_values[dof]) > tol)
                       computed_constraints[face_dof_indices[dof]] = dof_values[dof];
@@ -3859,7 +3859,7 @@ VectorTools::project_boundary_values_div_conforming (const DoFHandler<dim>& dof_
                 	                               // do
                   if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
                     return;
-                  
+
                                                    // This is only
                                                    // implemented, if the
                                                    // FE is a Raviart-Thomas
@@ -4417,7 +4417,7 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 					     // then construct constraints
 					     // from this:
 	    const internal::VectorTools::VectorDoFTuple<dim> &
-	      dof_indices = same_dof_range[0]->first;	      
+	      dof_indices = same_dof_range[0]->first;
 	    internal::VectorTools::add_constraint (dof_indices, normal,
 						   constraints);
 
@@ -4587,7 +4587,28 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 						 // calculate the
 						 // tangent as the
 						 // outer product of
-						 // the normal vectors
+						 // the normal
+						 // vectors. since
+						 // these vectors do
+						 // not need to be
+						 // orthogonal (think,
+						 // for example, the
+						 // case of the
+						 // deal.II/no_flux_07
+						 // test: a sheared
+						 // cube in 3d, with
+						 // Q2 elements, where
+						 // we have
+						 // constraints from
+						 // the two normal
+						 // vectors of two
+						 // faces of the
+						 // sheared cube that
+						 // are not
+						 // perpendicular to
+						 // each other), we
+						 // have to normalize
+						 // the outer product
 		Tensor<1,dim> tangent;
 		switch (dim)
 		  {
@@ -4602,8 +4623,10 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 							   // it in
 							   // the
 							   // current
-							   // form to
-							   // make
+							   // form
+							   // (with
+							   // [dim-2])
+							   // to make
 							   // sure
 							   // that
 							   // compilers
@@ -4642,8 +4665,10 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 			  Assert (false, ExcNotImplemented());
 		  }
 
-		Assert (std::fabs (tangent.norm()-1) < 1e-12,
-			ExcInternalError());
+		Assert (std::fabs (tangent.norm()) > 1e-12,
+			ExcMessage("Two normal vectors from adjacent faces are almost "
+				   "parallel."));
+		tangent /= tangent.norm();
 
 		tangential_vectors.push_back (tangent);
 	      }
