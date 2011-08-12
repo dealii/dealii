@@ -22,7 +22,19 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /**
- * Class that manages the conversion of global indices into a block vector or
+ * @brief Auxiliary class aiding in the handling of block structures like in
+ * BlockVector or FESystem.
+ *
+ * The information obtained from this class falls into two
+ * groups. First, it is possible to obtain the number of blocks,
+ * namely size(), the block_size() for each block and the total_size()
+ * of the object described by the block indices, namely the length of
+ * the whole index set. These functions do not make any assumption on
+ * the ordering of the index set.
+ *
+ * If on the other hand the index set is ordered "by blocks", such
+ * that each block forms a consecutive set of indices, this
+ * class that manages the conversion of global indices into a block vector or
  * matrix to the local indices within this block. This is required, for
  * example, when you address a global element in a block vector and want to
  * know which element within which block this is. It is also useful if a
@@ -31,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup data
  * @see @ref GlossBlockLA "Block (linear algebra)"
- * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007
+ * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007, 2011
  */
 class BlockIndices : public Subscriptor
 {
@@ -43,7 +55,7 @@ class BlockIndices : public Subscriptor
 				      * @p n_blocks blocks and set
 				      * all block sizes to zero.
 				      */
-    BlockIndices (const unsigned int n_blocks = 0);
+    BlockIndices (/*const unsigned int n_blocks = 0*/);
 
 				     /**
 				      * Constructor. Initialize the
@@ -53,7 +65,13 @@ class BlockIndices : public Subscriptor
 				      * size of the vector
 				      */
     BlockIndices (const std::vector<unsigned int> &n);
-
+    
+				     /**
+				      * Specialized constructor for a
+				      * structure with blocks of equal size.
+				      */
+    BlockIndices(const unsigned int n_blocks, const unsigned int block_size);
+    
 				     /**
 				      * Reinitialize the number of
 				      * blocks and assign each block
@@ -74,22 +92,9 @@ class BlockIndices : public Subscriptor
     inline void reinit (const std::vector<unsigned int> &n);
     
 				     /**
-				      * Return the block and the
-				      * index within that block
-				      * for the global index @p i. The
-				      * first element of the pair is
-				      * the block, the second the
-				      * index within it.
+				      * @name Size information
 				      */
-    std::pair<unsigned int,unsigned int>
-    global_to_local (const unsigned int i) const;
-
-				     /**
-				      * Return the global index of
-				      * @p index in block @p block.
-				      */
-    unsigned int local_to_global (const unsigned int block,
-				  const unsigned int index) const;
+				     //@{
 
 				     /**
 				      * Number of blocks in index field.
@@ -110,10 +115,46 @@ class BlockIndices : public Subscriptor
 				      */
     unsigned int block_size (const unsigned int i) const;
 
+				     //@}
+
+				     /**
+				      * @name Index conversion
+				      *
+				      * Functions in this group
+				      * assume an object, which
+				      * was created after sorting by
+				      * block, such that each block
+				      * forms a set of consecutive
+				      * indices in the object.
+				      * If applied to other objects,
+				      * the numbers obtained from
+				      * these functions are meaningless.
+				      */
+				     //@{
+
+				     /**
+				      * Return the block and the
+				      * index within that block
+				      * for the global index @p i. The
+				      * first element of the pair is
+				      * the block, the second the
+				      * index within it.
+				      */
+    std::pair<unsigned int,unsigned int>
+    global_to_local (const unsigned int i) const;
+
+				     /**
+				      * Return the global index of
+				      * @p index in block @p block.
+				      */
+    unsigned int local_to_global (const unsigned int block,
+				  const unsigned int index) const;
+
 				     /**
 				      * The start index of the ith block.
 				      */
     unsigned int block_start (const unsigned int i) const;
+				     //@}
     
 				     /**
 				      * Copy operator.
@@ -123,8 +164,8 @@ class BlockIndices : public Subscriptor
 				     /**
 				      * Compare whether two objects
 				      * are the same, i.e. whether the
-				      * starting indices of all blocks
-				      * are equal.
+				      * number of blocks and the sizes
+				      * of all blocks are equal.
 				      */
     bool operator == (const BlockIndices &b) const;
     
@@ -161,6 +202,27 @@ class BlockIndices : public Subscriptor
     std::vector<unsigned int> start_indices;
 };
 
+
+/**
+ * Output operator for BlockIndices
+ *
+ * @ref BlockIndices
+ * @author Guido Kanschat
+ * @date 2011 
+ */
+template <class STREAM>
+STREAM&
+operator << (STREAM& s, const BlockIndices& bi)
+{
+  const unsigned int n = bi.size();
+  s << n << ":[";
+  if (n>0)
+    s << bi.block_size(0);
+  for (unsigned int i=1;i<n;++i)
+    s << ' ' << bi.block_size(i);
+  s << ']';
+  return s;
+}
 
 
 template <typename MatrixType> class BlockMatrixBase;
@@ -249,35 +311,14 @@ const bool IsBlockMatrix<MatrixType>::value;
 /* ---------------------- template and inline functions ------------------- */
 
 inline
-BlockIndices::BlockIndices (const unsigned int n_blocks)
-		:
-		n_blocks(n_blocks),
-		start_indices(n_blocks+1)
-{
-  for (unsigned int i=0; i<=n_blocks; ++i)
-    start_indices[i] = 0;
-}
-
-
-
-inline
-BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
-		:
-		n_blocks(n.size()),
-		start_indices(n.size()+1)
-{
-  reinit (n);
-}
-
-
-
-inline
 void
-BlockIndices::reinit (const unsigned int n_blocks,
-		      const unsigned int n_elements_per_block)
+BlockIndices::reinit (const unsigned int nb,
+		      const unsigned int block_size)
 {
-  const std::vector<unsigned int> v(n_blocks, n_elements_per_block);
-  reinit (v);
+  n_blocks = nb;
+  start_indices.resize(nb);
+  for (unsigned int i=0; i<=n_blocks; ++i)
+    start_indices[i] = i * block_size;
 }
 
 
@@ -295,6 +336,40 @@ BlockIndices::reinit (const std::vector<unsigned int> &n)
   for (unsigned int i=1; i<=n_blocks; ++i)
     start_indices[i] = start_indices[i-1] + n[i-1];
 }
+
+
+inline
+BlockIndices::BlockIndices (/*const unsigned int n_blocks*/)
+		:
+		n_blocks(0/*n_blocks*/)//,
+//		start_indices(n_blocks+1, 0)
+{}
+
+
+
+inline
+BlockIndices::BlockIndices (
+  const unsigned int n_blocks,
+  const unsigned int block_size)
+		:
+		n_blocks(n_blocks),
+		start_indices(n_blocks+1)
+{
+  for (unsigned int i=0; i<=n_blocks; ++i)
+    start_indices[i] = i * block_size;
+}
+
+
+
+inline
+BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
+		:
+		n_blocks(n.size()),
+		start_indices(n.size()+1)
+{
+  reinit (n);
+}
+
 
 
 
