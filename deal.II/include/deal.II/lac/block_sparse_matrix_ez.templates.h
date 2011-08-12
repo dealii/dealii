@@ -22,9 +22,6 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ ()
-                :
-		row_indices (0),
-		column_indices (0)
 {}
 
 
@@ -34,8 +31,8 @@ BlockSparseMatrixEZ<number>::
 BlockSparseMatrixEZ (const unsigned int rows,
                      const unsigned int cols)
                 :
-		row_indices (rows),
-		column_indices (cols)
+		row_indices (rows, 0),
+		column_indices (cols, 0)
 {}
 
 
