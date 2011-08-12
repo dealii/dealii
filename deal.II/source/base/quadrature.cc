@@ -40,12 +40,11 @@ namespace
 }
 
 
-//TODO: It would be desirable to have a Tensor<rank,0>
 template <>
-Quadrature<0>::Quadrature (const unsigned int)
+Quadrature<0>::Quadrature (const unsigned int n_q)
 		:
-//		quadrature_points(1),
-		weights (1, 1.)
+		quadrature_points (n_q, Point<0>()),
+		weights (n_q, 0)
 {}
 
 
@@ -57,7 +56,8 @@ Quadrature<0>::~Quadrature ()
 
 
 template <int dim>
-Quadrature<dim>::Quadrature (const unsigned int n_q) :
+Quadrature<dim>::Quadrature (const unsigned int n_q)
+		:
 		quadrature_points (n_q, Point<dim>()),
 		weights (n_q, 0)
 {}

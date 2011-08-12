@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -41,26 +41,20 @@ namespace
 template <>
 QGauss<0>::QGauss (const unsigned int)
                 :
-                Quadrature<0> (0)
-{
-                                   // this function has to be provided to
-                                   // avoid certain linker failures, but it
-                                   // should never be called
-  Assert (false, ExcInternalError());
-}
+						 // there are n_q^dim == 1
+						 // points
+                Quadrature<0> (1)
+{}
 
 
 
 template <>
 QGaussLobatto<0>::QGaussLobatto (const unsigned int)
                 :
-                Quadrature<0> (0)
-{
-                                   // this function has to be provided to
-                                   // avoid certain linker failures, but it
-                                   // should never be called
-  Assert (false, ExcInternalError());
-}
+						 // there are n_q^dim == 1
+						 // points
+                Quadrature<0> (1)
+{}
 
 
 
