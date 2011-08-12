@@ -43,7 +43,7 @@ namespace
 template <>
 Quadrature<0>::Quadrature (const unsigned int n_q)
 		:
-		quadrature_points (n_q, Point<0>()),
+		quadrature_points (n_q),
 		weights (n_q, 0)
 {}
 
@@ -1094,35 +1094,8 @@ face (const unsigned int face_no,
       const bool         face_rotation,
       const unsigned int n_quadrature_points)
 {
-  Assert (dim != 1, ExcInternalError());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcInternalError());
-
-				   // in 3d, we have to account for faces that
-				   // have non-standard face orientation, flip
-				   // and rotation. thus, we have to store
-				   // _eight_ data sets per face or subface
-
-				   // set up a table with the according offsets
-				   // for non-standard orientation, first index:
-				   // face_orientation (standard true=1), second
-				   // index: face_flip (standard false=0), third
-				   // index: face_rotation (standard false=0)
-				   //
-				   // note, that normally we should use the
-				   // obvious offsets 0,1,2,3,4,5,6,7. However,
-				   // prior to the changes enabling flipped and
-				   // rotated faces, in many places of the
-				   // library the convention was used, that the
-				   // first dataset with offset 0 corresponds to
-				   // a face in standard orientation. therefore
-				   // we use the offsets 4,5,6,7,0,1,2,3 here to
-				   // stick to that (implicit) convention
-  static const unsigned int offset[2][2][2]=
-    {{{4*GeometryInfo<dim>::faces_per_cell, 5*GeometryInfo<dim>::faces_per_cell},    // face_orientation=false; face_flip=false; face_rotation=false and true
-      {6*GeometryInfo<dim>::faces_per_cell, 7*GeometryInfo<dim>::faces_per_cell}},   // face_orientation=false; face_flip=true;  face_rotation=false and true
-     {{0*GeometryInfo<dim>::faces_per_cell, 1*GeometryInfo<dim>::faces_per_cell},    // face_orientation=true;  face_flip=false; face_rotation=false and true
-      {2*GeometryInfo<dim>::faces_per_cell, 3*GeometryInfo<dim>::faces_per_cell}}};  // face_orientation=true;  face_flip=true;  face_rotation=false and true
 
   switch (dim)
     {
@@ -1132,10 +1105,38 @@ face (const unsigned int face_no,
 
 
       case 3:
-            return ((face_no
-		     + offset[face_orientation][face_flip][face_rotation])
-		    * n_quadrature_points);
+      {
+	// in 3d, we have to account for faces that
+	// have non-standard face orientation, flip
+	// and rotation. thus, we have to store
+	// _eight_ data sets per face or subface
 
+        // set up a table with the according offsets
+        // for non-standard orientation, first index:
+        // face_orientation (standard true=1), second
+        // index: face_flip (standard false=0), third
+        // index: face_rotation (standard false=0)
+        //
+        // note, that normally we should use the
+        // obvious offsets 0,1,2,3,4,5,6,7. However,
+        // prior to the changes enabling flipped and
+        // rotated faces, in many places of the
+        // library the convention was used, that the
+        // first dataset with offset 0 corresponds to
+        // a face in standard orientation. therefore
+        // we use the offsets 4,5,6,7,0,1,2,3 here to
+        // stick to that (implicit) convention
+        static const unsigned int offset[2][2][2]=
+        {{{4*GeometryInfo<dim>::faces_per_cell, 5*GeometryInfo<dim>::faces_per_cell},    // face_orientation=false; face_flip=false; face_rotation=false and true
+	{6*GeometryInfo<dim>::faces_per_cell, 7*GeometryInfo<dim>::faces_per_cell}},   // face_orientation=false; face_flip=true;  face_rotation=false and true
+	{{0*GeometryInfo<dim>::faces_per_cell, 1*GeometryInfo<dim>::faces_per_cell},    // face_orientation=true;  face_flip=false; face_rotation=false and true
+	{2*GeometryInfo<dim>::faces_per_cell, 3*GeometryInfo<dim>::faces_per_cell}}};  // face_orientation=true;  face_flip=true;  face_rotation=false and true
+
+        return ((face_no
+                 + offset[face_orientation][face_flip][face_rotation])
+	        * n_quadrature_points);
+      }
+      
       default:
             Assert (false, ExcInternalError());
     }
