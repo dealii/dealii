@@ -1,0 +1,72 @@
+
+DEAL::dim=1
+DEAL::MappingFace1d-MappingQ1
+DEAL::Face=0
+DEAL::x=0.000
+DEAL::n=-1.000
+DEAL::JxW=1.000
+DEAL::shape_function 0:
+DEAL::  phi=1.000
+DEAL::  grad phi=-3.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 1:
+DEAL::  phi=0
+DEAL::  grad phi=-1.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 2:
+DEAL::  phi=0
+DEAL::  grad phi=4.000
+DEAL::  grad^2 phi=-8.000
+DEAL::
+DEAL::Face=1
+DEAL::x=1.000
+DEAL::n=1.000
+DEAL::JxW=1.000
+DEAL::shape_function 0:
+DEAL::  phi=0
+DEAL::  grad phi=1.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 1:
+DEAL::  phi=1.000
+DEAL::  grad phi=3.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 2:
+DEAL::  phi=0
+DEAL::  grad phi=-4.000
+DEAL::  grad^2 phi=-8.000
+DEAL::
+DEAL::MappingSubface1d-MappingQ1
+DEAL::Face=0, subface=0
+DEAL::x=0.000
+DEAL::n=-1.000
+DEAL::JxW=1.000
+DEAL::shape_function 0:
+DEAL::  phi=1.000
+DEAL::  grad phi=-3.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 1:
+DEAL::  phi=0
+DEAL::  grad phi=-1.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 2:
+DEAL::  phi=0
+DEAL::  grad phi=4.000
+DEAL::  grad^2 phi=-8.000
+DEAL::
+DEAL::Face=1, subface=0
+DEAL::x=1.000
+DEAL::n=1.000
+DEAL::JxW=1.000
+DEAL::shape_function 0:
+DEAL::  phi=0
+DEAL::  grad phi=1.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 1:
+DEAL::  phi=1.000
+DEAL::  grad phi=3.000
+DEAL::  grad^2 phi=4.000
+DEAL::shape_function 2:
+DEAL::  phi=0
+DEAL::  grad phi=-4.000
+DEAL::  grad^2 phi=-8.000
+DEAL::

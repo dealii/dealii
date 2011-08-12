@@ -91,6 +91,14 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Extended: Many operations on objects of type Point<0>, Quadrature<0>, etc
+(including creation) were previously forbidden since such objects do not make
+much sense. However, this prevented a lot of code that could otherwise work
+in a dimension independent way, from working in 1d, e.g. integration on
+faces. Many of these places have now been cleaned up and work.
+<br>
+(Wolfgang Bangerth, 2011/08/12)
+
 <li> Extended: The classes Tensor, SymmetricTensor and Point now have an
 additional template argument for the number type. It is now possible to base
 these classes on any abstract data type that implements basic arithmetic

@@ -911,73 +911,6 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 
 
 
-template <>
-void
-MappingQ1<1,1>::fill_fe_face_values (
-  const Triangulation<1,1>::cell_iterator &,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1,1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-MappingQ1<1,2>::fill_fe_face_values (
-  const Triangulation<1,2>::cell_iterator &,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1,2>::InternalDataBase&,
-  std::vector<Point<2> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,2> >&,
-  std::vector<Point<2> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-MappingQ1<1,1>::fill_fe_subface_values (
-  const Triangulation<1,1>::cell_iterator &,
-  const unsigned,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1,1>::InternalDataBase&,
-  std::vector<Point<1> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,1> >&,
-  std::vector<Point<1> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-
-template <>
-void
-MappingQ1<1,2>::fill_fe_subface_values (
-  const Triangulation<1,2>::cell_iterator &,
-  const unsigned,
-  const unsigned,
-  const Quadrature<0>&,
-  Mapping<1,2>::InternalDataBase&,
-  std::vector<Point<2> >&,
-  std::vector<double>&,
-  std::vector<Tensor<1,2> >&,
-  std::vector<Point<2> >&) const
-{
-  Assert(false, ExcNotImplemented());
-}
 
 
 
@@ -985,24 +918,6 @@ namespace internal
 {
   namespace
   {
-    template <int spacedim>
-    void
-    compute_fill_face (const dealii::MappingQ1<1,spacedim> &,
-		       const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
-		       const unsigned int,
-		       const unsigned int,
-		       const unsigned int,
-		       const std::vector<double> &,
-		       typename dealii::MappingQ1<1,spacedim>::InternalData &,
-		       std::vector<double> &,
-		       std::vector<Tensor<1,spacedim> > &,
-		       std::vector<Point<spacedim> > &)
-    {
-      Assert(false, ExcNotImplemented());
-    }
-
-
-
     template <int dim, int spacedim>
     void
     compute_fill_face (const dealii::MappingQ1<dim,spacedim> &mapping,
@@ -1053,12 +968,32 @@ namespace internal
 	  if (dim == spacedim)
 	    {
 	      for (unsigned int i=0; i<n_q_points; ++i)
-		if (dim == 2)
-      	  	  cross_product (boundary_forms[i], data.aux[0][i]);
-		else if (dim == 3)
-      	  	  cross_product (boundary_forms[i], data.aux[0][i], data.aux[1][i]);
-		else
-		  Assert(false, ExcNotImplemented());
+		switch (dim)
+		  {
+		    case 1:
+							   // in 1d, we don't
+							   // have access to
+							   // any of the
+							   // data.aux fields,
+							   // but we can still
+							   // compute the
+							   // boundary form
+							   // simply by simply
+							   // looking at the
+							   // number of the
+							   // face
+			  boundary_forms[i][0] = (face_no == 0 ?
+						  -1 : +1);
+			  break;
+		    case 2:
+			  cross_product (boundary_forms[i], data.aux[0][i]);
+			  break;
+		    case 3:
+			  cross_product (boundary_forms[i], data.aux[0][i], data.aux[1][i]);
+			  break;
+		    default:
+			  Assert(false, ExcNotImplemented());
+		  }
       	    }
 	  else
 	    {
@@ -1140,7 +1075,8 @@ namespace internal
       	      {
       	  	if (update_flags & update_JxW_values)
       	  	  {
-      	  	    JxW_values[i] = boundary_forms[i].norm() * weights[i];
+		    JxW_values[i] = boundary_forms[i].norm() * weights[i];
+
       	  	    if (subface_no!=deal_II_numbers::invalid_unsigned_int)
       	  	      {
       	  		const double area_ratio=GeometryInfo<dim>::subface_ratio(

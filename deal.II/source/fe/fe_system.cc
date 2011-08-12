@@ -864,41 +864,6 @@ FESystem<dim,spacedim>::get_subface_data (
 }
 
 
-template <>
-Mapping<1,1>::InternalDataBase *
-FESystem<1,1>::get_face_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const
-{
-  Assert (false, ExcNotImplemented ());
-  return 0;
-}
-
-
-template <>
-Mapping<1,1>::InternalDataBase *
-FESystem<1,1>::get_subface_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const
-{
-  Assert (false, ExcNotImplemented ());
-  return 0;
-}
-
-
-template <>
-Mapping<1,2>::InternalDataBase *
-FESystem<1,2>::get_face_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const
-{
-  Assert (false, ExcNotImplemented ());
-  return 0;
-}
-
-
-template <>
-Mapping<1,2>::InternalDataBase *
-FESystem<1,2>::get_subface_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const
-{
-  Assert (false, ExcNotImplemented ());
-  return 0;
-}
-
 
 template <int dim, int spacedim>
 void

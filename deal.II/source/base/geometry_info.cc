@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -280,7 +280,6 @@ double
 GeometryInfo<1>::subface_ratio(const internal::SubfaceCase<1> &,
 			       const unsigned int)
 {
-  Assert(false, ExcImpossibleInDim(1));
   return 1;
 }
 

@@ -1267,24 +1267,6 @@ class FESystem : public FiniteElement<dim,spacedim>
     };
 };
 
-// Force explicit implementation of the following templates
-template <>
-Mapping<1,1>::InternalDataBase*
-FESystem<1,1>::get_face_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const;
-
-template <>
-Mapping<1,1>::InternalDataBase*
-FESystem<1,1>::get_subface_data (const UpdateFlags, const Mapping<1,1>&, const Quadrature<0> &) const;
-
-template <>
-Mapping<1,2>::InternalDataBase*
-FESystem<1,2>::get_face_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const;
-
-template <>
-Mapping<1,2>::InternalDataBase*
-FESystem<1,2>::get_subface_data (const UpdateFlags, const Mapping<1,2>&, const Quadrature<0> &) const;
-
-
 
 DEAL_II_NAMESPACE_CLOSE
 

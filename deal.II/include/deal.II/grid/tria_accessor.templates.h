@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2600,7 +2600,6 @@ inline
 internal::SubfaceCase<1>
 CellAccessor<1>::subface_case(const unsigned int) const
 {
-  Assert(false, ExcImpossibleInDim(1));
   return internal::SubfaceCase<1>::case_none;
 }
 
@@ -2609,7 +2608,6 @@ inline
 internal::SubfaceCase<1>
 CellAccessor<1,2>::subface_case(const unsigned int) const
 {
-  Assert(false, ExcImpossibleInDim(1));
   return internal::SubfaceCase<1>::case_none;
 }
 
@@ -2622,7 +2620,9 @@ CellAccessor<2>::subface_case(const unsigned int face_no) const
   Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
   Assert(face_no<GeometryInfo<2>::faces_per_cell,
 	 ExcIndexRange(face_no,0,GeometryInfo<2>::faces_per_cell));
-  return (face(face_no)->has_children()) ? internal::SubfaceCase<2>::case_x : internal::SubfaceCase<2>::case_none;
+  return ((face(face_no)->has_children()) ?
+	  internal::SubfaceCase<2>::case_x :
+	  internal::SubfaceCase<2>::case_none);
 }
 
 template <>
@@ -2633,7 +2633,9 @@ CellAccessor<2,3>::subface_case(const unsigned int face_no) const
   Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
   Assert(face_no<GeometryInfo<2>::faces_per_cell,
 	 ExcIndexRange(face_no,0,GeometryInfo<2>::faces_per_cell));
-  return (face(face_no)->has_children()) ? internal::SubfaceCase<2>::case_x : internal::SubfaceCase<2>::case_none;
+  return ((face(face_no)->has_children()) ?
+	  internal::SubfaceCase<2>::case_x :
+	  internal::SubfaceCase<2>::case_none);
 }
 
 

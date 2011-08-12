@@ -1148,16 +1148,22 @@ face (const unsigned int face_no,
 template <>
 QProjector<1>::DataSetDescriptor
 QProjector<1>::DataSetDescriptor::
-subface (const unsigned int,
-         const unsigned int,
+subface (const unsigned int face_no,
+         const unsigned int subface_no,
          const bool,
          const bool,
          const bool,
-         const unsigned int,
+         const unsigned int n_quadrature_points,
 	 const internal::SubfaceCase<1>)
 {
-  Assert (false, ExcInternalError());
-  return deal_II_numbers::invalid_unsigned_int;
+  Assert (face_no < GeometryInfo<1>::faces_per_cell,
+          ExcInternalError());
+  Assert (subface_no < GeometryInfo<1>::max_children_per_face,
+          ExcInternalError());
+
+  return ((face_no * GeometryInfo<1>::max_children_per_face +
+	   subface_no)
+	  * n_quadrature_points);
 }
 
 
