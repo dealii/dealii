@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -386,7 +386,6 @@ inline
 const Point<dim> &
 Quadrature<dim>::point (const unsigned int i) const
 {
-  Assert (dim != 0, ExcNotImplemented());
   AssertIndexRange(i, size());
   return quadrature_points[i];
 }
@@ -397,7 +396,6 @@ template <int dim>
 double
 Quadrature<dim>::weight (const unsigned int i) const
 {
-  Assert (dim != 0, ExcNotImplemented());
   AssertIndexRange(i, size());
   return weights[i];
 }
@@ -409,7 +407,6 @@ inline
 const std::vector<Point<dim> > &
 Quadrature<dim>::get_points () const
 {
-  Assert (dim > 0, ExcInternalError());
   return quadrature_points;
 }
 

@@ -258,6 +258,18 @@ MappingCartesian<dim, spacedim>::compute_fill (const typename Triangulation<dim,
 
       switch (dim)
         {
+	  case 1:
+	  {
+            static const Point<dim>
+              normals[GeometryInfo<1>::faces_per_cell]
+              = { Point<dim>(-1.),
+                  Point<dim>( 1.) };
+            std::fill (normal_vectors.begin(),
+                       normal_vectors.end(),
+                       normals[face_no]);
+            break;
+          }
+	    
           case 2:
           {
             static const Point<dim>
