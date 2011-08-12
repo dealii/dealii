@@ -70,7 +70,7 @@ class BlockIndices : public Subscriptor
 				      * Specialized constructor for a
 				      * structure with blocks of equal size.
 				      */
-    BlockIndices(const unsigned int n_blocks, const unsigned int block_size);
+    explicit BlockIndices(const unsigned int n_blocks, const unsigned int block_size = 0);
     
 				     /**
 				      * Reinitialize the number of
@@ -339,10 +339,10 @@ BlockIndices::reinit (const std::vector<unsigned int> &n)
 
 
 inline
-BlockIndices::BlockIndices (/*const unsigned int n_blocks*/)
+BlockIndices::BlockIndices ()
 		:
-		n_blocks(0/*n_blocks*/)//,
-//		start_indices(n_blocks+1, 0)
+		n_blocks(0),
+		start_indices(1, 0)
 {}
 
 
@@ -413,6 +413,7 @@ inline
 unsigned int
 BlockIndices::total_size () const 
 {
+  if (n_blocks == 0) return 0;
   return start_indices[n_blocks];
 }
 
