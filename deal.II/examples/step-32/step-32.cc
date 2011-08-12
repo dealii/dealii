@@ -1765,6 +1765,11 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 
 //  old_temperature_solution = solution;
   old_temperature_solution.reinit(solution, false, true);
+				   // this is good enough: no need to set
+				   // current temperature since we need this
+				   // field only for computing the next stokes
+				   // system, which depends on the temperature
+				   // of the *previous* time step
 }
 
 
