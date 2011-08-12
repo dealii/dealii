@@ -1,5 +1,5 @@
 // mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010 Ralf Hartmann
+// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011 Ralf Hartmann
 //
 // Shows the shape functions implemented and computes the area of cells.
 
@@ -27,7 +27,6 @@
 
 #define PRECISION 2
 
-char fname[50];
 
 template<int dim>
 inline void

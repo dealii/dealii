@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
 //    Version: 
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,6 @@
 #include <fstream>
 #include <string>
 
-char fname[50];
 
 #define TEST(dim, l, el, deg) { el<dim> fe(deg); \
   deallog << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
