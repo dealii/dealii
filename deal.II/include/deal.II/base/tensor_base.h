@@ -886,8 +886,6 @@ template <int dim, typename Number>
 inline
 Tensor<1,dim,Number>::Tensor (const bool initialize)
 {
-  Assert (dim>0, ExcDimTooSmall(dim));
-
   if (initialize)
     for (unsigned int i=0; i!=dim; ++i)
       values[i] = 0;
