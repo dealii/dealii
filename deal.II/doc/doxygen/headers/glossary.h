@@ -507,8 +507,8 @@
  * DoFHandler objects. In essence, it is a guide to the parallel::distributed
  * namespace and the techniques used in step-40.
  *
- * The paper is submitted to the ACM Transactions on Mathematical Software
- * (ACM TOMS). It is also available as
+ * The paper is accepted for publication in the ACM Transactions on
+ * Mathematical Software (ACM TOMS). It is also available as
  * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
  * preprint 2011-187</a>. Its current BiBTex entry is
  * @code
