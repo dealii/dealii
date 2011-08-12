@@ -44,7 +44,11 @@ QGauss<0>::QGauss (const unsigned int)
 						 // there are n_q^dim == 1
 						 // points
                 Quadrature<0> (1)
-{}
+{
+				   // the single quadrature point gets unit
+				   // weight
+  this->weights[0] = 1;
+}
 
 
 
@@ -54,7 +58,11 @@ QGaussLobatto<0>::QGaussLobatto (const unsigned int)
 						 // there are n_q^dim == 1
 						 // points
                 Quadrature<0> (1)
-{}
+{
+				   // the single quadrature point gets unit
+				   // weight
+  this->weights[0] = 1;
+}
 
 
 
