@@ -107,6 +107,15 @@ namespace internals
  * been added, you need to call close(), which compresses the storage format
  * and sorts the entries.
  *
+ * @note Many of the algorithms this class implements are discussed in
+ * the @ref hp_paper . The algorithms are also related to those shown
+ * in <i>M. S. Shephard: Linear multipoint constraints applied via
+ * transformation as part of a direct stiffness assembly process. Int. J.
+ * Numer. Meth. Engrg., vol. 20 (1984), pp. 2107-2112.</i>, with the
+ * difference that the algorithms shown there completely eliminated
+ * constrained degrees of freedom, whereas we usually keep them as part
+ * of the linear system.
+ *
  * @ingroup dofs
  * @ingroup constraints
  * @author Wolfgang Bangerth, Martin Kronbichler, 1998, 2004, 2008, 2009
