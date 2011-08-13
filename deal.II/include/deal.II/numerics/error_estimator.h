@@ -36,18 +36,19 @@ namespace hp
 
 
 /**
- *  Implementation of the error estimator by Kelly, Gago, Zienkiewicz
- *  and Babuska.  This error estimator tries to approximate the error
+ *  Implementation of the error indicator by Kelly, Gago, Zienkiewicz
+ *  and Babuska.  This error indicator tries to approximate the error
  *  per cell by integration of the jump of the gradient of the
  *  solution along the faces of each cell.  It can be understood as a
  *  gradient recovery estimator; see the survey of Ainsworth for a
  *  complete discussion.
  *
- *  It seem as if this error estimator should only be valid for linear trial
- *  spaces, and there are indications that for higher order trial spaces the
- *  integrals computed here show superconvergence properties, i.e. they tend
- *  to zero faster than the error itself, thus ruling out the values as error
- *  indicators.
+ *  @note In spite of the name, this is not truly an a posteriori
+ *  error estimator, even if applied to the Poisson problem only. It
+ *  gives good hints for mesh refinement, but the estimate is not to
+ *  be trusted. For higher order trial spaces the integrals computed
+ *  here tend to zero faster than the error itself, thus ruling out
+ *  the values as error estimators.
  *
  *  The error estimator really only estimates the error for the generalized
  *  Poisson equation $-\nabla\cdot a(x) \nabla u = f$ with either Dirichlet
