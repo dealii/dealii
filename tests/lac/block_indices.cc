@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2007 by the deal.II authors
+//    Copyright (C) 2007, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,14 +23,10 @@
 void test (const BlockIndices& idx)
 {
   const unsigned int n = idx.size();
-  deallog << "blocks " << idx.size() << std::endl
-	  << "elements " << idx.total_size() << std::endl
-	  << "block sizes ";
+  deallog << "sizes: " << idx << std::endl;
+  deallog << "start:   ";
   for (unsigned i=0;i<n;++i)
-    deallog << '\t' << idx.block_size(i);
-  deallog << std::endl << "Block start ";
-  for (unsigned i=0;i<n;++i)
-    deallog << '\t' << idx.block_start(i);
+    deallog << ' ' << idx.block_start(i);
 
   deallog << std::endl;
   
@@ -60,9 +56,22 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   
+  BlockIndices bi0;
+  deallog << "empty: " << bi0 << std::endl;
+  bi0.push_back(3);
+  deallog << "push:  " << bi0 << std::endl;
+  bi0.push_back(2);
+  deallog << "push:  " << bi0 << std::endl;
+  
   BlockIndices bi1(3);
   test(bi1);
   bi1.reinit(3,4);
+  test(bi1);
+  bi1.push_back(2);
+  deallog << "push: " << bi1 << std::endl;
+  bi1.push_back(5);
+  deallog << "push: " << bi1 << std::endl;
+  bi1.push_back(4);
   test(bi1);
   
   std::vector<unsigned int> v(4);
