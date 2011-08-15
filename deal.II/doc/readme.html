@@ -22,8 +22,17 @@
     </p>
     <ul>
       <li> <a href="#prerequisites">System requirements</a>
+	<ul>
+	  <li> <a href="#supported">Supported platforms</a>
+	  <li> <a href="#unsupported">Unsupported and partly supported platforms</a>
+	  <li> <a href="#additional-software">Additional software requirements</a>
+	</ul>  
       <li> <a href="#installation">Installation</a>
-      <li> <a href="#configuration-options">Configuration options</a>
+	<ul>
+	  <li>  <a href="#unpacking">Unpacking</a>
+	  <li>  <a href="#configuration">Configuring</a>
+	  <li>  <a href="#building">Building the library</a>
+	  <li> <a href="#configuration-options">Configuration options</a>
          <ul>
 	 <li> <a href="#choose-compiler">Changing the compiler or
                compiler flags</a>
@@ -31,6 +40,7 @@
 	 <li> <a href="#optional-software">Optional interfaces to
       other software packages</a>
 	 </ul>
+	</ul>
       <li> <a href="#problems">Problems, questions, mailing lists</a>
       <li> <a href="#license">License</a>
     </ul>
@@ -40,7 +50,8 @@
     <a name="prerequisites"></a>
     <h2>System requirements</h2>
 
-    <p>
+    <a name="supported"></a>
+    <h3>Supported platforms</h3>
     At present, <acronym>deal.II</acronym> has been
     developed and tested on the following platforms:
     <ul>
@@ -72,7 +83,11 @@
     work, as are other brands of Unix (for example Sun Solaris,
     FreeBSD, or Linux on chips like SPARC, PA-RISC, PowerPC, etc) using
     gcc as compiler, but we do not regularly test them.
-    Furthermore, for the following list of systems, we have collected
+    
+    <a name="unsupported"></a>
+    <h3>Unsupported / partly supported platforms</h3>
+
+    For the following list of systems, we have collected
     our experiences on separate pages:
     <ul>
       <li> <a href="platforms/sgi-irix.html" target="body">SGI
@@ -102,11 +117,10 @@
     describes <a href="porting.html" target="body">porting the library
     to new systems</a>.
     </p>
-
-    <p>
-    </p>
-
-    <p>
+    
+    <a name="additional-software"></a>
+    <h3>Additional software requirements</h3>
+    
     In order to compile and use the <acronym>deal.II</acronym>
     libraries you need to have the following programs installed:
     <ul>
@@ -205,25 +219,32 @@
     <a name="installation"></a>
     <h2>Installation</h2>
 
+    <a name="unpacking"></a>
     <h3>Unpacking</h3>
     The whole library usually comes as a .tar.gz file, that is a
     tarred file archive which is compressed with gzip. After downloading this
     tar file, please unpack it at the position where you want to install the
     deal.II library using either
     <pre>
+
       gunzip deal.II-X.Y.Z.tar.gz
       tar xf deal.II-X.Y.Z.tar
     </pre>
     or, if you have GNU tar with
     <pre>
+
       tar xzf deal.II-X.Y.Z.tar.gz
     </pre>
     Unpacking will create a subdirectory <tt>deal.II</tt> with
-    the whole library wherever you do it).
+    the whole library wherever you do it. Since deal.II does not have
+    a <tt>make install</tt> which would copy the libraries to a final position,
+    this subdirectory is where the built library will reside.
 
+    <a name="configuration"></a>
     <h3>Configuration</h3>
     Unpacking will create a subdirectory <tt>deal.II</tt>. First run
     <pre>
+
       cd deal.II
       ./configure
     </pre>
@@ -244,8 +265,9 @@
     of your own projects</a> to set relevant paths and parameters correctly.
     </p>
 
+    <a name="building"></a>
     <h3>Building the library</h3>
-    After configuring, type <tt>make<tt>, to obtain the following help (this
+    After configuring, type <tt>make</tt>, to obtain the following help (this
     output may change slightly over time, just try it):
 
     <pre>
@@ -337,7 +359,6 @@
     <acronym>deal.II</acronym>, you may want to continue with the
     <a href="doxygen/tutorial/index.html" target="_top">tutorial</a>.
     </p>
-
 
 
     <a name="configuration-options"></a>
