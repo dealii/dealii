@@ -185,7 +185,8 @@ class ConstraintMatrix;
  *   inhomogeneous Neumann boundary values in Laplace's equation or
  *   other second order operators. This function also takes an
  *   optional argument denoting over which parts of the boundary the
- *   integration shall extend.
+ *   integration shall extend. If the default argument is used, it is applied
+ *   to all boundaries.
  *
  * <li> Interpolation of boundary values:
  *   The MatrixTools::apply_boundary_values() function takes a list

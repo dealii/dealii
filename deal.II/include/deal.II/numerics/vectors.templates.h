@@ -54,6 +54,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <set>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -964,9 +965,10 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->at_boundary () &&
+		  (boundary_indicators.empty() ||
 	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	       !=
-	       boundary_indicators.end()))
+	       boundary_indicators.end())))
 	    {
 	      fe_values.reinit(cell, face);
 
@@ -993,9 +995,10 @@ VectorTools::create_boundary_right_hand_side (const Mapping<dim, spacedim>      
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->at_boundary () &&
+		  (boundary_indicators.empty() ||
 	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	       !=
-	       boundary_indicators.end()))
+	       boundary_indicators.end())))
 	    {
 	      fe_values.reinit(cell, face);
 
@@ -1132,9 +1135,10 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,sp
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->at_boundary () &&
+		  (boundary_indicators.empty() ||
 	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	       !=
-	       boundary_indicators.end()))
+	       boundary_indicators.end())))
 	    {
 	      x_fe_values.reinit(cell, face);
 
@@ -1168,9 +1172,10 @@ VectorTools::create_boundary_right_hand_side (const hp::MappingCollection<dim,sp
       for (; cell!=endc; ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 	  if (cell->face(face)->at_boundary () &&
+		  (boundary_indicators.empty() ||
 	      (boundary_indicators.find (cell->face(face)->boundary_indicator())
 	       !=
-	       boundary_indicators.end()))
+	       boundary_indicators.end())))
 	    {
 	      x_fe_values.reinit(cell, face);
 

@@ -268,6 +268,12 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The functions VectorTools::create_boundary_right_hand_side()
+called with an empty set of boundary_indicators (the default), did not apply
+any boundary conditions. The empty set now applies it to all boundaries.
+<br>
+(Timo Heister, Sebastian Pauletti, 2011/08/15)
+
 <li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
 a bug that led to an exception whenever we were computing constraints for
 vector fields located on edges shared between two faces of a 3d cell if those
