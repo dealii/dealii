@@ -673,6 +673,12 @@ class GridGenerator
 				      * computed adaptively such that
 				      * the resulting elements have
 				      * the least aspect ratio.
+				      * 
+				      * If colorize is set to true, the
+				      * inner, outer, left, and right
+				      * boundary get indicator 0, 1, 2,
+				      * and 3, respectively. Otherwise 
+				      * all indicators are set to 0.
 				      *
 				      * @note The triangulation needs to be
 				      * void upon calling this
@@ -683,7 +689,8 @@ class GridGenerator
 				  const Point<dim>     &center,
 				  const double        inner_radius,
 				  const double        outer_radius,
-				  const unsigned int  n_cells = 0);
+				  const unsigned int  n_cells = 0,
+				  const bool colorize = false);
 
     
 				     /**
@@ -706,7 +713,13 @@ class GridGenerator
 				      * the resulting elements have
 				      * the least aspect ratio.
 				      *
-				      * @note The triangulation needs to be
+				      * If colorize is set to true, the
+				      * inner, outer, left, and right
+				      * boundary get indicator 0, 1, 2,
+				      * and 3, respectively. Otherwise
+				      * all indicators are set to 0.
+				      *
+					  * @note The triangulation needs to be
 				      * void upon calling this
 				      * function. Only implemented in 2d so far.
 				      */

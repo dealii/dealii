@@ -1208,7 +1208,8 @@ GridGenerator::half_hyper_shell (Triangulation<1>&,
 				 const Point<1>&,
 				 const double,
 				 const double,
-				 const unsigned int)
+				 const unsigned int,
+				 const bool)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1635,7 +1636,8 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 				 const Point<2>     &center,
 				 const double        inner_radius,
 				 const double        outer_radius,
-				 const unsigned int  n_cells)
+				 const unsigned int  n_cells,
+				 const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
@@ -1695,6 +1697,18 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
     };
 
   tria.create_triangulation (vertices, cells, SubCellData());
+  
+  if (colorize)
+  {
+      Triangulation<2>::cell_iterator cell = tria.begin();
+      for (;cell!=tria.end();++cell)
+      {
+	cell->face(2)->set_boundary_indicator(1);
+      }
+      tria.begin()->face(0)->set_boundary_indicator(3);
+      
+      tria.last()->face(1)->set_boundary_indicator(2);
+  }
 }
 
 
@@ -2624,10 +2638,12 @@ GridGenerator::half_hyper_shell (Triangulation<3>& tria,
 				 const Point<3>& center,
 				 const double inner_radius,
 				 const double outer_radius,
-				 const unsigned int n)
+				 const unsigned int n,
+				 const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
 	  ExcInvalidRadii ());
+  Assert(colorize == false, ExcNotImplemented());
 
   if (n <= 5)
     {
