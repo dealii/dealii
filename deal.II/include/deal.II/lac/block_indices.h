@@ -53,10 +53,9 @@ class BlockIndices : public Subscriptor
 				     /**
 				      * Default
 				      * constructor. Initialize for
-				      * @p n_blocks blocks and set
-				      * all block sizes to zero.
+				      * zero blocks.
 				      */
-    BlockIndices (/*const unsigned int n_blocks = 0*/);
+    BlockIndices ();
 
 				     /**
 				      * Constructor. Initialize the
@@ -90,7 +89,14 @@ class BlockIndices : public Subscriptor
 				      * of block @p i is set to
 				      * <tt>n[i]</tt>.
 				      */
-    inline void reinit (const std::vector<unsigned int> &n);
+    void reinit (const std::vector<unsigned int> &n);
+    
+				     /**
+				      * Add another block of given
+				      * size to the end of the block
+				      * structure.
+				      */
+    void push_back(const unsigned int size);
     
 				     /**
 				      * @name Size information
@@ -109,7 +115,7 @@ class BlockIndices : public Subscriptor
 				      * of the vector space of the
 				      * block vector.
 				      */
-    inline unsigned int total_size () const;
+    unsigned int total_size () const;
 
 				     /**
 				      * The size of the @p ith block.
@@ -205,7 +211,8 @@ class BlockIndices : public Subscriptor
 
 
 /**
- * Output operator for BlockIndices
+ * Operator for logging BlockIndices. Writes the number of blocks, the
+ * size of each block and the total size of the index field.
  *
  * @ref BlockIndices
  * @author Guido Kanschat
@@ -217,11 +224,13 @@ operator << (LogStream& s, const BlockIndices& bi)
 {
   const unsigned int n = bi.size();
   s << n << ":[";
+				   // Write first size without leading space
   if (n>0)
     s << bi.block_size(0);
+				   // Write all other sizes
   for (unsigned int i=1;i<n;++i)
     s << ' ' << bi.block_size(i);
-  s << ']';
+  s << "]->" << bi.total_size();
   return s;
 }
 
@@ -317,7 +326,7 @@ BlockIndices::reinit (const unsigned int nb,
 		      const unsigned int block_size)
 {
   n_blocks = nb;
-  start_indices.resize(nb);
+  start_indices.resize(n_blocks+1);
   for (unsigned int i=0; i<=n_blocks; ++i)
     start_indices[i] = i * block_size;
 }
@@ -372,6 +381,14 @@ BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
 }
 
 
+inline
+void
+BlockIndices::push_back(const unsigned int sz)
+{
+  start_indices.push_back(start_indices[n_blocks]+sz);
+  ++n_blocks;
+  AssertDimension(start_indices.size(), n_blocks+1);
+}
 
 
 inline
