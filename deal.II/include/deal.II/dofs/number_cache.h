@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -107,7 +107,7 @@ namespace internal
     template <class Archive>
     void 
     NumberCache::serialize (Archive & ar, 
-			    const unsigned int version)
+			    const unsigned int /*version*/)
     {
       ar & n_global_dofs & n_locally_owned_dofs;
       ar & locally_owned_dofs;
