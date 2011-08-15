@@ -974,8 +974,11 @@ namespace internal
 							   // in 1d, we don't
 							   // have access to
 							   // any of the
-							   // data.aux fields,
-							   // but we can still
+							   // data.aux fields
+							   // (because it has
+							   // only dim-1
+							   // components), but
+							   // we can still
 							   // compute the
 							   // boundary form
 							   // simply by simply
