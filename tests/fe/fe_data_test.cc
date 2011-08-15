@@ -195,7 +195,7 @@ void test_fe_datas()
       deallog << "dofs_per_cell=" << fe_data->dofs_per_cell << std::endl;
       deallog << "primitive=" << (fe_data->is_primitive() ? "yes" : "no") << std::endl
 	      << "components=" << fe_data->components << std::endl
-	      << "blocks=" << fe_data->n_blocks() << std::endl
+	      << "blocks=" << fe_data->block_indices() << std::endl
 	      << "degree=" << fe_data->tensor_degree() << std::endl
 	      << "conformity=";
       if (fe_data->conforms(FiniteElementData<dim>::L2)) deallog << " L2";
