@@ -62,6 +62,8 @@ int main()
   deallog << "push:  " << bi0 << std::endl;
   bi0.push_back(2);
   deallog << "push:  " << bi0 << std::endl;
+  bi0.reinit(0,0);
+  deallog << "empty: " << bi0 << std::endl;
   
   BlockIndices bi1(3);
   test(bi1);
