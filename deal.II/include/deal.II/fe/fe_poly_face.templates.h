@@ -254,34 +254,4 @@ FE_PolyFace<POLY,dim,spacedim>::fill_fe_subface_values (
   Assert (!(flags & update_hessians), ExcNotImplemented());
 }
 
-
-
-template <class POLY, int dim, int spacedim>
-unsigned int
-FE_PolyFace<POLY,dim,spacedim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-const FiniteElement<dim,spacedim> &
-FE_PolyFace<POLY,dim,spacedim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-unsigned int
-FE_PolyFace<POLY,dim,spacedim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
-
-
 DEAL_II_NAMESPACE_CLOSE

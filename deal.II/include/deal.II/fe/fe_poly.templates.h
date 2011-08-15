@@ -622,34 +622,4 @@ FE_Poly<POLY,dim,spacedim>::fill_fe_subface_values (const Mapping<dim,spacedim> 
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
-
-
-template <class POLY, int dim, int spacedim>
-unsigned int
-FE_Poly<POLY,dim,spacedim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-const FiniteElement<dim,spacedim> &
-FE_Poly<POLY,dim,spacedim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-unsigned int
-FE_Poly<POLY,dim,spacedim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
-
-
 DEAL_II_NAMESPACE_CLOSE

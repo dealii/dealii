@@ -392,19 +392,7 @@ class FiniteElementData
 				      * base element.
 				      */
     const unsigned int components;
-				     /**
-				      * The number of vector blocks a
-				      * BlockVector for this element
-				      * should contain. For primitive
-				      * elements, this is equal to
-				      * #components, but for vector
-				      * valued base elements it may
-				      * differ. Actually, in systems
-				      * this is the sum of the base
-				      * element multiplicities.
-				      */
-    const unsigned int blocks;
-
+    
 				     /**
 				      * Maximal polynomial degree of a
 				      * shape function in a single
@@ -417,6 +405,17 @@ class FiniteElementData
 				      */
     const Conformity conforming_space;
 
+				     /**
+				      * Storage for an object
+				      * describing the sizes of each
+				      * block of a compound
+				      * element. For an element which
+				      * is not an FESystem, this
+				      * contains only a single block
+				      * with length #dofs_per_cell.
+				      */
+    BlockIndices block_indices_data;
+    
     				     /**
 				      * Default
 				      * constructor. Constructs an
@@ -449,8 +448,7 @@ class FiniteElementData
 				      * @param conformity The finite
 				      * element space has continuity
 				      * of this Sobolev space.
-				      * @param n_blocks Number of
-				      * vector blocks.
+				      * @param n_blocks obsolete and ignored.
 				      */
     FiniteElementData (const std::vector<unsigned int> &dofs_per_object,
 		       const unsigned int n_components,
@@ -529,6 +527,11 @@ class FiniteElementData
 				      */
     unsigned int n_blocks () const;
 
+				     /**
+				      * Detailed infromation on block sizes.
+				      */
+    const BlockIndices& block_indices() const;
+    
 				     /**
 				      * Return whether the entire
 				      * finite element is primitive,
@@ -832,10 +835,20 @@ FiniteElementData<dim>::set_primitivity (const bool value)
 
 template <int dim>
 inline
+const BlockIndices&
+FiniteElementData<dim>::block_indices () const
+{
+  return block_indices_data;
+}
+
+
+
+template <int dim>
+inline
 unsigned int
 FiniteElementData<dim>::n_blocks () const
 {
-  return blocks;
+  return block_indices_data.size();
 }
 
 

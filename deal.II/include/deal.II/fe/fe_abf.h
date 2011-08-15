@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -113,35 +113,6 @@ class FE_ABF : public FE_PolyTensor<PolynomialsABF<dim>, dim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-
-
-				     /**
-				      * Number of base elements in a
-				      * mixed discretization. Here,
-				      * this is of course equal to
-				      * one.
-				      */
-    virtual unsigned int n_base_elements () const;
-    
-				     /**
-				      * Access to base element
-				      * objects. Since this element is
-				      * atomic, <tt>base_element(0)</tt> is
-				      * @p this, and all other
-				      * indices throw an error.
-				      */
-    virtual const FiniteElement<dim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * Multiplicity of base element
-                                      * @p index. Since this is an
-                                      * atomic element,
-                                      * <tt>element_multiplicity(0)</tt>
-                                      * returns one, and all other
-                                      * indices will throw an error.
-                                      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
     
 				     /**
 				      * Check whether a shape function

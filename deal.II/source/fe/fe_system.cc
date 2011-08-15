@@ -154,6 +154,8 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe,
 				    compute_nonzero_components(fe, n_elements)),
                 base_elements(1)
 {
+  this->base_to_block_indices.reinit(0, 0);
+  this->base_to_block_indices.push_back(n_elements);
   base_elements[0] = ElementPair(fe.clone(), n_elements);
   base_elements[0].first->subscribe (typeid(*this).name());
   initialize ();
@@ -173,11 +175,13 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 							       fe2, n2)),
                 base_elements(2)
 {
+  this->base_to_block_indices.reinit(0, 0);
+  this->base_to_block_indices.push_back(n1);
+  this->base_to_block_indices.push_back(n2);
   base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first->subscribe (typeid(*this).name());
-  this->first_block_of_base_table.push_back(n1);
   initialize ();
 }
 
@@ -201,14 +205,16 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 							       fe3, n3)),
                 base_elements(3)
 {
+  this->base_to_block_indices.reinit(0, 0);
+  this->base_to_block_indices.push_back(n1);
+  this->base_to_block_indices.push_back(n2);
+  this->base_to_block_indices.push_back(n3);
   base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
   base_elements[1].first->subscribe (typeid(*this).name());
   base_elements[2] = ElementPair(fe3.clone(), n3);
   base_elements[2].first->subscribe (typeid(*this).name());
-  this->first_block_of_base_table.push_back(n1);
-  this->first_block_of_base_table.push_back(n1+n2);
   initialize ();
 }
 
@@ -236,6 +242,11 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 							  fe4 ,n4)),
   base_elements(4)
 {
+  this->base_to_block_indices.reinit(0, 0);
+  this->base_to_block_indices.push_back(n1);
+  this->base_to_block_indices.push_back(n2);
+  this->base_to_block_indices.push_back(n3);
+  this->base_to_block_indices.push_back(n4);
   base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
@@ -244,9 +255,6 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   base_elements[2].first->subscribe (typeid(*this).name());
   base_elements[3] = ElementPair(fe4.clone(), n4);
   base_elements[3].first->subscribe (typeid(*this).name());
-  this->first_block_of_base_table.push_back(n1);
-  this->first_block_of_base_table.push_back(n1+n2);
-  this->first_block_of_base_table.push_back(n1+n2+n3);
   initialize ();
 }
 
@@ -278,6 +286,13 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 							  fe5, n5)),
   base_elements(5)
 {
+  this->base_to_block_indices.reinit(0, 0);
+  this->base_to_block_indices.push_back(n1);
+  this->base_to_block_indices.push_back(n2);
+  this->base_to_block_indices.push_back(n3);
+  this->base_to_block_indices.push_back(n4);
+  this->base_to_block_indices.push_back(n5);
+  
   base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
@@ -288,10 +303,6 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   base_elements[3].first->subscribe (typeid(*this).name());
   base_elements[4] = ElementPair(fe5.clone(), n5);
   base_elements[4].first->subscribe (typeid(*this).name());
-  this->first_block_of_base_table.push_back(n1);
-  this->first_block_of_base_table.push_back(n1+n2);
-  this->first_block_of_base_table.push_back(n1+n2+n3);
-  this->first_block_of_base_table.push_back(n1+n2+n3+n4);
   initialize ();
 }
 
@@ -325,12 +336,12 @@ FESystem<dim,spacedim>::get_name () const
   std::ostringstream namebuf;
 
   namebuf << "FESystem<" << dim << ">[";
-  for (unsigned int i=0; i<n_base_elements(); ++i)
+  for (unsigned int i=0; i< this->n_base_elements(); ++i)
     {
       namebuf << base_element(i).get_name();
-      if (element_multiplicity(i) != 1)
-	namebuf << '^' << element_multiplicity(i);
-      if (i != n_base_elements()-1)
+      if (this->element_multiplicity(i) != 1)
+	namebuf << '^' << this->element_multiplicity(i);
+      if (i != this->n_base_elements()-1)
 	namebuf << '-';
     }
   namebuf << ']';
@@ -344,43 +355,43 @@ template <int dim, int spacedim>
 FiniteElement<dim,spacedim>*
 FESystem<dim,spacedim>::clone() const
 {
-  switch (n_base_elements())
+  switch (this->n_base_elements())
     {
     case 1:
       return new FESystem(base_element(0),
-			  element_multiplicity(0));
+			  this->element_multiplicity(0));
     case 2:
       return new FESystem(base_element(0),
-			  element_multiplicity(0),
+			  this->element_multiplicity(0),
 			  base_element(1),
-			  element_multiplicity(1));
+			  this->element_multiplicity(1));
     case 3:
       return new FESystem(base_element(0),
-			  element_multiplicity(0),
+			  this->element_multiplicity(0),
 			  base_element(1),
-			  element_multiplicity(1),
+			  this->element_multiplicity(1),
 			  base_element(2),
-			  element_multiplicity(2));
+			  this->element_multiplicity(2));
     case 4:
       return new FESystem(base_element(0),
-			  element_multiplicity(0),
+			  this->element_multiplicity(0),
 			  base_element(1),
-			  element_multiplicity(1),
+			  this->element_multiplicity(1),
 			  base_element(2),
-			  element_multiplicity(2),
+			  this->element_multiplicity(2),
 			  base_element(3),
-			  element_multiplicity(3));
+			  this->element_multiplicity(3));
     case 5:
       return new FESystem(base_element(0),
-			  element_multiplicity(0),
+			  this->element_multiplicity(0),
 			  base_element(1),
-			  element_multiplicity(1),
+			  this->element_multiplicity(1),
 			  base_element(2),
-			  element_multiplicity(2),
+			  this->element_multiplicity(2),
 			  base_element(3),
-			  element_multiplicity(3),
+			  this->element_multiplicity(3),
 			  base_element(4),
-			  element_multiplicity(4));
+			  this->element_multiplicity(4));
       default:
 			  Assert(false, ExcNotImplemented());
     }
@@ -547,9 +558,9 @@ FESystem<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
 
 template <int dim, int spacedim>
 void
-FESystem<dim,spacedim>::
-get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
-			  FullMatrix<double>           &interpolation_matrix) const
+FESystem<dim,spacedim>::get_interpolation_matrix (
+  const FiniteElement<dim,spacedim> &x_source_fe,
+  FullMatrix<double>           &interpolation_matrix) const
 {
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
 	  ExcDimensionMismatch (interpolation_matrix.m(),
@@ -579,14 +590,14 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 
                                    // condition 2: same number of
                                    // basis elements
-  AssertThrow (n_base_elements() == source_fe.n_base_elements(),
+  AssertThrow (this->n_base_elements() == source_fe.n_base_elements(),
                typename FEL::
                ExcInterpolationNotImplemented());
 
                                    // condition 3: same number of
                                    // basis elements
-  for (unsigned int i=0; i<n_base_elements(); ++i)
-    AssertThrow (element_multiplicity(i) ==
+  for (unsigned int i=0; i< this->n_base_elements(); ++i)
+    AssertThrow (this->element_multiplicity(i) ==
                  source_fe.element_multiplicity(i),
                  typename FEL::
                  ExcInterpolationNotImplemented());
@@ -604,8 +615,8 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                                    // continuing and assembling the
                                    // one big matrix from the small
                                    // ones of the base elements
-  std::vector<FullMatrix<double> > base_matrices (n_base_elements());
-  for (unsigned int i=0; i<n_base_elements(); ++i)
+  std::vector<FullMatrix<double> > base_matrices (this->n_base_elements());
+  for (unsigned int i=0; i<this->n_base_elements(); ++i)
     {
       base_matrices[i].reinit (base_element(i).dofs_per_cell,
                                source_fe.base_element(i).dofs_per_cell);
@@ -644,7 +655,7 @@ FESystem<dim,spacedim>::update_once (const UpdateFlags flags) const
   UpdateFlags out = update_default;
 				   // generate maximal set of flags
 				   // that are necessary
-  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     out |= base_element(base_no).update_once(flags);
   return out;
 }
@@ -658,7 +669,7 @@ FESystem<dim,spacedim>::update_each (const UpdateFlags flags) const
   UpdateFlags out = update_default;
 				   // generate maximal set of flags
 				   // that are necessary
-  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     out |= base_element(base_no).update_each(flags);
 
 				   // second derivatives are handled
@@ -685,7 +696,7 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 				  const Quadrature<dim> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData* data = new InternalData(n_base_elements());
+  InternalData* data = new InternalData(this->n_base_elements());
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
@@ -708,7 +719,7 @@ FESystem<dim,spacedim>::get_data (const UpdateFlags      flags_,
 
 				   // get data objects from each of
 				   // the base elements and store them
-  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
       typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_data(sub_flags, mapping, quadrature);
@@ -772,7 +783,7 @@ FESystem<dim,spacedim>::get_face_data (
   const Quadrature<dim-1> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData* data = new InternalData(n_base_elements());
+  InternalData* data = new InternalData(this->n_base_elements());
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
@@ -786,7 +797,7 @@ FESystem<dim,spacedim>::get_face_data (
       data->initialize_2nd (this, mapping, QProjector<dim>::project_to_all_faces(quadrature));
     }
 
-  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
       typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_face_data(sub_flags, mapping, quadrature);
@@ -824,7 +835,7 @@ FESystem<dim,spacedim>::get_subface_data (
   const Quadrature<dim-1> &quadrature) const
 {
   UpdateFlags flags = flags_;
-  InternalData* data = new InternalData(n_base_elements());
+  InternalData* data = new InternalData(this->n_base_elements());
 
   data->update_once = update_once (flags);
   data->update_each = update_each (flags);
@@ -838,7 +849,7 @@ FESystem<dim,spacedim>::get_subface_data (
       data->initialize_2nd (this, mapping, QProjector<dim>::project_to_all_subfaces(quadrature));
     }
 
-  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
     {
       typename Mapping<dim,spacedim>::InternalDataBase *base_fe_data_base =
 	base_element(base_no).get_subface_data(sub_flags, mapping, quadrature);
@@ -884,14 +895,14 @@ FESystem<dim,spacedim>::fill_fe_values (
 
 template <int dim, int spacedim>
 void
-FESystem<dim,spacedim>::
-fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
-                     const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                     const unsigned int                    face_no,
-                     const Quadrature<dim-1>              &quadrature,
-                     typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                     typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
-                     FEValuesData<dim,spacedim>                    &data) const
+FESystem<dim,spacedim>::fill_fe_face_values (
+  const Mapping<dim,spacedim>                   &mapping,
+  const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+  const unsigned int                    face_no,
+  const Quadrature<dim-1>              &quadrature,
+  typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  typename Mapping<dim,spacedim>::InternalDataBase &fe_data,
+  FEValuesData<dim,spacedim>                    &data) const
 {
   compute_fill (mapping, cell, face_no, invalid_face_number, quadrature,
                 CellSimilarity::none, mapping_data, fe_data, data);
@@ -968,7 +979,7 @@ FESystem<dim,spacedim>::compute_fill (
 					   // (and: how should it know
 					   // of their existence,
 					   // after all).
-	  for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+	  for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
 	    {
 					       // Pointer needed to get
 					       // the update flags of the
@@ -1041,7 +1052,7 @@ FESystem<dim,spacedim>::compute_fill (
 
                                        // let base elements update the
                                        // necessary data
-      for (unsigned int base_no=0; base_no<n_base_elements(); ++base_no)
+      for (unsigned int base_no=0; base_no<this->n_base_elements(); ++base_no)
 	{
 	  const FiniteElement<dim,spacedim> &
             base_fe      = base_element(base_no);
@@ -1233,14 +1244,19 @@ FESystem<dim,spacedim>::build_cell_tables()
   this->face_system_to_component_table.resize(this->dofs_per_face);
 
   unsigned total_index = 0;
-  for (unsigned int base=0; base < n_base_elements(); ++base)
-    for (unsigned int m = 0; m < element_multiplicity(base); ++m)
-      for (unsigned int k=0; k<base_element(base).n_components(); ++k)
-	this->component_to_base_table[total_index++]
-	  = std::make_pair(std::make_pair(base,k), m);
+  this->block_indices_data.reinit(0,0);
+  
+  for (unsigned int base=0; base < this->n_base_elements(); ++base)
+    for (unsigned int m = 0; m < this->element_multiplicity(base); ++m)
+      {
+	this->block_indices_data.push_back(base_element(base).dofs_per_cell);
+	for (unsigned int k=0; k<base_element(base).n_components(); ++k)
+	  this->component_to_base_table[total_index++]
+	    = std::make_pair(std::make_pair(base,k), m);
+      }
   Assert (total_index == this->component_to_base_table.size(),
 	  ExcInternalError());
-
+  
 				   // Initialize index tables.
 				   // Multi-component base elements
 				   // have to be thought of. For
@@ -1261,8 +1277,8 @@ FESystem<dim,spacedim>::build_cell_tables()
        ++vertex_number)
     {
       unsigned comp_start = 0;
-      for(unsigned int base=0; base<n_base_elements(); ++base)
-	for (unsigned int m=0; m<element_multiplicity(base);
+      for(unsigned int base=0; base<this->n_base_elements(); ++base)
+	for (unsigned int m=0; m<this->element_multiplicity(base);
 	     ++m, comp_start+=base_element(base).n_components())
 	  for (unsigned int local_index = 0;
 	       local_index < base_element(base).dofs_per_vertex;
@@ -1298,8 +1314,8 @@ FESystem<dim,spacedim>::build_cell_tables()
 	 ++line_number)
       {
 	unsigned comp_start = 0;
-	for (unsigned int base=0; base<n_base_elements(); ++base)
-	  for (unsigned int m=0; m<element_multiplicity(base);
+	for (unsigned int base=0; base<this->n_base_elements(); ++base)
+	  for (unsigned int m=0; m<this->element_multiplicity(base);
 	       ++m, comp_start+=base_element(base).n_components())
 	    for (unsigned int local_index = 0;
 		 local_index < base_element(base).dofs_per_line;
@@ -1336,8 +1352,8 @@ FESystem<dim,spacedim>::build_cell_tables()
 	 ++quad_number)
       {
 	unsigned int comp_start = 0;
-	for (unsigned int base=0; base<n_base_elements(); ++base)
-	  for (unsigned int m=0; m<element_multiplicity(base);
+	for (unsigned int base=0; base<this->n_base_elements(); ++base)
+	  for (unsigned int m=0; m<this->element_multiplicity(base);
 	       ++m, comp_start += base_element(base).n_components())
 	    for (unsigned int local_index = 0;
 		 local_index < base_element(base).dofs_per_quad;
@@ -1374,8 +1390,8 @@ FESystem<dim,spacedim>::build_cell_tables()
 	 ++hex_number)
       {
 	unsigned int comp_start = 0;
-	for(unsigned int base=0; base<n_base_elements(); ++base)
-	  for (unsigned int m=0; m<element_multiplicity(base);
+	for(unsigned int base=0; base<this->n_base_elements(); ++base)
+	  for (unsigned int m=0; m<this->element_multiplicity(base);
 	       ++m, comp_start+=base_element(base).n_components())
 	    for (unsigned int local_index = 0;
 		 local_index < base_element(base).dofs_per_hex;
@@ -1431,8 +1447,8 @@ FESystem<dim,spacedim>::build_face_tables()
        ++vertex_number)
     {
       unsigned int comp_start = 0;
-      for(unsigned int base=0; base<n_base_elements(); ++base)
-	for (unsigned int m=0; m<element_multiplicity(base);
+      for(unsigned int base=0; base<this->n_base_elements(); ++base)
+	for (unsigned int m=0; m<this->element_multiplicity(base);
 	     ++m, comp_start += base_element(base).n_components())
 	  for (unsigned int local_index = 0;
 	       local_index < base_element(base).dofs_per_vertex;
@@ -1497,8 +1513,8 @@ FESystem<dim,spacedim>::build_face_tables()
 	 ++line_number)
       {
 	unsigned comp_start = 0;
-	for(unsigned base = 0; base < n_base_elements(); ++base)
-	  for (unsigned m=0; m<element_multiplicity(base);
+	for(unsigned base = 0; base < this->n_base_elements(); ++base)
+	  for (unsigned m=0; m<this->element_multiplicity(base);
 	       ++m, comp_start += base_element(base).n_components())
 	    for (unsigned local_index = 0;
 		 local_index < base_element(base).dofs_per_line;
@@ -1543,8 +1559,8 @@ FESystem<dim,spacedim>::build_face_tables()
 	 ++quad_number)
       {
 	unsigned comp_start = 0;
-	for(unsigned base=0; base<n_base_elements(); ++base)
-	  for (unsigned m=0; m<element_multiplicity(base);
+	for(unsigned base=0; base<this->n_base_elements(); ++base)
+	  for (unsigned m=0; m<this->element_multiplicity(base);
 	       ++m, comp_start += base_element(base).n_components())
 	    for (unsigned local_index = 0;
 		 local_index < base_element(base).dofs_per_quad;
@@ -1601,7 +1617,7 @@ void FESystem<dim,spacedim>::build_interface_constraints ()
                                    // composed element empty as well;
                                    // however, the rest of the element
                                    // is usable
-  for (unsigned int base=0; base<n_base_elements(); ++base)
+  for (unsigned int base=0; base<this->n_base_elements(); ++base)
     if (base_element(base).constraints_are_implemented() == false)
       return;
 
@@ -1872,7 +1888,7 @@ void FESystem<dim,spacedim>::initialize ()
       bool do_restriction = true;
       bool do_prolongation = true;
 
-      for (unsigned int i=0; i<n_base_elements(); ++i)
+      for (unsigned int i=0; i<this->n_base_elements(); ++i)
 	{
 	  if (base_element(i).restriction[ref_case-1][0].n() == 0)
 	    do_restriction = false;
@@ -2004,7 +2020,7 @@ initialize_unit_support_points ()
 				   // an empty array to
 				   // demonstrate that
 				   // fact
-  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
+  for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
     if (!base_element(base_el).has_support_points())
       {
 	this->unit_support_points.resize(0);
@@ -2021,7 +2037,7 @@ initialize_unit_support_points ()
       const unsigned int
 	base       = this->system_to_base_table[i].first.first,
 	base_index = this->system_to_base_table[i].second;
-      Assert (base<n_base_elements(), ExcInternalError());
+      Assert (base<this->n_base_elements(), ExcInternalError());
       Assert (base_index<base_element(base).unit_support_points.size(),
 	      ExcInternalError());
       this->unit_support_points[i] = base_element(base).unit_support_points[base_index];
@@ -2055,7 +2071,7 @@ initialize_unit_face_support_points ()
 				   // or not. this is, for example, the case
 				   // for the stable Stokes element Q(p)^dim
 				   // \times DGP(p-1).
-  for (unsigned int base_el=0; base_el<n_base_elements(); ++base_el)
+  for (unsigned int base_el=0; base_el<this->n_base_elements(); ++base_el)
     if (!base_element(base_el).has_support_points()
 	&&
 	(base_element(base_el).dofs_per_face > 0))
@@ -2102,11 +2118,11 @@ FESystem<dim,spacedim>::initialize_quad_dof_index_permutation ()
 				   // element, copy the shift information of
 				   // the base elements
   unsigned int index = 0;
-  for (unsigned int b=0; b<n_base_elements();++b)
+  for (unsigned int b=0; b<this->n_base_elements();++b)
     {
       const Table<2,int> &temp
 	= this->base_element(b).adjust_quad_dof_index_for_face_orientation_table;
-      for (unsigned int c=0; c<element_multiplicity(b); ++c)
+      for (unsigned int c=0; c<this->element_multiplicity(b); ++c)
 	{
 	  for (unsigned int i=0; i<temp.size(0); ++i)
 	    for (unsigned int j=0; j<8; ++j)
@@ -2123,11 +2139,11 @@ FESystem<dim,spacedim>::initialize_quad_dof_index_permutation ()
   Assert (this->adjust_line_dof_index_for_line_orientation_table.size()==
 	  this->dofs_per_line, ExcInternalError());
   index = 0;
-  for (unsigned int b=0; b<n_base_elements();++b)
+  for (unsigned int b=0; b<this->n_base_elements();++b)
     {
       const std::vector<int> &temp2
 	= this->base_element(b).adjust_line_dof_index_for_line_orientation_table;
-      for (unsigned int c=0; c<element_multiplicity(b); ++c)
+      for (unsigned int c=0; c<this->element_multiplicity(b); ++c)
 	{
 	  std::copy(temp2.begin(), temp2.end(),
 		    this->adjust_line_dof_index_for_line_orientation_table.begin()
@@ -2146,7 +2162,7 @@ bool
 FESystem<dim,spacedim>::
 hp_constraints_are_implemented () const
 {
-  for (unsigned int b=0; b<n_base_elements(); ++b)
+  for (unsigned int b=0; b<this->n_base_elements(); ++b)
     if (base_element(b).hp_constraints_are_implemented() == false)
       return false;
 
@@ -2247,7 +2263,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 				       // or if have to move on to the
 				       // next base element
       ++multiplicity;
-      if (multiplicity == element_multiplicity(base_index))
+      if (multiplicity == this->element_multiplicity(base_index))
 	{
 	  multiplicity = 0;
 	  ++base_index;
@@ -2264,7 +2280,7 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 				       // of the present element. if so,
 				       // we should have reached the end
 				       // of the other one as well
-      if (base_index == n_base_elements())
+      if (base_index == this->n_base_elements())
 	{
 	  Assert (base_index_other == fe_other_system->n_base_elements(),
 		  ExcInternalError());
@@ -2376,7 +2392,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
 				       // or if have to move on to the
 				       // next base element
       ++multiplicity;
-      if (multiplicity == element_multiplicity(base_index))
+      if (multiplicity == this->element_multiplicity(base_index))
 	{
 	  multiplicity = 0;
 	  ++base_index;
@@ -2393,7 +2409,7 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
 				       // of the present element. if so,
 				       // we should have reached the end
 				       // of the other one as well
-      if (base_index == n_base_elements())
+      if (base_index == this->n_base_elements())
 	{
 	  Assert (base_index_other == fe_other_system->n_base_elements(),
 		  ExcInternalError());
@@ -2500,7 +2516,7 @@ FESystem<dim,spacedim>::hp_object_dof_identities (const FiniteElement<dim,spaced
 					   // or if have to move on to the
 					   // next base element
 	  ++multiplicity;
-	  if (multiplicity == element_multiplicity(base_index))
+	  if (multiplicity == this->element_multiplicity(base_index))
 	    {
 	      multiplicity = 0;
 	      ++base_index;
@@ -2517,7 +2533,7 @@ FESystem<dim,spacedim>::hp_object_dof_identities (const FiniteElement<dim,spaced
 					   // of the present element. if so,
 					   // we should have reached the end
 					   // of the other one as well
-	  if (base_index == n_base_elements())
+	  if (base_index == this->n_base_elements())
 	    {
 	      Assert (base_index_other == fe_other_system->n_base_elements(),
 		      ExcInternalError());
@@ -3367,26 +3383,6 @@ FESystem<dim,spacedim>::base_element (const unsigned int index) const
   Assert (index < base_elements.size(),
 	  ExcIndexRange(index, 0, base_elements.size()));
   return *base_elements[index].first;
-}
-
-
-
-template <int dim, int spacedim>
-unsigned int
-FESystem<dim,spacedim>::n_base_elements () const
-{
-  return base_elements.size();
-}
-
-
-
-template <int dim, int spacedim>
-unsigned int
-FESystem<dim,spacedim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index < base_elements.size(),
-	  ExcIndexRange(index, 0, base_elements.size()));
-  return base_elements[index].second;
 }
 
 

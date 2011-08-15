@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -180,34 +180,6 @@ class FE_DGPNonparametric : public FiniteElement<dim,spacedim>
 				      * constructor.
 				      */
     unsigned int get_degree () const;
-
-				     /**
-				      * Number of base elements in a
-				      * mixed discretization. Since
-				      * this is a scalar element,
-				      * return one.
-				      */
-    virtual unsigned int n_base_elements () const;
-    
-				     /**
-				      * Access to base element
-				      * objects. Since this element is
-				      * scalar, <tt>base_element(0)</tt> is
-				      * @p this, and all other
-				      * indices throw an error.
-				      */
-    virtual const FiniteElement<dim,spacedim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * Multiplicity of base element
-                                      * @p index. Since this is a
-                                      * scalar element,
-                                      * <tt>element_multiplicity(0)</tt>
-                                      * returns one, and all other
-                                      * indices will throw an error.
-                                      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
     
 				     /**
 				      * Return the matrix

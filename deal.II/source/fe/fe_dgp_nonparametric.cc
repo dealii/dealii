@@ -414,35 +414,6 @@ FE_DGPNonparametric<dim,spacedim>::fill_fe_subface_values (
 
 
 template <int dim, int spacedim>
-unsigned int
-FE_DGPNonparametric<dim,spacedim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <int dim, int spacedim>
-const FiniteElement<dim,spacedim> &
-FE_DGPNonparametric<dim,spacedim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <int dim, int spacedim>
-unsigned int
-FE_DGPNonparametric<dim,spacedim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
-
-
-
-template <int dim, int spacedim>
 void
 FE_DGPNonparametric<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,

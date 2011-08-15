@@ -105,41 +105,7 @@ class FE_Nothing : public FiniteElement<dim>
     virtual
     std::string
     get_name() const;
-
-                                     /**
-                                      * Number of base elements in a
-                                      * mixed discretization. In this case
-                                      * we only have one.
-                                      */
-    virtual
-    unsigned int
-    n_base_elements () const;
     
-                                     /**
-                                      * Access to base element
-                                      * objects. Since the element is
-                                      * scalar, then
-                                      * <code>base_element(0)</code> is
-                                      * @p this.
-                                      */
-    virtual
-    const FiniteElement<dim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * This index denotes how often
-                                      * the base element @p index is
-                                      * used in a composed element. If
-                                      * the element is scalar, then
-                                      * the result is always equal to
-                                      * one. See the documentation for
-                                      * the n_base_elements()
-                                      * function for more details.
-                                      */
-    virtual
-    unsigned int
-    element_multiplicity (const unsigned int index) const;
-
                                      /**
                                       * Determine the values a finite
                                       * element should compute on

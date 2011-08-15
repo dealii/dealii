@@ -424,26 +424,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual void
     get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>           &matrix) const;
-
-                                     /**
-				      * Number of different base
-				      * elements of this object.
-				      *
-				      * Since these objects can have
-				      * multiplicity and subobjects
-				      * themselves, this may be
-				      * smaller than the total number
-				      * of finite elements composed
-				      * into this structure.
-				      */
-    virtual unsigned int n_base_elements () const;
-
-				     /**
-				      * How often is a composing
-				      * element used.
-				      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
-
+    
 				     /**
 				      * Access to a composing
 				      * element. The index needs to be

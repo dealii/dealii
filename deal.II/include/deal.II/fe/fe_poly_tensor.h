@@ -162,36 +162,7 @@ class FE_PolyTensor : public FiniteElement<dim,spacedim>
     virtual Tensor<2,dim> shape_grad_grad_component (const unsigned int i,
 						     const Point<dim> &p,
 						     const unsigned int component) const;
-
-                                     /**
-				      * Number of base elements in a
-				      * mixed discretization. Since
-				      * this is not a composed element,
-				      * return one.
-				      */
-    virtual unsigned int n_base_elements () const;
     
-				     /**
-				      * Access to base element
-				      * objects. Since this element is
-				      * not composed of several elements,
-				      * <tt>base_element(0)</tt> is
-				      * <tt>this</tt>, and all other
-				      * indices throw an error.
-				      */
-    virtual const FiniteElement<dim,spacedim> &
-    base_element (const unsigned int index) const;
-
-                                     /**
-                                      * Multiplicity of base element
-                                      * <tt>index</tt>. Since this is
-                                      * not a composed element,
-                                      * <tt>element_multiplicity(0)</tt>
-                                      * returns one, and all other
-                                      * indices will throw an error.
-                                      */
-    virtual unsigned int element_multiplicity (const unsigned int index) const;
-
 				     /**
 				      * Given <tt>flags</tt>,
 				      * determines the values which

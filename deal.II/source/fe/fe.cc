@@ -204,7 +204,7 @@ FiniteElement<dim,spacedim>::FiniteElement (
 				   // Fill with default value; may be
 				   // changed by constructor of
 				   // derived class.
-  first_block_of_base_table.resize(1,0);
+  base_to_block_indices.reinit(1,1);
 
 				   // initialize the restriction and
 				   // prolongation matrices. the default
@@ -1150,6 +1150,9 @@ const FiniteElement<dim,spacedim>&
 FiniteElement<dim,spacedim>::base_element(const unsigned index) const
 {
   Assert (index==0, ExcIndexRange(index,0,1));
+				   // This function should not be
+				   // called for a system element
+  Assert (base_to_block_indices.size() == 1, ExcInternalError());
   return *this;
 }
 

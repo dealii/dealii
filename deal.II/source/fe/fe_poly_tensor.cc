@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -967,34 +967,6 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
     this->compute_2nd (mapping, cell, offset, mapping_data, fe_data, data);
 }
 
-
-
-template <class POLY, int dim, int spacedim>
-unsigned int
-FE_PolyTensor<POLY,dim,spacedim>::n_base_elements () const
-{
-  return 1;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-const FiniteElement<dim,spacedim> &
-FE_PolyTensor<POLY,dim,spacedim>::base_element (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return *this;
-}
-
-
-
-template <class POLY, int dim, int spacedim>
-unsigned int
-FE_PolyTensor<POLY,dim,spacedim>::element_multiplicity (const unsigned int index) const
-{
-  Assert (index==0, ExcIndexRange(index, 0, 1));
-  return 1;
-}
 
 
 template <class POLY, int dim, int spacedim>

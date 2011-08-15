@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1421,32 +1421,31 @@ class FiniteElement : public Subscriptor,
 				      * element is equal to the
 				      * multiplicity.
 				      */
-    virtual unsigned int n_base_elements () const = 0;
+    unsigned int n_base_elements () const;
 
 				     /**
 				      * Access to base element
 				      * objects. If the element is
-				      * scalar, then
+				      * atomic, then
 				      * <code>base_element(0)</code> is
 				      * @p this.
 				      */
     virtual
     const FiniteElement<dim,spacedim> &
-    base_element (const unsigned int index) const = 0;
+    base_element (const unsigned int index) const;
 
                                      /**
                                       * This index denotes how often
                                       * the base element @p index is
                                       * used in a composed element. If
-                                      * the element is scalar, then
+                                      * the element is atomic, then
                                       * the result is always equal to
                                       * one. See the documentation for
                                       * the n_base_elements()
                                       * function for more details.
                                       */
-    virtual
     unsigned int
-    element_multiplicity (const unsigned int index) const = 0;
+    element_multiplicity (const unsigned int index) const;
     
                                      /**
                                       * Return for shape function
@@ -2344,10 +2343,11 @@ class FiniteElement : public Subscriptor,
 
 				     /**
 				      * For each base element, store
-				      * the first block in a block
+				      * the number of blocks generated
+				      * by the base and the first block in a block
 				      * vector it will generate.
 				      */
-    std::vector<unsigned int> first_block_of_base_table;
+    BlockIndices base_to_block_indices;
     
 				     /**
 				      * The base element establishing
@@ -2651,6 +2651,26 @@ FiniteElement<dim,spacedim>::system_to_component_index (const unsigned int index
 template <int dim, int spacedim>  
 inline
 unsigned int
+FiniteElement<dim,spacedim>::n_base_elements () const
+{
+  return base_to_block_indices.size();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+unsigned int
+FiniteElement<dim,spacedim>::element_multiplicity (const unsigned int index) const
+{
+  return base_to_block_indices.block_size(index);
+}
+
+
+
+template <int dim, int spacedim>  
+inline
+unsigned int
 FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int component,
                                                    const unsigned int index) const
 {
@@ -2723,10 +2743,7 @@ inline
 unsigned int
 FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) const
 {
-  Assert(index < first_block_of_base_table.size(),
-	 ExcIndexRange(index, 0, first_block_of_base_table.size()));
-
-  return first_block_of_base_table[index];
+  return base_to_block_indices.block_start(index);
 }
 
 
@@ -2749,15 +2766,7 @@ inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) const
 {
-  Assert(index < this->n_blocks(),
-	 ExcIndexRange(index, 0, this->n_blocks()));
-  
-  for (int i=first_block_of_base_table.size()-1; i>=0; --i)
-    if (first_block_of_base_table[i] <= index)
-      return std::pair<unsigned int, unsigned int>(static_cast<unsigned int> (i),
-						   index - first_block_of_base_table[i]);
-  return std::make_pair(numbers::invalid_unsigned_int,
-			numbers::invalid_unsigned_int);
+  return base_to_block_indices.global_to_local(index);
 }
 
 
