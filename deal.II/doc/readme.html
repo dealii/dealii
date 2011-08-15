@@ -205,38 +205,50 @@
     <a name="installation"></a>
     <h2>Installation</h2>
 
-    <p>
+    <h3>Unpacking</h3>
     The whole library usually comes as a .tar.gz file, that is a
-    tarred file archive which is compressed with gzip. After unpacking
-    it with gunzip and tar (or <tt>tar xzf</tt> if you use GNU tar), you will
-    find several subdirectories. First run the script
-    <pre><code>
-         ./configure
-    </code></pre>
-    in the top-level directory,
-    which sets some paths and finds out what compiler you
-    use. ./configure supports several flags which are discussed
+    tarred file archive which is compressed with gzip. After downloading this
+    tar file, please unpack it at the position where you want to install the
+    deal.II library using either
+    <pre>
+      gunzip deal.II-X.Y.Z.tar.gz
+      tar xf deal.II-X.Y.Z.tar
+    </pre>
+    or, if you have GNU tar with
+    <pre>
+      tar xzf deal.II-X.Y.Z.tar.gz
+    </pre>
+    Unpacking will create a subdirectory <tt>deal.II</tt> with
+    the whole library wherever you do it).
+
+    <h3>Configuration</h3>
+    Unpacking will create a subdirectory <tt>deal.II</tt>. First run
+    <pre>
+      cd deal.II
+      ./configure
+    </pre>
+    to set some paths and find out your system parameters. <tt>configure</tt>
+    supports several flags which are discussed
     further down <a href="#configuration-options">below</a>.
     </p>
 
     <p>
-    The most important result of <code>./configure</code> is the
-    creation of the files <code>common/Make.global_options</code> and
-    <code>include/deal.II/base/config.h</code>. The first
-    file contains compiler options, paths, etc which you may want to
-    use in the <a href="development/index.html" target="_top">Makefiles
-    of your own projects</a>. More
-    information about Makefiles can also be found in the section on
-    <a href="development/index.html" target="_top">development</a>.
-    The second generated file contains preprocessor
-    definitions that can be used to conditionalize pieces of the source code.
+    <code>./configure</code> creates the
+    file <code>deal.II/common/Make.global_options</code>,
+    which remembers paths and configuration options. Please note that it is not
+    possible to move the library directory after configuration. Neither will
+    the library compile, nor will your application programs be able to use it.
+    You can
+    use <code>deal.II/common/Make.global_options</code> in the
+    <a href="development/index.html" target="_top">Makefiles
+    of your own projects</a> to set relevant paths and parameters correctly.
     </p>
 
-    <p>
-    After configuring, type `make', to obtain the following help (this
+    <h3>Building the library</h3>
+    After configuring, type <tt>make<tt>, to obtain the following help (this
     output may change slightly over time, just try it):
 
-    <pre><code>
+    <pre>
     ========================================================================
     =              Global Makefile for the deal.II libraries               =
     ========================================================================
@@ -255,7 +267,7 @@
     =    clean      : removes all object files in subdirs                  =
     =    distclean  : removes all object files, libraries, etc in subdirs  =
     ========================================================================
-    </code></pre>
+    </pre>
 
     <p>
       To execute one of the commands, type for example <code>make
@@ -311,7 +323,7 @@
     </p>
 
     <p>
-    Apart from the libraries, you should generate the full set of
+    Apart from the libraries, you can generate the full set of
     documentation files, by typing <code>make online-doc</code>; this takes
     some minutes but you will
     have (almost) all the documentation locally on your computer. You
