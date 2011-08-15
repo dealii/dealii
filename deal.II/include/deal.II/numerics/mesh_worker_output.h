@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <deal.II/numerics/mesh_worker_info.h>
 #include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
+#include <base/utilities.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/base/mg_level_object.h>
 
@@ -46,15 +47,22 @@ namespace MeshWorker
 					 /**
 					  * Initialize for writing
 					  * <i>n</i> data vectors. The
+					  * number of points is the
+					  * number of quadrature
+					  * points in a single
+					  * direction in a tensor
+					  * product formula. It must
+					  * match the number in the
+					  * actual Quadrature used to
+					  * create the patches. The
 					  * total number of data
 					  * vectors produced is n+dim
 					  * and the first dim will be
 					  * the space coordinates of
 					  * the points.
 					  */
-	void initialize (const unsigned int dim, 
-			 const unsigned int n_vectors, 
-		         const unsigned int n_points);
+	void initialize (const unsigned int n_points,
+			 const unsigned int n_vectors);
 
 					 /**
 					  * Set the stream #os to
@@ -72,19 +80,14 @@ namespace MeshWorker
 					  * object used later for
 					  * assembling.
 					  *
-					  * The second parameter is
-					  * used to distinguish
-					  * between the data used on
-					  * cells and boundary faces
-					  * on the one hand and
-					  * interior faces on the
-					  * other. Interior faces may
-					  * require additional data
-					  * being initialized.
+					  * The info object refers to
+					  * a cell if
+					  * <code>!face</code>, or
+					  * else to an interior or
+					  * boundary face.
 					  */
 	template <int dim>
-	void initialize_info(DoFInfo<dim>& info,
-			     bool interior_face);
+	void initialize_info(DoFInfo<dim>& info, bool face);
 
 					 /**
 					  * Assemble the local values
@@ -121,7 +124,6 @@ namespace MeshWorker
 					  */
         void write_endl () const;
 
-	unsigned int patch_dimension;
 	unsigned int n_vectors;
 	unsigned int n_points;
 
@@ -162,11 +164,9 @@ namespace MeshWorker
 
 
     inline void
-    GnuplotPatch::initialize (const unsigned int dim,
-			      const unsigned int np,
+    GnuplotPatch::initialize (const unsigned int np,
 			      const unsigned int nv)
     {
-      patch_dimension = dim;
       n_vectors = nv;
       n_points = np;
     }
@@ -181,10 +181,12 @@ namespace MeshWorker
 
     template <int dim>
     inline void
-    GnuplotPatch::initialize_info(DoFInfo<dim>& info, bool)
+    GnuplotPatch::initialize_info(DoFInfo<dim>& info, bool face)
     {
-      AssertDimension(patch_dimension,dim);
-      info.initialize_quadrature(n_points, n_vectors);
+      if (face)
+	info.initialize_quadrature(Utilities::fixed_power<dim-1>(n_points), n_vectors+dim);
+      else
+	info.initialize_quadrature(Utilities::fixed_power<dim>(n_points), n_vectors+dim);
     }
 
 
@@ -192,31 +194,40 @@ namespace MeshWorker
     inline void
     GnuplotPatch::assemble(const DoFInfo<dim>& info)
     {
-      const unsigned int n_q_points = info.n_quadrature_points();
+      const unsigned int np = info.n_quadrature_points();
       const unsigned int nv = info.n_quadrature_values();
-      const unsigned int square_root = static_cast<unsigned int>(std::pow(n_q_points, 1./dim)+.5);
-      for (unsigned int k1=0; k1<square_root; ++k1)
-      {
-        for (unsigned int k2=0; k2<square_root; ++k2)
-        {
-          for(unsigned int i=0; i<nv; ++i)
-          {
-            write(info.quadrature_value(k1*square_root+k2,i));
-            write('\t');
-          }
-          write_endl();
-        }
-        write_endl();
-      }
-      write_endl();
+      const unsigned int patch_dim = (info.face_number == numbers::invalid_unsigned_int)
+				     ? dim : (dim-1);
+      const unsigned int row_length = static_cast<unsigned int>(std::pow(np, 1./patch_dim)+.5);
+      
+				       // If patches are 1D, end the
+				       // patch after a row, else and
+				       // it after a square
+      const unsigned int row_length2 = (patch_dim==1) ? row_length : (row_length*row_length);
+      
+      for (unsigned int k=0; k<np; ++k)
+	{
+	  if (k % row_length == 0)
+	    write_endl();
+	  if (k % row_length2 == 0)
+	    write_endl();
+	  
+	    for(unsigned int i=0; i<nv; ++i)
+	      {
+		write(info.quadrature_value(k,i));
+		write('\t');
+	      }
+	  write_endl();
+	}
     }
 
 
     template <int dim>
     inline void
-    GnuplotPatch::assemble(const DoFInfo<dim>& /*info1*/, const DoFInfo<dim>& /*info2*/)
+    GnuplotPatch::assemble(const DoFInfo<dim>& info1, const DoFInfo<dim>& info2)
     {
-      Assert(false, ExcNotImplemented());
+      assemble(info1);
+      assemble(info2);
     }
   }
 }
