@@ -5,7 +5,119 @@
 This is the first example where we actually use finite elements to compute
 something. We 
 will solve a simple version of Poisson's equation with zero boundary
-values, but a nonzero right hand side (here equal to the constant one).
+values, but a nonzero right hand side:
+@f{align*}
+  -\Delta u &= 1 \qquad\qquad & \text{in}\ \Omega,
+  \\
+  u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
+@f}
+We will solve this equation on the unit square, $\Omega=[0,1]^2$, for which
+you've already learned how to generate a mesh in step-1 and step-2.
+
+If you've learned about the basics of the finite element method, you will
+remember the steps we need to take to approximate the solution $u$ by a finite
+dimensional approximation. Specifically, we first need to derive the weak form
+of the equation above, which we obtain by multiplying the equation by a test
+function $\varphi$ <i>from the left</i> (we will come back to the reason for
+multiplying from the left and not from the right below) and integrating over
+the domain $\Omega$:
+@f{align*}
+  -\int_\Omega \varphi \Delta u = \int_\Omega \varphi f.
+@f}
+This can be integrated by parts:
+@f{align*}
+  \int_\Omega \nabla\varphi \cdot \nabla u
+  -
+  \int_{\partial\Omega} \varphi \mathbf{n}\cdot \nabla u
+   = \int_\Omega \varphi f.
+@f}
+The test function $\varphi$ has to satisfy the same kind of boundary
+conditions (in mathematical terms: it needs to come from the tangent space of
+the set in which we seek the solution), so on the boundary $\varphi=0$ and
+consequently the weak form we are looking for reads
+@f{align*}
+  (\nabla\varphi, \nabla u)
+   = (\varphi, f),
+@f}
+where we have used the common notation $(a,b)=\int_\Omega a\; b$. The problem
+then asks for a function $u$ for which this statement is true for all test
+functions $\varphi$ from the appropriate space (which here is the space
+$H^1$).
+
+Of course we can't find such a function on a computer in the general case, and
+instead we seek an approximation $u_h(\mathbf x)=\sum_j U_j \varphi_j(\mathbf
+x)$, where the $U_j$ are unknown expansion coefficients we need to determine
+(the "degrees of freedom" of this problem), and $\varphi_i(\mathbf x)$ are the
+finite element shape functions we will use. To define these shape functions,
+we need the following:
+
+- A mesh on which to define shape functions. You have already seen how to
+  generate and manipulate the objects that describe meshes in step-1 and
+  step-2.
+- A finite element that describes the shape functions we want to use on the
+  reference cell (which in deal.II is always the unit interval $[0,1]$, the
+  unit square $[0,1]^2$ or the unit cube $[0,1]^3$, depending on which space
+  dimension you work in. In step-2, we had already used an object of type
+  FE_Q<2>, which denotes the usual Lagrange elements that define shape
+  functions by interpolation on support points. The simplest one is
+  FE_Q<2>(1), which uses polynomial degree 1. In 2d, these are often referred
+  to as <i>bilinear</i>, since they are linear in each of the two coordinates
+  of the reference cell. (In 1d, they would be <i>linear</i> and in 3d
+  <i>tri-linear</i>; however, in the deal.II documentation, we will frequently
+  not make this distinction and simply always call these functions "linear".)
+- A DoFHandler object that enumerates all the degrees of freedom on the mesh,
+  taking the reference cell description the finite element object provides as
+  the basis. You've also already seen how to do this in step-2.
+- A mapping that tells how the shape functions on the real cell are obtained
+  from the shape functions defined by the finite element class on the
+  reference cell. By default, unless you explicitly say otherwise, deal.II
+  will use a (bi-, tri-)linear mapping for this, so in most cases you don't
+  have to worry about this step.
+
+Through these steps, we now have a set of functions $\varphi_i$, and we can
+define the weak form of the discrete problem: Find a function $u_h$, i.e. find
+the expansion coefficients $U_i$ mentioned above, so that
+@f{align*}
+  (\nabla\varphi_i, \nabla u_h)
+   = (\varphi_i, f),
+   \qquad\qquad
+   i=0\ldots N-1.
+@f}
+Note that we here follow the convention that everything is counted starting at
+zero, as common in C and C++. This equation can be rewritten as a linear
+system by inserting the representation $u_h(\mathbf x)=\sum_j U_j
+\varphi_j(\mathbf x)$: Find a vector $U$ so that
+@f{align*}
+  A U = F
+@f}
+where the matrix $A$ and the right hand side $F$ are defined as
+@f{align*}
+  A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j)
+  \\
+  F_i &= (\varphi_i, f).
+@f}
+Before we move on with describing how these quantities can be computed, note
+that if we had multiplied the original equation from the <i>right</i> by a
+test function rather than from the left, then we would have obtained a linear
+system of the form
+@f{align*}
+  U^T A = F
+@f}
+with a row vector $F$. By transposing this system, this is of course
+equivalent to solving
+@f{align*}
+  A^T U = F
+@f}
+which here is the same as above since $A=A^T$ but in general is not. To avoid
+any sort of confusion, experience has shown that simply getting into the habit
+of multiplying the equation from the left rather than from the right (as is
+often done in the mathematical literature) avoids a common class of errors as
+the matrix is automatically correct and does not need to be transposed when
+comparing theory and implementation.
+
+
+<h3>About the implementation</h3>
+
 This example shows the basic structure of most finite
 element programs, which are along the following lines:
 <ul>
@@ -14,3 +126,6 @@ element programs, which are along the following lines:
   <li> Solving the linear system of equations;
   <li> Writing results to disk.
 </ul>
+
+
+
