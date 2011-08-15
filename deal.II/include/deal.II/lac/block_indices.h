@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/logstream.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -210,9 +211,9 @@ class BlockIndices : public Subscriptor
  * @author Guido Kanschat
  * @date 2011 
  */
-template <class STREAM>
-STREAM&
-operator << (STREAM& s, const BlockIndices& bi)
+inline
+LogStream&
+operator << (LogStream& s, const BlockIndices& bi)
 {
   const unsigned int n = bi.size();
   s << n << ":[";
