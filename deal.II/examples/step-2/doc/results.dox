@@ -1,7 +1,10 @@
 <h1>Results</h1>
 
 The program has, after having been run, produced two sparsity
-patterns. We can visualize them using GNUPLOT:
+patterns. We can visualize them using <a
+href="http://www.gnuplot.info/">GNUPLOT</a> (one of the simpler visualization
+programs; maybe not the easiest to use since it is command line driven, but
+also universally available on all linux and other unix-like systems):
 @code
 examples/step-2> gnuplot
 
@@ -26,12 +29,12 @@ gnuplot> set style data points
 gnuplot> plot "sparsity_pattern.1"
 @endcode
 
-The results then look like this (every cross denotes an entry which
+The results then look like this (every point denotes an entry which
 might be nonzero; of course the fact whether the entry actually is
 zero or not depends on the equation under consideration, but the
 indicated positions in the matrix tell us which shape functions can
-and which can't couple, if the equation is a local, i.e. differential
-one):
+and which can't couple when discretizing a local, i.e. differential,
+equation):
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -44,7 +47,8 @@ one):
   </tr>
 </table>
 
-The different regions in the left picture represent the degrees of
+The different regions in the left picture, indicated by kinks in the lines and
+single dots on the left and top, represent the degrees of
 freedom on the different refinement levels of the triangulation.  As
 can be seen in the right picture, the sparsity pattern is much better
 clustered around the main diagonal of the matrix after
@@ -70,4 +74,5 @@ diagonal), though the ratio of bandwidth to size typically shrinks,
 i.e. the matrix clusters more around the diagonal.
 
 Another idea of experiments would be to try other renumbering
-strategies than Cuthill-McKee from the DoFRenumbering namespace.
+strategies than Cuthill-McKee from the DoFRenumbering namespace and see how
+they affect the sparsity pattern.
