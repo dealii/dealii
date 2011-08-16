@@ -892,7 +892,7 @@ Tensor<1,dim,Number>::Tensor (const bool initialize)
 				// Tensor::operator=(scalar) when using
 				// something like
 				// Tensor<1,dim,Tensor<1,dim,Number> >.
-    for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int i=0; i!=dim; ++i)
       values[i] = Number(0);
 }
 

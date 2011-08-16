@@ -945,10 +945,11 @@ namespace internal
       		    ExcDimensionMismatch(JxW_values.size(), n_q_points));
 
 					   // map the unit tangentials to the
-					   // real cell (use int for loop to
-					   // avoid compiler warning that
-					   // unsigned int < 0 is always false)
-	  for (int d=0; d<dim-1; ++d)
+					   // real cell. checking for d!=dim-1
+					   // eliminates compiler warnings
+					   // regarding unsigned expressions <
+					   // 0.
+	  for (unsigned int d=0; d!=dim-1; ++d)
 	    {
 	      Assert (face_no+GeometryInfo<dim>::faces_per_cell*d <
 		      data.unit_tangentials.size(),
