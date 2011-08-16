@@ -87,6 +87,8 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 </ol>
 
 
+<-- ----------- GENERAL IMPROVEMENTS ----------------- -->
+
 <a name="general"></a>
 <h3>General</h3>
 
@@ -256,6 +258,7 @@ and DoF handlers embedded in higher dimensional space have been added.
 </ol>
 
 
+<-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
 <a name="specific"></a>
 <h3>Specific improvements</h3>
