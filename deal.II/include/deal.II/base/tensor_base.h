@@ -887,8 +887,13 @@ inline
 Tensor<1,dim,Number>::Tensor (const bool initialize)
 {
   if (initialize)
-    for (unsigned int i=0; i!=dim; ++i)
-      values[i] = 0;
+				// need to create an object Number(0) to
+				// initialize to zero to avoid confusion with
+				// Tensor::operator=(scalar) when using
+				// something like
+				// Tensor<1,dim,Tensor<1,dim,Number> >.
+    for (unsigned int i=0; i<dim; ++i)
+      values[i] = Number(0);
 }
 
 
