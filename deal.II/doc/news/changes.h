@@ -335,7 +335,7 @@ for objects of type hp::DoFHandler.
 <br>
 (Christian Goll, Wolfgang Bangerth 2011/07/06)
 
-<li> Fixed: Under some circumstances, the Threads::Thread::join() could only be
+<li> Fixed: Under some circumstances, Threads::Thread::join() could only be
 called once and would generate a system exception when called a second time.
 Since it is often useful to not track whether this function had already been
 called, this is now worked around in such a way that one can always call
