@@ -108,10 +108,6 @@ $(example-toc):
 	@echo "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>" >> $@
 	@echo "</ol> </td> </tr> </table>" >> $@
 
-# To revert, enter those lines before the last
-#	@cat generated/$(call get_basename, $@)_toc.plain >> $@
-
-
 $(example-dox-prog):
 	@echo ================== Making $@
 	@cat $D/examples/$(call get_basename, $@)/*.cc \
