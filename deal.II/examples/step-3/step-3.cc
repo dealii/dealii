@@ -126,9 +126,11 @@ class Step3
 
 				     // Then there are the member functions
 				     // that mostly do what their names
-				     // suggest. Since they do not need to be
-				     // called from outside, they are made
-				     // private to this class.
+				     // suggest and whose have been discussed
+				     // in the introduction already. Since
+				     // they do not need to be called from
+				     // outside, they are made private to this
+				     // class.
 
   private:
     void make_grid ();
@@ -185,7 +187,8 @@ class Step3
 				 // the other member variables of the
 				 // Step3 class have a default
 				 // constructor which does all we want.
-Step3::Step3 () :
+Step3::Step3 ()
+		:
                 fe (1),
 		dof_handler (triangulation)
 {}
@@ -212,7 +215,7 @@ void Step3::make_grid ()
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (0);
 				   // Unsure that 1024 is the correct number?
-				   // Let's see: n_active_cells return the
+				   // Let's see: n_active_cells returns the
 				   // number of active cells:
   std::cout << "Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -238,19 +241,19 @@ void Step3::make_grid ()
 
                                  // @sect4{Step3::setup_system}
 
-				   // Next we enumerate all the degrees of
-				   // freedom and set up matrix and
-				   // vector objects to hold the
-				   // system data. Enumerating is done by using
-				   // DoFHandler::distribute_dofs(), as we have
-				   // seen in the step-2 example. Since we use
-				   // the FE_Q class with a polynomial
-				   // degree of 1, i.e. bilinear elements,
-				   // this associates one degree of freedom
-				   // with each vertex. While we're at
-				   // generating output, let us also take a
-				   // look at how many degrees of freedom are
-				   // generated:
+				 // Next we enumerate all the degrees of
+				 // freedom and set up matrix and vector
+				 // objects to hold the system
+				 // data. Enumerating is done by using
+				 // DoFHandler::distribute_dofs(), as we have
+				 // seen in the step-2 example. Since we use
+				 // the FE_Q class and have set the polynomial
+				 // degree to 1 in the constructor,
+				 // i.e. bilinear elements, this associates
+				 // one degree of freedom with each
+				 // vertex. While we're at generating output,
+				 // let us also take a look at how many
+				 // degrees of freedom are generated:
 void Step3::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
@@ -263,40 +266,36 @@ void Step3::setup_system ()
 				   // should be 33 times 33, or 1089.
 
 				   // As we have seen in the previous example,
-				   // we set up a sparsity pattern for the
-				   // system matrix and tag those entries that
-				   // might be nonzero.
+				   // we set up a sparsity pattern by first
+				   // creating a temporary structure, tagging
+				   // those entries that might be nonzero, and
+				   // then copying the data over to the
+				   // SparsityPattern object that can then be
+				   // used by the system matrix.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
   sparsity_pattern.copy_from(c_sparsity);
 
-				   // Now the sparsity pattern is
-				   // built, you
-				   // can't add nonzero entries
-				   // anymore. The sparsity pattern is
-				   // `sealed', so to say, and we can
-				   // initialize the matrix itself
-				   // with it. Note that the
+				   // Note that the
 				   // SparsityPattern object does
 				   // not hold the values of the
 				   // matrix, it only stores the
 				   // places where entries are. The
-				   // entries are themselves stored in
+				   // entries themselves are stored in
 				   // objects of type SparseMatrix, of
 				   // which our variable system_matrix
 				   // is one.
 				   //
-				   // The distinction between sparsity
-				   // pattern and matrix was made to
-				   // allow several matrices to use
-				   // the same sparsity pattern. This
-				   // may not seem relevant, but when
-				   // you consider the size which
-				   // matrices can have, and that it
-				   // may take some time to build the
-				   // sparsity pattern, this becomes
-				   // important in large-scale
-				   // problems.
+				   // The distinction between sparsity pattern
+				   // and matrix was made to allow several
+				   // matrices to use the same sparsity
+				   // pattern. This may not seem relevant
+				   // here, but when you consider the size
+				   // which matrices can have, and that it may
+				   // take some time to build the sparsity
+				   // pattern, this becomes important in
+				   // large-scale problems if you have to
+				   // store several matrices in your program.
   system_matrix.reinit (sparsity_pattern);
 
 				   // The last thing to do in this
@@ -311,26 +310,25 @@ void Step3::setup_system ()
                                  // @sect4{Step3::assemble_system}
 
 
-				 // Now comes the difficult part:
-				 // assembling matrices and
-				 // vectors. In fact, this is not
-				 // overly difficult, but it is
-				 // something that the library can't
-				 // do for you as for most of the
-				 // other things in the functions
-				 // above and below.
+				 // The next step is to compute the entries of
+				 // the matrix and right hand side that form
+				 // the linear system from which we compute
+				 // the solution. This is the central function
+				 // of each finite element program and we have
+				 // discussed the primary steps in the
+				 // introduction already.
 				 //
-				 // The general way to assemble matrices and
-				 // vectors is to loop over all cells, and on
-				 // each cell compute the contribution of that
-				 // cell to the global matrix and right hand
-				 // side by quadrature. The point to realize
-				 // now is that we need the values of the
-				 // shape functions at the locations of
+				 // The general approach to assemble matrices
+				 // and vectors is to loop over all cells, and
+				 // on each cell compute the contribution of
+				 // that cell to the global matrix and right
+				 // hand side by quadrature. The point to
+				 // realize now is that we need the values of
+				 // the shape functions at the locations of
 				 // quadrature points on the real
 				 // cell. However, both the finite element
 				 // shape functions as well as the quadrature
-				 // points are only defined on the unit
+				 // points are only defined on the reference
 				 // cell. They are therefore of little help to
 				 // us, and we will in fact hardly ever query
 				 // information about finite element shape
@@ -338,17 +336,18 @@ void Step3::setup_system ()
 				 // objects directly.
 				 //
 				 // Rather, what is required is a way to map
-				 // this data from the unit cell to the real
-				 // cell. Classes that can do that are derived
-				 // from the Mapping class, though one again
-				 // often does not have to deal with them
-				 // directly: many functions in the library
-				 // can take a mapping object as argument, but
-				 // when it is omitted they simply resort to
-				 // the standard bilinear Q1 mapping. We will
-				 // go this route, and not bother with it for
-				 // the moment (we come back to this in
-				 // step-10, step-11, and step-12).
+				 // this data from the reference cell to the
+				 // real cell. Classes that can do that are
+				 // derived from the Mapping class, though one
+				 // again often does not have to deal with
+				 // them directly: many functions in the
+				 // library can take a mapping object as
+				 // argument, but when it is omitted they
+				 // simply resort to the standard bilinear Q1
+				 // mapping. We will go this route, and not
+				 // bother with it for the moment (we come
+				 // back to this in step-10, step-11, and
+				 // step-12).
 				 //
 				 // So what we now have is a collection of
 				 // three classes to deal with: finite
@@ -356,12 +355,13 @@ void Step3::setup_system ()
 				 // objects. That's too much, so there is one
 				 // type of class that orchestrates
 				 // information exchange between these three:
-				 // the FEValues class. If given one
-				 // instance of each three of these objects,
-				 // it will be able to provide you with
-				 // information about values and gradients of
-				 // shape functions at quadrature points on a
-				 // real cell.
+				 // the FEValues class. If given one instance
+				 // of each three of these objects (or two,
+				 // and an implicit linear mapping), it will
+				 // be able to provide you with information
+				 // about values and gradients of shape
+				 // functions at quadrature points on a real
+				 // cell.
                                  //
                                  // Using all this, we will assemble the
                                  // linear system for this problem in the
@@ -392,17 +392,17 @@ void Step3::assemble_system ()
 				   // what we want it to compute on each cell:
 				   // we need the values of the shape
 				   // functions at the quadrature points (for
-				   // the right hand side (f,phi)), their
-				   // gradients (for the matrix entries (grad
-				   // phi_i, grad phi_j)), and also the
+				   // the right hand side $(\varphi,f)$), their
+				   // gradients (for the matrix entries $(\nabla
+				   // \varphi_i, \nabla \varphi_j)$), and also the
 				   // weights of the quadrature points and the
 				   // determinants of the Jacobian
-				   // transformations from the unit cell to
-				   // the real cells.
+				   // transformations from the reference cell
+				   // to the real cells.
 				   //
 				   // This list of what kind of information we
-				   // actually need is given as a bitwise
-				   // connection of flags as the third
+				   // actually need is given as a
+				   // collection of flags as the third
 				   // argument to the constructor of
 				   // FEValues. Since these values have to
 				   // be recomputed, or updated, every time we
@@ -422,7 +422,7 @@ void Step3::assemble_system ()
 				   // #update_JxW_values as well:
   FEValues<2> fe_values (fe, quadrature_formula,
 			 update_values | update_gradients | update_JxW_values);
-                                   // The advantage of this proceeding is that
+                                   // The advantage of this approach is that
 				   // we can specify what kind of information
 				   // we actually need on each cell. It is
 				   // easily understandable that this approach
@@ -525,8 +525,8 @@ void Step3::assemble_system ()
 				       // gradients of the shape functions be
 				       // computed, as well as the
 				       // determinants of the Jacobian
-				       // matrices of the mapping between unit
-				       // cell and true cell, at the
+				       // matrices of the mapping between
+				       // reference cell and true cell, at the
 				       // quadrature points. Since all these
 				       // values depend on the geometry of the
 				       // cell, we have to have the FEValues
@@ -552,9 +552,9 @@ void Step3::assemble_system ()
 				       // at the quadrature point times the
 				       // weight of this quadrature point. You
 				       // can get the gradient of shape
-				       // function i at quadrature point
+				       // function $i$ at quadrature point
 				       // q_point by using
-				       // fe_values.shape_grad(i,q_point);
+				       // <code>fe_values.shape_grad(i,q_point)</code>;
 				       // this gradient is a 2-dimensional
 				       // vector (in fact it is of type
 				       // Tensor@<1,dim@>, with here dim=2) and
@@ -568,7 +568,7 @@ void Step3::assemble_system ()
 				       // the call to
 				       // FEValues::JxW() ). Finally, this is
 				       // repeated for all shape functions
-				       // phi_i and phi_j:
+				       // $i$ and $j$:
       for (unsigned int i=0; i<dofs_per_cell; ++i)
 	for (unsigned int j=0; j<dofs_per_cell; ++j)
 	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
@@ -756,13 +756,13 @@ void Step3::solve ()
 				   // First, we need to have an object that
 				   // knows how to tell the CG algorithm when
 				   // to stop. This is done by using a
-				   // SolverControl object, and as
-				   // stopping criterion we say: stop after a
-				   // maximum of 1000 iterations (which is far
-				   // more than is needed for 1089 variables;
-				   // see the results section to find out how
-				   // many were really used), and stop if the
-				   // norm of the residual is below 1e-12. In
+				   // SolverControl object, and as stopping
+				   // criterion we say: stop after a maximum
+				   // of 1000 iterations (which is far more
+				   // than is needed for 1089 variables; see
+				   // the results section to find out how many
+				   // were really used), and stop if the norm
+				   // of the residual is below $10^{-12}$. In
 				   // practice, the latter criterion will be
 				   // the one which stops the iteration:
   SolverControl           solver_control (1000, 1e-12);
