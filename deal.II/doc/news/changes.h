@@ -91,13 +91,6 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
-<li> Extended: GridGenerator::half_hyper_shell() got the option
-<code>colorize</code>, which assigns different boundary indicators to the
-different parts of the boundary. Added GridGenerator::quarter_hyper_shell()
-with the same options.
-<br>
-(Timo Heister, 2011/08/15)
-
 <li> Extended: Many operations on objects of
 type Point<0>, Quadrature<0>, etc
 (including creation) were previously forbidden since such objects do not make
@@ -268,6 +261,13 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Extended: GridGenerator::half_hyper_shell() got the option
+<code>colorize</code>, which assigns different boundary indicators to the
+different parts of the boundary. Added GridGenerator::quarter_hyper_shell()
+with the same options.
+<br>
+(Timo Heister, 2011/08/15)
+
 <li> Fixed: The functions VectorTools::create_boundary_right_hand_side()
 called with an empty set of boundary_indicators (the default), did not apply
 any boundary conditions. The empty set now applies it to all boundaries.
