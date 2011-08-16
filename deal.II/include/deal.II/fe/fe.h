@@ -134,9 +134,9 @@ namespace hp
  * dimension presets the #interface_constraints matrix to have
  * dimension zero. Changing this behaviour in derived classes is
  * generally not a reasonable idea and you risk getting into trouble.
- * 
+ *
  * <h4>Finite elements in two dimensions</h4>
- * 
+ *
  * In addition to the fields already present in 1D, a constraint
  * matrix is needed, if the finite element has node values located on
  * edges or vertices. These constraints are represented by an $m\times
@@ -168,7 +168,7 @@ namespace hp
  * constrained. Only one level of indirection is allowed. It is not known
  * at the time of this writing whether this is a constraint itself.
  *
- * 
+ *
  * <h4>Finite elements in three dimensions</h4>
  *
  * For the interface constraints, almost the same holds as for the 2D case.
@@ -329,7 +329,7 @@ namespace hp
  * as on the coarse grid vertices. See the discussion above for details.
  *
  * @ingroup febase fe
- * 
+ *
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */
 template <int dim, int spacedim=dim>
@@ -351,7 +351,7 @@ class FiniteElement : public Subscriptor,
 				    */
   class InternalDataBase : public Mapping<dim,spacedim>::InternalDataBase
     {
-      public:      
+      public:
 					 /**
 					  * Destructor. Needed to
 					  * avoid memory leaks with
@@ -369,7 +369,7 @@ class FiniteElement : public Subscriptor,
 	void initialize_2nd (const FiniteElement<dim,spacedim> *element,
 			     const Mapping<dim,spacedim>       &mapping,
 			     const Quadrature<dim>    &quadrature);
-	
+
 					 /**
 					  * Storage for FEValues
 					  * objects needed to
@@ -400,7 +400,7 @@ class FiniteElement : public Subscriptor,
 				      * are deleted properly.
 				      */
     virtual ~FiniteElement ();
-    
+
 				     /**
 				      * Return a string that uniquely
 				      * identifies a finite
@@ -465,12 +465,12 @@ class FiniteElement : public Subscriptor,
 				      * anyway).
 				      */
     const FiniteElement<dim,spacedim> & operator[] (const unsigned int fe_index) const;
-    
+
 				     /**
 				      * @name Shape function access
 				      * @{
 				      */
-    
+
 				     /**
 				      * Return the value of the
 				      * @p ith shape function at the
@@ -519,7 +519,7 @@ class FiniteElement : public Subscriptor,
     virtual double shape_value_component (const unsigned int i,
 					  const Point<dim>   &p,
 					  const unsigned int component) const;
-    
+
 				     /**
 				      * Return the gradient of the
 				      * @p ith shape function at the
@@ -643,13 +643,13 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual bool has_support_on_face (const unsigned int shape_index,
 				      const unsigned int face_index) const;
-    
+
 				     //@}
 				     /**
 				      * @name Transfer and constraint matrices
 				      * @{
 				      */
-    
+
 				     /**
 				      * Projection from a fine grid
 				      * space onto a coarse grid
@@ -680,7 +680,7 @@ class FiniteElement : public Subscriptor,
 				      * If projection matrices are not
 				      * implemented in the derived
 				      * finite element class, this
-				      * function aborts with 
+				      * function aborts with
 				      * ExcProjectionVoid. You can
 				      * check whether this is the case
 				      * by calling the
@@ -695,7 +695,7 @@ class FiniteElement : public Subscriptor,
 
 				     /**
 				      * Embedding matrix between grids.
-				      * 
+				      *
 				      * The identity operator from a
 				      * coarse grid space into a fine
 				      * grid space is associated with
@@ -884,7 +884,7 @@ class FiniteElement : public Subscriptor,
                                       * this just expresses.
                                       */
     bool isotropic_restriction_is_implemented () const;
-    
+
 
 				     /**
 				      * Access the
@@ -904,7 +904,7 @@ class FiniteElement : public Subscriptor,
 				      * constraints at the interface
 				      * between a refined and an
 				      * unrefined cell.
-				      * 
+				      *
 				      * The matrix is obviously empty
 				      * in only one dimension,
 				      * since there are no constraints
@@ -1027,16 +1027,16 @@ class FiniteElement : public Subscriptor,
 				     //@}
 
 				     /**
-				      * @name Functions to support hp 
+				      * @name Functions to support hp
 				      * @{
 				      */
-    
+
 
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.#dofs_per_face</tt> times
 				      * <tt>this->#dofs_per_face</tt>.
@@ -1056,13 +1056,13 @@ class FiniteElement : public Subscriptor,
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 				   FullMatrix<double>       &matrix) const;
-    
+
 
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the subface of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.#dofs_per_face</tt> times
 				      * <tt>this->#dofs_per_face</tt>.
@@ -1084,7 +1084,7 @@ class FiniteElement : public Subscriptor,
 				      const unsigned int        subface,
 				      FullMatrix<double>       &matrix) const;
 				     //@}
-    
+
 
 				     /**
 				      * If, on a vertex, several
@@ -1161,9 +1161,9 @@ class FiniteElement : public Subscriptor,
     virtual
     FiniteElementDomination::Domination
     compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
-    
+
 				     //@}
-    
+
 				     /**
 				      * Comparison operator. We also
 				      * check for equality of the
@@ -1264,7 +1264,7 @@ class FiniteElement : public Subscriptor,
 				      */
    unsigned int component_to_system_index(const unsigned int component,
                                           const unsigned int index) const;
-  
+
 				     /**
 				      * Same as
 				      * system_to_component_index(),
@@ -1318,7 +1318,7 @@ class FiniteElement : public Subscriptor,
 				      */
     unsigned int adjust_line_dof_index_for_line_orientation (const unsigned int index,
 							     const bool line_orientation) const;
-    
+
 				     /**
 				      * Return in which of the vector
 				      * components of this finite
@@ -1398,7 +1398,7 @@ class FiniteElement : public Subscriptor,
     is_primitive (const unsigned int i) const;
 
     FiniteElementData<dim>::is_primitive;
-    
+
 				     /**
 				      * Number of base elements in a
 				      * mixed discretization.
@@ -1446,7 +1446,7 @@ class FiniteElement : public Subscriptor,
                                       */
     unsigned int
     element_multiplicity (const unsigned int index) const;
-    
+
                                      /**
                                       * Return for shape function
                                       * @p index the base element it
@@ -1513,7 +1513,7 @@ class FiniteElement : public Subscriptor,
 				      * BlockVector it would generate.
 				      */
     unsigned int first_block_of_base (const unsigned int b) const;
-    
+
  				     /**
 				      * For each vector component,
 				      * return which base
@@ -1540,8 +1540,8 @@ class FiniteElement : public Subscriptor,
 				      */
     std::pair<unsigned int, unsigned int>
     component_to_base_index (const unsigned int component) const;
-    
-    
+
+
 				     /**
 				      * Return the base element for
 				      * this block and the number of
@@ -1549,7 +1549,7 @@ class FiniteElement : public Subscriptor,
 				      */
     std::pair<unsigned int,unsigned int>
     block_to_base_index (const unsigned int block) const;
-    
+
 				     /**
 				      * The vector block and the index
 				      * inside the block for this
@@ -1566,12 +1566,12 @@ class FiniteElement : public Subscriptor,
     component_to_block_index (const unsigned int component) const;
 
 				     //@}
-    
+
 				     /**
 				      * @name Support points and interpolation
 				      * @{
 				      */
-    
+
 				     /**
 				      * Return the support points of
 				      * the trial functions on the
@@ -1602,7 +1602,7 @@ class FiniteElement : public Subscriptor,
 				      * for details on support points.
 				      */
     const std::vector<Point<dim> > &
-    get_unit_support_points () const;    
+    get_unit_support_points () const;
 
 				     /**
 				      * Return whether a finite
@@ -1662,7 +1662,7 @@ class FiniteElement : public Subscriptor,
     virtual
     Point<dim>
     unit_support_point (const unsigned int index) const;
-    
+
 				     /**
 				      * Return the support points of
 				      * the trial functions on the
@@ -1720,7 +1720,7 @@ class FiniteElement : public Subscriptor,
 				      * for details on support points.
 				      */
     const std::vector<Point<dim-1> > &
-    get_unit_face_support_points () const;    
+    get_unit_face_support_points () const;
 
 				     /**
 				      * Return whether a finite
@@ -1746,13 +1746,13 @@ class FiniteElement : public Subscriptor,
     virtual
     Point<dim-1>
     unit_face_support_point (const unsigned int index) const;
-    
+
 				     /**
 				      * Return a support point vector
 				      * for generalized interpolation.
 				      */
     const std::vector<Point<dim> > &
-    get_generalized_support_points () const;    
+    get_generalized_support_points () const;
 
 				     /**
 				      * Returns <tt>true</tt> if the
@@ -1802,7 +1802,7 @@ class FiniteElement : public Subscriptor,
 				      */
     virtual void interpolate(std::vector<double>&       local_dofs,
 			     const std::vector<double>& values) const;
-      
+
 				     /**
 				      * Interpolate a set of vector
 				      * values, computed in the
@@ -1820,7 +1820,7 @@ class FiniteElement : public Subscriptor,
     virtual void interpolate(std::vector<double>&                local_dofs,
 			     const std::vector<Vector<double> >& values,
 			     unsigned int offset = 0) const;
-      
+
 				     /**
 				      * Interpolate a set of vector
 				      * values, computed in the
@@ -1829,9 +1829,9 @@ class FiniteElement : public Subscriptor,
     virtual void interpolate(
       std::vector<double>& local_dofs,
       const VectorSlice<const std::vector<std::vector<double> > >& values) const;
-      
+
 				     //@}
-    
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
@@ -1888,7 +1888,7 @@ class FiniteElement : public Subscriptor,
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcEmbeddingVoid);
-    
+
 				     /**
 				      * Attempt to access restriction
 				      * matrices of a finite element
@@ -1899,7 +1899,7 @@ class FiniteElement : public Subscriptor,
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcProjectionVoid);
-    
+
 				     /**
 				      * Attempt to access constraint
 				      * matrices of a finite element
@@ -1910,7 +1910,7 @@ class FiniteElement : public Subscriptor,
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcConstraintsVoid);
-    
+
 				     /**
 				      * Exception
 				      * @ingroup Exceptions
@@ -1933,7 +1933,7 @@ class FiniteElement : public Subscriptor,
 				      * @ingroup Exceptions
                                       */
     DeclException0 (ExcInterpolationNotImplemented);
-    
+
 				     /**
 				      * Exception
 				      *
@@ -1946,7 +1946,7 @@ class FiniteElement : public Subscriptor,
 				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcJacobiDeterminantHasWrongSign);
-    
+
   protected:
 
 				     /**
@@ -1981,7 +1981,7 @@ class FiniteElement : public Subscriptor,
 				      */
     void reinit_restriction_and_prolongation_matrices(const bool isotropic_restriction_only=false,
 						      const bool isotropic_prolongation_only=false);
-    
+
  				     /**
 				      * Vector of projection
 				      * matrices. See
@@ -2085,21 +2085,21 @@ class FiniteElement : public Subscriptor,
 				      * support point.
 				      */
     std::vector<Point<dim-1> > unit_face_support_points;
-    
+
 				     /**
 				      * Support points used for
 				      * interpolation functions of
 				      * non-Lagrangian elements.
 				      */
     std::vector<Point<dim> > generalized_support_points;
-    
+
 				     /**
 				      * Face support points used for
 				      * interpolation functions of
 				      * non-Lagrangian elements.
-				      */    
+				      */
     std::vector<Point<dim-1> > generalized_face_support_points;
-    
+
 				     /**
 				      * For faces with non-standard
 				      * face_orientation in 3D, the dofs on
@@ -2241,7 +2241,7 @@ class FiniteElement : public Subscriptor,
 				      * FE_Q.
 				      */
     virtual UpdateFlags update_once (const UpdateFlags flags) const = 0;
-  
+
 				     /**
 				      * Complementary function for
 				      * update_once().
@@ -2258,7 +2258,7 @@ class FiniteElement : public Subscriptor,
 				      * more details.
 				      */
     virtual UpdateFlags update_each (const UpdateFlags flags) const = 0;
-  
+
 				     /**
 				      * A sort of virtual copy
 				      * constructor. Some places in
@@ -2270,8 +2270,8 @@ class FiniteElement : public Subscriptor,
 				      * knowing their exact type. They
 				      * do so through this function.
 				      */
-    virtual FiniteElement<dim,spacedim> *clone() const = 0;    
-    
+    virtual FiniteElement<dim,spacedim> *clone() const = 0;
+
   private:
 				     /**
 				      * Store what
@@ -2348,7 +2348,7 @@ class FiniteElement : public Subscriptor,
 				      * vector it will generate.
 				      */
     BlockIndices base_to_block_indices;
-    
+
 				     /**
 				      * The base element establishing
 				      * a component.
@@ -2378,7 +2378,7 @@ class FiniteElement : public Subscriptor,
 				      */
     std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> >
     component_to_base_table;
-    
+
 				     /**
 				      * Projection matrices are
 				      * concatenated or summed up.
@@ -2410,7 +2410,7 @@ class FiniteElement : public Subscriptor,
 				      * For examples of use of these
 				      * flags, see the places in the
 				      * library where it is queried.
-				      * 
+				      *
 				      * There is one flag per shape
 				      * function, indicating whether
 				      * it belongs to the class of
@@ -2556,7 +2556,7 @@ class FiniteElement : public Subscriptor,
 				      * The same function in
 				      * @p mapping must have been
 				      * called for the same cell first!
-				      */				      
+				      */
     virtual void
     fill_fe_values (const Mapping<dim,spacedim>                               &mapping,
 		    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -2565,7 +2565,7 @@ class FiniteElement : public Subscriptor,
 		    typename Mapping<dim,spacedim>::InternalDataBase          &fe_internal,
 		    FEValuesData<dim,spacedim>                                &data,
 		    CellSimilarity::Similarity                           &cell_similarity) const = 0;
-    
+
 				     /**
 				      * Fill the fields of
 				      * FEFaceValues. This function
@@ -2576,7 +2576,7 @@ class FiniteElement : public Subscriptor,
 				      * The same function in
 				      * @p mapping must have been
 				      * called for the same cell first!
-				      */				      
+				      */
     virtual void
     fill_fe_face_values (const Mapping<dim,spacedim>                   &mapping,
 			 const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -2585,7 +2585,7 @@ class FiniteElement : public Subscriptor,
 			 typename Mapping<dim,spacedim>::InternalDataBase       &mapping_internal,
 			 typename Mapping<dim,spacedim>::InternalDataBase       &fe_internal,
 			 FEValuesData<dim,spacedim>                    &data) const = 0;
-    
+
 				     /**
 				      * Fill the fields of
 				      * FESubfaceValues. This function
@@ -2596,7 +2596,7 @@ class FiniteElement : public Subscriptor,
 				      * The same function in
 				      * @p mapping must have been
 				      * called for the same cell first!
-				      */				      
+				      */
     virtual void
     fill_fe_subface_values (const Mapping<dim,spacedim>                   &mapping,
 			    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -2634,7 +2634,7 @@ FiniteElement<dim,spacedim>::operator[] (const unsigned int fe_index) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::system_to_component_index (const unsigned int index) const
@@ -2648,7 +2648,7 @@ FiniteElement<dim,spacedim>::system_to_component_index (const unsigned int index
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 unsigned int
 FiniteElement<dim,spacedim>::n_base_elements () const
@@ -2684,7 +2684,7 @@ FiniteElement<dim,spacedim>::component_to_system_index (const unsigned int compo
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int index) const
@@ -2713,7 +2713,7 @@ FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
 FiniteElement<dim,spacedim>::system_to_base_index (const unsigned int index) const
@@ -2726,7 +2726,7 @@ FiniteElement<dim,spacedim>::system_to_base_index (const unsigned int index) con
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<std::pair<unsigned int,unsigned int>,unsigned int>
 FiniteElement<dim,spacedim>::face_system_to_base_index (const unsigned int index) const
@@ -2738,7 +2738,7 @@ FiniteElement<dim,spacedim>::face_system_to_base_index (const unsigned int index
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 unsigned int
 FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) const
@@ -2748,7 +2748,7 @@ FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) cons
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::component_to_base_index (const unsigned int index) const
@@ -2761,7 +2761,7 @@ FiniteElement<dim,spacedim>::component_to_base_index (const unsigned int index) 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) const
@@ -2771,7 +2771,7 @@ FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) cons
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 std::pair<unsigned int,unsigned int>
 FiniteElement<dim,spacedim>::system_to_block_index (const unsigned int index) const
@@ -2801,7 +2801,7 @@ FiniteElement<dim,spacedim>::restriction_is_additive (const unsigned int index) 
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 const std::vector<bool> &
 FiniteElement<dim,spacedim>::get_nonzero_components (const unsigned int i) const
@@ -2812,7 +2812,7 @@ FiniteElement<dim,spacedim>::get_nonzero_components (const unsigned int i) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 unsigned int
 FiniteElement<dim,spacedim>::n_nonzero_components (const unsigned int i) const
@@ -2823,7 +2823,7 @@ FiniteElement<dim,spacedim>::n_nonzero_components (const unsigned int i) const
 
 
 
-template <int dim, int spacedim>  
+template <int dim, int spacedim>
 inline
 bool
 FiniteElement<dim,spacedim>::is_primitive (const unsigned int i) const

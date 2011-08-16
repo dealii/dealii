@@ -573,7 +573,7 @@ FE_Q<dim,spacedim>::FE_Q (const Quadrature<1> &points)
 		  std::vector<std::vector<bool> >(1, std::vector<bool>(1,true))),
 		face_index_map(FE_Q_Helper::invert_numbering(face_lexicographic_to_hierarchic_numbering (points.size()-1)))
 {
-  const unsigned int degree = points.size()-1;
+  const int degree = points.size()-1;
 
   Assert (degree > 0,
           ExcMessage ("This element can only be used for polynomial degrees "
