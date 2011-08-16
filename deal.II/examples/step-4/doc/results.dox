@@ -23,34 +23,25 @@ much higher. What cannot be seen here, is that besides this higher
 number of rows and columns in the matrix, there are also significantly
 more entries per row of the matrix in three space
 dimensions. Together, this leads to a much higher numerical effort for
-solving the system of equation, which you can feel when you actually
-run the program.
+solving the system of equation, which you can feel in the run time of the two
+solution steps when you actually run the program.
 
 
 
-The program produces two files: <code>solution-2d.gmv</code> and
-<code>solution-3d.gmv</code>, which can be viewed using the program
-GMV (in case you do not have that program, you can easily change the
+The program produces two files: <code>solution-2d.vtk</code> and
+<code>solution-3d.vtk</code>, which can be viewed using the programs
+Visit or Paraview (in case you do not have these programs, you can easily
+change the 
 output format in the program to something which you can view more
-easily). From the two-dimensional output, we have produced the
-following two pictures:
+easily). Visualizing solutions is a bit of an art, but it can also be fun, so
+you should play around with your favorite visualization tool to get familiar
+with its functionality. Here's what I have come up with for the 2d solution:
 
+<p align="center">
+  @image html step-4.solution-2d.png
+</p>
 
-
-<TABLE WIDTH="60%" ALIGN="center">
-  <tr>
-    <td ALIGN="center">
-      @image html step-4.solution-2d.png
-    </td>
-
-    <td ALIGN="center">
-      @image html step-4.grid-2d.png
-    </td>
-  </tr>
-</table>
-
-
-The left one shows the solution of the problem under consideration as
+The picture shows the solution of the problem under consideration as
 a 3D plot. As can be seen, the solution is almost flat in the interior
 of the domain and has a higher curvature near the boundary. This, of
 course, is due to the fact that for Laplace's equation the curvature
@@ -62,21 +53,19 @@ the domain, where also the solution is moving most rapidly.
 It is also nice to see that the solution follows the desired quadratic
 boundary values along the boundaries of the domain.
 
+On the other hand, even though the picture does not show the mesh lines
+explicitly, you can see them as little kinks in the solution. This clearly
+indicates that the solution hasn't been computed to very high accuracy and
+that to get a better solution, we may have to compute on a finer mesh.
 
-
-The right picture shows the two dimensional grid, colorized by the
-values of the solution function. This is not very exciting, but the
-colors are nice.
-
-
-
-
-In three spatial dimensions, visualization is a bit more difficult. To
-the left, you can see the solution at three of the six outer faces of
-the cube in which we solved the equation, and on a plane through the
-origin. On some of the planes, the cut through the grid is also shown.
-
-
+In three spatial dimensions, visualization is a bit more difficult. The left
+picture shows the solution and the mesh it was computed on on the surface of
+the domain. This is nice, but it has the drawback that it completely hides
+what is happening on the inside. The picture on the right is an attempt at
+visualizing the interior as well, by showing surfaces where the solution has
+constant values (as indicated by the legend at the top left). Isosurface
+pictures look best if one makes the individual surfaces slightly transparaent
+so that it is possible to see through them and see what's behind.
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -85,17 +74,27 @@ origin. On some of the planes, the cut through the grid is also shown.
     </td>
 
     <td ALIGN="center">
-      @image html step-4.grid-3d.png
+      @image html step-4.contours-3d.png
     </td>
   </tr>
 </table>
 
-
-
-The right picture shows the three dimensional grid, colorized by the
-solutions values. 3D grids are difficult to visualize, which can be
-seen here already, even though the grid is not even locally refined.
-
+@note
+A final remark on visualization: The idea of visualization is to give insight,
+which is not the same as displaying information. In particular, it is easy to
+overload a picture with information, but while it shows more information it
+makes it also more difficult to glean insight. As an example, the program I
+used to generate these pictures, Visit, by default puts tick marks on every
+axis, puts a big fat label "X Axis" on the $x$ axis and similar for the other
+axes, shows the file name from which the data was taken in the top left and
+the name of the user doing so and the time and date on the bottom right. None
+of this is important 
+here: the axes are equally easy to make out because the tripod at the bottom
+left is still visible, and we know from the program that the domain is
+$[0,1]^3$, so there is no need for tick marks. As a consequence, I have
+switched off all the extraneous stuff in the picture: The art of visualization
+is to reduce the picture to those parts that are important to see what one
+wants to see, but no more.
 
 
 

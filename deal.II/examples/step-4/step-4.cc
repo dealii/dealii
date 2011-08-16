@@ -606,17 +606,16 @@ void Step4<dim>::solve ()
                                  //
                                  // The only difference to the previous
                                  // example is that we want to write output in
-                                 // GMV format, rather than for gnuplot (GMV
-                                 // is another graphics program that, contrary
-                                 // to gnuplot, shows data in nice colors,
-                                 // allows rotation of geometries with the
-                                 // mouse, and generates reasonable
-                                 // representations of 3d data; for ways to
-                                 // obtain it see the ReadMe file of
+                                 // VTK format, rather than for gnuplot. VTK
+                                 // format is currently the most widely used
+                                 // one and is supported by a number of
+                                 // visualization programs such as Visit and
+                                 // Paraview (for ways to obtain these
+                                 // programs see the ReadMe file of
                                  // deal.II). To write data in this format, we
                                  // simply replace the
-                                 // <code>data_out.write_gnuplot</code> call by
-                                 // <code>data_out.write_gmv</code>.
+                                 // <code>data_out.write_gnuplot</code> call
+                                 // by <code>data_out.write_vtk</code>.
                                  //
                                  // Since the program will run both 2d and 3d
                                  // versions of the laplace solver, we use the
@@ -637,9 +636,9 @@ void Step4<dim>::output_results () const
   data_out.build_patches ();
 
   std::ofstream output (dim == 2 ?
-			"solution-2d.gmv" :
-			"solution-3d.gmv");
-  data_out.write_gmv (output);
+			"solution-2d.vtk" :
+			"solution-3d.vtk");
+  data_out.write_vtk (output);
 }
 
 
