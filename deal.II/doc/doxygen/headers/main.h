@@ -60,8 +60,9 @@
 }
  * @enddot
  *
- *
- * Here is a guide to this classification of groups, as well as links
+ * These groups are all covered in the tutorial programs, with a first
+ * overview of how they fit together given in step-3. The following
+ * is a guide to this classification of groups, as well as links
  * to the documentation pertaining to each of them:
  *
  * <ol>
