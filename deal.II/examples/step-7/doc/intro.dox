@@ -152,3 +152,46 @@ quadrature points on this face, which we can then use in the same way as for
 the domain integrals. The details of how this is done are shown in the
 following program.
 
+
+<h3>A note on good programming practice</h3>
+
+Besides the mathematical topics outlined above, we also want to use this
+program to illustrate one aspect of good programming practice, namely the use
+of namespaces. In programming the deal.II library, we have take great care not
+to use names for classes and global functions that are overly generic, say
+<code>f(), sz(), rhs()</code> etc. Furthermore, we have put everything into
+namespace <code>dealii</code>. But when one writes application programs that
+aren't meant for others to use, one doesn't always pay this much attention. If
+you follow the programming style of step-1 through step-6, these functions
+then end up in the global namespace where, unfortunately, a lot of other stuff
+also lives (basically everything the C language provides, along with
+everything you get from the operating system through header files). To make
+things a bit worse, the designers of the C language were also not always
+careful in avoiding generic names; for example, the symbols <code>j1,
+jn</code> are defined in C header files (they denote Bessel functions).
+
+To avoid the problems that result if names of different functions or variables
+collide (often with confusing error messages), it is good practice to put
+everything you do into a <a
+href="http://en.wikipedia.org/wiki/Namespace_(computer_science)">namespace</a>. Following
+this style, we will open a namespace <code>Step7</code> at the top of the
+program, import the deal.II namespace into it, put everything that's specific
+to this program (with the exception of <code>main()</code>, which must be in
+the global namespace) into it, and only close it at the bottom of the file. In
+other words, the structure of the program is of the kind
+@code
+  ... #includes
+
+  namespace Step7
+  {
+    using namespace dealii;
+
+    ...everything to do with the program...
+  }
+
+  int main ()
+  {
+    ...do whatever main() does...
+  }
+@endcode
+We will follow this scheme throughout the remainder of the deal.II tutorial.
