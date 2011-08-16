@@ -45,7 +45,7 @@ namespace MeshWorker
  * data models discussed in the Assembler namespace documentation.
  *
  * The choice of the local data model is triggered by the vector
- * #BlockInfo::local_renumbering, which in turn is usually filled by
+ * BlockInfo::local_renumbering, which in turn is usually filled by
  * BlockInfo::initialize_local(). If this function has been used, or
  * the vector has been changed from zero-length, then local dof
  * indices stored in this object will automatically be renumbered to
