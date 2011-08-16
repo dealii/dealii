@@ -93,6 +93,18 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Changed: Several of the tutorial programs used the same class
+names, often <code>LaplaceProblem</code> in the earlier programs.
+There is nothing inherently wrong with this, since these are
+entirely separate programs, but this sometimes confused
+integrated development environments because searching for
+individual symbols would turn up several occurrences in different
+files. To make this a bit simpler, the main classes for step-3
+through step-6 were renamed to <code>StepX</code> (steps 1 and 2
+do not have a main class).
+<br>
+(Wolfgang Bangerth, Guido Kanschat 2011/08/16)
+
 <li> Extended: Many operations on objects of
 type Point<0>, Quadrature<0>, etc
 (including creation) were previously forbidden since such objects do not make
