@@ -111,7 +111,7 @@ from the optimal square.
 
 
 For completeness, we show what happens if the code we commented about
-in the destructor of the <code>LaplaceProblem</code> class is omitted
+in the destructor of the <code>Step6</code> class is omitted
 from this example.
 
 @code
@@ -132,7 +132,7 @@ Stacktrace:
 #1  /u/bangerth/p/deal.II/1/deal.II/lib/libdeal_II_2d.g.so: FiniteElement<2>::~FiniteElement()
 #2  ./step-6: FE_Poly<TensorProductPolynomials<2>, 2>::~FE_Poly()
 #3  ./step-6: FE_Q<2>::~FE_Q()
-#4  ./step-6: LaplaceProblem<2>::~LaplaceProblem()
+#4  ./step-6: Step6<2>::~Step6()
 #5  ./step-6: main
 --------------------------------------------------------
 make: *** [run] Aborted
@@ -142,13 +142,14 @@ make: *** [run] Aborted
 
 From the above error message, we conclude that an object of type
 <code>10DoFHandlerILi2EE</code> is still using the object of type
-<code>4FE_QILi2EE</code>. These are of course "mangled" names for
+<code>4FE_QILi2EE</code>. These are of course <a
+href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" names</a> for 
 <code>DoFHandler</code> and <code>FE_Q</code>. The mangling works as
 follows: the first number indicates the number of characters of the
 template class, i.e. 10 for <code>DoFHandler</code> and 4
 for<code>FE_Q</code>; the rest of the text is then template
 arguments. From this we can already glean a little bit who's the
-culprit here, and who the victim.:
+culprit here, and who the victim:
 The one object that still uses the finite element is the
 <code>dof_handler</code> object.
 
@@ -158,7 +159,7 @@ The stacktrace gives an indication of where the problem happened. We
 see that the exception was triggered in the
 destructor of the <code>FiniteElement</code> class that was called
 through a few more functions from the destructor of the
-<code>LaplaceProblem</code> class, exactly where we have commented out
+<code>Step6</code> class, exactly where we have commented out
 the call to <code>DoFHandler::clear()</code>.
 
 

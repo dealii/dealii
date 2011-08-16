@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -105,7 +105,7 @@
 using namespace dealii;
 
 
-                                 // @sect3{The <code>LaplaceProblem</code> class template}
+                                 // @sect3{The <code>Step6</code> class template}
 
 				 // The main class is again almost
 				 // unchanged. Two additions, however,
@@ -122,11 +122,11 @@ using namespace dealii;
 				 // clear when we discuss its
 				 // implementation.
 template <int dim>
-class LaplaceProblem
+class Step6
 {
   public:
-    LaplaceProblem ();
-    ~LaplaceProblem ();
+    Step6 ();
+    ~Step6 ();
 
     void run ();
 
@@ -214,9 +214,9 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
+                                 // @sect3{The <code>Step6</code> class implementation}
 
-                                 // @sect4{LaplaceProblem::LaplaceProblem}
+                                 // @sect4{Step6::Step6}
 
 				 // The constructor of this class is
 				 // mostly the same as before, but
@@ -228,14 +228,14 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 				 // the desired polynomial degree
 				 // (here <code>2</code>):
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem ()
+Step6<dim>::Step6 ()
 		:
 		dof_handler (triangulation),
                 fe (2)
 {}
 
 
-                                 // @sect4{LaplaceProblem::~LaplaceProblem}
+                                 // @sect4{Step6::~Step6}
 
 				 // Here comes the added destructor of
 				 // the class. The reason why we want
@@ -325,7 +325,7 @@ LaplaceProblem<dim>::LaplaceProblem ()
 				 // exactly the behavior sketched
 				 // above. The reason is that member
 				 // variables of the
-				 // <code>LaplaceProblem</code> class are
+				 // <code>Step6</code> class are
 				 // destructed bottom-up (i.e. in
 				 // reverse order of their declaration
 				 // in the class), as always in
@@ -361,13 +361,13 @@ LaplaceProblem<dim>::LaplaceProblem ()
 				 // destructor, to the end of the
 				 // results section of this example.
 template <int dim>
-LaplaceProblem<dim>::~LaplaceProblem ()
+Step6<dim>::~Step6 ()
 {
   dof_handler.clear ();
 }
 
 
-                                 // @sect4{LaplaceProblem::setup_system}
+                                 // @sect4{Step6::setup_system}
 
 				 // The next function is setting up
 				 // all the variables that describe
@@ -406,7 +406,7 @@ LaplaceProblem<dim>::~LaplaceProblem ()
 				 // call will take care of this,
 				 // however:
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void Step6<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -507,7 +507,7 @@ void LaplaceProblem<dim>::setup_system ()
   system_matrix.reinit (sparsity_pattern);
 }
 
-                                 // @sect4{LaplaceProblem::assemble_system}
+                                 // @sect4{Step6::assemble_system}
 
 				 // Next, we have to assemble the
 				 // matrix again. There are no code
@@ -550,7 +550,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // code and nothing that you have to
 				 // worry about.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void Step6<dim>::assemble_system ()
 {
   const QGauss<dim>  quadrature_formula(3);
 
@@ -662,7 +662,7 @@ void LaplaceProblem<dim>::assemble_system ()
 
 
 
-                                 // @sect4{LaplaceProblem::solve}
+                                 // @sect4{Step6::solve}
 
 				 // We continue with gradual
 				 // improvements. The function that
@@ -693,7 +693,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // find at the end of this function:
 
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void Step6<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              solver (solver_control);
@@ -708,7 +708,7 @@ void LaplaceProblem<dim>::solve ()
 }
 
 
-                                 // @sect4{LaplaceProblem::refine_grid}
+                                 // @sect4{Step6::refine_grid}
 
 				 // Instead of global refinement, we
 				 // now use a slightly more elaborate
@@ -824,7 +824,7 @@ void LaplaceProblem<dim>::solve ()
 				 // doubles to represent error
 				 // indicators.
 template <int dim>
-void LaplaceProblem<dim>::refine_grid ()
+void Step6<dim>::refine_grid ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -912,7 +912,7 @@ void LaplaceProblem<dim>::refine_grid ()
 }
 
 
-                                 // @sect4{LaplaceProblem::output_results}
+                                 // @sect4{Step6::output_results}
 
 				 // At the end of computations on each
 				 // grid, and just before we continue
@@ -966,7 +966,7 @@ void LaplaceProblem<dim>::refine_grid ()
 				 // generation of file names for that
 				 // case):
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+void Step6<dim>::output_results (const unsigned int cycle) const
 {
   Assert (cycle < 10, ExcNotImplemented());
 
@@ -982,7 +982,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 
-                                 // @sect4{LaplaceProblem::run}
+                                 // @sect4{Step6::run}
 
 				 // The final function before
 				 // <code>main()</code> is again the main
@@ -1034,7 +1034,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				 // The rest of the loop looks as
 				 // before:
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void Step6<dim>::run ()
 {
   for (unsigned int cycle=0; cycle<8; ++cycle)
     {
@@ -1147,7 +1147,7 @@ int main ()
     {
       deallog.depth_console (0);
 
-      LaplaceProblem<2> laplace_problem_2d;
+      Step6<2> laplace_problem_2d;
       laplace_problem_2d.run ();
     }
 				   // ...and if this should fail, try

@@ -156,7 +156,7 @@ called from <code>main()</code> (stackframe 1). In realistic programs,
 there would be many more functions in between these two. For example,
 we might have made the mistake in the <code>assemble_system</code>
 function, in which case stack frame 1 would be
-<code>LaplaceProblem::assemble_system</code>, stack frame 2
-would be <code>LaplaceProblem::run</code>, and stack frame 3
+<code>Step5::assemble_system</code>, stack frame 2
+would be <code>Step5::run</code>, and stack frame 3
 would be <code>main()</code> &mdash; you get the idea.
 

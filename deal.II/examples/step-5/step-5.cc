@@ -61,7 +61,7 @@
 using namespace dealii;
 
 
-                                 // @sect3{The <code>LaplaceProblem</code> class template}
+                                 // @sect3{The <code>Step5</code> class template}
 
 				 // The main class is mostly as in the
 				 // previous example. The most visible
@@ -74,10 +74,10 @@ using namespace dealii;
 				 // <code>setup_system</code>. Apart from this,
 				 // everything is as before.
 template <int dim>
-class LaplaceProblem
+class Step5
 {
   public:
-    LaplaceProblem ();
+    Step5 ();
     void run ();
 
   private:
@@ -354,20 +354,20 @@ void Coefficient<dim>::value_list (const std::vector<Point<dim> > &points,
 }
 
 
-                                 // @sect3{The <code>LaplaceProblem</code> class implementation}
+                                 // @sect3{The <code>Step5</code> class implementation}
 
-                                 // @sect4{LaplaceProblem::LaplaceProblem}
+                                 // @sect4{Step5::Step5}
 
 				 // This function is as before.
 template <int dim>
-LaplaceProblem<dim>::LaplaceProblem () :
+Step5<dim>::Step5 () :
                 fe (1),
 		dof_handler (triangulation)
 {}
 
 
 
-                                 // @sect4{LaplaceProblem::setup_system}
+                                 // @sect4{Step5::setup_system}
 
 				 // This is the function
 				 // <code>make_grid_and_dofs</code> from the
@@ -375,7 +375,7 @@ LaplaceProblem<dim>::LaplaceProblem () :
 				 // generation of the grid. Everything
 				 // else is unchanged:
 template <int dim>
-void LaplaceProblem<dim>::setup_system ()
+void Step5<dim>::setup_system ()
 {
   dof_handler.distribute_dofs (fe);
 
@@ -395,7 +395,7 @@ void LaplaceProblem<dim>::setup_system ()
 
 
 
-                                 // @sect4{LaplaceProblem::assemble_system}
+                                 // @sect4{Step5::assemble_system}
 
 				 // As in the previous examples, this
 				 // function is not changed much with
@@ -429,7 +429,7 @@ void LaplaceProblem<dim>::setup_system ()
 				 // are completely unchanged from
 				 // before:
 template <int dim>
-void LaplaceProblem<dim>::assemble_system ()
+void Step5<dim>::assemble_system ()
 {
   QGauss<dim>  quadrature_formula(2);
 
@@ -581,7 +581,7 @@ void LaplaceProblem<dim>::assemble_system ()
 }
 
 
-                                 // @sect4{LaplaceProblem::solve}
+                                 // @sect4{Step5::solve}
 
 				 // The solution process again looks
 				 // mostly like in the previous
@@ -633,7 +633,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // declared, and the CG solver will
 				 // do the rest for us:
 template <int dim>
-void LaplaceProblem<dim>::solve ()
+void Step5<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              solver (solver_control);
@@ -650,7 +650,7 @@ void LaplaceProblem<dim>::solve ()
 }
 
 
-                                 // @sect4{LaplaceProblem::output_results and setting output flags}
+                                 // @sect4{Step5::output_results and setting output flags}
 
 				 // Writing output to a file is mostly
 				 // the same as for the previous
@@ -660,7 +660,7 @@ void LaplaceProblem<dim>::solve ()
 				 // filename for each refinement
 				 // cycle.
 template <int dim>
-void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
+void Step5<dim>::output_results (const unsigned int cycle) const
 {
   DataOut<dim> data_out;
 
@@ -796,7 +796,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 
 
 
-                                 // @sect4{LaplaceProblem::run}
+                                 // @sect4{Step5::run}
 
 				 // The second to last thing in this
 				 // program is the definition of the
@@ -837,7 +837,7 @@ void LaplaceProblem<dim>::output_results (const unsigned int cycle) const
 				 // triangulation with the data in the
 				 // file:
 template <int dim>
-void LaplaceProblem<dim>::run ()
+void Step5<dim>::run ()
 {
   GridIn<dim> grid_in;
   grid_in.attach_triangulation (triangulation);
@@ -952,7 +952,7 @@ int main ()
 {
   deallog.depth_console (0);
 
-  LaplaceProblem<2> laplace_problem_2d;
+  Step5<2> laplace_problem_2d;
   laplace_problem_2d.run ();
 
 				   // Finally, we have promised to
