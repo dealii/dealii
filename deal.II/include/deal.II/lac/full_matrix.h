@@ -1175,7 +1175,7 @@ class FullMatrix : public Table<2,number>
 				      * <b>B<sup>T</sup>
 				      * A<sup>-1</sup> D</b> in mind.
 				      * Note that in this case the
-				      * argument for <tt>A<tt> must be
+				      * argument for <tt>A</tt> must be
 				      * the inverse of the matrix <b>A</b>.
 				      */
     void triple_product(const FullMatrix<number>& A,
