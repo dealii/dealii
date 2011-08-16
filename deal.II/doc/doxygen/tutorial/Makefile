@@ -116,7 +116,7 @@ $(example-dox-prog):
 
 $(example-plain):
 	@echo ================== Making $@
-	@cat $D/examples/$(call get_basename, $(@F))/*cc | $(PERL) program2plain >> $@
+	@cat $D/examples/$(call get_basename, $(@F))/*cc | $(PERL) program2plain > $@
 
 $(example-dox-plain):
 	@echo ================== Making $@
