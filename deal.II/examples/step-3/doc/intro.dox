@@ -2,6 +2,8 @@
 <h1>Introduction</h1>
 
 
+<h3>The basic functioning of finite elements</h3>
+
 This is the first example where we actually use finite elements to compute
 something. We 
 will solve a simple version of Poisson's equation with zero boundary
@@ -88,11 +90,11 @@ zero, as common in C and C++. This equation can be rewritten as a linear
 system by inserting the representation $u_h(\mathbf x)=\sum_j U_j
 \varphi_j(\mathbf x)$: Find a vector $U$ so that
 @f{align*}
-  A U = F
+  A U = F,
 @f}
 where the matrix $A$ and the right hand side $F$ are defined as
 @f{align*}
-  A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j)
+  A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j),
   \\
   F_i &= (\varphi_i, f).
 @f}
@@ -115,17 +117,197 @@ often done in the mathematical literature) avoids a common class of errors as
 the matrix is automatically correct and does not need to be transposed when
 comparing theory and implementation.
 
+Now we know what we need (namely objects that hold the matrix and
+vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
+takes to make that happen:
+
+- The objects for $A,U,F$ are of type SparseMatrix and Vector, and we will see
+  in the program below what classes are used to solve linear systems.
+- We need a way to form the integrals. In the finite element method, this is
+  most commonly done using quadrature, i.e. the integrals are replaced by a
+  weighted sum over a set of points on each cell. That is, we first split the
+  integral over $\Omega$ into integrals over all cells,
+  @f{align*}
+    A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j)
+    = \sum_{K \in {\mathbb T}} \int_K \nabla\varphi_i \cdot \nabla \varphi_j,
+    \\
+    F_i &= (\varphi_i, f)
+    = \sum_{K \in {\mathbb T}} \int_K \varphi_i f,
+  @f}
+  and then approximate each cell's contribution by quadrature:
+  @f{align*}
+    A^K_{ij} &=
+    \int_K \nabla\varphi_i \cdot \nabla \varphi_j
+    \approx
+    \sum_q \nabla\varphi_i(\mathbf x^K_q) \cdot \nabla 
+    \varphi_j(\mathbf x^K_q) w_q^K,
+    \\
+    F^K_i &=
+    \int_K \varphi_i f
+    \approx
+    \sum_q \varphi_i(\mathbf x^K_q) f(\mathbf x^K_q) w^K_q,
+  @f}
+  where $\mathbf x^K_q$ is the $q$th quadrature point on cell $K$, and $w^K_q$
+  the $q$th quadrature weight. There are different parts to what is needed in
+  doing this, and we will discuss them in turn next.
+- First, we need a way to describe the location $\mathbf x_q^K$ of quadrature
+  points and their weights $w^K_q$. They are usually mapped from the reference
+  cell in the same way as shape functions, i.e., implicitly using the
+  MappingQ1 class or, if you explicitly say so, through one of the other
+  classes derived from Mapping. The locations and weights on the reference
+  cell are described by objects derived from the Quadrature base
+  class. Typically, one chooses a quadrature formula (i.e. a set of points and
+  weights) so that the quadrature exactly equals the integral in the matrix;
+  this can be achieved because all factors in the integral are polynomial, and
+  is done by Gaussian quadrature formulas, implemented in the QGauss class.
+- We then need something that can help us evaluate $\varphi_i(\mathbf x^K_q)$
+  on cell $K$. This is what the FEValues class does: it takes a finite element
+  objects to describe $\varphi$ on the reference cell, a quadrature object to
+  describe the quadrature points and weights, and a mapping object (or
+  implicitly takes the MappingQ1 class) and provides values and derivatives of
+  the shape functions on the real cell $K$ as well as all sorts of other
+  information needed for integration, at the quadrature points located on $K$.
+
+FEValues really is the central class in the assembly process. One way you can
+view it is as follows: The FiniteElement and derived classes describe shape
+<i>functions</i>, i.e., infinite dimensional objects: functions have values at
+every point. We need this for theoretical reasons because we want to perform
+our analysis with integrals over functions. However, for a computer, this is a
+very difficult concept, since they can in general only deal with a finite
+amount of information, and so we replace integrals by sums over quadrature
+points that we obtain by mapping (the Mapping object) using  points defined on
+a reference cell (the Quadrature object) onto points on the real cell. In
+essence, we reduce the problem to one where we only need a finite amount of
+information, namely shape function values and derivatives, quadrature weights,
+normal vectors, etc, exclusively at a finite set of points. The FEValues class
+is the one that brings the three components together and provides this finite
+set of information on a particular cell $K$. You will see it in action when we
+assemble the linear system below.
+
+It is noteworthy that all of this could also be achieved if you simply created
+these three objects yourself in an application program, and juggled the
+information yourself. However, this would neither be simpler (the FEValues
+class provides exactly the kind of information you actually need) nor faster:
+the FEValues class is highly optimized to only compute on each cell the
+particular information you need; if anything can be re-used from the previous
+cell, then it will do so, and there is a lot of code in that class to make
+sure things are cached wherever this is advantageous.
+
+The final piece of the this introduction is to mention that after a linear
+system is obtained, it is solved using an iterative solver and then
+postprocessed: we create an output file using the DataOut class that can then
+be visualized using one of the common visualization programs.
+
+@note The preceding overview of all the important steps of any finite element
+implementation has its counterpart in deal.II: The library can naturally be
+grouped into a number of "modules" that cover the basic concepts just
+outlined. You can access these modules through the tab at the top of this
+page. An overview of the most fundamental groups of concepts is also available
+on the <a href="index.html">front page of the deal.II manual</a>.
+
 
 <h3>About the implementation</h3>
 
-This example shows the basic structure of most finite
-element programs, which are along the following lines:
+Although this is the simplest possible equation you can solve using the finite
+element method, this program shows the basic structure of most finite
+element programs and also serves as the template that almost all of the
+following programs will essentially follow. Specifically, the main class of
+this program looks like this:
+@code
+class Step3
+{
+  public:
+    Step3 ();
+    void run ();
+
+  private:
+    void make_grid ();
+    void setup_system ();
+    void assemble_system ();
+    void solve ();
+    void output_results () const;
+
+    Triangulation<2>     triangulation;
+    FE_Q<2>              fe;
+    DoFHandler<2>        dof_handler;
+
+    SparsityPattern      sparsity_pattern;
+    SparseMatrix<double> system_matrix;
+    Vector<double>       solution;
+    Vector<double>       system_rhs;
+};
+@endcode
+
+This follows the object oriented programming mantra of <a
+href="http://en.wikipedia.org/wiki/Encapsulation_(object-oriented_programming)">data
+encapsulation</a>, i.e. we do our best to hide almost all internal details of
+this class in private members that are not accessible to the outside.
+
+Let's start with the member variables: These follow the building blocks we
+have outlined above in the bullet points, namely we need a Triangulation and a
+DoFHandler object, and a finite element object that describes the kinds of
+shape functions we want to use. The second group of objects relate to the
+linear algebra: the system matrix and right hand side as well as the solution
+vector, and an object that describes the sparsity pattern of the matrix. This
+is all this class needs (and the essentials that any solver for a stationary
+PDE requires) and that needs to survive throughout the entire program. In
+contrast to this, the FEValues object we need for assembly is only required
+throughout assembly, and so we create it as a local object in the function
+that does that and destroy it again at its end.
+
+Secondly, let's look at the member functions. These, as well, already form the
+common structure that almost all following tutorial programs will use:
 <ul>
-  <li> Grid generation;
-  <li> Assembling matrices and vectors of the discrete system;
-  <li> Solving the linear system of equations;
-  <li> Writing results to disk.
+  <li> <code>make_grid()</code>: This is what one could call a
+       <i>pre-processing function</i>. As its name suggests, it sets up the
+       object that stores the triangulation. In later examples, it could also
+       deal with boundary conditions, geometries, etc.
+  <li> <code>setup_system()</code>: This then is the function in which all the
+       other data structures are set up that are needed to solve the
+       problem. In particular, it will initialize the DoFHandler object and
+       correctly size the various objects that have to do with the linear
+       algebra. This function is often separated from the pre-processing
+       function above because, in a time dependent program, it may be called
+       at least every few time steps whenever the mesh
+       is adaptively refined (something we will see how to do in step-6). On
+       the other hand, setting up the mesh itself in the pre-processing
+       function above is done only once at the beginning of the program and
+       is, therefore, separated into its own function.
+  <li> <code>assemble_system()</code>: This, then is where the contents of the
+       matrix and right hand side are computed, as discussed at length in the
+       introduction above. Since doing something with this linear system is
+       conceptually very different from computing its entries, we separate it
+       from the following function.
+  <li> <code>solve()</code>: This then is the function in which we compute the
+       solution $U$ of the linear system $AU=F$. In the current program, this
+       is a simple task since the matrix is so simple, but it will become a
+       significant part of a program's size whenever the problem is not so
+       trivial any more (see, for example, step-20, step-22, or step-31 once
+       you've learned a bit more about the library).
+  <li> <code>output_results()</code>: Finally, when you have computed a
+       solution, you probably want to do something with it. For example, you
+       may want to output it in a format that can be visualized, or you may
+       want to compute quantities you are interested in: say, heat fluxes in a
+       heat exchanger, air friction coefficients of a wing, maximum bridge
+       loads, or simple the value of the numerical solution at a point. This
+       function is therefore the place for postprocessing your solution.
 </ul>
+All of this is held together by the single public function (other than the
+constructor), namely the <code>run()</code> function. It is the one that is
+called from the place where an object of this type is created, and it is the
+one that calls all the other functions in their proper order. Encapsulating
+this operation into the <code>run()</code> function, rather than calling all
+the other functions from <code>main()</code> makes sure that you
+can change how the separation of concerns within this class is
+implemented. For example, if one of the functions becomes too big, you can
+split it up into two, and the only places you have to be concerned about
+changing as a consequence are within this very same class, and not anywhere
+else.
+
+As mentioned above, you will see this general structure &mdash; sometimes with
+variants in spelling of the functions' names, but in essentially this order of
+separation of functionality &mdash; again in many of the
+following tutorial programs.
 
 
 
