@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2006, 2007, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -52,7 +52,7 @@ class MySquareFunction : public Function<dim>
     virtual void   vector_value (const Point<dim>   &p,
 				 Vector<double>     &values) const
       {
-	for (unsigned int d=0; d<dim; ++d)
+	for (unsigned int d=0; d<2; ++d)
 	  values(d) = value(p,d);
       }
 };
