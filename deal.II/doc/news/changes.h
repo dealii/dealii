@@ -93,6 +93,11 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> Changed: Triangulation<dim>::get_boundary_indicators() used the
+same algorithm for any dim.
+<br>
+(Sebastian Pauletti 2011/08/17)
+
 <li> Changed: Several of the tutorial programs used the same class
 names, often <code>LaplaceProblem</code> in the earlier programs.
 There is nothing inherently wrong with this, since these are
