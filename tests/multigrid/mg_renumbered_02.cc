@@ -242,7 +242,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   MeshWorker::DoFInfo<dim> dof_info(dof);
 
   MeshWorker::Assembler::GnuplotPatch assembler;
-  assembler.initialize(dim, quadrature.size(), dim+dof.get_fe().n_components());
+  assembler.initialize(n_gauss_points+1, dof.get_fe().n_components());
 
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
