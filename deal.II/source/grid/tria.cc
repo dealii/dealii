@@ -9472,9 +9472,6 @@ template <int dim, int spacedim>
 std::vector<unsigned char>
 Triangulation<dim, spacedim>::get_boundary_indicators () const
 {
-				   // in 1d, the situation is simpler:
-  if (dim == 1)
-    return std::vector<unsigned char> (0);;
 
   std::vector<bool> bi_exists(255, false);
   active_cell_iterator cell=begin_active();
