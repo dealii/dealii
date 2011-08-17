@@ -125,7 +125,7 @@
     <p>
     deal.II has a testsuite that, at the time this article is written (mid-2011),
     has some 2300 small programs (growing by roughly one per day) that we run
-    every time we make a 
+    every time we make a
     change to make sure that no existing functionality is broken. The
     expected output is also stored in our subversion archive, and when you
     run a test you are notified if a test fails. These days, every
@@ -337,8 +337,8 @@
     time we add new functionality to the library or fix a bug. If you
     want to contribute code to the library, you should do this
     as well. Here's how: you need a testcase,
-    a subdirectory with the same name as the test, an entry in the
-    Makefile, and an expected output.
+    a subdirectory with the same name as the test, and a file with the
+    expected output.
     </p>
 
     <h4>The testcase</h4>
@@ -537,15 +537,14 @@ testname/cmp/generic
     Tests are a way to make sure everything keeps working. If they
     aren't automated, they are no good. We are therefore very
     interested in getting new tests. If you have subversion write access
-    already, you have to add the new test and the expected output
-    file, and to commit them together with the changed Makefile, like
-    so:
+    already, you can add the new test and the expected output
+    file:
     <pre>
       svn add bits/my_new_test.cc
       svn add bits/my_new_test
       svn add bits/my_new_test/cmp
       svn add bits/my_new_test/cmp/generic
-      svn commit -m "New test" bits/my_new_test* bits/Makefile
+      svn commit -m "New test" bits/my_new_test*
     </pre>
     In addition, you should do the following in order to avoid that the files
     generated while running the testsuite show up in the output of <code>svn
