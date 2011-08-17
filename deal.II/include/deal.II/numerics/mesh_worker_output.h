@@ -124,7 +124,15 @@ namespace MeshWorker
 					  */
         void write_endl () const;
 
+					 /**
+					  * The number of output
+					  * components in each point.
+					  */
 	unsigned int n_vectors;
+					 /**
+					  * The number of points in
+					  * one direction.
+					  */
 	unsigned int n_points;
 
 	/**
@@ -198,12 +206,15 @@ namespace MeshWorker
       const unsigned int nv = info.n_quadrature_values();
       const unsigned int patch_dim = (info.face_number == numbers::invalid_unsigned_int)
 				     ? dim : (dim-1);
-      const unsigned int row_length = static_cast<unsigned int>(std::pow(np, 1./patch_dim)+.5);
-      
+      const unsigned int row_length = n_points;
 				       // If patches are 1D, end the
 				       // patch after a row, else and
 				       // it after a square
       const unsigned int row_length2 = (patch_dim==1) ? row_length : (row_length*row_length);
+
+      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
+      AssertDimension(nv, n_vectors+dim);
+      
       
       for (unsigned int k=0; k<np; ++k)
 	{
