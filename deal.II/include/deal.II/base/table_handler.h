@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -154,7 +154,7 @@ class TableEntry : public TableEntryBase
  * square roots are set to be 6 (instead of 4 as default).
  *
  * @code
- * TableHandler table();
+ * TableHandler table;
  *
  * for (unsigned int i=1; i<=n; ++i)
  *   {
