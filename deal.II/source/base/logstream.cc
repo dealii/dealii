@@ -19,7 +19,6 @@
 
 // include sys/resource.h for rusage(). Mac OS X needs sys/time.h then
 // as well (strange), so include that, too.
-#include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -60,6 +59,9 @@ LogStream::LogStream()
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
+#ifdef HAVE_TIMES
+  reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
+#endif
 }
 
 
@@ -371,6 +373,26 @@ LogStream::print_line_head()
 
       *file << head << ':';
     }
+}
+
+
+void
+LogStream::timestamp ()
+{
+  struct tms current_tms;
+#ifdef HAVE_TIMES
+  const clock_t tick = sysconf(_SC_CLK_TCK);
+  const double time = 1./tick * times(&current_tms);
+#else
+  const double time = 0.;
+  const unsigned int tick = 100;
+#endif
+  (*this) << "Wall: " << time - reference_time_val
+	  << " User: " << 1./tick * (current_tms.tms_utime - reference_tms.tms_utime)
+	  << " System: " << 1./tick * (current_tms.tms_stime - reference_tms.tms_stime)
+	  << " Child-User: " << 1./tick * (current_tms.tms_cutime - reference_tms.tms_cutime)
+	  << " Child-System: " << 1./tick * (current_tms.tms_cstime - reference_tms.tms_cstime)
+	  << std::endl;
 }
 
 

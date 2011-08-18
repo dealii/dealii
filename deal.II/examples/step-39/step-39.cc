@@ -928,6 +928,15 @@ Step39<dim>::estimate()
 				   // deal.II are not numbered, we
 				   // have to create our own numbering
 				   // in order to use this vector.
+				   //
+				   // On the other hand, somebody
+				   // might have used the user indices
+				   // already. So, let's be good
+				   // citizens and save them before
+				   // tampering with them.
+  std::vector<unsigned int> old_user_indices;
+  triangulation.save_user_indices(old_user_indices);
+  
   estimates.block(0).reinit(triangulation.n_active_cells());
   unsigned int i=0;
   for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
@@ -994,6 +1003,11 @@ Step39<dim>::estimate()
     &Estimator<dim>::boundary,
     &Estimator<dim>::face,
     assembler);
+
+				   // Right before we return the
+				   // result of the error estimate, we
+				   // restore the old user indices.
+  triangulation.load_user_indices(old_user_indices);
   return estimates.block(0).l2_norm();
 }
 

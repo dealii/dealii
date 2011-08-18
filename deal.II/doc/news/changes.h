@@ -281,6 +281,12 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Improved: The function LogStream::timestamp() outputs all results of the Posix
+function times, namely wall time, user time and system time.
+<br>
+(Guido Kanschat, 2011/08/18)
+
 <li> Extended: GridGenerator::half_hyper_shell() got the option
 <code>colorize</code>, which assigns different boundary indicators to the
 different parts of the boundary. Added GridGenerator::quarter_hyper_shell()

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,7 +12,6 @@
 #ifndef __deal2__logstream_h
 #define __deal2__logstream_h
 
-
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
@@ -22,6 +21,15 @@
 #include <map>
 #include <cmath>
 #include <sstream>
+
+#ifdef HAVE_SYS_TIMES_H
+#include <sys/times.h>
+#else
+struct tms 
+{
+    int tms_utime, tms_stime, tms_cutime, tms_cstime;
+};
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -186,6 +194,14 @@ class LogStream
 				      */
     bool log_time_differences (const bool flag);
 
+				     /**
+				      * Write detailed timing
+				      * information.
+				      *
+				      *
+				      */
+    void timestamp();
+    
 				     /**
 				      * Log the thread id.
 				      */
@@ -374,6 +390,18 @@ class LogStream
 				      * Flag for printing thread id.
 				      */
     bool print_thread_id;
+
+				     /**
+				      * The value times() returned
+				      * on initialization.
+				      */
+    double reference_time_val;
+
+				     /**
+				      * The tms structure times()
+				      * filled on initialization.
+				      */
+    struct tms reference_tms;
     
 				     /**
 				      * Original buffer of
