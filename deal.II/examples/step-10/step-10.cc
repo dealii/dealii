@@ -644,17 +644,46 @@ namespace Step10
 }
 
 
-				 // The following main function just
-				 // calls the above functions in the
-				 // order of their appearance.
+				 // The following main function just calls the
+				 // above functions in the order of their
+				 // appearance. Apart from this, it looks just
+				 // like the main functions of previous
+				 // tutorial programs.
 int main ()
 {
-  std::cout.precision (16);
+  try
+    {
+      std::cout.precision (16);
 
-  Step10::gnuplot_output<2>();
+      Step10::gnuplot_output<2>();
 
-  Step10::compute_pi_by_area<2> ();
-  Step10::compute_pi_by_perimeter<2> ();
+      Step10::compute_pi_by_area<2> ();
+      Step10::compute_pi_by_perimeter<2> ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
 
   return 0;
 }
