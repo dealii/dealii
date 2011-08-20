@@ -1397,7 +1397,12 @@ class FiniteElement : public Subscriptor,
     bool
     is_primitive (const unsigned int i) const;
 
-    FiniteElementData<dim>::is_primitive;
+                                     /**
+				      * Import function that is overloaded
+				      * by the one above and would otherwise
+				      * be hidden.
+				      */
+    using FiniteElementData<dim>::is_primitive;
 
 				     /**
 				      * Number of base elements in a
