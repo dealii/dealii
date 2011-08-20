@@ -2519,7 +2519,7 @@ const
 template <>
 void
 FE_Nedelec<1>::get_subface_interpolation_matrix(
-  const FiniteElement<1>&,
+  const FiniteElement<1,1>&,
   const unsigned int,
   FullMatrix<double>&) const
 {
