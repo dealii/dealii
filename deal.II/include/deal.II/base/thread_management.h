@@ -1353,7 +1353,7 @@ namespace Threads
 			:
 			thread_is_active (false)
 	  {}
-	
+
 
 					 /**
 					  * Start the thread and let
@@ -3737,7 +3737,7 @@ namespace Threads
   {
 #if (DEAL_II_USE_MT == 1)
 
-    template <typename> class TaskDescriptor;
+    template <typename> struct TaskDescriptor;
 
 
 				     /**
