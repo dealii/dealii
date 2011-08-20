@@ -461,10 +461,13 @@ class MatrixBlockVector
 				      */
     MATRIX& matrix(unsigned int i);
 
-    NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
-    NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
-    NamedData<std_cxx1x::shared_ptr<value_type> >::size;
-    NamedData<std_cxx1x::shared_ptr<value_type> >::name;
+				     /**
+				      * import functions from private base class
+				      */
+    using NamedData<std_cxx1x::shared_ptr<value_type> >::subscribe;
+    using NamedData<std_cxx1x::shared_ptr<value_type> >::unsubscribe;
+    using NamedData<std_cxx1x::shared_ptr<value_type> >::size;
+    using NamedData<std_cxx1x::shared_ptr<value_type> >::name;
 };
 
 
