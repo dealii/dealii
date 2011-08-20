@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ namespace internal
 {
   namespace DoFHandler
   {
-    class NumberCache;
+    struct NumberCache;
 
 				     /**
 				      * A namespace in which we define
@@ -58,7 +58,7 @@ namespace internal
 					    * Destructor.
 					    */
 	  virtual ~PolicyBase ();
-	  
+
 					   /**
 					    * Distribute degrees of freedom on
 					    * the object given as last argument.
