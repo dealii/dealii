@@ -286,7 +286,7 @@ class RefinementCase : public RefinementPossibilities<dim>
 				      * refinement case with no_refinement.
 				      */
     RefinementCase ();
-    
+
 				     /**
 				      * Constructor. Take and store a
 				      * value indicating a particular
@@ -388,9 +388,9 @@ class RefinementCase : public RefinementPossibilities<dim>
     static std::size_t memory_consumption ();
 
     /**
-     * Read or write the data of this object to or 
+     * Read or write the data of this object to or
      * from a stream for the purpose of serialization
-     */ 
+     */
     template <class Archive>
     void serialize(Archive & ar,
 		   const unsigned int version);
@@ -763,7 +763,7 @@ namespace internal
 
 
 
-template <int dim> class GeometryInfo;
+template <int dim> struct GeometryInfo;
 
 
 
@@ -2477,7 +2477,7 @@ template <class Archive>
 void RefinementCase<dim>::serialize (Archive &ar,
 				     const unsigned int)
 {
-  // serialization can't deal with bitfields, so copy from/to a full sized 
+  // serialization can't deal with bitfields, so copy from/to a full sized
   // unsigned char
   unsigned char uchar_value = value;
   ar & uchar_value;
