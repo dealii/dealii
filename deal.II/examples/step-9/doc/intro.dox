@@ -103,9 +103,14 @@ problem
 @f[
   {\mathbf u}^T A = {\mathbf f}^T,
 @f]
-where ${\mathbf u}=(u_i)$, i.e. we have to solve the transpose problem of
-what we might have expected naively. In order to obtain the usual form
-of the linear system, it is therefore best to rewrite the weak
+where ${\mathbf u}=(u_i)$, i.e., we have to solve the transpose problem of
+what we might have expected naively.
+
+This is a point we made in the introduction of step-3. There, we argued that
+to avoid this very kind of problem, one should get in the habit of always
+multiplying with test functions <i>from the left</i> instead of from the right
+to obtain the correct matrix right away. In order to obtain the form
+of the linear system that we need, it is therefore best to rewrite the weak
 formulation to
 @f[
   (v_h + \delta \beta\cdot\nabla v_h, \beta \cdot \nabla u_h)_\Omega
@@ -127,7 +132,7 @@ and then to obtain
 as system matrix. We will assemble this matrix in the program.
 
 There remains the solution of this linear system of equations. As the
-resulting matrix is no more symmetric positive definite, we can't
+resulting matrix is no longer symmetric positive definite, we can't
 employ the usual CG method any more. Suitable for the solution of
 systems as the one at hand is the BiCGStab (bi-conjugate gradients
 stabilized) method, which is also available in deal.II, so we will use

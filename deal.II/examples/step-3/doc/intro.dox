@@ -5,7 +5,7 @@
 <h3>The basic functioning of finite elements</h3>
 
 This is the first example where we actually use finite elements to compute
-something. We 
+something. We
 will solve a simple version of Poisson's equation with zero boundary
 values, but a nonzero right hand side:
 @f{align*}
@@ -115,7 +115,9 @@ any sort of confusion, experience has shown that simply getting into the habit
 of multiplying the equation from the left rather than from the right (as is
 often done in the mathematical literature) avoids a common class of errors as
 the matrix is automatically correct and does not need to be transposed when
-comparing theory and implementation.
+comparing theory and implementation. See step-9 for the first example in this
+tutorial where we have a non-symmetric bilinear form for which it makes a
+difference whether we multiply from the right or from the left.
 
 Now we know what we need (namely objects that hold the matrix and
 vectors, as well as ways to compute $A_{ij},F_i$), and we can look at what it
@@ -139,7 +141,7 @@ takes to make that happen:
     A^K_{ij} &=
     \int_K \nabla\varphi_i \cdot \nabla \varphi_j
     \approx
-    \sum_q \nabla\varphi_i(\mathbf x^K_q) \cdot \nabla 
+    \sum_q \nabla\varphi_i(\mathbf x^K_q) \cdot \nabla
     \varphi_j(\mathbf x^K_q) w_q^K,
     \\
     F^K_i &=
