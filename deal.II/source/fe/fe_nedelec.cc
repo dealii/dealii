@@ -2697,7 +2697,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
                     Point<dim>
                       quadrature_point (0.5 * (i + shifts[subface][0]),
                                         0.5 * (edge_quadrature_points[q_point] (0)
-                                               + shifts[subface][1]), 0.0);
+                                               + shifts[subface][1]), 
+					0.0);
 
                     interpolation_matrix (i * source_fe.degree, dof) += weight
                                                                      * this->shape_value_component
