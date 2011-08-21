@@ -115,8 +115,9 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int p,
 		degree(p),
 		n_inner(Utilities::fixed_power<dim>(degree-1)),
 		n_outer((dim==1) ? 2 :
-			(dim==2) ? 4+4*(degree-1)
-			:8+12*(degree-1)+6*(degree-1)*(degree-1)),
+			((dim==2) ?
+			 4+4*(degree-1) :
+			 8+12*(degree-1)+6*(degree-1)*(degree-1))),
 		tensor_pols(0),
 		n_shape_functions(Utilities::fixed_power<dim>(degree+1)),
 		renumber(FETools::
@@ -157,7 +158,7 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
 		MappingQ1<dim,spacedim>(),
 		degree(mapping.degree),
 		n_inner(mapping.n_inner),
-		n_outer(n_outer),
+		n_outer(mapping.n_outer),
 		tensor_pols(0),
 		n_shape_functions(mapping.n_shape_functions),
 		renumber(mapping.renumber),
@@ -1360,8 +1361,8 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   if(p_data->shape_values.size()<p_data->mapping_support_points.size())
     p_data->mapping_support_points.resize
       (GeometryInfo<dim>::vertices_per_cell);
-  
-  
+
+
   return this->transform_unit_to_real_cell_internal(*p_data);
 }
 
@@ -1400,7 +1401,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 				       // points on the vertices.
       if(mdata->shape_values.size()<points.size())
 	points.resize(GeometryInfo<dim>::vertices_per_cell);
-      
+
 
       this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
     }
