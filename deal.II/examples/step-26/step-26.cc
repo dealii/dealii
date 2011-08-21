@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -18,6 +18,7 @@
 				 // not explain their meaning here
 				 // again.
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -51,7 +52,6 @@
 
 #include <algorithm>
 #include <numeric>
-#include <deal.II/grid/tria_boundary.h>
 
 				 // The last step is as in all
 				 // previous programs:
@@ -64,7 +64,7 @@ class PointCloudSurface : public StraightBoundary<3>
 				      * Constructor.
 				      */
     PointCloudSurface (const std::string &filename);
-    
+
 				     /**
 				      * Let the new point be the
 				      * arithmetic mean of the two
@@ -138,7 +138,7 @@ class PointCloudSurface : public StraightBoundary<3>
 				      * point cloud, rather than doing any
 				      * sort of interpolation.
 				      */
-    Point<3> closest_point (const Point<3> &p) const;    
+    Point<3> closest_point (const Point<3> &p) const;
   private:
     std::vector<Point<3> > point_list;
 };
@@ -150,7 +150,7 @@ PointCloudSurface::PointCloudSurface (const std::string &filename)
   {
     std::ifstream in (filename.c_str());
     AssertThrow (in, ExcIO());
-    
+
     while (in)
       {
 	Point<3> p;
@@ -160,7 +160,7 @@ PointCloudSurface::PointCloudSurface (const std::string &filename)
 
     AssertThrow (point_list.size() > 1, ExcIO());
   }
-  
+
 				   // next fit a linear model through the data
 				   // cloud to rectify it in a local
 				   // coordinate system
@@ -179,7 +179,7 @@ PointCloudSurface::PointCloudSurface (const std::string &filename)
 				   // next do a least squares fit to the
 				   // function ax+by. this leads to the
 				   // following equations:
-  
+
 				   // min f(a,b) = sum_i (zi-a xi - b yi)^2 / 2
 				   //
 				   // f_a = sum_i (zi - a xi - b yi) xi = 0
@@ -216,7 +216,7 @@ PointCloudSurface::PointCloudSurface (const std::string &filename)
       = Point<2>(-b,a) / std::sqrt(a*a+b*b);
 
     const double stretch_factor = std::sqrt(1.+a*a+b*b);
-    
+
     for (unsigned int i=0; i<point_list.size(); ++i)
       {
 					 // we can do that by, for each point,
@@ -244,7 +244,7 @@ PointCloudSurface::PointCloudSurface (const std::string &filename)
 	  = (grad_distance * stretch_factor * gradient_direction +
 	     orth_distance * orthogonal_direction);
 	point_list[i][0] = new_xy[0];
-	point_list[i][1] = new_xy[1];	
+	point_list[i][1] = new_xy[1];
       }
   }
 }
@@ -255,7 +255,7 @@ PointCloudSurface::closest_point (const Point<3> &p) const
 {
   double distance = p.distance (point_list[0]);
   Point<3> point = point_list[0];
-  
+
   for (std::vector<Point<3> >::const_iterator i=point_list.begin();
        i != point_list.end(); ++i)
     {
@@ -270,7 +270,7 @@ PointCloudSurface::closest_point (const Point<3> &p) const
   return point;
 }
 
-  
+
 Point<3>
 PointCloudSurface::
 get_new_point_on_line (const Triangulation<3>::line_iterator &line) const
@@ -344,12 +344,12 @@ PointCloudSurface pds("surface-points");
 				 // respectively. Apart from this,
 				 // everything is as before.
 template <int dim>
-class LaplaceProblem 
+class LaplaceProblem
 {
   public:
     LaplaceProblem ();
     void run ();
-    
+
   private:
     void make_grid_and_dofs ();
     void assemble_system ();
@@ -374,11 +374,11 @@ class LaplaceProblem
 
 
 template <int dim>
-class BoundaryValues : public Function<dim> 
+class BoundaryValues : public Function<dim>
 {
   public:
     BoundaryValues () : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 };
@@ -387,7 +387,7 @@ class BoundaryValues : public Function<dim>
 
 template <int dim>
 double BoundaryValues<dim>::value (const Point<dim> &p,
-				   const unsigned int /*component*/) const 
+				   const unsigned int /*component*/) const
 {
   return std::max(p[dim-1], -5.);
 }
@@ -497,15 +497,15 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 	break;
       }
   triangulation.set_boundary (1, pds);
-  
-  
+
+
   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
     if (triangulation.begin()->vertex(v)[2] > 0)
       triangulation.begin()->vertex(v)
 	= pds.closest_point (Point<3>(triangulation.begin()->vertex(v)[0],
 				      triangulation.begin()->vertex(v)[1],
 				      0));
-	
+
   for (unsigned int i=0; i<4; ++i)
     {
       for (typename Triangulation<dim>::active_cell_iterator
@@ -514,7 +514,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	  if (cell->face(f)->boundary_indicator() == 1)
 	    cell->set_refine_flag ();
-      
+
       triangulation.execute_coarsening_and_refinement ();
 
       std::cout << "Refinement cycle " << i << std::endl
@@ -526,8 +526,8 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 		<< std::endl;
 
     }
-  
-  
+
+
   dof_handler.distribute_dofs (fe);
 
   std::cout << "   Number of degrees of freedom: "
@@ -563,7 +563,7 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 				 // way we assemble matrix and right
 				 // hand side vector dimension
 				 // independently: there is simply no
-				 // difference to the 
+				 // difference to the
 				 // two-dimensional case. Since the
 				 // important objects used in this
 				 // function (quadrature formula,
@@ -580,13 +580,13 @@ void LaplaceProblem<dim>::make_grid_and_dofs ()
 				 // don't have to care about most
 				 // things.
 template <int dim>
-void LaplaceProblem<dim>::assemble_system () 
-{  
+void LaplaceProblem<dim>::assemble_system ()
+{
   MatrixTools::create_laplace_matrix (dof_handler,
 				      QGauss<dim>(2),
 				      system_matrix);
   system_rhs = 0;
-  
+
   std::map<unsigned int,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
@@ -609,7 +609,7 @@ void LaplaceProblem<dim>::assemble_system ()
 				 // function is copied verbatim from the
 				 // previous example.
 template <int dim>
-void LaplaceProblem<dim>::solve () 
+void LaplaceProblem<dim>::solve ()
 {
 				   // NEW
   SolverControl           solver_control (dof_handler.n_dofs(),
@@ -678,10 +678,10 @@ void LaplaceProblem<dim>::output_results () const
 				 // additional output, it is the same
 				 // as for the previous example.
 template <int dim>
-void LaplaceProblem<dim>::run () 
+void LaplaceProblem<dim>::run ()
 {
   std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
+
   make_grid_and_dofs();
   assemble_system ();
   solve ();
@@ -763,13 +763,13 @@ void LaplaceProblem<dim>::run ()
                                  // written. By changing it you can get more
                                  // information about the innards of the
                                  // library.
-int main () 
+int main ()
 {
   deallog.depth_console (0);
   {
     LaplaceProblem<3> laplace_problem_3d;
     laplace_problem_3d.run ();
   }
-  
+
   return 0;
 }
