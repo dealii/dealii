@@ -117,10 +117,11 @@ namespace DoFRenumbering
 	  {
 	    return (! (T::operator==(i)));
 	  }
-					 // Allow access to these operators of T
-	T::operator->;
-	T::operator++;
-	T::operator==;
+					 // Allow access to these
+					 // private operators of T
+	using T::operator->;
+	using T::operator++;
+	using T::operator==;
     };
   }
 
