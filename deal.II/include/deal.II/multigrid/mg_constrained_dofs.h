@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class MGDoFHandler;
-template <int dim> class FunctionMap;
+template <int dim> struct FunctionMap;
 
 
 /**
@@ -83,7 +83,7 @@ class MGConstrainedDoFs : public Subscriptor
 
 				     /**
 				      * Determine whether a dof index
-				      * is at the refinement edge and 
+				      * is at the refinement edge and
                                       * subject to a boundary
 				      * constraint .
 				      */
@@ -119,14 +119,14 @@ class MGConstrainedDoFs : public Subscriptor
       get_refinement_edge_boundary_indices () const;
 
 				     /**
-				      * Return if boundary_indices need to 
+				      * Return if boundary_indices need to
                                       * be set or not.
 				      */
 
     bool set_boundary_values () const;
 
 				     /**
-				      * Return if the finite element requires 
+				      * Return if the finite element requires
                                       * continuity across refinement edges.
                                       */
     bool continuity_across_refinement_edges () const;
@@ -171,7 +171,7 @@ MGConstrainedDoFs::initialize(const MGDoFHandler<dim,spacedim>& dof)
       refinement_edge_indices[l].resize(dof.n_dofs(l));
       refinement_edge_boundary_indices[l].resize(dof.n_dofs(l));
     }
-  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices, 
+  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
 					 refinement_edge_boundary_indices);
 }
 
@@ -188,30 +188,30 @@ MGConstrainedDoFs::initialize(
   boundary_indices.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
-  
+
   for(unsigned int l=0; l<nlevels; ++l)
     {
       boundary_indices[l].clear();
       refinement_edge_indices[l].resize(dof.n_dofs(l));
       refinement_edge_boundary_indices[l].resize(dof.n_dofs(l));
     }
-  
+
   MGTools::make_boundary_list (dof, function_map, boundary_indices, component_mask);
-  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices, 
+  MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
 					 refinement_edge_boundary_indices);
 }
 
 
 inline
 void
-MGConstrainedDoFs::clear() 
+MGConstrainedDoFs::clear()
 {
   for(unsigned int l=0; l<boundary_indices.size(); ++l)
     boundary_indices[l].clear();
-  
+
   for(unsigned int l=0; l<refinement_edge_indices.size(); ++l)
     refinement_edge_indices[l].clear();
-  
+
   for(unsigned int l=0; l<refinement_edge_boundary_indices.size(); ++l)
     refinement_edge_boundary_indices[l].clear();
 }
@@ -219,7 +219,7 @@ MGConstrainedDoFs::clear()
 
 inline
 bool
-MGConstrainedDoFs::is_boundary_index (const unsigned int level, 
+MGConstrainedDoFs::is_boundary_index (const unsigned int level,
 				  const unsigned int index) const
 {
   AssertIndexRange(level, boundary_indices.size());
@@ -275,16 +275,16 @@ MGConstrainedDoFs::get_refinement_edge_boundary_indices () const
 }
 
 inline
-bool 
+bool
 MGConstrainedDoFs::set_boundary_values () const
 {
-  const bool boundary_values_need_to_be_set 
+  const bool boundary_values_need_to_be_set
     = boundary_indices.size()!=0;
   return boundary_values_need_to_be_set;
 }
 
 inline
-bool 
+bool
 MGConstrainedDoFs::continuity_across_refinement_edges () const
 {
   bool is_continuous = false;

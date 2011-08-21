@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,7 +24,7 @@ namespace internal
 {
   namespace MGDoFHandler
   {
-    class Implementation;
+    struct Implementation;
   }
 }
 
@@ -104,7 +104,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * Destructor
 				      */
     virtual ~MGDoFHandler ();
-    
+
 				     /**
 				      * Go through the triangulation
 				      * and distribute the degrees of
