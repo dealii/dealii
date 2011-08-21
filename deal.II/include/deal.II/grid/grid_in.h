@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,8 +24,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int space_dim> class Triangulation;
-template <int dim> class CellData;
-class SubCellData;
+template <int dim> struct CellData;
+struct SubCellData;
 
 
 /**
@@ -163,7 +163,7 @@ class SubCellData;
  *
  *
  * <h3>Structure of input grid data. The GridReordering class</h3>
- * 
+ *
  * It is your duty to use a correct numbering of vertices in the cell
  * list, i.e. for lines in 1d, you have to first give the vertex with
  * the lower coordinate value, then that with the higher coordinate
@@ -266,12 +266,12 @@ class GridIn
 					   /// Use read_tecplot()
 	  tecplot
     };
-    
+
 				     /**
 				      * Constructor.
 				      */
     GridIn ();
-    
+
 				     /**
 				      * Attach this triangulation
 				      * to be fed with the grid data.
@@ -285,7 +285,7 @@ class GridIn
 				      * used.
 				      */
     void read (std::istream &in, Format format=Default);
-    
+
 				     /**
 				      * Open the file given by the
 				      * string and call the previous
@@ -295,7 +295,7 @@ class GridIn
 				      * used is <code>MESH</code>.
 				      */
     void read (const std::string &in, Format format=Default);
-    
+
 				     /**
 				      * Read grid data from an ucd file.
 				      * Numerical data is ignored.
@@ -308,14 +308,14 @@ class GridIn
 				      * format.
 				      */
     void read_dbmesh (std::istream &in);
-    
+
 				     /**
 				      * Read grid data from a file
 				      * containing data in the XDA
 				      * format.
 				      */
     void read_xda (std::istream &in);
-    
+
     				     /**
 				      * Read grid data from an msh
 				      * file, either version 1 or
@@ -333,7 +333,7 @@ class GridIn
 				      * than Gmsh.
 				      */
     void read_msh (std::istream &in);
-    
+
     				     /**
 				      * Read grid data from a NetCDF
 				      * file. The only data format
@@ -345,7 +345,7 @@ class GridIn
 				      * NetCDF library.
 				      */
     void read_netcdf (const std::string &filename);
-    
+
     				     /**
 				      * Read grid data from a file containing
 				      * tecplot ASCII data. This also works in
@@ -353,13 +353,13 @@ class GridIn
 				      * installation.
 				      */
     void read_tecplot (std::istream &in);
-    
+
 				     /**
 				      * Returns the standard suffix
 				      * for a file in this format.
 				      */
     static std::string default_suffix (const Format format);
-    
+
 				     /**
 				      * Return the enum Format for the
 				      * format name.
@@ -407,7 +407,7 @@ class GridIn
 		    std::string,
 		    << "The string <" << arg1 << "> is not recognized at the present"
 		    << " position of a DB Mesh file.");
-    
+
 				     /**
 				      * Exception
 				      */
@@ -415,7 +415,7 @@ class GridIn
 		    int,
 		    << "The specified dimension " << arg1
 		    << " is not the same as that of the triangulation to be created.");
-				    
+
     DeclException1 (ExcInvalidGMSHInput,
 		    std::string,
 		    << "The string <" << arg1 << "> is not recognized at the present"
@@ -432,7 +432,7 @@ class GridIn
 		    << "5 Hexahedron (8 nodes, 12 edges, 6 faces).\n"
 		    << "15 Point (1 node, ignored when read)");
 
-    
+
     DeclException0 (ExcGmshNoCellInformation);
   protected:
 				     /**
@@ -440,7 +440,7 @@ class GridIn
 				      * be fed with the data read in.
 				      */
     SmartPointer<Triangulation<dim,spacedim>,GridIn<dim,spacedim> > tria;
-    
+
 				     /**
 				      * This function can write the
 				      * raw cell data objects created
@@ -499,7 +499,7 @@ class GridIn
 				      * whitespace.
 				      */
     static void skip_empty_lines (std::istream &in);
-    
+
 				     /**
 				      * Skip lines of comment that
 				      * start with the indicated
@@ -535,7 +535,7 @@ class GridIn
 				     std::vector<unsigned int> &IJK,
 				     bool          &structured,
 				     bool          &blocked);
-    
+
 				     /**
 				      * Input format used by read() if
 				      * no format is given.
