@@ -93,10 +93,10 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
-<li> Changed: Triangulation<dim>::get_boundary_indicators() used the
-same algorithm for any dim.
+<li> New: deal.II can now be configured and built with the
+<a href="http://clang.llvm.org">Clang C++ frontend of the LLVM compiler</a>.
 <br>
-(Sebastian Pauletti 2011/08/17)
+(Timo Heister, Wolfgang Bangerth, 2011/08/20)
 
 <li> Changed: Several of the tutorial programs used the same class
 names, often <code>LaplaceProblem</code> in the earlier programs.
@@ -281,6 +281,10 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: Triangulation<dim>::get_boundary_indicators() returned
+wrong data for dim=1.
+<br>
+(Sebastian Pauletti 2011/08/17)
 
 <li> Improved: The function LogStream::timestamp() outputs all results of the Posix
 function times, namely wall time, user time and system time.
