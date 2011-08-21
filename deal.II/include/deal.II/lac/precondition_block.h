@@ -599,22 +599,25 @@ class PreconditionBlockJacobi : public virtual Subscriptor,
         Accessor accessor;
     };
 
-    PreconditionBlock<MATRIX, inverse_type>::initialize;
-    PreconditionBlock<MATRIX, inverse_type>::clear;
-    PreconditionBlock<MATRIX, inverse_type>::empty;
-    PreconditionBlock<MATRIX, inverse_type>::el;
-    PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
-    PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
-    PreconditionBlock<MATRIX, inverse_type>::block_size;
-    PreconditionBlockBase<inverse_type>::size;
-    PreconditionBlockBase<inverse_type>::inverse;
-    PreconditionBlockBase<inverse_type>::inverse_householder;
-    PreconditionBlockBase<inverse_type>::inverse_svd;
+				     /**
+				      * import functions from private base class
+				      */
+    using PreconditionBlock<MATRIX, inverse_type>::initialize;
+    using PreconditionBlock<MATRIX, inverse_type>::clear;
+    using PreconditionBlock<MATRIX, inverse_type>::empty;
+    using PreconditionBlock<MATRIX, inverse_type>::el;
+    using PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
+    using PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
+    using PreconditionBlock<MATRIX, inverse_type>::block_size;
+    using PreconditionBlockBase<inverse_type>::size;
+    using PreconditionBlockBase<inverse_type>::inverse;
+    using PreconditionBlockBase<inverse_type>::inverse_householder;
+    using PreconditionBlockBase<inverse_type>::inverse_svd;
 				     /**
 				      * @deprecated Use size() instead
 				      */
-    PreconditionBlock<MATRIX, inverse_type>::n_blocks;
-    PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    using PreconditionBlock<MATRIX, inverse_type>::n_blocks;
+    using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
 				      * Execute block Jacobi
