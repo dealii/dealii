@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2405,9 +2405,14 @@ namespace internal
 	get_dof_indices (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim> > &accessor,
 			 std::vector<unsigned int>                            &dof_indices)
 	  {
-					     // no caching for hp::DoFHandler implemented
-	    accessor.dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim> >::get_dof_indices (dof_indices,
-										      accessor.active_fe_index());
+					     // no caching for
+					     // hp::DoFHandler
+					     // implemented
+	    typedef
+	      dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim> >
+	      DoFAccessor;
+	    accessor.DoFAccessor::get_dof_indices (dof_indices,
+						   accessor.active_fe_index());
 	  }
 
 
