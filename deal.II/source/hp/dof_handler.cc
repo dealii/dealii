@@ -2685,7 +2685,7 @@ namespace hp
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
-    DoFHandler<1>::cell_iterator cell;
+    DoFHandler<1,1>::cell_iterator cell;
     unsigned int n = 0;
 
                                      // search left-most cell
@@ -2718,7 +2718,7 @@ namespace hp
       Assert ((i->first == 0) || (i->first == 1),
               ExcInvalidBoundaryIndicator());
 
-    DoFHandler<1>::active_cell_iterator cell;
+    DoFHandler<1,1>::active_cell_iterator cell;
     unsigned int n = 0;
 
                                      // search left-most cell
