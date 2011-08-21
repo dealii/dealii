@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -126,10 +126,10 @@ BlockMatrixArray<number>::vmult_add (BlockVector<number>& dst,
 
   typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
-  
+
   typename std::vector<Entry>::const_iterator m = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
-  
+
   for (; m != end ; ++m)
     {
       aux.reinit(dst.block(m->row));
@@ -169,10 +169,10 @@ BlockMatrixArray<number>::Tvmult_add (BlockVector<number>& dst,
 
   typename std::vector<Entry>::const_iterator m = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
-  
+
   typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
-  
+
   for (; m != end ; ++m)
     {
       aux.reinit(dst.block(m->col));
@@ -212,12 +212,12 @@ BlockMatrixArray<number>::matrix_scalar_product (
 
   typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
-  
+
   typename std::vector<Entry>::const_iterator m;
   typename std::vector<Entry>::const_iterator end = entries.end();
 
   number result = 0.;
-  
+
   for (unsigned int i=0;i<block_rows;++i)
     {
       aux.reinit(u.block(i));
@@ -303,7 +303,7 @@ BlockTrianglePrecondition<number>::initialize(
   bool backward)
 {
   BlockMatrixArray<number>::initialize(n_block_rows, n_block_rows, memory);
-  backward = backward;
+  this->backward = backward;
 }
 
 
@@ -329,12 +329,12 @@ BlockTrianglePrecondition<number>::do_row (
     end = this->entries.end();
   std::vector<typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator>
     diagonals;
-  
+
   typename VectorMemory<Vector<number> >::Pointer p_aux(mem);
   Vector<number>& aux = *p_aux;
-  
+
   aux.reinit(dst.block(row_num), true);
-  
+
 				   // Loop over all entries, since
 				   // they are not ordered by rows.
   for (; m != end ; ++m)
@@ -436,7 +436,7 @@ BlockTrianglePrecondition<number>::vmult (
       for (unsigned int i=0; i<n_block_rows(); ++i)
 	do_row(dst, i);
     }
-  
+
 }
 
 template <typename number>
