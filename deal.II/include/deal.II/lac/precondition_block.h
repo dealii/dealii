@@ -770,20 +770,20 @@ class PreconditionBlockSOR : public virtual Subscriptor,
     typedef typename MATRIX::value_type number;
 
 				     /**
-				      * Make type publicly available.
+				      * import types and functions from protected base class.
 				      */
-    PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
-    PreconditionBlock<MATRIX, inverse_type>::initialize;
-    PreconditionBlock<MATRIX, inverse_type>::clear;
-    PreconditionBlock<MATRIX, inverse_type>::empty;
-    PreconditionBlockBase<inverse_type>::size;
-    PreconditionBlockBase<inverse_type>::inverse;
-    PreconditionBlockBase<inverse_type>::inverse_householder;
-    PreconditionBlockBase<inverse_type>::inverse_svd;
-    PreconditionBlock<MATRIX, inverse_type>::el;
-    PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
-    PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
-    PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    using typename PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
+    using typename PreconditionBlock<MATRIX, inverse_type>::initialize;
+    using typename PreconditionBlock<MATRIX, inverse_type>::clear;
+    using typename PreconditionBlock<MATRIX, inverse_type>::empty;
+    using typename PreconditionBlockBase<inverse_type>::size;
+    using typename PreconditionBlockBase<inverse_type>::inverse;
+    using typename PreconditionBlockBase<inverse_type>::inverse_householder;
+    using typename PreconditionBlockBase<inverse_type>::inverse_svd;
+    using typename PreconditionBlock<MATRIX, inverse_type>::el;
+    using typename PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
+    using typename PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
+    using typename PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
 				      * Execute block SOR
