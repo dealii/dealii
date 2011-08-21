@@ -2757,7 +2757,7 @@ namespace hp
       Assert ((*i == 0) || (*i == 1),
               ExcInvalidBoundaryIndicator());
 
-    DoFHandler<1>::active_cell_iterator cell;
+    DoFHandler<1,1>::active_cell_iterator cell;
     unsigned int n = 0;
 
                                      // search left-most cell
