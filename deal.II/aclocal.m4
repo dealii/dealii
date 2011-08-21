@@ -300,11 +300,21 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
 			  GXX_VERSION=pathscale_cc
    	                  GXX_VERSION_DETAILED="$GXX_VERSION"
                         else
-                          dnl  Aw, nothing suitable found...
-                          AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
-                          GXX_BRAND=Unknown
-			  GXX_VERSION=unknown_cc
-                          GXX_VERSION_DETAILED="$GXX_VERSION"
+
+			  is_clang="`($CXX --version 2>&1) | grep clang`"
+			  if test "x$is_clang" != x ; then
+                            AC_MSG_RESULT(C++ compiler is clang)
+  	                    GXX_BRAND=clang
+			    GXX_VERSION=clang
+   	                    GXX_VERSION_DETAILED="$GXX_VERSION"
+			  else
+
+                            dnl  Aw, nothing suitable found...
+                            AC_MSG_RESULT(Unrecognized C++ compiler -- Try to go ahead and get help from dealii@dealii.org)
+                            GXX_BRAND=Unknown
+			    GXX_VERSION=unknown_cc
+   	                    GXX_VERSION_DETAILED="$GXX_VERSION"
+                          fi
                         fi
                       fi
                     fi
@@ -620,6 +630,16 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl linker command, therefore it cannot be included into LDFLAGS
           DEAL_II_ADD_EXTERNAL_LIBS_AT_TAIL(-lm)
           ;;
+
+      clang*)
+          dnl Like many other compilers, clang produces warnings for array
+	  dnl accesses out of bounds, even if they are in code that's dead
+	  dnl for this dimension. suppress this
+          CXXFLAGSG="$CXXFLAGS -DDEBUG -g -Wall -Wno-array-bounds -Wno-parentheses -Wno-delete-non-virtual-dtor -Wno-unneeded-internal-declaration -Wno-unused-function -Wno-unused-variable"
+          CXXFLAGSO="$CXXFLAGS -O2"
+	  CXXFLAGSPIC="-fPIC"
+	  LDFLAGSPIC="-fPIC"
+	  ;;
 
       intel_icc*)
           dnl Earlier icc versions used -Kxxx for flags. Later versions use
@@ -2041,6 +2061,10 @@ AC_DEFUN(DEAL_II_CHECK_MULTITHREADING, dnl
 	    ;;
 
         intel_icc*)
+	    LDFLAGS="$LDFLAGS -lpthread"
+	    ;;
+
+        clang*)
 	    LDFLAGS="$LDFLAGS -lpthread"
 	    ;;
 
