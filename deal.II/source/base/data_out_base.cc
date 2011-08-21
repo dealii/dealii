@@ -330,6 +330,12 @@ namespace
 	    case 1:
 		  Assert (xstep<n_subdivisions+1, ExcIndexRange(xstep,0,n_subdivisions+1));
 		  point_no+=xstep;
+
+						   // break here for dim<=3
+		  break;
+
+	    default:
+		  Assert (false, ExcNotImplemented());
 	  }
 	for (unsigned int d=0; d<spacedim; ++d)
 	  node[d]=patch->data(patch->data.size(0)-spacedim+d,point_no);
@@ -5968,7 +5974,7 @@ operator >> (std::istream                     &in,
 #define INSTANTIATE(dim,spacedim) \
   template class DataOutInterface<dim,spacedim>;                \
   template class DataOutReader<dim,spacedim>;                   \
-  template class DataOutBase::Patch<dim,spacedim>;              \
+  template struct DataOutBase::Patch<dim,spacedim>;              \
   template                                                      \
   std::ostream &                                                \
   operator << (std::ostream                           &out,     \
