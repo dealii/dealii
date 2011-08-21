@@ -1013,7 +1013,7 @@ class MGDoFHandler : public DoFHandler<dim,spacedim>
 				      * Make accessor objects friends.
 				      */
     template <int dim1, int dim2, int dim3> friend class MGDoFAccessor;
-    friend class internal::MGDoFHandler::Implementation;
+    friend struct internal::MGDoFHandler::Implementation;
 };
 
 /*@}*/

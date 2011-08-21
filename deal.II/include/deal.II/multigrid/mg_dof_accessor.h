@@ -416,7 +416,7 @@ class MGDoFAccessor : public internal::MGDoFAccessor::Inheritance<structdim,dim,
     operator = (const MGDoFAccessor &da);
 
     template <int, int> friend class MGDoFHandler;
-    friend class internal::MGDoFHandler::Implementation;
+    friend struct internal::MGDoFHandler::Implementation;
 };
 
 
