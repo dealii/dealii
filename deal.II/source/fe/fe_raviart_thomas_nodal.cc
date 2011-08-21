@@ -542,7 +542,7 @@ FE_RaviartThomasNodal<dim>::compare_for_face_domination (
 template <>
 void
 FE_RaviartThomasNodal<1>::get_face_interpolation_matrix (
-  const FiniteElement<1> &/*x_source_fe*/,
+  const FiniteElement<1,1> &/*x_source_fe*/,
   FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   Assert (false, ExcImpossibleInDim(1));
@@ -552,7 +552,7 @@ FE_RaviartThomasNodal<1>::get_face_interpolation_matrix (
 template <>
 void
 FE_RaviartThomasNodal<1>::get_subface_interpolation_matrix (
-  const FiniteElement<1> &/*x_source_fe*/,
+  const FiniteElement<1,1> &/*x_source_fe*/,
   const unsigned int      /*subface*/,
   FullMatrix<double>     &/*interpolation_matrix*/) const
 {

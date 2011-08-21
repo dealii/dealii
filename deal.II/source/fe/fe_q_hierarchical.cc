@@ -587,25 +587,21 @@ void FE_Q_Hierarchical<1>::initialize_unit_face_support_points ()
 
 template <>
 void FE_Q_Hierarchical<1>::
-get_face_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
+get_face_interpolation_matrix (const FiniteElement<1,1> &/*x_source_fe*/,
 			       FullMatrix<double>     &/*interpolation_matrix*/) const
 {
-  Assert (false,
-	  FiniteElement<1>::
-	  ExcInterpolationNotImplemented ());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
 template <>
 void
 FE_Q_Hierarchical<1>::
-get_subface_interpolation_matrix (const FiniteElement<1> &/*x_source_fe*/,
+get_subface_interpolation_matrix (const FiniteElement<1,1> &/*x_source_fe*/,
 				  const unsigned int      /*subface*/,
 				  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
-  Assert (false,
-	  FiniteElement<1>::
-	  ExcInterpolationNotImplemented ());
+  Assert (false, ExcImpossibleInDim(1));
 }
 
 
