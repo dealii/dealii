@@ -1123,10 +1123,10 @@ namespace hp
       void create_active_fe_table ();
 
                                        /**
-                                        *  Functions that will be triggered 
-					*  through signals whenever the 
+                                        *  Functions that will be triggered
+					*  through signals whenever the
 					*  triangulation is modified.
-					* 
+					*
 					*  Here they are used to
                                         *  administrate the the
                                         *  active_fe_fields during the
@@ -1134,7 +1134,7 @@ namespace hp
                                         */
       void pre_refinement_action ();
       void post_refinement_action ();
-      
+
 
 				       /**
 					* Compute identities between
@@ -1295,14 +1295,14 @@ namespace hp
        * triangulation changes.
        */
       std::vector<boost::signals2::connection> tria_listeners;
-      
+
                                        /**
                                         * Make accessor objects friends.
                                         */
       template <int, class> friend class dealii::DoFAccessor;
       template <class> friend class dealii::DoFCellAccessor;
-      friend class internal::DoFAccessor::Implementation;
-      friend class internal::DoFCellAccessor::Implementation;
+      friend struct internal::DoFAccessor::Implementation;
+      friend struct internal::DoFCellAccessor::Implementation;
 
                                        /**
                                         * Likewise for DoFLevel
@@ -1313,7 +1313,7 @@ namespace hp
                                         */
       template <int> friend class internal::hp::DoFLevel;
       template <int> friend class internal::hp::DoFObjects;
-      friend class internal::hp::DoFHandler::Implementation;
+      friend struct internal::hp::DoFHandler::Implementation;
   };
 
 

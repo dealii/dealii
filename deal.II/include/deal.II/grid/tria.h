@@ -262,13 +262,13 @@ namespace internal
                                           * of this object.
                                           */
         std::size_t memory_consumption () const;
-	
+
 	/**
-	 * Read or write the data of this object to or 
+	 * Read or write the data of this object to or
 	 * from a stream for the purpose of serialization
-	 */ 
+	 */
 	template <class Archive>
-	void serialize (Archive & ar, 
+	void serialize (Archive & ar,
 			const unsigned int version);
     };
 
@@ -329,11 +329,11 @@ namespace internal
         std::size_t memory_consumption () const;
 
 	/**
-	 * Read or write the data of this object to or 
+	 * Read or write the data of this object to or
 	 * from a stream for the purpose of serialization
-	 */ 
+	 */
 	template <class Archive>
-	void serialize (Archive & ar, 
+	void serialize (Archive & ar,
 			const unsigned int version);
     };
 
@@ -395,11 +395,11 @@ namespace internal
         std::size_t memory_consumption () const;
 
 	/**
-	 * Read or write the data of this object to or 
+	 * Read or write the data of this object to or
 	 * from a stream for the purpose of serialization
-	 */ 
+	 */
 	template <class Archive>
-	void serialize (Archive & ar, 
+	void serialize (Archive & ar,
 			const unsigned int version);
     };
   }
@@ -3757,11 +3757,11 @@ class Triangulation : public Subscriptor
     template <int,int,int> friend class TriaAccessor;
     friend class CellAccessor<dim, spacedim>;
 
-    friend class internal::TriaAccessor::Implementation;
+    friend struct internal::TriaAccessor::Implementation;
 
     friend class hp::DoFHandler<dim,spacedim>;
 
-    friend class internal::Triangulation::Implementation;
+    friend struct internal::Triangulation::Implementation;
 };
 
 
@@ -3772,7 +3772,7 @@ namespace internal
   namespace Triangulation
   {
     template <class Archive>
-    void NumberCache<1>::serialize (Archive & ar, 
+    void NumberCache<1>::serialize (Archive & ar,
 				    const unsigned int)
     {
       ar & n_levels;
@@ -3780,28 +3780,28 @@ namespace internal
       ar & n_active_lines & n_active_lines_level;
     }
 
-    
+
     template <class Archive>
-    void NumberCache<2>::serialize (Archive & ar, 
+    void NumberCache<2>::serialize (Archive & ar,
 				    const unsigned int version)
     {
       this->NumberCache<1>::serialize (ar, version);
-      
+
       ar & n_quads & n_quads_level;
       ar & n_active_quads & n_active_quads_level;
     }
-    
+
 
     template <class Archive>
-    void NumberCache<3>::serialize (Archive & ar, 
+    void NumberCache<3>::serialize (Archive & ar,
 				    const unsigned int version)
     {
       this->NumberCache<2>::serialize (ar, version);
-      
+
       ar & n_hexes & n_hexes_level;
       ar & n_active_hexes & n_active_hexes_level;
     }
-    
+
   }
 }
 
@@ -3849,7 +3849,7 @@ Triangulation<dim, spacedim>::get_vertices () const
 template <int dim, int spacedim>
 template <class Archive>
 void
-Triangulation<dim,spacedim>::save (Archive & ar, 
+Triangulation<dim,spacedim>::save (Archive & ar,
 				   const unsigned int) const
 {
 				   // as discussed in the documentation, do
@@ -3861,7 +3861,7 @@ Triangulation<dim,spacedim>::save (Archive & ar,
   ar & faces;
   ar & vertices;
   ar & vertices_used;
-  
+
   ar & anisotropic_refinement;
   ar & number_cache;
 
@@ -3873,13 +3873,13 @@ Triangulation<dim,spacedim>::save (Archive & ar,
 template <int dim, int spacedim>
 template <class Archive>
 void
-Triangulation<dim,spacedim>::load (Archive & ar, 
+Triangulation<dim,spacedim>::load (Archive & ar,
 				   const unsigned int)
 {
 				   // clear previous content. this also calls
 				   // the respective signal
   clear ();
-  
+
 				   // as discussed in the documentation, do
 				   // not store the signals as well as
 				   // boundary and manifold descrption
@@ -3889,7 +3889,7 @@ Triangulation<dim,spacedim>::load (Archive & ar,
   ar & faces;
   ar & vertices;
   ar & vertices_used;
-  
+
   ar & anisotropic_refinement;
   ar & number_cache;
 

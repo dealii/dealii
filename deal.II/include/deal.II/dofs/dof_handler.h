@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -138,7 +138,7 @@ namespace internal
  * <tt>renumber_dofs(vector<unsigned int>)</tt> function with the array, which
  * converts old into new degree of freedom indices.
  *
- * 
+ *
  * <h3>Serializing (loading or storing) DoFHandler objects</h3>
  *
  * Like many other classes in deal.II, the DoFHandler class can stream
@@ -1237,7 +1237,7 @@ class DoFHandler  :  public Subscriptor
    void load (Archive & ar, const unsigned int version);
 
    BOOST_SERIALIZATION_SPLIT_MEMBER()
-    
+
     				     /**
 				      * @todo Replace by ExcInternalError.
 				      */
@@ -1395,11 +1395,11 @@ class DoFHandler  :  public Subscriptor
 				      */
     template <int, class> friend class DoFAccessor;
     template <class> friend class DoFCellAccessor;
-    friend class internal::DoFAccessor::Implementation;
-    friend class internal::DoFCellAccessor::Implementation;
+    friend struct internal::DoFAccessor::Implementation;
+    friend struct internal::DoFCellAccessor::Implementation;
 
-    friend class internal::DoFHandler::Implementation;
-    friend class internal::DoFHandler::Policy::Implementation;
+    friend struct internal::DoFHandler::Implementation;
+    friend struct internal::DoFHandler::Policy::Implementation;
 };
 
 
@@ -1498,14 +1498,14 @@ void DoFHandler<dim,spacedim>::save (Archive & ar,
   ar & number_cache;
   ar & levels;
   ar & faces;
-  
+
   // write out the number of triangulation cells and later check
   // during loading that this number is indeed correct; same with something that
   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
   std::string  fe_name = selected_fe->get_name();
   std::string  policy_name = typeid(*policy).name();
-  
+
   ar & n_cells & fe_name & policy_name;
 }
 
@@ -1518,7 +1518,7 @@ void DoFHandler<dim,spacedim>::load (Archive & ar,
   ar & block_info_object;
   ar & vertex_dofs;
   ar & number_cache;
-  
+
   // boost::serialization can restore pointers just fine, but if the
   // pointer object still points to something useful, that object is
   // not destroyed and we end up with a memory leak. consequently,
@@ -1528,7 +1528,7 @@ void DoFHandler<dim,spacedim>::load (Archive & ar,
   levels.resize (0);
   delete faces;
   faces = 0;
-  
+
   ar & levels;
   ar & faces;
 
@@ -1536,10 +1536,10 @@ void DoFHandler<dim,spacedim>::load (Archive & ar,
   unsigned int n_cells;
   std::string  fe_name;
   std::string  policy_name;
-  
-  ar & n_cells & fe_name & policy_name;  
 
-  AssertThrow (n_cells == tria->n_cells(), 
+  ar & n_cells & fe_name & policy_name;
+
+  AssertThrow (n_cells == tria->n_cells(),
 	       ExcMessage ("The object being loaded into does not match the triangulation "
 	                   "that has been stored previously."));
   AssertThrow (fe_name == selected_fe->get_name(),

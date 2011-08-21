@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -748,10 +748,10 @@ class DoFAccessor : public internal::DoFAccessor::Inheritance<structdim, DH::dim
     template <int dim, int spacedim> friend class DoFHandler;
     template <int dim, int spacedim> friend class hp::DoFHandler;
 
-    friend class internal::DoFHandler::Policy::Implementation;
-    friend class internal::DoFHandler::Implementation;
-    friend class internal::hp::DoFHandler::Implementation;
-    friend class internal::DoFCellAccessor::Implementation;
+    friend struct internal::DoFHandler::Policy::Implementation;
+    friend struct internal::DoFHandler::Implementation;
+    friend struct internal::hp::DoFHandler::Implementation;
+    friend struct internal::DoFCellAccessor::Implementation;
 };
 
 
@@ -1372,10 +1372,10 @@ class DoFAccessor<0,DH<1,spacedim> > : public TriaAccessor<0,1,spacedim>
     template <int, int> friend class DoFHandler;
     template <int, int> friend class hp::DoFHandler;
 
-    friend class internal::DoFHandler::Policy::Implementation;
-    friend class internal::DoFHandler::Implementation;
-    friend class internal::hp::DoFHandler::Implementation;
-    friend class internal::DoFCellAccessor::Implementation;
+    friend struct internal::DoFHandler::Policy::Implementation;
+    friend struct internal::DoFHandler::Implementation;
+    friend struct internal::hp::DoFHandler::Implementation;
+    friend struct internal::DoFCellAccessor::Implementation;
 };
 
 
@@ -2068,7 +2068,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * function
 				      */
     template <int dim, int spacedim> friend class DoFHandler;
-    friend class internal::DoFCellAccessor::Implementation;
+    friend struct internal::DoFCellAccessor::Implementation;
 };
 
 

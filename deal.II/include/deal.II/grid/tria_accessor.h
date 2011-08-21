@@ -1579,8 +1579,8 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 
     template <int, int> friend class Triangulation;
 
-    friend class internal::Triangulation::Implementation;
-    friend class internal::TriaAccessor::Implementation;
+    friend struct internal::Triangulation::Implementation;
+    friend struct internal::TriaAccessor::Implementation;
 };
 
 
@@ -1855,7 +1855,7 @@ class TriaAccessor<0, 1, spacedim>
 				      * refers to.
 				      */
     Point<spacedim> center () const;
-    
+
 				     /**
 				      * Pointer to the @p ith line
 				      * bounding this object. Will
@@ -2879,8 +2879,7 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 
     template <int, int> friend class Triangulation;
 
-    friend class internal::Triangulation::Implementation;
-
+    friend struct internal::Triangulation::Implementation;
 };
 
 
