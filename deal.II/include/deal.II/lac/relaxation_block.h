@@ -309,7 +309,7 @@ class RelaxationBlockJacobi : public virtual Subscriptor,
 				     /**
 				      * Make type publicly available.
 				      */
-    using RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
+    using typename RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
 
 				     /**
 				      * Make initialization function
@@ -391,7 +391,7 @@ class RelaxationBlockSOR : public virtual Subscriptor,
 				     /**
 				      * Make type publicly available.
 				      */
-    using RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
+    using typename RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
 
 				     /**
 				      * Make initialization function
@@ -469,7 +469,7 @@ class RelaxationBlockSSOR : public virtual Subscriptor,
 				     /**
 				      * Make type publicly available.
 				      */
-    using RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
+    using typename RelaxationBlock<MATRIX,inverse_type>::AdditionalData;
 
 				     /**
 				      * Make initialization function
