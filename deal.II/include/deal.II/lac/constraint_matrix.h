@@ -49,7 +49,7 @@ template <typename MatrixType> struct IsBlockMatrix;
 
 namespace internals
 {
-  struct GlobalRowsFromLocal;
+  class GlobalRowsFromLocal;
 }
 
 
@@ -163,7 +163,7 @@ class ConstraintMatrix : public Subscriptor
 					    */
 	  right_object_wins
     };
-    
+
 				     /**
 				      * Constructor. The supplied IndexSet
 				      * defines which indices might be
