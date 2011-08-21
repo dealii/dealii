@@ -711,7 +711,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
   typename VectorMemory<Vector<number2> >::Pointer aux(mem);
   aux->reinit(dst);
 
-  backward_step(*aux, dst, src, true);
+  this->backward_step(*aux, dst, src, true);
   dst = *aux;
 }
 
@@ -1003,7 +1003,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 ::step (Vector<number2>       &dst,
 	const Vector<number2> &src) const
 {
-  forward_step(dst, dst, src, false);
+  this->forward_step(dst, dst, src, false);
 }
 
 
@@ -1013,7 +1013,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>
 ::Tstep (Vector<number2>       &dst,
 	const Vector<number2> &src) const
 {
-  backward_step(dst, dst, src, true);
+  this->backward_step(dst, dst, src, true);
 }
 
 
@@ -1098,8 +1098,8 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>
 ::step (Vector<number2>       &dst,
 	const Vector<number2> &src) const
 {
-  forward_step(dst, dst, src, false);
-  backward_step(dst, dst, src, false);
+  this->forward_step(dst, dst, src, false);
+  this->backward_step(dst, dst, src, false);
 }
 
 
@@ -1109,8 +1109,8 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>
 ::Tstep (Vector<number2>       &dst,
 	const Vector<number2> &src) const
 {
-  backward_step(dst, dst, src, true);
-  forward_step(dst, dst, src, true);
+  this->backward_step(dst, dst, src, true);
+  this->forward_step(dst, dst, src, true);
 }
 
 
