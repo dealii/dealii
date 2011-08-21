@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -476,7 +476,7 @@ template <>
 void
 StraightBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
-			 Boundary<1>::FaceVertexNormals &) const
+			 Boundary<1,1>::FaceVertexNormals &) const
 {
   Assert (false, ExcImpossibleInDim(1));
 }
@@ -496,7 +496,7 @@ template <>
 void
 StraightBoundary<2>::
 get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
-			 Boundary<2>::FaceVertexNormals &face_vertex_normals) const
+			 Boundary<2,2>::FaceVertexNormals &face_vertex_normals) const
 {
   const Tensor<1,2> tangent = face->vertex(1) - face->vertex(0);
   for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_face; ++vertex)
