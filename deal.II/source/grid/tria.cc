@@ -9394,13 +9394,13 @@ Triangulation (const MeshSmoothing smooth_grid,
 
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::
-Triangulation (const Triangulation<dim, spacedim> &)
+Triangulation (const Triangulation<dim, spacedim> & other)
 				   // do not set any subscriptors;
 				   // anyway, calling this constructor
 				   // is an error!
 		:
 		Subscriptor(),
-		check_for_distorted_cells(check_for_distorted_cells)
+		check_for_distorted_cells(other.check_for_distorted_cells)
 {
   Assert (false, ExcInternalError());
 }
