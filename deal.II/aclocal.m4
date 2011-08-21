@@ -634,7 +634,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
       clang*)
           dnl Like many other compilers, clang produces warnings for array
 	  dnl accesses out of bounds, even if they are in code that's dead
-	  dnl for this dimension. suppress this
+	  dnl for this dimension. Suppress this.
+	  dnl
+	  dnl There are a number of other warnings we get that can't easily
+	  dnl be worked around and that are definitely not useful. Suppress
+	  dnl those too.
           CXXFLAGSG="$CXXFLAGS -DDEBUG -g -Wall -Wno-array-bounds -Wno-parentheses -Wno-delete-non-virtual-dtor -Wno-unneeded-internal-declaration -Wno-unused-function -Wno-unused-variable"
           CXXFLAGSO="$CXXFLAGS -O2"
 	  CXXFLAGSPIC="-fPIC"
