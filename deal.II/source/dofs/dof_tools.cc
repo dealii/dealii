@@ -4761,6 +4761,250 @@ namespace DoFTools
     namespace
     {
 				       /**
+					* This is a function that is
+					* called by the _2 function and
+					* that operates on a range of
+					* cells only. It is used to
+					* split up the whole range of
+					* cells into chunks which are
+					* then worked on in parallel, if
+					* multithreading is available.
+					*/
+      template <int dim, int spacedim>
+      void
+      compute_intergrid_weights_3 (
+	const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
+	const unsigned int                  coarse_component,
+	const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
+	const std::vector<dealii::Vector<double> > &parameter_dofs,
+	const std::vector<int>             &weight_mapping,
+	std::vector<std::map<unsigned int, float> > &weights,
+	const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
+	const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &end)
+      {
+					 // aliases to the finite elements
+					 // used by the dof handlers:
+	const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();
+
+					 // for each cell on the parameter grid:
+					 // find out which degrees of freedom on the
+					 // fine grid correspond in which way to
+					 // the degrees of freedom on the parameter
+					 // grid
+					 //
+					 // since for continuous FEs some
+					 // dofs exist on more than one
+					 // cell, we have to track which
+					 // ones were already visited. the
+					 // problem is that if we visit a
+					 // dof first on one cell and
+					 // compute its weight with respect
+					 // to some global dofs to be
+					 // non-zero, and later visit the
+					 // dof again on another cell and
+					 // (since we are on another cell)
+					 // recompute the weights with
+					 // respect to the same dofs as
+					 // above to be zero now, we have to
+					 // preserve them. we therefore
+					 // overwrite all weights if they
+					 // are nonzero and do not enforce
+					 // zero weights since that might be
+					 // only due to the fact that we are
+					 // on another cell.
+					 //
+					 // example:
+					 // coarse grid
+					 //  |     |     |
+					 //  *-----*-----*
+					 //  | cell|cell |
+					 //  |  1  |  2  |
+					 //  |     |     |
+					 //  0-----1-----*
+					 //
+					 // fine grid
+					 //  |  |  |  |  |
+					 //  *--*--*--*--*
+					 //  |  |  |  |  |
+					 //  *--*--*--*--*
+					 //  |  |  |  |  |
+					 //  *--x--y--*--*
+					 //
+					 // when on cell 1, we compute the
+					 // weights of dof 'x' to be 1/2
+					 // from parameter dofs 0 and 1,
+					 // respectively. however, when
+					 // later we are on cell 2, we again
+					 // compute the prolongation of
+					 // shape function 1 restricted to
+					 // cell 2 to the globla grid and
+					 // find that the weight of global
+					 // dof 'x' now is zero. however, we
+					 // should not overwrite the old
+					 // value.
+					 //
+					 // we therefore always only set
+					 // nonzero values. why adding up is
+					 // not useful: dof 'y' would get
+					 // weight 1 from parameter dof 1 on
+					 // both cells 1 and 2, but the
+					 // correct weight is nevertheless
+					 // only 1.
+
+					 // vector to hold the representation of
+					 // a single degree of freedom on the
+					 // coarse grid (for the selected fe)
+					 // on the fine grid
+	const unsigned int n_fine_dofs = weight_mapping.size();
+	dealii::Vector<double> global_parameter_representation (n_fine_dofs);
+
+	typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
+	std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
+
+	for (cell=begin; cell!=end; ++cell)
+	  {
+					     // get the global indices of the
+					     // parameter dofs on this parameter
+					     // grid cell
+	    cell->get_dof_indices (parameter_dof_indices);
+
+					     // loop over all dofs on this
+					     // cell and check whether they
+					     // are interesting for us
+	    for (unsigned int local_dof=0;
+		 local_dof<coarse_fe.dofs_per_cell;
+		 ++local_dof)
+	      if (coarse_fe.system_to_component_index(local_dof).first
+		  ==
+		  coarse_component)
+		{
+						   // the how-many-th
+						   // parameter is this on
+						   // this cell?
+		  const unsigned int local_parameter_dof
+		    = coarse_fe.system_to_component_index(local_dof).second;
+
+		  global_parameter_representation = 0;
+
+						   // distribute the representation of
+						   // @p{local_parameter_dof} on the
+						   // parameter grid cell @p{cell} to
+						   // the global data space
+		  coarse_to_fine_grid_map[cell]->
+		    set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
+						     global_parameter_representation);
+						   // now that we've got the global
+						   // representation of each parameter
+						   // dof, we've only got to clobber the
+						   // non-zero entries in that vector and
+						   // store the result
+						   //
+						   // what we have learned: if entry @p{i}
+						   // of the global vector holds the value
+						   // @p{v[i]}, then this is the weight with
+						   // which the present dof contributes
+						   // to @p{i}. there may be several such
+						   // @p{i}s and their weights' sum should
+						   // be one. Then, @p{v[i]} should be
+						   // equal to @p{\sum_j w_{ij} p[j]} with
+						   // @p{p[j]} be the values of the degrees
+						   // of freedom on the coarse grid. we
+						   // can thus compute constraints which
+						   // link the degrees of freedom @p{v[i]}
+						   // on the fine grid to those on the
+						   // coarse grid, @p{p[j]}. Now to use
+						   // these as real constraints, rather
+						   // than as additional equations, we
+						   // have to identify representants
+						   // among the @p{i} for each @p{j}. this will
+						   // be done by simply taking the first
+						   // @p{i} for which @p{w_{ij}==1}.
+						   //
+						   // guard modification of
+						   // the weights array by a
+						   // Mutex. since it should
+						   // happen rather rarely
+						   // that there are several
+						   // threads operating on
+						   // different intergrid
+						   // weights, have only one
+						   // mutex for all of them
+		  static Threads::ThreadMutex mutex;
+		  Threads::ThreadMutex::ScopedLock lock (mutex);
+		  for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
+						     // set this weight if it belongs
+						     // to a parameter dof.
+		    if (weight_mapping[i] != -1)
+		      {
+							 // only overwrite old
+							 // value if not by
+							 // zero
+			if (global_parameter_representation(i) != 0)
+			  {
+			    const unsigned int wi = parameter_dof_indices[local_dof],
+					       wj = weight_mapping[i];
+			    weights[wi][wj] = global_parameter_representation(i);
+			  };
+		      }
+		    else
+		      Assert (global_parameter_representation(i) == 0,
+			      ExcInternalError());
+		}
+	  }
+      }
+
+
+				       /**
+					* This is a helper function that
+					* is used in the computation of
+					* integrid constraints. See the
+					* function for a thorough
+					* description of how it works.
+					*/
+      template <int dim, int spacedim>
+      void
+      compute_intergrid_weights_2 (
+	const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
+	const unsigned int                  coarse_component,
+	const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
+	const std::vector<dealii::Vector<double> > &parameter_dofs,
+	const std::vector<int>             &weight_mapping,
+	std::vector<std::map<unsigned int,float> > &weights)
+      {
+					 // simply distribute the range of
+					 // cells to different threads
+	typedef typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
+	std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
+	  cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
+								       coarse_grid.end(),
+								       multithread_info.n_default_threads);
+
+//TODO: use WorkStream here
+	Threads::TaskGroup<> tasks;
+	void (*fun_ptr) (const dealii::DoFHandler<dim,spacedim>              &,
+			 const unsigned int                  ,
+			 const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
+			 const std::vector<dealii::Vector<double> > &,
+			 const std::vector<int>             &,
+			 std::vector<std::map<unsigned int, float> > &,
+			 const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
+			 const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
+	  = &compute_intergrid_weights_3<dim>;
+	for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
+	  tasks += Threads::new_task (fun_ptr,
+				      coarse_grid, coarse_component,
+				      coarse_to_fine_grid_map, parameter_dofs,
+				      weight_mapping, weights,
+				      cell_intervals[i].first,
+				      cell_intervals[i].second);
+
+					 // wait for the tasks to finish
+	tasks.join_all ();
+      }
+
+      
+
+				       /**
 					* This is a helper function that
 					* is used in the computation of
 					* integrid constraints. See the
@@ -5005,247 +5249,6 @@ namespace DoFTools
       }
 
 
-				       /**
-					* This is a function that is
-					* called by the _2 function and
-					* that operates on a range of
-					* cells only. It is used to
-					* split up the whole range of
-					* cells into chunks which are
-					* then worked on in parallel, if
-					* multithreading is available.
-					*/
-      template <int dim, int spacedim>
-      void
-      compute_intergrid_weights_3 (
-	const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
-	const unsigned int                  coarse_component,
-	const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-	const std::vector<dealii::Vector<double> > &parameter_dofs,
-	const std::vector<int>             &weight_mapping,
-	std::vector<std::map<unsigned int, float> > &weights,
-	const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
-	const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &end)
-      {
-					 // aliases to the finite elements
-					 // used by the dof handlers:
-	const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe();
-
-					 // for each cell on the parameter grid:
-					 // find out which degrees of freedom on the
-					 // fine grid correspond in which way to
-					 // the degrees of freedom on the parameter
-					 // grid
-					 //
-					 // since for continuous FEs some
-					 // dofs exist on more than one
-					 // cell, we have to track which
-					 // ones were already visited. the
-					 // problem is that if we visit a
-					 // dof first on one cell and
-					 // compute its weight with respect
-					 // to some global dofs to be
-					 // non-zero, and later visit the
-					 // dof again on another cell and
-					 // (since we are on another cell)
-					 // recompute the weights with
-					 // respect to the same dofs as
-					 // above to be zero now, we have to
-					 // preserve them. we therefore
-					 // overwrite all weights if they
-					 // are nonzero and do not enforce
-					 // zero weights since that might be
-					 // only due to the fact that we are
-					 // on another cell.
-					 //
-					 // example:
-					 // coarse grid
-					 //  |     |     |
-					 //  *-----*-----*
-					 //  | cell|cell |
-					 //  |  1  |  2  |
-					 //  |     |     |
-					 //  0-----1-----*
-					 //
-					 // fine grid
-					 //  |  |  |  |  |
-					 //  *--*--*--*--*
-					 //  |  |  |  |  |
-					 //  *--*--*--*--*
-					 //  |  |  |  |  |
-					 //  *--x--y--*--*
-					 //
-					 // when on cell 1, we compute the
-					 // weights of dof 'x' to be 1/2
-					 // from parameter dofs 0 and 1,
-					 // respectively. however, when
-					 // later we are on cell 2, we again
-					 // compute the prolongation of
-					 // shape function 1 restricted to
-					 // cell 2 to the globla grid and
-					 // find that the weight of global
-					 // dof 'x' now is zero. however, we
-					 // should not overwrite the old
-					 // value.
-					 //
-					 // we therefore always only set
-					 // nonzero values. why adding up is
-					 // not useful: dof 'y' would get
-					 // weight 1 from parameter dof 1 on
-					 // both cells 1 and 2, but the
-					 // correct weight is nevertheless
-					 // only 1.
-
-					 // vector to hold the representation of
-					 // a single degree of freedom on the
-					 // coarse grid (for the selected fe)
-					 // on the fine grid
-	const unsigned int n_fine_dofs = weight_mapping.size();
-	dealii::Vector<double> global_parameter_representation (n_fine_dofs);
-
-	typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
-	std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
-
-	for (cell=begin; cell!=end; ++cell)
-	  {
-					     // get the global indices of the
-					     // parameter dofs on this parameter
-					     // grid cell
-	    cell->get_dof_indices (parameter_dof_indices);
-
-					     // loop over all dofs on this
-					     // cell and check whether they
-					     // are interesting for us
-	    for (unsigned int local_dof=0;
-		 local_dof<coarse_fe.dofs_per_cell;
-		 ++local_dof)
-	      if (coarse_fe.system_to_component_index(local_dof).first
-		  ==
-		  coarse_component)
-		{
-						   // the how-many-th
-						   // parameter is this on
-						   // this cell?
-		  const unsigned int local_parameter_dof
-		    = coarse_fe.system_to_component_index(local_dof).second;
-
-		  global_parameter_representation = 0;
-
-						   // distribute the representation of
-						   // @p{local_parameter_dof} on the
-						   // parameter grid cell @p{cell} to
-						   // the global data space
-		  coarse_to_fine_grid_map[cell]->
-		    set_dof_values_by_interpolation (parameter_dofs[local_parameter_dof],
-						     global_parameter_representation);
-						   // now that we've got the global
-						   // representation of each parameter
-						   // dof, we've only got to clobber the
-						   // non-zero entries in that vector and
-						   // store the result
-						   //
-						   // what we have learned: if entry @p{i}
-						   // of the global vector holds the value
-						   // @p{v[i]}, then this is the weight with
-						   // which the present dof contributes
-						   // to @p{i}. there may be several such
-						   // @p{i}s and their weights' sum should
-						   // be one. Then, @p{v[i]} should be
-						   // equal to @p{\sum_j w_{ij} p[j]} with
-						   // @p{p[j]} be the values of the degrees
-						   // of freedom on the coarse grid. we
-						   // can thus compute constraints which
-						   // link the degrees of freedom @p{v[i]}
-						   // on the fine grid to those on the
-						   // coarse grid, @p{p[j]}. Now to use
-						   // these as real constraints, rather
-						   // than as additional equations, we
-						   // have to identify representants
-						   // among the @p{i} for each @p{j}. this will
-						   // be done by simply taking the first
-						   // @p{i} for which @p{w_{ij}==1}.
-						   //
-						   // guard modification of
-						   // the weights array by a
-						   // Mutex. since it should
-						   // happen rather rarely
-						   // that there are several
-						   // threads operating on
-						   // different intergrid
-						   // weights, have only one
-						   // mutex for all of them
-		  static Threads::ThreadMutex mutex;
-		  Threads::ThreadMutex::ScopedLock lock (mutex);
-		  for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
-						     // set this weight if it belongs
-						     // to a parameter dof.
-		    if (weight_mapping[i] != -1)
-		      {
-							 // only overwrite old
-							 // value if not by
-							 // zero
-			if (global_parameter_representation(i) != 0)
-			  {
-			    const unsigned int wi = parameter_dof_indices[local_dof],
-					       wj = weight_mapping[i];
-			    weights[wi][wj] = global_parameter_representation(i);
-			  };
-		      }
-		    else
-		      Assert (global_parameter_representation(i) == 0,
-			      ExcInternalError());
-		}
-	  }
-      }
-
-
-				       /**
-					* This is a helper function that
-					* is used in the computation of
-					* integrid constraints. See the
-					* function for a thorough
-					* description of how it works.
-					*/
-      template <int dim, int spacedim>
-      void
-      compute_intergrid_weights_2 (
-	const dealii::DoFHandler<dim,spacedim>              &coarse_grid,
-	const unsigned int                  coarse_component,
-	const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-	const std::vector<dealii::Vector<double> > &parameter_dofs,
-	const std::vector<int>             &weight_mapping,
-	std::vector<std::map<unsigned int,float> > &weights)
-      {
-					 // simply distribute the range of
-					 // cells to different threads
-	typedef typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-	std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
-	  cell_intervals = Threads::split_range<active_cell_iterator> (coarse_grid.begin_active(),
-								       coarse_grid.end(),
-								       multithread_info.n_default_threads);
-
-//TODO: use WorkStream here
-	Threads::TaskGroup<> tasks;
-	void (*fun_ptr) (const dealii::DoFHandler<dim,spacedim>              &,
-			 const unsigned int                  ,
-			 const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
-			 const std::vector<dealii::Vector<double> > &,
-			 const std::vector<int>             &,
-			 std::vector<std::map<unsigned int, float> > &,
-			 const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
-			 const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
-	  = &compute_intergrid_weights_3<dim>;
-	for (unsigned int i=0; i<multithread_info.n_default_threads; ++i)
-	  tasks += Threads::new_task (fun_ptr,
-				      coarse_grid, coarse_component,
-				      coarse_to_fine_grid_map, parameter_dofs,
-				      weight_mapping, weights,
-				      cell_intervals[i].first,
-				      cell_intervals[i].second);
-
-					 // wait for the tasks to finish
-	tasks.join_all ();
-      }
     }
   }
 
