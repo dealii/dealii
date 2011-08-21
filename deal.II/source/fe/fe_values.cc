@@ -3431,7 +3431,7 @@ FEValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_it
 	  typename FEVB::ExcFEDontMatch());
 
   this->maybe_invalidate_previous_present_cell (cell);
-  check_cell_similarity(cell);
+  this->check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
 				   // care that old object gets
@@ -3466,7 +3466,7 @@ FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cel
 	  typename FEVB::ExcFEDontMatch());
 
   this->maybe_invalidate_previous_present_cell (cell);
-  check_cell_similarity(cell);
+  this->check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
 				   // care that old object gets
@@ -3508,7 +3508,7 @@ FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_
 //	  typename FEValuesBase<dim,spacedim>::ExcFEDontMatch());
 
   this->maybe_invalidate_previous_present_cell (cell);
-  check_cell_similarity(cell);
+  this->check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
 				   // care that old object gets
@@ -3535,7 +3535,7 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
 				   // no FE in this cell, so no assertion
 				   // necessary here
   this->maybe_invalidate_previous_present_cell (cell);
-  check_cell_similarity(cell);
+  this->check_cell_similarity(cell);
 
 				   // set new cell. auto_ptr will take
 				   // care that old object gets
