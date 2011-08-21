@@ -427,7 +427,7 @@ class PreconditionBlock
 				      * used by derived classes.
 				      */
     double relaxation;
-    
+
 				     /**
 				      * The permutation vector
 				      */
@@ -763,7 +763,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * Default constructor.
 				      */
     PreconditionBlockSOR();
-    
+
 				     /**
 				      * Define number type of matrix.
 				      */
@@ -773,17 +773,17 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * import types and functions from protected base class.
 				      */
     using typename PreconditionBlock<MATRIX,inverse_type>::AdditionalData;
-    using typename PreconditionBlock<MATRIX, inverse_type>::initialize;
-    using typename PreconditionBlock<MATRIX, inverse_type>::clear;
-    using typename PreconditionBlock<MATRIX, inverse_type>::empty;
-    using typename PreconditionBlockBase<inverse_type>::size;
-    using typename PreconditionBlockBase<inverse_type>::inverse;
-    using typename PreconditionBlockBase<inverse_type>::inverse_householder;
-    using typename PreconditionBlockBase<inverse_type>::inverse_svd;
-    using typename PreconditionBlock<MATRIX, inverse_type>::el;
-    using typename PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
-    using typename PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
-    using typename PreconditionBlock<MATRIX, inverse_type>::set_permutation;
+    using PreconditionBlock<MATRIX, inverse_type>::initialize;
+    using PreconditionBlock<MATRIX, inverse_type>::clear;
+    using PreconditionBlock<MATRIX, inverse_type>::empty;
+    using PreconditionBlockBase<inverse_type>::size;
+    using PreconditionBlockBase<inverse_type>::inverse;
+    using PreconditionBlockBase<inverse_type>::inverse_householder;
+    using PreconditionBlockBase<inverse_type>::inverse_svd;
+    using PreconditionBlock<MATRIX, inverse_type>::el;
+    using PreconditionBlock<MATRIX, inverse_type>::set_same_diagonal;
+    using PreconditionBlock<MATRIX, inverse_type>::invert_diagblocks;
+    using PreconditionBlock<MATRIX, inverse_type>::set_permutation;
 
 				     /**
 				      * Execute block SOR
@@ -881,7 +881,7 @@ class PreconditionBlockSOR : public virtual Subscriptor,
 				      * PreconditionBlockSSOR.
 				      */
     PreconditionBlockSOR(bool store);
-    
+
 				     /**
 				      * Implementation of the forward
 				      * substitution loop called by
@@ -957,7 +957,7 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
     PreconditionBlockSSOR ();
 
 				     // Keep AdditionalData accessible
-    PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
+    using typename PreconditionBlockSOR<MATRIX,inverse_type>::AdditionalData;
 
 				     // The following are the
 				     // functions of the base classes
@@ -967,17 +967,17 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 				      * Make initialization function
 				      * publicly available.
 				      */
-    PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
-    PreconditionBlockSOR<MATRIX,inverse_type>::clear;
-    PreconditionBlockBase<inverse_type>::size;
-    PreconditionBlockBase<inverse_type>::inverse;
-    PreconditionBlockBase<inverse_type>::inverse_householder;
-    PreconditionBlockBase<inverse_type>::inverse_svd;
-    PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
-    PreconditionBlockSOR<MATRIX, inverse_type>::empty;
-    PreconditionBlockSOR<MATRIX, inverse_type>::el;
-    PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
-    PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::initialize;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::clear;
+    using PreconditionBlockBase<inverse_type>::size;
+    using PreconditionBlockBase<inverse_type>::inverse;
+    using PreconditionBlockBase<inverse_type>::inverse_householder;
+    using PreconditionBlockBase<inverse_type>::inverse_svd;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::set_permutation;
+    using PreconditionBlockSOR<MATRIX, inverse_type>::empty;
+    using PreconditionBlockSOR<MATRIX, inverse_type>::el;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::set_same_diagonal;
+    using PreconditionBlockSOR<MATRIX,inverse_type>::invert_diagblocks;
 
 				     /**
 				      * Execute block SSOR
