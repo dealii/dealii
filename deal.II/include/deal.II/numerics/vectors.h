@@ -28,7 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim> class Function;
-template <int dim> class FunctionMap;
+template <int dim> struct FunctionMap;
 template <int dim> class Quadrature;
 template <int dim> class QGauss;
 
