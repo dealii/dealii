@@ -585,12 +585,12 @@ class BlockTrianglePrecondition
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<number>::print_latex;
+    using BlockMatrixArray<number>::print_latex;
 
 				     /**
 				      * Make function of base class available.
 				      */
-    BlockMatrixArray<number>::n_block_rows;
+    using BlockMatrixArray<number>::n_block_rows;
 
 				     /**
 				      * Make function of base class available.
