@@ -82,7 +82,7 @@ class MappingQ : public MappingQ1<dim,spacedim>
 				      * #tensor_pols pointer as done
 				      * by a default copy constructor.
 				      */
-    explicit MappingQ (const MappingQ<dim,spacedim> &mapping);
+    MappingQ (const MappingQ<dim,spacedim> &mapping);
 
 				     /**
 				      * Destructor.
