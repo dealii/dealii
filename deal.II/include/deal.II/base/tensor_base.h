@@ -654,7 +654,7 @@ class Tensor<1,dim,Number>
 				      * the coordinates. This is
 				      * supposed to improve speed.
 				      */
-    friend class Point<dim>;
+    friend class Point<dim,Number>;
 };
 
 
