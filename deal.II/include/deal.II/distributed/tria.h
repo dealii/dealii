@@ -208,6 +208,29 @@ namespace parallel
 					  * <code>check_for_distorted_cells</code>
 					  * argument provided by the
 					  * base class.
+					  *
+					  * @note While it is possible to pass
+					  * all of the mesh smoothing flags
+					  * listed in the base class to
+					  * objects of this type, it is not
+					  * always possible to honor all of
+					  * these smoothing options if they
+					  * would require knowledge of
+					  * refinement/coarsening flags on
+					  * cells not locally owned by this
+					  * processor. As a consequence, for
+					  * some of these flags, the ultimate
+					  * number of cells of the parallel
+					  * triangulation may depend on the
+					  * number of processors into which it
+					  * is partitioned. On the other hand,
+					  * if no smoothing flags are passed,
+					  * if you always mark the same cells
+					  * of the mesh, you will always get
+					  * the exact same refined mesh
+					  * independent of the number of
+					  * processors into which the
+					  * triangulation is partitioned.
 					  */
 	Triangulation (MPI_Comm mpi_communicator,
 		       const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing
