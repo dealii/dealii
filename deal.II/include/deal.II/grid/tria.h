@@ -735,7 +735,7 @@ namespace internal
  *   by the @p execute_coarsening_and_refinement function can do some
  *   smoothing of the triangulation. Note that mesh smoothing is only
  *   done for two or more space dimensions, no smoothing is available
- *   at present for one spatial dimension. In the sequel, let
+ *   at present for one spatial dimension. In the following, let
  *   <tt>execute_*</tt> stand for @p execute_coarsening_and_refinement.
  *
  *   For the purpose of smoothing, the
@@ -933,6 +933,14 @@ namespace internal
  *   <li> @p none:
  *     Select no smoothing at all.
  *   </ul>
+ *
+ *   @note While it is possible to pass all of the flags discussed above to
+ *   objects of type parallel::distributed::Triangulation, it is not always
+ *   possible to honor all of these smoothing options if they would require
+ *   knowledge of refinement/coarsening flags on cells not locally owned by
+ *   this processor. As a consequence, for some of these flags, the ultimate
+ *   number of cells of the parallel triangulation may depend on the number of
+ *   processors into which it is partitioned.
  *
  *
  *   <h3>Material and boundary information</h3>
