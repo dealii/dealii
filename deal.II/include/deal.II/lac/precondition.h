@@ -1592,6 +1592,8 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 						  const AdditionalData &additional_data)
 {
   Assert (matrix.m() == matrix.n(), ExcMessage("Matrix not quadratic."));
+  Assert (additional_data.eig_cg_n_iterations > 2,
+	  ExcMessage ("Need to set at least two iterations to find eigenvalues."));
   matrix_ptr = &matrix;
   data = additional_data;
   if (data.matrix_diagonal_inverse.size() != matrix.m())
@@ -1644,7 +1646,10 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 	g.add (alpha, update1);
 	res = g.l2_norm();
 
-	if (it > data.eig_cg_n_iterations || res < data.eig_cg_residual)
+				// need at least two iterations to have
+				// maximum and minimum eigenvalue
+	if (it > data.eig_cg_n_iterations || (it > 2 &&
+					      res < data.eig_cg_residual))
 	  break;
 
 	beta = gh;
