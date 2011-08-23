@@ -18,6 +18,7 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -200,10 +201,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 				       // increment dofs_per_cell
 				       // since a useless diagonal
 				       // element will be stored
-      prolongation_sparsities[level]->reinit (sizes[level+1],
-					      sizes[level],
-					      dofs_per_cell+1);
-
+      CompressedSimpleSparsityPattern csp (sizes[level+1],
+					   sizes[level]);
+      std::vector<unsigned int> entries (dofs_per_cell);
       for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
 	   cell != mg_dof.end(level); ++cell)
 	if (cell->has_children())
@@ -229,15 +229,19 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 						 // matrix which will be used
 						 // for this pair of parent/child
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    if (prolongation(i,j) != 0)
-		      prolongation_sparsities[level]->add (dof_indices_child[i],
-							   dof_indices_parent[j]);
+		  {
+		    entries.resize(0);
+		    for (unsigned int j=0; j<dofs_per_cell; ++j)
+		      if (prolongation(i,j) != 0)
+			entries.push_back (dof_indices_parent[j]);
+		    csp.add_entries (dof_indices_child[i],
+				     entries.begin(), entries.end());
+		  }
 	      }
 	  }
 
-      prolongation_sparsities[level]->compress ();
-
+      prolongation_sparsities[level]->copy_from (csp);
+      csp.reinit(0,0);
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
 				       // now actually build the matrices
