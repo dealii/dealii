@@ -1714,7 +1714,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * cell. You could then as well
 				      * get the desired values through
 				      * the @p get_dof_values
-				      * function In the other case,
+				      * function. In the other case,
 				      * when the cell has children, we
 				      * use the restriction matrices
 				      * provided by the finite element
@@ -1785,7 +1785,7 @@ class DoFCellAccessor :  public DoFAccessor<DH::dimension,DH>
 				      * cell. These requirements are
 				      * not taken care of and must be
 				      * enforced by the user
-				      * afterwards.
+				      * afterward.
 				      *
 				      * It is assumed that both
 				      * vectors already have the right
