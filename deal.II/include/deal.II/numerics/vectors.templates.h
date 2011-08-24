@@ -2213,11 +2213,55 @@ namespace internal
 				       // can also deal with cases like
 				       //   x0 = 0
 				       // if necessary
+				       //
+				       // there is a problem if we have a
+				       // normal vector of the form
+				       // (a,a,small) or (a,a,a). Depending on
+				       // round-off we may choose the first or
+				       // second component (or third, in the
+				       // latter case) as the largest one, and
+				       // depending on our choice one or
+				       // another degree of freedom will be
+				       // constrained. On a single processor
+				       // this is not much of a problem, but
+				       // it's a nightmare when we run in
+				       // parallel and two processors disagree
+				       // on which DoF should be
+				       // constrained. This led to an
+				       // incredibly difficult to find bug in
+				       // step-32 when running in parallel
+				       // with 9 or more processors.
+				       //
+				       // in practice, such normal vectors of
+				       // the form (a,a,small) or (a,a,a)
+				       // happen not infrequently since they
+				       // lie on the diagonals where vertices
+				       // frequently happen to land upon mesh
+				       // refinement if one starts from a
+				       // symmetric and regular body. we work
+				       // around this problem in the following
+				       // way: if we have a normal vector of
+				       // the form (a,b) (similarly algorithm
+				       // in 3d), we choose 'a' as the largest
+				       // coefficient not if a>b but if
+				       // a>b+1e-10. this shifts the problem
+				       // away from the frequently visited
+				       // diagonal to a line that is off the
+				       // diagonal. there will of course be
+				       // problems where the exact values of a
+				       // and b differ by exactly 1e-10 and we
+				       // get into the same instability, but
+				       // from a practical viewpoint such
+				       // problems should be much rarer. in
+				       // particular, meshes have to be very
+				       // very fine for a vertex to land on
+				       // this line if the original body had a
+				       // vertex on the diagonal as well
       switch (dim)
 	{
 	  case 2:
 	  {
-	    if (std::fabs(constraining_vector[0]) > std::fabs(constraining_vector[1]))
+	    if (std::fabs(constraining_vector[0]) > std::fabs(constraining_vector[1]) + 1e-10)
 	      {
 		if (!constraints.is_constrained(dof_indices.dof_indices[0])
 		    &&
@@ -2252,9 +2296,9 @@ namespace internal
 
 	  case 3:
 	  {
-	    if ((std::fabs(constraining_vector[0]) >= std::fabs(constraining_vector[1]))
+	    if ((std::fabs(constraining_vector[0]) >= std::fabs(constraining_vector[1])+1e-10)
 		&&
-		(std::fabs(constraining_vector[0]) >= std::fabs(constraining_vector[2])))
+		(std::fabs(constraining_vector[0]) >= std::fabs(constraining_vector[2])+2e-10))
 	      {
 		if (!constraints.is_constrained(dof_indices.dof_indices[0])
 		    &&
@@ -2276,9 +2320,9 @@ namespace internal
 		  }
 	      }
 	    else
-	      if ((std::fabs(constraining_vector[1]) >= std::fabs(constraining_vector[0]))
+	      if ((std::fabs(constraining_vector[1])+1e-10 >= std::fabs(constraining_vector[0]))
 		  &&
-		  (std::fabs(constraining_vector[1]) >= std::fabs(constraining_vector[2])))
+		  (std::fabs(constraining_vector[1]) >= std::fabs(constraining_vector[2])+1e-10))
 		{
 		  if (!constraints.is_constrained(dof_indices.dof_indices[1])
 		      &&
@@ -4419,6 +4463,12 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 	      normal += x->second.first;
 	    normal /= normal.norm();
 
+				// normalize again
+	    for (unsigned int d=0; d<dim; ++d)
+	      if (std::fabs(normal[d]) < 1e-13)
+		normal[d] = 0;
+	    normal /= normal.norm();
+
 					     // then construct constraints
 					     // from this:
 	    const internal::VectorTools::VectorDoFTuple<dim> &
@@ -4719,6 +4769,14 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 	    internal::VectorTools::
 	      compute_orthonormal_vectors<dim> (average_tangent,
 						constraining_normals);
+				// normalize again
+	    for (unsigned int e=0; e<dim-1; ++e)
+	      {
+		for (unsigned int d=0; d<dim; ++d)
+		  if (std::fabs(constraining_normals[e][d]) < 1e-13)
+		    constraining_normals[e][d] = 0;
+		constraining_normals[e] /= constraining_normals[e].norm();
+	      }
 
 					     // now all that is left
 					     // is that we add the
