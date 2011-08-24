@@ -281,6 +281,15 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
+a problem that led to extremely difficult to pin down bugs when running
+with sufficiently many processors. Basically, the constraints computed
+by different processors did not agree which should be the independent
+degrees of freedom and which should be the constrained ones. The result
+were constraints that did not lead to a consistent linear system.
+<br>
+(Martin Kronbichler, 2011/08/24)
+
 <li> New: Added GridRefinement::hierarchical() to reorder the degrees of freedom
 by going through the cells in hierarchical order. This ensures consistent
 DoF numbering in parallel computations.
