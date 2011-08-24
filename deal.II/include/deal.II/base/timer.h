@@ -508,8 +508,7 @@ class TimerOutput
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				     /**
-				      * Store whether the timer is presently
-				      * running.
+				      * mpi communicator
 				      */
     MPI_Comm            mpi_communicator;
 #endif
