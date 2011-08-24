@@ -183,13 +183,18 @@ class Quadrature : public Subscriptor
     Quadrature (const Point<dim> &point);
 
 				     /**
+				      * Virtual destructor.
+				      */
+    virtual ~Quadrature ();
+
+				     /**
 				      * Assignment operator. Copies
 				      * contents of #weights and
 				      * #quadrature_points as well as
 				      * size.
 				      */
     Quadrature& operator = (const Quadrature<dim>&);
-    
+
                      /**
 				      *  Test for equality of two quadratures.
 				      */
@@ -202,11 +207,6 @@ class Quadrature : public Subscriptor
 				      */
     void initialize(const std::vector<Point<dim> > &points,
 		    const std::vector<double>      &weights);
-    
-				     /**
-				      * Virtual destructor.
-				      */
-    virtual ~Quadrature ();
 
 				     /**
 				      * Number of quadrature points.
@@ -247,9 +247,9 @@ class Quadrature : public Subscriptor
     std::size_t memory_consumption () const;
 
                          /**
-                      * Write or read the data of this object to or 
+                      * Write or read the data of this object to or
                       * from a stream for the purpose of serialization.
-                      */ 
+                      */
     template <class Archive>
     void serialize (Archive & ar, const unsigned int version);
 
