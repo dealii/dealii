@@ -90,7 +90,7 @@ void test()
 
 				// create FE_System and fill in no-normal flux
 				// conditions on boundary 1 (outer)
-  static const FESystem<dim> fe(FE_Q<dim> (1), dim);
+  static const FESystem<dim> fe(FE_Q<dim> (2), dim);
   DoFHandler<dim> dofh(triangulation);
   dofh.distribute_dofs (fe);
   if (myid == 0)
