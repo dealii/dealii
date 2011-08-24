@@ -46,11 +46,14 @@ void test()
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
 				// create hypershell mesh and refine some
-				// cells
+				// cells. use some large numbers which make
+				// round-off influence more pronounced
+  const double R0      = 6371000.-2890000.;     /* m          */
+  const double R1      = 6371000.-  35000.;     /* m          */
   GridGenerator::hyper_shell (triangulation,
   			      Point<dim>(),
-  			      0.5,
-  			      1.,
+  			      R0,
+  			      R1,
 			      96, true);
   triangulation.refine_global (2);
 
@@ -58,7 +61,7 @@ void test()
 	 cell = triangulation.begin_active();
        cell != triangulation.end(); ++cell)
     if (!cell->is_ghost() && !cell->is_artificial())
-      if (cell->center()[2] > 0.75)
+      if (cell->center()[2] > 0.75 * R1)
 	{
 	  cell->set_refine_flag();
 	  for (unsigned int c=0; c<8; ++c)
@@ -90,7 +93,7 @@ void test()
 
 				// create FE_System and fill in no-normal flux
 				// conditions on boundary 1 (outer)
-  static const FESystem<dim> fe(FE_Q<dim> (2), dim);
+  static const FESystem<dim> fe(FE_Q<dim> (1), dim);
   DoFHandler<dim> dofh(triangulation);
   dofh.distribute_dofs (fe);
   if (myid == 0)
@@ -151,10 +154,8 @@ void test()
 				// now check that no entries were generated
 				// for constrained entries on the locally
 				// owned range.
-  const std::pair<unsigned int,unsigned int> range =
-    vector.local_range();
-  for (unsigned int i=range.first; i<range.second;
-       ++i)
+  const std::pair<unsigned int,unsigned int> range = vector.local_range();
+  for (unsigned int i=range.first; i<range.second; ++i)
     if (constraints.is_constrained(i))
       Assert (vector(i)==0, ExcInternalError());
 
