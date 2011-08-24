@@ -791,6 +791,17 @@ namespace DoFRenumbering
 			  const std::vector<unsigned int> &target_component);
 
 				   /**
+					* Renumber the degrees cell by cell in hierarchical order
+					* (also known as z-order). The main usage is that this
+					* guarantees the same ordering independent of the
+					* number of processors involved in a parallel
+					* distributed computation.
+					*/
+  template <int dim>
+  void
+  hierarchical (DoFHandler<dim> &dof_handler);
+  
+				   /**
 				    * Cell-wise renumbering for DG
 				    * elements.  This function takes
 				    * the ordered set of cells in

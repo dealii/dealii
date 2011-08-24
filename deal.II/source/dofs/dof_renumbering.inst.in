@@ -171,6 +171,11 @@ for (deal_II_dimension : DIMENSIONS)
   (MGDoFHandler<deal_II_dimension>&,
    const std::vector<unsigned int>&);
 
+  template
+  void hierarchical<deal_II_dimension>
+  (DoFHandler<deal_II_dimension>&);
+
+
 // DG renumbering for DoFHandler
 
   template

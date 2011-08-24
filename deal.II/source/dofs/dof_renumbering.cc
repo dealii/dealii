@@ -899,6 +899,96 @@ namespace DoFRenumbering
     return next_free_index;
   }
 
+  namespace
+  {
+	// helper function for hierarchical()
+    template <int dim, class iterator>
+    unsigned int
+    compute_hierarchical_recursive (
+      unsigned int next_free,
+      std::vector<unsigned int>& new_indices,
+      const iterator & cell,
+      const IndexSet & locally_owned)
+    {
+      if (cell->has_children())
+        {
+		  //recursion
+          for (unsigned int c = 0;c < GeometryInfo<dim>::max_children_per_cell; ++c)
+            next_free = compute_hierarchical_recursive<dim> (
+                          next_free,
+                          new_indices,
+                          cell->child (c),
+                          locally_owned);
+        }
+      else
+        {
+          if (!cell->is_artificial() && !cell->is_ghost())
+            {
+              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+              cell->get_dof_indices (local_dof_indices);
+
+              for (unsigned int i = 0;i < dofs_per_cell;++i)
+                {
+                  if (locally_owned.is_element (local_dof_indices[i]))
+                    {
+                      // this is a locally owned DoF, assign new number if not assigned a number yet
+                      unsigned int idx = locally_owned.index_within_set (local_dof_indices[i]);
+                      if (new_indices[idx] == DoFHandler<dim>::invalid_dof_index)
+                        {
+                          new_indices[idx] = locally_owned.nth_index_in_set (next_free);
+                          next_free++;
+                        }
+                    }
+                }
+            }
+        }
+      return next_free;
+    }
+  }
+
+
+
+  template <int dim>
+  void
+  hierarchical (DoFHandler<dim> &dof_handler)
+  {
+    std::vector<unsigned int> renumbering (dof_handler.n_locally_owned_dofs(),
+					   DoFHandler<dim>::invalid_dof_index);
+
+	typename DoFHandler<dim>::cell_iterator cell;
+
+	unsigned int next_free = 0;
+	const IndexSet locally_owned = dof_handler.locally_owned_dofs();
+
+    for(cell = dof_handler.begin(0); cell != dof_handler.end(0); ++cell)
+	  next_free = compute_hierarchical_recursive<dim> (next_free,
+													   renumbering,
+													   cell,
+													   locally_owned);
+
+				     // verify that the last numbered
+				     // degree of freedom is either
+				     // equal to the number of degrees
+				     // of freedom in total (the
+				     // sequential case) or in the
+				     // distributed case at least
+				     // makes sense
+    Assert ((next_free == dof_handler.n_locally_owned_dofs())
+	    ||
+	    ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
+	     &&
+	     (next_free <= dof_handler.n_dofs())),
+	    ExcRenumberingIncomplete());
+
+	// make sure that all local DoFs got new numbers assigned
+	Assert (std::find (renumbering.begin(), renumbering.end(),
+		       numbers::invalid_unsigned_int)
+	    == renumbering.end(),
+	    ExcInternalError());
+	dof_handler.renumber_dofs(renumbering);
+  }
+
 
 
   template <class DH>
