@@ -4172,6 +4172,40 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 
   std::vector<unsigned int> face_dofs;
 
+				   // create FE and mapping
+				   // collections for all elements in
+				   // use by this DoFHandler
+  hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe());
+  hp::MappingCollection<dim,spacedim> mapping_collection;
+  for (unsigned int i=0; i<fe_collection.size(); ++i)
+    mapping_collection.push_back (mapping);
+
+				   // now also create a quadrature
+				   // collection for the faces of a
+				   // cell. fill it with a quadrature
+				   // formula with the support points
+				   // on faces for each FE
+  hp::QCollection<dim-1> face_quadrature_collection;
+  for (unsigned int i=0; i<fe_collection.size(); ++i)
+    {
+      const std::vector<Point<dim-1> > &
+	unit_support_points = fe_collection[i].get_unit_face_support_points();
+
+      Assert (unit_support_points.size() == fe_collection[i].dofs_per_face,
+	      ExcInternalError());
+
+      face_quadrature_collection
+	.push_back (Quadrature<dim-1> (unit_support_points));
+    }
+
+				   // now create the object with which
+				   // we will generate the normal
+				   // vectors
+  hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
+						   fe_collection,
+						   face_quadrature_collection,
+						   update_normal_vectors);
+
 				   // have a map that stores normal
 				   // vectors for each vector-dof
 				   // tuple we want to
@@ -4223,19 +4257,8 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 	    face_dofs.resize (fe.dofs_per_face);
 	    face->get_dof_indices (face_dofs, cell->active_fe_index());
 
-					     // ...and the normal
-					     // vectors at the locations
-					     // where they are defined:
-	    const std::vector<Point<dim-1> > &
-	      unit_support_points = fe.get_unit_face_support_points();
-
-	    Assert (unit_support_points.size() == fe.dofs_per_face,
-		    ExcInternalError());
-
-	    const Quadrature<dim-1> aux_quad (unit_support_points);
-	    FEFaceValues<dim> fe_values (mapping, fe, aux_quad,
-					 update_normal_vectors);
-	    fe_values.reinit(cell, face_no);
+	    x_fe_face_values.reinit (cell, face_no);
+	    const FEFaceValues<dim> &fe_values = x_fe_face_values.get_present_fe_values();
 
 					     // then identify which of
 					     // them correspond to the
@@ -4253,7 +4276,8 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 		  for (unsigned int k=0; k<fe.dofs_per_face; ++k)
 		    if ((k != i)
 			&&
-			(unit_support_points[k] == unit_support_points[i])
+			(face_quadrature_collection[cell->active_fe_index()].point(k) ==
+			 face_quadrature_collection[cell->active_fe_index()].point(i))
 			&&
 			(fe.face_system_to_component_index(k).first >=
 			 first_vector_component)
