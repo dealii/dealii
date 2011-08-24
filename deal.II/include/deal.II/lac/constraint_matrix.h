@@ -365,6 +365,8 @@ class ConstraintMatrix : public Subscriptor
 				      * constraint line <i>i</i>, according
 				      * to the discussion in the general
 				      * class description.
+				      * Note: the line needs to be added with
+				      * one of the add_line() calls first.
 				      */
     void set_inhomogeneity (const unsigned int line,
 			    const double       value);
@@ -1857,7 +1859,12 @@ void
 ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 				     const double       value)
 {
-  ConstraintLine* line_ptr = &lines[lines_cache[calculate_line_index(line)]];
+  const unsigned int line_index = calculate_line_index(line);
+  Assert( line_index < lines_cache.size() &&
+      lines_cache[line_index] != numbers::invalid_unsigned_int, 
+      ExcMessage("call add_line() before calling set_inhomogeneity()"));
+  Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
+  ConstraintLine* line_ptr = &lines[lines_cache[line_index]];
   line_ptr->inhomogeneity = value;
 }
 
