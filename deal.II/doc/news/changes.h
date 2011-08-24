@@ -281,7 +281,7 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> New: Added GridRefinement:hierarchical() to reorder the degrees of freedom
+<li> New: Added GridRefinement::hierarchical() to reorder the degrees of freedom
 by going through the cells in hierarchical order. This ensures consistent
 DoF numbering in parallel computations.
 <br>
