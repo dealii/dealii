@@ -89,7 +89,6 @@ void test()
   DoFTools::make_hanging_node_constraints (dofh, cm);
   cm.close ();
   
-				   //x.print(std::cout);
   cm.distribute(x);
   x_rel = x;
 
@@ -101,24 +100,32 @@ void test()
   x_dub.reinit(dof_set.size());
   
   x_dub = x_rel;
-  
-    {
-    std::ofstream file((std::string("p4est_3d_constraintmatrix_02/dat.") + Utilities::int_to_string(myid)).c_str());
-    file << "**** proc " << myid << std::endl;
-    x_dub.print(file);
+
+  {
+	std::stringstream out;
+    out << "**** proc " << myid << std::endl;
+    x_dub.print (out);
+	
+	if (myid==0)
+	  deallog << out.str() << std::endl;
+	else
+	  MPI_Send((void*)out.str().c_str(),out.str().size()+1, MPI_CHAR, 0, 1, MPI_COMM_WORLD);
   }
-    MPI_Barrier(MPI_COMM_WORLD);
-
-  if (myid==0)
-    {
-      for (unsigned int i=0;i<numproc;++i)
-        {
-          cat_file((std::string("p4est_3d_constraintmatrix_02/dat.") + Utilities::int_to_string(i)).c_str());
-        }
-
-    }
-
   
+  if (myid == 0)
+    { 
+      for (unsigned int i = 1;i < numproc;++i)
+        {
+		  MPI_Status status;
+		  int msglen;
+		  MPI_Probe(i, 1, MPI_COMM_WORLD, &status);
+		  MPI_Get_count(&status, MPI_CHAR, &msglen);
+		  std::vector<char> buf(msglen);
+		  MPI_Recv(&buf[0], msglen, MPI_CHAR, status.MPI_SOURCE, 1,
+                 MPI_COMM_WORLD, &status);
+		  deallog << &buf[0] << std::endl;
+        }
+    }
 
 }
 
