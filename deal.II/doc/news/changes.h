@@ -281,6 +281,23 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: The function VectorTools::compute_no_normal_flux_constraints
+used to compute its constraints by evaluating the normal vector to the
+surface as described by the mapping, rather than using the normal to
+the surface described by the Boundary object associated with this face.
+(Note that the Mapping computes its approximation by polynomial interpolation
+of the surface described by the Boundary object.) This has now been changed:
+the normal vector is now obtained from the Boundary object directly, at
+points computed by the Mapping.
+<br>
+(Wolfgang Bangerth, 2011/08/25)
+
+<li> New: The Boundary base class now has a function Boundary::normal_vector
+that returns the normal vector to the surface at a given location. Derived
+classes need to implement it, of course, if they want it to be used.
+<br>
+(Wolfgang Bangerth, 2011/08/25)
+
 <li> Fixed: The function VectorTools::compute_no_normal_flux_constraints had
 a problem that led to extremely difficult to pin down bugs when running
 with sufficiently many processors. Basically, the constraints computed

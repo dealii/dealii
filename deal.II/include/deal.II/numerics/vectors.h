@@ -1267,9 +1267,10 @@ class VectorTools
 				      * function onces with the whole set of
 				      * boundary indicators at once.
 				      *
-				      * The last argument is denoted to
-				      * compute the normal vector $\vec n$ at
-				      * the boundary points.
+				      * The mapping argument is used to
+				      * compute the boundary points where the function
+				      * needs to request the normal vector $\vec n$
+				      * from the boundary description.
 				      *
 				      * @note When combining adaptively
 				      * refined meshes with hanging node

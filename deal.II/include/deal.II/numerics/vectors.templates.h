@@ -30,6 +30,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -4204,7 +4205,7 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
   hp::FEFaceValues<dim,spacedim> x_fe_face_values (mapping_collection,
 						   fe_collection,
 						   face_quadrature_collection,
-						   update_normal_vectors);
+						   update_q_points);
 
 				   // have a map that stores normal
 				   // vectors for each vector-dof
@@ -4345,7 +4346,10 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 						   // length of the vector
 						   // back to one, just to be
 						   // on the safe side
-		  Point<dim> normal_vector = fe_values.normal_vector(i);
+		  Point<dim> normal_vector 
+		  = (cell->face(face_no)->get_boundary()
+		     .normal_vector (cell->face(face_no),
+				     fe_values.quadrature_point(i)));
 		  Assert (std::fabs(normal_vector.norm() - 1) < 1e-14,
 			  ExcInternalError());
 		  for (unsigned int d=0; d<dim; ++d)
