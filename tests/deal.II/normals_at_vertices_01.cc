@@ -1,15 +1,15 @@
-//----------------------------  normals_at_vertices.cc  ---------------------------
+//----------------------------  normals_at_vertices_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2005, 2008 by the deal.II authors
+//    Copyright (C) 2005, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  normals_at_vertices.cc  ---------------------------
+//----------------------------  normals_at_vertices_01.cc  ---------------------------
 
 
 /* Author: Ralf Hartmann, 2005 */
@@ -56,9 +56,9 @@ void create_triangulation(const unsigned int case_no,
 
 int main ()
 {
-  std::ofstream logfile ("normals_at_vertices/output");
+  std::ofstream logfile ("normals_at_vertices_01/output");
   deallog << std::setprecision (3);
-  deallog << std::fixed;  
+  deallog << std::fixed;
   deallog.attach(logfile);
   deallog.depth_console (0);
 
@@ -77,8 +77,16 @@ int main ()
 	  face=cell->face(face_no);
 	  boundary.get_normals_at_vertices(face, normals);
 	  for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
-	    deallog << "  vertex=" << face->vertex(v)
-		    << ",  normal=" << normals[v] << std::endl;
+	    {
+	      deallog << "  vertex=" << face->vertex(v)
+		      << ",  normal=" << normals[v] << std::endl;
+
+					       // note that we can't check
+					       // here that the normal vector
+					       // is, in fact, normalized,
+					       // since the function does not
+					       // actually guarantee that
+	    }
 	}
       tria.clear();
     }
