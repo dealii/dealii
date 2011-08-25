@@ -91,6 +91,23 @@ namespace Utilities
   string_to_int (const std::vector<std::string> &s);
 
                                    /**
+                                    * Given a string, convert it to an
+                                    * double. Throw an assertion if that is
+                                    * not possible.
+                                    */
+  double
+  string_to_double (const std::string &s);
+
+
+                                   /**
+                                    * Given a list of strings, convert it to a
+                                    * list of doubles. Throw an assertion if
+                                    * that is not possible.
+                                    */
+  std::vector<double>
+  string_to_double (const std::vector<std::string> &s);
+
+                                   /**
                                     * Given a string that contains text
                                     * separated by a @p delimiter, split it into
                                     * its components; for each component,
@@ -220,7 +237,7 @@ namespace Utilities
   lower_bound (Iterator  first,
 	       Iterator  last,
 	       const T  &val);
-  
+
 
 				   /**
 				    * The same function as above, but taking
@@ -234,7 +251,7 @@ namespace Utilities
 	       Iterator   last,
 	       const T   &val,
 	       const Comp comp);
-    
+
 				   /**
 				    * Given a permutation vector (i.e. a
 				    * vector $p_0\ldots p_{N-1}$ where each
@@ -290,8 +307,8 @@ namespace Utilities
 	unsigned long int VmHWM; /** peak resident memory size in kB */
 	unsigned long int VmRSS; /** current resident memory size in kB */
     };
-    
-    
+
+
 				     /**
 				      * Fills the @param stats structure with
 				      * information about the memory
@@ -299,7 +316,7 @@ namespace Utilities
 				      * only implemented on Linux.
 				      */
     void get_memory_stats (MemoryStats & stats);
-    
+
 
                                      /**
                                       * Return the name of the host this
@@ -444,9 +461,9 @@ namespace Utilities
     void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
 					      const double my_value,
 					      MinMaxAvg & result);
-    
 
-    
+
+
 				     /**
 				      * A class that is used to initialize the
 				      * MPI system at the beginning of a
@@ -749,7 +766,7 @@ namespace Utilities
   {
     return Utilities::lower_bound (first, last, val,
 				   std::less<T>());
-  }  
+  }
 
 
 
@@ -837,7 +854,7 @@ namespace Utilities
 	else
 	  len = half;
       }
-  }  
+  }
 }
 
 				       /**
@@ -898,7 +915,7 @@ namespace Utilities
 	  }
 	return first;
       }
-    
+
 
 
 DEAL_II_NAMESPACE_CLOSE

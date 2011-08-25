@@ -281,6 +281,10 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There are now two new functions Utilities::string_to_double.
+<br>
+(Wolfgang Bangerth, 2011/08/25)
+
 <li> Changed: The function VectorTools::compute_no_normal_flux_constraints
 used to compute its constraints by evaluating the normal vector to the
 surface as described by the mapping, rather than using the normal to
