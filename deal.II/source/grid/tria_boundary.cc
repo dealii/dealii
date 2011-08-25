@@ -488,7 +488,7 @@ get_intermediate_points_on_quad (const Triangulation<2,3>::quad_iterator &quad,
 template <>
 Tensor<1,1>
 StraightBoundary<1,1>::
-normal_vector (const typename Triangulation<1,1>::face_iterator &,
+normal_vector (const Triangulation<1,1>::face_iterator &,
 	       const Point<1> &) const
 {
   Assert (false, ExcNotImplemented());
@@ -499,7 +499,7 @@ normal_vector (const typename Triangulation<1,1>::face_iterator &,
 template <>
 Tensor<1,2>
 StraightBoundary<1,2>::
-normal_vector (const typename Triangulation<1,2>::face_iterator &,
+normal_vector (const Triangulation<1,2>::face_iterator &,
 	       const Point<2> &) const
 {
   Assert (false, ExcNotImplemented());
