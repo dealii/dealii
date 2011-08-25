@@ -961,11 +961,42 @@ namespace DoFRenumbering
 	unsigned int next_free = 0;
 	const IndexSet locally_owned = dof_handler.locally_owned_dofs();
 
-    for(cell = dof_handler.begin(0); cell != dof_handler.end(0); ++cell)
-	  next_free = compute_hierarchical_recursive<dim> (next_free,
-													   renumbering,
-													   cell,
-													   locally_owned);
+    const parallel::distributed::Triangulation<dim> * tria
+	= dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+	   (&dof_handler.get_tria());
+
+	if (tria)
+      {
+#ifdef DEAL_II_USE_P4EST
+        //this is a distributed Triangulation. We need to traverse the coarse
+        //cells in the order p4est does
+        for (unsigned int c = 0; c < tria->n_cells (0); ++c)
+          {
+            unsigned int coarse_cell_index =
+              tria->get_p4est_tree_to_coarse_cell_permutation() [c];
+
+            const typename DoFHandler<dim>::cell_iterator
+            cell (tria, 0, coarse_cell_index, &dof_handler);
+
+            next_free = compute_hierarchical_recursive<dim> (next_free,
+                        renumbering,
+                        cell,
+                        locally_owned);
+          }
+#else
+        Assert (false, ExcNotImplemented());
+#endif
+      }
+    else
+      {
+        //this is not a distributed Triangulation. Traverse coarse cells in the
+        //normal order
+        for (cell = dof_handler.begin (0); cell != dof_handler.end (0); ++cell)
+          next_free = compute_hierarchical_recursive<dim> (next_free,
+                      renumbering,
+                      cell,
+                      locally_owned);
+      }
 
 				     // verify that the last numbered
 				     // degree of freedom is either
@@ -986,6 +1017,7 @@ namespace DoFRenumbering
 		       numbers::invalid_unsigned_int)
 	    == renumbering.end(),
 	    ExcInternalError());
+	
 	dof_handler.renumber_dofs(renumbering);
   }
 

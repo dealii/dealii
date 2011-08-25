@@ -2803,6 +2803,15 @@ namespace parallel
 
 
 
+	template <int dim, int spacedim>
+	const std::vector<unsigned int> &
+	Triangulation<dim,spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
+	{
+	  return p4est_tree_to_coarse_cell_permutation;
+	}
+
+
+
     template <int dim, int spacedim>
     MPI_Comm
     Triangulation<dim,spacedim>::get_communicator () const
@@ -2943,6 +2952,13 @@ namespace parallel
       return MPI_COMM_WORLD;
     }
 
+	template <>
+	const std::vector<unsigned int> &
+	Triangulation<1,1>::get_p4est_tree_to_coarse_cell_permutation() const
+	{
+	  static std::vector<unsigned int> a;
+	  return a;
+	}
 
 
     template <>
