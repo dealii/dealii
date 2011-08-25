@@ -122,7 +122,8 @@ class Boundary : public Subscriptor
 				      * lines therefore is also on the
 				      * boundary).
 				      */
-    virtual Point<spacedim>
+    virtual 
+    Point<spacedim>
     get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const = 0;
 
 				     /**
@@ -151,7 +152,8 @@ class Boundary : public Subscriptor
 				      * default implementation throws
 				      * an error in any case, however.
 				      */
-    virtual Point<spacedim>
+    virtual 
+    Point<spacedim>
     get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
@@ -193,7 +195,8 @@ class Boundary : public Subscriptor
 				      * default implementation throws
 				      * an error in any case, however.
 				      */
-    virtual void
+    virtual
+    void
     get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
 				     std::vector<Point<spacedim> > &points) const;
     
@@ -227,7 +230,8 @@ class Boundary : public Subscriptor
 				      * default implementation throws
 				      * an error in any case, however.
 				      */
-    virtual void
+    virtual
+    void
     get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
 				     std::vector<Point<spacedim> > &points) const;
 
@@ -248,6 +252,46 @@ class Boundary : public Subscriptor
     get_intermediate_points_on_face (const typename Triangulation<dim,spacedim>::face_iterator &face,
 				     std::vector<Point<spacedim> > &points) const;
 
+				     /**
+				      * Return the normal vector to the surface
+				      * at the point p. If p is not in fact
+				      * on the surface, but only closeby,
+				      * try to return something reasonable,
+				      * for example the normal vector
+				      * at the surface point closest to p.
+				      * (The point p will in fact not normally
+				      * lie on the actual surface, but rather
+				      * be a quadrature point mapped by some
+				      * polynomial mapping; the mapped surface,
+				      * however, will not usually coincide with
+				      * the actual surface.)
+				      * 
+				      * The face iterator gives an indication
+				      * which face this function is supposed
+				      * to compute the normal vector for.
+				      * This is useful if the boundary of
+				      * the domain is composed of different
+				      * nondifferential pieces (for example
+				      * when using the StraightBoundary class
+				      * to approximate a geometry that is
+				      * completely described by the coarse mesh,
+				      * with piecewise (bi-)linear components
+				      * between the vertices, but where the
+				      * boundary may have a kink at the vertices
+				      * itself).
+				      * 
+				      * @note Implementations of this function 
+				      * should be able to assume that the point p
+				      * lies within or close to the face described by the
+				      * first argument. In turn, callers of this
+				      * function should ensure that this is
+				      * in fact the case.
+				      */
+    virtual
+    Tensor<1,spacedim>
+    normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
+		   const Point<spacedim> &p) const;
+    
 				     /**
 				      * Compute the normal vectors to
 				      * the boundary at each vertex of
@@ -276,7 +320,8 @@ class Boundary : public Subscriptor
 				      * with respect to points inside
 				      * the given face.
 				      */
-    virtual void
+    virtual
+    void
     get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
 			     FaceVertexNormals &face_vertex_normals) const;
 
@@ -414,7 +459,8 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * base class for more
 				      * information.
 				      */
-    virtual Point<spacedim>
+    virtual
+    Point<spacedim>
     get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
@@ -429,7 +475,8 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * and the documentation of the
 				      * base class.
 				      */
-    virtual void
+    virtual
+    void
     get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
 				     std::vector<Point<spacedim> > &points) const;
 
@@ -445,11 +492,26 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * and the documentation of the
 				      * base class.
 				      */
-    virtual void
+    virtual
+    void
     get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
 				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
+				      * Implementation of the function
+				      * declared in the base class.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual
+    Tensor<1,spacedim>
+    normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
+		   const Point<spacedim> &p) const;
+
+		                     /**
 				      * Compute the normals to the
 				      * boundary at the vertices of
 				      * the given face.
@@ -459,7 +521,8 @@ class StraightBoundary : public Boundary<dim,spacedim>
 				      * and the documentation of the
 				      * base class.
 				      */
-    virtual void
+    virtual
+    void
     get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
 			     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
 

@@ -388,7 +388,8 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * this class and the documentation of the
 				      * base class.
 				      */
-    virtual Point<spacedim>
+    virtual 
+    Point<spacedim>
     get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
 
 				     /**
@@ -396,7 +397,8 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * this class and the documentation of the
 				      * base class.
 				      */
-    virtual Point<spacedim>
+    virtual 
+    Point<spacedim>
     get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
@@ -408,7 +410,8 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * Calls
 				      * @p get_intermediate_points_between_points.
 				      */
-    virtual void
+    virtual 
+    void
     get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
 				     std::vector<Point<spacedim> > &points) const;
 
@@ -421,11 +424,26 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * Only implemented for <tt>dim=3</tt>
 				      * and for <tt>points.size()==1</tt>.
 				      */
-    virtual void
+    virtual 
+    void
     get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
 				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
+				      * Implementation of the function
+				      * declared in the base class.
+				      *
+				      * Refer to the general
+				      * documentation of this class
+				      * and the documentation of the
+				      * base class.
+				      */
+    virtual
+    Tensor<1,spacedim>
+    normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
+		   const Point<spacedim> &p) const;
+
+		                     /**
 				      * Compute the normals to the
 				      * boundary at the vertices of
 				      * the given face.
@@ -435,19 +453,22 @@ class HyperBallBoundary : public StraightBoundary<dim,spacedim>
 				      * and the documentation of the
 				      * base class.
 				      */
-    virtual void
+    virtual 
+    void
     get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
 			     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
 
 				     /**
 				      * Return the center of the ball.
 				      */
-    Point<spacedim> get_center () const;
+    Point<spacedim>
+    get_center () const;
 
 				     /**
 				      * Return the radius of the ball.
 				      */
-    double get_radius () const;
+    double 
+    get_radius () const;
 
 				     /**
 				      * Exception. Thrown by the

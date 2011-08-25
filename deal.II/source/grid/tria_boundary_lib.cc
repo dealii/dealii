@@ -515,6 +515,7 @@ get_new_point_on_quad (const Triangulation<1,1>::quad_iterator &) const
   return Point<1>();
 }
 
+
 template <>
 Point<2>
 HyperBallBoundary<1,2>::
@@ -574,6 +575,7 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_on_line (
   else
     get_intermediate_points_between_points(line->vertex(0), line->vertex(1), points);
 }
+
 
 
 template <int dim, int spacedim>
@@ -728,6 +730,18 @@ HyperBallBoundary<dim,spacedim>::get_intermediate_points_on_quad (
   std::vector<Point<spacedim> > &) const
 {
   Assert(false, ExcImpossibleInDim(dim));
+}
+
+
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+HyperBallBoundary<dim,spacedim>::
+normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &,
+	       const Point<spacedim> &p) const
+{
+  const Tensor<1,spacedim> unnormalized_normal = p-center;
+  return unnormalized_normal/unnormalized_normal.norm();
 }
 
 

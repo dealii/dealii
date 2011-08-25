@@ -17,6 +17,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
+#include <deal.II/fe/fe_q.h>
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -147,6 +148,18 @@ get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
   Assert (false, ExcImpossibleInDim(1));
 }
 
+
+
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+Boundary<dim, spacedim>::
+normal_vector (const typename Triangulation<dim, spacedim>::face_iterator &,
+	       const Point<spacedim> &) const
+{
+  Assert (false, ExcPureFunctionCalled());
+  return Tensor<1,spacedim>();
+}
 
 
 
@@ -468,6 +481,157 @@ get_intermediate_points_on_quad (const Triangulation<2,3>::quad_iterator &quad,
 		      ((1-x) * vertices[2] +
 		       x     * vertices[3]) * y;
     }
+}
+
+
+
+template <>
+Tensor<1,1>
+StraightBoundary<1,1>::
+normal_vector (const typename Triangulation<1,1>::face_iterator &,
+	       const Point<1> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,1>();
+}
+
+
+template <>
+Tensor<1,2>
+StraightBoundary<1,2>::
+normal_vector (const typename Triangulation<1,2>::face_iterator &,
+	       const Point<2> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,2>();
+}
+
+
+
+namespace internal
+{
+  namespace
+  {
+    /**
+     * Compute the normalized cross product of a set of dim-1 basis
+     * vectors.
+     */
+    Tensor<1,2>
+    normalized_alternating_product (const Tensor<1,2> (&basis_vectors)[1])
+    {
+      Tensor<1,2> tmp;
+      cross_product (tmp, basis_vectors[0]);
+      return tmp/tmp.norm();
+    }
+
+
+
+    Tensor<1,3>
+    normalized_alternating_product (const Tensor<1,3> (&basis_vectors)[1])
+    {
+      // we get here from StraightBoundary<2,3>::normal_vector, but
+      // the implementation below is bogus for this case anyway
+      // (see the assert at the beginning of that function).
+      Assert (false, ExcNotImplemented());
+      return Tensor<1,3>();
+    }
+
+
+
+    Tensor<1,3>
+    normalized_alternating_product (const Tensor<1,3> (&basis_vectors)[2])
+    {
+      Tensor<1,3> tmp;
+      cross_product (tmp, basis_vectors[0], basis_vectors[1]);
+      return tmp/tmp.norm();
+    }
+
+  }
+}
+
+
+template <int dim, int spacedim>
+Tensor<1,spacedim>
+StraightBoundary<dim,spacedim>::
+normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
+	       const Point<spacedim> &p) const
+{
+  // I don't think the implementation below will work when dim!=spacedim;
+  // in fact, I believe that we don't even have enough information here,
+  // because we would need to know not only about the tangent vectors
+  // of the face, but also of the cell, to compute the normal vector.
+  // Someone will have to think about this some more.
+  Assert (dim == spacedim, ExcNotImplemented());
+
+  // in order to find out what the normal vector is, we first need to
+  // find the reference coordinates of the point p on the given face,
+  // or at least the reference coordinates of the closest point on the
+  // face
+  //
+  // in other words, we need to find a point xi so that f(xi)=||F(xi)-p||^2->min
+  // where F(xi) is the mapping. this algorithm is implemented in
+  // MappingQ1<dim,spacedim>::transform_real_to_unit_cell but only for cells,
+  // while we need it for faces here. it's also implemented in somewhat
+  // more generality there using the machinery of the MappingQ1 class
+  // while we really only need it for a specific case here
+  //
+  // in any case, the iteration we use here is a Gauss-Newton's iteration with
+  //   xi^{n+1} = xi^n - H(xi^n)^{-1} J(xi^n)
+  // where
+  //   J(xi) = (grad F(xi))^T (F(xi)-p)
+  // and
+  //   H(xi) = [grad F(xi)]^T [grad F(xi)]
+  // In all this,
+  //   F(xi) = sum_v vertex[v] phi_v(xi)
+  // We get the shape functions phi_v from an object of type FE_Q<dim-1>(1)
+
+  // we start with the point xi=1/2, xi=(1/2,1/2), ...
+  const unsigned int facedim = dim-1;
+
+  Point<facedim> xi;
+  for (unsigned int i=0; i<facedim; ++i)
+    xi[i] = 1./2;
+
+  FE_Q<facedim> linear_fe(1);
+
+  const double eps = 1e-12;
+  Tensor<1,spacedim> grad_F[facedim];
+  while (true)
+  {
+    Point<spacedim> F;
+    for (unsigned int v=0; v<GeometryInfo<facedim>::vertices_per_cell; ++v)
+      F += face->vertex(v) * linear_fe.shape_value(v, xi);
+
+    for (unsigned int i=0; i<facedim; ++i)
+    {
+      grad_F[i] = 0;
+      for (unsigned int v=0; v<GeometryInfo<facedim>::vertices_per_cell; ++v)
+	grad_F[i] += face->vertex(v) * linear_fe.shape_grad(v, xi)[i];
+    }
+
+    Tensor<1,facedim> J;
+    for (unsigned int i=0; i<facedim; ++i)
+      for (unsigned int j=0; j<spacedim; ++j)
+        J[i] += grad_F[i][j] * (F-p)[j];
+
+    Tensor<2,facedim> H;
+    for (unsigned int i=0; i<facedim; ++i)
+      for (unsigned int j=0; j<facedim; ++j)
+	for (unsigned int k=0; k<spacedim; ++k)
+      H[i][j] += grad_F[i][k] * grad_F[j][k];
+
+    const Point<facedim> delta_xi = -invert(H) * J;
+    xi += delta_xi;
+
+    if (delta_xi.norm() < eps)
+      break;
+  }
+
+  // so now we have the reference coordinates xi of the point p.
+  // we then have to compute the normal vector, which we can do
+  // by taking the (normalize) alternating product of all the tangent
+  // vectors given by grad_F
+  return internal::normalized_alternating_product(grad_F);
 }
 
 
