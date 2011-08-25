@@ -120,15 +120,16 @@ void test()
 						   MappingQ<dim>(degree));*/
   constraints.close();
 
+  std::string base = output_file_for_mpi("no_flux_constraints_02");
+  
   if (myid==0)
-	system("rm -rf no_flux_constraints_02/cm_?.dot");
+	system(("rm -rf " + base + "cm_?.dot").c_str());
 
   MPI_Barrier(MPI_COMM_WORLD);
 
   { //write the constraintmatrix to a file on each cpu
-	char fname[] = "no_flux_constraints_02/cm_0.dot";
-	fname[26]+=myid;
-	std::ofstream file(fname);
+	std::string fname = base+"cm_" + Utilities::int_to_string(myid) + ".dot";
+	std::ofstream file(fname.c_str());
 	constraints.print(file);
   }
   MPI_Barrier(MPI_COMM_WORLD);
@@ -137,10 +138,10 @@ void test()
   {
 	//sort and merge the constraint matrices on proc 0, generate a checksum
 	//and output that into the deallog
-	system("cat no_flux_constraints_02/cm_?.dot|sort -n|uniq >no_flux_constraints_02/cm");
-	system("md5sum no_flux_constraints_02/cm >no_flux_constraints_02/cm.check");
+	system((std::string("cat ") + base+"cm_?.dot|sort -n|uniq >" + base+"cm").c_str());
+	system((std::string("md5sum ") + base + "cm >" + base + "cm.check").c_str());
 	{
-	  std::ifstream file("no_flux_constraints_02/cm.check");
+	  std::ifstream file((base+"cm.check").c_str());
 	  std::string str;
 	  while (!file.eof())
 	  {
