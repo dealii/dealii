@@ -142,9 +142,13 @@ namespace Utilities
 
     int i = max_int;
     ss >> i;
-
                                      // check for errors
     AssertThrow (i != max_int, ExcCantConvertString (s));
+
+//TODO: The test for errors above doesn't work, as can easily be
+//verified. furthermore, it doesn't catch cases like when calling
+//string_to_int("1.23.4") since it just reads in however much it can, without
+//realizing that there is more
 
     return i;
   }
@@ -178,6 +182,11 @@ namespace Utilities
 
                                      // check for errors
     AssertThrow (i != max_double, ExcCantConvertString (s));
+
+//TODO: The test for errors above doesn't work, as can easily be
+//verified. furthermore, it doesn't catch cases like when calling
+//string_to_int("1.23.4") since it just reads in however much it can, without
+//realizing that there is more
 
     return i;
   }
