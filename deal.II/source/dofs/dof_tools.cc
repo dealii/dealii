@@ -4399,6 +4399,16 @@ namespace DoFTools
     std::vector<unsigned int> local_dof_indices;
     local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
+				// first generate an unsorted list of all
+				// indices which we fill from the back. could
+				// also insert them directly into the
+				// IndexSet, but that inserts indices in the
+				// middle, which is an O(n^2) algorithm and
+				// hence too expensive. Could also use
+				// std::set, but that is in general more
+				// expensive than a vector
+    std::vector<unsigned int> subdomain_indices;
+
     typename DH::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
@@ -4410,9 +4420,18 @@ namespace DoFTools
 	  const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 	  local_dof_indices.resize (dofs_per_cell);
 	  cell->get_dof_indices (local_dof_indices);
-	  index_set.add_indices (local_dof_indices.begin(),
-				 local_dof_indices.end());
+	  subdomain_indices.insert(subdomain_indices.end(),
+				   local_dof_indices.begin(),
+				   local_dof_indices.end());
 	}
+				// sort indices and remove duplicates
+    std::sort (subdomain_indices.begin(), subdomain_indices.end());
+    subdomain_indices.erase (std::unique(subdomain_indices.begin(),
+					 subdomain_indices.end()),
+			     subdomain_indices.end());
+
+				// insert into IndexSet
+    index_set.add_indices (subdomain_indices.begin(), subdomain_indices.end());
     index_set.compress ();
 
     return index_set;
