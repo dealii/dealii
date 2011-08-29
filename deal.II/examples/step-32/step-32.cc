@@ -886,7 +886,7 @@ class BoussinesqFlowProblem
 {
   public:
     struct Parameters;
-    BoussinesqFlowProblem (BoussinesqFlowProblem<dim>::Parameters & parameters);
+    BoussinesqFlowProblem (Parameters & parameters);
     void run ();
 
   private:
@@ -3704,7 +3704,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_fraction (triangulation,
   				       estimated_error_per_cell,
-  				       0.6, 0.1);
+  				       0.3, 0.1);
 
     // for (typename Triangulation<dim>::active_cell_iterator
     // 	   cell = triangulation.begin_active();
