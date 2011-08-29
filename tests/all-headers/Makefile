@@ -49,17 +49,6 @@ TESTS   = $(shell for i in $(HEADERS) ; do echo test-$$i | $(PERL) -pi -e 's/.h$
 ID = `id -un`"@"`hostname`
 
 
-# we need two auxiliary functions. the first one takes a filename and replaces
-# all occurrences of slashes by hyphens, so that we can create a .cc file that
-# corresponds to a header file in a different directory
-subst_slashes = $(shell echo $(1) | $(PERL) -pi -e 's/\//-/g;')
-
-# the second one takes a path to a header file and makes sure that we can
-# #include it, i.e. it drops the top-level xxx/include/ part of the filename,
-# since we only find include directives like <grid/tria.h>
-normalize = $(shell echo $(1) | $(PERL) -pi -e 's/.*include.//g;')
-
-
 # next the target that creates the target rules. First, we list all the header
 # files as the head of the rule, followed by a colon. Then the actual rule
 # that includes writing the .cc file that only includes a single header file,
