@@ -32,6 +32,7 @@
 
 #include <numeric>
 #include <algorithm>
+#include <limits>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -44,7 +45,11 @@ namespace
   number
   max_element (const Vector<number> &criteria)
   {
-    return *std::max_element(criteria.begin(), criteria.end());
+    return (criteria.size()>0)
+	?
+	(*std::max_element(criteria.begin(), criteria.end()))
+	:
+	std::numeric_limits<number>::min();
   }
 
 
@@ -54,7 +59,11 @@ namespace
   number
   min_element (const Vector<number> &criteria)
   {
-    return *std::min_element(criteria.begin(), criteria.end());
+    return (criteria.size()>0)
+	?
+	(*std::min_element(criteria.begin(), criteria.end()))
+	:
+	std::numeric_limits<number>::max();
   }
 
 
