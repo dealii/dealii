@@ -69,7 +69,12 @@
 
     <a name="referencing"> </a>
     <h3>Referencing <acronym>deal.II</acronym></h3>
-
+    
+    <p>
+    For your convenience, we provide a <a href="dealii.bib">BibTeX file</a> with entries
+    for the publications in this section.
+    </p>
+    
     <p>
     If you write a paper using results obtained with the help of
     <acronym>deal.II</acronym>, please cite one or both of the following
@@ -91,12 +96,11 @@
 	 ACM Transactions on Mathematical Software, vol. 33, no. 4, article 24
 	 <br>
 	 DOI <a href="http://doi.acm.org/10.1145/1268776.1268779">10.1145/1268776.1268779</a>
-	 for abstract and full text;
 	 (<a
-	 href="http://www.isc.tamu.edu/publications-reports/tr/0602.pdf">Preprint</a>), (<a href="http://math.nist.gov/toms/cgi-bin/TOMSbibget?Bangerth:2007:DGP">BibTeX Entry</a>)
+	 href="http://www.isc.tamu.edu/publications-reports/tr/0602.pdf">Preprint</a>)
 	 <br>
 	 <pre>
-@Article{BHK07,
+@Article{BangerthHartmannKanschat2007,
   author = 	 {Wolfgang Bangerth and Ralf Hartmann and Guido Kanschat},
   title = 	 {{deal.II} -- a General Purpose Object Oriented Finite Element Library},
   journal = 	 {ACM Trans. Math. Softw.},
@@ -120,7 +124,7 @@
 	 target="_top">http://www.dealii.org</a>
 	 <br>
 	 <pre>
-@Manual{BK,
+@Manual{DealIIReference,
   title = 	 {{\tt deal.{I}{I}} Differential Equations Analysis Library,
                   Technical Reference},
   author = 	 {W. Bangerth and G. Kanschat},
@@ -142,56 +146,68 @@
      Pieter Ghysels
      R. Ziegler -->
 
-    <a name="details"> </a>
-    <h3>Publications on details of <acronym>deal.II</acronym></h3>
+<a name="details"> </a>
+<h4>Publications on details of <acronym>deal.II</acronym></h4>
 
     <p>
-    The following publications explain in great detail the
-    implementation of algorithms and data structures of the hp, multigrid and
-    distributed mesh components of deal.II:
-    <ol>
-    <li value="1"> <p>
-	 <a
-	 href="http://www.math.tamu.edu/~bangerth"
-	 target="_top">W. Bangerth</a>, O. Kayser-Herold,
-	 <br>
-         <strong>Data Structures and Requirements for hp Finite Element
-               Software
-         </strong>
-	 <br>
-	 ACM Trans. Math. Softw., vol. 36, pp. 4/1-31, 2009
-	 </p>
-    <li value="2"> <p>
-         <a href="http://www.math.tamu.edu/~kanschat"
-         target="_top">G. Kanschat</a>
-         <br>
-         <strong>Multi-level methods for discontinuous Galerkin FEM on locally refined meshes</strong>
-         <br>
-	 Comput. &amp; Struct., vol. 82, pp. 2437-2445, 2004
-         </p>
-
-    <li value="3"> <p>
+      The following publications explain in great detail the
+      implementation of algorithms and data structures of the hp, multigrid and
+      distributed mesh components of deal.II:
+      <ol>
+	
+	<li>
+	  B. Janssen,
+	  <a href="http://www.math.tamu.edu/~kanschat"
+		target="_top">G. Kanschat</a>,
+	  <br>
+	  <strong>Adaptive Multilevel Methods with Local Smoothing for H<sup>1</sup>-
+	    and H<sup>curl</sup>-Conforming High Order Finite Element Methods</strong>
+	  <br>
+	  SIAM J. Sci. Comput., vol. 33/4, pp. 2095-2114, 2011
+	  <br>
+	  DOI: <a href="http://dx.doi.org/10.1137/090778523">10.1137/090778523</a>
+	</li>
+	<li> <p>
          <a href="http://www.math.tamu.edu/~bangerth"
             target="_top">W. Bangerth</a>,
 	 <a href="http://users.ices.utexas.edu/~carsten/"
 	    target="_top">C. Burstedde</a>, T. Heister, M. Kronbichler
          <br>
          <strong>Algorithms and Data Structures for Massively Parallel Generic
-         Finite Element Codes</strong>
+           Finite Element Codes</strong>
          <br>
-	 Accepted for publication in the ACM Trans. Math. Softw. This paper is
-	 also available as
+	 to appear in ACM Trans. Math. Softw. 
 	 <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
 	   preprint 2011-187</a>.
-	 <br>
-	 For massively parallel
+	 
+	 <li> <p>
+	     <a
+		href="http://www.math.tamu.edu/~bangerth"
+		target="_top">W. Bangerth</a>, O. Kayser-Herold,
+	     <br>
+             <strong>Data Structures and Requirements for hp Finite Element
+               Software
+             </strong>
+	     <br>
+	     ACM Trans. Math. Softw., vol. 36, pp. 4/1-31, 2009
+	   </p>
+	   
+	 <li> <p>
+             <a href="http://www.math.tamu.edu/~kanschat"
+		target="_top">G. Kanschat</a>
+             <br>
+             <strong>Multi-level methods for discontinuous Galerkin FEM on locally refined meshes</strong>
+             <br>
+	     Comput. &amp; Struct., vol. 82, pp. 2437-2445, 2004
+           </p>
+    </ol>
+    
+    <p>  For massively parallel
 	 computations, <acronym>deal.II</acronym> builds on the
 	 <a href="http://www.p4est.org/" target="_top">p4est</a>
 	 library. If you use this functionality, please also cite the
 	 p4est paper listed at their website.
          </p>
-    </ol>
-
     <p>
     <acronym>deal.II</acronym> is a component of the <a
     href="http://www.spec.org/cpu2006/">SPEC CPU2006</a> benchmark
@@ -200,14 +216,14 @@
     optimizations. The following special issue gives a detailed
     comparison with respect to many different metrics of the
     benchmarks in SPEC CPU2006, including <acronym>deal.II</acronym>:
-    <ol>
-    <li value="4"> <p>
+    <ul>
+    <li> <p>
 	 <strong>Special Issue: SPEC CPU2006 analysis (Editor: John Henning)
          </strong>
 	 <br>
 	 ACM SIGARCH Computer Architecture News, vol. 35, issue 1, 2007.
 	 </p>
-    </ol>
+    </ul>
 
     <a name="2011"> </a>
     <h3>Publications in 2011</h3>
