@@ -2092,9 +2092,6 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
       vec(it->line) = new_value;
     }
 
-				   // force every processor to write something
-  vec(local_range.first) = vec(local_range.first);
-
   vec.compress ();
 }
 
