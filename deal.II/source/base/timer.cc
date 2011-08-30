@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -410,7 +410,14 @@ TimerOutput::leave_subsection (const std::string &section_name)
 void
 TimerOutput::print_summary () const
 {
-				// in case we want to write CPU times
+				   // we are going to change the
+				   // precision and width of output
+				   // below. store the old values so we
+				   // can restore it later on
+  std::streamsize old_precision = out_stream.get_stream().precision ();
+  std::streamsize old_width     = out_stream.get_stream().width ();
+
+				   // in case we want to write CPU times
   if (output_type != wall_times)
     {
       double total_cpu_time;
@@ -563,6 +570,10 @@ TimerOutput::print_summary () const
 		   << "(Timer function may have introduced too much overhead, or different\n"
 		   << "section timers may have run at the same time.)" << std::endl;
     }
+
+				   // restore previous precision and width
+  out_stream.get_stream().precision (old_precision);
+  out_stream.get_stream().width (old_width);
 }
 
 

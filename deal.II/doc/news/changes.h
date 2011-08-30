@@ -281,6 +281,12 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The TimerOutput::print_summary() function changed the
+precision of output on the stream it prints to, but didn't restore
+the previous value. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/08/30)
+
 <li> New: There are now two new functions Utilities::string_to_double.
 <br>
 (Wolfgang Bangerth, 2011/08/25)
