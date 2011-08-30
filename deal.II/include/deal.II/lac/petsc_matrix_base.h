@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1148,7 +1148,7 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcSourceEqualsDestination);
-      
+
       /**
         * Exception.
 	*/
@@ -1159,13 +1159,13 @@ namespace PETScWrappers
 			  "'set'" :
 			  (arg1 == 2 ?
 			   "'add'" : "???"))
-		      << " operation but the vector is currently in "
+		      << " operation but the matrix is currently in "
 		      << (arg2 == 1 ?
 			  "'set'" :
 			  (arg2 == 2 ?
 			   "'add'" : "???"))
 		      << " mode. You first have to call 'compress()'.");
-	
+
     protected:
                                        /**
                                         * A generic matrix object in
@@ -1810,7 +1810,7 @@ namespace PETScWrappers
   void
   MatrixBase::prepare_action(const LastAction::Values new_action)
   {
-    if (last_action == new_action) 
+    if (last_action == new_action)
       ;
     else if (last_action == LastAction::none)
       last_action = new_action;
