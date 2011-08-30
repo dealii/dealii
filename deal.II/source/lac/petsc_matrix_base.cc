@@ -247,6 +247,8 @@ namespace PETScWrappers
 
     ierr = MatAssemblyEnd (matrix,MAT_FINAL_ASSEMBLY);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+    last_action == LastAction::none;
   }
 
 

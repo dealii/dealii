@@ -2,7 +2,7 @@
 //    $Id: simple_mpi_01.cc 23327 2011-02-11 03:19:07Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,8 +19,8 @@
 #include "../tests.h"
 
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
-#include <deal.II/lac/petsc_sparse_matrix.h>    
-#include <deal.II/lac/petsc_parallel_sparse_matrix.h>    
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
@@ -39,18 +39,17 @@ void test()
   CompressedSimpleSparsityPattern csp(2);
   csp.add(0,0);
   csp.add(1,1);
-  
+
   PETScWrappers::MPI::SparseMatrix mat;
   std::vector< unsigned int > local_rows(numprocs, 0);
   local_rows[0]=2;
-  
+
   mat.reinit(MPI_COMM_WORLD, csp, local_rows, local_rows, myid);
 
-#warning this here hangs, so it is uncommented until bug is fixed
-  //if (myid == 0 )
-	mat.add(0, 0, 1.0);
+  if (myid == 0 )
+    mat.add(0, 0, 1.0);
 
-  
+
   mat.compress();
 
   if (myid==0)

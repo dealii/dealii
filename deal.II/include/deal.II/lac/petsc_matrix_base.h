@@ -1148,7 +1148,24 @@ namespace PETScWrappers
                                         * Exception
                                         */
       DeclException0 (ExcSourceEqualsDestination);
-
+      
+      /**
+        * Exception.
+	*/
+      DeclException2 (ExcWrongMode,
+		      int, int,
+		      << "You tried to do a "
+		      << (arg1 == 1 ?
+			  "'set'" :
+			  (arg1 == 2 ?
+			   "'add'" : "???"))
+		      << " operation but the vector is currently in "
+		      << (arg2 == 1 ?
+			  "'set'" :
+			  (arg2 == 2 ?
+			   "'add'" : "???"))
+		      << " mode. You first have to call 'compress()'.");
+	
     protected:
                                        /**
                                         * A generic matrix object in
@@ -1190,9 +1207,10 @@ namespace PETScWrappers
       LastAction::Values last_action;
 
 				       /**
-					* Flush buffers on all CPUs when
-					* switching between inserting and
-					* adding to elements, no-op otherwise.
+					* Ensure that the add/set mode that
+					* is required for actions following
+					* this call is compatible with the
+					* current mode.
 					* Should be called from all internal
 					* functions accessing matrix elements.
 					*/
@@ -1433,7 +1451,6 @@ namespace PETScWrappers
 		   const unsigned int j,
 		   const PetscScalar  value)
   {
-
     Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
     set (i, 1, &j, &value, false);
@@ -1793,18 +1810,12 @@ namespace PETScWrappers
   void
   MatrixBase::prepare_action(const LastAction::Values new_action)
   {
-				     // flush PETSc buffers when switching
-				     // actions, otherwise just return.
-    if (last_action == new_action) return;
-
-    int ierr;
-    ierr = MatAssemblyBegin(matrix, MAT_FLUSH_ASSEMBLY);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    ierr = MatAssemblyEnd(matrix, MAT_FLUSH_ASSEMBLY);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    last_action = new_action;
+    if (last_action == new_action) 
+      ;
+    else if (last_action == LastAction::none)
+      last_action = new_action;
+    else
+      Assert (false, ExcWrongMode (last_action, new_action));
   }
 
 
