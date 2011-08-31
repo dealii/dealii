@@ -48,7 +48,7 @@ subsection Stabilization parameters
   set beta  = 0.078
 
   # The c_R factor in the entropy viscosity stabilization.
-  set c_R   = 0.11
+  set c_R   = 0.5
 end
 
 

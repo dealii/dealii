@@ -899,6 +899,7 @@ class BoussinesqFlowProblem
     void project_temperature_field ();
     double get_maximal_velocity () const;
     double get_cfl_number () const;
+    double get_entropy_variation (const double average_temperature) const;
     std::pair<double,double> get_extrapolated_temperature_range () const;
     void solve ();
     void output_results ();
@@ -917,6 +918,8 @@ class BoussinesqFlowProblem
 		      const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
 		      const double                        global_u_infty,
 		      const double                        global_T_variation,
+		      const double                        average_temperature,
+		      const double                        global_entropy_variatiion,
 		      const double                        cell_diameter) const;
 
   public:
@@ -1033,6 +1036,7 @@ class BoussinesqFlowProblem
     void
     local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 				    const double                   global_max_velocity,
+				    const double                   global_entropy_variation,
 				    const typename DoFHandler<dim>::active_cell_iterator &cell,
 				    Assembly::Scratch::TemperatureRHS<dim> &scratch,
 				    Assembly::CopyData::TemperatureRHS<dim> &data);
@@ -1426,6 +1430,87 @@ double BoussinesqFlowProblem<dim>::get_cfl_number () const
 
 
 
+template <int dim>
+double
+BoussinesqFlowProblem<dim>::get_entropy_variation (const double average_temperature) const
+{
+				// only do this if we really need entropy
+				// variation
+  if (parameters.stabilization_alpha != 2)
+    return 1.;
+
+				// record maximal entropy on Gauss quadrature
+				// points
+  const QGauss<dim> quadrature_formula (parameters.temperature_degree+1);
+  const unsigned int n_q_points = quadrature_formula.size();
+
+  FEValues<dim> fe_values (temperature_fe, quadrature_formula,
+                           update_values | update_JxW_values);
+  std::vector<double> old_temperature_values(n_q_points);
+  std::vector<double> old_old_temperature_values(n_q_points);
+
+  double min_entropy = std::numeric_limits<double>::max(),
+    max_entropy = -std::numeric_limits<double>::max(),
+    area = 0,
+    entropy_integrated = 0;
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = temperature_dof_handler.begin_active(),
+    endc = temperature_dof_handler.end();
+  for (; cell!=endc; ++cell)
+    if (cell->subdomain_id() ==
+	Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+      {
+	fe_values.reinit (cell);
+	fe_values.get_function_values (old_temperature_solution,
+				       old_temperature_values);
+	fe_values.get_function_values (old_old_temperature_solution,
+				       old_old_temperature_values);
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  {
+	    const double T = (old_temperature_values[q] +
+			      old_old_temperature_values[q]) / 2;
+	    const double entropy = ((T-average_temperature) *
+				    (T-average_temperature));
+
+	    min_entropy = std::min (min_entropy, entropy);
+	    max_entropy = std::max (max_entropy, entropy);
+	    area += fe_values.JxW(q);
+	    entropy_integrated += fe_values.JxW(q) * entropy;
+	  }
+      }
+
+				// do MPI data exchange: we need to sum over
+				// the two integrals (area,
+				// entropy_integrated), and get the extrema
+				// for maximum and minimum. combine
+				// MPI_Allreduce for two values since that is
+				// an expensive operation
+  double local_for_sum[2], global_for_sum[2];
+  double local_for_max[2], global_for_max[2];
+  local_for_sum[0] = entropy_integrated;
+  local_for_sum[1] = area;
+  local_for_max[0] = -min_entropy;
+  local_for_max[1] = max_entropy;
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  MPI_Allreduce (&local_for_sum[0], &global_for_sum[0], 2, MPI_DOUBLE,
+		 MPI_SUM, MPI_COMM_WORLD);
+  MPI_Allreduce (&local_for_max[0], &global_for_max[0], 2, MPI_DOUBLE,
+		 MPI_MAX, MPI_COMM_WORLD);
+#else
+  global_for_sum[0] = local_for_sum[0];
+  global_for_sum[1] = local_for_sum[1];
+  global_for_max[0] = local_for_max[0];
+  global_for_max[1] = local_for_max[1];
+#endif
+  const double average_entropy = global_for_sum[0] / global_for_sum[1];
+  const double entropy_diff = std::max(global_for_max[1] - average_entropy,
+				       average_entropy - (-global_for_max[0]));
+  return entropy_diff;
+}
+
+
+
 				 // Again, this is only a slightly
 				 // modified version of the respective
 				 // function in step-31. What is new is
@@ -1544,6 +1629,8 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 		   const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
 		   const double                        global_u_infty,
 		   const double                        global_T_variation,
+		   const double                        average_temperature,
+		   const double                        global_entropy_variation,
 		   const double                        cell_diameter) const
 {
   if (global_u_infty == 0)
@@ -1577,30 +1664,36 @@ compute_viscosity (const std::vector<double>          &old_temperature,
 	    2 * EquationData::eta * strain_rate * strain_rate) /
 	   (EquationData::density(T) * EquationData::specific_heat));
 
-      const double residual
-	= std::abs((dT_dt + u_grad_T - kappa_Delta_T - gamma) *
-		   std::pow((old_temperature[q]+old_old_temperature[q]) / 2,
-			    parameters.stabilization_alpha-1.));
+      double residual
+	= std::abs(dT_dt + u_grad_T - kappa_Delta_T - gamma);
+      if (parameters.stabilization_alpha == 2)
+	residual *= std::abs(T - average_temperature);
 
       max_residual = std::max (residual,        max_residual);
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
 
+  const double max_viscosity = (parameters.stabilization_beta * 
+				max_velocity * cell_diameter);
   if (timestep_number == 0)
-    return parameters.stabilization_beta * max_velocity * cell_diameter;
+    return max_viscosity;
   else
     {
       Assert (old_time_step > 0, ExcInternalError());
 
-      const double global_scaling = parameters.stabilization_c_R *
-				    global_u_infty * global_T_variation *
-				    std::pow(global_Omega_diameter, parameters.stabilization_alpha - 2.);
+      double entropy_viscosity;
+      if (parameters.stabilization_alpha == 2)
+	entropy_viscosity = (parameters.stabilization_c_R *
+			     cell_diameter * cell_diameter *
+			     max_residual /
+			     global_entropy_variation);
+      else
+	entropy_viscosity = (parameters.stabilization_c_R *
+			     cell_diameter * global_Omega_diameter *
+			     max_velocity * max_residual /
+			     (global_u_infty * global_T_variation));
 
-      return (parameters.stabilization_beta *
-	      max_velocity *
-	      std::min (cell_diameter,
-			std::pow(cell_diameter,parameters.stabilization_alpha) * max_residual /
-			global_scaling));
+      return std::min (max_viscosity, entropy_viscosity);
     }
 }
 
@@ -2399,7 +2492,7 @@ BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
   Amg_data.elliptic = true;
   Amg_data.higher_order_elements = true;
   Amg_data.smoother_sweeps = 2;
-//  Amg_data.aggregation_threshold = 0.02;
+  Amg_data.aggregation_threshold = 0.02;
 
   Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
   Amg_preconditioner->initialize (stokes_preconditioner_matrix.block(0,0),
@@ -2725,6 +2818,7 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::
 local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 				const double                   global_max_velocity,
+				const double                   global_entropy_variation,
 				const typename DoFHandler<dim>::active_cell_iterator &cell,
 				Assembly::Scratch::TemperatureRHS<dim> &scratch,
 				Assembly::CopyData::TemperatureRHS<dim> &data)
@@ -2786,6 +2880,8 @@ local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
 			 scratch.old_old_strain_rates,
 			 global_max_velocity,
 			 global_T_range.second - global_T_range.first,
+			 0.5 * (global_T_range.second + global_T_range.first),
+			 global_entropy_variation,
 			 cell->diameter());
 
   for (unsigned int q=0; q<n_q_points; ++q)
@@ -2944,6 +3040,17 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
   const std::pair<double,double>
     global_T_range = get_extrapolated_temperature_range();
 
+				// use midpoint between maximum and minimum
+				// temperature for definition of average
+				// temperature in entropy viscosity. Could
+				// also use the integral average, but the
+				// results are not very sensitive to this
+				// choice.
+  const double average_temperature = 0.5 * (global_T_range.first +
+					    global_T_range.second);
+  const double global_entropy_variation =
+    get_entropy_variation (average_temperature);
+
   typedef
     FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
     SubdomainFilter;
@@ -2960,6 +3067,7 @@ void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maxim
 			  this,
 			  global_T_range,
 			  maximal_velocity,
+			  global_entropy_variation,
 			  std_cxx1x::_1,
 			  std_cxx1x::_2,
 			  std_cxx1x::_3),
@@ -3056,7 +3164,7 @@ void BoussinesqFlowProblem<dim>::solve ()
 				// succeeds in 30 steps or less.
     unsigned int n_iterations = 0;
     double reduction = 0;
-    const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
+    const double solver_tolerance = 1e-7 * stokes_rhs.l2_norm();
     SolverControl solver_control (30, solver_tolerance);
 
     try
