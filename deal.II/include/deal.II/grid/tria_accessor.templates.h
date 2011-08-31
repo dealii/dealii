@@ -2209,9 +2209,15 @@ TriaAccessor<0, 1, spacedim>::boundary_indicator () const
   switch (vertex_kind)
     {
       case left_vertex:
-	    return 0;
       case right_vertex:
-	    return 1;
+      {
+	Assert (tria->vertex_to_boundary_id_map_1d->find (this->vertex_index())
+		!= tria->vertex_to_boundary_id_map_1d->end(),
+		ExcInternalError());
+
+	return (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()];
+      }
+
       default:
 	    return 255;
     }
@@ -2334,22 +2340,22 @@ int TriaAccessor<0, 1, spacedim>::isotropic_child_index (const unsigned int)
 template <int spacedim>
 inline
 void
-TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const unsigned char)
+TriaAccessor<0, 1, spacedim>::set_boundary_indicator (const unsigned char b)
 {
-  Assert(false,
-	 ExcMessage ("The boundary indicator of vertices is determined by their "
-		     "location within a triangulation and can not be set explicitly"));
+  Assert (tria->vertex_to_boundary_id_map_1d->find (this->vertex_index())
+	  != tria->vertex_to_boundary_id_map_1d->end(),
+	  ExcInternalError());
+
+  (*tria->vertex_to_boundary_id_map_1d)[this->vertex_index()] = b;
 }
 
 
 
 template <int spacedim>
 inline
-void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const unsigned char)
+void TriaAccessor<0, 1, spacedim>::set_all_boundary_indicators (const unsigned char b)
 {
-  Assert(false,
-	 ExcMessage ("The boundary indicator of vertices is determined by their "
-		     "location within a triangulation and can not be set explicitly"));
+  set_boundary_indicator (b);
 }
 
 

@@ -1570,6 +1570,19 @@ namespace internal
 				lines_at_vertex[line->vertex_index(vertex)][0]);
 		    line->set_neighbor (vertex, neighbor);
 		  }
+
+					     // finally set the
+					     // vertex_to_boundary_id_map_1d
+					     // map
+	    triangulation.vertex_to_boundary_id_map_1d->clear();
+	    for (typename Triangulation<dim,spacedim>::active_cell_iterator
+		   cell = triangulation.begin_active();
+		 cell != triangulation.end(); ++cell)
+	      for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+		if (cell->at_boundary(f))
+		  (*triangulation
+		   .vertex_to_boundary_id_map_1d)[cell->face(f)->vertex_index()]
+		    = f;
 	  }
 
 
@@ -8944,7 +8957,7 @@ namespace internal
 	void
 	prevent_distorted_boundary_cells (const Triangulation<1,spacedim> &);
 
-	
+
 	template <int dim, int spacedim>
 	static
 	void
@@ -8954,7 +8967,7 @@ namespace internal
 					     // one, we cannot perform
 					     // this check yet.
 	    if(spacedim>dim) return;
-	    
+
 	    for (typename Triangulation<dim,spacedim>::cell_iterator
 		   cell=triangulation.begin(); cell!=triangulation.end(); ++cell)
 	      if (cell->at_boundary() &&
@@ -9378,13 +9391,18 @@ Triangulation (const MeshSmoothing smooth_grid,
 		smooth_grid(smooth_grid),
 		faces(NULL),
 		anisotropic_refinement(false),
-		check_for_distorted_cells(check_for_distorted_cells)
+		check_for_distorted_cells(check_for_distorted_cells),
+		vertex_to_boundary_id_map_1d (0)
 {
 				   // set default boundary for all
 				   // possible components
   for (unsigned int i=0;i<255;++i)
     boundary[i] = &straight_boundary;
-  
+
+  if (dim == 1)
+    vertex_to_boundary_id_map_1d
+      = new std::map<unsigned int, unsigned char>();
+
   // connect the any_change signal to the other signals
   signals.create.connect (signals.any_change);
   signals.post_refinement.connect (signals.any_change);
@@ -9400,7 +9418,8 @@ Triangulation (const Triangulation<dim, spacedim> & other)
 				   // is an error!
 		:
 		Subscriptor(),
-		check_for_distorted_cells(other.check_for_distorted_cells)
+		check_for_distorted_cells(other.check_for_distorted_cells),
+		vertex_to_boundary_id_map_1d (0)
 {
   Assert (false, ExcInternalError());
 }
@@ -9414,6 +9433,14 @@ Triangulation<dim, spacedim>::~Triangulation ()
     delete levels[i];
   levels.clear ();
   delete faces;
+
+				   // the vertex_to_boundary_id_map_1d field
+				   // should be unused except in 1d
+  Assert ((dim == 1)
+	  ||
+	  (vertex_to_boundary_id_map_1d == 0),
+	  ExcInternalError());
+  delete vertex_to_boundary_id_map_1d;
 }
 
 
@@ -9472,24 +9499,40 @@ template <int dim, int spacedim>
 std::vector<unsigned char>
 Triangulation<dim, spacedim>::get_boundary_indicators () const
 {
+				   // in 1d, we store a map of all used
+				   // boundary indicators. use it for our
+				   // purposes
+  if (dim == 1)
+    {
+      std::vector<unsigned char> boundary_indicators;
+      for (std::map<unsigned int, unsigned char>::const_iterator
+	     p = vertex_to_boundary_id_map_1d->begin();
+	   p !=  vertex_to_boundary_id_map_1d->end();
+	   ++p)
+	boundary_indicators.push_back (p->second);
 
-  std::vector<bool> bi_exists(255, false);
-  active_cell_iterator cell=begin_active();
-  for (; cell!=end(); ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-      if (cell->at_boundary(face))
-	bi_exists[cell->face(face)->boundary_indicator()]=true;
+      return boundary_indicators;
+    }
+  else
+    {
+      std::vector<bool> bi_exists(255, false);
+      active_cell_iterator cell=begin_active();
+      for (; cell!=end(); ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+	  if (cell->at_boundary(face))
+	    bi_exists[cell->face(face)->boundary_indicator()]=true;
 
-  const unsigned int n_bi=
-    std::count(bi_exists.begin(), bi_exists.end(), true);
+      const unsigned int n_bi=
+	std::count(bi_exists.begin(), bi_exists.end(), true);
 
-  std::vector<unsigned char> boundary_indicators(n_bi);
-  unsigned int bi_counter=0;
-  for (unsigned int i=0; i<bi_exists.size(); ++i)
-    if (bi_exists[i]==true)
-      boundary_indicators[bi_counter++]=i;
+      std::vector<unsigned char> boundary_indicators(n_bi);
+      unsigned int bi_counter=0;
+      for (unsigned int i=0; i<bi_exists.size(); ++i)
+	if (bi_exists[i]==true)
+	  boundary_indicators[bi_counter++]=i;
 
-  return boundary_indicators;
+      return boundary_indicators;
+    }
 }
 
 
@@ -9529,6 +9572,14 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 		      TriaLevel<dim>(*old_tria.levels[level]));
 
   number_cache = old_tria.number_cache;
+
+  if (dim == 1)
+    {
+      delete vertex_to_boundary_id_map_1d;
+      vertex_to_boundary_id_map_1d
+	= (new std::map<unsigned int, unsigned char>
+	   (*old_tria.vertex_to_boundary_id_map_1d));
+    }
 
 				   // inform RefinementListeners of old_tria of
 				   // the copy operation
@@ -9594,7 +9645,7 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
     }
 
   compute_number_cache (*this, levels.size(), number_cache);
-  
+
 				   // now verify that there are indeed
 				   // no distorted cells. as per the
 				   // documentation of this class, we
@@ -12437,7 +12488,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
 				   // Inform RefinementListeners
                                    // about beginning of refinement.
   signals.pre_refinement();
-  
+
   execute_coarsening();
 
   const DistortedCellList
@@ -14507,8 +14558,8 @@ template<int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::add_refinement_listener (RefinementListener &listener) const
 {
-  // in this compatibility mode with the old-style refinement listeners, an 
-  // external class presents itself as one that may or may not have 
+  // in this compatibility mode with the old-style refinement listeners, an
+  // external class presents itself as one that may or may not have
   // overloaded all of the functions that the RefinementListener
   // class has. consequently, we need to connect each of its functions
   // to the relevant signals. for those functions that haven't been
@@ -14516,25 +14567,25 @@ Triangulation<dim, spacedim>::add_refinement_listener (RefinementListener &liste
   // to the function in the RefinementListener base class which simply
   // does nothing
   std::vector<boost::signals2::connection> connections;
-  
-  connections.push_back 
+
+  connections.push_back
   (signals.create.connect (std_cxx1x::bind (&RefinementListener::create_notification,
 					    std_cxx1x::ref(listener),
 					    std_cxx1x::cref(*this))));
-  connections.push_back 
+  connections.push_back
   (signals.copy.connect (std_cxx1x::bind (&RefinementListener::copy_notification,
 					  std_cxx1x::ref(listener),
 					  std_cxx1x::cref(*this),
 					  std_cxx1x::_1)));
-  connections.push_back 
+  connections.push_back
   (signals.pre_refinement.connect (std_cxx1x::bind (&RefinementListener::pre_refinement_notification,
 						    std_cxx1x::ref(listener),
 						    std_cxx1x::cref(*this))));
-  connections.push_back 
+  connections.push_back
   (signals.post_refinement.connect (std_cxx1x::bind (&RefinementListener::post_refinement_notification,
                                                     std_cxx1x::ref(listener),
 						    std_cxx1x::cref(*this))));
-  
+
   // now push the set of connections into the map
   refinement_listener_map.insert (std::make_pair(&listener, connections));
 }
@@ -14548,14 +14599,14 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
   Assert (refinement_listener_map.find (&listener) != refinement_listener_map.end(),
 	  ExcMessage("You try to remove a refinement listener that does "
 	    "not appear to have been added previously."));
-  
+
   // get the element of the map, and terminate these
   // connections. then erase the element from the list
   std::vector<boost::signals2::connection> connections
   = refinement_listener_map.find(&listener)->second;
   for (unsigned int i=0; i<connections.size(); ++i)
     connections[i].disconnect ();
-  
+
   refinement_listener_map.erase (refinement_listener_map.find (&listener));
 }
 

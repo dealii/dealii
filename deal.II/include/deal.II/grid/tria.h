@@ -38,7 +38,7 @@ template <int dim, int spacedim> class Boundary;
 template <int dim, int spacedim> class StraightBoundary;
 
 template <int, int, int> class TriaAccessor;
-template <int, int, int> class TriaAccessor;
+template <int spacedim> class TriaAccessor<0,1,spacedim>;
 
 namespace internal
 {
@@ -667,7 +667,7 @@ namespace internal
  *   refinement smoothes the mesh a bit.
  *
  *   The function will make sure that vertices on restricted faces (hanging
- *   nodes) will result in the correct place, i.e. in the middle of the two
+ *   nodes) will end up in the correct place, i.e. in the middle of the two
  *   other vertices of the mother line, and the analogue in higher space
  *   dimensions (vertices on the boundary are not corrected, so don't distort
  *   boundary vertices in more than two space dimension, i.e. in dimensions
@@ -945,7 +945,7 @@ namespace internal
  *
  *   <h3>Material and boundary information</h3>
  *
- *   Each line, quad, etc stores one byte of information denoting the
+ *   Each cell, face or edge stores information denoting the
  *   material or the part of the boundary that an object
  *   belongs to. The material of a cell may be used
  *   during matrix generation in order to implement different
@@ -986,16 +986,13 @@ namespace internal
  *   are separated by a vertex (in 2D) or a line (in 3D) such that each boundary
  *   line or quad has a unique boundary indicator.
  *
- *   Since in one dimension, no substructures of lower dimension exist to
- *   cells (of course apart from vertices, but these are handled
- *   in another way than the structures and substructures with dimension one
- *   or greater), there is no way to denote boundary indicators to boundary
- *   vertices (the endpoints). This is not a big thing, however, since you
- *   will normally not want to do a loop over all vertices, but rather work
- *   on the cells, which in turn have a possibility to find out whether they
- *   are at one of the endpoints. Only the handling of boundary values gets
- *   a bit more complicated, but this seems to be the price to be paid for
- *   the different handling of vertices from lines and quads.
+ *   By default (unless otherwise specified during creation of a
+ *   triangulation), all parts of the boundary have boundary indicator
+ *   zero. As a historical wart, this isn't true for 1d meshes, however: For
+ *   these, leftmost vertices have boundary indicator zero while rightmost
+ *   vertices have boundary indicator one. In either case, the boundary
+ *   indicator of a face can be changed using a call of the kind
+ *   <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>.
  *
  *
  *
@@ -3744,6 +3741,31 @@ class Triangulation : public Subscriptor
 				      */
     internal::Triangulation::NumberCache<dim> number_cache;
 
+				     /**
+				      * A map that relates the number of a
+				      * boundary vertex to the boundary
+				      * indicator. This field is only used in
+				      * 1d. We have this field because we
+				      * store boundary indicator information
+				      * with faces in 2d and higher where we
+				      * have space in the structures that
+				      * store data for faces, but in 1d there
+				      * is no such space for faces.
+				      *
+				      * The field is declared as a pointer for
+				      * a rather mundane reason: all other
+				      * fields of this class that can be
+				      * modified by the TriaAccessor hierarchy
+				      * are pointers, and so these accessor
+				      * classes store a const pointer to the
+				      * triangulation. We could no longer do
+				      * so for TriaAccessor<0,1,spacedim> if
+				      * this field (that can be modified by
+				      * TriaAccessor::set_boundary_indicator)
+				      * were not a pointer.
+				      */
+    std::map<unsigned int, unsigned char> *vertex_to_boundary_id_map_1d;
+
     /**
      * A map that correlates each refinement listener that has been added
      * through the outdated RefinementListener interface via
@@ -3763,6 +3785,8 @@ class Triangulation : public Subscriptor
 				     // friends
     template <int,int,int> friend class TriaAccessorBase;
     template <int,int,int> friend class TriaAccessor;
+    friend class TriaAccessor<0, 1, spacedim>;
+
     friend class CellAccessor<dim, spacedim>;
 
     friend struct internal::TriaAccessor::Implementation;
@@ -3874,6 +3898,9 @@ Triangulation<dim,spacedim>::save (Archive & ar,
   ar & number_cache;
 
   ar & check_for_distorted_cells;
+
+  if (dim == 1)
+    ar & vertex_to_boundary_id_map_1d;
 }
 
 
@@ -3908,6 +3935,9 @@ Triangulation<dim,spacedim>::load (Archive & ar,
 	  ExcMessage ("The triangulation loaded into here must have the "
 		      "same setting with regard to reporting distorted "
 		      "cell as the one previously stored."));
+
+  if (dim == 1)
+    ar & vertex_to_boundary_id_map_1d;
 
 				   // trigger the create signal to indicate
 				   // that new content has been imported into

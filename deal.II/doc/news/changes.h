@@ -283,6 +283,11 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Code like <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>
+now also works in 1d.
+<br>
+(Wolfgang Bangerth, 2011/08/30)
+
 <li> Fixed: The TimerOutput::print_summary() function changed the
 precision of output on the stream it prints to, but didn't restore
 the previous value. This is now fixed.

@@ -2020,17 +2020,40 @@ class TriaAccessor<0, 1, spacedim>
     int isotropic_child_index (const unsigned int i);
 
 				     /**
-				      * @brief Do nothing and throw and error
+				      * Set the boundary indicator.
+				      * The same applies as for the
+				      * <tt>boundary_indicator()</tt>
+				      * function.
+				      *
+				      * @warning You should never set the
+				      * boundary indicator of an interior face
+				      * (a face not at the boundary of the
+				      * domain), or set set the boundary
+				      * indicator of an exterior face to 255
+				      * (this value is reserved for another
+				      * purpose). Algorithms may not work or
+				      * produce very confusing results if
+				      * boundary cells have a boundary
+				      * indicator of 255 or if interior cells
+				      * have boundary indicators other than
+				      * 255. Unfortunately, the current object
+				      * has no means of finding out whether it
+				      * really is at the boundary of the
+				      * domain and so cannot determine whether
+				      * the value you are trying to set makes
+				      * sense under the current circumstances.
 				      */
-    static
     void
     set_boundary_indicator (const unsigned char);
 
 				     /**
-				      * @brief Do nothing and throw and error
+				      * Since this object only represents a
+				      * single vertex, call
+				      * set_boundary_indicator with the same
+				      * argument.
 				      */
-    static
-    void set_all_boundary_indicators (const unsigned char);
+    void
+    set_all_boundary_indicators (const unsigned char);
 
 				     /**
 				      * Return whether the vertex
