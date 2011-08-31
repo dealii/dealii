@@ -19,7 +19,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-
 template <int dim, int spacedim>
 bool operator == (const Triangulation<dim,spacedim> &t1,
 		  const Triangulation<dim,spacedim> &t2)
