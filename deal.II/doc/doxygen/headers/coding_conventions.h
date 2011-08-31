@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 2007, 2008 by the deal.II authors
+//    Copyright (C) 1998, 2007, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 /**
  * @page CodingConventions Coding conventions used throughout deal.II
- 
+
 Throughout deal.II, we strive to keep our programming style and the kind of
 interfaces we provide as consistent as possible. To this end, we have adopted
 a set of coding conventions that we attempt to follow wherever possible. They
@@ -28,18 +28,18 @@ because some things become clear already by looking at the style a piece of
 code is written, without having to look up the exact definition of something.
 
 <h3>Style issues</h3>
- 
+
 <ol>
 <li> %Functions which return the number of something (number of cells,
-  degrees of freedom, etc) should start with <code>n_*</code>. Example: 
+  degrees of freedom, etc) should start with <code>n_*</code>. Example:
   SparsityPattern::n_nonzero_entries().</li>
 
 <li> %Function which set a bit or flag should start with <code>set_*</code>;
   functions which clear bits of flags should be named <code>clear_*</code>.
   Example: CellIterator::set_refine_flag().</li>
 
-<li> In the implementation files, after each function, at least three 
-  empty lines are expected to 
+<li> In the implementation files, after each function, at least three
+  empty lines are expected to
   enable better readability. One empty line occurs in functions to
   group blocks of code, two empty lines are not enough to visibly
   distinguish sufficiently that the code belongs to two different functions.</li>
@@ -73,7 +73,7 @@ code is written, without having to look up the exact definition of something.
   block of public functions, beginning with the constructors, then
   the destructors. If there are public member variables, these have
   to occur before the constructor. Public variables shall only be
-  used if constant (in particular if they are static and constant) 
+  used if constant (in particular if they are static and constant)
   or unavoidable.
   <br>
   After the public members, the protected and finally the private
@@ -86,7 +86,7 @@ code is written, without having to look up the exact definition of something.
 <li> If a function has both input and output parameters, usually the
   input parameters shall precede the output parameters, unless there
   are good reasons to change this order. (The most common reason is trailing
-  input parameters with default default values.) </li>
+  input parameters with default values.) </li>
 
 <li> Exceptions are used for %internal parameter checking and for
   consistency checks through the Assert macro. Exception handling
@@ -96,7 +96,9 @@ code is written, without having to look up the exact definition of something.
   in any case, not only in debug mode.</li>
 
 <li> Classes and types generally are named using uppercase letters to denote
-  word beginnings (e.g. TriaIterator) while functions and variables
+  word beginnings (e.g. TriaIterator) &mdash; sometimes called
+  <a href="http://en.wikipedia.org/wiki/Camel_case"><i>camel
+  case</i></a> &mdash; while functions and variables
   use lowercase letters and underscores to separate words.
   The only exception are the iterator typedefs in Triangulation
   and DoFHandler (named cell_iterator, active_line_iterator, etc)
@@ -191,12 +193,12 @@ we list here:
   calls to the Assert macro are removed from the program in optimized mode
   (which you presumably only use once you know that everything runs just
   fine in debug mode. The optimized libraries are faster by a factor of
-  3-5 than the debug libraries, at the price that it's much harder to find 
+  3-5 than the debug libraries, at the price that it's much harder to find
   bugs.
   </li>
 
-<li> <i>Assert postconditions:</i> If a function computes something 
-  non-trivial there may be a bug in the code. To find these, use 
+<li> <i>Assert postconditions:</i> If a function computes something
+  non-trivial there may be a bug in the code. To find these, use
   postconditions: just like you have certain knowledge about useful values
   for input parameters, you have knowledge about what you expect possible
   return values to be. For example, a function that computes the norm of
@@ -258,7 +260,7 @@ we list here:
   that these problems are easily found.
   </li>
 
-<li> <i>Initialize variables at the point of their declaration if they 
+<li> <i>Initialize variables at the point of their declaration if they
   live on the stack:</i>
   Traditional C required that variables are declared at the beginning of
   the function even if they are only used further below. This leads to
@@ -279,7 +281,7 @@ we list here:
   </code>
   The problem is that if the code between the declaration and initialization
   is long and complicated, you can't look up on one page what the type of
-  a variable is and what it's value may be. In fact, it may not even be 
+  a variable is and what it's value may be. In fact, it may not even be
   quite clear that the variable is used initialized at all, or whether it
   is accidentally left uninitialized.
   <p>
@@ -307,7 +309,7 @@ we list here:
   <p>
   As a final note, it is clear that you can only do this sort of stuff
   for variables that completely live on the stack without allocating memory
-  on the heap. Within deal.II, this is only true for builtin types like 
+  on the heap. Within deal.II, this is only true for builtin types like
   <code>int, double, char</code>, etc, as well as the Point and Tensor
   classes. Everything else has something like a <code>std::vector</code>
   as a member variable, which requires memory allocation &mdash; you don't
@@ -340,7 +342,7 @@ we list here:
           ...
   </pre>
   </code>
-  This was most likely meant to be a <code>==</code> rather than an 
+  This was most likely meant to be a <code>==</code> rather than an
   assignment. By marking the variable as const, the compiler would have
   told us about this bug. Maybe equally importantly, human readers of the
   code need not look further down whether the value of the variable may
@@ -366,11 +368,11 @@ we list here:
   </code>
   Here, the user calls <code>cell-@>child(3)</code>, for example. There really
   is no reason why the function would ever want to change the value of
-  the <code>child_no</code> argument &mdash; so mark it as constant: 
+  the <code>child_no</code> argument &mdash; so mark it as constant:
   this both helps the reader of the code understand that this is an
   input argument of the function for which we need not search below whether
   it is ever changed, and it helps the compiler help us finding bugs if
   we ever accidentally change the value.
 </ol>
- 
+
  */
