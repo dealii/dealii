@@ -52,14 +52,11 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
   {
-
-#if deal_II_dimension != 1
     template
       double
       GridTools::diameter<deal_II_dimension> (const Triangulation<deal_II_dimension> &);
-#endif
 
-#if deal_II_dimension == 2
+#if deal_II_dimension < 3
     template
       double
       GridTools::diameter<deal_II_dimension, deal_II_dimension+1> (const Triangulation<deal_II_dimension, deal_II_dimension+1> &);

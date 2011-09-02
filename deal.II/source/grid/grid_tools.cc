@@ -126,23 +126,6 @@ GridTools::diameter (const Triangulation<dim, spacedim> &tria)
 
 
 
-double
-GridTools::diameter (const Triangulation<1> &tria)
-{
-				   // for 1d, simply check the
-				   // vertices of the left- and
-				   // rightmost coarse grid cell
-  Triangulation<1>::cell_iterator leftmost  = tria.begin(0);
-  Triangulation<1>::cell_iterator rightmost = tria.begin(0);
-
-  while (!leftmost->at_boundary(0))  leftmost  = leftmost->neighbor(0);
-  while (!rightmost->at_boundary(1)) rightmost = rightmost->neighbor(1);
-
-  return std::sqrt((leftmost->vertex(0) - rightmost->vertex(1)).square());
-}
-
-
-
 template <>
 double
 GridTools::cell_measure<3>(const std::vector<Point<3> > &all_vertices,

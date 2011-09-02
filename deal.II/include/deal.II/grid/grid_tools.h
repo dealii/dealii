@@ -62,18 +62,7 @@ class GridTools
     template <int dim, int spacedim>
     static
     double diameter (const Triangulation<dim, spacedim> &tria);
-
-				     /**
-				      * Same function, but for 1d.
-				      */
-    static
-    double diameter (const Triangulation<1> &tria);
-				     /**
-				      * Same function, but for 1d, 2sd.
-				      */
-    static
-    double diameter (const Triangulation<1,2> &tria);
-
+    
 				     /**
 				      * Given a list of vertices (typically
 				      * obtained using
