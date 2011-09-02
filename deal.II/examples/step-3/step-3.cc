@@ -213,7 +213,7 @@ void Step3::make_grid ()
 				   // has 32 times 32 cells, for a
 				   // total of 1024.
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (0);
+  triangulation.refine_global (5);
 				   // Unsure that 1024 is the correct number?
 				   // Let's see: n_active_cells returns the
 				   // number of active cells:
