@@ -1,0 +1,17 @@
+
+DEAL::1d, hypercube volume, 0 refinements: 1.000
+DEAL::1d, hypercube volume, 2 refinements: 1.000
+DEAL::2d, hypercube volume, 0 refinements: 1.000
+DEAL::2d, hypercube volume, 2 refinements: 1.000
+DEAL::2d, hyperball volume, 0 refinements: 2.828
+DEAL::2d, hyperball volume, 1 refinements: 3.061
+DEAL::2d, hyperball volume, 2 refinements: 3.121
+DEAL::2d, hyperball volume, 3 refinements: 3.137
+DEAL::exact value=3.142
+DEAL::3d, hypercube volume, 0 refinements: 1.000
+DEAL::3d, hypercube volume, 2 refinements: 1.000
+DEAL::3d, hyperball volume, 0 refinements: 3.210
+DEAL::3d, hyperball volume, 1 refinements: 3.917
+DEAL::3d, hyperball volume, 2 refinements: 4.119
+DEAL::3d, hyperball volume, 3 refinements: 4.171
+DEAL::exact value=4.189

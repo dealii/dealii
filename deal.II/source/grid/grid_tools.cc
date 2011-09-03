@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -27,6 +27,8 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
@@ -78,6 +80,10 @@ template <int dim, int spacedim>
 double
 GridTools::diameter (const Triangulation<dim, spacedim> &tria)
 {
+  Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria)
+           == 0),
+	  ExcNotImplemented());
+  
 				   // the algorithm used simply
 				   // traverses all cells and picks
 				   // out the boundary vertices. it
@@ -124,6 +130,58 @@ GridTools::diameter (const Triangulation<dim, spacedim> &tria)
   return std::sqrt(max_distance_sqr);
 }
 
+
+
+template <int dim, int spacedim>
+double
+GridTools::volume (const Triangulation<dim, spacedim> &triangulation,
+		   const Mapping<dim,spacedim> &mapping)
+{
+  // get the degree of the mapping if possible. if not, just assume 1
+  const unsigned int mapping_degree
+  = (dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping) != 0 ?
+     dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping)->get_degree() :
+     1);
+  
+  // then initialize an appropriate quadrature formula
+  const QGauss<dim> quadrature_formula (mapping_degree + 1);
+  const unsigned int n_q_points = quadrature_formula.size();
+
+  FE_DGQ<dim,spacedim> dummy_fe(0);
+  FEValues<dim,spacedim> fe_values (mapping, dummy_fe, quadrature_formula,
+			            update_JxW_values);
+
+  typename Triangulation<dim,spacedim>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+
+  double local_volume = 0;
+
+				   // compute the integral quantities by quadrature
+  for (; cell!=endc; ++cell)
+    if (!cell->is_ghost() && !cell->is_artificial())
+      {
+	fe_values.reinit (cell);
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  local_volume += fe_values.JxW(q);
+      }
+
+  double global_volume = 0;
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+  if (const parallel::distributed::Triangulation<dim,spacedim>* p_tria
+      = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation))
+    MPI_Allreduce (&local_volume, &global_volume, 1, MPI_DOUBLE,
+  		   MPI_SUM,
+		   p_tria->get_communicator());
+  else
+    global_volume = local_volume;
+#else
+  global_volume = local_volume;
+#endif
+
+  return global_volume;  
+}
 
 
 template <>

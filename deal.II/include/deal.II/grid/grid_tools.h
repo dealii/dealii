@@ -18,6 +18,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <list>
 
@@ -42,7 +43,6 @@ class SparsityPattern;
  * individual functions for more information.
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, 2001, 2003, 2004, Ralf Hartmann, 2005
  */
 class GridTools
 {
@@ -62,6 +62,21 @@ class GridTools
     template <int dim, int spacedim>
     static
     double diameter (const Triangulation<dim, spacedim> &tria);
+
+    /**
+     * Compute the volume (i.e. the dim-dimensional measure) of the
+     * triangulation. We compute the measure using the integral
+     * $\int 1 \; dx$. The integral approximated is approximated
+     * via quadrature for which we need the mapping argument.
+     * 
+     * This function also works for objects of type
+     * parallel::distributed::Triangulation, in which case the
+     * function is a collective operation.
+     */
+    template <int dim, int spacedim>
+    static
+    double volume (const Triangulation<dim,spacedim> &tria,
+		   const Mapping<dim,spacedim> &mapping = StaticMappingQ1<dim,spacedim>::mapping);
     
 				     /**
 				      * Given a list of vertices (typically

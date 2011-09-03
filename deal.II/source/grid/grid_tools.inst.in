@@ -63,6 +63,18 @@ for (deal_II_dimension : DIMENSIONS)
 #endif
 
     template
+      double
+      GridTools::volume<deal_II_dimension> (const Triangulation<deal_II_dimension> &,
+	                                    const Mapping<deal_II_dimension> &);
+
+#if deal_II_dimension < 3
+    template
+      double
+      GridTools::volume<deal_II_dimension, deal_II_dimension+1> (const Triangulation<deal_II_dimension, deal_II_dimension+1> &,
+	                                                         const Mapping<deal_II_dimension, deal_II_dimension+1> &);
+#endif
+
+    template
       void GridTools::delete_unused_vertices (std::vector<Point<deal_II_dimension> > &,
 					      std::vector<CellData<deal_II_dimension> > &,
 					      SubCellData &);

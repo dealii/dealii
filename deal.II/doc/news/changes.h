@@ -283,6 +283,11 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a function GridTools::volume computing the volume
+of a triangulation.
+<br>
+(Wolfgang Bangerth, 2011/09/02)
+
 <li> New: Code like <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>
 now also works in 1d.
 <br>
