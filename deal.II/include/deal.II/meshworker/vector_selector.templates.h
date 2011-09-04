@@ -10,7 +10,7 @@
 //
 //---------------------------------------------------------------------------
 
-#include <deal.II/numerics/mesh_worker_vector_selector.h>
+#include <deal.II/meshworker/vector_selector.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/fe/fe_values.h>
 

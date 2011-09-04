@@ -18,8 +18,9 @@
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
 #include <deal.II/dofs/block_info.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/mesh_worker.h>
-#include <deal.II/numerics/mesh_worker_vector_selector.h>
+//#include <deal.II/numerics/mesh_worker.h>
+#include <deal.II/meshworker/local_results.h>
+#include <deal.II/meshworker/vector_selector.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -18,7 +18,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/lac/matrix_block.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/numerics/mesh_worker_vector_selector.h>
+#include <deal.II/meshworker/vector_selector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
