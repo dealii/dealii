@@ -1,11 +1,12 @@
 ====================================================
 MESH CONVERSION TOOL
-v. 1.1
+v. 1.2
 
 Use: Convert an ABAQUS .inp file to an AVS UCD file.
 
 Author: Jean-Paul Pelteret
         jppelteret.uct@gmail.com
+        modified by: Timo Heister, heister@math.tamu.edu
 ===================================================
 
 Cubit features captured by ABAQUS .inp files:
@@ -29,11 +30,11 @@ IMPORTANT NOTE: From v12.0 onwards, the format of the Abaqus file that Cubit out
                 I describe outputs from before v12.0 as "Abaqus OLD" and v12.0 an on (up to v12.1 at this point) as "Abaqus NEW".
 2.1. Compile the program using 'make' or another suitable tool
 2.2. Run the program with the following command line arguments:
-       './convert_mesh <spatial_dimension> <ABAQUS input_file_type> /path/to/input_file.inp /path/to/output_file.ucd'
+       './convert_mesh <spatial_dimension>  /path/to/input_file.inp /path/to/output_file.ucd'
 
-       The first input argument is the spatial dimension of the input file, the second is the type of input file (0 for Abaqus OLD, 1 for Abaqus NEW), the third is the path to the read-in Abaqus .inp file, and the fourth is the name of the file to which you wish to write the output AVS .ucd file to.
+       The first input argument is the spatial dimension of the input file, the second is the path to the read-in Abaqus .inp file, and the third is the name of the file to which you wish to write the output AVS .ucd file to.
        An example of the correct program usage is: 
-e.g.  './convert_mesh 3 0 mesh/3d/test_in.inp mesh/3d/test_out.ucd'
+e.g.  './convert_mesh 3 mesh/3d/test_in.inp mesh/3d/test_out.ucd'
 
 
 Notes:
