@@ -296,9 +296,7 @@ namespace PETScWrappers
                                      // are hard to understand. gets me all
                                      // annoyed at their development
                                      // model</rant>
-#if (PETSC_VERSION_MAJOR <= 2) && \
-    ((PETSC_VERSION_MINOR < 2) ||  \
-     ((PETSC_VERSION_MINOR == 2) && (PETSC_VERSION_SUBMINOR == 0)))
+#if DEAL_II_PETSC_VERSION_LT(2,2,0)
     ierr = VecConvertMPIToSeqAll (static_cast<const Vec &>(v),
                                   &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
