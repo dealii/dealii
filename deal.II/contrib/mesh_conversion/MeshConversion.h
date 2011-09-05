@@ -16,24 +16,20 @@ using namespace std;
 class MeshConversion
 {
 	public:
-		MeshConversion (const unsigned int dimension, const int input_type, const std::string input_file, const std::string output_file);
-		~MeshConversion (void);
-		bool convert_mesh (void);
+		MeshConversion (const unsigned int dimension, const std::string input_file, const std::string output_file);
+		~MeshConversion ();
+		bool convert_mesh ();
 		
-		enum {abaqus_old = 0, abaqus_new} input_type;
-
 	private:
 		void greeting ();
-		
-		bool read_in_abaqus_inp_old (void);
-		bool read_in_abaqus_inp_new (void);
-		bool write_out_avs_ucd (void);
+
+		bool read_in_abaqus ();
+		bool write_out_avs_ucd ();
 		
 		std::vector <double> get_global_node_numbers(const int face_cell_no, const int face_cell_face_no);
 		
 		const double 				tolerance;
 		const unsigned int 			dimension;
-		const int 				input_file_type;
 		
 		unsigned int 				node_per_face;
 		unsigned int 				node_per_cell;

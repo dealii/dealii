@@ -1,6 +1,6 @@
 # FEM Mesh Converter
 # Mesh type: AVS UCD
-# Input file name: CC_cubit_new.inp
+# Input file name: mesh/3d/CC_cubit_new.inp
 54	48	0	0	0
 1	 -5.00000000e-01	 -5.00000000e-01	  5.00000000e-01	
 2	 -5.00000000e-01	 -5.00000000e-01	  0.00000000e+00	
