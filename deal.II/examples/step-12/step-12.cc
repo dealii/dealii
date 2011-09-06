@@ -59,10 +59,31 @@
 #include <deal.II/numerics/derivative_approximation.h>
 
 				 // Here come the new include files
-				 // for using the MeshWorker framework:
+				 // for using the MeshWorker
+				 // framework. The first contains the
+				 // class
+				 // MeshWorker::DoFInfo,
+				 // which provides local integrators
+				 // with a mapping between local and
+				 // global degrees of freedom. It
+				 // stores the results of local
+				 // integrals as well in its base
+				 // class Meshworker::LocalResults.
+				 // In the second of these files, we
+				 // find an object of type
+				 // MeshWorker::IntegrationInfo, which
+				 // is mostly a wrapper around a group
+				 // of FEValues objects. The file
+				 // <tt>meshworker/simple.h</tt>
+				 // contains classes assembling
+				 // locally integrated data into a
+				 // global system containing only a
+				 // single matrix. Finally, we will
+				 // need the file that runs the loop
+				 // over all mesh cells and faces.
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/simple.h>
 #include <deal.II/meshworker/loop.h>
 
 				 // Like in all programs, we finish
