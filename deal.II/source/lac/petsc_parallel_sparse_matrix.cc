@@ -114,7 +114,11 @@ namespace PETScWrappers
 
                                        // get rid of old matrix and generate a
                                        // new one
+#if DEAL_II_PETSC_VERSION_DEV()
+      const int ierr = MatDestroy (&matrix);
+#else
       const int ierr = MatDestroy (matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       do_reinit (m, n, local_rows, local_columns,
@@ -136,7 +140,11 @@ namespace PETScWrappers
 
                                        // get rid of old matrix and generate a
                                        // new one
+#if DEAL_II_PETSC_VERSION_DEV()
+      const int ierr = MatDestroy (&matrix);
+#else
       const int ierr = MatDestroy (matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       do_reinit (m, n, local_rows, local_columns, row_lengths, is_symmetric);
@@ -158,7 +166,11 @@ namespace PETScWrappers
 
                                        // get rid of old matrix and generate a
                                        // new one
+#if DEAL_II_PETSC_VERSION_DEV()
+      const int ierr = MatDestroy (&matrix);
+#else
       const int ierr = MatDestroy (matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       do_reinit (sparsity_pattern, local_rows_per_process,
