@@ -11,7 +11,8 @@
 //---------------------------------------------------------------------------
 
 
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
+#include <deal.II/meshworker/integration_info.h>
 #include <deal.II/base/quadrature_lib.h>
 
 DEAL_II_NAMESPACE_OPEN

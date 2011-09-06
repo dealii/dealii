@@ -18,7 +18,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

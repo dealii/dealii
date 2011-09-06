@@ -37,10 +37,10 @@
 
 				 // The include files for using the
 				 // MeshWorker framework
-#include <deal.II/numerics/mesh_worker.h>
-#include <deal.II/numerics/mesh_worker_info.h>
-#include <deal.II/numerics/mesh_worker_assembler.h>
-#include <deal.II/numerics/mesh_worker_loop.h>
+#include <deal.II/meshworker/dof_info.h>
+#include <deal.II/meshworker/integration_info.h>
+#include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/loop.h>
 
 				 // The include file for local
 				 // integrators associated with the

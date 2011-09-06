@@ -18,7 +18,8 @@
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
+#include <deal.II/meshworker/integration_info.h>
 
 #define DEAL_II_MESHWORKER_PARALLEL 1
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,7 +19,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 

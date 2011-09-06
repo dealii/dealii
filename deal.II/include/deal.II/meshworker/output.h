@@ -13,7 +13,7 @@
 #ifndef __deal2__mesh_worker_output_h
 #define __deal2__mesh_worker_output_h
 
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
 #include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
 #include <base/utilities.h>

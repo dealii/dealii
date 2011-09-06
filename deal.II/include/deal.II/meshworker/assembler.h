@@ -17,7 +17,7 @@
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 
 
