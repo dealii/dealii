@@ -26,6 +26,7 @@
 #  include <vector>
 
 #  include <petscversion.h>
+#  include <slepcversion.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,7 +36,11 @@ namespace SLEPcWrappers
   SolverBase::SolverData::~SolverData ()
   {
                                    // Destroy the solver object.
+#if DEAL_II_PETSC_VERSION_DEV()
+    int ierr = EPSDestroy (&eps);
+#else
     int ierr = EPSDestroy (eps);
+#endif
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
