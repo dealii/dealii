@@ -5784,8 +5784,11 @@ AC_DEFUN(DEAL_II_CONFIGURE_PETSC_VERSION, dnl
                      | perl -pi -e 's/.*RELEASE\s+//g;'`
   if test "$PETSC_RELEASE" = "0" ; then
     PETSC_VERSION+="-dev"
+    DEAL_II_PETSC_VERSION_DEV=yes
     AC_DEFINE([DEAL_II_USE_PETSC_VERSION_DEV], [1],
               [Defined if a PETSc installation was found and is not a release])
+  else
+    DEAL_II_USE_PETSC_VERSION_DEV=no
   fi
 
   AC_MSG_RESULT($PETSC_VERSION)
