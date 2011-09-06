@@ -408,21 +408,12 @@ namespace Step12
 
 				   // @sect4{The local integrators}
 
-				   // These functions are analogous to
-				   // step-12 and differ only in the
-				   // data structures. Instead of
-				   // providing the local matrices
-				   // explicitly in the argument list,
-				   // they are part of the info object.
-
-				   // Note that here we still have the
-				   // local integration loop inside the
-				   // following functions. The program
-				   // would be even shorter, if we used
-				   // pre-made operators from the
-				   // Operators namespace (which will be
-				   // added soon).
-
+				 // These are the functions given to
+				 // the MeshWorker::integration_loop()
+				 // called just above. They compute
+				 // the local contributions to the
+				 // system matrix and right hand side
+				 // on cells and faces.
   template <int dim>
   void AdvectionProblem<dim>::integrate_cell_term (DoFInfo& dinfo,
 						   CellInfo& info)
