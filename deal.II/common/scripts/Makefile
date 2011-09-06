@@ -18,15 +18,15 @@ default: make_dependencies$(EXEEXT) expand_instantiations$(EXEEXT) \
 # because we can't run the executable. So better be careful and regenerate
 # make_dependencies whenever we think it may be beneficial
 make_dependencies$(EXEEXT) : make_dependencies.cc $D/common/Make.global_options
-	@echo ============================ Compiling $@
+	@echo ===================================== Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
 expand_instantiations$(EXEEXT) : expand_instantiations.cc $D/common/Make.global_options
-	@echo ============================ Compiling $@
+	@echo ===================================== Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
 report_features$(EXEEXT) : report_features.cc $D/common/Make.global_options
-	@echo ============================ Compiling $@
+	@echo ===================================== Compiling $@
 	@$(CXX) $(CXXFLAGS.o) $(LDFLAGS) $< -o $@
 
 clean:
