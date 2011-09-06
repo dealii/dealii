@@ -12,7 +12,7 @@
 
 /**
  * @file
- * @deprecated The contents of this file has moved to <tt>meshworker/assembler.h>
+ * @deprecated The contents of this file has moved to <tt>meshworker/assembler.h</tt>
  */
 
 #include <deal.II/meshworker/assembler.h>

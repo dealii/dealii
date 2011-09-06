@@ -12,7 +12,7 @@
 
 /**
  * @file
- * @deprecated The contents of this file has moved to <tt>meshworker/local_results.h>
+ * @deprecated The contents of this file has moved to <tt>meshworker/local_results.h</tt>
  */
 
 #include <deal.II/meshworker/vector_selector.h>
