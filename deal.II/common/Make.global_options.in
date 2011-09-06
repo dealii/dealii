@@ -279,6 +279,9 @@ else
 endif
 include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
+ifeq ($(DEAL_II_PETSC_VERSION_DEV),yes)
+  include-path-slepc-include = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/include
+endif
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
 
@@ -312,6 +315,9 @@ endif
 
 ifeq ($(USE_CONTRIB_SLEPC),yes)
   INCLUDE += -I$(include-path-slepc) -I$(include-path-slepc-conf)
+ifeq ($(DEAL_II_PETSC_VERSION_DEV),yes)
+  INCLUDE += -I$(include-path-slepc-include)
+endif
 endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
