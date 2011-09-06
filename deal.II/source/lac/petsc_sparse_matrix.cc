@@ -74,7 +74,7 @@ namespace PETScWrappers
   }
 
 
-
+  
   void
   SparseMatrix::reinit (const unsigned int m,
                         const unsigned int n,
@@ -83,7 +83,11 @@ namespace PETScWrappers
   {
                                      // get rid of old matrix and generate a
                                      // new one
+#if DEAL_II_PETSC_VERSION_DEV()
+    const int ierr = MatDestroy (&matrix);
+#else
     const int ierr = MatDestroy (matrix);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     do_reinit (m, n, n_nonzero_per_row, is_symmetric);
@@ -99,7 +103,11 @@ namespace PETScWrappers
   {
                                      // get rid of old matrix and generate a
                                      // new one
+#if DEAL_II_PETSC_VERSION_DEV()
+    const int ierr = MatDestroy (&matrix);
+#else
     const int ierr = MatDestroy (matrix);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     do_reinit (m, n, row_lengths, is_symmetric);
@@ -115,7 +123,11 @@ namespace PETScWrappers
   {
                                      // get rid of old matrix and generate a
                                      // new one
+#if DEAL_II_PETSC_VERSION_DEV()
+    const int ierr = MatDestroy (&matrix);
+#else
     const int ierr = MatDestroy (matrix);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     do_reinit (sparsity_pattern, preset_nonzero_locations);

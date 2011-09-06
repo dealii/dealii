@@ -1108,7 +1108,12 @@ namespace PETScWrappers
 					 * $1000\times32$-bit machine
 					 * precision.
 					 */
-      PetscTruth is_symmetric (const double tolerance = 1.e-12);
+#if DEAL_II_PETSC_VERSION_DEV()
+      PetscBool
+#else
+	PetscTruth 
+#endif
+	is_symmetric (const double tolerance = 1.e-12);
 
 #if DEAL_II_PETSC_VERSION_GTE(2,3,0)
                                         /**
@@ -1120,7 +1125,12 @@ namespace PETScWrappers
 					 * $1000\times32$-bit machine
 					 * precision.
 					 */
-      PetscTruth is_hermitian (const double tolerance = 1.e-12);
+#if DEAL_II_PETSC_VERSION_DEV()
+      PetscBool
+#else
+	PetscTruth 
+#endif
+	is_hermitian (const double tolerance = 1.e-12);
 #endif
 
                                         /*

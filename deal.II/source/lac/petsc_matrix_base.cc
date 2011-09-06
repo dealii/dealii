@@ -90,7 +90,11 @@ namespace PETScWrappers
 
   MatrixBase::~MatrixBase ()
   {
+#if DEAL_II_PETSC_VERSION_DEV()
+    const int ierr = MatDestroy (&matrix);
+#else
     const int ierr = MatDestroy (matrix);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
@@ -100,7 +104,11 @@ namespace PETScWrappers
   MatrixBase::clear ()
   {
                                      // destroy the matrix...
+#if DEAL_II_PETSC_VERSION_DEV()
+    int ierr = MatDestroy (&matrix);
+#else
     int ierr = MatDestroy (matrix);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
                                      // ...and replace it by an empty
                                      // sequential matrix
@@ -146,19 +154,33 @@ namespace PETScWrappers
 #endif
 
     IS index_set;
+#if DEAL_II_PETSC_VERSION_DEV()
+    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, PETSC_COPY_VALUES, &index_set);
+#else
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
+#endif
+
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr
       = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
+#if DEAL_II_PETSC_VERSION_DEV()
+    const int ierr
+      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
+#else
     const int ierr
       = MatZeroRowsIS(matrix, index_set, new_diag_value);
+#endif
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#if DEAL_II_PETSC_VERSION_DEV()
+    ISDestroy (&index_set);
+#else
     ISDestroy (index_set);
+#endif
 
     compress ();
   }
@@ -183,20 +205,34 @@ namespace PETScWrappers
                                      // to call them even if #rows is empty,
                                      // since this is a collective operation
     IS index_set;
+#if DEAL_II_PETSC_VERSION_DEV()
+    ISCreateGeneral (get_mpi_communicator(), rows.size(),
+                     &petsc_rows[0], PETSC_COPY_VALUES, &index_set);
+#else
     ISCreateGeneral (get_mpi_communicator(), rows.size(),
                      &petsc_rows[0], &index_set);
+#endif
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr
       = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
+#if DEAL_II_PETSC_VERSION_DEV()
+    const int ierr
+      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
+#else
     const int ierr
       = MatZeroRowsIS(matrix, index_set, new_diag_value);
+#endif
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#if DEAL_II_PETSC_VERSION_DEV()
+    ISDestroy (&index_set);
+#else
     ISDestroy (index_set);
+#endif
 
     compress ();
   }
@@ -570,20 +606,39 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
+#if DEAL_II_PETSC_VERSION_DEV()
+  PetscBool
+#else
   PetscTruth
+#endif
   MatrixBase::is_symmetric (const double tolerance)
   {
-    PetscTruth truth;
+#if DEAL_II_PETSC_VERSION_DEV()
+    PetscBool
+#else
+    PetscTruth 
+#endif
+      truth;
                                        // First flush PETSc caches
     compress ();
     MatIsSymmetric (matrix, tolerance, &truth);
     return truth;
   }
 
+#if DEAL_II_PETSC_VERSION_DEV()
+  PetscBool
+#else
   PetscTruth
+#endif
   MatrixBase::is_hermitian (const double tolerance)
   {
-    PetscTruth truth;
+#if DEAL_II_PETSC_VERSION_DEV()
+    PetscBool
+#else
+    PetscTruth 
+#endif
+      truth;
+
 				     // First flush PETSc caches
     compress ();
 
