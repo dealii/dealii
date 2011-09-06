@@ -113,7 +113,12 @@ namespace PETScWrappers
 
                                            // so let's go the slow way:
           int ierr;
+#if DEAL_II_PETSC_VERSION_DEV()
+          ierr = VecDestroy (&vector);
+#else
           ierr = VecDestroy (vector);
+#endif
+
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 
           create_vector (n, local_sz);

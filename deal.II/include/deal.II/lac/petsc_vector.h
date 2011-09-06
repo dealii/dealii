@@ -283,7 +283,11 @@ namespace PETScWrappers
                                      // the petsc function we call wants to
                                      // generate the vector itself, so destroy
                                      // the old one first
+#if DEAL_II_PETSC_VERSION_DEV()
+	ierr = VecDestroy (&vector);
+#else
 	ierr = VecDestroy (vector);
+#endif
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
@@ -331,7 +335,11 @@ namespace PETScWrappers
 #endif        
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+#if DEAL_II_PETSC_VERSION_DEV()
+    ierr = VecScatterDestroy (&ctx);
+#else
     ierr = VecScatterDestroy (ctx);
+#endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
     

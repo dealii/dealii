@@ -215,7 +215,11 @@ namespace PETScWrappers
   {
     if (attained_ownership)
       {	
+#if DEAL_II_PETSC_VERSION_DEV()
+	const int ierr = VecDestroy (&vector);
+#else
 	const int ierr = VecDestroy (vector);
+#endif
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
   }
@@ -253,7 +257,12 @@ namespace PETScWrappers
     Assert (size() == v.size(),
             ExcDimensionMismatch(size(), v.size()));
 
-    PetscTruth flag;
+#if DEAL_II_PETSC_VERSION_DEV()
+    PetscBool 
+#else
+    PetscTruth 
+#endif
+      flag;
 
     const int ierr = VecEqual (vector, v.vector, &flag);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -269,7 +278,12 @@ namespace PETScWrappers
     Assert (size() == v.size(),
             ExcDimensionMismatch(size(), v.size()));
 
-    PetscTruth flag;
+#if DEAL_II_PETSC_VERSION_DEV()
+    PetscBool 
+#else
+    PetscTruth 
+#endif
+      flag;
 
     const int ierr = VecEqual (vector, v.vector, &flag);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

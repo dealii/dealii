@@ -78,7 +78,11 @@ namespace PETScWrappers
                                          // so let's go the slow way:
 	if (attained_ownership)
 	  {
+#if DEAL_II_PETSC_VERSION_DEV()
+	    int ierr = VecDestroy (&vector);
+#else
 	    int ierr = VecDestroy (vector);
+#endif
 	    AssertThrow (ierr == 0, ExcPETScError(ierr));
 	  }
 
