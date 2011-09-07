@@ -85,6 +85,16 @@ namespace Threads
     /**
      * Return a reference to the data stored by this object for the current
      * thread this function is called on.
+     * 
+     * Note that there is no member function get() that is const and
+     * returns a const reference as one would expect. The reason is that
+     * if such a member function were called on a thread for which no
+     * thread-local object has been created yet, then one has to create
+     * such an object first which would certainly be a non-constant
+     * operation. If you need to call the get() function for a member
+     * variable of a class from a const member function, then you
+     * need to declare the member variable <code>mutable</code> to
+     * allow such access.
      */
     T & get ();
     
