@@ -8,8 +8,8 @@ components of the program take, are given in the @ref hp_paper .
 When run, this is what the program produces:
 
 @code
-examples/step-27> make run
-============================ Running step-27
+examples/\step-27> make run
+============================ Running \step-27
 Cycle 0:
    Number of active cells:       768
    Number of degrees of freedom: 3264

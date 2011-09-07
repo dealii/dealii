@@ -9,11 +9,11 @@ Running the program with the space dimension set to 2 in <code>main()</code>
 yields the following output (when the flag is set to optimized in the
 Makefile):
 @code
-examples/step-22> make run
+examples/\step-22> make run
 ============================ Remaking Makefile.dep
-==============optimized===== step-22.cc
-============================ Linking step-22
-============================ Running step-22
+==============optimized===== \step-22.cc
+============================ Linking \step-22
+============================ Running \step-22
 Refinement cycle 0
    Number of active cells: 64
    Number of degrees of freedom: 679 (594+85)
@@ -186,7 +186,7 @@ We will address the question of how possibly to improve our solver <a
 href="#improved-solver">below</a>.
 
 As for the graphical output, the grids generated during the solution
-look as follow: 
+look as follow:
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -250,7 +250,7 @@ refinement in two dimensions:
 @image html step-22.2d.sparsity-nor.png
 
 In order to generate such a graph, you have to insert a piece of
-code like the following to the end of the setup step. 
+code like the following to the end of the setup step.
 @code
   {
     std::ofstream out ("sparsity_pattern.gpl");
@@ -284,7 +284,7 @@ look at a sparsity pattern in 3D. We show only the (0,0) block of the
 matrix, again after one adaptive refinement. Apart from the fact that the matrix
 size has increased, it is also visible that there are many more entries
 in the matrix. Moreover, even for the optimized renumbering, there will be a
-considerable amount of tentative fill-in elements. This illustrates why UMFPACK 
+considerable amount of tentative fill-in elements. This illustrates why UMFPACK
 is not a good choice in 3D - a full decomposition needs many new entries that
  eventually won't fit into the physical memory (RAM):
 
@@ -308,25 +308,25 @@ the 2D case where we precondition $A$ with a direct solver and the
 <code>vmult</code> operation of the inverse matrix structure will converge in
 one single CG step, but this changes in 3D where we only use an ILU
 preconditioner.  There, the number of required preconditioned CG steps to
-invert $A$ increases as the mesh is refined, and each <code>vmult</code> 
+invert $A$ increases as the mesh is refined, and each <code>vmult</code>
 operation involves on average approximately 14, 23, 36, 59, 75 and 101 inner
 CG iterations in the refinement steps shown above. (On the other hand,
 the number of iterations for applying the inverse pressure mass matrix is
-always around five, both in two and three dimensions.)  To summarize, most work 
+always around five, both in two and three dimensions.)  To summarize, most work
 is spent on solving linear systems with the same matrix $A$ over and over again.
-What makes this look even worse is the fact that we 
+What makes this look even worse is the fact that we
 actually invert a matrix that is about 95 precent the size of the total system
 matrix and stands for 85 precent of the non-zero entries in the sparsity
 pattern. Hence, the natural question is whether it is reasonable to solve a
-linear system with matrix $A$ for about 15 times when calculating the solution 
+linear system with matrix $A$ for about 15 times when calculating the solution
 to the block system.
-  
+
 The answer is, of course, that we can do that in a few other (most of the time
 better) ways.
 Nevertheless, it has to be remarked that an indefinite system as the one
 at hand puts indeed much higher
 demands on the linear algebra than standard elliptic problems as we have seen
-in the early tutorial programs. The improvements are still rather 
+in the early tutorial programs. The improvements are still rather
 unsatisfactory, if one compares with an elliptic problem of similar
 size. Either way, we will introduce below a number of improvements to the
 linear solver, a discussion that we will re-consider again with additional
@@ -341,10 +341,10 @@ already mentioned in the in-code comments. The DoFRenumbering namespace compares
 several choices for the renumbering of dofs for the Stokes equations. The best
 result regarding the computing time was found for the King ordering, which is
 accessed through the call DoFRenumbering::boost::king_ordering. With that
-program, the inner solver needs considerably less operations, e.g. about 62 
-inner CG iterations for the inversion of $A$ at cycle 4 compared to about 75 
-iterations with the standard Cuthill-McKee-algorithm. Also, the computing time 
-at cycle 4 decreased from about 17 to 11 minutes for the <code>solve()</code> 
+program, the inner solver needs considerably less operations, e.g. about 62
+inner CG iterations for the inversion of $A$ at cycle 4 compared to about 75
+iterations with the standard Cuthill-McKee-algorithm. Also, the computing time
+at cycle 4 decreased from about 17 to 11 minutes for the <code>solve()</code>
 call. However, the King ordering (and the orderings provided by the
 DoFRenumbering::boost namespace in general) has a serious drawback - it uses
 much more memory than the in-build deal versions, since it acts on abstract
@@ -354,17 +354,17 @@ infeasible algorithm for the last cycle in 3D with 1.2 million
 unknowns.
 
 <h5>Better preconditioner for the inner CG solver</h5>
-Another idea to improve the situation even more would be to choose a 
-preconditioner that makes CG for the (0,0) matrix $A$ converge in a 
+Another idea to improve the situation even more would be to choose a
+preconditioner that makes CG for the (0,0) matrix $A$ converge in a
 mesh-independent number of iterations, say 10 to 30. We have seen such a
 canditate in step-16: multigrid.
 
 <h5>Block Schur complement preconditioner</h5>
-Even with a good preconditioner for $A$, we still 
-need to solve of the same linear system repeatedly (with different 
-right hand sides, though) in order to make the Schur complement solve 
-converge. The approach we are going to discuss here is how inner iteration 
-and outer iteration can be combined. If we persist in calculating the Schur 
+Even with a good preconditioner for $A$, we still
+need to solve of the same linear system repeatedly (with different
+right hand sides, though) in order to make the Schur complement solve
+converge. The approach we are going to discuss here is how inner iteration
+and outer iteration can be combined. If we persist in calculating the Schur
 complement, there is no other possibility.
 
 The alternative is to attack the block system at once and use an approximate
@@ -379,7 +379,7 @@ is simple, then an iterative solver with that preconditioner will converge in a
 few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
 @f{eqnarray*}
   P^{-1}
-  = 
+  =
   \left(\begin{array}{cc}
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
   \end{array}\right)
@@ -388,14 +388,14 @@ would appear to be a good choice since
 @f{eqnarray*}
   P^{-1}\left(\begin{array}{cc}
     A & B^T \\ B & 0
-  \end{array}\right) 
-  = 
+  \end{array}\right)
+  =
   \left(\begin{array}{cc}
     A^{-1} & 0 \\ S^{-1} B A^{-1} & -S^{-1}
   \end{array}\right)\cdot \left(\begin{array}{cc}
     A & B^T \\ B & 0
-  \end{array}\right) 
-  = 
+  \end{array}\right)
+  =
   \left(\begin{array}{cc}
     I & A^{-1} B^T \\ 0 & I
   \end{array}\right).
@@ -409,7 +409,7 @@ method is bounded by the number of distinct eigenvalues). Below, we will
 discuss the choice of an adequate solver for this problem. First, we are
 going to have a closer look at the implementation of the preconditioner.
 
-Since $P$ is aimed to be a preconditioner only, we shall use approximations to 
+Since $P$ is aimed to be a preconditioner only, we shall use approximations to
 the inverse of the Schur complement $S$ and the matrix $A$. Hence, the Schur
 complement will be approximated by the pressure mass matrix $M_p$, and we use
 a preconditioner to $A$ (without an InverseMatrix class around it) for
@@ -433,10 +433,10 @@ class BlockSchurPreconditioner : public Subscriptor
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    const SmartPointer<const InverseMatrix<SparseMatrix<double>, 
+    const SmartPointer<const InverseMatrix<SparseMatrix<double>,
                        PreconditionerMp > > m_inverse;
     const PreconditionerA &a_preconditioner;
-    
+
     mutable Vector<double> tmp;
 
 };
@@ -455,7 +455,7 @@ BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::BlockSchurPrecondit
 {}
 
         // Now the interesting function, the multiplication of
-        // the preconditioner with a BlockVector. 
+        // the preconditioner with a BlockVector.
 template <class PreconditionerA, class PreconditionerMp>
 void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
                                      BlockVector<double>       &dst,
@@ -463,13 +463,13 @@ void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
 {
         // Form u_new = A^{-1} u
   a_preconditioner.vmult (dst.block(0), src.block(0));
-        // Form tmp = - B u_new + p 
+        // Form tmp = - B u_new + p
         // (<code>SparseMatrix::residual</code>
         // does precisely this)
   system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
         // Change sign in tmp
   tmp *= -1;
-        // Multiply by approximate Schur complement 
+        // Multiply by approximate Schur complement
         // (i.e. a pressure mass matrix)
   m_inverse->vmult (dst.block(1), tmp);
 }
@@ -488,9 +488,9 @@ problem at hand. One choice is the solver @ref SolverBicgstab "BiCGStab", which
 was used for the solution of the unsymmetric advection problem in step-9. The
 second option, the one we are going to choose, is @ref SolverGMRES "GMRES"
 (generalized minimum residual). Both methods have their pros and cons - there
-are problems where one of the two candidates clearly outperforms the other, and 
+are problems where one of the two candidates clearly outperforms the other, and
 vice versa.
-<a href="http://en.wikipedia.org/wiki/GMRES#Comparison_with_other_solvers">Wikipedia</a>'s 
+<a href="http://en.wikipedia.org/wiki/GMRES#Comparison_with_other_solvers">Wikipedia</a>'s
 article on the GMRES method gives a comparative presentation.
 A more comprehensive and well-founded comparsion can be read e.g. in the book by
 J.W. Demmel (Applied Numerical Linear Algebra, SIAM, 1997, section 6.6.6).
@@ -499,17 +499,17 @@ For our specific problem with the ILU preconditioner for $A$, we certainly need
 to perform hundreds of iterations on the block system for large problem sizes
 (we won't beat CG!). Actually, this disfavors GMRES: During the GMRES
 iterations, a basis of Krylov vectors is successively built up and some
-operations are performed on these vectors. The more vectors are in this basis, 
+operations are performed on these vectors. The more vectors are in this basis,
 the more operations and memory will be needed. The number of operations scales
-as ${\cal O}(n + k^2)$ and memory as ${\cal O}(kn)$, where $k$ is the number of 
+as ${\cal O}(n + k^2)$ and memory as ${\cal O}(kn)$, where $k$ is the number of
 vectors in the Krylov basis and $n$ the size of the (block) matrix.
 To not let these demands grow excessively, deal.II limits the size $k$ of the
 basis to 30 vectors by default.
 Then, the basis is rebuilt. This implementation of the GMRES method is called
-GMRES(k), with default $k=30$. What we have gained by this restriction, 
+GMRES(k), with default $k=30$. What we have gained by this restriction,
 namely a bound on operations and memory requirements, will be compensated by
 the fact that we use an incomplete basis - this will increase the number of
-required iterations. 
+required iterations.
 
 BiCGStab, on the other hand, won't get slower when many iterations are needed
 (one iteration uses only results from one preceeding step and
@@ -519,25 +519,25 @@ CG or GMRES), there is one main reason which makes BiCGStab not appropriate for
 this problem: The preconditioner applies the inverse of the pressure
 mass matrix by using the InverseMatrix class. Since the application of the
 inverse matrix to a vector is done only in approximative way (an exact inverse
-is too expensive), this will also affect the solver. In the case of BiCGStab, 
+is too expensive), this will also affect the solver. In the case of BiCGStab,
 the Krylov vectors will not be orthogonal due to that perturbation. While
 this is uncritical for a small number of steps (up to about 50), it ruins the
 performance of the solver when these perturbations have grown to a significant
 magnitude in the coarse of iterations.
 
 We did some experiments with BiCGStab and found it to
-be faster than GMRES up to refinement cycle 3 (in 3D), but it became very slow 
+be faster than GMRES up to refinement cycle 3 (in 3D), but it became very slow
 for cycles 4 and 5 (even slower than the original Schur complement), so the
 solver is useless in this situation. Choosing a sharper tolerance for the
-inverse matrix class (<code>1e-10*src.l2_norm()</code> instead of 
-<code>1e-6*src.l2_norm()</code>) made BiCGStab perform well also for cycle 4, 
+inverse matrix class (<code>1e-10*src.l2_norm()</code> instead of
+<code>1e-6*src.l2_norm()</code>) made BiCGStab perform well also for cycle 4,
 but did not change the failure on the very large problems.
 
 GMRES is of course also effected by the approximate inverses, but it is not as
 sensitive to orthogonality and retains a relatively good performance also for
 large sizes, see the results below.
 
-With this said, we turn to the realization of the solver call with GMRES with 
+With this said, we turn to the realization of the solver call with GMRES with
 $k=100$ temporary vectors:
 
 @code
@@ -547,36 +547,36 @@ $k=100$ temporary vectors:
       system_matrix.block(1,1) = 0;
 
       SparseILU<double> pmass_preconditioner;
-      pmass_preconditioner.initialize (pressure_mass_matrix, 
+      pmass_preconditioner.initialize (pressure_mass_matrix,
         SparseILU<double>::AdditionalData());
-      
+
       InverseMatrix<SparseMatrix<double>,SparseILU<double> >
         m_inverse (pressure_mass_matrix, pmass_preconditioner);
 
       BlockSchurPreconditioner<typename InnerPreconditioner<dim>::type,
-                               SparseILU<double> > 
+                               SparseILU<double> >
         preconditioner (system_matrix, m_inverse, *A_preconditioner);
-      
+
       SolverControl solver_control (system_matrix.m(),
                                     1e-6*system_rhs.l2_norm());
       GrowingVectorMemory<BlockVector<double> > vector_memory;
       SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
       gmres_data.max_n_tmp_vectors = 100;
-      
+
       SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
                                               gmres_data);
-      
+
       gmres.solve(system_matrix, solution, system_rhs,
                   preconditioner);
-      
+
       constraints.distribute (solution);
-      
+
       std::cout << " "
                 << solver_control.last_step()
                 << " block GMRES iterations";
 @endcode
 
-Obviously, one needs to add the include file @ref SolverGMRES 
+Obviously, one needs to add the include file @ref SolverGMRES
 "<lac/solver_gmres.h>" in order to make this run.
 We call the solver with a BlockVector template in order to enable
 GMRES to operate on block vectors and matrices.
@@ -595,7 +595,7 @@ Let's first see the results in 2D:
 @code
 Refinement cycle 0
    Number of active cells: 64
-   Number of degrees of freedom: 679 (594+85) [0.005999 s] 
+   Number of degrees of freedom: 679 (594+85) [0.005999 s]
    Assembling... [0.002 s]
    Computing preconditioner... [0.003 s]
    Solving...
@@ -605,7 +605,7 @@ Refinement cycle 0
 
 Refinement cycle 1
    Number of active cells: 160
-   Number of degrees of freedom: 1683 (1482+201) [0.013998 s] 
+   Number of degrees of freedom: 1683 (1482+201) [0.013998 s]
    Assembling... [0.005999 s]
    Computing preconditioner... [0.012998 s]
    Solving...
@@ -615,7 +615,7 @@ Refinement cycle 1
 
 Refinement cycle 2
    Number of active cells: 376
-   Number of degrees of freedom: 3813 (3370+443) [0.031995 s] 
+   Number of degrees of freedom: 3813 (3370+443) [0.031995 s]
    Assembling... [0.014998 s]
    Computing preconditioner... [0.044994 s]
    Solving...
@@ -625,7 +625,7 @@ Refinement cycle 2
 
 Refinement cycle 3
    Number of active cells: 880
-   Number of degrees of freedom: 8723 (7722+1001) [0.074988 s] 
+   Number of degrees of freedom: 8723 (7722+1001) [0.074988 s]
    Assembling... [0.035995 s]
    Computing preconditioner... [0.110983 s]
    Solving...
@@ -635,7 +635,7 @@ Refinement cycle 3
 
 Refinement cycle 4
    Number of active cells: 2008
-   Number of degrees of freedom: 19383 (17186+2197) [0.180973 s] 
+   Number of degrees of freedom: 19383 (17186+2197) [0.180973 s]
    Assembling... [0.081987 s]
    Computing preconditioner... [0.315952 s]
    Solving...
@@ -645,7 +645,7 @@ Refinement cycle 4
 
 Refinement cycle 5
    Number of active cells: 4288
-   Number of degrees of freedom: 40855 (36250+4605) [0.386941 s] 
+   Number of degrees of freedom: 40855 (36250+4605) [0.386941 s]
    Assembling... [0.171974 s]
    Computing preconditioner... [0.766883 s]
    Solving...
@@ -666,7 +666,7 @@ The picture of course changes in 3D:
 @code
 Refinement cycle 0
    Number of active cells: 32
-   Number of degrees of freedom: 1356 (1275+81) [0.025996 s] 
+   Number of degrees of freedom: 1356 (1275+81) [0.025996 s]
    Assembling... [0.056992 s]
    Computing preconditioner... [0.027995 s]
    Solving...
@@ -676,7 +676,7 @@ Refinement cycle 0
 
 Refinement cycle 1
    Number of active cells: 144
-   Number of degrees of freedom: 5088 (4827+261) [0.102984 s] 
+   Number of degrees of freedom: 5088 (4827+261) [0.102984 s]
    Assembling... [0.254961 s]
    Computing preconditioner... [0.161976 s]
    Solving...
@@ -686,7 +686,7 @@ Refinement cycle 1
 
 Refinement cycle 2
    Number of active cells: 704
-   Number of degrees of freedom: 22406 (21351+1055) [0.52592 s] 
+   Number of degrees of freedom: 22406 (21351+1055) [0.52592 s]
    Assembling... [1.24481 s]
    Computing preconditioner... [0.948856 s]
    Solving...
@@ -696,7 +696,7 @@ Refinement cycle 2
 
 Refinement cycle 3
    Number of active cells: 3168
-   Number of degrees of freedom: 93176 (89043+4133) [2.66759 s] 
+   Number of degrees of freedom: 93176 (89043+4133) [2.66759 s]
    Assembling... [5.66014 s]
    Computing preconditioner... [4.69529 s]
    Solving...
@@ -706,7 +706,7 @@ Refinement cycle 3
 
 Refinement cycle 4
    Number of active cells: 11456
-   Number of degrees of freedom: 327808 (313659+14149) [12.0242 s] 
+   Number of degrees of freedom: 327808 (313659+14149) [12.0242 s]
    Assembling... [20.2669 s]
    Computing preconditioner... [17.3384 s]
    Solving...
@@ -716,7 +716,7 @@ Refinement cycle 4
 
 Refinement cycle 5
    Number of active cells: 45056
-   Number of degrees of freedom: 1254464 (1201371+53093) [89.8533 s] 
+   Number of degrees of freedom: 1254464 (1201371+53093) [89.8533 s]
    Assembling... [80.3588 s]
    Computing preconditioner... [73.0849 s]
    Solving...
@@ -731,8 +731,8 @@ because GMRES(k) scales worse with the problem size than CG, as we discussed
 above.  Nonetheless, the improvement by a factor of 3-5 for moderate problem
 sizes is quite impressive.
 
-<h5>Combining block preconditioner and multigrid</h5> 
-An ultimate linear solver for this problem could be imagined as a 
+<h5>Combining block preconditioner and multigrid</h5>
+An ultimate linear solver for this problem could be imagined as a
 combination of an optimal
 preconditioner for $A$ (e.g. multigrid) and the block preconditioner
 described above, which is the approach taken in the step-31
@@ -768,14 +768,14 @@ BoundaryValues<dim>::value (const Point<dim>  &p,
           ExcIndexRange (component, 0, this->n_components));
 
   const double x_offset = std::atan(p[1]*4)/3;
-                                                                   
+
   if (component == 0)
     return (p[0] < x_offset ? -1 : (p[0] > x_offset ? 1 : 0));
   return 0;
 }
 @endcode
 and the following way to generate the mesh as the domain
-$[-2,2]\times[-2,2]\times[-1,0]$ 
+$[-2,2]\times[-2,2]\times[-1,0]$
 @code
     std::vector<unsigned int> subdivisions (dim, 1);
     subdivisions[0] = 4;
@@ -788,7 +788,7 @@ $[-2,2]\times[-2,2]\times[-1,0]$
     const Point<dim> top_right   = (dim == 2 ?
                                     Point<dim>(2,0) :
                                     Point<dim>(2,2,0));
-    
+
     GridGenerator::subdivided_hyper_rectangle (triangulation,
                                                subdivisions,
                                                bottom_left,

@@ -2,7 +2,7 @@
 <h1>Results</h1>
 
 The current program reads its run-time parameters from an input file
-called <code>step-29.prm</code> that looks like this:
+called <code>\step-29.prm</code> that looks like this:
 @code
 subsection Mesh & geometry parameters
   # Distance of the focal point of the lens to the x-axis
@@ -43,8 +43,8 @@ parameters here and therefore stick with their default values.
 Here's the console output of the program in debug mode:
 
 @code
-examples/step-29> make run
-============================ Running step-29
+examples/\step-29> make run
+============================ Running \step-29
 DEAL::Generating grid... done (1.11607s)
 DEAL::  Number of active cells:  25600
 DEAL::Setting up system... done (1.10807s)
@@ -62,7 +62,7 @@ of the program run much faster whereas solving the linear system is
 hardly sped up at all:
 
 @code
-============================ Running step-29
+============================ Running \step-29
 DEAL::Generating grid... done (0.0280020s)
 DEAL::  Number of active cells:  25600
 DEAL::Setting up system... done (0.112007s)

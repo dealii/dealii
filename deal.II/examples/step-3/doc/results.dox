@@ -24,7 +24,7 @@ Apart from the output shown above, the program generated the file
 viewed as follows: invoke GNUPLOT and enter the following sequence of
 commands at its prompt:
 @code
-examples/step-3> gnuplot
+examples/\step-3> gnuplot
 
         G N U P L O T
         Version 3.7 patchlevel 3
@@ -75,7 +75,7 @@ suggestions:
 </p>
 
 <ul>
-  <li> 
+  <li>
   Change the geometry and mesh: In the program, we have generated a square
   domain and mesh by using the <code>GridGenerator::hyper_cube</code>
   function. However, the <code>GridGenerator</code> has a good number of other
@@ -135,7 +135,7 @@ suggestions:
   VectorTools::interpolate_boundary_values (dof_handler,
 					    1,
 					    ConstantFunction<2>(1.),
-					    boundary_values);    
+					    boundary_values);
   @endcode
   If you have this call immediately after the first one to this function, then
   it will interpolate boundary values on faces with boundary indicator 1 to the
@@ -192,7 +192,7 @@ suggestions:
   the following code to <code>LaplaceProblem::output_results</code>:
   @code
     std::cout << "Mean value: "
-              << VectorTools::compute_mean_value (dof_handler, 
+              << VectorTools::compute_mean_value (dof_handler,
 						  QGauss<2>(3),
 						  solution,
 						  0)

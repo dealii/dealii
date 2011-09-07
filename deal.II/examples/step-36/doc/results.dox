@@ -2,7 +2,7 @@
 
 <h2>Running the problem</h2>
 
-The problem's input is parameterized by an input file <code>step-36.prm</code>
+The problem's input is parameterized by an input file <code>\step-36.prm</code>
 which could, for example, contain the following text:
 
 @code
@@ -17,8 +17,8 @@ $m,n\in{\mathbb N^+}$. Eigenfunctions are sines and cosines with $m$ and $n$
 periods in $x$ and $y$ directions. This matches the output our program
 generates:
 @code
-examples/step-36> make run
-============================ Running step-36
+examples/\step-36> make run
+============================ Running \step-36
    Number of active cells:       1024
    Number of degrees of freedom: 1089
 
@@ -66,7 +66,7 @@ look like this:
 It is always worth playing a few games in the playground! So here goes
 with a few suggestions:
 
-<ul> 
+<ul>
 
 <li> The potential used above (called the <i>infinite well</i> because
 it is a flat potential surrounded by infinitely high walls) is
@@ -75,14 +75,14 @@ from that, it is rather boring, however. That said, it is trivial to
 play around with the potential by just setting it to something
 different in the input file. For example, let us assume that we wanted
 to work with the following potential in
-2d: 
+2d:
 @f[
-  V(x,y) = \left\{ 
+  V(x,y) = \left\{
        \begin{array}{ll}
-         -100 & \text{if}\ \sqrt{x^2+y^2}<\frac 34 \ \text{and} 
+         -100 & \text{if}\ \sqrt{x^2+y^2}<\frac 34 \ \text{and}
                          \ xy>0
          \\
-         -5 & \text{if}\ \sqrt{x^2+y^2}<\frac 34 \ \text{and} 
+         -5 & \text{if}\ \sqrt{x^2+y^2}<\frac 34 \ \text{and}
                          \ xy\le 0
          \\
          0 & \text{otherwise}
@@ -95,10 +95,10 @@ this by using the following in the input file:
 set Potential = if (x^2 + y^2 < 0.75^2, if (x*y > 0, -100, -5), 0)
 @endcode
 If in addition we also increase the mesh refinement by one level, we get the
-following results: 
+following results:
 @code
-examples/step-36> make run
-============================ Running step-36
+examples/\step-36> make run
+============================ Running \step-36
    Number of active cells:       4096
    Number of degrees of freedom: 4225
 

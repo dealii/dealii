@@ -5,11 +5,11 @@
 
 If we run the program as is, we get this output:
 @code
-examples/step-20> make run
+examples/\step-20> make run
 ============================ Remaking Makefile.dep
-==============debug========= step-20.cc
-============================ Linking step-20
-============================ Running step-20
+==============debug========= \step-20.cc
+============================ Linking \step-20
+============================ Running \step-20
 Number of active cells: 64
 Total number of cells: 85
 Number of degrees of freedom: 208 (144+64)
@@ -180,7 +180,7 @@ the behavior of fluids in sandstone: in most of the domain, the sandstone is
 homogenous and, while permeably to fluids, not overly so; on the other stone,
 the stone has cracked, or faulted, along one line, and the fluids flow much
 easier along this large crask. Here is how we could implement something like
-this: 
+this:
 @code
 template <int dim>
 void
@@ -196,12 +196,12 @@ KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
 
       const double distance_to_flowline
         = std::fabs(points[p][1]-0.2*std::sin(10*points[p][0]));
-      
+
       const double permeability = std::max(std::exp(-(distance_to_flowline*
                                                       distance_to_flowline)
                                                     / (0.1 * 0.1)),
                                            0.001);
-      
+
       for (unsigned int d=0; d<dim; ++d)
 	values[p][d][d] = 1./permeability;
     }
@@ -212,7 +212,7 @@ Remember that the function returns the inverse of the permeability tensor.
 
 
 With a significantly higher mesh resolution, we can visualize this, here with
-x- and y-velocity: 
+x- and y-velocity:
 
 
 @image html step-20.u-wiggle.png
@@ -237,7 +237,7 @@ class KInverse : public TensorFunction<2,dim>
 {
   public:
     KInverse ();
-    
+
     virtual void value_list (const std::vector<Point<dim> > &points,
 			     std::vector<Tensor<2,dim> >    &values) const;
 
@@ -247,7 +247,7 @@ class KInverse : public TensorFunction<2,dim>
 
 
 template <int dim>
-KInverse<dim>::KInverse () 
+KInverse<dim>::KInverse ()
 {
   const unsigned int N = 40;
   centers.resize (N);
@@ -273,10 +273,10 @@ KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
       for (unsigned int i=0; i<centers.size(); ++i)
         permeability += std::exp(-(points[p]-centers[i]).square()
                                  / (0.1 * 0.1));
-      
+
       const double normalized_permeability
         = std::max(permeability, 0.005);
-      
+
       for (unsigned int d=0; d<dim; ++d)
 	values[p][d][d] = 1./normalized_permeability;
     }

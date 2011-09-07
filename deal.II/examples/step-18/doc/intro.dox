@@ -362,7 +362,7 @@ The next step is to convert this file or these files into whatever
 format you like. The program that does this is the step-19 tutorial program:
 for example, for the first time step, call it through
 @code
-    ../step-19/step-19 solution-0001.0000.*.d2 solution-0001.0000.gmv
+    ../\step-19/\step-19 solution-0001.0000.*.d2 solution-0001.0000.gmv
 @endcode
 to merge all the intermediate format files into a single file in GMV
 format. More details on the parameters of this program and what it can do for

@@ -130,10 +130,10 @@ Stacktrace:
 -----------
 #0  /u/bangerth/p/deal.II/1/deal.II/lib/libbase.g.so: Subscriptor::~Subscriptor()
 #1  /u/bangerth/p/deal.II/1/deal.II/lib/libdeal_II_2d.g.so: FiniteElement<2>::~FiniteElement()
-#2  ./step-6: FE_Poly<TensorProductPolynomials<2>, 2>::~FE_Poly()
-#3  ./step-6: FE_Q<2>::~FE_Q()
-#4  ./step-6: Step6<2>::~Step6()
-#5  ./step-6: main
+#2  ./\step-6: FE_Poly<TensorProductPolynomials<2>, 2>::~FE_Poly()
+#3  ./\step-6: FE_Q<2>::~FE_Q()
+#4  ./\step-6: Step6<2>::~Step6()
+#5  ./\step-6: main
 --------------------------------------------------------
 make: *** [run] Aborted
 @endcode
@@ -143,7 +143,7 @@ make: *** [run] Aborted
 From the above error message, we conclude that an object of type
 <code>10DoFHandlerILi2EE</code> is still using the object of type
 <code>4FE_QILi2EE</code>. These are of course <a
-href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" names</a> for 
+href="http://en.wikipedia.org/wiki/Name_mangling">"mangled" names</a> for
 <code>DoFHandler</code> and <code>FE_Q</code>. The mangling works as
 follows: the first number indicates the number of characters of the
 template class, i.e. 10 for <code>DoFHandler</code> and 4

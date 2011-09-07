@@ -13,8 +13,8 @@ reduced significantly, to about 23 minutes, a much more reasonable time.
 If run, the program prints the following output, explaining what it is
 doing during all that time:
 @code
-examples/step-18> time make run
-============================ Running step-18
+examples/\step-18> time make run
+============================ Running \step-18
 Timestep 1 at time 1
   Cycle 0:
     Number of active cells:       3712 (by partition: 3712)
@@ -89,7 +89,7 @@ unknowns. Not a whole lot, but enough for a coupled three-dimensional
 problem to keep a computer busy for a while. At the end of the day,
 this is what we have for output:
 @code
-examples/step-18> ls -l *.d2
+examples/\step-18> ls -l *.d2
 -rw-r--r--  1 bangerth wheeler 8797414 May 25 09:10 solution-0001.0000.d2
 -rw-r--r--  1 bangerth wheeler 8788500 May 25 09:32 solution-0002.0000.d2
 -rw-r--r--  1 bangerth wheeler 8763718 May 25 09:55 solution-0003.0000.d2
@@ -104,17 +104,17 @@ examples/step-18> ls -l *.d2
 
 
 Let us convert these files in deal.II intermediate format to gmv
-format (this assumes that you have already compiled the 
+format (this assumes that you have already compiled the
 step-19 example program):
 @code
-examples/step-18> ../step-19/step-19
+examples/\step-18> ../\step-19/\step-19
 
 Converter from deal.II intermediate format to other graphics formats.
 
-Usage: ./step-19 [-p parameter_file] list_of_input_files [-x output_format] output_file
+Usage: ./\step-19 [-p parameter_file] list_of_input_files [-x output_format] output_file
 
-examples/step-18> ../step-19/step-19 solution-0001.0000.d2 -x gmv solution-0001.0000.gmv
-examples/step-18> ../step-19/step-19 solution-0002.0000.d2 -x gmv solution-0002.0000.gmv
+examples/\step-18> ../\step-19/\step-19 solution-0001.0000.d2 -x gmv solution-0001.0000.gmv
+examples/\step-18> ../\step-19/\step-19 solution-0002.0000.d2 -x gmv solution-0002.0000.gmv
 [...]
 @endcode
 Of course, since we have run the program only in sequential mode, we
@@ -233,7 +233,7 @@ Timestep 20 at time 10
 That's quite a good number of unknowns, given that we are in 3d. The output of
 this program are 16 files for each time step:
 @code
-examples/step-18> ls -l solution-0001.000*
+examples/\step-18> ls -l solution-0001.000*
 -rw-r--r--    1 bangerth mfw       4325219 Aug 11 09:44 solution-0001.0000-000.d2
 -rw-r--r--    1 bangerth mfw       4454460 Aug 11 09:44 solution-0001.0000-001.d2
 -rw-r--r--    1 bangerth mfw       4485242 Aug 11 09:43 solution-0001.0000-002.d2
@@ -252,14 +252,14 @@ examples/step-18> ls -l solution-0001.000*
 -rw-r--r--    1 bangerth mfw       4340488 Aug 11 09:44 solution-0001.0000-015.d2
 @endcode
 We merge and convert these 16 intermediate files into a single gmv file as
-follows: 
+follows:
 @code
-examples/step-18> time ../step-19/step-19 solution-0001.0000-* -x gmv -o solution-0001.0000.gmv
+examples/\step-18> time ../\step-19/\step-19 solution-0001.0000-* -x gmv -o solution-0001.0000.gmv
 
 real    0m45.929s
 user    0m41.290s
 sys     0m0.990s
-examples/step-18> ls -l solution-0001.0000.gmv
+examples/\step-18> ls -l solution-0001.0000.gmv
 -rw-r--r--    1 bangerth mfw      68925360 Aug 11 17:04 solution-0001.0000.gmv
 @endcode
 
@@ -349,7 +349,7 @@ what direction it may be extended:
  The most obvious extension is to use a more
 realistic material model for large-scale quasistatic deformation. The natural
 choice for this would be plasticity, in which a nonlinear relationship between
-stress and strain replaces equation <a href="#step-18.stress-strain">[stress-strain]</a>. Plasticity
+stress and strain replaces equation <a href="#step_18.stress-strain">[stress-strain]</a>. Plasticity
 models are usually rather complicated to program since the stress-strain
 dependence is generally non-smooth. The material can be thought of being able
 to withstand only a maximal stress (the yield stress) after which it starts to
@@ -379,7 +379,7 @@ elastoplasticity: I. Mixed displacement-pressure formulation&rdquo;
 pp. 3559-3586, 2004).
 
 
-<h5>Stabilization issues</h5> 
+<h5>Stabilization issues</h5>
 
 The formulation we have chosen, i.e. using
 piecewise (bi-, tri-)linear elements for all components of the displacement
@@ -412,19 +412,19 @@ elasticity&rdquo; (Computer Methods in Applied Mechanics and Engineering, vol. 1
 pp. 1093-1112, 2005).
 
 
-<h5>Refinement during timesteps</h5> 
+<h5>Refinement during timesteps</h5>
 
 In the present form, the program
 only refines the initial mesh a number of times, but then never again. For any
 kind of realistic simulation, one would want to extend this so that the mesh
 is refined and coarsened every few time steps instead. This is not hard to do,
 in fact, but has been left for future tutorial programs or as an exercise, if
-you wish. 
+you wish.
 
 The main complication one has to overcome is that one has to
 transfer the data that is stored in the quadrature points of the cells of the
 old mesh to the new mesh, preferably by some sort of projection scheme. The
-general approach to this would go like this: 
+general approach to this would go like this:
 
 - At the beginning, the data is only available in the quadrature points of
   individual cells, not as a finite element field that is defined everywhere.
@@ -440,30 +440,30 @@ general approach to this would go like this:
   for example, if you have a QGauss(2) quadrature formula (i.e. 4 points per
   cell in 2d, 8 points in 3d), then one would use a finite element of kind
   FE_DGQ(1), i.e. bi-/tri-linear functions as these have 4 degrees of freedom
-  per cell in 2d and 8 in 3d. 
+  per cell in 2d and 8 in 3d.
 
-- There are functions that can make this conversion from individual points to 
-  a global field simpler. The following piece of pseudo-code should help if 
-  you use a QGauss(2) quadrature formula. Note that the multiplication by the 
+- There are functions that can make this conversion from individual points to
+  a global field simpler. The following piece of pseudo-code should help if
+  you use a QGauss(2) quadrature formula. Note that the multiplication by the
   projection matrix below takes a vector of scalar components, i.e., we can only
   convert one set of scalars at a time from the quadrature points to the degrees
-  of freedom and vice versa. So we need to store each component of stress separately, 
+  of freedom and vice versa. So we need to store each component of stress separately,
   which requires <code>dim*dim</code> vectors. We'll store this set of vectors in a 2D array to
-  make it easier to read off components in the same way you would the stress tensor. 
+  make it easier to read off components in the same way you would the stress tensor.
   Thus, we'll loop over the components of stress on each cell and store
-  these values in the global history field. (The prefix <code>history_</code> 
-  indicates that we work with quantities related to the history variables defined 
-  in the quadrature points.)  
+  these values in the global history field. (The prefix <code>history_</code>
+  indicates that we work with quantities related to the history variables defined
+  in the quadrature points.)
   @code
     FE_DGQ<dim>     history_fe (1);
     DoFHandler<dim> history_dof_handler (triangulation);
     history_dof_handler.distribute_dofs (history_fe);
 
-    std::vector< std::vector< Vector<double> > > 
+    std::vector< std::vector< Vector<double> > >
                  history_field (dim, std::vector< Vector<double> >(dim)),
                  local_history_values_at_qpoints (dim, std::vector< Vector<double> >(dim)),
                  local_history_fe_values (dim, std::vector< Vector<double> >(dim));
-    
+
     for (unsigned int i=0; i<dim; i++)
       for (unsigned int j=0; j<dim; j++)
       {
@@ -479,7 +479,7 @@ general approach to this would go like this:
 	       quadrature, quadrature,
 	       qpoint_to_dof_matrix);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),                                                   
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end(),
                                                    dg_cell = history_dof_handler.begin_active();
 
@@ -488,7 +488,7 @@ general approach to this would go like this:
 
         PointHistory<dim> *local_quadrature_points_history
 	       = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
-          
+
         Assert (local_quadrature_points_history >=
                     &quadrature_point_history.front(),
 		    ExcInternalError());
@@ -498,11 +498,11 @@ general approach to this would go like this:
 
         for (unsigned int i=0; i<dim; i++)
           for (unsigned int j=0; j<dim; j++)
-          {	
+          {
             for (unsigned int q=0; q<quadrature.size(); ++q)
-              local_history_values_at_qpoints[i][j](q) 
+              local_history_values_at_qpoints[i][j](q)
                        = local_quadrature_points_history[q].old_stress[i][j];
- 
+
             qpoint_to_dof_matrix.vmult (local_history_fe_values[i][j],
                                         local_history_values_at_qpoints[i][j]);
 
@@ -514,7 +514,7 @@ general approach to this would go like this:
 
 - Now that we have a global field, we can refine the mesh and transfer the
   history_field vector as usual using the SolutionTransfer class. This will
-  interpolate everything from the old to the new mesh. 
+  interpolate everything from the old to the new mesh.
 
 - In a final step, we have to get the data back from the now interpolated
   global field to the quadrature points on the new mesh. The following code
@@ -530,22 +530,22 @@ general approach to this would go like this:
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
                                                    endc = dof_handler.end(),
                                                    dg_cell = history_dof_handler.begin_active();
-  
+
     for (; cell != endc; ++cell, ++dg_cell)
     {
       PointHistory<dim> *local_quadrature_points_history
 	     = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
-          
+
       Assert (local_quadrature_points_history >=
                   &quadrature_point_history.front(),
 		  ExcInternalError());
       Assert (local_quadrature_points_history <
                   &quadrature_point_history.back(),
 		  ExcInternalError());
-    
+
       for (unsigned int i=0; i<dim; i++)
         for (unsigned int j=0; j<dim; j++)
-        {	
+        {
           dg_cell->get_dof_values (history_field[i][j],
 	                           local_history_fe_values[i][j]);
 
@@ -553,7 +553,7 @@ general approach to this would go like this:
                                       local_history_fe_values[i][j]);
 
           for (unsigned int q=0; q<quadrature.size(); ++q)
-            local_quadrature_points_history[q].old_stress[i][j] 
+            local_quadrature_points_history[q].old_stress[i][j]
                        = local_history_values_at_qpoints[i][j](q);
       }
   @endcode

@@ -22,17 +22,23 @@ s/(::)?dealii::/::/g;
 # this rule, we actually had to write this sequence out in our
 # documentation. Unfortunately, as a consequence, there are vestiges
 # of this style, so we can't substitute things that look like
-# "step-xx".
+# "step-xx". We therefore not substitute if step-xx is preceded or
+# followed by quotation marks, or if the text is explicitly
+# preceded by a backslash for escaping.
 #
-# There is other exceptions:
+# There are other exceptions:
 # - the scripts in doc/doxygen/tutorial produce files that have
 #   table of contents entries. We don't want these cross-linked
 #   to itself.
-# - things like step_12.solution.png that typically appear in
+# - things like step-12.solution.png that typically appear in
 #   @image commands.
 # - things in headings
-s/(?<!\")step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
+s/(?<![\"\\])step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
   if !m/(\@page|\@image|<h\d>)/i;
+
+# If step-xx was explicitly escaped with a backslash, remove the
+# latter
+s/\\(step-\d+)/\1/g;
 
 
 s#(static dealii::ExceptionBase\&)#\n//\! \@ingroup Exceptions\n \1#g;

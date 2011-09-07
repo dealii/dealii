@@ -6,7 +6,7 @@ href="http://www.gnuplot.info/">GNUPLOT</a> (one of the simpler visualization
 programs; maybe not the easiest to use since it is command line driven, but
 also universally available on all linux and other unix-like systems):
 @code
-examples/step-2> gnuplot
+examples/\step-2> gnuplot
 
         G N U P L O T
         Version 3.7 patchlevel 3

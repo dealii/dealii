@@ -4,7 +4,7 @@ When run, the program simulates convection in 3d in much the same way
 as step-31 did, though with an entirely different testcase.
 
 
-<h3>Comparison of results with step-31</h3>
+<h3>Comparison of results with \step-31</h3>
 
 Before we go to this testcase, however, let us show a few results from a
 slightly earlier version of this program that was solving exactly the
@@ -260,7 +260,7 @@ The last two images show the grid as well as the partitioning of the
 mesh for the last timestep shown into the 10 subdomains used for this
 computation. The full dynamics are really only visible by looking at
 an animation. <a
-href="http://www.math.tamu.edu/~bangerth/images/pictures/convection-outward/step-32.2d.convection.gif">At
+href="http://www.math.tamu.edu/~bangerth/images/pictures/convection-outward/\step-32.2d.convection.gif">At
 this site</a> is such an animation. Beware that this animation is
 about 20MB large, though it is well worth watching due to its almost
 artistic quality.

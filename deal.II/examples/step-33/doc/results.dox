@@ -3,12 +3,12 @@
 
 We run the problem with the mesh <code>slide.inp</code> (this file is in the
 same directory as the source code for this program) and the following input
-deck (available as <code>input.prm</code> in the same directory): 
+deck (available as <code>input.prm</code> in the same directory):
 @verbatim
 # Listing of Parameters
 # ---------------------
 
-# The input grid 
+# The input grid
 set mesh = slide.inp
 
 # Stabilization parameter
@@ -202,15 +202,15 @@ T=8.32
 
 
 ----------------------------------------------------
-Exception on processing: 
+Exception on processing:
 --------------------------------------------------------
-An error occurred in line <3119> of file <step-33.cc> in function
+An error occurred in line <3119> of file <\step-33.cc> in function
     void ConservationLaw<dim>::run() [with int dim = 2]
-The violated condition was: 
+The violated condition was:
     nonlin_iter <= 10
 The name and call sequence of the exception was:
     ExcMessage ("No convergence in nonlinear solver")
-Additional Information: 
+Additional Information:
 No convergence in nonlinear solver
 --------------------------------------------------------
 
