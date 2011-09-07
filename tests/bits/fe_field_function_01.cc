@@ -82,7 +82,7 @@ void test() {
 
 int main ()
 {
-  std::ofstream logfile("fe_field_function/output");
+  std::ofstream logfile("fe_field_function_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
 
