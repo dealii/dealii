@@ -31,9 +31,9 @@ namespace Functions
 		  dh(&mydh, "FEFieldFunction"),
 		  data_vector(myv),
 		  mapping(mymapping),
+		  cell_hint(dh->end()),
 		  n_components(mydh.get_fe().n_components())
   {
-    cell = dh->begin_active();
   }
 
 
@@ -43,17 +43,20 @@ namespace Functions
   FEFieldFunction<dim, DH, VECTOR>::
   set_active_cell(typename DH::active_cell_iterator &newcell)
   {
-    cell = newcell;
+    cell_hint.get() = newcell;
   }
 
 
-  
+
   template <int dim, typename DH, typename VECTOR>
   void FEFieldFunction<dim, DH, VECTOR>::vector_value (const Point<dim> &p,
 						       Vector<double>   &values) const 
   { 
     Assert (values.size() == n_components, 
 	    ExcDimensionMismatch(values.size(), n_components));
+    typename DH::active_cell_iterator cell = cell_hint.get();
+    if (cell == dh->end()) 
+	cell = dh->begin_active();
     Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
   
 				     // Check if we already have all we need
@@ -64,6 +67,8 @@ namespace Functions
 	cell = my_pair.first;
 	qp = my_pair.second;
       }				    
+
+    cell_hint.get() = cell;
   
 				     // Now we can find out about the point
     Quadrature<dim> quad(qp);
@@ -96,6 +101,9 @@ namespace Functions
   { 
     Assert (gradients.size() == n_components, 
 	    ExcDimensionMismatch(gradients.size(), n_components));
+    typename DH::active_cell_iterator cell = cell_hint.get();
+    if(cell == dh->end())
+	cell = dh->begin_active();
     Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
   
 				     // Check if we already have all we need
@@ -106,7 +114,9 @@ namespace Functions
 	cell = my_pair.first;
 	qp = my_pair.second;
       }				    
-  
+
+    cell_hint.get() = cell;
+   
 				     // Now we can find out about the point
     Quadrature<dim> quad(qp);
     FEValues<dim> fe_v(mapping, dh->get_fe(), quad, 
@@ -268,6 +278,9 @@ namespace Functions
     bool left_over = true;
   
 				     // Current quadrature point
+    typename DH::active_cell_iterator cell = cell_hint.get();
+    if (cell == dh->end())
+	cell = dh->begin_active();
     Point<dim> qp = mapping.transform_real_to_unit_cell(cell, points[0]);
   
 				     // Check if we already have a

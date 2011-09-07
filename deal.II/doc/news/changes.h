@@ -283,6 +283,13 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: FEFieldFunction class was not thread-safe because it keeps a
+cache on the side that was invalidated when different
+threads kept pouncing on it. This is now fixed.
+<br>
+(Patrick Sodr&eacute;, 2011/09/07)
+
+
 <li> New: There is now a function GridTools::volume computing the volume
 of a triangulation.
 <br>

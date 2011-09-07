@@ -19,6 +19,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -150,10 +151,10 @@ namespace Functions
 					* points lie, you can tell
 					* this object by calling this
 					* function. This will speed
-					* things up a little.
+					* things up a little. 
 					*/
       void set_active_cell(typename DH::active_cell_iterator &newcell);
-  
+
 				       /**
 					* Get ONE vector value at the
 					* given point. It is
@@ -329,6 +330,12 @@ namespace Functions
 			      std::vector<std::vector<unsigned int> > &maps) const;
     
     private:
+      				       /**
+					* Typedef holding the local cell_hint.
+					*/
+      typedef Threads::ThreadLocalStorage < 
+	typename DH::active_cell_iterator > cell_hint_t; 
+
 				       /**
 					* Pointer to the dof handler.
 					*/
@@ -347,10 +354,9 @@ namespace Functions
       const Mapping<dim> & mapping;
   
 				       /**
-					* The current cell in which we
-					* are evaluating.
+					* The latest cell hint.
 					*/
-      mutable typename DH::active_cell_iterator cell;
+      mutable cell_hint_t cell_hint;
   
 				       /**
 					* Store the number of
