@@ -75,7 +75,7 @@ void test() {
 
   deallog << "Projection error: " << abs_zero(v2.l2_norm())
 	  << std::endl;
-  Assert (v2.l2_norm() < 1e-12, ExcInternalError());
+  Assert (v2.l2_norm() < 1e-10, ExcInternalError());
 }
 
 int main ()
