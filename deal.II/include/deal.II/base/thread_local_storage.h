@@ -98,6 +98,27 @@ namespace Threads
      */
     T & get ();
     
+    /**
+     * Conversion operator that simply converts the thread-local object
+     * to the data type that it stores. This function is equivalent to
+     * calling the get() member function; it's purpose is to make the
+     * TLS object look more like the object it is storing.
+     */
+    operator T & ();
+    
+    /**
+     * Copy the given argument into the storage space used to represent
+     * the current thread. Calling this function as <code>tls_data = object</code>
+     * is equivalent to calling <code>tls_data.get() = object</code>. The
+     * intent of this operator is to make the ThreadLocalStorage object
+     * look more like the object it represents on the current thread.
+     *
+     * @param t The object to be copied into the storage space used 
+     * for the current thread.
+     * 
+     * @return The current object, after the changes have been made
+     **/
+    ThreadLocalStorage<T> & operator = (const T &t);
   private:
 #if DEAL_II_USE_MT == 1
     /**
@@ -148,7 +169,24 @@ namespace Threads
 #endif        
   }
 
+
+
+  template <typename T>
+  inline
+  ThreadLocalStorage<T>::operator T& ()
+  {
+    return get();
+  }
   
+
+  template <typename T>
+  inline
+  ThreadLocalStorage<T> &
+  ThreadLocalStorage<T>::operator = (const T &t)
+  {
+    get() = t;
+    return *this;
+  }
 }   // end of implementation of namespace Threads
 
 /**
