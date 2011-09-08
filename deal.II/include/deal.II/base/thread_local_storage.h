@@ -74,7 +74,7 @@ namespace Threads
      * A kind of copy constructor. Initialize each thread local object
      * by copying the given object.
      **/
-    ThreadLocalStorage (const T &t);
+    explicit ThreadLocalStorage (const T &t);
 
     /**
      * Copy constructor. Initialize each thread local object
@@ -119,6 +119,7 @@ namespace Threads
      * @return The current object, after the changes have been made
      **/
     ThreadLocalStorage<T> & operator = (const T &t);
+
   private:
 #if DEAL_II_USE_MT == 1
     /**
