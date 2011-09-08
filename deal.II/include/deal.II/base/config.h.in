@@ -266,7 +266,7 @@
 #undef DEAL_II_USE_PETSC_COMPLEX
 
 /* Defined if a PETSc installation was found and is not a release */
-#undef DEAL_II_USE_PETSC_VERSION_DEV
+#undef DEAL_II_USE_PETSC_DEV
 
 /* Defined if a SLEPc installation was found and is going to be used */
 #undef DEAL_II_USE_SLEPC
@@ -651,7 +651,7 @@
     (major)*10000 + (minor)*100 + (subminor))
 
 #define DEAL_II_PETSC_VERSION_DEV() \
-  (DEAL_II_USE_PETSC_VERSION_DEV)
+  (DEAL_II_USE_PETSC_DEV)
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>
