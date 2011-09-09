@@ -1149,12 +1149,40 @@ InteriorPenaltyProblem<dim>::run(unsigned int n_steps)
 
 int main()
 {
-  using namespace dealii;
-  using namespace Step39;
+  try
+    {
+      using namespace dealii;
+      using namespace Step39;
 
-  std::ofstream logfile("deallog");
-  deallog.attach(logfile);
-  FE_DGQ<2> fe1(3);
-  InteriorPenaltyProblem<2> test1(fe1);
-  test1.run(12);
+      std::ofstream logfile("deallog");
+      deallog.attach(logfile);
+      FE_DGQ<2> fe1(3);
+      InteriorPenaltyProblem<2> test1(fe1);
+      test1.run(12);
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
+
+  return 0;
 }
