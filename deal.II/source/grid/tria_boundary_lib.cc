@@ -1311,7 +1311,7 @@ TorusBoundary<2,3>::get_surf_coord(const Point<3>& p) const
 
 template <>
 Point<3>
-TorusBoundary<2,3>::get_new_point_on_line (const typename Triangulation<2,3>::line_iterator &line) const
+TorusBoundary<2,3>::get_new_point_on_line (const Triangulation<2,3>::line_iterator &line) const
 {
 				   //Just get the average
   Point<2>  p0=get_surf_coord(line->vertex(0));
@@ -1337,7 +1337,7 @@ TorusBoundary<2,3>::get_new_point_on_line (const typename Triangulation<2,3>::li
 
 template <>
 Point<3>
-TorusBoundary<2,3>::get_new_point_on_quad (const typename Triangulation<2,3>::quad_iterator &quad) const
+TorusBoundary<2,3>::get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
 {
 				   //Just get the average
   Point<2> p[4];
@@ -1403,7 +1403,7 @@ TorusBoundary<2,3>::get_surf_norm(const Point<3>& p) const{
 template<>
 void
 TorusBoundary<2,3>::
-get_intermediate_points_on_line (const typename Triangulation<2, 3>::line_iterator &  line,
+get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator &  line,
 				 std::vector< Point< 3 > > & points) const
 {
 				   //Almost the same implementation as  StraightBoundary<2,3>
@@ -1451,7 +1451,7 @@ get_intermediate_points_on_line (const typename Triangulation<2, 3>::line_iterat
 template<>
 void
 TorusBoundary<2,3>::
-get_intermediate_points_on_quad (const typename Triangulation< 2, 3 >::quad_iterator &quad,
+get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &quad,
 				 std::vector< Point< 3 > > & points )const
 {
 				   //Almost the same implementation as  StraightBoundary<2,3>
@@ -1509,7 +1509,7 @@ get_intermediate_points_on_quad (const typename Triangulation< 2, 3 >::quad_iter
 template<>
 void
 TorusBoundary<2,3>::
-get_normals_at_vertices (const typename Triangulation<2,3 >::face_iterator &face,
+get_normals_at_vertices (const Triangulation<2,3 >::face_iterator &face,
 			 FaceVertexNormals &face_vertex_normals) const
 {
   for(unsigned i=0; i<GeometryInfo<2>::vertices_per_face; i++)
