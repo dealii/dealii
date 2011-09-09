@@ -768,15 +768,40 @@ namespace Step26
                                  // library.
 int main ()
 {
-  using namespace dealii;
-  using namespace Step26;
+  try
+    {
+      using namespace dealii;
+      using namespace Step26;
 
-  deallog.depth_console (0);
+      deallog.depth_console (0);
 
-  {
-    LaplaceProblem<3> laplace_problem_3d;
-    laplace_problem_3d.run ();
-  }
+      LaplaceProblem<3> laplace_problem_3d;
+      laplace_problem_3d.run ();
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+		<< exc.what() << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+		<< "Aborting!" << std::endl
+		<< "----------------------------------------------------"
+		<< std::endl;
+      return 1;
+    }
 
   return 0;
 }
