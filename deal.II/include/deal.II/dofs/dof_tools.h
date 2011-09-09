@@ -1156,6 +1156,10 @@ namespace DoFTools
 				   //@}
 
 				   /**
+				    * @name Parallelization and domain decomposition
+				    * @{
+				    */
+				   /**
 				    * Flag all those degrees of
 				    * freedom which are on cells
 				    * with the given subdomain
@@ -1250,77 +1254,6 @@ namespace DoFTools
   void
   extract_locally_relevant_dofs (const DH & dof_handler,
 				 IndexSet & dof_set);
-
-				   /**
-				    * Extract a vector that represents the
-				    * constant modes of the DoFHandler for
-				    * the components chosen by
-				    * <tt>component_select</tt>.  The
-				    * constant modes on a discretization are
-				    * the null space of a Laplace operator
-				    * on the selected components with
-				    * Neumann boundary conditions
-				    * applied. The null space is a necessary
-				    * ingredient for obtaining a good AMG
-				    * preconditioner when using the class
-				    * TrilinosWrappers::PreconditionAMG.
-				    * Since the ML AMG package only works on
-				    * algebraic properties of the respective
-				    * matrix, it has no chance to detect
-				    * whether the matrix comes from a scalar
-				    * or a vector valued problem. However, a
-				    * near null space supplies exactly the
-				    * needed information about these
-				    * components.  The null space will
-				    * consist of as many vectors as there
-				    * are true arguments in
-				    * <tt>component_select</tt>, each of
-				    * which will be one in one vector component and
-				    * zero in all others. We store this
-				    * object in a vector of vectors, where
-				    * the outer vector is of the size of the
-				    * number of selected components, and
-				    * each inner vector has as many
-				    * components as there are (locally owned) degrees of
-				    * freedom in the selected
-				    * components. Note that any matrix
-				    * associated with this null space must
-				    * have been constructed using the same
-				    * <tt>component_select</tt> argument,
-				    * since the numbering of DoFs is done
-				    * relative to the selected dofs, not to
-				    * all dofs.
-				    *
-				    * The main reason for this
-				    * program is the use of the
-				    * null space with the
-				    * AMG preconditioner.
-				    */
-  template <class DH>
-  void
-  extract_constant_modes (const DH                        &dof_handler,
-			  const std::vector<bool>         &component_select,
-			  std::vector<std::vector<bool> > &constant_modes);
-
-				   /**
-				    * For each active cell of a DoFHandler
-				    * or hp::DoFHandler, extract the active
-				    * finite element index and fill the
-				    * vector given as second argument. This
-				    * vector is assumed to have as many
-				    * entries as there are active cells.
-				    *
-				    * For non-hp DoFHandler objects given as
-				    * first argument, the returned vector
-				    * will consist of only zeros, indicating
-				    * that all cells use the same finite
-				    * element. For a hp::DoFHandler, the
-				    * values may be different, though.
-				    */
-  template <class DH>
-  void
-  get_active_fe_indices (const DH                  &dof_handler,
-			 std::vector<unsigned int> &active_fe_indices);
 
 				   /**
 				    * For each DoF, return in the output
@@ -1502,6 +1435,79 @@ namespace DoFTools
   IndexSet
   dof_indices_with_subdomain_association (const DH           &dof_handler,
 					  const types::subdomain_id_t subdomain);
+
+				   // @}
+
+				   /**
+				    * Extract a vector that represents the
+				    * constant modes of the DoFHandler for
+				    * the components chosen by
+				    * <tt>component_select</tt>.  The
+				    * constant modes on a discretization are
+				    * the null space of a Laplace operator
+				    * on the selected components with
+				    * Neumann boundary conditions
+				    * applied. The null space is a necessary
+				    * ingredient for obtaining a good AMG
+				    * preconditioner when using the class
+				    * TrilinosWrappers::PreconditionAMG.
+				    * Since the ML AMG package only works on
+				    * algebraic properties of the respective
+				    * matrix, it has no chance to detect
+				    * whether the matrix comes from a scalar
+				    * or a vector valued problem. However, a
+				    * near null space supplies exactly the
+				    * needed information about these
+				    * components.  The null space will
+				    * consist of as many vectors as there
+				    * are true arguments in
+				    * <tt>component_select</tt>, each of
+				    * which will be one in one vector component and
+				    * zero in all others. We store this
+				    * object in a vector of vectors, where
+				    * the outer vector is of the size of the
+				    * number of selected components, and
+				    * each inner vector has as many
+				    * components as there are (locally owned) degrees of
+				    * freedom in the selected
+				    * components. Note that any matrix
+				    * associated with this null space must
+				    * have been constructed using the same
+				    * <tt>component_select</tt> argument,
+				    * since the numbering of DoFs is done
+				    * relative to the selected dofs, not to
+				    * all dofs.
+				    *
+				    * The main reason for this
+				    * program is the use of the
+				    * null space with the
+				    * AMG preconditioner.
+				    */
+  template <class DH>
+  void
+  extract_constant_modes (const DH                        &dof_handler,
+			  const std::vector<bool>         &component_select,
+			  std::vector<std::vector<bool> > &constant_modes);
+
+				   /**
+				    * For each active cell of a DoFHandler
+				    * or hp::DoFHandler, extract the active
+				    * finite element index and fill the
+				    * vector given as second argument. This
+				    * vector is assumed to have as many
+				    * entries as there are active cells.
+				    *
+				    * For non-hp DoFHandler objects given as
+				    * first argument, the returned vector
+				    * will consist of only zeros, indicating
+				    * that all cells use the same finite
+				    * element. For a hp::DoFHandler, the
+				    * values may be different, though.
+				    */
+  template <class DH>
+  void
+  get_active_fe_indices (const DH                  &dof_handler,
+			 std::vector<unsigned int> &active_fe_indices);
 
 				   /**
 				    * Count how many degrees of
