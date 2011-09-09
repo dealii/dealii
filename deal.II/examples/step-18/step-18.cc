@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors */
+/*    Copyright (C) 2000, 2004, 2005, 2006, 2007, 2008, 2009, 2011 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -69,17 +69,9 @@
 
 				 // The last step is as in all
 				 // previous programs:
-using namespace dealii;
-
-				 // So much for the header files. As a
-				 // matter of good practice, I have
-				 // started to put everything that
-				 // corresponds to a certain project
-				 // into a namespace of its own, named
-				 // after the problem that we are
-				 // solving:
-namespace QuasiStaticElasticity
+namespace Step18
 {
+  using namespace dealii;
 
 				   // @sect3{The <code>PointHistory</code> class}
 
@@ -116,20 +108,20 @@ namespace QuasiStaticElasticity
   };
 
 
-                                   // @sect3{The stress-strain tensor}
+				   // @sect3{The stress-strain tensor}
 
-                                   // Next, we define the linear relationship
-                                   // between the stress and the strain in
-                                   // elasticity. It is given by a tensor of
-                                   // rank 4 that is usually written in the
-                                   // form $C_{ijkl} = \mu (\delta_{ik}
-                                   // \delta_{jl} + \delta_{il} \delta_{jk}) +
-                                   // \lambda \delta_{ij} \delta_{kl}$. This
-                                   // tensor maps symmetric tensor of rank 2
-                                   // to symmetric tensors of rank 2. A
-                                   // function implementing its creation for
-                                   // given values of the Lame constants
-                                   // lambda and mu is straightforward:
+				   // Next, we define the linear relationship
+				   // between the stress and the strain in
+				   // elasticity. It is given by a tensor of
+				   // rank 4 that is usually written in the
+				   // form $C_{ijkl} = \mu (\delta_{ik}
+				   // \delta_{jl} + \delta_{il} \delta_{jk}) +
+				   // \lambda \delta_{ij} \delta_{kl}$. This
+				   // tensor maps symmetric tensor of rank 2
+				   // to symmetric tensors of rank 2. A
+				   // function implementing its creation for
+				   // given values of the Lame constants
+				   // lambda and mu is straightforward:
   template <int dim>
   SymmetricTensor<4,dim>
   get_stress_strain_tensor (const double lambda, const double mu)
@@ -137,42 +129,42 @@ namespace QuasiStaticElasticity
     SymmetricTensor<4,dim> tmp;
     for (unsigned int i=0; i<dim; ++i)
       for (unsigned int j=0; j<dim; ++j)
-        for (unsigned int k=0; k<dim; ++k)
-          for (unsigned int l=0; l<dim; ++l)
-            tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0.0) +
-                               ((i==l) && (j==k) ? mu : 0.0) +
-                               ((i==j) && (k==l) ? lambda : 0.0));
+	for (unsigned int k=0; k<dim; ++k)
+	  for (unsigned int l=0; l<dim; ++l)
+	    tmp[i][j][k][l] = (((i==k) && (j==l) ? mu : 0.0) +
+			       ((i==l) && (j==k) ? mu : 0.0) +
+			       ((i==j) && (k==l) ? lambda : 0.0));
     return tmp;
   }
 
-                                   // With this function, we will
-                                   // define a static member variable
-                                   // of the main class below that
-                                   // will be used throughout the
-                                   // program as the stress-strain
-                                   // tensor. Note that
-                                   // in more elaborate programs, this will
-                                   // probably be a member variable of some
-                                   // class instead, or a function that
-                                   // returns the stress-strain relationship
-                                   // depending on other input. For example in
-                                   // damage theory models, the Lame constants
-                                   // are considered a function of the prior
-                                   // stress/strain history of a
-                                   // point. Conversely, in plasticity the
-                                   // form of the stress-strain tensor is
-                                   // modified if the material has reached the
-                                   // yield stress in a certain point, and
-                                   // possibly also depending on its prior
-                                   // history.
-                                   //
-                                   // In the present program, however, we
-                                   // assume that the material is completely
-                                   // elastic and linear, and a constant
-                                   // stress-strain tensor is sufficient for
-                                   // our present purposes.
+				   // With this function, we will
+				   // define a static member variable
+				   // of the main class below that
+				   // will be used throughout the
+				   // program as the stress-strain
+				   // tensor. Note that
+				   // in more elaborate programs, this will
+				   // probably be a member variable of some
+				   // class instead, or a function that
+				   // returns the stress-strain relationship
+				   // depending on other input. For example in
+				   // damage theory models, the Lame constants
+				   // are considered a function of the prior
+				   // stress/strain history of a
+				   // point. Conversely, in plasticity the
+				   // form of the stress-strain tensor is
+				   // modified if the material has reached the
+				   // yield stress in a certain point, and
+				   // possibly also depending on its prior
+				   // history.
+				   //
+				   // In the present program, however, we
+				   // assume that the material is completely
+				   // elastic and linear, and a constant
+				   // stress-strain tensor is sufficient for
+				   // our present purposes.
 
-  
+
 
 				   // @sect3{Auxiliary functions}
 
@@ -286,9 +278,9 @@ namespace QuasiStaticElasticity
     for (unsigned int i=0; i<dim; ++i)
       for (unsigned int j=i+1; j<dim; ++j)
 	tmp[i][j]
-          = (fe_values.shape_grad_component (shape_func,q_point,i)[j] +
-             fe_values.shape_grad_component (shape_func,q_point,j)[i]) / 2;
-  
+	  = (fe_values.shape_grad_component (shape_func,q_point,i)[j] +
+	     fe_values.shape_grad_component (shape_func,q_point,j)[i]) / 2;
+
     return tmp;
   }
 
@@ -345,47 +337,47 @@ namespace QuasiStaticElasticity
     SymmetricTensor<2,dim> strain;
     for (unsigned int i=0; i<dim; ++i)
       strain[i][i] = grad[i][i];
-    
+
     for (unsigned int i=0; i<dim; ++i)
       for (unsigned int j=i+1; j<dim; ++j)
 	strain[i][j] = (grad[i][j] + grad[j][i]) / 2;
-    
+
     return strain;
   }
 
 
-                                   // Finally, below we will need a function
-                                   // that computes the rotation matrix
-                                   // induced by a displacement at a given
-                                   // point. In fact, of course, the
-                                   // displacement at a single point only has
-                                   // a direction and a magnitude, it is the
-                                   // change in direction and magnitude that
-                                   // induces rotations. In effect, the
-                                   // rotation matrix can be computed from the
-                                   // gradients of a displacement, or, more
-                                   // specifically, from the curl.
-                                   //
-                                   // The formulas by which the rotation
-                                   // matrices are determined are a little
-                                   // awkward, especially in 3d. For 2d, there
-                                   // is a simpler way, so we implement this
-                                   // function twice, once for 2d and once for
-                                   // 3d, so that we can compile and use the
-                                   // program in both space dimensions if so
-                                   // desired -- after all, deal.II is all
-                                   // about dimension independent programming
-                                   // and reuse of algorithm thoroughly tested
-                                   // with cheap computations in 2d, for the
-                                   // more expensive computations in 3d. Here
-                                   // is one case, where we have to implement
-                                   // different algorithms for 2d and 3d, but
-                                   // then can write the rest of the program
-                                   // in a way that is independent of the
-                                   // space dimension.
-                                   //
-                                   // So, without further ado to the 2d
-                                   // implementation:
+				   // Finally, below we will need a function
+				   // that computes the rotation matrix
+				   // induced by a displacement at a given
+				   // point. In fact, of course, the
+				   // displacement at a single point only has
+				   // a direction and a magnitude, it is the
+				   // change in direction and magnitude that
+				   // induces rotations. In effect, the
+				   // rotation matrix can be computed from the
+				   // gradients of a displacement, or, more
+				   // specifically, from the curl.
+				   //
+				   // The formulas by which the rotation
+				   // matrices are determined are a little
+				   // awkward, especially in 3d. For 2d, there
+				   // is a simpler way, so we implement this
+				   // function twice, once for 2d and once for
+				   // 3d, so that we can compile and use the
+				   // program in both space dimensions if so
+				   // desired -- after all, deal.II is all
+				   // about dimension independent programming
+				   // and reuse of algorithm thoroughly tested
+				   // with cheap computations in 2d, for the
+				   // more expensive computations in 3d. Here
+				   // is one case, where we have to implement
+				   // different algorithms for 2d and 3d, but
+				   // then can write the rest of the program
+				   // in a way that is independent of the
+				   // space dimension.
+				   //
+				   // So, without further ado to the 2d
+				   // implementation:
   Tensor<2,2>
   get_rotation_matrix (const std::vector<Tensor<1,2> > &grad_u)
   {
@@ -394,20 +386,20 @@ namespace QuasiStaticElasticity
 				     // gradients. Note that we are in 2d, so
 				     // the rotation is a scalar:
     const double curl = (grad_u[1][0] - grad_u[0][1]);
-    
+
 				     // From this, compute the angle of
 				     // rotation:
     const double angle = std::atan (curl);
 
-                                     // And from this, build the antisymmetric
-                                     // rotation matrix:
+				     // And from this, build the antisymmetric
+				     // rotation matrix:
     const double t[2][2] = {{ cos(angle), sin(angle) },
 			    {-sin(angle), cos(angle) }};
     return Tensor<2,2>(t);
   }
 
 
-                                   // The 3d case is a little more contrived:
+				   // The 3d case is a little more contrived:
   Tensor<2,3>
   get_rotation_matrix (const std::vector<Tensor<1,3> > &grad_u)
   {
@@ -415,9 +407,9 @@ namespace QuasiStaticElasticity
 				     // velocity field. This time, it is a
 				     // real vector:
     const Point<3> curl (grad_u[2][1] - grad_u[1][2],
-                         grad_u[0][2] - grad_u[2][0],
-                         grad_u[1][0] - grad_u[0][1]);
-    
+			 grad_u[0][2] - grad_u[2][0],
+			 grad_u[1][0] - grad_u[0][1]);
+
 				     // From this vector, using its magnitude,
 				     // compute the tangent of the angle of
 				     // rotation, and from it the actual
@@ -425,42 +417,42 @@ namespace QuasiStaticElasticity
     const double tan_angle = std::sqrt(curl*curl);
     const double angle = std::atan (tan_angle);
 
-                                     // Now, here's one problem: if the angle
-                                     // of rotation is too small, that means
-                                     // that there is no rotation going on
-                                     // (for example a translational
-                                     // motion). In that case, the rotation
-                                     // matrix is the identity matrix.
-                                     //
-                                     // The reason why we stress that is that
-                                     // in this case we have that
-                                     // <code>tan_angle==0</code>. Further down, we
-                                     // need to divide by that number in the
-                                     // computation of the axis of rotation,
-                                     // and we would get into trouble when
-                                     // dividing doing so. Therefore, let's
-                                     // shortcut this and simply return the
-                                     // identity matrix if the angle of
-                                     // rotation is really small:
+				     // Now, here's one problem: if the angle
+				     // of rotation is too small, that means
+				     // that there is no rotation going on
+				     // (for example a translational
+				     // motion). In that case, the rotation
+				     // matrix is the identity matrix.
+				     //
+				     // The reason why we stress that is that
+				     // in this case we have that
+				     // <code>tan_angle==0</code>. Further down, we
+				     // need to divide by that number in the
+				     // computation of the axis of rotation,
+				     // and we would get into trouble when
+				     // dividing doing so. Therefore, let's
+				     // shortcut this and simply return the
+				     // identity matrix if the angle of
+				     // rotation is really small:
     if (angle < 1e-9)
       {
-        static const double rotation[3][3]
-          = {{ 1, 0, 0}, { 0, 1, 0 }, { 0, 0, 1 } };
-        static const Tensor<2,3> rot(rotation);
-        return rot;
+	static const double rotation[3][3]
+	  = {{ 1, 0, 0}, { 0, 1, 0 }, { 0, 0, 1 } };
+	static const Tensor<2,3> rot(rotation);
+	return rot;
       }
 
-                                     // Otherwise compute the real rotation
-                                     // matrix. The algorithm for this is not
-                                     // exactly obvious, but can be found in a
-                                     // number of books, particularly on
-                                     // computer games where rotation is a
-                                     // very frequent operation. Online, you
-                                     // can find a description at
-                                     // http://www.makegames.com/3drotation/
-                                     // and (this particular form, with the
-                                     // signs as here) at
-                                     // http://www.gamedev.net/reference/articles/article1199.asp:
+				     // Otherwise compute the real rotation
+				     // matrix. The algorithm for this is not
+				     // exactly obvious, but can be found in a
+				     // number of books, particularly on
+				     // computer games where rotation is a
+				     // very frequent operation. Online, you
+				     // can find a description at
+				     // http://www.makegames.com/3drotation/
+				     // and (this particular form, with the
+				     // signs as here) at
+				     // http://www.gamedev.net/reference/articles/article1199.asp:
     const double c = std::cos(angle);
     const double s = std::sin(angle);
     const double t = 1-c;
@@ -468,50 +460,50 @@ namespace QuasiStaticElasticity
     const Point<3> axis = curl/tan_angle;
     const double rotation[3][3]
       = {{ t*axis[0]*axis[0]+c,
-           t*axis[0]*axis[1]+s*axis[2],
-           t*axis[0]*axis[2]-s*axis[1]},
-         { t*axis[0]*axis[1]-s*axis[2],
-           t*axis[1]*axis[1]+c,
-           t*axis[1]*axis[2]+s*axis[0]},
-         { t*axis[0]*axis[2]+s*axis[1],
-           t*axis[1]*axis[1]-s*axis[0],
-           t*axis[2]*axis[2]+c  } };
+	   t*axis[0]*axis[1]+s*axis[2],
+	   t*axis[0]*axis[2]-s*axis[1]},
+	 { t*axis[0]*axis[1]-s*axis[2],
+	   t*axis[1]*axis[1]+c,
+	   t*axis[1]*axis[2]+s*axis[0]},
+	 { t*axis[0]*axis[2]+s*axis[1],
+	   t*axis[1]*axis[1]-s*axis[0],
+	   t*axis[2]*axis[2]+c  } };
     return Tensor<2,3>(rotation);
   }
-  
+
 
 
 				   // @sect3{The <code>TopLevel</code> class}
-  
+
 				   // This is the main class of the
 				   // program. Since the namespace already
 				   // indicates what problem we are solving,
 				   // let's call it by what it does: it
 				   // directs the flow of the program, i.e. it
 				   // is the toplevel driver.
-                                   //
-                                   // The member variables of this class are
-                                   // essentially as before, i.e. it has to
-                                   // have a triangulation, a DoF handler and
-                                   // associated objects such as constraints,
-                                   // variables that describe the linear
-                                   // system, etc. There are a good number of
-                                   // more member functions now, which we will
-                                   // explain below.
-                                   //
-                                   // The external interface of the class,
-                                   // however, is unchanged: it has a public
-                                   // constructor and desctructor, and it has
-                                   // a <code>run</code> function that initiated all
-                                   // the work.
+				   //
+				   // The member variables of this class are
+				   // essentially as before, i.e. it has to
+				   // have a triangulation, a DoF handler and
+				   // associated objects such as constraints,
+				   // variables that describe the linear
+				   // system, etc. There are a good number of
+				   // more member functions now, which we will
+				   // explain below.
+				   //
+				   // The external interface of the class,
+				   // however, is unchanged: it has a public
+				   // constructor and desctructor, and it has
+				   // a <code>run</code> function that initiated all
+				   // the work.
   template <int dim>
-  class TopLevel 
+  class TopLevel
   {
     public:
       TopLevel ();
       ~TopLevel ();
       void run ();
-    
+
     private:
 				       // The private interface is more
 				       // extensive than in step-17. First, we
@@ -530,29 +522,29 @@ namespace QuasiStaticElasticity
 				       // output the solution vector on the
 				       // currect mesh:
       void create_coarse_grid ();
-    
+
       void setup_system ();
-      
+
       void assemble_system ();
-      
+
       void solve_timestep ();
 
       unsigned int solve_linear_problem ();
 
       void output_results () const;
 
-                                       // All, except for the first two, of
-                                       // these functions are called in each
-                                       // timestep. Since the first time step
-                                       // is a little special, we have
-                                       // separate functions that describe
-                                       // what has to happen in a timestep:
-                                       // one for the first, and one for all
-                                       // following timesteps:
+				       // All, except for the first two, of
+				       // these functions are called in each
+				       // timestep. Since the first time step
+				       // is a little special, we have
+				       // separate functions that describe
+				       // what has to happen in a timestep:
+				       // one for the first, and one for all
+				       // following timesteps:
       void do_initial_timestep ();
 
       void do_timestep ();
-      
+
 				       // Then we need a whole bunch of
 				       // functions that do various
 				       // things. The first one refines the
@@ -572,12 +564,12 @@ namespace QuasiStaticElasticity
 				       // each quadrature point.
       void refine_initial_grid ();
 
-                                       // At the end of each time step, we
-                                       // want to move the mesh vertices
-                                       // around according to the incremental
-                                       // displacement computed in this time
-                                       // step. This is the function in which
-                                       // this is done:
+				       // At the end of each time step, we
+				       // want to move the mesh vertices
+				       // around according to the incremental
+				       // displacement computed in this time
+				       // step. This is the function in which
+				       // this is done:
       void move_mesh ();
 
 				       // Next are two functions that handle
@@ -596,10 +588,10 @@ namespace QuasiStaticElasticity
 				       // timestep:
       void update_quadrature_point_history ();
 
-                                       // After the member functions, here are
-                                       // the member variables. The first ones
-                                       // have all been discussed in more
-                                       // detail in previous example programs:
+				       // After the member functions, here are
+				       // the member variables. The first ones
+				       // have all been discussed in more
+				       // detail in previous example programs:
       Triangulation<dim>   triangulation;
 
       FESystem<dim>        fe;
@@ -636,98 +628,98 @@ namespace QuasiStaticElasticity
 				       // processors).
       std::vector<PointHistory<dim> > quadrature_point_history;
 
-                                       // The way this object is accessed is
-                                       // through a <code>user pointer</code> that each
-                                       // cell, face, or edge holds: it is a
-                                       // <code>void*</code> pointer that can be used
-                                       // by application programs to associate
-                                       // arbitrary data to cells, faces, or
-                                       // edges. What the program actually
-                                       // does with this data is within its
-                                       // own responsibility, the library just
-                                       // allocates some space for these
-                                       // pointers, and application programs
-                                       // can set and read the pointers for
-                                       // each of these objects.
-    
+				       // The way this object is accessed is
+				       // through a <code>user pointer</code> that each
+				       // cell, face, or edge holds: it is a
+				       // <code>void*</code> pointer that can be used
+				       // by application programs to associate
+				       // arbitrary data to cells, faces, or
+				       // edges. What the program actually
+				       // does with this data is within its
+				       // own responsibility, the library just
+				       // allocates some space for these
+				       // pointers, and application programs
+				       // can set and read the pointers for
+				       // each of these objects.
 
-                                       // Further: we need the objects of
-                                       // linear systems to be solved,
-                                       // i.e. matrix, right hand side vector,
-                                       // and the solution vector. Since we
-                                       // anticipate solving big problems, we
-                                       // use the same types as in step-17,
-                                       // i.e. distributed %parallel matrices
-                                       // and vectors built on top of the
-                                       // PETSc library. Conveniently, they
-                                       // can also be used when running on
-                                       // only a single machine, in which case
-                                       // this machine happens to be the only
-                                       // one in our %parallel universe.
-                                       //
-                                       // However, as a difference to step-17,
-                                       // we do not store the solution vector
-                                       // -- which here is the incremental
-                                       // displacements computed in each time
-                                       // step -- in a distributed
-                                       // fashion. I.e., of course it must be
-                                       // a distributed vector when computing
-                                       // it, but immediately after that we
-                                       // make sure each processor has a
-                                       // complete copy. The reason is that we
-                                       // had already seen in step-17 that
-                                       // many functions needed a complete
-                                       // copy. While it is not hard to get
-                                       // it, this requires communication on
-                                       // the network, and is thus slow. In
-                                       // addition, these were repeatedly the
-                                       // same operations, which is certainly
-                                       // undesirable unless the gains of not
-                                       // always having to store the entire
-                                       // vector outweighs it. When writing
-                                       // this program, it turned out that we
-                                       // need a complete copy of the solution
-                                       // in so many places that it did not
-                                       // seem worthwhile to only get it when
-                                       // necessary. Instead, we opted to
-                                       // obtain the complete copy once and
-                                       // for all, and instead get rid of the
-                                       // distributed copy immediately. Thus,
-                                       // note that the declaration of
-                                       // <code>inremental_displacement</code> does not
-                                       // denote a distribute vector as would
-                                       // be indicated by the middle namespace
-                                       // <code>MPI</code>:
+
+				       // Further: we need the objects of
+				       // linear systems to be solved,
+				       // i.e. matrix, right hand side vector,
+				       // and the solution vector. Since we
+				       // anticipate solving big problems, we
+				       // use the same types as in step-17,
+				       // i.e. distributed %parallel matrices
+				       // and vectors built on top of the
+				       // PETSc library. Conveniently, they
+				       // can also be used when running on
+				       // only a single machine, in which case
+				       // this machine happens to be the only
+				       // one in our %parallel universe.
+				       //
+				       // However, as a difference to step-17,
+				       // we do not store the solution vector
+				       // -- which here is the incremental
+				       // displacements computed in each time
+				       // step -- in a distributed
+				       // fashion. I.e., of course it must be
+				       // a distributed vector when computing
+				       // it, but immediately after that we
+				       // make sure each processor has a
+				       // complete copy. The reason is that we
+				       // had already seen in step-17 that
+				       // many functions needed a complete
+				       // copy. While it is not hard to get
+				       // it, this requires communication on
+				       // the network, and is thus slow. In
+				       // addition, these were repeatedly the
+				       // same operations, which is certainly
+				       // undesirable unless the gains of not
+				       // always having to store the entire
+				       // vector outweighs it. When writing
+				       // this program, it turned out that we
+				       // need a complete copy of the solution
+				       // in so many places that it did not
+				       // seem worthwhile to only get it when
+				       // necessary. Instead, we opted to
+				       // obtain the complete copy once and
+				       // for all, and instead get rid of the
+				       // distributed copy immediately. Thus,
+				       // note that the declaration of
+				       // <code>inremental_displacement</code> does not
+				       // denote a distribute vector as would
+				       // be indicated by the middle namespace
+				       // <code>MPI</code>:
       PETScWrappers::MPI::SparseMatrix system_matrix;
 
       PETScWrappers::MPI::Vector       system_rhs;
 
       PETScWrappers::Vector            incremental_displacement;
 
-                                       // The next block of variables is then
-                                       // related to the time dependent nature
-                                       // of the problem: they denote the
-                                       // length of the time interval which we
-                                       // want to simulate, the present time
-                                       // and number of time step, and length
-                                       // of present timestep:
+				       // The next block of variables is then
+				       // related to the time dependent nature
+				       // of the problem: they denote the
+				       // length of the time interval which we
+				       // want to simulate, the present time
+				       // and number of time step, and length
+				       // of present timestep:
       double       present_time;
       double       present_timestep;
       double       end_time;
       unsigned int timestep_no;
 
-                                       // Then a few variables that have to do
-                                       // with %parallel processing: first, a
-                                       // variable denoting the MPI
-                                       // communicator we use, and then two
-                                       // numbers telling us how many
-                                       // participating processors there are,
-                                       // and where in this world we
-                                       // are. Finally, a stream object that
-                                       // makes sure only one processor is
-                                       // actually generating output to the
-                                       // console. This is all the same as in
-                                       // step-17:
+				       // Then a few variables that have to do
+				       // with %parallel processing: first, a
+				       // variable denoting the MPI
+				       // communicator we use, and then two
+				       // numbers telling us how many
+				       // participating processors there are,
+				       // and where in this world we
+				       // are. Finally, a stream object that
+				       // makes sure only one processor is
+				       // actually generating output to the
+				       // console. This is all the same as in
+				       // step-17:
       MPI_Comm mpi_communicator;
 
       const unsigned int n_mpi_processes;
@@ -736,13 +728,13 @@ namespace QuasiStaticElasticity
 
       ConditionalOStream pcout;
 
-                                       // Here is a vector where each entry
-                                       // denotes the numbers of degrees of
-                                       // freedom that are stored on the
-                                       // processor with that particular
-                                       // number:
+				       // Here is a vector where each entry
+				       // denotes the numbers of degrees of
+				       // freedom that are stored on the
+				       // processor with that particular
+				       // number:
       std::vector<unsigned int> local_dofs_per_process;
-    
+
 				       // Next, how many degrees of freedom
 				       // the present processor stores. This
 				       // is, of course, an abbreviation to
@@ -777,8 +769,8 @@ namespace QuasiStaticElasticity
   };
 
 
-                                   // @sect3{The <code>BodyForce</code> class}
-  
+				   // @sect3{The <code>BodyForce</code> class}
+
 				   // Before we go on to the main
 				   // functionality of this program, we have
 				   // to define what forces will act on the
@@ -808,39 +800,39 @@ namespace QuasiStaticElasticity
 				   // in the function, and we take as the
 				   // density 7700 kg/m^3, a value commonly
 				   // assumed for steel.
-                                   //
-                                   // To be a little more general and to be
-                                   // able to do computations in 2d as well,
-                                   // we realize that the body force is always
-                                   // a function returning a <code>dim</code>
-                                   // dimensional vector. We assume that
-                                   // gravity acts along the negative
-                                   // direction of the last, i.e. <code>dim-1</code>th
-                                   // coordinate. The rest of the
-                                   // implementation of this function should
-                                   // be mostly self-explanatory given similar
-                                   // definitions in previous example
-                                   // programs. Note that the body force is
-                                   // independent of the location; to avoid
-                                   // compiler warnings about unused function
-                                   // arguments, we therefore comment out the
-                                   // name of the first argument of the
-                                   // <code>vector_value</code> function:
+				   //
+				   // To be a little more general and to be
+				   // able to do computations in 2d as well,
+				   // we realize that the body force is always
+				   // a function returning a <code>dim</code>
+				   // dimensional vector. We assume that
+				   // gravity acts along the negative
+				   // direction of the last, i.e. <code>dim-1</code>th
+				   // coordinate. The rest of the
+				   // implementation of this function should
+				   // be mostly self-explanatory given similar
+				   // definitions in previous example
+				   // programs. Note that the body force is
+				   // independent of the location; to avoid
+				   // compiler warnings about unused function
+				   // arguments, we therefore comment out the
+				   // name of the first argument of the
+				   // <code>vector_value</code> function:
   template <int dim>
-  class BodyForce :  public Function<dim> 
+  class BodyForce :  public Function<dim>
   {
     public:
       BodyForce ();
-    
+
       virtual
       void
       vector_value (const Point<dim> &p,
-                    Vector<double>   &values) const;
+		    Vector<double>   &values) const;
 
       virtual
       void
       vector_value_list (const std::vector<Point<dim> > &points,
-                         std::vector<Vector<double> >   &value_list) const;
+			 std::vector<Vector<double> >   &value_list) const;
   };
 
 
@@ -855,14 +847,14 @@ namespace QuasiStaticElasticity
   inline
   void
   BodyForce<dim>::vector_value (const Point<dim> &/*p*/,
-                                Vector<double>   &values) const 
+				Vector<double>   &values) const
   {
-    Assert (values.size() == dim, 
+    Assert (values.size() == dim,
 	    ExcDimensionMismatch (values.size(), dim));
 
     const double g   = 9.81;
     const double rho = 7700;
-    
+
     values = 0;
     values(dim-1) = -rho * g;
   }
@@ -872,86 +864,86 @@ namespace QuasiStaticElasticity
   template <int dim>
   void
   BodyForce<dim>::vector_value_list (const std::vector<Point<dim> > &points,
-                                     std::vector<Vector<double> >   &value_list) const 
+				     std::vector<Vector<double> >   &value_list) const
   {
     const unsigned int n_points = points.size();
 
-    Assert (value_list.size() == n_points, 
+    Assert (value_list.size() == n_points,
 	    ExcDimensionMismatch (value_list.size(), n_points));
 
     for (unsigned int p=0; p<n_points; ++p)
       BodyForce<dim>::vector_value (points[p],
-                                    value_list[p]);
+				    value_list[p]);
   }
 
 
 
-                                   // @sect3{The <code>IncrementalBoundaryValue</code> class}
+				   // @sect3{The <code>IncrementalBoundaryValue</code> class}
 
-                                   // In addition to body forces, movement can
-                                   // be induced by boundary forces and forced
-                                   // boundary displacement. The latter case
-                                   // is equivalent to forces being chosen in
-                                   // such a way that they induce certain
-                                   // displacement.
-                                   //
-                                   // For quasistatic displacement, typical
-                                   // boundary forces would be pressure on a
-                                   // body, or tangential friction against
-                                   // another body. We chose a somewhat
-                                   // simpler case here: we prescribe a
-                                   // certain movement of (parts of) the
-                                   // boundary, or at least of certain
-                                   // components of the displacement
-                                   // vector. We describe this by another
-                                   // vector-valued function that, for a given
-                                   // point on the boundary, returns the
-                                   // prescribed displacement.
-                                   //
-                                   // Since we have a time-dependent problem,
-                                   // the displacement increment of the
-                                   // boundary equals the displacement
-                                   // accumulated during the length of the
-                                   // timestep. The class therefore has to
-                                   // know both the present time and the
-                                   // length of the present time step, and can
-                                   // then approximate the incremental
-                                   // displacement as the present velocity
-                                   // times the present timestep.
-                                   //
-                                   // For the purposes of this
-                                   // program, we choose a simple form
-                                   // of boundary displacement: we
-                                   // displace the top boundary with
-                                   // constant velocity downwards. The
-                                   // rest of the boundary is either
-                                   // going to be fixed (and is then
-                                   // described using an object of
-                                   // type <code>ZeroFunction</code>) or free
-                                   // (Neumann-type, in which case
-                                   // nothing special has to be done).
-                                   // The implementation of the
-                                   // class describing the constant
-                                   // downward motion should then be
-                                   // obvious using the knowledge we
-                                   // gained through all the previous
-                                   // example programs:
+				   // In addition to body forces, movement can
+				   // be induced by boundary forces and forced
+				   // boundary displacement. The latter case
+				   // is equivalent to forces being chosen in
+				   // such a way that they induce certain
+				   // displacement.
+				   //
+				   // For quasistatic displacement, typical
+				   // boundary forces would be pressure on a
+				   // body, or tangential friction against
+				   // another body. We chose a somewhat
+				   // simpler case here: we prescribe a
+				   // certain movement of (parts of) the
+				   // boundary, or at least of certain
+				   // components of the displacement
+				   // vector. We describe this by another
+				   // vector-valued function that, for a given
+				   // point on the boundary, returns the
+				   // prescribed displacement.
+				   //
+				   // Since we have a time-dependent problem,
+				   // the displacement increment of the
+				   // boundary equals the displacement
+				   // accumulated during the length of the
+				   // timestep. The class therefore has to
+				   // know both the present time and the
+				   // length of the present time step, and can
+				   // then approximate the incremental
+				   // displacement as the present velocity
+				   // times the present timestep.
+				   //
+				   // For the purposes of this
+				   // program, we choose a simple form
+				   // of boundary displacement: we
+				   // displace the top boundary with
+				   // constant velocity downwards. The
+				   // rest of the boundary is either
+				   // going to be fixed (and is then
+				   // described using an object of
+				   // type <code>ZeroFunction</code>) or free
+				   // (Neumann-type, in which case
+				   // nothing special has to be done).
+				   // The implementation of the
+				   // class describing the constant
+				   // downward motion should then be
+				   // obvious using the knowledge we
+				   // gained through all the previous
+				   // example programs:
   template <int dim>
-  class IncrementalBoundaryValues :  public Function<dim> 
+  class IncrementalBoundaryValues :  public Function<dim>
   {
     public:
       IncrementalBoundaryValues (const double present_time,
-                                 const double present_timestep);
-    
+				 const double present_timestep);
+
       virtual
       void
       vector_value (const Point<dim> &p,
-                    Vector<double>   &values) const;
+		    Vector<double>   &values) const;
 
       virtual
       void
       vector_value_list (const std::vector<Point<dim> > &points,
-                         std::vector<Vector<double> >   &value_list) const;
+			 std::vector<Vector<double> >   &value_list) const;
 
     private:
       const double velocity;
@@ -963,12 +955,12 @@ namespace QuasiStaticElasticity
   template <int dim>
   IncrementalBoundaryValues<dim>::
   IncrementalBoundaryValues (const double present_time,
-                             const double present_timestep)
+			     const double present_timestep)
 		  :
 		  Function<dim> (dim),
 		  velocity (.1),
 		  present_time (present_time),
-                  present_timestep (present_timestep)
+		  present_timestep (present_timestep)
   {}
 
 
@@ -976,9 +968,9 @@ namespace QuasiStaticElasticity
   void
   IncrementalBoundaryValues<dim>::
   vector_value (const Point<dim> &/*p*/,
-                Vector<double>   &values) const 
+		Vector<double>   &values) const
   {
-    Assert (values.size() == dim, 
+    Assert (values.size() == dim,
 	    ExcDimensionMismatch (values.size(), dim));
 
     values = 0;
@@ -991,11 +983,11 @@ namespace QuasiStaticElasticity
   void
   IncrementalBoundaryValues<dim>::
   vector_value_list (const std::vector<Point<dim> > &points,
-                     std::vector<Vector<double> >   &value_list) const 
+		     std::vector<Vector<double> >   &value_list) const
   {
     const unsigned int n_points = points.size();
 
-    Assert (value_list.size() == n_points, 
+    Assert (value_list.size() == n_points,
 	    ExcDimensionMismatch (value_list.size(), n_points));
 
     for (unsigned int p=0; p<n_points; ++p)
@@ -1005,10 +997,10 @@ namespace QuasiStaticElasticity
 
 
 
-                                   // @sect3{Implementation of the <code>TopLevel</code> class}
+				   // @sect3{Implementation of the <code>TopLevel</code> class}
 
-                                   // Now for the implementation of the main
-                                   // class. First, we initialize the
+				   // Now for the implementation of the main
+				   // class. First, we initialize the
 				   // stress-strain tensor, which we
 				   // have declared as a static const
 				   // variable. We chose Lame
@@ -1019,11 +1011,11 @@ namespace QuasiStaticElasticity
   TopLevel<dim>::stress_strain_tensor
   = get_stress_strain_tensor<dim> (/*lambda = */ 9.695e10,
 				   /*mu     = */ 7.617e10);
-  
 
 
-                                   // @sect4{The public interface}
-  
+
+				   // @sect4{The public interface}
+
 				   // The next step is the definition of
 				   // constructors and descructors. There are
 				   // no surprises here: we choose linear and
@@ -1048,32 +1040,32 @@ namespace QuasiStaticElasticity
 
 
   template <int dim>
-  TopLevel<dim>::~TopLevel () 
+  TopLevel<dim>::~TopLevel ()
   {
     dof_handler.clear ();
   }
 
-  
 
-                                   // The last of the public functions is the
-                                   // one that directs all the work,
-                                   // <code>run()</code>. It initializes the variables
-                                   // that describe where in time we presently
-                                   // are, then runs the first time step, then
-                                   // loops over all the other time
-                                   // steps. Note that for simplicity we use a
-                                   // fixed time step, whereas a more
-                                   // sophisticated program would of course
-                                   // have to choose it in some more
+
+				   // The last of the public functions is the
+				   // one that directs all the work,
+				   // <code>run()</code>. It initializes the variables
+				   // that describe where in time we presently
+				   // are, then runs the first time step, then
+				   // loops over all the other time
+				   // steps. Note that for simplicity we use a
+				   // fixed time step, whereas a more
+				   // sophisticated program would of course
+				   // have to choose it in some more
 				   // reasonable way adaptively:
   template <int dim>
-  void TopLevel<dim>::run () 
+  void TopLevel<dim>::run ()
   {
     present_time = 0;
     present_timestep = 1;
     end_time = 10;
     timestep_no = 0;
-  
+
     do_initial_timestep ();
 
     while (present_time < end_time)
@@ -1081,23 +1073,23 @@ namespace QuasiStaticElasticity
   }
 
 
-                                   // @sect4{TopLevel::create_coarse_grid}
+				   // @sect4{TopLevel::create_coarse_grid}
 
-                                   // The next function in the order
-                                   // in which they were declared
-                                   // above is the one that creates
-                                   // the coarse grid from which we
-                                   // start. For this example program,
-                                   // we want to compute the
-                                   // deformation of a cylinder under
-                                   // axial compression. The first
-                                   // step therefore is to generate a
-                                   // mesh for a cylinder of length 3
-                                   // and with inner and outer radii
-                                   // of 0.8 and 1,
-                                   // respectively. Fortunately, there
-                                   // is a library function for such a
-                                   // mesh.
+				   // The next function in the order
+				   // in which they were declared
+				   // above is the one that creates
+				   // the coarse grid from which we
+				   // start. For this example program,
+				   // we want to compute the
+				   // deformation of a cylinder under
+				   // axial compression. The first
+				   // step therefore is to generate a
+				   // mesh for a cylinder of length 3
+				   // and with inner and outer radii
+				   // of 0.8 and 1,
+				   // respectively. Fortunately, there
+				   // is a library function for such a
+				   // mesh.
 				   //
 				   // In a second step, we have to associated
 				   // boundary conditions with the upper and
@@ -1114,7 +1106,7 @@ namespace QuasiStaticElasticity
   void TopLevel<dim>::create_coarse_grid ()
   {
     const double inner_radius = 0.8,
-                 outer_radius = 1;
+		 outer_radius = 1;
     GridGenerator::cylinder_shell (triangulation,
 				   3, inner_radius, outer_radius);
     for (typename Triangulation<dim>::active_cell_iterator
@@ -1123,115 +1115,115 @@ namespace QuasiStaticElasticity
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	if (cell->face(f)->at_boundary())
 	  {
-            const Point<dim> face_center = cell->face(f)->center();
-            
+	    const Point<dim> face_center = cell->face(f)->center();
+
 	    if (face_center[2] == 0)
 	      cell->face(f)->set_boundary_indicator (0);
 	    else if (face_center[2] == 3)
 	      cell->face(f)->set_boundary_indicator (1);
 	    else if (std::sqrt(face_center[0]*face_center[0] +
-                               face_center[1]*face_center[1])
-                     <
-                     (inner_radius + outer_radius) / 2)
+			       face_center[1]*face_center[1])
+		     <
+		     (inner_radius + outer_radius) / 2)
 	      cell->face(f)->set_boundary_indicator (2);
-            else
-              cell->face(f)->set_boundary_indicator (3);
+	    else
+	      cell->face(f)->set_boundary_indicator (3);
 	  }
 
-                                     // In order to make sure that new
-                                     // vertices are placed correctly on mesh
-                                     // refinement, we have to associate
-                                     // objects describing those parts of the
-                                     // boundary that do not consist of
-                                     // straight parts. Corresponding to the
-                                     // cylinder shell generator function used
-                                     // above, there are classes that can be
-                                     // used to describe the geometry of
-                                     // cylinders. We need to use different
-                                     // objects for the inner and outer parts
-                                     // of the cylinder, with different radii;
-                                     // the second argument to the constructor
-                                     // indicates the axis around which the
-                                     // cylinder revolves -- in this case the
-                                     // z-axis. Note that the boundary objects
-                                     // need to live as long as the
-                                     // triangulation does; we can achieve
-                                     // this by making the objects static,
-                                     // which means that they live as long as
-                                     // the program runs:
+				     // In order to make sure that new
+				     // vertices are placed correctly on mesh
+				     // refinement, we have to associate
+				     // objects describing those parts of the
+				     // boundary that do not consist of
+				     // straight parts. Corresponding to the
+				     // cylinder shell generator function used
+				     // above, there are classes that can be
+				     // used to describe the geometry of
+				     // cylinders. We need to use different
+				     // objects for the inner and outer parts
+				     // of the cylinder, with different radii;
+				     // the second argument to the constructor
+				     // indicates the axis around which the
+				     // cylinder revolves -- in this case the
+				     // z-axis. Note that the boundary objects
+				     // need to live as long as the
+				     // triangulation does; we can achieve
+				     // this by making the objects static,
+				     // which means that they live as long as
+				     // the program runs:
     static const CylinderBoundary<dim> inner_cylinder (inner_radius, 2);
     static const CylinderBoundary<dim> outer_cylinder (outer_radius, 2);
-                                     // We then attach these two objects to
-                                     // the triangulation, and make them
-                                     // correspond to boundary indicators 2
-                                     // and 3:
+				     // We then attach these two objects to
+				     // the triangulation, and make them
+				     // correspond to boundary indicators 2
+				     // and 3:
     triangulation.set_boundary (2, inner_cylinder);
     triangulation.set_boundary (3, outer_cylinder);
 
-                                     // There's one more thing we have to take
-                                     // care of (we should have done so above
-                                     // already, but for didactic reasons it
-                                     // was more appropriate to handle it
-                                     // after discussing boundary
-                                     // objects). %Boundary indicators in
-                                     // deal.II, for mostly historic reasons,
-                                     // serve a dual purpose: they describe
-                                     // the type of a boundary for other
-                                     // places in a program where different
-                                     // boundary conditions are implemented;
-                                     // and they describe which boundary
-                                     // object (as the ones associated above)
-                                     // should be queried when new boundary
-                                     // points need to be placed upon mesh
-                                     // refinement. In the prefix to this
-                                     // function, we have discussed the
-                                     // boundary condition issue, and the
-                                     // boundary geometry issue was mentioned
-                                     // just above. But there is a case where
-                                     // we have to be careful with geometry:
-                                     // what happens if a cell is refined that
-                                     // has two faces with different boundary
-                                     // indicators? For example one at the
-                                     // edges of the cylinder? In that case,
-                                     // the library wouldn't know where to put
-                                     // new points in the middle of edges (one
-                                     // of the twelve lines of a
-                                     // hexahedron). In fact, the library
-                                     // doesn't even care about the boundary
-                                     // indicator of adjacent faces when
-                                     // refining edges: it considers the
-                                     // boundary indicators associated with
-                                     // the edges themselves. So what do we
-                                     // want to happen with the edges of the
-                                     // cylinder shell: they sit on both faces
-                                     // with boundary indicators 2 or 3 (inner
-                                     // or outer shell) and 0 or 1 (for which
-                                     // no boundary objects have been
-                                     // specified, and for which the library
-                                     // therefore assumes straight
-                                     // lines). Obviously, we want these lines
-                                     // to follow the curved shells, so we
-                                     // have to assign all edges along faces
-                                     // with boundary indicators 2 or 3 these
-                                     // same boundary indicators to make sure
-                                     // they are refined using the appropriate
-                                     // geometry objects. This is easily done:
+				     // There's one more thing we have to take
+				     // care of (we should have done so above
+				     // already, but for didactic reasons it
+				     // was more appropriate to handle it
+				     // after discussing boundary
+				     // objects). %Boundary indicators in
+				     // deal.II, for mostly historic reasons,
+				     // serve a dual purpose: they describe
+				     // the type of a boundary for other
+				     // places in a program where different
+				     // boundary conditions are implemented;
+				     // and they describe which boundary
+				     // object (as the ones associated above)
+				     // should be queried when new boundary
+				     // points need to be placed upon mesh
+				     // refinement. In the prefix to this
+				     // function, we have discussed the
+				     // boundary condition issue, and the
+				     // boundary geometry issue was mentioned
+				     // just above. But there is a case where
+				     // we have to be careful with geometry:
+				     // what happens if a cell is refined that
+				     // has two faces with different boundary
+				     // indicators? For example one at the
+				     // edges of the cylinder? In that case,
+				     // the library wouldn't know where to put
+				     // new points in the middle of edges (one
+				     // of the twelve lines of a
+				     // hexahedron). In fact, the library
+				     // doesn't even care about the boundary
+				     // indicator of adjacent faces when
+				     // refining edges: it considers the
+				     // boundary indicators associated with
+				     // the edges themselves. So what do we
+				     // want to happen with the edges of the
+				     // cylinder shell: they sit on both faces
+				     // with boundary indicators 2 or 3 (inner
+				     // or outer shell) and 0 or 1 (for which
+				     // no boundary objects have been
+				     // specified, and for which the library
+				     // therefore assumes straight
+				     // lines). Obviously, we want these lines
+				     // to follow the curved shells, so we
+				     // have to assign all edges along faces
+				     // with boundary indicators 2 or 3 these
+				     // same boundary indicators to make sure
+				     // they are refined using the appropriate
+				     // geometry objects. This is easily done:
     for (typename Triangulation<dim>::active_face_iterator
 	   face=triangulation.begin_active_face();
 	 face!=triangulation.end_face(); ++face)
       if (face->at_boundary())
-        if ((face->boundary_indicator() == 2)
-            ||
-            (face->boundary_indicator() == 3))
-          for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
-               ++edge)
-            face->line(edge)
-              ->set_boundary_indicator (face->boundary_indicator());
+	if ((face->boundary_indicator() == 2)
+	    ||
+	    (face->boundary_indicator() == 3))
+	  for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
+	       ++edge)
+	    face->line(edge)
+	      ->set_boundary_indicator (face->boundary_indicator());
 
-                                     // Once all this is done, we can refine
-                                     // the mesh once globally:
+				     // Once all this is done, we can refine
+				     // the mesh once globally:
     triangulation.refine_global (1);
-    
+
 
 				     // As the final step, we need to
 				     // set up a clean state of the
@@ -1245,13 +1237,13 @@ namespace QuasiStaticElasticity
 				     // the following two function
 				     // calls:
     GridTools::partition_triangulation (n_mpi_processes, triangulation);
-    setup_quadrature_point_history ();  
+    setup_quadrature_point_history ();
   }
-  
 
 
 
-                                   // @sect4{TopLevel::setup_system}
+
+				   // @sect4{TopLevel::setup_system}
 
 				   // The next function is the one
 				   // that sets up the data structures
@@ -1282,28 +1274,28 @@ namespace QuasiStaticElasticity
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::subdomain_wise (dof_handler);
 
-                                     // The next thing is to store some
-                                     // information for later use on how many
-                                     // cells or degrees of freedom the
-                                     // present processor, or any of the
-                                     // processors has to work on. First the
-                                     // cells local to this processor...
+				     // The next thing is to store some
+				     // information for later use on how many
+				     // cells or degrees of freedom the
+				     // present processor, or any of the
+				     // processors has to work on. First the
+				     // cells local to this processor...
     n_local_cells
       = GridTools::count_cells_with_subdomain_association (triangulation,
 							   this_mpi_process);
 
-                                     // ...and then a list of numbers of how
-                                     // many degrees of freedom each processor
-                                     // has to handle:
+				     // ...and then a list of numbers of how
+				     // many degrees of freedom each processor
+				     // has to handle:
     local_dofs_per_process.resize (n_mpi_processes);
     for (unsigned int i=0; i<n_mpi_processes; ++i)
       local_dofs_per_process[i]
 	= DoFTools::count_dofs_with_subdomain_association (dof_handler, i);
 
-                                     // Finally, make it easier to denote how
-                                     // many degrees of freedom the present
-                                     // process has to deal with, by
-                                     // introducing an abbreviation:
+				     // Finally, make it easier to denote how
+				     // many degrees of freedom the present
+				     // process has to deal with, by
+				     // introducing an abbreviation:
     n_local_dofs = local_dofs_per_process[this_mpi_process];
 
 				     // The next step is to set up constraints
@@ -1313,7 +1305,7 @@ namespace QuasiStaticElasticity
     DoFTools::make_hanging_node_constraints (dof_handler,
 					     hanging_node_constraints);
     hanging_node_constraints.close ();
-  
+
 				     // And then we have to set up the
 				     // matrix. Here we deviate from step-17,
 				     // in which we simply used PETSc's
@@ -1335,154 +1327,154 @@ namespace QuasiStaticElasticity
 				     // by almost two orders of magnitude if
 				     // we instruct PETSc which elements will
 				     // be used and which are not.
-                                     //
-                                     // To do so, we first generate the
-                                     // sparsity pattern of the matrix we are
-                                     // going to work with, and make sure that
-                                     // the condensation of hanging node
-                                     // constraints add the necessary
-                                     // additional entries in the sparsity
-                                     // pattern:
+				     //
+				     // To do so, we first generate the
+				     // sparsity pattern of the matrix we are
+				     // going to work with, and make sure that
+				     // the condensation of hanging node
+				     // constraints add the necessary
+				     // additional entries in the sparsity
+				     // pattern:
     CompressedSparsityPattern sparsity_pattern (dof_handler.n_dofs(),
 						dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
     hanging_node_constraints.condense (sparsity_pattern);
-                                     // Note that we have used the
-                                     // <code>CompressedSparsityPattern</code> class
-                                     // here that was already introduced in
-                                     // step-11, rather than the
-                                     // <code>SparsityPattern</code> class that we have
-                                     // used in all other cases. The reason
-                                     // for this is that for the latter class
-                                     // to work we have to give an initial
-                                     // upper bound for the number of entries
-                                     // in each row, a task that is
-                                     // traditionally done by
-                                     // <code>DoFHandler::max_couplings_between_dofs()</code>. However,
-                                     // this function suffers from a serious
-                                     // problem: it has to compute an upper
-                                     // bound to the number of nonzero entries
-                                     // in each row, and this is a rather
-                                     // complicated task, in particular in
-                                     // 3d. In effect, while it is quite
-                                     // accurate in 2d, it often comes up with
-                                     // much too large a number in 3d, and in
-                                     // that case the <code>SparsityPattern</code>
-                                     // allocates much too much memory at
-                                     // first, often several 100 MBs. This is
-                                     // later corrected when
-                                     // <code>DoFTools::make_sparsity_pattern</code> is
-                                     // called and we realize that we don't
-                                     // need all that much memory, but at time
-                                     // it is already too late: for large
-                                     // problems, the temporary allocation of
-                                     // too much memory can lead to
-                                     // out-of-memory situations.
-                                     //
-                                     // In order to avoid this, we resort to
-                                     // the <code>CompressedSparsityPattern</code>
-                                     // class that is slower but does not
-                                     // require any up-front estimate on the
-                                     // number of nonzero entries per row. It
-                                     // therefore only ever allocates as much
-                                     // memory as it needs at any given time,
-                                     // and we can build it even for large 3d
-                                     // problems.
-                                     //
-                                     // It is also worth noting that the
-                                     // sparsity pattern we construct is
-                                     // global, i.e. comprises all degrees of
-                                     // freedom whether they will be owned by
-                                     // the processor we are on or another one
-                                     // (in case this program is run in
-                                     // %parallel via MPI). This of course is
-                                     // not optimal -- it limits the size of
-                                     // the problems we can solve, since
-                                     // storing the entire sparsity pattern
-                                     // (even if only for a short time) on
-                                     // each processor does not scale
-                                     // well. However, there are several more
-                                     // places in the program in which we do
-                                     // this, for example we always keep the
-                                     // global triangulation and DoF handler
-                                     // objects around, even if we only work
-                                     // on part of them. At present, deal.II
-                                     // does not have the necessary facilities
-                                     // to completely distribute these objects
-                                     // (a task that, indeed, is very hard to
-                                     // achieve with adaptive meshes, since
-                                     // well-balanced subdivisions of a domain
-                                     // tend to become unbalanced as the mesh
-                                     // is adaptively refined).
-                                     //
-                                     // With this data structure, we can then
-                                     // go to the PETSc sparse matrix and tell
-                                     // it to pre-allocate all the entries we
-                                     // will later want to write to:
+				     // Note that we have used the
+				     // <code>CompressedSparsityPattern</code> class
+				     // here that was already introduced in
+				     // step-11, rather than the
+				     // <code>SparsityPattern</code> class that we have
+				     // used in all other cases. The reason
+				     // for this is that for the latter class
+				     // to work we have to give an initial
+				     // upper bound for the number of entries
+				     // in each row, a task that is
+				     // traditionally done by
+				     // <code>DoFHandler::max_couplings_between_dofs()</code>. However,
+				     // this function suffers from a serious
+				     // problem: it has to compute an upper
+				     // bound to the number of nonzero entries
+				     // in each row, and this is a rather
+				     // complicated task, in particular in
+				     // 3d. In effect, while it is quite
+				     // accurate in 2d, it often comes up with
+				     // much too large a number in 3d, and in
+				     // that case the <code>SparsityPattern</code>
+				     // allocates much too much memory at
+				     // first, often several 100 MBs. This is
+				     // later corrected when
+				     // <code>DoFTools::make_sparsity_pattern</code> is
+				     // called and we realize that we don't
+				     // need all that much memory, but at time
+				     // it is already too late: for large
+				     // problems, the temporary allocation of
+				     // too much memory can lead to
+				     // out-of-memory situations.
+				     //
+				     // In order to avoid this, we resort to
+				     // the <code>CompressedSparsityPattern</code>
+				     // class that is slower but does not
+				     // require any up-front estimate on the
+				     // number of nonzero entries per row. It
+				     // therefore only ever allocates as much
+				     // memory as it needs at any given time,
+				     // and we can build it even for large 3d
+				     // problems.
+				     //
+				     // It is also worth noting that the
+				     // sparsity pattern we construct is
+				     // global, i.e. comprises all degrees of
+				     // freedom whether they will be owned by
+				     // the processor we are on or another one
+				     // (in case this program is run in
+				     // %parallel via MPI). This of course is
+				     // not optimal -- it limits the size of
+				     // the problems we can solve, since
+				     // storing the entire sparsity pattern
+				     // (even if only for a short time) on
+				     // each processor does not scale
+				     // well. However, there are several more
+				     // places in the program in which we do
+				     // this, for example we always keep the
+				     // global triangulation and DoF handler
+				     // objects around, even if we only work
+				     // on part of them. At present, deal.II
+				     // does not have the necessary facilities
+				     // to completely distribute these objects
+				     // (a task that, indeed, is very hard to
+				     // achieve with adaptive meshes, since
+				     // well-balanced subdivisions of a domain
+				     // tend to become unbalanced as the mesh
+				     // is adaptively refined).
+				     //
+				     // With this data structure, we can then
+				     // go to the PETSc sparse matrix and tell
+				     // it to pre-allocate all the entries we
+				     // will later want to write to:
     system_matrix.reinit (mpi_communicator,
 			  sparsity_pattern,
 			  local_dofs_per_process,
 			  local_dofs_per_process,
 			  this_mpi_process);
-                                     // After this point, no further explicit
-                                     // knowledge of the sparsity pattern is
-                                     // required any more and we can let the
-                                     // <code>sparsity_pattern</code> variable go out
-                                     // of scope without any problem.
-                                     
-                                     // The last task in this function
-                                     // is then only to reset the
-                                     // right hand side vector as well
-                                     // as the solution vector to its
-                                     // correct size; remember that
-                                     // the solution vector is a local
-                                     // one, unlike the right hand
-                                     // side that is a distributed
-                                     // %parallel one and therefore
-                                     // needs to know the MPI
-                                     // communicator over which it is
-                                     // supposed to transmit messages:
+				     // After this point, no further explicit
+				     // knowledge of the sparsity pattern is
+				     // required any more and we can let the
+				     // <code>sparsity_pattern</code> variable go out
+				     // of scope without any problem.
+
+				     // The last task in this function
+				     // is then only to reset the
+				     // right hand side vector as well
+				     // as the solution vector to its
+				     // correct size; remember that
+				     // the solution vector is a local
+				     // one, unlike the right hand
+				     // side that is a distributed
+				     // %parallel one and therefore
+				     // needs to know the MPI
+				     // communicator over which it is
+				     // supposed to transmit messages:
     system_rhs.reinit (mpi_communicator, dof_handler.n_dofs(), n_local_dofs);
     incremental_displacement.reinit (dof_handler.n_dofs());
   }
 
 
 
-                                   // @sect4{TopLevel::assemble_system}
+				   // @sect4{TopLevel::assemble_system}
 
-                                   // Again, assembling the system
-                                   // matrix and right hand side
-                                   // follows the same structure as in
-                                   // many example programs before. In
-                                   // particular, it is mostly
-                                   // equivalent to step-17, except
-                                   // for the different right hand
-                                   // side that now only has to take
-                                   // into account internal
-                                   // stresses. In addition,
-                                   // assembling the matrix is made
-                                   // significantly more transparent
-                                   // by using the <code>SymmetricTensor</code>
-                                   // class: note the elegance of
-                                   // forming the scalar products of
-                                   // symmetric tensors of rank 2 and
-                                   // 4. The implementation is also
-                                   // more general since it is
-                                   // independent of the fact that we
-                                   // may or may not be using an
-                                   // isotropic elasticity tensor.
-                                   //
-                                   // The first part of the assembly routine
-                                   // is as always:
+				   // Again, assembling the system
+				   // matrix and right hand side
+				   // follows the same structure as in
+				   // many example programs before. In
+				   // particular, it is mostly
+				   // equivalent to step-17, except
+				   // for the different right hand
+				   // side that now only has to take
+				   // into account internal
+				   // stresses. In addition,
+				   // assembling the matrix is made
+				   // significantly more transparent
+				   // by using the <code>SymmetricTensor</code>
+				   // class: note the elegance of
+				   // forming the scalar products of
+				   // symmetric tensors of rank 2 and
+				   // 4. The implementation is also
+				   // more general since it is
+				   // independent of the fact that we
+				   // may or may not be using an
+				   // isotropic elasticity tensor.
+				   //
+				   // The first part of the assembly routine
+				   // is as always:
   template <int dim>
-  void TopLevel<dim>::assemble_system () 
+  void TopLevel<dim>::assemble_system ()
   {
     system_rhs = 0;
     system_matrix = 0;
 
-    FEValues<dim> fe_values (fe, quadrature_formula, 
+    FEValues<dim> fe_values (fe, quadrature_formula,
 			     update_values   | update_gradients |
-                             update_quadrature_points | update_JxW_values);
+			     update_quadrature_points | update_JxW_values);
 
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
@@ -1494,11 +1486,11 @@ namespace QuasiStaticElasticity
 
     BodyForce<dim>      body_force;
     std::vector<Vector<double> > body_force_values (n_q_points,
-                                                    Vector<double>(dim));
+						    Vector<double>(dim));
 
-                                     // As in step-17, we only need to loop
-                                     // over all cells that belong to the
-                                     // present processor:
+				     // As in step-17, we only need to loop
+				     // over all cells that belong to the
+				     // present processor:
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
@@ -1510,25 +1502,25 @@ namespace QuasiStaticElasticity
 
 	  fe_values.reinit (cell);
 
-                                           // Then loop over all indices i,j
-                                           // and quadrature points and
-                                           // assemble the system matrix
-                                           // contributions from this cell.
-                                           // Note how we extract the
-                                           // symmetric gradients (strains) of
-                                           // the shape functions at a given
-                                           // quadrature point from the
-                                           // <code>FEValues</code> object, and the
-                                           // elegance with which we form the
-                                           // triple contraction <code>eps_phi_i :
-                                           // C : eps_phi_j</code>; the latter
-                                           // needs to be compared to the
-                                           // clumsy computations needed in
-                                           // step-17, both in the
-                                           // introduction as well as in the
-                                           // respective place in the program:
+					   // Then loop over all indices i,j
+					   // and quadrature points and
+					   // assemble the system matrix
+					   // contributions from this cell.
+					   // Note how we extract the
+					   // symmetric gradients (strains) of
+					   // the shape functions at a given
+					   // quadrature point from the
+					   // <code>FEValues</code> object, and the
+					   // elegance with which we form the
+					   // triple contraction <code>eps_phi_i :
+					   // C : eps_phi_j</code>; the latter
+					   // needs to be compared to the
+					   // clumsy computations needed in
+					   // step-17, both in the
+					   // introduction as well as in the
+					   // respective place in the program:
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j) 
+	    for (unsigned int j=0; j<dofs_per_cell; ++j)
 	      for (unsigned int q_point=0; q_point<n_q_points;
 		   ++q_point)
 		{
@@ -1536,55 +1528,55 @@ namespace QuasiStaticElasticity
 		    eps_phi_i = get_strain (fe_values, i, q_point),
 		    eps_phi_j = get_strain (fe_values, j, q_point);
 
-		  cell_matrix(i,j) 
+		  cell_matrix(i,j)
 		    += (eps_phi_i * stress_strain_tensor * eps_phi_j
-                        *
-                        fe_values.JxW (q_point));
+			*
+			fe_values.JxW (q_point));
 		}
 
 
-                                           // Then also assemble the local
-                                           // right hand side
-                                           // contributions. For this, we need
-                                           // to access the prior stress value
-                                           // in this quadrature point. To get
-                                           // it, we use the user pointer of
-                                           // this cell that points into the
-                                           // global array to the quadrature
-                                           // point data corresponding to the
-                                           // first quadrature point of the
-                                           // present cell, and then add an
-                                           // offset corresponding to the
-                                           // index of the quadrature point we
-                                           // presently consider:
-          const PointHistory<dim> *local_quadrature_points_data
-            = reinterpret_cast<PointHistory<dim>*>(cell->user_pointer());
-                                           // In addition, we need the values
-                                           // of the external body forces at
-                                           // the quadrature points on this
-                                           // cell:
-          body_force.vector_value_list (fe_values.get_quadrature_points(),
-                                        body_force_values);
-                                           // Then we can loop over all
-                                           // degrees of freedom on this cell
-                                           // and compute local contributions
-                                           // to the right hand side:
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
+					   // Then also assemble the local
+					   // right hand side
+					   // contributions. For this, we need
+					   // to access the prior stress value
+					   // in this quadrature point. To get
+					   // it, we use the user pointer of
+					   // this cell that points into the
+					   // global array to the quadrature
+					   // point data corresponding to the
+					   // first quadrature point of the
+					   // present cell, and then add an
+					   // offset corresponding to the
+					   // index of the quadrature point we
+					   // presently consider:
+	  const PointHistory<dim> *local_quadrature_points_data
+	    = reinterpret_cast<PointHistory<dim>*>(cell->user_pointer());
+					   // In addition, we need the values
+					   // of the external body forces at
+					   // the quadrature points on this
+					   // cell:
+	  body_force.vector_value_list (fe_values.get_quadrature_points(),
+					body_force_values);
+					   // Then we can loop over all
+					   // degrees of freedom on this cell
+					   // and compute local contributions
+					   // to the right hand side:
+	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
-	      const unsigned int 
+	      const unsigned int
 		component_i = fe.system_to_component_index(i).first;
-	  
+
 	      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 		{
 		  const SymmetricTensor<2,dim> &old_stress
 		    = local_quadrature_points_data[q_point].old_stress;
-		
+
 		  cell_rhs(i) += (body_force_values[q_point](component_i) *
 				  fe_values.shape_value (i,q_point)
 				  -
-                                  old_stress *
+				  old_stress *
 				  get_strain (fe_values,i,q_point))
-                                 *
+				 *
 				 fe_values.JxW (q_point);
 		}
 	    }
@@ -1596,7 +1588,7 @@ namespace QuasiStaticElasticity
 					   // done exactly as in step-17:
 	  cell->get_dof_indices (local_dof_indices);
 
-          hanging_node_constraints
+	  hanging_node_constraints
 	    .distribute_local_to_global (cell_matrix,
 					 local_dof_indices,
 					 system_matrix);
@@ -1627,7 +1619,7 @@ namespace QuasiStaticElasticity
 				     // vector in the form of a
 				     // temporary vector which we then
 				     // copy into the sequential one.
-    
+
 				     // We make up for this
 				     // complication by showing how
 				     // boundary values can be used
@@ -1695,46 +1687,46 @@ namespace QuasiStaticElasticity
     std::map<unsigned int,double> boundary_values;
     VectorTools::
       interpolate_boundary_values (dof_handler,
-                                   0,
-                                   ZeroFunction<dim> (dim),
-                                   boundary_values);
+				   0,
+				   ZeroFunction<dim> (dim),
+				   boundary_values);
     VectorTools::
       interpolate_boundary_values (dof_handler,
-                                   1,
-                                   IncrementalBoundaryValues<dim>(present_time,
-                                                                  present_timestep),
-                                   boundary_values,
+				   1,
+				   IncrementalBoundaryValues<dim>(present_time,
+								  present_timestep),
+				   boundary_values,
 				   z_component);
-    
+
     PETScWrappers::MPI::Vector tmp (mpi_communicator, dof_handler.n_dofs(),
 				    n_local_dofs);
     MatrixTools::apply_boundary_values (boundary_values,
-                                        system_matrix, tmp,
-                                        system_rhs, false);
+					system_matrix, tmp,
+					system_rhs, false);
     incremental_displacement = tmp;
   }
 
 
 
-                                   // @sect4{TopLevel::solve_timestep}
+				   // @sect4{TopLevel::solve_timestep}
 
-                                   // The next function is the one that
-                                   // controls what all has to happen within a
-                                   // timestep. The order of things should be
-                                   // relatively self-explanatory from the
-                                   // function names:
+				   // The next function is the one that
+				   // controls what all has to happen within a
+				   // timestep. The order of things should be
+				   // relatively self-explanatory from the
+				   // function names:
   template <int dim>
   void TopLevel<dim>::solve_timestep ()
   {
     pcout << "    Assembling system..." << std::flush;
     assemble_system ();
     pcout << " norm of rhs is " << system_rhs.l2_norm()
-          << std::endl;
-      
+	  << std::endl;
+
     const unsigned int n_iterations = solve_linear_problem ();
-  
+
     pcout << "    Solver converged in " << n_iterations
-          << " iterations." << std::endl;
+	  << " iterations." << std::endl;
 
     pcout << "    Updating quadrature point data..." << std::flush;
     update_quadrature_point_history ();
@@ -1743,43 +1735,43 @@ namespace QuasiStaticElasticity
 
 
 
-                                   // @sect4{TopLevel::solve_linear_problem}
+				   // @sect4{TopLevel::solve_linear_problem}
 
-                                   // Solving the linear system again
-                                   // works mostly as before. The only
-                                   // difference is that we want to
-                                   // only keep a complete local copy
-                                   // of the solution vector instead
-                                   // of the distributed one that we
-                                   // get as output from PETSc's
-                                   // solver routines. To this end, we
-                                   // declare a local temporary
-                                   // variable for the distributed
-                                   // vector and initialize it with
-                                   // the contents of the local
-                                   // variable (remember that the
-                                   // <code>apply_boundary_values</code>
-                                   // function called in
-                                   // <code>assemble_system</code> preset the
-                                   // values of boundary nodes in this
-                                   // vector), solve with it, and at
-                                   // the end of the function copy it
-                                   // again into the complete local
-                                   // vector that we declared as a
-                                   // member variable. Hanging node
-                                   // constraints are then distributed
-                                   // only on the local copy,
-                                   // i.e. independently of each other
-                                   // on each of the processors:
+				   // Solving the linear system again
+				   // works mostly as before. The only
+				   // difference is that we want to
+				   // only keep a complete local copy
+				   // of the solution vector instead
+				   // of the distributed one that we
+				   // get as output from PETSc's
+				   // solver routines. To this end, we
+				   // declare a local temporary
+				   // variable for the distributed
+				   // vector and initialize it with
+				   // the contents of the local
+				   // variable (remember that the
+				   // <code>apply_boundary_values</code>
+				   // function called in
+				   // <code>assemble_system</code> preset the
+				   // values of boundary nodes in this
+				   // vector), solve with it, and at
+				   // the end of the function copy it
+				   // again into the complete local
+				   // vector that we declared as a
+				   // member variable. Hanging node
+				   // constraints are then distributed
+				   // only on the local copy,
+				   // i.e. independently of each other
+				   // on each of the processors:
   template <int dim>
-  unsigned int TopLevel<dim>::solve_linear_problem () 
+  unsigned int TopLevel<dim>::solve_linear_problem ()
   {
     PETScWrappers::MPI::Vector
       distributed_incremental_displacement (mpi_communicator,
 					    dof_handler.n_dofs(),
 					    n_local_dofs);
     distributed_incremental_displacement = incremental_displacement;
-    
+
     SolverControl           solver_control (dof_handler.n_dofs(),
 					    1e-16*system_rhs.l2_norm());
     PETScWrappers::SolverCG cg (solver_control,
@@ -1793,7 +1785,7 @@ namespace QuasiStaticElasticity
     incremental_displacement = distributed_incremental_displacement;
 
     hanging_node_constraints.distribute (incremental_displacement);
-    
+
     return solver_control.last_step();
   }
 
@@ -1812,63 +1804,63 @@ namespace QuasiStaticElasticity
 				   // file in any of the supported
 				   // output files, as mentioned in
 				   // the introduction.
-                                   //
-                                   // The crucial part of this function is to
-                                   // give the <code>DataOut</code> class a way to only
-                                   // work on the cells that the present
-                                   // process owns. This class is already
-                                   // well-equipped for that: it has two
-                                   // virtual functions <code>first_cell</code> and
-                                   // <code>next_cell</code> that return the first cell
-                                   // to be worked on, and given one cell
-                                   // return the next cell to be worked on. By
-                                   // default, these functions return the
-                                   // first active cell (i.e. the first one
-                                   // that has no children) and the next
-                                   // active cell. What we have to do here is
-                                   // derive a class from <code>DataOut</code> that
-                                   // overloads these two functions to only
-                                   // iterate over those cells with the right
-                                   // subdomain indicator.
-                                   //
-                                   // We do this at the beginning of this
-                                   // function. The <code>first_cell</code> function
-                                   // just starts with the first active cell,
-                                   // and then iterates to the next cells
-                                   // while the cell presently under
-                                   // consideration does not yet have the
-                                   // correct subdomain id. The only thing
-                                   // that needs to be taken care of is that
-                                   // we don't try to keep iterating when we
-                                   // have hit the end iterator.
-                                   //
-                                   // The <code>next_cell</code> function could be
-                                   // implemented in a similar way. However,
-                                   // we use this occasion as a pretext to
-                                   // introduce one more thing that the
-                                   // library offers: filtered
-                                   // iterators. These are wrappers for the
-                                   // iterator classes that just skip all
-                                   // cells (or faces, lines, etc) that do not
-                                   // satisfy a certain predicate (a predicate
-                                   // in computer-lingo is a function that
-                                   // when applied to a data element either
-                                   // returns true or false). In the present
-                                   // case, the predicate is that the cell has
-                                   // to have a certain subdomain id, and the
-                                   // library already has this predicate built
-                                   // in. If the cell iterator is not the end
-                                   // iterator, what we then have to do is to
-                                   // initialize such a filtered iterator with
-                                   // the present cell and the predicate, and
-                                   // then increase the iterator exactly
-                                   // once. While the more conventional loop
-                                   // would probably not have been much
-                                   // longer, this is definitely the more
-                                   // elegant way -- and then, these example
-                                   // programs also serve the purpose of
-                                   // introducing what is available in
-                                   // deal.II.
+				   //
+				   // The crucial part of this function is to
+				   // give the <code>DataOut</code> class a way to only
+				   // work on the cells that the present
+				   // process owns. This class is already
+				   // well-equipped for that: it has two
+				   // virtual functions <code>first_cell</code> and
+				   // <code>next_cell</code> that return the first cell
+				   // to be worked on, and given one cell
+				   // return the next cell to be worked on. By
+				   // default, these functions return the
+				   // first active cell (i.e. the first one
+				   // that has no children) and the next
+				   // active cell. What we have to do here is
+				   // derive a class from <code>DataOut</code> that
+				   // overloads these two functions to only
+				   // iterate over those cells with the right
+				   // subdomain indicator.
+				   //
+				   // We do this at the beginning of this
+				   // function. The <code>first_cell</code> function
+				   // just starts with the first active cell,
+				   // and then iterates to the next cells
+				   // while the cell presently under
+				   // consideration does not yet have the
+				   // correct subdomain id. The only thing
+				   // that needs to be taken care of is that
+				   // we don't try to keep iterating when we
+				   // have hit the end iterator.
+				   //
+				   // The <code>next_cell</code> function could be
+				   // implemented in a similar way. However,
+				   // we use this occasion as a pretext to
+				   // introduce one more thing that the
+				   // library offers: filtered
+				   // iterators. These are wrappers for the
+				   // iterator classes that just skip all
+				   // cells (or faces, lines, etc) that do not
+				   // satisfy a certain predicate (a predicate
+				   // in computer-lingo is a function that
+				   // when applied to a data element either
+				   // returns true or false). In the present
+				   // case, the predicate is that the cell has
+				   // to have a certain subdomain id, and the
+				   // library already has this predicate built
+				   // in. If the cell iterator is not the end
+				   // iterator, what we then have to do is to
+				   // initialize such a filtered iterator with
+				   // the present cell and the predicate, and
+				   // then increase the iterator exactly
+				   // once. While the more conventional loop
+				   // would probably not have been much
+				   // longer, this is definitely the more
+				   // elegant way -- and then, these example
+				   // programs also serve the purpose of
+				   // introducing what is available in
+				   // deal.II.
   template<int dim>
   class FilteredDataOut : public DataOut<dim>
   {
@@ -1877,7 +1869,7 @@ namespace QuasiStaticElasticity
 		      :
 		      subdomain_id (subdomain_id)
 	{}
-      
+
       virtual typename DoFHandler<dim>::cell_iterator
       first_cell ()
 	{
@@ -1886,10 +1878,10 @@ namespace QuasiStaticElasticity
 	  while ((cell != this->dofs->end()) &&
 		 (cell->subdomain_id() != subdomain_id))
 	    ++cell;
-	  
+
 	  return cell;
 	}
-      
+
       virtual typename DoFHandler<dim>::cell_iterator
       next_cell (const typename DoFHandler<dim>::cell_iterator &old_cell)
 	{
@@ -1897,7 +1889,7 @@ namespace QuasiStaticElasticity
 	    {
 	      const IteratorFilters::SubdomainEqualTo
 		predicate(subdomain_id);
-	      
+
 	      return
 		++(FilteredIterator
 		   <typename DoFHandler<dim>::active_cell_iterator>
@@ -1906,35 +1898,35 @@ namespace QuasiStaticElasticity
 	  else
 	    return old_cell;
 	}
-      
+
     private:
       const unsigned int subdomain_id;
   };
 
 
-  
+
   template <int dim>
   void TopLevel<dim>::output_results () const
   {
-                                     // With this newly defined class, declare
-                                     // an object that is going to generate
-                                     // the graphical output and attach the
-                                     // dof handler with it from which to get
-                                     // the solution vector:
+				     // With this newly defined class, declare
+				     // an object that is going to generate
+				     // the graphical output and attach the
+				     // dof handler with it from which to get
+				     // the solution vector:
     FilteredDataOut<dim> data_out(this_mpi_process);
     data_out.attach_dof_handler (dof_handler);
 
-                                     // Then, just as in step-17, define the
-                                     // names of solution variables (which
-                                     // here are the displacement increments)
-                                     // and queue the solution vector for
-                                     // output. Note in the following switch
-                                     // how we make sure that if the space
-                                     // dimension should be unhandled that we
-                                     // throw an exception saying that we
-                                     // haven't implemented this case yet
-                                     // (another case of defensive
-                                     // programming):
+				     // Then, just as in step-17, define the
+				     // names of solution variables (which
+				     // here are the displacement increments)
+				     // and queue the solution vector for
+				     // output. Note in the following switch
+				     // how we make sure that if the space
+				     // dimension should be unhandled that we
+				     // throw an exception saying that we
+				     // haven't implemented this case yet
+				     // (another case of defensive
+				     // programming):
     std::vector<std::string> solution_names;
     switch (dim)
       {
@@ -1958,74 +1950,74 @@ namespace QuasiStaticElasticity
 			      solution_names);
 
 
-                                     // The next thing is that we wanted to
-                                     // output something like the average norm
-                                     // of the stresses that we have stored in
-                                     // each cell. This may seem complicated,
-                                     // since on the present processor we only
-                                     // store the stresses in quadrature
-                                     // points on those cells that actually
-                                     // belong to the present process. In
-                                     // other words, it seems as if we can't
-                                     // compute the average stresses for all
-                                     // cells. However, remember that our
-                                     // class derived from <code>DataOut</code> only
-                                     // iterates over those cells that
-                                     // actually do belong to the present
-                                     // processor, i.e. we don't have to
-                                     // compute anything for all the other
-                                     // cells as this information would not be
-                                     // touched. The following little loop
-                                     // does this. We enclose the entire block
-                                     // into a pair of braces to make sure
-                                     // that the iterator variables do not
-                                     // remain accidentally visible beyond the
-                                     // end of the block in which they are
-                                     // used:
+				     // The next thing is that we wanted to
+				     // output something like the average norm
+				     // of the stresses that we have stored in
+				     // each cell. This may seem complicated,
+				     // since on the present processor we only
+				     // store the stresses in quadrature
+				     // points on those cells that actually
+				     // belong to the present process. In
+				     // other words, it seems as if we can't
+				     // compute the average stresses for all
+				     // cells. However, remember that our
+				     // class derived from <code>DataOut</code> only
+				     // iterates over those cells that
+				     // actually do belong to the present
+				     // processor, i.e. we don't have to
+				     // compute anything for all the other
+				     // cells as this information would not be
+				     // touched. The following little loop
+				     // does this. We enclose the entire block
+				     // into a pair of braces to make sure
+				     // that the iterator variables do not
+				     // remain accidentally visible beyond the
+				     // end of the block in which they are
+				     // used:
     Vector<double> norm_of_stress (triangulation.n_active_cells());
     {
-                                       // Loop over all the cells...
+				       // Loop over all the cells...
       typename Triangulation<dim>::active_cell_iterator
-        cell = triangulation.begin_active(),
-        endc = triangulation.end();
+	cell = triangulation.begin_active(),
+	endc = triangulation.end();
       for (unsigned int index=0; cell!=endc; ++cell, ++index)
-                                         // ... and pick those that are
-                                         // relevant to us:
-        if (cell->subdomain_id() == this_mpi_process)
-          {
-                                             // On these cells, add up the
-                                             // stresses over all quadrature
-                                             // points...
-            SymmetricTensor<2,dim> accumulated_stress;
-            for (unsigned int q=0;
-                 q<quadrature_formula.size();
-                 ++q)
-              accumulated_stress +=
-                reinterpret_cast<PointHistory<dim>*>(cell->user_pointer())[q]
-                .old_stress;
+					 // ... and pick those that are
+					 // relevant to us:
+	if (cell->subdomain_id() == this_mpi_process)
+	  {
+					     // On these cells, add up the
+					     // stresses over all quadrature
+					     // points...
+	    SymmetricTensor<2,dim> accumulated_stress;
+	    for (unsigned int q=0;
+		 q<quadrature_formula.size();
+		 ++q)
+	      accumulated_stress +=
+		reinterpret_cast<PointHistory<dim>*>(cell->user_pointer())[q]
+		.old_stress;
 
-                                             // ...then write the norm of the
-                                             // average to their destination:
-            norm_of_stress(index)
-              = (accumulated_stress /
-                 quadrature_formula.size()).norm();
-          }
-                                       // And on the cells that we are not
-                                       // interested in, set the respective
-                                       // value in the vector to a bogus value
-                                       // (norms must be positive, and a large
-                                       // negative value should catch your
-                                       // eye) in order to make sure that if
-                                       // we were somehow wrong about our
-                                       // assumption that these elements would
-                                       // not appear in the output file, that
-                                       // we would find out by looking at the
-                                       // graphical output:
-        else
-          norm_of_stress(index) = -1e+20;
+					     // ...then write the norm of the
+					     // average to their destination:
+	    norm_of_stress(index)
+	      = (accumulated_stress /
+		 quadrature_formula.size()).norm();
+	  }
+				       // And on the cells that we are not
+				       // interested in, set the respective
+				       // value in the vector to a bogus value
+				       // (norms must be positive, and a large
+				       // negative value should catch your
+				       // eye) in order to make sure that if
+				       // we were somehow wrong about our
+				       // assumption that these elements would
+				       // not appear in the output file, that
+				       // we would find out by looking at the
+				       // graphical output:
+	else
+	  norm_of_stress(index) = -1e+20;
     }
-                                     // Finally attach this vector as well to
-                                     // be treated for output:
+				     // Finally attach this vector as well to
+				     // be treated for output:
     data_out.add_data_vector (norm_of_stress, "norm_of_stress");
 
 				     // As a last piece of data, let
@@ -2051,7 +2043,7 @@ namespace QuasiStaticElasticity
 				     // vectors:
     data_out.build_patches ();
 
-    
+
 				     // Now that we have generated the
 				     // intermediate format, let us
 				     // determine the name of the file
@@ -2131,37 +2123,37 @@ namespace QuasiStaticElasticity
     data_out.write_deal_II_intermediate (output);
   }
 
-  
 
-                                   // @sect4{TopLevel::do_initial_timestep}
 
-                                   // This and the next function handle the
-                                   // overall structure of the first and
-                                   // following timesteps, respectively. The
-                                   // first timestep is slightly more involved
-                                   // because we want to compute it multiple
-                                   // times on successively refined meshes,
-                                   // each time starting from a clean
-                                   // state. At the end of these computations,
-                                   // in which we compute the incremental
-                                   // displacements each time, we use the last
-                                   // results obtained for the incremental
-                                   // displacements to compute the resulting
-                                   // stress updates and move the mesh
-                                   // accordingly. On this new mesh, we then
-                                   // output the solution and any additional
-                                   // data we consider important.
-                                   //
-                                   // All this is interspersed by generating
-                                   // output to the console to update the
-                                   // person watching the screen on what is
-                                   // going on. As in step-17, the use of
-                                   // <code>pcout</code> instead of <code>std::cout</code> makes
-                                   // sure that only one of the parallel
-                                   // processes is actually writing to the
-                                   // console, without having to explicitly
-                                   // code an if-statement in each place where
-                                   // we generate output:
+				   // @sect4{TopLevel::do_initial_timestep}
+
+				   // This and the next function handle the
+				   // overall structure of the first and
+				   // following timesteps, respectively. The
+				   // first timestep is slightly more involved
+				   // because we want to compute it multiple
+				   // times on successively refined meshes,
+				   // each time starting from a clean
+				   // state. At the end of these computations,
+				   // in which we compute the incremental
+				   // displacements each time, we use the last
+				   // results obtained for the incremental
+				   // displacements to compute the resulting
+				   // stress updates and move the mesh
+				   // accordingly. On this new mesh, we then
+				   // output the solution and any additional
+				   // data we consider important.
+				   //
+				   // All this is interspersed by generating
+				   // output to the console to update the
+				   // person watching the screen on what is
+				   // going on. As in step-17, the use of
+				   // <code>pcout</code> instead of <code>std::cout</code> makes
+				   // sure that only one of the parallel
+				   // processes is actually writing to the
+				   // console, without having to explicitly
+				   // code an if-statement in each place where
+				   // we generate output:
   template <int dim>
   void TopLevel<dim>::do_initial_timestep ()
   {
@@ -2169,7 +2161,7 @@ namespace QuasiStaticElasticity
     ++timestep_no;
     pcout << "Timestep " << timestep_no << " at time " << present_time
 	  << std::endl;
-  
+
     for (unsigned int cycle=0; cycle<2; ++cycle)
       {
 	pcout << "  Cycle " << cycle << ':' << std::endl;
@@ -2208,14 +2200,14 @@ namespace QuasiStaticElasticity
     pcout << std::endl;
   }
 
-  
 
-                                   // @sect4{TopLevel::do_timestep}
 
-                                   // Subsequent timesteps are simpler, and
-                                   // probably do not require any more
-                                   // documentation given the explanations for
-                                   // the previous function above:
+				   // @sect4{TopLevel::do_timestep}
+
+				   // Subsequent timesteps are simpler, and
+				   // probably do not require any more
+				   // documentation given the explanations for
+				   // the previous function above:
   template <int dim>
   void TopLevel<dim>::do_timestep ()
   {
@@ -2229,7 +2221,7 @@ namespace QuasiStaticElasticity
 	present_time = end_time;
       }
 
-  
+
     solve_timestep ();
 
     move_mesh ();
@@ -2239,8 +2231,8 @@ namespace QuasiStaticElasticity
   }
 
 
-                                   // @sect4{TopLevel::refine_initial_grid}
-				    
+				   // @sect4{TopLevel::refine_initial_grid}
+
 				   // The following function is called when
 				   // solving the first time step on
 				   // successively refined meshes. After each
@@ -2251,8 +2243,8 @@ namespace QuasiStaticElasticity
   template <int dim>
   void TopLevel<dim>::refine_initial_grid ()
   {
-                                     // First, let each process compute error
-                                     // indicators for the cells it owns:
+				     // First, let each process compute error
+				     // indicators for the cells it owns:
     Vector<float> error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
 					QGauss<dim-1>(2),
@@ -2264,174 +2256,174 @@ namespace QuasiStaticElasticity
 					multithread_info.n_default_threads,
 					this_mpi_process);
 
-                                     // Then set up a global vector into which
-                                     // we merge the local indicators from
-                                     // each of the %parallel processes:
+				     // Then set up a global vector into which
+				     // we merge the local indicators from
+				     // each of the %parallel processes:
     const unsigned int n_local_cells
       = GridTools::count_cells_with_subdomain_association (triangulation,
 							   this_mpi_process);
     PETScWrappers::MPI::Vector
       distributed_error_per_cell (mpi_communicator,
-                                  triangulation.n_active_cells(),
-                                  n_local_cells);
-  
+				  triangulation.n_active_cells(),
+				  n_local_cells);
+
     for (unsigned int i=0; i<error_per_cell.size(); ++i)
       if (error_per_cell(i) != 0)
 	distributed_error_per_cell(i) = error_per_cell(i);
     distributed_error_per_cell.compress ();
 
-                                     // Once we have that, copy it back into
-                                     // local copies on all processors and
-                                     // refine the mesh accordingly:
+				     // Once we have that, copy it back into
+				     // local copies on all processors and
+				     // refine the mesh accordingly:
     error_per_cell = distributed_error_per_cell;
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 						     error_per_cell,
 						     0.35, 0.03);
     triangulation.execute_coarsening_and_refinement ();
 
-                                     // Finally, set up quadrature
-                                     // point data again on the new
-                                     // mesh, and only on those cells
-                                     // that we have determined to be
-                                     // ours:
+				     // Finally, set up quadrature
+				     // point data again on the new
+				     // mesh, and only on those cells
+				     // that we have determined to be
+				     // ours:
     GridTools::partition_triangulation (n_mpi_processes, triangulation);
     setup_quadrature_point_history ();
   }
-  
 
 
-                                   // @sect4{TopLevel::move_mesh}
 
-                                   // At the end of each time step, we move
-                                   // the nodes of the mesh according to the
-                                   // incremental displacements computed in
-                                   // this time step. To do this, we keep a
-                                   // vector of flags that indicate for each
-                                   // vertex whether we have already moved it
-                                   // around, and then loop over all cells and
-                                   // move those vertices of the cell that
-                                   // have not been moved yet. It is worth
-                                   // noting that it does not matter from
-                                   // which of the cells adjacent to a vertex
-                                   // we move this vertex: since we compute
-                                   // the displacement using a continuous
-                                   // finite element, the displacement field
-                                   // is continuous as well and we can compute
-                                   // the displacement of a given vertex from
-                                   // each of the adjacent cells. We only have
-                                   // to make sure that we move each node
-                                   // exactly once, which is why we keep the
-                                   // vector of flags.
-                                   //
-                                   // There are two noteworthy things in this
-                                   // function. First, how we get the
-                                   // displacement field at a given vertex
-                                   // using the
-                                   // <code>cell-@>vertex_dof_index(v,d)</code> function
-                                   // that returns the index of the <code>d</code>th
-                                   // degree of freedom at vertex <code>v</code> of the
-                                   // given cell. In the present case,
-                                   // displacement in the k-th coordinate
-                                   // direction corresonds to the kth
-                                   // component of the finite element. Using a
-                                   // function like this bears a certain risk,
-                                   // because it uses knowledge of the order
-                                   // of elements that we have taken together
-                                   // for this program in the <code>FESystem</code>
-                                   // element. If we decided to add an
-                                   // additional variable, for example a
-                                   // pressure variable for stabilization, and
-                                   // happened to insert it as the first
-                                   // variable of the element, then the
-                                   // computation below will start to produce
-                                   // non-sensical results. In addition, this
-                                   // computation rests on other assumptions:
-                                   // first, that the element we use has,
-                                   // indeed, degrees of freedom that are
-                                   // associated with vertices. This is indeed
-                                   // the case for the present Q1 element, as
-                                   // would be for all Qp elements of
-                                   // polynomial order <code>p</code>. However, it
-                                   // would not hold for discontinuous
-                                   // elements, or elements for mixed
-                                   // formulations. Secondly, it also rests on
-                                   // the assumption that the displacement at
-                                   // a vertex is determined solely by the
-                                   // value of the degree of freedom
-                                   // associated with this vertex; in other
-                                   // words, all shape functions corresponding
-                                   // to other degrees of freedom are zero at
-                                   // this particular vertex. Again, this is
-                                   // the case for the present element, but is
-                                   // not so for all elements that are
-                                   // presently available in deal.II. Despite
-                                   // its risks, we choose to use this way in
-                                   // order to present a way to query
-                                   // individual degrees of freedom associated
-                                   // with vertices.
-                                   //
-                                   // In this context, it is instructive to
-                                   // point out what a more general way would
-                                   // be. For general finite elements, the way
-                                   // to go would be to take a quadrature
-                                   // formula with the quadrature points in
-                                   // the vertices of a cell. The <code>QTrapez</code>
-                                   // formula for the trapezoidal rule does
-                                   // exactly this. With this quadrature
-                                   // formula, we would then initialize an
-                                   // <code>FEValues</code> object in each cell, and
-                                   // use the
-                                   // <code>FEValues::get_function_values</code>
-                                   // function to obtain the values of the
-                                   // solution function in the quadrature
-                                   // points, i.e. the vertices of the
-                                   // cell. These are the only values that we
-                                   // really need, i.e. we are not at all
-                                   // interested in the weights (or the
-                                   // <code>JxW</code> values) associated with this
-                                   // particular quadrature formula, and this
-                                   // can be specified as the last argument in
-                                   // the constructor to <code>FEValues</code>. The
-                                   // only point of minor inconvenience in
-                                   // this scheme is that we have to figure
-                                   // out which quadrature point corresponds
-                                   // to the vertex we consider at present, as
-                                   // they may or may not be ordered in the
-                                   // same order.
-                                   //
-                                   // Another point worth explaining about
-                                   // this short function is the way in which
-                                   // the triangulation class exports
-                                   // information about its vertices: through
-                                   // the <code>Triangulation::n_vertices</code>
-                                   // function, it advertises how many
-                                   // vertices there are in the
-                                   // triangulation. Not all of them are
-                                   // actually in use all the time -- some are
-                                   // left-overs from cells that have been
-                                   // coarsened previously and remain in
-                                   // existence since deal.II never changes
-                                   // the number of a vertex once it has come
-                                   // into existence, even if vertices with
-                                   // lower number go away. Secondly, the
-                                   // location returned by <code>cell-@>vertex(v)</code>
-                                   // is not only a read-only object of type
-                                   // <code>Point@<dim@></code>, but in fact a reference
-                                   // that can be written to. This allows to
-                                   // move around the nodes of a mesh with
-                                   // relative ease, but it is worth pointing
-                                   // out that it is the responsibility of an
-                                   // application program using this feature
-                                   // to make sure that the resulting cells
-                                   // are still useful, i.e. are not distorted
-                                   // so much that the cell is degenerated
-                                   // (indicated, for example, by negative
-                                   // Jacobians). Note that we do not have any
-                                   // provisions in this function to actually
-                                   // ensure this, we just have faith.
-                                   //
-                                   // After this lengthy introduction, here
-                                   // are the full 20 or so lines of code:
+				   // @sect4{TopLevel::move_mesh}
+
+				   // At the end of each time step, we move
+				   // the nodes of the mesh according to the
+				   // incremental displacements computed in
+				   // this time step. To do this, we keep a
+				   // vector of flags that indicate for each
+				   // vertex whether we have already moved it
+				   // around, and then loop over all cells and
+				   // move those vertices of the cell that
+				   // have not been moved yet. It is worth
+				   // noting that it does not matter from
+				   // which of the cells adjacent to a vertex
+				   // we move this vertex: since we compute
+				   // the displacement using a continuous
+				   // finite element, the displacement field
+				   // is continuous as well and we can compute
+				   // the displacement of a given vertex from
+				   // each of the adjacent cells. We only have
+				   // to make sure that we move each node
+				   // exactly once, which is why we keep the
+				   // vector of flags.
+				   //
+				   // There are two noteworthy things in this
+				   // function. First, how we get the
+				   // displacement field at a given vertex
+				   // using the
+				   // <code>cell-@>vertex_dof_index(v,d)</code> function
+				   // that returns the index of the <code>d</code>th
+				   // degree of freedom at vertex <code>v</code> of the
+				   // given cell. In the present case,
+				   // displacement in the k-th coordinate
+				   // direction corresonds to the kth
+				   // component of the finite element. Using a
+				   // function like this bears a certain risk,
+				   // because it uses knowledge of the order
+				   // of elements that we have taken together
+				   // for this program in the <code>FESystem</code>
+				   // element. If we decided to add an
+				   // additional variable, for example a
+				   // pressure variable for stabilization, and
+				   // happened to insert it as the first
+				   // variable of the element, then the
+				   // computation below will start to produce
+				   // non-sensical results. In addition, this
+				   // computation rests on other assumptions:
+				   // first, that the element we use has,
+				   // indeed, degrees of freedom that are
+				   // associated with vertices. This is indeed
+				   // the case for the present Q1 element, as
+				   // would be for all Qp elements of
+				   // polynomial order <code>p</code>. However, it
+				   // would not hold for discontinuous
+				   // elements, or elements for mixed
+				   // formulations. Secondly, it also rests on
+				   // the assumption that the displacement at
+				   // a vertex is determined solely by the
+				   // value of the degree of freedom
+				   // associated with this vertex; in other
+				   // words, all shape functions corresponding
+				   // to other degrees of freedom are zero at
+				   // this particular vertex. Again, this is
+				   // the case for the present element, but is
+				   // not so for all elements that are
+				   // presently available in deal.II. Despite
+				   // its risks, we choose to use this way in
+				   // order to present a way to query
+				   // individual degrees of freedom associated
+				   // with vertices.
+				   //
+				   // In this context, it is instructive to
+				   // point out what a more general way would
+				   // be. For general finite elements, the way
+				   // to go would be to take a quadrature
+				   // formula with the quadrature points in
+				   // the vertices of a cell. The <code>QTrapez</code>
+				   // formula for the trapezoidal rule does
+				   // exactly this. With this quadrature
+				   // formula, we would then initialize an
+				   // <code>FEValues</code> object in each cell, and
+				   // use the
+				   // <code>FEValues::get_function_values</code>
+				   // function to obtain the values of the
+				   // solution function in the quadrature
+				   // points, i.e. the vertices of the
+				   // cell. These are the only values that we
+				   // really need, i.e. we are not at all
+				   // interested in the weights (or the
+				   // <code>JxW</code> values) associated with this
+				   // particular quadrature formula, and this
+				   // can be specified as the last argument in
+				   // the constructor to <code>FEValues</code>. The
+				   // only point of minor inconvenience in
+				   // this scheme is that we have to figure
+				   // out which quadrature point corresponds
+				   // to the vertex we consider at present, as
+				   // they may or may not be ordered in the
+				   // same order.
+				   //
+				   // Another point worth explaining about
+				   // this short function is the way in which
+				   // the triangulation class exports
+				   // information about its vertices: through
+				   // the <code>Triangulation::n_vertices</code>
+				   // function, it advertises how many
+				   // vertices there are in the
+				   // triangulation. Not all of them are
+				   // actually in use all the time -- some are
+				   // left-overs from cells that have been
+				   // coarsened previously and remain in
+				   // existence since deal.II never changes
+				   // the number of a vertex once it has come
+				   // into existence, even if vertices with
+				   // lower number go away. Secondly, the
+				   // location returned by <code>cell-@>vertex(v)</code>
+				   // is not only a read-only object of type
+				   // <code>Point@<dim@></code>, but in fact a reference
+				   // that can be written to. This allows to
+				   // move around the nodes of a mesh with
+				   // relative ease, but it is worth pointing
+				   // out that it is the responsibility of an
+				   // application program using this feature
+				   // to make sure that the resulting cells
+				   // are still useful, i.e. are not distorted
+				   // so much that the cell is degenerated
+				   // (indicated, for example, by negative
+				   // Jacobians). Note that we do not have any
+				   // provisions in this function to actually
+				   // ensure this, we just have faith.
+				   //
+				   // After this lengthy introduction, here
+				   // are the full 20 or so lines of code:
   template <int dim>
   void TopLevel<dim>::move_mesh ()
   {
@@ -2446,72 +2438,72 @@ namespace QuasiStaticElasticity
 	if (vertex_touched[cell->vertex_index(v)] == false)
 	  {
 	    vertex_touched[cell->vertex_index(v)] = true;
-            
+
 	    Point<dim> vertex_displacement;
 	    for (unsigned int d=0; d<dim; ++d)
 	      vertex_displacement[d]
 		= incremental_displacement(cell->vertex_dof_index(v,d));
-            
+
 	    cell->vertex(v) += vertex_displacement;
 	  }
   }
 
 
-                                   // @sect4{TopLevel::setup_quadrature_point_history}
+				   // @sect4{TopLevel::setup_quadrature_point_history}
 
-                                   // At the beginning of our computations, we
-                                   // needed to set up initial values of the
-                                   // history variables, such as the existing
-                                   // stresses in the material, that we store
-                                   // in each quadrature point. As mentioned
-                                   // above, we use the <code>user_pointer</code> for
-                                   // this that is available in each cell.
-                                   //
-                                   // To put this into larger perspective, we
-                                   // note that if we had previously available
-                                   // stresses in our model (which we assume
-                                   // do not exist for the purpose of this
-                                   // program), then we would need to
-                                   // interpolate the field of pre-existing
-                                   // stresses to the quadrature
-                                   // points. Likewise, if we were to simulate
-                                   // elasto-plastic materials with
-                                   // hardening/softening, then we would have
-                                   // to store additional history variables
-                                   // like the present yield stress of the
-                                   // accumulated plastic strains in each
-                                   // quadrature points. Pre-existing
-                                   // hardening or weakening would then be
-                                   // implemented by interpolating these
-                                   // variables in the present function as
-                                   // well.
+				   // At the beginning of our computations, we
+				   // needed to set up initial values of the
+				   // history variables, such as the existing
+				   // stresses in the material, that we store
+				   // in each quadrature point. As mentioned
+				   // above, we use the <code>user_pointer</code> for
+				   // this that is available in each cell.
+				   //
+				   // To put this into larger perspective, we
+				   // note that if we had previously available
+				   // stresses in our model (which we assume
+				   // do not exist for the purpose of this
+				   // program), then we would need to
+				   // interpolate the field of pre-existing
+				   // stresses to the quadrature
+				   // points. Likewise, if we were to simulate
+				   // elasto-plastic materials with
+				   // hardening/softening, then we would have
+				   // to store additional history variables
+				   // like the present yield stress of the
+				   // accumulated plastic strains in each
+				   // quadrature points. Pre-existing
+				   // hardening or weakening would then be
+				   // implemented by interpolating these
+				   // variables in the present function as
+				   // well.
   template <int dim>
   void TopLevel<dim>::setup_quadrature_point_history ()
   {
-                                     // What we need to do here is to first
-                                     // count how many quadrature points are
-                                     // within the responsibility of this
-                                     // processor. This, of course, equals the
-                                     // number of cells that belong to this
-                                     // processor times the number of
-                                     // quadrature points our quadrature
-                                     // formula has on each cell.
-                                     //
-                                     // For good measure, we also set all user
-                                     // pointers of all cells, whether ours of
-                                     // not, to the null pointer. This way, if
-                                     // we ever access the user pointer of a
-                                     // cell which we should not have
-                                     // accessed, a segmentation fault will
-                                     // let us know that this should not have
-                                     // happened:
+				     // What we need to do here is to first
+				     // count how many quadrature points are
+				     // within the responsibility of this
+				     // processor. This, of course, equals the
+				     // number of cells that belong to this
+				     // processor times the number of
+				     // quadrature points our quadrature
+				     // formula has on each cell.
+				     //
+				     // For good measure, we also set all user
+				     // pointers of all cells, whether ours of
+				     // not, to the null pointer. This way, if
+				     // we ever access the user pointer of a
+				     // cell which we should not have
+				     // accessed, a segmentation fault will
+				     // let us know that this should not have
+				     // happened:
     unsigned int our_cells = 0;
     for (typename Triangulation<dim>::active_cell_iterator
 	   cell = triangulation.begin_active();
 	 cell != triangulation.end(); ++cell)
       if (cell->subdomain_id() == this_mpi_process)
 	++our_cells;
-      
+
     triangulation.clear_user_data();
 
 				     // Next, allocate as many quadrature
@@ -2560,21 +2552,21 @@ namespace QuasiStaticElasticity
 	  history_index += quadrature_formula.size();
 	}
 
-                                     // At the end, for good measure make sure
-                                     // that our count of elements was correct
-                                     // and that we have both used up all
-                                     // objects we allocated previously, and
-                                     // not point to any objects beyond the
-                                     // end of the vector. Such defensive
-                                     // programming strategies are always good
-                                     // checks to avoid accidental errors and
-                                     // to guard against future changes to
-                                     // this function that forget to update
-                                     // all uses of a variable at the same
-                                     // time. Recall that constructs using the
-                                     // <code>Assert</code> macro are optimized away in
-                                     // optimized mode, so do not affect the
-                                     // run time of optimized runs:
+				     // At the end, for good measure make sure
+				     // that our count of elements was correct
+				     // and that we have both used up all
+				     // objects we allocated previously, and
+				     // not point to any objects beyond the
+				     // end of the vector. Such defensive
+				     // programming strategies are always good
+				     // checks to avoid accidental errors and
+				     // to guard against future changes to
+				     // this function that forget to update
+				     // all uses of a variable at the same
+				     // time. Recall that constructs using the
+				     // <code>Assert</code> macro are optimized away in
+				     // optimized mode, so do not affect the
+				     // run time of optimized runs:
     Assert (history_index == quadrature_point_history.size(),
 	    ExcInternalError());
   }
@@ -2582,113 +2574,113 @@ namespace QuasiStaticElasticity
 
 
 
-                                   // @sect4{TopLevel::update_quadrature_point_history}
+				   // @sect4{TopLevel::update_quadrature_point_history}
 
-                                   // At the end of each time step, we
-                                   // should have computed an
-                                   // incremental displacement update
-                                   // so that the material in its new
-                                   // configuration accomodates for
-                                   // the difference between the
-                                   // external body and boundary
-                                   // forces applied during this time
-                                   // step minus the forces exerted
-                                   // through pre-existing internal
-                                   // stresses. In order to have the
-                                   // pre-existing stresses available
-                                   // at the next time step, we
-                                   // therefore have to update the
-                                   // pre-existing stresses with the
-                                   // stresses due to the incremental
-                                   // displacement computed during the
-                                   // present time step. Ideally, the
-                                   // resulting sum of internal
-                                   // stresses would exactly counter
-                                   // all external forces. Indeed, a
-                                   // simple experiment can make sure
-                                   // that this is so: if we choose
-                                   // boundary conditions and body
-                                   // forces to be time independent,
-                                   // then the forcing terms (the sum
-                                   // of external forces and internal
-                                   // stresses) should be exactly
-                                   // zero. If you make this
-                                   // experiment, you will realize
-                                   // from the output of the norm of
-                                   // the right hand side in each time
-                                   // step that this is almost the
-                                   // case: it is not exactly zero,
-                                   // since in the first time step the
-                                   // incremental displacement and
-                                   // stress updates were computed
-                                   // relative to the undeformed mesh,
-                                   // which was then deformed. In the
-                                   // second time step, we again
-                                   // compute displacement and stress
-                                   // updates, but this time in the
-                                   // deformed mesh -- there, the
-                                   // resulting updates are very small
-                                   // but not quite zero. This can be
-                                   // iterated, and in each such
-                                   // iteration the residual, i.e. the
-                                   // norm of the right hand side
-                                   // vector, is reduced; if one makes
-                                   // this little experiment, one
-                                   // realizes that the norm of this
-                                   // residual decays exponentially
-                                   // with the number of iterations,
-                                   // and after an initial very rapid
-                                   // decline is reduced by roughly a
-                                   // factor of about 3.5 in each
-                                   // iteration (for one testcase I
-                                   // looked at, other testcases, and
-                                   // other numbers of unknowns change
-                                   // the factor, but not the
-                                   // exponential decay).
+				   // At the end of each time step, we
+				   // should have computed an
+				   // incremental displacement update
+				   // so that the material in its new
+				   // configuration accomodates for
+				   // the difference between the
+				   // external body and boundary
+				   // forces applied during this time
+				   // step minus the forces exerted
+				   // through pre-existing internal
+				   // stresses. In order to have the
+				   // pre-existing stresses available
+				   // at the next time step, we
+				   // therefore have to update the
+				   // pre-existing stresses with the
+				   // stresses due to the incremental
+				   // displacement computed during the
+				   // present time step. Ideally, the
+				   // resulting sum of internal
+				   // stresses would exactly counter
+				   // all external forces. Indeed, a
+				   // simple experiment can make sure
+				   // that this is so: if we choose
+				   // boundary conditions and body
+				   // forces to be time independent,
+				   // then the forcing terms (the sum
+				   // of external forces and internal
+				   // stresses) should be exactly
+				   // zero. If you make this
+				   // experiment, you will realize
+				   // from the output of the norm of
+				   // the right hand side in each time
+				   // step that this is almost the
+				   // case: it is not exactly zero,
+				   // since in the first time step the
+				   // incremental displacement and
+				   // stress updates were computed
+				   // relative to the undeformed mesh,
+				   // which was then deformed. In the
+				   // second time step, we again
+				   // compute displacement and stress
+				   // updates, but this time in the
+				   // deformed mesh -- there, the
+				   // resulting updates are very small
+				   // but not quite zero. This can be
+				   // iterated, and in each such
+				   // iteration the residual, i.e. the
+				   // norm of the right hand side
+				   // vector, is reduced; if one makes
+				   // this little experiment, one
+				   // realizes that the norm of this
+				   // residual decays exponentially
+				   // with the number of iterations,
+				   // and after an initial very rapid
+				   // decline is reduced by roughly a
+				   // factor of about 3.5 in each
+				   // iteration (for one testcase I
+				   // looked at, other testcases, and
+				   // other numbers of unknowns change
+				   // the factor, but not the
+				   // exponential decay).
 
-                                   // In a sense, this can then be considered
-                                   // as a quasi-timestepping scheme to
-                                   // resolve the nonlinear problem of solving
-                                   // large-deformation elasticity on a mesh
-                                   // that is moved along in a Lagrangian
-                                   // manner.
-                                   //
-                                   // Another complication is that the
-                                   // existing (old) stresses are defined on
-                                   // the old mesh, which we will move around
-                                   // after updating the stresses. If this
-                                   // mesh update involves rotations of the
-                                   // cell, then we need to also rotate the
-                                   // updated stress, since it was computed
-                                   // relative to the coordinate system of the
-                                   // old cell.
-                                   //
-                                   // Thus, what we need is the following: on
-                                   // each cell which the present processor
-                                   // owns, we need to extract the old stress
-                                   // from the data stored with each
-                                   // quadrature point, compute the stress
-                                   // update, add the two together, and then
-                                   // rotate the result together with the
-                                   // incremental rotation computed from the
-                                   // incremental displacement at the present
-                                   // quadrature point. We will detail these
-                                   // steps below:
+				   // In a sense, this can then be considered
+				   // as a quasi-timestepping scheme to
+				   // resolve the nonlinear problem of solving
+				   // large-deformation elasticity on a mesh
+				   // that is moved along in a Lagrangian
+				   // manner.
+				   //
+				   // Another complication is that the
+				   // existing (old) stresses are defined on
+				   // the old mesh, which we will move around
+				   // after updating the stresses. If this
+				   // mesh update involves rotations of the
+				   // cell, then we need to also rotate the
+				   // updated stress, since it was computed
+				   // relative to the coordinate system of the
+				   // old cell.
+				   //
+				   // Thus, what we need is the following: on
+				   // each cell which the present processor
+				   // owns, we need to extract the old stress
+				   // from the data stored with each
+				   // quadrature point, compute the stress
+				   // update, add the two together, and then
+				   // rotate the result together with the
+				   // incremental rotation computed from the
+				   // incremental displacement at the present
+				   // quadrature point. We will detail these
+				   // steps below:
   template <int dim>
   void TopLevel<dim>::update_quadrature_point_history ()
   {
-                                     // First, set up an <code>FEValues</code> object
-                                     // by which we will evaluate the
-                                     // incremental displacements and the
-                                     // gradients thereof at the quadrature
-                                     // points, together with a vector that
-                                     // will hold this information:
-    FEValues<dim> fe_values (fe, quadrature_formula, 
+				     // First, set up an <code>FEValues</code> object
+				     // by which we will evaluate the
+				     // incremental displacements and the
+				     // gradients thereof at the quadrature
+				     // points, together with a vector that
+				     // will hold this information:
+    FEValues<dim> fe_values (fe, quadrature_formula,
 			     update_values | update_gradients);
     std::vector<std::vector<Tensor<1,dim> > >
       displacement_increment_grads (quadrature_formula.size(),
 				    std::vector<Tensor<1,dim> >(dim));
-  
+
 				     // Then loop over all cells and do the
 				     // job in the cells that belong to our
 				     // subdomain:
@@ -2697,27 +2689,27 @@ namespace QuasiStaticElasticity
 	 cell != dof_handler.end(); ++cell)
       if (cell->subdomain_id() == this_mpi_process)
 	{
-                                           // Next, get a pointer to the
-                                           // quadrature point history data
-                                           // local to the present cell, and,
-                                           // as a defensive measure, make
-                                           // sure that this pointer is within
-                                           // the bounds of the global array:
+					   // Next, get a pointer to the
+					   // quadrature point history data
+					   // local to the present cell, and,
+					   // as a defensive measure, make
+					   // sure that this pointer is within
+					   // the bounds of the global array:
 	  PointHistory<dim> *local_quadrature_points_history
 	    = reinterpret_cast<PointHistory<dim> *>(cell->user_pointer());
 	  Assert (local_quadrature_points_history >=
-                  &quadrature_point_history.front(),
+		  &quadrature_point_history.front(),
 		  ExcInternalError());
 	  Assert (local_quadrature_points_history <
-                  &quadrature_point_history.back(),
+		  &quadrature_point_history.back(),
 		  ExcInternalError());
 
-                                           // Then initialize the <code>FEValues</code>
-                                           // object on the present cell, and
-                                           // extract the gradients of the
-                                           // displacement at the quadrature
-                                           // points for later computation of
-                                           // the strains
+					   // Then initialize the <code>FEValues</code>
+					   // object on the present cell, and
+					   // extract the gradients of the
+					   // displacement at the quadrature
+					   // points for later computation of
+					   // the strains
 	  fe_values.reinit (cell);
 	  fe_values.get_function_grads (incremental_displacement,
 					displacement_increment_grads);
@@ -2726,49 +2718,49 @@ namespace QuasiStaticElasticity
 					   // points of this cell:
 	  for (unsigned int q=0; q<quadrature_formula.size(); ++q)
 	    {
-                                               // On each quadrature point,
-                                               // compute the strain increment
-                                               // from the gradients, and
-                                               // multiply it by the
-                                               // stress-strain tensor to get
-                                               // the stress update. Then add
-                                               // this update to the already
-                                               // existing strain at this
-                                               // point:
-              const SymmetricTensor<2,dim> new_stress
-                = (local_quadrature_points_history[q].old_stress
-                   +
-                   (stress_strain_tensor *
-                    get_strain (displacement_increment_grads[q])));
+					       // On each quadrature point,
+					       // compute the strain increment
+					       // from the gradients, and
+					       // multiply it by the
+					       // stress-strain tensor to get
+					       // the stress update. Then add
+					       // this update to the already
+					       // existing strain at this
+					       // point:
+	      const SymmetricTensor<2,dim> new_stress
+		= (local_quadrature_points_history[q].old_stress
+		   +
+		   (stress_strain_tensor *
+		    get_strain (displacement_increment_grads[q])));
 
-                                               // Finally, we have to rotate
-                                               // the result. For this, we
-                                               // first have to compute a
-                                               // rotation matrix at the
-                                               // present quadrature point
-                                               // from the incremental
-                                               // displacements. In fact, it
-                                               // can be computed from the
-                                               // gradients, and we already
-                                               // have a function for that
-                                               // purpose:
-              const Tensor<2,dim> rotation
-                = get_rotation_matrix (displacement_increment_grads[q]);
-                                               // Note that the result, a
-                                               // rotation matrix, is in
-                                               // general an antisymmetric
-                                               // tensor of rank 2, so we must
-                                               // store it as a full tensor.
+					       // Finally, we have to rotate
+					       // the result. For this, we
+					       // first have to compute a
+					       // rotation matrix at the
+					       // present quadrature point
+					       // from the incremental
+					       // displacements. In fact, it
+					       // can be computed from the
+					       // gradients, and we already
+					       // have a function for that
+					       // purpose:
+	      const Tensor<2,dim> rotation
+		= get_rotation_matrix (displacement_increment_grads[q]);
+					       // Note that the result, a
+					       // rotation matrix, is in
+					       // general an antisymmetric
+					       // tensor of rank 2, so we must
+					       // store it as a full tensor.
 
-                                               // With this rotation matrix,
-                                               // we can compute the rotated
-                                               // tensor by contraction from
-                                               // the left and right, after we
-                                               // expand the symmetric tensor
-                                               // <code>new_stress</code> into a full
-                                               // tensor:
-              const SymmetricTensor<2,dim> rotated_new_stress
-                = symmetrize(transpose(rotation) *
+					       // With this rotation matrix,
+					       // we can compute the rotated
+					       // tensor by contraction from
+					       // the left and right, after we
+					       // expand the symmetric tensor
+					       // <code>new_stress</code> into a full
+					       // tensor:
+	      const SymmetricTensor<2,dim> rotated_new_stress
+		= symmetrize(transpose(rotation) *
 			     static_cast<Tensor<2,dim> >(new_stress) *
 			     rotation);
 					       // Note that while the
@@ -2800,19 +2792,19 @@ namespace QuasiStaticElasticity
 					       // result to make it
 					       // exactly symmetric.
 
-                                               // The result of all these
-                                               // operations is then written
-                                               // back into the original
-                                               // place:
-              local_quadrature_points_history[q].old_stress
-                = rotated_new_stress;
+					       // The result of all these
+					       // operations is then written
+					       // back into the original
+					       // place:
+	      local_quadrature_points_history[q].old_stress
+		= rotated_new_stress;
 	    }
 	}
   }
 
 				   // This ends the project specific
 				   // namespace
-				   // <code>QuasiStaticElasticity</code>. The
+				   // <code>Step18</code>. The
 				   // rest is as usual and as already
 				   // shown in step-17: A <code>main()</code>
 				   // function that initializes and
@@ -2824,20 +2816,23 @@ namespace QuasiStaticElasticity
 }
 
 
-int main (int argc, char **argv) 
+int main (int argc, char **argv)
 {
   try
     {
+      using namespace dealii;
+      using namespace Step18;
+
       PetscInitialize(&argc,&argv,0,0);
 
       {
         deallog.depth_console (0);
 
-        QuasiStaticElasticity::TopLevel<3> elastic_problem;
+        TopLevel<3> elastic_problem;
         elastic_problem.run ();
       }
 
-      PetscFinalize();      
+      PetscFinalize();
     }
   catch (std::exception &exc)
     {
@@ -2849,10 +2844,10 @@ int main (int argc, char **argv)
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"
