@@ -1220,6 +1220,304 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 
 
+
+template <int dim, int spacedim>
+TorusBoundary<dim,spacedim>::TorusBoundary (const double R__,
+					    const double r__)
+		:
+		R(R__),
+		r(r__)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
+template <>
+TorusBoundary<2,3>::TorusBoundary (const double R__,
+				   const double r__)
+		:
+		R(R__),
+		r(r__)
+{
+  Assert (R>r, ExcMessage("Outer radius must be greater than inner radius."));
+}
+
+
+
+template <int dim, int spacedim>
+double
+TorusBoundary<dim,spacedim>::get_correct_angle(const double angle,
+					       const double x,
+					       const double y) const
+{
+  if(y>=0)
+    {
+      if (x >=0)
+	return angle;
+
+      return numbers::PI-angle;
+    }
+
+  if (x <=0)
+    return numbers::PI+angle;
+
+  return 2.0*numbers::PI-angle;
+}
+
+
+
+template <>
+Point<3>
+TorusBoundary<2,3>::get_real_coord (const Point<2>& surfP) const
+{
+  const double theta=surfP(0);
+  const double phi=surfP(1);
+
+  return Point<3> ((R+r*std::cos(phi))*std::cos(theta),
+		   r*std::sin(phi),
+		   (R+r*std::cos(phi))*std::sin(theta));
+}
+
+
+
+template <>
+Point<2>
+TorusBoundary<2,3>::get_surf_coord(const Point<3>& p) const
+{
+  const double phi=std::asin(std::abs(p(1))/r);
+  const double Rr_2=p(0)*p(0)+p(2)*p(2);
+
+  Point<2> surfP;
+  surfP(1)=get_correct_angle(phi,Rr_2-R*R,p(1));//phi
+
+  if(std::abs(p(0))<1.E-5)
+    {
+      if(p(2)>=0)
+	surfP(0) =  numbers::PI*0.5;
+      else
+	surfP(0) = -numbers::PI*0.5;
+    }
+  else
+    {
+      const double theta = std::atan(std::abs(p(2)/p(0)));
+      surfP(0)=  get_correct_angle(theta,p(0),p(2));
+    }
+
+  return surfP;
+}
+
+
+
+template <>
+Point<3>
+TorusBoundary<2,3>::get_new_point_on_line (const typename Triangulation<2,3>::line_iterator &line) const
+{
+				   //Just get the average
+  Point<2>  p0=get_surf_coord(line->vertex(0));
+  Point<2>  p1=get_surf_coord(line->vertex(1));
+
+  Point<2>  middle(0,0);
+
+				   //Take care for periodic conditions,
+				   //For instance phi0= 0, phi1= 3/2*Pi  middle has to be 7/4*Pi not 3/4*Pi
+				   //This also works for -Pi/2 + Pi, middle is 5/4*Pi
+  for(unsigned i=0; i<2;i++)
+    if(std::abs(p0(i)-p1(i))> numbers::PI)
+      middle(i)=2*numbers::PI;
+
+  middle+=  p0 + p1;
+  middle*=0.5;
+
+  Point<3> midReal=get_real_coord(middle);
+  return midReal;
+}
+
+
+
+template <>
+Point<3>
+TorusBoundary<2,3>::get_new_point_on_quad (const typename Triangulation<2,3>::quad_iterator &quad) const
+{
+				   //Just get the average
+  Point<2> p[4];
+
+  for(unsigned i=0;i<4;i++)
+    p[i]=get_surf_coord(quad->vertex(i));
+
+  Point<2>  middle(0,0);
+
+				   //Take care for periodic conditions, see get_new_point_on_line() above
+				   //For instance phi0= 0, phi1= 3/2*Pi  middle has to be 7/4*Pi not 3/4*Pi
+				   //This also works for -Pi/2 + Pi + Pi- Pi/2, middle is 5/4*Pi
+  for(unsigned i=0;i<2;i++)
+    for(unsigned j=1;j<4;j++){
+      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
+	middle(i)+=2*numbers::PI;
+      }
+    }
+
+  for(unsigned i=0;i<4;i++)
+    middle+=p[i];
+
+  middle*= 0.25;
+
+  return get_real_coord(middle);
+}
+
+
+
+//Normal field without unit length
+template <>
+Point<3>
+TorusBoundary<2,3>:: get_surf_norm_from_sp(const Point<2>& surfP) const
+{
+
+  Point<3> n;
+  double theta=surfP[0];
+  double phi=surfP[1];
+
+  double f=R+r*std::cos(phi);
+
+  n[0]=r*std::cos(phi)*std::cos(theta)*f;
+  n[1]=r*std::sin(phi)*f;
+  n[2]=r*std::sin(theta)*std::cos(phi)*f;
+
+  return n;
+}
+
+
+
+//Normal field without unit length
+template <>
+Point<3>
+TorusBoundary<2,3>::get_surf_norm(const Point<3>& p) const{
+
+  Point<2> surfP=get_surf_coord(p);
+  return get_surf_norm_from_sp(surfP);
+
+}
+
+
+
+template<>
+void
+TorusBoundary<2,3>::
+get_intermediate_points_on_line (const typename Triangulation<2, 3>::line_iterator &  line,
+				 std::vector< Point< 3 > > & points) const
+{
+				   //Almost the same implementation as  StraightBoundary<2,3>
+  unsigned npoints=points.size();
+  if(npoints==0) return;
+
+  Point<2> p[2];
+
+  for(unsigned i=0;i<2;i++)
+    p[i]=get_surf_coord(line->vertex(i));
+
+  unsigned  offset[2];
+  offset[0]=0;
+  offset[1]=0;
+
+				   //Take care for periodic conditions & negative angles,
+				   //see get_new_point_on_line() above
+				   //Because we dont have a symmetric interpolation (just the middle) we need to
+				   //add 2*Pi to each almost zero and negative angles.
+  for(unsigned i=0;i<2;i++)
+    for(unsigned j=1;j<2;j++){
+      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
+	offset[i]++;
+	break;
+      }
+    }
+
+  for(unsigned  i=0;i<2;i++)
+    for(unsigned  j=0;j<2;j++)
+      if(p[j](i)<1.E-12 ) //Take care for periodic conditions & negative angles
+	p[j](i)+=2*numbers::PI*offset[i];
+
+
+  double dx=1.0/(npoints+1);
+  double x=dx;
+  Point<2>  target;
+  for(unsigned i=0; i<npoints;i++,x+=dx){
+    target=  (1-x)*p[0] + x*p[1];
+    points[i]=get_real_coord(target);
+  }
+}
+
+
+
+template<>
+void
+TorusBoundary<2,3>::
+get_intermediate_points_on_quad (const typename Triangulation< 2, 3 >::quad_iterator &quad,
+				 std::vector< Point< 3 > > & points )const
+{
+				   //Almost the same implementation as  StraightBoundary<2,3>
+  const unsigned int n=points.size(),
+		     m=static_cast<unsigned int>(std::sqrt(static_cast<double>(n)));
+				   // is n a square number
+  Assert(m*m==n, ExcInternalError());
+
+  const double ds=1./(m+1);
+  double y=ds;
+
+  Point<2>  p[4];
+
+  for(unsigned  i=0;i<4;i++)
+    p[i]=get_surf_coord(quad->vertex(i));
+
+  Point<2>  target;
+  unsigned  offset[2];
+  offset[0]=0;
+  offset[1]=0;
+
+				   //Take care for periodic conditions & negative angles,
+				   //see get_new_point_on_line() above
+				   //Because we dont have a symmetric interpolation (just the middle) we need to
+				   //add 2*Pi to each almost zero and negative angles.
+  for(unsigned  i=0;i<2;i++)
+    for(unsigned  j=1;j<4;j++){
+      if(std::abs(p[0](i)-p[j](i))> numbers::PI){
+	offset[i]++;
+	break;
+      }
+    }
+
+  for(unsigned  i=0;i<2;i++)
+    for(unsigned  j=0;j<4;j++)
+      if(p[j](i)<1.E-12 ) //Take care for periodic conditions & negative angles
+	p[j](i)+=2*numbers::PI*offset[i];
+
+  for (unsigned  i=0; i<m; ++i, y+=ds)
+    {
+      double x=ds;
+      for (unsigned  j=0; j<m; ++j, x+=ds){
+	target=((1-x) * p[0] +
+		x     * p[1]) * (1-y) +
+	       ((1-x) * p[2] +
+		x     * p[3]) * y;
+
+	points[i*m+j]=get_real_coord(target);
+      }
+    }
+}
+
+
+
+template<>
+void
+TorusBoundary<2,3>::
+get_normals_at_vertices (const typename Triangulation<2,3 >::face_iterator &face,
+			 FaceVertexNormals &face_vertex_normals) const
+{
+  for(unsigned i=0; i<GeometryInfo<2>::vertices_per_face; i++)
+    face_vertex_normals[i]=get_surf_norm(face->vertex(i));
+}
+
+
+
 // explicit instantiations
 #include "tria_boundary_lib.inst"
 

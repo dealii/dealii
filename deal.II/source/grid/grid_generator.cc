@@ -232,6 +232,141 @@ GridGenerator::moebius (
 
 
 
+void
+GridGenerator::torus (Triangulation<2,3>&  tria,
+		      const double         R,
+		      const double         r)
+{
+  Assert (R>r, ExcMessage("Outer radius must be greater than inner radius."));
+
+  const unsigned int dim=2;
+  const unsigned int spacedim=3;
+  std::vector<Point<spacedim> > vertices (16);
+
+  vertices[0]=Point<spacedim>(R-r,0,0);
+  vertices[1]=Point<spacedim>(R,-r,0);
+  vertices[2]=Point<spacedim>(R+r,0,0);
+  vertices[3]=Point<spacedim>(R, r,0);
+  vertices[4]=Point<spacedim>(0,0,R-r);
+  vertices[5]=Point<spacedim>(0,-r,R);
+  vertices[6]=Point<spacedim>(0,0,R+r);
+  vertices[7]=Point<spacedim>(0,r,R);
+  vertices[8]=Point<spacedim>(-(R-r),0,0);
+  vertices[9]=Point<spacedim>(-R,-r,0);
+  vertices[10]=Point<spacedim>(-(R+r),0,0);
+  vertices[11]=Point<spacedim>(-R, r,0);
+  vertices[12]=Point<spacedim>(0,0,-(R-r));
+  vertices[13]=Point<spacedim>(0,-r,-R);
+  vertices[14]=Point<spacedim>(0,0,-(R+r));
+  vertices[15]=Point<spacedim>(0,r,-R);
+
+  std::vector<CellData<dim> > cells (16);
+				   //Right Hand Orientation
+  cells[0].vertices[0] =  0;
+  cells[0].vertices[1] =  4;
+  cells[0].vertices[2] =  7;
+  cells[0].vertices[3] =  3;
+  cells[0].material_id = 0;
+
+  cells[1].vertices[0] =  1;
+  cells[1].vertices[1] =  5;
+  cells[1].vertices[2] =  4;
+  cells[1].vertices[3] =  0;
+  cells[1].material_id = 0;
+
+  cells[2].vertices[0] =  2;
+  cells[2].vertices[1] =  6;
+  cells[2].vertices[2] =  5;
+  cells[2].vertices[3] =  1;
+  cells[2].material_id = 0;
+
+  cells[3].vertices[0] =  3;
+  cells[3].vertices[1] =  7;
+  cells[3].vertices[2] =  6;
+  cells[3].vertices[3] =  2;
+  cells[3].material_id = 0;
+
+  cells[4].vertices[0] =  4;
+  cells[4].vertices[1] =  8;
+  cells[4].vertices[2] =  11;
+  cells[4].vertices[3] =  7;
+  cells[4].material_id = 0;
+
+  cells[5].vertices[0] =  5;
+  cells[5].vertices[1] =  9;
+  cells[5].vertices[2] =  8;
+  cells[5].vertices[3] =  4;
+  cells[5].material_id = 0;
+
+  cells[6].vertices[0] =  6;
+  cells[6].vertices[1] =  10;
+  cells[6].vertices[2] =  9;
+  cells[6].vertices[3] =  5;
+  cells[6].material_id = 0;
+
+  cells[7].vertices[0] =  7;
+  cells[7].vertices[1] =  11;
+  cells[7].vertices[2] =  10;
+  cells[7].vertices[3] =  6;
+  cells[7].material_id = 0;
+
+  cells[8].vertices[0] =  8;
+  cells[8].vertices[1] =  12;
+  cells[8].vertices[2] =  15;
+  cells[8].vertices[3] =  11;
+  cells[8].material_id = 0;
+
+  cells[9].vertices[0] =  9;
+  cells[9].vertices[1] =  13;
+  cells[9].vertices[2] =  12;
+  cells[9].vertices[3] =  8;
+  cells[9].material_id = 0;
+
+  cells[10].vertices[0] =  10;
+  cells[10].vertices[1] =  14;
+  cells[10].vertices[2] =  13;
+  cells[10].vertices[3] =  9;
+  cells[10].material_id = 0;
+
+  cells[11].vertices[0] =  11;
+  cells[11].vertices[1] =  15;
+  cells[11].vertices[2] =  14;
+  cells[11].vertices[3] =  10;
+  cells[11].material_id = 0;
+
+  cells[12].vertices[0] =  12;
+  cells[12].vertices[1] =  0;
+  cells[12].vertices[2] =  3;
+  cells[12].vertices[3] =  15;
+  cells[12].material_id = 0;
+
+  cells[13].vertices[0] =  13;
+  cells[13].vertices[1] =  1;
+  cells[13].vertices[2] =  0;
+  cells[13].vertices[3] =  12;
+  cells[13].material_id = 0;
+
+  cells[14].vertices[0] =  14;
+  cells[14].vertices[1] =  2;
+  cells[14].vertices[2] =  1;
+  cells[14].vertices[3] =  13;
+  cells[14].material_id = 0;
+
+  cells[15].vertices[0] =  15;
+  cells[15].vertices[1] =  3;
+  cells[15].vertices[2] =  2;
+  cells[15].vertices[3] =  14;
+  cells[15].material_id = 0;
+
+				   // Must call this to be able to create a
+				   // correct triangulation in dealii, read
+				   // GridReordering<> doc
+  GridReordering<dim,spacedim>::reorder_cells (cells);
+  tria.create_triangulation_compatibility (vertices, cells, SubCellData());
+}
+
+
+
 
 // Implementation for 2D only
 template<>
@@ -1697,7 +1832,7 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
     };
 
   tria.create_triangulation (vertices, cells, SubCellData());
-  
+
   if (colorize)
   {
       Triangulation<2>::cell_iterator cell = tria.begin();
@@ -1706,7 +1841,7 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 	cell->face(2)->set_boundary_indicator(1);
       }
       tria.begin()->face(0)->set_boundary_indicator(3);
-      
+
       tria.last()->face(1)->set_boundary_indicator(2);
   }
 }
@@ -1776,8 +1911,8 @@ void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
       cells[i].material_id = 0;
     };
 
-  tria.create_triangulation (vertices, cells, SubCellData());   
-  
+  tria.create_triangulation (vertices, cells, SubCellData());
+
   if (colorize)
   {
       Triangulation<2>::cell_iterator cell = tria.begin();
@@ -1786,7 +1921,7 @@ void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
 	cell->face(2)->set_boundary_indicator(1);
       }
       tria.begin()->face(0)->set_boundary_indicator(3);
-      
+
       tria.last()->face(1)->set_boundary_indicator(2);
   }
 }
@@ -2813,13 +2948,13 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
 	  ExcMessage ("The input triangulations must be coarse meshes."));
   Assert (triangulation_2.n_levels() == 1,
 	  ExcMessage ("The input triangulations must be coarse meshes."));
-  
+
   // get the union of the set of vertices
   std::vector<Point<spacedim> > vertices = triangulation_1.get_vertices();
   vertices.insert (vertices.end(),
 		   triangulation_2.get_vertices().begin(),
 		   triangulation_2.get_vertices().end());
-  
+
   // now form the union of the set of cells
   std::vector<CellData<dim> > cells;
   cells.reserve (triangulation_1.n_cells() + triangulation_2.n_cells());
@@ -2832,8 +2967,8 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
     this_cell.material_id = cell->material_id();
     cells.push_back (this_cell);
   }
-  
-  // now do the same for the other other mesh. note that we have to 
+
+  // now do the same for the other other mesh. note that we have to
   // translate the vertex indices
   for (typename Triangulation<dim,spacedim>::cell_iterator
     cell = triangulation_2.begin(); cell != triangulation_2.end(); ++cell)
@@ -2844,7 +2979,7 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
     this_cell.material_id = cell->material_id();
     cells.push_back (this_cell);
   }
-  
+
   // throw out duplicated vertices from the two meshes
   // and create the triangulation
   SubCellData subcell_data;

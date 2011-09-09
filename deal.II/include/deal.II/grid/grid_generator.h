@@ -47,9 +47,6 @@ template <typename number> class SparseMatrix;
  *
  *
  * @ingroup grid
- * @author Wolfgang Bangerth, Ralf Hartmann, Guido Kanschat, Stefan
- * Nauber, Joerg Weimar, Yaqi Wang, Luca Heltai, 1998, 1999, 2000, 2001, 2002,
- * 2003, 2006, 2007, 2008, 2009, 2010, 2011.
  */
 class GridGenerator
 {
@@ -673,11 +670,11 @@ class GridGenerator
 				      * computed adaptively such that
 				      * the resulting elements have
 				      * the least aspect ratio.
-				      * 
+				      *
 				      * If colorize is set to true, the
 				      * inner, outer, left, and right
 				      * boundary get indicator 0, 1, 2,
-				      * and 3, respectively. Otherwise 
+				      * and 3, respectively. Otherwise
 				      * all indicators are set to 0.
 				      *
 				      * @note The triangulation needs to be
@@ -692,7 +689,7 @@ class GridGenerator
 				  const unsigned int  n_cells = 0,
 				  const bool colorize = false);
 
-    
+
 				     /**
 				      * Produce a quarter hyper-shell,
 				      * i.e. the space between two
@@ -730,7 +727,7 @@ class GridGenerator
 				  const double        outer_radius,
 				  const unsigned int  n_cells = 0,
 				  const bool colorize = false);
-   
+
 				     /**
 				      * Produce a domain that is the space
 				      * between two cylinders in 3d, with
@@ -760,6 +757,30 @@ class GridGenerator
                                 const double        outer_radius,
                                 const unsigned int  n_radial_cells = 0,
                                 const unsigned int  n_axial_cells = 0);
+
+
+
+                                     /**
+				      * Produce the surface meshing of the
+				      * torus. The axis of the torus is the
+				      * $y$-axis while the plane of the torus
+				      * is the $x$-$z$ plane. The boundary of
+				      * this object can be described by the
+				      * TorusBoundary class.
+				      *
+				      * @param R The radius of the circle,
+				      * which forms the middle line of the
+				      * torus containing the loop of
+				      * cells. Must be greater than @p r.
+				      *
+				      * @param r The inner radius of the
+				      * torus.
+				      */
+
+    static void torus (Triangulation<2,3>&  tria,
+		       const double         R,
+		       const double         r);
+
 
 				     /**
 				      * This class produces a square
@@ -826,8 +847,8 @@ class GridGenerator
 				      * the third parameter. Previous
 				      * content of @p result will be
 				      * deleted.
-				      * 
-				      * This function is most often used 
+				      *
+				      * This function is most often used
 				      * to compose meshes for more
 				      * complicated geometries if the
 				      * geometry can be composed of
@@ -835,7 +856,7 @@ class GridGenerator
 				      * exist to generate coarse meshes.
 				      * For example, the channel mesh used
 				      * in step-35 could in principle be
-				      * created using a mesh created by the 
+				      * created using a mesh created by the
 				      * GridGenerator::hyper_cube_with_cylindrical_hole
 				      * function and several rectangles,
 				      * and merging them using the current
@@ -847,11 +868,11 @@ class GridGenerator
 				      * individual mesh building blocks are
 				      * GridTools::transform, GridTools::rotate,
 				      * and GridTools::scale).
-				      * 
+				      *
 				      * @note The two input triangulations
 				      * must be coarse meshes that have
-				      * no refined cells. 
-				      * 
+				      * no refined cells.
+				      *
 				      * @note The function copies the material ids
 				      * of the cells of the two input
 				      * triangulations into the output
@@ -863,7 +884,7 @@ class GridGenerator
 				      * then you will currently have to set
 				      * boundary indicators again by hand
 				      * in the output triangulation.
-				      * 
+				      *
 				      * @note For a related operation
 				      * on refined meshes when both
 				      * meshes are derived from the
