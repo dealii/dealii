@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,7 +26,7 @@
 #ifdef DEAL_II_USE_MUMPS
 #  include <deal.II/base/utilities.h>
 #  include <dmumps_c.h>
-#endif 
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -106,7 +106,7 @@ DEAL_II_NAMESPACE_OPEN
  * <h3>Note on parallelization</h3>
  *
  * <h4>Synchronisation</h4>
- * 
+ *
  * Due to the use of global variables through COMMON blocks, the calls
  * to the sparse direct solver routines are not multithreading-safe,
  * i.e. at each time there may only be one call to these functions
@@ -161,7 +161,7 @@ DEAL_II_NAMESPACE_OPEN
  * of this object multiply in parallel at the same time, which is what
  * you probably wanted.
  *
- * 
+ *
  * <h5>Internals of the detached mode</h5>
  *
  * The program that actually runs the detached solver is called
@@ -183,9 +183,9 @@ DEAL_II_NAMESPACE_OPEN
  * some time. Presently, the check interval is once every 20
  * seconds. After that time, the detached solver should have noticed
  * the main programs demise.
- * 
+ *
  * @ingroup Solvers Preconditioners
- * 
+ *
  * @author Wolfgang Bangerth, 2000, 2001, 2002
  */
 class SparseDirectMA27 : public Subscriptor
@@ -209,7 +209,7 @@ class SparseDirectMA27 : public Subscriptor
                                       * Destructor.
                                       */
     ~SparseDirectMA27 ();
-    
+
                                      /**
                                       * Set the detached mode (see the
                                       * general class documentation
@@ -232,7 +232,7 @@ class SparseDirectMA27 : public Subscriptor
                                       * mode is set.
                                       */
     bool detached_mode_set () const;
-    
+
 				     /**
 				      * Initialize some data
 				      * structures. This function
@@ -302,7 +302,7 @@ class SparseDirectMA27 : public Subscriptor
     void solve (Vector<number> &rhs_and_solution) const;
 
 				     /**
-				      * Call the three functions 
+				      * Call the three functions
 				      * initialize, factorize and solve
 				      * in that order, i.e. perform
 				      * the whole solution process for
@@ -322,7 +322,7 @@ class SparseDirectMA27 : public Subscriptor
 				      * memory used by this class.
 				      */
     std::size_t memory_consumption () const;
-    
+
 				     /**
 				      * Get a reference to the
 				      * synchronisation lock which can
@@ -381,7 +381,7 @@ class SparseDirectMA27 : public Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcMatrixNotSymmetric);
-				     //@}    
+				     //@}
   private:
                                      /**
                                       * Declare a local type which
@@ -394,7 +394,7 @@ class SparseDirectMA27 : public Subscriptor
                                       * file.
                                       */
     struct DetachedModeData;
-    
+
                                      /**
                                       * Store in the constructor
                                       * whether the MA27 routines
@@ -417,7 +417,7 @@ class SparseDirectMA27 : public Subscriptor
                                       * detached solver.
                                       */
     DetachedModeData *detached_mode_data;
-    
+
 				     /**
 				      * Store the three values passed
 				      * to the cinstructor. See the
@@ -436,7 +436,7 @@ class SparseDirectMA27 : public Subscriptor
     const double LIW_increase_factor_1;
     const double LIW_increase_factor_2;
     const double LA_increase_factor;
-    
+
 				     /**
 				      * Flags storing whether the
 				      * first two functions have
@@ -452,14 +452,14 @@ class SparseDirectMA27 : public Subscriptor
 				      * all calls.
 				      */
     SmartPointer<const SparsityPattern,SparseDirectMA27> sparsity_pattern;
-    
+
 				     /**
 				      * Number of nonzero elements in
 				      * the sparsity pattern on and
 				      * above the diagonal.
 				      */
     unsigned int n_nonzero_elements;
-    
+
 				     /**
 				      * Arrays holding row and column
 				      * indices.
@@ -478,7 +478,7 @@ class SparseDirectMA27 : public Subscriptor
 				      * Length of the <tt>A</tt> array.
 				      */
     unsigned int         LA;
-    
+
 				     /**
 				      * Scratch arrays and variables
 				      * used by the MA27 functions. We
@@ -492,7 +492,7 @@ class SparseDirectMA27 : public Subscriptor
     std::vector<unsigned int> IW;
     std::vector<unsigned int> IKEEP;
     std::vector<unsigned int> IW1;
-    
+
     unsigned int NSTEPS;
     unsigned int MAXFRT;
 
@@ -508,7 +508,7 @@ class SparseDirectMA27 : public Subscriptor
 				      */
     unsigned int NRLNEC;
     unsigned int NIRNEC;
-    
+
 				     /**
 				      * Flag indicating the level of
 				      * output desired and returning
@@ -522,13 +522,13 @@ class SparseDirectMA27 : public Subscriptor
 				      */
     static Threads::ThreadMutex static_synchronisation_lock;
     mutable Threads::ThreadMutex non_static_synchronisation_lock;
-    
+
 				     /**
 				      * Fill the <tt>A</tt> array from the
 				      * symmetric part of the given
 				      * matrix.
 				      */
-    template <typename number>    
+    template <typename number>
     void fill_A (const SparseMatrix<number> &matrix);
 
 				     /**
@@ -565,7 +565,7 @@ class SparseDirectMA27 : public Subscriptor
                       unsigned int       *MAXFRT,
                       unsigned int       *IW1,
                       int                *IFLAG);
-    
+
 				     /**
 				      * Call the respective function
 				      * with the given args, either
@@ -625,7 +625,7 @@ class SparseDirectMA27 : public Subscriptor
  * detected the presence of this solver. Please read the README file on what
  * the configure script is looking for and how to provide it.
  *
- * 
+ *
  * <h3>Interface and Method</h3>
  *
  * For the meaning of the three functions initialize(), factorize(),
@@ -673,7 +673,7 @@ class SparseDirectMA27 : public Subscriptor
  * A detached mode as for MA27 has not yet been implemented for this
  * class.
  *
- * 
+ *
  * @ingroup Solvers Preconditioners
  *
  * @author Wolfgang Bangerth, 2000, 2001
@@ -802,7 +802,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * information.
 				      */
     Threads::ThreadMutex & get_synchronisation_lock () const;
-    
+
     				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -847,7 +847,7 @@ class SparseDirectMA47 : public Subscriptor
                                       * Exception
                                       */
     DeclException0 (ExcMatrixNotSymmetric);
-				     //@}    
+				     //@}
   private:
                                      /**
                                       * Store in the constructor
@@ -890,7 +890,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * same thing for all calls.
 				      */
     SmartPointer<const SparseMatrix<double>,SparseDirectMA47> matrix;
-    
+
 				     /**
 				      * Number of nonzero elements in
 				      * the sparsity pattern on and
@@ -929,7 +929,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * Length of the <tt>A</tt> array.
 				      */
     unsigned int         LA;
-    
+
 				     /**
 				      * Scratch arrays and variables
 				      * used by the MA47 functions. We
@@ -949,7 +949,7 @@ class SparseDirectMA47 : public Subscriptor
 				      * to this class.
 				      */
     static Threads::ThreadMutex synchronisation_lock;
-    
+
 				     /**
 				      * Fill the <tt>A</tt> array from the
 				      * symmetric part of the given
@@ -1067,8 +1067,8 @@ class SparseDirectUMFPACK : public Subscriptor
 				      */
     class AdditionalData
     {};
-    
-    
+
+
 				     /**
 				      * Constructor. See the
 				      * documentation of this class
@@ -1080,8 +1080,8 @@ class SparseDirectUMFPACK : public Subscriptor
                                      /**
                                       * Destructor.
                                       */
-    ~SparseDirectUMFPACK ();    
-    
+    ~SparseDirectUMFPACK ();
+
 				     /**
 				      * This function does nothing. It is only
 				      * here to provide an interface that is
@@ -1107,7 +1107,7 @@ class SparseDirectUMFPACK : public Subscriptor
 				      *
 				      * In contrast to the other direct solver
 				      * classes, the initialisation method
-				      * does nothing. Therefore initialise 
+				      * does nothing. Therefore initialise
 				      * is not automatically called by this
 				      * method, when
 				      * the initialization step has
@@ -1129,7 +1129,7 @@ class SparseDirectUMFPACK : public Subscriptor
     template <class Matrix>
     void initialize(const Matrix &matrix,
 		    const AdditionalData additional_data = AdditionalData());
-    
+
 				     /**
 				      * Preconditioner interface
 				      * function. Usually, given the source
@@ -1148,7 +1148,7 @@ class SparseDirectUMFPACK : public Subscriptor
 				      * for compiling.
 				      */
     void Tvmult (Vector<double>&, const Vector<double>&) const;
-    
+
 				     /**
 				      * Same as vmult(), but adding to
 				      * the previous solution. Not
@@ -1190,7 +1190,7 @@ class SparseDirectUMFPACK : public Subscriptor
     void solve (Vector<double> &rhs_and_solution) const;
 
 				     /**
-				      * Call the two functions 
+				      * Call the two functions
 				      * factorize and solve
 				      * in that order, i.e. perform
 				      * the whole solution process for
@@ -1216,8 +1216,10 @@ class SparseDirectUMFPACK : public Subscriptor
                                       */
     DeclException2 (ExcUMFPACKError, char*, int,
 		    << "UMFPACK routine " << arg1
-		    << " returned error status " << arg2);
-    
+		    << " returned error status " << arg2
+		    << ". See the file <contrib/umfpack/UMFPACK/Include/umfpack.h>"
+		    << " for a description of error codes.");
+
   private:
                                      /**
                                       * The UMFPACK routines allocate objects
@@ -1253,7 +1255,7 @@ class SparseDirectUMFPACK : public Subscriptor
 
     template <typename number>
     void sort_arrays (const SparseMatrix<number> &);
-    
+
     template <typename number>
     void sort_arrays (const BlockSparseMatrix<number> &);
 
@@ -1293,10 +1295,10 @@ class SparseDirectUMFPACK : public Subscriptor
  *
  * @author Markus Buerg, 2010
  */
-class SparseDirectMUMPS 
+class SparseDirectMUMPS
 {
  private:
-  
+
 #ifdef DEAL_II_USE_MUMPS
   DMUMPS_STRUC_C id;
 #endif // DEAL_II_USE_MUMPS
@@ -1313,7 +1315,7 @@ class SparseDirectMUMPS
 			 * <tt>initialize ()</tt> has already been
 			 * called.
 			 */
-  bool initialize_called;  
+  bool initialize_called;
 
  public:
 
@@ -1321,7 +1323,7 @@ class SparseDirectMUMPS
 			 * Constructor
 			 */
   SparseDirectMUMPS ();
-  
+
                         /**
 			 * Destructor
 			 */
@@ -1331,7 +1333,7 @@ class SparseDirectMUMPS
                          * Exception
                          */
   DeclException0 (ExcInitializeAlreadyCalled);
-  
+
                         /**
                          * This function initializes a MUMPS instance
 			 * and hands over the system's matrix
@@ -1339,14 +1341,14 @@ class SparseDirectMUMPS
 			 * <tt>vector</tt> to the solver.
 			 */
   template <class Matrix>
-    void initialize (const Matrix& matrix, 
+    void initialize (const Matrix& matrix,
 		     const Vector<double>      & vector);
-  
+
                         /**
                          * A function in which the linear system is
 			 * solved and the solution vector is copied
 			 * into the given <tt>vector</tt>.
-			 */      
+			 */
   void solve (Vector<double>& vector);
 };
 
