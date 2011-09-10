@@ -241,6 +241,8 @@ namespace SLEPcWrappers
       case ::dealii::SolverControl::failure:
 	if (solver_control.last_step() > solver_control.max_steps())
 	  *reason = EPS_DIVERGED_ITS;
+	else
+	  *reason = EPS_DIVERGED_BREAKDOWN;
 	break;
 
       default:
