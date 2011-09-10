@@ -318,21 +318,29 @@ namespace SLEPcWrappers
                                     */
       virtual void set_solver_type (EPS &eps) const = 0;
 
-                                   /*
-                                    * Attributes that store the
-				    * relevant information for the
-				    * eigenproblem solver
-				    * context. These are: which
-				    * portion of the spectrum to solve
-				    * from; and the matrices and
-				    * vectors that discribe the
-				    * problem.
+                                   /**
+                                    * Which portion of the spectrum to
+				    * solve from.
                                     */
-      EPSWhich                           set_which;
+      EPSWhich set_which;
 
-      const PETScWrappers::MatrixBase   *opA;
-      const PETScWrappers::MatrixBase   *opB;
-      const PETScWrappers::VectorBase   *initial_vector;
+                                   /**
+                                    * The matrix $A$ of the
+                                    * generalized eigenvalue problem
+                                    * $Ax=B\lambda x$, or the standard
+                                    * eigenvalue problem $Ax=\lambda
+                                    * x$.
+                                    */
+      const PETScWrappers::MatrixBase *opA;
+
+                                   /**
+                                    * The matrix $B$ of the
+                                    * generalized eigenvalue problem
+                                    * $Ax=B\lambda x$.
+                                    */
+      const PETScWrappers::MatrixBase *opB;
+
+      const PETScWrappers::VectorBase *initial_vector;
 
                                    /**
                                     * Pointer to an an object that
@@ -425,8 +433,8 @@ namespace SLEPcWrappers
                                     * the PETScWrappers, but you can
                                     * change that.
                                     */
-       SolverKrylovSchur (SolverControl        &cn,
-			  const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+       SolverKrylovSchur (SolverControl        &cn, 
+			  const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
 			  const AdditionalData &data = AdditionalData());
 
     protected:
@@ -451,7 +459,7 @@ namespace SLEPcWrappers
  * solver. Usage: All spectrum, all problem types, complex.
  *
  * @ingroup SLEPcWrappers
- * @author Toby D. Young 2008
+ * @author Toby D. Young 2008, 2011
  */
   class SolverArnoldi : public SolverBase
     {
@@ -462,7 +470,21 @@ namespace SLEPcWrappers
                                     * should it be needed.
                                     */
       struct AdditionalData
-      {};
+      {
+                                   /**
+                                    * Constructor. By default, set the
+                                    * option of delayed
+                                    * reorthogonalization to false,
+                                    * i.e. don't do it.
+                                    */
+          AdditionalData (const bool delayed_reorthogonalization = false);
+
+	                           /**
+				    * Flag for delayed
+				    * reorthogonalization.
+				    */
+	  bool delayed_reorthogonalization;
+      };
 
                                    /**
                                     * SLEPc solvers will want to have
@@ -474,7 +496,7 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverArnoldi (SolverControl        &cn,
-		     const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
 		     const AdditionalData &data = AdditionalData());
 
     protected:
@@ -523,7 +545,7 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverLanczos (SolverControl        &cn,
-		     const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+		     const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
 		     const AdditionalData &data = AdditionalData());
 
     protected:
@@ -573,7 +595,7 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverPower (SolverControl        &cn,
-		   const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+		   const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
 		   const AdditionalData &data = AdditionalData());
 
     protected:
@@ -623,7 +645,7 @@ namespace SLEPcWrappers
                                     * change that.
                                     */
       SolverDavidson (SolverControl        &cn,
-		      const MPI_Comm       &mpi_communicator = PETSC_COMM_WORLD,
+		      const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
 		      const AdditionalData &data = AdditionalData());
 
     protected:

@@ -282,6 +282,12 @@ namespace SLEPcWrappers
 
   /* ---------------------- SolverArnoldi ------------------------ */
 
+  SolverArnoldi::AdditionalData::
+  AdditionalData (const bool delayed_reorthogonalization)                           
+    :
+    delayed_reorthogonalization (delayed_reorthogonalization)
+  {}
+
   SolverArnoldi::SolverArnoldi (SolverControl        &cn,
 				const MPI_Comm       &mpi_communicator,
 				const AdditionalData &data)
@@ -305,6 +311,15 @@ namespace SLEPcWrappers
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
 			    this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+                                    // if requested, set delayed
+                                    // reorthogonalization in the
+                                    // Arnoldi iteration.
+    if (additional_data.delayed_reorthogonalization)
+      {
+	ierr = EPSArnoldiSetDelayed (eps, PETSC_TRUE);
+	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+      }
   }
 
   /* ---------------------- Lanczos ------------------------ */
