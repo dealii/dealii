@@ -283,6 +283,17 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The CellAccessor::is_locally_owned function is a shortcut
+for the <code>!cell-@>is_ghost() && !cell-@>is_artificial()</code> pattern
+found in many places when dealing with distributed meshes.
+<br>
+(Wolfgang Bangerth, 2011/09/10)
+
+<li> New: The GridGenerator::torus function and TorusBoundary class can
+create and describe the surface of a torus.
+<br>
+(Daniel Castanon Quiroz, 2011/09/08)
+
 <li> New: The GridGenerator::torus function and TorusBoundary class can
 create and describe the surface of a torus.
 <br>

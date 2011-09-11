@@ -2809,6 +2809,29 @@ CellAccessor<dim,spacedim>::active () const
 template <int dim, int spacedim>
 inline
 bool
+CellAccessor<dim,spacedim>::is_locally_owned () const
+{
+#ifndef DEAL_II_USE_P4EST
+  return true;
+#else
+  const types::subdomain_id_t subdomain = this->subdomain_id();
+  if (subdomain == types::artificial_subdomain_id)
+    return false;
+
+  const parallel::distributed::Triangulation<dim,spacedim> *pdt
+    = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(this->tria);
+
+  if (pdt == 0)
+    return true;
+  else
+    return (subdomain == pdt->locally_owned_subdomain());
+#endif
+}
+
+
+template <int dim, int spacedim>
+inline
+bool
 CellAccessor<dim,spacedim>::is_ghost () const
 {
 #ifndef DEAL_II_USE_P4EST

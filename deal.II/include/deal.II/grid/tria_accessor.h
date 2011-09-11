@@ -2719,6 +2719,23 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      */
     bool active () const;
 
+    /**
+     * Return whether this cell is owned by the current processor
+     * or is owned by another processor. The function always returns
+     * true if applied to an object of type dealii::Triangulation,
+     * but may yield false if the triangulation is of type
+     * parallel::distributed::Triangulation.
+     *
+     * See the @ref GlossGhostCell
+     * "glossary" and the @ref
+     * distributed module for more
+     * information.
+     * 
+     * @post The returned value is equal to <code>!is_ghost() &&
+     * !is_artificial()</code>.
+     **/
+    bool is_locally_owned () const;
+    
 				     /**
 				      * Return whether this cell
 				      * exists in the global mesh but
@@ -2741,6 +2758,10 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * "glossary" and the @ref
 				      * distributed module for more
 				      * information.
+				      *
+				      * @post The returned value is equal to
+				      * <code>!is_locally_owned() &&
+				      * !is_artificial()</code>.
 				      */
     bool is_ghost () const;
 
@@ -2775,6 +2796,10 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * GlossArtificialCell "glossary"
 				      * and the @ref distributed
 				      * module for more information.
+				      *
+				      * @post The returned value is equal to
+				      * <code>!is_ghost() &&
+				      * !is_artificial()</code>.
 				      */
     bool is_artificial () const;
 

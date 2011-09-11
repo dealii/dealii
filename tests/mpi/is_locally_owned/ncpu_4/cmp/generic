@@ -1,0 +1,11 @@
+
+DEAL:0:2d::hyper_cube
+DEAL:0:2d::0.0: locally owned
+DEAL:0:2d::0.1: locally owned
+DEAL:0:2d::0.2: ghost
+DEAL:0:2d::0.3: ghost
+DEAL:0:2d::0.4: ghost
+DEAL:0:2d::0.5: ghost
+DEAL:0:2d::0.6: artificial
+DEAL:0:2d::0.7: artificial
+DEAL:0:2d::0.8: artificial
