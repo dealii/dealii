@@ -793,9 +793,9 @@ class TorusBoundary : public Boundary<dim,spacedim>
                                      /**
 				      * Function that corrects the value and
 				      * sign of angle, that is, given
-				      * <tt>angle=tan(abs(y/x))<tt>; if <tt>
-				      * (y > 0) && (x < 0) <tt> then
-				      * <tt>correct_angle = Pi - angle<tt>,
+				      * <tt>angle=tan(abs(y/x))</tt>; if <tt>
+				      * (y > 0) && (x < 0) </tt> then
+				      * <tt>correct_angle = Pi - angle</tt>,
 				      * etc.
 				      */
 
@@ -803,15 +803,15 @@ class TorusBoundary : public Boundary<dim,spacedim>
 
                                      /**
 				      * Get the cartesian coordinates of the
-				      * Torus, i.e., from <tt>(theta,phi)<tt>
-				      * to <tt>(x,y,z)<tt>.
+				      * Torus, i.e., from <tt>(theta,phi)</tt>
+				      * to <tt>(x,y,z)</tt>.
 				      */
     Point<spacedim>  get_real_coord(const Point<dim>& surfP) const ;
 
                                      /**
 				      * Get the surface coordinates of the
-				      * Torus, i.e., from <tt>(x,y,z)<tt> to
-				      * <tt>(theta,phi)<tt>.
+				      * Torus, i.e., from <tt>(x,y,z)</tt> to
+				      * <tt>(theta,phi)</tt>.
 				      */
     Point<dim>       get_surf_coord(const Point<spacedim>& p) const ;
 
