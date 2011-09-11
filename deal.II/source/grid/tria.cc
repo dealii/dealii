@@ -13470,8 +13470,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 	    if (!cell->active() ||
 		(cell->active() &&
 		 cell->refine_flag_set() &&
-		 !cell->is_ghost() &&
-		 !cell->is_artificial()))
+		 cell->is_locally_owned()))
 	      {
 						 // check whether all
 						 // children are

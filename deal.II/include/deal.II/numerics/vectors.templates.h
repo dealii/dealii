@@ -190,7 +190,7 @@ void VectorTools::interpolate (const Mapping<DH::dimension,DH::space_dimension> 
 			       fe, support_quadrature, update_quadrature_points);
 
   for (; cell!=endc; ++cell)
-    if (!cell->is_artificial() && !cell->is_ghost())
+    if (cell->is_locally_owned())
     {
       const unsigned int fe_index = cell->active_fe_index();
 
@@ -4346,7 +4346,7 @@ compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 						   // length of the vector
 						   // back to one, just to be
 						   // on the safe side
-		  Point<dim> normal_vector 
+		  Point<dim> normal_vector
 		  = (cell->face(face_no)->get_boundary()
 		     .normal_vector (cell->face(face_no),
 				     fe_values.quadrature_point(i)));
@@ -4928,7 +4928,7 @@ namespace internal
       typename DH::active_cell_iterator cell = dof.begin_active(),
                                         endc = dof.end();
       for (unsigned int index=0; cell != endc; ++cell, ++index)
-	if (!cell->is_artificial() && !cell->is_ghost())
+	if (cell->is_locally_owned())
 	  {
 	    double diff=0;
 					     // initialize for this cell
@@ -5480,7 +5480,7 @@ VectorTools::compute_mean_value (const Mapping<dim, spacedim>    &mapping,
   double area = 0.;
 				   // Compute mean value
   for (cell = dof.begin_active(); cell != dof.end(); ++cell)
-    if (!cell->is_artificial() && !cell->is_ghost())
+    if (cell->is_locally_owned())
       {
 	fe.reinit (cell);
 	fe.get_function_values(v, values);

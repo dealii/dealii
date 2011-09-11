@@ -83,7 +83,7 @@ GridTools::diameter (const Triangulation<dim, spacedim> &tria)
   Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria)
            == 0),
 	  ExcNotImplemented());
-  
+
 				   // the algorithm used simply
 				   // traverses all cells and picks
 				   // out the boundary vertices. it
@@ -142,7 +142,7 @@ GridTools::volume (const Triangulation<dim, spacedim> &triangulation,
   = (dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping) != 0 ?
      dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping)->get_degree() :
      1);
-  
+
   // then initialize an appropriate quadrature formula
   const QGauss<dim> quadrature_formula (mapping_degree + 1);
   const unsigned int n_q_points = quadrature_formula.size();
@@ -159,7 +159,7 @@ GridTools::volume (const Triangulation<dim, spacedim> &triangulation,
 
 				   // compute the integral quantities by quadrature
   for (; cell!=endc; ++cell)
-    if (!cell->is_ghost() && !cell->is_artificial())
+    if (cell->is_locally_owned())
       {
 	fe_values.reinit (cell);
 	for (unsigned int q=0; q<n_q_points; ++q)
@@ -180,7 +180,7 @@ GridTools::volume (const Triangulation<dim, spacedim> &triangulation,
   global_volume = local_volume;
 #endif
 
-  return global_volume;  
+  return global_volume;
 }
 
 

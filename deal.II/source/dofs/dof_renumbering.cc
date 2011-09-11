@@ -765,7 +765,7 @@ namespace DoFRenumbering
     std::vector<std::vector<unsigned int> >
       component_to_dof_map (fe_collection.n_components());
     for (ITERATOR cell=start; cell!=end; ++cell)
-      if (!cell->is_artificial() && !cell->is_ghost())
+      if (cell->is_locally_owned())
 	{
 					 // on each cell: get dof indices
 					 // and insert them into the global
@@ -922,7 +922,7 @@ namespace DoFRenumbering
         }
       else
         {
-          if (!cell->is_artificial() && !cell->is_ghost())
+          if (cell->is_locally_owned())
             {
               const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
               std::vector<unsigned int> local_dof_indices (dofs_per_cell);
@@ -1017,7 +1017,7 @@ namespace DoFRenumbering
 		       numbers::invalid_unsigned_int)
 	    == renumbering.end(),
 	    ExcInternalError());
-	
+
 	dof_handler.renumber_dofs(renumbering);
   }
 

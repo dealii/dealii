@@ -96,9 +96,7 @@ namespace DoFTools
 	   ||
 	   (subdomain_id == cell->subdomain_id()))
 	  &&
-	  !cell->is_artificial()
-	  &&
-	  !cell->is_ghost())
+	  cell->is_locally_owned())
 	{
 	  const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 	  dofs_on_this_cell.resize (dofs_per_cell);
@@ -225,9 +223,7 @@ namespace DoFTools
 	   ||
 	   (subdomain_id == cell->subdomain_id()))
 	  &&
-	  !cell->is_artificial()
-	  &&
-	  !cell->is_ghost())
+	  cell->is_locally_owned())
 	{
 	  const unsigned int fe_index = cell->active_fe_index();
 	  const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
@@ -568,9 +564,7 @@ namespace DoFTools
 	   ||
 	   (subdomain_id == cell->subdomain_id()))
           &&
-          !cell->is_artificial()
-          &&
-          !cell->is_ghost())
+          cell->is_locally_owned())
 	{
 	  const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
 	  dofs_on_this_cell.resize (n_dofs_on_this_cell);
@@ -768,7 +762,7 @@ namespace DoFTools
 	typename DH::active_cell_iterator cell = dof.begin_active(),
 					  endc = dof.end();
 	for (; cell!=endc; ++cell)
-          if (!cell->is_ghost() && !cell->is_artificial())
+          if (cell->is_locally_owned())
 	    {
 	      cell->get_dof_indices (dofs_on_this_cell);
 					       // make sparsity pattern for this cell
@@ -3383,7 +3377,7 @@ namespace DoFTools
       std::vector<unsigned int> indices;
       for (typename DH::active_cell_iterator c=dof.begin_active();
 	   c!=dof.end(); ++ c)
-	if (!c->is_artificial() && !c->is_ghost())
+	if (c->is_locally_owned())
 	  {
 	    const unsigned int fe_index = c->active_fe_index();
 	    const unsigned int dofs_per_cell = c->get_fe().dofs_per_cell;
@@ -4161,7 +4155,7 @@ namespace DoFTools
     typename DH::active_cell_iterator cell = dof_handler.begin_active(),
 				      endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (!cell->is_ghost() && !cell->is_artificial())
+      if (cell->is_locally_owned())
 	{
 	  dof_indices.resize(cell->get_fe().dofs_per_cell);
 	  cell->get_dof_indices(dof_indices);
@@ -4670,7 +4664,7 @@ namespace DoFTools
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
-    
+
     if (const parallel::distributed::Triangulation<dim,spacedim> * tria
 	= (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
 	   (&dof_handler.get_tria())))
@@ -5021,7 +5015,7 @@ namespace DoFTools
 	tasks.join_all ();
       }
 
-      
+
 
 				       /**
 					* This is a helper function that

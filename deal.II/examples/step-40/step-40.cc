@@ -432,14 +432,19 @@ namespace Step40
 				   // being almost exactly what we've seen
 				   // before. The points to watch out for are:
 				   // - Assembly must only loop over locally
-				   //   owned cells. We test this by comparing
+				   //   owned cells. There are multiple ways to
+				   //   test that; for example, we could
+				   //   compare
 				   //   a cell's subdomain_id against
 				   //   information from the triangulation
-				   //   but an equally valid condition would
-				   //   have been to skip all cells for which
+				   //   as in <code>cell->subdomain_id() ==
+				   //   triangulation.locally_owned_subdomain()</code>,
+				   //   or skip all cells for which
 				   //   the condition <code>cell->is_ghost()
 				   //   || cell->is_artificial()</code> is
-				   //   true.
+				   //   true. The simplest way, however, is
+				   //   to simply ask the cell whether it is
+				   //   owned by the local processor.
 				   // - Copying local contributions into the
 				   //   global matrix must include distributing
 				   //   constraints and boundary values. In
@@ -483,7 +488,7 @@ namespace Step40
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() == triangulation.locally_owned_subdomain())
+      if (cell->is_locally_owned())
 	{
 	  cell_matrix = 0;
 	  cell_rhs = 0;

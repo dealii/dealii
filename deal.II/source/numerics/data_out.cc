@@ -1143,7 +1143,7 @@ DataOut<dim,DH>::first_locally_owned_cell ()
 				   // is a ghost or artificial cell
   while ((cell != this->dofs->end()) &&
 	 (cell->has_children() == false) &&
-	 (cell->is_ghost() || cell->is_artificial()))
+	 !cell->is_locally_owned())
     cell = next_cell(cell);
 
   return cell;
@@ -1159,7 +1159,7 @@ DataOut<dim,DH>::next_locally_owned_cell (const typename DataOut<dim,DH>::cell_i
     cell = next_cell(old_cell);
   while ((cell != this->dofs->end()) &&
 	 (cell->has_children() == false) &&
-	 (cell->is_ghost() || cell->is_artificial()))
+	 !cell->is_locally_owned())
     cell = next_cell(cell);
   return cell;
 }

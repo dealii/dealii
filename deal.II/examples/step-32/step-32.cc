@@ -1673,7 +1673,7 @@ compute_viscosity (const std::vector<double>          &old_temperature,
       max_velocity = std::max (std::sqrt (u*u), max_velocity);
     }
 
-  const double max_viscosity = (parameters.stabilization_beta * 
+  const double max_viscosity = (parameters.stabilization_beta *
 				max_velocity * cell_diameter);
   if (timestep_number == 0)
     return max_viscosity;
@@ -3614,7 +3614,7 @@ void BoussinesqFlowProblem<dim>::output_results ()
       temperature_cell = temperature_dof_handler.begin_active();
     for (; joint_cell!=joint_endc;
 	 ++joint_cell, ++stokes_cell, ++temperature_cell)
-      if (!joint_cell->is_artificial() && !joint_cell->is_ghost())
+      if (joint_cell->is_locally_owned())
 	{
 	  joint_cell->get_dof_indices (local_joint_dof_indices);
 	  stokes_cell->get_dof_indices (local_stokes_dof_indices);
@@ -3817,7 +3817,7 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
     // for (typename Triangulation<dim>::active_cell_iterator
     // 	   cell = triangulation.begin_active();
     // 	 cell != triangulation.end(); ++cell)
-    //   if (!cell->is_ghost() && !cell->is_artificial())
+    //   if (cell->is_locally_owned())
     // 	if ((cell->center()[1] > 0)
     // 	    &&
     // 	    (cell->center()[2] > 0))

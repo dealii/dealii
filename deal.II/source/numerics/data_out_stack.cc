@@ -65,17 +65,17 @@ void DataOutStack<dim,spacedim,DH>::new_parameter_value (const double p,
        i!=cell_data.end(); ++i)
     Assert (i->data.size() == 0,
 	    ExcDataNotCleared ());
-  
+
 }
 
 
 template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::attach_dof_handler (const DH& dof) 
+void DataOutStack<dim,spacedim,DH>::attach_dof_handler (const DH& dof)
 {
 				   // Check consistency of redundant
 				   // template parameter
   Assert (dim==DH::dimension, ExcDimensionMismatch(dim, DH::dimension));
-  
+
   dof_handler = &dof;
 }
 
@@ -114,7 +114,7 @@ void DataOutStack<dim,spacedim,DH>::declare_data_vector (const std::vector<std::
 	for (unsigned int i=0; i<data_set->names.size(); ++i)
 	  Assert (*name != data_set->names[i], ExcNameAlreadyUsed(*name));
     };
-  
+
   switch (vector_type)
     {
       case dof_vector:
@@ -185,7 +185,7 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
 				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 							    "0123456789_<>()")));
-  
+
   if (vec.size() == dof_handler->n_dofs())
     {
       typename std::vector<DataVector>::iterator data_vector=dof_data.begin();
@@ -231,22 +231,22 @@ void DataOutStack<dim,spacedim,DH>::add_data_vector (const Vector<number> &vec,
 
 
 template <int dim, int spacedim, class DH>
-void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdivisions) 
+void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdivisions)
 {
 				   // this is mostly copied from the
 				   // DataOut class
   unsigned int n_subdivisions = (nnnn_subdivisions != 0)
 				? nnnn_subdivisions
 				: this->default_subdivisions;
-  
+
   Assert (n_subdivisions >= 1,
-	  ExcInvalidNumberOfSubdivisions(n_subdivisions));  
+	  ExcInvalidNumberOfSubdivisions(n_subdivisions));
   Assert (dof_handler != 0, ExcNoDoFHandlerSelected());
-  
+
   const unsigned int n_components   = dof_handler->get_fe().n_components();
   const unsigned int n_datasets     = dof_data.size() * n_components +
 				      cell_data.size();
-  
+
 				   // first count the cells we want to
 				   // create patches of and make sure
 				   // there is enough memory for that
@@ -265,7 +265,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
 				   // cell to these points
   QTrapez<1>     q_trapez;
   QIterated<dim> patch_points (q_trapez, n_subdivisions);
-  
+
 				   // create collection objects from
 				   // single quadratures,
 				   // and finite elements. if we have
@@ -275,7 +275,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
 				   // shallow copy instead
   const hp::QCollection<dim>       q_collection (patch_points);
   const hp::FECollection<dim>      fe_collection(dof_handler->get_fe());
-  
+
   hp::FEValues<dim> x_fe_patch_values (fe_collection, q_collection,
                                        update_values);
 
@@ -302,8 +302,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
   for (typename DH::active_cell_iterator cell=dof_handler->begin_active();
        cell != dof_handler->end(); ++cell, ++patch, ++cell_number)
     {
-      Assert (!cell->is_ghost() &&
-	      !cell->is_artificial(),
+      Assert (cell->is_locally_owned(),
 	      ExcNotImplemented());
 
       Assert (patch != patches.end(), ExcInternalError());
@@ -329,7 +328,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
 		patch->vertices[3] = Point<dim+1>(cell->vertex(1)(0),
 						  parameter);
 		break;
-		
+
           case 2:
 		patch->vertices[0] = Point<dim+1>(cell->vertex(0)(0),
 		    				  cell->vertex(0)(1),
@@ -356,7 +355,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
 		    				  cell->vertex(3)(1),
 						  parameter);
 		break;
-	
+
 	  default:
 		Assert (false, ExcNotImplemented());
 	};
@@ -373,7 +372,7 @@ void DataOutStack<dim,spacedim,DH>::build_patches (const unsigned int nnnn_subdi
 	  x_fe_patch_values.reinit (cell);
           const FEValues<dim> &fe_patch_values
             = x_fe_patch_values.get_present_fe_values ();
-	  
+
 					   // first fill dof_data
 	  for (unsigned int dataset=0; dataset<dof_data.size(); ++dataset)
 	    {
@@ -421,7 +420,7 @@ void DataOutStack<dim,spacedim,DH>::finish_parameter_value ()
   for (typename std::vector<DataVector>::iterator i=dof_data.begin();
        i!=dof_data.end(); ++i)
     i->data.reinit (0);
-  
+
   for (typename std::vector<DataVector>::iterator i=cell_data.begin();
        i!=cell_data.end(); ++i)
     i->data.reinit (0);
@@ -463,7 +462,7 @@ std::vector<std::string> DataOutStack<dim,spacedim,DH>::get_dataset_names () con
   for (typename std::vector<DataVector>::const_iterator dataset=cell_data.begin();
        dataset!=cell_data.end(); ++dataset)
     names.insert (names.end(), dataset->names.begin(), dataset->names.end());
-  
+
   return names;
 }
 
