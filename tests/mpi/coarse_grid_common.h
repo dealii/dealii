@@ -2,7 +2,7 @@
 //    $Id: coarse_grid_01.cc 16363 2008-06-16 20:42:57Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,9 @@
 #include <iomanip>
 #include <unistd.h>
 
+
+// given the name of a file, copy it to deallog
+// and then delete it
 void cat_file(const char * filename)
 {
   std::ifstream in(filename);
@@ -32,6 +35,9 @@ void cat_file(const char * filename)
       std::getline(in, s);
       deallog.get_file_stream() << s << "\n";
     }
+  in.close();
+
+  std::remove (filename);
 }
 
 
