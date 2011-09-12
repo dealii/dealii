@@ -146,11 +146,11 @@ endif
 
 
 # rules for static libraries
-$(LIBDIR)/libdeal_II.g$(static-lib-suffix): $(go-files)
+$(LIBDIR)/libdeal_II.g$(static-lib-suffix): $(go-files) $(extra-g.o-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(go-files) $(extra-g.o-files)
 	@$(RANLIB) $@
-$(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files)
+$(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
 	@$(AR) ru $@ $(o-files) $(extra-o-files)
 	@$(RANLIB) $@
@@ -162,7 +162,7 @@ $(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files)
 # slow on remotely mounted file systems. Consequently, we link in a
 # local file in the $TMPDIR directory, and only after the fact move
 # them to their final location
-$(LIBDIR)/libdeal_II.g$(shared-lib-suffix): $(go-files)
+$(LIBDIR)/libdeal_II.g$(shared-lib-suffix): $(go-files) $(extra-g.o-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
 	@rm -f $@
 	@WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmp.XXXXXXXXXX` && \
@@ -170,7 +170,7 @@ $(LIBDIR)/libdeal_II.g$(shared-lib-suffix): $(go-files)
 	 	mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g)
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,deal_II.g) $@
 
-$(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files)
+$(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
 	@rm -f $@
 	@WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmp.XXXXXXXXXX` && \
