@@ -710,6 +710,17 @@ namespace parallel
 	MPI_Comm get_communicator () const;
 
 					 /**
+					  * Return the sum over all
+					  * processors of the number
+					  * of active cells owned by
+					  * each processor. This
+					  * equals the overall number
+					  * of active cells in the
+					  * distributed triangulation.
+					  */
+	unsigned int n_global_active_cells () const;
+
+					 /**
 					  * Returns a permutation vector for the order the coarse
 					  * cells are handed of to p4est. For example the first
 					  * element i in this vector denotes that the first cell
