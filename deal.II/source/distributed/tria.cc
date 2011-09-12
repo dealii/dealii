@@ -2946,6 +2946,15 @@ namespace parallel
 
 
     template <>
+    unsigned int
+    Triangulation<1,1>::n_global_active_cells () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
     MPI_Comm
     Triangulation<1,1>::get_communicator () const
     {
