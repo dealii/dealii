@@ -709,11 +709,16 @@ namespace parallel
 					  */
 	MPI_Comm get_communicator () const;
 
-	/**
-	 * */
-		const std::vector<unsigned int> &
+					 /**
+					  * Returns a permutation vector for the order the coarse
+					  * cells are handed of to p4est. For example the first
+					  * element i in this vector denotes that the first cell
+					  * in hierarchical ordering is the ith deal cell starting
+					  * from begin(0).
+					  */
+	const std::vector<unsigned int> &
 	get_p4est_tree_to_coarse_cell_permutation() const;
-	
+
 					 /**
 					  * Return the subdomain id of
 					  * those cells that are owned
