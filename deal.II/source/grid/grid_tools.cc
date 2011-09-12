@@ -80,9 +80,22 @@ template <int dim, int spacedim>
 double
 GridTools::diameter (const Triangulation<dim, spacedim> &tria)
 {
-  Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria)
-           == 0),
-	  ExcNotImplemented());
+				   // we can't deal with distributed meshes
+				   // since we don't have all vertices
+				   // locally. there is one exception,
+				   // however: if the mesh has never been
+				   // refined. the way to test this is not to
+				   // ask tria.n_levels()==1, since this is
+				   // something that can happen on one
+				   // processor without being true on
+				   // all. however, we can ask for the global
+				   // number of active cells and use that
+#ifdef DEAL_II_USE_P4EST
+  if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
+      = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria))
+    Assert (p_tria->n_global_active_cells() == tria.n_cells(0),
+	    ExcNotImplemented());
+#endif
 
 				   // the algorithm used simply
 				   // traverses all cells and picks
