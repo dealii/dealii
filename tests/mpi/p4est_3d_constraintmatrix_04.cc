@@ -69,7 +69,7 @@ void test ()
 
   IndexSet locally_active (dof.n_dofs());
   DoFTools::extract_locally_active_dofs (dof, locally_active);
-  std::ofstream file (("p4est_3d_constraintmatrix_04/dat."+Utilities::int_to_string(myid,1)).c_str());
+  std::ofstream file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
   file << "**** proc " << myid << ": \n\n";
   file << "Constraints:\n";
   constraints.print(file);
