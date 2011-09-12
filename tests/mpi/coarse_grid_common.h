@@ -29,6 +29,8 @@
 void cat_file(const char * filename)
 {
   std::ifstream in(filename);
+  Assert (in, ExcIO());
+  
   while (in)
     {
       std::string s;
@@ -36,7 +38,7 @@ void cat_file(const char * filename)
       deallog.get_file_stream() << s << "\n";
     }
   in.close();
-
+  
   std::remove (filename);
 }
 
