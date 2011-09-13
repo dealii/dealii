@@ -1108,10 +1108,10 @@ namespace PETScWrappers
 					 * $1000\times32$-bit machine
 					 * precision.
 					 */
-#if DEAL_II_PETSC_VERSION_DEV()
-      PetscBool
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      PetscTruth 
 #else
-	PetscTruth 
+	PetscBool
 #endif
 	is_symmetric (const double tolerance = 1.e-12);
 
@@ -1125,14 +1125,14 @@ namespace PETScWrappers
 					 * $1000\times32$-bit machine
 					 * precision.
 					 */
-#if DEAL_II_PETSC_VERSION_DEV()
-      PetscBool
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+      PetscTruth 
 #else
-	PetscTruth 
+	PetscBool
 #endif
 	is_hermitian (const double tolerance = 1.e-12);
 #endif
-
+      
                                         /*
 					 * Abstract PETSc object that helps view
 					 * in ASCII other PETSc objects. Currently

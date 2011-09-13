@@ -34,10 +34,10 @@ namespace PETScWrappers
   SolverBase::SolverData::~SolverData ()
   {
                                      // destroy the solver object
-#if DEAL_II_PETSC_VERSION_DEV()
-    int ierr = KSPDestroy (&ksp);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     int ierr = KSPDestroy (ksp);
+#else
+    int ierr = KSPDestroy (&ksp);
 #endif
     
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -402,10 +402,10 @@ namespace PETScWrappers
 				     // right
     if (additional_data.right_preconditioning)
       {
-#if DEAL_II_PETSC_VERSION_DEV()
-	ierr = KSPSetPCSide(ksp, PC_RIGHT);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
 	ierr = KSPSetPreconditionerSide(ksp, PC_RIGHT);
+#else
+	ierr = KSPSetPCSide(ksp, PC_RIGHT);
 #endif
 
 	AssertThrow (ierr == 0, ExcPETScError(ierr));

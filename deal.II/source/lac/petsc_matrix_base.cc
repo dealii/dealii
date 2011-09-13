@@ -90,10 +90,10 @@ namespace PETScWrappers
 
   MatrixBase::~MatrixBase ()
   {
-#if DEAL_II_PETSC_VERSION_DEV()
-    const int ierr = MatDestroy (&matrix);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     const int ierr = MatDestroy (matrix);
+#else
+    const int ierr = MatDestroy (&matrix);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
@@ -104,10 +104,10 @@ namespace PETScWrappers
   MatrixBase::clear ()
   {
                                      // destroy the matrix...
-#if DEAL_II_PETSC_VERSION_DEV()
-    int ierr = MatDestroy (&matrix);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     int ierr = MatDestroy (matrix);
+#else
+    int ierr = MatDestroy (&matrix);
 #endif
     AssertThrow (ierr == 0, ExcPETScError(ierr));
                                      // ...and replace it by an empty
@@ -154,10 +154,10 @@ namespace PETScWrappers
 #endif
 
     IS index_set;
-#if DEAL_II_PETSC_VERSION_DEV()
-    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, PETSC_COPY_VALUES, &index_set);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, &index_set);
+#else
+    ISCreateGeneral (get_mpi_communicator(), 1, &petsc_row, PETSC_COPY_VALUES, &index_set);
 #endif
 
 
@@ -165,21 +165,21 @@ namespace PETScWrappers
     const int ierr
       = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
-#if DEAL_II_PETSC_VERSION_DEV()
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     const int ierr
       = MatZeroRowsIS(matrix, index_set, new_diag_value);
+#else
+    const int ierr
+      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
 #endif
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_DEV()
-    ISDestroy (&index_set);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     ISDestroy (index_set);
+#else
+    ISDestroy (&index_set);
 #endif
 
     compress ();
@@ -205,33 +205,34 @@ namespace PETScWrappers
                                      // to call them even if #rows is empty,
                                      // since this is a collective operation
     IS index_set;
-#if DEAL_II_PETSC_VERSION_DEV()
-    ISCreateGeneral (get_mpi_communicator(), rows.size(),
-                     &petsc_rows[0], PETSC_COPY_VALUES, &index_set);
-#else
+
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     ISCreateGeneral (get_mpi_communicator(), rows.size(),
                      &petsc_rows[0], &index_set);
+#else
+    ISCreateGeneral (get_mpi_communicator(), rows.size(),
+                     &petsc_rows[0], PETSC_COPY_VALUES, &index_set);
 #endif
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,0)
     const int ierr
       = MatZeroRows(matrix, index_set, &new_diag_value);
 #else
-#if DEAL_II_PETSC_VERSION_DEV()
-    const int ierr
-      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     const int ierr
       = MatZeroRowsIS(matrix, index_set, new_diag_value);
+#else
+    const int ierr
+      = MatZeroRowsIS(matrix, index_set, new_diag_value, PETSC_NULL, PETSC_NULL);
 #endif
 #endif
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-#if DEAL_II_PETSC_VERSION_DEV()
-    ISDestroy (&index_set);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     ISDestroy (index_set);
+#else
+    ISDestroy (&index_set);
 #endif
 
     compress ();
@@ -606,17 +607,17 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
 
-#if DEAL_II_PETSC_VERSION_DEV()
-  PetscBool
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
   PetscTruth
+#else
+  PetscBool
 #endif
   MatrixBase::is_symmetric (const double tolerance)
   {
-#if DEAL_II_PETSC_VERSION_DEV()
-    PetscBool
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     PetscTruth 
+#else
+      PetscBool
 #endif
       truth;
                                        // First flush PETSc caches
@@ -625,17 +626,17 @@ namespace PETScWrappers
     return truth;
   }
 
-#if DEAL_II_PETSC_VERSION_DEV()
-  PetscBool
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
   PetscTruth
+#else
+  PetscBool
 #endif
   MatrixBase::is_hermitian (const double tolerance)
   {
-#if DEAL_II_PETSC_VERSION_DEV()
-    PetscBool
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     PetscTruth 
+#else
+      PetscBool
 #endif
       truth;
 

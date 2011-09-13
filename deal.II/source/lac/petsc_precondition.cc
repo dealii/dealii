@@ -37,10 +37,10 @@ namespace PETScWrappers
   {
     if (pc!=NULL)
       {
-#if DEAL_II_PETSC_VERSION_DEV()
-	int ierr = PCDestroy(&pc);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
 	int ierr = PCDestroy(pc);
+#else
+	int ierr = PCDestroy(&pc);
 #endif
 	AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
