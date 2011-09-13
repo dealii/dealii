@@ -306,8 +306,10 @@ INCLUDE = -I$D/include \
 #
 # also, note that this only works for PETSc before 2.3 :-]
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
+  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
+    ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
+      include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
+    endif
   endif
   INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
              $(MPI_INCLUDE)

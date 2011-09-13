@@ -5829,7 +5829,7 @@ AC_DEFUN(DEAL_II_CHECK_PETSC_MPI_CONSISTENCY, dnl
   dnl
   dnl Like always, we have to cake care of version control!
     case "${DEAL_II_PETSC_VERSION_MAJOR}.${DEAL_II_PETSC_VERSION_MINOR}.${DEAL_II_PETSC_VERSION_SUBMINOR}" in
-      2.3*) dnl
+      2.3.*) dnl
         AC_TRY_COMPILE(
         [#include "$DEAL_II_PETSC_DIR/bmake/$DEAL_II_PETSC_ARCH/petscconf.h"
         ],
