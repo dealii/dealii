@@ -594,8 +594,22 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 
     case "$GXX_VERSION" in
       ibm_xlc)
-          CXXFLAGSG="$CXXFLAGSG -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909"
-          CXXFLAGSO="$CXXFLAGSO -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909"
+          dnl Set flags for IBM's xlC compiler. As of version 11.1, it still
+	  dnl doesn't grok all of deal.II, but it's getting closer. The
+	  dnl -qxflag=EnableIssue214PartialOrdering flag is necessary to
+	  dnl resolve code like this that we have in the MemoryConsumption
+	  dnl namespace:
+	  dnl ----------------------------------------------
+	  dnl template <typename T> void f (T* const);
+	  dnl template <typename T> void f (const T &);
+	  dnl
+	  dnl void g() {
+	  dnl  int *p;
+	  dnl  f(p);
+	  dnl }
+	  dnl ----------------------------------------------
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909 -qxflag=EnableIssue214PartialOrdering"
+          CXXFLAGSO="$CXXFLAGSO -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909 -qxflag=EnableIssue214PartialOrdering"
           CXXFLAGSPIC="-qpic"
           LDFLAGSPIC="-qpic"
           ;;
