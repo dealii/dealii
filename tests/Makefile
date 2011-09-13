@@ -18,6 +18,7 @@ nofail-dirs = a-framework       \
               aniso             \
               codim_one         \
               serialization     \
+	      mesh_converter    \
 	      $(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
 	      $(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
 	      $(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
