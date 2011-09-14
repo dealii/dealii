@@ -21,6 +21,13 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li> Changed: GridTools, DoFTools, MGTools and VectorTools are now namespaces. They have long
+been classes that had only public, static member functions, making
+the end result semantically exactly equivalent to a namespace, which is
+also how it was used. This is now also reflected in the actual code.
+<br>
+(Wolfgang Bangerth, 2011/04/27, 2011/09/14)
+
 <li> Changed: The PETScWrapper::VectorBase and PETScWrapper::MatrixBase
 classes tried to keep track of
 whether the last operation done on a vector was to add to an element or to
@@ -507,13 +514,6 @@ wrong results for rectangular matrices. The same is true for
 TrilinosWrappers::SparsityPattern::exists(). This is now fixed.
 <br>
 (Habib Talavatifard, Wolfgang Bangerth 2011/05/09, 2011/05/27)
-
-<li> Changed: DoFTools is now a namespace. It has long been a class that
-had only public, static member functions, making the end result semantically
-exactly equivalent to a namespace, which is also how it was used. This is
-now also reflected in the actual code.
-<br>
-(Wolfgang Bangerth, 2011/04/27)
 
 <li> New: The version of DoFTools::make_flux_sparsity_pattern that takes
 the coupling masks is now also available for hp::DoFHandler objects.

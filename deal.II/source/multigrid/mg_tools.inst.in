@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,103 +14,104 @@
 
 for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 {
-template void
-MGTools::make_sparsity_pattern<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension> &,
-  PATTERN &,
-  const unsigned int);
+  namespace MGTools
+  \{
 
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension> &,
-  PATTERN &,
-  const unsigned int);
+    template void
+      make_sparsity_pattern<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension> &,
+	PATTERN &,
+	const unsigned int);
 
-template void
-MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension> &,
-  PATTERN &,
-  const unsigned int);
+    template void
+      make_flux_sparsity_pattern<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension> &,
+	PATTERN &,
+	const unsigned int);
+
+    template void
+      make_flux_sparsity_pattern_edge<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension> &,
+	PATTERN &,
+	const unsigned int);
 
 #if deal_II_dimension > 1
 
-template void
-MGTools::make_flux_sparsity_pattern<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension> &,
-  PATTERN &,
-  const unsigned int,
-  const Table<2,DoFTools::Coupling>&,
-  const Table<2,DoFTools::Coupling>&);
+    template void
+      make_flux_sparsity_pattern<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension> &,
+	PATTERN &,
+	const unsigned int,
+	const Table<2,DoFTools::Coupling>&,
+	const Table<2,DoFTools::Coupling>&);
 
-template void
-MGTools::make_flux_sparsity_pattern_edge<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension> &,
-  PATTERN &,
-  const unsigned int,
-  const Table<2,DoFTools::Coupling>&);
-
+    template void
+      make_flux_sparsity_pattern_edge<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension> &,
+	PATTERN &,
+	const unsigned int,
+	const Table<2,DoFTools::Coupling>&);
 #endif
+    \}
 }
 
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#if deal_II_dimension > 1
-template void
-MGTools::compute_row_length_vector(
-  const MGDoFHandler<deal_II_dimension>&, unsigned int,
-  std::vector<unsigned int>&, const DoFTools::Coupling);
-template void
-MGTools::compute_row_length_vector(
-  const MGDoFHandler<deal_II_dimension>&, unsigned int,
-  std::vector<unsigned int>&,
-  const Table<2,DoFTools::Coupling>&, const Table<2,DoFTools::Coupling>&);
-#endif
-
-template void MGTools::count_dofs_per_component<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
-  bool, std::vector<unsigned int>);
-template void MGTools::count_dofs_per_component<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
-  std::vector<unsigned int>);
-template void MGTools::count_dofs_per_block<deal_II_dimension> (
-  const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
-  std::vector<unsigned int>);
+    namespace MGTools
+    \{
 
 #if deal_II_dimension > 1
-template void MGTools::make_boundary_list(
-  const MGDoFHandler<deal_II_dimension>&,
-  const FunctionMap<deal_II_dimension>::type&,
-  std::vector<std::set<unsigned int> >&,
-  const std::vector<bool>&);
+      template void
+	compute_row_length_vector(
+	  const MGDoFHandler<deal_II_dimension>&, unsigned int,
+	  std::vector<unsigned int>&, const DoFTools::Coupling);
+      template void
+	compute_row_length_vector(
+	  const MGDoFHandler<deal_II_dimension>&, unsigned int,
+	  std::vector<unsigned int>&,
+	  const Table<2,DoFTools::Coupling>&, const Table<2,DoFTools::Coupling>&);
 #endif
 
-template void MGTools::make_boundary_list(
-  const MGDoFHandler<deal_II_dimension>&,
-  const FunctionMap<deal_II_dimension>::type&,
-  std::vector<IndexSet>&,
-  const std::vector<bool>&);
+      template void count_dofs_per_component<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
+	bool, std::vector<unsigned int>);
+      template void count_dofs_per_component<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
+	std::vector<unsigned int>);
+      template void count_dofs_per_block<deal_II_dimension> (
+	const MGDoFHandler<deal_II_dimension>&, std::vector<std::vector<unsigned int> >&,
+	std::vector<unsigned int>);
 
 #if deal_II_dimension > 1
-template
-void
-MGTools::
-extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
-			      std::vector<std::vector<bool> >  &interface_dofs,
-			      std::vector<std::vector<bool> >  &boundary_interface_dofs);
-template
-void
-MGTools::
-extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
-			      std::vector<std::vector<bool> >  &interface_dofs);
+      template void make_boundary_list(
+	const MGDoFHandler<deal_II_dimension>&,
+	const FunctionMap<deal_II_dimension>::type&,
+	std::vector<std::set<unsigned int> >&,
+	const std::vector<bool>&);
 #endif
+
+      template void make_boundary_list(
+	const MGDoFHandler<deal_II_dimension>&,
+	const FunctionMap<deal_II_dimension>::type&,
+	std::vector<IndexSet>&,
+	const std::vector<bool>&);
+
+      template
+	void
+	extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
+				      std::vector<std::vector<bool> >  &interface_dofs,
+				      std::vector<std::vector<bool> >  &boundary_interface_dofs);
+      template
+	void
+	extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
+				      std::vector<std::vector<bool> >  &interface_dofs);
 
 #if deal_II_dimension < 3
-
-template void MGTools::count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
-  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<std::vector<unsigned int> >&, std::vector<unsigned int>);
-
+      template void count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
+	const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+	std::vector<std::vector<unsigned int> >&, std::vector<unsigned int>);
 #endif
+      \}
   }
 
