@@ -1072,7 +1072,7 @@ namespace VectorTools
 						const Function<dim>& boundary_function,
 						const unsigned char boundary_component,
 						ConstraintMatrix& constraints,
-						const Mapping<dim>& mapping = MappingQ1<dim>::mapping);
+						const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
 				   /**
 				    * Same as above for the hp-namespace.
@@ -1157,7 +1157,7 @@ namespace VectorTools
 					       const Function<dim>& boundary_function,
 					       const unsigned char boundary_component,
 					       ConstraintMatrix& constraints,
-					       const Mapping<dim>& mapping = MappingQ1<dim>::mapping);
+					       const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
 				   /**
 				    * Same as above for the hp-namespace.
@@ -1495,7 +1495,7 @@ namespace VectorTools
 				      const unsigned int     first_vector_component,
 				      const std::set<unsigned char> &boundary_ids,
 				      ConstraintMatrix      &constraints,
-				      const Mapping<dim, spacedim>    &mapping = MappingQ1<dim>::mapping);
+				      const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
 
 
 				   //@}
