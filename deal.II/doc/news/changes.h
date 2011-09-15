@@ -21,7 +21,8 @@ inconvenience this causes.
 </p>
 
 <ol>
-<li> Changed: GridTools, DoFTools, MGTools and VectorTools are now namespaces. They have long
+<li> Changed: GridTools, DoFTools, MGTools, VectorTools, MatrixCreator
+and MatrixTools are now namespaces. They have long
 been classes that had only public, static member functions, making
 the end result semantically exactly equivalent to a namespace, which is
 also how it was used. This is now also reflected in the actual code.

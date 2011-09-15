@@ -785,303 +785,311 @@ namespace MatrixCreator
  * @ingroup numerics
  * @author Wolfgang Bangerth, 1998, 2000, 2004, 2005
  */
-class MatrixTools
+namespace MatrixTools
 {
-// using namespace MatrixCreator
-  public:
-				     /**
-				      * Apply dirichlet boundary conditions
-				      * to the system matrix and vectors
-				      * as described in the general
-				      * documentation.
-				      */
-    template <typename number>
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   SparseMatrix<number>  &matrix,
-			   Vector<number>        &solution,
-			   Vector<number>        &right_hand_side,
-			   const bool             eliminate_columns = true);
+				   /**
+				    * Import namespace MatrixCreator for
+				    * backward compatibility with older
+				    * versions of deal.II in which these
+				    * namespaces were classes and class
+				    * MatrixTools was publicly derived from
+				    * class MatrixCreator.
+				    */
+  using namespace MatrixCreator;
 
-				     /**
-				      * Apply dirichlet boundary
-				      * conditions to the system
-				      * matrix and vectors as
-				      * described in the general
-				      * documentation. This function
-				      * works for block sparse
-				      * matrices and block vectors
-				      */
-    template <typename number>
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   BlockSparseMatrix<number>           &matrix,
-			   BlockVector<number>                 &solution,
-			   BlockVector<number>                 &right_hand_side,
-			   const bool           eliminate_columns = true);
+				   /**
+				    * Apply dirichlet boundary conditions
+				    * to the system matrix and vectors
+				    * as described in the general
+				    * documentation.
+				    */
+  template <typename number>
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 SparseMatrix<number>  &matrix,
+			 Vector<number>        &solution,
+			 Vector<number>        &right_hand_side,
+			 const bool             eliminate_columns = true);
+
+				   /**
+				    * Apply dirichlet boundary
+				    * conditions to the system
+				    * matrix and vectors as
+				    * described in the general
+				    * documentation. This function
+				    * works for block sparse
+				    * matrices and block vectors
+				    */
+  template <typename number>
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 BlockSparseMatrix<number>           &matrix,
+			 BlockVector<number>                 &solution,
+			 BlockVector<number>                 &right_hand_side,
+			 const bool           eliminate_columns = true);
 
 #ifdef DEAL_II_USE_PETSC
-				     /**
-				      * Apply dirichlet boundary conditions to
-				      * the system matrix and vectors as
-				      * described in the general
-				      * documentation. This function works on
-				      * the classes that are used to wrap
-				      * PETSc objects.
-				      *
- 				      * Note that this function is not very
- 				      * efficient: it needs to alternatingly
- 				      * read and write into the matrix, a
- 				      * situation that PETSc does not handle
- 				      * too well. In addition, we only get rid
- 				      * of rows corresponding to boundary
- 				      * nodes, but the corresponding case of
- 				      * deleting the respective columns
- 				      * (i.e. if @p eliminate_columns is @p
- 				      * true) is not presently implemented,
- 				      * and probably will never because it is
- 				      * too expensive without direct access to
- 				      * the PETSc data structures. (This leads
- 				      * to the situation where the action
- 				      * indicates by the default value of the
- 				      * last argument is actually not
- 				      * implemented; that argument has
- 				      * <code>true</code> as its default value
- 				      * to stay consistent with the other
- 				      * functions of same name in this class.)
- 				      * A third reason against this function
- 				      * is that it doesn't handle the case
- 				      * where the matrix is distributed across
- 				      * an MPI system.
- 				      *
- 				      * This function is used in
-				      * step-17 and
-				      * step-18.
- 				      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   PETScWrappers::SparseMatrix  &matrix,
-			   PETScWrappers::Vector  &solution,
-			   PETScWrappers::Vector  &right_hand_side,
-			   const bool             eliminate_columns = true);
+				   /**
+				    * Apply dirichlet boundary conditions to
+				    * the system matrix and vectors as
+				    * described in the general
+				    * documentation. This function works on
+				    * the classes that are used to wrap
+				    * PETSc objects.
+				    *
+				    * Note that this function is not very
+				    * efficient: it needs to alternatingly
+				    * read and write into the matrix, a
+				    * situation that PETSc does not handle
+				    * too well. In addition, we only get rid
+				    * of rows corresponding to boundary
+				    * nodes, but the corresponding case of
+				    * deleting the respective columns
+				    * (i.e. if @p eliminate_columns is @p
+				    * true) is not presently implemented,
+				    * and probably will never because it is
+				    * too expensive without direct access to
+				    * the PETSc data structures. (This leads
+				    * to the situation where the action
+				    * indicates by the default value of the
+				    * last argument is actually not
+				    * implemented; that argument has
+				    * <code>true</code> as its default value
+				    * to stay consistent with the other
+				    * functions of same name in this class.)
+				    * A third reason against this function
+				    * is that it doesn't handle the case
+				    * where the matrix is distributed across
+				    * an MPI system.
+				    *
+				    * This function is used in
+				    * step-17 and
+				    * step-18.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 PETScWrappers::SparseMatrix  &matrix,
+			 PETScWrappers::Vector  &solution,
+			 PETScWrappers::Vector  &right_hand_side,
+			 const bool             eliminate_columns = true);
 
-                                     /**
-                                      * Same function, but for parallel PETSc
-                                      * matrices.
-                                      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   PETScWrappers::MPI::SparseMatrix  &matrix,
-			   PETScWrappers::MPI::Vector  &solution,
-			   PETScWrappers::MPI::Vector  &right_hand_side,
-			   const bool             eliminate_columns = true);
+				   /**
+				    * Same function, but for parallel PETSc
+				    * matrices.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 PETScWrappers::MPI::SparseMatrix  &matrix,
+			 PETScWrappers::MPI::Vector  &solution,
+			 PETScWrappers::MPI::Vector  &right_hand_side,
+			 const bool             eliminate_columns = true);
 
-                                     /**
-                                      * Same function, but for
-                                      * parallel PETSc matrices. Note
-                                      * that this function only
-                                      * operates on the local range of
-                                      * the parallel matrix, i.e. it
-                                      * only eliminates rows
-                                      * corresponding to degrees of
-                                      * freedom for which the row is
-                                      * stored on the present
-                                      * processor. All other boundary
-                                      * nodes are ignored, and it
-                                      * doesn't matter whether they
-                                      * are present in the first
-                                      * argument to this function or
-                                      * not. A consequence of this,
-                                      * however, is that this function
-                                      * has to be called from all
-                                      * processors that participate in
-                                      * sharing the contents of the
-                                      * given matrices and vectors. It
-                                      * is also implied that the local
-                                      * range for all objects passed
-                                      * to this function is the same.
-                                      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   PETScWrappers::MPI::SparseMatrix  &matrix,
-			   PETScWrappers::Vector       &solution,
-			   PETScWrappers::MPI::Vector  &right_hand_side,
-			   const bool             eliminate_columns = true);
+				   /**
+				    * Same function, but for
+				    * parallel PETSc matrices. Note
+				    * that this function only
+				    * operates on the local range of
+				    * the parallel matrix, i.e. it
+				    * only eliminates rows
+				    * corresponding to degrees of
+				    * freedom for which the row is
+				    * stored on the present
+				    * processor. All other boundary
+				    * nodes are ignored, and it
+				    * doesn't matter whether they
+				    * are present in the first
+				    * argument to this function or
+				    * not. A consequence of this,
+				    * however, is that this function
+				    * has to be called from all
+				    * processors that participate in
+				    * sharing the contents of the
+				    * given matrices and vectors. It
+				    * is also implied that the local
+				    * range for all objects passed
+				    * to this function is the same.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 PETScWrappers::MPI::SparseMatrix  &matrix,
+			 PETScWrappers::Vector       &solution,
+			 PETScWrappers::MPI::Vector  &right_hand_side,
+			 const bool             eliminate_columns = true);
 
-                                    /**
-                                      * Same as above but for BlockSparseMatrix.
-				      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
-                       PETScWrappers::MPI::BlockSparseMatrix  &matrix,
-                       PETScWrappers::MPI::BlockVector        &solution,
-                       PETScWrappers::MPI::BlockVector        &right_hand_side,
-                       const bool       eliminate_columns = true);
+				   /**
+				    * Same as above but for BlockSparseMatrix.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
+			 PETScWrappers::MPI::BlockSparseMatrix  &matrix,
+			 PETScWrappers::MPI::BlockVector        &solution,
+			 PETScWrappers::MPI::BlockVector        &right_hand_side,
+			 const bool       eliminate_columns = true);
 
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-				     /**
-				      * Apply dirichlet boundary
-				      * conditions to the system matrix
-				      * and vectors as described in the
-				      * general documentation. This
-				      * function works on the classes
-				      * that are used to wrap Trilinos
-				      * objects.
-				      *
- 				      * Note that this function is not
- 				      * very efficient: it needs to
- 				      * alternatingly read and write
- 				      * into the matrix, a situation
- 				      * that Trilinos does not handle
- 				      * too well. In addition, we only
- 				      * get rid of rows corresponding to
- 				      * boundary nodes, but the
- 				      * corresponding case of deleting
- 				      * the respective columns (i.e. if
- 				      * @p eliminate_columns is @p true)
- 				      * is not presently implemented,
- 				      * and probably will never because
- 				      * it is too expensive without
- 				      * direct access to the Trilinos
- 				      * data structures. (This leads to
- 				      * the situation where the action
- 				      * indicates by the default value
- 				      * of the last argument is actually
- 				      * not implemented; that argument
- 				      * has <code>true</code> as its
- 				      * default value to stay consistent
- 				      * with the other functions of same
- 				      * name in this class.)  A third
- 				      * reason against this function is
- 				      * that it doesn't handle the case
- 				      * where the matrix is distributed
- 				      * across an MPI system.
- 				      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   TrilinosWrappers::SparseMatrix  &matrix,
-			   TrilinosWrappers::Vector        &solution,
-			   TrilinosWrappers::Vector        &right_hand_side,
-			   const bool             eliminate_columns = true);
+				   /**
+				    * Apply dirichlet boundary
+				    * conditions to the system matrix
+				    * and vectors as described in the
+				    * general documentation. This
+				    * function works on the classes
+				    * that are used to wrap Trilinos
+				    * objects.
+				    *
+				    * Note that this function is not
+				    * very efficient: it needs to
+				    * alternatingly read and write
+				    * into the matrix, a situation
+				    * that Trilinos does not handle
+				    * too well. In addition, we only
+				    * get rid of rows corresponding to
+				    * boundary nodes, but the
+				    * corresponding case of deleting
+				    * the respective columns (i.e. if
+				    * @p eliminate_columns is @p true)
+				    * is not presently implemented,
+				    * and probably will never because
+				    * it is too expensive without
+				    * direct access to the Trilinos
+				    * data structures. (This leads to
+				    * the situation where the action
+				    * indicates by the default value
+				    * of the last argument is actually
+				    * not implemented; that argument
+				    * has <code>true</code> as its
+				    * default value to stay consistent
+				    * with the other functions of same
+				    * name in this class.)  A third
+				    * reason against this function is
+				    * that it doesn't handle the case
+				    * where the matrix is distributed
+				    * across an MPI system.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 TrilinosWrappers::SparseMatrix  &matrix,
+			 TrilinosWrappers::Vector        &solution,
+			 TrilinosWrappers::Vector        &right_hand_side,
+			 const bool             eliminate_columns = true);
 
-				     /**
-				      * This function does the same as
-				      * the one above, except now
-				      * working on block structures.
-				      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   TrilinosWrappers::BlockSparseMatrix  &matrix,
-			   TrilinosWrappers::BlockVector        &solution,
-			   TrilinosWrappers::BlockVector        &right_hand_side,
-			   const bool                eliminate_columns = true);
+				   /**
+				    * This function does the same as
+				    * the one above, except now
+				    * working on block structures.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 TrilinosWrappers::BlockSparseMatrix  &matrix,
+			 TrilinosWrappers::BlockVector        &solution,
+			 TrilinosWrappers::BlockVector        &right_hand_side,
+			 const bool                eliminate_columns = true);
 
-				     /**
-				      * Apply dirichlet boundary
-				      * conditions to the system matrix
-				      * and vectors as described in the
-				      * general documentation. This
-				      * function works on the classes
-				      * that are used to wrap Trilinos
-				      * objects.
-				      *
- 				      * Note that this function is not
- 				      * very efficient: it needs to
- 				      * alternatingly read and write
- 				      * into the matrix, a situation
- 				      * that Trilinos does not handle
- 				      * too well. In addition, we only
- 				      * get rid of rows corresponding to
- 				      * boundary nodes, but the
- 				      * corresponding case of deleting
- 				      * the respective columns (i.e. if
- 				      * @p eliminate_columns is @p true)
- 				      * is not presently implemented,
- 				      * and probably will never because
- 				      * it is too expensive without
- 				      * direct access to the Trilinos
- 				      * data structures. (This leads to
- 				      * the situation where the action
- 				      * indicates by the default value
- 				      * of the last argument is actually
- 				      * not implemented; that argument
- 				      * has <code>true</code> as its
- 				      * default value to stay consistent
- 				      * with the other functions of same
- 				      * name in this class.) This
- 				      * function does work on MPI vector
- 				      * types.
- 				      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   TrilinosWrappers::SparseMatrix  &matrix,
-			   TrilinosWrappers::MPI::Vector   &solution,
-			   TrilinosWrappers::MPI::Vector   &right_hand_side,
-			   const bool             eliminate_columns = true);
+				   /**
+				    * Apply dirichlet boundary
+				    * conditions to the system matrix
+				    * and vectors as described in the
+				    * general documentation. This
+				    * function works on the classes
+				    * that are used to wrap Trilinos
+				    * objects.
+				    *
+				    * Note that this function is not
+				    * very efficient: it needs to
+				    * alternatingly read and write
+				    * into the matrix, a situation
+				    * that Trilinos does not handle
+				    * too well. In addition, we only
+				    * get rid of rows corresponding to
+				    * boundary nodes, but the
+				    * corresponding case of deleting
+				    * the respective columns (i.e. if
+				    * @p eliminate_columns is @p true)
+				    * is not presently implemented,
+				    * and probably will never because
+				    * it is too expensive without
+				    * direct access to the Trilinos
+				    * data structures. (This leads to
+				    * the situation where the action
+				    * indicates by the default value
+				    * of the last argument is actually
+				    * not implemented; that argument
+				    * has <code>true</code> as its
+				    * default value to stay consistent
+				    * with the other functions of same
+				    * name in this class.) This
+				    * function does work on MPI vector
+				    * types.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 TrilinosWrappers::SparseMatrix  &matrix,
+			 TrilinosWrappers::MPI::Vector   &solution,
+			 TrilinosWrappers::MPI::Vector   &right_hand_side,
+			 const bool             eliminate_columns = true);
 
-				     /**
-				      * This function does the same as
-				      * the one above, except now working
-				      * on block structures.
-				      */
-    static void
-    apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-			   TrilinosWrappers::BlockSparseMatrix  &matrix,
-			   TrilinosWrappers::MPI::BlockVector   &solution,
-			   TrilinosWrappers::MPI::BlockVector   &right_hand_side,
-			   const bool                eliminate_columns = true);
+				   /**
+				    * This function does the same as
+				    * the one above, except now working
+				    * on block structures.
+				    */
+  void
+  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			 TrilinosWrappers::BlockSparseMatrix  &matrix,
+			 TrilinosWrappers::MPI::BlockVector   &solution,
+			 TrilinosWrappers::MPI::BlockVector   &right_hand_side,
+			 const bool                eliminate_columns = true);
 #endif
 
-                                     /**
-                                      * Rather than applying boundary
-                                      * values to the global matrix
-                                      * and vector after creating the
-                                      * global matrix, this function
-                                      * does so during assembly, by
-                                      * modifying the local matrix and
-                                      * vector contributions. If you
-                                      * call this function on all
-                                      * local contributions, the
-                                      * resulting matrix will have the
-                                      * same entries, and the final
-                                      * call to
-                                      * apply_boundary_values() on the
-                                      * global system will not be
-                                      * necessary.
-                                      *
-                                      * Since this function does not
-                                      * have to work on the
-                                      * complicated data structures of
-                                      * sparse matrices, it is
-                                      * relatively cheap. It may
-                                      * therefore be a win if you have
-                                      * many fixed degrees of freedom
-                                      * (e.g. boundary nodes), or if
-                                      * access to the sparse matrix is
-                                      * expensive (e.g. for block
-                                      * sparse matrices, or for PETSc
-                                      * or trilinos
-                                      * matrices). However, it doesn't
-                                      * work as expected if there are
-                                      * also hanging nodes to be
-                                      * considered. More caveats are
-                                      * listed in the general
-                                      * documentation of this class.
-                                      */
-    static void
-    local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-                                 const std::vector<unsigned int> &local_dof_indices,
-                                 FullMatrix<double> &local_matrix,
-                                 Vector<double>     &local_rhs,
-                                 const bool          eliminate_columns);
+				   /**
+				    * Rather than applying boundary
+				    * values to the global matrix
+				    * and vector after creating the
+				    * global matrix, this function
+				    * does so during assembly, by
+				    * modifying the local matrix and
+				    * vector contributions. If you
+				    * call this function on all
+				    * local contributions, the
+				    * resulting matrix will have the
+				    * same entries, and the final
+				    * call to
+				    * apply_boundary_values() on the
+				    * global system will not be
+				    * necessary.
+				    *
+				    * Since this function does not
+				    * have to work on the
+				    * complicated data structures of
+				    * sparse matrices, it is
+				    * relatively cheap. It may
+				    * therefore be a win if you have
+				    * many fixed degrees of freedom
+				    * (e.g. boundary nodes), or if
+				    * access to the sparse matrix is
+				    * expensive (e.g. for block
+				    * sparse matrices, or for PETSc
+				    * or trilinos
+				    * matrices). However, it doesn't
+				    * work as expected if there are
+				    * also hanging nodes to be
+				    * considered. More caveats are
+				    * listed in the general
+				    * documentation of this class.
+				    */
+  void
+  local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+			       const std::vector<unsigned int> &local_dof_indices,
+			       FullMatrix<double> &local_matrix,
+			       Vector<double>     &local_rhs,
+			       const bool          eliminate_columns);
 
-				     /**
-				      * Exception
-				      */
-    DeclException0 (ExcBlocksDontMatch);
-};
+				   /**
+				    * Exception
+				    */
+  DeclException0 (ExcBlocksDontMatch);
+}
 
 
 
