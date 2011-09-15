@@ -607,10 +607,10 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
-					  const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient)
+			   const DoFHandler<dim,spacedim>    &dof,
+			   const Quadrature<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (matrix.m() == dof.n_dofs(),
 	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -647,9 +647,9 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient)
+			   const Quadrature<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
@@ -660,12 +660,12 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
-					  const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<spacedim> * const coefficient)
+			   const DoFHandler<dim,spacedim>    &dof,
+			   const Quadrature<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim>      &rhs,
+			   Vector<double>           &rhs_vector,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (matrix.m() == dof.n_dofs(),
 	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -701,11 +701,11 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-					  const Quadrature<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<spacedim> * const coefficient)
+			   const Quadrature<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim>      &rhs,
+			   Vector<double>           &rhs_vector,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
@@ -716,10 +716,10 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
-					  const hp::DoFHandler<dim,spacedim>    &dof,
-					  const hp::QCollection<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient)
+			   const hp::DoFHandler<dim,spacedim>    &dof,
+			   const hp::QCollection<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (matrix.m() == dof.n_dofs(),
 	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -752,9 +752,9 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-					  const hp::QCollection<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim> * const coefficient)
+			   const hp::QCollection<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
@@ -764,12 +764,12 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-					  const hp::DoFHandler<dim,spacedim>    &dof,
-					  const hp::QCollection<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<spacedim> * const coefficient)
+			   const hp::DoFHandler<dim,spacedim>    &dof,
+			   const hp::QCollection<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim>      &rhs,
+			   Vector<double>           &rhs_vector,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (matrix.m() == dof.n_dofs(),
 	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -802,11 +802,11 @@ namespace MatrixCreator
 
   template <int dim, typename number, int spacedim>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-					  const hp::QCollection<dim>    &q,
-					  SparseMatrix<number>     &matrix,
-					  const Function<spacedim>      &rhs,
-					  Vector<double>           &rhs_vector,
-					  const Function<spacedim> * const coefficient)
+			   const hp::QCollection<dim>    &q,
+			   SparseMatrix<number>     &matrix,
+			   const Function<spacedim>      &rhs,
+			   Vector<double>           &rhs_vector,
+			   const Function<spacedim> * const coefficient)
   {
     Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
@@ -1108,14 +1108,14 @@ namespace MatrixCreator
   template <int dim, int spacedim>
   void
   create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mapping,
-					      const DoFHandler<dim,spacedim> &dof,
-					      const Quadrature<dim-1>  &q,
-					      SparseMatrix<double>  &matrix,
-					      const typename FunctionMap<spacedim>::type  &boundary_functions,
-					      Vector<double>            &rhs_vector,
-					      std::vector<unsigned int> &dof_to_boundary_mapping,
-					      const Function<spacedim> * const coefficient,
-					      std::vector<unsigned int> component_mapping)
+			       const DoFHandler<dim,spacedim> &dof,
+			       const Quadrature<dim-1>  &q,
+			       SparseMatrix<double>  &matrix,
+			       const typename FunctionMap<spacedim>::type  &boundary_functions,
+			       Vector<double>            &rhs_vector,
+			       std::vector<unsigned int> &dof_to_boundary_mapping,
+			       const Function<spacedim> * const coefficient,
+			       std::vector<unsigned int> component_mapping)
   {
 				     // what would that be in 1d? the
 				     // identity matrix on the boundary
@@ -2548,7 +2548,6 @@ namespace MatrixTools
 
 
   void
-
   apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
 			 PETScWrappers::MPI::SparseMatrix   &matrix,
 			 PETScWrappers::MPI::Vector   &solution,
