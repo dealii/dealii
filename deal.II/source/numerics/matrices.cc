@@ -2608,11 +2608,11 @@ namespace MatrixTools
 				     // the diagonal subblocks and the
 				     // solution/rhs.
     for (unsigned int block=0; block<n_blocks; ++block)
-      PETScWrappers::apply_boundary_values(block_boundary_values[block],
-					   matrix.block(block,block),
-					   solution.block(block),
-					   right_hand_side.block(block),
-					   eliminate_columns);
+      internal::PETScWrappers::apply_boundary_values(block_boundary_values[block],
+						     matrix.block(block,block),
+						     solution.block(block),
+						     right_hand_side.block(block),
+						     eliminate_columns);
 
 				     // Finally, we need to do something
 				     // about the off-diagonal matrices. This
