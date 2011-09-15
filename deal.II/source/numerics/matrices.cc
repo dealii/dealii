@@ -62,10 +62,80 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace internal
+namespace MatrixCreator
 {
-  namespace MatrixCreator
+  namespace internal
   {
+				     /**
+				      * Convenience abbreviation for
+				      * pairs of DoF handler cell
+				      * iterators. This type works
+				      * just like a
+				      * <tt>std::pair<iterator,iterator></tt>
+				      * but is templatized on the
+				      * dof handler that shouls be used.
+				      */
+    template <typename DH>
+    struct IteratorRange
+    {
+					 /**
+					  * Typedef for the iterator type.
+					  */
+	typedef typename DH::active_cell_iterator active_cell_iterator;
+
+					 /**
+					  * Abbreviation for a pair of
+					  * iterators.
+					  */
+	typedef std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
+
+					 /**
+					  * Constructor. Initialize
+					  * the two values by the
+					  * given values.
+					  */
+	IteratorRange (const active_cell_iterator &first,
+		       const active_cell_iterator &second);
+
+					 /**
+					  * Constructor taking a pair
+					  * of values for
+					  * initialization.
+					  */
+	IteratorRange (const iterator_pair &ip);
+
+					 /**
+					  * Pair of iterators denoting
+					  * a half-open range.
+					  */
+	active_cell_iterator first, second;
+    };
+
+
+
+
+    template <typename DH>
+    inline
+    IteratorRange<DH>::
+    IteratorRange (const active_cell_iterator &first,
+		   const active_cell_iterator &second)
+		    :
+		    first (first),
+		    second (second)
+    {}
+
+
+
+    template <typename DH>
+    inline
+    IteratorRange<DH>::IteratorRange (const iterator_pair &ip)
+		    :
+		    first (ip.first),
+		    second (ip.second)
+    {}
+
+
+
     namespace AssemblerData
     {
       template <int dim,
@@ -148,8 +218,8 @@ namespace internal
 	      int spacedim,
 	      typename CellIterator>
     void mass_assembler (const CellIterator &cell,
-			 internal::MatrixCreator::AssemblerData::Scratch<dim,spacedim> &data,
-			 internal::MatrixCreator::AssemblerData::CopyData              &copy_data)
+			 MatrixCreator::internal::AssemblerData::Scratch<dim,spacedim> &data,
+			 MatrixCreator::internal::AssemblerData::CopyData              &copy_data)
     {
       data.x_fe_values.reinit (cell);
       const FEValues<dim,spacedim> &fe_values = data.x_fe_values.get_present_fe_values ();
@@ -329,8 +399,8 @@ namespace internal
 	      int spacedim,
 	      typename CellIterator>
     void laplace_assembler (const CellIterator &cell,
-			    internal::MatrixCreator::AssemblerData::Scratch<dim,spacedim> &data,
-			    internal::MatrixCreator::AssemblerData::CopyData              &copy_data)
+			    MatrixCreator::internal::AssemblerData::Scratch<dim,spacedim> &data,
+			    MatrixCreator::internal::AssemblerData::CopyData              &copy_data)
     {
       data.x_fe_values.reinit (cell);
       const FEValues<dim,spacedim> &fe_values = data.x_fe_values.get_present_fe_values ();
@@ -532,905 +602,396 @@ namespace internal
 }
 
 
-
-template <typename DH>
-inline
-MatrixCreator::IteratorRange<DH>::
-IteratorRange (const active_cell_iterator &first,
-	       const active_cell_iterator &second)
-		:
-		first (first),
-		second (second)
-{}
-
-
-
-template <typename DH>
-inline
-MatrixCreator::IteratorRange<DH>::IteratorRange (const iterator_pair &ip)
-		:
-		first (ip.first),
-		second (ip.second)
-{}
-
-
-
-
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
-					const DoFHandler<dim,spacedim>    &dof,
-					const Quadrature<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim> * const coefficient)
+namespace MatrixCreator
 {
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
-  hp::QCollection<dim>                q_collection (q);
-  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (fe_collection,
-		    update_values | update_JxW_values |
-		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-		    coefficient, /*rhs_function=*/0,
-		    q_collection, mapping_collection);
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
+					  const DoFHandler<dim,spacedim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::QCollection<dim>                q_collection (q);
+    hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (fe_collection,
+		      update_values | update_JxW_values |
+		      (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		      coefficient, /*rhs_function=*/0,
+		      q_collection, mapping_collection);
 
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
-		   assembler_data,
-		   copy_data);
-}
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
 
-
-
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-					const Quadrature<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
-		     q, matrix, coefficient);
-}
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				      std_cxx1x::_1, &matrix, (Vector<double>*)0),
+		     assembler_data,
+		     copy_data);
+  }
 
 
 
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
-					const DoFHandler<dim,spacedim>    &dof,
-					const Quadrature<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim>      &rhs,
-					Vector<double>           &rhs_vector,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
-
-  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
-  hp::QCollection<dim>                q_collection (q);
-  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (fe_collection,
-		    update_values |
-		    update_JxW_values | update_quadrature_points,
-		    coefficient, &rhs,
-		    q_collection, mapping_collection);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
-
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind(&internal::MatrixCreator::
-				   copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				   std_cxx1x::_1, &matrix, &rhs_vector),
-		   assembler_data,
-		   copy_data);
-}
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
+		       q, matrix, coefficient);
+  }
 
 
 
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-					const Quadrature<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim>      &rhs,
-					Vector<double>           &rhs_vector,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
-		     dof, q, matrix, rhs, rhs_vector, coefficient);
-}
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
+					  const DoFHandler<dim,spacedim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim>      &rhs,
+					  Vector<double>           &rhs_vector,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::QCollection<dim>                q_collection (q);
+    hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (fe_collection,
+		      update_values |
+		      update_JxW_values | update_quadrature_points,
+		      coefficient, &rhs,
+		      q_collection, mapping_collection);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind(&MatrixCreator::internal::
+				     copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				     std_cxx1x::_1, &matrix, &rhs_vector),
+		     assembler_data,
+		     copy_data);
+  }
 
 
 
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
-					const hp::DoFHandler<dim,spacedim>    &dof,
-					const hp::QCollection<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
-
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
-		    update_values | update_JxW_values |
-		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-		    coefficient, /*rhs_function=*/0,
-		    q, mapping);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
-
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
-		   assembler_data,
-		   copy_data);
-}
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
+					  const Quadrature<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim>      &rhs,
+					  Vector<double>           &rhs_vector,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
+		       dof, q, matrix, rhs, rhs_vector, coefficient);
+  }
 
 
 
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-					const hp::QCollection<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
-}
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
+					  const hp::DoFHandler<dim,spacedim>    &dof,
+					  const hp::QCollection<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (dof.get_fe(),
+		      update_values | update_JxW_values |
+		      (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		      coefficient, /*rhs_function=*/0,
+		      q, mapping);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				      std_cxx1x::_1, &matrix, (Vector<double>*)0),
+		     assembler_data,
+		     copy_data);
+  }
 
 
 
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-					const hp::DoFHandler<dim,spacedim>    &dof,
-					const hp::QCollection<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim>      &rhs,
-					Vector<double>           &rhs_vector,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
-
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
-		    update_values |
-		    update_JxW_values | update_quadrature_points,
-		    coefficient, &rhs,
-		    q, mapping);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
-
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (&internal::MatrixCreator::
-				    copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-				    std_cxx1x::_1, &matrix, &rhs_vector),
-		   assembler_data,
-		   copy_data);
-}
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+					  const hp::QCollection<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
+  }
 
 
 
-template <int dim, typename number, int spacedim>
-void MatrixCreator::create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-					const hp::QCollection<dim>    &q,
-					SparseMatrix<number>     &matrix,
-					const Function<spacedim>      &rhs,
-					Vector<double>           &rhs_vector,
-					const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
-		     matrix, rhs, rhs_vector, coefficient);
-}
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+					  const hp::DoFHandler<dim,spacedim>    &dof,
+					  const hp::QCollection<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim>      &rhs,
+					  Vector<double>           &rhs_vector,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (dof.get_fe(),
+		      update_values |
+		      update_JxW_values | update_quadrature_points,
+		      coefficient, &rhs,
+		      q, mapping);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::mass_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (&MatrixCreator::internal::
+				      copy_local_to_global<SparseMatrix<number>, Vector<double> >,
+				      std_cxx1x::_1, &matrix, &rhs_vector),
+		     assembler_data,
+		     copy_data);
+  }
 
 
 
-template <int dim, int spacedim>
-void
-MatrixCreator::create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mapping,
-					    const DoFHandler<dim,spacedim> &dof,
-					    const Quadrature<dim-1>  &q,
-					    SparseMatrix<double>  &matrix,
-					    const typename FunctionMap<spacedim>::type  &boundary_functions,
-					    Vector<double>            &rhs_vector,
-					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<spacedim> * const coefficient,
-					    std::vector<unsigned int> component_mapping)
-{
-				   // what would that be in 1d? the
-				   // identity matrix on the boundary
-				   // dofs?
-  if (dim == 1)
+  template <int dim, typename number, int spacedim>
+  void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+					  const hp::QCollection<dim>    &q,
+					  SparseMatrix<number>     &matrix,
+					  const Function<spacedim>      &rhs,
+					  Vector<double>           &rhs_vector,
+					  const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
+		       matrix, rhs, rhs_vector, coefficient);
+  }
+
+
+
+  namespace
+  {
+    template <int dim, int spacedim>
+    void
+    create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim, spacedim> &,
+						    const DoFHandler<dim,spacedim> &,
+						    const Quadrature<dim-1> & >  commons,
+				   SparseMatrix<double>      &matrix,
+				   const typename FunctionMap<spacedim>::type &boundary_functions,
+				   Vector<double>            &rhs_vector,
+				   std::vector<unsigned int> &dof_to_boundary_mapping,
+				   const Function<spacedim> * const coefficient,
+				   const std::vector<unsigned int>& component_mapping,
+				   const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
+				   Threads::ThreadMutex      &mutex)
     {
-      Assert (false, ExcNotImplemented());
-      return;
-    }
+				       // All assertions for this function
+				       // are in the calling function
+				       // before creating threads.
+      const Mapping<dim,spacedim>& mapping = std_cxx1x::get<0>(commons);
+      const DoFHandler<dim,spacedim>& dof = std_cxx1x::get<1>(commons);
+      const Quadrature<dim-1>& q = std_cxx1x::get<2>(commons);
 
-  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
-  const unsigned int n_components  = fe.n_components();
+      const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+      const unsigned int n_components  = fe.n_components();
+      const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
+      const bool         fe_is_system  = (n_components != 1);
+      const bool         fe_is_primitive = fe.is_primitive();
 
-  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
-          ExcInternalError());
-  Assert (matrix.n() == matrix.m(), ExcInternalError());
-  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
-  Assert (boundary_functions.size() != 0, ExcInternalError());
-  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
-	  ExcInternalError());
-  Assert (coefficient ==0 ||
-	  coefficient->n_components==1 ||
-	  coefficient->n_components==n_components, ExcComponentMismatch());
+      const unsigned int dofs_per_cell = fe.dofs_per_cell,
+			 dofs_per_face = fe.dofs_per_face;
 
-  if (component_mapping.size() == 0)
-    {
-      AssertDimension (n_components, boundary_functions.begin()->second->n_components);
-      for (unsigned int i=0;i<n_components;++i)
-	component_mapping.push_back(i);
-    }
-  else
-    AssertDimension (n_components, component_mapping.size());
-
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
-
-				   // define starting and end point
-				   // for each thread
-  typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-
-  typedef std_cxx1x::tuple<const Mapping<dim,spacedim>&,
-    const DoFHandler<dim,spacedim>&,
-    const Quadrature<dim-1>&> Commons;
-
-				   // then assemble in parallel
-  typedef void (*create_boundary_mass_matrix_1_t)
-      (Commons,
-       SparseMatrix<double>      &matrix,
-       const typename FunctionMap<spacedim>::type &boundary_functions,
-       Vector<double>            &rhs_vector,
-       std::vector<unsigned int> &dof_to_boundary_mapping,
-       const Function<spacedim> * const coefficient,
-       const std::vector<unsigned int>& component_mapping,
-       const IteratorRange<DoFHandler<dim,spacedim> >   range,
-       Threads::ThreadMutex      &mutex);
-  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim,spacedim>;
-
-//TODO: Use WorkStream here
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::new_thread (p,
-				    Commons(mapping, dof, q), matrix,
-				    boundary_functions, rhs_vector,
-				    dof_to_boundary_mapping, coefficient,
-				    component_mapping,
-				    thread_ranges[thread], mutex);
-  threads.join_all ();
-}
+      FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+      Vector<double>     cell_vector(dofs_per_cell);
 
 
+      UpdateFlags update_flags = UpdateFlags (update_values     |
+					      update_JxW_values |
+					      update_normal_vectors |
+					      update_quadrature_points);
+      FEFaceValues<dim,spacedim> fe_values (mapping, fe, q, update_flags);
 
-template <>
-void
-MatrixCreator::
-create_boundary_mass_matrix_1<2,3> (std_cxx1x::tuple<const Mapping<2,3> &,
-				    const DoFHandler<2,3> &,
-			            const Quadrature<1> & > ,
-			            SparseMatrix<double>  &,
-			            const FunctionMap<3>::type &,
-			            Vector<double> &,
-			            std::vector<unsigned int> &,
-			            const Function<3> * const ,
-			            const std::vector<unsigned int> &,
-				    const IteratorRange<DoFHandler<2,3> > ,
-			            Threads::ThreadMutex &)
-{
-  Assert(false,ExcNotImplemented());
-}
+				       // two variables for the coefficient,
+				       // one for the two cases indicated in
+				       // the name
+      std::vector<double>          coefficient_values (fe_values.n_quadrature_points, 1.);
+      std::vector<Vector<double> > coefficient_vector_values (fe_values.n_quadrature_points,
+							      Vector<double>(n_components));
+      const bool coefficient_is_vector = (coefficient != 0 && coefficient->n_components != 1)
+					 ? true : false;
 
+      std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
+      std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
+						      Vector<double>(n_function_components));
 
+      std::vector<unsigned int> dofs (dofs_per_cell);
+      std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
 
-template <int dim, int spacedim>
-void
-MatrixCreator::
-create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim, spacedim> &,
-			       const DoFHandler<dim,spacedim> &,
-			       const Quadrature<dim-1> & >  commons,
-			       SparseMatrix<double>      &matrix,
-			       const typename FunctionMap<spacedim>::type &boundary_functions,
-			       Vector<double>            &rhs_vector,
-			       std::vector<unsigned int> &dof_to_boundary_mapping,
-			       const Function<spacedim> * const coefficient,
-			       const std::vector<unsigned int>& component_mapping,
-			       const IteratorRange<DoFHandler<dim,spacedim> >   range,
-			       Threads::ThreadMutex      &mutex)
-{
-				   // All assertions for this function
-				   // are in the calling function
-				   // before creating threads.
-  const Mapping<dim,spacedim>& mapping = std_cxx1x::get<0>(commons);
-  const DoFHandler<dim,spacedim>& dof = std_cxx1x::get<1>(commons);
-  const Quadrature<dim-1>& q = std_cxx1x::get<2>(commons);
+				       // for each dof on the cell, have a
+				       // flag whether it is on the face
+      std::vector<bool>         dof_is_on_face(dofs_per_cell);
 
-  const FiniteElement<dim,spacedim> &fe = dof.get_fe();
-  const unsigned int n_components  = fe.n_components();
-  const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
-  const bool         fe_is_system  = (n_components != 1);
-  const bool         fe_is_primitive = fe.is_primitive();
-
-  const unsigned int dofs_per_cell = fe.dofs_per_cell,
-		     dofs_per_face = fe.dofs_per_face;
-
-  FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_vector(dofs_per_cell);
-
-
-  UpdateFlags update_flags = UpdateFlags (update_values     |
-					  update_JxW_values |
-					  update_normal_vectors |
-					  update_quadrature_points);
-  FEFaceValues<dim,spacedim> fe_values (mapping, fe, q, update_flags);
-
-				   // two variables for the coefficient,
-				   // one for the two cases indicated in
-				   // the name
-  std::vector<double>          coefficient_values (fe_values.n_quadrature_points, 1.);
-  std::vector<Vector<double> > coefficient_vector_values (fe_values.n_quadrature_points,
-							  Vector<double>(n_components));
-  const bool coefficient_is_vector = (coefficient != 0 && coefficient->n_components != 1)
-				     ? true : false;
-
-  std::vector<double>          rhs_values_scalar (fe_values.n_quadrature_points);
-  std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
-						  Vector<double>(n_function_components));
-
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
-
-				   // for each dof on the cell, have a
-				   // flag whether it is on the face
-  std::vector<bool>         dof_is_on_face(dofs_per_cell);
-
-  typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-				       // check if this face is on that part of
-				       // the boundary we are interested in
-      if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
-	  boundary_functions.end())
-	{
-	  cell_matrix = 0;
-	  cell_vector = 0;
-
-	  fe_values.reinit (cell, face);
-
-	  if (fe_is_system)
-					     // FE has several components
+      typename DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
+      for (; cell!=range.second; ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+					   // check if this face is on that part of
+					   // the boundary we are interested in
+	  if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+	      boundary_functions.end())
 	    {
-	      boundary_functions.find(cell->face(face)->boundary_indicator())
-		->second->vector_value_list (fe_values.get_quadrature_points(),
-					     rhs_values_system);
+	      cell_matrix = 0;
+	      cell_vector = 0;
 
-	      if (coefficient_is_vector)
-						 // If coefficient is
-						 // vector valued, fill
-						 // all components
-		coefficient->vector_value_list (fe_values.get_quadrature_points(),
-						coefficient_vector_values);
-	      else
+	      fe_values.reinit (cell, face);
+
+	      if (fe_is_system)
+						 // FE has several components
 		{
-						   // If a scalar
-						   // function is
-						   // geiven, update
-						   // the values, if
-						   // not, use the
-						   // default one set
-						   // in the
-						   // constructor above
+		  boundary_functions.find(cell->face(face)->boundary_indicator())
+		    ->second->vector_value_list (fe_values.get_quadrature_points(),
+						 rhs_values_system);
+
+		  if (coefficient_is_vector)
+						     // If coefficient is
+						     // vector valued, fill
+						     // all components
+		    coefficient->vector_value_list (fe_values.get_quadrature_points(),
+						    coefficient_vector_values);
+		  else
+		    {
+						       // If a scalar
+						       // function is
+						       // geiven, update
+						       // the values, if
+						       // not, use the
+						       // default one set
+						       // in the
+						       // constructor above
+		      if (coefficient != 0)
+			coefficient->value_list (fe_values.get_quadrature_points(),
+						 coefficient_values);
+						       // Copy scalar
+						       // values into vector
+		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			coefficient_vector_values[point] = coefficient_values[point];
+		    }
+
+						   // Special treatment
+						   // for Hdiv and Hcurl
+						   // elements, where only
+						   // the normal or
+						   // tangential component
+						   // should be projected.
+		  std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
+								      std::vector<double>(n_components, 1.));
+
+		  for (unsigned int comp = 0;comp<n_components;++comp)
+		    {
+		      const FiniteElement<dim,spacedim>& base = fe.base_element(fe.component_to_base_index(comp).first);
+		      const unsigned int bcomp = fe.component_to_base_index(comp).second;
+
+		      if (!base.conforms(FiniteElementData<dim>::H1) &&
+			  base.conforms(FiniteElementData<dim>::Hdiv))
+			for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			  normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
+							   * fe_values.normal_vector(point)(bcomp);
+		    }
+
+		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		    {
+		      const double weight = fe_values.JxW(point);
+		      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+			if (fe_is_primitive)
+			  {
+			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+			      {
+				if (fe.system_to_component_index(j).first
+				    == fe.system_to_component_index(i).first)
+				  {
+				    cell_matrix(i,j)
+				      += weight
+				      * fe_values.shape_value(j,point)
+				      * fe_values.shape_value(i,point)
+				      * coefficient_vector_values[point](fe.system_to_component_index(i).first);
+				  }
+			      }
+			    cell_vector(i) += fe_values.shape_value(i,point)
+					      * rhs_values_system[point](component_mapping[fe.system_to_component_index(i).first])
+					      * weight;
+			  }
+			else
+			  {
+			    for (unsigned int comp=0;comp<n_components;++comp)
+			      {
+				for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+				  cell_matrix(i,j)
+				    += fe_values.shape_value_component(j,point,comp)
+				    * fe_values.shape_value_component(i,point,comp)
+				    * normal_adjustment[point][comp]
+				    * weight * coefficient_vector_values[point](comp);
+				cell_vector(i) += fe_values.shape_value_component(i,point,comp) *
+						  rhs_values_system[point](component_mapping[comp])
+						  * normal_adjustment[point][comp]
+						  * weight;
+			      }
+			  }
+		    }
+		}
+	      else
+						 // FE is a scalar one
+		{
+		  boundary_functions.find(cell->face(face)->boundary_indicator())
+		    ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
+
 		  if (coefficient != 0)
 		    coefficient->value_list (fe_values.get_quadrature_points(),
 					     coefficient_values);
-						   // Copy scalar
-						   // values into vector
-		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		    coefficient_vector_values[point] = coefficient_values[point];
-		}
-
-					       // Special treatment
-					       // for Hdiv and Hcurl
-					       // elements, where only
-					       // the normal or
-					       // tangential component
-					       // should be projected.
-	      std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
-								  std::vector<double>(n_components, 1.));
-
-	      for (unsigned int comp = 0;comp<n_components;++comp)
-		{
-		  const FiniteElement<dim,spacedim>& base = fe.base_element(fe.component_to_base_index(comp).first);
-		  const unsigned int bcomp = fe.component_to_base_index(comp).second;
-
-		  if (!base.conforms(FiniteElementData<dim>::H1) &&
-		      base.conforms(FiniteElementData<dim>::Hdiv))
-		    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		      normal_adjustment[point][comp] = fe_values.normal_vector(point)(bcomp)
-						       * fe_values.normal_vector(point)(bcomp);
-		}
-
-	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-		    if (fe_is_primitive)
-		      {
-			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			  {
-			    if (fe.system_to_component_index(j).first
-				== fe.system_to_component_index(i).first)
-			      {
-				cell_matrix(i,j)
-				  += weight
-				  * fe_values.shape_value(j,point)
-				  * fe_values.shape_value(i,point)
-				  * coefficient_vector_values[point](fe.system_to_component_index(i).first);
-			      }
-			  }
-			cell_vector(i) += fe_values.shape_value(i,point)
-					  * rhs_values_system[point](component_mapping[fe.system_to_component_index(i).first])
-					  * weight;
-		      }
-		    else
-		      {
-			for (unsigned int comp=0;comp<n_components;++comp)
-			  {
-			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			      cell_matrix(i,j)
-				+= fe_values.shape_value_component(j,point,comp)
-				* fe_values.shape_value_component(i,point,comp)
-				* normal_adjustment[point][comp]
-				* weight * coefficient_vector_values[point](comp);
-			    cell_vector(i) += fe_values.shape_value_component(i,point,comp) *
-					      rhs_values_system[point](component_mapping[comp])
-					      * normal_adjustment[point][comp]
-					      * weight;
-			  }
-		      }
-		}
-	    }
-	  else
-					     // FE is a scalar one
-	    {
-	      boundary_functions.find(cell->face(face)->boundary_indicator())
-		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
-
-	      if (coefficient != 0)
-		coefficient->value_list (fe_values.get_quadrature_points(),
-					 coefficient_values);
-	      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		{
-		  const double weight = fe_values.JxW(point);
-		  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-		    {
-		      const double v = fe_values.shape_value(i,point);
-		      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			{
-			  const double u = fe_values.shape_value(j,point);
-			  cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
-			}
-		      cell_vector(i) += v * rhs_values_scalar[point] *weight;
-		    }
-		}
-	    }
-					   // now transfer cell matrix and vector
-					   // to the whole boundary matrix
-					   //
-					   // in the following: dof[i] holds the
-					   // global index of the i-th degree of
-					   // freedom on the present cell. If it
-					   // is also a dof on the boundary, it
-					   // must be a nonzero entry in the
-					   // dof_to_boundary_mapping and then
-					   // the boundary index of this dof is
-					   // dof_to_boundary_mapping[dof[i]].
-					   //
-					   // if dof[i] is not on the boundary,
-					   // it should be zero on the boundary
-					   // therefore on all quadrature
-					   // points and finally all of its
-					   // entries in the cell matrix and
-					   // vector should be zero. If not, we
-					   // throw an error (note: because of
-					   // the evaluation of the shape
-					   // functions only up to machine
-					   // precision, the term "must be zero"
-					   // really should mean: "should be
-					   // very small". since this is only an
-					   // assertion and not part of the
-					   // code, we may choose "very small"
-					   // quite arbitrarily)
-					   //
-					   // the main problem here is that the
-					   // matrix or vector entry should also
-					   // be zero if the degree of freedom
-					   // dof[i] is on the boundary, but not
-					   // on the present face, i.e. on
-					   // another face of the same cell also
-					   // on the boundary. We can therefore
-					   // not rely on the
-					   // dof_to_boundary_mapping[dof[i]]
-					   // being !=-1, we really have to
-					   // determine whether dof[i] is a
-					   // dof on the present face. We do so
-					   // by getting the dofs on the
-					   // face into @p{dofs_on_face_vector},
-					   // a vector as always. Usually,
-					   // searching in a vector is
-					   // inefficient, so we copy the dofs
-					   // into a set, which enables binary
-					   // searches.
-	  cell->get_dof_indices (dofs);
-	  cell->face(face)->get_dof_indices (dofs_on_face_vector);
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
-					   dofs_on_face_vector.end(),
-					   dofs[i])
-				 !=
-				 dofs_on_face_vector.end());
-
-                                           // lock the matrix
-          Threads::ThreadMutex::ScopedLock lock (mutex);
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    {
-	      if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
-		{
-		  for (unsigned int j=0; j<dofs_per_cell; ++j)
-		    if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_unsigned_int)
-		      {
-			Assert(numbers::is_finite(cell_matrix(i,j)), ExcNumberNotFinite());
-			matrix.add(dof_to_boundary_mapping[dofs[i]],
-				   dof_to_boundary_mapping[dofs[j]],
-				   cell_matrix(i,j));
-		      }
-		  Assert(numbers::is_finite(cell_vector(i)), ExcNumberNotFinite());
-		  rhs_vector(dof_to_boundary_mapping[dofs[i]]) += cell_vector(i);
-		}
-	    }
-	}
-}
-
-
-
-template <int dim, int spacedim>
-void MatrixCreator::create_boundary_mass_matrix (const DoFHandler<dim,spacedim>     &dof,
-						 const Quadrature<dim-1>   &q,
-						 SparseMatrix<double>      &matrix,
-						 const typename FunctionMap<spacedim>::type &rhs,
-						 Vector<double>            &rhs_vector,
-						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<spacedim> * const a,
-						 std::vector<unsigned int> component_mapping)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_boundary_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
-			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
-}
-
-
-
-template <int dim, int spacedim>
-void
-MatrixCreator::create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>        &mapping,
-					    const hp::DoFHandler<dim,spacedim>     &dof,
-					    const hp::QCollection<dim-1>   &q,
-					    SparseMatrix<double>      &matrix,
-					    const typename FunctionMap<spacedim>::type         &boundary_functions,
-					    Vector<double>            &rhs_vector,
-					    std::vector<unsigned int> &dof_to_boundary_mapping,
-					    const Function<spacedim> * const coefficient,
-					    std::vector<unsigned int> component_mapping)
-{
-				   // what would that be in 1d? the
-				   // identity matrix on the boundary
-				   // dofs?
-  if (dim == 1)
-    {
-      Assert (false, ExcNotImplemented());
-      return;
-    }
-
-  const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
-  const unsigned int n_components  = fe_collection.n_components();
-
-  Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
-          ExcInternalError());
-  Assert (matrix.n() == matrix.m(), ExcInternalError());
-  Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
-  Assert (boundary_functions.size() != 0, ExcInternalError());
-  Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
-	  ExcInternalError());
-  Assert (coefficient ==0 ||
-	  coefficient->n_components==1 ||
-	  coefficient->n_components==n_components, ExcComponentMismatch());
-
-  if (component_mapping.size() == 0)
-    {
-      AssertDimension (n_components, boundary_functions.begin()->second->n_components);
-      for (unsigned int i=0;i<n_components;++i)
-	component_mapping.push_back(i);
-    }
-  else
-    AssertDimension (n_components, component_mapping.size());
-
-  const unsigned int n_threads = multithread_info.n_default_threads;
-  Threads::ThreadGroup<> threads;
-
-				   // define starting and end point
-				   // for each thread
-  typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
-  std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
-    = Threads::split_range<active_cell_iterator> (dof.begin_active(),
-						  dof.end(), n_threads);
-
-  typedef std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim>&,
-    const hp::DoFHandler<dim,spacedim>&,
-    const hp::QCollection<dim-1>&> Commons;
-
-				   // mutex to synchronise access to
-				   // the matrix
-  Threads::ThreadMutex mutex;
-
-				   // then assemble in parallel
-  typedef void (*create_boundary_mass_matrix_1_t)
-      (Commons,
-       SparseMatrix<double>      &matrix,
-       const typename FunctionMap<spacedim>::type &boundary_functions,
-       Vector<double>            &rhs_vector,
-       std::vector<unsigned int> &dof_to_boundary_mapping,
-       const Function<spacedim> * const coefficient,
-       const std::vector<unsigned int>& component_mapping,
-       const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-       Threads::ThreadMutex      &mutex);
-  create_boundary_mass_matrix_1_t p = &MatrixCreator::template create_boundary_mass_matrix_1<dim,spacedim>;
-
-//TODO: Use WorkStream here
-  for (unsigned int thread=0; thread<n_threads; ++thread)
-    threads += Threads::new_thread (p,
-				    Commons(mapping, dof, q), matrix,
-				    boundary_functions, rhs_vector,
-				    dof_to_boundary_mapping, coefficient,
-				    component_mapping,
-				    thread_ranges[thread], mutex);
-  threads.join_all ();
-}
-
-
-
-template <int dim, int spacedim>
-void
-MatrixCreator::
-create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim> &,
-			       const hp::DoFHandler<dim,spacedim> &,
-			       const hp::QCollection<dim-1> &> commons,
-			       SparseMatrix<double>      &matrix,
-			       const typename FunctionMap<spacedim>::type &boundary_functions,
-			       Vector<double>            &rhs_vector,
-			       std::vector<unsigned int> &dof_to_boundary_mapping,
-			       const Function<spacedim> * const coefficient,
-			       const std::vector<unsigned int>& component_mapping,
-			       const IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-			       Threads::ThreadMutex      &mutex)
-{
-  const hp::MappingCollection<dim,spacedim>& mapping = std_cxx1x::get<0>(commons);
-  const hp::DoFHandler<dim,spacedim>& dof = std_cxx1x::get<1>(commons);
-  const hp::QCollection<dim-1>& q = std_cxx1x::get<2>(commons);
-  const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
-  const unsigned int n_components  = fe_collection.n_components();
-  const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
-  const bool         fe_is_system  = (n_components != 1);
-#ifdef DEBUG
-  if (true)
-    {
-      unsigned int max_element = 0;
-      for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
-	   i!=dof_to_boundary_mapping.end(); ++i)
-	if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
-	    (*i > max_element))
-	  max_element = *i;
-      Assert (max_element  == matrix.n()-1, ExcInternalError());
-    };
-#endif
-
-  const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell(),
-		     max_dofs_per_face = fe_collection.max_dofs_per_face();
-
-  FullMatrix<double> cell_matrix(max_dofs_per_cell, max_dofs_per_cell);
-  Vector<double>     cell_vector(max_dofs_per_cell);
-
-
-  UpdateFlags update_flags = UpdateFlags (update_values     |
-					  update_JxW_values |
-					  update_quadrature_points);
-  hp::FEFaceValues<dim> x_fe_values (mapping, fe_collection, q, update_flags);
-
-				   // two variables for the coefficient,
-				   // one for the two cases indicated in
-				   // the name
-  std::vector<double>          coefficient_values;
-  std::vector<Vector<double> > coefficient_vector_values;
-
-  std::vector<double>          rhs_values_scalar;
-  std::vector<Vector<double> > rhs_values_system;
-
-  std::vector<unsigned int> dofs (max_dofs_per_cell);
-  std::vector<unsigned int> dofs_on_face_vector (max_dofs_per_face);
-
-				   // for each dof on the cell, have a
-				   // flag whether it is on the face
-  std::vector<bool>         dof_is_on_face(max_dofs_per_cell);
-
-
-  typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
-  for (; cell!=range.second; ++cell)
-    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-				       // check if this face is on that part of
-				       // the boundary we are interested in
-      if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
-	  boundary_functions.end())
-	{
-	  x_fe_values.reinit (cell, face);
-
-	  const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
-
-	  const FiniteElement<dim,spacedim> &fe = cell->get_fe();
-	  const unsigned int dofs_per_cell = fe.dofs_per_cell;
-	  const unsigned int dofs_per_face = fe.dofs_per_face;
-
-	  cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
-	  cell_vector.reinit (dofs_per_cell);
-	  cell_matrix = 0;
-	  cell_vector = 0;
-
-	  if (fe_is_system)
-					     // FE has several components
-	    {
-	      rhs_values_system.resize (fe_values.n_quadrature_points,
-					Vector<double>(n_function_components));
-	      boundary_functions.find(cell->face(face)->boundary_indicator())
-		->second->vector_value_list (fe_values.get_quadrature_points(),
-					     rhs_values_system);
-
-	      if (coefficient != 0)
-		{
-		  if (coefficient->n_components==1)
-		    {
-		      coefficient_values.resize (fe_values.n_quadrature_points);
-		      coefficient->value_list (fe_values.get_quadrature_points(),
-					       coefficient_values);
-		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-			{
-			  const double weight = fe_values.JxW(point);
-			  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-			    {
-			      const double v = fe_values.shape_value(i,point);
-			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-				if (fe.system_to_component_index(i).first ==
-				    fe.system_to_component_index(j).first)
-				  {
-				    const double u = fe_values.shape_value(j,point);
-				    cell_matrix(i,j)
-				      += (u * v * weight * coefficient_values[point]);
-				  }
-
-			      cell_vector(i) += v *
-						rhs_values_system[point](
-						  component_mapping[fe.system_to_component_index(i).first]) * weight;
-			    }
-			}
-		    }
-		  else
-		    {
-		      coefficient_vector_values.resize (fe_values.n_quadrature_points,
-							Vector<double>(n_components));
-		      coefficient->vector_value_list (fe_values.get_quadrature_points(),
-						      coefficient_vector_values);
-		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-			{
-			  const double weight = fe_values.JxW(point);
-			  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-			    {
-			      const double v = fe_values.shape_value(i,point);
-			      const unsigned int component_i=
-				fe.system_to_component_index(i).first;
-			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-				if (fe.system_to_component_index(j).first ==
-				    component_i)
-				  {
-				    const double u = fe_values.shape_value(j,point);
-				    cell_matrix(i,j) +=
-				      (u * v * weight * coefficient_vector_values[point](component_i));
-				  }
-			      cell_vector(i) += v * rhs_values_system[point](component_mapping[component_i]) * weight;
-			    }
-			}
-		    }
-		}
-	      else	//      if (coefficient == 0)
-		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-		      {
-			const double v = fe_values.shape_value(i,point);
-			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-			  if (fe.system_to_component_index(i).first ==
-			      fe.system_to_component_index(j).first)
-			    {
-			      const double u = fe_values.shape_value(j,point);
-			      cell_matrix(i,j) += (u * v * weight);
-			    }
-			cell_vector(i) += v *
-					  rhs_values_system[point](
-					    fe.system_to_component_index(i).first) *
-					  weight;
-		      }
-		  }
-	    }
-	  else
-					     // FE is a scalar one
-	    {
-	      rhs_values_scalar.resize (fe_values.n_quadrature_points);
-	      boundary_functions.find(cell->face(face)->boundary_indicator())
-		->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
-
-	      if (coefficient != 0)
-		{
-		  coefficient_values.resize (fe_values.n_quadrature_points);
-		  coefficient->value_list (fe_values.get_quadrature_points(),
-					   coefficient_values);
 		  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
 		    {
 		      const double weight = fe_values.JxW(point);
@@ -1446,419 +1007,914 @@ create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,
 			}
 		    }
 		}
-	      else
-		for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-		  {
-		    const double weight = fe_values.JxW(point);
-		    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-		      {
-			const double v = fe_values.shape_value(i,point);
-			for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+					       // now transfer cell matrix and vector
+					       // to the whole boundary matrix
+					       //
+					       // in the following: dof[i] holds the
+					       // global index of the i-th degree of
+					       // freedom on the present cell. If it
+					       // is also a dof on the boundary, it
+					       // must be a nonzero entry in the
+					       // dof_to_boundary_mapping and then
+					       // the boundary index of this dof is
+					       // dof_to_boundary_mapping[dof[i]].
+					       //
+					       // if dof[i] is not on the boundary,
+					       // it should be zero on the boundary
+					       // therefore on all quadrature
+					       // points and finally all of its
+					       // entries in the cell matrix and
+					       // vector should be zero. If not, we
+					       // throw an error (note: because of
+					       // the evaluation of the shape
+					       // functions only up to machine
+					       // precision, the term "must be zero"
+					       // really should mean: "should be
+					       // very small". since this is only an
+					       // assertion and not part of the
+					       // code, we may choose "very small"
+					       // quite arbitrarily)
+					       //
+					       // the main problem here is that the
+					       // matrix or vector entry should also
+					       // be zero if the degree of freedom
+					       // dof[i] is on the boundary, but not
+					       // on the present face, i.e. on
+					       // another face of the same cell also
+					       // on the boundary. We can therefore
+					       // not rely on the
+					       // dof_to_boundary_mapping[dof[i]]
+					       // being !=-1, we really have to
+					       // determine whether dof[i] is a
+					       // dof on the present face. We do so
+					       // by getting the dofs on the
+					       // face into @p{dofs_on_face_vector},
+					       // a vector as always. Usually,
+					       // searching in a vector is
+					       // inefficient, so we copy the dofs
+					       // into a set, which enables binary
+					       // searches.
+	      cell->get_dof_indices (dofs);
+	      cell->face(face)->get_dof_indices (dofs_on_face_vector);
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
+					       dofs_on_face_vector.end(),
+					       dofs[i])
+				     !=
+				     dofs_on_face_vector.end());
+
+					       // lock the matrix
+	      Threads::ThreadMutex::ScopedLock lock (mutex);
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		{
+		  if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
+		    {
+		      for (unsigned int j=0; j<dofs_per_cell; ++j)
+			if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_unsigned_int)
 			  {
-			    const double u = fe_values.shape_value(j,point);
-			    cell_matrix(i,j) += (u * v * weight);
+			    Assert(numbers::is_finite(cell_matrix(i,j)), ExcNumberNotFinite());
+			    matrix.add(dof_to_boundary_mapping[dofs[i]],
+				       dof_to_boundary_mapping[dofs[j]],
+				       cell_matrix(i,j));
 			  }
-			cell_vector(i) += v * rhs_values_scalar[point] * weight;
-		      }
-		  }
+		      Assert(numbers::is_finite(cell_vector(i)), ExcNumberNotFinite());
+		      rhs_vector(dof_to_boundary_mapping[dofs[i]]) += cell_vector(i);
+		    }
+		}
 	    }
+    }
 
-					   // now transfer cell matrix and vector
-					   // to the whole boundary matrix
-					   //
-					   // in the following: dof[i] holds the
-					   // global index of the i-th degree of
-					   // freedom on the present cell. If it
-					   // is also a dof on the boundary, it
-					   // must be a nonzero entry in the
-					   // dof_to_boundary_mapping and then
-					   // the boundary index of this dof is
-					   // dof_to_boundary_mapping[dof[i]].
-					   //
-					   // if dof[i] is not on the boundary,
-					   // it should be zero on the boundary
-					   // therefore on all quadrature
-					   // points and finally all of its
-					   // entries in the cell matrix and
-					   // vector should be zero. If not, we
-					   // throw an error (note: because of
-					   // the evaluation of the shape
-					   // functions only up to machine
-					   // precision, the term "must be zero"
-					   // really should mean: "should be
-					   // very small". since this is only an
-					   // assertion and not part of the
-					   // code, we may choose "very small"
-					   // quite arbitrarily)
-					   //
-					   // the main problem here is that the
-					   // matrix or vector entry should also
-					   // be zero if the degree of freedom
-					   // dof[i] is on the boundary, but not
-					   // on the present face, i.e. on
-					   // another face of the same cell also
-					   // on the boundary. We can therefore
-					   // not rely on the
-					   // dof_to_boundary_mapping[dof[i]]
-					   // being !=-1, we really have to
-					   // determine whether dof[i] is a
-					   // dof on the present face. We do so
-					   // by getting the dofs on the
-					   // face into @p{dofs_on_face_vector},
-					   // a vector as always. Usually,
-					   // searching in a vector is
-					   // inefficient, so we copy the dofs
-					   // into a set, which enables binary
-					   // searches.
-	  dofs.resize (dofs_per_cell);
-	  dofs_on_face_vector.resize (dofs_per_face);
-	  dof_is_on_face.resize (dofs_per_cell);
 
-	  cell->get_dof_indices (dofs);
-	  cell->face(face)->get_dof_indices (dofs_on_face_vector,
-					     cell->active_fe_index());
+    template <>
+    void
+    create_boundary_mass_matrix_1<2,3> (std_cxx1x::tuple<const Mapping<2,3> &,
+							 const DoFHandler<2,3> &,
+							 const Quadrature<1> & > ,
+					SparseMatrix<double>  &,
+					const FunctionMap<3>::type &,
+					Vector<double> &,
+					std::vector<unsigned int> &,
+					const Function<3> * const ,
+					const std::vector<unsigned int> &,
+					const MatrixCreator::internal::IteratorRange<DoFHandler<2,3> > ,
+					Threads::ThreadMutex &)
+    {
+      Assert(false,ExcNotImplemented());
+    }
+  }
 
-					   // check for each of the
-					   // dofs on this cell
-					   // whether it is on the
-					   // face
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
-					   dofs_on_face_vector.end(),
-					   dofs[i])
-				 !=
-				 dofs_on_face_vector.end());
 
-					   // in debug mode: compute an element
-					   // in the matrix which is
-					   // guaranteed to belong to a boundary
-					   // dof. We do this to check that the
-					   // entries in the cell matrix are
-					   // guaranteed to be zero if the
-					   // respective dof is not on the
-					   // boundary. Since because of
-					   // round-off, the actual
-					   // value of the matrix entry may be
-					   // only close to zero, we assert that
-					   // it is small relative to an element
-					   // which is guaranteed to be nonzero.
-					   // (absolute smallness does not
-					   // suffice since the size of the
-					   // domain scales in here)
-					   //
-					   // for this purpose we seek the
-					   // diagonal of the matrix, where there
-					   // must be an element belonging to
-					   // the boundary. we take the maximum
-					   // diagonal entry.
+
+  template <int dim, int spacedim>
+  void
+  create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mapping,
+					      const DoFHandler<dim,spacedim> &dof,
+					      const Quadrature<dim-1>  &q,
+					      SparseMatrix<double>  &matrix,
+					      const typename FunctionMap<spacedim>::type  &boundary_functions,
+					      Vector<double>            &rhs_vector,
+					      std::vector<unsigned int> &dof_to_boundary_mapping,
+					      const Function<spacedim> * const coefficient,
+					      std::vector<unsigned int> component_mapping)
+  {
+				     // what would that be in 1d? the
+				     // identity matrix on the boundary
+				     // dofs?
+    if (dim == 1)
+      {
+	Assert (false, ExcNotImplemented());
+	return;
+      }
+
+    const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+    const unsigned int n_components  = fe.n_components();
+
+    Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
+	    ExcInternalError());
+    Assert (matrix.n() == matrix.m(), ExcInternalError());
+    Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
+    Assert (boundary_functions.size() != 0, ExcInternalError());
+    Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
+	    ExcInternalError());
+    Assert (coefficient ==0 ||
+	    coefficient->n_components==1 ||
+	    coefficient->n_components==n_components, ExcComponentMismatch());
+
+    if (component_mapping.size() == 0)
+      {
+	AssertDimension (n_components, boundary_functions.begin()->second->n_components);
+	for (unsigned int i=0;i<n_components;++i)
+	  component_mapping.push_back(i);
+      }
+    else
+      AssertDimension (n_components, component_mapping.size());
+
+    const unsigned int n_threads = multithread_info.n_default_threads;
+    Threads::ThreadGroup<> threads;
+
+				     // define starting and end point
+				     // for each thread
+    typedef typename DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
+    std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
+      = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						    dof.end(), n_threads);
+
+				     // mutex to synchronise access to
+				     // the matrix
+    Threads::ThreadMutex mutex;
+
+    typedef std_cxx1x::tuple<const Mapping<dim,spacedim>&,
+			     const DoFHandler<dim,spacedim>&,
+			     const Quadrature<dim-1>&> Commons;
+
+				     // then assemble in parallel
+    typedef void (*create_boundary_mass_matrix_1_t)
+      (Commons,
+       SparseMatrix<double>      &matrix,
+       const typename FunctionMap<spacedim>::type &boundary_functions,
+       Vector<double>            &rhs_vector,
+       std::vector<unsigned int> &dof_to_boundary_mapping,
+       const Function<spacedim> * const coefficient,
+       const std::vector<unsigned int>& component_mapping,
+       const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
+       Threads::ThreadMutex      &mutex);
+    create_boundary_mass_matrix_1_t p
+      = &create_boundary_mass_matrix_1<dim,spacedim>;
+
+//TODO: Use WorkStream here
+    for (unsigned int thread=0; thread<n_threads; ++thread)
+      threads += Threads::new_thread (p,
+				      Commons(mapping, dof, q), matrix,
+				      boundary_functions, rhs_vector,
+				      dof_to_boundary_mapping, coefficient,
+				      component_mapping,
+				      thread_ranges[thread], mutex);
+    threads.join_all ();
+  }
+
+
+
+  namespace
+  {
+
+    template <int dim, int spacedim>
+    void
+    create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim> &,
+						    const hp::DoFHandler<dim,spacedim> &,
+						    const hp::QCollection<dim-1> &> commons,
+				   SparseMatrix<double>      &matrix,
+				   const typename FunctionMap<spacedim>::type &boundary_functions,
+				   Vector<double>            &rhs_vector,
+				   std::vector<unsigned int> &dof_to_boundary_mapping,
+				   const Function<spacedim> * const coefficient,
+				   const std::vector<unsigned int>& component_mapping,
+                                   const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
+				   Threads::ThreadMutex      &mutex)
+    {
+      const hp::MappingCollection<dim,spacedim>& mapping = std_cxx1x::get<0>(commons);
+      const hp::DoFHandler<dim,spacedim>& dof = std_cxx1x::get<1>(commons);
+      const hp::QCollection<dim-1>& q = std_cxx1x::get<2>(commons);
+      const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
+      const unsigned int n_components  = fe_collection.n_components();
+      const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
+      const bool         fe_is_system  = (n_components != 1);
 #ifdef DEBUG
-	  double max_diag_entry = 0;
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
-	      max_diag_entry = std::fabs(cell_matrix(i,i));
+      if (true)
+	{
+	  unsigned int max_element = 0;
+	  for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+	       i!=dof_to_boundary_mapping.end(); ++i)
+	    if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
+		(*i > max_element))
+	      max_element = *i;
+	  Assert (max_element  == matrix.n()-1, ExcInternalError());
+	};
 #endif
 
-                                           // lock the matrix
-          Threads::ThreadMutex::ScopedLock lock (mutex);
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      if (dof_is_on_face[i] && dof_is_on_face[j])
-		matrix.add(dof_to_boundary_mapping[dofs[i]],
-			   dof_to_boundary_mapping[dofs[j]],
-			   cell_matrix(i,j));
-	      else
+      const unsigned int max_dofs_per_cell = fe_collection.max_dofs_per_cell(),
+			 max_dofs_per_face = fe_collection.max_dofs_per_face();
+
+      FullMatrix<double> cell_matrix(max_dofs_per_cell, max_dofs_per_cell);
+      Vector<double>     cell_vector(max_dofs_per_cell);
+
+
+      UpdateFlags update_flags = UpdateFlags (update_values     |
+					      update_JxW_values |
+					      update_quadrature_points);
+      hp::FEFaceValues<dim> x_fe_values (mapping, fe_collection, q, update_flags);
+
+				       // two variables for the coefficient,
+				       // one for the two cases indicated in
+				       // the name
+      std::vector<double>          coefficient_values;
+      std::vector<Vector<double> > coefficient_vector_values;
+
+      std::vector<double>          rhs_values_scalar;
+      std::vector<Vector<double> > rhs_values_system;
+
+      std::vector<unsigned int> dofs (max_dofs_per_cell);
+      std::vector<unsigned int> dofs_on_face_vector (max_dofs_per_face);
+
+				       // for each dof on the cell, have a
+				       // flag whether it is on the face
+      std::vector<bool>         dof_is_on_face(max_dofs_per_cell);
+
+
+      typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell = range.first;
+      for (; cell!=range.second; ++cell)
+	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+					   // check if this face is on that part of
+					   // the boundary we are interested in
+	  if (boundary_functions.find(cell->face(face)->boundary_indicator()) !=
+	      boundary_functions.end())
+	    {
+	      x_fe_values.reinit (cell, face);
+
+	      const FEFaceValues<dim,spacedim> &fe_values = x_fe_values.get_present_fe_values ();
+
+	      const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+	      const unsigned int dofs_per_cell = fe.dofs_per_cell;
+	      const unsigned int dofs_per_face = fe.dofs_per_face;
+
+	      cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
+	      cell_vector.reinit (dofs_per_cell);
+	      cell_matrix = 0;
+	      cell_vector = 0;
+
+	      if (fe_is_system)
+						 // FE has several components
 		{
-						   // assume that all
-						   // shape functions
-						   // that are nonzero
-						   // on the boundary
-						   // are also listed
-						   // in the
-						   // @p{dof_to_boundary}
-						   // mapping. if that
-						   // is not the case,
-						   // then the
-						   // boundary mass
-						   // matrix does not
-						   // make that much
-						   // sense anyway, as
-						   // it only contains
-						   // entries for
-						   // parts of the
-						   // functions living
-						   // on the boundary
-						   //
-						   // these, we may
-						   // compare here for
-						   // relative
-						   // smallness of all
-						   // entries in the
-						   // local matrix
-						   // which are not
-						   // taken over to
-						   // the global one
-		  Assert (std::fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
-			  ExcInternalError ());
-		};
+		  rhs_values_system.resize (fe_values.n_quadrature_points,
+					    Vector<double>(n_function_components));
+		  boundary_functions.find(cell->face(face)->boundary_indicator())
+		    ->second->vector_value_list (fe_values.get_quadrature_points(),
+						 rhs_values_system);
 
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if (dof_is_on_face[j])
-	      rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
-	    else
-	      {
-						 // compare here for relative
-						 // smallness
-		Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
-			ExcInternalError());
-	      }
-	}
-}
+		  if (coefficient != 0)
+		    {
+		      if (coefficient->n_components==1)
+			{
+			  coefficient_values.resize (fe_values.n_quadrature_points);
+			  coefficient->value_list (fe_values.get_quadrature_points(),
+						   coefficient_values);
+			  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			    {
+			      const double weight = fe_values.JxW(point);
+			      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+				{
+				  const double v = fe_values.shape_value(i,point);
+				  for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+				    if (fe.system_to_component_index(i).first ==
+					fe.system_to_component_index(j).first)
+				      {
+					const double u = fe_values.shape_value(j,point);
+					cell_matrix(i,j)
+					  += (u * v * weight * coefficient_values[point]);
+				      }
+
+				  cell_vector(i) += v *
+						    rhs_values_system[point](
+						      component_mapping[fe.system_to_component_index(i).first]) * weight;
+				}
+			    }
+			}
+		      else
+			{
+			  coefficient_vector_values.resize (fe_values.n_quadrature_points,
+							    Vector<double>(n_components));
+			  coefficient->vector_value_list (fe_values.get_quadrature_points(),
+							  coefficient_vector_values);
+			  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			    {
+			      const double weight = fe_values.JxW(point);
+			      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+				{
+				  const double v = fe_values.shape_value(i,point);
+				  const unsigned int component_i=
+				    fe.system_to_component_index(i).first;
+				  for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+				    if (fe.system_to_component_index(j).first ==
+					component_i)
+				      {
+					const double u = fe_values.shape_value(j,point);
+					cell_matrix(i,j) +=
+					  (u * v * weight * coefficient_vector_values[point](component_i));
+				      }
+				  cell_vector(i) += v * rhs_values_system[point](component_mapping[component_i]) * weight;
+				}
+			    }
+			}
+		    }
+		  else	//      if (coefficient == 0)
+		    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		      {
+			const double weight = fe_values.JxW(point);
+			for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+			  {
+			    const double v = fe_values.shape_value(i,point);
+			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+			      if (fe.system_to_component_index(i).first ==
+				  fe.system_to_component_index(j).first)
+				{
+				  const double u = fe_values.shape_value(j,point);
+				  cell_matrix(i,j) += (u * v * weight);
+				}
+			    cell_vector(i) += v *
+					      rhs_values_system[point](
+						fe.system_to_component_index(i).first) *
+					      weight;
+			  }
+		      }
+		}
+	      else
+						 // FE is a scalar one
+		{
+		  rhs_values_scalar.resize (fe_values.n_quadrature_points);
+		  boundary_functions.find(cell->face(face)->boundary_indicator())
+		    ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
+
+		  if (coefficient != 0)
+		    {
+		      coefficient_values.resize (fe_values.n_quadrature_points);
+		      coefficient->value_list (fe_values.get_quadrature_points(),
+					       coefficient_values);
+		      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+			{
+			  const double weight = fe_values.JxW(point);
+			  for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+			    {
+			      const double v = fe_values.shape_value(i,point);
+			      for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+				{
+				  const double u = fe_values.shape_value(j,point);
+				  cell_matrix(i,j) += (u * v * weight * coefficient_values[point]);
+				}
+			      cell_vector(i) += v * rhs_values_scalar[point] *weight;
+			    }
+			}
+		    }
+		  else
+		    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+		      {
+			const double weight = fe_values.JxW(point);
+			for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+			  {
+			    const double v = fe_values.shape_value(i,point);
+			    for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+			      {
+				const double u = fe_values.shape_value(j,point);
+				cell_matrix(i,j) += (u * v * weight);
+			      }
+			    cell_vector(i) += v * rhs_values_scalar[point] * weight;
+			  }
+		      }
+		}
+
+					       // now transfer cell matrix and vector
+					       // to the whole boundary matrix
+					       //
+					       // in the following: dof[i] holds the
+					       // global index of the i-th degree of
+					       // freedom on the present cell. If it
+					       // is also a dof on the boundary, it
+					       // must be a nonzero entry in the
+					       // dof_to_boundary_mapping and then
+					       // the boundary index of this dof is
+					       // dof_to_boundary_mapping[dof[i]].
+					       //
+					       // if dof[i] is not on the boundary,
+					       // it should be zero on the boundary
+					       // therefore on all quadrature
+					       // points and finally all of its
+					       // entries in the cell matrix and
+					       // vector should be zero. If not, we
+					       // throw an error (note: because of
+					       // the evaluation of the shape
+					       // functions only up to machine
+					       // precision, the term "must be zero"
+					       // really should mean: "should be
+					       // very small". since this is only an
+					       // assertion and not part of the
+					       // code, we may choose "very small"
+					       // quite arbitrarily)
+					       //
+					       // the main problem here is that the
+					       // matrix or vector entry should also
+					       // be zero if the degree of freedom
+					       // dof[i] is on the boundary, but not
+					       // on the present face, i.e. on
+					       // another face of the same cell also
+					       // on the boundary. We can therefore
+					       // not rely on the
+					       // dof_to_boundary_mapping[dof[i]]
+					       // being !=-1, we really have to
+					       // determine whether dof[i] is a
+					       // dof on the present face. We do so
+					       // by getting the dofs on the
+					       // face into @p{dofs_on_face_vector},
+					       // a vector as always. Usually,
+					       // searching in a vector is
+					       // inefficient, so we copy the dofs
+					       // into a set, which enables binary
+					       // searches.
+	      dofs.resize (dofs_per_cell);
+	      dofs_on_face_vector.resize (dofs_per_face);
+	      dof_is_on_face.resize (dofs_per_cell);
+
+	      cell->get_dof_indices (dofs);
+	      cell->face(face)->get_dof_indices (dofs_on_face_vector,
+						 cell->active_fe_index());
+
+					       // check for each of the
+					       // dofs on this cell
+					       // whether it is on the
+					       // face
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		dof_is_on_face[i] = (std::find(dofs_on_face_vector.begin(),
+					       dofs_on_face_vector.end(),
+					       dofs[i])
+				     !=
+				     dofs_on_face_vector.end());
+
+					       // in debug mode: compute an element
+					       // in the matrix which is
+					       // guaranteed to belong to a boundary
+					       // dof. We do this to check that the
+					       // entries in the cell matrix are
+					       // guaranteed to be zero if the
+					       // respective dof is not on the
+					       // boundary. Since because of
+					       // round-off, the actual
+					       // value of the matrix entry may be
+					       // only close to zero, we assert that
+					       // it is small relative to an element
+					       // which is guaranteed to be nonzero.
+					       // (absolute smallness does not
+					       // suffice since the size of the
+					       // domain scales in here)
+					       //
+					       // for this purpose we seek the
+					       // diagonal of the matrix, where there
+					       // must be an element belonging to
+					       // the boundary. we take the maximum
+					       // diagonal entry.
+#ifdef DEBUG
+	      double max_diag_entry = 0;
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		if (std::fabs(cell_matrix(i,i)) > max_diag_entry)
+		  max_diag_entry = std::fabs(cell_matrix(i,i));
+#endif
+
+					       // lock the matrix
+	      Threads::ThreadMutex::ScopedLock lock (mutex);
+	      for (unsigned int i=0; i<dofs_per_cell; ++i)
+		for (unsigned int j=0; j<dofs_per_cell; ++j)
+		  if (dof_is_on_face[i] && dof_is_on_face[j])
+		    matrix.add(dof_to_boundary_mapping[dofs[i]],
+			       dof_to_boundary_mapping[dofs[j]],
+			       cell_matrix(i,j));
+		  else
+		    {
+						       // assume that all
+						       // shape functions
+						       // that are nonzero
+						       // on the boundary
+						       // are also listed
+						       // in the
+						       // @p{dof_to_boundary}
+						       // mapping. if that
+						       // is not the case,
+						       // then the
+						       // boundary mass
+						       // matrix does not
+						       // make that much
+						       // sense anyway, as
+						       // it only contains
+						       // entries for
+						       // parts of the
+						       // functions living
+						       // on the boundary
+						       //
+						       // these, we may
+						       // compare here for
+						       // relative
+						       // smallness of all
+						       // entries in the
+						       // local matrix
+						       // which are not
+						       // taken over to
+						       // the global one
+		      Assert (std::fabs(cell_matrix(i,j)) <= 1e-10 * max_diag_entry,
+			      ExcInternalError ());
+		    };
+
+	      for (unsigned int j=0; j<dofs_per_cell; ++j)
+		if (dof_is_on_face[j])
+		  rhs_vector(dof_to_boundary_mapping[dofs[j]]) += cell_vector(j);
+		else
+		  {
+						     // compare here for relative
+						     // smallness
+		    Assert (std::fabs(cell_vector(j)) <= 1e-10 * max_diag_entry,
+			    ExcInternalError());
+		  }
+	    }
+    }
+
+  }
 
 
 
-template <int dim, int spacedim>
-void MatrixCreator::create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>     &dof,
-						 const hp::QCollection<dim-1>   &q,
-						 SparseMatrix<double>      &matrix,
-						 const typename FunctionMap<spacedim>::type &rhs,
-						 Vector<double>            &rhs_vector,
-						 std::vector<unsigned int> &dof_to_boundary_mapping,
-						 const Function<spacedim> * const a,
-						 std::vector<unsigned int> component_mapping)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_boundary_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
-			      matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
-}
+  template <int dim, int spacedim>
+  void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>     &dof,
+				    const Quadrature<dim-1>   &q,
+				    SparseMatrix<double>      &matrix,
+				    const typename FunctionMap<spacedim>::type &rhs,
+				    Vector<double>            &rhs_vector,
+				    std::vector<unsigned int> &dof_to_boundary_mapping,
+				    const Function<spacedim> * const a,
+				    std::vector<unsigned int> component_mapping)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_boundary_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
+				matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
+  }
 
 
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
-					   const DoFHandler<dim,spacedim>    &dof,
-					   const Quadrature<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+  template <int dim, int spacedim>
+  void
+  create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>        &mapping,
+			       const hp::DoFHandler<dim,spacedim>     &dof,
+			       const hp::QCollection<dim-1>   &q,
+			       SparseMatrix<double>      &matrix,
+			       const typename FunctionMap<spacedim>::type         &boundary_functions,
+			       Vector<double>            &rhs_vector,
+			       std::vector<unsigned int> &dof_to_boundary_mapping,
+			       const Function<spacedim> * const coefficient,
+			       std::vector<unsigned int> component_mapping)
+  {
+				     // what would that be in 1d? the
+				     // identity matrix on the boundary
+				     // dofs?
+    if (dim == 1)
+      {
+	Assert (false, ExcNotImplemented());
+	return;
+      }
 
-  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
-  hp::QCollection<dim>                q_collection (q);
-  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (fe_collection,
-		    update_gradients  | update_JxW_values |
-		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-		    coefficient, /*rhs_function=*/0,
-		    q_collection, mapping_collection);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
+    const unsigned int n_components  = fe_collection.n_components();
 
-  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
-				SparseMatrix<double> *,
-				Vector<double> *)
-    = &internal::MatrixCreator::
-    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+    Assert (matrix.n() == dof.n_boundary_dofs(boundary_functions),
+	    ExcInternalError());
+    Assert (matrix.n() == matrix.m(), ExcInternalError());
+    Assert (matrix.n() == rhs_vector.size(), ExcInternalError());
+    Assert (boundary_functions.size() != 0, ExcInternalError());
+    Assert (dof_to_boundary_mapping.size() == dof.n_dofs(),
+	    ExcInternalError());
+    Assert (coefficient ==0 ||
+	    coefficient->n_components==1 ||
+	    coefficient->n_components==n_components, ExcComponentMismatch());
 
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (copy_local_to_global,
-				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
-		   assembler_data,
-		   copy_data);
-}
+    if (component_mapping.size() == 0)
+      {
+	AssertDimension (n_components, boundary_functions.begin()->second->n_components);
+	for (unsigned int i=0;i<n_components;++i)
+	  component_mapping.push_back(i);
+      }
+    else
+      AssertDimension (n_components, component_mapping.size());
 
+    const unsigned int n_threads = multithread_info.n_default_threads;
+    Threads::ThreadGroup<> threads;
 
+				     // define starting and end point
+				     // for each thread
+    typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
+    std::vector<std::pair<active_cell_iterator,active_cell_iterator> > thread_ranges
+      = Threads::split_range<active_cell_iterator> (dof.begin_active(),
+						    dof.end(), n_threads);
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
-					   const Quadrature<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
-}
+    typedef std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim>&,
+			     const hp::DoFHandler<dim,spacedim>&,
+			     const hp::QCollection<dim-1>&> Commons;
 
+				     // mutex to synchronise access to
+				     // the matrix
+    Threads::ThreadMutex mutex;
 
+				     // then assemble in parallel
+    typedef void (*create_boundary_mass_matrix_1_t)
+      (Commons,
+       SparseMatrix<double>      &matrix,
+       const typename FunctionMap<spacedim>::type &boundary_functions,
+       Vector<double>            &rhs_vector,
+       std::vector<unsigned int> &dof_to_boundary_mapping,
+       const Function<spacedim> * const coefficient,
+       const std::vector<unsigned int>& component_mapping,
+       const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
+       Threads::ThreadMutex      &mutex);
+    create_boundary_mass_matrix_1_t p = &create_boundary_mass_matrix_1<dim,spacedim>;
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
-					   const DoFHandler<dim,spacedim>    &dof,
-					   const Quadrature<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim>      &rhs,
-					   Vector<double>           &rhs_vector,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
-
-  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
-  hp::QCollection<dim>                q_collection (q);
-  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (fe_collection,
-		    update_gradients  | update_values |
-		    update_JxW_values | update_quadrature_points,
-		    coefficient, &rhs,
-		    q_collection, mapping_collection);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
-
-  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
-				SparseMatrix<double> *,
-				Vector<double> *)
-    = &internal::MatrixCreator::
-    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
-
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (copy_local_to_global,
-				    std_cxx1x::_1, &matrix, &rhs_vector),
-		   assembler_data,
-		   copy_data);
-}
+//TODO: Use WorkStream here
+    for (unsigned int thread=0; thread<n_threads; ++thread)
+      threads += Threads::new_thread (p,
+				      Commons(mapping, dof, q), matrix,
+				      boundary_functions, rhs_vector,
+				      dof_to_boundary_mapping, coefficient,
+				      component_mapping,
+				      thread_ranges[thread], mutex);
+    threads.join_all ();
+  }
 
 
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
-					   const Quadrature<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim>      &rhs,
-					   Vector<double>           &rhs_vector,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
-			matrix, rhs, rhs_vector, coefficient);
-}
+
+  template <int dim, int spacedim>
+  void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>     &dof,
+				    const hp::QCollection<dim-1>   &q,
+				    SparseMatrix<double>      &matrix,
+				    const typename FunctionMap<spacedim>::type &rhs,
+				    Vector<double>            &rhs_vector,
+				    std::vector<unsigned int> &dof_to_boundary_mapping,
+				    const Function<spacedim> * const a,
+				    std::vector<unsigned int> component_mapping)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_boundary_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
+				matrix,rhs, rhs_vector, dof_to_boundary_mapping, a, component_mapping);
+  }
 
 
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-					   const hp::DoFHandler<dim,spacedim>    &dof,
-					   const hp::QCollection<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
+			      const DoFHandler<dim,spacedim>    &dof,
+			      const Quadrature<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
-		    update_gradients  | update_JxW_values |
-		    (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
-		    coefficient, /*rhs_function=*/0,
-		    q, mapping);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::QCollection<dim>                q_collection (q);
+    hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (fe_collection,
+		      update_gradients  | update_JxW_values |
+		      (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		      coefficient, /*rhs_function=*/0,
+		      q_collection, mapping_collection);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
 
-  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
-				SparseMatrix<double> *,
-				Vector<double> *)
-    = &internal::MatrixCreator::
-    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
+				  SparseMatrix<double> *,
+				  Vector<double> *)
+      = &MatrixCreator::internal::
+      copy_local_to_global<SparseMatrix<double>, Vector<double> >;
 
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (copy_local_to_global,
-				    std_cxx1x::_1, &matrix, (Vector<double>*)0),
-		   assembler_data,
-		   copy_data);
-}
-
-
-
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-					   const hp::QCollection<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
-}
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (copy_local_to_global,
+				      std_cxx1x::_1, &matrix, (Vector<double>*)0),
+		     assembler_data,
+		     copy_data);
+  }
 
 
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-					   const hp::DoFHandler<dim,spacedim>    &dof,
-					   const hp::QCollection<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim>      &rhs,
-					   Vector<double>           &rhs_vector,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-	  ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
-
-  internal::MatrixCreator::AssemblerData::Scratch<dim, spacedim>
-    assembler_data (dof.get_fe(),
-		    update_gradients  | update_values |
-		    update_JxW_values | update_quadrature_points,
-		    coefficient, &rhs,
-		    q, mapping);
-  internal::MatrixCreator::AssemblerData::CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-			 assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
-
-  void (*copy_local_to_global) (const internal::MatrixCreator::AssemblerData::CopyData &,
-				SparseMatrix<double> *,
-				Vector<double> *)
-    = &internal::MatrixCreator::
-    copy_local_to_global<SparseMatrix<double>, Vector<double> >;
-
-  WorkStream::run (dof.begin_active(),
-		   static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
-		   &internal::MatrixCreator::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
-		   std_cxx1x::bind (copy_local_to_global,
-				    std_cxx1x::_1, &matrix, &rhs_vector),
-		   assembler_data,
-		   copy_data);
-}
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
+			      const Quadrature<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
+  }
 
 
 
-template <int dim, int spacedim>
-void MatrixCreator::create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-					   const hp::QCollection<dim>    &q,
-					   SparseMatrix<double>     &matrix,
-					   const Function<spacedim>      &rhs,
-					   Vector<double>           &rhs_vector,
-					   const Function<spacedim> * const coefficient)
-{
-  Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
-  create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
-			matrix, rhs, rhs_vector, coefficient);
-}
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
+			      const DoFHandler<dim,spacedim>    &dof,
+			      const Quadrature<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim>      &rhs,
+			      Vector<double>           &rhs_vector,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::QCollection<dim>                q_collection (q);
+    hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (fe_collection,
+		      update_gradients  | update_values |
+		      update_JxW_values | update_quadrature_points,
+		      coefficient, &rhs,
+		      q_collection, mapping_collection);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
+				  SparseMatrix<double> *,
+				  Vector<double> *)
+      = &MatrixCreator::internal::
+      copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (copy_local_to_global,
+				      std_cxx1x::_1, &matrix, &rhs_vector),
+		     assembler_data,
+		     copy_data);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
+			      const Quadrature<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim>      &rhs,
+			      Vector<double>           &rhs_vector,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
+			  matrix, rhs, rhs_vector, coefficient);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+			      const hp::DoFHandler<dim,spacedim>    &dof,
+			      const hp::QCollection<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (dof.get_fe(),
+		      update_gradients  | update_JxW_values |
+		      (coefficient != 0 ? update_quadrature_points : UpdateFlags(0)),
+		      coefficient, /*rhs_function=*/0,
+		      q, mapping);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
+				  SparseMatrix<double> *,
+				  Vector<double> *)
+      = &MatrixCreator::internal::
+      copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (copy_local_to_global,
+				      std_cxx1x::_1, &matrix, (Vector<double>*)0),
+		     assembler_data,
+		     copy_data);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+			      const hp::QCollection<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+			      const hp::DoFHandler<dim,spacedim>    &dof,
+			      const hp::QCollection<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim>      &rhs,
+			      Vector<double>           &rhs_vector,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (matrix.m() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
+    Assert (matrix.n() == dof.n_dofs(),
+	    ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
+
+    MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim>
+      assembler_data (dof.get_fe(),
+		      update_gradients  | update_values |
+		      update_JxW_values | update_quadrature_points,
+		      coefficient, &rhs,
+		      q, mapping);
+    MatrixCreator::internal::AssemblerData::CopyData copy_data;
+    copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
+				  assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+
+    void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
+				  SparseMatrix<double> *,
+				  Vector<double> *)
+      = &MatrixCreator::internal::
+      copy_local_to_global<SparseMatrix<double>, Vector<double> >;
+
+    WorkStream::run (dof.begin_active(),
+		     static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
+		     &MatrixCreator::internal::laplace_assembler<dim, spacedim, typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>,
+		     std_cxx1x::bind (copy_local_to_global,
+				      std_cxx1x::_1, &matrix, &rhs_vector),
+		     assembler_data,
+		     copy_data);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+			      const hp::QCollection<dim>    &q,
+			      SparseMatrix<double>     &matrix,
+			      const Function<spacedim>      &rhs,
+			      Vector<double>           &rhs_vector,
+			      const Function<spacedim> * const coefficient)
+  {
+    Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
+    create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
+			  matrix, rhs, rhs_vector, coefficient);
+  }
+
+}  // namespace MatrixCreator
 
 
 
@@ -1901,7 +1957,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	break;
       }
 
-  
+
   std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
 						endd = boundary_values.end();
   const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
@@ -1910,10 +1966,10 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
   for (; dof != endd; ++dof)
     {
       Assert (dof->first < n_dofs, ExcInternalError());
-      
+
       const unsigned int dof_number = dof->first;
 				       // for each boundary dof:
-      
+
 				       // set entries of this line
 				       // to zero except for the diagonal
 				       // entry. Note that the diagonal
@@ -1968,7 +2024,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					   // of this line for the Gauss
 					   // elimination step
 	  const number diagonal_entry = matrix.diag_element(dof_number);
-	  
+
 					   // we have to loop over all
 					   // rows of the matrix which
 					   // have a nonzero entry in
@@ -2012,11 +2068,11 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 
 	      const unsigned int global_entry
 		= (p - &sparsity_colnums[sparsity_rowstart[0]]);
-	      
+
 					       // correct right hand side
 	      right_hand_side(row) -= matrix.global_entry(global_entry) /
 				      diagonal_entry * new_rhs;
-	      
+
 					       // set matrix entry to zero
 	      matrix.global_entry(global_entry) = 0.;
 	    }
@@ -2038,14 +2094,14 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				    const bool             eliminate_columns)
 {
   const unsigned int blocks = matrix.n_block_rows();
-  
+
   Assert (matrix.n() == right_hand_side.size(),
 	  ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
   Assert (matrix.n() == solution.size(),
 	  ExcDimensionMismatch(matrix.n(), solution.size()));
   Assert (matrix.n_block_rows() == matrix.n_block_cols(),
 	  ExcNotQuadratic());
-  Assert (matrix.get_sparsity_pattern().get_row_indices() == 
+  Assert (matrix.get_sparsity_pattern().get_row_indices() ==
 	  matrix.get_sparsity_pattern().get_column_indices(),
 	  ExcNotQuadratic());
   Assert (matrix.get_sparsity_pattern().get_column_indices() ==
@@ -2059,7 +2115,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
     Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
 	    SparsityPattern::ExcDiagonalNotOptimized());
 
-  
+
 				   // if no boundary values are to be applied
 				   // simply return
   if (boundary_values.size() == 0)
@@ -2080,7 +2136,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
       for (unsigned int i=0; i<matrix.block(diag_block,diag_block).n(); ++i)
 	if (matrix.block(diag_block,diag_block).diag_element(i) != 0)
 	  {
-	    first_nonzero_diagonal_entry 
+	    first_nonzero_diagonal_entry
 	      = matrix.block(diag_block,diag_block).diag_element(i);
 	    break;
 	  }
@@ -2094,13 +2150,13 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				   // blocks? if so, use 1.0 instead
   if (first_nonzero_diagonal_entry == 0)
     first_nonzero_diagonal_entry = 1;
-  
+
 
   std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
 						endd = boundary_values.end();
   const BlockSparsityPattern &
     sparsity_pattern = matrix.get_sparsity_pattern();
-  
+
 				   // pointer to the mapping between
 				   // global and block indices. since
 				   // the row and column mappings are
@@ -2108,7 +2164,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 				   // one of them
   const BlockIndices &
     index_mapping = sparsity_pattern.get_column_indices();
-  
+
 				   // now loop over all boundary dofs
   for (; dof != endd; ++dof)
     {
@@ -2122,7 +2178,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 	block_index = index_mapping.global_to_local (dof_number);
 
 				       // for each boundary dof:
-      
+
 				       // set entries of this line
 				       // to zero except for the diagonal
 				       // entry. Note that the diagonal
@@ -2149,16 +2205,16 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					   // matrix so the diagonal
 					   // element is the first of
 					   // this row.
-	  const unsigned int 
+	  const unsigned int
 	    last  = local_sparsity.get_rowstart_indices()[block_index.second+1],
 	    first = (block_col == block_index.first ?
 		     local_sparsity.get_rowstart_indices()[block_index.second]+1 :
 		     local_sparsity.get_rowstart_indices()[block_index.second]);
-	  
+
 	  for (unsigned int j=first; j<last; ++j)
 	    matrix.block(block_index.first,block_col).global_entry(j) = 0.;
 	}
-      
+
 
 				       // set right hand side to
 				       // wanted value: if main diagonal
@@ -2176,7 +2232,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
       number new_rhs;
       if (matrix.block(block_index.first, block_index.first)
 	  .diag_element(block_index.second) != 0.0)
-	new_rhs = dof->second * 
+	new_rhs = dof->second *
 		  matrix.block(block_index.first, block_index.first)
 		  .diag_element(block_index.second);
       else
@@ -2204,10 +2260,10 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 					   // store the only nonzero entry
 					   // of this line for the Gauss
 					   // elimination step
-	  const number diagonal_entry 
+	  const number diagonal_entry
 	    = matrix.block(block_index.first,block_index.first)
 	    .diag_element(block_index.second);
-	  
+
 					   // we have to loop over all
 					   // rows of the matrix which
 					   // have a nonzero entry in
@@ -2239,7 +2295,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 		= sparsity_pattern.block (block_row, block_index.first);
 	      const SparsityPattern &transpose_sparsity
 		= sparsity_pattern.block (block_index.first, block_row);
-	      
+
 					       // traverse the row of
 					       // the transpose block
 					       // to find the
@@ -2253,7 +2309,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 			 transpose_sparsity.get_rowstart_indices()[block_index.second]+1 :
 			 transpose_sparsity.get_rowstart_indices()[block_index.second]),
 		last  = transpose_sparsity.get_rowstart_indices()[block_index.second+1];
-	      
+
 	      for (unsigned int j=first; j<last; ++j)
 		{
 						   // get the number
@@ -2325,7 +2381,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 			  (p != &this_sparsity.get_column_numbers()
 			   [this_sparsity.get_rowstart_indices()[row+1]]),
 			  ExcInternalError());
-		  
+
 		  const unsigned int global_entry
 		    = (p
 		       -
@@ -2336,7 +2392,7 @@ MatrixTools::apply_boundary_values (const std::map<unsigned int,double> &boundar
 		  right_hand_side.block(block_row)(row)
 		    -= matrix.block(block_row,block_index.first).global_entry(global_entry) /
 		    diagonal_entry * new_rhs;
-		  
+
 						   // set matrix entry to zero
 		  matrix.block(block_row,block_index.first).global_entry(global_entry) = 0.;
 		}
@@ -2380,7 +2436,7 @@ namespace PETScWrappers
             ExcInternalError());
     Assert (local_range == solution.local_range(),
             ExcInternalError());
-    
+
 
                                      // we have to read and write from this
                                      // matrix (in this order). this will only
@@ -2501,7 +2557,7 @@ apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
                                         right_hand_side, eliminate_columns);
 
 				   // compress the matrix once we're done
-  matrix.compress ();  
+  matrix.compress ();
 }
 
 
@@ -2719,7 +2775,7 @@ namespace TrilinosWrappers
 	    ExcDimensionMismatch(matrix.n(), solution.size()));
     Assert (matrix.n_block_rows() == matrix.n_block_cols(),
 	    ExcNotQuadratic());
-  
+
     const unsigned int n_blocks = matrix.n_block_rows();
 
     matrix.compress();
@@ -2746,7 +2802,7 @@ namespace TrilinosWrappers
 	     std::pair<unsigned int, double> (index,dof->second));
 	}
     }
-  
+
 				   // Now call the non-block variants on
 				   // the diagonal subblocks and the
 				   // solution/rhs.
@@ -2756,8 +2812,8 @@ namespace TrilinosWrappers
 					      solution.block(block),
 					      right_hand_side.block(block),
 					      eliminate_columns);
-  
-				   // Finally, we need to do something 
+
+				   // Finally, we need to do something
 				   // about the off-diagonal matrices. This
 				   // is luckily not difficult. Just clear
 				   // the whole row.
@@ -2765,7 +2821,7 @@ namespace TrilinosWrappers
       {
 	const std::pair<unsigned int, unsigned int> local_range
 	  = matrix.block(block_m,0).local_range();
-      
+
 	std::vector<unsigned int> constrained_rows;
 	for (std::map<unsigned int,double>::const_iterator
 	       dof  = block_boundary_values[block_m].begin();
@@ -2774,7 +2830,7 @@ namespace TrilinosWrappers
 	  if ((dof->first >= local_range.first) &&
 	      (dof->first < local_range.second))
 	    constrained_rows.push_back (dof->first);
-  
+
 	for (unsigned int block_n=0; block_n<n_blocks; ++block_n)
 	  if (block_m != block_n)
 	    matrix.block(block_m,block_n).clear_rows(constrained_rows);
@@ -2825,8 +2881,8 @@ apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
                        TrilinosWrappers::BlockVector        &right_hand_side,
                        const bool                            eliminate_columns)
 {
-  TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix, 
-						 solution, right_hand_side, 
+  TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix,
+						 solution, right_hand_side,
 						 eliminate_columns);
 }
 
@@ -2840,8 +2896,8 @@ apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
                        TrilinosWrappers::MPI::BlockVector   &right_hand_side,
                        const bool                            eliminate_columns)
 {
-  TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix, 
-						 solution, right_hand_side, 
+  TrilinosWrappers::apply_block_boundary_values (boundary_values, matrix,
+						 solution, right_hand_side,
 						 eliminate_columns);
 }
 
@@ -2943,7 +2999,7 @@ local_apply_boundary_values (const std::map<unsigned int,double> &boundary_value
             }
           else
             local_matrix(i,i) = std::fabs(local_matrix(i,i));
-          
+
                                            // and replace rhs entry by correct
                                            // value
           local_rhs(i) = local_matrix(i,i) * boundary_value->second;

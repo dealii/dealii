@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -78,10 +78,9 @@ namespace TrilinosWrappers
 
 
 /**
- * This class provides functions that assemble certain standard matrices for a
+ * This namespace provides functions that assemble certain standard matrices for a
  * given triangulation, using a given finite element, a given mapping and a
- * quadrature formula.  All functions are static, so it is not necessary to
- * create an object of this type.
+ * quadrature formula.
  *
  *
  * <h3>Conventions for all functions</h3>
@@ -208,9 +207,8 @@ namespace TrilinosWrappers
  * @ingroup numerics
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
-class MatrixCreator
+namespace MatrixCreator
 {
-  public:
 				     /**
 				      * Assemble the mass matrix. If no
 				      * coefficient is given, it is assumed
@@ -224,7 +222,7 @@ class MatrixCreator
 				      * for more information.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
+     void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
 				    const DoFHandler<dim,spacedim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<number>     &matrix,
@@ -236,7 +234,7 @@ class MatrixCreator
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
+     void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<number>     &matrix,
 				    const Function<spacedim> * const a = 0);
@@ -255,7 +253,7 @@ class MatrixCreator
 				      * class for more information.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
+     void create_mass_matrix (const Mapping<dim, spacedim>       &mapping,
 				    const DoFHandler<dim,spacedim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<number>     &matrix,
@@ -269,7 +267,7 @@ class MatrixCreator
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
+     void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 				    const Quadrature<dim>    &q,
 				    SparseMatrix<number>     &matrix,
 				    const Function<spacedim>      &rhs,
@@ -280,7 +278,7 @@ class MatrixCreator
 				      * objects.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+     void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
 				    const hp::DoFHandler<dim,spacedim>    &dof,
 				    const hp::QCollection<dim>    &q,
 				    SparseMatrix<number>     &matrix,
@@ -291,7 +289,7 @@ class MatrixCreator
 				      * objects.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+     void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 				    const hp::QCollection<dim>    &q,
 				    SparseMatrix<number>     &matrix,
 				    const Function<spacedim> * const a = 0);
@@ -301,7 +299,7 @@ class MatrixCreator
 				      * objects.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+     void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
 				    const hp::DoFHandler<dim,spacedim>    &dof,
 				    const hp::QCollection<dim>    &q,
 				    SparseMatrix<number>     &matrix,
@@ -314,7 +312,7 @@ class MatrixCreator
 				      * objects.
 				      */
     template <int dim, typename number, int spacedim>
-    static void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+     void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 				    const hp::QCollection<dim>    &q,
 				    SparseMatrix<number>     &matrix,
 				    const Function<spacedim>      &rhs,
@@ -362,7 +360,7 @@ class MatrixCreator
 				      * cell-dependent shape functions.
 				      */
     template <int dim, int spacedim>
-    static
+
     void create_boundary_mass_matrix (const Mapping<dim, spacedim>       &mapping,
 				      const DoFHandler<dim,spacedim>    &dof,
 				      const Quadrature<dim-1>  &q,
@@ -375,7 +373,7 @@ class MatrixCreator
 
 // 				      * Same function, but for 1d.
 // 				      */
-//     static
+//
 //     void create_boundary_mass_matrix (const Mapping<1,1>       &mapping,
 // 				      const DoFHandler<1,1>    &dof,
 // 				      const Quadrature<0>    &q,
@@ -385,7 +383,7 @@ class MatrixCreator
 // 				      std::vector<unsigned int>&dof_to_boundary_mapping,
 // 				      const Function<1> * const a = 0);
 // //codimension 1
-//     static
+//
 //     void create_boundary_mass_matrix (const Mapping<1,2>       &mapping,
 // 				      const DoFHandler<1,2>    &dof,
 // 				      const Quadrature<0>    &q,
@@ -404,7 +402,7 @@ class MatrixCreator
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, int spacedim>
-    static
+
     void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
 				      const Quadrature<dim-1>  &q,
 				      SparseMatrix<double>     &matrix,
@@ -419,7 +417,7 @@ class MatrixCreator
 				      * objects.
 				      */
     template <int dim, int spacedim>
-    static
+
     void create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
 				      const hp::DoFHandler<dim,spacedim>    &dof,
 				      const hp::QCollection<dim-1>  &q,
@@ -434,7 +432,7 @@ class MatrixCreator
 				      * Same function as above, but for hp
 				      * objects.
 				      */
-//     static
+//
 //     void create_boundary_mass_matrix (const hp::MappingCollection<1,1>       &mapping,
 // 				      const hp::DoFHandler<1,1>    &dof,
 // 				      const hp::QCollection<0>    &q,
@@ -449,7 +447,7 @@ class MatrixCreator
 				      * objects.
 				      */
     template <int dim, int spacedim>
-    static
+
     void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 				      const hp::QCollection<dim-1>  &q,
 				      SparseMatrix<double>     &matrix,
@@ -473,7 +471,7 @@ class MatrixCreator
 				      * class for more information.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
+     void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
 				       const DoFHandler<dim,spacedim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
@@ -486,7 +484,7 @@ class MatrixCreator
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
+     void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<spacedim> * const a = 0);
@@ -506,7 +504,7 @@ class MatrixCreator
 				      * class for more information.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
+     void create_laplace_matrix (const Mapping<dim, spacedim>       &mapping,
 				       const DoFHandler<dim,spacedim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
@@ -521,7 +519,7 @@ class MatrixCreator
 				      * <tt>mapping=MappingQ1@<dim@>()</tt>.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
+     void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
 				       const Quadrature<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<spacedim>      &rhs,
@@ -534,7 +532,7 @@ class MatrixCreator
 				      * collections.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+     void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
 				       const hp::DoFHandler<dim,spacedim>    &dof,
 				       const hp::QCollection<dim>    &q,
 				       SparseMatrix<double>     &matrix,
@@ -546,7 +544,7 @@ class MatrixCreator
 				      * collections.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+     void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 				       const hp::QCollection<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<spacedim> * const a = 0);
@@ -557,7 +555,7 @@ class MatrixCreator
 				      * collections.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
+     void create_laplace_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
 				       const hp::DoFHandler<dim,spacedim>    &dof,
 				       const hp::QCollection<dim>    &q,
 				       SparseMatrix<double>     &matrix,
@@ -571,7 +569,7 @@ class MatrixCreator
 				      * collections.
 				      */
     template <int dim, int spacedim>
-    static void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
+     void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
 				       const hp::QCollection<dim>    &q,
 				       SparseMatrix<double>     &matrix,
 				       const Function<spacedim>      &rhs,
@@ -582,93 +580,7 @@ class MatrixCreator
 				      * Exception
 				      */
     DeclException0 (ExcComponentMismatch);
-  private:
-				     /**
-				      * Convenience abbreviation for
-				      * pairs of DoF handler cell
-				      * iterators. This type works
-				      * just like a
-				      * <tt>std::pair<iterator,iterator></tt>
-				      * but is templatized on the
-				      * dof handler that shouls be used.
-				      */
-    template <typename DH>
-    struct IteratorRange
-    {
-					 /**
-					  * Typedef for the iterator type.
-					  */
-	typedef typename DH::active_cell_iterator active_cell_iterator;
-
-					 /**
-					  * Abbreviation for a pair of
-					  * iterators.
-					  */
-	typedef std::pair<active_cell_iterator,active_cell_iterator> iterator_pair;
-
-					 /**
-					  * Constructor. Initialize
-					  * the two values by the
-					  * given values.
-					  */
-	IteratorRange (const active_cell_iterator &first,
-		       const active_cell_iterator &second);
-
-					 /**
-					  * Constructor taking a pair
-					  * of values for
-					  * initialization.
-					  */
-	IteratorRange (const iterator_pair &ip);
-
-					 /**
-					  * Pair of iterators denoting
-					  * a half-open range.
-					  */
-	active_cell_iterator first, second;
-    };
-
-				     /**
-				      * Version of the same function
-				      * (without suffix @p _1) with
-				      * the same argument list that
-				      * operates only on an interval
-				      * of iterators. Used for
-				      * parallelization. The mutex is
-				      * used to synchronise access to
-				      * the matrix.
-				      */
-    template <int dim, int spacedim>
-    static
-    void create_boundary_mass_matrix_1 (std_cxx1x::tuple<const Mapping<dim,spacedim> &,
-					const DoFHandler<dim,spacedim> &,
-					const Quadrature<dim-1> & > commons,
-					SparseMatrix<double>     &matrix,
-					const typename FunctionMap<spacedim>::type        &boundary_functions,
-					Vector<double>           &rhs_vector,
-					std::vector<unsigned int>&dof_to_boundary_mapping,
-					const Function<spacedim> * const coefficient,
-					const std::vector<unsigned int>& component_mapping,
-					const IteratorRange<DoFHandler<dim,spacedim> >  range,
-					Threads::ThreadMutex     &mutex);
-
-				     /**
-				      * Same as above, but for hp.
-				      */
-    template <int dim, int spacedim>
-    static
-    void create_boundary_mass_matrix_1 (std_cxx1x::tuple<const hp::MappingCollection<dim,spacedim> &,
-					const hp::DoFHandler<dim,spacedim>&,
-					const hp::QCollection<dim-1> & > commons,
-					SparseMatrix<double>     &matrix,
-					const typename FunctionMap<spacedim>::type        &boundary_functions,
-					Vector<double>           &rhs_vector,
-					std::vector<unsigned int>&dof_to_boundary_mapping,
-					const Function<spacedim> * const coefficient,
-					const std::vector<unsigned int>& component_mapping,
-					const IteratorRange<hp::DoFHandler<dim,spacedim> >  range,
-					Threads::ThreadMutex     &mutex);
-};
+}
 
 
 
@@ -873,8 +785,9 @@ class MatrixCreator
  * @ingroup numerics
  * @author Wolfgang Bangerth, 1998, 2000, 2004, 2005
  */
-class MatrixTools : public MatrixCreator
+class MatrixTools
 {
+// using namespace MatrixCreator
   public:
 				     /**
 				      * Apply dirichlet boundary conditions
