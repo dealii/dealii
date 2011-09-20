@@ -63,6 +63,7 @@ RelaxationBlock<MATRIX,inverse_type>::initialize (
 //  Assert (M.m() == M.n(), ExcNotQuadratic());
   A = &M;
   additional_data = &parameters;
+  this->inversion = parameters.inversion;
   
   this->reinit(additional_data->block_list.size(), 0, additional_data->same_diagonal,
 	       additional_data->inversion);
