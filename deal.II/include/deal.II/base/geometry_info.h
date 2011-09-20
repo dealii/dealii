@@ -16,7 +16,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
-#include <lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
