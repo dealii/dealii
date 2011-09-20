@@ -1483,12 +1483,12 @@ namespace DoFRenumbering
 
 	const hp::FECollection<dim> fe_collection (dof.get_fe ());
 	Assert (fe_collection[0].has_support_points(),
-		DoFTools::ExcFEHasNoSupportPoints());
+		typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
 	hp::QCollection<dim> quadrature_collection;
 	for (unsigned int comp=0; comp<fe_collection.size(); ++comp)
 	  {
 	    Assert (fe_collection[comp].has_support_points(),
-		    DoFTools::ExcFEHasNoSupportPoints());
+		    typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
 	    quadrature_collection.push_back
 	      (Quadrature<DH::dimension> (fe_collection[comp].
 					  get_unit_support_points()));
@@ -1614,7 +1614,7 @@ namespace DoFRenumbering
     else
       {
 	Assert (dof.get_fe().has_support_points(),
-		DoFTools::ExcFEHasNoSupportPoints());
+		typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
 	const unsigned int n_dofs = dof.n_dofs(level);
 	std::vector<std::pair<Point<dim>,unsigned int> > support_point_list
 	  (n_dofs);

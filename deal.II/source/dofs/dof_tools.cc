@@ -3400,16 +3400,15 @@ namespace DoFTools
     Vector<double>       &dof_data,
     const unsigned int    component)
   {
-    const Triangulation<DH::dimension,DH::space_dimension> &tria = dof_handler.get_tria();
+    const unsigned int dim = DH::dimension;
+    const unsigned int spacedim = DH::space_dimension;
+    const Triangulation<dim,spacedim> &tria = dof_handler.get_tria();
 
-    Assert (cell_data.size()==tria.n_active_cells(),
-	    ExcWrongSize (cell_data.size(), tria.n_active_cells()));
-    Assert (dof_data.size()==dof_handler.n_dofs(),
-	    ExcWrongSize (dof_data.size(), dof_handler.n_dofs()));
-    Assert (component < n_components(dof_handler),
-	    ExcInvalidComponent(component, n_components(dof_handler)));
+    AssertDimension (cell_data.size(), tria.n_active_cells());
+    AssertDimension (dof_data.size(), dof_handler.n_dofs());
+    AssertIndexRange (component, n_components(dof_handler));
     Assert (fe_is_primitive(dof_handler) == true,
-	    ExcFENotPrimitive());
+	    typename FiniteElement<dim>::ExcFENotPrimitive());
 
 				     // store a flag whether we should care
 				     // about different components. this is
@@ -3733,9 +3732,7 @@ namespace DoFTools
 			 std::vector<bool>             &selected_dofs,
 			 const std::set<unsigned char> &boundary_indicators)
   {
-    Assert (component_select.size() == n_components(dof_handler),
-	    ExcWrongSize (component_select.size(),
-			  n_components(dof_handler)));
+    AssertDimension (component_select.size(),n_components(dof_handler));
     Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
@@ -3859,9 +3856,7 @@ namespace DoFTools
 					 std::vector<bool>             &selected_dofs,
 					 const std::set<unsigned char> &boundary_indicators)
   {
-    Assert (component_select.size() == n_components(dof_handler),
-	    ExcWrongSize (component_select.size(),
-			  n_components(dof_handler)));
+    AssertDimension (component_select.size(), n_components(dof_handler));
     Assert (boundary_indicators.find (255) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
 
@@ -4263,9 +4258,7 @@ namespace DoFTools
   get_active_fe_indices (const DH                  &dof_handler,
 			 std::vector<unsigned int> &active_fe_indices)
   {
-    Assert (active_fe_indices.size() == dof_handler.get_tria().n_active_cells(),
-	    ExcWrongSize (active_fe_indices.size(),
-			  dof_handler.get_tria().n_active_cells()));
+    AssertDimension (active_fe_indices.size(), dof_handler.get_tria().n_active_cells());
 
     typename DH::active_cell_iterator
       cell = dof_handler.begin_active(),
@@ -5073,10 +5066,8 @@ namespace DoFTools
 
 					 // check whether component numbers
 					 // are valid
-	Assert (coarse_component < coarse_fe.n_components(),
-		ExcInvalidComponent (coarse_component, coarse_fe.n_components()));
-	Assert (fine_component < fine_fe.n_components(),
-		ExcInvalidComponent (fine_component, fine_fe.n_components()));
+	AssertIndexRange (coarse_component,coarse_fe.n_components());
+	AssertIndexRange (fine_component, fine_fe.n_components());
 					 // check whether respective finite
 					 // elements are equal
 	Assert (coarse_fe.base_element (coarse_fe.component_to_base_index(coarse_component).first)
@@ -5706,9 +5697,8 @@ namespace DoFTools
 				     // check whether fe has support
 				     // points
     Assert (dof_handler.get_fe().has_support_points(),
-	    ExcFEHasNoSupportPoints());
-    Assert (support_points.size() == dof_handler.n_dofs(),
-	    ExcWrongSize (support_points.size(), dof_handler.n_dofs()));
+	    typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+    AssertDimension (support_points.size(), dof_handler.n_dofs());
 
 				     // now loop over all cells and
 				     // enquire the support points on

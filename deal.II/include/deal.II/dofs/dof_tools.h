@@ -2106,49 +2106,29 @@ namespace DoFTools
   std::vector<Table<2,Coupling> >
   dof_couplings_from_component_couplings (const hp::FECollection<dim,spacedim> &fe,
 					  const Table<2,Coupling> &component_couplings);
-
 				   /**
 				    * Exception
-				    */
-  DeclException0 (ExcFEHasNoSupportPoints);
-				   /**
-				    * Exception
-				    */
-  DeclException0 (ExcFENotPrimitive);
-				   /**
-				    * Exception
-				    */
-  DeclException2 (ExcWrongSize,
-		  int, int,
-		  << "The dimension " << arg1 << " of the vector is wrong. "
-		  << "It should be " << arg2);
-				   /**
-				    * Exception
-				    */
-  DeclException2 (ExcInvalidComponent,
-		  int, int,
-		  << "The component you gave (" << arg1 << ") "
-		  << "is invalid with respect to the number "
-		  << "of components in the finite element "
-		  << "(" << arg2 << ")");
-				   /**
-				    * Exception
+				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcFiniteElementsDontMatch);
 				   /**
 				    * Exception
+				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcGridNotCoarser);
 				   /**
 				    * Exception
+				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcGridsDontMatch);
 				   /**
 				    * Exception
+				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcNoFESelected);
 				   /**
 				    * Exception
+				    * @ingroup Exceptions
 				    */
   DeclException0 (ExcInvalidBoundaryIndicator);
 }

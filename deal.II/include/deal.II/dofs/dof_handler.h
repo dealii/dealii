@@ -1238,26 +1238,28 @@ class DoFHandler  :  public Subscriptor
 
    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-    				     /**
-				      * @todo Replace by ExcInternalError.
+				     /**
+				      * We are trying to renumber the
+				      * degrees of freedom, but
+				      * somehow did not count
+				      * correctly.
+				      *
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcRenumberingIncomplete);
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcGridsDoNotMatch);
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcInvalidBoundaryIndicator);
 				     /**
 				      * Exception
-				      */
-    DeclException1 (ExcMatrixHasWrongSize,
-		    int,
-		    << "The matrix has the wrong dimension " << arg1);
-				     /**
-				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcNewNumbersNotConsecutive,
 		    int,
@@ -1265,6 +1267,7 @@ class DoFHandler  :  public Subscriptor
 		    << "the index " << arg1 << " does not exist.");
 				     /**
 				      *  Exception
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcInvalidLevel,
 		    int,
@@ -1272,11 +1275,13 @@ class DoFHandler  :  public Subscriptor
 		    << " is not in the valid range!");
 				     /**
 				      * Exception
+				      * @ingroup Exceptions
 				      */
     DeclException0 (ExcFacesHaveNoLevel);
 				     /**
 				      * The triangulation level you
 				      * accessed is empty.
+				      * @ingroup Exceptions
 				      */
     DeclException1 (ExcEmptyLevel,
 		    int,
