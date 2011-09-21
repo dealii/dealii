@@ -7,7 +7,7 @@
 # The first is the name of the application. It is assumed that the
 # application name is the same as the base file name of the single C++
 # file from which the application is generated.
-target = $(basename $(shell echo step-*.cc))
+target = step-17
 
 # The second field determines whether you want to run your program in
 # debug or optimized mode. The latter is significantly faster, but no
