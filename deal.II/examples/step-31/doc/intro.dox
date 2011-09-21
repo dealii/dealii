@@ -863,7 +863,10 @@ $F_T$ depend on the already computed solution $U^n$, in the first case through
 the time step (that depends on $U^n$ because it has to satisfy a CFL
 condition). So we can only assemble it once we've already solved the top left
 $2\times 2$ block Stokes system, and once we've moved on to the temperature
-equation we don't need the Stokes part any more. Furthermore, we don't
+equation we don't need the Stokes part any more; the fact that we
+build an object for a matrix that never exists as a whole in memory at
+any given time led us to jumping through some hoops in step-21, so
+let's not repeat this sort of error. Furthermore, we don't
 actually build the matrix $C$: Because by the time we get to the temperature
 equation we already know $U^n$, and because we have to assemble the right hand
 side $F_T$ at this time anyway, we simply move the term $CU^n$ to the right
