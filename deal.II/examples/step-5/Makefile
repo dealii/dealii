@@ -7,7 +7,7 @@
 # The first is the name of the application. It is assumed that the
 # application name is the same as the base file name of the single C++
 # file from which the application is generated.
-target = step-5.cc
+target = step-5
 
 # The second field determines whether you want to run your program in
 # debug or optimized mode. The latter is significantly faster, but no
