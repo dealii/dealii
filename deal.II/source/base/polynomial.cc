@@ -114,13 +114,13 @@ namespace Polynomials
 				// (x-x_1)*(x-x_2)*...*(x-x_n), expand the
 				// derivatives like automatic differentiation
 				// does.
-	values[0] = 1.;
-	for (unsigned int d=1; d<values_size; ++d)
-	  values[d] = 0.;
 	const unsigned int n_supp = lagrange_support_points.size();
 	switch (values_size)
 	  {
 	  default:
+	    values[0] = 1;
+	    for (unsigned int d=1; d<values_size; ++d)
+	      values[d] = 0;
 	    for (unsigned int i=0; i<n_supp; ++i)
 	      {
 		const number v = x-lagrange_support_points[i];
@@ -131,46 +131,13 @@ namespace Polynomials
 				// product rule for the old value and the new
 				// variable 'v', i.e., expand value v and
 				// derivative one). since we reuse a value
-				// from the next lower derivative, need to
-				// start from the highest derivative
-		for (unsigned int d=values_size-1; d>0; --d)
-		  values[d] = (values[d] * v +
-			       static_cast<number>(d) * values[d-1]);
+				// from the next lower derivative from the
+				// steps before, need to start from the
+				// highest derivative
+		for (unsigned int k=values_size-1; k>0; --k)
+		  values[k] = (values[k] * v + values[k-1]);
 		values[0] *= v;
 	      }
-	    break;
-
-				// manually implement size 1 (values only),
-				// size 2 (value + first derivative), and size
-				// 3 (up to second derivative) since they
-				// might be called often. then, we can unroll
-				// the loop.
-	  case 1:
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
-		values[0] *= v;
-	      }
-	    break;
-	  case 2:
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
-		values[1] = values[1] * v + values[0];
-		values[0] *= v;
-	      }
-	    break;
-	  case 3:
-	    for (unsigned int i=0; i<n_supp; ++i)
-	      {
-		const number v = x-lagrange_support_points[i];
-		values[2] = values[2] * v + static_cast<number>(2) * values[1];
-		values[1] = values[1] * v + values[0];
-		values[0] *= v;
-	      }
-	    break;
-	  }
-
 				// finally, multiply by the weight in the
 				// Lagrange denominator. Could be done instead
 				// of setting values[0] = 1 above, but that
@@ -179,10 +146,64 @@ namespace Polynomials
 				// compared to when we computed the weight,
 				// and hence a basis function might not be
 				// exactly one at the center point, which is
-				// nice to have
-	for (unsigned int d=0; d<values_size; ++d)
-	  values[d] *= lagrange_weight;
+				// nice to have. We also multiply derivatives
+				// by k! to transform the product p_n =
+				// p^(n)(x)/k! into the actual form of the
+				// derivative
+	    {
+	      number k_faculty = 1;
+	      for (unsigned int k=0; k<values_size; ++k)
+		{
+		  values[k] *= k_faculty * lagrange_weight;
+		  k_faculty *= static_cast<number>(k+1);
+		}
+	    }
+	    break;
 
+				// manually implement size 1 (values only),
+				// size 2 (value + first derivative), and size
+				// 3 (up to second derivative) since they
+				// might be called often. then, we can unroll
+				// the loop.
+	  case 1:
+	    values[0] = 1;
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+		values[0] *= v;
+	      }
+	    values[0] *= lagrange_weight;
+	    break;
+
+	  case 2:
+	    values[0] = 1;
+	    values[1] = 0;
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+		values[1] = values[1] * v + values[0];
+		values[0] *= v;
+	      }
+	    values[0] *= lagrange_weight;
+	    values[1] *= lagrange_weight;
+	    break;
+
+	  case 3:
+	    values[0] = 1;
+	    values[1] = 0;
+	    values[2] = 0;
+	    for (unsigned int i=0; i<n_supp; ++i)
+	      {
+		const number v = x-lagrange_support_points[i];
+		values[2] = values[2] * v + values[1];
+		values[1] = values[1] * v + values[0];
+		values[0] *= v;
+	      }
+	    values[0] *= lagrange_weight;
+	    values[1] *= lagrange_weight;
+	    values[2] *= static_cast<number>(2) * lagrange_weight;
+	    break;
+	  }
 	return;
       }
 
