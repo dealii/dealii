@@ -771,7 +771,7 @@ because it neglects the coupling of components at the boundary. A
 better way to do things is therefore if we build the matrix $\hat A$
 as the vector Laplace matrix $\hat A_{ij} = (\nabla {\mathbf v}_i,
 \eta \nabla {\mathbf v}_j)$ and then apply the same boundary condition
-as we applied to <i>A</i>. If this is a Dirichlet boundary conditions all
+as we applied to <i>A</i>. If this is a Dirichlet boundary condition all
 around the domain, the $\hat A$ will decouple to three diagonal blocks
 as above, and if the boundary conditions are of the form $\mathbf u
 \cdot \mathbf n = 0$ then this will introduce a coupling of degrees of
