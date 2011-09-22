@@ -1852,14 +1852,34 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
   temperature_constraints.distribute (solution);
-
-//  old_temperature_solution = solution;
+				   // Having so computed the current
+				   // temperature field, let us set
+				   // the member variable that holds
+				   // the temperature nodes. Strictly
+				   // speaking, we really only need to
+				   // set
+				   // <code>old_temperature_solution</code>
+				   // since the first thing we will do
+				   // is to compute the Stokes
+				   // solution that only requires the
+				   // previous time step's temperature
+				   // field. That said, nothing good
+				   // can come from not initializing
+				   // the other vectors as well
+				   // (especially since it's a
+				   // relatively cheap operation and
+				   // we only have to do it once at
+				   // the beginning of the program) if
+				   // we ever want to extend our
+				   // numerical method or physical
+				   // model, and so we initialize
+				   // <code>temperature_solution</code>
+				   // and
+				   // <code>old_old_temperature_solution</code>
+				   // as well:
+  temperature_solution.reinit(solution, false, true);
   old_temperature_solution.reinit(solution, false, true);
-  // this is good enough: no need to set
-  // current temperature since we need this
-  // field only for computing the next stokes
-  // system, which depends on the temperature
-  // of the *previous* time step
+  old_old_temperature_solution.reinit(solution, false, true);
 }
 
 
