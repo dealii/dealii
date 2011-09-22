@@ -1798,15 +1798,15 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
   Vector<double> cell_vector (dofs_per_cell);
   FullMatrix<double> matrix_for_bc (dofs_per_cell, dofs_per_cell);
 
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = temperature_dof_handler.begin_active(),
-  endc = temperature_dof_handler.end();
-
   std::vector<double> rhs_values(n_q_points);
 
   TrilinosWrappers::MPI::Vector
   rhs (temperature_mass_matrix.row_partitioner()),
       solution (temperature_mass_matrix.row_partitioner());
+
+  typename DoFHandler<dim>::active_cell_iterator
+  cell = temperature_dof_handler.begin_active(),
+  endc = temperature_dof_handler.end();
 
   for (; cell!=endc; ++cell)
     if (cell->subdomain_id() ==
