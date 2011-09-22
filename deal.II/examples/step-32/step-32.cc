@@ -1,7 +1,4 @@
-//TODO: - adjust stopping criteria for solvers
-//      - better refinement at the start?
-//      - check solver stability
-//      - Q2 Mapping useful?
+//TODO: - rescale pressure immediately
 
 
 /* $Id$ */
@@ -3532,62 +3529,6 @@ template <int dim>
 void BoussinesqFlowProblem<dim>::output_results ()
 {
   computing_timer.enter_section ("Postprocessing");
-
-  //calculate l2 norm of divergence and
-  //norm of gradient
-  {
-    double my_cells_error[2] = {0, 0};
-    QGauss<1>      q_base(parameters.stokes_velocity_degree);
-    QIterated<dim> err_quadrature(q_base, 2);
-
-    const unsigned int n_q_points =  err_quadrature.size();
-    FEValues<dim> fe_values (mapping, stokes_fe,  err_quadrature,
-                             update_JxW_values | update_gradients);
-    const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
-    const FEValuesExtractors::Vector velocities (0);
-
-    std::vector<unsigned int> local_dof_indices (fe_values.dofs_per_cell);
-
-    std::vector<double>         local_div (n_q_points);
-    std::vector<Tensor<2,dim> > local_grad (n_q_points);
-
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-    for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() ==
-          Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
-        {
-          fe_values.reinit (cell);
-          cell->get_dof_indices(local_dof_indices);
-
-          fe_values[velocities].get_function_divergences (stokes_solution,
-                                                          local_div);
-          fe_values[velocities].get_function_gradients (stokes_solution,
-                                                        local_grad);
-
-          double cell_error = 0.0;
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              my_cells_error[0] += local_div[q] * local_div[q] * fe_values.JxW(q);
-              my_cells_error[1] += scalar_product(local_grad[q], local_grad[q]) * fe_values.JxW(q);
-            }
-        }
-
-    double div_error[2] = {0,0};
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&my_cells_error, &div_error, 2, MPI_DOUBLE,
-                   MPI_SUM, MPI_COMM_WORLD);
-#else
-    div_error[0] = my_cells_error[0];
-    div_error[1] = my_cells_error[1];
-#endif
-
-    div_error[0] = std::sqrt(div_error[0]);
-    div_error[1] = std::sqrt(div_error[1]);
-    pcout << "> ||divergence||=" << div_error[0] << std::endl;
-    pcout << "> || gradient ||=" << div_error[1] << std::endl;
-  }
 
   const FESystem<dim> joint_fe (stokes_fe, 1,
                                 temperature_fe, 1);
