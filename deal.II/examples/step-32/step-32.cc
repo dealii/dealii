@@ -2209,26 +2209,9 @@ void BoussinesqFlowProblem<dim>::setup_dofs ()
     temperature_constraints.close ();
   }
 
-  if (Utilities::System::job_supports_mpi() == false)
-    {
-      Threads::TaskGroup<> tasks;
-      tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_matrix,
-                                  *this,
-                                  stokes_partitioning);
-      tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_stokes_preconditioner,
-                                  *this,
-                                  stokes_partitioning);
-      tasks += Threads::new_task (&BoussinesqFlowProblem<dim>::setup_temperature_matrices,
-                                  *this,
-                                  temperature_partitioning);
-      tasks.join_all ();
-    }
-  else
-    {
-      setup_stokes_matrix (stokes_partitioning);
-      setup_stokes_preconditioner (stokes_partitioning);
-      setup_temperature_matrices (temperature_partitioning);
-    }
+  setup_stokes_matrix (stokes_partitioning);
+  setup_stokes_preconditioner (stokes_partitioning);
+  setup_temperature_matrices (temperature_partitioning);
 
   stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
   stokes_solution.reinit (stokes_relevant_partitioning, MPI_COMM_WORLD);
