@@ -1876,7 +1876,16 @@ void BoussinesqFlowProblem<dim>::project_temperature_field ()
 				   // <code>temperature_solution</code>
 				   // and
 				   // <code>old_old_temperature_solution</code>
-				   // as well:
+				   // as well. The second and third
+				   // argument to the reinit function
+				   // indicates that the elements of
+				   // the first argument shall be
+				   // copied and that while the
+				   // <code>solution</code> vector is
+				   // strictly distributed, the
+				   // vectors here initialized can
+				   // (and indeed do) have ghost
+				   // elements:
   temperature_solution.reinit(solution, false, true);
   old_temperature_solution.reinit(solution, false, true);
   old_old_temperature_solution.reinit(solution, false, true);
