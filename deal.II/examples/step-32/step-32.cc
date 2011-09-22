@@ -7,7 +7,7 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University,
-	   Timo Heister, University of Göttingen, 2008-2011 */
+	   Timo Heister, University of Goettingen, 2008-2011 */
 /*                                                                */
 /*    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
@@ -3991,6 +3991,12 @@ void BoussinesqFlowProblem<dim>::run ()
       				     -time_step/old_time_step,
       				     old_old_temperature_solution);
       	}
+
+ 				       // every 100 time steps output
+ 				       // a summary of the current
+ 				       // timing information
+      if (timestep_number % 100 == 0)
+ 	computing_timer.print_summary ();
     }
   while (true);
 
