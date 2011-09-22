@@ -3242,7 +3242,6 @@ void BoussinesqFlowProblem<dim>::solve ()
   computing_timer.enter_section ("   Assemble temperature rhs");
   {
     old_time_step = time_step;
-    old_time_step = time_step;
     const double cfl_number = get_cfl_number();
 
     // we found out that we need
