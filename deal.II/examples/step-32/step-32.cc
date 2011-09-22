@@ -3814,15 +3814,6 @@ void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
                                      estimated_error_per_cell,
                                      0.3, 0.1);
 
-  // for (typename Triangulation<dim>::active_cell_iterator
-  //     cell = triangulation.begin_active();
-  //   cell != triangulation.end(); ++cell)
-  //   if (cell->is_locally_owned())
-  //  if ((cell->center()[1] > 0)
-  //      &&
-  //      (cell->center()[2] > 0))
-  //    cell->set_refine_flag();
-
   // limit maximum refinement level
   if (triangulation.n_levels() > max_grid_level)
     for (typename Triangulation<dim>::active_cell_iterator
