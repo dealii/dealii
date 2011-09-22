@@ -344,6 +344,13 @@ namespace Utilities
 				      * result indicates whether the
 				      * current job is running under
 				      * MPI.
+				      *
+				      * @note The function does not
+				      * take into account whether an
+				      * MPI job actually runs on more
+				      * than one processor or is, in
+				      * fact, a single-node job that
+				      * happens to run under MPI.
 				      */
     bool job_supports_mpi ();
 
