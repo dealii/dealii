@@ -916,7 +916,7 @@ class BoussinesqFlowProblem
                       const double                        global_u_infty,
                       const double                        global_T_variation,
                       const double                        average_temperature,
-                      const double                        global_entropy_variatiion,
+                      const double                        global_entropy_variation,
                       const double                        cell_diameter) const;
 
   public:
