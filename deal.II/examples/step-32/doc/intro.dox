@@ -254,9 +254,10 @@ of Stokes equations jointly, we have to scale them so that they all have the
 same physical dimensions. In our case, this means multiplying the second
 equation by something that has units $\frac{\text{Pa\; s}}{\text{m}}$; one
 choice is to multiply with $\frac{\eta}{L}$ where $L$ is a typical lengthscale
-in our domain. Using the %numbers above, this factor is around $10^{14}$, which
-just so happens to be the order of magnitude that would make the two equations
-numerically about the same. So, we now get this for the Stokes system:
+in our domain (which experiments show is best chosen to be the diameter of
+plumes &mdash; around 10 km &mdash; rather than the diameter of the
+domain). Using these %numbers for $\eta$ and $L$, this factor is around
+$10^{17}$. So, we now get this for the Stokes system:
 @f{eqnarray*}
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T) \; \mathbf{g},
@@ -281,69 +282,16 @@ procedure.
 In the program below, we will introduce a factor
 <code>EquationData::pressure_scaling</code> that corresponds to
 $\frac{\eta}{L}$, and we will use this factor in the assembly of the system
-matrix and preconditioner. We will recover the unscaled pressure in the
-<code>output_results</code> function.
-
-@code
-  //calculate l2 norm of divergence and
-  //norm of gradient
-  {
-    double my_cells_error[2] = {0, 0};
-    QGauss<1>      q_base(parameters.stokes_velocity_degree);
-    QIterated<dim> err_quadrature(q_base, 2);
-
-    const unsigned int n_q_points =  err_quadrature.size();
-    FEValues<dim> fe_values (mapping, stokes_fe,  err_quadrature,
-                             update_JxW_values | update_gradients);
-    const unsigned int dofs_per_cell = fe_values.get_fe().dofs_per_cell;
-    const FEValuesExtractors::Vector velocities (0);
-
-    std::vector<unsigned int> local_dof_indices (fe_values.dofs_per_cell);
-
-    std::vector<double>         local_div (n_q_points);
-    std::vector<Tensor<2,dim> > local_grad (n_q_points);
-
-    typename DoFHandler<dim>::active_cell_iterator
-    cell = stokes_dof_handler.begin_active(),
-    endc = stokes_dof_handler.end();
-    for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() ==
-          Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
-        {
-          fe_values.reinit (cell);
-          cell->get_dof_indices(local_dof_indices);
-
-          fe_values[velocities].get_function_divergences (stokes_solution,
-                                                          local_div);
-          fe_values[velocities].get_function_gradients (stokes_solution,
-                                                        local_grad);
-
-          double cell_error = 0.0;
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            {
-              my_cells_error[0] += local_div[q] * local_div[q] * fe_values.JxW(q);
-              my_cells_error[1] += scalar_product(local_grad[q], local_grad[q]) * fe_values.JxW(q);
-            }
-        }
-
-    double div_error[2] = {0,0};
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&my_cells_error, &div_error, 2, MPI_DOUBLE,
-                   MPI_SUM, MPI_COMM_WORLD);
-#else
-    div_error[0] = my_cells_error[0];
-    div_error[1] = my_cells_error[1];
-#endif
-
-    div_error[0] = std::sqrt(div_error[0]);
-    div_error[1] = std::sqrt(div_error[1]);
-    pcout << "> ||divergence||=" << div_error[0] << std::endl;
-    pcout << "> || gradient ||=" << div_error[1] << std::endl;
-  }
-@endcode
+matrix and preconditioner. Because it is annoying and error prone, we will
+recover the unscaled pressure immediately following the solution of the linear
+system, i.e., the solution vector's pressure component will immediately be
+un-scaled to retrieve the physical pressure. Since the solver uses the fact that
+we can use a good initial guess by extrapolating the previous solutions, we
+also have to scale the pressure immediately <i>before</i> solving.
 
 
-<h3> Changes to the Stokes preconditioner </h3>
+
+<h3> Changes to the Stokes preconditioner and solver </h3>
 
 In this tutorial program, we apply a variant of the preconditioner used in
 step-31. That preconditioner was built to operate on the
@@ -371,33 +319,29 @@ An observation one can make is that we use just the action of a
 preconditioner for approximating the velocity inverse $A^{-1}$ (and the
 outer GMRES iteration takes care of the approximate character of the
 inverse), whereas we use a more or less <i>exact</i> inverse for $M_p^{-1}$,
-realized by a fully converged CG solve. What we change here is to skip that
-<i>exact</i> inverse matrix and replace it &ndash; as usual &ndash; by the
-action of a preconditioner only. This works, as we will demonstrate
-below. For efficiency reasons, we want to avoid increasing the number of
-iterations for the block solve. Keep in mind that most of the time in the
-solution of the matrix system is the application of the AMG preconditioner
-(about half the time of the total solve), and the application of matrix
-<i>A</i> (about one third of the total solve time). This means that we
-really do not want to do those operations more often when we remove the
-inner solve on the Schur complement approximation. It turns out that the
-Trilinos IC preconditioner would not fulfill this requirement, however, the
-Trilinos ILU preconditioner does. It does even better than so &mdash; it
-decreases the iteration count for large 3D problems. The reason for that
-decrease is that we avoid some errors that CG introduces: Even a converged
-solve has still some residual. That is a problem because that small error
-interferes with the outer iterative solver, probably because a CG solver
-does some nonlinear operations by weighting vectors by some inner products.
+realized by a fully converged CG solve. This appears unbalanced, but there's
+system to this madness: almost all the effort goes into the upper left block
+to which we apply the AMG preconditioner, whereas even an exact inversion of
+the pressure mass matrix costs basically nothing. Consequently, if it helps us
+reduce the overall number of iterations somewhat, then this effort is well
+spent.
 
-Except the simplification in the preconditioner, we replaced the GMRES
-solver by BiCGStab. This is merely to demonstrate that GMRES is not the only
-possible option for a saddle point system like the Stokes
-equations. BiCGStab harmonizes nicely with the ILU preconditioner on a
-pressure mass matrix as approximation for $S^{-1}$, so it is at least as
-good as GMRES in this example. Keep in mind the discussion in the results
-section of the step-22 tutorial program, where we observed
-that BiCGStab does <i>not</i> like inner solves with CG, which made us
-prefer GMRES in step-31.
+That said, even though the solver worked well for step-31, we have a problem
+here that is a bit more complicated (cells are deformed, the pressure varies
+by orders of magnitude, and we want to plan ahead for more complicated
+physics), and so we'll change a few things slightly:
+
+- FGMRES instead of GMRES
+
+- two-stage solver
+
+- right preconditioner
+
+- ILU instead of IC
+
+@todo Why again did we use a right preconditioner when in step-31 we use a
+left preconditioner?
+
 
 As a final note, let us remark that in step-31 we computed the
 Schur complement $S=B A^{-1} B^T$ by approximating
@@ -409,6 +353,7 @@ $-\frac{\eta}{L}\text{div}(-\eta\Delta)^{-1}\nabla \frac{\eta}{L} \approx
 This is exactly the operator we use to approximate $S$.
 
 
+@todo discretization with FE_DGP
 
 <h3> Changes to the artificial viscosity stabilization </h3>
 
