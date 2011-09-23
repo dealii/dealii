@@ -32,8 +32,8 @@ template <typename number> class BlockSparseMatrix;
 template <typename number> class FullMatrix;
 template <typename number> class BlockSparseMatrix;
 
-/*!@addtogroup mg */
-/*@{*/
+/* !@addtogroup mg */
+/* @{ */
 
 /**
  * This is a collection of functions operating on, and manipulating
@@ -299,7 +299,7 @@ namespace MGTools
 				std::vector<std::vector<bool> >  &interface_dofs);
 }
 
-
+/* @} */
 
 DEAL_II_NAMESPACE_CLOSE
 
