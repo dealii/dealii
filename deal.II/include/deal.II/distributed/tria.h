@@ -808,6 +808,15 @@ namespace parallel
 					  * on other processors.
 					  */
 	types::subdomain_id_t locally_owned_subdomain () const;
+
+					 /**
+					  * Return the MPI
+					  * communicator used by this
+					  * triangulation.
+					  */
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+	MPI_Comm get_communicator () const;
+#endif
     };
   }
 }

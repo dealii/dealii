@@ -3041,6 +3041,17 @@ namespace parallel
       Assert (false, ExcNotImplemented());
       return 0;
     }
+
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    template <int dim, int spacedim>
+    MPI_Comm
+    Triangulation<dim,spacedim>::get_communicator () const
+    {
+      Assert (false, ExcNotImplemented());
+      return MPI_COMM_WORLD;
+    }
+#endif
   }
 }
 
