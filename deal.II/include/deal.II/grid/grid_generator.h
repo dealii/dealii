@@ -768,6 +768,9 @@ class GridGenerator
 				      * this object can be described by the
 				      * TorusBoundary class.
 				      *
+				      * @param tria The triangulation to be
+				      * filled.
+				      *
 				      * @param R The radius of the circle,
 				      * which forms the middle line of the
 				      * torus containing the loop of
