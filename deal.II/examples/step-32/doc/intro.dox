@@ -91,7 +91,9 @@ with which the Stokes equations would read:
 This is exactly the form we used in step-31, and it was
 appropriate to do so because all changes in the fluid flow are only
 driven by the dynamic pressure that results from temperature
-differences.
+differences. (In other words: Any contribution to the right hand side
+that results from taking the gradient of a scalar field have no effect
+on the velocity field.)
 
 On the other hand, we will here use the form of the Stokes equations
 that considers the total pressure instead:
