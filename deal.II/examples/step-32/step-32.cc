@@ -3169,7 +3169,7 @@ namespace Step32
 				       // before solving we scale the
 				       // initial solution to the right
 				       // dimensions
-      distributed_stokes_solution.block(1) /= EquationData::MaterialModel::pressure_scaling;
+      distributed_stokes_solution.block(1) /= EquationData::pressure_scaling;
 
 
       const unsigned int
@@ -3187,7 +3187,6 @@ namespace Step32
 				       // step 1: try if the simple and fast solver
 				       // succeeds in 30 steps or less.
       unsigned int n_iterations = 0;
-      double reduction = 0;
       const double solver_tolerance = 1e-7 * stokes_rhs.l2_norm();
       SolverControl solver_control (30, solver_tolerance);
 
@@ -3207,7 +3206,6 @@ namespace Step32
 		       preconditioner);
 
 	  n_iterations = solver_control.last_step();
-	  reduction = solver_control.last_value()/solver_control.initial_value();
 	}
 
 				       // step 2: take the stronger solver in case
@@ -3230,9 +3228,6 @@ namespace Step32
 
 	  n_iterations = (solver_control.last_step() +
 			  solver_control_refined.last_step());
-	  reduction = (solver_control_refined.last_value()/
-		       std::max(solver_control.initial_value(),
-				solver_control_refined.initial_value()));
 	}
 
 
@@ -3240,7 +3235,7 @@ namespace Step32
 
 				       // now rescale the pressure
 				       // back to real physical units
-      distributed_stokes_solution.block(1) *= EquationData::MaterialModel::pressure_scaling;
+      distributed_stokes_solution.block(1) *= EquationData::pressure_scaling;
 
       stokes_solution.block(0).reinit(distributed_stokes_solution.block(0),
 				      false, true);
@@ -3248,22 +3243,7 @@ namespace Step32
 				      false, true);
 
       pcout << n_iterations  << " iterations."
-	    << " Reduced residual by " << reduction
 	    << std::endl;
-
-      TrilinosWrappers::MPI::Vector tmp;
-      tmp.reinit (stokes_rhs.block(1));
-      pcout << "   Relative divergence residual: "
-	    << stokes_matrix.block(1,0).residual (tmp,
-						  distributed_stokes_solution.block(0),
-						  stokes_rhs.block(1))
-	/
-	distributed_stokes_solution.block(0).l2_norm() / EquationData::pressure_scaling
-	    << std::endl;
-
-      pcout << "   Relative vector sizes: "
-	    << distributed_stokes_solution.block(0).linfty_norm() << ' '
-	    << distributed_stokes_solution.block(1).linfty_norm() << std::endl;
     }
     computing_timer.exit_section();
 
