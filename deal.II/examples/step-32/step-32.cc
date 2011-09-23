@@ -4,7 +4,7 @@
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University,
-     Timo Heister, University of Goettingen, 2008-2011 */
+           Timo Heister, University of Goettingen, 2008-2011 */
 /*                                                                */
 /*    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors */
 /*                                                                */
@@ -13,12 +13,12 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-// @sect3{Include files}
+				 // @sect3{Include files}
 
-// We include the functionality
-// of these well-known deal.II
-// library files and some C++
-// header files.
+				 //The first task as usual is to
+				 // include the functionality of these
+				 // well-known deal.II library files
+				 // and some C++ header files.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
@@ -67,22 +67,30 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/solution_transfer.h>
 
-// This is the only include file that is new:
-// We use an IndexSet to describe the
-// %parallel partitioning of vectors and
-// matrices.
-#include <deal.II/base/index_set.h>
-
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/solution_transfer.h>
-#include <deal.II/distributed/grid_refinement.h>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <limits>
 #include <locale>
 #include <string>
+
+				 // This is the only include file that
+				 // is new: It introduces the
+				 // equivalent of the
+				 // dealii::SolutionTransfer class to
+				 // take a solution from on mesh to
+				 // the next one upon mesh refinement,
+				 // but in the case of parallel
+				 // distributed triangulations:
+#include <deal.II/distributed/solution_transfer.h>
+
+				 // The following classes are used in
+				 // parallel distributed computations
+				 // and have all already been
+				 // introduced in step-40:
+#include <deal.II/base/index_set.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_refinement.h>
 
 
 
