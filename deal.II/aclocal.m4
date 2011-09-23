@@ -453,6 +453,28 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
             CXXFLAGSG="$CXXFLAGSG -Wno-return-type"
           ])
 
+    dnl Newer versions of gcc can pass a flag to the assembler to
+    dnl compress debug sections. At the time of writing this test,
+    dnl this can save around 230 MB of disk space on the object
+    dnl files we produce (810MB down to 570MB for the debug versions
+    dnl of object files). Unfortunately, the sections have to be
+    dnl unpacked again when they are put into the shared libs, so
+    dnl no savings there.
+    CXXFLAGS="-Wa,--compress-debug-sections"
+    AC_MSG_CHECKING([whether the assembler understands -Wa,--compress-debug-sections])
+    AC_TRY_LINK(
+          [
+          ],
+          [;],
+          [
+            AC_MSG_RESULT(yes)
+            CXXFLAGSG="$CXXFLAGSG -Wa,--compress-debug-sections"
+          ],
+          [
+            AC_MSG_RESULT(no)
+          ])
+
+
     dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
     dnl anything to avoid a warning. on AIX make sure we always pass -lpthread
     dnl because this seems to be somehow required to make things work. Likewise

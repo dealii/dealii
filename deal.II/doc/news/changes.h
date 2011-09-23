@@ -103,6 +103,12 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> New: When using a new enough version of GCC, debug sections in
+object files are now compressed using the <code>-Wa,--compress-debug-sections</code>
+flag, resulting in savings in disk space on the order of 230 MB.
+<br>
+(Wolfgang Bangerth, 2011/09/22)
+
 <li> New: deal.II can now be configured and built with the
 <a href="http://clang.llvm.org">Clang C++ frontend of the LLVM compiler</a>.
 <br>
