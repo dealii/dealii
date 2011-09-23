@@ -3166,6 +3166,11 @@ namespace Step32
       distributed_stokes_solution.block(0).reinit(stokes_solution.block(0),false,true);
       distributed_stokes_solution.block(1).reinit(stokes_solution.block(1),false,true);
 
+				       // before solving we scale the
+				       // initial solution to the right
+				       // dimensions
+      distributed_stokes_solution.block(1) /= EquationData::MaterialModel::pressure_scaling;
+
 
       const unsigned int
 	start = (distributed_stokes_solution.block(0).size() +
@@ -3232,6 +3237,11 @@ namespace Step32
 
 
       stokes_constraints.distribute (distributed_stokes_solution);
+
+				       // now rescale the pressure
+				       // back to real physical units
+      distributed_stokes_solution.block(1) *= EquationData::MaterialModel::pressure_scaling;
+
       stokes_solution.block(0).reinit(distributed_stokes_solution.block(0),
 				      false, true);
       stokes_solution.block(1).reinit(distributed_stokes_solution.block(1),
@@ -3455,7 +3465,7 @@ namespace Step32
 	    = (uh[q](d) *  EquationData::year_in_seconds * 100);
 
 					 // pressure
-	const double pressure = (uh[q](dim)-minimal_pressure) * EquationData::pressure_scaling;
+	const double pressure = (uh[q](dim)-minimal_pressure);
 	computed_quantities[q](dim) = pressure;
 
 					 // temperature
