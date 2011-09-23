@@ -1,6 +1,3 @@
-//TODO: - rescale pressure immediately
-
-
 /* $Id$ */
 /* Author: Martin Kronbichler, Uppsala University,
            Wolfgang Bangerth, Texas A&M University,
@@ -1823,7 +1820,7 @@ namespace Step32
 	  Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
 	{
 	  cell->get_dof_indices (local_dof_indices);
-	  fe_values.reinit(cell);
+	  fe_values.reinit (cell);
 
 	  EquationData::TemperatureInitialValues<dim>().value_list
 	    (fe_values.get_quadrature_points(), rhs_values);
@@ -1896,9 +1893,9 @@ namespace Step32
 				     // vectors here initialized can
 				     // (and indeed do) have ghost
 				     // elements:
-    temperature_solution.reinit(solution, false, true);
-    old_temperature_solution.reinit(solution, false, true);
-    old_old_temperature_solution.reinit(solution, false, true);
+    temperature_solution = solution;
+    old_temperature_solution = solution;
+    old_old_temperature_solution = solution;
   }
 
 
@@ -2210,7 +2207,7 @@ namespace Step32
 //    IndexSet stokes_la;
 //    DoFTools::extract_locally_active_dofs (stokes_dof_handler,
 //             stokes_la);
-      stokes_constraints.reinit(stokes_relevant_set);
+      stokes_constraints.reinit (stokes_relevant_set);
 
       DoFTools::make_hanging_node_constraints (stokes_dof_handler,
 					       stokes_constraints);
@@ -2233,7 +2230,7 @@ namespace Step32
     }
     {
       temperature_constraints.clear ();
-      temperature_constraints.reinit(temperature_relevant_partitioning);//temp_locally_active);
+      temperature_constraints.reinit (temperature_relevant_partitioning);//temp_locally_active);
 
       DoFTools::make_hanging_node_constraints (temperature_dof_handler,
 					       temperature_constraints);
@@ -3162,9 +3159,7 @@ namespace Step32
 
       TrilinosWrappers::MPI::BlockVector
 	distributed_stokes_solution (stokes_rhs);
-//    distributed_stokes_solution = stokes_solution;
-      distributed_stokes_solution.block(0).reinit(stokes_solution.block(0),false,true);
-      distributed_stokes_solution.block(1).reinit(stokes_solution.block(1),false,true);
+      distributed_stokes_solution = stokes_solution;
 
 				       // before solving we scale the
 				       // initial solution to the right
@@ -3237,10 +3232,7 @@ namespace Step32
 				       // back to real physical units
       distributed_stokes_solution.block(1) *= EquationData::pressure_scaling;
 
-      stokes_solution.block(0).reinit(distributed_stokes_solution.block(0),
-				      false, true);
-      stokes_solution.block(1).reinit(distributed_stokes_solution.block(1),
-				      false, true);
+      stokes_solution = distributed_stokes_solution;
 
       pcout << n_iterations  << " iterations."
 	    << std::endl;
@@ -3284,15 +3276,13 @@ namespace Step32
 
       TrilinosWrappers::MPI::Vector
 	distributed_temperature_solution (temperature_rhs);
-//    distributed_temperature_solution = temperature_solution;
-      distributed_temperature_solution.reinit(temperature_solution, false, true);
+      distributed_temperature_solution = temperature_solution;
 
       cg.solve (temperature_matrix, distributed_temperature_solution,
 		temperature_rhs, *T_preconditioner);
 
       temperature_constraints.distribute (distributed_temperature_solution);
-//    temperature_solution = distributed_temperature_solution;
-      temperature_solution.reinit(distributed_temperature_solution, false, true);
+      temperature_solution = distributed_temperature_solution;
 
       pcout << "   "
 	    << solver_control.last_step()
@@ -3807,10 +3797,8 @@ namespace Step32
       tmp[1] = &(distributed_temp2);
       temperature_trans.interpolate(tmp);
 
-				       //  temperature_solution = distributed_temp1;
-      temperature_solution.reinit(distributed_temp1, false, true);
-				       //  old_temperature_solution = distributed_temp2;
-      old_temperature_solution.reinit(distributed_temp2, false, true);
+      temperature_solution     = distributed_temp1;
+      old_temperature_solution = distributed_temp2;
     }
 
     {
@@ -3823,11 +3811,8 @@ namespace Step32
       stokes_tmp[1] = &(old_distributed_stokes);
 
       stokes_trans.interpolate (stokes_tmp);
-				       //  stokes_solution = distributed_stokes;
-      stokes_solution.block(0).reinit(distributed_stokes.block(0), false, true);
-      stokes_solution.block(1).reinit(distributed_stokes.block(1), false, true);
-      old_stokes_solution.block(0).reinit(old_distributed_stokes.block(0), false, true);
-      old_stokes_solution.block(1).reinit(old_distributed_stokes.block(1), false, true);
+      stokes_solution     = distributed_stokes;
+      old_stokes_solution = old_distributed_stokes;
     }
 
     computing_timer.exit_section();
