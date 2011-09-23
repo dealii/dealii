@@ -5,31 +5,39 @@ Bangerth, and Timo Heister.
 <br>
 This material is based upon work partly supported by the National
 Science Foundation under Award No. EAR-0426271 and The California Institute of
-Technology. Any opinions, findings, and conclusions or recommendations
+Technology; and in a continuation by the National Science
+Foundation under Award No. EAR-0949446 and The University of California
+&ndash; Davis. Any opinions, findings, and conclusions or recommendations
 expressed in this publication are those of the author and do not
-necessarily reflect the views of the National Science Foundation or of The
-California Institute of Technology.
+necessarily reflect the views of the National Science Foundation, The
+California Institute of Technology, or of The University of California
+&ndash; Davis.
 </i>
 
 
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-This program does pretty much exactly what step-31 already
-does: it solves the Boussinesq equations that describe the motion of a fluid
-whose temperature is not in equilibrium. As such, all the equations we have
-described in step-31 still hold: we solve the same partial
-differential equation, using the same finite element scheme, the same time
-stepping algorithm, and the same stabilization method for the temperature
-advection-diffusion equation. As a consequence, you may first want to
-understand that program before you work on the current one.
+This program does pretty much exactly what step-31 already does: it
+solves the Boussinesq equations that describe the motion of a fluid
+whose temperature is not in equilibrium. As such, all the equations we
+have described in step-31 still hold: we solve the same general
+partial differential equation (with only minor modifications to adjust
+for more realism in the problem setting), using the same finite
+element scheme, the same time stepping algorithm, and more or less the
+same stabilization method for the temperature advection-diffusion
+equation. As a consequence, you may first want to understand that
+program &mdash; and its implementation &mdash; before you work on the
+current one.
 
 The difference between step-31 and the current program is that
 here we want to do things in %parallel, using both the availability of many
 machines in a cluster (with parallelization based on MPI) as well as many
 processor cores within a single machine (with parallelization based on
 threads). This program's main job is therefore to introduce the changes that are
-necessary to utilize the availability of these %parallel compute resources.
+necessary to utilize the availability of these %parallel compute
+resources. In this regard, it builds on the step-40 program that first
+introduces the necessary classes for much of the %parallel functionality.
 
 In addition to these changes, we also use a slightly different
 preconditioner, and we will have to make a number of changes that have
@@ -103,27 +111,51 @@ that considers the total pressure instead:
   \\
   \nabla \cdot {\mathbf u} &=& 0.
 @f}
-This way we can plot the pressure in our program in such a way that it
-actually shows the total pressure that includes the effects of
-temperature differences as well as the static pressure of the
-overlying rocks. Since the pressure does not appear any further in any
-of the other equations, whether to use one or the other is more a
-matter of taste than of correctness. The flow field is exactly the
-same, but we get a pressure that we can now compare with values that
-are given in geophysical books as those that hold at the bottom of the
-earth mantle, for example. A second reason to use the total pressure here is
-that if we wanted to make the model even more realistic, we would have to take
-into account that many of the material parameters (e.g. the viscosity, the
-density, etc) not only depend on the temperature but also the total pressure.
+There are several advantages to this:
 
-A final reason to do this is discussed in the results section and
-concerns possible extensions to the model we use here. It has to do
-with the fact that while the temperature equation we use here does not
-include a term that contains the pressure. It should, however:
-rock, like gas, heats up as you compress it. Consequently,
-material that rises up cools adiabatically, and cold material that
-sinks down heats adiabatically. We discuss this further below.
+- This way we can plot the pressure in our program in such a way that it
+  actually shows the total pressure that includes the effects of
+  temperature differences as well as the static pressure of the
+  overlying rocks. Since the pressure does not appear any further in any
+  of the other equations, whether to use one or the other is more a
+  matter of taste than of correctness. The flow field is exactly the
+  same, but we get a pressure that we can now compare with values that
+  are given in geophysical books as those that hold at the bottom of the
+  earth mantle, for example.
 
+- If we wanted to make the model even more realistic, we would have to take
+  into account that many of the material parameters (e.g. the viscosity, the
+  density, etc) not only depend on the temperature but also the
+  <i>total</i> pressure.
+
+- The model above assumed a linear dependence $\rho(T) = \rho_{\text{ref}}
+  [1-\beta(T-T_{\text{ref}})]$ and assumed that $\beta$ is small. In
+  practice, this may not be so. In fact, realistic models are
+  certainly not linear, and $\beta$ may also not be small for at least
+  part of the temperature range because the density's behavior is
+  substantially dependent not only on thermal expansion but by phase
+  changes.
+
+- A final reason to do this is discussed in the results section and
+  concerns possible extensions to the model we use here. It has to do
+  with the fact that while the temperature equation we use here does not
+  include a term that contains the pressure. It should, however:
+  rock, like gas, heats up as you compress it. Consequently,
+  material that rises up cools adiabatically, and cold material that
+  sinks down heats adiabatically. We discuss this further below.
+
+@note There is, however, a downside to this procedure. In the earth,
+the dynamic pressure is several order of magnitude smaller than the
+total pressure. If we use the equations above and solve all variables
+to, say, 4 digits of accuracy, then we may be able to get the velocity
+and the total pressure right, but we will have no accuracy at all if
+we compute the dynamic pressure by subtracting from the total pressure
+the static part $p_\text{static}=\rho_{\text{ref}}
+[1+\beta T_{\text{ref}}] \varphi$. If, for example, the dynamic
+pressure is six orders of magnitude smaller than the static pressure,
+then we need to solve the overall pressure to at least seven digits of
+accuracy to get anything remotely accurate. That said, in practice
+this turns out not to be a limiting factor.
 
 
 
@@ -165,7 +197,7 @@ Stokes problem: if we discretize it as usual, we get a linear system
   =
   F
 @f}
-which in this program we will solve with a BiCGStab solver. BiCGStab
+which in this program we will solve with a FGMRES solver. This solver
 iterates until the residual of these linear equations is below a
 certain tolerance, i.e. until
 @f[
@@ -205,7 +237,7 @@ for the first equation is going to be
 $\eta\text{div}\varepsilon(\mathbf u) \approx 10^{21} \frac{10^{-8}}{(10^7)^2}
 \approx 10^{-1}$, whereas the second equation will be around
 $\text{div}{\mathbf u}\approx \frac{10^{-8}}{10^7} \approx 10^{-15}$. Well, so
-what this will lead to is this: if BiCGStab wants to make the residual small,
+what this will lead to is this: if the solver wants to make the residual small,
 it will almost entirely focus on the first set of equations because they are
 so much bigger, and ignore the divergence equation that describes mass
 conservation. That's exactly what happens: unless we set the tolerance to
