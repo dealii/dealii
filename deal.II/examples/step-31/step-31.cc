@@ -470,7 +470,7 @@ namespace Step31
 	BlockSchurPreconditioner (
 	  const TrilinosWrappers::BlockSparseMatrix     &S,
 	  const InverseMatrix<TrilinosWrappers::SparseMatrix,
-	  PreconditionerMp>         &Mpinv,
+	                      PreconditionerMp>         &Mpinv,
 	  const PreconditionerA                         &Apreconditioner);
 
 	void vmult (TrilinosWrappers::BlockVector       &dst,
@@ -526,9 +526,10 @@ namespace Step31
 				     // vector, completing our work on the
 				     // Stokes preconditioner:
     template <class PreconditionerA, class PreconditionerMp>
-    void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
-      TrilinosWrappers::BlockVector       &dst,
-      const TrilinosWrappers::BlockVector &src) const
+    void
+    BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
+    vmult (TrilinosWrappers::BlockVector       &dst,
+	   const TrilinosWrappers::BlockVector &src) const
     {
       a_preconditioner.vmult (dst.block(0), src.block(0));
       stokes_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
@@ -2239,11 +2240,11 @@ namespace Step31
 
     {
       const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-	TrilinosWrappers::PreconditionIC>
+	                                 TrilinosWrappers::PreconditionIC>
 	mp_inverse (stokes_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
       const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-	TrilinosWrappers::PreconditionIC>
+						    TrilinosWrappers::PreconditionIC>
 	preconditioner (stokes_matrix, mp_inverse, *Amg_preconditioner);
 
       SolverControl solver_control (stokes_matrix.m(),
