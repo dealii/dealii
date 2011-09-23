@@ -331,17 +331,43 @@ here that is a bit more complicated (cells are deformed, the pressure varies
 by orders of magnitude, and we want to plan ahead for more complicated
 physics), and so we'll change a few things slightly:
 
-- FGMRES instead of GMRES
+- For more complex problems, it turns out that using just a single AMG V-cycle
+  as preconditioner is not always sufficient. The outer solver converges just
+  fine most of the time in a reasonable number of iterations (say, less than
+  50) but there are the occasional time step where it suddenly takes 700 or
+  so. What exactly is going on there is hard to determine, but the problem can
+  be avoided by using a more accurate solver for the top left
+  block. Consequently, we'll want to use a CG iteration to invert the top left
+  block of the preconditioner matrix, and use the AMG as a preconditioner for
+  the CG solver.
 
-- two-stage solver
+- The downside of this is that, of course, the Stokes preconditioner becomes
+  much more expensive (approximately 10 times more expensive than when we just
+  use a single V-cycle). Our strategy then is this: let's do up to 30 GMRES
+  iterations with just the V-cycle as a preconditioner and if that doesn't
+  yield convergence, then take the best approximation of the Stokes solution
+  obtained after this first round of iterations and use that as the starting
+  guess for iterations where we use the full inner solver with a rather
+  lenient tolerance as preconditioner. In all our experiments this leads to
+  convergence in only a few additional iterations.
 
-- right preconditioner
+- One thing we need to pay attention to is that when using a CG with a lenient
+  tolerance in the preconditioner, then $y = \tilde A^{-1} r$ is no longer a
+  linear function of $r$ (it is, of course, if we have a very stringent
+  tolerance in our solver, or if we only apply a single V-cycle). This is a
+  problem since now our preconditioner is no longer a linear operator; in
+  other words, every time GMRES uses it the preconditioner looks
+  different. The standard GMRES solver can't deal with this, leading to slow
+  convergence or even breakdown, but the F-GMRES variant is designed to deal
+  with exactly this kind of situation and we consequently use it.
 
-- ILU instead of IC
+@todo Couldn't we use GMRES for the first stage solve and F-GMRES for the
+second stage only. Does it make a difference? Is F-GMRES slower?
 
 @todo Why again did we use a right preconditioner when in step-31 we use a
-left preconditioner?
+left preconditioner? or do we?
 
+@todo Why do we use an ILU instead of an IC for S as in step-31?
 
 As a final note, let us remark that in step-31 we computed the
 Schur complement $S=B A^{-1} B^T$ by approximating
