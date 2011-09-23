@@ -350,7 +350,8 @@ however, we have re-scaled the $B$ and $B^T$ operators. So $S$ should now
 approximate
 $-\frac{\eta}{L}\text{div}(-\eta\Delta)^{-1}\nabla \frac{\eta}{L} \approx
 \left(\frac{\eta}{L}\right)^2 \frac 1{\eta} \mathbf{1}$.
-This is exactly the operator we use to approximate $S$.
+We use the discrete form of the right hand side of this as our approximation
+$\tilde S$ to $S$.
 
 
 @todo discretization with FE_DGP
