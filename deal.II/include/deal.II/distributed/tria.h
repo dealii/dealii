@@ -25,6 +25,10 @@
 #include <list>
 #include <utility>
 
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  include <mpi.h>
+#endif
+
 #ifdef DEAL_II_USE_P4EST
 #include <p4est_connectivity.h>
 #include <p4est.h>
