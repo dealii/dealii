@@ -969,6 +969,16 @@ operator part of the momentum equation. The ability to solve problems in
 %parallel will be explored in step-32, using the same problem as
 discussed here.
 
+PETSc, which we have used in step-17 and step-18, is certainly a powerful
+library, providing a large number of functions that deal with matrices,
+vectors, and iterative solvers and preconditioners, along with lots of other
+stuff, most of which runs quite well in %parallel. It is, however, a few years
+old already than Trilinos, written in C, and generally not quite as easy to
+use as some other libraries. As a consequence, deal.II has also acquired
+interfaces to Trilinos, which shares a lot of the same functionality with
+PETSc. It is, however, a project that is several years younger, is written in
+C++ and by people who generally have put a significant emphasis on software
+design.
 
 
 <h3>The testcase</h3>
