@@ -361,11 +361,29 @@ physics), and so we'll change a few things slightly:
   convergence or even breakdown, but the F-GMRES variant is designed to deal
   with exactly this kind of situation and we consequently use it.
 
-@todo Couldn't we use GMRES for the first stage solve and F-GMRES for the
-second stage only. Does it make a difference? Is F-GMRES slower?
+- On the other hand, once we have settled on using F-GMRES we can relax the
+  tolerance used in inverting the preconditioner for $S$. In step-31, we ran a
+  preconditioned CG method on $\tilde S$ until the residual had been reduced
+  by 7 orders of magnitude. Here, we can again be more lenient because we know
+  that the outer preconditioner doesn't suffer.
 
-@todo Why again did we use a right preconditioner when in step-31 we use a
-left preconditioner? or do we?
+- In step-31, we used a left preconditioner in which we first invert the top
+  left block of the preconditioner matrix, then apply the bottom left
+  (divergence) one, and then invert the bottom right. In other words, the
+  application of the preconditioner acts as a lower left block triangular
+  matrix. Another option is to use a right preconditioner that here would be
+  upper right block triangulation, i.e., we first invert the bottom right
+  Schur complement, apply the top right (gradient) operator and then invert
+  the elliptic top left block. To a degree, which one to choose is a matter of
+  taste. That said, there is one significant advantage to a right
+  preconditioner in GMRES-type solvers: the residual with which we determine
+  whether we should stop the iteration is the true residual, not the norm of
+  the preconditioned equations. Consequently, it is much simpler to compare it
+  to the stopping criterion we typically use, namely the norm of the right
+  hand side vector. In writing this code we found that the scaling issues we
+  discussed above also made it difficult to determine suitable stopping
+  criteria for left-preconditioned linear systems, and consequently this
+  program uses a right preconditioner.
 
 @todo Why do we use an ILU instead of an IC for S as in step-31?
 
@@ -384,6 +402,9 @@ $\tilde S$ to $S$.
 
 <h3> Changes to the artificial viscosity stabilization </h3>
 
+@todo Martin, can you take another look at this section? In particular, I
+believe we now define the entropy residual differently.
+
 As in step-31, we will use an artificial viscosity of
 the form
 @f{eqnarray*}
@@ -401,7 +422,7 @@ in this problem, where
 $c(\mathbf{u},T) =
  c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
  \ |\mathrm{diam}(\Omega)|^{\alpha-2}$ (for the meaning of the various
-terms in these formulas, see step-31. In the results
+terms in these formulas, see step-31). In the results
 section of that program, we have discussed our choice for $c_R$ and
 how we arrived at the value used there mostly by accident, and in more
 detail how $\beta$ was chosen. For the
@@ -411,11 +432,19 @@ using the same line of reasoning with which we chose two other
 parameters in our discretization, $c_k$ and $\beta$, in the results
 section of step-31. In particular, remember that we would like to make
 the artificial viscosity as small as possible while keeping it as large as
-necessary. To see what is happening, note that below we will impose
+necessary. In the following, let us describe the general strategy one may
+follow. The computations shown here were done with an earlier version of the
+program and so the actual numerical values you get when running the program
+may no longer match those shown here; that said, the general approach remains
+valid and has been used to find the values of the parameters actually used in
+the program.
+
+To see what is happening, note that below we will impose
 boundary conditions for the temperature between 973 and 4273 Kelvin,
-and initial conditions are also chosen in this range; because there
-are no %internal heat sources or sinks, the temperature should
-consequently always be in this range, barring any %internal
+and initial conditions are also chosen in this range; for these
+considerations, we run the program without %internal heat sources or sinks,
+and consequently the temperature should
+always be in this range, barring any %internal
 oscillations. If the minimal temperature drops below 973 Kelvin, then
 we need to add stabilization by either increasing $\beta$ or
 decreasing $c_R$.
@@ -453,9 +482,12 @@ stabilization. Second: In step-31, we used
 $\beta=0.015\cdot\text{dim}$; why does this not work here? The answer
 to this is not entirely clear -- stabilization parameters are
 certainly known to depend on things like the shape of cells, for which
-we had square in step-31 but have trapezoids in the current
+we had squares in step-31 but have trapezoids in the current
 program. Whatever the exact cause, we at least have a value of
 $\beta$, namely 0.052 for 2d, that works for the current program.
+A similar set of experiments can be made in 3d where we find that
+$\beta=0.078$ is a good choice &mdash; neatly leading to the formula
+$\beta=0.026 \cdot \textrm{dim}$.
 
 With this value fixed, we can go back to the original formula for the
 viscosity $\nu$ and play with the constant $c_R$, making it as large
@@ -464,32 +496,44 @@ a picture like this:
 
 @image html doc/step-32.beta_cr.2d.png
 
-Consequently, $c_R=0.1$ would appear to be the right value.
+Consequently, $c_R=0.1$ would appear to be the right value here. While this
+graph has been obtained for an exponent $\alpha=1$, in the program we use
+$\alpha=2$ instead, and in that case one has to re-tune the parameter. It
+turns out that $c_R=0.5$ works with $\alpha=2$.
 
 
 
 <h3> Parallelization on clusters </h3>
 
+Running convection codes in 3d with significant Raleigh numbers requires a lot
+of computations &mdash; in the case of whole earth simulations on the order of
+one or several hundred million unknowns. This can obviously not be done with a
+single machine any more (at least not in 2010 when we started writing this
+code). Consequently, we need to parallelize it.
 Parallelization of scientific codes across multiple machines in a cluster of
 computers is almost always done using the Message Passing Interface
-(MPI). This program is no exception to that, and it follows the
-step-17 and step-18 programs in this.
+(MPI). This program is no exception to that, and it follows the general spirit
+of step-17 and step-18 programs in this though in practice it borrows more
+from step-40 in which we first introduced the classes and strategies we use
+when we want to <i>completely</i> distribute all computations: including, for
+example, splitting the mesh up into a number of parts so that each processor
+only stores its own share plus some ghost cells, and using strategies where no
+processor potentially has enough memory to hold the entries of the combined
+solution vector locally.
 
-MPI is a rather awkward interface to program with, and so we usually try to
-not use it directly but through an interface layer that abstracts most of the
-MPI operations into a friendlier interface. In the two programs mentioned
-above, this was achieved by using the PETSc library that provides support for
-%parallel linear algebra in a way that almost completely hides the MPI layer
-under it. PETSc is powerful, providing a large number of functions that deal
-with matrices, vectors, and iterative solvers and preconditioners, along with
-lots of other stuff, most of which runs quite well in %parallel. It is,
-however, a few years old already, written in C, and generally not quite as
-easy to use as some other libraries. As a consequence, deal.II also has
-interfaces to Trilinos, a library similar to PETSc in its aims and with a lot
-of the same functionality. It is, however, a project that is several years
-younger, is written in C++ and by people who generally have put a significant
-emphasis on software design. We have already used Trilinos in
-step-31, and will do so again here, with the difference that we
+MPI is a rather awkward interface to program with. It is a semi-object
+oriented set of functions, and while one uses it to send data around a
+network, one needs to explicitly describe the data types because the MPI
+functions insist on getting the address of the data as <code>void*</code>
+objects rather than deducing the data type automatically through overloading
+or templates. We've already seen in step-17 and step-18 how to avoid almost
+all of MPI by putting all the communication necessary into either the deal.II
+library or, in those programs, into PETSc. We'll do something similar here:
+like in step-40, deal.II and the underlying p4est library are responsible for
+all the communication necessary for distributing the mesh, and we will let the
+Trilinos library (along with the wrappers in namespace TrilinosWrappers) deal
+with parallelizing the linear algebra components. We have already used
+Trilinos in step-31, and will do so again here, with the difference that we
 will use its %parallel capabilities.
 
 deal.II's Trilinos interfaces encapsulate pretty much everything Trilinos
