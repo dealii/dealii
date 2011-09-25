@@ -189,11 +189,6 @@ namespace SparsityPatternIterators
 					* sparsity pattern.
 					*/
       bool operator < (const Accessor &) const;
-
-				       /** @addtogroup Exceptions
-					* @{ */
-
-				       //@}
     protected:
 				       /**
 					* The sparsity pattern we operate on
@@ -370,6 +365,11 @@ class SparsityPattern : public Subscriptor
 				      */
     static const unsigned int invalid_entry = numbers::invalid_unsigned_int;
 
+/**
+ * @name Functions generating and
+ * filling a SparsityPattern.
+ */
+// @{
 				     /**
 				      * Initialize the matrix empty,
 				      * that is with no memory
@@ -552,11 +552,6 @@ class SparsityPattern : public Subscriptor
 				      * objects.
 				      */
     SparsityPattern & operator = (const SparsityPattern &);
-    
-                     /**
-	                  *  Test for equality of two SparsityPatterns.
-	                  */
-    bool operator == (const SparsityPattern &)  const;
 
 				     /**
 				      * Reallocate memory and set up data
@@ -634,73 +629,6 @@ class SparsityPattern : public Subscriptor
 				      * reduce memory requirements.
 				      */
     void compress ();
-
-				     /**
-				      * STL-like iterator with the first entry
-				      * of the matrix. The resulting iterator
-				      * can be used to walk over all nonzero
-				      * entries of the sparsity pattern.
-				      */
-    inline iterator begin () const;
-
-				     /**
-				      * Final iterator.
-				      */
-    inline iterator end () const;
-
-				     /**
-				      * STL-like iterator with the first entry
-				      * of row <tt>r</tt>.
-				      *
-				      * Note that if the given row is empty,
-				      * i.e. does not contain any nonzero
-				      * entries, then the iterator returned by
-				      * this function equals
-				      * <tt>end(r)</tt>. Note also that the
-				      * iterator may not be dereferencable in
-				      * that case.
-				      */
-    inline iterator begin (const unsigned int r) const;
-
-				     /**
-				      * Final iterator of row <tt>r</tt>. It
-				      * points to the first element past the
-				      * end of line @p r, or past the end of
-				      * the entire sparsity pattern.
-				      *
-				      * Note that the end iterator is not
-				      * necessarily dereferencable. This is in
-				      * particular the case if it is the end
-				      * iterator for the last row of a matrix.
-				      */
-    inline iterator end (const unsigned int r) const;
-
-				     /**
-				      * STL-like iterator with the first entry
-				      * of row <tt>r</tt>.
-				      *
-				      * Note that if the given row is empty,
-				      * i.e. does not contain any nonzero
-				      * entries, then the iterator returned by
-				      * this function equals
-				      * <tt>end(r)</tt>. Note also that the
-				      * iterator may not be dereferencable in
-				      * that case.
-				      */
-    inline row_iterator row_begin (const unsigned int r) const;
-
-				     /**
-				      * Final iterator of row <tt>r</tt>. It
-				      * points to the first element past the
-				      * end of line @p r, or past the end of
-				      * the entire sparsity pattern.
-				      *
-				      * Note that the end iterator is not
-				      * necessarily dereferencable. This is in
-				      * particular the case if it is the end
-				      * iterator for the last row of a matrix.
-				      */
-    inline row_iterator row_end (const unsigned int r) const;
 
     				     /**
 				      * This function can be used as a
@@ -876,78 +804,19 @@ class SparsityPattern : public Subscriptor
 		    const bool optimize_diagonal = true);
 
 				     /**
-				      * Return whether the object is empty. It
-				      * is empty if no memory is allocated,
-				      * which is the same as that both
-				      * dimensions are zero.
+				      * Make the sparsity pattern
+				      * symmetric by adding the
+				      * sparsity pattern of the
+				      * transpose object.
+				      *
+				      * This function throws an
+				      * exception if the sparsity
+				      * pattern does not represent a
+				      * quadratic matrix.
 				      */
-    bool empty () const;
+    void symmetrize ();
 
-				     /**
-				      * Return the maximum number of entries per
-				      * row. Before compression, this equals the
-				      * number given to the constructor, while
-				      * after compression, it equals the maximum
-				      * number of entries actually allocated by
-				      * the user.
-				      */
-    unsigned int max_entries_per_row () const;
-
-				     /**
-				      * Return the index of the matrix
-				      * element with row number <tt>i</tt>
-				      * and column number <tt>j</tt>. If
-				      * the matrix element is not a
-				      * nonzero one, return
-				      * SparsityPattern::invalid_entry.
-				      *
-				      * This function is usually
-				      * called by the
-				      * SparseMatrix::operator()(). It
-				      * may only be called for
-				      * compressed sparsity patterns,
-				      * since in this case searching
-				      * whether the entry exists can
-				      * be done quite fast with a
-				      * binary sort algorithm because
-				      * the column numbers are sorted.
-				      *
-				      * If <tt>m</tt> is the number of
-				      * entries in <tt>row</tt>, then the
-				      * complexity of this function is
-				      * <i>log(m)</i> if the sparsity
-				      * pattern is compressed.
-				      *
-				      * @deprecated Use
-				      * SparseMatrix::const_iterator
-				      */
-    unsigned int operator() (const unsigned int i,
-			     const unsigned int j) const;
-
-				     /**
-				      * This is the inverse operation
-				      * to operator()(): given a
-				      * global index, find out row and
-				      * column of the matrix entry to
-				      * which it belongs. The returned
-				      * value is the pair composed of
-				      * row and column index.
-				      *
-				      * This function may only be
-				      * called if the sparsity pattern
-				      * is closed. The global index
-				      * must then be between zero and
-				      * n_nonzero_elements().
-				      *
-				      * If <tt>N</tt> is the number of
-				      * rows of this matrix, then the
-				      * complexity of this function is
-				      * <i>log(N)</i>.
-				      */
-    std::pair<unsigned int, unsigned int>
-    matrix_position (const unsigned int global_index) const;
-
-				     /**
+/**
 				      * Add a nonzero entry to the matrix.
 				      * This function may only be called
 				      * for non-compressed sparsity patterns.
@@ -973,66 +842,106 @@ class SparsityPattern : public Subscriptor
 		      ForwardIterator    end,
 		      const bool         indices_are_sorted = false);
 
+// @}
+/**
+ * @name Iterators
+ */
+// @{
+				      
 				     /**
-				      * Make the sparsity pattern
-				      * symmetric by adding the
-				      * sparsity pattern of the
-				      * transpose object.
+				      * STL-like iterator with the first entry
+				      * of the matrix. The resulting iterator
+				      * can be used to walk over all nonzero
+				      * entries of the sparsity pattern.
+				      */
+    inline iterator begin () const;
+
+				     /**
+				      * Final iterator.
+				      */
+    inline iterator end () const;
+
+				     /**
+				      * STL-like iterator with the first entry
+				      * of row <tt>r</tt>.
 				      *
-				      * This function throws an
-				      * exception if the sparsity
-				      * pattern does not represent a
-				      * quadratic matrix.
+				      * Note that if the given row is empty,
+				      * i.e. does not contain any nonzero
+				      * entries, then the iterator returned by
+				      * this function equals
+				      * <tt>end(r)</tt>. Note also that the
+				      * iterator may not be dereferencable in
+				      * that case.
 				      */
-    void symmetrize ();
+    inline iterator begin (const unsigned int r) const;
 
 				     /**
-				      * Return number of rows of this
-				      * matrix, which equals the dimension
-				      * of the image space.
-				      */
-    inline unsigned int n_rows () const;
-
-				     /**
-				      * Return number of columns of this
-				      * matrix, which equals the dimension
-				      * of the range space.
-				      */
-    inline unsigned int n_cols () const;
-
-    				     /**
-				      * Check if a value at a certain
-				      * position may be non-zero.
-				      */
-    bool exists (const unsigned int i,
-                 const unsigned int j) const;
-
-				     /**
-				      * Number of entries in a specific row.
-				      */
-    unsigned int row_length (const unsigned int row) const;
-
-				     /**
-				      * Access to column number field.
-				      * Return the column number of
-				      * the <tt>index</tt>th entry in
-				      * <tt>row</tt>. Note that if
-				      * diagonal elements are
-				      * optimized, the first element
-				      * in each row is the diagonal
-				      * element,
-				      * i.e. <tt>column_number(row,0)==row</tt>.
+				      * Final iterator of row <tt>r</tt>. It
+				      * points to the first element past the
+				      * end of line @p r, or past the end of
+				      * the entire sparsity pattern.
 				      *
-				      * If the sparsity pattern is
-				      * already compressed, then
-				      * (except for the diagonal
-				      * element), the entries are
-				      * sorted by columns,
-				      * i.e. <tt>column_number(row,i)</tt>
-				      * <tt><</tt> <tt>column_number(row,i+1)</tt>.
+				      * Note that the end iterator is not
+				      * necessarily dereferencable. This is in
+				      * particular the case if it is the end
+				      * iterator for the last row of a matrix.
 				      */
-    unsigned int column_number (const unsigned int row,
-				const unsigned int index) const;
+    inline iterator end (const unsigned int r) const;
+
+				     /**
+				      * STL-like iterator with the first entry
+				      * of row <tt>r</tt>.
+				      *
+				      * Note that if the given row is empty,
+				      * i.e. does not contain any nonzero
+				      * entries, then the iterator returned by
+				      * this function equals
+				      * <tt>end(r)</tt>. Note also that the
+				      * iterator may not be dereferencable in
+				      * that case.
+				      */
+    inline row_iterator row_begin (const unsigned int r) const;
+
+				     /**
+				      * Final iterator of row <tt>r</tt>. It
+				      * points to the first element past the
+				      * end of line @p r, or past the end of
+				      * the entire sparsity pattern.
+				      *
+				      * Note that the end iterator is not
+				      * necessarily dereferencable. This is in
+				      * particular the case if it is the end
+				      * iterator for the last row of a matrix.
+				      */
+    inline row_iterator row_end (const unsigned int r) const;
+
+// @}
+/**
+ * @name Querying information
+ */
+// @{
+				     /**
+				      *  Test for equality of two SparsityPatterns.
+				      */
+    bool operator == (const SparsityPattern &)  const;
+
+				     /**
+				      * Return whether the object is empty. It
+				      * is empty if no memory is allocated,
+				      * which is the same as that both
+				      * dimensions are zero.
+				      */
+    bool empty () const;
+
+				     /**
+				      * Return the maximum number of entries per
+				      * row. Before compression, this equals the
+				      * number given to the constructor, while
+				      * after compression, it equals the maximum
+				      * number of entries actually allocated by
+				      * the user.
+				      */
+    unsigned int max_entries_per_row () const;
 
 				     /**
 				      * Compute the bandwidth of the matrix
@@ -1065,6 +974,25 @@ class SparsityPattern : public Subscriptor
 				      * compressed or not.
 				      */
     bool is_compressed () const;
+
+				     /**
+				      * Return number of rows of this
+				      * matrix, which equals the dimension
+				      * of the image space.
+				      */
+    inline unsigned int n_rows () const;
+
+				     /**
+				      * Return number of columns of this
+				      * matrix, which equals the dimension
+				      * of the range space.
+				      */
+    inline unsigned int n_cols () const;
+
+				     /**
+				      * Number of entries in a specific row.
+				      */
+    unsigned int row_length (const unsigned int row) const;
 
 				     /**
 				      * Determine whether the matrix
@@ -1122,70 +1050,108 @@ class SparsityPattern : public Subscriptor
 				      */
     bool stores_only_added_elements () const;
 
-                                     /**
-				      * @deprecated
-				      *
-				      * This function is deprecated. Use
-				      * SparsityTools::partition instead.
-				      *
-                                      * Use the METIS partitioner to generate
-                                      * a partitioning of the degrees of
-                                      * freedom represented by this sparsity
-                                      * pattern. In effect, we view this
-                                      * sparsity pattern as a graph of
-                                      * connections between various degrees of
-                                      * freedom, where each nonzero entry in
-                                      * the sparsity pattern corresponds to an
-                                      * edge between two nodes in the
-                                      * connection graph. The goal is then to
-                                      * decompose this graph into groups of
-                                      * nodes so that a minimal number of
-                                      * edges are cut by the boundaries
-                                      * between node groups. This partitioning
-                                      * is done by METIS. Note that METIS can
-                                      * only partition symmetric sparsity
-                                      * patterns, and that of course the
-                                      * sparsity pattern has to be square. We
-                                      * do not check for symmetry of the
-                                      * sparsity pattern, since this is an
-                                      * expensive operation, but rather leave
-                                      * this as the responsibility of caller
-                                      * of this function.
-                                      *
-                                      * After calling this function, the
-                                      * output array will have values between
-                                      * zero and @p n_partitions-1 for each
-                                      * node (i.e. row or column of the
-                                      * matrix).
-                                      *
-                                      * This function will generate an error
-                                      * if METIS is not installed unless
-                                      * @p n_partitions is one. I.e., you can
-                                      * write a program so that it runs in the
-                                      * single-processor single-partition case
-                                      * without METIS installed, and only
-                                      * requires METIS when multiple
-                                      * partitions are required.
-                                      *
-                                      * Note that the sparsity pattern itself
-                                      * is not changed by calling this
-                                      * function. However, you will likely use
-                                      * the information generated by calling
-                                      * this function to renumber degrees of
-                                      * freedom, after which you will of
-                                      * course have to regenerate the sparsity
-                                      * pattern.
-                                      *
-                                      * This function will rarely be called
-                                      * separately, since in finite element
-                                      * methods you will want to partition the
-                                      * mesh, not the matrix. This can be done
-                                      * by calling
-                                      * @p GridTools::partition_triangulation.
-                                      */
-    void partition (const unsigned int         n_partitions,
-                    std::vector<unsigned int> &partition_indices) const;
+				     /**
+				      * Determine an estimate for the
+				      * memory consumption (in bytes)
+				      * of this object. See
+				      * MemoryConsumption.
+				      */
+    std::size_t memory_consumption () const;
 
+// @}
+/**
+ * @name Accessing entries
+ */
+// @{
+				     /**
+				      * Return the index of the matrix
+				      * element with row number <tt>i</tt>
+				      * and column number <tt>j</tt>. If
+				      * the matrix element is not a
+				      * nonzero one, return
+				      * SparsityPattern::invalid_entry.
+				      *
+				      * This function is usually
+				      * called by the
+				      * SparseMatrix::operator()(). It
+				      * may only be called for
+				      * compressed sparsity patterns,
+				      * since in this case searching
+				      * whether the entry exists can
+				      * be done quite fast with a
+				      * binary sort algorithm because
+				      * the column numbers are sorted.
+				      *
+				      * If <tt>m</tt> is the number of
+				      * entries in <tt>row</tt>, then the
+				      * complexity of this function is
+				      * <i>log(m)</i> if the sparsity
+				      * pattern is compressed.
+				      *
+				      * @deprecated Use
+				      * SparseMatrix::const_iterator
+				      */
+    unsigned int operator() (const unsigned int i,
+			     const unsigned int j) const;
+
+				     /**
+				      * This is the inverse operation
+				      * to operator()(): given a
+				      * global index, find out row and
+				      * column of the matrix entry to
+				      * which it belongs. The returned
+				      * value is the pair composed of
+				      * row and column index.
+				      *
+				      * This function may only be
+				      * called if the sparsity pattern
+				      * is closed. The global index
+				      * must then be between zero and
+				      * n_nonzero_elements().
+				      *
+				      * If <tt>N</tt> is the number of
+				      * rows of this matrix, then the
+				      * complexity of this function is
+				      * <i>log(N)</i>.
+				      */
+    std::pair<unsigned int, unsigned int>
+    matrix_position (const unsigned int global_index) const;
+
+    				     /**
+				      * Check if a value at a certain
+				      * position may be non-zero.
+				      */
+    bool exists (const unsigned int i,
+                 const unsigned int j) const;
+
+				     /**
+				      * Access to column number field.
+				      * Return the column number of
+				      * the <tt>index</tt>th entry in
+				      * <tt>row</tt>. Note that if
+				      * diagonal elements are
+				      * optimized, the first element
+				      * in each row is the diagonal
+				      * element,
+				      * i.e. <tt>column_number(row,0)==row</tt>.
+				      *
+				      * If the sparsity pattern is
+				      * already compressed, then
+				      * (except for the diagonal
+				      * element), the entries are
+				      * sorted by columns,
+				      * i.e. <tt>column_number(row,i)</tt>
+				      * <tt><</tt> <tt>column_number(row,i+1)</tt>.
+				      */
+    unsigned int column_number (const unsigned int row,
+				const unsigned int index) const;
+
+    
+// @}
+/**
+ * @name Input/Output
+ */
+// @{
 				     /**
 				      * Write the data of this object
 				      * en bloc to a file. This is
@@ -1269,14 +1235,89 @@ class SparsityPattern : public Subscriptor
 				      * <tt>plot</tt> command.
 				      */
     void print_gnuplot (std::ostream &out) const;
+                     /**
+                      * Write the data of this object to 
+                      * a stream for the purpose of serialization
+                      */ 
+    template <class Archive>
+    void save (Archive & ar, const unsigned int version) const;
 
-				     /**
-				      * Determine an estimate for the
-				      * memory consumption (in bytes)
-				      * of this object. See
-				      * MemoryConsumption.
-				      */
-    std::size_t memory_consumption () const;
+                     /**
+                      * Read the data of this object 
+                      * from a stream for the purpose of serialization
+                      */    
+    template <class Archive>
+    void load (Archive & ar, const unsigned int version);
+
+// @}
+/**
+ * @name Deprecated functions
+ */
+// @{
+                                     /**
+				      * @deprecated
+				      *
+				      * This function is deprecated. Use
+				      * SparsityTools::partition instead.
+				      *
+                                      * Use the METIS partitioner to generate
+                                      * a partitioning of the degrees of
+                                      * freedom represented by this sparsity
+                                      * pattern. In effect, we view this
+                                      * sparsity pattern as a graph of
+                                      * connections between various degrees of
+                                      * freedom, where each nonzero entry in
+                                      * the sparsity pattern corresponds to an
+                                      * edge between two nodes in the
+                                      * connection graph. The goal is then to
+                                      * decompose this graph into groups of
+                                      * nodes so that a minimal number of
+                                      * edges are cut by the boundaries
+                                      * between node groups. This partitioning
+                                      * is done by METIS. Note that METIS can
+                                      * only partition symmetric sparsity
+                                      * patterns, and that of course the
+                                      * sparsity pattern has to be square. We
+                                      * do not check for symmetry of the
+                                      * sparsity pattern, since this is an
+                                      * expensive operation, but rather leave
+                                      * this as the responsibility of caller
+                                      * of this function.
+                                      *
+                                      * After calling this function, the
+                                      * output array will have values between
+                                      * zero and @p n_partitions-1 for each
+                                      * node (i.e. row or column of the
+                                      * matrix).
+                                      *
+                                      * This function will generate an error
+                                      * if METIS is not installed unless
+                                      * @p n_partitions is one. I.e., you can
+                                      * write a program so that it runs in the
+                                      * single-processor single-partition case
+                                      * without METIS installed, and only
+                                      * requires METIS when multiple
+                                      * partitions are required.
+                                      *
+                                      * Note that the sparsity pattern itself
+                                      * is not changed by calling this
+                                      * function. However, you will likely use
+                                      * the information generated by calling
+                                      * this function to renumber degrees of
+                                      * freedom, after which you will of
+                                      * course have to regenerate the sparsity
+                                      * pattern.
+                                      *
+                                      * This function will rarely be called
+                                      * separately, since in finite element
+                                      * methods you will want to partition the
+                                      * mesh, not the matrix. This can be done
+                                      * by calling
+                                      * @p GridTools::partition_triangulation.
+                                      */
+    void partition (const unsigned int         n_partitions,
+                    std::vector<unsigned int> &partition_indices) const;
+
 
 				     /**
 				      * This is kind of an expert mode. Get
@@ -1335,20 +1376,6 @@ class SparsityPattern : public Subscriptor
 				      */
     inline const unsigned int * get_column_numbers () const;
     
-                     /**
-                      * Write the data of this object to 
-                      * a stream for the purpose of serialization
-                      */ 
-    template <class Archive>
-    void save (Archive & ar, const unsigned int version) const;
-
-                     /**
-                      * Read the data of this object 
-                      * from a stream for the purpose of serialization
-                      */    
-    template <class Archive>
-    void load (Archive & ar, const unsigned int version);
-
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 				     /** @addtogroup Exceptions
