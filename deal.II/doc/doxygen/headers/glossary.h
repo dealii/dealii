@@ -676,7 +676,10 @@ Article{BK07,
  * by only one processor, degrees of freedom on interfaces between cells owned
  * by different processors may be owned by one or the other, so not all
  * degrees of freedom on a locally owned cell are also locally owned degrees
- * of freedom.</dd>
+ * of freedom.
+ *
+ * Locally owned DoFs are a subset of the
+ * @ref GlossLocallyActiveDof "locally active DoFs".</dd>
  *
  *
  * <dt class="glossary">@anchor GlossLocallyActiveDof <b>Locally active degrees of freedom</b></dt>
@@ -685,6 +688,10 @@ Article{BK07,
  * of freedom are those that live on locally owned cells. Degrees of freedom
  * on interfaces between cells owned by different processors therefore belong
  * to the set of locally active degrees of freedom for more than one processor.
+ *
+ * Locally active DoFs are a superset of the
+ * @ref GlossLocallyOwnedDof "locally owned DoFs" and a subset of the
+ * @ref GlossLocallyRelevantDof "locally relevant DoFs".
  * </dd>
  *
  *
@@ -693,6 +700,9 @@ Article{BK07,
  * distributed meshes, see the @ref distributed module.  Locally relevant
  * degrees of freedom are those that live on locally owned or ghost cells.
  * Consequently, they may be owned by different processors.
+ *
+ * Locally relevant DoFs are a superset of the
+ * @ref GlossLocallyActiveDof "locally active DoFs."
  * </dd>
  *
  *
