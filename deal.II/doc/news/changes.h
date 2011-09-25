@@ -297,6 +297,12 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The function Utilities::System::calculate_collective_mpi_sum
+function can be used to compute the sum of values over a number of
+MPI processes without having to deal with the underlying MPI functions.
+<br>
+(Wolfgang Bangerth, 2011/09/25)
+
 <li> New: The CellAccessor::is_locally_owned function is a shortcut
 for the <code>!cell-@>is_ghost() && !cell-@>is_artificial()</code> pattern
 found in many places when dealing with distributed meshes.

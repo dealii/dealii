@@ -23,7 +23,8 @@
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
 #include <mpi.h>
 #else
-typedef int MPI_Comm;
+
+extern boost::mutex m;typedef int MPI_Comm;
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
@@ -439,6 +440,22 @@ namespace Utilities
 				      */
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
 
+    
+    /**
+     * Return the sum over all processors of the value @p t. This function
+     * is collective over all processors given in the communicator. If
+     * deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p t. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e. all processors receive
+     * the result of this operation.
+     * 
+     * @note This function is only implemented for certain template
+     * arguments <code>T</code>, namely <code>float, double, int, 
+     * unsigned int</code>.
+     */
+    template <typename T>
+    T calculate_collective_mpi_sum (const T &t,
+				    const MPI_Comm &mpi_communicator);
 
 				     /**
 				      * Data structure to store the result of
@@ -861,6 +878,58 @@ namespace Utilities
 	else
 	  len = half;
       }
+  }
+  
+  
+  namespace System
+  {
+    namespace internal
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI      
+      /**
+       * Return the corresponding MPI data type id for the argument given.
+       */
+      inline MPI_Datatype mpi_type_id (const int *)
+      {
+	return MPI_INT;
+      }
+
+      
+      inline MPI_Datatype mpi_type_id (const unsigned int *)
+      {
+	return MPI_UNSIGNED;
+      }
+
+
+      inline MPI_Datatype mpi_type_id (const float *)
+      {
+	return MPI_FLOAT;
+      }
+
+
+      inline MPI_Datatype mpi_type_id (const double *)
+      {
+	return MPI_DOUBLE;
+      }
+#endif
+    }
+    
+    template <typename T>
+    inline
+    T calculate_collective_mpi_sum (const T &t,
+				    const MPI_Comm &mpi_communicator)
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      T sum;
+      MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&t)),
+		     &sum, 1, internal::mpi_type_id(&t), MPI_SUM, 
+		     mpi_communicator);
+      return sum;
+#else
+      (void)mpi_communicator;
+      return t;
+#endif
+    }
   }
 }
 
