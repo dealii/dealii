@@ -661,6 +661,41 @@ Article{BK07,
  * @ref GlossSupport "support points".</dd>
  *
  *
+ * <dt class="glossary">@anchor GlossLocallyOwnedCell <b>Locally owned cell</b></dt>
+ * <dd>This concept identifies a subset of all cells when using
+ * distributed meshes, see the @ref distributed module. In such meshes, each
+ * cell is owned by exactly one processor. The locally owned ones are those
+ * owned by the current processor.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossLocallyOwnedDof <b>Locally owned degrees of freedom</b></dt>
+ * <dd>This concept identifies a subset of all degrees of freedom when using
+ * distributed meshes, see the @ref distributed module.  Locally owned degrees
+ * of freedom live on locally owned cells. Since degrees of freedom are owned
+ * by only one processor, degrees of freedom on interfaces between cells owned
+ * by different processors may be owned by one or the other, so not all
+ * degrees of freedom on a locally owned cell are also locally owned degrees
+ * of freedom.</dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossLocallyActiveDof <b>Locally active degrees of freedom</b></dt>
+ * <dd>This concept identifies a subset of all degrees of freedom when using
+ * distributed meshes, see the @ref distributed module.  Locally active degrees
+ * of freedom are those that live on locally owned cells. Degrees of freedom
+ * on interfaces between cells owned by different processors therefore belong
+ * to the set of locally active degrees of freedom for more than one processor.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossLocallyRelevantDof <b>Locally relevant degrees of freedom</b></dt>
+ * <dd>This concept identifies a subset of all degrees of freedom when using
+ * distributed meshes, see the @ref distributed module.  Locally relevant
+ * degrees of freedom are those that live on locally owned or ghost cells.
+ * Consequently, they may be owned by different processors.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
  * "material id". It is commonly used in problems with heterogenous
