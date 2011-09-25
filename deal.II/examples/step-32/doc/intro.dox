@@ -536,8 +536,13 @@ with parallelizing the linear algebra components. We have already used
 Trilinos in step-31, and will do so again here, with the difference that we
 will use its %parallel capabilities.
 
-deal.II's Trilinos interfaces encapsulate pretty much everything Trilinos
-provides into wrapper classes (in namespace TrilinosWrappers) that make the
+Trilinos consists of a significant number of packages, implementing basic
+%parallel linear algebra operations (the Epetra package), different solver and
+preconditioner packages, and on to things that are of less importance to
+deal.II (e.g., optimization, uncertainty quantification, etc).
+deal.II's Trilinos interfaces encapsulate many of the things Trilinos offers
+that are of relevance to PDE solvers, and
+provides wrapper classes (in namespace TrilinosWrappers) that make the
 Trilinos matrix, vector, solver and preconditioner classes look very much the
 same as deal.II's own implementations of this functionality. However, as
 opposed to deal.II's classes, they can be used in %parallel if we give them the
@@ -557,18 +562,7 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
   processes that work together. It would be perfectly legitimate to start a
   process on $N$ machines but only store vectors on a subset of these by
   producing a communicator object that only encompasses this subset of
-  machines; there is really no compelling reason to do so here, however. As a
-  second note, while we use <code>MPI_COMM_WORLD</code> as communicator in the
-  program's source code, every time we create a Trilinos object in the wrapper
-  classes in namespace TrilinosWrappers, we don't use the given communicator
-  but instead create a new and unique communicator that happens to have the
-  same machines but has a distinct communicator ID. This way, we can ensure
-  that all communications that have to do with this, say, sparse matrix really
-  only occur on a channel associated with only this one object, while all
-  other objects communicate on other channels of their own. This helps in
-  debugging, and may also allow some communications to be reordered for better
-  %parallel performance because they can be told apart by their communicator
-  number, not just their relative timing.
+  machines; there is really no compelling reason to do so here, however.
 
 <li> The Epetra_Map class is used to describe which elements of a vector or which
   rows of a matrix reside on a given machine that is part of a
@@ -580,29 +574,34 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
   believe this is a better word) in the
   <code>BoussinesqFlowProblem::setup_dofs</code> function below and then hand
   it to every %parallel object we create.
+
+  Unlike PETSc, Trilinos makes no assumption that the elements of a vector
+  need to be partitioned into contiguous chunks. At least in principle, we
+  could store all elements with even indices on one processor and all odd ones
+  on another. That's not very efficient, of course, but it's
+  possible. Furthermore, the elements of these partitionings do not
+  necessarily by mutually exclusive. This is important because when
+  postprocessing solutions, we need access to all locally relevant or at least
+  the locally active degrees of freedom (see the module on @ref distributed
+  for a definition, as well as the discussion in step-40). Which elements the
+  Trilinos vector considers as locally owned is not important to us then. All
+  we care about is that it stores those elements locally that we need.
 </ul>
 
-The only other things specific to programming using MPI that we will use in
-this program are the following facilities deal.II provides:
-<ul>
-<li> We need to subdivide the domain into subdomains, each of which will
-  represent the cells that one of the processors coupled by MPI shall consider
-  its own and work on. This is done using the
-  GridTools::partition_triangulation function.
-<li> In order to know which elements of a vector or rows of a matrix shall be
-  stored on each of the processors, we need to know how many degrees of
-  freedom each of the owners of certain subdomains call their own. This is
-  conveniently returned by the DoFTools::count_dofs_with_subdomain_association
-  function.
-</ul>
-The rest of the program is almost completely agnostic about the fact that we
-don't store all objects completely locally. There will be a few points where
-we can not use certain programming techniques (though without making explicit
-reference to MPI or parallelization) or where we need access to <i>all</i>
-elements of a vector and therefore need to <i>localize</i> its elements
-(i.e. create a vector that has all its elements stored on the current
-machine), but we will comment on these locations as we get to them in the
-program code.
+There are a number of other concepts relevant to distributing the mesh to a
+number of processors; you may want to take a look at the @ref distributed
+module and step-40 before trying to understand this program.  The rest of the
+program is almost completely agnostic about the fact that we don't store all
+objects completely locally. There will be a few points where we have to limit
+loops over all cells to those that are locally owned, or where we need to
+distinguish between vectors that store only locally owned elements and those
+that store everything that is locally relevant (see @ref
+GlossLocallyRelevantDof "this glossary entry"), and there will be a few places
+where we have to
+explicitly call MPI functions, but by and large the amount of heavy lifting
+necessary to make the program run in %parallel is well hidden in the libraries
+upon which this program builds. In any case, we will comment on these
+locations as we get to them in the program code.
 
 
 <h3> Parallelization within individual nodes of a cluster </h3>
