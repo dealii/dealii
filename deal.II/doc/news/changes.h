@@ -297,7 +297,7 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> New: The function Utilities::System::calculate_collective_mpi_sum
+<li> New: The function Utilities::MPI::sum
 function can be used to compute the sum of values over a number of
 MPI processes without having to deal with the underlying MPI functions.
 <br>

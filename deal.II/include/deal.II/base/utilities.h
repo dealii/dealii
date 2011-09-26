@@ -276,6 +276,34 @@ namespace Utilities
 
                                    /**
                                     * A namespace for utility functions that
+                                    * abstract certain operations using the
+				    * Message Passing Interface (MPI) or
+				    * provide fallback operations in
+				    * case deal.II is configured not to use
+				    * MPI at all.
+                                    *
+                                    * @ingroup utilities
+                                    */
+  namespace MPI
+  {    
+    /**
+     * Return the sum over all processors of the value @p t. This function
+     * is collective over all processors given in the communicator. If
+     * deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p t. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e. all processors receive
+     * the result of this operation.
+     * 
+     * @note This function is only implemented for certain template
+     * arguments <code>T</code>, namely <code>float, double, int, 
+     * unsigned int</code>.
+     */
+    template <typename T>
+    T sum (const T &t,
+	   const MPI_Comm &mpi_communicator);
+  }
+                                   /**
+                                    * A namespace for utility functions that
                                     * probe system properties.
                                     *
                                     * @ingroup utilities
@@ -439,23 +467,6 @@ namespace Utilities
 				      * <code>MPI_Comm_free</code>.
 				      */
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
-
-    
-    /**
-     * Return the sum over all processors of the value @p t. This function
-     * is collective over all processors given in the communicator. If
-     * deal.II is not configured for use of MPI, this function simply
-     * returns the value of @p t. This function corresponds to the
-     * <code>MPI_Allreduce</code> function, i.e. all processors receive
-     * the result of this operation.
-     * 
-     * @note This function is only implemented for certain template
-     * arguments <code>T</code>, namely <code>float, double, int, 
-     * unsigned int</code>.
-     */
-    template <typename T>
-    T calculate_collective_mpi_sum (const T &t,
-				    const MPI_Comm &mpi_communicator);
 
 				     /**
 				      * Data structure to store the result of
@@ -881,7 +892,7 @@ namespace Utilities
   }
   
   
-  namespace System
+  namespace MPI
   {
     namespace internal
     {
@@ -916,8 +927,8 @@ namespace Utilities
     
     template <typename T>
     inline
-    T calculate_collective_mpi_sum (const T &t,
-				    const MPI_Comm &mpi_communicator)
+    T sum (const T &t,
+	   const MPI_Comm &mpi_communicator)
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       T sum;

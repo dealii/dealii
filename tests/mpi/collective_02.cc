@@ -27,20 +27,20 @@ void test()
   int int_sum, uint_sum, double_sum, float_sum;
   int_sum
     =
-    Utilities::System::calculate_collective_mpi_sum<int>(myid+1,
-							 MPI_COMM_WORLD);
+    Utilities::MPI::sum<int>(myid+1,
+			     MPI_COMM_WORLD);
   uint_sum
     =
-    Utilities::System::calculate_collective_mpi_sum<unsigned int>(myid+1,
-								  MPI_COMM_WORLD);
+    Utilities::MPI::sum<unsigned int>(myid+1,
+				      MPI_COMM_WORLD);
   float_sum
     =
-    Utilities::System::calculate_collective_mpi_sum<float>(myid+1,
-							   MPI_COMM_WORLD);
+    Utilities::MPI::sum<float>(myid+1,
+			       MPI_COMM_WORLD);
   double_sum
     =
-    Utilities::System::calculate_collective_mpi_sum<double>(myid+1,
-							    MPI_COMM_WORLD);
+    Utilities::MPI::sum<double>(myid+1,
+				MPI_COMM_WORLD);
 
   if (myid==0)
     deallog << int_sum << ' ' << uint_sum << ' ' << double_sum << ' ' << float_sum << std::endl;
