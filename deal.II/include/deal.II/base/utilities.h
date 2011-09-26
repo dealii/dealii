@@ -499,7 +499,7 @@ namespace Utilities
 				      *
 				      * @deprecated
 				      */
-    bool program_uses_mpi();
+    bool program_uses_mpi ();
 
 				     /**
 				      * @name Functions that work
@@ -630,16 +630,9 @@ namespace Utilities
 
 
   /**
-   * This class provides the basic structures for the use of the Trilinos
-   * classes such as matrices, vectors, and preconditioners. The most
-   * important function in this class is <tt>comm()</tt>, which is needed
-   * for the initialization of Trilinos Epetra_Maps, which design the
-   * %parallel distribution of vectors and matrices. Moreover, this class
-   * provides a unified interface to both serial and %parallel
-   * implementations of Trilinos, sets up the MPI communicator in case the
-   * programs are run in %parallel, and correctly terminates all processes
-   * when the destructor is called. An example usage of this class is shown
-   * in the tutorial program step-32.
+   * This namespace provides some of the basic structures used in the
+   * initialization of the Trilinos objects (e.g., matrices, vectors, and
+   * preconditioners).
    */
 #ifdef DEAL_II_USE_TRILINOS
   namespace Trilinos
