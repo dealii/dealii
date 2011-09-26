@@ -1,52 +1,397 @@
 
-DEAL::FE_Q<2>(1)
-DEAL::Block 0   0    1    2    3   
-DEAL::Block 1   1    4    3    5   
-DEAL::Block 2   2    3    6    7   
-DEAL::Block 3   3    5    7    8   
-DEAL::Block 4   4    9    5    10  
-DEAL::Block 5   9    11   10   12  
-DEAL::Block 6   5    10   8    13  
-DEAL::Block 7   10   12   13   14  
-DEAL::Block 8   6    7    15   16  
-DEAL::Block 9   7    8    16   17  
-DEAL::Block 10  15   16   18   19  
-DEAL::Block 11  16   17   19   20  
-DEAL::Block 12  8    13   17   21  
-DEAL::Block 13  13   14   21   22  
-DEAL::Block 14  17   21   20   23  
-DEAL::Block 15  21   22   23   24  
-DEAL::FE_Q<2>(2)
-DEAL::Block 0   0    1    2    3    4    5    6    7    8   
-DEAL::Block 1   1    9    3    10   5    11   12   13   14  
-DEAL::Block 2   2    3    15   16   17   18   7    19   20  
-DEAL::Block 3   3    10   16   21   18   22   13   23   24  
-DEAL::Block 4   9    25   10   26   11   27   28   29   30  
-DEAL::Block 5   25   31   26   32   27   33   34   35   36  
-DEAL::Block 6   10   26   21   37   22   38   29   39   40  
-DEAL::Block 7   26   32   37   41   38   42   35   43   44  
-DEAL::Block 8   15   16   45   46   47   48   19   49   50  
-DEAL::Block 9   16   21   46   51   48   52   23   53   54  
-DEAL::Block 10  45   46   55   56   57   58   49   59   60  
-DEAL::Block 11  46   51   56   61   58   62   53   63   64  
-DEAL::Block 12  21   37   51   65   52   66   39   67   68  
-DEAL::Block 13  37   41   65   69   66   70   43   71   72  
-DEAL::Block 14  51   65   61   73   62   74   67   75   76  
-DEAL::Block 15  65   69   73   77   74   78   71   79   80  
-DEAL::FE_RaviartThomas<2>(0)
-DEAL::Block 0   0    1    2    3   
-DEAL::Block 1   1    4    5    6   
-DEAL::Block 2   7    8    3    9   
-DEAL::Block 3   8    10   6    11  
-DEAL::Block 4   4    12   13   14  
-DEAL::Block 5   12   15   16   17  
-DEAL::Block 6   10   18   14   19  
-DEAL::Block 7   18   20   17   21  
-DEAL::Block 8   22   23   9    24  
-DEAL::Block 9   23   25   11   26  
-DEAL::Block 10  27   28   24   29  
-DEAL::Block 11  28   30   26   31  
-DEAL::Block 12  25   32   19   33  
-DEAL::Block 13  32   34   21   35  
-DEAL::Block 14  30   36   33   37  
-DEAL::Block 15  36   38   35   39  
+DEAL:Square::FE_Q<2>(1)
+DEAL:Square::Block 0   0    1    2    3   
+DEAL:Square::Block 1   1    3    4    5   
+DEAL:Square::Block 2   2    3    6    7   
+DEAL:Square::Block 3   3    5    7    8   
+DEAL:Square::Block 4   4    5    9    10  
+DEAL:Square::Block 5   9    10   11   12  
+DEAL:Square::Block 6   5    8    10   13  
+DEAL:Square::Block 7   10   12   13   14  
+DEAL:Square::Block 8   6    7    15   16  
+DEAL:Square::Block 9   7    8    16   17  
+DEAL:Square::Block 10  15   16   18   19  
+DEAL:Square::Block 11  16   17   19   20  
+DEAL:Square::Block 12  8    13   17   21  
+DEAL:Square::Block 13  13   14   21   22  
+DEAL:Square::Block 14  17   20   21   23  
+DEAL:Square::Block 15  21   22   23   24  
+DEAL:Square::FE_Q<2>(2)
+DEAL:Square::Block 0   0    1    2    3    4    5    6    7    8   
+DEAL:Square::Block 1   1    3    5    9    10   11   12   13   14  
+DEAL:Square::Block 2   2    3    7    15   16   17   18   19   20  
+DEAL:Square::Block 3   3    10   13   16   18   21   22   23   24  
+DEAL:Square::Block 4   9    10   11   25   26   27   28   29   30  
+DEAL:Square::Block 5   25   26   27   31   32   33   34   35   36  
+DEAL:Square::Block 6   10   21   22   26   29   37   38   39   40  
+DEAL:Square::Block 7   26   32   35   37   38   41   42   43   44  
+DEAL:Square::Block 8   15   16   19   45   46   47   48   49   50  
+DEAL:Square::Block 9   16   21   23   46   48   51   52   53   54  
+DEAL:Square::Block 10  45   46   49   55   56   57   58   59   60  
+DEAL:Square::Block 11  46   51   53   56   58   61   62   63   64  
+DEAL:Square::Block 12  21   37   39   51   52   65   66   67   68  
+DEAL:Square::Block 13  37   41   43   65   66   69   70   71   72  
+DEAL:Square::Block 14  51   61   62   65   67   73   74   75   76  
+DEAL:Square::Block 15  65   69   71   73   74   77   78   79   80  
+DEAL:Square::FE_RaviartThomas<2>(0)
+DEAL:Square::Block 0   0    1    2    3   
+DEAL:Square::Block 1   1    4    5    6   
+DEAL:Square::Block 2   3    7    8    9   
+DEAL:Square::Block 3   6    8    10   11  
+DEAL:Square::Block 4   4    12   13   14  
+DEAL:Square::Block 5   12   15   16   17  
+DEAL:Square::Block 6   10   14   18   19  
+DEAL:Square::Block 7   17   18   20   21  
+DEAL:Square::Block 8   9    22   23   24  
+DEAL:Square::Block 9   11   23   25   26  
+DEAL:Square::Block 10  24   27   28   29  
+DEAL:Square::Block 11  26   28   30   31  
+DEAL:Square::Block 12  19   25   32   33  
+DEAL:Square::Block 13  21   32   34   35  
+DEAL:Square::Block 14  30   33   36   37  
+DEAL:Square::Block 15  35   36   38   39  
+DEAL:Square::FE_RaviartThomas<2>(1)
+DEAL:Square::Block 0   0    1    2    3    4    5    6    7    8    9    10   11  
+DEAL:Square::Block 1   2    3    12   13   14   15   16   17   18   19   20   21  
+DEAL:Square::Block 2   6    7    22   23   24   25   26   27   28   29   30   31  
+DEAL:Square::Block 3   16   17   24   25   32   33   34   35   36   37   38   39  
+DEAL:Square::Block 4   12   13   40   41   42   43   44   45   46   47   48   49  
+DEAL:Square::Block 5   40   41   50   51   52   53   54   55   56   57   58   59  
+DEAL:Square::Block 6   32   33   44   45   60   61   62   63   64   65   66   67  
+DEAL:Square::Block 7   54   55   60   61   68   69   70   71   72   73   74   75  
+DEAL:Square::Block 8   26   27   76   77   78   79   80   81   82   83   84   85  
+DEAL:Square::Block 9   34   35   78   79   86   87   88   89   90   91   92   93  
+DEAL:Square::Block 10  80   81   94   95   96   97   98   99   100  101  102  103 
+DEAL:Square::Block 11  88   89   96   97   104  105  106  107  108  109  110  111 
+DEAL:Square::Block 12  62   63   86   87   112  113  114  115  116  117  118  119 
+DEAL:Square::Block 13  70   71   112  113  120  121  122  123  124  125  126  127 
+DEAL:Square::Block 14  104  105  114  115  128  129  130  131  132  133  134  135 
+DEAL:Square::Block 15  122  123  128  129  136  137  138  139  140  141  142  143 
+DEAL:Square::FE_DGQ<2>(2)
+DEAL:Square::Block 0   0    1    2    3    4    5    6    7    8   
+DEAL:Square::Block 1   9    10   11   12   13   14   15   16   17  
+DEAL:Square::Block 2   18   19   20   21   22   23   24   25   26  
+DEAL:Square::Block 3   27   28   29   30   31   32   33   34   35  
+DEAL:Square::Block 4   36   37   38   39   40   41   42   43   44  
+DEAL:Square::Block 5   45   46   47   48   49   50   51   52   53  
+DEAL:Square::Block 6   54   55   56   57   58   59   60   61   62  
+DEAL:Square::Block 7   63   64   65   66   67   68   69   70   71  
+DEAL:Square::Block 8   72   73   74   75   76   77   78   79   80  
+DEAL:Square::Block 9   81   82   83   84   85   86   87   88   89  
+DEAL:Square::Block 10  90   91   92   93   94   95   96   97   98  
+DEAL:Square::Block 11  99   100  101  102  103  104  105  106  107 
+DEAL:Square::Block 12  108  109  110  111  112  113  114  115  116 
+DEAL:Square::Block 13  117  118  119  120  121  122  123  124  125 
+DEAL:Square::Block 14  126  127  128  129  130  131  132  133  134 
+DEAL:Square::Block 15  135  136  137  138  139  140  141  142  143 
+DEAL:Square::FE_Nedelec<2>(1)
+DEAL:Square::Block 0   0    1    2    3    4    5    6    7    8    9    10   11  
+DEAL:Square::Block 1   2    3    12   13   14   15   16   17   18   19   20   21  
+DEAL:Square::Block 2   6    7    22   23   24   25   26   27   28   29   30   31  
+DEAL:Square::Block 3   16   17   24   25   32   33   34   35   36   37   38   39  
+DEAL:Square::Block 4   12   13   40   41   42   43   44   45   46   47   48   49  
+DEAL:Square::Block 5   40   41   50   51   52   53   54   55   56   57   58   59  
+DEAL:Square::Block 6   32   33   44   45   60   61   62   63   64   65   66   67  
+DEAL:Square::Block 7   54   55   60   61   68   69   70   71   72   73   74   75  
+DEAL:Square::Block 8   26   27   76   77   78   79   80   81   82   83   84   85  
+DEAL:Square::Block 9   34   35   78   79   86   87   88   89   90   91   92   93  
+DEAL:Square::Block 10  80   81   94   95   96   97   98   99   100  101  102  103 
+DEAL:Square::Block 11  88   89   96   97   104  105  106  107  108  109  110  111 
+DEAL:Square::Block 12  62   63   86   87   112  113  114  115  116  117  118  119 
+DEAL:Square::Block 13  70   71   112  113  120  121  122  123  124  125  126  127 
+DEAL:Square::Block 14  104  105  114  115  128  129  130  131  132  133  134  135 
+DEAL:Square::Block 15  122  123  128  129  136  137  138  139  140  141  142  143 
+DEAL:L::FE_Q<2>(1)
+DEAL:L::Block 0   0    1    2    3   
+DEAL:L::Block 1   1    3    4    5   
+DEAL:L::Block 2   2    3    6    7   
+DEAL:L::Block 3   3    5    7    8   
+DEAL:L::Block 4   4    5    9    10  
+DEAL:L::Block 5   9    10   11   12  
+DEAL:L::Block 6   5    8    10   13  
+DEAL:L::Block 7   10   12   13   14  
+DEAL:L::Block 8   6    7    15   16  
+DEAL:L::Block 9   7    8    16   17  
+DEAL:L::Block 10  15   16   18   19  
+DEAL:L::Block 11  16   17   19   20  
+DEAL:L::Block 12  8    13   17   21  
+DEAL:L::Block 13  13   14   21   22  
+DEAL:L::Block 14  17   20   21   23  
+DEAL:L::Block 15  21   22   23   24  
+DEAL:L::Block 16  11   12   25   26  
+DEAL:L::Block 17  25   26   27   28  
+DEAL:L::Block 18  12   14   26   29  
+DEAL:L::Block 19  26   28   29   30  
+DEAL:L::Block 20  27   28   31   32  
+DEAL:L::Block 21  31   32   33   34  
+DEAL:L::Block 22  28   30   32   35  
+DEAL:L::Block 23  32   34   35   36  
+DEAL:L::Block 24  14   22   29   37  
+DEAL:L::Block 25  29   30   37   38  
+DEAL:L::Block 26  22   24   37   39  
+DEAL:L::Block 27  37   38   39   40  
+DEAL:L::Block 28  30   35   38   41  
+DEAL:L::Block 29  35   36   41   42  
+DEAL:L::Block 30  38   40   41   43  
+DEAL:L::Block 31  41   42   43   44  
+DEAL:L::Block 32  18   19   45   46  
+DEAL:L::Block 33  19   20   46   47  
+DEAL:L::Block 34  45   46   48   49  
+DEAL:L::Block 35  46   47   49   50  
+DEAL:L::Block 36  20   23   47   51  
+DEAL:L::Block 37  23   24   51   52  
+DEAL:L::Block 38  47   50   51   53  
+DEAL:L::Block 39  51   52   53   54  
+DEAL:L::Block 40  48   49   55   56  
+DEAL:L::Block 41  49   50   56   57  
+DEAL:L::Block 42  55   56   58   59  
+DEAL:L::Block 43  56   57   59   60  
+DEAL:L::Block 44  50   53   57   61  
+DEAL:L::Block 45  53   54   61   62  
+DEAL:L::Block 46  57   60   61   63  
+DEAL:L::Block 47  61   62   63   64  
+DEAL:L::FE_Q<2>(2)
+DEAL:L::Block 0   0    1    2    3    4    5    6    7    8   
+DEAL:L::Block 1   1    3    5    9    10   11   12   13   14  
+DEAL:L::Block 2   2    3    7    15   16   17   18   19   20  
+DEAL:L::Block 3   3    10   13   16   18   21   22   23   24  
+DEAL:L::Block 4   9    10   11   25   26   27   28   29   30  
+DEAL:L::Block 5   25   26   27   31   32   33   34   35   36  
+DEAL:L::Block 6   10   21   22   26   29   37   38   39   40  
+DEAL:L::Block 7   26   32   35   37   38   41   42   43   44  
+DEAL:L::Block 8   15   16   19   45   46   47   48   49   50  
+DEAL:L::Block 9   16   21   23   46   48   51   52   53   54  
+DEAL:L::Block 10  45   46   49   55   56   57   58   59   60  
+DEAL:L::Block 11  46   51   53   56   58   61   62   63   64  
+DEAL:L::Block 12  21   37   39   51   52   65   66   67   68  
+DEAL:L::Block 13  37   41   43   65   66   69   70   71   72  
+DEAL:L::Block 14  51   61   62   65   67   73   74   75   76  
+DEAL:L::Block 15  65   69   71   73   74   77   78   79   80  
+DEAL:L::Block 16  31   32   33   81   82   83   84   85   86  
+DEAL:L::Block 17  81   82   83   87   88   89   90   91   92  
+DEAL:L::Block 18  32   41   42   82   85   93   94   95   96  
+DEAL:L::Block 19  82   88   91   93   94   97   98   99   100 
+DEAL:L::Block 20  87   88   89   101  102  103  104  105  106 
+DEAL:L::Block 21  101  102  103  107  108  109  110  111  112 
+DEAL:L::Block 22  88   97   98   102  105  113  114  115  116 
+DEAL:L::Block 23  102  108  111  113  114  117  118  119  120 
+DEAL:L::Block 24  41   69   70   93   95   121  122  123  124 
+DEAL:L::Block 25  93   97   99   121  122  125  126  127  128 
+DEAL:L::Block 26  69   77   78   121  123  129  130  131  132 
+DEAL:L::Block 27  121  125  127  129  130  133  134  135  136 
+DEAL:L::Block 28  97   113  115  125  126  137  138  139  140 
+DEAL:L::Block 29  113  117  119  137  138  141  142  143  144 
+DEAL:L::Block 30  125  133  134  137  139  145  146  147  148 
+DEAL:L::Block 31  137  141  143  145  146  149  150  151  152 
+DEAL:L::Block 32  55   56   59   153  154  155  156  157  158 
+DEAL:L::Block 33  56   61   63   154  156  159  160  161  162 
+DEAL:L::Block 34  153  154  157  163  164  165  166  167  168 
+DEAL:L::Block 35  154  159  161  164  166  169  170  171  172 
+DEAL:L::Block 36  61   73   75   159  160  173  174  175  176 
+DEAL:L::Block 37  73   77   79   173  174  177  178  179  180 
+DEAL:L::Block 38  159  169  170  173  175  181  182  183  184 
+DEAL:L::Block 39  173  177  179  181  182  185  186  187  188 
+DEAL:L::Block 40  163  164  167  189  190  191  192  193  194 
+DEAL:L::Block 41  164  169  171  190  192  195  196  197  198 
+DEAL:L::Block 42  189  190  193  199  200  201  202  203  204 
+DEAL:L::Block 43  190  195  197  200  202  205  206  207  208 
+DEAL:L::Block 44  169  181  183  195  196  209  210  211  212 
+DEAL:L::Block 45  181  185  187  209  210  213  214  215  216 
+DEAL:L::Block 46  195  205  206  209  211  217  218  219  220 
+DEAL:L::Block 47  209  213  215  217  218  221  222  223  224 
+DEAL:L::FE_RaviartThomas<2>(0)
+DEAL:L::Block 0   0    1    2    3   
+DEAL:L::Block 1   1    4    5    6   
+DEAL:L::Block 2   3    7    8    9   
+DEAL:L::Block 3   6    8    10   11  
+DEAL:L::Block 4   4    12   13   14  
+DEAL:L::Block 5   12   15   16   17  
+DEAL:L::Block 6   10   14   18   19  
+DEAL:L::Block 7   17   18   20   21  
+DEAL:L::Block 8   9    22   23   24  
+DEAL:L::Block 9   11   23   25   26  
+DEAL:L::Block 10  24   27   28   29  
+DEAL:L::Block 11  26   28   30   31  
+DEAL:L::Block 12  19   25   32   33  
+DEAL:L::Block 13  21   32   34   35  
+DEAL:L::Block 14  30   33   36   37  
+DEAL:L::Block 15  35   36   38   39  
+DEAL:L::Block 16  15   40   41   42  
+DEAL:L::Block 17  40   43   44   45  
+DEAL:L::Block 18  20   42   46   47  
+DEAL:L::Block 19  45   46   48   49  
+DEAL:L::Block 20  43   50   51   52  
+DEAL:L::Block 21  50   53   54   55  
+DEAL:L::Block 22  48   52   56   57  
+DEAL:L::Block 23  55   56   58   59  
+DEAL:L::Block 24  34   47   60   61  
+DEAL:L::Block 25  49   60   62   63  
+DEAL:L::Block 26  38   61   64   65  
+DEAL:L::Block 27  63   64   66   67  
+DEAL:L::Block 28  57   62   68   69  
+DEAL:L::Block 29  59   68   70   71  
+DEAL:L::Block 30  66   69   72   73  
+DEAL:L::Block 31  71   72   74   75  
+DEAL:L::Block 32  29   76   77   78  
+DEAL:L::Block 33  31   77   79   80  
+DEAL:L::Block 34  78   81   82   83  
+DEAL:L::Block 35  80   82   84   85  
+DEAL:L::Block 36  37   79   86   87  
+DEAL:L::Block 37  39   86   88   89  
+DEAL:L::Block 38  84   87   90   91  
+DEAL:L::Block 39  89   90   92   93  
+DEAL:L::Block 40  83   94   95   96  
+DEAL:L::Block 41  85   95   97   98  
+DEAL:L::Block 42  96   99   100  101 
+DEAL:L::Block 43  98   100  102  103 
+DEAL:L::Block 44  91   97   104  105 
+DEAL:L::Block 45  93   104  106  107 
+DEAL:L::Block 46  102  105  108  109 
+DEAL:L::Block 47  107  108  110  111 
+DEAL:L::FE_RaviartThomas<2>(1)
+DEAL:L::Block 0   0    1    2    3    4    5    6    7    8    9    10   11  
+DEAL:L::Block 1   2    3    12   13   14   15   16   17   18   19   20   21  
+DEAL:L::Block 2   6    7    22   23   24   25   26   27   28   29   30   31  
+DEAL:L::Block 3   16   17   24   25   32   33   34   35   36   37   38   39  
+DEAL:L::Block 4   12   13   40   41   42   43   44   45   46   47   48   49  
+DEAL:L::Block 5   40   41   50   51   52   53   54   55   56   57   58   59  
+DEAL:L::Block 6   32   33   44   45   60   61   62   63   64   65   66   67  
+DEAL:L::Block 7   54   55   60   61   68   69   70   71   72   73   74   75  
+DEAL:L::Block 8   26   27   76   77   78   79   80   81   82   83   84   85  
+DEAL:L::Block 9   34   35   78   79   86   87   88   89   90   91   92   93  
+DEAL:L::Block 10  80   81   94   95   96   97   98   99   100  101  102  103 
+DEAL:L::Block 11  88   89   96   97   104  105  106  107  108  109  110  111 
+DEAL:L::Block 12  62   63   86   87   112  113  114  115  116  117  118  119 
+DEAL:L::Block 13  70   71   112  113  120  121  122  123  124  125  126  127 
+DEAL:L::Block 14  104  105  114  115  128  129  130  131  132  133  134  135 
+DEAL:L::Block 15  122  123  128  129  136  137  138  139  140  141  142  143 
+DEAL:L::Block 16  50   51   144  145  146  147  148  149  150  151  152  153 
+DEAL:L::Block 17  144  145  154  155  156  157  158  159  160  161  162  163 
+DEAL:L::Block 18  68   69   148  149  164  165  166  167  168  169  170  171 
+DEAL:L::Block 19  158  159  164  165  172  173  174  175  176  177  178  179 
+DEAL:L::Block 20  154  155  180  181  182  183  184  185  186  187  188  189 
+DEAL:L::Block 21  180  181  190  191  192  193  194  195  196  197  198  199 
+DEAL:L::Block 22  172  173  184  185  200  201  202  203  204  205  206  207 
+DEAL:L::Block 23  194  195  200  201  208  209  210  211  212  213  214  215 
+DEAL:L::Block 24  120  121  166  167  216  217  218  219  220  221  222  223 
+DEAL:L::Block 25  174  175  216  217  224  225  226  227  228  229  230  231 
+DEAL:L::Block 26  136  137  218  219  232  233  234  235  236  237  238  239 
+DEAL:L::Block 27  226  227  232  233  240  241  242  243  244  245  246  247 
+DEAL:L::Block 28  202  203  224  225  248  249  250  251  252  253  254  255 
+DEAL:L::Block 29  210  211  248  249  256  257  258  259  260  261  262  263 
+DEAL:L::Block 30  240  241  250  251  264  265  266  267  268  269  270  271 
+DEAL:L::Block 31  258  259  264  265  272  273  274  275  276  277  278  279 
+DEAL:L::Block 32  98   99   280  281  282  283  284  285  286  287  288  289 
+DEAL:L::Block 33  106  107  282  283  290  291  292  293  294  295  296  297 
+DEAL:L::Block 34  284  285  298  299  300  301  302  303  304  305  306  307 
+DEAL:L::Block 35  292  293  300  301  308  309  310  311  312  313  314  315 
+DEAL:L::Block 36  130  131  290  291  316  317  318  319  320  321  322  323 
+DEAL:L::Block 37  138  139  316  317  324  325  326  327  328  329  330  331 
+DEAL:L::Block 38  308  309  318  319  332  333  334  335  336  337  338  339 
+DEAL:L::Block 39  326  327  332  333  340  341  342  343  344  345  346  347 
+DEAL:L::Block 40  302  303  348  349  350  351  352  353  354  355  356  357 
+DEAL:L::Block 41  310  311  350  351  358  359  360  361  362  363  364  365 
+DEAL:L::Block 42  352  353  366  367  368  369  370  371  372  373  374  375 
+DEAL:L::Block 43  360  361  368  369  376  377  378  379  380  381  382  383 
+DEAL:L::Block 44  334  335  358  359  384  385  386  387  388  389  390  391 
+DEAL:L::Block 45  342  343  384  385  392  393  394  395  396  397  398  399 
+DEAL:L::Block 46  376  377  386  387  400  401  402  403  404  405  406  407 
+DEAL:L::Block 47  394  395  400  401  408  409  410  411  412  413  414  415 
+DEAL:L::FE_DGQ<2>(2)
+DEAL:L::Block 0   0    1    2    3    4    5    6    7    8   
+DEAL:L::Block 1   9    10   11   12   13   14   15   16   17  
+DEAL:L::Block 2   18   19   20   21   22   23   24   25   26  
+DEAL:L::Block 3   27   28   29   30   31   32   33   34   35  
+DEAL:L::Block 4   36   37   38   39   40   41   42   43   44  
+DEAL:L::Block 5   45   46   47   48   49   50   51   52   53  
+DEAL:L::Block 6   54   55   56   57   58   59   60   61   62  
+DEAL:L::Block 7   63   64   65   66   67   68   69   70   71  
+DEAL:L::Block 8   72   73   74   75   76   77   78   79   80  
+DEAL:L::Block 9   81   82   83   84   85   86   87   88   89  
+DEAL:L::Block 10  90   91   92   93   94   95   96   97   98  
+DEAL:L::Block 11  99   100  101  102  103  104  105  106  107 
+DEAL:L::Block 12  108  109  110  111  112  113  114  115  116 
+DEAL:L::Block 13  117  118  119  120  121  122  123  124  125 
+DEAL:L::Block 14  126  127  128  129  130  131  132  133  134 
+DEAL:L::Block 15  135  136  137  138  139  140  141  142  143 
+DEAL:L::Block 16  144  145  146  147  148  149  150  151  152 
+DEAL:L::Block 17  153  154  155  156  157  158  159  160  161 
+DEAL:L::Block 18  162  163  164  165  166  167  168  169  170 
+DEAL:L::Block 19  171  172  173  174  175  176  177  178  179 
+DEAL:L::Block 20  180  181  182  183  184  185  186  187  188 
+DEAL:L::Block 21  189  190  191  192  193  194  195  196  197 
+DEAL:L::Block 22  198  199  200  201  202  203  204  205  206 
+DEAL:L::Block 23  207  208  209  210  211  212  213  214  215 
+DEAL:L::Block 24  216  217  218  219  220  221  222  223  224 
+DEAL:L::Block 25  225  226  227  228  229  230  231  232  233 
+DEAL:L::Block 26  234  235  236  237  238  239  240  241  242 
+DEAL:L::Block 27  243  244  245  246  247  248  249  250  251 
+DEAL:L::Block 28  252  253  254  255  256  257  258  259  260 
+DEAL:L::Block 29  261  262  263  264  265  266  267  268  269 
+DEAL:L::Block 30  270  271  272  273  274  275  276  277  278 
+DEAL:L::Block 31  279  280  281  282  283  284  285  286  287 
+DEAL:L::Block 32  288  289  290  291  292  293  294  295  296 
+DEAL:L::Block 33  297  298  299  300  301  302  303  304  305 
+DEAL:L::Block 34  306  307  308  309  310  311  312  313  314 
+DEAL:L::Block 35  315  316  317  318  319  320  321  322  323 
+DEAL:L::Block 36  324  325  326  327  328  329  330  331  332 
+DEAL:L::Block 37  333  334  335  336  337  338  339  340  341 
+DEAL:L::Block 38  342  343  344  345  346  347  348  349  350 
+DEAL:L::Block 39  351  352  353  354  355  356  357  358  359 
+DEAL:L::Block 40  360  361  362  363  364  365  366  367  368 
+DEAL:L::Block 41  369  370  371  372  373  374  375  376  377 
+DEAL:L::Block 42  378  379  380  381  382  383  384  385  386 
+DEAL:L::Block 43  387  388  389  390  391  392  393  394  395 
+DEAL:L::Block 44  396  397  398  399  400  401  402  403  404 
+DEAL:L::Block 45  405  406  407  408  409  410  411  412  413 
+DEAL:L::Block 46  414  415  416  417  418  419  420  421  422 
+DEAL:L::Block 47  423  424  425  426  427  428  429  430  431 
+DEAL:L::FE_Nedelec<2>(1)
+DEAL:L::Block 0   0    1    2    3    4    5    6    7    8    9    10   11  
+DEAL:L::Block 1   2    3    12   13   14   15   16   17   18   19   20   21  
+DEAL:L::Block 2   6    7    22   23   24   25   26   27   28   29   30   31  
+DEAL:L::Block 3   16   17   24   25   32   33   34   35   36   37   38   39  
+DEAL:L::Block 4   12   13   40   41   42   43   44   45   46   47   48   49  
+DEAL:L::Block 5   40   41   50   51   52   53   54   55   56   57   58   59  
+DEAL:L::Block 6   32   33   44   45   60   61   62   63   64   65   66   67  
+DEAL:L::Block 7   54   55   60   61   68   69   70   71   72   73   74   75  
+DEAL:L::Block 8   26   27   76   77   78   79   80   81   82   83   84   85  
+DEAL:L::Block 9   34   35   78   79   86   87   88   89   90   91   92   93  
+DEAL:L::Block 10  80   81   94   95   96   97   98   99   100  101  102  103 
+DEAL:L::Block 11  88   89   96   97   104  105  106  107  108  109  110  111 
+DEAL:L::Block 12  62   63   86   87   112  113  114  115  116  117  118  119 
+DEAL:L::Block 13  70   71   112  113  120  121  122  123  124  125  126  127 
+DEAL:L::Block 14  104  105  114  115  128  129  130  131  132  133  134  135 
+DEAL:L::Block 15  122  123  128  129  136  137  138  139  140  141  142  143 
+DEAL:L::Block 16  50   51   144  145  146  147  148  149  150  151  152  153 
+DEAL:L::Block 17  144  145  154  155  156  157  158  159  160  161  162  163 
+DEAL:L::Block 18  68   69   148  149  164  165  166  167  168  169  170  171 
+DEAL:L::Block 19  158  159  164  165  172  173  174  175  176  177  178  179 
+DEAL:L::Block 20  154  155  180  181  182  183  184  185  186  187  188  189 
+DEAL:L::Block 21  180  181  190  191  192  193  194  195  196  197  198  199 
+DEAL:L::Block 22  172  173  184  185  200  201  202  203  204  205  206  207 
+DEAL:L::Block 23  194  195  200  201  208  209  210  211  212  213  214  215 
+DEAL:L::Block 24  120  121  166  167  216  217  218  219  220  221  222  223 
+DEAL:L::Block 25  174  175  216  217  224  225  226  227  228  229  230  231 
+DEAL:L::Block 26  136  137  218  219  232  233  234  235  236  237  238  239 
+DEAL:L::Block 27  226  227  232  233  240  241  242  243  244  245  246  247 
+DEAL:L::Block 28  202  203  224  225  248  249  250  251  252  253  254  255 
+DEAL:L::Block 29  210  211  248  249  256  257  258  259  260  261  262  263 
+DEAL:L::Block 30  240  241  250  251  264  265  266  267  268  269  270  271 
+DEAL:L::Block 31  258  259  264  265  272  273  274  275  276  277  278  279 
+DEAL:L::Block 32  98   99   280  281  282  283  284  285  286  287  288  289 
+DEAL:L::Block 33  106  107  282  283  290  291  292  293  294  295  296  297 
+DEAL:L::Block 34  284  285  298  299  300  301  302  303  304  305  306  307 
+DEAL:L::Block 35  292  293  300  301  308  309  310  311  312  313  314  315 
+DEAL:L::Block 36  130  131  290  291  316  317  318  319  320  321  322  323 
+DEAL:L::Block 37  138  139  316  317  324  325  326  327  328  329  330  331 
+DEAL:L::Block 38  308  309  318  319  332  333  334  335  336  337  338  339 
+DEAL:L::Block 39  326  327  332  333  340  341  342  343  344  345  346  347 
+DEAL:L::Block 40  302  303  348  349  350  351  352  353  354  355  356  357 
+DEAL:L::Block 41  310  311  350  351  358  359  360  361  362  363  364  365 
+DEAL:L::Block 42  352  353  366  367  368  369  370  371  372  373  374  375 
+DEAL:L::Block 43  360  361  368  369  376  377  378  379  380  381  382  383 
+DEAL:L::Block 44  334  335  358  359  384  385  386  387  388  389  390  391 
+DEAL:L::Block 45  342  343  384  385  392  393  394  395  396  397  398  399 
+DEAL:L::Block 46  376  377  386  387  400  401  402  403  404  405  406  407 
+DEAL:L::Block 47  394  395  400  401  408  409  410  411  412  413  414  415 
