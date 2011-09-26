@@ -23,8 +23,7 @@
 #if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
 #include <mpi.h>
 #else
-
-extern boost::mutex m;typedef int MPI_Comm;
+  typedef int MPI_Comm;
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
