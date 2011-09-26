@@ -779,25 +779,10 @@ namespace Utilities
     }
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-
     bool job_supports_mpi ()
     {
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-
-      return (MPI_has_been_started > 0);
+      return program_uses_mpi;
     }
-
-
-#else
-
-    bool job_supports_mpi ()
-    {
-      return false;
-    }
-
-#endif
 
 
 

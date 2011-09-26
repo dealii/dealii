@@ -121,6 +121,12 @@ is now deprecated.
 <br>
 (Wolfgang Bangerth, 2011/09/26)
 
+<li> Removed: Utilities::System::program_uses_mpi does exactly the same thing
+as Utilities::System::job_supports_mpi. The former has therefore been
+deprecated.
+<br>
+(Wolfgang Bangerth, 2011/09/26)
+
 <li> New: When using a new enough version of GCC, debug sections in
 object files are now compressed using the <code>-Wa,--compress-debug-sections</code>
 flag, resulting in savings in disk space on the order of 230 MB.

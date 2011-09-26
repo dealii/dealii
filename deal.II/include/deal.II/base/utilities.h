@@ -495,6 +495,23 @@ namespace Utilities
     bool job_supports_mpi ();
 
 				     /**
+				      * Alias for job_supports_mpi().
+				      *
+				      * @deprecated
+				      */
+    bool program_uses_mpi();
+
+				     /**
+				      * @name Functions that work
+				      * in parallel via MPI. The
+				      * functions following here
+				      * are all deprecated and have
+				      * been moved to namespace
+				      * Utilities::MPI.
+				      */
+				     /** @{ */
+
+				     /**
 				      * This function is an alias for
 				      * Utilities::MPI::n_mpi_processes.
 				      *
@@ -546,6 +563,7 @@ namespace Utilities
 					  const double my_value,
 					  MinMaxAvg & result);
 
+				     /** @} */
 
 
 				     /**
@@ -608,14 +626,6 @@ namespace Utilities
 					  */
 	const bool owns_mpi;
     };
-
-				     /**
-				      * Returns whether deal.II has been
-				      * configured to use MPI and if so
-				      * whether MPI has already been
-				      * initialized using MPI_Init().
-				      */
-    bool program_uses_mpi();
   }
 
 
