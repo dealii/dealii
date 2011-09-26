@@ -1372,15 +1372,7 @@ namespace Step32
 					   velocity_values[q].norm());
 	}
 
-    double max_velocity = 0.;
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&max_local_velocity, &max_velocity, 1, MPI_DOUBLE,
-		   MPI_MAX, MPI_COMM_WORLD);
-#else
-    max_velocity = max_local_velocity;
-#endif
-
-    return max_velocity;
+    return Utilities::MPI::max (max_local_velocity, MPI_COMM_WORLD);
   }
 
 
@@ -1422,15 +1414,7 @@ namespace Step32
 				   max_local_velocity / cell->diameter());
 	}
 
-    double max_cfl_number = 0.;
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&max_local_cfl, &max_cfl_number, 1, MPI_DOUBLE,
-		   MPI_MAX, MPI_COMM_WORLD);
-#else
-    max_cfl_number = max_local_cfl;
-#endif
-
-    return max_cfl_number;
+    return Utilities::MPI::max (max_local_cfl, MPI_COMM_WORLD);
   }
 
 
@@ -1491,23 +1475,13 @@ namespace Step32
 				     // for maximum and minimum. combine
 				     // MPI_Allreduce for two values since that is
 				     // an expensive operation
-    double local_for_sum[2], global_for_sum[2];
-    double local_for_max[2], global_for_max[2];
-    local_for_sum[0] = entropy_integrated;
-    local_for_sum[1] = area;
-    local_for_max[0] = -min_entropy;
-    local_for_max[1] = max_entropy;
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&local_for_sum[0], &global_for_sum[0], 2, MPI_DOUBLE,
-		   MPI_SUM, MPI_COMM_WORLD);
-    MPI_Allreduce (&local_for_max[0], &global_for_max[0], 2, MPI_DOUBLE,
-		   MPI_MAX, MPI_COMM_WORLD);
-#else
-    global_for_sum[0] = local_for_sum[0];
-    global_for_sum[1] = local_for_sum[1];
-    global_for_max[0] = local_for_max[0];
-    global_for_max[1] = local_for_max[1];
-#endif
+    const double local_for_sum[2] = { entropy_integrated, area },
+		 local_for_max[2] = { -min_entropy, max_entropy };
+    double global_for_sum[2], global_for_max[2];
+
+    Utilities::MPI::sum (local_for_sum, MPI_COMM_WORLD, global_for_sum);
+    Utilities::MPI::max (local_for_max, MPI_COMM_WORLD, global_for_max);
+
     const double average_entropy = global_for_sum[0] / global_for_sum[1];
     const double entropy_diff = std::max(global_for_max[1] - average_entropy,
 					 average_entropy - (-global_for_max[0]));
@@ -1600,18 +1574,10 @@ namespace Step32
 	    }
       }
 
-    double min_temperature, max_temperature;
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    MPI_Allreduce (&max_local_temperature, &max_temperature, 1, MPI_DOUBLE,
-		   MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce (&min_local_temperature, &min_temperature, 1, MPI_DOUBLE,
-		   MPI_MIN, MPI_COMM_WORLD);
-#else
-    min_temperature = min_local_temperature;
-    max_temperature = max_local_temperature;
-#endif
-
-    return std::make_pair(min_temperature, max_temperature);
+    return std::make_pair(-Utilities::MPI::max (-min_local_temperature,
+						MPI_COMM_WORLD),
+			  Utilities::MPI::max (max_local_temperature,
+					       MPI_COMM_WORLD));
   }
 
 
@@ -3292,9 +3258,10 @@ namespace Step32
       computing_timer.exit_section();
 
 				       // extract temperature range
-      std::vector<double> temperature (2), global_temperature (2);
-      temperature[0] = std::numeric_limits<double>::max(),
-      temperature[1] = -std::numeric_limits<double>::max();
+      double temperature[2] = { std::numeric_limits<double>::max(),
+				-std::numeric_limits<double>::max() };
+      double global_temperature[2];
+
       for (unsigned int i=0; i<distributed_temperature_solution.local_size(); ++i)
 	{
 	  temperature[0] = std::min<double> (temperature[0],
@@ -3302,14 +3269,10 @@ namespace Step32
 	  temperature[1] = std::max<double> (temperature[1],
 					     distributed_temperature_solution.trilinos_vector()[0][i]);
 	}
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
       temperature[0] *= -1.0;
-      MPI_Allreduce (&temperature[0], &global_temperature[0],
-		     2, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      Utilities::MPI::max (temperature, MPI_COMM_WORLD, global_temperature);
       global_temperature[0] *= -1.0;
-#else
-      global_temperature = local_temperature;
-#endif
 
       pcout << "   Temperature range: "
 	    << global_temperature[0] << ' ' << global_temperature[1]
