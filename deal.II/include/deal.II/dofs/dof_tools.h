@@ -1437,7 +1437,25 @@ namespace DoFTools
 					  const types::subdomain_id_t subdomain);
 
 				   // @}
-
+				   /**
+				    * @name Dof indices for patches
+				    */
+				   //@{
+				   /**
+				    * Create a sparsity pattern which
+				    * in each row lists the degrees of
+				    * freedom associated to the
+				    * corresponding cell.
+				    *
+				    * Ordering follows the ordering of
+				    * the standard cell iterators.
+				    */
+  template <class DH, class Sparsity>
+  void make_cell_patches(Sparsity& block_list,
+			 const DH& dof_handler,
+			 const unsigned int level);
+  
+				   //@}
 				   /**
 				    * Extract a vector that represents the
 				    * constant modes of the DoFHandler for
