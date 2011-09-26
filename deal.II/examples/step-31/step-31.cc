@@ -2893,7 +2893,7 @@ namespace Step31
 				 // MPI. Nevertheless, Trilinos wants the MPI
 				 // system to be initialized. We do that be
 				 // creating an object of type
-				 // Utilities::System::MPI_InitFinalize that
+				 // Utilities::MPI::MPI_InitFinalize that
 				 // initializes MPI (if available) using the
 				 // arguments given to main() (i.e.,
 				 // <code>argc</code> and <code>argv</code>)
@@ -2908,7 +2908,7 @@ int main (int argc, char *argv[])
 
       deallog.depth_console (0);
 
-      Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
       BoussinesqFlowProblem<2> flow_problem;
       flow_problem.run ();

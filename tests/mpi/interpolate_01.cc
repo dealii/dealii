@@ -79,7 +79,7 @@ void test()
 int main(int argc, char *argv[])
 {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  Utilities::System::MPI_InitFinalize mpi (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi (argc, argv);
 #else
   (void)argc;
   (void)argv;

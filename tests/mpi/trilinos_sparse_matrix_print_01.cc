@@ -80,7 +80,7 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

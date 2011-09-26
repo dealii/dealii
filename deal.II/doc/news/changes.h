@@ -113,8 +113,11 @@ is now Utilities::MPI::compute_point_to_point_communication_pattern;
 Utilities::System::duplicate_communicator
 is now Utilities::MPI::duplicate_communicator;
 Utilities::System::calculate_collective_mpi_min_max_avg
-is now Utilities::MPI::min_max_avg.
-In addition, some of the arguments of these functions have changed.
+is now Utilities::MPI::min_max_avg;
+Utilities::System::MPI_InitFinalize
+is now Utilities::MPI::MPI_InitFinalize.
+In addition, some of the arguments of these functions or classes
+have changed.
 <br>
 The previous functions should still be available, though their use
 is now deprecated.

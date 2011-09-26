@@ -386,7 +386,7 @@ namespace Utilities
 
 				     /**
 				      * Data structure to store the result of
-				      * calculate_collective_mpi_min_max_avg.
+				      * min_max_avg().
 				      */
     struct MinMaxAvg
     {
@@ -405,13 +405,75 @@ namespace Utilities
 				      * on the given MPI communicator @param
 				      * mpi_communicator . Each processor's
 				      * value is given in @param my_value and
-				      * the result will be returned in @param
+				      * the result will be returned in @p
 				      * result . The result is available on all
 				      * machines.
 				      */
     MinMaxAvg
     min_max_avg (const double my_value,
 		 const MPI_Comm &mpi_communicator);
+
+
+
+				     /**
+				      * A class that is used to initialize the
+				      * MPI system at the beginning of a
+				      * program and to shut it down again at
+				      * the end.
+				      *
+				      * If a program uses MPI one would
+				      * typically just create an object of
+				      * this type at the beginning of
+				      * <code>main()</code>. The constructor
+				      * of this class then runs
+				      * <code>MPI_Init()</code> with the given
+				      * arguments. At the end of the program,
+				      * the compiler will invoke the
+				      * destructor of this object which in
+				      * turns calls <code>MPI_Finalize</code>
+				      * to shut down the MPI system.
+				      *
+				      * This class is used in step-32, for example.
+				      */
+    class MPI_InitFinalize
+    {
+      public:
+					 /**
+					  * Constructor. Takes the arguments
+					  * from the command line (in case of
+					  * MPI, the number of processes is
+					  * specified there), and sets up a
+					  * respective communicator by calling
+					  * <tt>MPI_Init()</tt>. This
+					  * constructor can only be called once
+					  * in a program, since MPI cannot be
+					  * initialized twice.
+					  */
+	MPI_InitFinalize (int    &argc,
+			  char** &argv);
+
+					 /**
+					  * Destructor. Calls
+					  * <tt>MPI_Finalize()</tt> in
+					  * case this class owns the MPI
+					  * process.
+					  */
+	~MPI_InitFinalize();
+
+      private:
+					 /**
+					  * This flag tells the class
+					  * whether it owns the MPI
+					  * process (i.e., it has been
+					  * constructed using the
+					  * argc/argv input, or it has
+					  * been copied). In the former
+					  * case, the command
+					  * <tt>MPI_Finalize()</tt> will
+					  * be called at destruction.
+					  */
+	const bool owns_mpi;
+    };
   }
                                    /**
                                     * A namespace for utility functions that
@@ -563,69 +625,14 @@ namespace Utilities
 					  const double my_value,
 					  MinMaxAvg & result);
 
-				     /** @} */
-
-
 				     /**
-				      * A class that is used to initialize the
-				      * MPI system at the beginning of a
-				      * program and to shut it down again at
-				      * the end.
+				      * An alias for Utilities::MPI::MPI_InitFinalize.
 				      *
-				      * If a program uses MPI one would
-				      * typically just create an object of
-				      * this type at the beginning of
-				      * <code>main()</code>. The constructor
-				      * of this class then runs
-				      * <code>MPI_Init()</code> with the given
-				      * arguments. At the end of the program,
-				      * the compiler will invoke the
-				      * destructor of this object which in
-				      * turns calls <code>MPI_Finalize</code>
-				      * to shut down the MPI system.
-				      *
-				      * This class is used in @ref step_32
-				      * "step-32", for example.
+				      * @deprecated
 				      */
-    class MPI_InitFinalize
-    {
-      public:
-					 /**
-					  * Constructor. Takes the arguments
-					  * from the command line (in case of
-					  * MPI, the number of processes is
-					  * specified there), and sets up a
-					  * respective communicator by calling
-					  * <tt>MPI_Init()</tt>. This
-					  * constructor can only be called once
-					  * in a program, since MPI cannot be
-					  * initialized twice.
-					  */
-	MPI_InitFinalize (int    &argc,
-			  char** &argv);
+    using Utilities::MPI::MPI_InitFinalize;
 
-					 /**
-					  * Destructor. Calls
-					  * <tt>MPI_Finalize()</tt> in
-					  * case this class owns the MPI
-					  * process.
-					  */
-	~MPI_InitFinalize();
-
-      private:
-					 /**
-					  * This flag tells the class
-					  * whether it owns the MPI
-					  * process (i.e., it has been
-					  * constructed using the
-					  * argc/argv input, or it has
-					  * been copied). In the former
-					  * case, the command
-					  * <tt>MPI_Finalize()</tt> will
-					  * be called at destruction.
-					  */
-	const bool owns_mpi;
-    };
+				     /** @} */
   }
 
 

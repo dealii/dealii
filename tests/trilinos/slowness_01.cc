@@ -111,7 +111,7 @@ int main (int argc,char **argv)
   deallog.attach(logfile);
   deallog.depth_console(0);
 
-  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   try
     {

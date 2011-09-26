@@ -3951,7 +3951,7 @@ int main (int argc, char *argv[])
   using namespace Step32;
   using namespace dealii;
 
-  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   try
     {

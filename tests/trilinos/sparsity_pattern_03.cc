@@ -19,7 +19,7 @@
 
 int main (int argc, char** argv)
 {
-  Utilities::System::MPI_InitFinalize mpi_init (argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
 
   std::ofstream logfile("sparsity_pattern_03/output");
   logfile.setf(std::ios::fixed);

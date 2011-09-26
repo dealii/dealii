@@ -173,7 +173,7 @@ void test()
 int main(int argc, char *argv[])
 {
   {
-    Utilities::System::MPI_InitFinalize mpi_init (argc, argv);
+    Utilities::MPI::MPI_InitFinalize mpi_init (argc, argv);
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
