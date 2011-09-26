@@ -1012,9 +1012,21 @@ namespace Utilities
       }
 
 
+      inline MPI_Datatype mpi_type_id (const long int *)
+      {
+	return MPI_LONG;
+      }
+
+
       inline MPI_Datatype mpi_type_id (const unsigned int *)
       {
 	return MPI_UNSIGNED;
+      }
+
+
+      inline MPI_Datatype mpi_type_id (const unsigned long int *)
+      {
+	return MPI_UNSIGNED_LONG;
       }
 
 

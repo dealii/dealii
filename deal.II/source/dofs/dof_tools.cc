@@ -4653,8 +4653,7 @@ namespace DoFTools
 	    ExcInternalError());
 
 				     // reduce information from all CPUs
-#ifdef DEAL_II_USE_P4EST
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#if defined(DEAL_II_USE_P4EST) && defined(DEAL_II_COMPILER_SUPPORTS_MPI)
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
 
@@ -4667,7 +4666,6 @@ namespace DoFTools
 	MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
 			MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
       }
-#endif
 #endif
   }
 

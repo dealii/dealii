@@ -187,9 +187,7 @@ namespace GridTools
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     if (const parallel::distributed::Triangulation<dim,spacedim>* p_tria
 	= dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation))
-      MPI_Allreduce (&local_volume, &global_volume, 1, MPI_DOUBLE,
-		     MPI_SUM,
-		     p_tria->get_communicator());
+      global_volume = Utilities::MPI::sum (local_volume, p_tria->get_communicator());
     else
       global_volume = local_volume;
 #else

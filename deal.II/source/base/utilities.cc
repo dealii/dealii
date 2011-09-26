@@ -520,11 +520,8 @@ namespace Utilities
 				       // communicate the maximal
 				       // number of destinations they
 				       // have
-      unsigned int my_n_destinations = destinations.size();
-      unsigned int max_n_destinations = 0;
-
-      MPI_Allreduce (&my_n_destinations, &max_n_destinations, 1, MPI_UNSIGNED,
-		    MPI_MAX, mpi_comm);
+      const unsigned int max_n_destinations
+	= Utilities::MPI::max (destinations.size(), mpi_comm);
 
 				       // now that we know the number
 				       // of data packets every
@@ -638,7 +635,7 @@ namespace Utilities
       AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
 
       ierr = MPI_Type_commit(&type);
-      ierr = MPI_Allreduce ( &in, &result, 1, type, op, mpi_communicator );
+      ierr = MPI_Allreduce (&in, &result, 1, type, op, mpi_communicator);
       AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
 
       ierr = MPI_Type_free (&type);

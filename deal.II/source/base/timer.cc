@@ -156,46 +156,12 @@ double Timer::operator() () const
 				   // in case we just want to have the time
 				   // of a single thread, since then the
 				   // communicator is MPI_COMM_SELF
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      double local_time = dtime - start_time + dtime_children
-	- start_time_children + cumulative_time;
-
-      int mpiInitialized;
-      MPI_Initialized(&mpiInitialized);
-
-      if ( mpiInitialized )
-	{
-	  double global_time = 0.;
-	  MPI_Allreduce (&local_time, &global_time, 1, MPI_DOUBLE, MPI_SUM,
-			 mpi_communicator);
-	  return global_time;
-	}
-      else
-	return local_time;
-#else
-      return dtime - start_time + dtime_children - start_time_children + cumulative_time;
-#endif
+      return Utilities::MPI::sum (dtime - start_time + dtime_children
+				  - start_time_children + cumulative_time,
+				  mpi_communicator);
     }
   else
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    {
-      int mpiInitialized;
-      MPI_Initialized(&mpiInitialized);
-
-      if ( mpiInitialized )
-	{
-	  double local_time = cumulative_time;
-	  double global_time = 0.;
-	  MPI_Allreduce (&local_time, &global_time, 1, MPI_DOUBLE, MPI_SUM,
-			 mpi_communicator);
-	  return global_time;
-	}
-      else
-	return cumulative_time;
-    }
-#else
-    return cumulative_time;
-#endif
+    return Utilities::MPI::sum (cumulative_time, mpi_communicator);
 }
 
 
@@ -358,25 +324,8 @@ TimerOutput::leave_subsection (const std::string &section_name)
 				       // itself, but we didn't initialize
 				       // the Timers here according to that
   double cpu_time = sections[actual_section_name].timer();
-  {
-
-				// On MPI, sum up all the local CPU
-				// times.
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    double total_cpu_time = 0.;
-    int mpiInitialized;
-    MPI_Initialized(&mpiInitialized);
-
-    if( mpiInitialized )
-      {
-	MPI_Allreduce (&cpu_time, &total_cpu_time, 1, MPI_DOUBLE, MPI_SUM,
-		       mpi_communicator);
-	cpu_time = total_cpu_time;
-      }
-#endif
-    sections[actual_section_name].total_cpu_time += cpu_time;
-  }
-
+  sections[actual_section_name].total_cpu_time
+    += Utilities::MPI::sum (cpu_time, mpi_communicator);
 
 				   // in case we have to print out
 				   // something, do that here...
@@ -419,25 +368,8 @@ TimerOutput::print_summary () const
 				   // in case we want to write CPU times
   if (output_type != wall_times)
     {
-      double total_cpu_time;
-
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      {
-	double my_cpu_time = timer_all();
-	int mpiInitialized;
-	MPI_Initialized(&mpiInitialized);
-
-	if( mpiInitialized )
-	  {
-	    MPI_Allreduce (&my_cpu_time, &total_cpu_time, 1, MPI_DOUBLE,
-			   MPI_SUM, mpi_communicator);
-	  }
-	else
-	  total_cpu_time = my_cpu_time;
-      }
-#else
-      total_cpu_time = timer_all();
-#endif
+      double total_cpu_time = Utilities::MPI::sum (timer_all(),
+						   mpi_communicator);
 
 				       // check that the sum of all times is
 				       // less or equal than the total

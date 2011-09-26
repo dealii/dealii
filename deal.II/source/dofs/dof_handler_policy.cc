@@ -1505,9 +1505,8 @@ namespace internal
 	  unsigned int my_size = oss_str.size();
 
 					   // determine maximum size of IndexSet
-	  unsigned int max_size;
-
-	  MPI_Allreduce(&my_size, &max_size, 1, MPI_UNSIGNED, MPI_MAX, tr->get_communicator());
+	  const unsigned int max_size
+	    = Utilities::MPI::max (my_size, tr->get_communicator());
 
 					   // as we are reading past the end, we
 					   // need to increase the size of the
