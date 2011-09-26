@@ -2880,14 +2880,25 @@ namespace Step31
 				 // @sect3{The <code>main</code> function}
 				 //
 				 // The main function looks almost the same
-				 // as in all other programs. The only
-				 // difference is that Trilinos wants to get
-				 // the arguments from calling the function
-				 // (argc and argv) in order to correctly
-				 // set up the MPI system in case those
-				 // compilers are in use (even though this
-				 // program is only meant to be run on one
-				 // processor).
+				 // as in all other programs.
+				 //
+				 // There is one difference we have to be
+				 // careful about. This program uses Trilinos
+				 // and, typically, Trilinos is configured so
+				 // that it can run in %parallel using
+				 // MPI. This doesn't mean that it <i>has</i>
+				 // to run in %parallel, and in fact this
+				 // program (unlike step-32) makes no attempt
+				 // at all to do anything in %parallel using
+				 // MPI. Nevertheless, Trilinos wants the MPI
+				 // system to be initialized. We do that be
+				 // creating an object of type
+				 // Utilities::System::MPI_InitFinalize that
+				 // initializes MPI (if available) using the
+				 // arguments given to main() (i.e.,
+				 // <code>argc</code> and <code>argv</code>)
+				 // and de-initializes it again when the
+				 // object goes out of scope.
 int main (int argc, char *argv[])
 {
   try
