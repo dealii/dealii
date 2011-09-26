@@ -452,7 +452,10 @@ ComponentSelectFunction (const unsigned int selected,
 		:
 		ConstantFunction<dim> (1., n_components),
                 selected_components(std::make_pair(selected,selected+1))
-{}
+{
+  Assert (selected < n_components,
+	  ExcIndexRange (selected, 0, n_components));
+}
 
 
 
