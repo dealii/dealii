@@ -15,10 +15,10 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/utilities.h>
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-#include <mpi.h>
-#include <deal.II/base/utilities.h>
+#  include <mpi.h>
 #endif
 
 #include <string>
@@ -506,12 +506,10 @@ class TimerOutput
 				      */
     std::list<std::string> active_sections;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				     /**
 				      * mpi communicator
 				      */
     MPI_Comm            mpi_communicator;
-#endif
 
 				     /**
 				      * A lock that makes sure that this
