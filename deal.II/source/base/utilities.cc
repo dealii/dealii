@@ -568,6 +568,90 @@ namespace Utilities
       return origins;
     }
 
+
+    namespace
+    {
+				       // custom MIP_Op for
+				       // calculate_collective_mpi_min_max_avg
+      void max_reduce ( const void * in_lhs_,
+			void * inout_rhs_,
+			int * len,
+			MPI_Datatype * )
+      {
+	const MinMaxAvg * in_lhs = static_cast<const MinMaxAvg*>(in_lhs_);
+	MinMaxAvg * inout_rhs = static_cast<MinMaxAvg*>(inout_rhs_);
+
+	Assert(*len==1, ExcInternalError());
+
+	inout_rhs->sum += in_lhs->sum;
+	if (inout_rhs->min>in_lhs->min)
+	  {
+	    inout_rhs->min = in_lhs->min;
+	    inout_rhs->min_index = in_lhs->min_index;
+	  }
+	else if (inout_rhs->min == in_lhs->min)
+	  { // choose lower cpu index when tied to make operator cumutative
+	    if (inout_rhs->min_index > in_lhs->min_index)
+	      inout_rhs->min_index = in_lhs->min_index;
+	  }
+
+	if (inout_rhs->max < in_lhs->max)
+	  {
+	  inout_rhs->max = in_lhs->max;
+	  inout_rhs->max_index = in_lhs->max_index;
+	  }
+	else if (inout_rhs->max == in_lhs->max)
+	  { // choose lower cpu index when tied to make operator cumutative
+	    if (inout_rhs->max_index > in_lhs->max_index)
+	      inout_rhs->max_index = in_lhs->max_index;
+	  }
+      }
+    }
+
+
+
+    MinMaxAvg
+    min_max_avg(const double my_value,
+		const MPI_Comm &mpi_communicator)
+    {
+      MinMaxAvg result;
+
+      const unsigned int my_id
+	= dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
+      const unsigned int numproc
+	= dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
+
+      MPI_Op op;
+      int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+      MinMaxAvg in;
+      in.sum = in.min = in.max = my_value;
+      in.min_index = in.max_index = my_id;
+
+      MPI_Datatype type;
+      int lengths[]={3,2};
+      MPI_Aint displacements[]={0,offsetof(MinMaxAvg, min_index)};
+      MPI_Datatype types[]={MPI_DOUBLE, MPI_INT};
+
+      ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+      ierr = MPI_Type_commit(&type);
+      ierr = MPI_Allreduce ( &in, &result, 1, type, op, mpi_communicator );
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+      ierr = MPI_Type_free (&type);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+      ierr = MPI_Op_free(&op);
+      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
+
+      result.avg = result.sum / numproc;
+
+      return result;
+    }
+
 #else
 
     unsigned int get_n_mpi_processes (const MPI_Comm &)
@@ -587,7 +671,26 @@ namespace Utilities
     {
       return mpi_communicator;
     }
-#endif    
+
+
+
+
+    void min_max_avg(const double my_value,
+		     const MPI_Comm &)
+    {
+      MinMaxAvg result;
+
+      result.sum = my_value;
+      result.avg = my_value;
+      result.min = my_value;
+      result.max = my_value;
+      result.min_index = 0;
+      result.max_index = 0;
+
+      return result;
+    }
+
+#endif
   }
 
 
@@ -687,110 +790,12 @@ namespace Utilities
     }
 
 
-    namespace
-    {
-				       // custom MIP_Op for
-				       // calculate_collective_mpi_min_max_avg
-      void max_reduce ( const void * in_lhs_,
-			void * inout_rhs_,
-			int * len,
-			MPI_Datatype * )
-      {
-	const MinMaxAvg * in_lhs = static_cast<const MinMaxAvg*>(in_lhs_);
-	MinMaxAvg * inout_rhs = static_cast<MinMaxAvg*>(inout_rhs_);
-
-	Assert(*len==1, ExcInternalError());
-
-	inout_rhs->sum += in_lhs->sum;
-	if (inout_rhs->min>in_lhs->min)
-	  {
-	    inout_rhs->min = in_lhs->min;
-	    inout_rhs->min_index = in_lhs->min_index;
-	  }
-	else if (inout_rhs->min == in_lhs->min)
-	  { // choose lower cpu index when tied to make operator cumutative
-	    if (inout_rhs->min_index > in_lhs->min_index)
-	      inout_rhs->min_index = in_lhs->min_index;
-	  }
-
-	if (inout_rhs->max < in_lhs->max)
-	  {
-	  inout_rhs->max = in_lhs->max;
-	  inout_rhs->max_index = in_lhs->max_index;
-	  }
-	else if (inout_rhs->max == in_lhs->max)
-	  { // choose lower cpu index when tied to make operator cumutative
-	    if (inout_rhs->max_index > in_lhs->max_index)
-	      inout_rhs->max_index = in_lhs->max_index;
-	  }
-      }
-    }
-
-
-
-    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
-					      double my_value,
-					      MinMaxAvg & result)
-    {
-      const unsigned int my_id
-	= dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
-      const unsigned int numproc
-	= dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
-
-      MPI_Op op;
-      int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-      MinMaxAvg in;
-      in.sum = in.min = in.max = my_value;
-      in.min_index = in.max_index = my_id;
-
-      MPI_Datatype type;
-      int lengths[]={3,2};
-      MPI_Aint displacements[]={0,offsetof(MinMaxAvg, min_index)};
-      MPI_Datatype types[]={MPI_DOUBLE, MPI_INT};
-
-      ierr = MPI_Type_struct(2, lengths, displacements, types, &type);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-      ierr = MPI_Type_commit(&type);
-      ierr = MPI_Allreduce ( &in, &result, 1, type, op, mpi_communicator );
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-      ierr = MPI_Type_free (&type);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-      ierr = MPI_Op_free(&op);
-      AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
-      result.avg = result.sum / numproc;
-    }
-
-
-
 #else
 
     bool job_supports_mpi ()
     {
       return false;
     }
-
-
-
-
-
-    void calculate_collective_mpi_min_max_avg(const MPI_Comm &,
-					      double my_value,
-					      MinMaxAvg & result)
-    {
-      result.sum = my_value;
-      result.avg = my_value;
-      result.min = my_value;
-      result.max = my_value;
-      result.min_index = 0;
-      result.max_index = 0;
-    }
-
 
 #endif
 
@@ -897,7 +902,7 @@ namespace Utilities
 #endif
     }
 
-    
+
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator)
     {
       return MPI::n_mpi_processes (mpi_communicator);
@@ -906,7 +911,19 @@ namespace Utilities
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
     {
       return MPI::this_mpi_process (mpi_communicator);
-    }    
+    }
+
+
+
+    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
+					      double my_value,
+					      MinMaxAvg & result)
+    {
+      result = Utilities::MPI::min_max_avg (my_value,
+					    mpi_communicator);
+    }
+
+
   }
 
 

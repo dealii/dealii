@@ -1162,11 +1162,10 @@ namespace TrilinosWrappers
 				     // behaviour in the call to
 				     // GlobalAssemble().
     double double_mode = mode;
-    struct Utilities::System::MinMaxAvg result;
-    Utilities::System::calculate_collective_mpi_min_max_avg(
-      dynamic_cast<const Epetra_MpiComm*>(&vector_partitioner().Comm())->GetMpiComm(),
-      double_mode,
-      result);
+    Utilities::MPI::MinMaxAvg result
+      = Utilities::MPI::min_max_avg (double_mode,
+				     dynamic_cast<const Epetra_MpiComm*>
+				     (&vector_partitioner().Comm())->GetMpiComm());
     Assert(result.max-result.min<1e-5,
 	   ExcMessage ("Not all processors agree whether the last operation on "
 		       "this vector was an addition or a set operation. This will "

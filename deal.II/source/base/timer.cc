@@ -121,9 +121,8 @@ double Timer::stop ()
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       if (sync_wall_time)
 	{
-	  Utilities::System
-	    ::calculate_collective_mpi_min_max_avg(mpi_communicator, time,
-						   this->mpi_data);
+	  this->mpi_data
+	    = Utilities::MPI::min_max_avg (time, mpi_communicator);
 
 	  cumulative_wall_time += this->mpi_data.max;
 	}

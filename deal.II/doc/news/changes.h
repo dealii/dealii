@@ -107,10 +107,17 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 functions that were previously part of Utilities::System. Specifically, the following
 functions were moved and in part renamed: Utilities::System::get_n_mpi_processes
 is now Utilities::MPI::n_mpi_processes; Utilities::System::get_this_mpi_process
-is now Utilities::MPI::this_mpi_process; Utilities::System::compute_point_to_point_communication_pattern
+is now Utilities::MPI::this_mpi_process;
+Utilities::System::compute_point_to_point_communication_pattern
 is now Utilities::MPI::compute_point_to_point_communication_pattern;
 Utilities::System::duplicate_communicator
-is now Utilities::MPI::duplicate_communicator.
+is now Utilities::MPI::duplicate_communicator;
+Utilities::System::calculate_collective_mpi_min_max_avg
+is now Utilities::MPI::min_max_avg.
+In addition, some of the arguments of these functions have changed.
+<br>
+The previous functions should still be available, though their use
+is now deprecated.
 <br>
 (Wolfgang Bangerth, 2011/09/26)
 

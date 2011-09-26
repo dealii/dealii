@@ -285,23 +285,7 @@ namespace Utilities
                                     * @ingroup utilities
                                     */
   namespace MPI
-  {    
-    /**
-     * Return the sum over all processors of the value @p t. This function
-     * is collective over all processors given in the communicator. If
-     * deal.II is not configured for use of MPI, this function simply
-     * returns the value of @p t. This function corresponds to the
-     * <code>MPI_Allreduce</code> function, i.e. all processors receive
-     * the result of this operation.
-     * 
-     * @note This function is only implemented for certain template
-     * arguments <code>T</code>, namely <code>float, double, int, 
-     * unsigned int</code>.
-     */
-    template <typename T>
-    T sum (const T &t,
-	   const MPI_Comm &mpi_communicator);
-
+  {
 				     /**
 				      * Return the number of MPI processes
 				      * there exist in the given communicator
@@ -382,7 +366,52 @@ namespace Utilities
 				      * be destroyed using
 				      * <code>MPI_Comm_free</code>.
 				      */
-    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);    
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
+
+    /**
+     * Return the sum over all processors of the value @p t. This function
+     * is collective over all processors given in the communicator. If
+     * deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p t. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e. all processors receive
+     * the result of this operation.
+     *
+     * @note This function is only implemented for certain template
+     * arguments <code>T</code>, namely <code>float, double, int,
+     * unsigned int</code>.
+     */
+    template <typename T>
+    T sum (const T &t,
+	   const MPI_Comm &mpi_communicator);
+
+				     /**
+				      * Data structure to store the result of
+				      * calculate_collective_mpi_min_max_avg.
+				      */
+    struct MinMaxAvg
+    {
+	double sum;
+	double min;
+	double max;
+	unsigned int min_index;
+	unsigned int max_index;
+	double avg;
+    };
+
+				     /**
+				      * Returns sum, average, minimum,
+				      * maximum, processor id of minimum and
+				      * maximum as a collective operation of
+				      * on the given MPI communicator @param
+				      * mpi_communicator . Each processor's
+				      * value is given in @param my_value and
+				      * the result will be returned in @param
+				      * result . The result is available on all
+				      * machines.
+				      */
+    MinMaxAvg
+    min_max_avg (const double my_value,
+		 const MPI_Comm &mpi_communicator);
   }
                                    /**
                                     * A namespace for utility functions that
@@ -466,68 +495,56 @@ namespace Utilities
     bool job_supports_mpi ();
 
 				     /**
-				      * This function is an alias for 
+				      * This function is an alias for
 				      * Utilities::MPI::n_mpi_processes.
-				      * 
+				      *
 				      * @deprecated
 				      */
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
 				     /**
-				      * This function is an alias for 
+				      * This function is an alias for
 				      * Utilities::MPI::this_mpi_process.
-				      * 
+				      *
 				      * @deprecated
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
 
 
 				     /**
-				      * This function is an alias for 
+				      * This function is an alias for
 				      * Utilities::MPI::compute_point_to_point_communication_pattern.
-				      * 
+				      *
 				      * @deprecated
 				      */
-    using 
+    using
     Utilities::MPI::compute_point_to_point_communication_pattern;
 
 
 				     /**
-				      * This function is an alias for 
+				      * This function is an alias for
 				      * Utilities::MPI::duplicate_communicator.
-				      * 
+				      *
 				      * @deprecated
 				      */
     using Utilities::MPI::duplicate_communicator;
 
 				     /**
-				      * Data structure to store the result of
-				      * calculate_collective_mpi_min_max_avg.
+				      * An alias for Utilities::MPI::MinMaxAvg.
+				      *
+				      * @deprecated
 				      */
-    struct MinMaxAvg
-    {
-	double sum;
-	double min;
-	double max;
-	unsigned int min_index;
-	unsigned int max_index;
-	double avg;
-    };
+    using Utilities::MPI::MinMaxAvg;
 
 				     /**
-				      * Returns sum, average, minimum,
-				      * maximum, processor id of minimum and
-				      * maximum as a collective operation of
-				      * on the given MPI communicator @param
-				      * mpi_communicator . Each processor's
-				      * value is given in @param my_value and
-				      * the result will be returned in @param
-				      * result . The result is available on all
-				      * machines.
+				      * An alias for Utilities::MPI::min_max_avg.
+				      *
+				      * @deprecated
 				      */
-    void calculate_collective_mpi_min_max_avg(const MPI_Comm &mpi_communicator,
-					      const double my_value,
-					      MinMaxAvg & result);
+    void
+    calculate_collective_mpi_min_max_avg (const MPI_Comm &mpi_communicator,
+					  const double my_value,
+					  MinMaxAvg & result);
 
 
 
@@ -922,13 +939,13 @@ namespace Utilities
 	  len = half;
       }
   }
-  
-  
+
+
   namespace MPI
   {
     namespace internal
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI      
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       /**
        * Return the corresponding MPI data type id for the argument given.
        */
@@ -937,7 +954,7 @@ namespace Utilities
 	return MPI_INT;
       }
 
-      
+
       inline MPI_Datatype mpi_type_id (const unsigned int *)
       {
 	return MPI_UNSIGNED;
@@ -956,7 +973,7 @@ namespace Utilities
       }
 #endif
     }
-    
+
     template <typename T>
     inline
     T sum (const T &t,
@@ -965,7 +982,7 @@ namespace Utilities
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       T sum;
       MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&t)),
-		     &sum, 1, internal::mpi_type_id(&t), MPI_SUM, 
+		     &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
 		     mpi_communicator);
       return sum;
 #else
