@@ -701,7 +701,15 @@ The setup for this program is mildly reminiscent of the problem we wanted to
 solve in the first place (see the introduction of step-31):
 convection in the earth mantle. As a consequence, we choose the following
 data, all of which appears in the program in units of meters and seconds (the
-SI system) even if we list them here in other units.
+SI system) even if we list them here in other units. We do note,
+however, that these choices are essentially still only exemplary, and
+not meant to result in a completely realistic description of
+convection in the earth mantle: for that, more and more difficult
+physics would have to be implemented, and several other aspects are
+currently missing from this program as well. We will come back to this
+issue in the results section again, but state for now that providing a
+realistic description is a goal of the <i>Apect</i> code in
+development at the time of writing this.
 
 As a reminder, let us again state the equations we want to solve are these:
 @f{eqnarray*}
@@ -735,9 +743,6 @@ the following quantities:
   GridGenerator::hyper_shell() function, and we use a HyperShellBoundary
   objects for the inner and outer boundary.
 
-  These two %numbers also provide us with the lengthscale $L$ we need for the
-  pressure scaling. We choose $L=R_1-R_0$.
-
   <li>At the interface between crust and mantle, the temperature is between
   500 and 900 degrees Celsius, whereas at its bottom it is around 4000 degrees
   Celsius (see, for example, <a target="_top"
@@ -749,8 +754,8 @@ the following quantities:
   the temperature field. The real temperature field of the earth is quite
   complicated as a consequence of the convection that has been going on for
   more than four billion years -- in fact, it is the properties of this
-  temperature distribution that we want to explore with programs like this
-  (or, to be honest, more sophisticated versions of it). As a consequence, we
+  temperature distribution that we want to explore with programs like
+  this. As a consequence, we
   don't really have anything useful to offer here, but we can hope that if we
   start with something and let things run for a while that the exact initial
   conditions don't matter that much any more. The initial temperature field we
