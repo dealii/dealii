@@ -629,12 +629,12 @@ namespace Utilities
   }
 
 
+#ifdef DEAL_II_USE_TRILINOS
   /**
    * This namespace provides some of the basic structures used in the
    * initialization of the Trilinos objects (e.g., matrices, vectors, and
    * preconditioners).
    */
-#ifdef DEAL_II_USE_TRILINOS
   namespace Trilinos
   {
 				     /**
