@@ -693,8 +693,6 @@ for this machine. On the other hand, if you want to run this program on a
 single multicore machine, then it may make sense to use threads.
 
 
-@todo talk about the input file
-
 <h3> The testcase </h3>
 
 The setup for this program is mildly reminiscent of the problem we wanted to
@@ -758,14 +756,41 @@ the following quantities:
   this. As a consequence, we
   don't really have anything useful to offer here, but we can hope that if we
   start with something and let things run for a while that the exact initial
-  conditions don't matter that much any more. The initial temperature field we
-  use here is given in terms of the radius by
+  conditions don't matter that much any more &mdash; as is in fact suggested
+  by looking at the pictures shown in the <a href="#Results">results section
+  below</a>. The initial temperature field we use here is given in terms of
+  the radius by
   @f{align*}
-    s &= \frac{r-R_0}{R_1-R_0}, \\
-    T(r) &= T_0(1-s)^2 + T_1[1-(1-s)^2].
+    s &= \frac{\|\mathbf x\|-R_0}{R_1-R_0}, \\
+    \varphi &= \atan \frac{y}{x}, \\
+    \tau &= s + \frac 15 s(1-s) \sin(6\varphi) q(z), \\
+    T(\mathbf x) &= T_0(1-\tau) + T_1\tau,
   @f}
-  This profile is quadratic and matches the boundary conditions at the inner
-  and outer radii. We will see in the results section that this is an
+  where
+  @f{align*}
+    q(z) = \left\{
+    \begin{array}{ll}
+      1 & \text{in 2d} \\
+      \max\{0, \cos(\pi |z/R_1|)\} & \text{in 3d}
+    \end{array}
+    \right. .
+  @f}
+  This complicated function is essentially a perturbation of a linear profile
+  between the inner and outer temperatures. In 2d, the function
+  $\tau=\tau(\mathbf x)$ looks like this (I got the picture from
+  <a
+  href="http://www.wolframalpha.com/input/?i=plot+%28sqrt%28x^2%2By^2%29%2B0.2*%28sqrt%28x^2%2By^2%29*%281-sqrt%28x^2%2By^2%29%29*sin%286*atan2%28x%2Cy%29%29%29%2C+x%3D-1+to+1%2C+y%3D-1+to+1">this
+  page</a>):
+
+  @image html step-32.2d-initial.png
+
+  The point of this profile is that if we had used $s$ instead of $\tau$ in
+  the definition of $T(\mathbf x)$ then it would simply be a linear
+  interpolation. $\tau$ has the same function values as $s$ on the inner and
+  outer boundaries (zero and one, respectively), but it stretches the
+  temperature profile a bit depending on the angle and the $z$ value in 3d,
+  producing an angle-dependent perturbation of the linearly interpolating
+  field. We will see in the results section that this is an
   entirely unphysical temperature field (though it will make for
   interesting images) as the equilibrium state for the temperature
   will be an almost constant temperature with boundary layers at the
@@ -812,10 +837,15 @@ the following quantities:
   tangentially, but they will incur a shear stress through friction against
   the medium at the other side of the interface (the metallic core and the
   crust, respectively). Such a situation could be modeled by a Robin-type
-  boundary condition. To make things worse, the medium on the other side is
-  in motion as well, so the shear stress would, in the simplest case, be
-  proportional to the <i>velocity difference</i>, leading to a boundary
-  condition of the form
+  boundary condition for the tangential velocity; in either case, the normal (vertical)
+  velocity would be zero, although even that is not entirely correct since
+  continental plates also have vertical motion (see, for example, the
+  phenomenon of <a
+  href="http://en.wikipedia.org/wiki/Postglacial_rebound">post-glacial
+  rebound</a>). But to already make things worse for the tangential velocity,
+  the medium on the other side is in motion as well, so the shear stress
+  would, in the simplest case, be proportional to the <i>velocity
+  difference</i>, leading to a boundary condition of the form
   @f{align*}
     \mathbf{n}\cdot [2\eta \varepsilon(\mathbf v)]
     &=
@@ -824,24 +854,27 @@ the following quantities:
     \mathbf{n} \cdot \mathbf v &= 0,
   @f}
   with a proportionality constant $s$. Rather than going down this route,
-  however, we rather stick with the choice of zero (stick) and tangential
+  however, we go with the choice of zero (stick) and tangential
   flow boundary conditions.
 
   As a side note of interest, we may also have chosen tangential flow
   conditions on both inner and outer boundary. That has a significant
   drawback, however: it leaves the velocity not uniquely defined. The reason
   is that all velocity fields $\hat{\mathbf v}$ that correspond to a solid
-  body rotation around the center of the domain satisfy $\mathrm{div}
-  \varepsilon(\hat{\mathbf v})=0, \mathrm{div} \hat{\mathbf v} = 0$, and
+  body rotation around the center of the domain satisfy $\mathrm{div}\;
+  \varepsilon(\hat{\mathbf v})=0, \mathrm{div} \;\hat{\mathbf v} = 0$, and
   $\mathbf{n} \cdot \hat{\mathbf v} = 0$. As a consequence, if $\mathbf v$
   satisfies equations and boundary conditions, then so does $\mathbf v +
   \hat{\mathbf v}$. That's certainly not a good situation that we would like
   to avoid. The traditional way to work around this is to pick an arbitrary
   point on the boundary and call this your fixed point by choosing the
-  velocity to be zero in all components there.
+  velocity to be zero in all components there. (In 3d one has to choose two
+  points.) Since this program isn't meant to be too realistic to begin with,
+  we avoid this complication by simply fixing the velocity along the entire
+  interior boundary.
 
   <li>To first order, the gravity vector always points downward. The question for
-  a body as big as the earth is just: where is "up". The answer of course is
+  a body as big as the earth is just: where is "up". The naive answer of course is
   "radially inward, towards the center of the earth". So at the surface of the
   earth, we have
   @f[
@@ -887,8 +920,7 @@ the following quantities:
   The factor $-\frac{\mathbf x}{\|\mathbf x\|}$ is the unit vector pointing
   radially inward. Of course, within this problem, we are only interested in
   the branch that pertains to within the earth, i.e. $\|\mathbf
-  x\|<R_1$. In
-  the program, we therefore only consider the expression
+  x\|<R_1$. We would therefore only consider the expression
   @f[
     \mathbf g(\mathbf x) =
         -\frac{4}{3}\pi G \rho \|\mathbf x\| \frac{\mathbf x}{\|\mathbf x\|}
@@ -912,7 +944,7 @@ the following quantities:
 
   There are two problems with this, however: (i) The Earth is not homogenous,
   i.e. the density $\rho$ depends on $\mathbf x$; in fact it is not even a
-  function that only depends on the radius $r$. In reality, gravity therefore
+  function that only depends on the radius $r=\|\mathbf x\|$. In reality, gravity therefore
   does not always decrease as we get deeper: because the earth core is so much
   denser than the mantle, gravity actually peaks at around $10.7
   \frac{\text{m}}{\text{s}^2}$ at the core mantle boundary (see <a
@@ -937,7 +969,7 @@ the following quantities:
   mantle to obtain
   @f[
     \|\mathbf{g}\|
-    = 1.245\cdot 10^{-6} r + 7.714\cdot 10^{13}\frac 1{r^2}.
+    = 1.245\cdot 10^{-6} \frac{1}{\textrm{s^2}} r + 7.714\cdot 10^{13} \frac{\textrm{m}^3{\textrm{s^2}}\frac 1{r^2}.
   @f]
 
   <li>The density of the earth mantle varies spatially, but not by very
@@ -1019,3 +1051,118 @@ long-term maximal velocities around 10-40 centimeters per year (see
 the results section below), approximately the physically correct order
 of magnitude. We will set the end time to 1 billion years.
 
+@note The choice of the constants and material parameters above follows in
+large part the comprehensive book "Mantle Convection in the Earth and Planets,
+Part 1" by G. Schubert and D. L. Turcotte and P. Olson (Cambridge, 2001). It
+contains extensive discussion of ways to make the program more realistic.
+
+
+<h3> Implementation details </h3>
+
+Compared to step-31, this program has a number of noteworthy differences:
+
+- The <code>EquationData</code> namespace is significantly larger, reflecting
+  the fact that we now have much more physics to deal with. That said, most of
+  this additional physical detail is rather self-contained in functions in
+  this one namespace, and does not proliferate throughout the rest of the
+  program.
+
+- Of more obvious visibility is the fact that we have put a good number of
+  parameters into an input file handled by the ParameterHandler class (see,
+  for example, step-29, for ways to set up run-time parameter files with this
+  class). This often makes sense when one wants to avoid re-compiling the
+  program just because one wants to play with a single parameter (think, for
+  example, of parameter studies determining the best values of the
+  stabilization constants discussed above), in particular given that it takes
+  a non-trivial amount of time to re-compile programs of the current size. To
+  just give an overview of the kinds of parameters we have moved from fixed
+  values into the input file, here is a listing of a typical
+  <code>\step-32.prm</code> file:
+  @code
+# Listing of Parameters
+# ---------------------
+# The end time of the simulation in years.
+set End time                            = 1e8
+
+# Whether graphical output is to be generated or not. You may not want to get
+# graphical output if the number of processors is large.
+set Generate graphical output           = false
+
+# The number of adaptive refinement steps performed after initial global
+# refinement.
+set Initial adaptive refinement         = 1
+
+# The number of global refinement steps performed on the initial coarse mesh,
+# before the problem is first solved there.
+set Initial global refinement           = 1
+
+# The number of time steps between each generation of graphical output files.
+set Time steps between graphical output = 50
+
+# The number of time steps after which the mesh is to be adapted based on
+# computed error indicators.
+set Time steps between mesh refinement  = 10
+
+
+subsection Discretization
+  # The polynomial degree to use for the velocity variables in the Stokes
+  # system.
+  set Stokes velocity polynomial degree       = 2
+
+  # The polynomial degree to use for the temperature variable.
+  set Temperature polynomial degree           = 2
+
+  # Whether to use a Stokes discretization that is locally conservative at the
+  # expense of a larger number of degrees of freedom, or to go with a cheaper
+  # discretization that does not locally conserve mass (although it is
+  # globally conservative.
+  set Use locally conservative discretization = true
+end
+
+
+subsection Stabilization parameters
+  # The exponent in the entropy viscosity stabilization.
+  set alpha = 2
+
+  # The beta factor in the artificial viscosity stabilization. An appropriate
+  # value for 2d is 0.052 and 0.078 for 3d.
+  set beta  = 0.078
+
+  # The c_R factor in the entropy viscosity stabilization.
+  set c_R   = 0.5
+end
+  @endcode
+
+- There are, obviously, a good number of changes that have to do with the fact
+  that we want to run our program on a possibly very large number of
+  machines. Although one may suspect that this requires us to completely
+  re-structure our code, that isn't in fact the case (although the classes
+  that implement much of this functionality in deal.II certainly look very
+  different from an implementation viewpoint, but this doesn't reflect in
+  their public interface). Rather, the changes are mostly subtle, and the
+  overall structure of the main class is pretty much unchanged. That said, the
+  devil is in the detail: getting %parallel computing right, without
+  deadlocks, ensuring that the right data is available at the right place
+  (see, for example, the discussion on fully distributed vectors vs. vectors
+  with ghost elements), and avoiding bottlenecks is difficult and discussions
+  on this topic will appear in a good number of places in this program.
+
+
+<h3> Outlook </h3>
+
+This is a tutorial program. That means that at least most of its focus needs
+to lie on demonstrating ways of using deal.II and associated libraries, and
+not diluting this teaching lesson by focusing overly much on physical
+details. Despite the lengthy section above on the choice of physical
+parameters, the part of the program devoted to this is actually quite short
+and self contained.
+
+That said, both step-31 and the current step-32 have not come about by chance
+but are certainly meant as wayposts along the path to a more comprehensive
+program that will simulate convection in the earth mantle. We call this code
+<i>Aspect</i> (short for <i>Advanced Solver for Problems in Earth's
+ConvecTion</i>); its development is funded by the <a
+href="http://www.geodynamics.org">Computational Infrastructure in
+Geodynamics</a> initiative with support from the National Science
+Foundation. We hope to release this code not long after this tutorial program
+will officially be released as part of deal.II 7.1.
