@@ -324,6 +324,14 @@ and DoF handlers embedded in higher dimensional space have been added.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: SparsityPattern::row_position() finds a column index in a row and returns
+its "local" index or numbers::invalid_unsigned_int.
+<br>
+(Guido Kanschat, 2011/09/26)
+
+<li> New: There is now a function GridTools::volume() computing the volume
+
 <li> New: The function Utilities::MPI::sum
 function can be used to compute the sum of values over a number of
 MPI processes without having to deal with the underlying MPI functions.

@@ -794,8 +794,7 @@ SparsityPattern::add_entries (const unsigned int row,
 
 
 bool
-SparsityPattern::exists (const unsigned int i,
-			 const unsigned int j) const
+SparsityPattern::exists (const unsigned int i, const unsigned int j) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
   Assert (i<rows, ExcIndexRange(i,0,rows));
@@ -807,6 +806,23 @@ SparsityPattern::exists (const unsigned int i,
       if (colnums[k] == j) return true;
     }
   return false;
+}
+
+
+
+unsigned int
+SparsityPattern::row_position (const unsigned int i, const unsigned int j) const
+{
+  Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
+  Assert (i<rows, ExcIndexRange(i,0,rows));
+  Assert (j<cols, ExcIndexRange(j,0,cols));
+
+  for (unsigned int k=rowstart[i]; k<rowstart[i+1]; k++)
+    {
+				       // entry exists
+      if (colnums[k] == j) return k-rowstart[i];
+    }
+  return numbers::invalid_unsigned_int;
 }
 
 

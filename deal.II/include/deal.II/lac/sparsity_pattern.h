@@ -366,8 +366,8 @@ class SparsityPattern : public Subscriptor
     static const unsigned int invalid_entry = numbers::invalid_unsigned_int;
 
 /**
- * @name Functions generating and
- * filling a SparsityPattern.
+ * @name Construction and setup
+ * Constructors, destructor; functions initializing, copying and filling an object.
  */
 // @{
 				     /**
@@ -1125,6 +1125,19 @@ class SparsityPattern : public Subscriptor
                  const unsigned int j) const;
 
 				     /**
+				      * The index of a global matrix
+				      * entry in its row.
+				      *
+				      * This function is analogous to
+				      * operator(), but it computes
+				      * the index not with respect to
+				      * the total field, but only with
+				      * respect to the row <tt>j</tt>.
+				      */
+    unsigned int row_position(const unsigned int i,
+			      const unsigned int j) const;
+    
+				     /**
 				      * Access to column number field.
 				      * Return the column number of
 				      * the <tt>index</tt>th entry in
@@ -1256,7 +1269,6 @@ class SparsityPattern : public Subscriptor
 // @{
                                      /**
 				      * @deprecated
-				      *
 				      * This function is deprecated. Use
 				      * SparsityTools::partition instead.
 				      *
@@ -1320,7 +1332,7 @@ class SparsityPattern : public Subscriptor
 
 
 				     /**
-				      * This is kind of an expert mode. Get
+				      * @deprecated This is kind of an expert mode. Get
 				      * access to the rowstart array, but
 				      * read-only.
 				      *
@@ -1377,8 +1389,8 @@ class SparsityPattern : public Subscriptor
     inline const unsigned int * get_column_numbers () const;
     
     BOOST_SERIALIZATION_SPLIT_MEMBER()
-
 				     /** @addtogroup Exceptions
+				      * @name Exceptions
 				      * @{ */
 				     /**
 				      * You tried to add an element to
