@@ -314,8 +314,8 @@ namespace Step17
 		  dof_handler (triangulation),
 		  fe (FE_Q<dim>(1), dim),
 		  mpi_communicator (MPI_COMM_WORLD),
-		  n_mpi_processes (Utilities::System::get_n_mpi_processes(mpi_communicator)),
-		  this_mpi_process (Utilities::System::get_this_mpi_process(mpi_communicator))
+		  n_mpi_processes (Utilities::MPI::n_mpi_processes(mpi_communicator)),
+		  this_mpi_process (Utilities::MPI::this_mpi_process(mpi_communicator))
   {
     pcout.set_condition(this_mpi_process == 0);
   }

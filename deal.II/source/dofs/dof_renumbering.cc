@@ -833,7 +833,7 @@ namespace DoFRenumbering
 					 // gather information from all CPUs
 	std::vector<unsigned int>
 	  all_dof_counts(fe_collection.n_components() *
-			 Utilities::System::get_n_mpi_processes (tria->get_communicator()));
+			 Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
 	MPI_Allgather ( &local_dof_count[0], n_buckets, MPI_UNSIGNED, &all_dof_counts[0],
 			n_buckets, MPI_UNSIGNED, tria->get_communicator());
@@ -851,7 +851,7 @@ namespace DoFRenumbering
 	    shifts[c]=cumulated;
 	    for (types::subdomain_id_t i=0; i<tria->locally_owned_subdomain(); ++i)
 	      shifts[c] += all_dof_counts[c+n_buckets*i];
-	    for (unsigned int i=0; i<Utilities::System::get_n_mpi_processes (tria->get_communicator()); ++i)
+	    for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (tria->get_communicator()); ++i)
 	      cumulated += all_dof_counts[c+n_buckets*i];
 	  }
 #else

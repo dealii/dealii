@@ -438,6 +438,157 @@ namespace Utilities
   }
 
 
+  namespace MPI
+  {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+                                // Unfortunately, we have to work
+                                // around an oddity in the way PETSc
+                                // and some gcc versions interact. If
+                                // we use PETSc's MPI dummy
+                                // implementation, it expands the
+                                // calls to the two MPI functions
+                                // basically as ``(n_jobs=1, 0)'',
+                                // i.e. it assigns the number one to
+                                // the variable holding the number of
+                                // jobs, and then uses the comma
+                                // operator to let the entire
+                                // expression have the value zero. The
+                                // latter is important, since
+                                // ``MPI_Comm_size'' returns an error
+                                // code that we may want to check (we
+                                // don't here, but one could in
+                                // principle), and the trick with the
+                                // comma operator makes sure that both
+                                // the number of jobs is correctly
+                                // assigned, and the return value is
+                                // zero. Unfortunately, if some recent
+                                // versions of gcc detect that the
+                                // comma expression just stands by
+                                // itself, i.e. the result is not
+                                // assigned to another variable, then
+                                // they warn ``right-hand operand of
+                                // comma has no effect''. This
+                                // unwanted side effect can be
+                                // suppressed by casting the result of
+                                // the entire expression to type
+                                // ``void'' -- not beautiful, but
+                                // helps calming down unwarranted
+                                // compiler warnings...
+    unsigned int n_mpi_processes (const MPI_Comm &mpi_communicator)
+    {
+      int n_jobs=1;
+      (void) MPI_Comm_size (mpi_communicator, &n_jobs);
+
+      return n_jobs;
+    }
+
+
+    unsigned int this_mpi_process (const MPI_Comm &mpi_communicator)
+    {
+      int rank=0;
+      (void) MPI_Comm_rank (mpi_communicator, &rank);
+
+      return rank;
+    }
+
+
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
+    {
+      MPI_Comm new_communicator;
+      MPI_Comm_dup (mpi_communicator, &new_communicator);
+      return new_communicator;
+    }
+
+
+    std::vector<unsigned int>
+    compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
+						  const std::vector<unsigned int> & destinations)
+    {
+      unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
+      unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
+
+      for (unsigned int i=0; i<destinations.size(); ++i)
+	{
+	  Assert (destinations[i] < n_procs,
+		  ExcIndexRange (destinations[i], 0, n_procs));
+	  Assert (destinations[i] != myid,
+		  ExcMessage ("There is no point in communicating with ourselves."));
+	}
+
+
+				       // let all processors
+				       // communicate the maximal
+				       // number of destinations they
+				       // have
+      unsigned int my_n_destinations = destinations.size();
+      unsigned int max_n_destinations = 0;
+
+      MPI_Allreduce (&my_n_destinations, &max_n_destinations, 1, MPI_UNSIGNED,
+		    MPI_MAX, mpi_comm);
+
+				       // now that we know the number
+				       // of data packets every
+				       // processor wants to send, set
+				       // up a buffer with the maximal
+				       // size and copy our
+				       // destinations in there,
+				       // padded with -1's
+      std::vector<unsigned int> my_destinations(max_n_destinations,
+						numbers::invalid_unsigned_int);
+      std::copy (destinations.begin(), destinations.end(),
+		 my_destinations.begin());
+
+				       // now exchange these (we could
+				       // communicate less data if we
+				       // used MPI_Allgatherv, but
+				       // we'd have to communicate
+				       // my_n_destinations to all
+				       // processors in this case,
+				       // which is more expensive than
+				       // the reduction operation
+				       // above in MPI_Allreduce)
+      std::vector<unsigned int> all_destinations (max_n_destinations * n_procs);
+      MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
+		     &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
+		     mpi_comm);
+
+				       // now we know who is going to
+				       // communicate with
+				       // whom. collect who is going
+				       // to communicate with us!
+      std::vector<unsigned int> origins;
+      for (unsigned int i=0; i<n_procs; ++i)
+	for (unsigned int j=0; j<max_n_destinations; ++j)
+	  if (all_destinations[i*max_n_destinations + j] == myid)
+	    origins.push_back (i);
+	  else if (all_destinations[i*max_n_destinations + j] ==
+		   numbers::invalid_unsigned_int)
+	    break;
+
+      return origins;
+    }
+
+#else
+
+    unsigned int get_n_mpi_processes (const MPI_Comm &)
+    {
+      return 1;
+    }
+
+
+
+    unsigned int get_this_mpi_process (const MPI_Comm &)
+    {
+      return 0;
+    }
+
+
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
+    {
+      return mpi_communicator;
+    }
+#endif    
+  }
 
 
   namespace System
@@ -535,64 +686,6 @@ namespace Utilities
       return (MPI_has_been_started > 0);
     }
 
-                                // Unfortunately, we have to work
-                                // around an oddity in the way PETSc
-                                // and some gcc versions interact. If
-                                // we use PETSc's MPI dummy
-                                // implementation, it expands the
-                                // calls to the two MPI functions
-                                // basically as ``(n_jobs=1, 0)'',
-                                // i.e. it assigns the number one to
-                                // the variable holding the number of
-                                // jobs, and then uses the comma
-                                // operator to let the entire
-                                // expression have the value zero. The
-                                // latter is important, since
-                                // ``MPI_Comm_size'' returns an error
-                                // code that we may want to check (we
-                                // don't here, but one could in
-                                // principle), and the trick with the
-                                // comma operator makes sure that both
-                                // the number of jobs is correctly
-                                // assigned, and the return value is
-                                // zero. Unfortunately, if some recent
-                                // versions of gcc detect that the
-                                // comma expression just stands by
-                                // itself, i.e. the result is not
-                                // assigned to another variable, then
-                                // they warn ``right-hand operand of
-                                // comma has no effect''. This
-                                // unwanted side effect can be
-                                // suppressed by casting the result of
-                                // the entire expression to type
-                                // ``void'' -- not beautiful, but
-                                // helps calming down unwarranted
-                                // compiler warnings...
-    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator)
-    {
-      int n_jobs=1;
-      (void) MPI_Comm_size (mpi_communicator, &n_jobs);
-
-      return n_jobs;
-    }
-
-
-    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
-    {
-      int rank=0;
-      (void) MPI_Comm_rank (mpi_communicator, &rank);
-
-      return rank;
-    }
-
-
-    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
-    {
-      MPI_Comm new_communicator;
-      MPI_Comm_dup (mpi_communicator, &new_communicator);
-      return new_communicator;
-    }
-
 
     namespace
     {
@@ -640,9 +733,9 @@ namespace Utilities
 					      MinMaxAvg & result)
     {
       const unsigned int my_id
-	= dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
+	= dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
       const unsigned int numproc
-	= dealii::Utilities::System::get_n_mpi_processes(mpi_communicator);
+	= dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
 
       MPI_Op op;
       int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
@@ -674,73 +767,6 @@ namespace Utilities
     }
 
 
-    std::vector<unsigned int>
-    compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
-						  const std::vector<unsigned int> & destinations)
-    {
-      unsigned int myid = Utilities::System::get_this_mpi_process(mpi_comm);
-      unsigned int n_procs = Utilities::System::get_n_mpi_processes(mpi_comm);
-
-      for (unsigned int i=0; i<destinations.size(); ++i)
-	{
-	  Assert (destinations[i] < n_procs,
-		  ExcIndexRange (destinations[i], 0, n_procs));
-	  Assert (destinations[i] != myid,
-		  ExcMessage ("There is no point in communicating with ourselves."));
-	}
-
-
-				       // let all processors
-				       // communicate the maximal
-				       // number of destinations they
-				       // have
-      unsigned int my_n_destinations = destinations.size();
-      unsigned int max_n_destinations = 0;
-
-      MPI_Allreduce (&my_n_destinations, &max_n_destinations, 1, MPI_UNSIGNED,
-		    MPI_MAX, mpi_comm);
-
-				       // now that we know the number
-				       // of data packets every
-				       // processor wants to send, set
-				       // up a buffer with the maximal
-				       // size and copy our
-				       // destinations in there,
-				       // padded with -1's
-      std::vector<unsigned int> my_destinations(max_n_destinations,
-						numbers::invalid_unsigned_int);
-      std::copy (destinations.begin(), destinations.end(),
-		 my_destinations.begin());
-
-				       // now exchange these (we could
-				       // communicate less data if we
-				       // used MPI_Allgatherv, but
-				       // we'd have to communicate
-				       // my_n_destinations to all
-				       // processors in this case,
-				       // which is more expensive than
-				       // the reduction operation
-				       // above in MPI_Allreduce)
-      std::vector<unsigned int> all_destinations (max_n_destinations * n_procs);
-      MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
-		     &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
-		     mpi_comm);
-
-				       // now we know who is going to
-				       // communicate with
-				       // whom. collect who is going
-				       // to communicate with us!
-      std::vector<unsigned int> origins;
-      for (unsigned int i=0; i<n_procs; ++i)
-	for (unsigned int j=0; j<max_n_destinations; ++j)
-	  if (all_destinations[i*max_n_destinations + j] == myid)
-	    origins.push_back (i);
-	  else if (all_destinations[i*max_n_destinations + j] ==
-		   numbers::invalid_unsigned_int)
-	    break;
-
-      return origins;
-    }
 
 #else
 
@@ -751,17 +777,6 @@ namespace Utilities
 
 
 
-    unsigned int get_n_mpi_processes (const MPI_Comm &)
-    {
-      return 1;
-    }
-
-
-
-    unsigned int get_this_mpi_process (const MPI_Comm &)
-    {
-      return 0;
-    }
 
 
     void calculate_collective_mpi_min_max_avg(const MPI_Comm &,
@@ -777,10 +792,6 @@ namespace Utilities
     }
 
 
-    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
-    {
-      return mpi_communicator;
-    }
 #endif
 
 
@@ -885,6 +896,17 @@ namespace Utilities
       return false;
 #endif
     }
+
+    
+    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator)
+    {
+      return MPI::n_mpi_processes (mpi_communicator);
+    }
+
+    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator)
+    {
+      return MPI::this_mpi_process (mpi_communicator);
+    }    
   }
 
 

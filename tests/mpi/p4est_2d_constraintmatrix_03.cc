@@ -93,7 +93,7 @@ class FilteredDataOut : public DataOut<dim>
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
@@ -205,7 +205,7 @@ void test()
 
     if (myid==0)
       {
-	std::ofstream file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
+	std::ofstream file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
 	file << "**** proc " << myid << std::endl;
 	x_dub.print(file);
       }
@@ -214,7 +214,7 @@ void test()
 
     if (myid==0)
       {
-	cat_file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(0)).c_str());
+	cat_file((std::string("p4est_2d_constraintmatrix_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(0)).c_str());
       }
 
   tr.set_boundary (0);
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

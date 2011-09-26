@@ -103,6 +103,17 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> New: There is now a namespace Utilities::MPI that holds some of the MPI-related
+functions that were previously part of Utilities::System. Specifically, the following
+functions were moved and in part renamed: Utilities::System::get_n_mpi_processes
+is now Utilities::MPI::n_mpi_processes; Utilities::System::get_this_mpi_process
+is now Utilities::MPI::this_mpi_process; Utilities::System::compute_point_to_point_communication_pattern
+is now Utilities::MPI::compute_point_to_point_communication_pattern;
+Utilities::System::duplicate_communicator
+is now Utilities::MPI::duplicate_communicator.
+<br>
+(Wolfgang Bangerth, 2011/09/26)
+
 <li> New: When using a new enough version of GCC, debug sections in
 object files are now compressed using the <code>-Wa,--compress-debug-sections</code>
 flag, resulting in savings in disk space on the order of 230 MB.

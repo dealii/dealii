@@ -1032,8 +1032,8 @@ namespace Step18
 		  dof_handler (triangulation),
 		  quadrature_formula (2),
 		  mpi_communicator (MPI_COMM_WORLD),
-		  n_mpi_processes (Utilities::System::get_n_mpi_processes(mpi_communicator)),
-		  this_mpi_process (Utilities::System::get_this_mpi_process(mpi_communicator)),
+		  n_mpi_processes (Utilities::MPI::n_mpi_processes(mpi_communicator)),
+		  this_mpi_process (Utilities::MPI::this_mpi_process(mpi_communicator)),
 		  pcout (std::cout, this_mpi_process == 0)
   {}
 

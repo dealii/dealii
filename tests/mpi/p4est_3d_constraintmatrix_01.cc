@@ -39,10 +39,10 @@
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -76,7 +76,7 @@ void test()
   DoFTools::make_hanging_node_constraints (dofh, cm2);
 
   {
-    std::ofstream file((std::string("p4est_3d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
+    std::ofstream file((std::string("p4est_3d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
     file << "**** proc " << myid << std::endl;
     cm.print(file);
     file << "****" << std::endl;
@@ -92,7 +92,7 @@ void test()
     {
       for (unsigned int i=0;i<numproc;++i)
 	{
-	  cat_file((std::string("p4est_3d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
+	  cat_file((std::string("p4est_3d_constraintmatrix_01/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
 	}
 
     }
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

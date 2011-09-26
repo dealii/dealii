@@ -33,11 +33,11 @@
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   if (true)
     {
-      if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
 	deallog << "hyper_cube" << std::endl;
 
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
@@ -46,7 +46,7 @@ void test()
 
       for (int i=0;i<5;++i)
 	{
-	  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+	  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
 	    deallog << "refine loop:" << i << std::endl;
 
 	  tr.refine_global(1);
@@ -103,7 +103,7 @@ void test()
 	}
     }
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   std::cout << myid << ":" << getpid() << std::endl;
 				   //system("sleep 20");

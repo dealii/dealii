@@ -21,8 +21,8 @@
 
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   int int_sum, uint_sum, double_sum, float_sum;
   int_sum
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("collective_02").c_str());
       deallog.attach(logfile);

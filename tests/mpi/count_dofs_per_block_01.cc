@@ -54,7 +54,7 @@ void test()
   std::vector<unsigned int> dofs_per_block (fe.n_blocks());
   DoFTools::count_dofs_per_block (dof_handler, dofs_per_block);
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     for (unsigned int i=0; i<fe.n_blocks(); ++i)
       deallog << "Block " << i << " has " << dofs_per_block[i] << " dofs" << std::endl;
 }
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
       std::ofstream logfile(output_file_for_mpi("count_dofs_per_block_01").c_str());

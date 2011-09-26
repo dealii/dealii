@@ -26,8 +26,8 @@
 
 void test ()
 {
-  const unsigned int n_procs = Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD);
-  const unsigned int my_id = Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
+  const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   const unsigned int n_rows = 3;
   const unsigned int n_cols = 4;
@@ -82,8 +82,8 @@ int main (int argc, char **argv)
 {
   Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-  const unsigned int n_procs = Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD);
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
 				   // let processor 1 speak if we run

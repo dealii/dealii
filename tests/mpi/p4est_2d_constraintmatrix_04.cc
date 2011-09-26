@@ -297,7 +297,7 @@ void test()
   x_ref -= x;
   double err = x_ref.linfty_norm();
   if (err>1.0e-12)
-    if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       deallog << "err:" << err << std::endl;
 
 //	x_rel=x_ref; //uncomment to output error
@@ -319,7 +319,7 @@ void test()
 
   tr.set_boundary (0);
   tr.set_boundary (1);
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

@@ -44,11 +44,11 @@
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   std::vector<unsigned int> sub(2);
-  sub[0] = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  sub[0] = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
   sub[1] = 1;
   GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<dim>&>(tr),
 					    sub, Point<2>(0,0), Point<2>(1,1));
@@ -58,17 +58,17 @@ void test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs (fe);
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
 
   {
     IndexSet dof_set;
     DoFTools::extract_locally_active_dofs (dofh, dof_set);
-    if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       dof_set.print(deallog);
   }
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "****" << std::endl;
 
   DoFRenumbering::component_wise(dofh);
@@ -76,10 +76,10 @@ void test()
     IndexSet dof_set;
     DoFTools::extract_locally_active_dofs (dofh, dof_set);
 
-    if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+    if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
       {
 	dof_set.print(deallog);
-	for (unsigned int i=0; i<Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD); ++i)
+	for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD); ++i)
 	  {
 	    deallog << "Dofs owned by processor " << i << ": ";
 	    dofh.locally_owned_dofs_per_processor()[i].print(deallog);
@@ -94,7 +94,7 @@ void test()
 	typename DoFHandler<dim>::active_cell_iterator
 	  cell, endc = dofh.end();
 
-	if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+	if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
 	  for (cell = dofh.begin_active(); cell != endc; ++cell)
 	    if (!cell->is_artificial() && !cell->is_ghost())
 	      {
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

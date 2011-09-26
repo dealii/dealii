@@ -34,7 +34,7 @@
 
 void test()
 {
-  const unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<2> tr(MPI_COMM_WORLD);
 
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

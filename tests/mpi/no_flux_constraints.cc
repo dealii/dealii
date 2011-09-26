@@ -40,8 +40,8 @@ template<int dim>
 void test()
 {
   Assert (dim == 3, ExcNotImplemented());
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
 
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 {
   {
     Utilities::System::MPI_InitFinalize mpi_init (argc, argv);
-    unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+    unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
     deallog.push(Utilities::int_to_string(myid));

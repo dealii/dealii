@@ -100,7 +100,7 @@ namespace
 
 				     // make sure only processor zero
 				     // got something
-    if (Utilities::System::get_this_mpi_process (mpi_communicator) != 0)
+    if (Utilities::MPI::this_mpi_process (mpi_communicator) != 0)
       Assert ((result[0] == 0) && (result[1] == 0),
 	      ExcInternalError());
 
@@ -134,7 +134,7 @@ namespace
 
 				     // make sure only processor zero
 				     // got something
-    if (Utilities::System::get_this_mpi_process (mpi_communicator) != 0)
+    if (Utilities::MPI::this_mpi_process (mpi_communicator) != 0)
       Assert (result == 0, ExcInternalError());
 
     return result;
@@ -587,7 +587,7 @@ namespace parallel
 					 // from here on designate a
 					 // master and slaves
 	double top_threshold, bottom_threshold;
-	if (Utilities::System::get_this_mpi_process (mpi_communicator) == 0)
+	if (Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
 	  {
 					     // this is the master
 					     // processor
@@ -701,7 +701,7 @@ namespace parallel
 					 // from here on designate a
 					 // master and slaves
 	double top_threshold, bottom_threshold;
-	if (Utilities::System::get_this_mpi_process (mpi_communicator) == 0)
+	if (Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
 	  {
 					     // this is the master
 					     // processor

@@ -25,8 +25,8 @@
 
 void test ()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
@@ -53,11 +53,11 @@ void test ()
 				  // assignment with transfer to ghost 
   v_tmp = v;
                                   // check ghost values
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v_tmp(1) << std::endl;
   Assert(v_tmp(1) == 1.0, ExcInternalError());
   
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
 
@@ -67,7 +67,7 @@ int main (int argc, char **argv)
 {
   Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)

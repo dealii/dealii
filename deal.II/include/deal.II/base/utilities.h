@@ -301,6 +301,88 @@ namespace Utilities
     template <typename T>
     T sum (const T &t,
 	   const MPI_Comm &mpi_communicator);
+
+				     /**
+				      * Return the number of MPI processes
+				      * there exist in the given communicator
+				      * object. If this is a sequential job,
+				      * it returns 1.
+				      */
+    unsigned int n_mpi_processes (const MPI_Comm &mpi_communicator);
+
+				     /**
+				      * Return the number of the present MPI
+				      * process in the space of processes
+				      * described by the given
+				      * communicator. This will be a unique
+				      * value for each process between zero
+				      * and (less than) the number of all
+				      * processes (given by
+				      * get_n_mpi_processes()).
+				      */
+    unsigned int this_mpi_process (const MPI_Comm &mpi_communicator);
+
+				     /**
+				      * Consider an unstructured
+				      * communication pattern where
+				      * every process in an MPI
+				      * universe wants to send some
+				      * data to a subset of the other
+				      * processors. To do that, the
+				      * other processors need to know
+				      * who to expect messages
+				      * from. This function computes
+				      * this information.
+				      *
+				      * @param mpi_comm A communicator
+				      * that describes the processors
+				      * that are going to communicate
+				      * with each other.
+				      *
+				      * @param destinations The list
+				      * of processors the current
+				      * process wants to send
+				      * information to. This list need
+				      * not be sorted in any way. If
+				      * it contains duplicate entries
+				      * that means that multiple
+				      * messages are intended for a
+				      * given destination.
+				      *
+				      * @return A list of processors
+				      * that have indicated that they
+				      * want to send something to the
+				      * current processor. The
+				      * resulting list is not
+				      * sorted. It may contain
+				      * duplicate entries if
+				      * processors enter the same
+				      * destination more than once in
+				      * their destinations list.
+				      */
+    std::vector<unsigned int>
+    compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
+						  const std::vector<unsigned int> & destinations);
+
+				     /**
+				      * Given a communicator, generate a new
+				      * communicator that contains the same
+				      * set of processors but that has a
+				      * different, unique identifier.
+				      *
+				      * This functionality can be used to
+				      * ensure that different objects, such as
+				      * distributed matrices, each have unique
+				      * communicators over which they can
+				      * interact without interfering with each
+				      * other.
+				      *
+				      * When no longer needed, the
+				      * communicator created here needs to
+				      * be destroyed using
+				      * <code>MPI_Comm_free</code>.
+				      */
+    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);    
   }
                                    /**
                                     * A namespace for utility functions that
@@ -384,89 +466,39 @@ namespace Utilities
     bool job_supports_mpi ();
 
 				     /**
-				      * Return the number of MPI processes
-				      * there exist in the given communicator
-				      * object. If this is a sequential job,
-				      * it returns 1.
+				      * This function is an alias for 
+				      * Utilities::MPI::n_mpi_processes.
+				      * 
+				      * @deprecated
 				      */
     unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
 
 				     /**
-				      * Return the number of the present MPI
-				      * process in the space of processes
-				      * described by the given
-				      * communicator. This will be a unique
-				      * value for each process between zero
-				      * and (less than) the number of all
-				      * processes (given by
-				      * get_n_mpi_processes()).
+				      * This function is an alias for 
+				      * Utilities::MPI::this_mpi_process.
+				      * 
+				      * @deprecated
 				      */
     unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
 
 
 				     /**
-				      * Consider an unstructured
-				      * communication pattern where
-				      * every process in an MPI
-				      * universe wants to send some
-				      * data to a subset of the other
-				      * processors. To do that, the
-				      * other processors need to know
-				      * who to expect messages
-				      * from. This function computes
-				      * this information.
-				      *
-				      * @param mpi_comm A communicator
-				      * that describes the processors
-				      * that are going to communicate
-				      * with each other.
-				      *
-				      * @param destinations The list
-				      * of processors the current
-				      * process wants to send
-				      * information to. This list need
-				      * not be sorted in any way. If
-				      * it contains duplicate entries
-				      * that means that multiple
-				      * messages are intended for a
-				      * given destination.
-				      *
-				      * @return A list of processors
-				      * that have indicated that they
-				      * want to send something to the
-				      * current processor. The
-				      * resulting list is not
-				      * sorted. It may contain
-				      * duplicate entries if
-				      * processors enter the same
-				      * destination more than once in
-				      * their destinations list.
+				      * This function is an alias for 
+				      * Utilities::MPI::compute_point_to_point_communication_pattern.
+				      * 
+				      * @deprecated
 				      */
-    std::vector<unsigned int>
-    compute_point_to_point_communication_pattern (const MPI_Comm & mpi_comm,
-						  const std::vector<unsigned int> & destinations);
-
+    using 
+    Utilities::MPI::compute_point_to_point_communication_pattern;
 
 
 				     /**
-				      * Given a communicator, generate a new
-				      * communicator that contains the same
-				      * set of processors but that has a
-				      * different, unique identifier.
-				      *
-				      * This functionality can be used to
-				      * ensure that different objects, such as
-				      * distributed matrices, each have unique
-				      * communicators over which they can
-				      * interact without interfering with each
-				      * other.
-				      *
-				      * When no longer needed, the
-				      * communicator created here needs to
-				      * be destroyed using
-				      * <code>MPI_Comm_free</code>.
+				      * This function is an alias for 
+				      * Utilities::MPI::duplicate_communicator.
+				      * 
+				      * @deprecated
 				      */
-    MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator);
+    using Utilities::MPI::duplicate_communicator;
 
 				     /**
 				      * Data structure to store the result of

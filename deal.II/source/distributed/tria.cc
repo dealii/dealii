@@ -1803,9 +1803,9 @@ namespace parallel
 		    dealii::Triangulation<dim,spacedim>
 		    (smooth_grid,
 		     false),
-		    mpi_communicator (Utilities::System::
+		    mpi_communicator (Utilities::MPI::
 				      duplicate_communicator(mpi_communicator)),
-		    my_subdomain (Utilities::System::get_this_mpi_process (this->mpi_communicator)),
+		    my_subdomain (Utilities::MPI::this_mpi_process (this->mpi_communicator)),
 		    triangulation_has_content (false),
 		    connectivity (0),
 		    parallel_forest (0),
@@ -1819,7 +1819,7 @@ namespace parallel
       dealii::internal::p4est::InitFinalize::do_initialize ();
 
       number_cache.n_locally_owned_active_cells
-	.resize (Utilities::System::get_n_mpi_processes (mpi_communicator));
+	.resize (Utilities::MPI::n_mpi_processes (mpi_communicator));
     }
 
 
@@ -2474,7 +2474,7 @@ namespace parallel
       {
 	const unsigned int total_local_cells = this->n_active_cells();
 
-	if (Utilities::System::get_n_mpi_processes (mpi_communicator) == 1)
+	if (Utilities::MPI::n_mpi_processes (mpi_communicator) == 1)
 	  Assert (static_cast<unsigned int>(parallel_forest->local_num_quadrants) ==
 		  total_local_cells,
 		  ExcInternalError())
@@ -2655,7 +2655,7 @@ namespace parallel
     {
       Assert (number_cache.n_locally_owned_active_cells.size()
 	      ==
-	      Utilities::System::get_n_mpi_processes (mpi_communicator),
+	      Utilities::MPI::n_mpi_processes (mpi_communicator),
 	      ExcInternalError());
 
       std::fill (number_cache.n_locally_owned_active_cells.begin(),

@@ -25,8 +25,8 @@
 
 void test ()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
   
   if (myid==0)
     deallog << "numproc=" << numproc << std::endl;
@@ -52,7 +52,7 @@ void test ()
   
   
 				   // check local values
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       deallog << myid*2 << ":" << v(myid*2) << std::endl;
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
@@ -63,7 +63,7 @@ void test ()
   
 
 				   // check ghost values
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v(1) << std::endl;
   Assert(v(1) == 2.0, ExcInternalError());
 
@@ -77,7 +77,7 @@ void test ()
 int main (int argc, char **argv)
 {
   PetscInitialize(&argc,&argv,0,0);
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 

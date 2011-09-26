@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
       std::ofstream logfile(output_file_for_mpi("crash_02").c_str());

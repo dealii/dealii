@@ -91,7 +91,7 @@ void test()
 	      == dof_handler.n_dofs(),
 	      ExcInternalError());
       
-      unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+      unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
       if (myid == 0)
 	{
 	  deallog << "Total number of dofs: " << dof_handler.n_dofs() << std::endl;
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
       std::ofstream logfile("count_dofs_per_block_01/output");

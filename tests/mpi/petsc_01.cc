@@ -31,8 +31,8 @@
 
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 {
   PetscInitialize(&argc,&argv,0,0);
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("petsc_01").c_str());
       deallog.attach(logfile);

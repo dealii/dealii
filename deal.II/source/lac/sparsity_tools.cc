@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -421,7 +421,7 @@ namespace SparsityTools
 				   const MPI_Comm & mpi_comm,
 				   const IndexSet & myrange)
   {
-    unsigned int myid = Utilities::System::get_this_mpi_process(mpi_comm);
+    unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
     std::vector<unsigned int> start_index(rows_per_cpu.size()+1);
     start_index[0]=0;
     for (unsigned int i=0;i<rows_per_cpu.size();++i)
@@ -479,7 +479,7 @@ namespace SparsityTools
 	  send_to.push_back(it->first);
 
       num_receive =
-	Utilities::System::
+	Utilities::MPI::
 	compute_point_to_point_communication_pattern(mpi_comm, send_to).size();
     }
 

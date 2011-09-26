@@ -64,12 +64,12 @@ void test ()
 
 				// print out constraints for each
 				// processor.
-  const unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   IndexSet locally_active (dof.n_dofs());
   DoFTools::extract_locally_active_dofs (dof, locally_active);
-  std::ofstream file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
+  std::ofstream file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
   file << "**** proc " << myid << ": \n\n";
   file << "Constraints:\n";
   constraints.print(file);
@@ -84,7 +84,7 @@ void test ()
     {
       for (unsigned int i=0;i<numproc;++i)
 	{
-	  cat_file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
+	  cat_file((std::string("p4est_3d_constraintmatrix_04/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
 	}
     }
 }
@@ -92,7 +92,7 @@ void test ()
 int main(int argc, char** argv)
 {
   Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
-  const unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 

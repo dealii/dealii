@@ -1068,7 +1068,7 @@ namespace internal
 	Assert (tr != 0, ExcInternalError());
 
 	const unsigned int
-	  n_cpus = Utilities::System::get_n_mpi_processes (tr->get_communicator());
+	  n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
 					 //* 1. distribute on own
 					 //* subdomain

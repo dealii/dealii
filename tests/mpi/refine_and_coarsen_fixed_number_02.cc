@@ -36,12 +36,12 @@
 
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<2> tr(MPI_COMM_WORLD);
 
   std::vector<unsigned int> sub(2);
-  sub[0] = 5*Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  sub[0] = 5*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
   sub[1] = 1;
   GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<2>&>(tr),
 					    sub, Point<2>(0,0), Point<2>(1,1));
@@ -97,10 +97,10 @@ void test()
 // since that would make 'make' delete the output file without us
 // ever seeing what we want to see if things go wrong
 //       Assert (n_refined ==
-// 	      4*Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD),
+// 	      4*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD),
 // 	      ExcInternalError());
 //       Assert (n_coarsened ==
-// 	      4*Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD),
+// 	      4*Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD),
 // 	      ExcInternalError());
     }
 
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

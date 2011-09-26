@@ -40,11 +40,11 @@
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   std::vector<unsigned int> sub(2);
-  sub[0] = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  sub[0] = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
   sub[1] = 1;
   GridGenerator::subdivided_hyper_rectangle(static_cast<Triangulation<dim>&>(tr),
 					    sub, Point<2>(0,0), Point<2>(1,1));
@@ -54,7 +54,7 @@ void test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs (fe);
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
 
 				   // extract constant modes and print
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
   deallog.push(Utilities::int_to_string(myid));

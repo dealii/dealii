@@ -551,7 +551,7 @@ inline
 void
 Timer::print_data(STREAM & stream) const
 {
-  unsigned int my_id = dealii::Utilities::System::get_this_mpi_process(mpi_communicator);
+  unsigned int my_id = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
   if (my_id==0)
     stream << mpi_data.max << " wall,"
 	   << " max @" << mpi_data.max_index

@@ -1934,7 +1934,7 @@ void SparseDirectMUMPS::initialize (const Matrix& matrix,
   dmumps_c (&id);
    
                          // Hand over matrix and right-hand side
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0) 
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0) 
     {
 
                          // Objects denoting a MUMPS data structure:
@@ -2007,7 +2007,7 @@ void SparseDirectMUMPS::solve (Vector<double>& vector)
   dmumps_c (&id);
 
                         // Copy solution into the given vector
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0) 
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0) 
     {
       for (unsigned int i=0; i<n; ++i)
 	vector(i) = rhs[i];

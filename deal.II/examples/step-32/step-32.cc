@@ -297,6 +297,7 @@ namespace Step32
 	void solve_S(TrilinosWrappers::MPI::Vector &dst,
 		     const TrilinosWrappers::MPI::Vector &src) const
 	  {
+//TODO: shouldn't this be a *relative* tolerance
 	    SolverControl cn(5000, 1e-5);
 
 	    TrilinosWrappers::SolverCG solver(cn);
@@ -1360,7 +1361,7 @@ namespace Step32
       endc = stokes_dof_handler.end();
     for (; cell!=endc; ++cell)
       if (cell->subdomain_id() ==
-	  Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
 	{
 	  fe_values.reinit (cell);
 	  fe_values[velocities].get_function_values (stokes_solution,
@@ -1407,7 +1408,7 @@ namespace Step32
       endc = stokes_dof_handler.end();
     for (; cell!=endc; ++cell)
       if (cell->subdomain_id() ==
-	  Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
 	{
 	  fe_values.reinit (cell);
 	  fe_values[velocities].get_function_values (stokes_solution,
@@ -1463,7 +1464,7 @@ namespace Step32
       endc = temperature_dof_handler.end();
     for (; cell!=endc; ++cell)
       if (cell->subdomain_id() ==
-	  Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
 	{
 	  fe_values.reinit (cell);
 	  fe_values.get_function_values (old_temperature_solution,
@@ -1553,7 +1554,7 @@ namespace Step32
 	  endc = temperature_dof_handler.end();
 	for (; cell!=endc; ++cell)
 	  if (cell->subdomain_id() ==
-	      Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+	      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
 	    {
 	      fe_values.reinit (cell);
 	      fe_values.get_function_values (old_temperature_solution,
@@ -1581,7 +1582,7 @@ namespace Step32
 	  endc = temperature_dof_handler.end();
 	for (; cell!=endc; ++cell)
 	  if (cell->subdomain_id() ==
-	      Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+	      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
 	    {
 	      fe_values.reinit (cell);
 	      fe_values.get_function_values (old_temperature_solution,
@@ -1817,7 +1818,7 @@ namespace Step32
 
     for (; cell!=endc; ++cell)
       if (cell->subdomain_id() ==
-	  Utilities::System::get_this_mpi_process(MPI_COMM_WORLD))
+	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
 	{
 	  cell->get_dof_indices (local_dof_indices);
 	  fe_values.reinit (cell);
@@ -2186,7 +2187,7 @@ namespace Step32
     IndexSet stokes_relevant_set;
     {
       const unsigned int my_id =
-	Utilities::System::get_this_mpi_process(MPI_COMM_WORLD);
+	Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
       IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
       stokes_partitioning.push_back(stokes_index_set.get_view(0,n_u));
       stokes_partitioning.push_back(stokes_index_set.get_view(n_u,n_u+n_p));
@@ -2436,16 +2437,17 @@ namespace Step32
 
     const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree+1);
 
+//todo: define a new filter for locally owned cells
     typedef
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
       SubdomainFilter;
 
     WorkStream::
       run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    stokes_dof_handler.begin_active()),
 	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    stokes_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_stokes_preconditioner,
@@ -2649,10 +2651,10 @@ namespace Step32
 
     WorkStream::
       run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    stokes_dof_handler.begin_active()),
 	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    stokes_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_stokes_system,
@@ -2776,10 +2778,10 @@ namespace Step32
 
     WorkStream::
       run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    temperature_dof_handler.begin_active()),
 	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    temperature_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_temperature_matrix,
@@ -3073,10 +3075,10 @@ namespace Step32
 
     WorkStream::
       run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    temperature_dof_handler.begin_active()),
 	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)),
+			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
 			    temperature_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_temperature_rhs,
@@ -3615,10 +3617,10 @@ namespace Step32
     std::ofstream output (filename.c_str());
     data_out.write_vtu (output);
 
-    if (Utilities::System::get_this_mpi_process(MPI_COMM_WORLD) == 0)
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
 	std::vector<std::string> filenames;
-	for (unsigned int i=0; i<Utilities::System::get_n_mpi_processes(MPI_COMM_WORLD); ++i)
+	for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
 	  filenames.push_back (std::string("solution-") +
 			       Utilities::int_to_string (out_index, 5) +
 			       "." +

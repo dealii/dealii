@@ -50,7 +50,7 @@
 template<int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 				   // create a mesh so that all but one
 				   // processor are empty
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 {
   PetscInitialize(&argc,&argv,0,0);
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)

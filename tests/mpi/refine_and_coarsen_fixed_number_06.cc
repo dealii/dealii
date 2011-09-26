@@ -37,8 +37,8 @@
 template <int dim>
 void test()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
   GridGenerator::hyper_cube (triangulation);
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("refine_and_coarsen_fixed_number_06").c_str());
       deallog.attach(logfile);

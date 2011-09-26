@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,8 +26,8 @@ void test_mpi()
 {
   Assert( Utilities::System::job_supports_mpi(), ExcInternalError());
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
 				   // select a few destinations
   std::vector<unsigned int> destinations;
@@ -69,8 +69,8 @@ void test_mpi()
     deallog << "Exchanging data..." << std::endl;
 
   std::vector<unsigned int> origins
-    = Utilities::System::compute_point_to_point_communication_pattern (MPI_COMM_WORLD,
-								       destinations);
+    = Utilities::MPI::compute_point_to_point_communication_pattern (MPI_COMM_WORLD,
+								    destinations);
 
   if (myid == 0)
     {
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("point_to_point_pattern_01").c_str());
       deallog.attach(logfile);

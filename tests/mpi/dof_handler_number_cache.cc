@@ -96,7 +96,7 @@ void test()
       dof_handler.distribute_dofs (fe);
 
       const unsigned int N = dof_handler.n_dofs();
-      if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
 	deallog << N << std::endl;
 
       Assert (dof_handler.n_locally_owned_dofs() <= N,
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
   (void)argv;
 #endif
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)
     {
       std::ofstream logfile(output_file_for_mpi("dof_handler_number_cache").c_str());

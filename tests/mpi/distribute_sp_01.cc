@@ -30,8 +30,8 @@ void test_mpi()
   Assert( Utilities::System::job_supports_mpi(), ExcInternalError());
 
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
-  const unsigned int numprocs = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  const unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0)
     deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-  if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("distribute_sp_01").c_str());
       deallog.attach(logfile);

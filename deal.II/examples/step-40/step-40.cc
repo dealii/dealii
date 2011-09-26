@@ -420,7 +420,7 @@ namespace Step40
 			  csp,
 			  dof_handler.n_locally_owned_dofs_per_processor(),
 			  dof_handler.n_locally_owned_dofs_per_processor(),
-			  Utilities::System::get_this_mpi_process(mpi_communicator));
+			  Utilities::MPI::this_mpi_process(mpi_communicator));
   }
 
 
@@ -788,11 +788,11 @@ namespace Step40
 				     // file; we arbitrarily choose
 				     // processor zero to take over this
 				     // job.
-    if (Utilities::System::get_this_mpi_process(mpi_communicator) == 0)
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
 	std::vector<std::string> filenames;
 	for (unsigned int i=0;
-	     i<Utilities::System::get_n_mpi_processes(mpi_communicator);
+	     i<Utilities::MPI::n_mpi_processes(mpi_communicator);
 	     ++i)
 	  filenames.push_back ("solution-" +
 			       Utilities::int_to_string (cycle, 2) +
@@ -864,7 +864,7 @@ namespace Step40
 	assemble_system ();
 	solve ();
 
-	if (Utilities::System::get_n_mpi_processes(mpi_communicator) <= 32)
+	if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
 	  output_results (cycle);
 
 	pcout << std::endl;
