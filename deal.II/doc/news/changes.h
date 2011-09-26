@@ -325,6 +325,12 @@ and DoF handlers embedded in higher dimensional space have been added.
 
 <ol>
 
+<li> Improved: The class BlockList used in RelaxationBlock has been replaced
+by SparsityPattern, since it only reproduced its functionality.
+<br>
+(Guido Kanschat, 2011/09/26)
+
+
 <li> New: SparsityPattern::row_position() finds a column index in a row and returns
 its "local" index or numbers::invalid_unsigned_int.
 <br>

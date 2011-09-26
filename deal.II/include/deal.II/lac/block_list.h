@@ -15,6 +15,7 @@
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/template_constraints.h>
+#include <lac/sparsity_pattern.h>
 #include <deal.II/fe/fe.h>
 
 #include <vector>
@@ -22,8 +23,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * @warning This class is still experimental and will most likely be
- * changed in a future release.
+ * @deprecated This class is experimental and will be
+ * removed in a future release.
  *
  * A vector of index sets listing the indices of small blocks of a
  * linear system. For each block, the indices in that block are
@@ -52,6 +53,20 @@ class BlockList :
 				     /// The iterator for individual indices
     typedef block_container::const_iterator const_iterator;
 
+				     /**
+				      * Since SparsityPattern can
+				      * handle the tasks of BlockList,
+				      * this function allows us to
+				      * create one from an already
+				      * filled BlockList. A first step
+				      * to make BlockList obsolete.
+				      *
+				      * The additional integer
+				      * argument is the dimension of
+				      * the vector space.
+				      */
+    void create_sparsity_pattern(SparsityPattern& sparsity, unsigned int n) const;
+    
 				     /**
 				      * Add the indices in
 				      * <tt>indices</tt> to block
@@ -269,6 +284,24 @@ class BlockList :
 				      */
     std::vector<block_container> index_sets;
 };
+
+
+inline
+void
+BlockList::create_sparsity_pattern(SparsityPattern& sparsity, unsigned int n) const
+{
+  std::vector<unsigned int> sizes(size());
+  for (unsigned int b=0;b<size();++b)
+    sizes[b] = block_size(b);
+
+  sparsity.reinit(size(), n, sizes);
+  for (unsigned int b=0;b<size();++b)
+    {
+      for (const_iterator i = begin(b); i != end(b); ++i)
+	sparsity.add(b,*i);
+    }
+  sparsity.compress();
+}
 
 
 inline

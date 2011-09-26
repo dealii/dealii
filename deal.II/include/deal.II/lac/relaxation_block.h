@@ -96,7 +96,7 @@ class RelaxationBlock :
 					  * The mapping from indices
 					  * to blocks.
 					  */
-	BlockList block_list;
+	SparsityPattern block_list;
 
 					 /**
 					  * Relaxation parameter.
