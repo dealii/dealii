@@ -691,6 +691,97 @@ namespace Utilities
     }
 
 #endif
+
+
+
+
+    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
+					char** &argv)
+		    :
+		    owns_mpi (true)
+    {
+      static bool constructor_has_already_run = false;
+      Assert (constructor_has_already_run == false,
+	      ExcMessage ("You can only create a single object of this class "
+			  "in a program since it initializes the MPI system."));
+
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+      AssertThrow (MPI_has_been_started == 0,
+		   ExcMessage ("MPI error. You can only start MPI once!"));
+
+      int mpi_err;
+      mpi_err = MPI_Init (&argc, &argv);
+      AssertThrow (mpi_err == 0,
+		   ExcMessage ("MPI could not be initialized."));
+#else
+				       // make sure the compiler doesn't warn
+				       // about these variables
+      (void)argc;
+      (void)argv;
+#endif
+
+      constructor_has_already_run = true;
+    }
+
+
+    MPI_InitFinalize::~MPI_InitFinalize()
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+
+#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
+				       // make memory pool release all
+				       // vectors that are no longer
+				       // used at this point. this is
+				       // relevant because the static
+				       // object destructors run for
+				       // these vectors at the end of
+				       // the program would run after
+				       // MPI_Finalize is called,
+				       // leading to errors
+				       //
+				       // TODO: On Mac OS X, shared libs can
+ 				       // only depend on other libs listed
+ 				       // later on the command line. This
+ 				       // means that libbase can't depend on
+ 				       // liblac, and we can't destroy the
+ 				       // memory pool here as long as we have
+ 				       // separate libraries. Consequently,
+ 				       // the #ifdef above. Deal will then
+ 				       // just continue to seg fault upon
+ 				       // completion of main()
+      GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
+	::release_unused_memory ();
+      GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
+	::release_unused_memory ();
+#  endif
+
+      int mpi_err = 0;
+
+      int MPI_has_been_started = 0;
+      MPI_Initialized(&MPI_has_been_started);
+      if (Utilities::System::program_uses_mpi() == true && owns_mpi == true &&
+	  MPI_has_been_started != 0)
+	{
+	  if (std::uncaught_exception())
+	    {
+	      std::cerr << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
+			<< this_mpi_process(MPI_COMM_WORLD)
+			<< ". Skipping MPI_Finalize() to avoid a deadlock."
+			<< std::endl;
+	    }
+	  else
+	    mpi_err = MPI_Finalize();
+	}
+
+
+      AssertThrow (mpi_err == 0,
+		   ExcMessage ("An error occurred while calling MPI_Finalize()"));
+#endif
+    }
+
+
   }
 
 
@@ -781,97 +872,8 @@ namespace Utilities
 
     bool job_supports_mpi ()
     {
-      return program_uses_mpi;
+      return program_uses_mpi();
     }
-
-
-
-    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
-					char** &argv)
-		    :
-		    owns_mpi (true)
-    {
-      static bool constructor_has_already_run = false;
-      Assert (constructor_has_already_run == false,
-	      ExcMessage ("You can only create a single object of this class "
-			  "in a program since it initializes the MPI system."));
-
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-      AssertThrow (MPI_has_been_started == 0,
-		   ExcMessage ("MPI error. You can only start MPI once!"));
-
-      int mpi_err;
-      mpi_err = MPI_Init (&argc, &argv);
-      AssertThrow (mpi_err == 0,
-		   ExcMessage ("MPI could not be initialized."));
-#else
-				       // make sure the compiler doesn't warn
-				       // about these variables
-      (void)argc;
-      (void)argv;
-#endif
-
-      constructor_has_already_run = true;
-    }
-
-
-    MPI_InitFinalize::~MPI_InitFinalize()
-    {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-
-#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
-				       // make memory pool release all
-				       // vectors that are no longer
-				       // used at this point. this is
-				       // relevant because the static
-				       // object destructors run for
-				       // these vectors at the end of
-				       // the program would run after
-				       // MPI_Finalize is called,
-				       // leading to errors
-				       //
-				       // TODO: On Mac OS X, shared libs can
- 				       // only depend on other libs listed
- 				       // later on the command line. This
- 				       // means that libbase can't depend on
- 				       // liblac, and we can't destroy the
- 				       // memory pool here as long as we have
- 				       // separate libraries. Consequently,
- 				       // the #ifdef above. Deal will then
- 				       // just continue to seg fault upon
- 				       // completion of main()
-      GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
-	::release_unused_memory ();
-      GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
-	::release_unused_memory ();
-#  endif
-
-      int mpi_err = 0;
-
-      int MPI_has_been_started = 0;
-      MPI_Initialized(&MPI_has_been_started);
-      if (program_uses_mpi() == true && owns_mpi == true &&
-	  MPI_has_been_started != 0)
-	{
-	  if (std::uncaught_exception())
-	    {
-	      std::cerr << "ERROR: Uncaught exception in MPI_InitFinalize on proc "
-			<< get_this_mpi_process(MPI_COMM_WORLD)
-			<< ". Skipping MPI_Finalize() to avoid a deadlock."
-			<< std::endl;
-	    }
-	  else
-	    mpi_err = MPI_Finalize();
-	}
-
-
-      AssertThrow (mpi_err == 0,
-		   ExcMessage ("An error occurred while calling MPI_Finalize()"));
-#endif
-    }
-
 
 
     bool
