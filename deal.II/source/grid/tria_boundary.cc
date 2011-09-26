@@ -527,7 +527,7 @@ namespace internal
 
 
     Tensor<1,3>
-    normalized_alternating_product (const Tensor<1,3> (&basis_vectors)[1])
+    normalized_alternating_product (const Tensor<1,3> (&)[1])
     {
       // we get here from StraightBoundary<2,3>::normal_vector, but
       // the implementation below is bogus for this case anyway
