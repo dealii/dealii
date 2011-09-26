@@ -336,10 +336,8 @@ its "local" index or numbers::invalid_unsigned_int.
 <br>
 (Guido Kanschat, 2011/09/26)
 
-<li> New: There is now a function GridTools::volume() computing the volume
-
-<li> New: The function Utilities::MPI::sum
-function can be used to compute the sum of values over a number of
+<li> New: The functions Utilities::MPI::sum and Utilities::MPI::max
+function can be used to compute the sum or maximum of values over a number of
 MPI processes without having to deal with the underlying MPI functions.
 <br>
 (Wolfgang Bangerth, 2011/09/25)
@@ -366,7 +364,7 @@ threads kept pouncing on it. This is now fixed.
 <br>
 (Patrick Sodr&eacute;, 2011/09/07)
 
-<li> New: There is now a function GridTools::volume computing the volume
+<li> New: There is now a function GridTools::volume() computing the volume
 of a triangulation.
 <br>
 (Wolfgang Bangerth, 2011/09/02)

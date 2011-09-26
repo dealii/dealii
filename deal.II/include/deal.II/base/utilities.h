@@ -383,6 +383,22 @@ namespace Utilities
     T sum (const T &t,
 	   const MPI_Comm &mpi_communicator);
 
+    /**
+     * Return the maximum over all processors of the value @p t. This function
+     * is collective over all processors given in the communicator. If
+     * deal.II is not configured for use of MPI, this function simply
+     * returns the value of @p t. This function corresponds to the
+     * <code>MPI_Allreduce</code> function, i.e. all processors receive
+     * the result of this operation.
+     *
+     * @note This function is only implemented for certain template
+     * arguments <code>T</code>, namely <code>float, double, int,
+     * unsigned int</code>.
+     */
+    template <typename T>
+    T max (const T &t,
+	   const MPI_Comm &mpi_communicator);
+
 				     /**
 				      * Data structure to store the result of
 				      * min_max_avg().
@@ -983,6 +999,7 @@ namespace Utilities
 #endif
     }
 
+
     template <typename T>
     inline
     T sum (const T &t,
@@ -992,6 +1009,24 @@ namespace Utilities
       T sum;
       MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&t)),
 		     &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
+		     mpi_communicator);
+      return sum;
+#else
+      (void)mpi_communicator;
+      return t;
+#endif
+    }
+
+
+    template <typename T>
+    inline
+    T max (const T &t,
+	   const MPI_Comm &mpi_communicator)
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      T sum;
+      MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&t)),
+		     &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
 		     mpi_communicator);
       return sum;
 #else

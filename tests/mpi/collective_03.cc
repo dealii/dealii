@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// check Utilities::MPI::sum()
+// check Utilities::MPI::max()
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -27,19 +27,19 @@ void test()
   int int_sum, uint_sum, double_sum, float_sum;
   int_sum
     =
-    Utilities::MPI::sum<int>(myid+1,
+    Utilities::MPI::max<int>(myid+1,
 			     MPI_COMM_WORLD);
   uint_sum
     =
-    Utilities::MPI::sum<unsigned int>(myid+1,
+    Utilities::MPI::max<unsigned int>(myid+1,
 				      MPI_COMM_WORLD);
   float_sum
     =
-    Utilities::MPI::sum<float>(myid+1,
+    Utilities::MPI::max<float>(myid+1,
 			       MPI_COMM_WORLD);
   double_sum
     =
-    Utilities::MPI::sum<double>(myid+1,
+    Utilities::MPI::max<double>(myid+1,
 				MPI_COMM_WORLD);
 
   if (myid==0)
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("collective_02").c_str());
+      std::ofstream logfile(output_file_for_mpi("collective_03").c_str());
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
