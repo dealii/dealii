@@ -675,8 +675,9 @@ namespace Utilities
 
 
 
-    void min_max_avg(const double my_value,
-		     const MPI_Comm &)
+    MinMaxAvg
+    min_max_avg(const double my_value,
+		const MPI_Comm &)
     {
       MinMaxAvg result;
 
