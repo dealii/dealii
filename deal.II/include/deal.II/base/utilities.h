@@ -383,6 +383,22 @@ namespace Utilities
     T sum (const T &t,
 	   const MPI_Comm &mpi_communicator);
 
+				     /**
+				      * Like the previous function,
+				      * but take the sums over the
+				      * elements of an array
+				      * of length N. In other words,
+				      * the i-th element of the
+				      * results array is the sum over
+				      * the i-th entries of the input
+				      * arrays from each processor.
+				      */
+    template <typename T, unsigned int N>
+    inline
+    void sum (const T (&values)[N],
+	      const MPI_Comm &mpi_communicator,
+	      T (&sums)[N]);
+
     /**
      * Return the maximum over all processors of the value @p t. This function
      * is collective over all processors given in the communicator. If
@@ -398,6 +414,22 @@ namespace Utilities
     template <typename T>
     T max (const T &t,
 	   const MPI_Comm &mpi_communicator);
+
+				     /**
+				      * Like the previous function,
+				      * but take the maxima over the
+				      * elements of an array
+				      * of length N. In other words,
+				      * the i-th element of the
+				      * results array is the maximum of
+				      * the i-th entries of the input
+				      * arrays from each processor.
+				      */
+    template <typename T, unsigned int N>
+    inline
+    void max (const T (&values)[N],
+	      const MPI_Comm &mpi_communicator,
+	      T (&maxima)[N]);
 
 				     /**
 				      * Data structure to store the result of
@@ -1018,6 +1050,24 @@ namespace Utilities
     }
 
 
+    template <typename T, unsigned int N>
+    inline
+    void sum (const T (&values)[N],
+	      const MPI_Comm &mpi_communicator,
+	      T (&sums)[N])
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&values[0])),
+		     &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
+		     mpi_communicator);
+#else
+      (void)mpi_communicator;
+      for (unsigned int i=0; i<N; ++i)
+	sums[i] = values[i];
+#endif
+    }
+
+
     template <typename T>
     inline
     T max (const T &t,
@@ -1032,6 +1082,24 @@ namespace Utilities
 #else
       (void)mpi_communicator;
       return t;
+#endif
+    }
+
+
+    template <typename T, unsigned int N>
+    inline
+    void max (const T (&values)[N],
+	      const MPI_Comm &mpi_communicator,
+	      T (&maxima)[N])
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&values[0])),
+		     &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
+		     mpi_communicator);
+#else
+      (void)mpi_communicator;
+      for (unsigned int i=0; i<N; ++i)
+	maxima[i] = values[i];
 #endif
     }
   }
