@@ -1,41 +1,42 @@
 <map id="StepsMap" name="StepsMap">
-<area shape="poly" id="node1" href="../deal.II/step_1.html" title="Creating a grid. Refining it. Writing it to a file" alt="" coords="693,60 693,28 671,5 639,5 616,28 616,60 639,83 671,83"/>
-<area shape="poly" id="node2" href="../deal.II/step_2.html" title="Assigning degrees of freedom to a grid." alt="" coords="693,185 693,153 671,131 639,131 616,153 616,185 639,208 671,208"/>
-<area shape="poly" id="node3" href="../deal.II/step_3.html" title="Solving Poisson&#39;s equation." alt="" coords="693,311 693,279 671,256 639,256 616,279 616,311 639,333 671,333"/>
-<area shape="poly" id="node4" href="../deal.II/step_4.html" title="Dimension independent programming. Boundary conditions." alt="" coords="693,436 693,404 671,381 639,381 616,404 616,436 639,459 671,459"/>
-<area shape="poly" id="node5" href="../deal.II/step_5.html" title="Reading a grid from disk. Computations on successively refined grids." alt="" coords="453,561 453,529 431,507 399,507 376,529 376,561 399,584 431,584"/>
-<area shape="rect" id="node10" href="../deal.II/step_10.html" title="Higher order mappings." alt="" coords="549,529,584,562"/>
-<area shape="rect" id="node15" href="../deal.II/step_15.html" title="1d problems. A nonlinear problem." alt="" coords="608,529,643,562"/>
-<area shape="rect" id="node20" href="../deal.II/step_20.html" title="Mixed finite elements for the mixed Laplacian. Block solvers." alt="" coords="265,531,300,560"/>
-<area shape="rect" id="node23" href="../deal.II/step_23.html" title="Time dependent problems. The wave equation." alt="" coords="667,531,701,560"/>
-<area shape="rect" id="node28" href="../deal.II/step_29.html" title="A complex&#45;valued Helmholtz equation. Sparse direct solvers." alt="" coords="725,529,760,562"/>
-<area shape="rect" id="node32" href="../deal.II/step_34.html" title="Boundary element methods for potential flow." alt="" coords="835,531,869,560"/>
-<area shape="rect" id="node34" href="../deal.II/step_36.html" title="Finding eigenvalues of the Schr&ouml;dinger equation." alt="" coords="893,529,928,562"/>
-<area shape="rect" id="node35" href="../deal.II/step_38.html" title="Solve the Laplace Beltrami operator on a Half Sphere." alt="" coords="835,654,869,687"/>
-<area shape="rect" id="node38" href="../deal.II/step_45.html" title="Periodic boundary conditions" alt="" coords="629,758,664,791"/>
-<area shape="poly" id="node6" href="../deal.II/step_6.html" title="Adaptive local refinement. Higher order elements" alt="" coords="432,687 432,655 409,632 377,632 355,655 355,687 377,709 409,709"/>
-<area shape="rect" id="node7" href="../deal.II/step_7.html" title="Helmholtz equation. Computing errors. Boundary integrals." alt="" coords="523,758,555,791"/>
-<area shape="rect" id="node8" href="../deal.II/step_8.html" title="Systems of PDE. Elasticity." alt="" coords="184,758,216,791"/>
-<area shape="rect" id="node9" href="../deal.II/step_9.html" title="Advection equation. Multithreading. Refinement criteria." alt="" coords="240,758,272,791"/>
-<area shape="rect" id="node13" href="../deal.II/step_13.html" title="Modularity. Software design." alt="" coords="296,758,331,791"/>
-<area shape="rect" id="node16" href="../deal.II/step_16.html" title="Multigrid on adaptive meshes." alt="" coords="355,758,389,791"/>
-<area shape="rect" id="node22" href="../deal.II/step_22.html" title="The Stokes equation on adaptive meshes." alt="" coords="67,760,101,789"/>
-<area shape="rect" id="node26" href="../deal.II/step_27.html" title="hp&#45;adaptive finite element methods." alt="" coords="125,758,160,791"/>
-<area shape="rect" id="node27" href="../deal.II/step_28.html" title="Handling multiple meshes at the same time. Neutron transport." alt="" coords="413,758,448,791"/>
-<area shape="rect" id="node36" href="../deal.II/step_39.html" title="Interior Penalty for the Laplace equation. Adaptive refinement. Multigrid." alt="" coords="575,923,609,957"/>
-<area shape="rect" id="node37" href="../deal.II/step_40.html" title="Solving the Laplace equation on adaptive meshes on thousands of processors." alt="" coords="284,923,319,957"/>
-<area shape="rect" id="node12" href="../deal.II/step_12.html" title="Discontinuous Galerkin for linear advection." alt="" coords="520,841,555,874"/>
-<area shape="rect" id="node17" href="../deal.II/step_17.html" title="Parallel computing using MPI. Using PETSc." alt="" coords="240,843,275,872"/>
-<area shape="rect" id="node39" href="../deal.II/step_46.html" title="Coupling different models in different parts of the domain" alt="" coords="181,841,216,874"/>
-<area shape="rect" id="node11" href="../deal.II/step_11.html" title="Higher order mappings. Dealing with constraints." alt="" coords="549,654,584,687"/>
-<area shape="rect" id="node29" href="../deal.II/step_30.html" title="Anisotropic refinement for DG methods." alt="" coords="516,923,551,957"/>
-<area shape="rect" id="node31" href="../deal.II/step_33.html" title="Hyperbolic conservation laws: the Euler equations of gas dynamics." alt="" coords="457,925,492,955"/>
-<area shape="rect" id="node14" href="../deal.II/step_14.html" title="Duality based error estimates. Adaptivity." alt="" coords="299,841,333,874"/>
-<area shape="rect" id="node18" href="../deal.II/step_18.html" title="Quasistatic elasticity. More parallel computing." alt="" coords="196,925,231,955"/>
-<area shape="rect" id="node19" href="../deal.II/step_19.html" title="Handling input parameter files. Converting output formats." alt="" coords="123,841,157,874"/>
-<area shape="rect" id="node21" href="../deal.II/step_21.html" title="Two&#45;phase flow in porous media." alt="" coords="192,656,227,685"/>
-<area shape="rect" id="node30" href="../deal.II/step_31.html" title="Boussinesq flow for thermal convection." alt="" coords="5,843,40,872"/>
-<area shape="rect" id="node33" href="../deal.II/step_35.html" title="A projection solver for the Navier&#45;Stokes equations." alt="" coords="64,843,99,872"/>
-<area shape="rect" id="node24" href="../deal.II/step_24.html" title="The wave equation with absorbing boundary conditions. Extracting point values." alt="" coords="677,656,712,685"/>
-<area shape="rect" id="node25" href="../deal.II/step_25.html" title="The nonlinear sine&#45;Gordon soliton equation" alt="" coords="688,760,723,789"/>
+<area shape="poly" id="node1" href="../deal.II/step_1.html" title="Creating a grid. Refining it. Writing it to a file" alt="" coords="631,60 631,28 608,5 576,5 553,28 553,60 576,83 608,83"/>
+<area shape="poly" id="node2" href="../deal.II/step_2.html" title="Assigning degrees of freedom to a grid." alt="" coords="631,185 631,153 608,131 576,131 553,153 553,185 576,208 608,208"/>
+<area shape="poly" id="node3" href="../deal.II/step_3.html" title="Solving Poisson&#39;s equation." alt="" coords="631,311 631,279 608,256 576,256 553,279 553,311 576,333 608,333"/>
+<area shape="poly" id="node4" href="../deal.II/step_4.html" title="Dimension independent programming. Boundary conditions." alt="" coords="631,436 631,404 608,381 576,381 553,404 553,436 576,459 608,459"/>
+<area shape="poly" id="node5" href="../deal.II/step_5.html" title="Reading a grid from disk. Computations on successively refined grids." alt="" coords="391,561 391,529 368,507 336,507 313,529 313,561 336,584 368,584"/>
+<area shape="rect" id="node10" href="../deal.II/step_10.html" title="Higher order mappings." alt="" coords="487,529,521,562"/>
+<area shape="rect" id="node15" href="../deal.II/step_15.html" title="1d problems. A nonlinear problem." alt="" coords="545,529,580,562"/>
+<area shape="rect" id="node20" href="../deal.II/step_20.html" title="Mixed finite elements for the mixed Laplacian. Block solvers." alt="" coords="204,531,239,560"/>
+<area shape="rect" id="node23" href="../deal.II/step_23.html" title="Time dependent problems. The wave equation." alt="" coords="604,531,639,560"/>
+<area shape="rect" id="node28" href="../deal.II/step_29.html" title="A complex&#45;valued Helmholtz equation. Sparse direct solvers." alt="" coords="663,529,697,562"/>
+<area shape="rect" id="node33" href="../deal.II/step_34.html" title="Boundary element methods for potential flow." alt="" coords="772,531,807,560"/>
+<area shape="rect" id="node35" href="../deal.II/step_36.html" title="Finding eigenvalues of the Schr&ouml;dinger equation." alt="" coords="831,529,865,562"/>
+<area shape="rect" id="node36" href="../deal.II/step_38.html" title="Solve the Laplace Beltrami operator on a Half Sphere." alt="" coords="772,654,807,687"/>
+<area shape="rect" id="node39" href="../deal.II/step_45.html" title="Periodic boundary conditions" alt="" coords="568,758,603,791"/>
+<area shape="poly" id="node6" href="../deal.II/step_6.html" title="Adaptive local refinement. Higher order elements" alt="" coords="369,687 369,655 347,632 315,632 292,655 292,687 315,709 347,709"/>
+<area shape="rect" id="node7" href="../deal.II/step_7.html" title="Helmholtz equation. Computing errors. Boundary integrals." alt="" coords="405,758,437,791"/>
+<area shape="rect" id="node8" href="../deal.II/step_8.html" title="Systems of PDE. Elasticity." alt="" coords="240,758,272,791"/>
+<area shape="rect" id="node9" href="../deal.II/step_9.html" title="Advection equation. Multithreading. Refinement criteria." alt="" coords="512,758,544,791"/>
+<area shape="rect" id="node13" href="../deal.II/step_13.html" title="Modularity. Software design." alt="" coords="347,758,381,791"/>
+<area shape="rect" id="node16" href="../deal.II/step_16.html" title="Multigrid on adaptive meshes." alt="" coords="123,758,157,791"/>
+<area shape="rect" id="node22" href="../deal.II/step_22.html" title="The Stokes equation on adaptive meshes." alt="" coords="5,760,40,789"/>
+<area shape="rect" id="node26" href="../deal.II/step_27.html" title="hp&#45;adaptive finite element methods." alt="" coords="64,758,99,791"/>
+<area shape="rect" id="node27" href="../deal.II/step_28.html" title="Handling multiple meshes at the same time. Neutron transport." alt="" coords="181,758,216,791"/>
+<area shape="rect" id="node37" href="../deal.II/step_39.html" title="Interior Penalty for the Laplace equation. Adaptive refinement. Multigrid." alt="" coords="459,923,493,957"/>
+<area shape="rect" id="node38" href="../deal.II/step_40.html" title="Solving the Laplace equation on adaptive meshes on thousands of processors." alt="" coords="259,923,293,957"/>
+<area shape="rect" id="node12" href="../deal.II/step_12.html" title="Discontinuous Galerkin for linear advection." alt="" coords="404,841,439,874"/>
+<area shape="rect" id="node17" href="../deal.II/step_17.html" title="Parallel computing using MPI. Using PETSc." alt="" coords="236,843,271,872"/>
+<area shape="rect" id="node40" href="../deal.II/step_46.html" title="Coupling different physical models (flow, elasticity) in different parts of the domain" alt="" coords="177,841,212,874"/>
+<area shape="rect" id="node11" href="../deal.II/step_11.html" title="Higher order mappings. Dealing with constraints." alt="" coords="487,654,521,687"/>
+<area shape="rect" id="node29" href="../deal.II/step_30.html" title="Anisotropic refinement for DG methods." alt="" coords="341,923,376,957"/>
+<area shape="rect" id="node32" href="../deal.II/step_33.html" title="Hyperbolic conservation laws: the Euler equations of gas dynamics." alt="" coords="400,925,435,955"/>
+<area shape="rect" id="node14" href="../deal.II/step_14.html" title="Duality based error estimates. Adaptivity." alt="" coords="345,841,380,874"/>
+<area shape="rect" id="node18" href="../deal.II/step_18.html" title="Quasistatic elasticity. More parallel computing." alt="" coords="145,925,180,955"/>
+<area shape="rect" id="node31" href="../deal.II/step_32.html" title="A parallel Boussinesq flow for thermal convection." alt="" coords="204,1005,239,1035"/>
+<area shape="rect" id="node19" href="../deal.II/step_19.html" title="Handling input parameter files. Converting output formats." alt="" coords="119,841,153,874"/>
+<area shape="rect" id="node21" href="../deal.II/step_21.html" title="Two&#45;phase flow in porous media." alt="" coords="131,656,165,685"/>
+<area shape="rect" id="node30" href="../deal.II/step_31.html" title="Boussinesq flow for thermal convection." alt="" coords="56,925,91,955"/>
+<area shape="rect" id="node34" href="../deal.II/step_35.html" title="A projection solver for the Navier&#45;Stokes equations." alt="" coords="60,843,95,872"/>
+<area shape="rect" id="node24" href="../deal.II/step_24.html" title="The wave equation with absorbing boundary conditions. Extracting point values." alt="" coords="615,656,649,685"/>
+<area shape="rect" id="node25" href="../deal.II/step_25.html" title="The nonlinear sine&#45;Gordon soliton equation" alt="" coords="627,760,661,789"/>
 </map>
