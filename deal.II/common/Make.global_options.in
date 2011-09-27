@@ -174,7 +174,7 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
         lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
         lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/lib/$(DEAL_II_PETSC_ARCH)/*$(lib-suffix))
       else
-        # which is the same for PETSc 3.0.0:
+        # which is the similar as for PETSc 3.0.0:
         ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),30)
           lib-contrib-petsc.g = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
           lib-contrib-petsc.o = $(shell echo $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/lib/*$(lib-suffix))
@@ -306,10 +306,8 @@ INCLUDE = -I$D/include \
 #
 # also, note that this only works for PETSc before 2.3 :-]
 ifeq ($(USE_CONTRIB_PETSC),yes)
-  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
-    ifeq ($(DEAL_II_PETSC_VERSION_MINOR),2)
-      include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
-    endif
+  ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),22)
+    include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
   endif
   INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
              $(MPI_INCLUDE)
