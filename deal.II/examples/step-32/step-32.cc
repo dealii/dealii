@@ -121,15 +121,6 @@ namespace Step32
 
     const double year_in_seconds  = 60*60*24*365.2425;
 
-//TODO: document in intro.dox
-				     // scale not by R1-R0, but by a
-				     // typical length scale, say 10km,
-				     // of variation ("plume
-				     // diameter"). this choice also
-				     // roughly equilibrates the sizes
-				     // of the velocity and pressure
-				     // components of the solution
-				     // vectors
     const double pressure_scaling = eta / 10000;
 
 
@@ -144,7 +135,7 @@ namespace Step32
     template <int dim>
     Tensor<1,dim> gravity_vector (const Point<dim> &p)
     {
-// interpolate the following values with a physically realistic model:
+// Interpolate the following values with a physically realistic model:
 //    const double g0      = 10.7;                  /* m / s^2    */
 //    const double g1      = 9.81;                  /* m / s^2    */
 
@@ -157,17 +148,17 @@ namespace Step32
     template <int dim>
     double adiabatic_pressure (const Point<dim> &p)
     {
-				       // the static, adiabatic pressure
+				       // The static, adiabatic pressure
 				       // satisfies
 				       //    dP/dr = -g rho
 
-				       // assuming a constant density,
+				       // Assuming a constant density,
 				       // we can integrate the pressure
 				       // equation in depth to get that
 				       // the adiabatic pressure equals
 				       //   $P(r) = rho_0 \int_r^{R_1} g(r) dr$
 				       //
-				       // using the model for the
+				       // Using the model for the
 				       // gravity vector above, this
 				       // yields the following formula:
       const double r = p.norm();
@@ -178,11 +169,11 @@ namespace Step32
     template <int dim>
     double adiabatic_temperature (const Point<dim> &p)
     {
-				       // the static, adiabatic
+				       // The static, adiabatic
 				       // temperature satisfies
-				       //    $dT/dr = -T alpha/c_P g$
+				       //    $dT/dr = -T \alpha/c_P g$
 
-				       // let's assume constant gravity,
+				       // Let's assume constant gravity,
 				       // then we get by integration
       const double r = p.norm();
 
@@ -241,6 +232,8 @@ namespace Step32
 
 
 // @sect3{Linear solvers and preconditioners}
+
+// TODO (MK): update
 
 // In comparison to step-31, we did one
 // change in the linear algebra of the
@@ -389,7 +382,9 @@ namespace Step32
 // struct is equipped with a constructor
 // that create an FEValues object for a
 // @ref FiniteElement "finite element", a
-// @ref Quadrature "quadrature formula"
+// @ref Quadrature "quadrature formula", the
+// @ref Mapping "mapping" that describes the
+// interpolation of curved boundaries,
 // and some
 // @ref UpdateFlags "update flags".
 // Moreover, we manually
@@ -844,10 +839,14 @@ namespace Step32
 // frequently have to query velocities and
 // temperatures at arbitrary quadrature
 // points; consequently, rather than
-// "localizing" a vector whenever we need a
-// localized vector, we solve linear
+// importing ghost information of a vector
+// whenever we need access to degrees of freedom
+// that are relevant locally but owned by
+// another processor,
+// we solve linear
 // systems in %parallel but then immediately
-// localize the solution for further
+// initialize a vector including ghost entries
+// the solution for further
 // processing. The various
 // <code>*_solution</code> vectors are
 // therefore filled immediately after
@@ -1287,8 +1286,9 @@ namespace Step32
 
 // @sect4{The BoussinesqFlowProblem helper functions}
 //
-// Except two small details, this
-// function is the very same as in
+// Except two small details, the function
+// to compute the global maximum of
+// the velocity is the very same as in
 // step-31. The first detail is
 // actually common to all functions
 // that implement loop over all cells
@@ -1315,8 +1315,8 @@ namespace Step32
 // each processor calculate the
 // maximum among its cells, and then
 // do a global communication
-// operation called
-// <code>MaxAll</code> that searches
+// operation 
+// <code>Utilities::MPI::max</code> that searches
 // for the maximum value among all
 // the maximum values of the
 // individual processors. MPI
@@ -1327,12 +1327,10 @@ namespace Step32
 // will do the right thing even if we
 // work without MPI and on a single
 // machine only. The call to
-// <code>MaxAll</code> needs three
+// <code>Utilities::MPI::max</code> needs two
 // arguments, namely the local
-// maximum (input), a field for the
-// global maximum (output), and an
-// integer value one that says that
-// we only work on one double.
+// maximum (input) and the MPI communicator,
+// which is MPI_COMM_WORLD in this example.
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   {
@@ -1368,9 +1366,13 @@ namespace Step32
 
 
 // Similar function to before, but we now
-// compute the cfl number, i.e., maximal
+// compute the CFL number, i.e., maximal
 // velocity on a cell divided by the cell
-// diameter
+// diameter. This number is necessary to
+// determine the time step size, as we use
+// a semi-explicit time stepping scheme for
+// the temperature equation (see step-31 for
+// a discussion).
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_cfl_number () const
   {
@@ -1408,17 +1410,20 @@ namespace Step32
 
 
 
+  // Next comes the computation of the global entropy variation
+  // $\|E(T)-avg(E)\|_\infty$. This is needed for the evaluation of the
+  // stabilization in the temperature equation as explained in the
+  // introduction. The entropy variation is actually only needed if we use
+  // $\alpha=2$ as a power in the residual computation. The infinity norm is
+  // computed by the maxima over quadrature points, as usual in discrete
+  // computations.
   template <int dim>
   double
   BoussinesqFlowProblem<dim>::get_entropy_variation (const double average_temperature) const
   {
-				     // only do this if we really need entropy
-				     // variation
     if (parameters.stabilization_alpha != 2)
       return 1.;
 
-				     // record maximal entropy on Gauss quadrature
-				     // points
     const QGauss<dim> quadrature_formula (parameters.temperature_degree+1);
     const unsigned int n_q_points = quadrature_formula.size();
 
@@ -1427,6 +1432,14 @@ namespace Step32
     std::vector<double> old_temperature_values(n_q_points);
     std::vector<double> old_old_temperature_values(n_q_points);
 
+				     // Note how we preset the data fields for
+				     // the minimum and maximum values: The
+				     // minimum is initialized with a bigger
+				     // and the maximum with a smaller number
+				     // than one that is going to
+				     // appear. These numbers will be
+				     // overwritten in the cell loop or in the
+				     // communication step at the latest.
     double min_entropy = std::numeric_limits<double>::max(),
 	   max_entropy = -std::numeric_limits<double>::max(),
 		  area = 0,
@@ -1457,11 +1470,11 @@ namespace Step32
 	    }
 	}
 
-				     // do MPI data exchange: we need to sum over
+				     // MPI data exchange: we need to sum over
 				     // the two integrals (area,
 				     // entropy_integrated), and get the extrema
 				     // for maximum and minimum. combine
-				     // MPI_Allreduce for two values since that is
+				     // MPI_Allreduce for two values since it is
 				     // an expensive operation
     const double local_for_sum[2] = { entropy_integrated, area },
 		 local_for_max[2] = { -min_entropy, max_entropy };
@@ -1478,7 +1491,8 @@ namespace Step32
 
 
 
-// Again, this is only a slightly
+// Again, the evaluation of the extrapolated
+// temperature range is only a slightly
 // modified version of the respective
 // function in step-31. What is new is
 // that each processor works on its
@@ -1500,12 +1514,6 @@ namespace Step32
     std::vector<double> old_temperature_values(n_q_points);
     std::vector<double> old_old_temperature_values(n_q_points);
 
-				     // This presets the minimum with a bigger
-				     // and the maximum with a smaller number
-				     // than one that is going to appear. Will
-				     // be overwritten in the cell loop or in
-				     // the communication step at the
-				     // latest.
     double min_local_temperature = std::numeric_limits<double>::max(),
 	   max_local_temperature = -std::numeric_limits<double>::max();
 
