@@ -810,8 +810,8 @@ the following quantities:
   500 and 900 degrees Celsius, whereas at its bottom it is around 4000 degrees
   Celsius (see, for example, <a target="_top"
   href="http://en.wikipedia.org/wiki/Mantle_(geology)">this Wikipedia
-  entry</a>). In Kelvin, we therefore choose $T_0=(4000+273)\text{K},
-  T_1=(500+273)\text{K}$ as boundary conditions at the inner and outer edge.
+  entry</a>). In Kelvin, we therefore choose $T_0=(4000+273)\text{K}$,
+  $T_1=(500+273)\text{K}$ as boundary conditions at the inner and outer edge.
 
   In addition to this, we also have to specifiy some initial conditions for
   the temperature field. The real temperature field of the earth is quite
@@ -978,7 +978,7 @@ the following quantities:
 	& \text{for} \ \|\mathbf x\|<R_1, \\
         -\frac{4}{3}\pi G \rho R^3 \frac{1}{\|\mathbf x\|^2}
         \frac{\mathbf x}{\|\mathbf x\|}
-	& \text{for} \ \|\mathbf x\|\ge R_1
+	& \text{for} \ \|\mathbf x\|\ge R_1.
       \end{array}
     \right.
   @f]
@@ -1034,7 +1034,7 @@ the following quantities:
   mantle to obtain
   @f[
     \|\mathbf{g}\|
-    = 1.245\cdot 10^{-6} \frac{1}{\textrm{s^2}} r + 7.714\cdot 10^{13} \frac{\textrm{m}^3{\textrm{s^2}}\frac 1{r^2}.
+    = 1.245\cdot 10^{-6} \frac{1}{\textrm{s^2}} r + 7.714\cdot 10^{13} \frac{\textrm{m}^3}{\textrm{s^2}}\frac{1}{r^2}.
   @f]
 
   <li>The density of the earth mantle varies spatially, but not by very
