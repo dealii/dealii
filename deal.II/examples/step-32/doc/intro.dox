@@ -398,8 +398,6 @@ We use the discrete form of the right hand side of this as our approximation
 $\tilde S$ to $S$.
 
 
-@todo discretization with FE_DGP
-
 <h3> Changes to the artificial viscosity stabilization </h3>
 
 @todo Martin, can you take another look at this section? In particular, I
@@ -501,6 +499,73 @@ graph has been obtained for an exponent $\alpha=1$, in the program we use
 $\alpha=2$ instead, and in that case one has to re-tune the parameter. It
 turns out that $c_R=0.5$ works with $\alpha=2$.
 
+
+<h3> Locally conservative Stokes discretization </h3>
+
+The standard Taylor-Hood discretization for Stokes, using the $Q_{k+1}^d
+\times Q_k$ element, is globally conservative, i.e. $\int_{\partial\Omega}
+\mathbf n \cdot \mathbf u_h = 0$. This can easily be seen: the weak form of
+the divergence equation reads $(q_h, \textrm{div}\; \mathbf u_h)=0, \forall
+q_h\in Q_h$. Because the pressure space does contain the function $q_h=1$, we
+get
+@f{align*}
+  0 = (1, \textrm{div}\; \mathbf u_h)_\Omega
+  = \int_\Omega \textrm{div}\; \mathbf u_h
+  = \int_{\partial\Omega} \mathbf n \cdot \mathbf u_h
+@f}
+by the divergence theorem. This property is important: if we want to use the
+velocity field $u_h$ to transport along other quantities (such as the
+temperature in the current equations, but it could also be concentrations of
+chemical substances or entirely artificial tracer quantities) then the
+conservation property guarantees that the amount of the quantity advected
+remains constant.
+
+That said, there are applications where this <i>global</i> property is not
+enough. Rather, we would like that it holds <i>locally</i>, on every
+cell. This can be achieved by using the space
+$Q_{k+1}^d \times DGP_k$ for discretization, where we have replaced the
+<i>continuous</i> space of tensor product polynomials of degree $k$ for the
+pressure by the <i>discontinuous</i> space of the complete polynomials of the
+same degree. (Note that tensor product polynomials in 2d contain the functions
+$1, x, y, xy$, whereas the complete polynomials only have the functions $1,x,y$.)
+This space turns out to be stable for the Stokes equation.
+
+Because the space is discontinuous, we can now in particular choose the test
+function $q_h(\mathbf x)=\chi_K(\mathbf x)$, i.e. the characteristic function
+of cell $K$. We then get in a similar fashion as above
+@f{align*}
+  0
+  = (q_h, \textrm{div}\; \mathbf u_h)_\Omega
+  = (1, \textrm{div}\; \mathbf u_h)_K
+  = \int_K \textrm{div}\; \mathbf u_h
+  = \int_{\partial K} \mathbf n \cdot \mathbf u_h,
+@f}
+showing the conservation property for cell $K$. This clearly holds for each
+cell individually.
+
+There are good reasons to use this discretization. As mentioned above, this
+element guarantees conservation of advected quantities on each cell
+individually. A second advantage is that the pressure mass matrix we use as a
+preconditioner in place of the Schur complement becomes block diagonal and
+consequently very easy to invert. However, there are also downsides. For one,
+there are now more pressure variables, increasing the overall size of the
+problem, although this doesn't seem to cause much harm in practice. More
+importantly, though, the fact that now the divergence integrated over each
+cell is zero when it wasn't before does not guarantee that the divergence is
+pointwise smaller. In fact, as one can easily verify, the $L_2$ norm of the
+divergence is <i>larger</i> for this than for the standard Taylor-Hood
+discretization. (However, both converge at the same rate to zero, since it is
+easy to see that
+$\|\textrm{div}\; u_h\|=
+\|\textrm{div}\; (u-u_h)\|=
+\|\textrm{trace}\; \nabla (u-u_h)\|\le
+\|\nabla (u-u_h)\|={\cal O}(h^{k+2})$.) It is therefore not a priori clear
+that the error is indeed smaller just because we now have more degrees of
+freedom.
+
+Given these considerations, it remains unclear which discretization one should
+prefer. Consequently, we leave that up to the user and make it a parameter in
+the input file which one to use.
 
 
 <h3> Parallelization on clusters </h3>
