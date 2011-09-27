@@ -1351,8 +1351,7 @@ namespace Step32
       cell = stokes_dof_handler.begin_active(),
       endc = stokes_dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() ==
-	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+      if (cell->is_locally_owned())
 	{
 	  fe_values.reinit (cell);
 	  fe_values[velocities].get_function_values (stokes_solution,
@@ -1390,8 +1389,7 @@ namespace Step32
       cell = stokes_dof_handler.begin_active(),
       endc = stokes_dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() ==
-	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+      if (cell->is_locally_owned())
 	{
 	  fe_values.reinit (cell);
 	  fe_values[velocities].get_function_values (stokes_solution,
@@ -1438,8 +1436,7 @@ namespace Step32
       cell = temperature_dof_handler.begin_active(),
       endc = temperature_dof_handler.end();
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() ==
-	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+      if (cell->is_locally_owned())
 	{
 	  fe_values.reinit (cell);
 	  fe_values.get_function_values (old_temperature_solution,
@@ -1518,8 +1515,7 @@ namespace Step32
 	  cell = temperature_dof_handler.begin_active(),
 	  endc = temperature_dof_handler.end();
 	for (; cell!=endc; ++cell)
-	  if (cell->subdomain_id() ==
-	      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+	  if (cell->is_locally_owned())
 	    {
 	      fe_values.reinit (cell);
 	      fe_values.get_function_values (old_temperature_solution,
@@ -1546,8 +1542,7 @@ namespace Step32
 	  cell = temperature_dof_handler.begin_active(),
 	  endc = temperature_dof_handler.end();
 	for (; cell!=endc; ++cell)
-	  if (cell->subdomain_id() ==
-	      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+	  if (cell->is_locally_owned())
 	    {
 	      fe_values.reinit (cell);
 	      fe_values.get_function_values (old_temperature_solution,
@@ -1774,8 +1769,7 @@ namespace Step32
       endc = temperature_dof_handler.end();
 
     for (; cell!=endc; ++cell)
-      if (cell->subdomain_id() ==
-	  Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+      if (cell->is_locally_owned())
 	{
 	  cell->get_dof_indices (local_dof_indices);
 	  fe_values.reinit (cell);
