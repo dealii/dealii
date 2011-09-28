@@ -73,6 +73,7 @@
 
 				 // This is the only include file that
 				 // is new: It introduces the
+				 // parallel::distributed::SolutionTransfer
 				 // equivalent of the
 				 // dealii::SolutionTransfer class to
 				 // take a solution from on mesh to
@@ -90,27 +91,41 @@
 #include <deal.II/distributed/grid_refinement.h>
 
 
-
+				 // The next step is like in all
+				 // previous tutorial programs: We put
+				 // everything into a namespace of its
+				 // own and then import the deal.II
+				 // classes and functions into it:
 namespace Step32
 {
   using namespace dealii;
 
-// @sect3{Equation data}
+				   // @sect3{Equation data}
 
-// In the following namespace, we define the
-// various pieces of equation data. All of
-// these are exhaustively discussed in the
-// description of the testcase in the
-// introduction:
+				   // In the following namespace, we
+				   // define the various pieces of
+				   // equation data that describe the
+				   // problem. This corresponds to the
+				   // various aspects of making the
+				   // problem at least slightly
+				   // realistc and that were
+				   // exhaustively discussed in the
+				   // description of the testcase in
+				   // the introduction.
+				   //
+				   // We start with a few coefficients
+				   // that have constant values (the
+				   // comment after the value
+				   // indicates its physical units):
   namespace EquationData
   {
     const double eta                   = 1e21;    /* Pa s       */
-    const double kappa                 = 1e-6;
+    const double kappa                 = 1e-6;    /* m / s      */
     const double reference_density     = 3300;    /* kg / m^3   */
     const double reference_temperature = 293;     /* K          */
     const double expansion_coefficient = 2e-5;    /* 1/K        */
-    const double specific_heat         = 1250;    /* J / K / kg */  //??
-    const double radiogenic_heating    = 7.4e-12; /* W / kg     */  //??
+    const double specific_heat         = 1250;    /* J / K / kg */
+    const double radiogenic_heating    = 7.4e-12; /* W / kg     */
 
 
     const double R0      = 6371000.-2890000.;     /* m          */
@@ -119,11 +134,16 @@ namespace Step32
     const double T0      = 4000+273;              /* K          */
     const double T1      =  700+273;              /* K          */
 
-    const double year_in_seconds  = 60*60*24*365.2425;
 
-    const double pressure_scaling = eta / 10000;
-
-
+				     // The next set of definitions
+				     // are for functions that encode
+				     // the density as a function of
+				     // temperature, the gravity
+				     // vector, and the initial values
+				     // for the temperature. Again,
+				     // all of these (along with the
+				     // values they compute) are
+				     // discussed in the introduction:
     double density (const double temperature)
     {
       return (reference_density *
@@ -135,49 +155,8 @@ namespace Step32
     template <int dim>
     Tensor<1,dim> gravity_vector (const Point<dim> &p)
     {
-// Interpolate the following values with a physically realistic model:
-//    const double g0      = 10.7;                  /* m / s^2    */
-//    const double g1      = 9.81;                  /* m / s^2    */
-
       const double r = p.norm();
-      return -(1.245e-6 * r + 7.714e13/r/r) * p / p.norm();
-    }
-
-
-
-    template <int dim>
-    double adiabatic_pressure (const Point<dim> &p)
-    {
-				       // The static, adiabatic pressure
-				       // satisfies
-				       //    dP/dr = -g rho
-
-				       // Assuming a constant density,
-				       // we can integrate the pressure
-				       // equation in depth to get that
-				       // the adiabatic pressure equals
-				       //   $P(r) = rho_0 \int_r^{R_1} g(r) dr$
-				       //
-				       // Using the model for the
-				       // gravity vector above, this
-				       // yields the following formula:
-      const double r = p.norm();
-      return reference_density * (1./2 * 1.245e-6 * (R1*R1 - r*r) - 7.714e13 * (1./R1 - 1./r));
-    }
-
-
-    template <int dim>
-    double adiabatic_temperature (const Point<dim> &p)
-    {
-				       // The static, adiabatic
-				       // temperature satisfies
-				       //    $dT/dr = -T \alpha/c_P g$
-
-				       // Let's assume constant gravity,
-				       // then we get by integration
-      const double r = p.norm();
-
-      return T1 * std::exp(-expansion_coefficient * 9.81 / specific_heat * (r-R1));
+      return -(1.245e-6 * r + 7.714e13/r/r) * p / r;
     }
 
 
@@ -205,9 +184,6 @@ namespace Step32
       const double r = p.norm();
       const double h = R1-R0;
 
-				       // s = fraction of the way from
-				       // the inner to the outer
-				       // boundary; 0<=s<=1
       const double s = (r-R0)/h;
       const double q = (dim==3)?std::max(0.0,cos(numbers::PI*abs(p(2)/R1))):1.0;
       const double phi   = std::atan2(p(0),p(1));
@@ -227,93 +203,126 @@ namespace Step32
       for (unsigned int c=0; c<this->n_components; ++c)
 	values(c) = TemperatureInitialValues<dim>::value (p, c);
     }
+
+
+				     // As mentioned in the
+				     // introduction we need to
+				     // rescale the pressure to avoid
+				     // the relative ill-conditioning
+				     // of the momentum and mass
+				     // conservation equations. The
+				     // scaling factor is
+				     // $\frac{\eta}{L}$ where $L$ was
+				     // a typical length scale. By
+				     // experimenting it turns out
+				     // that a good length scale is
+				     // the diameter of plumes, which
+				     // is around $10$km:
+    const double pressure_scaling = eta / 10000;
+
+				     // The final number in this
+				     // namespace is a constant that
+				     // denotes the number of seconds
+				     // per (average, tropical)
+				     // year. We use this only when
+				     // generating screen output:
+				     // internally, all computations
+				     // of this program happen in SI
+				     // units (kilogram, meter,
+				     // seconds) but writing
+				     // geological times in seconds
+				     // yields numbers that one can't
+				     // relate to reality, and so we
+				     // convert to years using the
+				     // factor defined here:
+    const double year_in_seconds  = 60*60*24*365.2425;
+
   }
 
 
 
-// @sect3{Linear solvers and preconditioners}
+				   // @sect3{Linear solvers and preconditioners}
 
-// TODO (MK): update
+// @todo (MK): update
 
-// In comparison to step-31, we did one
-// change in the linear algebra of the
-// problem: We exchange the
-// <code>InverseMatrix</code> that
-// previously held the approximation of the
-// Schur complement by a preconditioner
-// only (we will choose ILU in the
-// application code below), as discussed in
-// the introduction. This trick we already
-// did for the velocity block - the idea of
-// this is that the solver iterations on
-// the block system will eventually also
-// make the approximation for the Schur
-// complement good. If the preconditioner
-// we're using is good enough, there will
-// be no increase in the outer iteration
-// count compared to using converged solves
-// for the inverse matrices of velocity and
-// Schur complement. All we need to do for
-// implementing that change is to give the
-// respective variable in the
-// BlockSchurPreconditioner class another
-// name.
+				   // In comparison to step-31, we did
+				   // one change in the linear algebra
+				   // of the problem: We exchange the
+				   // <code>InverseMatrix</code> that
+				   // previously held the
+				   // approximation of the Schur
+				   // complement by a preconditioner
+				   // only (we will choose ILU in the
+				   // application code below), as
+				   // discussed in the
+				   // introduction. This trick we
+				   // already did for the velocity
+				   // block - the idea of this is that
+				   // the solver iterations on the
+				   // block system will eventually
+				   // also make the approximation for
+				   // the Schur complement good. If
+				   // the preconditioner we're using
+				   // is good enough, there will be no
+				   // increase in the outer iteration
+				   // count compared to using
+				   // converged solves for the inverse
+				   // matrices of velocity and Schur
+				   // complement. All we need to do
+				   // for implementing that change is
+				   // to give the respective variable
+				   // in the BlockSchurPreconditioner
+				   // class another name.
   namespace LinearSolvers
   {
     template <class PreconditionerA, class PreconditionerMp>
-    class RightPrecond : public Subscriptor
+    class BlockSchurPreconditioner : public Subscriptor
     {
       public:
-	RightPrecond (
-	  const TrilinosWrappers::BlockSparseMatrix  &S,
-	  const TrilinosWrappers::BlockSparseMatrix  &Spre,
-	  const PreconditionerMp                     &Mppreconditioner,
-	  const PreconditionerA                      &Apreconditioner,
-	  const bool                                  do_solve_A_in = true)
+	BlockSchurPreconditioner (const TrilinosWrappers::BlockSparseMatrix  &S,
+				  const TrilinosWrappers::BlockSparseMatrix  &Spre,
+				  const PreconditionerMp                     &Mppreconditioner,
+				  const PreconditionerA                      &Apreconditioner,
+				  const bool                                  do_solve_A)
 			:
 			stokes_matrix     (&S),
 			stokes_preconditioner_matrix     (&Spre),
 			mp_preconditioner (Mppreconditioner),
 			a_preconditioner  (Apreconditioner),
-			do_solve_A        (do_solve_A_in)
+			do_solve_A        (do_solve_A)
 	  {}
-
-	void solve_S(TrilinosWrappers::MPI::Vector &dst,
-		     const TrilinosWrappers::MPI::Vector &src) const
-	  {
-//TODO: shouldn't this be a *relative* tolerance
-	    SolverControl cn(5000, 1e-5);
-
-	    TrilinosWrappers::SolverCG solver(cn);
-
-	    solver.solve(stokes_preconditioner_matrix->block(1,1),
-			 dst, src,
-			 mp_preconditioner);
-
-	    dst*=-1.0;
-	  }
-
-	void solve_A(TrilinosWrappers::MPI::Vector &dst,
-		     const TrilinosWrappers::MPI::Vector &src) const
-	  {
-	    SolverControl cn(5000, src.l2_norm()*1e-2);
-	    TrilinosWrappers::SolverCG solver(cn);
-	    solver.solve(stokes_matrix->block(0,0), dst, src, a_preconditioner);
-	  }
 
 	void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
 		    const TrilinosWrappers::MPI::BlockVector &src) const
 	  {
 	    TrilinosWrappers::MPI::Vector utmp(src.block(0));
 
-	    solve_S(dst.block(1), src.block(1));
+	    {
+// @todo shouldn't this be a *relative* tolerance
+	      SolverControl solver_control(5000, 1e-5);
 
-	    stokes_matrix->block(0,1).vmult(utmp, dst.block(1)); //B^T
-	    utmp*=-1.0;
-	    utmp.add(src.block(0));
+	      TrilinosWrappers::SolverCG solver(solver_control);
+
+	      solver.solve(stokes_preconditioner_matrix->block(1,1),
+			   dst.block(1), src.block(1),
+			   mp_preconditioner);
+
+	      dst.block(1) *= -1.0;
+	    }
+
+	    {
+	      stokes_matrix->block(0,1).vmult(utmp, dst.block(1)); //B^T
+	      utmp*=-1.0;
+	      utmp.add(src.block(0));
+	    }
 
 	    if (do_solve_A == true)
-	      solve_A(dst.block(0), utmp);
+	      {
+		SolverControl solver_control(5000, src.l2_norm()*1e-2);
+		TrilinosWrappers::SolverCG solver(solver_control);
+		solver.solve(stokes_matrix->block(0,0), dst.block(0), utmp,
+			     a_preconditioner);
+	      }
 	    else
 	      a_preconditioner.vmult (dst.block(0), utmp);
 	  }
@@ -1315,7 +1324,7 @@ namespace Step32
 // each processor calculate the
 // maximum among its cells, and then
 // do a global communication
-// operation 
+// operation
 // <code>Utilities::MPI::max</code> that searches
 // for the maximum value among all
 // the maximum values of the
@@ -3148,7 +3157,7 @@ namespace Step32
 
       try
 	{
-	  const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
+	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
 	    TrilinosWrappers::PreconditionILU>
 	    preconditioner (stokes_matrix, stokes_preconditioner_matrix,
 			    *Mp_preconditioner, *Amg_preconditioner,
@@ -3168,7 +3177,7 @@ namespace Step32
 				       // the simple solver failed
       catch (SolverControl::NoConvergence)
 	{
-	  const LinearSolvers::RightPrecond<TrilinosWrappers::PreconditionAMG,
+	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
 	    TrilinosWrappers::PreconditionILU>
 	    preconditioner (stokes_matrix, stokes_preconditioner_matrix,
 			    *Mp_preconditioner, *Amg_preconditioner,
@@ -3327,8 +3336,7 @@ namespace Step32
     solution_names.push_back ("T");
     solution_names.push_back ("friction_heating");
     solution_names.push_back ("partition");
-    solution_names.push_back ("non_adiabatic_pressure");
-    solution_names.push_back ("non_adiabatic_temperature");
+
     return solution_names;
   }
 
@@ -3350,8 +3358,6 @@ namespace Step32
       interpretation (dim,
 		      DataComponentInterpretation::component_is_part_of_vector);
 
-    interpretation.push_back (DataComponentInterpretation::component_is_scalar);
-    interpretation.push_back (DataComponentInterpretation::component_is_scalar);
     interpretation.push_back (DataComponentInterpretation::component_is_scalar);
     interpretation.push_back (DataComponentInterpretation::component_is_scalar);
     interpretation.push_back (DataComponentInterpretation::component_is_scalar);
@@ -3409,12 +3415,6 @@ namespace Step32
 					strain_rate * strain_rate;
 
 	computed_quantities[q](dim+3) = partition;
-
-	computed_quantities[q](dim+4) = pressure -
-					EquationData::adiabatic_pressure (evaluation_points[q]);
-
-	computed_quantities[q](dim+5) = temperature -
-					EquationData::adiabatic_temperature (evaluation_points[q]);
       }
   }
 
