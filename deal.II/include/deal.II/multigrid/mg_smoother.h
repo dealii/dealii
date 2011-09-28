@@ -257,7 +257,20 @@ class SmootherRelaxation : public MGLevelObject<RELAX>, public MGSmoother<VECTOR
     template <class MATRIX2>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
 		     const typename RELAX::AdditionalData & additional_data = typename RELAX::AdditionalData());
-
+    
+				     /**
+				      * Initialize matrices and
+				      * additional data for each
+				      * level.
+				      *
+				      * If minimal or maximal level of
+				      * the two objects differ, the
+				      * greatest common range is
+				      * utilized. This way, smoothing
+				      * can be restricted to certain
+				      * levels even if the matrix was
+				      * generated for all levels.
+				      */
     template <class MATRIX2, class DATA>
     void initialize (const MGLevelObject<MATRIX2>& matrices,
 		     const MGLevelObject<DATA>& additional_data);
@@ -785,13 +798,8 @@ namespace mg
     const MGLevelObject<MATRIX2>& m,
     const MGLevelObject<DATA>& data)
   {
-    const unsigned int min = m.get_minlevel();
-    const unsigned int max = m.get_maxlevel();
-    
-    Assert (data.get_minlevel() == min,
-	    ExcDimensionMismatch(data.get_minlevel(), min));
-    Assert (data.get_maxlevel() == max,
-	    ExcDimensionMismatch(data.get_maxlevel(), max));
+    const unsigned int min = std::max(m.get_minlevel(), data.get_minlevel());
+    const unsigned int max = std::min(m.get_maxlevel(), data.get_maxlevel());
     
     this->resize(min, max);
     
