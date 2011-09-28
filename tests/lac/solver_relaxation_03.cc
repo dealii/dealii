@@ -84,9 +84,7 @@ int main()
 	{
 	  deallog << "Block size " << blocksize << std::endl;
 
-	  const unsigned int n_blocks = dim/blocksize;
-	  std::vector<unsigned int> indices(blocksize);
-
+	  const unsigned int n_blocks = dim/blocksize;	  
 	  RelaxationBlock<SparseMatrix<double>,double>::AdditionalData relax_data(0.8);
 	  PreconditionBlock<SparseMatrix<double>,double>::AdditionalData prec_data(blocksize, 0.8);
 	  
@@ -94,14 +92,14 @@ int main()
 	  std::vector<unsigned int> bperm(n_blocks);
 	  std::vector<unsigned int> ibperm(n_blocks);
 	  
-	  relax_data.block_list.initialize(n_blocks);
+	  relax_data.block_list.reinit(n_blocks, dim, blocksize);
 	  for (unsigned int block=0;block<n_blocks;++block)
 	    {
 	      bperm[block] = n_blocks-block-1;
 	      for (unsigned int i=0;i<blocksize;++i)
-		indices[i] = i+block*blocksize;
-	      relax_data.block_list.add(block, indices);
+		relax_data.block_list.add(block, i+block*blocksize);
 	    }
+	  relax_data.block_list.compress();
 					   // Currently, bperm is just
 					   // the inversion.
 					   // Now swap the last two
