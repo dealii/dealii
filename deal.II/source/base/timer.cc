@@ -118,8 +118,7 @@ double Timer::stop ()
       double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
 			      - start_wall_time;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      if (sync_wall_time)
+      if (sync_wall_time && Utilities::System::job_supports_mpi())
 	{
 	  this->mpi_data
 	    = Utilities::MPI::min_max_avg (time, mpi_communicator);
@@ -128,9 +127,6 @@ double Timer::stop ()
 	}
       else
 	cumulative_wall_time += time;
-#else
-      cumulative_wall_time += time;
-#endif
     }
   return cumulative_time;
 }
@@ -150,18 +146,27 @@ double Timer::operator() () const
       const double dtime_children =
 	usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
 
+      const double running_time = dtime - start_time + dtime_children
+				  - start_time_children + cumulative_time;
+      
+      if (Utilities::System::job_supports_mpi())
 				   // in case of MPI, need to get the time
 				   // passed by summing the time over all
 				   // processes in the network. works also
 				   // in case we just want to have the time
 				   // of a single thread, since then the
 				   // communicator is MPI_COMM_SELF
-      return Utilities::MPI::sum (dtime - start_time + dtime_children
-				  - start_time_children + cumulative_time,
-				  mpi_communicator);
+	return Utilities::MPI::sum (running_time, mpi_communicator);
+      else
+	return running_time;
     }
   else
-    return Utilities::MPI::sum (cumulative_time, mpi_communicator);
+    {
+      if (Utilities::System::job_supports_mpi())
+	return Utilities::MPI::sum (cumulative_time, mpi_communicator);
+      else
+	return cumulative_time;
+    }
 }
 
 
