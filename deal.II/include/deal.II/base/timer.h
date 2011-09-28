@@ -233,7 +233,6 @@ class Timer
 				      */
     MPI_Comm            mpi_communicator;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 				     /**
 				      * Store whether the wall time is
 				      * synchronized between machines.
@@ -250,7 +249,6 @@ class Timer
 				      * of MPI processes in the MPI_Comm.
 				      */
     Utilities::System::MinMaxAvg mpi_data;
-#endif
 };
 
 
