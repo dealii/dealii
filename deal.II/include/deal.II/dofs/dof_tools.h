@@ -19,6 +19,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/point.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe.h>
@@ -221,11 +222,19 @@ namespace DoFTools
 				   /**
 				    * Maximal number of degrees of
 				    * freedom on a cell.
+				    *
+				    * @relates DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
   max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh);
 
+				   /**
+				    * Maximal number of degrees of
+				    * freedom on a cell.
+				    *
+				    * @relates hp::DoFHandler
+				    */
   template <int dim, int spacedim>
   unsigned int
   max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh);
@@ -239,6 +248,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
@@ -252,6 +263,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates hp::DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
@@ -265,6 +278,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
@@ -278,6 +293,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates hp::DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
@@ -292,6 +309,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
@@ -306,6 +325,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates hp::DoFHandler
 				    */
   template <int dim, int spacedim>
   unsigned int
@@ -320,6 +341,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates DoFHandler
 				    */
   template <int dim, int spacedim>
   bool
@@ -334,6 +357,8 @@ namespace DoFTools
 				    * and hp DoFHandlers, to allow for a
 				    * uniform interface to query this
 				    * property.
+				    *
+				    * @relates hp::DoFHandler
 				    */
   template <int dim, int spacedim>
   bool
@@ -1454,6 +1479,21 @@ namespace DoFTools
   void make_cell_patches(Sparsity& block_list,
 			 const DH& dof_handler,
 			 const unsigned int level);
+  
+				    /**
+				     * Create a sparsity pattern which
+				     * in each row lists the degrees of
+				     * freedom associated to the
+				     * corresponding cells
+				     * corresponding to a vertex.
+				     */
+   template <class DH>
+   void make_vertex_patches(SparsityPattern& block_list,
+			    const DH& dof_handler,
+			    const unsigned int level,
+			    const bool interior_dofs_only,
+			    const bool boundary_patches = true,
+			    const bool single_cell_patches = false);
   
 				   //@}
 				   /**

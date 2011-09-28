@@ -5859,7 +5859,144 @@ namespace DoFTools
 	    }
 	}
   }
+
+  template <class DH, class Sparsity>
+  void make_cell_patches(Sparsity& block_list, const DH& dof_handler, const unsigned int level)
+  {
+    typename DH::cell_iterator cell;
+    typename DH::cell_iterator endc = dof_handler.end(level);
+    std::vector<unsigned int> indices;
+    
+    unsigned int i=0;
+    for (cell=dof_handler.begin(level); cell != endc; ++i, ++cell)
+      {
+	indices.resize(cell->get_fe().dofs_per_cell);
+	cell->get_mg_dof_indices(indices);
+	for (unsigned int j=0;j<indices.size();++j)
+	  block_list.add(i,indices[j]);
+      }
+  }
+  
+  template <class DH>
+  void make_vertex_patches(
+    SparsityPattern& block_list,
+    const DH& dof_handler,
+    const unsigned int level,
+    const bool interior_only,
+    const bool boundary_patches,
+    const bool single_cell_patches)
+  {
+    typename DH::cell_iterator cell;
+    typename DH::cell_iterator endc = dof_handler.end(level);
+
+				     // Vector mapping from vertex
+				     // index in the triangulation to
+				     // consecutive block indices on
+				     // this level
+				     // The number of cells at a vertex
+    std::vector<unsigned int> vertex_cell_count(dof_handler.get_tria().n_vertices(), 0);
+				     // Is a vertex at the boundary?
+    std::vector<bool> vertex_boundary(dof_handler.get_tria().n_vertices(), false);
+    std::vector<unsigned int> vertex_mapping(dof_handler.get_tria().n_vertices(),
+					     numbers::invalid_unsigned_int);
+				     // Estimate for the number of
+				     // dofs at this point
+    std::vector<unsigned int> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
+    
+				     // Identify all vertices active
+				     // on this level and remember
+				     // some data about them
+    for (cell=dof_handler.begin(level); cell != endc; ++cell)
+      for (unsigned int v=0;v<GeometryInfo<DH::dimension>::vertices_per_cell;++v)
+	{
+	  const unsigned int vg = cell->vertex_index(v);
+	  vertex_dof_count[vg] += cell->get_fe().dofs_per_cell;
+	  ++vertex_cell_count[vg];
+	  for (unsigned int d=0;d<DH::dimension;++d)
+	    if (cell->at_boundary(GeometryInfo<DH::dimension>::vertex_to_face[v][d]))
+	      vertex_boundary[vg] = true;
+	}
+				     // From now on, onlly vertices
+				     // with positive dof count are
+				     // "in".
+    
+				     // Remove vertices at boundaries
+				     // or in corners
+    for (unsigned int vg=0;vg<vertex_dof_count.size();++vg)
+      if ((!single_cell_patches && vertex_cell_count[vg] < 2)
+	  ||
+	  (!boundary_patches && vertex_boundary[vg]))
+	vertex_dof_count[vg] = 0;
+
+				     // Create a mapping from all
+				     // vertices to the ones used here
+    unsigned int i=0;
+    for (unsigned int vg=0;vg<vertex_mapping.size();++vg)
+      if (vertex_dof_count[vg] != 0)
+	vertex_mapping[vg] = i++;
+
+				     // Compactify dof count
+    for (unsigned int vg=0;vg<vertex_mapping.size();++vg)
+      if (vertex_dof_count[vg] != 0)
+	vertex_dof_count[vertex_mapping[vg]] = vertex_dof_count[vg];
+    
+				     // Now that we have all the data,
+				     // we reduce it to the part we
+				     // actually want
+    vertex_dof_count.resize(i);
+    
+				     // At this point, the list of
+				     // patches is ready. Now we enter
+				     // the dofs into the sparsity
+				     // pattern.
+    block_list.reinit(vertex_dof_count.size(), dof_handler.n_dofs(level), vertex_dof_count);
+    
+    std::vector<unsigned int> indices;
+    std::vector<bool> exclude;
+    
+    for (cell=dof_handler.begin(level); cell != endc; ++cell)
+      {
+	const FiniteElement<DH::dimension>& fe = cell->get_fe();
+	indices.resize(fe.dofs_per_cell);
+	cell->get_mg_dof_indices(indices);
+	
+	for (unsigned int v=0;v<GeometryInfo<DH::dimension>::vertices_per_cell;++v)
+	  {
+	    const unsigned int vg = cell->vertex_index(v);
+	    const unsigned int block = vertex_mapping[vg];
+	    if (block == numbers::invalid_unsigned_int)
+	      continue;
+	    
+	    if (interior_only)
+	      {
+						 // Exclude degrees of
+						 // freedom on faces
+						 // opposite to the vertex
+		exclude.resize(fe.dofs_per_cell);
+		std::fill(exclude.begin(), exclude.end(), false);
+		const unsigned int dpf = fe.dofs_per_face;
+		
+		for (unsigned int d=0;d<DH::dimension;++d)
+		  {
+		    const unsigned int a_face = GeometryInfo<DH::dimension>::vertex_to_face[v][d];
+		    const unsigned int face = GeometryInfo<DH::dimension>::opposite_face[a_face];
+		    for (unsigned int i=0;i<dpf;++i)
+		      exclude[fe.face_to_cell_index(i,face)] = true;
+		  }
+		for (unsigned int j=0;j<indices.size();++j)
+		  if (!exclude[j])
+		    block_list.add(block, indices[j]);
+	      }
+	    else
+	      {
+		for (unsigned int j=0;j<indices.size();++j)
+		  block_list.add(block, indices[j]);
+	      }
+	  }
+      }
+  }
 }
+
 
 
 // explicit instantiations

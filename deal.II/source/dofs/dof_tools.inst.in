@@ -113,7 +113,11 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
     DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
     (const hp::DoFHandler<deal_II_dimension> &dof,
      SP    &sparsity);
-
+     
+    template void
+      DoFTools::make_cell_patches<MGDoFHandler<deal_II_dimension>,SP>
+      (SP&, const MGDoFHandler<deal_II_dimension>&, unsigned int);
+    
 #if deal_II_dimension > 1
 
     template void
@@ -236,6 +240,9 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
 
 for (deal_II_dimension : DIMENSIONS)
 {
+  template
+  void DoFTools::make_vertex_patches (SparsityPattern&, const MGDoFHandler<deal_II_dimension>&,
+  unsigned int, bool, bool, bool);
 
 #if deal_II_dimension < 3
 template
