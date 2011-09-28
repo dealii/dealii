@@ -755,7 +755,11 @@ each node, then using threads doesn't make the program any
 faster. Consequently, you probably want to use the
 <code>--disable-threads</code> flag when configuring your deal.II installation
 for this machine. On the other hand, if you want to run this program on a
-single multicore machine, then it may make sense to use threads.
+single multicore machine, then it may make sense to use threads. That said, at
+the time of writing this, we only use the WorkStream class for assembling
+(parts of) linear systems, while 75% or more of the run time of the program is
+spent in the linear solvers that are not parallelized &mdash; in other words,
+the best we could hope is to parallelize the remaining 25%.
 
 
 <h3> The testcase </h3>
