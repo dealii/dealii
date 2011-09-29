@@ -241,38 +241,31 @@ namespace Step32
 
 
 
-				   // @sect3{Linear solvers and preconditioners}
+				   // @sect3{Preconditioning the Stokes system}
 
 // @todo (MK): update
 
-				   // In comparison to step-31, we did
-				   // one change in the linear algebra
-				   // of the problem: We exchange the
-				   // <code>InverseMatrix</code> that
-				   // previously held the
-				   // approximation of the Schur
-				   // complement by a preconditioner
-				   // only (we will choose ILU in the
-				   // application code below), as
-				   // discussed in the
-				   // introduction. This trick we
-				   // already did for the velocity
-				   // block - the idea of this is that
-				   // the solver iterations on the
-				   // block system will eventually
-				   // also make the approximation for
-				   // the Schur complement good. If
-				   // the preconditioner we're using
-				   // is good enough, there will be no
-				   // increase in the outer iteration
-				   // count compared to using
-				   // converged solves for the inverse
-				   // matrices of velocity and Schur
-				   // complement. All we need to do
-				   // for implementing that change is
-				   // to give the respective variable
-				   // in the BlockSchurPreconditioner
-				   // class another name.
+				   // This namespace implements the
+				   // preconditioner. As discussed in the
+				   // introduction, this preconditioner
+				   // differs in a number of key portions from
+				   // the one used in step-31. Specifically,
+				   // it is a right preconditioner,
+				   // implementing the matrix
+				   // @f{align*}\left(\begin{array}{cc}A^{-1}
+				   // & B^T \\ 0 & S^{-1}\end{array}\right)@f}
+				   // where the two inverse matrix operations
+				   // are approximated by linear solvers or,
+				   // if the right flag is given to the
+				   // constructor of this class, by a single
+				   // AMG V-cycle. The three code blocks of
+				   // the <code>vmult</code> function
+				   // implement the multiplications with the
+				   // three blocks of this preconditioner
+				   // matrix and should be self explanatory if
+				   // you have read through step-31 or the
+				   // discussion of compositing solvers in
+				   // step-20.
   namespace LinearSolvers
   {
     template <class PreconditionerA, class PreconditionerMp>
@@ -338,70 +331,79 @@ namespace Step32
 
 
 
-// @sect3{Definition of assembly data structures}
-//
-// As described in the introduction, we will
-// use the WorkStream mechanism discussed in
-// the @ref threads module to parallelize
-// operations among the processors of a
-// single machine. The WorkStream class
-// requires that data is passed around in two
-// kinds of data structures, one for scratch
-// data and one to pass data from the
-// assembly function to the function that
-// copies local contributions into global
-// objects.
-//
-// The following namespace (and the two
-// sub-namespaces) contains a collection of
-// data structures that serve this purpose,
-// one pair for each of the four operations
-// discussed in the introduction that we will
-// want to parallelize. Each
-// assembly routine gets two sets of data: a
-// Scratch array that collects all the
-// classes and arrays that are used for the
-// calculation of the cell contribution, and
-// a CopyData array that keeps local matrices
-// and vectors which will be written into the
-// global matrix. Whereas CopyData is a
-// container for the final data that is
-// written into the global matrices and
-// vector (and, thus, absolutely necessary),
-// the Scratch arrays are merely there for
-// performance reasons &mdash; it would be
-// much more expensive to set up a FEValues
-// object on each cell, than creating it only
-// once and updating some derivative data.
-//
-// Using the program in step-31, we have
-// four assembly routines. One for the
-// preconditioner matrix of the Stokes
-// system, one for the Stokes matrix and
-// right hand side, one for the
-// temperature matrices and one for the
-// right hand side of the temperature
-// equation. We organize the scratch
-// arrays and a CopyData arrays for each
-// of those four assembly components
-// using a <code>struct</code>
-// environment.
-//
-// Regarding the Scratch array, each
-// struct is equipped with a constructor
-// that create an FEValues object for a
-// @ref FiniteElement "finite element", a
-// @ref Quadrature "quadrature formula", the
-// @ref Mapping "mapping" that describes the
-// interpolation of curved boundaries,
-// and some
-// @ref UpdateFlags "update flags".
-// Moreover, we manually
-// implement a copy constructor (since
-// the FEValues class is not copyable by
-// itself), and provide some additional
-// vector fields that are used to improve
-// performance of assembly.
+				   // @sect3{Definition of assembly data structures}
+				   //
+				   // As described in the introduction, we will
+				   // use the WorkStream mechanism discussed in
+				   // the @ref threads module to parallelize
+				   // operations among the processors of a
+				   // single machine. The WorkStream class
+				   // requires that data is passed around in two
+				   // kinds of data structures, one for scratch
+				   // data and one to pass data from the
+				   // assembly function to the function that
+				   // copies local contributions into global
+				   // objects.
+				   //
+				   // The following namespace (and the two
+				   // sub-namespaces) contains a collection of
+				   // data structures that serve this purpose,
+				   // one pair for each of the four operations
+				   // discussed in the introduction that we will
+				   // want to parallelize. Each
+				   // assembly routine gets two sets of data: a
+				   // Scratch array that collects all the
+				   // classes and arrays that are used for the
+				   // calculation of the cell contribution, and
+				   // a CopyData array that keeps local matrices
+				   // and vectors which will be written into the
+				   // global matrix. Whereas CopyData is a
+				   // container for the final data that is
+				   // written into the global matrices and
+				   // vector (and, thus, absolutely necessary),
+				   // the Scratch arrays are merely there for
+				   // performance reasons &mdash; it would be
+				   // much more expensive to set up a FEValues
+				   // object on each cell, than creating it only
+				   // once and updating some derivative data.
+				   //
+				   // Step-31 had four assembly routines: One
+				   // for the preconditioner matrix of the
+				   // Stokes system, one for the Stokes matrix
+				   // and right hand side, one for the
+				   // temperature matrices and one for the
+				   // right hand side of the temperature
+				   // equation. We here organize the scratch
+				   // arrays and CopyData objects for each of
+				   // those four assembly components using a
+				   // <code>struct</code> environment (since
+				   // we consider these as temporary objects
+				   // we pass around, rather than classes that
+				   // implement functionality of their own,
+				   // though this is a more subjective point
+				   // of view to distinguish between
+				   // <code>struct</code>s and
+				   // <code>class</code>es).
+				   //
+				   // Regarding the Scratch array, each struct
+				   // is equipped with a constructor that
+				   // creates an FEValues object for a @ref
+				   // FiniteElement "finite element", a @ref
+				   // Quadrature "quadrature formula", the
+				   // @ref Mapping "mapping" that describes
+				   // the interpolation of curved boundaries,
+				   // and some @ref UpdateFlags "update
+				   // flags".  Moreover, we manually implement
+				   // a copy constructor (since the FEValues
+				   // class is not copyable by itself), and
+				   // provide some additional vector fields
+				   // that are used to hold intermediate data
+				   // during the computation of local
+				   // contributions.
+				   //
+				   // Let us start with the scratch arrays
+				   // and, specifically, the one used for
+				   // assembly of the Stokes preconditioner:
   namespace Assembly
   {
     namespace Scratch
@@ -413,9 +415,11 @@ namespace Step32
 				const Quadrature<dim>    &stokes_quadrature,
 				const Mapping<dim>       &mapping,
 				const UpdateFlags         update_flags);
+
 	  StokesPreconditioner (const StokesPreconditioner &data);
 
-	  FEValues<dim>               stokes_fe_values;
+
+	  FEValues<dim>                        stokes_fe_values;
 
 	  std::vector<SymmetricTensor<2,dim> > grads_phi_u;
 	  std::vector<double>                  phi_p;
@@ -450,21 +454,25 @@ namespace Step32
 
 
 
-				       // Observe that we derive the
-				       // StokesSystem scratch array from the
-				       // StokesPreconditioner array. We do this
-				       // because all the objects that are
-				       // necessary for the assembly of the
-				       // preconditioner are also needed for the
-				       // actual matrix system and right hand
-				       // side, plus some extra data. This makes
-				       // the program more compact. Note also
-				       // that the assembly of the Stokes system
+				       // The next one is the scratch object
+				       // used for the assembly of the full
+				       // Stokes system. Observe that we
+				       // derive the StokesSystem scratch
+				       // class from the StokesPreconditioner
+				       // class above. We do this because all the
+				       // objects that are necessary for the
+				       // assembly of the preconditioner are
+				       // also needed for the actual matrix
+				       // system and right hand side, plus
+				       // some extra data. This makes the
+				       // program more compact. Note also that
+				       // the assembly of the Stokes system
 				       // and the temperature right hand side
 				       // further down requires data from
 				       // temperature and velocity,
-				       // respectively, so we actually need two
-				       // FEValues objects for those two cases.
+				       // respectively, so we actually need
+				       // two FEValues objects for those two
+				       // cases.
       template <int dim>
       struct StokesSystem : public StokesPreconditioner<dim>
       {
@@ -477,7 +485,8 @@ namespace Step32
 
 	  StokesSystem (const StokesSystem<dim> &data);
 
-	  FEValues<dim>  temperature_fe_values;
+
+	  FEValues<dim>                        temperature_fe_values;
 
 	  std::vector<Tensor<1,dim> >          phi_u;
 	  std::vector<SymmetricTensor<2,dim> > grads_phi_u;
@@ -524,20 +533,28 @@ namespace Step32
       {}
 
 
-
+				       // After defining the objects used in
+				       // the assembly of the Stokes system,
+				       // we do the same for the assembly of
+				       // the matrices necessary for the
+				       // temperature system. The general
+				       // structure is very similar:
       template <int dim>
       struct TemperatureMatrix
       {
 	  TemperatureMatrix (const FiniteElement<dim> &temperature_fe,
 			     const Mapping<dim>       &mapping,
 			     const Quadrature<dim>    &temperature_quadrature);
+
 	  TemperatureMatrix (const TemperatureMatrix &data);
+
 
 	  FEValues<dim>               temperature_fe_values;
 
 	  std::vector<double>         phi_T;
 	  std::vector<Tensor<1,dim> > grad_phi_T;
       };
+
 
       template <int dim>
       TemperatureMatrix<dim>::
@@ -567,6 +584,24 @@ namespace Step32
       {}
 
 
+				       // The final scratch object is used in
+				       // the assembly of the right hand side
+				       // of the temperature system. This
+				       // object is significantly larger than
+				       // the ones above because a lot more
+				       // quantities enter the computation of
+				       // the right hand side of the
+				       // temperature equation. In particular,
+				       // the temperature values and gradients
+				       // of the previous two time steps need
+				       // to be evaluated at the quadrature
+				       // points, as well as the velocities
+				       // and the strain rates (i.e. the
+				       // symmetric gradients of the velocity)
+				       // that enter the right hand side as
+				       // friction heating terms. Despite the
+				       // number of terms, the following
+				       // should be rather self explanatory:
       template <int dim>
       struct TemperatureRHS
       {
@@ -574,27 +609,30 @@ namespace Step32
 			  const FiniteElement<dim> &stokes_fe,
 			  const Mapping<dim>       &mapping,
 			  const Quadrature<dim>    &quadrature);
+
 	  TemperatureRHS (const TemperatureRHS &data);
 
-	  FEValues<dim>               temperature_fe_values;
-	  FEValues<dim>               stokes_fe_values;
 
-	  std::vector<double>         phi_T;
-	  std::vector<Tensor<1,dim> > grad_phi_T;
+	  FEValues<dim>                        temperature_fe_values;
+	  FEValues<dim>                        stokes_fe_values;
 
-	  std::vector<Tensor<1,dim> > old_velocity_values;
-	  std::vector<Tensor<1,dim> > old_old_velocity_values;
+	  std::vector<double>                  phi_T;
+	  std::vector<Tensor<1,dim> >          grad_phi_T;
+
+	  std::vector<Tensor<1,dim> >          old_velocity_values;
+	  std::vector<Tensor<1,dim> >          old_old_velocity_values;
 
 	  std::vector<SymmetricTensor<2,dim> > old_strain_rates;
 	  std::vector<SymmetricTensor<2,dim> > old_old_strain_rates;
 
-	  std::vector<double>         old_temperature_values;
-	  std::vector<double>         old_old_temperature_values;
-	  std::vector<Tensor<1,dim> > old_temperature_grads;
-	  std::vector<Tensor<1,dim> > old_old_temperature_grads;
-	  std::vector<double>         old_temperature_laplacians;
-	  std::vector<double>         old_old_temperature_laplacians;
+	  std::vector<double>                  old_temperature_values;
+	  std::vector<double>                  old_old_temperature_values;
+	  std::vector<Tensor<1,dim> >          old_temperature_grads;
+	  std::vector<Tensor<1,dim> >          old_old_temperature_grads;
+	  std::vector<double>                  old_temperature_laplacians;
+	  std::vector<double>                  old_old_temperature_laplacians;
       };
+
 
       template <int dim>
       TemperatureRHS<dim>::
