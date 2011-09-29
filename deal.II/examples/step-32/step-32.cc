@@ -333,77 +333,98 @@ namespace Step32
 
 				   // @sect3{Definition of assembly data structures}
 				   //
-				   // As described in the introduction, we will
-				   // use the WorkStream mechanism discussed in
-				   // the @ref threads module to parallelize
-				   // operations among the processors of a
-				   // single machine. The WorkStream class
-				   // requires that data is passed around in two
-				   // kinds of data structures, one for scratch
-				   // data and one to pass data from the
-				   // assembly function to the function that
-				   // copies local contributions into global
+				   // As described in the
+				   // introduction, we will use the
+				   // WorkStream mechanism discussed
+				   // in the @ref threads module to
+				   // parallelize operations among the
+				   // processors of a single
+				   // machine. The WorkStream class
+				   // requires that data is passed
+				   // around in two kinds of data
+				   // structures, one for scratch data
+				   // and one to pass data from the
+				   // assembly function to the
+				   // function that copies local
+				   // contributions into global
 				   // objects.
 				   //
-				   // The following namespace (and the two
-				   // sub-namespaces) contains a collection of
-				   // data structures that serve this purpose,
-				   // one pair for each of the four operations
-				   // discussed in the introduction that we will
-				   // want to parallelize. Each
-				   // assembly routine gets two sets of data: a
-				   // Scratch array that collects all the
-				   // classes and arrays that are used for the
-				   // calculation of the cell contribution, and
-				   // a CopyData array that keeps local matrices
-				   // and vectors which will be written into the
-				   // global matrix. Whereas CopyData is a
-				   // container for the final data that is
-				   // written into the global matrices and
-				   // vector (and, thus, absolutely necessary),
-				   // the Scratch arrays are merely there for
-				   // performance reasons &mdash; it would be
-				   // much more expensive to set up a FEValues
-				   // object on each cell, than creating it only
-				   // once and updating some derivative data.
+				   // The following namespace (and the
+				   // two sub-namespaces) contains a
+				   // collection of data structures
+				   // that serve this purpose, one
+				   // pair for each of the four
+				   // operations discussed in the
+				   // introduction that we will want
+				   // to parallelize. Each assembly
+				   // routine gets two sets of data: a
+				   // Scratch array that collects all
+				   // the classes and arrays that are
+				   // used for the calculation of the
+				   // cell contribution, and a
+				   // CopyData array that keeps local
+				   // matrices and vectors which will
+				   // be written into the global
+				   // matrix. Whereas CopyData is a
+				   // container for the final data
+				   // that is written into the global
+				   // matrices and vector (and, thus,
+				   // absolutely necessary), the
+				   // Scratch arrays are merely there
+				   // for performance reasons &mdash;
+				   // it would be much more expensive
+				   // to set up a FEValues object on
+				   // each cell, than creating it only
+				   // once and updating some
+				   // derivative data.
 				   //
-				   // Step-31 had four assembly routines: One
-				   // for the preconditioner matrix of the
-				   // Stokes system, one for the Stokes matrix
-				   // and right hand side, one for the
-				   // temperature matrices and one for the
-				   // right hand side of the temperature
-				   // equation. We here organize the scratch
-				   // arrays and CopyData objects for each of
-				   // those four assembly components using a
-				   // <code>struct</code> environment (since
-				   // we consider these as temporary objects
-				   // we pass around, rather than classes that
-				   // implement functionality of their own,
-				   // though this is a more subjective point
-				   // of view to distinguish between
+				   // Step-31 had four assembly
+				   // routines: One for the
+				   // preconditioner matrix of the
+				   // Stokes system, one for the
+				   // Stokes matrix and right hand
+				   // side, one for the temperature
+				   // matrices and one for the right
+				   // hand side of the temperature
+				   // equation. We here organize the
+				   // scratch arrays and CopyData
+				   // objects for each of those four
+				   // assembly components using a
+				   // <code>struct</code> environment
+				   // (since we consider these as
+				   // temporary objects we pass
+				   // around, rather than classes that
+				   // implement functionality of their
+				   // own, though this is a more
+				   // subjective point of view to
+				   // distinguish between
 				   // <code>struct</code>s and
 				   // <code>class</code>es).
 				   //
-				   // Regarding the Scratch array, each struct
-				   // is equipped with a constructor that
-				   // creates an FEValues object for a @ref
-				   // FiniteElement "finite element", a @ref
-				   // Quadrature "quadrature formula", the
-				   // @ref Mapping "mapping" that describes
-				   // the interpolation of curved boundaries,
-				   // and some @ref UpdateFlags "update
-				   // flags".  Moreover, we manually implement
-				   // a copy constructor (since the FEValues
-				   // class is not copyable by itself), and
-				   // provide some additional vector fields
-				   // that are used to hold intermediate data
-				   // during the computation of local
-				   // contributions.
+				   // Regarding the Scratch objects,
+				   // each struct is equipped with a
+				   // constructor that creates an
+				   // FEValues object for a @ref
+				   // FiniteElement "finite element",
+				   // a @ref Quadrature "quadrature
+				   // formula", the @ref Mapping
+				   // "mapping" that describes the
+				   // interpolation of curved
+				   // boundaries, and some @ref
+				   // UpdateFlags "update flags".
+				   // Moreover, we manually implement
+				   // a copy constructor (since the
+				   // FEValues class is not copyable
+				   // by itself), and provide some
+				   // additional vector fields that
+				   // are used to hold intermediate
+				   // data during the computation of
+				   // local contributions.
 				   //
-				   // Let us start with the scratch arrays
-				   // and, specifically, the one used for
-				   // assembly of the Stokes preconditioner:
+				   // Let us start with the scratch
+				   // arrays and, specifically, the
+				   // one used for assembly of the
+				   // Stokes preconditioner:
   namespace Assembly
   {
     namespace Scratch
@@ -698,13 +719,26 @@ namespace Step32
     }
 
 
-				     // The CopyData arrays are similar to the
-				     // Scratch arrays. They provide a
-				     // constructor, a copy operation, and
-				     // some arrays for local matrix, local
-				     // vectors and the relation between local
-				     // and global degrees of freedom (a.k.a.
-				     // <code>local_dof_indices</code>).
+				     // The CopyData objects are even
+				     // simpler than the Scratch
+				     // objects as all they have to do
+				     // is to store the results of
+				     // local computations until they
+				     // can be copied into the global
+				     // matrix or vector
+				     // objects. These structures
+				     // therefore only need to provide
+				     // a constructor, a copy
+				     // operation, and some arrays for
+				     // local matrix, local vectors
+				     // and the relation between local
+				     // and global degrees of freedom
+				     // (a.k.a.
+				     // <code>local_dof_indices</code>). Again,
+				     // we have one such structure for
+				     // each of the four operations we
+				     // will parallelize using the
+				     // WorkStream class:
     namespace CopyData
     {
       template <int dim>
@@ -726,8 +760,6 @@ namespace Step32
 		      local_dof_indices (stokes_fe.dofs_per_cell)
       {}
 
-
-
       template <int dim>
       StokesPreconditioner<dim>::
       StokesPreconditioner (const StokesPreconditioner &data)
@@ -747,7 +779,6 @@ namespace Step32
 	  Vector<double> local_rhs;
       };
 
-
       template <int dim>
       StokesSystem<dim>::
       StokesSystem (const FiniteElement<dim> &stokes_fe)
@@ -755,7 +786,6 @@ namespace Step32
 		      StokesPreconditioner<dim> (stokes_fe),
 		      local_rhs (stokes_fe.dofs_per_cell)
       {}
-
 
       template <int dim>
       StokesSystem<dim>::
@@ -789,7 +819,6 @@ namespace Step32
 		      local_dof_indices (temperature_fe.dofs_per_cell)
       {}
 
-
       template <int dim>
       TemperatureMatrix<dim>::
       TemperatureMatrix (const TemperatureMatrix &data)
@@ -798,6 +827,7 @@ namespace Step32
 		      local_stiffness_matrix (data.local_stiffness_matrix),
 		      local_dof_indices (data.local_dof_indices)
       {}
+
 
 
       template <int dim>
@@ -821,7 +851,6 @@ namespace Step32
 				     temperature_fe.dofs_per_cell)
       {}
 
-
       template <int dim>
       TemperatureRHS<dim>::
       TemperatureRHS (const TemperatureRHS &data)
@@ -835,99 +864,36 @@ namespace Step32
 
 
 
-// @sect3{The <code>BoussinesqFlowProblem</code> class template}
-//
-// This is the declaration of the main
-// class. It is very similar to
-// step-31. Following the @ref
-// MTWorkStream "task-based parallelization"
-// paradigm, we split all the
-// assembly routines into two parts: a
-// first part that can do all the
-// calculations on a certain cell without
-// taking care of other threads, and a
-// second part (which is writing the
-// local data into the global matrices
-// and vectors) which can be entered by
-// only one thread at a time. In order to
-// implement that, we provide functions
-// for each of those two steps for all
-// the four assembly routines that we use
-// in this program.
-//
-// Another new component is the definition of a struct for the parameters
-// according to the discussion in the introduction. This structure is
-// initialized by reading from a parameter file at the constructor phase of
-// the main class.
-//
-// The <code>pcout</code> (for <i>%parallel
-// <code>std::cout</code></i>) object is used
-// to simplify writing output: each MPI
-// process can use this to generate output as
-// usual, but since each of these processes
-// will produce the same output it will just
-// be replicated many times over; with the
-// ConditionalOStream class, only the output
-// generated by one task will actually be
-// printed to screen, whereas the output by
-// all the other threads will simply be
-// forgotten.
-//
-// In a bit of naming confusion, you will
-// notice below that some of the variables
-// from namespace TrilinosWrappers are
-// taken from namespace
-// TrilinosWrappers::MPI (such as the right
-// hand side vectors) whereas others are
-// not (such as the various matrices). For
-// the matrices, we happen to use the same
-// class names for %parallel and sequential
-// data structures, i.e. all matrices will
-// actually be considered %parallel
-// below. On the other hand, for vectors,
-// only those from namespace
-// TrilinosWrappers::MPI are actually
-// distributed. In particular, we will
-// frequently have to query velocities and
-// temperatures at arbitrary quadrature
-// points; consequently, rather than
-// importing ghost information of a vector
-// whenever we need access to degrees of freedom
-// that are relevant locally but owned by
-// another processor,
-// we solve linear
-// systems in %parallel but then immediately
-// initialize a vector including ghost entries
-// the solution for further
-// processing. The various
-// <code>*_solution</code> vectors are
-// therefore filled immediately after
-// solving their respective linear system
-// in %parallel.
-//
-// The only other new data member is
-// <code>computing_timer</code>. Its class
-// type, TimerOutput, can be used to
-// conveniently account for compute time
-// spent in certain "sections" of the code
-// that are repeatedly entered. For
-// example, we will enter (and leave)
-// sections for Stokes matrix assembly and
-// would like to accumulate the run time
-// spent in this section over all time
-// steps. At the end of the program, the
-// destructor of the TimerOutput class will
-// automatically produce a nice summary of
-// the times spent in all the sections. For
-// this output, one can choose whether wall
-// clock or CPU times are to be printed, as
-// well as whether we want to produce
-// output every time we leave a section --
-// which would be quite a lot of additional
-// output -- or just in the end of the
-// program (this choice is made in the
-// from this variable in the results
-// section of this tutorial program.
+				   // @sect3{The <code>BoussinesqFlowProblem</code> class template}
+				   //
+				   // This is the declaration of the
+				   // main class. It is very similar
+				   // to step-31 but there are a
+				   // number differences we will
+				   // comment on below.
+				   //
+				   // The top of the class is
+				   // essentially the same as in
+				   // step-31, listing the public
+				   // methods and a set of private
+				   // functions that do the heavy
+				   // lifting. Compared to step-31
+				   // there are only two additions to
+				   // this section: the function
+				   // <code>get_cfl_number()</code>
+				   // that computes the maximum CFL
+				   // number over all cells from which
+				   // we then compute the global time
+				   // step, and the function
+				   // <code>get_entropy_variation()</code>
+				   // that is used in the computation
+				   // of the entropy stabilization. It
+				   // is akin to the
+				   // <code>get_extrapolated_temperature_range()</code>
+				   // we have used in step-31 for this
+				   // purpose, but works on the
+				   // entropy instead of the
+				   // temperature instead.
   template <int dim>
   class BoussinesqFlowProblem
   {
@@ -970,6 +936,16 @@ namespace Step32
 			const double                        cell_diameter) const;
 
     public:
+
+				       // The first significant new
+				       // component is the definition
+				       // of a struct for the
+				       // parameters according to the
+				       // discussion in the
+				       // introduction. This structure
+				       // is initialized by reading
+				       // from a parameter file during
+				       // construction of this object.
       struct Parameters
       {
 	  Parameters (const std::string &parameter_filename);
@@ -977,7 +953,7 @@ namespace Step32
 	  static void declare_parameters (ParameterHandler &prm);
 	  void parse_parameters (ParameterHandler &prm);
 
-	  double end_time;
+	  double       end_time;
 
 	  unsigned int initial_global_refinement;
 	  unsigned int initial_adaptive_refinement;
@@ -998,60 +974,225 @@ namespace Step32
       };
 
     private:
-      Parameters                           &parameters;
-      ConditionalOStream                  pcout;
+      Parameters                               &parameters;
 
+				       // The <code>pcout</code> (for
+				       // <i>%parallel
+				       // <code>std::cout</code></i>)
+				       // object is used to simplify
+				       // writing output: each MPI
+				       // process can use this to
+				       // generate output as usual,
+				       // but since each of these
+				       // processes will (hopefully)
+				       // produce the same output it
+				       // will just be replicated many
+				       // times over; with the
+				       // ConditionalOStream class,
+				       // only the output generated by
+				       // one MPI process will
+				       // actually be printed to
+				       // screen, whereas the output
+				       // by all the other threads
+				       // will simply be forgotten.
+      ConditionalOStream                        pcout;
+
+				       // The following member
+				       // variables will then again be
+				       // similar to those in step-31
+				       // (and to other tutorial
+				       // programs). As mentioned in
+				       // the introduction, we fully
+				       // distribute computations, so
+				       // we will have to use the
+				       // parallel::distributed::Triangulation
+				       // class (see step-40) but the
+				       // remainder of these variables
+				       // is rather standard with two
+				       // exceptions:
+				       //
+				       // - The <code>mapping</code>
+				       // variable is used to denote a
+				       // higher-order polynomial
+				       // mapping. As mentioned in the
+				       // introduction, we use this
+				       // mapping when forming
+				       // integrals through quadrature
+				       // for all cells that are
+				       // adjacent to either the inner
+				       // or outer boundaries of our
+				       // domain where the boundary is
+				       // curved.
+				       //
+				       // - In a bit of naming
+				       // confusion, you will notice
+				       // below that some of the
+				       // variables from namespace
+				       // TrilinosWrappers are taken
+				       // from namespace
+				       // TrilinosWrappers::MPI (such
+				       // as the right hand side
+				       // vectors) whereas others are
+				       // not (such as the various
+				       // matrices). For the matrices,
+				       // we happen to use the same
+				       // class names for %parallel
+				       // and sequential data
+				       // structures, i.e., all
+				       // matrices will actually be
+				       // considered %parallel
+				       // below. On the other hand,
+				       // for vectors, only those from
+				       // namespace
+				       // TrilinosWrappers::MPI are
+				       // actually distributed. In
+				       // particular, we will
+				       // frequently have to query
+				       // velocities and temperatures
+				       // at arbitrary quadrature
+				       // points; consequently, rather
+				       // than importing ghost
+				       // information of a vector
+				       // whenever we need access to
+				       // degrees of freedom that are
+				       // relevant locally but owned
+				       // by another processor, we
+				       // solve linear systems in
+				       // %parallel but then
+				       // immediately initialize a
+				       // vector including ghost
+				       // entries of the solution for
+				       // further processing. The
+				       // various
+				       // <code>*_solution</code>
+				       // vectors are therefore filled
+				       // immediately after solving
+				       // their respective linear
+				       // system in %parallel and will
+				       // always contain values for
+				       // all @ref
+				       // GlossLocallyRelevantDof
+				       // "locally relevant degrees of
+				       // freedom"; the fully
+				       // distributed vectors that we
+				       // obtain from the solution
+				       // process and that only ever
+				       // contain the @ref
+				       // GlossLocallyOwnedDof
+				       // "locally owned degrees of
+				       // freedom" are destroyed
+				       // immediately after the
+				       // solution process and after
+				       // we have copied the relevant
+				       // values into the member
+				       // variable vectors.
       parallel::distributed::Triangulation<dim> triangulation;
-      double                              global_Omega_diameter;
+      double                                    global_Omega_diameter;
 
-      const MappingQ<dim>                 mapping;
+      const MappingQ<dim>                       mapping;
 
-      const FESystem<dim>                 stokes_fe;
+      const FESystem<dim>                       stokes_fe;
+      DoFHandler<dim>                           stokes_dof_handler;
+      ConstraintMatrix                          stokes_constraints;
 
-      DoFHandler<dim>                     stokes_dof_handler;
-      ConstraintMatrix                    stokes_constraints;
+      TrilinosWrappers::BlockSparseMatrix       stokes_matrix;
+      TrilinosWrappers::BlockSparseMatrix       stokes_preconditioner_matrix;
 
-      TrilinosWrappers::BlockSparseMatrix stokes_matrix;
-      TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
-
-      TrilinosWrappers::MPI::BlockVector  stokes_solution;
-      TrilinosWrappers::MPI::BlockVector  old_stokes_solution;
-      TrilinosWrappers::MPI::BlockVector  stokes_rhs;
-
-
-      FE_Q<dim>                           temperature_fe;
-      DoFHandler<dim>                     temperature_dof_handler;
-      ConstraintMatrix                    temperature_constraints;
-
-      TrilinosWrappers::SparseMatrix      temperature_mass_matrix;
-      TrilinosWrappers::SparseMatrix      temperature_stiffness_matrix;
-      TrilinosWrappers::SparseMatrix      temperature_matrix;
-
-      TrilinosWrappers::MPI::Vector       temperature_solution;
-      TrilinosWrappers::MPI::Vector       old_temperature_solution;
-      TrilinosWrappers::MPI::Vector       old_old_temperature_solution;
-      TrilinosWrappers::MPI::Vector       temperature_rhs;
+      TrilinosWrappers::MPI::BlockVector        stokes_solution;
+      TrilinosWrappers::MPI::BlockVector        old_stokes_solution;
+      TrilinosWrappers::MPI::BlockVector        stokes_rhs;
 
 
-      double time_step;
-      double old_time_step;
-      unsigned int timestep_number;
+      FE_Q<dim>                                 temperature_fe;
+      DoFHandler<dim>                           temperature_dof_handler;
+      ConstraintMatrix                          temperature_constraints;
+
+      TrilinosWrappers::SparseMatrix            temperature_mass_matrix;
+      TrilinosWrappers::SparseMatrix            temperature_stiffness_matrix;
+      TrilinosWrappers::SparseMatrix            temperature_matrix;
+
+      TrilinosWrappers::MPI::Vector             temperature_solution;
+      TrilinosWrappers::MPI::Vector             old_temperature_solution;
+      TrilinosWrappers::MPI::Vector             old_old_temperature_solution;
+      TrilinosWrappers::MPI::Vector             temperature_rhs;
+
+
+      double                                    time_step;
+      double                                    old_time_step;
+      unsigned int                              timestep_number;
 
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>    Amg_preconditioner;
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> Mp_preconditioner;
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> T_preconditioner;
 
-      bool rebuild_stokes_matrix;
-      bool rebuild_stokes_preconditioner;
-      bool rebuild_temperature_matrices;
-      bool rebuild_temperature_preconditioner;
+      bool                                      rebuild_stokes_matrix;
+      bool                                      rebuild_stokes_preconditioner;
+      bool                                      rebuild_temperature_matrices;
+      bool                                      rebuild_temperature_preconditioner;
 
-      TimerOutput computing_timer;
+				       // The next member variable,
+				       // <code>computing_timer</code>
+				       // is used to conveniently
+				       // account for compute time
+				       // spent in certain "sections"
+				       // of the code that are
+				       // repeatedly entered. For
+				       // example, we will enter (and
+				       // leave) sections for Stokes
+				       // matrix assembly and would
+				       // like to accumulate the run
+				       // time spent in this section
+				       // over all time steps. Every
+				       // so many time steps as well
+				       // as at the end of the program
+				       // (through the destructor of
+				       // the TimerOutput class) we
+				       // will then produce a nice
+				       // summary of the times spent
+				       // in the different sections
+				       // into which we categorize the
+				       // run-time of this program.
+      TimerOutput                               computing_timer;
 
+				       // After these member variables
+				       // we have a number of
+				       // auxiliary functions that
+				       // have been broken out of the
+				       // ones listed
+				       // above. Specifically, there
+				       // are first three functions
+				       // that we call from
+				       // <code>setup_dofs</code> and
+				       // then the ones that do the
+				       // assembling of linear
+				       // systems:
       void setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning);
       void setup_stokes_preconditioner (const std::vector<IndexSet> &stokes_partitioning);
       void setup_temperature_matrices (const IndexSet &temperature_partitioning);
 
+
+				       // Following the @ref
+				       // MTWorkStream "task-based
+				       // parallelization" paradigm,
+				       // we split all the assembly
+				       // routines into two parts: a
+				       // first part that can do all
+				       // the calculations on a
+				       // certain cell without taking
+				       // care of other threads, and a
+				       // second part (which is
+				       // writing the local data into
+				       // the global matrices and
+				       // vectors) which can be
+				       // entered by only one thread
+				       // at a time. In order to
+				       // implement that, we provide
+				       // functions for each of those
+				       // two steps for all the four
+				       // assembly routines that we
+				       // use in this program. The
+				       // following eight functions do
+				       // exactly this:
       void
       local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cell_iterator &cell,
 					    Assembly::Scratch::StokesPreconditioner<dim> &scratch,
@@ -1091,29 +1232,54 @@ namespace Step32
       void
       copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data);
 
+				       // Finally, we forward declare
+				       // a member class that we will
+				       // define later on and that
+				       // will be used to compute a
+				       // number of quantities from
+				       // our solution vectors that
+				       // we'd like to put into the
+				       // output files for
+				       // visualization.
       class Postprocessor;
   };
 
 
-// @sect3{BoussinesqFlowProblem class implementation}
+				   // @sect3{BoussinesqFlowProblem class implementation}
 
-// @sect4{BoussinesqFlowProblem::Parameters}
-//
-// Here comes the definition of the parameters for the Stokes problem. We
-// allow to set the end time for the simulation, the level of refinements
-// (both global and adaptive, which in the sum specify what maximum level the
-// cells are allowed to have), and the interval between refinements in the
-// time stepping.
-//
-// Then, we let the user specify constants for the stabilization parameters
-// (as discussed in the introduction), the polynomial degree for the Stokes
-// velocity space, whether to use the locally conservative discretization
-// based on FE_DGP elements for the pressure or not (FE_Q elements for
-// pressure), and the polynomial degree for the temperature interpolation.
-//
-// The constructor checks for a valid input file (if not, a file with default
-// parameters for the quantities is written), and eventually parses the
-// parameters.
+				   // @sect4{BoussinesqFlowProblem::Parameters}
+				   //
+				   // Here comes the definition of the
+				   // parameters for the Stokes
+				   // problem. We allow to set the end
+				   // time for the simulation, the
+				   // level of refinements (both
+				   // global and adaptive, which in
+				   // the sum specify what maximum
+				   // level the cells are allowed to
+				   // have), and the interval between
+				   // refinements in the time
+				   // stepping.
+				   //
+				   // Then, we let the user specify
+				   // constants for the stabilization
+				   // parameters (as discussed in the
+				   // introduction), the polynomial
+				   // degree for the Stokes velocity
+				   // space, whether to use the
+				   // locally conservative
+				   // discretization based on FE_DGP
+				   // elements for the pressure or not
+				   // (FE_Q elements for pressure),
+				   // and the polynomial degree for
+				   // the temperature interpolation.
+				   //
+				   // The constructor checks for a
+				   // valid input file (if not, a file
+				   // with default parameters for the
+				   // quantities is written), and
+				   // eventually parses the
+				   // parameters.
   template <int dim>
   BoussinesqFlowProblem<dim>::Parameters::Parameters (const std::string &parameter_filename)
 		  :
@@ -1159,8 +1325,12 @@ namespace Step32
 
 
 
-// Here we declare the parameters that we expect in the input file, together
-// with their data types, default values and a description.
+				   // Next we have a function that
+				   // declares the parameters that we
+				   // expect in the input file,
+				   // together with their data types,
+				   // default values and a
+				   // description:
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Parameters::
@@ -1231,6 +1401,14 @@ namespace Step32
 
 
 
+				   // And then we need a function that
+				   // reads the contents of the
+				   // ParameterHandler object we get
+				   // by reading the input file and
+				   // puts the results into variables
+				   // that store the values of the
+				   // parameters we have previously
+				   // declared:
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Parameters::
@@ -1266,49 +1444,64 @@ namespace Step32
 
 
 
-// @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
-//
-// The constructor of the problem is very
-// similar to the constructor in
-// step-31. What is different is the
-// %parallel communication: Trilinos uses a
-// message passing interface (MPI) for data
-// distribution. When entering the
-// BoussinesqFlowProblem class, we have to
-// decide how the parallization is to be
-// done. We choose a rather simple strategy
-// and let all processors that are running
-// the program work together, specified by
-// the communicator
-// <code>comm_world()</code>. Next, we
-// create some modified output stream as we
-// already did in step-18. In MPI, all the
-// processors run the same program
-// individually (they simply operate on
-// different chunks of data and exchange
-// some part of that data from time to
-// time). Next, we need to initialize the
-// <code>pcout</code> object in order to
-// print the user information only on one
-// processor. The implementation of this
-// idea is to check the process number when
-// <code>pcout</code> gets a true argument,
-// and it uses the <code>std::cout</code>
-// stream for output. If we are one
-// processor five, for instance, then we
-// will give a <code>false</code> argument
-// to <code>pcout</code>, which means that
-// the output of that processor will not be
-// printed anywhere.
-//
-// Finally, we enter the preferred options
-// for the TimerOutput object to its
-// constructor. We restrict the output to
-// the <code>pcout</code> stream (processor
-// 0), and then we specify that we want to
-// get a summary table in the end of the
-// program which shows us wallclock times
-// (as opposed to CPU times).
+				   // @sect4{BoussinesqFlowProblem::BoussinesqFlowProblem}
+				   //
+				   // The constructor of the problem
+				   // is very similar to the
+				   // constructor in step-31. What is
+				   // different is the %parallel
+				   // communication: Trilinos uses a
+				   // message passing interface (MPI)
+				   // for data distribution. When
+				   // entering the
+				   // BoussinesqFlowProblem class, we
+				   // have to decide how the
+				   // parallization is to be done. We
+				   // choose a rather simple strategy
+				   // and let all processors that are
+				   // running the program work
+				   // together, specified by the
+				   // communicator
+				   // <code>MPI_COMM_WORLD</code>. Next,
+				   // we create the output stream (as
+				   // we already did in step-18) that
+				   // only generates output on the
+				   // first MPI process and is
+				   // completely forgetful on all
+				   // others. The implementation of
+				   // this idea is to check the
+				   // process number when
+				   // <code>pcout</code> gets a true
+				   // argument, and it uses the
+				   // <code>std::cout</code> stream
+				   // for output. If we are one
+				   // processor five, for instance,
+				   // then we will give a
+				   // <code>false</code> argument to
+				   // <code>pcout</code>, which means
+				   // that the output of that
+				   // processor will not be
+				   // printed. With the exception of
+				   // the mapping object (for which we
+				   // use polynomials of degree 4) all
+				   // but the final member variable
+				   // are exactly the same as in
+				   // step-31.
+				   //
+				   // This final object, the
+				   // TimerOutput object, is then told
+				   // to restrict output to the
+				   // <code>pcout</code> stream
+				   // (processor 0), and then we
+				   // specify that we want to get a
+				   // summary table at the end of the
+				   // program which shows us wallclock
+				   // times (as opposed to CPU
+				   // times). We will manually also
+				   // request intermediate summaries
+				   // every so many time steps in the
+				   // <code>run()</code> function
+				   // below.
   template <int dim>
   BoussinesqFlowProblem<dim>::BoussinesqFlowProblem (Parameters &parameters_)
 		  :
@@ -1349,7 +1542,8 @@ namespace Step32
 		  rebuild_temperature_matrices (true),
 		  rebuild_temperature_preconditioner (true),
 
-		  computing_timer (pcout, TimerOutput::summary,
+		  computing_timer (pcout,
+				   TimerOutput::summary,
 				   TimerOutput::wall_times)
   {}
 
@@ -1888,7 +2082,7 @@ namespace Step32
     preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
 
     cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
- 
+
    temperature_constraints.distribute (solution);
 				     // Having so computed the current
 				     // temperature field, let us set
