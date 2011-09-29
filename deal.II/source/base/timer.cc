@@ -118,6 +118,7 @@ double Timer::stop ()
       double time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
 			      - start_wall_time;
 
+#ifdef DEAL_II_COMPILER_USE_MPI
       if (sync_wall_time && Utilities::System::job_supports_mpi())
 	{
 	  this->mpi_data
@@ -126,6 +127,7 @@ double Timer::stop ()
 	  cumulative_wall_time += this->mpi_data.max;
 	}
       else
+#endif
 	cumulative_wall_time += time;
     }
   return cumulative_time;
