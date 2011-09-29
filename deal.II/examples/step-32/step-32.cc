@@ -1507,8 +1507,7 @@ namespace Step32
 		  :
 		  parameters (parameters_),
 		  pcout (std::cout,
-			 (Utilities::System::
-			  get_this_mpi_process(MPI_COMM_WORLD)
+			 (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
 			  == 0)),
 
 		  triangulation (MPI_COMM_WORLD,
@@ -2224,8 +2223,8 @@ namespace Step32
     DoFTools::make_sparsity_pattern (stokes_dof_handler,
 				     coupling, sp,
 				     stokes_constraints, false,
-				     Utilities::System::
-				     get_this_mpi_process(MPI_COMM_WORLD));
+				     Utilities::MPI::
+				     this_mpi_process(MPI_COMM_WORLD));
     sp.compress();
 
     stokes_matrix.reinit (sp);
@@ -2256,8 +2255,8 @@ namespace Step32
     DoFTools::make_sparsity_pattern (stokes_dof_handler,
 				     coupling, sp,
 				     stokes_constraints, false,
-				     Utilities::System::
-				     get_this_mpi_process(MPI_COMM_WORLD));
+				     Utilities::MPI::
+				     this_mpi_process(MPI_COMM_WORLD));
     sp.compress();
 
     stokes_preconditioner_matrix.reinit (sp);
@@ -2277,8 +2276,8 @@ namespace Step32
 					  MPI_COMM_WORLD);
     DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
 				     temperature_constraints, false,
-				     Utilities::System::
-				     get_this_mpi_process(MPI_COMM_WORLD));
+				     Utilities::MPI::
+				     this_mpi_process(MPI_COMM_WORLD));
     sp.compress();
 
     temperature_matrix.reinit (sp);
@@ -2363,7 +2362,7 @@ namespace Step32
 // have had to guard every access to that
 // stream by something like <code>if
 // (Utilities:: System::
-// get_this_mpi_process
+// this_mpi_process
 // (MPI_COMM_WORLD) == 0)</code>,
 // hardly a pretty solution.
   template <int dim>
@@ -3804,8 +3803,7 @@ namespace Step32
     locally_relevant_joint_solution.reinit (locally_relevant_joint_dofs, MPI_COMM_WORLD);
     locally_relevant_joint_solution = joint_solution;
 
-    Postprocessor postprocessor (Utilities::System::
-				 get_this_mpi_process(MPI_COMM_WORLD),
+    Postprocessor postprocessor (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
 				 stokes_solution.block(1).minimal_value());
 
     DataOut<dim> data_out;
