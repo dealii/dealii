@@ -233,8 +233,7 @@ namespace Step40
 		  dof_handler (triangulation),
 		  fe (2),
 		  pcout (std::cout,
-			 (Utilities::System::
-			  get_this_mpi_process(mpi_communicator)
+			 (Utilities::MPI::this_mpi_process(mpi_communicator)
 			  == 0))
   {}
 
