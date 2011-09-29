@@ -855,6 +855,11 @@ namespace Step32
 // the four assembly routines that we use
 // in this program.
 //
+// Another new component is the definition of a struct for the parameters
+// according to the discussion in the introduction. This structure is
+// initialized by reading from a parameter file at the constructor phase of
+// the main class.
+//
 // The <code>pcout</code> (for <i>%parallel
 // <code>std::cout</code></i>) object is used
 // to simplify writing output: each MPI
@@ -1032,9 +1037,9 @@ namespace Step32
       double old_time_step;
       unsigned int timestep_number;
 
-      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU> Mp_preconditioner;
-      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  T_preconditioner;
+      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>    Amg_preconditioner;
+      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> Mp_preconditioner;
+      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> T_preconditioner;
 
       bool rebuild_stokes_matrix;
       bool rebuild_stokes_preconditioner;
@@ -1093,6 +1098,22 @@ namespace Step32
 // @sect3{BoussinesqFlowProblem class implementation}
 
 // @sect4{BoussinesqFlowProblem::Parameters}
+//
+// Here comes the definition of the parameters for the Stokes problem. We
+// allow to set the end time for the simulation, the level of refinements
+// (both global and adaptive, which in the sum specify what maximum level the
+// cells are allowed to have), and the interval between refinements in the
+// time stepping.
+//
+// Then, we let the user specify constants for the stabilization parameters
+// (as discussed in the introduction), the polynomial degree for the Stokes
+// velocity space, whether to use the locally conservative discretization
+// based on FE_DGP elements for the pressure or not (FE_Q elements for
+// pressure), and the polynomial degree for the temperature interpolation.
+//
+// The constructor checks for a valid input file (if not, a file with default
+// parameters for the quantities is written), and eventually parses the
+// parameters.
   template <int dim>
   BoussinesqFlowProblem<dim>::Parameters::Parameters (const std::string &parameter_filename)
 		  :
@@ -1137,6 +1158,9 @@ namespace Step32
   }
 
 
+
+// Here we declare the parameters that we expect in the input file, together
+// with their data types, default values and a description.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Parameters::
@@ -1864,8 +1888,8 @@ namespace Step32
     preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
 
     cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
-
-    temperature_constraints.distribute (solution);
+ 
+   temperature_constraints.distribute (solution);
 				     // Having so computed the current
 				     // temperature field, let us set
 				     // the member variable that holds
@@ -2192,8 +2216,6 @@ namespace Step32
     IndexSet temperature_partitioning (n_T), temperature_relevant_partitioning (n_T);
     IndexSet stokes_relevant_set;
     {
-      const unsigned int my_id =
-	Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
       IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
       stokes_partitioning.push_back(stokes_index_set.get_view(0,n_u));
       stokes_partitioning.push_back(stokes_index_set.get_view(n_u,n_u+n_p));
@@ -2484,7 +2506,7 @@ namespace Step32
 // matrix and then builds the Stokes
 // preconditioner. It is mostly the same as
 // in the serial case. The only difference to
-// step-31 is that we use an ILU
+// step-31 is that we use a Jacobi
 // preconditioner for the pressure mass
 // matrix instead of IC, as discussed in the
 // introduction.
@@ -2506,10 +2528,8 @@ namespace Step32
     DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components,
 				      constant_modes);
 
-    Mp_preconditioner  = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionILU>
-			 (new TrilinosWrappers::PreconditionILU());
-    Amg_preconditioner = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>
-			 (new TrilinosWrappers::PreconditionAMG());
+    Mp_preconditioner.reset  (new TrilinosWrappers::PreconditionJacobi());
+    Amg_preconditioner.reset (new TrilinosWrappers::PreconditionAMG());
 
     TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
     Amg_data.constant_modes = constant_modes;
@@ -3052,8 +3072,7 @@ namespace Step32
 
     if (rebuild_temperature_preconditioner == true)
       {
-	T_preconditioner =  std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>
-			    (new TrilinosWrappers::PreconditionIC());
+	T_preconditioner.reset (new TrilinosWrappers::PreconditionJacobi());
 	T_preconditioner->initialize (temperature_matrix);
 	rebuild_temperature_preconditioner = false;
       }
@@ -3190,13 +3209,13 @@ namespace Step32
 				       // step 1: try if the simple and fast solver
 				       // succeeds in 30 steps or less.
       unsigned int n_iterations = 0;
-      const double solver_tolerance = 1e-7 * stokes_rhs.l2_norm();
+      const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
       SolverControl solver_control (30, solver_tolerance);
 
       try
 	{
 	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-	    TrilinosWrappers::PreconditionILU>
+							TrilinosWrappers::PreconditionJacobi>
 	    preconditioner (stokes_matrix, stokes_preconditioner_matrix,
 			    *Mp_preconditioner, *Amg_preconditioner,
 			    false);
@@ -3216,7 +3235,7 @@ namespace Step32
       catch (SolverControl::NoConvergence)
 	{
 	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-	    TrilinosWrappers::PreconditionILU>
+							TrilinosWrappers::PreconditionJacobi>
 	    preconditioner (stokes_matrix, stokes_preconditioner_matrix,
 			    *Mp_preconditioner, *Amg_preconditioner,
 			    true);
@@ -3241,7 +3260,6 @@ namespace Step32
       distributed_stokes_solution.block(1) *= EquationData::pressure_scaling;
 
       stokes_solution = distributed_stokes_solution;
-
       pcout << n_iterations  << " iterations."
 	    << std::endl;
     }
@@ -3420,7 +3438,7 @@ namespace Step32
 				     const std::vector<std::vector<Tensor<1,dim> > > &duh,
 				     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
 				     const std::vector<Point<dim> >                  &/*normals*/,
-				     const std::vector<Point<dim> >                  &evaluation_points,
+				     const std::vector<Point<dim> >                  &/*evaluation_points*/,
 				     std::vector<Vector<double> >                    &computed_quantities) const
   {
     const unsigned int n_quadrature_points = uh.size();

@@ -1229,7 +1229,7 @@ and self contained.
 That said, both step-31 and the current step-32 have not come about by chance
 but are certainly meant as wayposts along the path to a more comprehensive
 program that will simulate convection in the earth mantle. We call this code
-<i>Aspect</i> (short for <i>Advanced Solver for Problems in Earth's
+<i>Aspect</i> (short for <i>Advanced %Solver for Problems in Earth's
 ConvecTion</i>); its development is funded by the <a
 href="http://www.geodynamics.org">Computational Infrastructure in
 Geodynamics</a> initiative with support from the National Science
