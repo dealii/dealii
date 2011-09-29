@@ -318,7 +318,7 @@ namespace Step32
 
 	    if (do_solve_A == true)
 	      {
-		SolverControl solver_control(5000, src.l2_norm()*1e-2);
+		SolverControl solver_control(5000, utmp.l2_norm()*1e-2);
 		TrilinosWrappers::SolverCG solver(solver_control);
 		solver.solve(stokes_matrix->block(0,0), dst.block(0), utmp,
 			     a_preconditioner);
