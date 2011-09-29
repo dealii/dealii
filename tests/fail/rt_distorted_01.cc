@@ -1,8 +1,8 @@
 //----------------------------  rt_distorted_01.cc  ---------------------------
 //    rt_distorted_01.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
-//    Version: 
+//    Version:
 //
-//    Copyright (C) 2003, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,12 +68,12 @@ class TestMap1 : public Function<dim>
     TestMap1 (const unsigned int n_components) :
 		    Function<dim> (n_components)
       {}
-  
+
     virtual ~TestMap1 () {}
-  
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-  
+
     void vector_value (const Point<dim> &p,
 		       Vector<double>   &return_value) const;
 };
@@ -83,7 +83,7 @@ class TestMap1 : public Function<dim>
 template <int dim>
 double
 TestMap1<dim>::value (const Point<dim>   &/*p*/,
-		      const unsigned int  /*component*/) const 
+		      const unsigned int  /*component*/) const
 {
   return (1);
 }
@@ -95,7 +95,7 @@ void TestMap1<dim>::vector_value (const Point<dim> &p,
 {
   Assert (return_value.size() == this->n_components,
 	  ExcDimensionMismatch (return_value.size(), this->n_components));
-  
+
 				   // Parabolic inflow profile
   for (unsigned int iCount = 0; iCount < this->n_components; iCount++)
     return_value (iCount) = value (p, iCount);
@@ -114,12 +114,12 @@ class TestDef1 : public Function<dim>
 		    Function<dim> (n_components),
 		    phi (ph)
       {}
-    
+
     virtual ~TestDef1 () {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     void vector_value (const Point<dim> &p,
 		       Vector<double>   &return_value) const;
 };
@@ -129,7 +129,7 @@ class TestDef1 : public Function<dim>
 template <int dim>
 double
 TestDef1<dim>::value (const Point<dim>   &p,
-		      const unsigned int  component) const 
+		      const unsigned int  component) const
 {
   Point<2> center;
   center(0) = 0.5;
@@ -169,12 +169,12 @@ class TestDef2 : public Function<dim>
 		    Function<dim> (n_components),
 		    scale (sc)
       {}
-    
+
     virtual ~TestDef2 () {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     void vector_value (const Point<dim> &p,
 		       Vector<double>   &return_value) const;
 };
@@ -183,7 +183,7 @@ class TestDef2 : public Function<dim>
 template <int dim>
 double
 TestDef2<dim>::value (const Point<dim>   &p,
-		      const unsigned int  component) const 
+		      const unsigned int  component) const
 {
   double x = p(0),
 	 y = p(1);
@@ -221,12 +221,12 @@ class TestDef3 : public Function<dim>
 		    Function<dim> (n_components),
 		    scale (sc)
       {}
-    
+
     virtual ~TestDef3 () {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
-    
+
     void vector_value (const Point<dim> &p,
 		       Vector<double>   &return_value) const;
 };
@@ -235,7 +235,7 @@ class TestDef3 : public Function<dim>
 template <int dim>
 double
 TestDef3<dim>::value (const Point<dim>   &p,
-		      const unsigned int  component) const 
+		      const unsigned int  component) const
 {
   double y = p(1);
 
@@ -266,9 +266,9 @@ double EvaluateArea (Mapping<2> &mapping,
 		     DoFHandler<2> *dof_handler,
 		     Vector<double> &solution)
 {
-				   // Use a high order quadrature. 
+				   // Use a high order quadrature.
   QGauss<2> quad (6);
-  FEValues<2> fe_values (mapping, dof_handler->get_fe (), quad, 
+  FEValues<2> fe_values (mapping, dof_handler->get_fe (), quad,
 			 UpdateFlags(update_values    |
 				     update_q_points  |
 				     update_JxW_values));
@@ -294,8 +294,8 @@ double EvaluateArea (Mapping<2> &mapping,
       for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	{
 	  double JxW = fe_values.JxW (q_point);
-	  result_u += this_value[q_point](0) * JxW; 
-	  result_v += this_value[q_point](1) * JxW; 
+	  result_u += this_value[q_point](0) * JxW;
+	  result_v += this_value[q_point](1) * JxW;
 	}
     }
 
@@ -306,7 +306,7 @@ double EvaluateArea (Mapping<2> &mapping,
 int main (int /*argc*/, char **/*argv*/)
 {
   logfile.precision (PRECISION);
-  logfile.setf(std::ios::fixed);  
+  logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
@@ -345,7 +345,7 @@ int main (int /*argc*/, char **/*argv*/)
 				   // Project solution onto RT FE field
   ConstraintMatrix     hn_constraints;
   hn_constraints.clear ();
-  DoFTools::make_hanging_node_constraints (*dof_handler, 
+  DoFTools::make_hanging_node_constraints (*dof_handler,
 					   hn_constraints);
   hn_constraints.close ();
   VectorTools::project (*dof_handler, hn_constraints,
@@ -355,7 +355,7 @@ int main (int /*argc*/, char **/*argv*/)
 				   // Project reference solution onto RT FE field
   ConstraintMatrix     hn_constraints_def;
   hn_constraints_def.clear ();
-  DoFTools::make_hanging_node_constraints (*dof_handler_def, 
+  DoFTools::make_hanging_node_constraints (*dof_handler_def,
 					   hn_constraints_def);
   hn_constraints_def.close ();
 
@@ -372,7 +372,7 @@ int main (int /*argc*/, char **/*argv*/)
 	   EvaluateArea (*mapping_euler, dof_handler, solution),
 	   EvaluateArea (*mapping_euler, dof_handler_def, solution_q));
   deallog << buf;
-	  
+
   unsigned int test_out = 0;
 				   // Try rotating the elements
   for (double rotat = 0; rotat < 2 * M_PI; rotat += 0.25 * M_PI)
@@ -391,7 +391,7 @@ int main (int /*argc*/, char **/*argv*/)
       DataOut<2> *data_out = new DataOut<2>;
       data_out->attach_dof_handler (*dof_handler);
       data_out->add_data_vector (solution, "solution");
-      data_out->build_patches (*mapping_euler, 8, 1);
+      data_out->build_patches (*mapping_euler, 8);
 
       data_out->write_gnuplot (deallog.get_file_stream());
       test_out++;
