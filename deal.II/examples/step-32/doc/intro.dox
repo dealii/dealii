@@ -568,6 +568,24 @@ prefer. Consequently, we leave that up to the user and make it a parameter in
 the input file which one to use.
 
 
+<h3> Higher order mappings for curved boundaries </h3>
+
+In the program, we will use a spherical shell as domain. This means
+that the inner and outer boundary of the domain are no longer
+"straight" (by which we usually mean that they are bilinear surfaces
+that can be represented by the StraightBoundary class). Rather, they
+are curved and it seems prudent to use a curved approximation in the
+program if we are already using higher order finite elements for the
+velocity. Consequently, we will introduce a member variable of type
+MappingQ that
+denotes such a mapping (step-10 and step-11 introduce such mappings
+for the first time) and that we will use in all computations on cells
+that are adjacent to the boundary. Since this only affects a
+relatively small fraction of cells, the additional effort is not very
+large and we will take the luxury of using a quartic mapping for these
+cells.
+
+
 <h3> Parallelization on clusters </h3>
 
 Running convection codes in 3d with significant Raleigh numbers requires a lot
