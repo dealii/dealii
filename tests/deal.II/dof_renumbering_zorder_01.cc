@@ -2,7 +2,7 @@
 //    $Id: dof_renumbering_02.cc 23710 2011-05-17 04:50:10Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,17 +80,17 @@ check ()
   dof.distribute_dofs(fe);
 
   std::ostringstream o1, o2;
-  
+
   print_dofs(dof, o1);
-  deallog << "**" << endl;
+  deallog << "**" << std::endl;
 
   DoFRenumbering::hierarchical(dof);
 
   print_dofs(dof, o2);
 
   if (o1.str()==o2.str())
-	deallog << "OK" << endl;
-  
+	deallog << "OK" << std::endl;
+
 }
 
 int main ()
