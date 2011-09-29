@@ -21,8 +21,8 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 template <int dim, int spacedim>
 bool operator == (const DoFHandler<dim,spacedim> &t1,
@@ -60,12 +60,12 @@ bool operator == (const DoFHandler<dim,spacedim> &t1,
 		return false;
 	      if (c1->neighbor(f)->index() != c2->neighbor(f)->index())
 		return false;
-	    }    
+	    }
 	}
-      
+
       if (c1->subdomain_id() != c2->subdomain_id())
 	return false;
-      
+
       if (c1->material_id() != c2->material_id())
 	return false;
 
@@ -77,7 +77,7 @@ bool operator == (const DoFHandler<dim,spacedim> &t1,
 
       if (c1->get_fe().get_name() != c2->get_fe().get_name())
 	return false;
-      
+
       if (c1->active_fe_index() != c2->active_fe_index())
 	return false;
 
@@ -86,17 +86,17 @@ bool operator == (const DoFHandler<dim,spacedim> &t1,
       {
 	std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_cell);
 	std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_cell);
-      
+
 	c1->get_dof_indices (local_dofs_1);
 	c2->get_dof_indices (local_dofs_2);
 	if (local_dofs_1 != local_dofs_2)
 	  return false;
-	
+
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	{
 	  std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_face);
 	  std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_face);
-      
+
 	  c1->face(f)->get_dof_indices (local_dofs_1);
 	  c2->face(f)->get_dof_indices (local_dofs_2);
 	  if (local_dofs_1 != local_dofs_2)
@@ -152,19 +152,19 @@ void test ()
   tria.begin_active()->set_refine_flag (RefinementCase<dim>::cut_x);
 
   do_boundary (tria);
-  
+
   FESystem<dim,spacedim> fe (FE_Q<dim,spacedim>(2),dim,
 			     FE_Q<dim,spacedim>(1),1);
 
   DoFHandler<dim,spacedim> dof_1 (tria);
   DoFHandler<dim,spacedim> dof_2 (tria);
-  
+
   dof_1.distribute_dofs (fe);
   dof_2.distribute_dofs (fe);
-  
+
   // right now, both DoFHandlers are the same. Renumber one of the them
   DoFRenumbering::Cuthill_McKee (dof_1);
-  
+
   verify (dof_1, dof_2);
 }
 
@@ -182,6 +182,6 @@ int main ()
   test<2,2> ();
   test<2,3> ();
   test<3,3> ();
-    
+
   deallog << "OK" << std::endl;
 }

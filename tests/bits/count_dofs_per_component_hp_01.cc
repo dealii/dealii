@@ -1,8 +1,8 @@
 //----------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2005, 2009 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -12,14 +12,14 @@
 //----------------------------------------------------------------------
 
 #include "../tests.h"
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <hp/fe_collection.h>
-#include <hp/dof_handler.h>
-#include <dofs/dof_handler.h>
-#include <fe/fe_q.h>
-#include <fe/fe_system.h>
-#include <dofs/dof_tools.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/dofs/dof_tools.h>
 
 // check
 //   DoFTools::
@@ -69,7 +69,7 @@ void test ()
 
 }
 
-int main () 
+int main ()
 {
   std::ofstream logfile("count_dofs_per_component_hp_01/output");
   deallog.attach(logfile);
