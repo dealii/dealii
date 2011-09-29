@@ -16,7 +16,7 @@
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/base/named_data.h>
 #include <deal.II/base/smartpointer.h>
-#include <base/utilities.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/base/mg_level_object.h>
 
@@ -214,15 +214,15 @@ namespace MeshWorker
 
 //      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
       AssertDimension(nv, n_vectors+dim);
-      
-      
+
+
       for (unsigned int k=0; k<np; ++k)
 	{
 	  if (k % row_length == 0)
 	    write_endl();
 	  if (k % row_length2 == 0)
 	    write_endl();
-	  
+
 	    for(unsigned int i=0; i<nv; ++i)
 	      {
 		write(info.quadrature_value(k,i));
