@@ -646,16 +646,16 @@ namespace Step31
       TrilinosWrappers::Vector            temperature_rhs;
 
 
-      double time_step;
-      double old_time_step;
-      unsigned int timestep_number;
+      double                              time_step;
+      double                              old_time_step;
+      unsigned int                        timestep_number;
 
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
 
-      bool rebuild_stokes_matrix;
-      bool rebuild_temperature_matrices;
-      bool rebuild_stokes_preconditioner;
+      bool                                rebuild_stokes_matrix;
+      bool                                rebuild_temperature_matrices;
+      bool                                rebuild_stokes_preconditioner;
   };
 
 
