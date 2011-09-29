@@ -18,15 +18,15 @@
 
 #include "../tests.h"
 
-#include <base/quadrature_lib.h>
-#include <grid/tria.h>
-#include <grid/grid_generator.h>
-#include <grid/tria_boundary_lib.h>
-#include <grid/grid_out.h>
-#include <grid/grid_tools.h>
-#include <fe/fe_values.h>
-#include <fe/fe_q.h>
-#include <fe/mapping_q.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/mapping_q.h>
 
 
 template <int dim>
@@ -40,19 +40,19 @@ void test (unsigned int degree)
   Point<dim> p;
 
 				   // Try to project a point on the
-				   // surface 
+				   // surface
   for(unsigned int i=0; i<dim; ++i)
     p[i] = .2;
-  
+
   Point<dim-1> q =
     mapping.transform_real_to_unit_cell(mesh.begin_active(), p);
 
   deallog << "Mapping Q("<< degree<< "): P: " << p
 	  << ", on unit: " << q << std::endl;
-  
+
 }
 
-  
+
 
 int main ()
 {
@@ -62,7 +62,7 @@ int main ()
 
   test<2> (1);
   test<2> (2);
-  
+
   test<3> (1);
   test<3> (2);
 
