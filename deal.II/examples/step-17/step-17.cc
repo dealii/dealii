@@ -51,7 +51,7 @@
 				 // of processes and the number of the
 				 // present process by calling the
 				 // respective functions in the
-				 // Utilities::System namespace.
+				 // Utilities::MPI namespace.
 #include <deal.II/base/utilities.h>
 				 // Then, we are
                                  // going to replace all linear algebra
