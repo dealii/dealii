@@ -3471,16 +3471,18 @@ namespace Step32
 // Stokes solver: A fast solver that sometimes breaks down, and a robust
 // solver that is slower. This is what we already discussed in the
 // introduction. Here is how we realize it: First, we perform 30 iterations
-// with the solver and the simple preconditioner. If we converge, everything
-// is fine. If we do not converge, the solver control will throw an exception
+// with the fast solver based on the simple preconditioner based on the AMG
+// V-cycle instead of an approximate solve. If we converge, everything is
+// fine. If we do not converge, the solver control will throw an exception
 // @NoConvergence. Usually, this will abort the program, which is certainly
-// not what we want. Rather, we want to switch to the strong solver and
-// continue the solution. Hence, we catch the exception with the C++ try/catch
-// mechanism. Note also how we construct different preconditioners: The fast
-// one gives a @p false flag to the BlockSchurPreconditioner class that
-// signals that no solve for the velocity-velocity block should be performed
-// (but only an AMG V-cycle). The @p true flag for the strong solver signals
-// an approximate CG solve, see the definition of the preconditioner above.
+// not what we want to happen here. Rather, we want to switch to the strong
+// solver and continue the solution process with whatever vector we got so
+// far. Hence, we catch the exception with the C++ try/catch mechanism. Note
+// also how we construct different preconditioners: The fast one gives a @p
+// false flag to the BlockSchurPreconditioner class that signals that no solve
+// for the velocity-velocity block should be performed (but only an AMG
+// V-cycle). The @p true flag for the strong solver signals an approximate CG
+// solve, see the definition of the preconditioner above.
   template <int dim>
   void BoussinesqFlowProblem<dim>::solve ()
   {
@@ -3657,6 +3659,16 @@ namespace Step32
 
 // @sect4{BoussinesqFlowProblem::output_results}
 
+// Next comes the function that generates the output. The quantities to output
+// could be introduced manually like we did in step-31. An alternative is to
+// hand this task over to a class PostProcessor that inherits from the class
+// DataPostprocessor, which can be attached to DataOut. This allows us to
+// output derived quantities from the solution, like the friction heating
+// included in this example. It overloads the virtual function @p
+// compute_derived_quantities_vector, which is then internally called in
+// DataOut. We have to give it values of the numerical solution, its
+// derivatives, normals to the cell, the actual evaluation points and any
+// additional quantities.
   template <int dim>
   class BoussinesqFlowProblem<dim>::Postprocessor : public DataPostprocessor<dim>
   {
@@ -3699,6 +3711,16 @@ namespace Step32
   {}
 
 
+				// Here we define the names for the variables
+				// we want to output. These are the actual
+				// solution values for velocity, pressure, and
+				// temperature, as well as the friction
+				// heating and to each cell the number of the
+				// processor that owns it. This allows us to
+				// visualize the partitioning of the domain
+				// among the processors. Except for the
+				// velocity, which is vector-valued, all other
+				// quantities are scalar.
   template <int dim>
   std::vector<std::string>
   BoussinesqFlowProblem<dim>::Postprocessor::get_names() const
@@ -3747,6 +3769,19 @@ namespace Step32
   }
 
 
+				// Now we implement the function that computes
+				// the derived quantities. As we also did for
+				// the output, we rescale the velocity from
+				// its SI units to something more readable,
+				// namely cm/year. Next, the pressure is
+				// scaled to be between 0 and the maximum
+				// pressure. This makes it more easily
+				// comparable -- in essence making all
+				// pressure variables positive or
+				// zero. Temperature is taken as is, and the
+				// friction heating is computed as $2 \eta
+				// \varepsilon(\mathbf{u}) \cdot
+				// \varepsilon(\mathbf{u})$.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Postprocessor::
@@ -3765,20 +3800,16 @@ namespace Step32
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
-					 // velocity; rescale in cm/year
 	for (unsigned int d=0; d<dim; ++d)
 	  computed_quantities[q](d)
 	    = (uh[q](d) *  EquationData::year_in_seconds * 100);
 
-					 // pressure
 	const double pressure = (uh[q](dim)-minimal_pressure);
 	computed_quantities[q](dim) = pressure;
 
-					 // temperature
 	const double temperature = uh[q](dim+1);
 	computed_quantities[q](dim+1) = temperature;
 
-					 // friction heating
 	Tensor<2,dim> grad_u;
 	for (unsigned int d=0; d<dim; ++d)
 	  grad_u[d] = duh[q][d];
@@ -3797,66 +3828,16 @@ namespace Step32
 // data from the two DoFHandler
 // objects (for the Stokes and the
 // temperature parts of the problem)
-// into one is the same. There are
-// three minor changes: we make sure
-// that only a single processor
-// actually does some work here; take
-// care of scaling variables in a
-// useful way; and in addition to the
-// Stokes and temperature parts in
-// the <code>joint_fe</code> finite
-// element, we also add a piecewise
-// constant field that denotes the
-// subdomain id a cell corresponds
-// to. This allows us to visualize
-// the partitioning of the domain. As
-// a consequence, we also have to
-// change the assertion about the
-// number of degrees of freedom in
-// the joint DoFHandler object (which
-// is now equal to the number of
-// Stokes degrees of freedom plus the
-// temperature degrees of freedom
-// plus the number of active cells as
-// that is the number of partition
-// variables we want to add), and
-// adjust the number of elements in
-// the arrays we use to name the
-// components of the joint solution
-// vector and to identify which of
-// these components are scalars or
-// parts of dim-dimensional vectors.
+// into one is the same. There is
+// one minor change: we make sure
+// that each processor
+// only works on the subdomain it owns locally (and not on ghost or artificial
+// cells). This we do by adding an additional number to the filename when we
+// write the solution. This is not really new, we did it similarly in
+// step-40. Note that we write in the compressed format @p .vtu instead of
+// plain vtk files, which saves quite some storage.
 //
-// As for scaling: as mentioned in
-// the introduction, to keep the
-// Stokes equations properly scaled
-// and symmetric, we introduced a new
-// pressure $\hat p =
-// \frac{L}{\eta}p$. What we really
-// wanted, however, was the original
-// pressure $p$, so while copying
-// data from the Stokes DoFHandler
-// into the joint one, we undo this
-// scaling. While we're at it messing
-// with the results of the
-// simulation, we do two more things:
-// First, the pressure is only
-// defined up to a constant. To make
-// it more easily comparable, we
-// compute the minimal value of the
-// pressure computed and shift all
-// values up by that amount -- in
-// essence making all pressure
-// variables positive or
-// zero. Secondly, let's also take
-// care of the awkward units we use
-// for the velocity: it is computed
-// in SI units of meters per second,
-// which of course is a very small
-// number in the earth mantle. We
-// therefore rescale things into
-// centimeters per year, the unit
-// commonly used in geophysics.
+// All the rest is done in the PostProcessor class.
   template <int dim>
   void BoussinesqFlowProblem<dim>::output_results ()
   {
@@ -3944,6 +3925,9 @@ namespace Step32
     std::ofstream output (filename.c_str());
     data_out.write_vtu (output);
 
+				// Eventually, we create a master file on the
+				// zeroth processor that describes how the
+				// subdomains are defining the global mesh.
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
 	std::vector<std::string> filenames;
@@ -3986,84 +3970,28 @@ namespace Step32
 // easily identify which of the two
 // is more expensive.
 //
-// One thing of note, however, is
-// that we don't want to compute all
-// error indicators on all cells, of
-// course. Rather, it would be nice
-// if each processor could only
-// compute the error indicators for
-// those cells it actually
-// owns. However, in order for mesh
-// refinement to proceed in the same
-// way on all processors, all
-// processors would have to exchange
-// their refinement indicators. We do
-// so in two steps: first, we call
-// the KellyErrorEstimator::estimate
-// function with an argument (usually
-// defaulted, but explicitly given
-// here) thatindicates the subdomain
-// id of all those cells that we want
-// to work on; note that this means
-// that we also have to specify
-// values for all those default
-// arguments that lie before the one
-// we want to give.
+// One thing of note, however, is that we don't want to compute all error
+// indicators only on the locally owned subdomain. In order to achieve this,
+// we pass one additional argument to the KellyErrorEstimator. Note that the
+// vector for error estimates is resized to the number of active cells present
+// on the current process, which is less than the total number of degrees of
+// freedom on all processors; each processor only has a few coarse cells
+// around the locally owned ones, as also explained in step-40.
 //
-// Secondly, we need to exchange the
-// data. To do this, we could add up
-// the refinement indicators from all
-// processors, since they all only
-// worked on a disjoint subset of the
-// elements of the vector that holds
-// these indicators. We could set up
-// a distributed Trilinos vector for
-// this, but that appears
-// unnecessarily complicated because
-// we would have to specify a
-// partition of this vector, and none
-// appears immediately
-// obvious. Rather, we want to use
-// the Trilinos communicator class to
-// this for us, taking the local
-// indicators as a collection of
-// floating point values rather than
-// a linear algebra
-// vector. Unfortunately, the
-// Trilinos communicator class
-// doesn't appear to have function
-// that wraps around the MPI add
-// function; it has one that computes
-// the maximum of a bunch of values,
-// though, which in our case is
-// equally good -- maybe even better,
-// in case two processors should
-// compute values for the same cell
-// (which they shouldn't of course,
-// unless we have made a mistake in
-// specifying the arguments to the
-// estimate function below). There is
-// little snag again, however, that
-// makes this a bit awkward: the
-// Trilinos communicator class can
-// take the maximum over all
-// processors for each element of a
-// vector, but only if the vector
-// contains doubles. The vector
-// returned by the
-// KellyErrorEstimator::estimate
-// function, on the other hand, has
-// floats as its data type. An ugly,
-// if workable way, is therefore to
-// compute the indicators as floats,
-// convert the vector to doubles, and
-// form the maximum of that.
+// The local error estimates are then handed to a %parallel version of
+// GridRefinement which evaluates the errors and finds the cells that need
+// refinement. As in step-31, we want to limit the maximum grid level. So in
+// case some cells have been marked that are already at the finest level, we
+// simply clear the refine flags.
 //
-// At the end of this chain of
-// events, every processors has the
-// complete set of refinement
-// indicators, and the rest of the
-// function proceeds as before.
+// With all that at hand, we set up the parallel SolutionTransfer to transfer
+// the solutions for the current time level and the next older one. The syntax
+// is similar to the non-%parallel solution transfer (with the exception that
+// here a pointer to the vector entries is enough), and SolutionTransfer will
+// already upon call to prepare_for_coarsening_and_refinement attach the data
+// to the cell information. This makes sure that the solution data eventually
+// arrives at the processor that will own the cell after repartitioning of the
+// domain with new cells.
   template <int dim>
   void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   {
@@ -4085,7 +4013,6 @@ namespace Step32
 					 estimated_error_per_cell,
 					 0.3, 0.1);
 
-				     // limit maximum refinement level
     if (triangulation.n_levels() > max_grid_level)
       for (typename Triangulation<dim>::active_cell_iterator
 	     cell = triangulation.begin_active(max_grid_level);
@@ -4151,15 +4078,11 @@ namespace Step32
 
 // @sect4{BoussinesqFlowProblem::run}
 
-// This is the final function in this
-// class. It actually runs the program. It
-// is, once more, very similar to
-// step-31. The only thing that really
-// changed is that we use the
-// <code>project_temperature_field()</code>
-// function instead of the library function
-// <code>VectorTools::project</code>, the
-// rest is as before.
+// This is the final function in this class. It actually runs the program. It
+// is, once more, very similar to step-31. We use a different mesh now (@p
+// hyper_shell instead of a simple cube geometry), and use the
+// <code>project_temperature_field()</code> function instead of the library
+// function <code>VectorTools::project</code>, the rest is as before.
   template <int dim>
   void BoussinesqFlowProblem<dim>::run ()
   {
@@ -4227,13 +4150,26 @@ namespace Step32
 	time += time_step;
 	++timestep_number;
 
-					 // if we are at the end of
-					 // time, stop now
+					 // In order to speed up linear
+					 // solvers, we extrapolate the
+					 // solutions from the old time levels
+					 // to the new one. This gives a very
+					 // good initial guess, cutting the
+					 // number of iterations needed in
+					 // solvers by more than one half. We
+					 // do not need to extrapolate in the
+					 // last iteration, so if we reached
+					 // the final time, we stop where.
+				         //
+				         // As last thing during a time step,
+				         // we check whether the current time
+				         // step number is divisible by 100,
+				         // which is when we let the computing
+				         // timer print a summary of times it
+				         // spent up to that point.
 	if (time > parameters.end_time * EquationData::year_in_seconds)
 	  break;
 
-					 // otherwise prepare for the
-					 // next time step
 	TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
 	old_old_stokes_solution      = old_stokes_solution;
 	old_stokes_solution          = stokes_solution;
@@ -4248,15 +4184,12 @@ namespace Step32
 				       old_old_temperature_solution);
 	  }
 
-					 // every 100 time steps output
-					 // a summary of the current
-					 // timing information
 	if (timestep_number % 100 == 0)
 	  computing_timer.print_summary ();
       }
     while (true);
 
-				     // if we are generating graphical
+				     // If we are generating graphical
 				     // output, do so also for the last
 				     // time step unless we had just
 				     // done so before we left the
@@ -4272,7 +4205,12 @@ namespace Step32
 
 // @sect3{The <code>main</code> function}
 
-// This is copied verbatim from step-31:
+// The main function is short as usual and very similar to the one in
+// step-31. Since we use a parameter file which is specified as an argument in
+// the command line, we have to read it in here and pass it on to the
+// Parameters class for parsing. If no filename is given in the command line,
+// we simply use the step-32.prm file which is distributed together with the
+// program.
 int main (int argc, char *argv[])
 {
   using namespace Step32;
