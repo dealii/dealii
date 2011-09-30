@@ -217,7 +217,7 @@ namespace Step32
 				     // experimenting it turns out
 				     // that a good length scale is
 				     // the diameter of plumes, which
-				     // is around $10$km:
+				     // is around 10 km:
     const double pressure_scaling = eta / 10000;
 
 				     // The final number in this
@@ -243,8 +243,6 @@ namespace Step32
 
 				   // @sect3{Preconditioning the Stokes system}
 
-// @todo (MK): update
-
 				   // This namespace implements the
 				   // preconditioner. As discussed in the
 				   // introduction, this preconditioner
@@ -258,14 +256,14 @@ namespace Step32
 				   // are approximated by linear solvers or,
 				   // if the right flag is given to the
 				   // constructor of this class, by a single
-				   // AMG V-cycle. The three code blocks of
-				   // the <code>vmult</code> function
-				   // implement the multiplications with the
-				   // three blocks of this preconditioner
-				   // matrix and should be self explanatory if
-				   // you have read through step-31 or the
-				   // discussion of compositing solvers in
-				   // step-20.
+				   // AMG V-cycle for the velocity block. The
+				   // three code blocks of the
+				   // <code>vmult</code> function implement
+				   // the multiplications with the three
+				   // blocks of this preconditioner matrix and
+				   // should be self explanatory if you have
+				   // read through step-31 or the discussion
+				   // of compositing solvers in step-20.
   namespace LinearSolvers
   {
     template <class PreconditionerA, class PreconditionerMp>
@@ -291,14 +289,14 @@ namespace Step32
 	    TrilinosWrappers::MPI::Vector utmp(src.block(0));
 
 	    {
-// @todo shouldn't this be a *relative* tolerance
-	      SolverControl solver_control(5000, 1e-5);
+	      SolverControl solver_control(5000, 1e-6 * src.block(1).l2_norm());
 
-	      TrilinosWrappers::SolverCG solver(solver_control);
+	      SolverCG<TrilinosWrappers::MPI::Vector> solver(solver_control);
 
 	      solver.solve(stokes_preconditioner_matrix->block(1,1),
 			   dst.block(1), src.block(1),
 			   mp_preconditioner);
+	      std::cout << solver_control.last_step() << "-";
 
 	      dst.block(1) *= -1.0;
 	    }
@@ -406,9 +404,9 @@ namespace Step32
 				   // constructor that creates an
 				   // FEValues object for a @ref
 				   // FiniteElement "finite element",
-				   // a @ref Quadrature "quadrature
-				   // formula", the @ref Mapping
-				   // "mapping" that describes the
+				   // a @ref Quadrature "quadrature formula",
+				   // the @ref Mapping "mapping" that
+				   // describes the
 				   // interpolation of curved
 				   // boundaries, and some @ref
 				   // UpdateFlags "update flags".
@@ -882,9 +880,9 @@ namespace Step32
 				   // this section: the function
 				   // <code>get_cfl_number()</code>
 				   // that computes the maximum CFL
-				   // number over all cells from which
+				   // number over all cells which
 				   // we then compute the global time
-				   // step, and the function
+				   // step from, and the function
 				   // <code>get_entropy_variation()</code>
 				   // that is used in the computation
 				   // of the entropy stabilization. It
@@ -1072,15 +1070,15 @@ namespace Step32
 				       // always contain values for
 				       // all @ref
 				       // GlossLocallyRelevantDof
-				       // "locally relevant degrees of
-				       // freedom"; the fully
+				       // "locally relevant degrees of freedom";
+				       // the fully
 				       // distributed vectors that we
 				       // obtain from the solution
 				       // process and that only ever
 				       // contain the @ref
 				       // GlossLocallyOwnedDof
-				       // "locally owned degrees of
-				       // freedom" are destroyed
+				       // "locally owned degrees of freedom"
+				       // are destroyed
 				       // immediately after the
 				       // solution process and after
 				       // we have copied the relevant
@@ -1172,8 +1170,9 @@ namespace Step32
 
 
 				       // Following the @ref
-				       // MTWorkStream "task-based
-				       // parallelization" paradigm,
+				       // MTWorkStream 
+				       // "task-based parallelization" 
+				       // paradigm,
 				       // we split all the assembly
 				       // routines into two parts: a
 				       // first part that can do all
@@ -1702,10 +1701,10 @@ namespace Step32
 
 				   // Next comes the computation of
 				   // the global entropy variation
-				   // $\|E(T)-\textrm{avg}(E)\|_\infty$
+				   // $\|E(T)-\bar{E}(T)\|_\infty$
 				   // where the entropy $E$ is defined
 				   // as discussed in the
-				   // introduction. This is needed for
+				   // introduction.  This is needed for
 				   // the evaluation of the
 				   // stabilization in the temperature
 				   // equation as explained in the
@@ -1717,6 +1716,24 @@ namespace Step32
 				   // is computed by the maxima over
 				   // quadrature points, as usual in
 				   // discrete computations.
+				   //
+				   // In order to compute this quantity, we
+				   // first have to find the space-average
+				   // $\bar{E}(T)$ and then evaluate the
+				   // maximum. However, that means that we
+				   // would need to perform two loops. We can
+				   // avoid the overhead by noting that
+				   // $\|E(T)-\bar{E}(T)\|_\infty =
+				   // \max\big(E_\max{}(T)-\bar{E}(T),
+				   // \bar{E}(T)-E_\min{}(T)\big)$, i.e., the
+				   // maximum out of the deviation from the
+				   // average entropy in positive and negative
+				   // directions. The four quantities we need
+				   // for the latter formula (maximum entropy,
+				   // minimum entropy, average entropy, area)
+				   // can all be evaluated in the same loop
+				   // over all cells, so we choose this
+				   // simpler variant.
   template <int dim>
   double
   BoussinesqFlowProblem<dim>::get_entropy_variation (const double average_temperature) const
@@ -1735,7 +1752,7 @@ namespace Step32
 				     // In the two functions above we
 				     // computed the maximum of
 				     // numbers that were all
-				     // non-negative, so we know that
+				     // non-negative, so we knew that
 				     // zero was certainly a lower
 				     // bound. On the other hand, here
 				     // we need to find the maximum
@@ -1833,7 +1850,7 @@ namespace Step32
 				     // Having computed everything
 				     // this way, we can then compute
 				     // the average entropy and find
-				     // the $L_\infty$ norm by taking
+				     // the $L^\infty$ norm by taking
 				     // the larger of the deviation of
 				     // the maximum or minimum from
 				     // the average:
@@ -1923,11 +1940,12 @@ namespace Step32
 	    }
       }
 
-// @todo: Do as above with one communication
-    return std::make_pair(-Utilities::MPI::max (-min_local_temperature,
-						MPI_COMM_WORLD),
-			  Utilities::MPI::max (max_local_temperature,
-					       MPI_COMM_WORLD));
+    double local_temperatures [2] = {-min_local_temperature, max_local_temperature};
+    double global_temperatures [2];
+
+    Utilities::MPI::max(local_temperatures, MPI_COMM_WORLD, global_temperatures);
+
+    return std::make_pair(-global_temperatures[0], global_temperatures[1]);
   }
 
 
@@ -2074,7 +2092,8 @@ namespace Step32
 // conditions are inhomogeneous, which
 // makes this procedure somewhat
 // tricky. Remember that we get the matrix
-// from some other function. However, the
+// from another assembly loop than the right 
+// hand side. However, the
 // correct imposition of boundary
 // conditions needs the matrix data we work
 // on plus the right hand side
@@ -2096,7 +2115,7 @@ namespace Step32
 // here. To implement this, we ask the
 // constraint matrix whether the dof under
 // consideration is inhomogeneously
-// constraint. In that case, we generate
+// constrained. In that case, we generate
 // the respective matrix column that we
 // need for creating the correct right hand
 // side. Note that this (manually
@@ -2234,45 +2253,24 @@ namespace Step32
 // this is not possible, as explained
 // in the introduction).
 //
-// The main functional difference
-// between the code here and that in
-// step-31 is that the matrices we
-// want to set up are distributed
-// across multiple processors. Since
-// we still want to build up the
-// sparsity pattern first for
-// efficiency reasons, we could
-// continue to build the
-// <i>entire</i> sparsity pattern as
-// a
-// BlockCompressedSimpleSparsityPattern,
-// as we did in step-31. However,
-// that would be inefficient: every
-// processor would build the same
-// sparsity pattern, but only
-// initialize a small part of the
-// matrix using it.
+// The main functional difference between the code here and that in step-31 is
+// that the matrices we want to set up are distributed across multiple
+// processors. As in other deal.II example programs, we want to build up the
+// sparsity pattern before assembling matrices for efficiency reasons (which
+// would be possible with Trilinos matrices, though).
 //
-// Rather, we use an object of type
-// TrilinosWrappers::BlockSparsityPattern,
-// which is (obviously) a wrapper
-// around a sparsity pattern object
-// provided by Trilinos. The
-// advantage is that the Trilinos
-// sparsity pattern class can
-// communicate across multiple
-// processors: if this processor
-// fills in all the nonzero entries
-// that result from the cells it
-// owns, and every other processor
-// does so as well, then at the end
-// after some MPI communication
-// initiated by the
-// <code>compress()</code> call, we
-// will have the globally assembled
-// sparsity pattern available with
-// which the global matrix can be
-// initialized.
+// In order to avoid storing information to all rows in the computations (that
+// will certainly not be feasible with large computations with billions of
+// unknowns!), we use an object of type
+// TrilinosWrappers::BlockSparsityPattern, which is (obviously) a wrapper
+// around a sparsity pattern object provided by Trilinos, instead of
+// BlockCompressedSparsityPattern. The advantage is that the Trilinos sparsity
+// pattern class can communicate across multiple processors: if this processor
+// fills in all the nonzero entries that result from the cells it owns, and
+// every other processor does so as well, then at the end after some MPI
+// communication initiated by the <code>compress()</code> call, we will have
+// the globally assembled sparsity pattern available with which the global
+// matrix can be initialized.
 //
 // The only other change we need to
 // make is to tell the
@@ -2383,23 +2381,16 @@ namespace Step32
 // (after splitting out the three functions
 // above) mostly has to deal with the
 // things we need to do for parallelization
-// across processors. In particular, at the
-// top it calls
-// GridTools::partition_triangulation to
-// subdivide all cells into subdomains of
-// roughly equal size and roughly minimal
-// interface length (using METIS). We then
+// across processors. We first
 // distribute degrees of freedom for Stokes
-// and temperature DoFHandler objects, and
-// re-sort them in such a way that all
-// degrees of freedom associated with
-// subdomain zero come before all those
-// associated with subdomain one, etc. For
-// the Stokes part, this entails, however,
+// and temperature DoFHandler objects. For
+// the Stokes part, the numbering of degrees
+// of degrees of freedom as a contiguous block
+// on each subdomain entails, however,
 // that velocities and pressures become
 // intermixed, but this is trivially solved
-// by sorting again by blocks; it is worth
-// noting that this latter operation leaves
+// by sorting by blocks; it is worth
+// noting that this operation leaves
 // the relative ordering of all velocities
 // and pressures alone, i.e. within the
 // velocity block we will still have all

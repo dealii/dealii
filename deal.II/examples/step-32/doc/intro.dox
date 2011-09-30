@@ -433,7 +433,7 @@ where we compute the viscosity from a residual $\|R_1(T)\|_{L^\infty(K)}}$ of
 the equation, limited by a diffusion proportional to the mesh size $h_K$ in
 regions where the residual is large (around steep gradients). This definition
 has been shown to work well for the given case, $\alpha = 1$ in step-31, but
-it is usually less effective as the diffusion for $alpha=2$. For that case, we
+it is usually less effective as the diffusion for $\alpha=2$. For that case, we
 choose a slightly more readable definition of the viscosity,
 @f{eqnarray*}
   \nu_2(T)|_K = \min (\nu_h^\mathrm{max}|_K,\nu_h^\mathrm{E}_K)
@@ -441,12 +441,12 @@ choose a slightly more readable definition of the viscosity,
 where the first term gives again the maximum dissipation (similarly to a first
 order upwind scheme),
 @f{eqnarray*}
-  \nu^\mathrm{max}_h|_K = \beta h_K \|\ve u\|_{\infty,K}
+  \nu^\mathrm{max}_h|_K = \beta h_K \|\ve u\|_{L^\infty}(K)}
 @f}
 and the entropy viscosity is defined as
 @f{eqnarray*}
-  \nu^\mathrm{E}_h|_K = c_R \frac{h_K^2 \|R_\mathrm{2,E}(T)\|_{\infty,K}}
-  {\|E(T) - \bar{E}(T)\|_{\infty,\Omega} }.
+  \nu^\mathrm{E}_h|_K = c_R \frac{h_K^2 \|R_\mathrm{2,E}(T)\|_{L^\infty(K)}}
+  {\|E(T) - \bar{E}(T)\|_{L^\infty(\Omega)} }.
 @f}
 
 This formula is described in the article <i>J.-L. Guermond, R. Pasquetti, \&
@@ -459,12 +459,11 @@ minimum temperature in the computation), which gives the following formula
  R_\mathrm{E}(T) = \frac{\partial E(T)}{\partial t} +
     (T-T_\mathrm{m}) \left(\ve u \cdot \nabla T -  \kappa \nabla^2 T - \gamma\right).
 @f}
-
 The denominator in the formula for $\nu^\mathrm{E}_h|_K$ is computed as the
-global deviation of the entropy from the space-averaged entropy. As in
-step-31, we evaluate the artificial viscosity from the temperature and
-velocity at two previous time levels, in order to avoid a nonlinearity in its
-definition.
+global deviation of the entropy from the space-averaged entropy $\bar{E}(T) =
+\int_\Omega E(T) d\mathbf{x}/\int_Omega d\mathbf{x}$. As in step-31, we
+evaluate the artificial viscosity from the temperature and velocity at two
+previous time levels, in order to avoid a nonlinearity in its definition.
 
 The above definitions of the viscosity are simple, but depend on two
 parameters, namely $\beta$ and $c_R$.  For the current program, we want to go
