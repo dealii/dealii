@@ -6522,10 +6522,18 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_LIBS, dnl
 
   dnl Trilinos' cmake invokation stores the set of libraries
   dnl in a special file for consumption of cmake at a later
-  dnl time. We'll simply grep through it
-  DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
-    | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
-  AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
+  dnl time. We'll simply grep through it. Unfortunately, it has
+  dnl changed place in Trilinos starting from version 10.8.0, so 
+  dnl manually detected prior version
+  if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 -a "$DEAL_II_TRILINOS_VERSION_MINOR" -lt 8 ; then
+    DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
+      | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+    AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
+  else
+    DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake \
+      | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+    AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
+  fi
   AC_SUBST(DEAL_II_TRILINOS_LIBS)
 ])
 
