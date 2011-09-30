@@ -1548,53 +1548,71 @@ namespace Step32
 
 
 
-// @sect4{The BoussinesqFlowProblem helper functions}
-//
-// Except two small details, the function
-// to compute the global maximum of
-// the velocity is the very same as in
-// step-31. The first detail is
-// actually common to all functions
-// that implement loop over all cells
-// in the triangulation: When
-// operating in %parallel, each
-// processor only works on a chunk of
-// cells. This chunk of cells is
-// identified via a so-called
-// <code>subdomain_id</code>, as we
-// also did in step-18. All we need
-// to change is hence to perform the
-// cell-related operations only on
-// the process with the correct
-// ID. The second difference is the
-// way we calculate the maximum
-// value. Before, we could simply
-// have a <code>double</code>
-// variable that we checked against
-// on each quadrature point for each
-// cell. Now, we have to be a bit
-// more careful since each processor
-// only operates on a subset of
-// cells. What we do is to first let
-// each processor calculate the
-// maximum among its cells, and then
-// do a global communication
-// operation
-// <code>Utilities::MPI::max</code> that searches
-// for the maximum value among all
-// the maximum values of the
-// individual processors. MPI
-// provides such a call, but it's
-// even simpler to use the respective
-// function of the MPI
-// communicator object since that
-// will do the right thing even if we
-// work without MPI and on a single
-// machine only. The call to
-// <code>Utilities::MPI::max</code> needs two
-// arguments, namely the local
-// maximum (input) and the MPI communicator,
-// which is MPI_COMM_WORLD in this example.
+				   // @sect4{The BoussinesqFlowProblem helper functions}
+				   //
+				   // Except for two small details,
+				   // the function to compute the
+				   // global maximum of the velocity
+				   // is the same as in step-31. The
+				   // first detail is actually common
+				   // to all functions that implement
+				   // loops over all cells in the
+				   // triangulation: When operating in
+				   // %parallel, each processor can
+				   // only work on a chunk of cells
+				   // since each processor only has a
+				   // certain part of the entire
+				   // triangulation. This chunk of
+				   // cells that we want to work on is
+				   // identified via a so-called
+				   // <code>subdomain_id</code>, as we
+				   // also did in step-18. All we need
+				   // to change is hence to perform
+				   // the cell-related operations only
+				   // on cells that are owned by the
+				   // current process (as opposed to
+				   // ghost or artificial cells),
+				   // i.e. for which the subdomain id
+				   // equals the number of the process
+				   // ID. Since this is a commonly
+				   // used operation, there is a
+				   // shortcut for this operation: we
+				   // can ask whether the cell is
+				   // owned by the current processor
+				   // using
+				   // <code>cell-@>is_locally_owned()</code>.
+				   //
+				   // The second difference is the way
+				   // we calculate the maximum
+				   // value. Before, we could simply
+				   // have a <code>double</code>
+				   // variable that we checked against
+				   // on each quadrature point for
+				   // each cell. Now, we have to be a
+				   // bit more careful since each
+				   // processor only operates on a
+				   // subset of cells. What we do is
+				   // to first let each processor
+				   // calculate the maximum among its
+				   // cells, and then do a global
+				   // communication operation
+				   // <code>Utilities::MPI::max</code>
+				   // that computes the maximum value
+				   // among all the maximum values of
+				   // the individual processors. MPI
+				   // provides such a call, but it's
+				   // even simpler to use the
+				   // respective function in namespace
+				   // Utilities::MPI using the MPI
+				   // communicator object since that
+				   // will do the right thing even if
+				   // we work without MPI and on a
+				   // single machine only. The call to
+				   // <code>Utilities::MPI::max</code>
+				   // needs two arguments, namely the
+				   // local maximum (input) and the
+				   // MPI communicator, which is
+				   // MPI_COMM_WORLD in this example.
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_maximal_velocity () const
   {
@@ -1629,14 +1647,22 @@ namespace Step32
 
 
 
-// Similar function to before, but we now
-// compute the CFL number, i.e., maximal
-// velocity on a cell divided by the cell
-// diameter. This number is necessary to
-// determine the time step size, as we use
-// a semi-explicit time stepping scheme for
-// the temperature equation (see step-31 for
-// a discussion).
+				   // The next function does something
+				   // similar, but we now compute the
+				   // CFL number, i.e., maximal
+				   // velocity on a cell divided by
+				   // the cell diameter. This number
+				   // is necessary to determine the
+				   // time step size, as we use a
+				   // semi-explicit time stepping
+				   // scheme for the temperature
+				   // equation (see step-31 for a
+				   // discussion). We compute it in
+				   // the same way as above: Compute
+				   // the local maximum over all
+				   // locally owned cells, then
+				   // exchange it via MPI to find the
+				   // global maximum.
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_cfl_number () const
   {
@@ -1674,13 +1700,23 @@ namespace Step32
 
 
 
-  // Next comes the computation of the global entropy variation
-  // $\|E(T)-avg(E)\|_\infty$. This is needed for the evaluation of the
-  // stabilization in the temperature equation as explained in the
-  // introduction. The entropy variation is actually only needed if we use
-  // $\alpha=2$ as a power in the residual computation. The infinity norm is
-  // computed by the maxima over quadrature points, as usual in discrete
-  // computations.
+				   // Next comes the computation of
+				   // the global entropy variation
+				   // $\|E(T)-\textrm{avg}(E)\|_\infty$
+				   // where the entropy $E$ is defined
+				   // as discussed in the
+				   // introduction. This is needed for
+				   // the evaluation of the
+				   // stabilization in the temperature
+				   // equation as explained in the
+				   // introduction. The entropy
+				   // variation is actually only
+				   // needed if we use $\alpha=2$ as a
+				   // power in the residual
+				   // computation. The infinity norm
+				   // is computed by the maxima over
+				   // quadrature points, as usual in
+				   // discrete computations.
   template <int dim>
   double
   BoussinesqFlowProblem<dim>::get_entropy_variation (const double average_temperature) const
@@ -1696,14 +1732,43 @@ namespace Step32
     std::vector<double> old_temperature_values(n_q_points);
     std::vector<double> old_old_temperature_values(n_q_points);
 
-				     // Note how we preset the data fields for
-				     // the minimum and maximum values: The
-				     // minimum is initialized with a bigger
-				     // and the maximum with a smaller number
-				     // than one that is going to
-				     // appear. These numbers will be
-				     // overwritten in the cell loop or in the
-				     // communication step at the latest.
+				     // In the two functions above we
+				     // computed the maximum of
+				     // numbers that were all
+				     // non-negative, so we know that
+				     // zero was certainly a lower
+				     // bound. On the other hand, here
+				     // we need to find the maximum
+				     // deviation from the average
+				     // value, i.e., we will need to
+				     // know the maximal and minimal
+				     // values of the entropy for
+				     // which we don't a priori know
+				     // the sign.
+				     //
+				     // To compute it, we can
+				     // therefore start with the
+				     // largest and smallest possible
+				     // values we can store in a
+				     // double precision number: The
+				     // minimum is initialized with a
+				     // bigger and the maximum with a
+				     // smaller number than any one
+				     // that is going to appear. We
+				     // are then guaranteed that these
+				     // numbers will be overwritten in
+				     // the loop on the first cell or,
+				     // if this processor does not own
+				     // any cells, in the
+				     // communication step at the
+				     // latest. The following loop
+				     // then computes the minimum and
+				     // maximum local entropy as well
+				     // as keeps track of the
+				     // area/volume of the part of the
+				     // domain we locally own and the
+				     // integral over the entropy on
+				     // it:
     double min_entropy = std::numeric_limits<double>::max(),
 	   max_entropy = -std::numeric_limits<double>::max(),
 		  area = 0,
@@ -1734,37 +1799,63 @@ namespace Step32
 	    }
 	}
 
-				     // MPI data exchange: we need to sum over
-				     // the two integrals (area,
-				     // entropy_integrated), and get the extrema
-				     // for maximum and minimum. combine
-				     // MPI_Allreduce for two values since it is
-				     // an expensive operation
-    const double local_for_sum[2] = { entropy_integrated, area },
-		 local_for_max[2] = { -min_entropy, max_entropy };
-    double global_for_sum[2], global_for_max[2];
+				     // Now we only need to exchange
+				     // data between processors: we
+				     // need to sum the two integrals
+				     // (<code>area</code>,
+				     // <code>entropy_integrated</code>),
+				     // and get the extrema for
+				     // maximum and minimum. We could
+				     // do this through four different
+				     // data exchanges, but we can it
+				     // with two: Utilities::MPI::sum
+				     // also exists in a variant that
+				     // takes an array of values that
+				     // are all to be summed up. And
+				     // we can also utilize the
+				     // Utilities::MPI::max function
+				     // by realizing that forming the
+				     // minimum over the minimal
+				     // entropies equals forming the
+				     // negative of the maximum over
+				     // the negative of the minimal
+				     // entropies; this maximum can
+				     // then be combined with forming
+				     // the maximum over the maximal
+				     // entropies.
+    const double local_sums[2]   = { entropy_integrated, area },
+		 local_maxima[2] = { -min_entropy, max_entropy };
+    double global_sums[2], global_maxima[2];
 
-    Utilities::MPI::sum (local_for_sum, MPI_COMM_WORLD, global_for_sum);
-    Utilities::MPI::max (local_for_max, MPI_COMM_WORLD, global_for_max);
+    Utilities::MPI::sum (local_sums,   MPI_COMM_WORLD, global_sums);
+    Utilities::MPI::max (local_maxima, MPI_COMM_WORLD, global_maxima);
 
-    const double average_entropy = global_for_sum[0] / global_for_sum[1];
-    const double entropy_diff = std::max(global_for_max[1] - average_entropy,
-					 average_entropy - (-global_for_max[0]));
+				     // Having computed everything
+				     // this way, we can then compute
+				     // the average entropy and find
+				     // the $L_\infty$ norm by taking
+				     // the larger of the deviation of
+				     // the maximum or minimum from
+				     // the average:
+    const double average_entropy = global_sums[0] / global_sums[1];
+    const double entropy_diff = std::max(global_maxima[1] - average_entropy,
+					 average_entropy - (-global_maxima[0]));
     return entropy_diff;
   }
 
 
 
-// Again, the evaluation of the extrapolated
-// temperature range is only a slightly
-// modified version of the respective
-// function in step-31. What is new is
-// that each processor works on its
-// partition of cells, and gets a minimum
-// and maximum temperature on that
-// partition. Two global communication
-// steps synchronize the data among the
-// processors.
+				   // The next function computes the
+				   // minimal and maximal value of the
+				   // extrapolated temperature over
+				   // the entire domain. Again, this
+				   // is only a slightly modified
+				   // version of the respective
+				   // function in step-31. As in the
+				   // function above, we collect local
+				   // minima and maxima and then
+				   // compute the global extrame using
+				   // the same trick as above:
   template <int dim>
   std::pair<double,double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
@@ -1832,6 +1923,7 @@ namespace Step32
 	    }
       }
 
+// @todo: Do as above with one communication
     return std::make_pair(-Utilities::MPI::max (-min_local_temperature,
 						MPI_COMM_WORLD),
 			  Utilities::MPI::max (max_local_temperature,
