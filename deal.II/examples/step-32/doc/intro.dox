@@ -385,7 +385,19 @@ physics), and so we'll change a few things slightly:
   criteria for left-preconditioned linear systems, and consequently this
   program uses a right preconditioner.
 
-@todo Why do we use an ILU instead of an IC for S as in step-31?
+- In step-31, we used an IC (incomplete Cholesky) preconditioner for the
+  pressure mass matrix in the Schur complement preconditioner and for the
+  solution of the temperature system. Here, we could in principle do the same,
+  but we do choose an even simpler preconditioner, namely a Jacobi
+  preconditioner for both systems. This is because here we target at massively
+  %parallel computations, where the decompositions for IC/ILU would have to be
+  performed block-wise for the locally owned degrees of freedom on each
+  processor. This means, that the preconditioner gets more like a Jacobi
+  preconditioner anyway, so we rather start from that variant straight
+  away. Note that we only use the Jacobi preconditioners for CG solvers with
+  mass matrices, where they give optimal (<i>h</i>-independent) convergence
+  anyway, even though they usually require about twice as many iterations as
+  an IC preconditioner.
 
 As a final note, let us remark that in step-31 we computed the
 Schur complement $S=B A^{-1} B^T$ by approximating
@@ -400,42 +412,72 @@ $\tilde S$ to $S$.
 
 <h3> Changes to the artificial viscosity stabilization </h3>
 
-@todo Martin, can you take another look at this section? In particular, I
-believe we now define the entropy residual differently.
-
-As in step-31, we will use an artificial viscosity of
-the form
+Similarly to step-31, we will use an artificial viscosity for stabilization
+based on a residual of the equation.  As a difference to step-31, we will
+provide two slightly different definitions of the stabilization parameter. For
+$\alpha=1$, we use the same definition as in step-31:
 @f{eqnarray*}
   \nu_\alpha(T)|_K
   =
+  \nu_1(T)|_K
+  =
   \beta
   \|\mathbf{u}\|_{L^\infty(K)}
+  h_K
   \min\left\{
-    h_K,
-    h_K^\alpha
-    \frac{\|R_\alpha(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
+    1,
+    \frac{\|R_1(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
   \right\}
 @f}
-in this problem, where
-$c(\mathbf{u},T) =
- c_R\ \|\mathbf{u}\|_{L^\infty(\Omega)} \ \mathrm{var}(T)
- \ |\mathrm{diam}(\Omega)|^{\alpha-2}$ (for the meaning of the various
-terms in these formulas, see step-31). In the results
-section of that program, we have discussed our choice for $c_R$ and
-how we arrived at the value used there mostly by accident, and in more
-detail how $\beta$ was chosen. For the
-current program, we want to go about this issue a bit more
-systematically for both parameters,
-using the same line of reasoning with which we chose two other
-parameters in our discretization, $c_k$ and $\beta$, in the results
-section of step-31. In particular, remember that we would like to make
-the artificial viscosity as small as possible while keeping it as large as
-necessary. In the following, let us describe the general strategy one may
-follow. The computations shown here were done with an earlier version of the
-program and so the actual numerical values you get when running the program
-may no longer match those shown here; that said, the general approach remains
-valid and has been used to find the values of the parameters actually used in
-the program.
+where we compute the viscosity from a residual $\|R_1(T)\|_{L^\infty(K)}}$ of
+the equation, limited by a diffusion proportional to the mesh size $h_K$ in
+regions where the residual is large (around steep gradients). This definition
+has been shown to work well for the given case, $\alpha = 1$ in step-31, but
+it is usually less effective as the diffusion for $alpha=2$. For that case, we
+choose a slightly more readable definition of the viscosity,
+@f{eqnarray*}
+  \nu_2(T)|_K = \min (\nu_h^\mathrm{max}|_K,\nu_h^\mathrm{E}_K)
+@f}
+where the first term gives again the maximum dissipation (similarly to a first
+order upwind scheme),
+@f{eqnarray*}
+  \nu^\mathrm{max}_h|_K = \beta h_K \|\ve u\|_{\infty,K}
+@f}
+and the entropy viscosity is defined as
+@f{eqnarray*}
+  \nu^\mathrm{E}_h|_K = c_R \frac{h_K^2 \|R_\mathrm{2,E}(T)\|_{\infty,K}}
+  {\|E(T) - \bar{E}(T)\|_{\infty,\Omega} }.
+@f}
+
+This formula is described in the article <i>J.-L. Guermond, R. Pasquetti, \&
+B. Popov, 2011.  Entropy viscosity method for nonlinear conservation laws, J.
+Comput. Phys., 230, 4248--4267.</i> Compared to the case $\alpha = 1$, the
+residual is computed from the temperature entropy, $E(T) = \frac12 (T-T_m)^2$
+with $T_m$ an average temperature (we choose the mean between the maximum and
+minimum temperature in the computation), which gives the following formula
+@f{eqnarray*}
+ R_\mathrm{E}(T) = \frac{\partial E(T)}{\partial t} +
+    (T-T_\mathrm{m}) \left(\ve u \cdot \nabla T -  \kappa \nabla^2 T - \gamma\right).
+@f}
+
+The denominator in the formula for $\nu^\mathrm{E}_h|_K$ is computed as the
+global deviation of the entropy from the space-averaged entropy. As in
+step-31, we evaluate the artificial viscosity from the temperature and
+velocity at two previous time levels, in order to avoid a nonlinearity in its
+definition.
+
+The above definitions of the viscosity are simple, but depend on two
+parameters, namely $\beta$ and $c_R$.  For the current program, we want to go
+about this issue a bit more systematically for both parameters in the case
+$\alpha =1$, using the same line of reasoning with which we chose two other
+parameters in our discretization, $c_k$ and $\beta$, in the results section of
+step-31. In particular, remember that we would like to make the artificial
+viscosity as small as possible while keeping it as large as necessary. In the
+following, let us describe the general strategy one may follow. The
+computations shown here were done with an earlier version of the program and
+so the actual numerical values you get when running the program may no longer
+match those shown here; that said, the general approach remains valid and has
+been used to find the values of the parameters actually used in the program.
 
 To see what is happening, note that below we will impose
 boundary conditions for the temperature between 973 and 4273 Kelvin,
@@ -496,8 +538,9 @@ a picture like this:
 
 Consequently, $c_R=0.1$ would appear to be the right value here. While this
 graph has been obtained for an exponent $\alpha=1$, in the program we use
-$\alpha=2$ instead, and in that case one has to re-tune the parameter. It
-turns out that $c_R=0.5$ works with $\alpha=2$.
+$\alpha=2$ instead, and in that case one has to re-tune the parameter (and
+observe that $c_R$ appears in the numerator and not in the denominator). It
+turns out that $c_R=1$ works with $\alpha=2$.
 
 
 <h3> Locally conservative Stokes discretization </h3>
