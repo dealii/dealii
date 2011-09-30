@@ -2401,7 +2401,7 @@ namespace Step32
 
 				   // The remainder of the setup function
 				   // (after splitting out the three functions
-				   // above) mostly has to deal with t he
+				   // above) mostly has to deal with the
 				   // things we need to do for parallelization
 				   // across processors. Because setting all
 				   // of this up is a significant compute time
@@ -2522,7 +2522,6 @@ namespace Step32
 
 //@todo work from here
     {
-
       stokes_constraints.clear ();
       stokes_constraints.reinit (stokes_relevant_set);
 
@@ -2547,7 +2546,7 @@ namespace Step32
     }
     {
       temperature_constraints.clear ();
-      temperature_constraints.reinit (temperature_relevant_partitioning);//temp_locally_active);
+      temperature_constraints.reinit (temperature_relevant_partitioning);
 
       DoFTools::make_hanging_node_constraints (temperature_dof_handler,
 					       temperature_constraints);
@@ -3327,17 +3326,21 @@ namespace Step32
 // WorkStream class), is that we now
 // precompute the temperature
 // preconditioner as well. The reason is
-// that the setup of the IC preconditioner
+// that the setup of the Jacobi preconditioner
 // takes a noticable time compared to the
 // solver because we usually only need
 // between 10 and 20 iterations for solving
-// the temperature system. Hence, it is
+// the temperature system (this might sound strange,
+// as Jacobi really only consists of a diagonal,
+// but in Trilinos it is derived from more general
+// framework for point relaxation preconditioners 
+// which is a bit inefficient). Hence, it is
 // more efficient to precompute the
 // preconditioner, even though the matrix
 // entries may slightly change because the
 // time step might change. This is not
 // too big a problem because we remesh every
-// fifth time step (and regenerate the
+// few time steps (and regenerate the
 // preconditioner then).
   template <int dim>
   void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maximal_velocity)
@@ -3371,12 +3374,18 @@ namespace Step32
     const std::pair<double,double>
       global_T_range = get_extrapolated_temperature_range();
 
-				     // use midpoint between maximum and minimum
-				     // temperature for definition of average
-				     // temperature in entropy viscosity. Could
-				     // also use the integral average, but the
-				     // results are not very sensitive to this
-				     // choice.
+				     // Here we compute the average
+				     // temperature $T_m$ that we use for
+				     // evaluating the artificial viscosity
+				     // stabilization through the residual
+				     // $E(T) = (T-T_m)^2$. We do this by
+				     // defining the midpoint between maximum
+				     // and minimum temperature as average
+				     // temperature in the definition of the
+				     // entropy viscosity. An alternative
+				     // would be to use the integral average,
+				     // but the results are not very sensitive
+				     // to this choice.
     const double average_temperature = 0.5 * (global_T_range.first +
 					      global_T_range.second);
     const double global_entropy_variation =
@@ -3426,28 +3435,25 @@ namespace Step32
 // work on the Stokes system and then on
 // the temperature system. In essence, it
 // does the same things as the respective
-// function in step-31. However, there are
-// a few things that we need to pay some
-// attention to. The first thing is, as
-// mentioned in the introduction, the way
-// we store our solution: we keep the full
-// vector with all degrees of freedom on
-// each MPI node. When we enter a solver
-// which is supposed to perform
-// matrix-vector products with a
-// distributed matrix, this is not the
-// appropriate form, though. There, we will
-// want to have the solution vector to be
-// distributed in the same way as the
-// matrix. So what we do first (after
-// initializing the Schur-complement based
-// preconditioner) is to generate a
-// distributed vector called
-// <code>distributed_stokes_solution</code>
-// and put only the locally owned dofs into
-// that, which is neatly done by the
-// <code>operator=</code> of the Trilinos
-// vector. Next, we need to set the
+// function in step-31. However, there are a few
+// changes here.
+//
+// The first change is related to the way we store our solution: we keep the
+// vectors with locally owned degrees of freedom plus ghost nodes on each MPI
+// node. When we enter a solver which is supposed to perform matrix-vector
+// products with a distributed matrix, this is not the appropriate form,
+// though. There, we will want to have the solution vector to be distributed
+// in the same way as the matrix without any ghosts. So what we do first is to
+// generate a distributed vector called
+// <code>distributed_stokes_solution</code> and put only the locally owned
+// dofs into that, which is neatly done by the <code>operator=</code> of the
+// Trilinos vector.
+//
+// Next, we scale the pressure solution (or rather, the initial guess) for the
+// solver so that it matches with the length scales in the matrices, as
+// discussed in the introduction. We also immediately scale the pressure
+// solution back to the correct units after the solution is completed.
+// We also need to set the
 // pressure values at hanging nodes to
 // zero. This we also did in step-31 in
 // order not to disturb the Schur
@@ -3461,9 +3467,20 @@ namespace Step32
 // vector for which every element is locally
 // owned.
 //
-// Apart from these two changes, everything
-// is the same as in step-31, so we don't
-// need to further comment on it.
+// The third and most obvious change is that we have two variants for the
+// Stokes solver: A fast solver that sometimes breaks down, and a robust
+// solver that is slower. This is what we already discussed in the
+// introduction. Here is how we realize it: First, we perform 30 iterations
+// with the solver and the simple preconditioner. If we converge, everything
+// is fine. If we do not converge, the solver control will throw an exception
+// @NoConvergence. Usually, this will abort the program, which is certainly
+// not what we want. Rather, we want to switch to the strong solver and
+// continue the solution. Hence, we catch the exception with the C++ try/catch
+// mechanism. Note also how we construct different preconditioners: The fast
+// one gives a @p false flag to the BlockSchurPreconditioner class that
+// signals that no solve for the velocity-velocity block should be performed
+// (but only an AMG V-cycle). The @p true flag for the strong solver signals
+// an approximate CG solve, see the definition of the preconditioner above.
   template <int dim>
   void BoussinesqFlowProblem<dim>::solve ()
   {
@@ -3476,11 +3493,7 @@ namespace Step32
 	distributed_stokes_solution (stokes_rhs);
       distributed_stokes_solution = stokes_solution;
 
-				       // before solving we scale the
-				       // initial solution to the right
-				       // dimensions
       distributed_stokes_solution.block(1) /= EquationData::pressure_scaling;
-
 
       const unsigned int
 	start = (distributed_stokes_solution.block(0).size() +
@@ -3494,8 +3507,6 @@ namespace Step32
 
       PrimitiveVectorMemory< TrilinosWrappers::MPI::BlockVector > mem;
 
-				       // step 1: try if the simple and fast solver
-				       // succeeds in 30 steps or less.
       unsigned int n_iterations = 0;
       const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
       SolverControl solver_control (30, solver_tolerance);
@@ -3518,8 +3529,6 @@ namespace Step32
 	  n_iterations = solver_control.last_step();
 	}
 
-				       // step 2: take the stronger solver in case
-				       // the simple solver failed
       catch (SolverControl::NoConvergence)
 	{
 	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
@@ -3543,8 +3552,6 @@ namespace Step32
 
       stokes_constraints.distribute (distributed_stokes_solution);
 
-				       // now rescale the pressure
-				       // back to real physical units
       distributed_stokes_solution.block(1) *= EquationData::pressure_scaling;
 
       stokes_solution = distributed_stokes_solution;
@@ -3554,14 +3561,36 @@ namespace Step32
     computing_timer.exit_section();
 
 
+				// Now let's turn to the temperature part:
+				// First, we compute the time step size. We
+				// found that we need smaller time steps for
+				// 3D than for 2D for the shell geometry. This
+				// is because the cells are more distorted in
+				// that case (it is the smallest edge length
+				// that determines the CFL number). Instead of
+				// computing the time step from maximum
+				// velocity and minimal mesh size as in
+				// step-31, we compute local CFL numbers,
+				// i.e., on each cell we compute the maximum
+				// velocity times the mesh size, and compute
+				// the maximum of them. Hence, we need to
+				// choose the factor in front of the time step
+				// slightly smaller. After temperature right
+				// hand side assembly, we solve the linear
+				// system for temperature (with fully
+				// distributed vectors without any ghosts),
+				// apply constraints and copy the vector back
+				// to one with ghosts.
+				//
+				// In the end, we extract the temperature
+				// range similarly to step-31. The only
+				// difference is that we need to exchange
+				// maxima over all processors.
     computing_timer.enter_section ("   Assemble temperature rhs");
     {
       old_time_step = time_step;
       const double cfl_number = get_cfl_number();
 
-				       // we found out that we need
-				       // approximately a quarter the time step
-				       // size in 3d
       double scaling = (dim==3)?0.25:1.0;
       time_step = (scaling/(2.1*dim*std::sqrt(1.*dim)) /
 		   (parameters.temperature_degree *
@@ -3603,7 +3632,6 @@ namespace Step32
 	    << " CG iterations for temperature" << std::endl;
       computing_timer.exit_section();
 
-				       // extract temperature range
       double temperature[2] = { std::numeric_limits<double>::max(),
 				-std::numeric_limits<double>::max() };
       double global_temperature[2];
