@@ -436,12 +436,12 @@ has been shown to work well for the given case, $\alpha = 1$ in step-31, but
 it is usually less effective as the diffusion for $\alpha=2$. For that case, we
 choose a slightly more readable definition of the viscosity,
 @f{eqnarray*}
-  \nu_2(T)|_K = \min (\nu_h^\mathrm{max}|_K,\nu_h^\mathrm{E}_K)
+  \nu_2(T)|_K = \min (\nu_h^\mathrm{max}|_K,\nu_h^\mathrm{E}|_K)
 @f}
 where the first term gives again the maximum dissipation (similarly to a first
 order upwind scheme),
 @f{eqnarray*}
-  \nu^\mathrm{max}_h|_K = \beta h_K \|\ve u\|_{L^\infty}(K)}
+  \nu^\mathrm{max}_h|_K = \beta h_K \|\mathrm u\|_{L^\infty}(K)}
 @f}
 and the entropy viscosity is defined as
 @f{eqnarray*}
@@ -457,7 +457,7 @@ with $T_m$ an average temperature (we choose the mean between the maximum and
 minimum temperature in the computation), which gives the following formula
 @f{eqnarray*}
  R_\mathrm{E}(T) = \frac{\partial E(T)}{\partial t} +
-    (T-T_\mathrm{m}) \left(\ve u \cdot \nabla T -  \kappa \nabla^2 T - \gamma\right).
+    (T-T_\mathrm{m}) \left(\mathrm u \cdot \nabla T -  \kappa \nabla^2 T - \gamma\right).
 @f}
 The denominator in the formula for $\nu^\mathrm{E}_h|_K$ is computed as the
 global deviation of the entropy from the space-averaged entropy $\bar{E}(T) =
