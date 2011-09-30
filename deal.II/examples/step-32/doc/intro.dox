@@ -441,7 +441,7 @@ choose a slightly more readable definition of the viscosity,
 where the first term gives again the maximum dissipation (similarly to a first
 order upwind scheme),
 @f{eqnarray*}
-  \nu^\mathrm{max}_h|_K = \beta h_K \|\mathbf {u}\|_{L^\infty}(K)}
+  \nu^\mathrm{max}_h|_K = \beta h_K \|\mathbf {u}\|_{L^\infty(K)}
 @f}
 and the entropy viscosity is defined as
 @f{eqnarray*}
