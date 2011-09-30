@@ -4154,6 +4154,9 @@ namespace FEValuesViews
               }
            }
         }
+				// should not end up here
+     Assert (false, ExcInternalError());
+     return curl_type();
   }
 
   template <int dim, int spacedim>
