@@ -3333,7 +3333,7 @@ namespace Step32
 // the temperature system (this might sound strange,
 // as Jacobi really only consists of a diagonal,
 // but in Trilinos it is derived from more general
-// framework for point relaxation preconditioners 
+// framework for point relaxation preconditioners
 // which is a bit inefficient). Hence, it is
 // more efficient to precompute the
 // preconditioner, even though the matrix
@@ -3474,7 +3474,7 @@ namespace Step32
 // with the fast solver based on the simple preconditioner based on the AMG
 // V-cycle instead of an approximate solve. If we converge, everything is
 // fine. If we do not converge, the solver control will throw an exception
-// @NoConvergence. Usually, this will abort the program, which is certainly
+// SolverControl::NoConvergence. Usually, this will abort the program, which is certainly
 // not what we want to happen here. Rather, we want to switch to the strong
 // solver and continue the solution process with whatever vector we got so
 // far. Hence, we catch the exception with the C++ try/catch mechanism. Note
