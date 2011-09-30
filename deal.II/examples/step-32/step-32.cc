@@ -1170,8 +1170,8 @@ namespace Step32
 
 
 				       // Following the @ref
-				       // MTWorkStream 
-				       // "task-based parallelization" 
+				       // MTWorkStream
+				       // "task-based parallelization"
 				       // paradigm,
 				       // we split all the assembly
 				       // routines into two parts: a
@@ -1548,7 +1548,7 @@ namespace Step32
 
 
 				   // @sect4{The BoussinesqFlowProblem helper functions}
-				   //
+				   // @sect5{BoussinesqFlowProblem::get_maximal_velocity}
 				   // Except for two small details,
 				   // the function to compute the
 				   // global maximum of the velocity
@@ -1645,7 +1645,7 @@ namespace Step32
   }
 
 
-
+				   // @sect5{BoussinesqFlowProblem::get_cfl_number}
 				   // The next function does something
 				   // similar, but we now compute the
 				   // CFL number, i.e., maximal
@@ -1698,7 +1698,7 @@ namespace Step32
   }
 
 
-
+				   // @sect5{BoussinesqFlowProblem::get_entropy_variation}
 				   // Next comes the computation of
 				   // the global entropy variation
 				   // $\|E(T)-\bar{E}(T)\|_\infty$
@@ -1862,6 +1862,7 @@ namespace Step32
 
 
 
+				   // @sect5{BoussinesqFlowProblem::get_extrapolated_temperature_range}
 				   // The next function computes the
 				   // minimal and maximal value of the
 				   // extrapolated temperature over
@@ -1871,8 +1872,16 @@ namespace Step32
 				   // function in step-31. As in the
 				   // function above, we collect local
 				   // minima and maxima and then
-				   // compute the global extrame using
-				   // the same trick as above:
+				   // compute the global extrema using
+				   // the same trick as above.
+				   //
+				   // As already discussed in step-31, the
+				   // function needs to distinguish between
+				   // the first and all following time steps
+				   // because it uses a higher order
+				   // temperature extrapolation scheme when at
+				   // least two previous time steps are
+				   // available.
   template <int dim>
   std::pair<double,double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range () const
@@ -1940,19 +1949,22 @@ namespace Step32
 	    }
       }
 
-    double local_temperatures [2] = {-min_local_temperature, max_local_temperature};
-    double global_temperatures [2];
+    double local_extrema[2] = { -min_local_temperature,
+				max_local_temperature };
+    double global_extrema[2];
+    Utilities::MPI::max (local_extrema, MPI_COMM_WORLD, global_extrema);
 
-    Utilities::MPI::max(local_temperatures, MPI_COMM_WORLD, global_temperatures);
-
-    return std::make_pair(-global_temperatures[0], global_temperatures[1]);
+    return std::make_pair(-global_extrema[0], global_extrema[1]);
   }
 
 
-
-// The function that calculates the
-// viscosity is purely local, so this is
-// the same code as in step-31.
+				   // @sect5{BoussinesqFlowProblem::compute_viscosity}
+				   // The function that calculates the
+				   // viscosity is purely local and so needs
+				   // no communication at all. It is mostly
+				   // the same as in step-31 but with an
+				   // updated formulation of the viscosity if
+				   // $\alpha=2$ is chosen:
   template <int dim>
   double
   BoussinesqFlowProblem<dim>::
@@ -2038,91 +2050,88 @@ namespace Step32
 
 
 
-// This function is new compared to
-// step-31. What is does is to re-implement
-// the library function
-// <code>VectorTools::project()</code> for
-// an MPI-based parallelization, a function
-// we used for generating an initial vector
-// for temperature based on some initial
-// function. The library function only
-// works with shared memory but doesn't
-// know how to utilize multiple machines
-// coupled through MPI to compute the
-// projected solution. If run with
-// more than one MPI process, this would
-// mean that each processor projects the
-// whole field, which is clearly not very
-// efficient. The details of a
-// <code>project()</code> function are not
-// very difficult. All we do is to use a
-// mass matrix and put the evaluation of
-// the initial value function on the right
-// hand side. The mass matrix for
-// temperature we can simply generate using
-// the respective assembly function, so all
-// we need to do here is to create the
-// right hand side and do a CG solve. The
-// assembly function does a loop over all
-// cells and evaluates the function in the
-// <code>EquationData</code> namespace, and
-// does this only on cells pertaining to
-// the respective processor. The
-// implementation of this assembly differs
-// from the assembly we do for the
-// principal assembly functions further
-// down (which include thread-based
-// parallelization with the WorkStream
-// concept). Here we chose to keep things
-// simple (keeping in mind that this function
-// is also only called at the beginning of
-// the program, not every time step), and
-// generating that right hand
-// side is cheap anyway so we won't even
-// notice that this part is not parallized
-// by threads.
-//
-// Regarding the implementation of
-// inhomogeneous Dirichlet boundary
-// conditions: Since we use the temperature
-// ConstraintMatrix, we can apply the
-// boundary conditions directly when
-// building the respective matrix and right
-// hand side. In this case, the boundary
-// conditions are inhomogeneous, which
-// makes this procedure somewhat
-// tricky. Remember that we get the matrix
-// from another assembly loop than the right 
-// hand side. However, the
-// correct imposition of boundary
-// conditions needs the matrix data we work
-// on plus the right hand side
-// simultaneously, since the right hand
-// side is created by Gaussian elimination
-// on the matrix rows. In order to not
-// introduce the matrix assembly at this
-// place, but still having the matrix data
-// available, we choose to create a dummy
-// matrix <code>matrix_for_bc</code> that
-// we only fill with data when we need it
-// for imposing boundary conditions. These
-// positions are exactly those where we
-// have an inhomogeneous entry in the
-// ConstraintMatrix. There are only a few
-// such positions (on the boundary dofs),
-// so it is still much cheaper to use this
-// function than to create the full matrix
-// here. To implement this, we ask the
-// constraint matrix whether the dof under
-// consideration is inhomogeneously
-// constrained. In that case, we generate
-// the respective matrix column that we
-// need for creating the correct right hand
-// side. Note that this (manually
-// generated) matrix entry needs to be
-// exactly the entry that we would fill the
-// matrix with &mdash; otherwise, this will
-// not work.
+  				   // @sect5{BoussinesqFlowProblem::project_temperature_field}
+
+				   // This function is new compared to
+				   // step-31. What is does is to re-implement
+				   // the library function
+				   // <code>VectorTools::project()</code> for
+				   // an MPI-based parallelization, a function
+				   // we used for generating an initial vector
+				   // for temperature based on some initial
+				   // function. The library function only
+				   // works with shared memory but doesn't
+				   // know how to utilize multiple machines
+				   // coupled through MPI to compute the
+				   // projected field. The details of a
+				   // <code>project()</code> function are not
+				   // very difficult. All we do is to use a
+				   // mass matrix and put the evaluation of
+				   // the initial value function on the right
+				   // hand side. The mass matrix for
+				   // temperature we can simply generate using
+				   // the respective assembly function, so all
+				   // we need to do here is to create the
+				   // right hand side and do a CG solve. The
+				   // assembly function does a loop over all
+				   // cells and evaluates the function in the
+				   // <code>EquationData</code> namespace, and
+				   // does this only on cells owned by the
+				   // respective processor. The implementation
+				   // of this assembly differs from the
+				   // assembly we do for the principal
+				   // assembly functions further down (which
+				   // include thread-based parallelization
+				   // with the WorkStream concept). Here we
+				   // chose to keep things simple (keeping in
+				   // mind that this function is also only
+				   // called once at the beginning of the
+				   // program, not in every time step), and
+				   // generating the right hand side is cheap
+				   // anyway so we won't even notice that this
+				   // part is not parallized by threads.
+				   //
+				   // Regarding the implementation of
+				   // inhomogeneous Dirichlet boundary
+				   // conditions: Since we use the temperature
+				   // ConstraintMatrix, we could apply the
+				   // boundary conditions directly when
+				   // building the respective matrix and right
+				   // hand side. In this case, the boundary
+				   // conditions are inhomogeneous, which
+				   // makes this procedure somewhat tricky
+				   // since we get the matrix from some other
+				   // function that uses its own integration
+				   // and assembly loop. However, the correct
+				   // imposition of boundary conditions needs
+				   // the matrix data we work on plus the
+				   // right hand side simultaneously, since
+				   // the right hand side is created by
+				   // Gaussian elimination on the matrix
+				   // rows. In order to not introduce the
+				   // matrix assembly at this place, but still
+				   // having the matrix data available, we
+				   // choose to create a dummy matrix
+				   // <code>matrix_for_bc</code> that we only
+				   // fill with data when we need it for
+				   // imposing boundary conditions. These
+				   // positions are exactly those where we
+				   // have an inhomogeneous entry in the
+				   // ConstraintMatrix. There are only a few
+				   // such positions (on the boundary DoFs),
+				   // so it is still much cheaper to use this
+				   // function than to create the full matrix
+				   // here. To implement this, we ask the
+				   // constraint matrix whether the DoF under
+				   // consideration is inhomogeneously
+				   // constrained. In that case, we generate
+				   // the respective matrix column that we
+				   // need for creating the correct right hand
+				   // side. Note that this (manually
+				   // generated) matrix entry needs to be
+				   // exactly the entry that we would fill the
+				   // matrix with &mdash; otherwise, this will
+				   // not work.
   template <int dim>
   void BoussinesqFlowProblem<dim>::project_temperature_field ()
   {
@@ -2147,6 +2156,8 @@ namespace Step32
       rhs (temperature_mass_matrix.row_partitioner()),
       solution (temperature_mass_matrix.row_partitioner());
 
+    const EquationData::TemperatureInitialValues<dim> initial_temperature;
+
     typename DoFHandler<dim>::active_cell_iterator
       cell = temperature_dof_handler.begin_active(),
       endc = temperature_dof_handler.end();
@@ -2157,8 +2168,8 @@ namespace Step32
 	  cell->get_dof_indices (local_dof_indices);
 	  fe_values.reinit (cell);
 
-	  EquationData::TemperatureInitialValues<dim>().value_list
-	    (fe_values.get_quadrature_points(), rhs_values);
+	  initial_temperature.value_list (fe_values.get_quadrature_points(),
+					  rhs_values);
 
 	  cell_vector = 0;
 	  matrix_for_bc = 0;
@@ -2185,6 +2196,10 @@ namespace Step32
 
     rhs.compress (Add);
 
+				     // Now that we have the right linear
+				     // system, we solve it using the CG
+				     // method with a simple Jacobi
+				     // preconditioner:
     SolverControl solver_control(5*rhs.size(), 1e-12*rhs.l2_norm());
     SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
@@ -2193,41 +2208,40 @@ namespace Step32
 
     cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
-   temperature_constraints.distribute (solution);
+    temperature_constraints.distribute (solution);
+
 				     // Having so computed the current
-				     // temperature field, let us set
-				     // the member variable that holds
-				     // the temperature nodes. Strictly
-				     // speaking, we really only need to
-				     // set
+				     // temperature field, let us set the
+				     // member variable that holds the
+				     // temperature nodes. Strictly speaking,
+				     // we really only need to set
 				     // <code>old_temperature_solution</code>
-				     // since the first thing we will do
-				     // is to compute the Stokes
-				     // solution that only requires the
-				     // previous time step's temperature
-				     // field. That said, nothing good
-				     // can come from not initializing
-				     // the other vectors as well
-				     // (especially since it's a
-				     // relatively cheap operation and
-				     // we only have to do it once at
-				     // the beginning of the program) if
-				     // we ever want to extend our
-				     // numerical method or physical
-				     // model, and so we initialize
-				     // <code>temperature_solution</code>
-				     // and
+				     // since the first thing we will do is to
+				     // compute the Stokes solution that only
+				     // requires the previous time step's
+				     // temperature field. That said, nothing
+				     // good can come from not initializing
+				     // the other vectors as well (especially
+				     // since it's a relatively cheap
+				     // operation and we only have to do it
+				     // once at the beginning of the program)
+				     // if we ever want to extend our
+				     // numerical method or physical model,
+				     // and so we initialize
+				     // <code>temperature_solution</code> and
 				     // <code>old_old_temperature_solution</code>
-				     // as well. The second and third
-				     // argument to the reinit function
-				     // indicates that the elements of
-				     // the first argument shall be
-				     // copied and that while the
+				     // as well. As a sidenote, while the
 				     // <code>solution</code> vector is
-				     // strictly distributed, the
-				     // vectors here initialized can
-				     // (and indeed do) have ghost
-				     // elements:
+				     // strictly distributed (i.e. each
+				     // processor only stores a mutually
+				     // exclusive subset of elements), the
+				     // assignment makes sure that the vectors
+				     // on the left hand side (which where
+				     // initialized to contain ghost elements
+				     // as well) also get the correct ghost
+				     // elements. In other words, the
+				     // assignment here requires communication
+				     // between processors:
     temperature_solution = solution;
     old_temperature_solution = solution;
     old_old_temperature_solution = solution;
@@ -2236,62 +2250,70 @@ namespace Step32
 
 
 
-// @sect4{The BoussinesqFlowProblem setup functions}
+				   // @sect4{The BoussinesqFlowProblem setup functions}
 
-// The following three functions set
-// up the Stokes matrix, the matrix
-// used for the Stokes
-// preconditioner, and the
-// temperature matrix. The code is
-// mostly the same as in step-31, but
-// it has been broken out into three
-// functions of their own for
-// simplicity, but also so that they
-// can easily be run in %parallel on
-// multiple threads (unless we are
-// running with MPI, in which case
-// this is not possible, as explained
-// in the introduction).
-//
-// The main functional difference between the code here and that in step-31 is
-// that the matrices we want to set up are distributed across multiple
-// processors. As in other deal.II example programs, we want to build up the
-// sparsity pattern before assembling matrices for efficiency reasons (which
-// would be possible with Trilinos matrices, though).
-//
-// In order to avoid storing information to all rows in the computations (that
-// will certainly not be feasible with large computations with billions of
-// unknowns!), we use an object of type
-// TrilinosWrappers::BlockSparsityPattern, which is (obviously) a wrapper
-// around a sparsity pattern object provided by Trilinos, instead of
-// BlockCompressedSparsityPattern. The advantage is that the Trilinos sparsity
-// pattern class can communicate across multiple processors: if this processor
-// fills in all the nonzero entries that result from the cells it owns, and
-// every other processor does so as well, then at the end after some MPI
-// communication initiated by the <code>compress()</code> call, we will have
-// the globally assembled sparsity pattern available with which the global
-// matrix can be initialized.
-//
-// The only other change we need to
-// make is to tell the
-// DoFTools::make_sparsity_pattern
-// function that it is only supposed
-// to work on a subset of cells,
-// namely the ones whose
-// <code>subdomain_id</code> equals
-// the number of the current
-// processor, and to ignore all other
-// cells.
-//
-// This strategy is replicated across
-// all three of the following
-// functions.
-//
-// Note that Trilinos matrices store the
-// information contained in the sparsity
-// patterns, so we can safely release the
-// <code>sp</code> variable once the matrix
-// has been given the sparsity structure.
+				   // The following three functions set up the
+				   // Stokes matrix, the matrix used for the
+				   // Stokes preconditioner, and the
+				   // temperature matrix. The code is mostly
+				   // the same as in step-31, but it has been
+				   // broken out into three functions of their
+				   // own for simplicity.
+				   //
+				   // The main functional difference between
+				   // the code here and that in step-31 is
+				   // that the matrices we want to set up are
+				   // distributed across multiple
+				   // processors. Since we still want to build
+				   // up the sparsity pattern first for
+				   // efficiency reasons, we could continue to
+				   // build the <i>entire</i> sparsity pattern
+				   // as a
+				   // BlockCompressedSimpleSparsityPattern, as
+				   // we did in step-31. However, that would
+				   // be inefficient: every processor would
+				   // build the same sparsity pattern, but
+				   // only initialize a small part of the
+				   // matrix using it. It also violates the
+				   // principle that every processor should
+				   // only work on those cells it owns (and,
+				   // if necessary the layer of ghost cells
+				   // around it).
+				   //
+				   // Rather, we use an object of type
+				   // TrilinosWrappers::BlockSparsityPattern,
+				   // which is (obviously) a wrapper around a
+				   // sparsity pattern object provided by
+				   // Trilinos. The advantage is that the
+				   // Trilinos sparsity pattern class can
+				   // communicate across multiple processors:
+				   // if this processor fills in all the
+				   // nonzero entries that result from the
+				   // cells it owns, and every other processor
+				   // does so as well, then at the end after
+				   // some MPI communication initiated by the
+				   // <code>compress()</code> call, we will
+				   // have the globally assembled sparsity
+				   // pattern available with which the global
+				   // matrix can be initialized.
+				   //
+				   // The only other change we need to make is
+				   // to tell the
+				   // DoFTools::make_sparsity_pattern() function
+				   // that it is only supposed to work on a
+				   // subset of cells, namely the ones whose
+				   // <code>subdomain_id</code> equals the
+				   // number of the current processor, and to
+				   // ignore all other cells.
+				   //
+				   // This strategy is replicated across all
+				   // three of the following functions.
+				   //
+				   // Note that Trilinos matrices store the
+				   // information contained in the sparsity
+				   // patterns, so we can safely release the
+				   // <code>sp</code> variable once the matrix
+				   // has been given the sparsity structure.
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   setup_stokes_matrix (const std::vector<IndexSet> &stokes_partitioning)
@@ -2377,77 +2399,63 @@ namespace Step32
 
 
 
-// The remainder of the setup function
-// (after splitting out the three functions
-// above) mostly has to deal with the
-// things we need to do for parallelization
-// across processors. We first
-// distribute degrees of freedom for Stokes
-// and temperature DoFHandler objects. For
-// the Stokes part, the numbering of degrees
-// of degrees of freedom as a contiguous block
-// on each subdomain entails, however,
-// that velocities and pressures become
-// intermixed, but this is trivially solved
-// by sorting by blocks; it is worth
-// noting that this operation leaves
-// the relative ordering of all velocities
-// and pressures alone, i.e. within the
-// velocity block we will still have all
-// those associated with subdomain zero
-// before all velocities associated with
-// subdomain one, etc. This is important
-// since we store each of the blocks of
-// this matrix distributed across all
-// processors and want this to be done in
-// such a way that each processor stores
-// that part of the matrix that is roughly
-// equal to the degrees of freedom located
-// on those cells that it will actually
-// work on. Note how we set boundary
-// conditions on the temperature by using
-// the ConstraintMatrix object.
-//
-// After this, we have to set up the
-// various partitioners (of type
-// <code>IndexSet</code>, see the
-// introduction) that describe which parts
-// of each matrix or vector will be stored
-// where, then call the functions that
-// actually set up the matrices
-// (concurrently if not using MPI
-// but sequentially otherwise, as explained
-// in the introduction), and at the end also
-// resize the various vectors we keep
-// around in this program. We given those
-// vectors the correct size using the
-// aforementioned Epetra_Map. Most of the
-// vectors are actually localized, i.e.,
-// they store all dofs in the problem on
-// each processor. In that case, the only
-// information that is used is the global
-// size. This is different for the two
-// right hand side vectors, which are
-// distributed ones, see also the class
-// declaration.
-//
-// Note how this function enters and leaves
-// a timed section so that we can get a
-// time report at the end of the
-// program. Note also the use of the
-// <code>pcout</code> variable: to every
-// process it looks like we can write to
-// screen, but only the output of the first
-// processor actually ends up somewhere. We
-// could of course have achieved the same
-// effect by writing to
-// <code>std::cout</code> but would then
-// have had to guard every access to that
-// stream by something like <code>if
-// (Utilities:: System::
-// this_mpi_process
-// (MPI_COMM_WORLD) == 0)</code>,
-// hardly a pretty solution.
+				   // The remainder of the setup function
+				   // (after splitting out the three functions
+				   // above) mostly has to deal with t he
+				   // things we need to do for parallelization
+				   // across processors. Because setting all
+				   // of this up is a significant compute time
+				   // expense of the program, we put
+				   // everything we do here into a timer group
+				   // so that we can get summary information
+				   // about the fraction of time spent in this
+				   // part of the program at its end.
+				   //
+				   // At the top as usual we enumerate degrees
+				   // of freedom and sort them by
+				   // component/block, followed by writing
+				   // their numbers to the screen from
+				   // processor zero. The DoFHandler::distributed_dofs() function, when applied to a parallel::distributed::Triangulation object, sorts degrees of freedom in such a
+				   // way that all degrees of freedom
+				   // associated with subdomain zero come
+				   // before all those associated with
+				   // subdomain one, etc. For the Stokes
+				   // part, this entails, however, that
+				   // velocities and pressures become
+				   // intermixed, but this is trivially
+				   // solved by sorting again by blocks; it
+				   // is worth noting that this latter
+				   // operation leaves the relative ordering
+				   // of all velocities and pressures alone,
+				   // i.e. within the velocity block we will
+				   // still have all those associated with
+				   // subdomain zero before all velocities
+				   // associated with subdomain one,
+				   // etc. This is important since we store
+				   // each of the blocks of this matrix
+				   // distributed across all processors and
+				   // want this to be done in such a way
+				   // that each processor stores that part
+				   // of the matrix that is roughly equal to
+				   // the degrees of freedom located on
+				   // those cells that it will actually work
+				   // on.
+				   //
+				   // When printing the numbers of degrees of
+				   // freedom, note that these numbers are
+				   // going to be large if we use many
+				   // processors. Consequently, we let the
+				   // stream put a comma separator in between
+				   // every three digits. The state of the
+				   // stream, using the locale, is saved from
+				   // before to after this operation. While
+				   // slightly opaque, the code works because
+				   // the default locale (which we get using
+				   // the constructor call
+				   // <code>std::locale("")</code>) implies
+				   // printing numbers with a comma separator
+				   // for every third digit (i.e., thousands,
+				   // millions, billions).
   template <int dim>
   void BoussinesqFlowProblem<dim>::setup_dofs ()
   {
@@ -2468,9 +2476,6 @@ namespace Step32
 		       n_p = stokes_dofs_per_block[1],
 		       n_T = temperature_dof_handler.n_dofs();
 
-				     // print dof numbers with 1000s
-				     // separator since they are frequently
-				     // large
     std::locale s = pcout.get_stream().getloc();
     pcout.get_stream().imbue(std::locale(""));
     pcout << "Number of active cells: "
@@ -2487,7 +2492,16 @@ namespace Step32
     pcout.get_stream().imbue(s);
 
 
-
+				     // After this, we have to set up the
+				     // various partitioners (of type
+				     // <code>IndexSet</code>, see the
+				     // introduction) that describe which
+				     // parts of each matrix or vector will be
+				     // stored where, then call the functions
+				     // that actually set up the matrices, and
+				     // at the end also resize the various
+				     // vectors we keep around in this
+				     // program.
     std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
     IndexSet temperature_partitioning (n_T), temperature_relevant_partitioning (n_T);
     IndexSet stokes_relevant_set;
@@ -2506,12 +2520,10 @@ namespace Step32
 					       temperature_relevant_partitioning);
     }
 
+@todo work from here
     {
 
       stokes_constraints.clear ();
-//    IndexSet stokes_la;
-//    DoFTools::extract_locally_active_dofs (stokes_dof_handler,
-//             stokes_la);
       stokes_constraints.reinit (stokes_relevant_set);
 
       DoFTools::make_hanging_node_constraints (stokes_dof_handler,
