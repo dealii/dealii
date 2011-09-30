@@ -690,14 +690,12 @@ are part of Trilinos' Epetra library of basic linear algebra and tool classes:
   producing a communicator object that only encompasses this subset of
   machines; there is really no compelling reason to do so here, however.
 
-<li> The Epetra_Map class is used to describe which elements of a vector or which
-  rows of a matrix reside on a given machine that is part of a
+<li> The IndexSet class is used to describe which elements of a vector or which
+  rows of a matrix should reside on the current machine that is part of a
   communicator. To create such an object, you need to know (i) the total
-  number of elements or rows, (ii) the number of elements or rows you want to
-  store on the current machine, and (iii) which communicator enumerates the
-  machines that we want this matrix or vector be stored on. We will set up
-  these maps (which we call <code>partitioners</code> in our code, since we
-  believe this is a better word) in the
+  number of elements or rows, (ii) the indices of the elements you want to
+  store locally. We will set up
+  these <code>partitioners</code> in the
   <code>BoussinesqFlowProblem::setup_dofs</code> function below and then hand
   it to every %parallel object we create.
 
