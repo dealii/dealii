@@ -6340,6 +6340,15 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
     AC_MSG_ERROR([Trilinos versions prior to 10.0 are no longer supported with deal.II.])
   fi
 
+  dnl Trilinos 10.6 had quite a number of bugs we ran into, see
+  dnl for example
+  dnl   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5062
+  dnl   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5319
+  if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 -a "$DEAL_II_TRILINOS_VERSION_MINOR" = 6 ; then
+    AC_MSG_ERROR([Trilinos versions 10.6.x have bugs that make it incompatible
+                  with deal.II. Please use versions before or after 10.6.x.])
+  fi
+
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MAJOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MINOR)
   AC_SUBST(DEAL_II_TRILINOS_VERSION_SUBMINOR)
