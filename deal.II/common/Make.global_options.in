@@ -204,7 +204,7 @@ endif
 
 # List all trilinos libraries that we want to link with. These must be sorted
 # in dependency order for linking. Fortunately, we can get the set of
-# libraries from Trilinos's cmake files.
+# libraries from Trilinos's cmake files in aclocal.m4.
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
   DEAL_II_TRILINOS_LIBS = $(addprefix $(DEAL_II_TRILINOS_LIBPREFIX), @DEAL_II_TRILINOS_LIBS@)
 
