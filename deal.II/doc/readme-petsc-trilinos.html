@@ -191,6 +191,16 @@ make install
 	</code>
       </p>
 
+      <p>
+	If the deal configuration complains about 
+<code><pre>
+configure: error: *** Your Trilinos installation is not compatible with the C++ standard selected for this compiler. See the deal.II FAQ page for a solution. ***
+</pre></code>
+	you have encountered a bug in Trilinos. As a workaround,
+	include/Sacado_cmath.hpp has to be edited (see <a href="http://dealii.sourceforge.net/index.php?title=Deal.II_Questions_and_Answers#Trilinos_detection_in_..2Fconfigure_fails_with_an_error_in_the_file_Sacado.hpp_or_Sacado_cmath.hpp">the FAQ entry for details</a>).
+      </p>
+
+
       <h3>Configuring for installed Trilinos packages</h3>
 
       <p>
