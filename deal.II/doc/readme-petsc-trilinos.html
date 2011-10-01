@@ -128,7 +128,7 @@
       <h6>Trilinos starting with version 10.0</h6>
 
       <p style="color: red">
-      Note: Trilinos versions 10.6.0 to 10.6.2 are not compatible with
+      Note: Trilinos versions 10.6.x are not compatible with
       deal.II. There are subtle bugs related to parallel matrices and vectors.
       </p>
 
@@ -141,7 +141,7 @@
       the following slightly longish set of commands:
       <code>
       <pre>
-cd trilinos-10.0.2
+cd trilinos-10.4.2
 mkdir build
 cd build
 
@@ -156,7 +156,7 @@ cmake -D Trilinos_ENABLE_OPTIONAL_PACKAGES:BOOL=ON \
       -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE \
       -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE \
       -D TPL_ENABLE_MPI:BOOL=OFF \
-      -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.4.0 \
+      -D CMAKE_INSTALL_PREFIX:PATH=/w/bangerth/share/x86_64/trilinos-10.4.2 \
       -D BUILD_SHARED_LIBS:BOOL=ON `pwd`/..
 
 make
