@@ -10871,8 +10871,17 @@ $as_echo "no" >&6; }
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the set of Trilinos libraries" >&5
 $as_echo_n "checking for the set of Trilinos libraries... " >&6; }
 
-        DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
-    | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+                  if test -f $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake ; then
+        DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake \
+      | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+  else
+    if test -f $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake ; then
+            DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
+        | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+    else
+            DEAL_II_TRILINOS_LIBS="stratimikosamesos stratimikosaztecoo stratimikosifpack stratimikosml stratimikos ml amesos belos ifpack aztecoo rtop sacado thyra thyraepetra thyraepetraext epetraext epetra teuchos triutils"
+    fi
+  fi
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEAL_II_TRILINOS_LIBS" >&5
 $as_echo "$DEAL_II_TRILINOS_LIBS" >&6; }
 

@@ -6523,17 +6523,26 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_LIBS, dnl
   dnl Trilinos' cmake invokation stores the set of libraries
   dnl in a special file for consumption of cmake at a later
   dnl time. We'll simply grep through it. Unfortunately, it has
-  dnl changed place in Trilinos starting from version 10.8.0, so 
-  dnl manually detected prior version
-  if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 -a "$DEAL_II_TRILINOS_VERSION_MINOR" -lt 8 ; then
-    DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
-      | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
-    AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
-  else
+  dnl changed place in Trilinos starting from version 10.8.0, and
+  dnl at least 10.0.4 did not have the file at all. So test
+  dnl whether the file is available at one location or another
+  dnl and if it is at neither then fall back to a hardcoded
+  dnl list of libraries
+  if test -f $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake ; then
+    dnl This is the location for 10.8 and following
     DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake \
       | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
-    AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
+  else
+    if test -f $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake ; then
+      dnl The location prior to 10.8
+      DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
+        | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+    else
+      dnl Fall back to the fixed list
+      DEAL_II_TRILINOS_LIBS="stratimikosamesos stratimikosaztecoo stratimikosifpack stratimikosml stratimikos ml amesos belos ifpack aztecoo rtop sacado thyra thyraepetra thyraepetraext epetraext epetra teuchos triutils"
+    fi
   fi
+  AC_MSG_RESULT([$DEAL_II_TRILINOS_LIBS])
   AC_SUBST(DEAL_II_TRILINOS_LIBS)
 ])
 
