@@ -296,13 +296,12 @@ namespace Step32
 	      solver.solve(stokes_preconditioner_matrix->block(1,1),
 			   dst.block(1), src.block(1),
 			   mp_preconditioner);
-	      std::cout << solver_control.last_step() << "-";
 
 	      dst.block(1) *= -1.0;
 	    }
 
 	    {
-	      stokes_matrix->block(0,1).vmult(utmp, dst.block(1)); //B^T
+	      stokes_matrix->block(0,1).vmult(utmp, dst.block(1));
 	      utmp*=-1.0;
 	      utmp.add(src.block(0));
 	    }
