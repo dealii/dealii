@@ -10881,6 +10881,8 @@ $as_echo_n "checking for the set of Trilinos libraries... " >&6; }
     else
                               if test $DEAL_II_TRILINOS_VERSION_MAJOR = 10 -a \
               $DEAL_II_TRILINOS_VERSION_MINOR -lt 4 ; then
+        :
+      else
         as_fn_error $? "package file TrilinosConfig.cmake not found" "$LINENO" 5
       fi
       DEAL_II_TRILINOS_LIBS="stratimikosamesos stratimikosaztecoo stratimikosifpack stratimikosml stratimikos ml amesos belos ifpack aztecoo rtop sacado thyra thyraepetra thyraepetraext epetraext epetra teuchos triutils"
