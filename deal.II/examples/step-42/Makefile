@@ -45,6 +45,24 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 # settings
 include $D/common/Make.global_options
 
+################################################################ 
+# This example program will only work if UMFPACK is installed. If this
+# is not the case, then simply redefine the main targets to do nothing
+
+
+ifneq ($(USE_CONTRIB_UMFPACK),yes)
+default run clean:
+	@echo
+	@echo "===========================================================" 
+	@echo "=   This program cannot be compiled without UMFPACK. Make ="
+	@echo "=   sure you have UMFPACK installed and detected during   ="
+	@echo "=   configuration of deal.II                              ="
+	@echo "==========================================================="
+	@echo
+endif
+#
+################################################################
+
 
 # Since the whole project consists of only one file, we need not
 # consider difficult dependencies. We only have to declare the
