@@ -6538,7 +6538,14 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_LIBS, dnl
       DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
         | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
     else
-      dnl Fall back to the fixed list
+      dnl Fall back to the fixed list. This should only be necessary
+      dnl for Trilinos versions before 10.4. If, for a later version,
+      dnl this happens, we don't want to fall back to this list, so
+      dnl add an assertion.
+      if test $DEAL_II_TRILINOS_VERSION_MAJOR = 10 -a \
+              $DEAL_II_TRILINOS_VERSION_MINOR -lt 4 ; then
+        AC_MSG_ERROR([package file TrilinosConfig.cmake not found])
+      fi
       DEAL_II_TRILINOS_LIBS="stratimikosamesos stratimikosaztecoo stratimikosifpack stratimikosml stratimikos ml amesos belos ifpack aztecoo rtop sacado thyra thyraepetra thyraepetraext epetraext epetra teuchos triutils"
     fi
   fi
