@@ -1,14 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-  <title>$title</title>
-  <link href="$relpath$doxygen.css" rel="stylesheet" type="text/css">
-  <link href="$relpath$tabs.css" rel="stylesheet" type="text/css">
-  <link href="$relpath$deal.css" rel="stylesheet" type="text/css">
-  <link rel="SHORTCUT ICON" href="http://www.dealii.org/deal.ico">
-  <meta name="author" content="the deal.II authors <authors@dealii.org>">
-  <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors">
-  <meta name="deal.II-version" content="@PACKAGE_VERSION@">
-</head>
-<body>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>$title</title>
+    <link href="$relpath$doxygen.css" rel="stylesheet" type="text/css">
+    <link href="$relpath$tabs.css" rel="stylesheet" type="text/css">
+    <link href="$relpath$deal.css" rel="stylesheet" type="text/css">
+    <link rel="SHORTCUT ICON" href="http://www.dealii.org/deal.ico">
+    <meta name="author" content="the deal.II authors <authors@dealii.org>">
+    <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors">
+    <meta name="deal.II-version" content="@PACKAGE_VERSION@">
+  </head>
+
+  <body>
