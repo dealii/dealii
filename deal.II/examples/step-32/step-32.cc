@@ -2519,7 +2519,27 @@ namespace Step32
 					       temperature_relevant_partitioning);
     }
 
-//@todo work from here
+				     // Following this, we can compute
+				     // constraints for the solution vectors,
+				     // including hanging node constraints and
+				     // homogenous and inhomogenous boundary
+				     // values for the Stokes and temperature
+				     // fields. Note that as for everything
+				     // else, the constraint objects can not
+				     // hold <i>all</i> constraints on every
+				     // processor. Rather, each processor
+				     // needs to store only those that are
+				     // actually necessary for correctness
+				     // given that it only assembles linear
+				     // systems on cells it owns. As discussed
+				     // in the
+				     // @ref distributed_paper "this paper",
+				     // the set of constraints we need to know
+				     // about is exactly the set of
+				     // constraints on all locally relevant
+				     // degrees of freedom, so this is what we
+				     // use to initialize the constraint
+				     // objects.
     {
       stokes_constraints.clear ();
       stokes_constraints.reinit (stokes_relevant_set);
@@ -2560,6 +2580,13 @@ namespace Step32
       temperature_constraints.close ();
     }
 
+				     // All this done, we can then initialize
+				     // the various matrix and vector objects
+				     // to their proper sizes. At the end, we
+				     // also record that all matrices and
+				     // preconditioners have to be re-computed
+				     // at the beginning of the next time
+				     // step.
     setup_stokes_matrix (stokes_partitioning);
     setup_stokes_preconditioner (stokes_partitioning);
     setup_temperature_matrices (temperature_partitioning);
