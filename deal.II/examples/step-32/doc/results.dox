@@ -128,19 +128,8 @@ As can be seen here, we spend most of the compute time in assembling linear
 systems, refining the mesh, and in particular in solving the Stokes and
 temperature linear systems.
 
-The 50% spent on solving the linear systems are affected in large part
-because the Brazos cluster has a relatively slow ethernet interconnect. A
-cluster with a faster interconnect, for example using infiniband, should do
-better in this regard. On the other hand, there is little hope to do better
-with assembling the linear systems, though one could do significantly better
-with estimating the error by making sure that each processor only estimates
-the error on those cells it owns.
-
-
-The program writes output every 25th time step, but we won't show all
-2100 or so images this produces. Rather, let us only show the output
-from every 2500th time step here, even though this does, of course,
-not do full justice to the dynamics that are going on:
+We can clearly not show all output files produced by this program, so let us
+only show the output from every 2500th time step here:
 <table>
   <tr>
     <td>
@@ -257,21 +246,21 @@ not do full justice to the dynamics that are going on:
 </table>
 
 The last two images show the grid as well as the partitioning of the
-mesh for the last timestep shown into the 10 subdomains used for this
-computation. The full dynamics are really only visible by looking at
-an animation. <a
-href="http://www.math.tamu.edu/~bangerth/images/pictures/convection-outward/\step-32.2d.convection.gif">At
-this site</a> is such an animation. Beware that this animation is
+mesh for a computation with 10 subdomains on 10 processors. The full dynamics
+of this simulation are really only visible by looking at
+an animation, for example the one <a
+href="http://www.math.tamu.edu/~bangerth/images/pictures/convection-outward/\step-32.2d.convection.gif">shown here
+this site</a>. Beware that this animation is
 about 20MB large, though it is well worth watching due to its almost
 artistic quality.
 
 If you watch the movie, you'll see that the convection pattern goes
 through several stages: First, it gets rid of the instable temperature
-layering with the hot material overlaid by the dense cold
+layering with the hot material overlain by the dense cold
 material. After this great driver is removed and we have a sort of
 stable situation, a few blobs start to separate from the hot boundary
 layer at the inner ring and rise up, with a few cold fingers also
-dropping down from the outer ring. During this phase, the solution
+dropping down from the outer boundary layer. During this phase, the solution
 remains mostly symmetric, reflecting the 12-fold symmetry of the
 original mesh. In a final phase, the fluid enters vigorous chaotic
 stirring in which all symmetries are lost. This is a pattern that then
@@ -294,11 +283,16 @@ quite within the physically expected region.
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
 
-Apart from the various possibilities for extensions already outlined
-in the step-31, here are a few more ideas:
+There are many directions in which this program could be extended. As
+mentioned at the end of the introduction, most of these are under active
+development in the <i>Aspect</i> (short for <i>Advanced %Solver for Problems
+in Earth's ConvecTion</i>) code at the time this tutorial program is being
+finished. Specifically, the following are certainly topics that one should
+address to make the program more useful:
 
 <ul>
-  <li> The temperature field we get in our simulations after a while
+  <li> <b>Adiabatic heating/cooling:</b>
+  The temperature field we get in our simulations after a while
   is mostly constant with boundary layers at the inner and outer
   boundary, and streamers of cold and hot material mixing
   everything. Yet, this doesn't match our expectation that things
@@ -345,36 +339,52 @@ in the step-31, here are a few more ideas:
   \cdot \mathbf g > 0$ we get a positive heat source. Conversely, the
   fluid will cool down if it moves against the direction of gravity.
 
-  Implementing this requires one additional step, however. As mentioned in the
-  introduction, we use a rather simplified model for gravity in which the
-  gravity force diminishes with depth, as if Earth had a homogenous
-  density. That isn't the case, however: the earth core is much denser than
-  the mantle, and gravity actually tops out at the core
-  mantle boundary. A consequence of this is that our computations predict
-  pressures around 70 GPa at the core mantle boundary, whereas in reality the
-  value is closer to 140 GPa. With a pressure wrong by so much, we can't
-  expect compression heating to be accurate.
+<li> <b>Compressibility:</b>
+  As already hinted at in the temperature model above,
+  mantle rocks are not incompressible. Rather, given the enormous pressures in
+  the earth mantle (at the core-mantle boundary, the pressure is approximately
+  140 GPa, equivalent to 1,400,000 times atmospheric pressure), rock actually
+  does compress to something around 1.5 times the density it would have
+  at surface pressure. Modeling this presents any number of
+  difficulties. Primarily, the mass conservation equation is no longer
+  $\textrm{div}\;\mathbf u=0$ but should read
+  $\textrm{div}(\rho\mathbf u)=0$ where the density $\rho$ is now no longer
+  spatially constant but depends on temperature and pressure. A consequence is
+  that the model is now no longer linear; a linearized version of the Stokes
+  equation is also no longer symmetric requiring us to rethink preconditioners
+  and, possibly, even the discretization. We won't go into detail here as to
+  how this can be resolved.
 
-  A more realistic model for the gravity vector in the program would take the
-  spatially variable density into account, and that wouldn't actually be
-  terribly complicated: by integrating the PDE for the gravity potential under
-  the assumption that $\rho(\mathbf x)=\rho(r)$, we get
-  @f[
-    \varphi(r) = 4\pi G \int_0^r \frac 1{t^2} \int_0^t s^2 \rho(s) \; ds \; dt,
-  @f]
-  and consequently for the gravity vector
-  @f[
-    \mathbf g = - 4\pi G \frac 1{r^2} \left(
-      \int_0^r s^2 \rho(s) \; ds \right)
-    \frac{\mathbf x}{\|\mathbf x\|}.
-  @f]
-  This expression reduces to the one we use for the case that the density is
-  constant, but a more complete model would, for example, assume that the
-  density varies with the radius (in the simplest case it could be constant in
-  various layers). In either case, it can relatively easily be evaluated if
-  for non-trivial models of $\rho(r)$. Of course, a really complete model
-  would consider that $\rho$ can also vary in the tangential direction, for
-  example in a time dependent way as a consequence of the thermal expansion of
-  rocks as a result of the convection. Taking into account this self
-  gravitational effect of convection would be much harder, however.
+<li> <b>Nonlinear material models:</b> As already hinted at in various places,
+  material parameters such as the density, the viscosity, and the various
+  thermal parameters are not constant throughout the earth mantle. Rather,
+  they nonlinearly depend on the pressure and temperature, and in the case of
+  the viscosity on the strain rate $\varepsilon(\mathbf u)$. For complicated
+  models, the only way to solve such models accurately may be to actually
+  iterate this dependence out in each time step, rather than simply freezing
+  coefficients at values extrapolated from the previous time step(s).
+
+<li> <b>Checkpoint/restart:</b> Running this program in 2d on a number of
+  processors allows solving realistic models in a day or two. However, in 3d,
+  compute times are so large that one runs into two typical problems: (i) On
+  most compute clusters, the queuing system limits run times for individual
+  jobs are to 2 or 3 days; (ii) losing the results of a computation due to
+  hardware failures, misconfigurations, or power outages is a shame when
+  running on hundreds of processors for a couple of days. Both of these
+  problems can be addressed by periodically saving the state of the program
+  and, if necessary, restarting the program at this point. This technique is
+  commonly called <i>checkpoint/restart</i> and it requires that the entire
+  state of the program is written to a permanent storage location (e.g. a hard
+  drive). Given the complexity of the data structures of this program, this is
+  not entirely trivial (it may also involve writing gigabytes or more of
+  data), but it can be made easier by realizing that one can save the state
+  between two time steps where it essentially only consists of the mesh and
+  solution vectors; during restart one would then first re-enumerate degrees
+  of freedom in the same way as done before and then re-assemble
+  matrices. Nevertheless, given the distributed nature of the data structures
+  involved here, saving and restoring the state of a program is not
+  trivial. An additional complexity is introduced by the fact that one may
+  want to change the number of processors between runs, for example because
+  one may wish to continue computing on a mesh that is finer than the one used
+  to pre-compute a starting temperature field at an intermediate time.
 </ul>
