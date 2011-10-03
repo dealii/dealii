@@ -53,8 +53,9 @@ void test()
 	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 	}
 
+      const unsigned int checksum = tr.get_checksum ();
       deallog << "Checksum: "
-	      << tr.get_checksum ()
+	      << checksum
 	      << std::endl;
     }
 
