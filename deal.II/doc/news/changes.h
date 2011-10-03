@@ -29,7 +29,7 @@ also how it was used. This is now also reflected in the actual code.
 <br>
 (Wolfgang Bangerth, 2011/04/27, 2011/09/14)
 
-<li> Changed: The PETScWrapper::VectorBase and PETScWrapper::MatrixBase
+<li> Changed: The PETScWrappers::VectorBase and PETScWrappers::MatrixBase
 classes tried to keep track of
 whether the last operation done on a vector was to add to an element or to
 write into one. If the previous such operation was of a different kind
@@ -46,11 +46,11 @@ PETScWrapper::MatrixBase::compress() instead.
 
 <li> Changed: The classes Tensor, SymmetricTensor and Point now have an
 additional template argument for the number type. While a default template
-value of double ensures that all old code is still valid, this
+value of <code>double</code> ensures that all old code is still valid, this
 change invalidates forward declarations of the form <code>template
-<int dim@> class Point</code> that might be present in user-defined header
+@<int dim@> class Point</code> that might be present in user-defined header
 files. Now forward declarations need to specify the type as well, i.e.,
-<code>template <int dim, typename Number> class Point</code>. However,
+<code>template @<int dim, typename Number@> class Point</code>. However,
 nothing changes if the full declarations in <code>deal.II/base/tensor.h,
 deal.II/base/symmetric_tensor.h</code> and <code>deal.II/base/point.h</code>
 are included.
@@ -97,7 +97,7 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 </ol>
 
 
-<-- ----------- GENERAL IMPROVEMENTS ----------------- -->
+<!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
 <a name="general"></a>
 <h3>General</h3>
@@ -149,12 +149,15 @@ integrated development environments because searching for
 individual symbols would turn up several occurrences in different
 files. To make this a bit simpler, the main classes for step-3
 through step-6 were renamed to <code>StepX</code> (steps 1 and 2
-do not have a main class).
+do not have a main class). Starting with step-7, everything specific
+to a tutorial program has been moved into a namespace called
+<code>StepX</code> to make the fully qualified names unique across
+different tutorial programs.
 <br>
 (Wolfgang Bangerth, Guido Kanschat 2011/08/16)
 
 <li> Extended: Many operations on objects of
-type Point<0>, Quadrature<0>, etc
+type Point@<0@>, Quadrature@<0@>, etc
 (including creation) were previously forbidden since such objects do not make
 much sense. However, this prevented a lot of code that could otherwise work
 in a dimension independent way, from working in 1d, e.g. integration on
@@ -318,7 +321,7 @@ and DoF handlers embedded in higher dimensional space have been added.
 </ol>
 
 
-<-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
+<!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
 <a name="specific"></a>
 <h3>Specific improvements</h3>
@@ -347,11 +350,6 @@ for the <code>!cell-@>is_ghost() && !cell-@>is_artificial()</code> pattern
 found in many places when dealing with distributed meshes.
 <br>
 (Wolfgang Bangerth, 2011/09/10)
-
-<li> New: The GridGenerator::torus function and TorusBoundary class can
-create and describe the surface of a torus.
-<br>
-(Daniel Castanon Quiroz, 2011/09/08)
 
 <li> New: The GridGenerator::torus function and TorusBoundary class can
 create and describe the surface of a torus.
@@ -539,11 +537,11 @@ result in any incompatibilities.
 (Wolfgang Bangerth 2011/05/27)
 
 <li> New: The class RelaxationBlockJacobi has been added to the relaxation classes.
-<br> (GK, 2011/05/19)
+<br> (Guido Kanschat, 2011/05/19)
 
 <li> New: discontinuous Galerkin versions of vector-valued elements have been
 implemented: FE_DGBDM, FE_DGNedelec, and FE_DGRaviartThomas.
-<br> (GK, 2011/05/19)
+<br> (Guido Kanschat, 2011/05/19)
 
 <li> New: Mapping<dim,spacedim>::transform_real_to_unit_cell  now
 works also in the codimension one case, where it performs the normal
@@ -610,18 +608,18 @@ in codimension one.
 <li> Fixed: Corrections in the creation of the face and subface
 interpolation matrices in the class FE_Nedelec.
 <br>
-(Markus Buerg, 2011/03/17)
+(Markus B&uuml;rg, 2011/03/17)
 
 <li> Fixed: In step-21, the inner iteration would sometimes not converge for
 very coarse meshes because of numerical roundoff. This is now fixed by allowing
 more than <code>rhs.size()</code> CG iterations if the number of degrees of freedom
 is very small.
 <br>
-(Jichao Yin, WB, 2011/04/06)
+(Jichao Yin, Wolfgang Bangerth, 2011/04/06)
 
 <li> New: There is now a new function ConditionalOStream::get_stream().
 <br>
-(WB, 2011/03/09)
+(Wolfgang Bangerth, 2011/03/09)
 
 <li> Fixed: FESystem::get_unit_face_support_points would refuse to return
 anything if one of the base elements did not have support points. This
@@ -629,14 +627,14 @@ condition has been relaxed: it now only doesn't return anything if this
 base element has no support points and also has degrees of freedom on
 the face.
 <br>
-(WB, 2011/03/07)
+(Wolfgang Bangerth, 2011/03/07)
 
 <li> Fixed: Objects of type FE_Nothing could be generated with multiple vector components
 by passing an argument to the constructor. Yet, the FE_Nothing::get_name() function
 always just returned the string <code>FE_Nothing@<dim@>()</code> independently of the
 number of components. This is now fixed.
 <br>
-(WB, 2011/03/07)
+(Wolfgang Bangerth, 2011/03/07)
 
 <li> Fixed: PETScWrappers:MPI:SparseMatrix and apply_boundary_values() produced an error in debug mode about non-existant SparsityPattern entries. Reason: clear_rows() also eliminated the whole row in the PETSc-internal SparsityPattern, which resulted in an error in the next assembly process.
 <br>
