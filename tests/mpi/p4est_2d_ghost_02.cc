@@ -119,9 +119,6 @@ int main(int argc, char *argv[])
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
-  std::cout << myid << ":" << getpid() << std::endl;
-				   //system("sleep 20");
-
 
   deallog.push(Utilities::int_to_string(myid));
 
