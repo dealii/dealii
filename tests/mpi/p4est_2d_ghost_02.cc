@@ -93,9 +93,11 @@ void test()
 		}
 	    }
 
-	  deallog << "Checksum: "
-		  << tr.get_checksum ()
-		  << std::endl;
+	  const unsigned int checksum = tr.get_checksum ();
+	  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+	    deallog << "Checksum: "
+		    << checksum
+		    << std::endl;
 
 	  Assert (tr.n_global_active_cells() ==
 		  static_cast<unsigned int>(std::pow (1.*GeometryInfo<dim>::max_children_per_cell, i+1)),
