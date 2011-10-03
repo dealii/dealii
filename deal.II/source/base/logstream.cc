@@ -139,6 +139,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream&))
 std::ostringstream&
 LogStream::get_stream()
 {
+//TODO: use a ThreadLocalStorage object here
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int id = Threads::this_thread_id();
 
