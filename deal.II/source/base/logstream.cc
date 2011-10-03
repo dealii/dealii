@@ -143,13 +143,13 @@ LogStream::get_stream()
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   const unsigned int id = Threads::this_thread_id();
 
-  std_cxx1x::shared_ptr<std::ostringstream>& sptr = outstreams[id];
-  if (sptr == std_cxx1x::shared_ptr<std::ostringstream>())
+				   // if necessary allocate a stream object
+  if (outstreams.find (id) == outstreams.end())
     {
-      sptr = std_cxx1x::shared_ptr<std::ostringstream> (new std::ostringstream());
-      sptr->setf(std::ios::showpoint | std::ios::left);
+      outstreams[id].reset (new std::ostringstream());
+      outstreams[id]->setf(std::ios::showpoint | std::ios::left);
     }
-  return *sptr;
+  return *outstreams[id];
 }
 
 
