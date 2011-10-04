@@ -916,6 +916,13 @@
 		:
 		fe_values (fe, quadrature, update_flags)
        {}
+     
+     ScratchData (const ScratchData &scratch)
+		:
+		fe_values (scratch.fe_values.get_fe(), 
+		           scratch.fe_values.get_quadrature(), 
+		           scratch.fe_values.get_update_flags())
+       {}
    }
  * @endcode
  * and then use this FEValues object in the assemble function:
@@ -929,8 +936,15 @@
      ...
    }
  * @endcode
+ *   Just as for the <code>PerTaskData</code> structure, we will create a 
+ *   sample <code>ScratchData</code> object and pass it to the work stream
+ *   object, which will replicate it as many times as necessary. For this 
+ *   to work <code>ScratchData</code> structures need to copyable. Since FEValues 
+ *   objects are rather complex and cannot be copied implicitly, we provided 
+ *   our own copy constructor for the <code>ScratchData</code> structure. 
+ * 
  *   The same approach, putting things into the <code>ScratchData</code>
- *   data structure should be used for everything that is expensive to
+ *   data structure, should be used for everything that is expensive to
  *   construct. This holds, in particular, for everything that needs to
  *   allocate memory upon construction; for example, if the values of a
  *   function need to be evaluated at quadrature points, then this is
@@ -957,8 +971,16 @@
                   const Quadrature<dim>    &quadrature,
                   const UpdateFlags         update_flags)
 		:
-		rhs_values (quadrature.n_quadrature_points),
+		rhs_values (quadrature.size()),
 		fe_values (fe, quadrature, update_flags)
+       {}
+       
+      ScratchData (const ScratchData &scratch)
+		:
+		rhs_values (scratch.rhs_values),
+		fe_values (scratch.fe_values.get_fe(), 
+		           scratch.fe_values.get_quadrature(), 
+		           scratch.fe_values.get_update_flags())
        {}
    }
 
