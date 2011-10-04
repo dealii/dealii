@@ -2610,57 +2610,56 @@ namespace Step32
 
 
 
-// @sect4{The BoussinesqFlowProblem assembly functions}
-//
-// Following the discussion in the
-// introduction and in the @ref threads
-// module, we split the assembly functions
-// into different parts:
-//
-// <ul>
-// <li> The local calculations of matrices
-// and right hand sides, given a certain cell
-// as input (these functions are named
-// <code>local_assemble_*</code> below). The
-// resulting function is, in other words,
-// essentially the body of the loop over all
-// cells in step-31. Note, however, that
-// these functions store the result from the
-// local calculations in variables of classes
-// from the CopyData namespace.
-//
-// <li>These objects are then given to the
-// second step which writes the local data
-// into the global data structures (these
-// functions are named
-// <code>copy_local_to_global_*</code>
-// below). These functions are pretty
-// trivial.
-//
-// <li>These two subfunctions are then used
-// in the respective assembly routine (called
-// <code>assemble_*</code> below), where a
-// WorkStream object is set up and runs over
-// all the cells that belong to the
-// processor's subdomain.
-// </ul>
+				   // @sect4{The BoussinesqFlowProblem assembly functions}
+				   //
+				   // Following the discussion in the
+				   // introduction and in the @ref threads
+				   // module, we split the assembly functions
+				   // into different parts:
+				   //
+				   // <ul> <li> The local calculations of
+				   // matrices and right hand sides, given a
+				   // certain cell as input (these functions
+				   // are named <code>local_assemble_*</code>
+				   // below). The resulting function is, in
+				   // other words, essentially the body of the
+				   // loop over all cells in step-31. Note,
+				   // however, that these functions store the
+				   // result from the local calculations in
+				   // variables of classes from the CopyData
+				   // namespace.
+				   //
+				   // <li>These objects are then given to the
+				   // second step which writes the local data
+				   // into the global data structures (these
+				   // functions are named
+				   // <code>copy_local_to_global_*</code>
+				   // below). These functions are pretty
+				   // trivial.
+				   //
+				   // <li>These two subfunctions are then used
+				   // in the respective assembly routine
+				   // (called <code>assemble_*</code> below),
+				   // where a WorkStream object is set up and
+				   // runs over all the cells that belong to
+				   // the processor's subdomain.  </ul>
 
-// @sect5{Stokes preconditioner assembly}
-//
-// Let us start with the functions that
-// builds the Stokes preconditioner. The
-// first two of these are pretty trivial,
-// given the discussion above. Note in
-// particular that the main point in using
-// the scratch data object is that we want to
-// avoid allocating any objects on the free
-// space each time we visit a new cell. As a
-// consequence, the assembly function below
-// only has automatic local variables, and
-// everything else is accessed through the
-// scratch data object, which is allocated
-// only once before we start the loop over
-// all cells:
+				   // @sect5{Stokes preconditioner assembly}
+				   //
+				   // Let us start with the functions that
+				   // builds the Stokes preconditioner. The
+				   // first two of these are pretty trivial,
+				   // given the discussion above. Note in
+				   // particular that the main point in using
+				   // the scratch data object is that we want
+				   // to avoid allocating any objects on the
+				   // free space each time we visit a new
+				   // cell. As a consequence, the assembly
+				   // function below only has automatic local
+				   // variables, and everything else is
+				   // accessed through the scratch data
+				   // object, which is allocated only once
+				   // before we start the loop over all cells:
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::
@@ -2692,6 +2691,7 @@ namespace Step32
 	    if (stokes_fe.system_to_component_index(i).first
 		==
 		stokes_fe.system_to_component_index(j).first)
+//@todo figure this out...
 	      data.local_matrix(i,j) += (EquationData::eta *
 					 (scratch.grads_phi_u[i] *
 					  scratch.grads_phi_u[j])
@@ -2717,59 +2717,89 @@ namespace Step32
   }
 
 
-
-// When we create the WorkStream, we modify
-// the start and end iterator into a
-// so-called <code>SubdomainFilter</code>
-// that tells the individual processes which
-// cells to work on. This is exactly the case
-// discussed in the introduction. Note how we
-// use the construct
-// <code>std_cxx1x::bind</code> to create a
-// function object that is compatible with
-// the WorkStream class. It uses placeholders
-// <code>_1, std_cxx1x::_2, _3</code> for the local
-// assembly function that specify cell,
-// scratch data, and copy data, as well as
-// the placeholder <code>_1</code> for the
-// copy function that expects the data to be
-// written into the global matrix. On the
-// other hand, the implicit zeroth argument
-// of member functions (namely the
-// <code>this</code> pointer of the object on
-// which that member function is to operate
-// on) is <i>bound</i> to the
-// <code>this</code> pointer of the current
-// function. The WorkStream class, as a
-// consequence, does not need to know
-// anything about the object these functions
-// work on.
-//
-// When the
-// WorkStream is executed, it will create
-// several local assembly routines of the
-// first kind for several cells and let
-// some available processors work on
-// them. The function that needs to be
-// synchronized, i.e., the write operation
-// into the global matrix, however, is
-// executed by only one thread at a time in
-// the prescribed order. Of course, this
-// only holds for the parallelization on a
-// single MPI process. Different MPI
-// processes will have their own WorkStream
-// objects and do that work completely
-// independently. In a distributed
-// calculation, some data will accumulate
-// at degrees of freedom that are not owned
-// by the respective processor. It would be
-// inefficient to send data around every
-// time we encounter such a dof. What
-// happens instead is that the Trilinos
-// sparse matrix will keep that data and
-// send it to the owner at the end of
-// assembly, by calling the
-// <code>compress()</code> command.
+				   // Now for the function that actually puts
+				   // things together, using the WorkStream
+				   // functions.  WorkStream::run needs a
+				   // start and end iterator to enumerate the
+				   // cells it is supposed to work
+				   // on. Typically, one would use
+				   // DoFHandler::begin_active() and
+				   // DoFHandler::end() for that but here we
+				   // actually only want the subset of cells
+				   // that in fact are owned by the current
+				   // processor. This is where the
+				   // FilteredIterator class comes into play:
+				   // you give it a range of cells and it
+				   // provides an iterator that only iterates
+				   // over that subset of cells that satisfy a
+				   // certain predicate (a predicate is a
+				   // function of one argument that either
+				   // returns true or false). The predicate we
+				   // use here is
+				   // IteratorFilters::LocallyOwnedCell, i.e.,
+				   // it returns true exactly if the cell is
+				   // owned by the current processor. The
+				   // resulting iterator range is then exactly
+				   // what we need.
+				   //
+				   // With this obstacle out of the way, we
+				   // call the WorkStream::run function with
+				   // this set of cells, scratch and copy
+				   // objects, and with pointers to two
+				   // functions: the local assembly and
+				   // copy-local-to-global function. These
+				   // functions need to have very specific
+				   // signatures: three arguments in the first
+				   // and one argument in the latter case (see
+				   // the documentation of the WorkStream::run
+				   // function for the meaning of these
+				   // arguments).  Note how we use the
+				   // construct <code>std_cxx1x::bind</code>
+				   // to create a function object that
+				   // satisfies this requirement. It uses
+				   // placeholders <code>_1, std_cxx1x::_2,
+				   // _3</code> for the local assembly
+				   // function that specify cell, scratch
+				   // data, and copy data, as well as the
+				   // placeholder <code>_1</code> for the copy
+				   // function that expects the data to be
+				   // written into the global matrix. On the
+				   // other hand, the implicit zeroth argument
+				   // of member functions (namely the
+				   // <code>this</code> pointer of the object
+				   // on which that member function is to
+				   // operate on) is <i>bound</i> to the
+				   // <code>this</code> pointer of the current
+				   // function. The WorkStream::run function,
+				   // as a consequence, does not need to know
+				   // anything about the object these
+				   // functions work on.
+				   //
+				   // When the WorkStream is executed, it will
+				   // create several local assembly routines
+				   // of the first kind for several cells and
+				   // let some available processors work on
+				   // them. The function that needs to be
+				   // synchronized, i.e., the write operation
+				   // into the global matrix, however, is
+				   // executed by only one thread at a time in
+				   // the prescribed order. Of course, this
+				   // only holds for the parallelization on a
+				   // single MPI process. Different MPI
+				   // processes will have their own WorkStream
+				   // objects and do that work completely
+				   // independently (and in different memory
+				   // spaces). In a distributed calculation,
+				   // some data will accumulate at degrees of
+				   // freedom that are not owned by the
+				   // respective processor. It would be
+				   // inefficient to send data around every
+				   // time we encounter such a dof. What
+				   // happens instead is that the Trilinos
+				   // sparse matrix will keep that data and
+				   // send it to the owner at the end of
+				   // assembly, by calling the
+				   // <code>compress()</code> command.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
@@ -2778,18 +2808,15 @@ namespace Step32
 
     const QGauss<dim> quadrature_formula(parameters.stokes_velocity_degree+1);
 
-//todo: define a new filter for locally owned cells
     typedef
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      SubdomainFilter;
+      CellFilter;
 
     WorkStream::
-      run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    stokes_dof_handler.begin_active()),
-	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    stokes_dof_handler.end()),
+      run (CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       stokes_dof_handler.begin_active()),
+	   CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       stokes_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_stokes_preconditioner,
 			    this,
@@ -2814,15 +2841,15 @@ namespace Step32
 
 
 
-// The final function in this block initiates
-// assemble of the Stokes preconditioner
-// matrix and then builds the Stokes
-// preconditioner. It is mostly the same as
-// in the serial case. The only difference to
-// step-31 is that we use a Jacobi
-// preconditioner for the pressure mass
-// matrix instead of IC, as discussed in the
-// introduction.
+				   // The final function in this block
+				   // initiates assembly of the Stokes
+				   // preconditioner matrix and then in fact
+				   // builds the Stokes preconditioner. It is
+				   // mostly the same as in the serial
+				   // case. The only difference to step-31 is
+				   // that we use a Jacobi preconditioner for
+				   // the pressure mass matrix instead of IC,
+				   // as discussed in the introduction.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
@@ -2986,15 +3013,13 @@ namespace Step32
 
     typedef
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      SubdomainFilter;
+      CellFilter;
 
     WorkStream::
-      run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    stokes_dof_handler.begin_active()),
-	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    stokes_dof_handler.end()),
+      run (CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       stokes_dof_handler.begin_active()),
+	   CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       stokes_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_stokes_system,
 			    this,
@@ -3113,15 +3138,13 @@ namespace Step32
 
     typedef
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      SubdomainFilter;
+      CellFilter;
 
     WorkStream::
-      run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    temperature_dof_handler.begin_active()),
-	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    temperature_dof_handler.end()),
+      run (CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       temperature_dof_handler.begin_active()),
+	   CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       temperature_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_temperature_matrix,
 			    this,
@@ -3419,15 +3442,13 @@ namespace Step32
 
     typedef
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      SubdomainFilter;
+      CellFilter;
 
     WorkStream::
-      run (SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    temperature_dof_handler.begin_active()),
-	   SubdomainFilter (IteratorFilters::SubdomainEqualTo
-			    (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
-			    temperature_dof_handler.end()),
+      run (CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       temperature_dof_handler.begin_active()),
+	   CellFilter (IteratorFilters::LocallyOwnedCell(),
+		       temperature_dof_handler.end()),
 	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
 			    local_assemble_temperature_rhs,
 			    this,
