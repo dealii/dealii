@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -188,6 +188,31 @@ namespace IteratorFilters
 					* subdomain with.
 					*/
       const types::subdomain_id_t subdomain_id;
+  };
+
+
+
+				   /**
+				    * Filter for iterators that evaluates to
+				    * true if a cell is owned by the current
+				    * processor, i.e., if it is a
+				    * @ref GlossLocallyOwnedCell "locally owned cell".
+				    *
+				    * This class is used in step-32, in
+				    * connection with the methods of the @ref
+				    * distributed module.
+				    *
+				    * @ingroup Iterators
+				    */
+  class LocallyOwnedCell
+  {
+    public:
+				       /**
+					* Evaluation operator. Returns true if
+					* the cell is locally owned.
+					*/
+      template <class Iterator>
+      bool operator () (const Iterator &i) const;
   };
 }
 
@@ -1112,6 +1137,18 @@ namespace IteratorFilters
   SubdomainEqualTo::operator () (const Iterator &i) const
   {
     return (i->subdomain_id() == subdomain_id);
+  }
+
+
+
+// ---------------- IteratorFilters::LocallyOwnedCell ---------
+
+  template <class Iterator>
+  inline
+  bool
+  LocallyOwnedCell::operator () (const Iterator &i) const
+  {
+    return (i->is_locally_owned());
   }
 }
 
