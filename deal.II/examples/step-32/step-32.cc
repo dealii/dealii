@@ -3324,10 +3324,10 @@ namespace Step32
 	     scratch.old_strain_rates[q]);
 
 	const double gamma
-	  = ((EquationData::radiogenic_heating * EquationData::density(T_term_for_rhs)
+	  = ((EquationData::radiogenic_heating * EquationData::density(ext_T)
 	      +
 	      2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
-	     (EquationData::density(T_term_for_rhs) * EquationData::specific_heat));
+	     (EquationData::density(ext_T) * EquationData::specific_heat));
 
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
