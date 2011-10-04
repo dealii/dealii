@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2007, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
  * and possibly the first and second derivates of the solution. Examples are
  * the calculation Mach numbers from velocity and density in supersonic flow
  * computations, or the computation of the magnitude of a complex-valued
- * solution as demonstrated in step-29. Other uses are shown in
+ * solution as demonstrated in step-29. Other uses are shown in step-32 and
  * step-33. This class offers the interface to perform such
  * postprocessing. Given the values and derivatives of the solution at those
  * points where we want to generated output, the functions of this class can
@@ -100,7 +100,7 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<Tensor<2,dim> > &dduh,
 				       const std::vector<Point<dim> >    &normals,
 				       std::vector<Vector<double> >      &computed_quantities) const;
-				       
+
 				     /**
 				      * This is the main function which actually
 				      * performs the postprocessing. The last
@@ -136,7 +136,7 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<Point<dim> >    &normals,
 				       const std::vector<Point<dim> >    &evaluation_points,
 				       std::vector<Vector<double> >      &computed_quantities) const;
-    
+
 				     /**
 				      * @deprecated
 				      *
@@ -158,7 +158,7 @@ class DataPostprocessor: public Subscriptor
 				       const std::vector<std::vector<Tensor<2,dim> > > &dduh,
 				       const std::vector<Point<dim> >                  &normals,
 				       std::vector<Vector<double> >                    &computed_quantities) const;
-				       
+
 				     /**
 				      * Same as the
 				      * compute_derived_quantities_scalar()
@@ -182,7 +182,7 @@ class DataPostprocessor: public Subscriptor
 				      * the names of the computed quantities.
 				      */
     virtual std::vector<std::string> get_names () const=0;
-    
+
 				     /**
 				      * This functions returns
 				      * information about how the
@@ -224,7 +224,7 @@ class DataPostprocessor: public Subscriptor
     virtual
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     get_data_component_interpretation () const;
-    
+
 				     /**
 				      * Return, which data has to be provided to
 				      * compute the derived quantities. This has
@@ -250,7 +250,7 @@ class DataPostprocessor: public Subscriptor
 				      * get_names().
 				      */
     virtual unsigned int n_output_variables() const=0;
-    
+
 };
 
 DEAL_II_NAMESPACE_CLOSE
