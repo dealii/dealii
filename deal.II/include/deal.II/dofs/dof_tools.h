@@ -1464,6 +1464,16 @@ namespace DoFTools
 				   // @}
 				   /**
 				    * @name Dof indices for patches
+				    *
+				    * Create structures containing a
+				    * large set of degrees of freedom
+				    * for small patches of cells. The
+				    * resulting objects can be used in
+				    * RelaxationBlockSOR and related
+				    * classes to implement Schwarz
+				    * preconditioners and smoothers,
+				    * where the subdomains consist of
+				    * small numbers of cells only.
 				    */
 				   //@{
 				   /**
@@ -1486,13 +1496,61 @@ namespace DoFTools
 				     * freedom associated to the
 				     * corresponding cells
 				     * corresponding to a vertex.
+				     *
+				     * The function has some boolean
+				     * arguments (lsited below)
+				     * controlling details of the
+				     * generated patches. The default
+				     * settings are those for
+				     * Arnold-Falk-Winther type
+				     * smoothers for divergence and
+				     * curl conforming finite elements
+				     * with essential boundary
+				     * conditions. Other applications
+				     * are possible, in particular
+				     * changing
+				     * <tt>boundary_patches</tt> for
+				     * non-essential boundary conditions.
+				     *
+				     * @arg <tt>block_list</tt>: the
+				     * SparsityPattern into which the
+				     * patches will be stored.
+				     * @arg <tt>dof_handler</tt>: The
+				     * multilevel dof handler
+				     * providing the topology operated
+				     * on.
+				     * @arg
+				     * <tt>interior_dofs_only</tt>:
+				     * for each patch of cells around
+				     * a vertex, collect only the
+				     * interior degrees of freedom of
+				     * the patch and disregard those
+				     * on the boundary of the
+				     * patch. This is for instance the
+				     * setting for smoothers of
+				     * Arnold-Falk-Winther type.
+				     * @arg <tt>boundary_patches</tt>:
+				     * include patches around vertices
+				     * at the boundary of the
+				     * domain. If not, only patches
+				     * around interior vertices will
+				     * be generated.
+				     * @arg
+				     * <tt>level_boundary_patches</tt>:
+				     * same for refinement edges
+				     * towards coarser cells.
+				     * @arg
+				     * <tt>single_cell_patches</tt>:
+				     * if not true, patches containing
+				     * a single cell are eliminated.
 				     */
    template <class DH>
    void make_vertex_patches(SparsityPattern& block_list,
 			    const DH& dof_handler,
 			    const unsigned int level,
 			    const bool interior_dofs_only,
-			    const bool boundary_patches = true,
+			    const bool boundary_patches = false,
+			    const bool level_boundary_patches = false,
 			    const bool single_cell_patches = false);
   
 				   //@}

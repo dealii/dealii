@@ -5913,8 +5913,15 @@ namespace DoFTools
 	  vertex_dof_count[vg] += cell->get_fe().dofs_per_cell;
 	  ++vertex_cell_count[vg];
 	  for (unsigned int d=0;d<DH::dimension;++d)
-	    if (cell->at_boundary(GeometryInfo<DH::dimension>::vertex_to_face[v][d]))
-	      vertex_boundary[vg] = true;
+	    {
+	      const unsigned int face = GeometryInfo<DH::dimension>::vertex_to_face[v][d];
+	      if (cell->at_boundary(face))
+		vertex_boundary[vg] = true;
+	      else
+		if ((!level_boundary_patches)
+		    && (cell->neighbor(face)->level() != (int) level))
+		  vertex_boundary[vg] = true;
+	    }
 	}
 				     // From now on, onlly vertices
 				     // with positive dof count are
