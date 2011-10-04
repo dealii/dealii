@@ -4100,40 +4100,46 @@ namespace Step32
 
 
 
-// @sect4{BoussinesqFlowProblem::refine_mesh}
+				   // @sect4{BoussinesqFlowProblem::refine_mesh}
 
-// This function isn't really new
-// either. Since the
-// <code>setup_dofs</code> function
-// that we call in the middle has its
-// own timer section, we split timing
-// this function into two
-// sections. It will also allow us to
-// easily identify which of the two
-// is more expensive.
-//
-// One thing of note, however, is that we don't want to compute all error
-// indicators only on the locally owned subdomain. In order to achieve this,
-// we pass one additional argument to the KellyErrorEstimator. Note that the
-// vector for error estimates is resized to the number of active cells present
-// on the current process, which is less than the total number of degrees of
-// freedom on all processors; each processor only has a few coarse cells
-// around the locally owned ones, as also explained in step-40.
-//
-// The local error estimates are then handed to a %parallel version of
-// GridRefinement which evaluates the errors and finds the cells that need
-// refinement. As in step-31, we want to limit the maximum grid level. So in
-// case some cells have been marked that are already at the finest level, we
-// simply clear the refine flags.
-//
-// With all that at hand, we set up the parallel SolutionTransfer to transfer
-// the solutions for the current time level and the next older one. The syntax
-// is similar to the non-%parallel solution transfer (with the exception that
-// here a pointer to the vector entries is enough), and SolutionTransfer will
-// already upon call to prepare_for_coarsening_and_refinement attach the data
-// to the cell information. This makes sure that the solution data eventually
-// arrives at the processor that will own the cell after repartitioning of the
-// domain with new cells.
+				   // This function isn't really new
+				   // either. Since the
+				   // <code>setup_dofs</code> function that we
+				   // call in the middle has its own timer
+				   // section, we split timing this function
+				   // into two sections. It will also allow us
+				   // to easily identify which of the two is
+				   // more expensive.
+				   //
+				   // One thing of note, however, is that we
+				   // only want to compute error indicators on
+				   // the locally owned subdomain. In order to
+				   // achieve this, we pass one additional
+				   // argument to the
+				   // KellyErrorEstimator::estimate
+				   // function. Note that the vector for error
+				   // estimates is resized to the number of
+				   // active cells present on the current
+				   // process, which is less than the total
+				   // number of active cells on all processors
+				   // (but more than the number of locally
+				   // owned active cells); each processor only
+				   // has a few coarse cells around the
+				   // locally owned ones, as also explained in
+				   // step-40.
+				   //
+				   // The local error estimates are then
+				   // handed to a %parallel version of
+				   // GridRefinement (in namespace
+				   // parallel::distributed::GridRefinement,
+				   // see also step-40) which looks at the
+				   // errors and finds the cells that need
+				   // refinement by comparing the error values
+				   // across processors. As in step-31, we
+				   // want to limit the maximum grid level. So
+				   // in case some cells have been marked that
+				   // are already at the finest level, we
+				   // simply clear the refine flags.
   template <int dim>
   void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   {
@@ -4161,6 +4167,20 @@ namespace Step32
 	   cell != triangulation.end(); ++cell)
 	cell->clear_refine_flag ();
 
+				     // With all flags marked as necessary, we
+				     // set up the
+				     // parallel::distributed::SolutionTransfer
+				     // object to transfer the solutions for
+				     // the current time level and the next
+				     // older one. The syntax is similar to
+				     // the non-%parallel solution transfer
+				     // (with the exception that here a
+				     // pointer to the vector entries is
+				     // enough). The remainder of the function
+				     // is concerned with setting up the data
+				     // structures again after mesh refinement
+				     // and restoring the solution vectors on
+				     // the new mesh.
     std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature (2);
     x_temperature[0] = &temperature_solution;
     x_temperature[1] = &old_temperature_solution;
@@ -4185,10 +4205,8 @@ namespace Step32
     computing_timer.enter_section ("Refine mesh structure, part 2");
 
     {
-      TrilinosWrappers::MPI::Vector
-	distributed_temp1 (temperature_rhs);
-      TrilinosWrappers::MPI::Vector
-	distributed_temp2 (temperature_rhs);
+      TrilinosWrappers::MPI::Vector distributed_temp1 (temperature_rhs);
+      TrilinosWrappers::MPI::Vector distributed_temp2 (temperature_rhs);
 
       std::vector<TrilinosWrappers::MPI::Vector *> tmp (2);
       tmp[0] = &(distributed_temp1);
@@ -4200,10 +4218,9 @@ namespace Step32
     }
 
     {
-      TrilinosWrappers::MPI::BlockVector
-	distributed_stokes (stokes_rhs);
-      TrilinosWrappers::MPI::BlockVector
-	old_distributed_stokes (stokes_rhs);
+      TrilinosWrappers::MPI::BlockVector distributed_stokes (stokes_rhs);
+      TrilinosWrappers::MPI::BlockVector old_distributed_stokes (stokes_rhs);
+
       std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp (2);
       stokes_tmp[0] = &(distributed_stokes);
       stokes_tmp[1] = &(old_distributed_stokes);
@@ -4218,13 +4235,19 @@ namespace Step32
 
 
 
-// @sect4{BoussinesqFlowProblem::run}
+				   // @sect4{BoussinesqFlowProblem::run}
 
-// This is the final function in this class. It actually runs the program. It
-// is, once more, very similar to step-31. We use a different mesh now (@p
-// hyper_shell instead of a simple cube geometry), and use the
-// <code>project_temperature_field()</code> function instead of the library
-// function <code>VectorTools::project</code>, the rest is as before.
+				   // This is the final and controlling
+				   // function in this class. It, in fact,
+				   // runs the entire rest of the program and
+				   // is, once more, very similar to
+				   // step-31. We use a different mesh now (a
+				   // GridGenerator::hyper_shell instead of a
+				   // simple cube geometry), and use the
+				   // <code>project_temperature_field()</code>
+				   // function instead of the library function
+				   // <code>VectorTools::project</code>, the
+				   // rest is as before.
   template <int dim>
   void BoussinesqFlowProblem<dim>::run ()
   {
@@ -4301,13 +4324,13 @@ namespace Step32
 					 // solvers by more than one half. We
 					 // do not need to extrapolate in the
 					 // last iteration, so if we reached
-					 // the final time, we stop where.
+					 // the final time, we stop here.
 				         //
-				         // As last thing during a time step,
+				         // As the last thing during a time step,
 				         // we check whether the current time
 				         // step number is divisible by 100,
 				         // which is when we let the computing
-				         // timer print a summary of times it
+				         // timer print a summary of CPU times
 				         // spent up to that point.
 	if (time > parameters.end_time * EquationData::year_in_seconds)
 	  break;
@@ -4345,14 +4368,18 @@ namespace Step32
 
 
 
-// @sect3{The <code>main</code> function}
+				 // @sect3{The <code>main</code> function}
 
-// The main function is short as usual and very similar to the one in
-// step-31. Since we use a parameter file which is specified as an argument in
-// the command line, we have to read it in here and pass it on to the
-// Parameters class for parsing. If no filename is given in the command line,
-// we simply use the step-32.prm file which is distributed together with the
-// program.
+				 // The main function is short as usual and
+				 // very similar to the one in step-31. Since
+				 // we use a parameter file which is specified
+				 // as an argument in the command line, we
+				 // have to read it in here and pass it on to
+				 // the Parameters class for parsing. If no
+				 // filename is given in the command line, we
+				 // simply use the <code>\step-32.prm</code>
+				 // file which is distributed together with
+				 // the program.
 int main (int argc, char *argv[])
 {
   using namespace Step32;
