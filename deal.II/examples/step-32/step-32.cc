@@ -437,10 +437,10 @@ namespace Step32
 	  StokesPreconditioner (const StokesPreconditioner &data);
 
 
-	  FEValues<dim>                        stokes_fe_values;
+         FEValues<dim>               stokes_fe_values;
 
-	  std::vector<SymmetricTensor<2,dim> > grads_phi_u;
-	  std::vector<double>                  phi_p;
+         std::vector<Tensor<2,dim> > grad_phi_u;
+         std::vector<double>         phi_p;
       };
 
       template <int dim>
@@ -452,7 +452,7 @@ namespace Step32
 		      :
 		      stokes_fe_values (mapping, stokes_fe, stokes_quadrature,
 					update_flags),
-		      grads_phi_u (stokes_fe.dofs_per_cell),
+                     grad_phi_u (stokes_fe.dofs_per_cell),
 		      phi_p (stokes_fe.dofs_per_cell)
       {}
 
@@ -466,7 +466,7 @@ namespace Step32
 					scratch.stokes_fe_values.get_fe(),
 					scratch.stokes_fe_values.get_quadrature(),
 					scratch.stokes_fe_values.get_update_flags()),
-		      grads_phi_u (scratch.grads_phi_u),
+                     grad_phi_u (scratch.grad_phi_u),
 		      phi_p (scratch.phi_p)
       {}
 
@@ -2682,25 +2682,21 @@ namespace Step32
       {
 	for (unsigned int k=0; k<dofs_per_cell; ++k)
 	  {
-	    scratch.grads_phi_u[k] = scratch.stokes_fe_values[velocities].symmetric_gradient(k,q);
-	    scratch.phi_p[k]       = scratch.stokes_fe_values[pressure].value (k, q);
+	    scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
+	    scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value (k, q);
 	  }
 
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if (stokes_fe.system_to_component_index(i).first
-		==
-		stokes_fe.system_to_component_index(j).first)
-//@todo figure this out...
-	      data.local_matrix(i,j) += (EquationData::eta *
-					 (scratch.grads_phi_u[i] *
-					  scratch.grads_phi_u[j])
-					 +
-					 (1./EquationData::eta) *
-					 EquationData::pressure_scaling *
-					 EquationData::pressure_scaling *
-					 (scratch.phi_p[i] * scratch.phi_p[j]))
-					* scratch.stokes_fe_values.JxW(q);
+	    data.local_matrix(i,j) += (EquationData::eta *
+				       scalar_product (scratch.grad_phi_u[i],
+						       scratch.grad_phi_u[j])
+				       +
+				       (1./EquationData::eta) *
+				       EquationData::pressure_scaling *
+				       EquationData::pressure_scaling *
+				       (scratch.phi_p[i] * scratch.phi_p[j]))
+				      * scratch.stokes_fe_values.JxW(q);
       }
   }
 
