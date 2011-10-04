@@ -5884,6 +5884,7 @@ namespace DoFTools
     const unsigned int level,
     const bool interior_only,
     const bool boundary_patches,
+    const bool level_boundary_patches,
     const bool single_cell_patches)
   {
     typename DH::cell_iterator cell;
