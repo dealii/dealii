@@ -3272,7 +3272,7 @@ namespace Step32
 	  }
 
 
-	const double old_Ts
+	const double T_term_for_rhs
 	  = (use_bdf2_scheme ?
 	     (scratch.old_temperature_values[q] *
 	      (1 + time_step/old_time_step)
@@ -3324,14 +3324,14 @@ namespace Step32
 	     scratch.old_strain_rates[q]);
 
 	const double gamma
-	  = ((EquationData::radiogenic_heating * EquationData::density(old_Ts)
+	  = ((EquationData::radiogenic_heating * EquationData::density(T_term_for_rhs)
 	      +
 	      2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
-	     (EquationData::density(old_Ts) * EquationData::specific_heat));
+	     (EquationData::density(T_term_for_rhs) * EquationData::specific_heat));
 
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  {
-	    data.local_rhs(i) += (old_Ts * scratch.phi_T[i]
+	    data.local_rhs(i) += (T_term_for_rhs * scratch.phi_T[i]
 				  -
 				  time_step *
 				  extrapolated_u * ext_grad_T * scratch.phi_T[i]

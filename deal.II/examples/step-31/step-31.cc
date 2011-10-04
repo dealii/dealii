@@ -2128,7 +2128,7 @@ namespace Step31
 		phi_T[k]      = temperature_fe_values.shape_value (k, q);
 	      }
 
-	    const double old_Ts
+	    const double T_term_for_rhs
 	      = (use_bdf2_scheme ?
 		 (old_temperature_values[q] *
 		  (1 + time_step/old_time_step)
@@ -2160,7 +2160,7 @@ namespace Step31
 		 old_velocity_values[q]);
 
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      local_rhs(i) += (old_Ts * phi_T[i]
+	      local_rhs(i) += (T_term_for_rhs * phi_T[i]
 			       -
 			       time_step *
 			       extrapolated_u * ext_grad_T * phi_T[i]
