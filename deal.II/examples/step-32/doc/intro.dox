@@ -2,7 +2,7 @@
 
 <i>This program was contributed by Martin Kronbichler, Wolfgang
 Bangerth, and Timo Heister.
-<br>
+
 This material is based upon work partly supported by the National
 Science Foundation under Award No. EAR-0426271 and The California Institute of
 Technology; and in a continuation by the National Science
@@ -12,6 +12,14 @@ expressed in this publication are those of the author and do not
 necessarily reflect the views of the National Science Foundation, The
 California Institute of Technology, or of The University of California
 &ndash; Davis.
+
+The work discussed here is also presented in the following publication:
+<b>
+  M. Kronbichler, T. Heister, W. Bangerth:
+  <i>High Accuracy Mantle Convection Simulation through Modern Numerical
+  Methods</i>,
+  in preparation, 2011.
+</b>
 </i>
 
 
