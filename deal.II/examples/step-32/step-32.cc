@@ -3275,7 +3275,7 @@ namespace Step32
 	const double old_Ts
 	  = (use_bdf2_scheme ?
 	     (scratch.old_temperature_values[q] *
-	      (time_step + old_time_step) / old_time_step
+	      (1 + time_step/old_time_step)
 	      -
 	      scratch.old_old_temperature_values[q] *
 	      (time_step * time_step) /
@@ -3283,30 +3283,46 @@ namespace Step32
 	     :
 	     scratch.old_temperature_values[q]);
 
+	const double ext_T
+	  = (use_bdf2_scheme ?
+	     (scratch.old_temperature_values[q] *
+	      (1 + time_step/old_time_step)
+	      -
+	      scratch.old_old_temperature_values[q] *
+	      time_step/old_time_step)
+	     :
+	     scratch.old_temperature_values[q]);
+
 	const Tensor<1,dim> ext_grad_T
 	  = (use_bdf2_scheme ?
 	     (scratch.old_temperature_grads[q] *
-	      (1+time_step/old_time_step)
+	      (1 + time_step/old_time_step)
 	      -
 	      scratch.old_old_temperature_grads[q] *
-	      time_step / old_time_step)
+	      time_step/old_time_step)
 	     :
 	     scratch.old_temperature_grads[q]);
 
 	const Tensor<1,dim> extrapolated_u
 	  = (use_bdf2_scheme ?
-	     (scratch.old_velocity_values[q] * (1+time_step/old_time_step) -
-	      scratch.old_old_velocity_values[q] * time_step/old_time_step)
+	     (scratch.old_velocity_values[q] *
+	      (1 + time_step/old_time_step)
+	      -
+	      scratch.old_old_velocity_values[q] *
+	      time_step/old_time_step)
 	     :
 	     scratch.old_velocity_values[q]);
+
 	const SymmetricTensor<2,dim> extrapolated_strain_rate
 	  = (use_bdf2_scheme ?
-	     (scratch.old_strain_rates[q] * (1+time_step/old_time_step) -
-	      scratch.old_old_strain_rates[q] * time_step/old_time_step)
+	     (scratch.old_strain_rates[q] *
+	      (1 + time_step/old_time_step)
+	      -
+	      scratch.old_old_strain_rates[q] *
+	      time_step/old_time_step)
 	     :
 	     scratch.old_strain_rates[q]);
 
-// @todo ?????? why old_Ts?
 	const double gamma
 	  = ((EquationData::radiogenic_heating * EquationData::density(old_Ts)
 	      +
