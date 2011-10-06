@@ -13,7 +13,7 @@ set Initial adaptive refinement         = 2
 
 # The number of global refinement steps performed on the initial coarse mesh,
 # before the problem is first solved there.
-set Initial global refinement           = 2
+set Initial global refinement           = 5
 
 # The number of time steps between each generation of graphical output files.
 set Time steps between graphical output = 50
