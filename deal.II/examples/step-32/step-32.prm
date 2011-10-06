@@ -5,7 +5,7 @@ set End time                            = 1e8
 
 # Whether graphical output is to be generated or not. You may not want to get
 # graphical output if the number of processors is large.
-set Generate graphical output           = false
+set Generate graphical output           = true
 
 # The number of adaptive refinement steps performed after initial global
 # refinement.
