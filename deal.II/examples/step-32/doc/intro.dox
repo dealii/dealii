@@ -437,7 +437,7 @@ $\alpha=1$, we use the same definition as in step-31:
     \frac{\|R_1(T)\|_{L^\infty(K)}}{c(\mathbf{u},T)}
   \right\}
 @f}
-where we compute the viscosity from a residual $\|R_1(T)\|_{L^\infty(K)}}$ of
+where we compute the viscosity from a residual $\|R_1(T)\|_{L^\infty(K)}$ of
 the equation, limited by a diffusion proportional to the mesh size $h_K$ in
 regions where the residual is large (around steep gradients). This definition
 has been shown to work well for the given case, $\alpha = 1$ in step-31, but
