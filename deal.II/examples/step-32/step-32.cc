@@ -4324,9 +4324,6 @@ namespace Step32
 	    (timestep_number % parameters.graphical_output_interval == 0))
 	  output_results ();
 
-	time += time_step;
-	++timestep_number;
-
 					 // In order to speed up linear
 					 // solvers, we extrapolate the
 					 // solutions from the old time levels
@@ -4338,12 +4335,16 @@ namespace Step32
 					 // last iteration, so if we reached
 					 // the final time, we stop here.
 				         //
-				         // As the last thing during a time step,
-				         // we check whether the current time
-				         // step number is divisible by 100,
-				         // which is when we let the computing
-				         // timer print a summary of CPU times
-				         // spent up to that point.
+				         // As the last thing during a
+				         // time step (before actually
+				         // bumping up the number of
+				         // the time step), we check
+				         // whether the current time
+				         // step number is divisible
+				         // by 100, and if so we let
+				         // the computing timer print
+				         // a summary of CPU times
+				         // spent so far.
 	if (time > parameters.end_time * EquationData::year_in_seconds)
 	  break;
 
@@ -4361,8 +4362,11 @@ namespace Step32
 				       old_old_temperature_solution);
 	  }
 
-	if (timestep_number % 100 == 0)
+	if ((timestep_number > 0) && (timestep_number % 100 == 0))
 	  computing_timer.print_summary ();
+
+	time += time_step;
+	++timestep_number;
       }
     while (true);
 
