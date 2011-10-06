@@ -279,6 +279,26 @@ regime. There, it remains in the range of 10-40 centimeters per year,
 quite within the physically expected region.
 
 
+<h3>Results for a 3d spherical shell testcase</h3>
+
+3d computations are very expensive computationally. Furthermore, as
+seen above, interesting behavior only starts after quite a long time
+requiring more CPU hours than is available on a typical
+cluster. Consequently, rather than showing a complete simulation here,
+let us simply show a couple of pictures we have obtained using the
+successor to this program, called <i>Aspect</i> (short for <i>Advanced
+%Solver for Problems in Earth's ConvecTion</i>), that is being
+developed independently of deal.II and that already incorporates some
+of the extensions discussed below. The following two pictures show
+isocontours of the temperature and the partition of the domain (along
+with the mesh) onto 512 processors:
+
+<p align="center">
+@image html step-32.3d-sphere.solution.png
+
+@image html step-32.3d-sphere.partition.png
+</p>
+
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
@@ -388,7 +408,7 @@ address to make the program more useful:
   one may wish to continue computing on a mesh that is finer than the one used
   to pre-compute a starting temperature field at an intermediate time.
 
-<li> <b>Predicted postprocessing:</b> The point of computations like this is
+<li> <b>Predictive postprocessing:</b> The point of computations like this is
   not simply to solve the equations. Rather, it is typically the exploration
   of different physical models and their comparison with things that we can
   measure at the earth surface, in order to find which models are realistic
@@ -397,4 +417,14 @@ address to make the program more useful:
   observe. Among these are, for example, heatfluxes at the surface of the
   earth, as well as seismic velocities throughout the mantle as these affect
   earthquake waves that are recorded by seismographs.
+
+<li> <b>Better refinement criteria:</b> As can be seen above for the
+3d case, the mesh in 3d is primarily refined along the inner
+boundary. This is because the boundary layer there is stronger than
+any other transition in the domain, leading us to refine there almost
+exclusively and basically not at all following the plumes. One
+certainly needs better refinement criteria to track the parts of the
+solution we are really interested in better than the criterion used
+here, namely the KellyErrorEstimator applied to the temperature, is
+able to.
 </ul>
