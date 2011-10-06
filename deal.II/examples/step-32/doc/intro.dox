@@ -897,7 +897,7 @@ the following quantities:
   the radius by
   @f{align*}
     s &= \frac{\|\mathbf x\|-R_0}{R_1-R_0}, \\
-    \varphi &= \atan \frac{y}{x}, \\
+    \varphi &= \arctan \frac{y}{x}, \\
     \tau &= s + \frac 15 s(1-s) \sin(6\varphi) q(z), \\
     T(\mathbf x) &= T_0(1-\tau) + T_1\tau,
   @f}
@@ -1104,7 +1104,7 @@ the following quantities:
   mantle to obtain
   @f[
     \|\mathbf{g}\|
-    = 1.245\cdot 10^{-6} \frac{1}{\textrm{s^2}} r + 7.714\cdot 10^{13} \frac{\textrm{m}^3}{\textrm{s^2}}\frac{1}{r^2}.
+    = 1.245\cdot 10^{-6} \frac{1}{\textrm{s}^2} r + 7.714\cdot 10^{13} \frac{\textrm{m}^3}{\textrm{s}^2}\frac{1}{r^2}.
   @f]
 
   <li>The density of the earth mantle varies spatially, but not by very
