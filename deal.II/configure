@@ -10707,9 +10707,15 @@ $as_echo "$DEAL_II_TRILINOS_VERSION_MAJOR.$DEAL_II_TRILINOS_VERSION_MINOR.$DEAL_
     as_fn_error $? "Trilinos versions prior to 10.0 are no longer supported with deal.II." "$LINENO" 5
   fi
 
-          if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 -a "$DEAL_II_TRILINOS_VERSION_MINOR" = 6 ; then
+              if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 -a "$DEAL_II_TRILINOS_VERSION_MINOR" = 6 ; then
     as_fn_error $? "Trilinos versions 10.6.x have bugs that make it incompatible
-                  with deal.II. Please use versions before or after 10.6.x." "$LINENO" 5
+                  with deal.II. Please use versions before 10.6 or after 10.8.1." "$LINENO" 5
+  fi
+  if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 \
+       -a "$DEAL_II_TRILINOS_VERSION_MINOR" = 8  \
+       -a "$DEAL_II_TRILINOS_VERSION_SUBMINOR" -lt 2 ; then
+    as_fn_error $? "Trilinos versions 10.8.0 and 10.8.1 have bugs that make it incompatible
+                  with deal.II. Please use versions before 10.6 or after 10.8.1." "$LINENO" 5
   fi
 
 

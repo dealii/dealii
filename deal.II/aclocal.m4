@@ -6344,9 +6344,17 @@ AC_DEFUN(DEAL_II_CONFIGURE_TRILINOS_VERSION, dnl
   dnl for example
   dnl   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5062
   dnl   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5319
+  dnl The same is unfortunately true for 10.8.[01]:
+  dnl   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5370
   if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 -a "$DEAL_II_TRILINOS_VERSION_MINOR" = 6 ; then
     AC_MSG_ERROR([Trilinos versions 10.6.x have bugs that make it incompatible
-                  with deal.II. Please use versions before or after 10.6.x.])
+                  with deal.II. Please use versions before 10.6 or after 10.8.1.])
+  fi
+  if test "$DEAL_II_TRILINOS_VERSION_MAJOR" = 10 \
+       -a "$DEAL_II_TRILINOS_VERSION_MINOR" = 8  \
+       -a "$DEAL_II_TRILINOS_VERSION_SUBMINOR" -lt 2 ; then
+    AC_MSG_ERROR([Trilinos versions 10.8.0 and 10.8.1 have bugs that make it incompatible
+                  with deal.II. Please use versions before 10.6 or after 10.8.1.])
   fi
 
   AC_SUBST(DEAL_II_TRILINOS_VERSION_MAJOR)
