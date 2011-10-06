@@ -1723,8 +1723,8 @@ namespace Step32
 				   // would need to perform two loops. We can
 				   // avoid the overhead by noting that
 				   // $\|E(T)-\bar{E}(T)\|_\infty =
-				   // \max\big(E_\max{}(T)-\bar{E}(T),
-				   // \bar{E}(T)-E_\min{}(T)\big)$, i.e., the
+				   // \max\big(E_{\textrm{max}}(T)-\bar{E}(T),
+				   // \bar{E}(T)-E_{\textrm{min}}(T)\big)$, i.e., the
 				   // maximum out of the deviation from the
 				   // average entropy in positive and negative
 				   // directions. The four quantities we need
