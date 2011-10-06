@@ -161,12 +161,14 @@ Timestep 7092:  t=1.00027e+08 years
 </pre>
 </code>
 
-You can extrapolate from this how long a simulation would take for a
-given number of time steps (the time
-steps ultimately settles on somewhere around 20,000 years, so
-computing for one billion years will take 50,000 time steps, give or take 20%).
-As can be seen here, we spend most of the compute time in assembling linear
-systems and &mdash; above all &mdash; in solving Stokes systems.
+The simulation terminates when the time reaches the 100 million years
+selected in the input file.  You can extrapolate from this how long a
+simulation would take for a different final time (the time step size
+ultimately settles on somewhere around 20,000 years, so computing for
+one billion years will take 50,000 time steps, give or take 20%).  As
+can be seen here, we spend most of the compute time in assembling
+linear systems and &mdash; above all &mdash; in solving Stokes
+systems.
 
 We can clearly not show all output files produced by this program when
 run for a longer period of time, so let us
@@ -175,114 +177,114 @@ only show the output from every 2500th time step here:
   <tr>
     <td>
       @image html step-32.2d.temperature.0000.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.0100.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.0200.png
-    <td>
+    </td>
   </tr>
 
   <tr>
     <td>
       @image html step-32.2d.temperature.0300.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.0400.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.0500.png
-    <td>
+    </td>
   </tr>
 
   <tr>
     <td>
       @image html step-32.2d.temperature.0600.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.0700.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.0800.png
-    <td>
+    </td>
   </tr>
 
   <tr>
     <td>
       @image html step-32.2d.temperature.0900.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1000.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1100.png
-    <td>
+    </td>
   </tr>
 
   <tr>
     <td>
       @image html step-32.2d.temperature.1200.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1300.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1400.png
-    <td>
+    </td>
   </tr>
 
   <tr>
     <td>
       @image html step-32.2d.temperature.1500.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1600.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1700.png
-    <td>
+    </td>
   </tr>
 
   <tr>
     <td>
       @image html step-32.2d.temperature.1800.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.1900.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.temperature.2000.png
-    <td>
+    </td>
   </tr>
 
 
   <tr>
     <td>
       @image html step-32.2d.temperature.2100.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.grid.2100.png
-    <td>
+    </td>
 
     <td>
       @image html step-32.2d.partition.2100.png
-    <td>
+    </td>
   </tr>
 </table>
 
