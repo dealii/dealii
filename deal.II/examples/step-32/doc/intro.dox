@@ -469,7 +469,7 @@ minimum temperature in the computation), which gives the following formula
 @f}
 The denominator in the formula for $\nu^\mathrm{E}_h|_K$ is computed as the
 global deviation of the entropy from the space-averaged entropy $\bar{E}(T) =
-\int_\Omega E(T) d\mathbf{x}/\int_Omega d\mathbf{x}$. As in step-31, we
+\int_\Omega E(T) d\mathbf{x}/\int_\Omega d\mathbf{x}$. As in step-31, we
 evaluate the artificial viscosity from the temperature and velocity at two
 previous time levels, in order to avoid a nonlinearity in its definition.
 
