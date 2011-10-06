@@ -4392,6 +4392,13 @@ namespace Step32
 				 // simply use the <code>\step-32.prm</code>
 				 // file which is distributed together with
 				 // the program.
+				 //
+				 // Because 3d computations are simply
+				 // very slow unless you throw a lot
+				 // of processors at them, the program
+				 // defaults to 2d. You can get the 3d
+				 // version by changing the constant
+				 // dimension below to 3.
 int main (int argc, char *argv[])
 {
   using namespace Step32;
@@ -4409,7 +4416,7 @@ int main (int argc, char *argv[])
       else
         parameter_filename = "step-32.prm";
 
-      const int dim = 3;
+      const int dim = 2;
       BoussinesqFlowProblem<dim>::Parameters  parameters(parameter_filename);
       BoussinesqFlowProblem<dim> flow_problem (parameters);
       flow_problem.run ();
