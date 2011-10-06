@@ -103,6 +103,11 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 <h3>General</h3>
 
 <ol>
+<li> New: Long in the making, the new tutorial program step-32 is a massively
+%parallel simulator for the Boussinesq equations that describe thermal convection.
+<br>
+(Martin Kronbichler, Timo Heister, Wolfgang Bangerth, 2011/10/06)
+
 <li> New: There is now a namespace Utilities::MPI that holds some of the MPI-related
 functions that were previously part of Utilities::System. Specifically, the following
 functions were moved and in part renamed: Utilities::System::get_n_mpi_processes
