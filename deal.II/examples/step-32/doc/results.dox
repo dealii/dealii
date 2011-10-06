@@ -39,96 +39,137 @@ cluster at Texas A&amp;M University.
 <h3>Results for a 2d circular shell testcase</h3>
 
 
-If we run the program as shown above, the output will look roughly like this,
-producing the final part of the output after some 2 days when run on 10
-processors:
+If we run the program as shown above (with the parameter file in the
+directory), the output will look roughly
+like this when run on 50 processors:
 
 <code>
 <pre>
-Number of active cells: 12288 (on 6 levels)
-Number of degrees of freedom: 162432 (99840+12672+49920)
+Number of active cells: 12,288 (on 6 levels)
+Number of degrees of freedom: 186,624 (99,840+36,864+49,920)
 
 Timestep 0:  t=0 years
-   Assembling...
-   Rebuilding Stokes preconditioner...
-   Solving...
-   14 BiCGStab iterations for Stokes subsystem.
-   Maximal velocity: 1.80187 cm/year
-   Time step: 607937 years
-   15 CG iterations for temperature
-   Temperature range: 973 4273.27
 
-Number of active cells: 17988 (on 7 levels)
-Number of degrees of freedom: 240504 (147888+18672+73944)
-
-Timestep 0:  t=0 years
-   Assembling...
    Rebuilding Stokes preconditioner...
-   Solving...
-   3 BiCGStab iterations for Stokes subsystem.
-   Maximal velocity: 1.52763 cm/year
-   Time step: 357565 years
+   Solving Stokes system... 41 iterations.
+   Maximal velocity: 60.672 cm/year
+   Time step: 17661 years
    17 CG iterations for temperature
-   Temperature range: 973 4274.08
+   Temperature range: 973 4273.16
 
-Number of active cells: 34716 (on 8 levels)
-Number of degrees of freedom: 474550 (291896+36706+145948)
+Number of active cells: 16,803 (on 7 levels)
+Number of degrees of freedom: 266,589 (144,120+50,409+72,060)
 
 Timestep 0:  t=0 years
-   Assembling...
-   Rebuilding Stokes preconditioner...
-   Solving...
-   3 BiCGStab iterations for Stokes subsystem.
-   Maximal velocity: 2.97931 cm/year
-   Time step: 91574.3 years
-   17 CG iterations for temperature
-   Temperature range: 973 4277.31
 
-Timestep 1:  t=91574.3 years
-   Assembling...
-   Solving...
-   2 BiCGStab iterations for Stokes subsystem.
-   Maximal velocity: 2.86431 cm/year
-   Time step: 95251.1 years
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 33 iterations.
+   Maximal velocity: 60.6718 cm/year
+   Time step: 11032.2 years
+   19 CG iterations for temperature
+   Temperature range: 973 4273.16
+
+Number of active cells: 21,024 (on 8 levels)
+Number of degrees of freedom: 339,999 (184,618+63,072+92,309)
+
+Timestep 0:  t=0 years
+
+   Rebuilding Stokes preconditioner...
+   Solving Stokes system... 33 iterations.
+   Maximal velocity: 60.6835 cm/year
+   Time step: 5520.09 years
    18 CG iterations for temperature
-   Temperature range: 973 4277.31
+   Temperature range: 973 4273.44
+
+Timestep 1:  t=5520.09 years
+
+   Solving Stokes system... 34 iterations.
+   Maximal velocity: 61.9054 cm/year
+   Time step: 5410.41 years
+   18 CG iterations for temperature
+   Temperature range: 973 4273.44
+
+Timestep 2:  t=10930.5 years
+
+   Solving Stokes system... 24 iterations.
+   Maximal velocity: 63.1348 cm/year
+   Time step: 5304.37 years
+   18 CG iterations for temperature
+   Temperature range: 973 4273.44
 
 [...]
 
-Timestep 53906:  t=9.99985e+08 years
-   Assembling...
-   Solving...
-   4 BiCGStab iterations for Stokes subsystem.
-   Maximal velocity: 12.2898 cm/year
-   Time step: 22199.6 years
+Timestep 100:  t=283833 years
+
+   Solving Stokes system... 23 iterations.
+   Maximal velocity: 168.248 cm/year
+   Time step: 1732.43 years
    18 CG iterations for temperature
-   Temperature range: 973 4273.07
+   Temperature range: 973 4285.06
+
+Number of active cells: 42,681 (on 8 levels)
+Number of degrees of freedom: 694,359 (377,544+128,043+188,772)
+
 
 
 +---------------------------------------------+------------+------------+
-| Total wallclock time elapsed since start    |  1.87e+05s |            |
+| Total wallclock time elapsed since start    |       140s |            |
 |                                             |            |            |
 | Section                         | no. calls |  wall time | % of total |
 +---------------------------------+-----------+------------+------------+
-| Assemble Stokes system          |     53909 |  1.06e+04s |       5.7% |
-| Assemble temperature matrices   |      5393 |       913s |      0.49% |
-| Assemble temperature rhs        |     53909 |  1.24e+04s |       6.6% |
-| Build Stokes preconditioner     |      5393 |  4.52e+03s |       2.4% |
-| Solve Stokes system             |     53909 |  6.94e+04s |        37% |
-| Solve temperature system        |     53909 |  2.34e+04s |        13% |
-| Postprocessing                  |      2157 |  5.51e+03s |       2.9% |
-| Refine mesh structure, part 1   |      5392 |  4.71e+04s |        25% |
-| Refine mesh structure, part 2   |      5392 |  1.02e+03s |      0.55% |
-| Setup dof systems               |      5393 |  1.11e+04s |       5.9% |
+| Assemble Stokes system          |       103 |      7.08s |       5.1% |
+| Assemble temperature matrices   |        12 |     0.702s |       0.5% |
+| Assemble temperature rhs        |       103 |      10.3s |       7.3% |
+| Build Stokes preconditioner     |        12 |       3.6s |       2.6% |
+| Solve Stokes system             |       103 |       103s |        74% |
+| Solve temperature system        |       103 |      8.13s |       5.8% |
+| Postprocessing                  |         3 |     0.417s |       0.3% |
+| Refine mesh structure, part 1   |        12 |     0.859s |      0.61% |
+| Refine mesh structure, part 2   |        12 |      1.15s |      0.82% |
+| Setup dof systems               |        13 |      4.13s |       2.9% |
 +---------------------------------+-----------+------------+------------+
+
+[...]
+
+Timestep 7092:  t=1.00027e+08 years
+
+   Solving Stokes system... 26 iterations.
+   Maximal velocity: 8.08888 cm/year
+   Time step: 35734.5 years
+   18 CG iterations for temperature
+   Temperature range: 973 4273.04
+
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |  8.36e+03s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assemble Stokes system          |      7095 |       482s |       5.8% |
+| Assemble temperature matrices   |       712 |      40.6s |      0.49% |
+| Assemble temperature rhs        |      7095 |       671s |         8% |
+| Build Stokes preconditioner     |       712 |       231s |       2.8% |
+| Solve Stokes system             |      7095 |  5.99e+03s |        72% |
+| Solve temperature system        |      7095 |       578s |       6.9% |
+| Postprocessing                  |       143 |      19.3s |      0.23% |
+| Refine mesh structure, part 1   |       711 |      48.7s |      0.58% |
+| Refine mesh structure, part 2   |       711 |      68.6s |      0.82% |
+| Setup dof systems               |       712 |       223s |       2.7% |
++---------------------------------+-----------+------------+------------+
+
 </pre>
 </code>
 
+You can extrapolate from this how long a simulation would take for a
+given number of time steps (the time
+steps ultimately settles on somewhere around 20,000 years, so
+computing for one billion years will take 50,000 time steps, give or take 20%).
 As can be seen here, we spend most of the compute time in assembling linear
-systems, refining the mesh, and in particular in solving the Stokes and
-temperature linear systems.
+systems and &mdash; above all &mdash; in solving Stokes systems.
 
-We can clearly not show all output files produced by this program, so let us
+We can clearly not show all output files produced by this program when
+run for a longer period of time, so let us
 only show the output from every 2500th time step here:
 <table>
   <tr>
