@@ -2,7 +2,7 @@
 //    $Id: simple_mpi_01.cc 23327 2011-02-11 03:19:07Z bangerth $
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,6 +25,7 @@
 #include "../tests.h"
 
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/distributed/tria.h>
@@ -42,7 +43,7 @@ void test()
 
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
   GridGenerator::hyper_cube (triangulation);
-  
+
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
   parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_number (triangulation,
@@ -55,10 +56,10 @@ void test()
   triangulation.execute_coarsening_and_refinement ();
 
   if (myid==0)
-	deallog << "n_global_active_cells=" 
+	deallog << "n_global_active_cells="
 	<< triangulation.n_global_active_cells()
 	<< std::endl;
-  
+
   if (myid==0)
     deallog << "OK" << std::endl;
 }
