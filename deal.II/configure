@@ -5175,18 +5175,26 @@ $as_echo "C compiler is Borland C" >&6; }
   	              CC_VERSION=borland_bcc
   	            else
 
-  	              		      	              	 	      	              	                                                                                  	              is_kai_cc="`($CC --version 2>&1) | grep 'KAI C'`"
-  	              is_kai_cc="$is_kai_cc`($CC -v 2>&1) | grep /KCC/`"
-  	              if test "x$is_kai_cc" != "x" ; then
-  	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: C compiler is KAI C" >&5
-$as_echo "C compiler is KAI C" >&6; }
-  	                CC_VERSION=kai_cc
-  	              else
+		      is_clang="`($CC --version 2>&1) | grep clang`"
+		      if test "x$is_clang" != x ; then
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: C compiler is clang" >&5
+$as_echo "C compiler is clang" >&6; }
+			CC_VERSION=clang
+		      else
 
-                                                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unrecognized compiler -- still trying" >&5
+  	                		        	                	 	        	                	                                                                                          	                is_kai_cc="`($CC --version 2>&1) | grep 'KAI C'`"
+  	                is_kai_cc="$is_kai_cc`($CC -v 2>&1) | grep /KCC/`"
+  	                if test "x$is_kai_cc" != "x" ; then
+  	                  { $as_echo "$as_me:${as_lineno-$LINENO}: result: C compiler is KAI C" >&5
+$as_echo "C compiler is KAI C" >&6; }
+  	                  CC_VERSION=kai_cc
+  	                else
+
+                                                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: Unrecognized compiler -- still trying" >&5
 $as_echo "Unrecognized compiler -- still trying" >&6; }
-			CC_VERSION=unknown_cc
-                      fi
+			  CC_VERSION=unknown_cc
+                        fi
+		      fi
                     fi
                   fi
                 fi
@@ -5321,6 +5329,12 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
           ;;
+
+      clang)
+	  CFLAGS="$CFLAGS -g"
+	  CFLAGSO="$CFLAGS -fast -O2"
+	  CFLAGSPIC="-fPIC"
+	  ;;
 
       sun_cc*)
           CFLAGS="$CFLAGS -g"

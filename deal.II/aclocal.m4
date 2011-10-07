@@ -1382,26 +1382,33 @@ AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
   	              CC_VERSION=borland_bcc
   	            else
 
-  	              dnl KAI C? It seems as if the documented options
-		      dnl -V and --version are not always supported, so give
-	              dnl the whole thing a second try by looking for /KCC/
-	 	      dnl somewhere in the paths that are output by -v. This
-	              dnl is risky business, since this combination of
-	              dnl characters might appear on other installations
-                      dnl of other compilers as well, so put this test to
-                      dnl the very end of the detection chain for the
-                      dnl various compilers
-  	              is_kai_cc="`($CC --version 2>&1) | grep 'KAI C'`"
-  	              is_kai_cc="$is_kai_cc`($CC -v 2>&1) | grep /KCC/`"
-  	              if test "x$is_kai_cc" != "x" ; then
-  	                AC_MSG_RESULT(C compiler is KAI C)
-  	                CC_VERSION=kai_cc
-  	              else
+		      is_clang="`($CC --version 2>&1) | grep clang`"
+		      if test "x$is_clang" != x ; then
+                        AC_MSG_RESULT(C compiler is clang)
+			CC_VERSION=clang
+		      else
 
-                        dnl  Aw, nothing suitable found...
-                        AC_MSG_RESULT([Unrecognized compiler -- still trying])
-			CC_VERSION=unknown_cc
-                      fi
+  	                dnl KAI C? It seems as if the documented options
+		        dnl -V and --version are not always supported, so give
+	                dnl the whole thing a second try by looking for /KCC/
+	 	        dnl somewhere in the paths that are output by -v. This
+	                dnl is risky business, since this combination of
+	                dnl characters might appear on other installations
+                        dnl of other compilers as well, so put this test to
+                        dnl the very end of the detection chain for the
+                        dnl various compilers
+  	                is_kai_cc="`($CC --version 2>&1) | grep 'KAI C'`"
+  	                is_kai_cc="$is_kai_cc`($CC -v 2>&1) | grep /KCC/`"
+  	                if test "x$is_kai_cc" != "x" ; then
+  	                  AC_MSG_RESULT(C compiler is KAI C)
+  	                  CC_VERSION=kai_cc
+  	                else
+
+                          dnl  Aw, nothing suitable found...
+                          AC_MSG_RESULT([Unrecognized compiler -- still trying])
+			  CC_VERSION=unknown_cc
+                        fi
+		      fi
                     fi
                   fi
                 fi
@@ -1539,6 +1546,12 @@ AC_DEFUN(DEAL_II_SET_CC_FLAGS, dnl
 	  DEAL_II_ICC_C_WD_1572
 
           ;;
+
+      clang)
+	  CFLAGS="$CFLAGS -g"
+	  CFLAGSO="$CFLAGS -fast -O2"
+	  CFLAGSPIC="-fPIC"
+	  ;;
 
       sun_cc*)
           CFLAGS="$CFLAGS -g"
