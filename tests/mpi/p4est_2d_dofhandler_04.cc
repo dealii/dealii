@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -112,10 +112,11 @@ void test()
 	     }
 	 }
 
-       deallog << "# in locally_active_dofs:" << dof_set.n_elements() << std::endl;
        if (myid==0)
-	 dof_set.print(deallog);
-
+	 {
+	   deallog << "# in locally_active_dofs:" << dof_set.n_elements() << std::endl;
+	   dof_set.print(deallog);
+	 }
     }
 
 }
