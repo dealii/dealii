@@ -27,8 +27,7 @@ include $D/common/Make.global_options
 	@cmd="diff $(<:%.inp=%.ucd) $(@:OK=ucd) > /dev/null" ; \
 	 if eval $$cmd ; then \
 			echo '=====OK============' $@ ; \
-			echo 'diff ok' > $(dir $@)/status ; \
-			echo $$i > $@ ; \
+			echo OK > $@ ; \
 	 else \
 			echo '+++++Error+++++++++' $@ ; \
 	 fi
