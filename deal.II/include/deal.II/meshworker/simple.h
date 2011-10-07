@@ -57,7 +57,7 @@ namespace MeshWorker
       public:
 	void initialize(NamedData<VECTOR*>& results);
 					 /**
-					  * Initialize the constraints. 
+					  * Initialize the constraints.
 					  */
         void initialize(const ConstraintMatrix& constraints);
 					 /**
@@ -73,14 +73,14 @@ namespace MeshWorker
 					  */
 	template <class DOFINFO>
 	void initialize_info(DOFINFO& info, bool face) const;
-	
+
 					 /**
 					  * Assemble the local residuals
 					  * into the global residuals.
 					  */
 	template <class DOFINFO>
 	void assemble(const DOFINFO& info);
-	
+
 					 /**
 					  * Assemble both local residuals
 					  * into the global residuals.
@@ -99,7 +99,7 @@ namespace MeshWorker
 					  */
 	SmartPointer<const ConstraintMatrix,ResidualSimple<VECTOR> > constraints;
     };
-    
+
 /**
  * Assemble local matrices into a single global matrix without using
  * block structure.
@@ -127,14 +127,14 @@ namespace MeshWorker
 					  * the matrix.
 					  */
 	MatrixSimple(double threshold = 1.e-12);
-	
+
 					 /**
 					  * Store the result matrix
 					  * for later assembling.
 					  */
 	void initialize(MATRIX& m);
 					 /**
-					  * Initialize the constraints. 
+					  * Initialize the constraints.
 					  */
         void initialize(const ConstraintMatrix& constraints);
 					 /**
@@ -152,7 +152,7 @@ namespace MeshWorker
 					  */
 	template <class DOFINFO>
 	void initialize_info(DOFINFO& info, bool face) const;
-	
+
 					 /**
 					  * Assemble the matrix
 					  * DoFInfo::M1[0]
@@ -160,7 +160,7 @@ namespace MeshWorker
 					  */
 	template<class DOFINFO>
 	void assemble(const DOFINFO& info);
-	
+
 					 /**
 					  * Assemble both local
 					  * matrices in the info
@@ -178,7 +178,7 @@ namespace MeshWorker
 	void assemble(const FullMatrix<double>& M,
 		      const std::vector<unsigned int>& i1,
 		      const std::vector<unsigned int>& i2);
-	
+
 					 /**
 					  * The global matrix being
 					  * assembled.
@@ -188,7 +188,7 @@ namespace MeshWorker
 					  * A pointer to the object containing constraints.
 					  */
         SmartPointer<const ConstraintMatrix,MatrixSimple<MATRIX> > constraints;
-	
+
 					 /**
 					  * The smallest positive
 					  * number that will be
@@ -199,10 +199,10 @@ namespace MeshWorker
 					  * not be assembled.
 					  */
 	const double threshold;
-	
+
     };
-    
-    
+
+
 /**
  * Assemble local matrices into level matrices without using
  * block structure.
@@ -225,7 +225,7 @@ namespace MeshWorker
 					  * the matrix.
 					  */
 	MGMatrixSimple(double threshold = 1.e-12);
-	
+
 					 /**
 					  * Store the result matrix
 					  * for later assembling.
@@ -234,7 +234,7 @@ namespace MeshWorker
 
 					 /**
 					  * Initialize the multilevel
-                                          * constraints. 
+                                          * constraints.
 					  */
         void initialize(const MGConstrainedDoFs& mg_constrained_dofs);
 
@@ -247,7 +247,7 @@ namespace MeshWorker
 					  */
 	void initialize_fluxes(MGLevelObject<MATRIX>& flux_up,
 			       MGLevelObject<MATRIX>& flux_down);
-	
+
 					 /**
 					  * Initialize the matrices
 					  * #interface_in and #interface_out
@@ -273,7 +273,7 @@ namespace MeshWorker
 					  */
 	template <class DOFINFO>
 	void initialize_info(DOFINFO& info, bool face) const;
-	
+
 					 /**
 					  * Assemble the matrix
 					  * DoFInfo::M1[0]
@@ -281,7 +281,7 @@ namespace MeshWorker
 					  */
 	template<class DOFINFO>
 	void assemble(const DOFINFO& info);
-	
+
 					 /**
 					  * Assemble both local
 					  * matrices in the info
@@ -310,7 +310,7 @@ namespace MeshWorker
 		      const std::vector<unsigned int>& i1,
 		      const std::vector<unsigned int>& i2,
 		      const unsigned int level);
-	
+
 					 /**
 					  * Assemble a single matrix
 					  * into a global matrix.
@@ -320,7 +320,7 @@ namespace MeshWorker
 			 const FullMatrix<double>& M,
 			 const std::vector<unsigned int>& i1,
 			 const std::vector<unsigned int>& i2,
-			 const unsigned int level = -1);
+			 const unsigned int level = numbers::invalid_unsigned_int);
 					 /**
 					  * Assemble a single matrix
 					  * into a global matrix.
@@ -330,7 +330,7 @@ namespace MeshWorker
 			   const FullMatrix<double>& M,
 			   const std::vector<unsigned int>& i1,
 			   const std::vector<unsigned int>& i2,
-			   const unsigned int level = -1);
+			   const unsigned int level = numbers::invalid_unsigned_int);
 
 					 /**
 					  * Assemble a single matrix
@@ -341,7 +341,7 @@ namespace MeshWorker
 			 const FullMatrix<double>& M,
 			 const std::vector<unsigned int>& i1,
 			 const std::vector<unsigned int>& i2,
-			 const unsigned int level = -1);
+			 const unsigned int level = numbers::invalid_unsigned_int);
 
 					 /**
 					  * Assemble a single matrix
@@ -352,14 +352,14 @@ namespace MeshWorker
 			  const FullMatrix<double>& M,
 			  const std::vector<unsigned int>& i1,
 			  const std::vector<unsigned int>& i2,
-			  const unsigned int level = -1);
-	
+			  const unsigned int level = numbers::invalid_unsigned_int);
+
 					 /**
 					  * The global matrix being
 					  * assembled.
 					  */
 	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > matrix;
-	
+
 					 /**
 					  * The matrix used for face
 					  * flux terms across the
@@ -367,7 +367,7 @@ namespace MeshWorker
 					  * coarse to fine.
 					  */
 	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > flux_up;
-	
+
 					 /**
 					  * The matrix used for face
 					  * flux terms across the
@@ -384,7 +384,7 @@ namespace MeshWorker
 					  * coarse to fine.
 					  */
 	SmartPointer<MGLevelObject<MATRIX>,MGMatrixSimple<MATRIX> > interface_in;
-	
+
 					 /**
 					  * The matrix used for face
 					  * contributions for continuous
@@ -397,7 +397,7 @@ namespace MeshWorker
 					  * A pointer to the object containing constraints.
 					  */
         SmartPointer<const MGConstrainedDoFs,MGMatrixSimple<MATRIX> > mg_constrained_dofs;
-	
+
 					 /**
 					  * The smallest positive
 					  * number that will be
@@ -408,10 +408,10 @@ namespace MeshWorker
 					  * not be assembled.
 					  */
 	const double threshold;
-	
+
     };
-    
-    
+
+
 /**
  * Assemble a simple matrix and a simple right hand side at once. We
  * use a combination of MatrixSimple and ResidualSimple to achieve
@@ -440,7 +440,7 @@ namespace MeshWorker
 					  * is assembled into.
 					  */
 	void initialize(MATRIX& m, VECTOR& rhs);
-	
+
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -456,7 +456,7 @@ namespace MeshWorker
 					  */
 	template <class DOFINFO>
 	void initialize_info(DOFINFO& info, bool face) const;
-	
+
 					 /**
 					  * Assemble the matrix
 					  * DoFInfo::M1[0]
@@ -464,7 +464,7 @@ namespace MeshWorker
 					  */
 	template<class DOFINFO>
 	void assemble(const DOFINFO& info);
-	
+
 					 /**
 					  * Assemble both local
 					  * matrices in the info
@@ -476,7 +476,7 @@ namespace MeshWorker
 		      const DOFINFO& info2);
     };
 
-    
+
 //----------------------------------------------------------------------//
 
     template <class VECTOR>
@@ -493,7 +493,7 @@ namespace MeshWorker
       constraints = &c;
     }
 
-    
+
     template <class VECTOR>
     template <class DOFINFO>
     inline void
@@ -502,7 +502,7 @@ namespace MeshWorker
       info.initialize_vectors(residuals.size());
     }
 
-    
+
     template <class VECTOR>
     template <class DOFINFO>
     inline void
@@ -521,7 +521,7 @@ namespace MeshWorker
 	}
     }
 
-    
+
     template <class VECTOR>
     template <class DOFINFO>
     inline void
@@ -547,7 +547,7 @@ namespace MeshWorker
 	}
     }
 
-    
+
 //----------------------------------------------------------------------//
 
     template <class MATRIX>
@@ -556,8 +556,8 @@ namespace MeshWorker
 		    :
 		    threshold(threshold)
     {}
-    
-    
+
+
     template <class MATRIX>
     inline void
     MatrixSimple<MATRIX>::initialize(MATRIX& m)
@@ -572,7 +572,7 @@ namespace MeshWorker
     {
       constraints = &c;
     }
-    
+
 
     template <class MATRIX >
     template <class DOFINFO>
@@ -592,9 +592,9 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-     
+
       if(constraints == 0)
-	{ 
+	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
 	    for (unsigned int k=0; k<i2.size(); ++k)
 	      if (std::fabs(M(j,k)) >= threshold)
@@ -604,8 +604,8 @@ namespace MeshWorker
 	constraints->distribute_local_to_global(
 	  M, i1, i2, *matrix);
     }
-    
-    
+
+
     template <class MATRIX>
     template <class DOFINFO>
     inline void
@@ -613,7 +613,7 @@ namespace MeshWorker
     {
       assemble(info.matrix(0,false).matrix, info.indices, info.indices);
     }
-    
+
 
     template <class MATRIX>
     template <class DOFINFO>
@@ -626,8 +626,8 @@ namespace MeshWorker
       assemble(info2.matrix(0,false).matrix, info2.indices, info2.indices);
       assemble(info2.matrix(0,true).matrix, info2.indices, info1.indices);
     }
-    
-    
+
+
 //----------------------------------------------------------------------//
 
     template <class MATRIX>
@@ -636,15 +636,15 @@ namespace MeshWorker
 		    :
 		    threshold(threshold)
     {}
-    
-    
+
+
     template <class MATRIX>
     inline void
     MGMatrixSimple<MATRIX>::initialize(MGLevelObject<MATRIX>& m)
     {
       matrix = &m;
     }
-    
+
     template <class MATRIX>
     inline void
     MGMatrixSimple<MATRIX>::initialize(const MGConstrainedDoFs& c)
@@ -660,7 +660,7 @@ namespace MeshWorker
       flux_up = &up;
       flux_down = &down;
     }
-    
+
 
     template <class MATRIX>
     inline void
@@ -691,7 +691,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      
+
       if(mg_constrained_dofs == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -723,7 +723,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      
+
       if(mg_constrained_dofs == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -754,8 +754,8 @@ namespace MeshWorker
 		  }
 	}
     }
-    
-    
+
+
     template <class MATRIX>
     inline void
     MGMatrixSimple<MATRIX>::assemble_up(
@@ -767,7 +767,7 @@ namespace MeshWorker
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
-      
+
       if(mg_constrained_dofs == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -797,7 +797,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      
+
       if(mg_constrained_dofs == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -827,7 +827,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-      
+
       if(mg_constrained_dofs == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -858,7 +858,7 @@ namespace MeshWorker
 		  }
 	}
     }
-    
+
     template <class MATRIX>
     inline void
     MGMatrixSimple<MATRIX>::assemble_out(
@@ -870,7 +870,7 @@ namespace MeshWorker
     {
       AssertDimension(M.n(), i1.size());
       AssertDimension(M.m(), i2.size());
-      
+
       if(mg_constrained_dofs == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -889,7 +889,7 @@ namespace MeshWorker
 		    if (mg_constrained_dofs->set_boundary_values())
 		      {
 			if((!mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
-			    !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k])) 
+			    !mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]))
 			   ||
 			   (mg_constrained_dofs->at_refinement_edge_boundary(level, i1[j]) &&
 			    mg_constrained_dofs->at_refinement_edge_boundary(level, i2[k]) &&
@@ -901,8 +901,8 @@ namespace MeshWorker
 		  }
 	}
     }
-    
-    
+
+
     template <class MATRIX>
     template <class DOFINFO>
     inline void
@@ -917,7 +917,7 @@ namespace MeshWorker
 	  assemble_out((*interface_out)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
 	}
     }
-    
+
 
     template <class MATRIX>
     template <class DOFINFO>
@@ -927,7 +927,7 @@ namespace MeshWorker
     {
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
-      
+
       if (level1 == level2)
 	{
           if(mg_constrained_dofs == 0)
@@ -977,12 +977,12 @@ namespace MeshWorker
       NamedData<VECTOR*> data;
       VECTOR* p = &rhs;
       data.add(p, "right hand side");
-      
+
       MatrixSimple<MATRIX>::initialize(m);
       ResidualSimple<VECTOR>::initialize(data);
     }
 
-    
+
     template <class MATRIX, class VECTOR>
     template <class DOFINFO>
     inline void
@@ -1012,7 +1012,7 @@ namespace MeshWorker
     {
       MatrixSimple<MATRIX>::assemble(info1, info2);
       ResidualSimple<VECTOR>::assemble(info1, info2);
-    }    
+    }
   }
 }
 
