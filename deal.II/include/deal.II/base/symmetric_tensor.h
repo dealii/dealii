@@ -1731,7 +1731,8 @@ namespace internal
 	      Assert (false, ExcNotImplemented());
       }
 
-    return Number();
+    static Number dummy;
+    return dummy;
   }
 
 
@@ -1829,7 +1830,13 @@ namespace internal
 
 	  return data[base_index[0]][base_index[1]];
 	}
+
+	default:
+	      Assert (false, ExcNotImplemented());
       }
+
+    static Number dummy;
+    return dummy;
   }
 
 } // end of namespace internal
