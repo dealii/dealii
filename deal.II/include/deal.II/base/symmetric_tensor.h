@@ -1640,19 +1640,19 @@ namespace internal
   {
     switch (dim)
       {
-      case 1:
-	return data[0][0];
+	case 1:
+	      return data[0][0];
 
-      case 2:
-				   // each entry of the tensor can be
-				   // thought of as an entry in a
-				   // matrix that maps the rolled-out
-				   // rank-2 tensors into rolled-out
-				   // rank-2 tensors. this is the
-				   // format in which we store rank-4
-				   // tensors. determine which
-				   // position the present entry is
-				   // stored in
+	case 2:
+					       // each entry of the tensor can be
+					       // thought of as an entry in a
+					       // matrix that maps the rolled-out
+					       // rank-2 tensors into rolled-out
+					       // rank-2 tensors. this is the
+					       // format in which we store rank-4
+					       // tensors. determine which
+					       // position the present entry is
+					       // stored in
 	{
 	  unsigned int base_index[2] ;
 	  if ((indices[0] == 0) && (indices[1] == 0))
@@ -1672,16 +1672,16 @@ namespace internal
 	  return data[base_index[0]][base_index[1]];
 	}
 
-      case 3:
-				   // each entry of the tensor can be
-				   // thought of as an entry in a
-				   // matrix that maps the rolled-out
-				   // rank-2 tensors into rolled-out
-				   // rank-2 tensors. this is the
-				   // format in which we store rank-4
-				   // tensors. determine which
-				   // position the present entry is
-				   // stored in
+	case 3:
+					       // each entry of the tensor can be
+					       // thought of as an entry in a
+					       // matrix that maps the rolled-out
+					       // rank-2 tensors into rolled-out
+					       // rank-2 tensors. this is the
+					       // format in which we store rank-4
+					       // tensors. determine which
+					       // position the present entry is
+					       // stored in
 	{
 	  unsigned int base_index[2] ;
 	  if ((indices[0] == 0) && (indices[1] == 0))
@@ -1726,7 +1726,12 @@ namespace internal
 
 	  return data[base_index[0]][base_index[1]];
 	}
+
+	default:
+	      Assert (false, ExcNotImplemented());
       }
+
+    return Number();
   }
 
 
