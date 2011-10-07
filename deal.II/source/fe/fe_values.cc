@@ -1320,7 +1320,7 @@ class FEValuesBase<dim,spacedim>::CellIteratorBase
 				      * conversion operator.
 				      */
     virtual
-    operator const typename Triangulation<dim,spacedim>::cell_iterator () const = 0;
+    operator typename Triangulation<dim,spacedim>::cell_iterator () const = 0;
 
 				     /**
 				      * Return the number of
@@ -1380,7 +1380,7 @@ class FEValuesBase<dim,spacedim>::CellIterator : public FEValuesBase<dim,spacedi
 				      * conversion operator.
 				      */
     virtual
-    operator const typename Triangulation<dim,spacedim>::cell_iterator () const;
+    operator typename Triangulation<dim,spacedim>::cell_iterator () const;
 
 				     /**
 				      * Return the number of
@@ -1474,7 +1474,7 @@ class FEValuesBase<dim,spacedim>::TriaCellIterator : public FEValuesBase<dim,spa
 				      * from and to the same time.
 				      */
     virtual
-    operator const typename Triangulation<dim,spacedim>::cell_iterator () const;
+    operator typename Triangulation<dim,spacedim>::cell_iterator () const;
 
 				     /**
 				      * Implement the respective
@@ -1526,7 +1526,7 @@ FEValuesBase<dim,spacedim>::CellIterator<CI>::CellIterator (const CI &cell)
 template <int dim, int spacedim>
 template <typename CI>
 FEValuesBase<dim,spacedim>::CellIterator<CI>::
-operator const typename Triangulation<dim,spacedim>::cell_iterator () const
+operator typename Triangulation<dim,spacedim>::cell_iterator () const
 {
   return cell;
 }
@@ -1571,7 +1571,7 @@ TriaCellIterator (const typename Triangulation<dim,spacedim>::cell_iterator &cel
 
 template <int dim, int spacedim>
 FEValuesBase<dim,spacedim>::TriaCellIterator::
-operator const typename Triangulation<dim,spacedim>::cell_iterator () const
+operator typename Triangulation<dim,spacedim>::cell_iterator () const
 {
   return cell;
 }
@@ -1703,7 +1703,7 @@ FEValuesBase<dim,spacedim>::~FEValuesBase ()
       mapping_data=0;
       delete tmp1;
     }
-    
+
   tria_listener.disconnect ();
 }
 
@@ -3263,7 +3263,7 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
   if (present_cell.get() != 0)
   {
     if (&cell->get_triangulation() !=
-        &static_cast<const typename Triangulation<dim,spacedim>::cell_iterator>(*present_cell)
+        &static_cast<typename Triangulation<dim,spacedim>::cell_iterator>(*present_cell)
 	->get_triangulation())
       {
 	// the triangulations for the previous cell and the current cell
@@ -3273,7 +3273,7 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
 	// triangulations
 	tria_listener.disconnect ();
 	invalidate_present_cell();
-	tria_listener = 
+	tria_listener =
 	  cell->get_triangulation().signals.any_change.connect
 	  (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
 			    std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
@@ -3284,7 +3284,7 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
     // if this FEValues has never been set to any cell at all, then
     // at least subscribe to the triangulation to get notified of
     // changes
-    tria_listener = 
+    tria_listener =
     cell->get_triangulation().signals.post_refinement.connect
     (std_cxx1x::bind (&FEValuesBase<dim,spacedim>::invalidate_present_cell,
 		      std_cxx1x::ref(static_cast<FEValuesBase<dim,spacedim>&>(*this))));
