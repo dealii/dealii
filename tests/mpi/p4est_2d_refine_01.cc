@@ -55,15 +55,17 @@ void test()
 	    deallog << cell_subd[i] << " ";
 	  deallog << std::endl;
 	}
-      
+
       if (myid == 0)
 	{
 	  deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
 	}
 
-      deallog << "Checksum: "
-	      << tr.get_checksum ()
-	      << std::endl;
+      const unsigned int checksum = tr.get_checksum ();
+      if (myid == 0)
+	deallog << "Checksum: "
+		<< checksum
+		<< std::endl;
     }
 
 

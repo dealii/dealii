@@ -54,7 +54,10 @@ void test()
 		  << std::endl;
 	}
 
-      deallog << "subdomainid = " << tr.begin_active()->subdomain_id() << std::endl;
+      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+	deallog << "subdomainid = "
+		<< tr.begin_active()->subdomain_id()
+		<< std::endl;
 
 //      std::vector< unsigned int > cell_subd;
 //      cell_subd.resize(tr.n_active_cells());
@@ -72,9 +75,11 @@ void test()
 		 ExcInternalError() );
 	}
 
-      deallog << "Checksum: "
-	      << tr.get_checksum ()
-	      << std::endl;
+      const unsigned int checksum = tr.get_checksum ();
+      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+	deallog << "Checksum: "
+		<< checksum
+		<< std::endl;
     }
 
 

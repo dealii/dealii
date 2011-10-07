@@ -48,21 +48,27 @@ void test()
       Assert(tr.n_active_cells()==1, ExcInternalError());
 
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-	deallog << "subdomainid = " << tr.begin_active()->subdomain_id() << std::endl;
+	deallog << "subdomainid = "
+		<< tr.begin_active()->subdomain_id()
+		<< std::endl;
 
       if (myid == numproc-1)
 	{
-	  Assert( tr.begin_active()->subdomain_id()==(unsigned int)myid, ExcInternalError() );
+	  Assert( tr.begin_active()->subdomain_id()==(unsigned int)myid,
+		  ExcInternalError() );
 	}
       else
 	{
-	  Assert( tr.begin_active()->subdomain_id()==types::artificial_subdomain_id, ExcInternalError() );
+	  Assert( tr.begin_active()->subdomain_id()==types::artificial_subdomain_id,
+		  ExcInternalError() );
 	}
 
 
-      deallog << "Checksum: "
-	      << tr.get_checksum ()
-	      << std::endl;
+      const unsigned int checksum = tr.get_checksum ();
+      if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+	deallog << "Checksum: "
+		<< checksum
+		<< std::endl;
     }
 
 

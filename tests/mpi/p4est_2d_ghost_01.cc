@@ -98,8 +98,9 @@ void test()
 
 	}
 
+      const unsigned int checksum = tr.get_checksum ();
       deallog << "Checksum: "
-	      << tr.get_checksum ()
+	      << checksum
 	      << std::endl;
     }
 

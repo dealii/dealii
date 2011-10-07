@@ -40,7 +40,7 @@ void test()
     {
       if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
 	deallog << "hyper_cube" << std::endl;
-      
+
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
       unsigned int rep=2;
@@ -54,7 +54,7 @@ void test()
       GridGenerator::subdivided_hyper_rectangle(tr, repetitions, p, q, false);
 
       tr.refine_global(ref);
-      
+
 
       if (myid==0)
 	{
@@ -98,16 +98,17 @@ void test()
 	    }
 
 
-	  
+
 	}
 
-      deallog << "Checksum: "
-	      << tr.get_checksum ()
-	      << std::endl;
+      const unsigned int checksum = tr.get_checksum ();
       if (myid==0)
 	{
+	  deallog << "Checksum: "
+		  << checksum
+		  << std::endl;
+
 	  std::ofstream file("p4est_3d_ghost_01/1.gpl");
-	  
 	  GridOut().write_gnuplot (tr, file);
 	}
 
