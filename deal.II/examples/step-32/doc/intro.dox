@@ -638,7 +638,7 @@ cells.
 
 <h3> Parallelization on clusters </h3>
 
-Running convection codes in 3d with significant Raleigh numbers requires a lot
+Running convection codes in 3d with significant Rayleigh numbers requires a lot
 of computations &mdash; in the case of whole earth simulations on the order of
 one or several hundred million unknowns. This can obviously not be done with a
 single machine any more (at least not in 2010 when we started writing this
