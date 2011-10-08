@@ -26,7 +26,7 @@
 	  <li> <a href="#supported">Supported platforms</a>
 	  <li> <a href="#unsupported">Unsupported and partly supported platforms</a>
 	  <li> <a href="#additional-software">Additional software requirements</a>
-	</ul>  
+	</ul>
       <li> <a href="#installation">Installation</a>
 	<ul>
 	  <li>  <a href="#unpacking">Unpacking</a>
@@ -56,7 +56,7 @@
     developed and tested on the following platforms:
     <ul>
       <li>Linux on x86, with gcc 3.3, 3.4, 4.0, 4.1, 4.2, 4.3, 4.4 and 4.5; and
-          Intel ICC 7.0, 7.1, 8.0, 8.1, 9.0, 10.0 and 11.0;
+          Intel ICC 10.0, 11.0 and 12;
       <li>Linux on x86_64 (Opteron, AMD64, and Intel EM64T chips) using gcc
           3.3, 3.4, 4.0, 4.1, 4.3, 4.4 and 4.5;
       <li>Mac OS X 10.2 or later, with gcc 4.0 or later (Please see the <a href="http://dealii.sourceforge.net/index.php?title=Main_Page"
@@ -83,7 +83,7 @@
     work, as are other brands of Unix (for example Sun Solaris,
     FreeBSD, or Linux on chips like SPARC, PA-RISC, PowerPC, etc) using
     gcc as compiler, but we do not regularly test them.
-    
+
     <a name="unsupported"></a>
     <h3>Unsupported / partly supported platforms</h3>
 
@@ -117,10 +117,10 @@
     describes <a href="porting.html" target="body">porting the library
     to new systems</a>.
     </p>
-    
+
     <a name="additional-software"></a>
     <h3>Additional software requirements</h3>
-    
+
     In order to compile and use the <acronym>deal.II</acronym>
     libraries you need to have the following programs installed:
     <ul>
@@ -169,7 +169,7 @@
            In case you want to generate the documentation locally on your
 	   machine from the header <acronym>deal.II</acronym> files, you need a
 	   copy of <a href="http://www.doxygen.org/" target="_top">doxygen</a>
-	   on your machine. If not, you can still work with the library and 
+	   on your machine. If not, you can still work with the library and
 	   use the documentation provided on our homepage for reference. Note
            that in order to generate inheritance graphs for classes, doxygen
            can use the <code>dot</code> program, which is part of the <a
@@ -207,7 +207,7 @@
        In case you didn't find your favorite graphics format above, adding a new
        writer to <acronym>deal.II</acronym> is not too difficult as only a
        simple
-       intermediate format needs to be 
+       intermediate format needs to be
        converted into output (without references to cells,
        nodes, types of finite elements, and the like).
        </p>
@@ -297,7 +297,7 @@
       and several hours, depending on the number of processors your machine
       has, and requires about 2 GB of free disk space. If you have a
       multi-processor machine, you can call <code>make -j16 target-name</code>
-      to let <code>make</code> call multiple instances of the compiler 
+      to let <code>make</code> call multiple instances of the compiler
       (in this case sixteen). This speeds up compilation by about
       the factor given after <code>-j</code>, at least if you have as many
       processors.
@@ -307,7 +307,7 @@
       The <acronym>deal.II</acronym> libraries come in two versions
       corresponding to their respective targets:
       <ul>
-	<li> 
+	<li>
 	  <p><code>lib/libdeal_II.g</code>: This is the
 	    debug version of the library. It is compiled with compiler flags so
 	    that the library contains information that can be used by debuggers. (The
