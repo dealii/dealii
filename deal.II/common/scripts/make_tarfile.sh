@@ -27,7 +27,7 @@ mv doc examples deal.II
 # Generate documentation
 
 cd deal.II
-./configure --with-umfpack
+./configure --with-umfpack --without-petsc --without-trilinos
 make online-doc
 cd ..
 tar czf deal.doc-$MAJOR.$MINOR.$PATCH.tar.gz deal.II/doc
