@@ -39,24 +39,24 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup textoutput
  * @author Ralf Hartmann, 1999
  */
-class TableEntryBase 
+class TableEntryBase
 {
   public:
                                      /**
                                       * Constructor.
                                       */
     TableEntryBase();
-    
+
                                      /**
                                       * Virtual destructor.
-                                      */    
+                                      */
     virtual ~TableEntryBase();
-    
+
                                      /**
                                       * Write the table entry as text.
                                       */
     virtual void write_text (std::ostream &) const = 0;
-    
+
                                      /**
                                       * Write the table entry in tex format.
                                       */
@@ -77,7 +77,7 @@ class TableEntryBase
  * @author Ralf Hartmann, 1999
  */
 template <typename value_type>
-class TableEntry : public TableEntryBase 
+class TableEntry : public TableEntryBase
 {
   public:
                                      /**
@@ -141,10 +141,10 @@ class TableEntry : public TableEntryBase
  *
  * A detailed explanation of this class is also given in the step-13 tutorial
  * program.
- * 
- * 
+ *
+ *
  * <h3>Example</h3>
- * 
+ *
  * This is a simple example demonstrating the usage of this class. The
  * first column includes the numbers <tt>i=1..n</tt>, the second
  * $1^2$...$n^2$, the third $sqrt(1)...sqrt(n)$, where the second and
@@ -187,7 +187,7 @@ class TableHandler
                                       * Constructor.
                                       */
     TableHandler ();
-    
+
                                      /**
                                       * Adds a column (if not yet
                                       * existent) with the key <tt>key</tt>
@@ -197,7 +197,7 @@ class TableHandler
     template <typename value_type>
     void add_value (const std::string &key,
                     const value_type   value);
-    
+
                                      /**
                                       * Creates a supercolumn (if not
                                       * yet existent) and includes
@@ -253,7 +253,7 @@ class TableHandler
                                       * and so on.
                                       */
     void set_column_order (const std::vector<std::string> &new_order);
-    
+
                                      /**
                                       * Sets the <tt>precision</tt>
                                       * e.g. double or float variables
@@ -287,13 +287,13 @@ class TableHandler
 
                                     /**
                                       * Sets the tex caption of the entire
-                                      * <tt>table</tt> for tex output. 
+                                      * <tt>table</tt> for tex output.
                                       */
     void set_tex_table_caption (const std::string &table_caption);
 
                                      /**
                                       * Sets the label of this
-                                      * <tt>table</tt> for tex output. 
+                                      * <tt>table</tt> for tex output.
                                       */
     void set_tex_table_label (const std::string &table_label);
 
@@ -312,7 +312,7 @@ class TableHandler
                                      /**
                                       * Sets the tex output format of
                                       * a column, e.g. <tt>c</tt>, <tt>r</tt>,
-                                      * <tt>l</tt>, or <tt>p{3cm</tt>}. The
+                                      * <tt>l</tt>, or <tt>p{3cm}</tt>. The
                                       * default is <tt>c</tt>. Also if this
                                       * function is not called for a
                                       * column, the default is preset
@@ -332,7 +332,7 @@ class TableHandler
                                       * with_header is set to false
                                       * (it is true by default), then
                                       * no "\documentclass{...}",
-                                      * "\begin{document}" and 
+                                      * "\begin{document}" and
                                       * "\end{document}" are used. In
                                       * this way the file can be
                                       * included into an existing tex
@@ -364,7 +364,7 @@ class TableHandler
     DeclException1 (ExcColumnOrSuperColumnNotExistent,
                     std::string,
                     << "Column or supercolumn <" << arg1 << "> does not exist.");
-    
+
                                      /**
                                       * Exception
                                       */
@@ -398,12 +398,12 @@ class TableHandler
                                           * Constructor.
                                           */
         Column(const std::string &tex_caption);
-	
+
                                          /**
                                           * Destructor.
                                           */
         ~Column();
-	
+
                                          /**
                                           * List of entries within
                                           * this column.  They may
@@ -417,7 +417,7 @@ class TableHandler
                                           * <tt>TableEntryBase</tt>.
                                           */
         std::vector<TableEntryBase *> entries;
-	
+
                                          /**
                                           * The caption of the column
                                           * in tex output.  By
@@ -440,7 +440,7 @@ class TableHandler
                                           * with <tt>"c", "r", "l"</tt> for
                                           * centered, right or left.
                                           */
-	
+
         std::string tex_format;
 
                                          /**
@@ -486,7 +486,7 @@ class TableHandler
                                       * in <tt>sel_columns</tt>.
                                       */
     void get_selected_columns (std::vector<std::string> &sel_columns) const;
-    
+
                                      /**
                                       * Builtin function, that gives
                                       * the number of rows in the
@@ -549,8 +549,8 @@ class TableHandler
                                      /**
                                       * The label of the table.
 				      */
-    std::string tex_table_label; 
-    
+    std::string tex_table_label;
+
 };
 
 DEAL_II_NAMESPACE_CLOSE
