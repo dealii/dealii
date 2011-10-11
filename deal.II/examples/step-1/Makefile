@@ -33,8 +33,6 @@ D = ../../
 clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 
 
-
-
 #
 #
 # Usually, you will not need to change anything beyond this point.
@@ -44,6 +42,41 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 # deal.II top level directory and to include the file with the global
 # settings
 include $D/common/Make.global_options
+
+CXX += -I$(VTK_DIR)/include/vtk-5.6
+LIBS += -L/usr/local/vtk/lib/vtk/ -I$(VTK_DIR)/include/vtk-5.6 \
+-lvtkCharts \
+-lvtkCommon \
+-lvtkDICOMParser \
+-lvtkFiltering \
+-lvtkGenericFiltering \
+-lvtkGeovis \
+-lvtkGraphics \
+-lvtkHybrid \
+-lvtkIO \
+-lvtkImaging \
+-lvtkInfovis \
+-lvtkNetCDF \
+-lvtkRendering \
+-lvtkViews \
+-lvtkVolumeRendering \
+-lvtkWidgets \
+-lvtkalglib \
+-lvtkexoIIc \
+-lvtkexpat \
+-lvtkfreetype \
+-lvtkftgl \
+-lvtkjpeg \
+-lvtklibxml2 \
+-lvtkmetaio \
+-lvtkpng \
+-lvtkproj4 \
+-lvtksqlite \
+-lvtksys \
+-lvtktiff \
+-lvtkverdict \
+-lvtkzlib 
+
 
 
 # Since the whole project consists of only one file, we need not

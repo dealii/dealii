@@ -16,28 +16,30 @@
 				 // been covered in previous examples
 				 // and will thus not be further
 				 // commented on.
-#include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_values.h>
-#include <deal.II/numerics/vectors.h>
-#include <deal.II/numerics/matrices.h>
-#include <deal.II/numerics/data_out.h>
+#include <base/quadrature_lib.h>
+#include <base/function.h>
+#include <base/logstream.h>
+#include <lac/vector.h>
+#include <lac/full_matrix.h>
+#include <lac/sparse_matrix.h>
+#include <lac/compressed_sparsity_pattern.h>
+#include <lac/solver_cg.h>
+#include <lac/solver_gmres.h>
+#include <lac/precondition.h>
+#include <grid/tria.h>
+#include <dofs/dof_handler.h>
+#include <grid/grid_generator.h>
+#include <grid/tria_accessor.h>
+#include <grid/tria_iterator.h>
+#include <grid/tria_boundary_lib.h>
+#include <dofs/dof_accessor.h>
+#include <dofs/dof_tools.h>
+#include <fe/fe_values.h>
+#include <numerics/vectors.h>
+#include <numerics/matrices.h>
+#include <numerics/data_out.h>
 
+#include "constrained_matrix.h"
 #include <fstream>
 #include <iostream>
 
@@ -51,7 +53,7 @@
 				 // tri-linear elements, but we will
 				 // now use it for bi-quadratic
 				 // elements:
-#include <deal.II/fe/fe_q.h>
+#include <fe/fe_q.h>
 				 // We will not read the grid from a
 				 // file as in the previous example,
 				 // but generate it using a function
@@ -61,7 +63,7 @@
 				 // the solution) in each step, so we
 				 // need the following include file
 				 // instead of <code>grid_in.h</code>:
-#include <deal.II/grid/grid_out.h>
+#include <grid/grid_out.h>
 
 
 				 // When using locally refined grids,
@@ -77,7 +79,7 @@
 				 // following file contains a class
 				 // which is used to handle these
 				 // constraints:
-#include <deal.II/lac/constraint_matrix.h>
+#include <lac/constraint_matrix.h>
 
 				 // In order to refine our grids
 				 // locally, we need a function from
@@ -86,7 +88,7 @@
 				 // coarsening based on the error
 				 // indicators we have computed. This
 				 // function is defined here:
-#include <deal.II/grid/grid_refinement.h>
+#include <grid/grid_refinement.h>
 
 				 // Finally, we need a simple way to
 				 // actually compute the refinement
@@ -98,7 +100,7 @@
 				 // often yields quite nicely adapted
 				 // grids for a wide class of
 				 // problems.
-#include <deal.II/numerics/error_estimator.h>
+#include <numerics/error_estimator.h>
 
 				 // Finally, this is as in previous
 				 // programs:
@@ -615,8 +617,9 @@ void Step6<dim>::assemble_system ()
 				   // constraints due to hanging
 				   // nodes. This is done using the
 				   // following two function calls:
-  hanging_node_constraints.condense (system_matrix);
-  hanging_node_constraints.condense (system_rhs);
+  // hanging_node_constraints.condense (system_matrix);
+  // hanging_node_constraints.condense (system_rhs);
+  
 				   // Using them, degrees of freedom
 				   // associated to hanging nodes have
 				   // been removed from the linear
@@ -695,16 +698,28 @@ void Step6<dim>::assemble_system ()
 template <int dim>
 void Step6<dim>::solve ()
 {
-  SolverControl           solver_control (1000, 1e-12);
-  SolverCG<>              solver (solver_control);
+  SolverControl           solver_control (10000, 1e-12);
+  SolverGMRES<>              solver (solver_control);
 
-  PreconditionSSOR<> preconditioner;
-  preconditioner.initialize(system_matrix, 1.2);
+  PreconditionIdentity preconditioner;
+//preconditioner.initialize(system_matrix, 1.2);rGM
 
-  solver.solve (system_matrix, solution, system_rhs,
+  double scaling = 10000;
+  typename DoFHandler<dim>::active_cell_iterator
+    cell=dof_handler.begin_active(),
+    endc = dof_handler.end();
+  for(; cell != endc; ++cell)
+    scaling = std::min(scaling, cell->diameter()*cell->diameter());
+
+  ConstrainedOperator<Vector<double>, SparseMatrix<double> >
+    cc(system_matrix, hanging_node_constraints, scaling);
+
+				   // cc.distribute_rhs(system_rhs);
+  solution = system_rhs;
+  cc.distribute_rhs(system_rhs);
+  
+  solver.solve (cc, solution, system_rhs,
 		preconditioner);
-
-  hanging_node_constraints.distribute (solution);
 }
 
 
@@ -978,6 +993,19 @@ void Step6<dim>::output_results (const unsigned int cycle) const
 
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
+  
+  DataOut<dim> data_out;
+
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (solution, "solution");
+  data_out.build_patches ();
+  
+  filename = "solution-";
+  filename += ('0' + cycle);
+  filename += ".vtu";
+  output.close();
+  output.open(filename.c_str());
+  data_out.write_vtu (output);
 }
 
 
@@ -1090,8 +1118,8 @@ void Step6<dim>::run ()
   data_out.add_data_vector (solution, "solution");
   data_out.build_patches ();
 
-  std::ofstream output ("final-solution.eps");
-  data_out.write_eps (output);
+  std::ofstream output ("final-solution.vtk");
+  data_out.write_vtk (output);
 }
 
 

@@ -1,10 +1,10 @@
 # Listing of Parameters
 # ---------------------
 set Extend solution on the -2,2 box = true
-set External refinement             = 5
+set External refinement             = 7
 set Number of cycles                = 4
 set Run 2d simulation               = true
-set Run 3d simulation               = true
+set Run 3d simulation               = false
 
 
 subsection Exact solution 2d
