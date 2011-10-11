@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1476,16 +1476,16 @@ merge_patches (const DataOut_DoFData<DH2,patch_dim,patch_space_dim> &source,
 		      "as vectors."));
   for (unsigned int i=0; i<get_vector_data_ranges().size(); ++i)
     {
-      Assert (get_vector_data_ranges()[i].template get<0>() ==
-	      source.get_vector_data_ranges()[i].template get<0>(),
+      Assert (std_cxx1x::get<0>(get_vector_data_ranges()[i]) ==
+	      std_cxx1x::get<0>(source.get_vector_data_ranges()[i]),
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
-      Assert (get_vector_data_ranges()[i].template get<1>() ==
-	      source.get_vector_data_ranges()[i].template get<1>(),
+      Assert (std_cxx1x::get<1>(get_vector_data_ranges()[i]) ==
+	      std_cxx1x::get<1>(source.get_vector_data_ranges()[i]),
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
-      Assert (get_vector_data_ranges()[i].template get<2>() ==
-	      source.get_vector_data_ranges()[i].template get<2>(),
+      Assert (std_cxx1x::get<2>(get_vector_data_ranges()[i]) ==
+	      std_cxx1x::get<2>(source.get_vector_data_ranges()[i]),
 	      ExcMessage ("Both sources need to declare the same components "
 			  "as vectors."));
     }

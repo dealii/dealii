@@ -44,7 +44,10 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> None so far.
+<li> Fixed: The DataOut_DoFData::merge_patches did not compile with newer compilers.
+This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/10/11)
 </ol>
 
 
