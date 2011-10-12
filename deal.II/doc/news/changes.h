@@ -34,7 +34,9 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> None so far.
+<li> New: parallel::distributed::Triangulation::save()/load() to store
+the refinement information to disk. Also supports saving solution vectors
+using the SolutionTransfer class. (Timo Heister, 2011/10/12)
 </ol>
 
 

@@ -93,10 +93,20 @@ namespace parallel
     SolutionTransfer<dim, VECTOR, DH>::
     prepare_for_coarsening_and_refinement (const std::vector<const VECTOR*> &all_in)
     {
-      Assert(all_in.size() > 0, ExcMessage("Please transfer atleast one vector!"));
+      
       input_vectors = all_in;
-      SolutionTransfer<dim, VECTOR, DH> *ptr = this;
+	  register_data_attach( get_data_size() * input_vectors.size() );
+    }
 
+
+
+	template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+	register_data_attach(const std::size_t size)
+	{
+	  Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
+	  
 //TODO: casting away constness is bad
       parallel::distributed::Triangulation<dim> * tria
 	= (dynamic_cast<parallel::distributed::Triangulation<dim>*>
@@ -105,16 +115,16 @@ namespace parallel
       Assert (tria != 0, ExcInternalError());
 
       offset
-	= tria->register_data_attach(static_cast<size_t>
-				     (get_data_size() * input_vectors.size()),
+	= tria->register_data_attach(size,
 				     std_cxx1x::bind(&SolutionTransfer<dim, VECTOR, DH>::pack_callback,
-						     ptr,
+						     this,
 						     std_cxx1x::_1,
 						     std_cxx1x::_2,
 						     std_cxx1x::_3));
-    }
+	  
+	}
 
-
+  
 
     template<int dim, typename VECTOR, class DH>
     void
@@ -125,6 +135,52 @@ namespace parallel
       prepare_for_coarsening_and_refinement(all_in);
     }
 
+
+
+    template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+	prepare_serialization(const VECTOR &in)
+	{
+      std::vector<const VECTOR*> all_in(1, &in);
+      prepare_serialization(all_in);
+	}
+
+
+
+	template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+	prepare_serialization(const std::vector<const VECTOR*> &all_in)
+	{
+	  prepare_for_coarsening_and_refinement (all_in);
+	}
+
+
+
+    template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+	deserialize(VECTOR &in)
+	{
+      std::vector<VECTOR*> all_in(1, &in);
+      deserialize(all_in);
+	}
+
+
+
+	template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+	deserialize(std::vector<VECTOR*> &all_in)
+	{
+	  register_data_attach( get_data_size() * all_in.size() );
+
+	  // this makes interpolate() happy
+	  input_vectors.resize(all_in.size());
+	  
+	  interpolate(all_in);
+	}
 
 
     template<int dim, typename VECTOR, class DH>

@@ -437,6 +437,21 @@ namespace parallel
 	unsigned int get_checksum () const;
 
 					 /**
+					  * Save the refinement information from the coarse mesh into the given
+					  * file. This file needs to be reachable from all nodes in the computation
+	 				  * on a shared network file system. See the SolutionTransfer class
+	 				  * on how to store solution vectors into this file.
+	 				  */
+	void save(const char* filename) const;
+
+					  /**
+				  	   * Load the refinement information saved with save() back in. The mesh
+				  	   * must contain the same coarse mesh that was used in save(). You need
+				  	   * to load with the same number of CPUs that you saved with.
+	 				   */
+	void load(const char* filename);
+	
+					 /**
 					  * Used to inform in the callbacks of
 					  * register_data_attach() and
 					  * notify_ready_to_unpack() how the

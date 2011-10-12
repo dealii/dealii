@@ -32,30 +32,69 @@ namespace parallel
  * coarsening a distributed grid and
  * handles the necessary communication.
  *
- * <h3>Usage</h3>
+ * @note: It is important to note, that if you use more than one
+ * SolutionTransfer object at the same time, that the calls to
+ * prepare_*() and interpolate()/deserialize() need to be in the same order.
+ *
+ * <h3>Note on ghost elements</h3>
+ * In a parallel computation PETSc or Trilinos vector may contain ghost
+ * elements or not. For reading in information with
+ * prepare_for_coarsening_and_refinement() or prepare_serialization() you need
+ * to supply vectors with ghost elements, so that all locally_active elements
+ * can be read. On the other hand, ghosted vectors are generally not writable,
+ * so for calls to interpolate() or deserialize() you need to supply
+ * distributed vectors without ghost elements.
+ * 
+ * <h3>Transfering a solution</h3>
+ * Here VECTOR is your favorite vector type, e.g. PETScWrappers::MPI::Vector,
+ * TrilinosWrappers::MPI::Vector, or corresponding blockvectors.
  * @verbatim
- * SolutionTransfer<dim, Vector<double> > soltrans(dof_handler);
- *                                     // flag some cells for refinement
- *                                     // and coarsening, e.g.
- * GridRefinement::refine_and_coarsen_fixed_fraction(
- *   *tria, error_indicators, 0.3, 0.05);
- *                                     // prepare the triangulation,
- * tria->prepare_coarsening_and_refinement();
- *                                     // prepare the SolutionTransfer object
- *                                     // for coarsening and refinement and give
- *                                     // the solution vector that we intend to
- *                                     // interpolate later,
- * soltrans.prepare_for_coarsening_and_refinement(solution);
- *                                     // actually execute the refinement,
- * tria->execute_coarsening_and_refinement ();
- *                                     // redistribute dofs,
- * dof_handler->distribute_dofs (fe);
- *                                     // and interpolate the solution
- * Vector<double> interpolated_solution(dof_handler->n_dofs());
- * soltrans.interpolate(interpolated_solution);
- * @endverbatim
+ SolutionTransfer<dim, VECTOR> soltrans(dof_handler);
+                                     // flag some cells for refinement
+                                     // and coarsening, e.g.
+ GridRefinement::refine_and_coarsen_fixed_fraction(
+   tria, error_indicators, 0.3, 0.05);
+                                     // prepare the triangulation,
+ tria.prepare_coarsening_and_refinement();
+                                     // prepare the SolutionTransfer object
+                                     // for coarsening and refinement and give
+                                     // the solution vector that we intend to
+                                     // interpolate later,
+ soltrans.prepare_for_coarsening_and_refinement(solution);
+                                     // actually execute the refinement,
+ tria.execute_coarsening_and_refinement ();
+                                     // redistribute dofs,
+ dof_handler.distribute_dofs (fe);
+                                     // and interpolate the solution
+ VECTOR interpolated_solution;
+ //create VECTOR in the right size here
+ soltrans.interpolate(interpolated_solution);
+@endverbatim
+ *
+ * <h3>Use for Serialization</h3>
+ *
+ * This class can be used to serialize and later deserialize a distributed mesh with solution vectors
+ * to a file. If you use more than one DoFHandler and therefore more than one SolutionTransfer object, they need to be serialized and deserialized in the same order.
+ *
+ * If vector has the locally relevant DoFs, serialization works as follows:
+ *@verbatim
+ 
+parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
+sol_trans.prepare_serialization (vector);
+
+triangulation.save(filename);
+@endverbatim
+* For deserialization the vector needs to be a distributed vector (without ghost elements):
+* @verbatim
+//[create coarse mesh...]
+triangulation.load(filename);
+
+parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
+sol_trans.deserialize (distributed_vector);
+@endverbatim
+ * 
  * @ingroup distributed
- * @author Timo Heister, 2009
+ * @author Timo Heister, 2009-2011
  */
     template<int dim, typename VECTOR, class DH=DoFHandler<dim> >
     class SolutionTransfer
@@ -113,12 +152,49 @@ namespace parallel
 
 
 					 /**
-					  * return the size in bytes that need
+					  * Return the size in bytes that need
 					  * to be stored per cell.
 					  */
 	unsigned int get_data_size() const;
 
 
+					 /**
+					 * Prepare the serialization of the
+					 * given vector. The serialization is
+					 * done by Triangulation::save(). The
+					 * given vector needs all information
+					 * on the locally active DoFs (it must
+					 * be ghosted). See documentation of
+					 * this class for more information.
+					 */
+	void prepare_serialization(const VECTOR &in);
+
+
+					 /**
+					  * Same as the function above, only
+					  * for a list of vectors.
+					  */
+	void prepare_serialization(const std::vector<const VECTOR*> &all_in);
+
+
+					 /**
+					  * Execute the deserialization of the
+					  * given vector. This needs to be
+					  * done after calling
+					  * Triangulation::load(). The given
+					  * vector must be a fully distributed
+					  * vector without ghost elements. See
+					  * documentation of this class for
+					  * more information.
+					  */
+	void deserialize(VECTOR &in);
+
+
+					 /**
+					  * Same as the function above, only
+					  * for a list of vectors.
+					  */
+	void deserialize(std::vector<VECTOR*> &all_in);
 
       private:
 					 /**
@@ -172,6 +248,12 @@ namespace parallel
 			     const typename Triangulation<dim,dim>::CellStatus status,
 			     const void* data,
 			     std::vector<VECTOR*> &all_out);
+
+
+	/**
+	 *
+	 */
+	void register_data_attach(const std::size_t size);
 
     };
 

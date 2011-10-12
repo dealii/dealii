@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+#include <fstream>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1947,7 +1948,92 @@ namespace parallel
     }
 
 
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::
+    save(const char* filename) const
+    {
+	  int real_data_size = 0;
+	  if (attached_data_size>0)
+		real_data_size = attached_data_size+sizeof(CellStatus);
+	  
+	  if (my_subdomain==0)
+	  {
+		std::string fname=std::string(filename)+".info";
+		std::ofstream f(fname.c_str());
+		f << Utilities::System::get_n_mpi_processes (mpi_communicator) << " "
+		<< real_data_size << " "
+		<< attached_data_pack_callbacks.size() << std::endl;
+	  }
 
+	  if (attached_data_size>0)
+	  {
+		const_cast<dealii::parallel::distributed::Triangulation<dim, spacedim>*>(this)
+		->attach_mesh_data();
+	  }
+
+      dealii::internal::p4est::functions<dim>::save(filename, parallel_forest, attached_data_size>0);
+
+	  dealii::parallel::distributed::Triangulation<dim, spacedim>* tria
+		= const_cast<dealii::parallel::distributed::Triangulation<dim, spacedim>*>(this);
+	  
+	  tria->n_attached_datas = 0;
+	  tria->attached_data_size = 0;
+	  tria->attached_data_pack_callbacks.clear();
+	  
+					   // and release the data
+	  void * userptr = parallel_forest->user_pointer;
+	  dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
+	  parallel_forest->user_pointer = userptr;
+    }
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::
+    load(const char* filename)
+    {
+      dealii::internal::p4est::functions<dim>::destroy (parallel_forest);
+      parallel_forest = 0;
+      dealii::internal::p4est::functions<dim>::connectivity_destroy (connectivity);
+      connectivity=0;
+      
+	  unsigned int numcpus, attached_size, attached_count;
+	  {
+		std::string fname=std::string(filename)+".info";
+		std::ifstream f(fname.c_str());
+		f >> numcpus >> attached_size >> attached_count;
+		if (numcpus != Utilities::System::get_n_mpi_processes (mpi_communicator))
+		  throw ExcInternalError();
+	  }
+
+	  attached_data_size = 0;
+	  n_attached_datas = 0;
+	  
+      parallel_forest = dealii::internal::p4est::functions<dim>::load (
+		filename, mpi_communicator,
+		attached_size, attached_size>0,
+		this,
+		&connectivity);
+
+	  try
+	  {
+		copy_local_forest_to_triangulation ();
+	  }
+      catch (const typename Triangulation<dim>::DistortedCellList &)
+	  {
+					   // the underlying
+					   // triangulation should not
+					   // be checking for
+					   // distorted cells
+		AssertThrow (false, ExcInternalError());
+	  }
+
+      update_number_cache ();
+    }
+
+
+    
     template <int dim, int spacedim>
     unsigned int
     Triangulation<dim,spacedim>::get_checksum () const
