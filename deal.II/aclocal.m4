@@ -7422,9 +7422,14 @@ AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
   if test "x$use_p4est" != "xno" ; then
     AC_MSG_RESULT(yes)
 
+    dnl Verify that the p4est files are actually there
     if test ! -d "${use_p4est}/DEBUG" -o ! -d "${use_p4est}/FAST" ; then
-    echo "${use_p4est}/DEBUG"
       AC_MSG_ERROR([p4est directories $use_p4est/DEBUG or $use_p4est/FAST not found])
+    fi
+
+    dnl Make sure that we have also enabled MPI
+    if test "x${DEAL_II_COMPILER_SUPPORTS_MPI}" != "x1" ; then
+      AC_MSG_ERROR([When using p4est you also need to enable MPI.])
     fi
 
     dnl Right now, we always build p4est as shared lib, so make sure we
