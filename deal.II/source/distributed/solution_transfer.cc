@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,20 +93,19 @@ namespace parallel
     SolutionTransfer<dim, VECTOR, DH>::
     prepare_for_coarsening_and_refinement (const std::vector<const VECTOR*> &all_in)
     {
-      
       input_vectors = all_in;
-	  register_data_attach( get_data_size() * input_vectors.size() );
+      register_data_attach( get_data_size() * input_vectors.size() );
     }
 
 
 
-	template<int dim, typename VECTOR, class DH>
+    template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-	register_data_attach(const std::size_t size)
-	{
-	  Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
-	  
+    register_data_attach(const std::size_t size)
+    {
+      Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
+
 //TODO: casting away constness is bad
       parallel::distributed::Triangulation<dim> * tria
 	= (dynamic_cast<parallel::distributed::Triangulation<dim>*>
@@ -121,10 +120,10 @@ namespace parallel
 						     std_cxx1x::_1,
 						     std_cxx1x::_2,
 						     std_cxx1x::_3));
-	  
-	}
 
-  
+    }
+
+
 
     template<int dim, typename VECTOR, class DH>
     void
@@ -178,7 +177,7 @@ namespace parallel
 
 	  // this makes interpolate() happy
 	  input_vectors.resize(all_in.size());
-	  
+
 	  interpolate(all_in);
 	}
 
