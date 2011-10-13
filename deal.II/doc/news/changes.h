@@ -46,6 +46,9 @@ using the SolutionTransfer class. (Timo Heister, 2011/10/12)
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: searching in the doxygen documentation.
+<br>
+(Timo Heister, 2011/10/13)
 <li> Fixed: The DataOut_DoFData::merge_patches did not compile with newer compilers.
 This is now fixed.
 <br>
