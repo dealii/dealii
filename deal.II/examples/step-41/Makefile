@@ -1,4 +1,4 @@
-# $Id: Makefile 24349 2011-09-21 08:38:41Z kronbichler $
+# $Id: Makefile 24592 2011-10-11 11:55:57Z heltai $
 
 
 # For the small projects Makefile, you basically need to fill in only
@@ -23,7 +23,7 @@ debug-mode = on
 # designated by a single-character variable, since that can be
 # reference using $D only, i.e. without the parentheses that are
 # required for most other parameters, as e.g. in $(target).
-D = ../deal.II/
+D = ../../
 
 
 # The last field specifies the names of data and other files that
