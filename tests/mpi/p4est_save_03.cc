@@ -49,46 +49,46 @@ void test()
     deallog << "hyper_cube" << std::endl;
 
   std::string filename =
-      (std::string("p4est_save_03/ncpu_") + Utilities::int_to_string(Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat");
+    (std::string ("p4est_save_03/ncpu_") + Utilities::int_to_string (Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) + "/dat");
   {
-    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+    parallel::distributed::Triangulation<dim> tr (MPI_COMM_WORLD);
 
-    GridGenerator::hyper_cube(tr);
+    GridGenerator::hyper_cube (tr);
 
-    tr.refine_global(2);
+    tr.refine_global (2);
     for (typename Triangulation<dim>::active_cell_iterator
-	   cell = tr.begin_active();
-	 cell != tr.end(); ++cell)
+         cell = tr.begin_active();
+         cell != tr.end(); ++cell)
       if (!cell->is_ghost() && !cell->is_artificial())
-	if (cell->center().norm() < 0.3)
-	  {
-	    cell->set_refine_flag();
-	  }
+        if (cell->center().norm() < 0.3)
+          {
+            cell->set_refine_flag();
+          }
 
     tr.execute_coarsening_and_refinement ();
 
-    FE_Q<dim> fe(1);
-    DoFHandler<dim> dh(tr);
+    FE_Q<dim> fe (1);
+    DoFHandler<dim> dh (tr);
 
-    dh.distribute_dofs(fe);
+    dh.distribute_dofs (fe);
 
     IndexSet locally_owned_dofs = dh.locally_owned_dofs ();
     IndexSet locally_relevant_dofs;
 
-    DoFTools::extract_locally_relevant_dofs (dh,locally_relevant_dofs);
+    DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
 
-    PETScWrappers::MPI::Vector solution(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
-	PETScWrappers::MPI::Vector solution2(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
+    PETScWrappers::MPI::Vector solution (MPI_COMM_WORLD, locally_owned_dofs, locally_relevant_dofs);
+    PETScWrappers::MPI::Vector solution2 (MPI_COMM_WORLD, locally_owned_dofs, locally_relevant_dofs);
 
-    parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans(dh);
-	parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans2(dh);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2 (dh);
 
-    for (unsigned int i=0;i<locally_owned_dofs.n_elements();++i)
+    for (unsigned int i = 0;i < locally_owned_dofs.n_elements();++i)
       {
-	unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-	solution(idx)=idx;
-	solution2(idx)=2*idx;
-	
+        unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
+        solution (idx) = idx;
+        solution2 (idx) = 2 * idx;
+
 //	std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }
 
@@ -96,69 +96,69 @@ void test()
     solution.update_ghost_values();
     solution2.compress();
     solution2.update_ghost_values();
-    
+
     soltrans.prepare_serialization (solution);
     soltrans2.prepare_serialization (solution2);
 
-    tr.save(filename.c_str());
-  
+    tr.save (filename.c_str());
+
     if (myid == 0)
       {
-	deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
+        deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: "
-	    << tr.get_checksum ()
-	    << std::endl;
-  
+    << tr.get_checksum ()
+    << std::endl;
+
   }
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier (MPI_COMM_WORLD);
 
   {
-    parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+    parallel::distributed::Triangulation<dim> tr (MPI_COMM_WORLD);
 
-    GridGenerator::hyper_cube(tr);
-    tr.load(filename.c_str());
-    FE_Q<dim> fe(1);
-    DoFHandler<dim> dh(tr);
+    GridGenerator::hyper_cube (tr);
+    tr.load (filename.c_str());
+    FE_Q<dim> fe (1);
+    DoFHandler<dim> dh (tr);
 
-    dh.distribute_dofs(fe);
+    dh.distribute_dofs (fe);
 
     IndexSet locally_owned_dofs = dh.locally_owned_dofs ();
     IndexSet locally_relevant_dofs;
 
-    DoFTools::extract_locally_relevant_dofs (dh,locally_relevant_dofs);
+    DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
 
-    PETScWrappers::MPI::Vector solution(MPI_COMM_WORLD,locally_owned_dofs);
-	PETScWrappers::MPI::Vector solution2(MPI_COMM_WORLD,locally_owned_dofs);
-    parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans(dh);
-	parallel::distributed::SolutionTransfer<dim,PETScWrappers::MPI::Vector> soltrans2(dh);
+    PETScWrappers::MPI::Vector solution (MPI_COMM_WORLD, locally_owned_dofs);
+    PETScWrappers::MPI::Vector solution2 (MPI_COMM_WORLD, locally_owned_dofs);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans (dh);
+    parallel::distributed::SolutionTransfer<dim, PETScWrappers::MPI::Vector> soltrans2 (dh);
     solution = 2;
-    soltrans.deserialize(solution);
-	soltrans2.deserialize(solution2);
-    
-    for (unsigned int i=0;i<locally_owned_dofs.n_elements();++i)
+    soltrans.deserialize (solution);
+    soltrans2.deserialize (solution2);
+
+    for (unsigned int i = 0;i < locally_owned_dofs.n_elements();++i)
       {
-	unsigned int idx = locally_owned_dofs.nth_index_in_set(i);
-	//std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
-	Assert(idx == solution(idx),ExcInternalError());
-	Assert(2*idx == solution(idx),ExcInternalError());
-	
+        unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
+        //std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
+        Assert (idx == solution (idx), ExcInternalError());
+        Assert (2*idx == solution2 (idx), ExcInternalError());
       }
 
     double norm = solution.l1_norm();
+	double norm2 = solution2.l1_norm();
 
     if (myid == 0)
       {
-	deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
-	deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
+        deallog << "#cells = " << tr.n_global_active_cells() << std::endl;
+        deallog << "cells(0) = " << tr.n_active_cells() << std::endl;
       }
     deallog << "Checksum: "
-	    << tr.get_checksum ()
-	    << std::endl;
+    << tr.get_checksum ()
+    << std::endl;
     deallog << "sum: "
-	    << norm
-	    << std::endl;
+    << norm << " " << norm2
+    << std::endl;
   }
 
   if (Utilities::System::get_this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -166,30 +166,30 @@ void test()
 }
 
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-  PetscInitialize(&argc,&argv,0,0);
+  PetscInitialize (&argc, &argv, 0, 0);
 
 //  MPI_Init (&argc,&argv);
 #else
-  (void)argc;
-  (void)argv;
+  (void) argc;
+  (void) argv;
 #endif
 
   unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
 
 
-  deallog.push(Utilities::int_to_string(myid));
+  deallog.push (Utilities::int_to_string (myid));
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("p4est_save_03").c_str());
-      deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
+      std::ofstream logfile (output_file_for_mpi ("p4est_save_03").c_str());
+      deallog.attach (logfile);
+      deallog.depth_console (0);
+      deallog.threshold_double (1.e-10);
 
-      deallog.push("2d");
+      deallog.push ("2d");
       test<2>();
       deallog.pop();
     }
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-				   //MPI_Finalize();
+  //MPI_Finalize();
   PetscFinalize();
 
 #endif
