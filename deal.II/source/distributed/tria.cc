@@ -1812,7 +1812,8 @@ namespace parallel
 		    parallel_forest (0),
 		    refinement_in_progress (false),
 		    attached_data_size(0),
-		    n_attached_datas(0)
+		    n_attached_datas(0),
+		    n_attached_deserialize(0)
     {
       // initialize p4est. do this in a separate function since it has
       // to happen only once, even if we have triangulation objects
@@ -1953,6 +1954,8 @@ namespace parallel
     Triangulation<dim,spacedim>::
     save(const char* filename) const
     {
+	  Assert(n_attached_deserialize==0,
+			 ExcMessage ("not all SolutionTransfer's got deserialized after the last load()"));
 	  int real_data_size = 0;
 	  if (attached_data_size>0)
 		real_data_size = attached_data_size+sizeof(CellStatus);
@@ -2009,6 +2012,7 @@ namespace parallel
 
 	  attached_data_size = 0;
 	  n_attached_datas = 0;
+	  n_attached_deserialize = attached_count;
 	  
       parallel_forest = dealii::internal::p4est::functions<dim>::load (
 		filename, mpi_communicator,
@@ -2840,61 +2844,72 @@ namespace parallel
 							    const CellStatus,
 							    const void*)> & unpack_callback)
     {
-      Assert(offset < attached_data_size, ExcMessage("invalid offset in notify_ready_to_unpack()"));
-      Assert(n_attached_datas>0, ExcMessage("notify_ready_to_unpack() called too often"));
+      Assert (offset < attached_data_size, ExcMessage ("invalid offset in notify_ready_to_unpack()"));
+      Assert (n_attached_datas > 0, ExcMessage ("notify_ready_to_unpack() called too often"));
 
-				       // Recurse over p4est and hand the caller the data back
-      for (typename Triangulation<dim,spacedim>::cell_iterator
-	     cell = this->begin(0);
-	   cell != this->end(0);
-	   ++cell)
-	{
-					   //skip coarse cells, that are not ours
-	  if (tree_exists_locally<dim,spacedim>(parallel_forest,
-						coarse_cell_to_p4est_tree_permutation[cell->index()])
-		  == false)
-	    continue;
+      // Recurse over p4est and hand the caller the data back
+      for (typename Triangulation<dim, spacedim>::cell_iterator
+           cell = this->begin (0);
+           cell != this->end (0);
+           ++cell)
+        {
+          //skip coarse cells, that are not ours
+          if (tree_exists_locally<dim, spacedim> (parallel_forest,
+                                                  coarse_cell_to_p4est_tree_permutation[cell->index() ])
+              == false)
+            continue;
 
-	  typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
-	  typename dealii::internal::p4est::types<dim>::tree *tree =
-	    init_tree(cell->index());
+          typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+          typename dealii::internal::p4est::types<dim>::tree *tree =
+            init_tree (cell->index());
 
-	  dealii::internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
+          dealii::internal::p4est::init_coarse_quadrant<dim> (p4est_coarse_cell);
 
-					   // parent_cell is not correct here,
-					   // but is only used in a refined
-					   // cell
-	  post_mesh_data_recursively<dim,spacedim>(*tree,
-						   cell,
-						   cell,
-						   p4est_coarse_cell,
-						   offset,
-						   unpack_callback);
-	}
+          // parent_cell is not correct here,
+          // but is only used in a refined
+          // cell
+          post_mesh_data_recursively<dim, spacedim> (*tree,
+              cell,
+              cell,
+              p4est_coarse_cell,
+              offset,
+              unpack_callback);
+        }
 
       --n_attached_datas;
+      if (n_attached_deserialize > 0)
+        {
+          --n_attached_deserialize;
+          attached_data_pack_callbacks.pop_front();
+        }
 
-      if (!n_attached_datas)
-	{
-					   // everybody got his data, time for cleanup!
-	  attached_data_size=0;
-	  attached_data_pack_callbacks.clear();
+      // important: only remove data if we are not in the deserialization
+      // process. There, each SolutionTransfer registers and unpacks
+      // before the next one does this, so n_attached_datas is only 1 here.
+      // This would destroy the saved data before the second SolutionTransfer
+      // can get it. This created a bug that is documented in
+      // tests/mpi/p4est_save_03 with more than one SolutionTransfer.
+      if (!n_attached_datas && n_attached_deserialize == 0)
+        {
+          // everybody got his data, time for cleanup!
+          attached_data_size = 0;
+          attached_data_pack_callbacks.clear();
 
-					   // and release the data
-	  void * userptr = parallel_forest->user_pointer;
-	  dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
-	  parallel_forest->user_pointer = userptr;
-	}
+          // and release the data
+          void * userptr = parallel_forest->user_pointer;
+          dealii::internal::p4est::functions<dim>::reset_data (parallel_forest, 0, NULL, NULL);
+          parallel_forest->user_pointer = userptr;
+        }
     }
 
 
 
-	template <int dim, int spacedim>
-	const std::vector<unsigned int> &
-	Triangulation<dim,spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
-	{
-	  return p4est_tree_to_coarse_cell_permutation;
-	}
+    template <int dim, int spacedim>
+    const std::vector<unsigned int> &
+    Triangulation<dim, spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
+      {
+        return p4est_tree_to_coarse_cell_permutation;
+      }
 
 
 

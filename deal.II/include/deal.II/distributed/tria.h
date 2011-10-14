@@ -603,10 +603,25 @@ namespace parallel
 
 
 					 /**
-					  *
+					  * number of bytes that get attached to the Triangulation
+					  * through register_data_attach() for example
+					  * SolutionTransfer.
 					  */
 	unsigned int attached_data_size;
+	
+					 /**
+					  * number of functions that get attached to the Triangulation
+					  * through register_data_attach() for example
+					  * SolutionTransfer.
+					  */
 	unsigned int n_attached_datas;
+	
+					 /**
+					  * number of functions that need to unpack their data
+					  * after a call from load()
+					  */
+	unsigned int n_attached_deserialize;
+	
 	typedef  std_cxx1x::function<
 	  void(typename Triangulation<dim,spacedim>::cell_iterator, CellStatus, void*)
 	  > pack_callback_t;
@@ -614,10 +629,13 @@ namespace parallel
 	typedef std::pair<unsigned int, pack_callback_t> callback_pair_t;
 
 	typedef std::list<callback_pair_t> callback_list_t;
+	
+					 /**
+					  * List of callback functions registered by
+					  * register_data_attach() that are going to be called
+					  * for packing data.
+					  */
 	callback_list_t attached_data_pack_callbacks;
-
-
-
 
 
 					 /**
