@@ -21,7 +21,6 @@
 #include <string>
 #include <fstream>
 
-DEAL_II_NAMESPACE_OPEN
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
 #ifdef HAVE_STD_OSTREAM_HEADER
@@ -30,89 +29,53 @@ DEAL_II_NAMESPACE_OPEN
 #  include <iostream>
 #endif
 
+#include <boost/variant.hpp>
 
 
-/**
- * Abstract base class for the <tt>TableEntry</tt> class. See there.
- * This class is not to be used by the user.
- *
- * @ingroup textoutput
- * @author Ralf Hartmann, 1999
- */
-class TableEntryBase
+DEAL_II_NAMESPACE_OPEN
+
+
+namespace internal
 {
-  public:
-                                     /**
-                                      * Constructor.
-                                      */
-    TableEntryBase();
-
-                                     /**
-                                      * Virtual destructor.
-                                      */
-    virtual ~TableEntryBase();
-
-                                     /**
-                                      * Write the table entry as text.
-                                      */
-    virtual void write_text (std::ostream &) const = 0;
-
-                                     /**
-                                      * Write the table entry in tex format.
-                                      */
-    virtual void write_tex (std::ostream &) const = 0;
-};
-
-
-/**
- * A <tt>TableEntry</tt> stores the value of a table entry.
- * The value type of this table entry is arbitrary. For
- * a <tt>TableEntry<typename value_type></tt> with a non-common value
- * type you may want to specialize the output functions in order
- * to get nicer output. This class is not to be used by the user.
- *
- * For more detail see the <tt>TableHandler</tt> class.
- *
- * @ingroup textoutput
- * @author Ralf Hartmann, 1999
- */
-template <typename value_type>
-class TableEntry : public TableEntryBase
-{
-  public:
-                                     /**
-                                      * Constructor.
-                                      */
-    TableEntry (const value_type value);
-
-                                     /**
-                                      * Destructor.
-                                      */
-    virtual ~TableEntry();
-
-                                     /**
-                                      * Returns the value of this
-                                      * table entry.
-                                      */
-    value_type value () const;
-
-                                     /**
-                                      * Write the table entry as text.
-                                      */
-    virtual void write_text (std::ostream &out) const;
-
-                                     /**
-                                      * Write the table entry in tex
-                                      * format.
-                                      */
-    virtual void write_tex (std::ostream &out) const;
-
-  private:
-                                     /**
-                                      * Stored value.
-                                      */
-    const value_type val;
-};
+  /**
+   * A <tt>TableEntry</tt> stores the value of a table entry.
+   * It can either be of type int, unsigned int, double or std::string.
+   * In essence, this structure is the same as 
+   * <code>boost::variant<int,unsigned int,double,std::string></code>
+   * but we wrap this object in a structure for which we can write
+   * a function that can serialize it. This is also why the function 
+   * is not in fact of type boost::any.
+   */
+  struct TableEntry
+  {
+    /**
+     * Abbreviation for the data type stored by this object.
+     */
+    typedef boost::variant<int,unsigned int,double,std::string> value_type;
+    
+    /**
+     * Return the value stored by this object. The template type
+     * T must be one of <code>int,unsigned int,double,std::string</code>
+     * and it must match the data type of the object originally stored
+     * in this TableEntry object.
+     */
+    template <typename T>
+    T get () const;
+    
+    /**
+     * Return the numeric value of this object if data has been stored in
+     * it either as an integer, an unsigned integer, or a double.
+     *
+     * @return double
+     **/
+    double get_numeric_value () const;
+    
+    /**
+     * Stored value.
+     */
+    value_type value;
+  };
+}
 
 
 /**
@@ -177,7 +140,7 @@ class TableEntry : public TableEntryBase
  * @endcode
  *
  * @ingroup textoutput
- * @author Ralf Hartmann, 1999
+ * @author Ralf Hartmann, 1999; Wolfgang Bangerth, 2011
  */
 class TableHandler
 {
@@ -392,31 +355,23 @@ class TableHandler
                                          /**
                                           * Constructor needed by STL maps.
                                           */
-        Column();
+        Column ();
 
                                          /**
                                           * Constructor.
                                           */
-        Column(const std::string &tex_caption);
+        Column (const std::string &tex_caption);
 
-                                         /**
-                                          * Destructor.
-                                          */
-        ~Column();
 
                                          /**
                                           * List of entries within
-                                          * this column.  They may
-                                          * actually be of very
-                                          * different type, since we
-                                          * use the templated
-                                          * <tt>TableEntry<T></tt> class
-                                          * for actual values, which
-                                          * is only a wrapper for
-                                          * <tt>T</tt>, but is derived from
-                                          * <tt>TableEntryBase</tt>.
+                                          * this column. Values are
+					  * always immediately
+					  * converted to strings to
+					  * provide a uniform method
+					  * of lookup.
                                           */
-        std::vector<TableEntryBase *> entries;
+        std::vector<internal::TableEntry> entries;
 
                                          /**
                                           * The caption of the column
@@ -550,8 +505,73 @@ class TableHandler
                                       * The label of the table.
 				      */
     std::string tex_table_label;
-
 };
+
+
+// inline and template functions
+namespace internal
+{
+  template <typename T>
+  inline
+  T TableEntry::get () const
+  {
+    // we don't quite know the data type in 'value', but
+    // it must be one of the ones in the type list of the
+    // boost::variant. so if T is not in the list, or if
+    // the data stored in the TableEntry is not of type
+    // T, then we will get an exception that we can
+    // catch and produce an error message
+    try
+    {
+      return boost::get<T>(value);
+    }
+    catch (...)
+    {
+      Assert(false, ExcMessage ("This TableEntry object does not store a datum of type T"));
+      throw;
+    }
+  }
+  
+  
+  inline
+  double TableEntry::get_numeric_value () const
+  {
+    // we don't quite know the data type in 'value', but
+    // it must be one of the ones in the type list of the
+    // boost::variant. Go through this list and return
+    // the value if this happens to be a number
+    //
+    // first try with int
+    try
+    {
+      return boost::get<int>(value);
+    }
+    catch (...)
+    {}
+
+    
+    // ... then with unsigned int...
+    try
+    {
+      return boost::get<unsigned int>(value);
+    }
+    catch (...)
+    {}
+    
+    // ...and finally with double precision:
+    try
+    {
+      return boost::get<double>(value);
+    }
+    catch (...)
+    {
+      Assert (false, ExcMessage ("The number stored by this element of the "
+      "table is not a number."))
+    }
+    
+    return 0;
+  }    
+}
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -36,7 +36,9 @@ inconvenience this causes.
 <ol>
 <li> New: parallel::distributed::Triangulation::save()/load() to store
 the refinement information to disk. Also supports saving solution vectors
-using the SolutionTransfer class. (Timo Heister, 2011/10/12)
+using the SolutionTransfer class.
+<br>
+(Timo Heister, 2011/10/12)
 </ol>
 
 
@@ -46,6 +48,13 @@ using the SolutionTransfer class. (Timo Heister, 2011/10/12)
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: The TableHandler class has been changed significantly internally.
+It could previously store arbitrary values (though in practice, only int, unsigned int,
+double and std::string were implemented. The class is now restricted to this particular
+set of types
+<br>
+(Wolfgang Bangerth, 2011/10/17)
+
 <li> Fixed: searching in the doxygen documentation.
 <br>
 (Timo Heister, 2011/10/13)
