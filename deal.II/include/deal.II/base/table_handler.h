@@ -30,6 +30,10 @@
 #endif
 
 #include <boost/variant.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/split_member.hpp>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -40,10 +44,10 @@ namespace internal
   /**
    * A <tt>TableEntry</tt> stores the value of a table entry.
    * It can either be of type int, unsigned int, double or std::string.
-   * In essence, this structure is the same as 
+   * In essence, this structure is the same as
    * <code>boost::variant<int,unsigned int,double,std::string></code>
    * but we wrap this object in a structure for which we can write
-   * a function that can serialize it. This is also why the function 
+   * a function that can serialize it. This is also why the function
    * is not in fact of type boost::any.
    */
   struct TableEntry
@@ -52,7 +56,12 @@ namespace internal
      * Abbreviation for the data type stored by this object.
      */
     typedef boost::variant<int,unsigned int,double,std::string> value_type;
-    
+
+    /**
+     * Stored value.
+     */
+    value_type value;
+
     /**
      * Return the value stored by this object. The template type
      * T must be one of <code>int,unsigned int,double,std::string</code>
@@ -61,7 +70,7 @@ namespace internal
      */
     template <typename T>
     T get () const;
-    
+
     /**
      * Return the numeric value of this object if data has been stored in
      * it either as an integer, an unsigned integer, or a double.
@@ -69,11 +78,24 @@ namespace internal
      * @return double
      **/
     double get_numeric_value () const;
-    
+
     /**
-     * Stored value.
+     * Write the data of this object to a
+     * stream for the purpose of
+     * serialization.
      */
-    value_type value;
+    template <class Archive>
+    void save (Archive & ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a
+     * stream for the purpose of
+     * serialization.
+     */
+    template <class Archive>
+    void load (Archive & ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
   };
 }
 
@@ -304,6 +326,14 @@ class TableHandler
                                       */
     void write_tex (std::ostream &file, const bool with_header=true) const;
 
+                                     /**
+				      * Read or write the data of this
+				      * object to or from a stream for
+				      * the purpose of serialization.
+				      */
+    template <class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+
     				     /** @addtogroup Exceptions
 				      * @{ */
 
@@ -362,6 +392,13 @@ class TableHandler
                                           */
         Column (const std::string &tex_caption);
 
+				         /**
+				          * Read or write the data of this
+				          * object to or from a stream for
+				          * the purpose of serialization.
+				          */
+	template <class Archive>
+	void serialize(Archive & ar, const unsigned int version);
 
                                          /**
                                           * List of entries within
@@ -531,8 +568,8 @@ namespace internal
       throw;
     }
   }
-  
-  
+
+
   inline
   double TableEntry::get_numeric_value () const
   {
@@ -549,7 +586,7 @@ namespace internal
     catch (...)
     {}
 
-    
+
     // ... then with unsigned int...
     try
     {
@@ -557,7 +594,7 @@ namespace internal
     }
     catch (...)
     {}
-    
+
     // ...and finally with double precision:
     try
     {
@@ -568,10 +605,120 @@ namespace internal
       Assert (false, ExcMessage ("The number stored by this element of the "
       "table is not a number."))
     }
-    
+
     return 0;
-  }    
+  }
+
+
+
+  template <class Archive>
+  void TableEntry::save (Archive & ar,
+			 const unsigned int) const
+  {
+				     // write first an identifier for the kind
+				     // of data stored and then the actual
+				     // data, in its correct data type
+    if (const int *p = boost::get<int>(&value))
+      {
+	char c = 'i';
+	ar & c & *p;
+      }
+    else if (const unsigned int *p = boost::get<unsigned int>(&value))
+      {
+	char c = 'u';
+	ar & c & *p;
+      }
+    else if (const double *p = boost::get<double>(&value))
+      {
+	char c = 'd';
+	ar & c & *p;
+      }
+    else if (const std::string *p = boost::get<std::string>(&value))
+      {
+	char c = 's';
+	ar & c & *p;
+      }
+    else
+      Assert (false, ExcInternalError());
+  }
+
+
+
+  template <class Archive>
+  void TableEntry::load (Archive & ar,
+			 const unsigned int)
+  {
+				     // following what we do in the save()
+				     // function, first read in the data type
+				     // as a one-character id, and then read
+				     // the data
+    char c;
+    ar & c;
+
+    switch (c)
+      {
+	case 'i':
+	{
+	  int val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 'u':
+	{
+	  unsigned int val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 'd':
+	{
+	  double val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 's':
+	{
+	  std::string val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	default:
+	      Assert (false, ExcInternalError());
+      }
+  }
 }
+
+
+template <class Archive>
+void
+TableHandler::Column::serialize(Archive & ar,
+				const unsigned int)
+{
+  ar & entries & tex_caption
+    & tex_format & precision
+    & scientific & flag;
+}
+
+
+
+template <class Archive>
+void
+TableHandler::serialize(Archive & ar,
+			const unsigned int)
+{
+  ar & column_order & columns
+    & supercolumns & tex_supercaptions
+    & tex_table_caption
+    & tex_table_label;
+}
+
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -50,10 +50,11 @@ Debian. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/10/17)
 
-<li> Changed: The TableHandler class has been changed significantly internally.
-It could previously store arbitrary values (though in practice, only int, unsigned int,
-double and std::string were implemented. The class is now restricted to this particular
-set of types.
+<li> Changed: The TableHandler class has been changed significantly
+internally.  It could previously store arbitrary values (though in practice,
+only int, unsigned int, double and std::string were implemented. The class is
+now restricted to this particular set of types. On the other hand, the
+TableHandler class can now be serialized.
 <br>
 (Wolfgang Bangerth, 2011/10/17)
 
