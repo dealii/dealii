@@ -2102,7 +2102,7 @@ class ParameterHandler : public Subscriptor
 
                          /**
 	                  * Test for equality.
-                      */
+                          */
    bool operator == (const ParameterHandler & prm2)  const;
 
 				     /** @addtogroup Exceptions
