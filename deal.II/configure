@@ -10834,8 +10834,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
   CXXFLAGS="${OLD_CXXFLAGS}"
 
 
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether Trilinos uses shared libraries" >&5
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether Trilinos uses shared libraries" >&5
 $as_echo_n "checking whether Trilinos uses shared libraries... " >&6; }
   if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${shared_lib_suffix} ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -10894,10 +10893,14 @@ $as_echo_n "checking for the set of Trilinos libraries... " >&6; }
                   if test -f $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake ; then
         DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake \
       | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+
+                    DEAL_II_TRILINOS_LIBPREFIX=""
   else
     if test -f $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake ; then
             DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
         | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+
+            DEAL_II_TRILINOS_LIBPREFIX=""
     else
                               if test $DEAL_II_TRILINOS_VERSION_MAJOR = 10 -a \
               $DEAL_II_TRILINOS_VERSION_MINOR -lt 4 ; then

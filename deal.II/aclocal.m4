@@ -6477,7 +6477,9 @@ dnl ------------------------------------------------------------
 AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
 [
   dnl Check using the epetra library since that should always be there
-
+  dnl The problem is that on Debian, the library isn't called
+  dnl libepetra.so, but instead libtrilinos_epetra.so, so
+  dnl record this prefix in a variable of its own
   AC_MSG_CHECKING(whether Trilinos uses shared libraries)
   if test -f $DEAL_II_TRILINOS_LIBDIR/libepetra${shared_lib_suffix} ; then
     AC_MSG_RESULT(yes)
@@ -6553,11 +6555,20 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_LIBS, dnl
     dnl This is the location for 10.8 and following
     DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_LIBDIR/cmake/Trilinos/TrilinosConfig.cmake \
       | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+
+    dnl Above, we may have set DEAL_II_TRILINOS_LIBPREFIX="trilinos_" to deal
+    dnl with alternate naming conventions on Debian. However, if
+    dnl we can get the list of libraries from Trilinos directly we
+    dnl don't really need to do this any more
+    DEAL_II_TRILINOS_LIBPREFIX=""
   else
     if test -f $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake ; then
       dnl The location prior to 10.8
       DEAL_II_TRILINOS_LIBS="`grep Trilinos_LIBRARIES $DEAL_II_TRILINOS_INCDIR/TrilinosConfig.cmake \
         | perl -pi -e 's/.*\"(.*)\".*/\1/g; s/;/ /g;'`"
+
+      dnl Same as above
+      DEAL_II_TRILINOS_LIBPREFIX=""
     else
       dnl Fall back to the fixed list. This should only be necessary
       dnl for Trilinos versions before 10.4. If, for a later version,
