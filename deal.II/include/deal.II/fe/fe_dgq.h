@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -102,7 +102,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 				      * values.
 				      */
     virtual std::string get_name () const;
-    
+
 				     /**
 				      * Return the matrix
 				      * interpolating from the given
@@ -122,12 +122,12 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
     virtual void
     get_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
 			      FullMatrix<double>           &matrix) const;
-    
+
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.dofs_per_face</tt> times
 				      * <tt>this->dofs_per_face</tt>.
@@ -146,13 +146,13 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 				      */
     virtual void
     get_face_interpolation_matrix (const FiniteElement<dim, spacedim> &source,
-				   FullMatrix<double>       &matrix) const;    
+				   FullMatrix<double>       &matrix) const;
 
 				     /**
 				      * Return the matrix
 				      * interpolating from a face of
 				      * of one element to the face of
-				      * the neighboring element. 
+				      * the neighboring element.
 				      * The size of the matrix is
 				      * then <tt>source.dofs_per_face</tt> times
 				      * <tt>this->dofs_per_face</tt>.
@@ -175,10 +175,10 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 				      FullMatrix<double>       &matrix) const;
 
 				     /**
-				      * @name Functions to support hp 
+				      * @name Functions to support hp
 				      * @{
 				      */
-    
+
 				     /**
 				      * If, on a vertex, several
 				      * finite elements are active,
@@ -284,7 +284,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 				     /**
 				      * @}
 				      */
-    
+
 				     /**
 				      * Check for non-zero values on a face.
 				      *
@@ -353,7 +353,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 				      * @p FiniteElementData.
 				      */
     static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
-  
+
 				     /**
 				      * Compute renumbering for rotation
 				      * of degrees of freedom.
@@ -382,7 +382,7 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 				      */
     void rotate_indices (std::vector<unsigned int> &indices,
 			 const char                 direction) const;
-    
+
 				     /**
 				      * Allow access from other dimensions.
 				      */
@@ -399,10 +399,17 @@ class FE_DGQ : public FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
 
 
 /**
- * Implementation of scalar, discontinuous tensor product elements
- * based on Lagrange polynomials with arbitrary nodes.
+ * Implementation of scalar, discontinuous tensor product elements based on
+ * Lagrange polynomials with arbitrary nodes. The primary purpose of this
+ * class is to provide an element for which the mass matrix can be made
+ * diagonal by choosing basis functions that are not either zero or one at the
+ * vertices of the cell, but instead are zero or one at a given set of
+ * quadrature points. If this set of quadrature points is then also used in
+ * integrating the mass matrix, then it will be diagonal. The number of
+ * quadrature points automatically determines the polynomial degree chosen for
+ * this element.
  *
- * See base class documentation for details.
+ * See the base class documentation in FE_DGQ for details.
  *
  * @author F. Prill 2006
  */
