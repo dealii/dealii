@@ -55,11 +55,16 @@ namespace internal
   {
   public:
     /**
+     * Default constructor.
+     */
+    TableEntry ();
+
+    /**
      * Constructor. Initialize this table element with the value <code>t</code>.
      */
     template <typename T>
     TableEntry (const T &t);
-    
+
     /**
      * Return the value stored by this object. The template type
      * T must be one of <code>int,unsigned int,double,std::string</code>
@@ -94,7 +99,7 @@ namespace internal
     void load (Archive & ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
-    
+
   private:
     /**
      * Abbreviation for the data type stored by this object.
@@ -105,7 +110,7 @@ namespace internal
      * Stored value.
      */
     value_type value;
-    
+
     friend class dealii::TableHandler;
   };
 }
@@ -179,7 +184,7 @@ namespace internal
  * same number of elements in it so that the result is in fact a table. This
  * assumes that in each of the iterations (time steps, nonlinear iterations, etc)
  * you fill every single column. On the other hand, this may not always be what
- * you want to do. For example, it could be that the function that computes the 
+ * you want to do. For example, it could be that the function that computes the
  * nonlinear residual is only called every few time steps; or, a function computing
  * statistics of the mesh is only called whenever the mesh is in fact refined.
  * In these cases, the add_value() function will be called less often for some
@@ -189,7 +194,7 @@ namespace internal
  * An entirely different scenario is that the table is filled and at a later time
  * we use the data in there to compute the elements of other rows; the ConvergenceTable
  * class does something like this.
- * 
+ *
  * To support both scenarios, the TableHandler class has a property called
  * <i>auto-fill mode</i>. By default, auto-fill mode is off, but it can be
  * enabled by calling set_auto_fill_mode(). If auto-fill mode is enabled
@@ -204,12 +209,12 @@ namespace internal
  *   the number zero; if <code>T</code> is <code>std::string</code>, then
  *   <code>T()</code> is the empty string <code>""</code>.
  * - Add the given value to this column.
- * 
+ *
  * Padding the column with default elements makes sure that after the addition the
  * column has as many entries as the longest other column. In other words, if
  * we have skipped previous invokations of add_value() for a given key, then the
  * padding will enter default values into this column.
- * 
+ *
  * The algorithm as described will fail if you try to skip adding values for a key
  * if adding an element for this key is the first thing you want to do for a given
  * iteration or time step, since we would then pad to the length of the longest
@@ -217,7 +222,7 @@ namespace internal
  * adding to this column to a different spot in your program, after adding to
  * a column that will always be added to; or, you may want to start every iteration
  * by adding the number of the iteration to the table, for example in column 1.
- * 
+ *
  *
  * @ingroup textoutput
  * @author Ralf Hartmann, 1999; Wolfgang Bangerth, 2011
@@ -244,7 +249,7 @@ class TableHandler
     template <typename T>
     void add_value (const std::string &key,
                     const T            value);
-    
+
     /**
      * Switch auto-fill mode on or off. See the general documentation
      * of this class for a description of what auto-fill mode does.
@@ -526,7 +531,7 @@ class TableHandler
                                           * fixed point notation.
                                           */
         bool scientific;
-	
+
                                          /**
                                           * Flag that may be used by
                                           * derived classes for
@@ -631,11 +636,17 @@ class TableHandler
 // inline and template functions
 namespace internal
 {
+  inline
+  TableEntry::TableEntry ()
+  {}
+
+
   template <typename T>
   TableEntry::TableEntry (const T &t)
   :
   value (t)
   {}
+
 
   template <typename T>
   inline
@@ -804,11 +815,11 @@ void TableHandler::add_value (const std::string &key,
     unsigned int n = 0;
     for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
       n = (n >= p->second.entries.size() ? n : p->second.entries.size());
-  
+
     while (columns[key].entries.size()+1 < n)
       columns[key].entries.push_back (internal::TableEntry(T()));
   }
-  
+
   // now push the value given to this function
   columns[key].entries.push_back (internal::TableEntry(value));
 }
