@@ -109,13 +109,13 @@ namespace internal
  * <h3>Usage</h3>
  *
  * The most important function is the templatized function
- * add_value(const std::string &key, const value_type value), that
- * adds a column with the name <tt>key</tt> to the table if this column
- * does not yet exist and adds the value of <tt>value_type</tt>
- * (e.g. <tt>unsigned int</tt>, <tt>double</tt>, <tt>std::string</tt>, ...) to this
- * column.  After the table is complete there are different
- * possibilities of output, e.g.  into a tex file with
- * write_tex() or as text with write_text().
+ * <code>add_value(const std::string &key, const T value)</code> that adds a
+ * column with the name <tt>key</tt> to the table if this column does not yet
+ * exist and adds the given value of type <tt>T</tt> (which must be one of
+ * <tt>int</tt>, <tt>unsigned int</tt>, <tt>double</tt>, <tt>std::string</tt>)
+ * to this column.  After the table is complete there are different
+ * possibilities of output, e.g., into a latex file with write_tex() or as text
+ * with write_text().
  *
  * Two (or more) columns may be merged into a "supercolumn" by twice
  * (or multiple) calling add_column_to_supercolumn(), see
@@ -174,14 +174,18 @@ class TableHandler
     TableHandler ();
 
                                      /**
-                                      * Adds a column (if not yet
-                                      * existent) with the key <tt>key</tt>
-                                      * and adds the value of
-                                      * <tt>value_type</tt> to the column.
+                                      * Adds a column (if not yet existent)
+                                      * with the key <tt>key</tt> and adds the
+                                      * value of type <tt>T</tt> to the
+                                      * column. Values of type <tt>T</tt> must
+                                      * be convertible to one of <code>int,
+                                      * unsigned int, double,
+                                      * std::string</code> or a compiler error
+                                      * will result.
                                       */
-    template <typename value_type>
+    template <typename T>
     void add_value (const std::string &key,
-                    const value_type   value);
+                    const T            value);
 
                                      /**
                                       * Creates a supercolumn (if not
@@ -704,6 +708,23 @@ namespace internal
       }
   }
 }
+
+
+template <typename T>
+void TableHandler::add_value (const std::string &key,
+			      const T            value)
+{
+  if (columns.find(key) == columns.end())
+    {
+      std::pair<std::string, Column> new_column(key, Column(key));
+      columns.insert(new_column);
+      column_order.push_back(key);
+    }
+
+  const internal::TableEntry entry = { value };
+  columns[key].entries.push_back (entry);
+}
+
 
 
 template <class Archive>

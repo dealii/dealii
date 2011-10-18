@@ -57,23 +57,6 @@ TableHandler::TableHandler()
 
 
 
-template <typename number>
-void TableHandler::add_value (const std::string &key,
-			      const number value)
-{
-  if (columns.find(key) == columns.end())
-    {
-      std::pair<std::string, Column> new_column(key, Column(key));
-      columns.insert(new_column);
-      column_order.push_back(key);
-    }
-
-  const internal::TableEntry entry = { value };
-  columns[key].entries.push_back (entry);
-}
-
-
-
 void TableHandler::add_column_to_supercolumn (const std::string &key,
 					      const std::string &superkey)
 {
@@ -487,22 +470,5 @@ void TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) c
     }
 }
 
-
-// explicit instantiations
-template
-void TableHandler::add_value<double> (const std::string &,
-				      const double);
-
-template
-void TableHandler::add_value<int> (const std::string &,
-				   const int);
-
-template
-void TableHandler::add_value<unsigned int> (const std::string &,
-					    const unsigned int);
-
-template
-void TableHandler::add_value<std::string> (const std::string &,
-					   const std::string);
 
 DEAL_II_NAMESPACE_CLOSE
