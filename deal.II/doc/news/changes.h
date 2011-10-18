@@ -44,6 +44,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The TableHandler class now pads columns that have only been
+partially filled. See the documentation of the class for a description.
+<br>
+(Wolfgang Bangerth, 2011/10/18)
+
 <li> Fixed: In TableHandler::print_text, it can happen that the function
 wants to print an empty string as the element of the table to be printed.
 This can confuse machine readers of this table, for example for visualization,

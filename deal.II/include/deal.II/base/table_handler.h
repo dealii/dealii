@@ -38,6 +38,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+class TableHandler;
 
 namespace internal
 {
@@ -45,23 +46,20 @@ namespace internal
    * A <tt>TableEntry</tt> stores the value of a table entry.
    * It can either be of type int, unsigned int, double or std::string.
    * In essence, this structure is the same as
-   * <code>boost::variant<int,unsigned int,double,std::string></code>
+   * <code>boost::variant@<int,unsigned int,double,std::string@></code>
    * but we wrap this object in a structure for which we can write
    * a function that can serialize it. This is also why the function
    * is not in fact of type boost::any.
    */
   struct TableEntry
   {
+  public:
     /**
-     * Abbreviation for the data type stored by this object.
+     * Constructor. Initialize this table element with the value <code>t</code>.
      */
-    typedef boost::variant<int,unsigned int,double,std::string> value_type;
-
-    /**
-     * Stored value.
-     */
-    value_type value;
-
+    template <typename T>
+    TableEntry (const T &t);
+    
     /**
      * Return the value stored by this object. The template type
      * T must be one of <code>int,unsigned int,double,std::string</code>
@@ -96,6 +94,19 @@ namespace internal
     void load (Archive & ar, const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
+    
+  private:
+    /**
+     * Abbreviation for the data type stored by this object.
+     */
+    typedef boost::variant<int,unsigned int,double,std::string> value_type;
+
+    /**
+     * Stored value.
+     */
+    value_type value;
+    
+    friend class dealii::TableHandler;
   };
 }
 
@@ -160,6 +171,48 @@ namespace internal
  * table.write_tex(out_file);
  * out_file.close();
  * @endcode
+ *
+ *
+ * <h3>Dealing with sparse data</h3>
+ *
+ * When generating output, TableHandler expects that all columns have the exact
+ * same number of elements in it so that the result is in fact a table. This
+ * assumes that in each of the iterations (time steps, nonlinear iterations, etc)
+ * you fill every single column. On the other hand, this may not always be what
+ * you want to do. For example, it could be that the function that computes the 
+ * nonlinear residual is only called every few time steps; or, a function computing
+ * statistics of the mesh is only called whenever the mesh is in fact refined.
+ * 
+ * In these cases, the add_value() function will be called less often for some
+ * columns and the column would therefore have fewer elements; furthermore, these
+ * elements would not be aligned with the rows that contain the other data elements
+ * that were produced during this iteration.
+ * 
+ * To avoid this problem, we use the following algorithm:
+ * - When calling <code>add_value(key, value)</code>, we count the number of elements
+ *   in the column corresponding to <code>key</code>. Let's call this number $m$.
+ * - We also determine the maximal number of elements in the other columns; call
+ *   it $n$.
+ * - If $m < n-1$ then we add $n-m-1$ copies of the object <code>T()</code>
+ *   to this column. Here, <code>T</code> is the data type of the given <code>value</code>.
+ *   For example, if <code>T</code> is a numeric type, then <code>T()</code> is
+ *   the number zero; if <code>T</code> is <code>std::string</code>, then
+ *   <code>T()</code> is the empty string <code>""</code>.
+ * - Add the given value to this column.
+ * 
+ * Padding the column with default elements makes sure that after the addition the
+ * column has as many entries as the longest other column. In other words, if
+ * we have skipped previous invokations of add_value() for a given key, then the
+ * padding will enter default values into this column.
+ * 
+ * The algorithm as described will fail if you try to skip adding values for a key
+ * if adding an element for this key is the first thing you want to do for a given
+ * iteration or time step, since we would then pad to the length of the longest
+ * column of the <i>previous</i> iteration or time step. You may have to re-order
+ * adding to this column to a different spot in your program, after adding to
+ * a column that will always be added to; or, you may want to start every iteration
+ * by adding the number of the iteration to the table, for example in column 1.
+ * 
  *
  * @ingroup textoutput
  * @author Ralf Hartmann, 1999; Wolfgang Bangerth, 2011
@@ -563,6 +616,12 @@ class TableHandler
 namespace internal
 {
   template <typename T>
+  TableEntry::TableEntry (const T &t)
+  :
+  value (t)
+  {}
+
+  template <typename T>
   inline
   T TableEntry::get () const
   {
@@ -714,6 +773,7 @@ template <typename T>
 void TableHandler::add_value (const std::string &key,
 			      const T            value)
 {
+  // see if the column already exists
   if (columns.find(key) == columns.end())
     {
       std::pair<std::string, Column> new_column(key, Column(key));
@@ -721,8 +781,17 @@ void TableHandler::add_value (const std::string &key,
       column_order.push_back(key);
     }
 
-  const internal::TableEntry entry = { value };
-  columns[key].entries.push_back (entry);
+  // follow the algorithm given in the introduction to this class
+  // of padding columns as necessary
+  unsigned int n = 0;
+  for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
+    n = (n >= p->second.entries.size() ? n : p->second.entries.size());
+  
+  while (columns[key].entries.size()+1 < n)
+    columns[key].entries.push_back (internal::TableEntry(T()));
+
+  // now push the value given to this function
+  columns[key].entries.push_back (internal::TableEntry(value));
 }
 
 
