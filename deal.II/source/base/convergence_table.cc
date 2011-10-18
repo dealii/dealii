@@ -33,8 +33,8 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
   if (rate_mode==none)
     return;
  
-  std::vector<TableEntryBase *> &entries=columns[data_column_key].entries;
-  std::vector<TableEntryBase *> &ref_entries=columns[reference_column_key].entries;
+  std::vector<internal::TableEntry> &entries=columns[data_column_key].entries;
+  std::vector<internal::TableEntry> &ref_entries=columns[reference_column_key].entries;
   std::string rate_key=data_column_key;
 
   const unsigned int n=entries.size();
@@ -46,28 +46,8 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
   
   for (unsigned int i=0; i<n; ++i)
     {
-      if (dynamic_cast<TableEntry<double>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<double>*>(entries[i])->value();
-      else if (dynamic_cast<TableEntry<float>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<float>*>(entries[i])->value();
-      else if (dynamic_cast<TableEntry<int>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<int>*>(entries[i])->value();
-      else if (dynamic_cast<TableEntry<unsigned int>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<unsigned int>*>(entries[i])->value();
-      else
-	Assert(false, ExcWrongValueType());
-      
-      // And now the reference values.
-      if (dynamic_cast<TableEntry<double>*>(ref_entries[i]) != 0)
-	ref_values[i]=dynamic_cast<TableEntry<double>*>(ref_entries[i])->value();
-      else if (dynamic_cast<TableEntry<float>*>(ref_entries[i]) != 0)
-	ref_values[i]=dynamic_cast<TableEntry<float>*>(ref_entries[i])->value();
-      else if (dynamic_cast<TableEntry<int>*>(ref_entries[i]) != 0)
-	ref_values[i]=dynamic_cast<TableEntry<int>*>(ref_entries[i])->value();
-      else if (dynamic_cast<TableEntry<unsigned int>*>(ref_entries[i]) != 0)
-	ref_values[i]=dynamic_cast<TableEntry<unsigned int>*>(ref_entries[i])->value();
-      else
-	Assert(false, ExcWrongValueType());
+      values[i]     = entries[i].get_numeric_value();
+      ref_values[i] = ref_entries[i].get_numeric_value();
     }
   
   switch (rate_mode)
@@ -120,25 +100,14 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
 {
   Assert(columns.count(data_column_key), ExcColumnNotExistent(data_column_key));
   
-  std::vector<TableEntryBase *> &entries=columns[data_column_key].entries;
+  std::vector<internal::TableEntry> &entries = columns[data_column_key].entries;
   std::string rate_key=data_column_key+"...";
 
   const unsigned int n=entries.size();
   
   std::vector<double> values(n);
   for (unsigned int i=0; i<n; ++i)
-    {
-      if (dynamic_cast<TableEntry<double>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<double>*>(entries[i])->value();
-      else if (dynamic_cast<TableEntry<float>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<float>*>(entries[i])->value();
-      else if (dynamic_cast<TableEntry<int>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<int>*>(entries[i])->value();
-      else if (dynamic_cast<TableEntry<unsigned int>*>(entries[i]) != 0)
-	values[i]=dynamic_cast<TableEntry<unsigned int>*>(entries[i])->value();
-      else
-	Assert(false, ExcWrongValueType());
-    }
+    values[i] = entries[i].get_numeric_value();
   
   switch (rate_mode)
     {
