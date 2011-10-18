@@ -35,6 +35,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/numerics/data_out.h>
@@ -260,7 +261,7 @@ template <int dim>
 double Obstacle<dim>::value (const Point<dim> &p,
 			     const unsigned int /*component*/) const 
 {
-  return p.square() - 0.5;
+  return 2.0*p.square() - 0.5;
 }
 
 
@@ -378,7 +379,8 @@ void Step4<dim>::setup_system ()
 	    << std::endl;
 
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
+  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
+//   c_sparsity.compress ();
   sparsity_pattern.copy_from(c_sparsity);
   
   system_matrix.reinit (sparsity_pattern);
@@ -582,8 +584,6 @@ void Step4<dim>::assemble_system ()
                                               local_dof_indices,
                                               system_matrix, system_rhs);
     }
-
-  std::cout<< "Norm of RHS: " << system_rhs.l2_norm () <<std::endl;
   
 // 				   // As the final step in this function, we
 // 				   // wanted to have non-homogeneous boundary
@@ -665,10 +665,9 @@ void Step4<dim>::projection_active_set ()
 	double obstacle_value = obstacle.value (point);
 	if (solution (index_x) >= obstacle_value && resid_vector (index_x) <= 0)
 	{
-       
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
-	  solution (index_x) = obstacle_value;
+ 	  solution (index_x) = 0;
 	  active_set (index_x) = 1;
 	}
       }
@@ -694,18 +693,16 @@ void Step4<dim>::solve ()
 {
   ReductionControl        reduction_control (100, 1e-12, 1e-2);
   SolverCG<>              solver (reduction_control);
+  SolverBicgstab<>        solver_bicgstab (reduction_control);
   PreconditionSSOR<SparseMatrix<double> > precondition;
-  precondition.initialize (system_matrix, 1.5);
-  solver.solve (system_matrix, solution, system_rhs, precondition);
-  //		PreconditionIdentity());
+  precondition.initialize (system_matrix, 1.2);
 
-				   // We have made one addition,
-				   // though: since we suppress output
-				   // from the linear solvers, we have
-				   // to print the number of
-				   // iterations by hand.
+  solver.solve (system_matrix, solution, system_rhs, precondition);
+
+  std::cout << "Initial error: " << reduction_control.initial_value() <<std::endl;
   std::cout << "   " << reduction_control.last_step()
-	    << " CG iterations needed to obtain convergence."
+	    << " CG iterations needed to obtain convergence with an error: "
+	    <<  reduction_control.last_value()
 	    << std::endl;
 
   constraints.distribute (solution);
@@ -776,16 +773,43 @@ void Step4<dim>::run ()
   make_grid();
   setup_system ();
 
-  std::cout<< "Update Active Set in Dim = " << dim <<std::endl;
+  constraints.clear ();
+  VectorTools::interpolate_boundary_values (dof_handler,
+					    0,
+					    BoundaryValues<dim>(),
+					    constraints);
+  constraints.close ();
+  ConstraintMatrix constraints_complete (constraints);
+  assemble_system ();
+
+  system_matrix_complete.copy_from (system_matrix);
+  system_rhs_complete = system_rhs;
+
+  std::cout<< "Update Active Set:" <<std::endl;
+  solution = 0;
+  resid_vector = 0;
   projection_active_set ();
 
   for (unsigned int i=0; i<solution.size (); i++)
     {
-      std::cout<< "Assemble Matrix in Dim = " << dim <<std::endl;
+//       std::ostringstream filename_matrix;
+//       filename_matrix << "system_matrix_";
+//       filename_matrix << i;
+//       filename_matrix << ".dat";
+//       std::ofstream matrix (filename_matrix.str ().c_str());
+
+      std::cout<< "Assemble System:" <<std::endl;
       system_matrix = 0;
       system_rhs = 0;
       assemble_system ();
-      std::cout<< "Solve System in Dim = " << dim <<std::endl;
+//       constraints.print (matrix);
+//       system_matrix.print (matrix);
+//       for (unsigned int k=0; k<solution.size (); k++)
+// 	std::cout<< system_rhs (k) << ", "
+// 		 << solution (k) << ", "
+// 		 << system_rhs.l2_norm ()
+// 		 <<std::endl;
+      std::cout<< "Solve System" <<std::endl;
       solve ();
 
       std::ostringstream filename_solution;
@@ -818,7 +842,7 @@ void Step4<dim>::run ()
 	  break;
 	}
 
-      std::cout<< "Update Active Set in Dim = " << dim <<std::endl;
+      std::cout<< "Update Active Set:"<<std::endl;
       projection_active_set ();
     }
 }
