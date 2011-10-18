@@ -286,12 +286,18 @@ void TableHandler::write_text(std::ostream &out) const
 					   // be a bit careful about the case
 					   // where the string may be empty,
 					   // in which case we'll print it as
-					   // ""
+					   // "". note that ultimately we
+					   // still just << it into the stream
+					   // since we want to use the flags
+					   // of that stream, and the first
+					   // test is only used to determine
+					   // whether the size of the string
+					   // representation is zero
 	  {
 	    std::ostringstream text;
 	    text << column.entries[i].value;
 	    if (text.str().size() > 0)
-	      out << text.str();
+	      out << column.entries[i].value;
 	    else
 	      out << "\"\"";
 	  }
