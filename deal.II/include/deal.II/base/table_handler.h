@@ -307,8 +307,18 @@ class TableHandler
                          const std::string &format="c");
 
                                      /**
-                                      * Write table as formatted text,
-                                      * e.g.  to the standard output.
+                                      * Write table as formatted text to the
+                                      * given stream. The text is formatted in
+                                      * such as way that it represents data as
+                                      * formatted columns of text. To avoid
+                                      * problems when reading these tables
+                                      * automatically, for example for
+                                      * postprocessing, if an entry in a cell
+                                      * of this table is empty (i.e. it has
+                                      * been created by calling the
+                                      * add_value() function with an empty
+                                      * string), then the entry of the table
+                                      * is printed as <code>""</code>.
                                       */
     void write_text (std::ostream &out) const;
 

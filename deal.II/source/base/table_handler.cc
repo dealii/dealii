@@ -67,7 +67,7 @@ void TableHandler::add_value (const std::string &key,
       columns.insert(new_column);
       column_order.push_back(key);
     }
-    
+
   const internal::TableEntry entry = { value };
   columns[key].entries.push_back (entry);
 }
@@ -229,10 +229,18 @@ void TableHandler::write_text(std::ostream &out) const
 
 	dummy_out << column.entries[i].value;
 
-					 // get size, note that we are
-					 // not interested in the
-					 // trailing \0
-	entry_widths[i][j] = dummy_out.str().length();
+					 // get size. as a side note, if the
+					 // text printed is in fact the empty
+					 // string, then we get into a bit of
+					 // trouble since readers would skip
+					 // over the resulting whitespaces. as
+					 // a consequence, we'll print ""
+					 // instead in that case.
+	const unsigned int size = dummy_out.str().length();
+	if (size > 0)
+	  entry_widths[i][j] = size;
+	else
+	  entry_widths[i][j] = 2;
       }
 
 				   // next compute the width each row
@@ -288,7 +296,24 @@ void TableHandler::write_text(std::ostream &out) const
 	  else
 	    out.setf(std::ios::fixed, std::ios::floatfield);
 	  out << std::setw(column_widths[j]);
-	  out << column.entries[i].value;
+
+					   // get the string to write into the
+					   // table. we could simply << it
+					   // into the stream but we have to
+					   // be a bit careful about the case
+					   // where the string may be empty,
+					   // in which case we'll print it as
+					   // ""
+	  {
+	    std::ostringstream text;
+	    text << column.entries[i].value;
+	    if (text.str().size() > 0)
+	      out << text.str();
+	    else
+	      out << "\"\"";
+	  }
+
+					   // pad after this column
 	  out << " ";
 	}
       out << std::endl;

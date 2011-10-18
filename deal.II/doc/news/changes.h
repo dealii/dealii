@@ -44,6 +44,14 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: In TableHandler::print_text, it can happen that the function
+wants to print an empty string as the element of the table to be printed.
+This can confuse machine readers of this table, for example for visualization,
+since they then do not see this column in that row. To prevent this, we now
+print <code>""</code> in such places.
+<br>
+(Wolfgang Bangerth, 2011/10/18)
+
 <li> Fixed: Using Trilinos versions 10.4 and later on Debian failed to
 configure due to a different naming scheme of Trilinos libraries on
 Debian. This is now fixed.
