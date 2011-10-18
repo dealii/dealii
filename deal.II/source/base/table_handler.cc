@@ -53,8 +53,17 @@ TableHandler::Column::Column()
 
 
 TableHandler::TableHandler()
+:
+auto_fill_mode (false)
 {}
 
+
+
+void
+TableHandler::set_auto_fill_mode (const bool state)
+{
+  auto_fill_mode = state;
+}
 
 
 void TableHandler::add_column_to_supercolumn (const std::string &key,

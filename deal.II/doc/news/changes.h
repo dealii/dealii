@@ -44,7 +44,7 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> New: The TableHandler class now pads columns that have only been
+<li> New: The TableHandler class can now pad columns that have only been
 partially filled. See the documentation of the class for a description.
 <br>
 (Wolfgang Bangerth, 2011/10/18)

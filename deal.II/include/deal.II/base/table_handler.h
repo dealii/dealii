@@ -173,7 +173,7 @@ namespace internal
  * @endcode
  *
  *
- * <h3>Dealing with sparse data</h3>
+ * <h3>Dealing with sparse data: auto-fill mode</h3>
  *
  * When generating output, TableHandler expects that all columns have the exact
  * same number of elements in it so that the result is in fact a table. This
@@ -182,13 +182,18 @@ namespace internal
  * you want to do. For example, it could be that the function that computes the 
  * nonlinear residual is only called every few time steps; or, a function computing
  * statistics of the mesh is only called whenever the mesh is in fact refined.
- * 
  * In these cases, the add_value() function will be called less often for some
  * columns and the column would therefore have fewer elements; furthermore, these
  * elements would not be aligned with the rows that contain the other data elements
  * that were produced during this iteration.
+ * An entirely different scenario is that the table is filled and at a later time
+ * we use the data in there to compute the elements of other rows; the ConvergenceTable
+ * class does something like this.
  * 
- * To avoid this problem, we use the following algorithm:
+ * To support both scenarios, the TableHandler class has a property called
+ * <i>auto-fill mode</i>. By default, auto-fill mode is off, but it can be
+ * enabled by calling set_auto_fill_mode(). If auto-fill mode is enabled
+ * we use the following algorithm:
  * - When calling <code>add_value(key, value)</code>, we count the number of elements
  *   in the column corresponding to <code>key</code>. Let's call this number $m$.
  * - We also determine the maximal number of elements in the other columns; call
@@ -239,6 +244,12 @@ class TableHandler
     template <typename T>
     void add_value (const std::string &key,
                     const T            value);
+    
+    /**
+     * Switch auto-fill mode on or off. See the general documentation
+     * of this class for a description of what auto-fill mode does.
+     */
+    void set_auto_fill_mode (const bool state);
 
                                      /**
                                       * Creates a supercolumn (if not
@@ -515,7 +526,7 @@ class TableHandler
                                           * fixed point notation.
                                           */
         bool scientific;
-
+	
                                          /**
                                           * Flag that may be used by
                                           * derived classes for
@@ -609,6 +620,11 @@ class TableHandler
                                       * The label of the table.
 				      */
     std::string tex_table_label;
+
+    /**
+     * Flag indicating whether auto-fill mode should be used.
+     */
+    bool auto_fill_mode;
 };
 
 
@@ -781,15 +797,18 @@ void TableHandler::add_value (const std::string &key,
       column_order.push_back(key);
     }
 
-  // follow the algorithm given in the introduction to this class
-  // of padding columns as necessary
-  unsigned int n = 0;
-  for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
-    n = (n >= p->second.entries.size() ? n : p->second.entries.size());
+  if (auto_fill_mode == true)
+  {
+    // follow the algorithm given in the introduction to this class
+    // of padding columns as necessary
+    unsigned int n = 0;
+    for (std::map< std::string, Column >::iterator p = columns.begin(); p != columns.end(); ++p)
+      n = (n >= p->second.entries.size() ? n : p->second.entries.size());
   
-  while (columns[key].entries.size()+1 < n)
-    columns[key].entries.push_back (internal::TableEntry(T()));
-
+    while (columns[key].entries.size()+1 < n)
+      columns[key].entries.push_back (internal::TableEntry(T()));
+  }
+  
   // now push the value given to this function
   columns[key].entries.push_back (internal::TableEntry(value));
 }
@@ -803,7 +822,8 @@ TableHandler::Column::serialize(Archive & ar,
 {
   ar & entries & tex_caption
     & tex_format & precision
-    & scientific & flag;
+    & scientific
+    & flag;
 }
 
 
@@ -816,7 +836,8 @@ TableHandler::serialize(Archive & ar,
   ar & column_order & columns
     & supercolumns & tex_supercaptions
     & tex_table_caption
-    & tex_table_label;
+    & tex_table_label
+    & auto_fill_mode;
 }
 
 
