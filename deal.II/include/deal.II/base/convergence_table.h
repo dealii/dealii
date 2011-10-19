@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,8 +25,8 @@ DEAL_II_NAMESPACE_OPEN
  * cg-method, or some evaluated <i>L<sup>2</sup></i>-errors of
  * discrete solutions, etc, and evaluates convergence rates or orders.
  *
- * The already implemented #RateMode's are #reduction_rate, 
- * where the convergence rate is the quotient of two following rows, and 
+ * The already implemented #RateMode's are #reduction_rate,
+ * where the convergence rate is the quotient of two following rows, and
  * #reduction_rate_log2, that evaluates the order of convergence.
  * These standard evaluations are useful for global refinement, for local refinement
  * this may not be an appropriate method, as the convergence rates should be
@@ -39,12 +39,12 @@ DEAL_II_NAMESPACE_OPEN
  * functions evaluate_convergence_rates() and evaluate_all_convergence_rates()
  * may be called (even multiply).
  *
- * There are two possibilities of how to evaluate the convergence rates of multiple 
+ * There are two possibilities of how to evaluate the convergence rates of multiple
  * columns in the same RateMode.
  * <ol>
  * <li> call evaluate_convergence_rates() for all wanted columns
  * <li> call omit_column_from_convergence_rate_evaluation() for all
- * NOT wanted columns and then 
+ * NOT wanted columns and then
  * evaluate_all_convergence_rates() to evaluate the convergence rates of all columns
  * that are not signed to be omitted.
  * </ol>
@@ -62,7 +62,7 @@ class ConvergenceTable: public TableHandler
 				      * Constructor.
 				      */
     ConvergenceTable();
-    
+
 				     /**
 				      * Rate in relation to the rows.
 				      */
@@ -88,10 +88,10 @@ class ConvergenceTable: public TableHandler
 					    */
 	  reduction_rate_log2
     };
-    
+
 				     /**
 				      * Evaluates the convergence rates of the
-				      * data column <tt>data_column_key</tt> 
+				      * data column <tt>data_column_key</tt>
 				      * due to the #RateMode in relation to
 				      * the reference column <tt>reference_column_key</tt>.
 				      * Be sure that the value types of the
@@ -108,25 +108,34 @@ class ConvergenceTable: public TableHandler
 				      * the <tt>set_tex_supercaption (...)</tt> function
 				      * of the base class TableHandler.
 				      *
-				      * This method behaves in the following way: 
-				      * 
+				      * This method behaves in the following way:
+				      *
 				      * If RateMode is reduction_rate, then the computed
-				      * output is 
+				      * output is
 				      * $ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} $.
 				      *
 				      * Where $k$ is the reference column.
 				      *
-				      * If RateMode is reduction_rate_log2, then the 
+				      * If RateMode is reduction_rate_log2, then the
 				      * computed output is
 				      * $
-				      * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|} 
+				      * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|}
 				      * $.
 				      *
-				      * This is useful, for example, if we use as 
-				      * reference key the number of degrees of freedom. 
-				      * Assuming that the error is proportional to 
-				      * $ C (1/\sqrt{k})^r $, then this method will 
+				      * This is useful, for example, if we use as
+				      * reference key the number of degrees of freedom.
+				      * Assuming that the error is proportional to
+				      * $ C (1/\sqrt{k})^r $, then this method will
 				      * produce the rate $r$ as a result.
+				      *
+				      * @note Since this function adds columns
+				      * to the table after several rows have
+				      * already been filled, it switches off
+				      * the auto fill mode of the TableHandler
+				      * base class. If you intend to add
+				      * further data with auto fill, you will
+				      * have to re-enable it after calling
+				      * this function.
 				      */
     void
     evaluate_convergence_rates (const std::string &data_column_key,
@@ -136,7 +145,7 @@ class ConvergenceTable: public TableHandler
 
 				     /**
 				      * Evaluates the convergence rates of the
-				      * data column <tt>data_column_key</tt> 
+				      * data column <tt>data_column_key</tt>
 				      * due to the #RateMode.
 				      * Be sure that the value types of the
 				      * table entries of the data column
@@ -150,16 +159,25 @@ class ConvergenceTable: public TableHandler
 				      * data column. This may be changed by using
 				      * the set_tex_supercaption() function
 				      * of the base class TableHandler.
+				      *
+				      * @note Since this function adds columns
+				      * to the table after several rows have
+				      * already been filled, it switches off
+				      * the auto fill mode of the TableHandler
+				      * base class. If you intend to add
+				      * further data with auto fill, you will
+				      * have to re-enable it after calling
+				      * this function.
 				      */
     void
-    evaluate_convergence_rates (const std::string &data_column_key, 
+    evaluate_convergence_rates (const std::string &data_column_key,
                                 const RateMode     rate_mode);
 
 				     /**
-				      * Omit this column <tt>key</tt> 
+				      * Omit this column <tt>key</tt>
 				      * (not supercolumn!) from the
 				      * evaluation of the convergence rates
-				      * of `all' columns (see the following 
+				      * of `all' columns (see the following
 				      * two functions).
 				      *
 				      * The Column::flag==1 is reserved for
@@ -188,8 +206,8 @@ class ConvergenceTable: public TableHandler
 				      * evaluate_convergence_rates()
 				      * for each column separately.
 				      *
-				      * Example: 
-				      * Columns like <tt>n cells</tt> or 
+				      * Example:
+				      * Columns like <tt>n cells</tt> or
 				      * <tt>n dofs</tt> columns may be wanted
 				      * to be omitted in the evaluation
 				      * of the convergence rates. Hence they
@@ -204,7 +222,7 @@ class ConvergenceTable: public TableHandler
 				      * Evaluates convergence rates
 				      * due to the <tt>rate_mode</tt>. This
 				      * function evaluates the rates of
-				      * ALL columns except of the 
+				      * ALL columns except of the
 				      * columns that are to be omitted
 				      * (see previous function)
 				      * and execpt of the columns that are
@@ -216,8 +234,8 @@ class ConvergenceTable: public TableHandler
 				      * evaluate_convergence_rates()
 				      * for each column seperately.
 				      *
-				      * Example: 
-				      * Columns like <tt>n cells</tt> or 
+				      * Example:
+				      * Columns like <tt>n cells</tt> or
 				      * <tt>n dofs</tt> columns may be wanted
 				      * to be omitted in the evaluation
 				      * of the convergence rates. Hence they
@@ -226,10 +244,10 @@ class ConvergenceTable: public TableHandler
 				      */
     void
     evaluate_all_convergence_rates(const RateMode rate_mode);
-    
+
 				     /** @addtogroup Exceptions
 				      * @{ */
-    
+
     				     /**
 				      * Exception
 				      */
