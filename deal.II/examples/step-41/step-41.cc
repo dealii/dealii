@@ -941,9 +941,11 @@ void Step4<dim>::run ()
                                  // written. By changing it you can get more
                                  // information about the innards of the
                                  // library.
-int main () 
+int main (int argc, char *argv[])
 {
   deallog.depth_console (0);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+
   {
     Step4<2> laplace_problem_2d;
     laplace_problem_2d.run ();
