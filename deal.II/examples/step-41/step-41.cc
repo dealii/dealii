@@ -38,6 +38,11 @@
 #include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_solver.h>
+
 #include <deal.II/numerics/data_out.h>
 #include <fstream>
 #include <iostream>
@@ -89,7 +94,7 @@ class Step4
     void assemble_system ();
     void projection_active_set ();
     void solve ();
-    void output_results (Vector<double> vector_to_plot, const std::string& title) const;
+    void output_results (TrilinosWrappers::Vector vector_to_plot, const std::string& title) const;
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -98,14 +103,14 @@ class Step4
     ConstraintMatrix     constraints;
     
     SparsityPattern      sparsity_pattern;
-    SparseMatrix<double> system_matrix;
-    SparseMatrix<double> system_matrix_complete;
+    TrilinosWrappers::SparseMatrix system_matrix;
+    TrilinosWrappers::SparseMatrix system_matrix_complete;
 
-    Vector<double>       solution;
-    Vector<double>       system_rhs;
-    Vector<double>       system_rhs_complete;
-    Vector<double>       resid_vector;
-    Vector<double>       active_set;
+    TrilinosWrappers::Vector       solution;
+    TrilinosWrappers::Vector       system_rhs;
+    TrilinosWrappers::Vector       system_rhs_complete;
+    TrilinosWrappers::Vector       resid_vector;
+    TrilinosWrappers::Vector       active_set;
 
     std::map<unsigned int,double> boundary_values;
 };
@@ -233,7 +238,8 @@ template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
 				  const unsigned int /*component*/) const 
 {
-  double return_value = 0;
+//   double return_value = -2.0*p.square () - 2.0;
+  double return_value = -10;
   // for (unsigned int i=0; i<dim; ++i)
   //   return_value += 4*std::pow(p(i), 4);
 
@@ -261,7 +267,19 @@ template <int dim>
 double Obstacle<dim>::value (const Point<dim> &p,
 			     const unsigned int /*component*/) const 
 {
-  return 2.0*p.square() - 0.5;
+//   return 2.0*p.square() - 0.5;
+
+  double return_value = 0;
+  if (p (0) < -0.5)
+    return_value = -0.2;
+  else if (p (0) >= -0.5 && p (0) < 0.0)
+    return_value = -0.4;
+  else if (p (0) >= 0.0 && p (0) < 0.5)
+    return_value = -0.6;
+  else
+    return_value = -0.8;
+
+      return return_value;
 }
 
 
@@ -348,7 +366,7 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (6);
+  triangulation.refine_global (7);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -470,7 +488,7 @@ void Step4<dim>::assemble_system ()
   const unsigned int   n_q_points    = quadrature_formula.size();
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-  Vector<double>       cell_rhs (dofs_per_cell);
+  TrilinosWrappers::Vector       cell_rhs (dofs_per_cell);
 
   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -663,7 +681,7 @@ void Step4<dim>::projection_active_set ()
 
 	Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
 	double obstacle_value = obstacle.value (point);
-	if (solution (index_x) >= obstacle_value && resid_vector (index_x) <= 0)
+	if (solution (index_x) <= obstacle_value && resid_vector (index_x) >= 0)
 	{
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
@@ -692,9 +710,9 @@ template <int dim>
 void Step4<dim>::solve () 
 {
   ReductionControl        reduction_control (100, 1e-12, 1e-2);
-  SolverCG<>              solver (reduction_control);
-  SolverBicgstab<>        solver_bicgstab (reduction_control);
-  PreconditionSSOR<SparseMatrix<double> > precondition;
+  SolverCG<TrilinosWrappers::Vector>   solver (reduction_control);       
+//   SolverBicgstab<>        solver_bicgstab (reduction_control);
+  TrilinosWrappers::PreconditionSSOR precondition;
   precondition.initialize (system_matrix, 1.2);
 
   solver.solve (system_matrix, solution, system_rhs, precondition);
@@ -736,7 +754,7 @@ void Step4<dim>::solve ()
                                  // than 2 or 3, but we neglect this here for
                                  // the sake of brevity).
 template <int dim>
-void Step4<dim>::output_results (Vector<double> vector_to_plot, const std::string& title) const
+void Step4<dim>::output_results (TrilinosWrappers::Vector vector_to_plot, const std::string& title) const
 {
   DataOut<dim> data_out;
 
@@ -822,7 +840,7 @@ void Step4<dim>::run ()
       system_matrix_complete.vmult_add  (resid_vector, solution);
 
       for (unsigned int k = 0; k<solution.size (); k++)
-	if (resid_vector (k) < 0)
+	if (resid_vector (k) > 0)
 	  resid_vector (k) = 0;
 
       std::ostringstream filename_residuum;
