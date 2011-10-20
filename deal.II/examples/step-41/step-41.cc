@@ -710,10 +710,9 @@ template <int dim>
 void Step4<dim>::solve () 
 {
   ReductionControl        reduction_control (100, 1e-12, 1e-2);
-  SolverCG<TrilinosWrappers::Vector>   solver (reduction_control);       
-//   SolverBicgstab<>        solver_bicgstab (reduction_control);
-  TrilinosWrappers::PreconditionSSOR precondition;
-  precondition.initialize (system_matrix, 1.2);
+  SolverCG<TrilinosWrappers::Vector>   solver (reduction_control); 
+  TrilinosWrappers::PreconditionAMG precondition;
+  precondition.initialize (system_matrix);
 
   solver.solve (system_matrix, solution, system_rhs, precondition);
 
@@ -768,10 +767,10 @@ void Step4<dim>::output_results (TrilinosWrappers::Vector vector_to_plot, const 
 			    (title + ".vtk").c_str ());
   data_out.write_vtk (output_vtk);
 
-  std::ofstream output_gnuplot (dim == 2 ?
-				(title + ".gp").c_str () :
-				(title + ".gp").c_str ());
-  data_out.write_gnuplot (output_gnuplot);
+//   std::ofstream output_gnuplot (dim == 2 ?
+// 				(title + ".gp").c_str () :
+// 				(title + ".gp").c_str ());
+//   data_out.write_gnuplot (output_gnuplot);
 }
 
 
@@ -827,13 +826,8 @@ void Step4<dim>::run ()
 // 		 << solution (k) << ", "
 // 		 << system_rhs.l2_norm ()
 // 		 <<std::endl;
-      std::cout<< "Solve System" <<std::endl;
+      std::cout<< "Solve System:" <<std::endl;
       solve ();
-
-      std::ostringstream filename_solution;
-      filename_solution << "solution_";
-      filename_solution << i;
-      output_results (solution, filename_solution.str ());
 
       resid_vector = 0;
       resid_vector -= system_rhs_complete;
@@ -843,15 +837,21 @@ void Step4<dim>::run ()
 	if (resid_vector (k) > 0)
 	  resid_vector (k) = 0;
 
-      std::ostringstream filename_residuum;
-      filename_residuum << "residuum_";
-      filename_residuum << i;
-      output_results (resid_vector, filename_residuum.str ());
+      std::cout<< "Create Output:" <<std::endl;
+      std::ostringstream filename_solution;
+      filename_solution << "solution_";
+      filename_solution << i;
+      output_results (solution, filename_solution.str ());
 
-      std::ostringstream filename_active_set;
-      filename_active_set << "active_set_";
-      filename_active_set << i;
-      output_results (active_set, filename_active_set.str ());
+//       std::ostringstream filename_residuum;
+//       filename_residuum << "residuum_";
+//       filename_residuum << i;
+//       output_results (resid_vector, filename_residuum.str ());
+
+//       std::ostringstream filename_active_set;
+//       filename_active_set << "active_set_";
+//       filename_active_set << i;
+//       output_results (active_set, filename_active_set.str ());
 
       double resid = resid_vector.l2_norm ();
       std::cout<< i << ". Residuum = " << resid <<std::endl;
@@ -941,12 +941,12 @@ void Step4<dim>::run ()
                                  // written. By changing it you can get more
                                  // information about the innards of the
                                  // library.
-int main (int argc, char *argv[])
+int main (int argc, char *argv[]) 
 {
   deallog.depth_console (0);
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-
   {
+    Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+
     Step4<2> laplace_problem_2d;
     laplace_problem_2d.run ();
   }
