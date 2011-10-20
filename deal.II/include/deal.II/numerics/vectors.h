@@ -416,7 +416,10 @@ namespace VectorTools
 				    * Compute the interpolation of
 				    * @p function at the support
 				    * points to the finite element
-				    * space. It is assumed that the
+				    * space described by the Triangulation
+				    * and FiniteElement object with which
+				    * the given DoFHandler argument is
+				    * initialized. It is assumed that the
 				    * number of components of
 				    * @p function matches that of
 				    * the finite element used by
