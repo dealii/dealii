@@ -44,6 +44,11 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Trying to write a TableHandler object that is empty resulted
+in a segmentation fault. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/10/21)
+
 <li> New: The TableHandler class can now pad columns that have only been
 partially filled. See the documentation of the class for a description.
 <br>

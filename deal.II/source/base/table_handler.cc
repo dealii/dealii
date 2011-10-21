@@ -441,7 +441,10 @@ void TableHandler::write_tex (std::ostream &out, const bool with_header) const
 
 unsigned int TableHandler::n_rows() const
 {
-  std::map<std::string, Column>::const_iterator col_iter=columns.begin();
+  if (columns.size() == 0)
+    return 0;
+  
+  std::map<std::string, Column>::const_iterator col_iter = columns.begin();
   unsigned int n = col_iter->second.entries.size();
   std::string first_name=col_iter->first;
 
