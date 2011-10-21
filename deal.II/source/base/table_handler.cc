@@ -26,6 +26,160 @@ DEAL_II_NAMESPACE_OPEN
 
 /*---------------------------------------------------------------------*/
 
+// inline and template functions
+namespace internal
+{
+  TableEntry::TableEntry ()
+  {}
+
+
+  double TableEntry::get_numeric_value () const
+  {
+    // we don't quite know the data type in 'value', but
+    // it must be one of the ones in the type list of the
+    // boost::variant. Go through this list and return
+    // the value if this happens to be a number
+    //
+    // first try with int
+    try
+    {
+      return boost::get<int>(value);
+    }
+    catch (...)
+    {}
+
+
+    // ... then with unsigned int...
+    try
+    {
+      return boost::get<unsigned int>(value);
+    }
+    catch (...)
+    {}
+
+    // ...and finally with double precision:
+    try
+    {
+      return boost::get<double>(value);
+    }
+    catch (...)
+    {
+      Assert (false, ExcMessage ("The number stored by this element of the "
+      "table is not a number."))
+    }
+
+    return 0;
+  }
+
+
+  namespace Local
+  {
+    // see which type we can cast to, then use this type to create
+    // a default constructed object
+    struct GetDefaultValue : public boost::static_visitor<>
+    {
+      template <typename T>
+      void operator()( T & operand ) const
+      {
+	operand = T();
+      }
+    };
+  }
+
+  TableEntry TableEntry::get_default_constructed_copy () const
+  {
+    TableEntry new_entry = *this;
+    boost::apply_visitor(Local::GetDefaultValue(), new_entry.value);
+    
+    return new_entry;
+  }
+
+
+  template <class Archive>
+  void TableEntry::save (Archive & ar,
+			 const unsigned int) const
+  {
+				     // write first an identifier for the kind
+				     // of data stored and then the actual
+				     // data, in its correct data type
+    if (const int *p = boost::get<int>(&value))
+      {
+	char c = 'i';
+	ar & c & *p;
+      }
+    else if (const unsigned int *p = boost::get<unsigned int>(&value))
+      {
+	char c = 'u';
+	ar & c & *p;
+      }
+    else if (const double *p = boost::get<double>(&value))
+      {
+	char c = 'd';
+	ar & c & *p;
+      }
+    else if (const std::string *p = boost::get<std::string>(&value))
+      {
+	char c = 's';
+	ar & c & *p;
+      }
+    else
+      Assert (false, ExcInternalError());
+  }
+
+
+
+  template <class Archive>
+  void TableEntry::load (Archive & ar,
+			 const unsigned int)
+  {
+				     // following what we do in the save()
+				     // function, first read in the data type
+				     // as a one-character id, and then read
+				     // the data
+    char c;
+    ar & c;
+
+    switch (c)
+      {
+	case 'i':
+	{
+	  int val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 'u':
+	{
+	  unsigned int val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 'd':
+	{
+	  double val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 's':
+	{
+	  std::string val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	default:
+	      Assert (false, ExcInternalError());
+      }
+  }
+}
+
+/* ------------------------------------------------ */
 
 TableHandler::Column::Column(const std::string &tex_caption)
                 :
@@ -47,6 +201,19 @@ TableHandler::Column::Column()
 		flag(0)
 {}
 
+
+
+void
+TableHandler::Column::pad_column_below (const unsigned int size)
+{
+  // we should never have a column that is completely
+  // empty and that needs to be padded
+  Assert (entries.size() > 0, ExcInternalError());
+  
+  // add as many elements as necessary
+  while (entries.size() < size)
+    entries.push_back (entries.back().get_default_constructed_copy());
+}
 
 
 /*---------------------------------------------------------------------*/
@@ -186,6 +353,19 @@ void TableHandler::write_text(std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
+  // first pad the table from below if necessary
+  if (auto_fill_mode == true)
+  {
+    unsigned int max_rows = 0;
+    for (std::map<std::string, Column>::const_iterator p = columns.begin();
+	 p != columns.end(); ++p)
+      max_rows = std::max<unsigned int>(max_rows, p->second.entries.size());
+
+    for (std::map<std::string, Column>::iterator p = columns.begin();
+	 p != columns.end(); ++p)
+      p->second.pad_column_below (max_rows);
+  }
+  
   std::vector<std::string> sel_columns;
   get_selected_columns(sel_columns);
 
@@ -330,6 +510,19 @@ void TableHandler::write_tex (std::ostream &out, const bool with_header) const
   out << "\\begin{table}[H]" << std::endl
       << "\\begin{center}" << std::endl
       << "\\begin{tabular}{|";
+
+  // first pad the table from below if necessary
+  if (auto_fill_mode == true)
+  {
+    unsigned int max_rows = 0;
+    for (std::map<std::string, Column>::const_iterator p = columns.begin();
+	 p != columns.end(); ++p)
+      max_rows = std::max<unsigned int>(max_rows, p->second.entries.size());
+
+    for (std::map<std::string, Column>::iterator p = columns.begin();
+	 p != columns.end(); ++p)
+      p->second.pad_column_below (max_rows);
+  }
 
   std::vector<std::string> sel_columns;
   get_selected_columns(sel_columns);

@@ -83,6 +83,14 @@ namespace internal
     double get_numeric_value () const;
 
     /**
+     * Return a TableEntry object that has the same data type
+     * of the stored value but with a value that is default
+     * constructed for this data type. This is used to pad
+     * columns below previously set ones.
+     */
+    TableEntry get_default_constructed_copy() const;
+    
+    /**
      * Write the data of this object to a
      * stream for the purpose of
      * serialization.
@@ -223,6 +231,14 @@ namespace internal
  * a column that will always be added to; or, you may want to start every iteration
  * by adding the number of the iteration to the table, for example in column 1.
  *
+ * In the case above, we have always padded columns <b>above</b> the element that
+ * is being added to a column. However, there is also a case where we have to pad
+ * <b>below</b>. Namely, if a previous row has been completely filled using
+ * TableHandler::add_value(), subsequent rows have been filled partially, and we
+ * then ask for output via write_text() or write_tex(). In that case, the last
+ * few rows that have been filled only partially need to be padded below the last
+ * element that has been added to them. As before, we do that by using default
+ * constructed objects of the same type as the last element of that column.
  *
  * @ingroup textoutput
  * @author Ralf Hartmann, 1999; Wolfgang Bangerth, 2011
@@ -475,6 +491,12 @@ class TableHandler
                                           */
         Column (const std::string &tex_caption);
 
+	/**
+	 * Pad this column with default constructed elements to the
+	 * number of rows given by the argument.
+	 */
+	void pad_column_below (const unsigned int length);
+	
 				         /**
 				          * Read or write the data of this
 				          * object to or from a stream for
@@ -587,8 +609,14 @@ class TableHandler
                                      /**
                                       * Maps the column keys to the
                                       * columns (not supercolumns).
+				      * 
+				      * The field is declared mutable so
+				      * that the write_text() and write_tex()
+				      * functions can be const, even though they
+				      * may pad columns below if auto_fill_mode
+				      * is on.
                                       */
-    std::map<std::string,Column> columns;
+    mutable std::map<std::string,Column> columns;
 
                                      /**
                                       * Maps each supercolumn key to
@@ -633,14 +661,8 @@ class TableHandler
 };
 
 
-// inline and template functions
 namespace internal
 {
-  inline
-  TableEntry::TableEntry ()
-  {}
-
-
   template <typename T>
   TableEntry::TableEntry (const T &t)
   :
@@ -649,7 +671,6 @@ namespace internal
 
 
   template <typename T>
-  inline
   T TableEntry::get () const
   {
     // we don't quite know the data type in 'value', but
@@ -667,134 +688,8 @@ namespace internal
       Assert(false, ExcMessage ("This TableEntry object does not store a datum of type T"));
       throw;
     }
-  }
-
-
-  inline
-  double TableEntry::get_numeric_value () const
-  {
-    // we don't quite know the data type in 'value', but
-    // it must be one of the ones in the type list of the
-    // boost::variant. Go through this list and return
-    // the value if this happens to be a number
-    //
-    // first try with int
-    try
-    {
-      return boost::get<int>(value);
-    }
-    catch (...)
-    {}
-
-
-    // ... then with unsigned int...
-    try
-    {
-      return boost::get<unsigned int>(value);
-    }
-    catch (...)
-    {}
-
-    // ...and finally with double precision:
-    try
-    {
-      return boost::get<double>(value);
-    }
-    catch (...)
-    {
-      Assert (false, ExcMessage ("The number stored by this element of the "
-      "table is not a number."))
-    }
-
-    return 0;
-  }
-
-
-
-  template <class Archive>
-  void TableEntry::save (Archive & ar,
-			 const unsigned int) const
-  {
-				     // write first an identifier for the kind
-				     // of data stored and then the actual
-				     // data, in its correct data type
-    if (const int *p = boost::get<int>(&value))
-      {
-	char c = 'i';
-	ar & c & *p;
-      }
-    else if (const unsigned int *p = boost::get<unsigned int>(&value))
-      {
-	char c = 'u';
-	ar & c & *p;
-      }
-    else if (const double *p = boost::get<double>(&value))
-      {
-	char c = 'd';
-	ar & c & *p;
-      }
-    else if (const std::string *p = boost::get<std::string>(&value))
-      {
-	char c = 's';
-	ar & c & *p;
-      }
-    else
-      Assert (false, ExcInternalError());
-  }
-
-
-
-  template <class Archive>
-  void TableEntry::load (Archive & ar,
-			 const unsigned int)
-  {
-				     // following what we do in the save()
-				     // function, first read in the data type
-				     // as a one-character id, and then read
-				     // the data
-    char c;
-    ar & c;
-
-    switch (c)
-      {
-	case 'i':
-	{
-	  int val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
-
-	case 'u':
-	{
-	  unsigned int val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
-
-	case 'd':
-	{
-	  double val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
-
-	case 's':
-	{
-	  std::string val;
-	  ar & val;
-	  value = val;
-	  break;
-	}
-
-	default:
-	      Assert (false, ExcInternalError());
-      }
-  }
+  }  
 }
-
 
 template <typename T>
 void TableHandler::add_value (const std::string &key,
