@@ -689,6 +689,91 @@ namespace internal
       throw;
     }
   }  
+
+  
+  
+  template <class Archive>
+  void TableEntry::save (Archive & ar,
+			 const unsigned int) const
+  {
+				     // write first an identifier for the kind
+				     // of data stored and then the actual
+				     // data, in its correct data type
+    if (const int *p = boost::get<int>(&value))
+      {
+	char c = 'i';
+	ar & c & *p;
+      }
+    else if (const unsigned int *p = boost::get<unsigned int>(&value))
+      {
+	char c = 'u';
+	ar & c & *p;
+      }
+    else if (const double *p = boost::get<double>(&value))
+      {
+	char c = 'd';
+	ar & c & *p;
+      }
+    else if (const std::string *p = boost::get<std::string>(&value))
+      {
+	char c = 's';
+	ar & c & *p;
+      }
+    else
+      Assert (false, ExcInternalError());
+  }
+
+
+
+  template <class Archive>
+  void TableEntry::load (Archive & ar,
+			 const unsigned int)
+  {
+				     // following what we do in the save()
+				     // function, first read in the data type
+				     // as a one-character id, and then read
+				     // the data
+    char c;
+    ar & c;
+
+    switch (c)
+      {
+	case 'i':
+	{
+	  int val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 'u':
+	{
+	  unsigned int val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 'd':
+	{
+	  double val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	case 's':
+	{
+	  std::string val;
+	  ar & val;
+	  value = val;
+	  break;
+	}
+
+	default:
+	      Assert (false, ExcInternalError());
+      }
+  }  
 }
 
 template <typename T>
