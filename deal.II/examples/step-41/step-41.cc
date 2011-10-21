@@ -94,7 +94,7 @@ class Step4
     void assemble_system ();
     void projection_active_set ();
     void solve ();
-    void output_results (TrilinosWrappers::Vector vector_to_plot, const std::string& title) const;
+    void output_results (const std::string& title) const;
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -366,7 +366,7 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (7);
+  triangulation.refine_global (4);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -673,7 +673,7 @@ void Step4<dim>::projection_active_set ()
   endc = dof_handler.end();
 
   constraints.clear();
-  active_set = 0;
+  active_set = 0.0;
   for (; cell!=endc; ++cell)
     for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
       {
@@ -686,7 +686,7 @@ void Step4<dim>::projection_active_set ()
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
  	  solution (index_x) = 0;
-	  active_set (index_x) = 1;
+	  active_set (index_x) = 1.0;
 	}
       }
       
@@ -753,12 +753,14 @@ void Step4<dim>::solve ()
                                  // than 2 or 3, but we neglect this here for
                                  // the sake of brevity).
 template <int dim>
-void Step4<dim>::output_results (TrilinosWrappers::Vector vector_to_plot, const std::string& title) const
+void Step4<dim>::output_results (const std::string& title) const
 {
   DataOut<dim> data_out;
-
+  
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (vector_to_plot, "vector_to_plot");
+  data_out.add_data_vector (solution, "Displacement");
+  data_out.add_data_vector (resid_vector, "Residual");
+  data_out.add_data_vector (active_set, "ActiveSet");
 
   data_out.build_patches ();
 
@@ -767,10 +769,10 @@ void Step4<dim>::output_results (TrilinosWrappers::Vector vector_to_plot, const 
 			    (title + ".vtk").c_str ());
   data_out.write_vtk (output_vtk);
 
-//   std::ofstream output_gnuplot (dim == 2 ?
-// 				(title + ".gp").c_str () :
-// 				(title + ".gp").c_str ());
-//   data_out.write_gnuplot (output_gnuplot);
+  std::ofstream output_gnuplot (dim == 2 ?
+				(title + ".gp").c_str () :
+				(title + ".gp").c_str ());
+  data_out.write_gnuplot (output_gnuplot);
 }
 
 
@@ -838,20 +840,10 @@ void Step4<dim>::run ()
 	  resid_vector (k) = 0;
 
       std::cout<< "Create Output:" <<std::endl;
-      std::ostringstream filename_solution;
-      filename_solution << "solution_";
-      filename_solution << i;
-      output_results (solution, filename_solution.str ());
-
-//       std::ostringstream filename_residuum;
-//       filename_residuum << "residuum_";
-//       filename_residuum << i;
-//       output_results (resid_vector, filename_residuum.str ());
-
-//       std::ostringstream filename_active_set;
-//       filename_active_set << "active_set_";
-//       filename_active_set << i;
-//       output_results (active_set, filename_active_set.str ());
+      std::ostringstream filename_output;
+      filename_output << "output_";
+      filename_output << i;
+      output_results (filename_output.str ());
 
       double resid = resid_vector.l2_norm ();
       std::cout<< i << ". Residuum = " << resid <<std::endl;
