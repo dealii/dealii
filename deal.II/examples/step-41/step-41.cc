@@ -107,6 +107,7 @@ class Step4
     TrilinosWrappers::SparseMatrix system_matrix_complete;
 
     TrilinosWrappers::Vector       solution;
+    TrilinosWrappers::Vector       tmp_solution;
     TrilinosWrappers::Vector       system_rhs;
     TrilinosWrappers::Vector       system_rhs_complete;
     TrilinosWrappers::Vector       resid_vector;
@@ -366,7 +367,7 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (4);
+  triangulation.refine_global (7);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -405,6 +406,7 @@ void Step4<dim>::setup_system ()
   system_matrix_complete.reinit (sparsity_pattern);
   
   solution.reinit (dof_handler.n_dofs());
+  tmp_solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
   system_rhs_complete.reinit (dof_handler.n_dofs());
   resid_vector.reinit (dof_handler.n_dofs());
@@ -681,7 +683,7 @@ void Step4<dim>::projection_active_set ()
 
 	Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
 	double obstacle_value = obstacle.value (point);
-	if (solution (index_x) <= obstacle_value && resid_vector (index_x) >= 0)
+	if (solution (index_x) <= obstacle_value && resid_vector (index_x) >= -1e-15)
 	{
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
@@ -758,7 +760,7 @@ void Step4<dim>::output_results (const std::string& title) const
   DataOut<dim> data_out;
   
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (solution, "Displacement");
+  data_out.add_data_vector (tmp_solution, "Displacement");
   data_out.add_data_vector (resid_vector, "Residual");
   data_out.add_data_vector (active_set, "ActiveSet");
 
@@ -830,6 +832,7 @@ void Step4<dim>::run ()
 // 		 <<std::endl;
       std::cout<< "Solve System:" <<std::endl;
       solve ();
+      tmp_solution = solution;
 
       resid_vector = 0;
       resid_vector -= system_rhs_complete;
@@ -838,6 +841,9 @@ void Step4<dim>::run ()
       for (unsigned int k = 0; k<solution.size (); k++)
 	if (resid_vector (k) > 0)
 	  resid_vector (k) = 0;
+
+      std::cout<< "Update Active Set:"<<std::endl;
+      projection_active_set ();
 
       std::cout<< "Create Output:" <<std::endl;
       std::ostringstream filename_output;
@@ -851,9 +857,6 @@ void Step4<dim>::run ()
 	{
 	  break;
 	}
-
-      std::cout<< "Update Active Set:"<<std::endl;
-      projection_active_set ();
     }
 }
 
