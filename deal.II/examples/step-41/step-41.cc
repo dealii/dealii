@@ -102,7 +102,7 @@ class Step4
 
     ConstraintMatrix     constraints;
     
-    SparsityPattern      sparsity_pattern;
+    SparsityPattern                sparsity_pattern;
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix system_matrix_complete;
 
@@ -239,10 +239,7 @@ template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
 				  const unsigned int /*component*/) const 
 {
-//   double return_value = -2.0*p.square () - 2.0;
   double return_value = -10;
-  // for (unsigned int i=0; i<dim; ++i)
-  //   return_value += 4*std::pow(p(i), 4);
 
   return return_value;
 }
@@ -268,9 +265,8 @@ template <int dim>
 double Obstacle<dim>::value (const Point<dim> &p,
 			     const unsigned int /*component*/) const 
 {
-//   return 2.0*p.square() - 0.5;
-
   double return_value = 0;
+
   if (p (0) < -0.5)
     return_value = -0.2;
   else if (p (0) >= -0.5 && p (0) < 0.0)
@@ -280,7 +276,7 @@ double Obstacle<dim>::value (const Point<dim> &p,
   else
     return_value = -0.8;
 
-      return return_value;
+  return return_value;
 }
 
 
@@ -399,7 +395,6 @@ void Step4<dim>::setup_system ()
 
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
-//   c_sparsity.compress ();
   sparsity_pattern.copy_from(c_sparsity);
   
   system_matrix.reinit (sparsity_pattern);
@@ -589,37 +584,11 @@ void Step4<dim>::assemble_system ()
 				       // and right hand side is done exactly
 				       // as before, but here we have again
 				       // merged some loops for efficiency:
-      cell->get_dof_indices (local_dof_indices);
-//       for (unsigned int i=0; i<dofs_per_cell; ++i)
-// 	{
-// 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-// 	    system_matrix.add (local_dof_indices[i],
-// 			       local_dof_indices[j],
-// 			       cell_matrix(i,j));
-// 	  
-// 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
-// 	}
-	
+      cell->get_dof_indices (local_dof_indices);	
       constraints.distribute_local_to_global (cell_matrix, cell_rhs,
                                               local_dof_indices,
                                               system_matrix, system_rhs);
     }
-  
-// 				   // As the final step in this function, we
-// 				   // wanted to have non-homogeneous boundary
-// 				   // values in this example, unlike the one
-// 				   // before. This is a simple task, we only
-// 				   // have to replace the
-// 				   // ZeroFunction used there by
-// 				   // an object of the class which describes
-// 				   // the boundary values we would like to use
-// 				   // (i.e. the <code>BoundaryValues</code>
-// 				   // class declared above):
-// 
-//   MatrixTools::apply_boundary_values (boundary_values,
-// 				      system_matrix,
-// 				      solution,
-// 				      system_rhs);
 }
 
                                  // @sect4{Step4::projection_active_set}
@@ -629,44 +598,6 @@ void Step4<dim>::assemble_system ()
 template <int dim>
 void Step4<dim>::projection_active_set ()
 {
-//   const Obstacle<dim>     obstacle;
-//   std::vector<bool>       vertex_touched (triangulation.n_vertices(),
-// 				    false);
-// 
-//   boundary_values.clear ();
-//   VectorTools::interpolate_boundary_values (dof_handler,
-// 					    0,
-// 					    BoundaryValues<dim>(),
-// 					    boundary_values);
-// 
-//   typename DoFHandler<dim>::active_cell_iterator
-//     cell = dof_handler.begin_active(),
-//     endc = dof_handler.end();
-// 
-//   active_set = 0;
-//   unsigned int n = 0;
-//   for (; cell!=endc; ++cell)
-//     for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-//       {
-// 	if (vertex_touched[cell->vertex_index(v)] == false)
-// 	  {
-// 	    vertex_touched[cell->vertex_index(v)] = true;
-// 	    unsigned int index_x = cell->vertex_dof_index (v,0);
-// 	    // unsigned int index_y = cell->vertex_dof_index (v,1);
-// 
-// 	    Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
-// 	    double obstacle_value = obstacle.value (point);
-// 	    if (solution (index_x) >= obstacle_value && resid_vector (index_x) <= 0)
-// 	      {
-// 		solution (index_x) = obstacle_value;
-// 		boundary_values.insert (std::pair<unsigned int, double>(index_x, obstacle_value));
-// 		active_set (index_x) = 1;
-// 		n += 1;
-// 	      }
-// 	  }
-//       }
-//   std::cout<< "Number of active contraints: " << n <<std::endl;
-  
   const Obstacle<dim>     obstacle;
   std::vector<bool>       vertex_touched (triangulation.n_vertices(),
 				    false);
@@ -683,7 +614,9 @@ void Step4<dim>::projection_active_set ()
 
 	Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
 	double obstacle_value = obstacle.value (point);
-	if (solution (index_x) <= obstacle_value && resid_vector (index_x) >= -1e-15)
+	double solution_index_x = solution (index_x);
+	if (solution_index_x <= obstacle_value &&
+	    (resid_vector (index_x) >= solution_index_x - obstacle_value))
 	{
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
@@ -770,11 +703,6 @@ void Step4<dim>::output_results (const std::string& title) const
 			    (title + ".vtk").c_str () :
 			    (title + ".vtk").c_str ());
   data_out.write_vtk (output_vtk);
-
-  std::ofstream output_gnuplot (dim == 2 ?
-				(title + ".gp").c_str () :
-				(title + ".gp").c_str ());
-  data_out.write_gnuplot (output_gnuplot);
 }
 
 
@@ -813,23 +741,11 @@ void Step4<dim>::run ()
 
   for (unsigned int i=0; i<solution.size (); i++)
     {
-//       std::ostringstream filename_matrix;
-//       filename_matrix << "system_matrix_";
-//       filename_matrix << i;
-//       filename_matrix << ".dat";
-//       std::ofstream matrix (filename_matrix.str ().c_str());
-
       std::cout<< "Assemble System:" <<std::endl;
       system_matrix = 0;
       system_rhs = 0;
       assemble_system ();
-//       constraints.print (matrix);
-//       system_matrix.print (matrix);
-//       for (unsigned int k=0; k<solution.size (); k++)
-// 	std::cout<< system_rhs (k) << ", "
-// 		 << solution (k) << ", "
-// 		 << system_rhs.l2_norm ()
-// 		 <<std::endl;
+
       std::cout<< "Solve System:" <<std::endl;
       solve ();
       tmp_solution = solution;
@@ -837,7 +753,6 @@ void Step4<dim>::run ()
       resid_vector = 0;
       resid_vector -= system_rhs_complete;
       system_matrix_complete.vmult_add  (resid_vector, solution);
-
       for (unsigned int k = 0; k<solution.size (); k++)
 	if (resid_vector (k) > 0)
 	  resid_vector (k) = 0;
@@ -852,7 +767,7 @@ void Step4<dim>::run ()
       output_results (filename_output.str ());
 
       double resid = resid_vector.l2_norm ();
-      std::cout<< i << ". Residuum = " << resid <<std::endl;
+      std::cout<< i << ". Residual = " << resid <<std::endl;
       if (resid < 1e-10)
 	{
 	  break;
@@ -939,17 +854,11 @@ void Step4<dim>::run ()
 int main (int argc, char *argv[]) 
 {
   deallog.depth_console (0);
-  {
-    Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
-    Step4<2> laplace_problem_2d;
-    laplace_problem_2d.run ();
-  }
-  
-  // {
-  //   Step4<3> laplace_problem_3d;
-  //   laplace_problem_3d.run ();
-  // }
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+
+  Step4<2> laplace_problem_2d;
+  laplace_problem_2d.run ();
   
   return 0;
 }
