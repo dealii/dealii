@@ -267,7 +267,8 @@ void TableHandler::set_scientific (const std::string &key,
 }
 
 
-void TableHandler::write_text(std::ostream &out) const
+void TableHandler::write_text(std::ostream &out,
+			      const TextOutputFormat format) const
 {
   AssertThrow (out, ExcIO());
 
@@ -298,9 +299,9 @@ void TableHandler::write_text(std::ostream &out) const
     for (unsigned int j=0; j<n_cols; ++j)
       {
 					 // get key and entry here
-	std::string key=sel_columns[j];
+	std::string key = sel_columns[j];
 	const std::map<std::string, Column>::const_iterator
-	  col_iter=columns.find(key);
+	  col_iter = columns.find(key);
 	Assert(col_iter!=columns.end(), ExcInternalError());
 
 	const Column & column = col_iter->second;
@@ -341,32 +342,52 @@ void TableHandler::write_text(std::ostream &out) const
       column_widths[j] = std::max(entry_widths[i][j],
 				  column_widths[j]);
 
-				   // write the caption line
+				   // write the captions
   for (unsigned int j=0; j<column_order.size(); ++j)
     {
       const std::string & key = column_order[j];
 
-				       // if the key of this column is
-				       // wider than the widest entry,
-				       // then adjust
-      if (key.length() > column_widths[j])
-	column_widths[j] = key.length();
+      switch (format)
+      {
+	case table_with_headers:
+	{
+	  // if the key of this column is
+	  // wider than the widest entry,
+	  // then adjust
+	  if (key.length() > column_widths[j])
+	    column_widths[j] = key.length();
 
-				       // now write key. try to center
-				       // it somehow
-      const unsigned int front_padding = (column_widths[j]-key.length())/2,
-			  rear_padding = (column_widths[j]-key.length()) -
-					 front_padding;
-      for (unsigned int i=0; i<front_padding; ++i)
-	out << ' ';
-      out << key;
-      for (unsigned int i=0; i<rear_padding; ++i)
-	out << ' ';
+	  // now write key. try to center
+	  // it somehow
+	  const unsigned int front_padding = (column_widths[j]-key.length())/2,
+	                     rear_padding  = (column_widths[j]-key.length()) -
+	                                      front_padding;
+          for (unsigned int i=0; i<front_padding; ++i)
+	    out << ' ';
+	  out << key;
+	  for (unsigned int i=0; i<rear_padding; ++i)
+	    out << ' ';
 
-				       // finally column break
-      out << ' ';
+	  // finally column break
+	  out << ' ';
+	  
+	  break;
+	}
+	
+	case table_with_separate_column_description:
+	{
+	  // print column key with column number. enumerate
+	  // columns starting with 1
+	  out << "# " << j+1 << ": " << key << std::endl;
+	  break;
+	}
+	
+	default:
+	  Assert (false, ExcInternalError());
+      }
     }
-  out << std::endl;
+  if (format == table_with_headers)  
+    out << std::endl;
 
   for (unsigned int i=0; i<nrows; ++i)
     {

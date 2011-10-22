@@ -246,6 +246,28 @@ namespace internal
 class TableHandler
 {
   public:
+    /**
+     * Set of options how a table should be formatted when output with
+     * the write_text() function. The following possibilities exist:
+     * 
+     * - <code>table_with_headers</code>: The table is formatted in such a way
+     *   that the contents are aligned under the key of each column, i.e. the
+     *   key sits atop each column. This is suitable for tables with few columns
+     *   where the entire table can be displayed on the screen.
+     * - <code>table_with_separate_column_description</code>: This is a better
+     *   format when there are many columns and the table as a whole can not
+     *   be displayed on the screen. Here, the column keys are first listed
+     *   one-by-one on lines of their own, and are numbered for better readability.
+     *   In addition, each of these description lines are prefixed by '#' to mark
+     *   these lines as comments for programs that want to read the following
+     *   table as data and should ignore these descriptive lines. GNUPLOT is
+     *   one such program that will automatically ignore lines so prefixed.
+     **/
+    enum TextOutputFormat
+    {
+      table_with_headers,
+      table_with_separate_column_description
+    };
 
                                      /**
                                       * Constructor.
@@ -408,8 +430,14 @@ class TableHandler
                                       * add_value() function with an empty
                                       * string), then the entry of the table
                                       * is printed as <code>""</code>.
+				      * 
+				      * The second argument indicates how
+				      * column keys are to be displayed. See
+				      * the description of TextOutputFormat
+				      * for more information
                                       */
-    void write_text (std::ostream &out) const;
+    void write_text (std::ostream &out,
+		     const TextOutputFormat format = table_with_headers) const;
 
                                      /**
                                       * Write table as a tex file. If

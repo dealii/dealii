@@ -44,6 +44,12 @@ inconvenience this causes.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: TableHandler::print_text now supports not only printing column
+keys above their own column, but also in a separate header, to make it simpler
+for external plotting programs to skip this line.
+<br>
+(Wolfgang Bangerth, 2011/10/22)
+
 <li> Fixed: Trying to write a TableHandler object that is empty resulted
 in a segmentation fault. This is now fixed.
 <br>
