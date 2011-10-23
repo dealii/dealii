@@ -89,7 +89,7 @@ namespace internal
      * columns below previously set ones.
      */
     TableEntry get_default_constructed_copy() const;
-    
+
     /**
      * Write the data of this object to a
      * stream for the purpose of
@@ -249,11 +249,19 @@ class TableHandler
     /**
      * Set of options how a table should be formatted when output with
      * the write_text() function. The following possibilities exist:
-     * 
+     *
      * - <code>table_with_headers</code>: The table is formatted in such a way
      *   that the contents are aligned under the key of each column, i.e. the
      *   key sits atop each column. This is suitable for tables with few columns
-     *   where the entire table can be displayed on the screen.
+     *   where the entire table can be displayed on the screen. Output looks
+     *   like this:
+     *   @code
+     *     key1 key2 key3
+     *     0    0    ""
+     *     1    0    ""
+     *     2    13   a
+     *     1    0    ""
+     *   @endcode
      * - <code>table_with_separate_column_description</code>: This is a better
      *   format when there are many columns and the table as a whole can not
      *   be displayed on the screen. Here, the column keys are first listed
@@ -262,6 +270,16 @@ class TableHandler
      *   these lines as comments for programs that want to read the following
      *   table as data and should ignore these descriptive lines. GNUPLOT is
      *   one such program that will automatically ignore lines so prefixed.
+     *   Output with this option looks like this:
+     *   @code
+     *     # 1: key1
+     *     # 2: key2
+     *     # 3: key3
+     *     0 0  ""
+     *     1 0  ""
+     *     2 13 a
+     *     1 0  ""
+     *   @endcode
      **/
     enum TextOutputFormat
     {
@@ -430,7 +448,7 @@ class TableHandler
                                       * add_value() function with an empty
                                       * string), then the entry of the table
                                       * is printed as <code>""</code>.
-				      * 
+				      *
 				      * The second argument indicates how
 				      * column keys are to be displayed. See
 				      * the description of TextOutputFormat
@@ -524,7 +542,7 @@ class TableHandler
 	 * number of rows given by the argument.
 	 */
 	void pad_column_below (const unsigned int length);
-	
+
 				         /**
 				          * Read or write the data of this
 				          * object to or from a stream for
@@ -637,7 +655,7 @@ class TableHandler
                                      /**
                                       * Maps the column keys to the
                                       * columns (not supercolumns).
-				      * 
+				      *
 				      * The field is declared mutable so
 				      * that the write_text() and write_tex()
 				      * functions can be const, even though they
@@ -716,10 +734,10 @@ namespace internal
       Assert(false, ExcMessage ("This TableEntry object does not store a datum of type T"));
       throw;
     }
-  }  
+  }
 
-  
-  
+
+
   template <class Archive>
   void TableEntry::save (Archive & ar,
 			 const unsigned int) const
@@ -801,7 +819,7 @@ namespace internal
 	default:
 	      Assert (false, ExcInternalError());
       }
-  }  
+  }
 }
 
 template <typename T>
