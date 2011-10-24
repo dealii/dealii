@@ -1,2 +1,29 @@
 <h1>Results</h1>
 
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The primary objection one may have to this program is that it is still too
+slow: 3d computations on reasonably fine meshes are simply too expensive to be
+done routinely and with reasonably quick turn-around. This is similar to the
+situation we were in when we wrote step-31, from which this program has taken
+much inspiration. The solution is similar as it was there as well: We need to
+parallelize the program in a way similar to how we derived step-32 out of
+step-31. In fact, all of the techniques used in step-32 would be transferable
+to this program as well, making the program run on dozens or hundreds of
+processors immediately.
+
+A different direction is to make the program more relevant to many other
+porous media applications. Specifically, one avenue is to go to the primary
+user of porous media flow simulators, namely the oil industry. There,
+applications in this area are dominated by multiphase flow (i.e., more than
+the two phases we have here), and the reactions they may have with each other
+(or any other way phases may exchange mass, such as through dissolution in and
+bubbling out of gas from the oil phase). Furthermore, the presence of gas
+often leads to compressibility effects of the fluid. Jointly, these effects
+are typically formulated in the widely-used "black oil model". True reactions
+between multiple phases also play a role in oil reservoir modeling when
+considering controlled burns of oil in the reservoir to raise pressure and
+temperature. These are much more complex problems, though, and left for future
+projects.
