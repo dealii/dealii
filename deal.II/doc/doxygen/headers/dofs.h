@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2005, 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -24,13 +24,28 @@
  * parallel::distributed::DoFHandler and MGDoFHandler that do similar
  * things for more special cases.
  *
+ * DoFHandler objects are used together with objects of type FiniteElement
+ * (or hp::FECollection in the case of hp::DoFHandler) to enumerate all the
+ * degrees of freedom that exist in a triangulation for this particular
+ * finite element. As such, the combination of mesh, finite element, and
+ * DoF handler object can be thought of as providing a <i>basis</i> of
+ * the finite element space: the mesh provides the locations at which basis
+ * functions are defined; the finite element describes what kinds of basis
+ * functions exist; and the DoF handler object provides an enumeration of
+ * the basis, i.e., it is provides a concrete structure of the space so that
+ * we can describe functions in this finite dimensional space by vectors
+ * of coefficients.
+ *
  * DoFHandlers extend Triangulation objects (and the other classes in the @ref
  * grid module) in that they, too, offer iterators that run over all cells,
  * faces, or other geometric objects that make up a triangulation. These
  * iterators are derived from the triangulation iterators and therefore offer
  * the same functionality, but they also offer additional functions. For
  * example, they allow to query the indices of the degrees of freedom
- * associated with the present cell.
+ * associated with the present cell. Note that DoFHandler classes are <i>not
+ * derived</i> from Triangulation, though they use Triangulation objects;
+ * the reason is that there can be more than one DoFHandler object that works
+ * on the same Triangulation object.
  *
  * In addition to the DoF handler classes, this module holds a number of
  * auxiliary classes not commonly used in application programs, as well as
