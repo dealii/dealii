@@ -6,13 +6,13 @@ Wolfgang Bangerth. Results from this program are used and discussed in the
 following publications:
 - Chih-Che Chueh, Marc Secanell, Wolfgang Bangerth, Ned Djilali. Multi-level
   adaptive simulation of transient two-phase flow in heterogeneous porous
-  media. Computers &amp; Fluids, 39:1585-1596, 2010 
+  media. Computers &amp; Fluids, 39:1585-1596, 2010
 - Chih-Che Chueh, Wolfgang Bangerth, Ned Djilali. An h-adaptive operator
   splitting method for two-phase flow in 3D heterogeneous porous
   media. Submitted to Communications in Computational Physics.
 
 The implementation discussed here uses and extends
-parts of the step-21, step-31 and step-33 tutorial programs.
+parts of the step-21 and step-31 tutorial programs.
 
 The work of the first author was funded through the Canada Research Chairs
 Program and the MITACS Network of Centres of Excellence. Parts of the work by
@@ -26,13 +26,13 @@ Research Fellowship.
 
 The simulation of multiphase flow in porous media is a ubiquitous problem, and
 we have previously addressed it already in some form in step-20 and
-step-21. However, as was easy to see there,
-it faces two major difficulties: numerical accuracy and efficiency. The first
-is easy to see in step-20: using lowest order Raviart-Thomas elements can not
-be expected to yield highly accurate solutions. We need more accurate
-methods. The second reason is apparent from step-21: that program is
-exceedingly slow, and there is no hope to get highly accurate solutions in 3d
-within reasonable time frames.
+step-21. However, as was easy to see there, it faces two major difficulties:
+numerical accuracy and efficiency. The first is easy to see in the stationary
+solver step-20: using lowest order Raviart-Thomas elements can not be expected
+to yield highly accurate solutions. We need more accurate methods. The second
+reason is apparent from the time dependent step-21: that program is
+excruciatingly slow, and there is no hope to get highly accurate solutions in
+3d within reasonable time frames.
 
 In this
 program, in order to overcome these two problems, there are five areas which
@@ -45,6 +45,10 @@ we are trying to improve for a high performance simulator:
 <li> Operator splitting
 <li> Efficient solver and preconditioning
 </ul>
+
+Much inspiration for this program comes from step-31 but several of the
+techniques discussed here are original.
+
 
 <h3>Advection-dominated two-phase flow mathematical model.</h3>
 
@@ -102,9 +106,9 @@ flow variables need to be updated, we call this splitting an "adaptive
 operator splitting" scheme.
 
 Here, we use the following a posteriori criterion to decide when to re-compute
-pressure and velocity variables:
+pressure and velocity variables
 (detailed derivations and descriptions can be found in [Chueh, Bangerth
-and Djilali 2010]):
+and Djilali 2011]):
 @f{align*}
   \theta(n,n_p)
   =
@@ -118,14 +122,14 @@ and Djilali 2010]):
 @f}
 where superscripts in parentheses denote the number of the saturation time
 step at which any quantity is defined and $n_p<n$ represents the last step
-where actually we computed the pressure and velocity. If $\theta(n,n_p)$
+where we actually computed the pressure and velocity. If $\theta(n,n_p)$
 exceeds a certain threshold we re-compute the flow variables; otherwise, we
 skip this computation in time step $n$ and only move the saturation variable
 one time step forward.
 
 In short, the algorithm allows us to perform a number of
-saturation time steps of length $\Delta t_c^{(n)}$ until the criterion above
-tells us to re-compute velocity and pressure
+saturation time steps of length $\Delta t_c^{(n)}=t^{(n)}_c-t^{(n-1)}_c$ until
+the criterion above tells us to re-compute velocity and pressure
 variables, leading to a macro time step of length
 @f[
    \Delta t_p^{(n)} = \sum_{i=n_p+1}^{n} \Delta t_c^{(i)}.
@@ -142,14 +146,14 @@ The result is a scheme where neither micro nor macro time
 steps are of uniform length, and both are chosen adaptively.
 
 <h3>Time discretization.</h3>
-Using this time discretization, we obtain the following set of equations for each time step:
+Using this time discretization, we obtain the following set of equations for
+each time step from the IMPES approach (see step-21):
 @f{align*}
    \mathbf{u}^{(n)}_t + \lambda_t\left(S^{(n-1)}\right) \mathbf{K} \nabla p^{(n)} =0, \\
    \nabla \cdot \mathbf{u}^{(n)}_t = q, \\
-   \epsilon \left( \frac{S^{(n-1)}-S^{(n)}}{\Delta t^{(n)}_c} \right) + \mathbf{u}^{(n)}_t \cdot \nabla F\left(S^{(n-1)}\right) + F\left(S^{(n-1)}\right) \nabla \cdot \mathbf{u}^{(n)}_t =0,
+   \epsilon \left( \frac{S^{(n-1)}-S^{(n)}}{\Delta t^{(n)}_c} \right) + \mathbf{u}^{(n)}_t \cdot \nabla F\left(S^{(n-1)}\right) + F\left(S^{(n-1)}\right) \nabla \cdot \mathbf{u}^{(n)}_t =0.
 @f}
-where $\Delta
-t^{(n)}_c=t^{(n)}_c-t^{(n-1)}_c$ is the length of the $n$-th time step.
+
 
 Using the fact that $\nabla \cdot \mathbf{u}_t = q$, the time discrete
 saturation equation becomes
@@ -161,7 +165,7 @@ saturation equation becomes
 
 By multiplying the equations defining the total velocity $\mathbf u_t^{(n)}$ and
 the equation that expresses its divergence in terms of source terms, with test
-functions $\mathbf{v}$ and $w$ 
+functions $\mathbf{v}$ and $w$
 respectively and then integrating terms by parts as necessary, the weak form
 of the problem reads: Find $\mathbf u, p$ so that for all test functions
 $\mathbf{v}, w$ there holds
@@ -169,7 +173,12 @@ $\mathbf{v}, w$ there holds
    \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1} \mathbf{u}^{(n)}_t, \mathbf{v}\right)_{\Omega} - \left(p^{(n)}, \nabla \cdot \mathbf{v}\right)_{\Omega} = -\left(p^{(n)}, \mathbf{n} \cdot \mathbf{v} \right)_{\partial \Omega}, \\
    - \left( \nabla \cdot \mathbf{u}^{(n)}_t,w\right)_{\Omega} = - \big(q,w\big)_{\Omega}.
 @f}
-Here, $\mathbf{n}$ represents the unit outward normal vector to $\partial \Omega$ and the pressure $p^{(n+1)}$ can be prescribed weakly on the boundary $\partial \Omega$.
+Here, $\mathbf{n}$ represents the unit outward normal vector to $\partial
+\Omega$ and the pressure $p^{(n)}$ can be prescribed weakly on the open part
+of the boundary $\partial \Omega$ whereas on those parts where a velocity is
+prescribed (for example impermeable boundaries with $\mathbf n \cdot \mathbf
+u=0$ the term disappears altogether because $\mathbf n \cdot \mathbf
+v=0$.
 
 We use continuous finite elements to discretize the velocity and pressure
 equations. Specifically, we use mixed finite elements to ensure high order approximation
@@ -192,7 +201,8 @@ diffusion term is is one approach to eliminating these oscillations
 fronts in the solution and suffers from grid-orientation difficulties
 [Chen 2005]. To avoid these effects, we use the artificial diffusion
 term proposed by [Guermond and Pasquetti 2008] and already
-validated in [Chueh et al. 2010].
+validated in [Chueh, Bangerth, Djilali 2011] and
+[Kronbichler, Heister and Bangerth, 2011], as well as in step-31.
 
 This method modifies the (discrete) weak form of the saturation equation
 to read
@@ -200,10 +210,10 @@ to read
   \left(\epsilon \frac{\partial S_h}{\partial t},\sigma_h\right)
   -
   \left(\mathbf{u}_t  F\left( S_h \right),
-    \nabla \sigma\right)
+    \nabla \sigma_h\right)
   +
   \left(\mathbf n \cdot \mathbf{u}_t  \hat F\left( S_h \right),
-    \sigma\right)_{\partial\Omega}
+    \sigma_h\right)_{\partial\Omega}
   +
   (\nu(S_h) \nabla S_h, \nabla \sigma_h)
   &=0
@@ -218,7 +228,7 @@ Following [Guermond and Pasquetti 2008], we use
 the parameter as a piecewise
 constant function set on each cell $K$ with the diameter $h_{K}$ as
 @f[
-   \nu(S)|_{K} = \beta \| \mathbf{u}_t \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
+   \nu(S_h)|_{K} = \beta \| \mathbf{u}_t \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S_h)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
 @f]
 where $\alpha$ is a stabilization exponent and $\beta$ is a dimensionless
 user-defined stabilization constant. Following [Guermond and Pasquetti 2008]
@@ -247,9 +257,9 @@ nonlinear since $\nu$ depends on the saturation $S$. We avoid this difficulty
 by treating all nonlinear terms explicitly, which leads to the following
 fully discrete problem at time step $n$:
 @f{align*}
-   &\left( \epsilon S^{(n)},\sigma\right)_{\Omega} - \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\mathbf{u}^{*}_t,\nabla\sigma\Big)_{\Omega} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{*}_t\right),\sigma\Big)_{\partial\Omega} \nonumber \\
-   & \quad = \left( \epsilon S^{(n-1)},\sigma\right)_{\Omega} - \Delta t^{(n)}_c \bigg(\nu\left(S^{(n-1)}\right)\nabla S^{(n-1)},\nabla\sigma\bigg)_{\Omega} \nonumber \\
-   & \qquad + \Delta t^{(n)}_c \bigg(\mathbf{n}\cdot\nu\left(S^{(n-1)}\right)\nabla S^{(n-1)},\sigma\bigg)_{\partial\Omega}
+   &\left( \epsilon S_h^{(n)},\sigma_h\right)_{\Omega} - \Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\mathbf{u}^{*}_t,\nabla\sigma_h\Big)_{\Omega} + \Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{*}_t\right),\sigma_h\Big)_{\partial\Omega} \nonumber \\
+   & \quad = \left( \epsilon S_h^{(n-1)},\sigma_h\right)_{\Omega} - \Delta t^{(n)}_c \bigg(\nu\left(S_h^{(n-1)}\right)\nabla S_h^{(n-1)},\nabla\sigma_h\bigg)_{\Omega} \nonumber \\
+   & \qquad + \Delta t^{(n)}_c \bigg(\mathbf{n}\cdot\nu\left(S_h^{(n-1)}\right)\nabla S^{(n-1)},\sigma_h\bigg)_{\partial\Omega}
 @f}
 where $\mathbf{u}_t^{*}$ is the velocity linearly extrapolated from
 $\mathbf{u}^{(n_p)}_t$ and $\mathbf{u}^{(n_{pp})}_t$ to the current time $t^{(n)}$ if $\theta<\theta^*$ while $\mathbf{u}_t^{*}$ is $\mathbf{u}^{(n_p)}_t$ if $\theta>\theta^*$.
@@ -258,10 +268,10 @@ is to solve with a mass matrix on the saturation space.
 
 Since the Dirichlet boundary conditions for saturation are only imposed on the
 inflow boundaries, the third term on the left hand side of the equation above
-needs to be split further into two parts: 
+needs to be split further into two parts:
 @f{align*}
-  &\Delta t^{(n)}_c \Big(F\left(S^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_t\right),\sigma\Big)_{\partial\Omega} \nonumber \\
-  &\qquad= \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(+)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(+)}\right),\sigma\Big)_{\partial\Omega_{(+)}} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(-)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(-)}\right),\sigma\Big)_{\partial\Omega_{(-)}}
+  &\Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_t\right),\sigma_h\Big)_{\partial\Omega} \nonumber \\
+  &\qquad= \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(+)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(+)}\right),\sigma_h\Big)_{\partial\Omega_{(+)}} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(-)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(-)}\right),\sigma_h\Big)_{\partial\Omega_{(-)}}
 @f}
 where $\partial\Omega_{(-)} = \left\{\mathbf{x} \in \partial\Omega : \mathbf{n}
   \cdot \mathbf{u}_t<0\right\}$ and
@@ -273,20 +283,23 @@ correspond to the values taken from the present cell, while the values of
 $S^{(n-1)}_{(-)}$ and $\mathbf{u}^{(n)}_{t(-)}$ are those taken from the
 neighboring boundary $\partial\Omega_{(-)}$.
 
+
 <h3>Adaptive mesh refinement.</h3>
-choosing meshes adaptively to resolve sharp
+
+Choosing meshes adaptively to resolve sharp
 saturation fronts is an essential ingredient to achieve efficiency in our
 algorithm. Here, we use the same shock-type refinement approach used in
-[Chueh et al. 2010] to select those cells that should be refined or
+[Chueh, Bangerth and Djilali 2011] to select those cells that should be refined or
 coarsened. The refinement indicator for each cell $K$ of the triangulation is
 computed by
 @f[
-   \eta_{K} = |\nabla S_h(\mathbf x_K)|
+   \eta_{K} = |\nabla_h S_h(\mathbf x_K)|
 @f]
-where $S_h(\mathbf x_K)$ is the discrete saturation variable evaluated at the
-center of cell $K$. This approach is analogous to ones frequently used in
-compressible flow problems, where density gradients are used to indicate
-refinement.
+where $\nabla_h S_h(\mathbf x_K)$ is the gradient of the discrete saturation
+variable evaluated at the center $\mathbf x_K$ of cell $K$. This approach is
+analogous to ones frequently used in compressible flow problems, where density
+gradients are used to indicate refinement.
+
 
 <h3>Linear system and its preconditioning.</h3>
 
@@ -440,8 +453,8 @@ use an incomplete Cholesky decomposition of $\mathbf{\tilde S}$ for $\widetilde
 {\mathbf{{S}}^{-1}}$. It is important to note that $\mathbf{\tilde S}$ needs
 to be built with Dirichlet boundary conditions to ensure its invertibility.
 
-Once the velocity is available $\mathbf{U}^{(n)} \equiv \mathbf{u}^*_t$ (see
-[Chueh et al. 2010]), we can assemble $\mathbf{H}$ and
+Once the velocity $\mathbf{U}^{(n)} \equiv \mathbf{u}^*_t$  is available, we
+can assemble $\mathbf{H}$ and
 $\mathbf{F}_{3}$ and solve for the saturations using
 @f{align*}
   \mathbf{M}^{S} \mathbf{S}^{(n)} = \mathbf{F}_{3} - \mathbf{H} \mathbf{U}^{(n)}.
@@ -459,7 +472,7 @@ the <code>Trilinos</code> library (see [Trilinos 2004]).
 We show numerical results that illustrate the
 efficiency and accuracy of our combined methods in solving the two-phase flow equations
 augmented by
-appropriate initial and boundary in conjunction with two different choices of the
+appropriate initial and boundary conditions in conjunction with two different choices of the
 permeability model. In the problems considered, there is no internal source term ($q=0$).
 
 For simplicity, we choose $\Omega=[0,1]^d,d=2,3$, though all methods (as well
@@ -489,7 +502,7 @@ cases are listed in the following table:
 
 <table align="center" class="tutorial" width="50%">
 <tr>
-    <td>PARAMETER                           </td><td>SYMBOL          </td><td>VALUE               </td><td>UNIT     </td></tr><tr>
+    <th>Parameter                           </th><th>Symbol          </th><th>Value               </th><th>units     </th></tr><tr>
     <td>Porosity                            </td><td>$\epsilon$      </td><td>1.0                 </td><td>-                   </td></tr><tr>
     <td>Viscosity (wetting)                 </td><td>$\mu_w$         </td><td>0.2                 </td><td>$kg \cdot m^{-1} \cdot sec^{-1}$   </td></tr><tr>
     <td>Viscosity (nonwetting)              </td><td>$\mu_{nw}$      </td><td>1.0                 </td><td>$kg \cdot m^{-1} \cdot sec^{-1}$      </td></tr><tr>
@@ -509,7 +522,13 @@ cases are listed in the following table:
 CC Chueh, W Bangerth, and N Djilali.
 <br> An h-adaptive operator splitting method for two-phase flow in 3D
   heterogeneous porous media.
-<br> <i>Submitted to Communications in Computational Physics</i>.
+<br> <i>Submitted to Communications in Computational Physics</i>, 2011.
+
+<li>
+M. Kronbichler, T. Heister, and W. Bangerth
+<br> High Accuracy Mantle Convection Simulation through Modern Numerical
+Methods.
+<br> <i>Submitted to Geophysics Journal International</i>, 2011.
 
 <li>
 F Brezzi and M Fortin.

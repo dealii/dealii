@@ -2,9 +2,9 @@
 
 ...
 
-<table align="center" border="1" cellspacing="3" cellpadding="3">
+<table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
-    <td>
+    <td align="center">
         @image html "step-43.3d.velocity.png"
 	<p align="center">
         Velocity vectors of flow through the porous medium with random
@@ -12,7 +12,7 @@
         high velocity are clearly visible.
 	</p>
     </td>
-    <td>
+    <td align="center">
         @image html "step-43.3d.streamlines.png"
 	<p align="center">
         Streamlines colored by the saturation along the streamline path. Blue
@@ -26,14 +26,14 @@
   </tr>
 
   <tr>
-    <td>
+    <td align="center">
         @image html "step-43.3d.saturation.png"
 	<p align="center">
         Streamlines with a volume rendering of the saturation, showing how far
         the fluid front has advanced at this time.
 	</p>
     </td>
-    <td>
+    <td align="center">
         @image html "step-43.3d.mesh.png"
 	<p align="center">
 	Surface of the mesh showing the adaptive refinement along the front.
