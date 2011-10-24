@@ -1,5 +1,51 @@
 <h1>Results</h1>
 
+...
+
+<table align="center" border="1" cellspacing="3" cellpadding="3">
+  <tr>
+    <td>
+        @image html "step-43.3d.velocity.png" "" width=50%
+	<p align="center">
+        Velocity vectors of flow through the porous medium with random
+        permeability model. Streaming paths of high permeability and resulting
+        high velocity are clearly visible.
+	</p>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+        @image html "step-43.3d.streamlines.png" "" width=50%
+	<p align="center">
+        Streamlines colored by the saturation along the streamline path. Blue
+        streamlines indicate low saturations, i.e., the flow along these
+	streamlines must be slow or else more fluid would have been
+        transported along them. On the other hand, green paths indicate high
+        velocities since the fluid front has already reached further into the
+        domain.
+	</p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+        @image html "step-43.3d.saturation.png" "" width=50%
+	<p align="center">
+        Streamlines with a volume rendering of the saturation, showing how far
+        the fluid front has advanced at this time.
+	</p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+        @image html "step-43.3d.mesh.png" "" width=50%
+	<p align="center">
+	Surface of the mesh showing the adaptive refinement along the front.
+	</p>
+    </td>
+  </tr>
+</table>
+
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
