@@ -1912,6 +1912,32 @@ TriaAccessor<structdim, dim, spacedim>::diameter () const
 }
 
 
+
+template <int structdim, int dim, int spacedim>
+double
+TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance () const
+{
+    switch (structdim)
+    {
+      case 1:
+	    return std::sqrt((this->vertex(1)-this->vertex(0)).square());
+      case 2:
+      case 3:
+      {
+	double min = std::numeric_limits<double>::max();
+	for (unsigned int i=0;i<GeometryInfo<structdim>::vertices_per_cell;++i)
+	  for (unsigned int j=i+1;j<GeometryInfo<structdim>::vertices_per_cell;++j)
+	    min = std::min(min, (this->vertex(i)-this->vertex(j)).square());
+	return std::sqrt(min);
+      }
+      default:
+	    Assert (false, ExcNotImplemented());
+	    return -1e10;
+    }
+}
+
+
+
 template <int structdim, int dim, int spacedim>
 Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::center () const

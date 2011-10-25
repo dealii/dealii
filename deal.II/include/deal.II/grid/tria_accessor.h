@@ -1351,8 +1351,13 @@ class TriaAccessor : public TriaAccessorBase<structdim, dim, spacedim>
 				      */
     double extent_in_direction (const unsigned int axis) const;
 
-
     				     /**
+				      * Returns the minimal distance between
+				      * any two vertices.
+				      */
+    double minimum_vertex_distance () const;
+
+				     /**
 				      * Center of the object. The center of an
 				      * object is defined to be the average of
 				      * the locations of the vertices, which
