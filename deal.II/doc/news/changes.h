@@ -34,7 +34,11 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li>
+<li> Fixed: deal.II could not be compiled with gcc 4.6.1 when MPI is
+enabled due to a missing include file in file
+<code>source/base/utilities.cc</code>. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/10/25)
 </ol>
 
 
