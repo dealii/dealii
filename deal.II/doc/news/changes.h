@@ -80,7 +80,7 @@ Debian. This is now fixed.
 
 <li> Changed: The TableHandler class has been changed significantly
 internally.  It could previously store arbitrary values (though in practice,
-only int, unsigned int, double and std::string were implemented. The class is
+only int, unsigned int, double and std::string were implemented). The class is
 now restricted to this particular set of types. On the other hand, the
 TableHandler class can now be serialized.
 <br>
