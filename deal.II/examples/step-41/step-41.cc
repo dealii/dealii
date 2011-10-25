@@ -99,6 +99,7 @@ class Step4
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
     DoFHandler<dim>      dof_handler;
+    unsigned int         n_refinements;
 
     ConstraintMatrix     constraints;
     
@@ -112,8 +113,7 @@ class Step4
     TrilinosWrappers::Vector       system_rhs_complete;
     TrilinosWrappers::Vector       resid_vector;
     TrilinosWrappers::Vector       active_set;
-
-    std::map<unsigned int,double> boundary_values;
+    TrilinosWrappers::Vector       diag_mass_matrix_vector;
 };
 
 
@@ -363,7 +363,8 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  triangulation.refine_global (7);
+  n_refinements = 5;
+  triangulation.refine_global (n_refinements);
   
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
@@ -406,6 +407,7 @@ void Step4<dim>::setup_system ()
   system_rhs_complete.reinit (dof_handler.n_dofs());
   resid_vector.reinit (dof_handler.n_dofs());
   active_set.reinit (dof_handler.n_dofs());
+  diag_mass_matrix_vector.reinit (dof_handler.n_dofs());
 }
 
 
@@ -615,9 +617,11 @@ void Step4<dim>::projection_active_set ()
 	Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
 	double obstacle_value = obstacle.value (point);
 	double solution_index_x = solution (index_x);
-	if (solution_index_x <= obstacle_value &&
-	    (resid_vector (index_x) >= solution_index_x - obstacle_value))
+// 	if (solution_index_x <= obstacle_value &&
+	if ((resid_vector (index_x)*std::pow (2, 2*n_refinements)*diag_mass_matrix_vector (index_x) >= solution_index_x - obstacle_value))
 	{
+	  std::cout<< std::pow (2, 2*n_refinements) << ", " << diag_mass_matrix_vector (index_x) <<std::endl;
+
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
  	  solution (index_x) = 0;
@@ -733,6 +737,9 @@ void Step4<dim>::run ()
 
   system_matrix_complete.copy_from (system_matrix);
   system_rhs_complete = system_rhs;
+
+  for (unsigned int j=0; j<solution.size (); j++)
+    diag_mass_matrix_vector (j) = system_matrix_complete.diag_element (j);
 
   std::cout<< "Update Active Set:" <<std::endl;
   solution = 0;
