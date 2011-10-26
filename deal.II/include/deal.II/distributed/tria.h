@@ -191,6 +191,30 @@ namespace parallel
 	typedef typename dealii::Triangulation<dim,spacedim>::raw_cell_iterator    raw_cell_iterator;
 
 					 /**
+					  * Generic settings for distributed
+					  * Triangulations. If
+					  * mesh_reconstruction_after_repartitioning
+					  * is set, the deal.II mesh will be
+					  * reconstructed from the coarse mesh
+					  * every time a repartioning in p4est
+					  * happens. This can be a bit more
+					  * expensive, but guarantees the same
+					  * memory layout and therefore cell
+					  * ordering in the deal.II mesh. As
+					  * assembly is done in the deal.II
+					  * cell ordering, this flag is
+					  * required to get reproducable
+					  * behaviour after snapshot/resume.
+					  */
+	enum Settings
+	{
+	  default_setting = 0x0,
+	  mesh_reconstruction_after_repartitioning = 0x1,
+	};
+	
+	    
+	
+					 /**
 					  * Constructor.
 					  *
 					  * @param mpi_communicator denotes
@@ -238,7 +262,8 @@ namespace parallel
 					  */
 	Triangulation (MPI_Comm mpi_communicator,
 		       const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing
-		       smooth_grid = (dealii::Triangulation<dim,spacedim>::none));
+		       smooth_grid = (dealii::Triangulation<dim,spacedim>::none),
+		       const Settings settings = default_setting);
 
 					 /**
 					  * Destructor.
@@ -536,6 +561,11 @@ namespace parallel
 					  */
 	MPI_Comm mpi_communicator;
 
+					 /**
+					  * store the Settings.
+					  */
+	Settings settings;
+	
 					 /**
 					  * The subdomain id to be
 					  * used for the current

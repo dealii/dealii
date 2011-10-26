@@ -48,6 +48,13 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning
+setting which is necessary for save()/load() to be deterministic. Otherwise the matrix assembly
+is done in a different order depending on the order of old refinements.
+<br>
+(Timo Heister, 2011/10/26)
+
 <li> New: TriaAccessor<>::minimum_vertex_distance().
 <br>
 (Timo Heister, 2011/10/25)

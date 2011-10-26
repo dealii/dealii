@@ -1796,7 +1796,8 @@ namespace parallel
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::
     Triangulation (MPI_Comm mpi_communicator,
-		   const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid)
+		   const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing smooth_grid,
+		   const Settings settings_)
 		    :
 						     // do not check
 						     // for distorted
@@ -1806,6 +1807,7 @@ namespace parallel
 		     false),
 		    mpi_communicator (Utilities::MPI::
 				      duplicate_communicator(mpi_communicator)),
+		    settings(settings_),
 		    my_subdomain (Utilities::MPI::this_mpi_process (this->mpi_communicator)),
 		    triangulation_has_content (false),
 		    connectivity (0),
@@ -2391,6 +2393,45 @@ namespace parallel
 	save_smooth = this->smooth_grid;
       this->smooth_grid = dealii::Triangulation<dim,spacedim>::none;
       bool mesh_changed = false;
+
+
+	  // remove all deal.II refinements. Note that we could skip this and
+	  // start from our current state, because the algorithm later coarsens as
+	  // necessary. This has the advantage of being faster when large parts
+	  // of the local partition changes (likely) and gives a deterministic
+	  // ordering of the cells (useful for snapshot/resume).
+	  // TODO: is there a more efficient way to do this?
+      if (settings & mesh_reconstruction_after_repartitioning)
+        while (this->begin_active()->level() > 0)
+          {
+            for (typename Triangulation<dim, spacedim>::active_cell_iterator
+		   cell = this->begin_active();
+                 cell != this->end();
+                 ++cell)
+              {
+                cell->set_coarsen_flag();
+              }
+	    
+            this->prepare_coarsening_and_refinement();
+            const bool saved_refinement_in_progress = refinement_in_progress;
+            refinement_in_progress = true;
+	    
+            try
+              {
+                this->execute_coarsening_and_refinement();
+              }
+            catch (const typename Triangulation<dim, spacedim>::DistortedCellList &)
+              {
+						 // the underlying
+						 // triangulation should not
+						 // be checking for
+						 // distorted cells
+                AssertThrow (false, ExcInternalError());
+              }
+	    
+            refinement_in_progress = saved_refinement_in_progress;
+          }
+
 
 				       // query p4est for the ghost cells
       typename dealii::internal::p4est::types<dim>::ghost * ghostlayer;
