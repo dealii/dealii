@@ -33,6 +33,28 @@
 // so in each and every testcase
 using namespace dealii;
 
+// Function for initialize deallog. Normally, it should be called at
+// the beginning of main() like
+//
+// initlog(__FILE__);
+//
+// This will open the correct output file, divert log output there and
+// switch off screen output. If screen output is desired, provide the
+// optional second argument as 'true'.
+std::string deallogname;
+std::ofstream deallogfile;
+
+inline
+void
+initlog(const char* filename, bool console=false)
+{
+  deallogname = JobIdentifier::base_name(filename) + std::string("/output");
+  deallogfile.open(deallogname.c_str());
+  deallog.attach(deallogfile);
+  if (!console)
+    deallog.depth_console(0);
+}
+
 
 // overload floating point output operators for LogStream so that small
 // numbers below a certain threshold are simply printed as zeros. this removes
