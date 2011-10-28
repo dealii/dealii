@@ -17,6 +17,7 @@
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
+#include <dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
@@ -38,17 +39,18 @@ test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
   MGDoFHandler<dim> dof;
   dof.initialize(tr, fe);
   
-  BlockList bl;
-
+  
   const unsigned int level = tr.n_levels()-1;
   
-  bl.initialize_mg(tr.n_cells(level), dof.begin(level), dof.end(level));
-
-  for (unsigned int i=0;i<bl.size();++i)
+  SparsityPattern bl(tr.n_cells(level), dof.n_dofs(level), fe.dofs_per_cell);
+  DoFTools::make_cell_patches(bl, dof, level);
+  bl.compress();
+  
+  for (unsigned int i=0;i<bl.n_rows();++i)
     {
       deallog << "Block " << std::setw(3) << i;
       std::vector<unsigned int> entries;
-      for (BlockList::const_iterator b = bl.begin(i);b != bl.end(i);++b)
+      for (SparsityPattern::row_iterator b = bl.row_begin(i);b != bl.row_end(i);++b)
 	entries.push_back(*b);
 
       std::sort(entries.begin(), entries.end());

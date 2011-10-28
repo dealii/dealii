@@ -17,6 +17,7 @@
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
+#include <dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
@@ -29,6 +30,25 @@
 using namespace dealii;
 
 
+void
+print_patches (const SparsityPattern& bl)
+{
+  for (unsigned int i=0;i<bl.n_rows();++i)
+    {
+      deallog << "Block " << std::setw(3) << i;
+      std::vector<unsigned int> entries;
+      for (SparsityPattern::row_iterator b = bl.row_begin(i);b != bl.row_end(i);++b)
+	entries.push_back(*b);
+      
+      std::sort(entries.begin(), entries.end());
+      
+      for (unsigned int i=0;i<entries.size();++i)
+	deallog << ' ' << std::setw(4) << entries[i];
+      deallog << std::endl;
+    }
+}
+
+
 template <int dim>
 void
 test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
@@ -36,27 +56,55 @@ test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
   deallog << fe.get_name() << std::endl;
   
   MGDoFHandler<dim> dof;
-  dof.initialize(tr, fe);
+  dof.initialize(tr, fe); 
   
-  BlockList bl;
-
   const unsigned int level = tr.n_levels()-1;
-  const unsigned int n = bl.count_vertex_patches<2>(dof.begin(level), dof.end(level), true);
-  bl.initialize_vertex_patches_mg<dim>(n, dof.begin(level), dof.end(level));
 
-  for (unsigned int i=0;i<bl.size();++i)
-    {
-      deallog << "Block " << std::setw(3) << i;
-      std::vector<unsigned int> entries;
-      for (BlockList::const_iterator b = bl.begin(i);b != bl.end(i);++b)
-	entries.push_back(*b);
-
-      std::sort(entries.begin(), entries.end());
-
-      for (unsigned int i=0;i<entries.size();++i)
-	deallog << ' ' << std::setw(4) << entries[i];
-      deallog << std::endl;
-    }
+  {
+    deallog.push("ttt");
+    SparsityPattern bl;
+    DoFTools::make_vertex_patches(bl, dof, level, true, true, true);
+    bl.compress();
+    print_patches(bl);
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("ttf");
+    SparsityPattern bl;
+    DoFTools::make_vertex_patches(bl, dof, level, true, true, false);
+    bl.compress();
+    print_patches(bl);
+    deallog.pop(); 
+    deallog << std::endl;
+  }
+  {
+    deallog.push("tff");
+    SparsityPattern bl;
+    DoFTools::make_vertex_patches(bl, dof, level, true, false, false);
+    bl.compress();
+    print_patches(bl);
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("ftt");
+    SparsityPattern bl;
+    DoFTools::make_vertex_patches(bl, dof, level, false, true, true);
+    bl.compress();
+    print_patches(bl);
+    deallog.pop();
+    deallog << std::endl;
+  }
+  {
+    deallog.push("fff");
+    SparsityPattern bl;
+    DoFTools::make_vertex_patches(bl, dof, level, false, false, false);
+    bl.compress();
+    print_patches(bl);
+    deallog.pop();
+    deallog << std::endl;
+  }
 }
 
 
