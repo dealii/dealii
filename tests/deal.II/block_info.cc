@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2009, 2010 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -80,11 +80,8 @@ void test_fe (const FiniteElement<dim>& fe)
 
 int main () 
 {
-  std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-
+  initlog(__FILE__);
+  
   FE_Q<2> q21(1);
   FE_Q<2> q22(2);
   FESystem<2> s2(q21, 3, q22, 2);

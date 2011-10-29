@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2008 by the deal.II authors
+//    Copyright (C) 2008, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,7 +68,7 @@ satisfies_level1_at_vertex_rule (const Triangulation<dim> &tr)
 
 
 template<int dim>
-void test(std::ostream& /*out*/)
+void test()
 {
   Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);
 
@@ -120,16 +120,14 @@ void test(std::ostream& /*out*/)
 
 int main()
 {
-  std::ofstream logfile("coarsening_02/output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog(__FILE__);
   deallog.threshold_double(1.e-10);
   
   deallog.push("2d");
-  test<2>(logfile);
+  test<2>();
   deallog.pop();
 
   deallog.push("3d");
-  test<3>(logfile);
+  test<3>();
   deallog.pop();
 }
