@@ -36,10 +36,10 @@ namespace SLEPcWrappers
   SolverBase::SolverData::~SolverData ()
   {
                                    // Destroy the solver object.
-#if DEAL_II_PETSC_VERSION_DEV()
-    int ierr = EPSDestroy (&eps);
-#else
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
     int ierr = EPSDestroy (eps);
+#else
+    int ierr = EPSDestroy (&eps);
 #endif
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
