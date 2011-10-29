@@ -86,14 +86,18 @@ ifneq ($(GXX-VERSION),compaq_cxx)
 
   # same with PETSC
   ifeq ($(USE_CONTRIB_PETSC),yes)
-    deplibs.g += $(lib-contrib-petsc.g)
-    deplibs.o += $(lib-contrib-petsc.o)
+    deplibs.g += $(lib-contrib-petsc.g) \
+	         $(call DEAL_II_RPATH,$(DEAL_II_PETSC_LIBDIR))
+    deplibs.o += $(lib-contrib-petsc.o) \
+	         $(call DEAL_II_RPATH,$(DEAL_II_PETSC_LIBDIR))
   endif
 
   # same with SLEPC
   ifeq ($(USE_CONTRIB_SLEPC),yes)
-    deplibs.g += $(lib-contrib-slepc)
-    deplibs.o += $(lib-contrib-slepc)
+    deplibs.g += $(lib-contrib-slepc) \
+	         $(call DEAL_II_RPATH,$(DEAL_II_SLEPC_LIBDIR))
+    deplibs.o += $(lib-contrib-slepc) \
+	         $(call DEAL_II_RPATH,$(DEAL_II_SLEPC_LIBDIR))
   endif
 
   # same with TRILINOS

@@ -277,11 +277,9 @@ ifeq ($(DEAL_II_PETSC_VERSION_MAJOR),2)
 else
   include-path-petsc-bmake   = $(DEAL_II_PETSC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 endif
-include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include
+include-path-slepc           = $(DEAL_II_SLEPC_DIR)/include 
+include-path-slepc-bmake     = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/include
 include-path-slepc-conf      = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/conf
-ifeq ($(DEAL_II_PETSC_VERSION_DEV),yes)
-  include-path-slepc-include = $(DEAL_II_SLEPC_DIR)/$(DEAL_II_PETSC_ARCH)/include
-endif
 include-path-trilinos        = $(DEAL_II_TRILINOS_INCDIR)
 include-path-mumps           = $(DEAL_II_MUMPS_DIR)/include
 
@@ -309,15 +307,15 @@ ifeq ($(USE_CONTRIB_PETSC),yes)
   ifeq ($(DEAL_II_PETSC_VERSION_MAJOR)$(DEAL_II_PETSC_VERSION_MINOR),22)
     include $(DEAL_II_PETSC_DIR)/bmake/$(DEAL_II_PETSC_ARCH)/packages
   endif
-  INCLUDE += -I$(include-path-petsc) -I$(include-path-petsc-bmake)\
-             $(MPI_INCLUDE)
+  INCLUDE += -I$(include-path-petsc) \
+             -I$(include-path-petsc-bmake) \
+               $(MPI_INCLUDE)
 endif
 
 ifeq ($(USE_CONTRIB_SLEPC),yes)
-  INCLUDE += -I$(include-path-slepc) -I$(include-path-slepc-conf)
-ifeq ($(DEAL_II_PETSC_VERSION_DEV),yes)
-  INCLUDE += -I$(include-path-slepc-include)
-endif
+  INCLUDE += -I$(include-path-slepc) \
+             -I$(include-path-slepc-bmake) \
+             -I$(include-path-slepc-conf)
 endif
 
 ifeq ($(USE_CONTRIB_TRILINOS),yes)
