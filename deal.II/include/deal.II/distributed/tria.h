@@ -211,9 +211,9 @@ namespace parallel
 	  default_setting = 0x0,
 	  mesh_reconstruction_after_repartitioning = 0x1,
 	};
-	
-	    
-	
+
+
+
 					 /**
 					  * Constructor.
 					  *
@@ -230,6 +230,10 @@ namespace parallel
 					  * the kinds of smoothing
 					  * operations that can be
 					  * applied.
+					  *
+					  * @param settings See the
+					  * description of the Settings
+					  * enumerator.
 					  *
 					  * @note This class does not
 					  * currently support the
@@ -475,7 +479,7 @@ namespace parallel
 				  	   * to load with the same number of CPUs that you saved with.
 	 				   */
 	void load(const char* filename);
-	
+
 					 /**
 					  * Used to inform in the callbacks of
 					  * register_data_attach() and
@@ -565,7 +569,7 @@ namespace parallel
 					  * store the Settings.
 					  */
 	Settings settings;
-	
+
 					 /**
 					  * The subdomain id to be
 					  * used for the current
@@ -638,20 +642,20 @@ namespace parallel
 					  * SolutionTransfer.
 					  */
 	unsigned int attached_data_size;
-	
+
 					 /**
 					  * number of functions that get attached to the Triangulation
 					  * through register_data_attach() for example
 					  * SolutionTransfer.
 					  */
 	unsigned int n_attached_datas;
-	
+
 					 /**
 					  * number of functions that need to unpack their data
 					  * after a call from load()
 					  */
 	unsigned int n_attached_deserialize;
-	
+
 	typedef  std_cxx1x::function<
 	  void(typename Triangulation<dim,spacedim>::cell_iterator, CellStatus, void*)
 	  > pack_callback_t;
@@ -659,7 +663,7 @@ namespace parallel
 	typedef std::pair<unsigned int, pack_callback_t> callback_pair_t;
 
 	typedef std::list<callback_pair_t> callback_list_t;
-	
+
 					 /**
 					  * List of callback functions registered by
 					  * register_data_attach() that are going to be called
