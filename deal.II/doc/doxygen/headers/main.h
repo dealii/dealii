@@ -22,17 +22,18 @@
  * href="../tutorial/index.html">tutorial programs on the use of this
  * library</a>.
  *
- * Many of the classes in the deal.II library can be grouped into
- * modules (see the <a href="modules.html">Modules page</a> or the
- * corresponding entry in the menu at the top of this page). These
- * modules follow roughly the following collaboration diagram that
- * finite element programs follow:
+ * Many of the classes in the deal.II library can be grouped into modules (see
+ * the <a href="modules.html">Modules page</a> or the corresponding entry in
+ * the menu at the top of this page). These modules form around the building
+ * blocks of any finite element program. An outline of how the primary groups
+ * of classes in deal.II interact is given by the following clickable graph,
+ * with a more detailed description below:
  *
  * @dot
  digraph G
 {
   graph[rankdir="TB",bgcolor="transparent"];
-  
+
   edge [fontname="FreeSans",fontsize=15,labelfontname="FreeSans",labelfontsize=10];
   node [fontname="FreeSans",fontsize=15,
         shape=record,height=0.2,width=0.4,
@@ -44,8 +45,8 @@
   Quadrature [label="Quadrature",URL="\ref Quadrature"];
   Mapping [label="Mapping",URL="\ref mapping"];
   FEValues [label="FEValues",URL="\ref feaccess"];
-  Linear [label="Discrete System",URL="\ref LAC"];
-  LinearSolver [label="Solver",URL="\ref Solvers"];
+  Linear [label="Linear Systems",URL="\ref LAC"];
+  LinearSolver [label="Linear Solvers",URL="\ref Solvers"];
   Output [label="Output",URL="\ref output"];
 
   Tria -> DoFHandler [color="black",fontsize=10,style="solid",fontname="FreeSans"];
@@ -122,8 +123,16 @@
  *   each vertex, line, or cell of the triangulation has the correct
  *   number of them. It also gives them a global numbering.
  *
+ *   A different viewpoint is this: While the mesh and finite element
+ *   describe abstract properties of the the finite dimensional space
+ *   $V_h$ in which we seek the discrete solution, the %DoFHandler
+ *   classes enumerate a concrete basis of this space so that we can
+ *   represent the discrete solution as $u_h(\mathbf x)=
+ *   \sum_j U_j \varphi_i(\mathbf x)$ by an ordered set of coefficients
+ *   $U_j$.
+ *
  *   Just as with triangulation objects, most operations on
- *   DoFHandlers is done by looping over all cells and doing something
+ *   DoFHandlers are done by looping over all cells and doing something
  *   on each or a subset of them. The interfaces of the two classes are
  *   therefore rather similar: they allow to get iterators to the
  *   first and last cell (or face, or line, etc) and offer information
@@ -143,7 +152,8 @@
  *   functions that correspond to the degrees of freedom it manages:
  *   all it knows is that there are, for example, 2 degrees of freedom
  *   for each vertex and 4 per cell interior. Nothing about their
- *   specifics is relevant to the DoFHandler class.
+ *   specifics is relevant to the DoFHandler class with the exception of
+ *   the fact that they exist.
  *
  *   The DoFHandler class and its associates are described in the @ref
  *   dofs module. In addition, there are specialized versions that can
@@ -198,7 +208,7 @@
  *   module.
  *
  *
- *   <li> <b>Linear System</b>: If one knows how to evaluate the
+ *   <li> <b>Linear Systems</b>: If one knows how to evaluate the
  *   values and gradients of shape functions on individual cells using
  *   FEValues and friends, and knows how to get the global numbers of
  *   the degrees of freedom on a cell using the DoFHandler iterators,
@@ -214,7 +224,7 @@
  *   to this end can be found in the @ref LAC module.
  *
  *
- *   <li> <b>Linear %Solver</b>: In order to determine the solution of
+ *   <li> <b>Linear Solvers</b>: In order to determine the solution of
  *   a finite-dimensional, linear system of equations, one needs
  *   linear solvers. In finite element applications, they are
  *   frequently iterative, but sometimes one may also want to use
@@ -225,7 +235,7 @@
  *   <li> <b>Output</b>: Finally, once one has obtained a solution of
  *   a finite element problem on a given triangulation, one will often
  *   want to postprocess it using a visualization program. This
- *   library doesn't do that by itself, but rather generates output
+ *   library doesn't do the visualization by itself, but rather generates output
  *   files in a variety of graphics formats understood by widely
  *   available visualization tools.
  *
@@ -241,5 +251,6 @@
  * finite element programs, but appear there as well. These classes
  * are all listed in the Classes and Namespaces views reachable from
  * the menu bar at the top of this page, and are also grouped into
- * modules of their own (see the Modules view also in the menu bar).
+ * modules of their own (see the <a href="modules.html">Modules linke</a>
+ * at the top of this page).
  */
