@@ -174,7 +174,7 @@ namespace parallel
  * it relies on the p4est library that does not support this. Attempts
  * to refine cells anisotropically will result in errors.
  *
- * @author Wolfgang Bangerth, Timo Heister 2008, 2009, 2010
+ * @author Wolfgang Bangerth, Timo Heister 2008, 2009, 2010, 2011
  * @ingroup distributed
  */
     template <int dim, int spacedim = dim>
@@ -334,7 +334,7 @@ namespace parallel
 					  * other cells as well (and
 					  * may often, in fact, if you
 					  * call
-					  * Triangulation::prepare_coarsening_and_refinement)
+					  * dealii::Triangulation::prepare_coarsening_and_refinement)
 					  * but will be largely
 					  * ignored: the decision to
 					  * refine the global mesh
