@@ -65,7 +65,7 @@ void test ()
 int main ()
 {
   initlog(__FILE__);
-  deallog << std::setprecision(2);
+  deallogfile << std::setprecision(2);
   deallog.threshold_double(1.e-10);  
 
   test<3> ();
