@@ -1492,10 +1492,14 @@ namespace DoFTools
   
 				    /**
 				     * Create a sparsity pattern which
-				     * in each row lists the degrees of
-				     * freedom associated to the
-				     * corresponding cells
-				     * corresponding to a vertex.
+				     * in each row lists the degrees
+				     * of freedom associated to the
+				     * cells corresponding to a
+				     * vertex. The sparsity pattern
+				     * may be empty when entering this
+				     * function and will be
+				     * reinitialized to the correct
+				     * size.
 				     *
 				     * The function has some boolean
 				     * arguments (lsited below)
@@ -1552,6 +1556,99 @@ namespace DoFTools
 			    const bool boundary_patches = false,
 			    const bool level_boundary_patches = false,
 			    const bool single_cell_patches = false);
+  
+				    /**
+				     * Create a sparsity pattern which
+				     * in each row lists the degrees of
+				     * freedom associated to the
+				     * cells which are the children of
+				     * the same cell. The
+				     * sparsity pattern may be empty
+				     * when entering this function and
+				     * will be reinitialized to the
+				     * correct size.
+				     *
+				     * The function has some boolean
+				     * arguments (lsited below)
+				     * controlling details of the
+				     * generated patches. The default
+				     * settings are those for
+				     * Arnold-Falk-Winther type
+				     * smoothers for divergence and
+				     * curl conforming finite elements
+				     * with essential boundary
+				     * conditions. Other applications
+				     * are possible, in particular
+				     * changing
+				     * <tt>boundary_dofs</tt> for
+				     * non-essential boundary
+				     * conditions.
+				     *
+				     * Since the patches are defined
+				     * through refinement, th 
+				     *
+				     * @arg <tt>block_list</tt>: the
+				     * SparsityPattern into which the
+				     * patches will be stored.
+				     * @arg <tt>dof_handler</tt>: The
+				     * multilevel dof handler
+				     * providing the topology operated
+				     * on.
+				     * @arg
+				     * <tt>interior_dofs_only</tt>:
+				     * for each patch of cells around
+				     * a vertex, collect only the
+				     * interior degrees of freedom of
+				     * the patch and disregard those
+				     * on the boundary of the
+				     * patch. This is for instance the
+				     * setting for smoothers of
+				     * Arnold-Falk-Winther type.
+				     * @arg <tt>boundary_dofs</tt>:
+				     * include degrees of freedom,
+				     * which would have excluded by
+				     * <tt>interior_dofs_only</tt>,
+				     * but are lying on the boundary
+				     * of the domain, and thus need smoothing.
+				     */
+   template <class DH>
+   void make_child_patches(SparsityPattern& block_list,
+			    const DH& dof_handler,
+			    const unsigned int level,
+			    const bool interior_dofs_only,
+			    const bool boundary_dofs = false);
+
+				   /**
+				    * Create a block list with only a
+				    * single patch, which in turn
+				    * contains all degrees of freedom
+				    * on the given level.
+				    *
+				    * This function is mostly a
+				    * closure on level 0 for functions
+				    * like make_child_patches() and
+				    * make_vertex_patches(), which may
+				    * produce an empty patch list.
+				    *
+				    * @arg <tt>block_list</tt>: the
+				    * SparsityPattern into which the
+				    * patches will be stored.
+				    * @arg <tt>dof_handler</tt>: The
+				    * multilevel dof handler
+				    * providing the topology operated
+				    * on.
+				    * @arg <tt>level</tt> The grid
+				    * level used for building the list.
+				    * @arg
+				    * <tt>interior_dofs_only</tt>:
+				    * if true, exclude degrees of freedom on
+				    * the boundary of the domain.
+				    */
+  template <class DH>
+   void make_single_patch(SparsityPattern& block_list,
+			  const DH& dof_handler,
+			  const unsigned int level,
+			  const bool interior_dofs_only = false);
   
 				   //@}
 				   /**

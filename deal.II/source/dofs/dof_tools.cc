@@ -5877,6 +5877,100 @@ namespace DoFTools
       }
   }
   
+  
+  template <class DH>
+  void make_single_patch(
+    SparsityPattern& block_list,
+    const DH& dof_handler,
+    const unsigned int level,
+    const bool interior_only)
+    {
+      const FiniteElement<DH::dimension>& fe = dof_handler.get_fe();
+      block_list.reinit(1, dof_handler.n_dofs(level), dof_handler.n_dofs(level));
+      typename DH::cell_iterator cell;
+      typename DH::cell_iterator endc = dof_handler.end(level);
+      
+      std::vector<unsigned int> indices;
+      std::vector<bool> exclude;
+      
+      for (cell=dof_handler.begin(level); cell != endc;++cell)
+      {
+	indices.resize(cell->get_fe().dofs_per_cell);
+	cell->get_mg_dof_indices(indices);
+	
+	if (interior_only)
+	  {
+					     // Exclude degrees of
+					     // freedom on faces
+					     // opposite to the vertex
+	    exclude.resize(fe.dofs_per_cell);
+	    std::fill(exclude.begin(), exclude.end(), false);
+	    const unsigned int dpf = fe.dofs_per_face;
+	    
+	    for (unsigned int face=0;face<GeometryInfo<DH::dimension>::faces_per_cell;++face)
+	      if (cell->at_boundary(face) || cell->neighbor(face)->level() != cell->level())
+		for (unsigned int i=0;i<dpf;++i)
+		  exclude[fe.face_to_cell_index(i,face)] = true;
+	    for (unsigned int j=0;j<indices.size();++j)
+	      if (!exclude[j])
+		block_list.add(0, indices[j]);
+	  }
+	else
+	  {
+	    for (unsigned int j=0;j<indices.size();++j)
+	      block_list.add(0, indices[j]);
+	  }
+      }
+    }
+
+  
+  template <class DH>
+  void make_child_patches(
+    SparsityPattern& block_list,
+    const DH& dof_handler,
+    const unsigned int level,
+    const bool interior_dofs_only,
+    const bool boundary_dofs)
+  {
+    Assert(level > 0 && level < dof_handler.get_tria().n_levels(),
+	   ExcIndexRange(level, 1, dof_handler.get_tria().n_levels()));
+
+    typename DH::cell_iterator cell;
+    typename DH::cell_iterator pcell = dof_handler.begin(level-1);
+    typename DH::cell_iterator endc = dof_handler.end(level-1);
+    
+    std::vector<unsigned int> indices;
+    std::vector<bool> exclude;
+    
+    for (unsigned int block = 0;pcell != endc;++pcell)
+      {
+	if (pcell->has_children()) continue;
+	for (unsigned int child=0;child<pcell->n_children();++child)
+	  {
+	    cell = pcell->child(child);
+					     // For hp, only this line
+					     // here would have to be
+					     // replaced.
+	    const FiniteElement<DH::dimension>& fe = dof_handler.get_fe();
+	    const unsigned int n_dofs = fe.dofs_per_cell;
+	    indices.resize(n_dofs);
+	    exclude.resize(n_dofs);
+	    std::fill(exclude.begin(), exclude.end(), false);
+	    cell->get_mg_dof_indices(indices);
+
+	    Assert(!interior_dofs_only, ExcNotImplemented());
+	    Assert(!boundary_dofs, ExcNotImplemented());
+	    
+	    for (unsigned int i=0;i<n_dofs;++i)
+	      if (!exclude[i])
+		block_list.add(block, indices[i]);
+	  }
+	++block;
+      }
+  }
+  
+  
+    
   template <class DH>
   void make_vertex_patches(
     SparsityPattern& block_list,
