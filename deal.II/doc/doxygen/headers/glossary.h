@@ -334,6 +334,37 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossDoF <b>Degree of freedom</b></dt>
+ *
+ * <dd> The term "degree of freedom" (often abbreviated as "DoF") is commonly
+ * used in the finite element community to indicate two slightly different,
+ * but related things. The first is that we'd like to represent the finite
+ * element solution as a linear combination of shape function, in the form
+ * $u_h(\mathbf x) = \sum_{j=0}^{N-1} U_j \varphi_j(\mathbf x)$. Here, $U_j$
+ * is a vector of expension coefficients. Because we don't know their values
+ * yet (we will compute them as the solution of a linear or nonlinear system),
+ * they are called "unknowns" or "degrees of freedom". The second meaning of
+ * the term con be explained as follows: A mathematical description of finite
+ * element problem is often to say that we are looking for a finite
+ * dimensional function $u_h \in V_h$ that satisfies some set of equations
+ * (e.g. $a(u_h,\varphi_h)=(f,\varphi_h)$ for all test functions $\varphi_h\in
+ * V_h$). In other words, all we say here that the solution needs to lie in
+ * some space $V_h$. However, to actually solve this problem on a computer we
+ * need to choose a basis of this space; this is the set of shape functions
+ * $\varphi_j(\mathbf x)$ we have used above in the expansion of $u_h(\mathbf
+ * x)$ with coefficients $U_j$. There are of course many bases of the space
+ * $V_h$, but we will specifically choose the one that is described by the
+ * finite element functions that are traditionally defined locally on the
+ * cells of the mesh. Describing "degrees of freedom" in this context requires
+ * us to simply <i>enumerate</i> the basis functions of the space $V_h$. For
+ * $Q_1$ elements this means simply enumerating the vertices of the mesh in
+ * some way, but for higher elements one also has to enumerate the shape
+ * functions that are associated with edges, faces, or cell interiors of the
+ * mesh. The class that provides this enumeration of the basis functions of
+ * $V_h$ is called DoFHandler.  The process of enumerating degrees of freedom
+ * is referred to as "distributing DoFs" in deal.II.
+ * </dd>
+ *
  * <dt class="glossary">@anchor GlossDirectionFlag <b>Direction flags</b></dt>
  *
  * <dd>The <i>direction flag</i> is used in triangulations embedded in a
