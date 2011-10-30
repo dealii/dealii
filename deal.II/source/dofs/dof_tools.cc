@@ -5944,7 +5944,7 @@ namespace DoFTools
     
     for (unsigned int block = 0;pcell != endc;++pcell)
       {
-	if (pcell->has_children()) continue;
+	if (!pcell->has_children()) continue;
 	for (unsigned int child=0;child<pcell->n_children();++child)
 	  {
 	    cell = pcell->child(child);
@@ -5958,8 +5958,31 @@ namespace DoFTools
 	    std::fill(exclude.begin(), exclude.end(), false);
 	    cell->get_mg_dof_indices(indices);
 
-	    Assert(!interior_dofs_only, ExcNotImplemented());
-	    Assert(!boundary_dofs, ExcNotImplemented());
+	    if (interior_dofs_only)
+	      {
+						 // Eliminate dofs on
+						 // faces of the child
+						 // which are on faces
+						 // of the parent
+		const unsigned int dpf = fe.dofs_per_face;
+		
+		for (unsigned int d=0;d<DH::dimension;++d)
+		  {
+		    const unsigned int face = GeometryInfo<DH::dimension>::vertex_to_face[child][d];
+		    for (unsigned int i=0;i<dpf;++i)
+		      exclude[fe.face_to_cell_index(i,face)] = true;
+		  }
+						 // Now remove all
+						 // degrees of freedom
+						 // on the domain
+						 // boundary from the
+						 // exclusion list
+		if (boundary_dofs)
+		  for (unsigned int face=0;face< GeometryInfo<DH::dimension>::faces_per_cell;++face)
+		    if (cell->at_boundary(face))
+		      for (unsigned int i=0;i<dpf;++i)
+			exclude[fe.face_to_cell_index(i,face)] = false;
+	      }
 	    
 	    for (unsigned int i=0;i<n_dofs;++i)
 	      if (!exclude[i])
@@ -6018,7 +6041,7 @@ namespace DoFTools
 		  vertex_boundary[vg] = true;
 	    }
 	}
-				     // From now on, onlly vertices
+				     // From now on, only vertices
 				     // with positive dof count are
 				     // "in".
     
@@ -6052,6 +6075,11 @@ namespace DoFTools
 				     // the dofs into the sparsity
 				     // pattern.
     block_list.reinit(vertex_dof_count.size(), dof_handler.n_dofs(level), vertex_dof_count);
+
+    deallog << "Vertex Dofs (" << vertex_dof_count.size() << ')';
+    for (unsigned int i=0;i<vertex_dof_count.size();++i)
+      deallog << ' ' << vertex_dof_count[i];
+    deallog << std::endl;
     
     std::vector<unsigned int> indices;
     std::vector<bool> exclude;

@@ -1609,7 +1609,10 @@ namespace DoFTools
 				     * which would have excluded by
 				     * <tt>interior_dofs_only</tt>,
 				     * but are lying on the boundary
-				     * of the domain, and thus need smoothing.
+				     * of the domain, and thus need
+				     * smoothing. This parameter has
+				     * no effect if
+				     * <tt>interior_dofs_only</tt> is false.
 				     */
    template <class DH>
    void make_child_patches(SparsityPattern& block_list,
