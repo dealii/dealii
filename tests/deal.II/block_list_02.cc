@@ -63,7 +63,7 @@ test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
   {
     deallog.push("ttt");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, true, true, true);
+    DoFTools::make_vertex_patches(bl, dof, level, true, true, true, true);
     bl.compress();
     print_patches(bl);
     deallog.pop();
@@ -90,7 +90,7 @@ test_block_list(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
   {
     deallog.push("ftt");
     SparsityPattern bl;
-    DoFTools::make_vertex_patches(bl, dof, level, false, true, true);
+    DoFTools::make_vertex_patches(bl, dof, level, false, true, true, true);
     bl.compress();
     print_patches(bl);
     deallog.pop();
