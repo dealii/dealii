@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1504,12 +1504,19 @@ class SparseMatrix : public virtual Subscriptor
 				      * and instead uses the sparsity
 				      * pattern stored in <tt>C</tt>. In
 				      * that case, make sure that it really
-				      * fits.
+				      * fits. The default is to rebuild the
+				      * sparsity pattern.
+				      *
+				      * @note Rebuilding the sparsity pattern
+				      * requires changing it. This means that
+				      * all other matrices that are associated
+				      * with this sparsity pattern will
+				      * then have invalid entries.
 				      */
-    template <typename numberB, typename numberC, typename numberV>
+    template <typename numberB, typename numberC>
     void mmult (SparseMatrix<numberC>       &C,
 		const SparseMatrix<numberB> &B,
-		const Vector<numberV>       &V = Vector<numberV>(),
+		const Vector<number>        &V = Vector<number>(),
 		const bool                   rebuild_sparsity_pattern = true) const;
 
 				     /**
@@ -1545,12 +1552,19 @@ class SparseMatrix : public virtual Subscriptor
 				      * and instead uses the sparsity
 				      * pattern stored in <tt>C</tt>. In
 				      * that case, make sure that it really
-				      * fits.
+				      * fits. The default is to rebuild the
+				      * sparsity pattern.
+				      *
+				      * @note Rebuilding the sparsity pattern
+				      * requires changing it. This means that
+				      * all other matrices that are associated
+				      * with this sparsity pattern will
+				      * then have invalid entries.
 				      */
-    template <typename numberB, typename numberC, typename numberV>
+    template <typename numberB, typename numberC>
     void Tmmult (SparseMatrix<numberC>       &C,
 		 const SparseMatrix<numberB> &B,
-		 const Vector<numberV>       &V = Vector<numberV>(),
+		 const Vector<number>       &V = Vector<number>(),
 		 const bool                   rebuild_sparsity_pattern = true) const;
 
 //@}

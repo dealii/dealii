@@ -897,11 +897,11 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber>& u,
 
 
 template <typename number>
-template <typename numberB, typename numberC, typename numberV>
+template <typename numberB, typename numberC>
 void
 SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
 			     const SparseMatrix<numberB> &B,
-			     const Vector<numberV>       &V,
+			     const Vector<number>        &V,
 			     const bool                   rebuild_sparsity_C) const
 {
   const bool use_vector = V.size() == n() ? true : false;
@@ -916,6 +916,17 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
 				   // clear previous content of C
   if  (rebuild_sparsity_C == true)
     {
+				       // we are about to change the sparsity
+				       // pattern of C. this can not work if
+				       // either A or B use the same sparsity
+				       // pattern
+      Assert (&C.get_sparsity_pattern() != &this->get_sparsity_pattern(),
+	      ExcMessage ("Can't use the same sparsity pattern for "
+			  "different matrices if it is to be rebuilt."));
+      Assert (&C.get_sparsity_pattern() != &B.get_sparsity_pattern(),
+	      ExcMessage ("Can't use the same sparsity pattern for "
+			  "different matrices if it is to be rebuilt."));
+
 				   // need to change the sparsity pattern of
 				   // C, so cast away const-ness.
       SparsityPattern & sp_C =
@@ -1034,11 +1045,11 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
 
 
 template <typename number>
-template <typename numberB, typename numberC, typename numberV>
+template <typename numberB, typename numberC>
 void
 SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
 			      const SparseMatrix<numberB> &B,
-			      const Vector<numberV>       &V,
+			      const Vector<number>        &V,
 			      const bool                   rebuild_sparsity_C) const
 {
   const bool use_vector = V.size() == m() ? true : false;
@@ -1053,8 +1064,19 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
 				   // clear previous content of C
   if  (rebuild_sparsity_C == true)
     {
-				   // need to change the sparsity pattern of
-				   // C, so cast away const-ness.
+				       // we are about to change the sparsity
+				       // pattern of C. this can not work if
+				       // either A or B use the same sparsity
+				       // pattern
+      Assert (&C.get_sparsity_pattern() != &this->get_sparsity_pattern(),
+	      ExcMessage ("Can't use the same sparsity pattern for "
+			  "different matrices if it is to be rebuilt."));
+      Assert (&C.get_sparsity_pattern() != &B.get_sparsity_pattern(),
+	      ExcMessage ("Can't use the same sparsity pattern for "
+			  "different matrices if it is to be rebuilt."));
+
+				       // need to change the sparsity pattern of
+				       // C, so cast away const-ness.
       SparsityPattern & sp_C =
 	*(const_cast<SparsityPattern *>(&C.get_sparsity_pattern()));
       C.clear();

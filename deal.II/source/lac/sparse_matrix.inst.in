@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2007, 2009, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -26,22 +26,22 @@ for (S1, S2 : REAL_SCALARS)
     template SparseMatrix<S1> &
       SparseMatrix<S1>::copy_from<S2> (const SparseMatrix<S2> &);
 
-    template 
+    template
       void SparseMatrix<S1>::copy_from<S2> (const FullMatrix<S2> &);
 
     template void SparseMatrix<S1>::add<S2> (const S1,
 					     const SparseMatrix<S2> &);
 
     template void SparseMatrix<S1>::add<S2> (const unsigned int,
-					     const unsigned int,    
-					     const unsigned int *,    
+					     const unsigned int,
+					     const unsigned int *,
 					     const S2 *,
-					     const bool,    
+					     const bool,
 					     const bool);
 
     template void SparseMatrix<S1>::set<S2> (const unsigned int,
-					     const unsigned int,    
-					     const unsigned int *,    
+					     const unsigned int,
+					     const unsigned int *,
 					     const S2 *,
 					     const bool);
   }
@@ -117,7 +117,7 @@ for (S1, S2 : REAL_SCALARS)
 		     const S1) const;
     template void SparseMatrix<S1>::
       SSOR_step<S2> (Vector<S2> &,
-		     const Vector<S2> &, 
+		     const Vector<S2> &,
 		     const S1) const;
   }
 
@@ -134,14 +134,14 @@ for (S1, S2, S3 : REAL_SCALARS;
       Tvmult_add (V1<S2> &, const V2<S3> &) const;
   }
 
-for (S1, S2, S3, S4: REAL_SCALARS)
+for (S1, S2, S3: REAL_SCALARS)
   {
     template void SparseMatrix<S1>::
-      mmult (SparseMatrix<S2> &, const SparseMatrix<S3> &, const Vector<S4>&,
+      mmult (SparseMatrix<S2> &, const SparseMatrix<S3> &, const Vector<S1>&,
              const bool) const;
     template void SparseMatrix<S1>::
-      Tmmult (SparseMatrix<S2> &, const SparseMatrix<S3> &, const Vector<S4>&,
-       	      const bool) const;
+      Tmmult (SparseMatrix<S2> &, const SparseMatrix<S3> &, const Vector<S1>&,
+	      const bool) const;
   }
 
 
@@ -160,7 +160,7 @@ for (S1, S2, S3, S4: REAL_SCALARS)
 //     template SparseMatrix<S1> &
 //       SparseMatrix<S1>::copy_from<S2> (const SparseMatrix<S2> &);
 
-//     template 
+//     template
 //       void SparseMatrix<S1>::copy_from<S2> (const FullMatrix<S2> &);
 
 //     template void SparseMatrix<S1>::add<S2> (const S1,
@@ -233,7 +233,7 @@ for (S1, S2, S3, S4: REAL_SCALARS)
 // 		     const S1) const;
 //     template void SparseMatrix<S1>::
 //       SSOR_step<S2> (Vector<S2> &,
-// 		     const Vector<S2> &, 
+// 		     const Vector<S2> &,
 // 		     const S1) const;
 //   }
 

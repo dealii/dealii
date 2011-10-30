@@ -48,10 +48,20 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: SparseMatrix::mmult and SpareMatrix::Tmmult had a number of
+issues that are now fixed: (i) rebuilding the sparsity pattern was allowed
+even if several of the matrices involved in these operations shared a
+sparsity pattern; (ii) the functions had a vector argument that had a default
+value but the default value could not be used because it wasn't used in a
+template context deducible by the compiler.
+<br>
+(Wolfgang Bangerth, 2011/10/30)
 
-<li> New: parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning
-setting which is necessary for save()/load() to be deterministic. Otherwise the matrix assembly
-is done in a different order depending on the order of old refinements.
+<li> New:
+parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning
+setting which is necessary for save()/load() to be deterministic. Otherwise
+the matrix assembly is done in a different order depending on the order of old
+refinements.
 <br>
 (Timo Heister, 2011/10/26)
 
