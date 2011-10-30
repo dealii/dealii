@@ -10,7 +10,7 @@
 //
 //----------------------------  full_matrix_03.cc,v  ---------------------------
 
-//check method FullMatrix::triple_prduct
+//check method FullMatrix::triple_product
 
 #include "../tests.h"
 #include <cmath>
@@ -38,7 +38,7 @@ void test (const unsigned int n, const unsigned int m)
 {
 				   // Create some random matrices
   FullMatrix<double> A(n,n);
-  FullMatrix<double> C(m,m);  
+  FullMatrix<double> C(m,m);
   FullMatrix<double> B(n,m);
   FullMatrix<double> D(m,n);
   FullMatrix<double> Bt(m,n);
@@ -95,7 +95,7 @@ void test (const unsigned int n, const unsigned int m)
   aux2.triple_product(A, Dt, Bt, true, true);
   aux2.add(-1., S1);
   diff(aux2);
-  
+
   aux4 = 0.;
   aux4.triple_product(C, Bt, D, true, false);
   aux4.add(-1., S2);
@@ -122,4 +122,4 @@ main ()
 
   test(3,4);
   test(4,7);
-}    
+}
