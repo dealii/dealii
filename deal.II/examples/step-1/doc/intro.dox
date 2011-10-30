@@ -1,6 +1,8 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
+<h3> About the tutorial </h3>
+
 Since this is the first tutorial program, let us comment first on how
 this tutorial and the rest of the deal.II documentation is supposed to
 work. The documentation for deal.II comes essentially at three
@@ -114,3 +116,42 @@ about them).
 
 The program is otherwise small enough that it doesn't need a whole lot
 of introduction. Let us just continue with its commented source.
+
+
+<h3> About scientific computing in general </h3>
+
+If you are reading through this tutorial program, chances are that you are
+interested in continuing to use deal.II for your own projects. Thus, you are
+about to embark on an exercise in programming using a large-scale scientific
+computing library. Unless you are already an experienced user of large-scale
+programming methods, this may be new territory for you &mdash; with all the
+new rules that go along with it such as the fact that you will have to deal
+with code written by others, that you may have to think about documenting your
+own code because you may not remember what exactly it is doing a year down the
+road (or because others will be using it as well), or coming up with ways to
+test that your program is doing the right thing. None of this is something
+that we typically train mathematicians, engineers, or scientists in but that
+is important when you start writing software of more than a few hundred
+lines. Remember: Producing software is not the same as just writing code.
+
+To make your life easier on this journey let us point to two resources that
+are worthwhile browsing through before you start any large-scale programming:
+
+- The <a
+  href="http://dealii.sourceforge.net/index.php/Deal.II_Questions_and_Answers">deal.II
+  Frequently Asked Questions</a>: This page has a good number of questions
+  that pertain to particular aspects of deal.II, but also to more general
+  questions such as "How do I debug scientific computing codes?" or "Can I
+  train myself to write code that has fewer bugs?".
+
+- The <a href="http://software-carpentry.org/">Software Carpentry project</a>
+  that provides introductions to many topics that are important to dealing
+  with software, such as version control, make files, testing, etc. It is
+  specifically written for scientists and engineers, not for computer
+  scientists, and has a focus on short, practical lessons.
+
+As a general recommendation: If you expect to spend more than a few days
+writing software in the future, do yourself the favor of learning tools that
+can make your life more productive, in particular debuggers and integrated
+development environments. You will find that you will get the time spent
+learning these tools back severalfold soon by being more productive!
