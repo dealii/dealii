@@ -56,7 +56,8 @@ namespace internal
 
 /**
  * Manage the distribution and numbering of the degrees of freedom for
- * non-multigrid algorithms.
+ * non-multigrid algorithms. The purpose of this class is first discussed
+ * in the step-2 tutorial program.
  *
  * For each vertex, line, quad, etc, we store a list of the indices of degrees
  * of freedom living on this object. These indices refer to the unconstrained
@@ -288,7 +289,9 @@ class DoFHandler  :  public Subscriptor
 				      * distribute the degrees of freedoms
 				      * needed for the given finite element
 				      * according to the given distribution
-				      * method.
+				      * method. The purpose of this function
+				      * is first discussed in the introduction
+				      * to the step-2 tutorial program.
 				      *
 				      * The additional optional
 				      * parameter @p offset allows you
