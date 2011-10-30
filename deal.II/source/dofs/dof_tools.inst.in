@@ -113,11 +113,11 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
     DoFTools::make_flux_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
     (const hp::DoFHandler<deal_II_dimension> &dof,
      SP    &sparsity);
-     
+
     template void
       DoFTools::make_cell_patches<MGDoFHandler<deal_II_dimension>,SP>
       (SP&, const MGDoFHandler<deal_II_dimension>&, unsigned int);
-    
+
 #if deal_II_dimension > 1
 
     template void
@@ -383,6 +383,13 @@ DoFTools::extract_constant_modes<DoFHandler<deal_II_dimension> >
 
 template
 void
+DoFTools::extract_constant_modes<hp::DoFHandler<deal_II_dimension> >
+(const hp::DoFHandler<deal_II_dimension> &dof_handler,
+ const std::vector<bool> &selected_components,
+ std::vector<std::vector<bool> > &constant_modes);
+
+template
+void
 DoFTools::get_active_fe_indices<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &dof_handler,
  std::vector<unsigned int> &active_fe_indices);
@@ -525,13 +532,13 @@ void
 DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
   const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
   std::vector<unsigned int>&, bool, std::vector<unsigned int>);
-  
-template 
-void 
+
+template
+void
 DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
 (const unsigned int level, const MGDoFHandler<deal_II_dimension, deal_II_dimension+1>&,
  const std::vector<bool>&, std::vector<bool>&, bool);
-  
+
 #endif
 
 template
