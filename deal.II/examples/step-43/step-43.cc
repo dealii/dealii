@@ -296,16 +296,17 @@ namespace Step43
       static
       double
       compute_viscosity(const std::vector<double>          &old_saturation,
-			const std::vector<double>          &old_old_saturation,
-			const std::vector<Tensor<1,dim> >  &old_saturation_grads,
-			const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
-			const std::vector<Vector<double> > &present_darcy_values,
-			const double                        global_u_infty,
-			const double                        global_S_variation,
-			const double                        global_Omega_diameter,
-			const double                        cell_diameter,
-			const double                        old_time_step,
-			const double                        viscosity);
+                        const std::vector<double>          &old_old_saturation,
+                        const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+                        const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
+                        const std::vector<Vector<double> > &present_darcy_values,
+                        const double                        global_u_infty,
+                        const double                        global_S_variation,
+                        const double                        global_Omega_diameter,
+                        const double                        cell_diameter,
+                        const double                        old_time_step,
+                        const double                        viscosity,
+                        const double                        porosity);
 
 
       const unsigned int degree;
@@ -348,7 +349,7 @@ namespace Step43
       bool                      previous_solve_pressure_velocity_part;
 
       const double              saturation_level;
-      const double              saturation_value;
+      const double              saturation_refinement_threshold;
 
       double n_minus_oneth_time_step;
       double cumulative_nth_time_step;
@@ -357,6 +358,8 @@ namespace Step43
       double old_time_step;
       unsigned int timestep_number;
       double viscosity;
+      double porosity;
+      double AOS_threshold;
 
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
@@ -673,11 +676,13 @@ namespace Step43
 		  previous_solve_pressure_velocity_part (false),
 
 		  saturation_level (2),
-		  saturation_value (0.5),
+		  saturation_refinement_threshold (0.5),
 
 		  time_step (0),
 		  old_time_step (0),
 		  viscosity (0.2),
+                  porosity (1.0),
+                  AOS_threshold (3.0),
 
 		  rebuild_saturation_matrix (true)
   {}
@@ -1092,7 +1097,7 @@ namespace Step43
 				   // program more efficient.
 				   //
 				   // There is one thing that needs to be
-				   // commented ¡V since we have a separate
+				   // commented ï¿½V since we have a separate
 				   // finite element and DoFHandler for the
 				   // saturation, we need to generate a second
 				   // FEValues object for the proper evaluation
@@ -1404,7 +1409,7 @@ namespace Step43
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
 		{
 		  const double phi_j_s = saturation_fe_values.shape_value (j,q);
-		  local_matrix(i,j) += phi_i_s * phi_j_s * saturation_fe_values.JxW(q);
+		  local_matrix(i,j) += porosity * phi_i_s * phi_j_s * saturation_fe_values.JxW(q);
 		}
 	    }
 	cell->get_dof_indices (local_dof_indices);
@@ -1573,16 +1578,17 @@ namespace Step43
 
     const double nu
       = compute_viscosity (old_saturation_solution_values,
-			   old_old_saturation_solution_values,
-			   old_grad_saturation_solution_values,
-			   old_old_grad_saturation_solution_values,
-			   present_darcy_solution_values,
-			   global_u_infty,
-			   global_S_variation,
-			   global_Omega_diameter,
-			   saturation_fe_values.get_cell()->diameter(),
-			   old_time_step,
-			   viscosity);
+                           old_old_saturation_solution_values,
+                           old_grad_saturation_solution_values,
+                           old_old_grad_saturation_solution_values,
+                           present_darcy_solution_values,
+                           global_u_infty,
+                           global_S_variation,
+                           global_Omega_diameter,
+                           saturation_fe_values.get_cell()->diameter(),
+                           old_time_step,
+                           viscosity,
+                           porosity);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1604,7 +1610,7 @@ namespace Step43
 			   nu *
 			   old_grad_saturation_solution_values[q] * grad_phi_i_s
 			   +
-			   old_s * phi_i_s)
+			   porosity * old_s * phi_i_s)
 			  *
 			  saturation_fe_values.JxW(q);
 	}
@@ -1931,7 +1937,7 @@ namespace Step43
 					    (max_local_mobility_reciprocal_difference*max_local_permeability_inverse_l1_norm));
       }
 
-    if ( max_global_aop_indicator > 5.0 )
+    if ( max_global_aop_indicator > AOS_threshold )
       {
 	return true;
       }
@@ -2016,11 +2022,11 @@ namespace Step43
 	  cell->clear_refine_flag();
 
 	  if ((cell->level() < current_saturation_level) &&
-	      (std::fabs(refinement_indicators(cell_no)) > saturation_value))
+	      (std::fabs(refinement_indicators(cell_no)) > saturation_refinement_threshold))
 	    cell->set_refine_flag();
 	  else
 	    if ((cell->level() > double(n_refinement_steps)) &&
-		(std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_value))
+		(std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_refinement_threshold))
 	      cell->set_coarsen_flag();
 	}
     }
@@ -2367,22 +2373,23 @@ namespace Step43
       }
   }
 
-  template <int dim>
-  double
-  TwoPhaseFlowProblem<dim>::
-  compute_viscosity (const std::vector<double>          &old_saturation,
-		     const std::vector<double>          &old_old_saturation,
-		     const std::vector<Tensor<1,dim> >  &old_saturation_grads,
-		     const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
-		     const std::vector<Vector<double> > &present_darcy_values,
-		     const double                        global_u_infty,
-		     const double                        global_S_variation,
-		     const double                        global_Omega_diameter,
-		     const double                        cell_diameter,
-		     const double                        old_time_step,
-		     const double                        viscosity)
+template <int dim>
+double
+TwoPhaseFlowProblem<dim>::
+compute_viscosity (const std::vector<double>          &old_saturation,
+                   const std::vector<double>          &old_old_saturation,
+                   const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+                   const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
+                   const std::vector<Vector<double> > &present_darcy_values,
+                   const double                        global_u_infty,
+                   const double                        global_S_variation,
+                   const double                        global_Omega_diameter,
+                   const double                        cell_diameter,
+                   const double                        old_time_step,
+                   const double                        viscosity,
+                   const double                        porosity)
   {
-    const double beta = 0.08 * dim;
+    const double beta = 0.27 * dim;
     const double alpha = 1;
 
     if (global_u_infty == 0)
@@ -2399,7 +2406,7 @@ namespace Step43
 	for (unsigned int d=0; d<dim; ++d)
 	  u[d] = present_darcy_values[q](d);
 
-	const double dS_dt = (old_saturation[q] - old_old_saturation[q])
+	const double dS_dt = porosity * (old_saturation[q] - old_old_saturation[q])
 			     / old_time_step;
 
 	const double dF_dS = get_fractional_flow_derivative ((old_saturation[q] + old_old_saturation[q]) / 2.0,
