@@ -80,7 +80,7 @@ avenue for further extensions would be to confirm the order of
 convergence for this program. In the current case, the solution is
 non-smooth, and so we can not expect to get a particularly high order
 of convergence, even if we used higher order elements. But even if the
-solution is smooth, the equation is not elliptic and so it is not
+solution <i>is</i> smooth, the equation is not elliptic and so it is not
 immediately clear that we should obtain a convergence order that
 equals that of the optimal interpolation estimates (i.e. for example
 that we would get $h^3$ convergence in the $L^2$ norm by using
@@ -97,3 +97,10 @@ uniformly refined meshes, one can construct so-called Peterson meshes
 on which the worse theoretical bound is actually attained. This should
 be relatively simple to verify, for example using the
 VectorTools::integrate_difference function.
+
+A different direction is to observe that the solution of transport problems
+often has discontinuities and that therefore a mesh in which we <i>bisect</i>
+every cell in every coordinate direction may not be optimal. Rather, a better
+strategy would be to only cut cells in the direction parallel to the
+discontinuity. This is called <i>anisotropic mesh refinement</i> and is the
+subject of step-30.
