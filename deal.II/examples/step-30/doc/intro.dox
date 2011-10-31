@@ -23,6 +23,14 @@ refinement is only fully implemented for discontinuous Galerkin Finite
 Elements. This may later change (or may already have).
 
 
+@note While this program is a modification of step-12, it is an adaptation of
+a version of step-12 written early on in the history of deal.II when the
+MeshWorker framework wasn't available yet. Consequently, it bears little
+resemblance to the step-12 as it exists now, apart from the fact that it
+solves the same equation with the same discretization.
+
+
+
 <h3>Anisotropic refinement</h3>
 
 All the adaptive processes in the preceding tutorial programs were based on
@@ -37,7 +45,7 @@ simple square cell, for example:
   |       |
   |       |
   *-------*
-@endcode 
+@endcode
 After the usual refinement it will consist of four children and look like this:
 @code
   *---*---*
@@ -84,12 +92,12 @@ x-axis running to the right, y-axis 'into the page' and z-axis to the top,
    /           /  |
   *-----------*   |
   |           |   |
-  |           |   * 
+  |           |   *
   |           |  /
   |           | /
   |           |/
   *-----------*
-@endcode 
+@endcode
 we have the isotropic refinement case,
 @code
       *-----*-----*
@@ -98,46 +106,46 @@ we have the isotropic refinement case,
    /     /     /| *
   *-----*-----* |/|
   |     |     | * |
-  |     |     |/| * 
+  |     |     |/| *
   *-----*-----* |/
   |     |     | *
   |     |     |/
   *-----*-----*
 
      cut_xyz
-@endcode 
+@endcode
 three anisotropic cases which refine only one axis:
 @code
-      *-----*-----*           *-----------*           *-----------*  
-     /     /     /|          /           /|          /           /|  
-    /     /     / |         *-----------* |         /           / |  
-   /     /     /  |        /           /| |        /           /  *  
-  *-----*-----*   |       *-----------* | |       *-----------*  /|  
-  |     |     |   |       |           | | |       |           | / |  
-  |     |     |   *       |           | | *       |           |/  *  
-  |     |     |  /        |           | |/        *-----------*  /   
-  |     |     | /         |           | *         |           | /    
-  |     |     |/          |           |/          |           |/     
-  *-----*-----*           *-----------*           *-----------*      
-								                     	                     
-     cut_x                   cut_y                   cut_z           
-@endcode 
+      *-----*-----*           *-----------*           *-----------*
+     /     /     /|          /           /|          /           /|
+    /     /     / |         *-----------* |         /           / |
+   /     /     /  |        /           /| |        /           /  *
+  *-----*-----*   |       *-----------* | |       *-----------*  /|
+  |     |     |   |       |           | | |       |           | / |
+  |     |     |   *       |           | | *       |           |/  *
+  |     |     |  /        |           | |/        *-----------*  /
+  |     |     | /         |           | *         |           | /
+  |     |     |/          |           |/          |           |/
+  *-----*-----*           *-----------*           *-----------*
+
+     cut_x                   cut_y                   cut_z
+@endcode
 and three cases which refine two of the three axes:
 @code
-      *-----*-----*           *-----*-----*           *-----------*  
-     /     /     /|          /     /     /|          /           /|  
-    *-----*-----* |         /     /     / |         *-----------* |  
-   /     /     /| |        /     /     /  *        /           /| *  
-  *-----*-----* | |       *-----*-----*  /|       *-----------* |/|  
-  |     |     | | |       |     |     | / |       |           | * |  
-  |     |     | | *       |     |     |/  *       |           |/| *  
-  |     |     | |/        *-----*-----*  /        *-----------* |/   
-  |     |     | *         |     |     | /         |           | *    
-  |     |     |/          |     |     |/          |           |/     
-  *-----*-----*           *-----*-----*           *-----------*      
-								                     	                     
-     cut_xy                  cut_xz                  cut_yz       
-@endcode 
+      *-----*-----*           *-----*-----*           *-----------*
+     /     /     /|          /     /     /|          /           /|
+    *-----*-----* |         /     /     / |         *-----------* |
+   /     /     /| |        /     /     /  *        /           /| *
+  *-----*-----* | |       *-----*-----*  /|       *-----------* |/|
+  |     |     | | |       |     |     | / |       |           | * |
+  |     |     | | *       |     |     |/  *       |           |/| *
+  |     |     | |/        *-----*-----*  /        *-----------* |/
+  |     |     | *         |     |     | /         |           | *
+  |     |     |/          |     |     |/          |           |/
+  *-----*-----*           *-----*-----*           *-----------*
+
+     cut_xy                  cut_xz                  cut_yz
+@endcode
 For 1D problems, anisotropic refinement can make no difference, as there is only
 one coordinate direction for a cell, so it is not possible to split it
 in any other way than isotropically.
@@ -200,7 +208,7 @@ retrieved using the function call <code>cell-@>n_children()</code>,
 a call that works equally well for both isotropic and anisotropic
 refinement. A very similar situation can be found for
 faces and their subfaces: the previously available variable
-GeometryInfo<dim>::subfaces_per_face no 
+GeometryInfo<dim>::subfaces_per_face no
 longer exists; the pertinent information can now be queried using
 GeometryInfo<dim>::max_children_per_face or <code>face->n_children()</code>,
 depending on the context.
@@ -224,11 +232,11 @@ exactly one level below ours, but can pretty much have any level
 relative to the current one; in fact, it can even be on a higher
 level even though it is coarser. Thus the decisions
 have to be made on a different basis, whereas the intention of the
-decisions stays the same. 
+decisions stays the same.
 
 In the following, we will discuss the cases that can happen when we
 want to compute contributions to the matrix (or right hand side) of
-the form 
+the form
 @f[
   \int_{\partial K} \varphi_i(x) \varphi_j(x) \; dx
 @f]
@@ -244,10 +252,10 @@ write code that works for both isotropic and anisotropic refinement:
   common face. In this case, the face
   under consideration has to be a refined one, which can determine by
   asking <code>if(face->has_children())</code>. If this is true, we need to
-  loop over 
+  loop over
   all subfaces and get the neighbors' child behind this subface, so that we can
   reinit an FEFaceValues object with the neighbor and an FESubfaceValues object
-  with our cell and the respective subface. 
+  with our cell and the respective subface.
 
   For isotropic refinement, this kind is reasonably simple because we
   know that an invariant of the isotropically refined adaptive meshes
@@ -255,7 +263,7 @@ write code that works for both isotropic and anisotropic refinement:
   refinement level. However, this isn't quite true any more for
   anisotropically refined meshes, in particular in 3d; there,
   the active cell we are interested on the other side of $f$ might not
-  actually be a child of our 
+  actually be a child of our
   neighbor, but perhaps a grandchild or even a farther offspring. Fortunately,
   this complexity is hidden in the internals of the library. All we need to do
   is call the <code>cell->neighbor_child_on_subface(face_no, subface_no)</code>
@@ -263,7 +271,7 @@ write code that works for both isotropic and anisotropic refinement:
   <ul>
     <li> If the neighbor is refined more than once anisotropically, it might be
   that here are not two or four but actually three subfaces to
-  consider. Imagine 
+  consider. Imagine
   the following refinement process of the (two-dimensional) face of
   the (three-dimensional) neighbor cell we are considering: first the
   face is refined along x, later on only the left subface is refined along y.
@@ -279,7 +287,7 @@ write code that works for both isotropic and anisotropic refinement:
   <code>face->number_of_children()</code>. The first function returns the number of
   immediate children, which would be two for the above example, whereas the
   second returns the number of active offsprings, which is the correct three in
-  the example above. Using <code>face->number_of_children()</code> works for 
+  the example above. Using <code>face->number_of_children()</code> works for
   isotropic and anisotropic as well as 2D and 3D cases, so it should always be
   used. It should be noted that if any of the cells behind the two
   small subfaces on the left side of the rightmost image is further
@@ -292,25 +300,25 @@ write code that works for both isotropic and anisotropic refinement:
   are finer than our current cell. This situation can occur if two equally
   coarse cells are refined, where one of the cells has two children at the face
   under consideration and the other one four. The cells in the next graphic are
-  only separated from each other to show the individual refinement cases. 
+  only separated from each other to show the individual refinement cases.
 @code
-      *-----------*     *-----------* 
-     /           /|    /           /| 
-    ############# |   +++++++++++++ | 
-   #           ## |  +           ++ * 
-  ############# # | +++++++++++++ +/| 
-  #           # # | +           + + | 
-  #           # # * +           +++ * 
-  #           # #/  +++++++++++++ +/  
-  #           # #   +           + +   
-  #           ##    +           ++    
-  #############     +++++++++++++     
-@endcode 
+      *-----------*     *-----------*
+     /           /|    /           /|
+    ############# |   +++++++++++++ |
+   #           ## |  +           ++ *
+  ############# # | +++++++++++++ +/|
+  #           # # | +           + + |
+  #           # # * +           +++ *
+  #           # #/  +++++++++++++ +/
+  #           # #   +           + +
+  #           ##    +           ++
+  #############     +++++++++++++
+@endcode
 
   Here, the left two cells resulted from an anisotropic bisection of
   the mother cell in $y$-direction, whereas the right four cells
   resulted from a simultaneous anisotropic refinement in both the $y$-
-  and $z$-directions. 
+  and $z$-directions.
   The left cell marked with # has two finer neighbors marked with +, but the
   actual neighbor of the left cell is the complete right mother cell, as the
   two cells marked with + are finer and their direct mother is the one
@@ -349,7 +357,7 @@ write code that works for both isotropic and anisotropic refinement:
   the case where the cells have the same index, and give an additional
   condition, which of the cells should assemble the terms, e.g. we can choose
   the cell with lower level. The details of this concept can be seen in the
-  implementation below. 
+  implementation below.
 
   <li> <em>Coarser neighbor</em>: The remaining case is obvious: If there are no
   refined neighbors and the neighbor is not as fine as the current cell, then it needs
@@ -409,7 +417,7 @@ algorithms worth mentioning, however:
 Using the benefits of anisotropic refinement requires an indicator to catch
 anisotropic features of the solution and exploit them for the refinement
 process. Generally the anisotropic refinement process will consist of several
-steps: 
+steps:
 <ol>
   <li> Calculate an error indicator.
   <li> Use the error indicator to flag cells for refinement, e.g. using a fixed
@@ -421,7 +429,7 @@ steps:
   <li> Call Triangulation<dim>::execute_coarsening_and_refinement to perform the
   requested refinement, using the requested isotropic and anisotropic flags.
 </ol>
-This approach is similar to the one we have used in step-27 
+This approach is similar to the one we have used in step-27
 for hp refinement and
 has the great advantage of flexibility: Any error indicator can be
 used in the anisotropic process, i.e. if you have quite involved a posteriori
@@ -460,7 +468,7 @@ If the average jump in one direction is larger than the average of the
 jumps in the other directions by a
 certain factor $\kappa$, i.e. if
 $K_i > \kappa \frac 1{d-1} \sum_{j=1, j\neq i}^d K_j$, the cell is refined only along that particular
-direction $i$, otherwise the cell is refined isotropically. 
+direction $i$, otherwise the cell is refined isotropically.
 
 Such a criterion is easily generalized to systems of equations: the
 absolute value of the jump would be replaced by an appropriate norm of
