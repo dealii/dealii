@@ -363,7 +363,7 @@ template <int dim>
 void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  n_refinements = 5;
+  n_refinements = 6;
   triangulation.refine_global (n_refinements);
   
   std::cout << "   Number of active cells: "
@@ -589,7 +589,7 @@ void Step4<dim>::assemble_system ()
       cell->get_dof_indices (local_dof_indices);	
       constraints.distribute_local_to_global (cell_matrix, cell_rhs,
                                               local_dof_indices,
-                                              system_matrix, system_rhs);
+                                              system_matrix, system_rhs, true);
     }
 }
 
@@ -603,32 +603,49 @@ void Step4<dim>::projection_active_set ()
   const Obstacle<dim>     obstacle;
   std::vector<bool>       vertex_touched (triangulation.n_vertices(),
 				    false);
+  unsigned int            counter_contact_constraints = 0; 
+  
   typename DoFHandler<dim>::active_cell_iterator
   cell = dof_handler.begin_active(),
   endc = dof_handler.end();
 
   constraints.clear();
+
+                                       // to find and supply the constraints for the
+                                       // obstacle condition
   active_set = 0.0;
   for (; cell!=endc; ++cell)
     for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
       {
 	unsigned int index_x = cell->vertex_dof_index (v,0);
 
+				       // the local row where
 	Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
 	double obstacle_value = obstacle.value (point);
 	double solution_index_x = solution (index_x);
-// 	if (solution_index_x <= obstacle_value &&
+
+                                       // to decide which dof belongs to the
+                                       // active-set. for that we scale the
+                                       // residual-vector with the cell-size and
+                                       // the diag-entry of the mass-matrix.
 	if ((resid_vector (index_x)*std::pow (2, 2*n_refinements)*diag_mass_matrix_vector (index_x) >= solution_index_x - obstacle_value))
 	{
-	  std::cout<< std::pow (2, 2*n_refinements) << ", " << diag_mass_matrix_vector (index_x) <<std::endl;
-
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
- 	  solution (index_x) = 0;
+	  solution (index_x) = obstacle_value;
 	  active_set (index_x) = 1.0;
+	  
+	  if (vertex_touched[cell->vertex_index(v)] == false)
+	  {
+	    vertex_touched[cell->vertex_index(v)] = true;
+	    counter_contact_constraints += 1;
+	  }
 	}
       }
-      
+  std::cout<< "Number of Contact-Constaints: " << counter_contact_constraints <<std::endl;
+
+                                       // to supply the boundary values of the
+                                       // dirichlet-boundary in constraints
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    BoundaryValues<dim>(),
@@ -734,16 +751,24 @@ void Step4<dim>::run ()
   constraints.close ();
   ConstraintMatrix constraints_complete (constraints);
   assemble_system ();
+  solve ();
 
+                                       // to save the system_matrix and the
+                                       // rhs to compute the residual in every
+                                       // step of the active-set-iteration
   system_matrix_complete.copy_from (system_matrix);
   system_rhs_complete = system_rhs;
+  
+  resid_vector = 0;
+  resid_vector -= system_rhs_complete;
+  system_matrix_complete.vmult_add  (resid_vector, solution);
 
+                                       // for the factor which is used
+                                       // to scale the residual
   for (unsigned int j=0; j<solution.size (); j++)
     diag_mass_matrix_vector (j) = system_matrix_complete.diag_element (j);
 
   std::cout<< "Update Active Set:" <<std::endl;
-  solution = 0;
-  resid_vector = 0;
   projection_active_set ();
 
   for (unsigned int i=0; i<solution.size (); i++)
