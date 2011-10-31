@@ -22,12 +22,6 @@ to write the local integrators for your problem. Second, you select
 classes from the MeshWorker namespace and combine them to achieve your
 goal.
 
-@note While this program is a modification of step-12, it is an adaptation of
-a version of step-12 written early on in the history of deal.II when the
-MeshWorker framework wasn't available yet. Consequently, it bears little
-resemblance to the step-12 as it exists now, apart from the fact that it
-solves the same equation with the same discretization.
-
 
 <h3>Problem</h3>
 
