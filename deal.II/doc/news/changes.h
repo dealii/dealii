@@ -48,7 +48,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
-<li> New: Implementation of an alternative handling of inhomogeneous constraints in ConstraintMatrix. This is controlled with a new parameter use_inhomogeneities_for_rhs in distribute_local_to_global() and determines whether the correct or zero values (this was the case before and still is the default) are kept in the linear system during the solution process.
+<li> New: Implementation of an alternative handling of
+inhomogeneous constraints in ConstraintMatrix. This is controlled with
+a new parameter use_inhomogeneities_for_rhs in
+distribute_local_to_global() and determines whether the correct or
+zero values (this was the case before and still is the default) are
+kept in the linear system during the solution process.
 <br>
 (Jörg Frohne, 2011/11/01)
 
