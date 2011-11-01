@@ -1913,12 +1913,15 @@ namespace internals
 				       // hanging nodes in 3d). however, in
 				       // the line below, we do actually do
 				       // something with this dof
-  template <typename MatrixType>
+  template <typename MatrixType, typename VectorType>
   inline void
   set_matrix_diagonals (const internals::GlobalRowsFromLocal &global_rows,
 			const std::vector<unsigned int>      &local_dof_indices,
 			const FullMatrix<double>             &local_matrix,
-			MatrixType                           &global_matrix)
+			const ConstraintMatrix               &constraints,
+			MatrixType                           &global_matrix,
+			VectorType                           &global_vector,
+			bool                                 use_inhomogeneities_for_rhs)
   {
     if (global_rows.n_constraints() > 0)
       {
@@ -1935,6 +1938,15 @@ namespace internals
 	      = (std::fabs(local_matrix(local_row,local_row)) != 0 ?
 		 std::fabs(local_matrix(local_row,local_row)) : average_diagonal);
 	    global_matrix.add(global_row, global_row, new_diagonal);
+
+				       // if the use_inhomogeneities_for_rhs flag is
+                                       // set to true, the inhomogeneities are used
+                                       // to create the global vector. instead of
+                                       // fill in a zero in the ith components with an
+                                       // inhomogeneity, we set those to:
+                                       //    inhomogeneity(i)*global_matrix (i,i).
+ 	    if (use_inhomogeneities_for_rhs == true)
+	      global_vector(global_row) += constraints.get_inhomogeneity(global_row) * new_diagonal;
 	  }
       }
   }
@@ -2190,6 +2202,7 @@ ConstraintMatrix::distribute_local_to_global (
   const std::vector<unsigned int> &local_dof_indices,
   MatrixType                      &global_matrix,
   VectorType                      &global_vector,
+  bool                            use_inhomogeneities_for_rhs,
   internal::bool2type<false>) const
 {
 				   // check whether we work on real vectors
@@ -2281,7 +2294,8 @@ ConstraintMatrix::distribute_local_to_global (
     }
 
   internals::set_matrix_diagonals (global_rows, local_dof_indices,
-				   local_matrix, global_matrix);
+				   local_matrix, *this,
+				   global_matrix, global_vector, use_inhomogeneities_for_rhs);
 }
 
 
@@ -2350,6 +2364,7 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                             const std::vector<unsigned int> &local_dof_indices,
                             MatrixType                      &global_matrix,
 			    VectorType                      &global_vector,
+			    bool                            use_inhomogeneities_for_rhs,
 			    internal::bool2type<true>) const
 {
   const bool use_vectors = (local_vector.size() == 0 &&
@@ -2454,7 +2469,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
     }
 
   internals::set_matrix_diagonals (global_rows, local_dof_indices,
-				   local_matrix, global_matrix);
+				   local_matrix, *this,
+				   global_matrix, global_vector, use_inhomogeneities_for_rhs);
 }
 
 

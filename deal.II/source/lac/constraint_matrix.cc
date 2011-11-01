@@ -2352,6 +2352,7 @@ distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>    
                                                     const std::vector<unsigned int> &, \
                                                     MatrixType                      &, \
                                                     VectorType                      &, \
+						    bool                             , \
                                                     internal::bool2type<false>) const
 #define MATRIX_FUNCTIONS(MatrixType) \
 template void ConstraintMatrix:: \
@@ -2360,6 +2361,7 @@ distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>
                                                         const std::vector<unsigned int> &, \
                                                         MatrixType                      &, \
                                                         Vector<double>                  &, \
+							bool                             , \
                                                         internal::bool2type<false>) const
 #define BLOCK_MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType)   \
 template void ConstraintMatrix:: \
@@ -2368,6 +2370,7 @@ distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<double>    
                                                     const std::vector<unsigned int> &, \
                                                     MatrixType                      &, \
                                                     VectorType                      &, \
+						    bool                             , \
                                                     internal::bool2type<true>) const
 #define BLOCK_MATRIX_FUNCTIONS(MatrixType)      \
 template void ConstraintMatrix:: \
@@ -2376,6 +2379,7 @@ distribute_local_to_global<MatrixType,Vector<double> > (const FullMatrix<double>
                                                         const std::vector<unsigned int> &, \
                                                         MatrixType                      &, \
                                                         Vector<double>                  &, \
+							bool                             , \
                                                         internal::bool2type<true>) const
 
 MATRIX_FUNCTIONS(SparseMatrix<double>);

@@ -654,7 +654,7 @@ class ConstraintMatrix : public Subscriptor
 				      * This function does much the same as
 				      * the above one, except that it
 				      * condenses the matrix struct
-				      * 'in-place'. It does not remove
+				      * 'in-place'. It does not removes
 				      * nonzero entries from the matrix but
 				      * adds those needed for the process of
 				      * distribution of the constrained
@@ -1175,13 +1175,17 @@ class ConstraintMatrix : public Subscriptor
                                 MatrixType                      &global_matrix) const;
 
 				     /**
-				      * This function simultaneously writes
-				      * elements into matrix and vector,
-				      * according to the constraints
-				      * specified by the calling
-				      * ConstraintMatrix. This function can
-				      * correctly handle inhomogeneous
-				      * constraints as well.
+				      * This function simultaneously
+				      * writes elements into matrix
+				      * and vector, according to the
+				      * constraints specified by the
+				      * calling ConstraintMatrix. This
+				      * function can correctly handle
+				      * inhomogeneous constraints as
+				      * well. For the parameter
+				      * use_inhomogeneities_for_rhs
+				      * see the documentation in @ref
+				      * constraints module.
 				      *
 				      * Note: This function is not
 				      * thread-safe, so you will need to
@@ -1194,7 +1198,8 @@ class ConstraintMatrix : public Subscriptor
 				const Vector<double>            &local_vector,
                                 const std::vector<unsigned int> &local_dof_indices,
                                 MatrixType                      &global_matrix,
-				VectorType                      &global_vector) const;
+				VectorType                      &global_vector,
+				bool                            use_inhomogeneities_for_rhs = false) const;
 
 				     /**
 				      * Do a similar operation as the
@@ -1668,6 +1673,7 @@ class ConstraintMatrix : public Subscriptor
                                 const std::vector<unsigned int> &local_dof_indices,
                                 MatrixType                      &global_matrix,
 				VectorType                      &global_vector,
+				bool                            use_inhomogeneities_for_rhs,
 				internal::bool2type<false>) const;
 
 				     /**
@@ -1682,6 +1688,7 @@ class ConstraintMatrix : public Subscriptor
                                 const std::vector<unsigned int> &local_dof_indices,
                                 MatrixType                      &global_matrix,
 				VectorType                      &global_vector,
+				bool                            use_inhomogeneities_for_rhs,
 				internal::bool2type<true>) const;
 
 				     /**
@@ -2059,14 +2066,15 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                             const Vector<double>            &local_vector,
                             const std::vector<unsigned int> &local_dof_indices,
                             MatrixType                      &global_matrix,
-                            VectorType                      &global_vector) const
+                            VectorType                      &global_vector,
+			    bool                            use_inhomogeneities_for_rhs) const
 {
                                    // enter the internal function with the
                                    // respective block information set, the
                                    // actual implementation follows in the
                                    // cm.templates.h file.
   distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
-                              global_matrix, global_vector,
+                              global_matrix, global_vector, use_inhomogeneities_for_rhs,
                               internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 

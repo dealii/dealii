@@ -283,7 +283,34 @@
  * has already been condensed before).
  *
  * The use of ConstraintMatrix for implementing Dirichlet boundary conditions
- * is discussed in the step-22 tutorial program.
+ * is discussed in the step-22 tutorial program. A further example that applies
+ * the ConstraintMatrix is step-41. The situation here is little more complicated,
+ * because there we have some constraints which are not at the boundary.
+ * There are two ways to apply inhomogeneous constraints after creating the
+ * ConstraintMatrix:
+ *
+ * First:
+ * - Set the solution to zero in the inhomogeneous constrained components
+ *   using the ConstraintMatrix::set_zero() function (or start with a solution 
+ *   vector equal to zero)
+ * - Apply the ConstraintMatrix::distribute_local_to_global() function to the
+ *   system matrix and the right-hand-side with the parameter 
+ *   use_inhomogeneities_for_rhs = false (default)
+ * - solve() the linear system
+ * - Apply ConstraintMatrix::distribute() to the solution
+ * 
+ * Second:
+ * - Set the concerning components of the solution to the inhomogeneous
+ *   constrained values
+ * - Use the ConstraintMatrix::distribute_local_to_global() function with the parameter 
+ *   use_inhomogeneities_for_rhs = true and apply it to
+ *   the system matrix and the right-hand-side
+ * - solve() the linear system
+ * - Depending on the solver now you have to apply the ConstraintMatrix::distribute()
+ *   function to the solution, because the solver could change the constrained
+ *   values in the solution. For a krylov based solver this should not be the
+ *   case, but it is still possible that there is a difference between the
+ *   inhomogeneous value and the solution value in the order of machine precision.   
  *
  *
  * <h3>Dealing with conflicting constraints</h3>
