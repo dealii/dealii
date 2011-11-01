@@ -677,8 +677,6 @@ void Step4<dim>::solve ()
 	    << " CG iterations needed to obtain convergence with an error: "
 	    <<  reduction_control.last_value()
 	    << std::endl;
-
-  constraints.distribute (solution);
 }
 
                                  // @sect4{Step4::output_results}
