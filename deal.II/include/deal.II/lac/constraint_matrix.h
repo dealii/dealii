@@ -2051,9 +2051,8 @@ distribute_local_to_global (const FullMatrix<double>        &local_matrix,
                                    // function actually implementing this
                                    // feature in the cm.templates.h file.
   Vector<double> dummy(0);
-  bool           bool_dummy = false;
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
-                              global_matrix, dummy, bool_dummy,
+                              global_matrix, dummy, false,
                               internal::bool2type<IsBlockMatrix<MatrixType>::value>());
 }
 
