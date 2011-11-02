@@ -654,7 +654,7 @@ class ConstraintMatrix : public Subscriptor
 				      * This function does much the same as
 				      * the above one, except that it
 				      * condenses the matrix struct
-				      * 'in-place'. It does not removes
+				      * 'in-place'. It does not remove
 				      * nonzero entries from the matrix but
 				      * adds those needed for the process of
 				      * distribution of the constrained
@@ -1204,7 +1204,7 @@ class ConstraintMatrix : public Subscriptor
 				     /**
 				      * Do a similar operation as the
 				      * distribute_local_to_global() function
-				      * that distributed writing entries into
+				      * that distributes writing entries into
 				      * a matrix for constrained degrees of
 				      * freedom, except that here we don't
 				      * write into a matrix but only allocate
@@ -1868,7 +1868,7 @@ ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 {
   const unsigned int line_index = calculate_line_index(line);
   Assert( line_index < lines_cache.size() &&
-      lines_cache[line_index] != numbers::invalid_unsigned_int, 
+      lines_cache[line_index] != numbers::invalid_unsigned_int,
       ExcMessage("call add_line() before calling set_inhomogeneity()"));
   Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
   ConstraintLine* line_ptr = &lines[lines_cache[line_index]];
