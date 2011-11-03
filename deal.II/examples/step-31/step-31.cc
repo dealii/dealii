@@ -1983,7 +1983,6 @@ namespace Step31
     const unsigned int   n_q_points      = quadrature_formula.size();
 
     Vector<double>       local_rhs (dofs_per_cell);
-    FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
 
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
