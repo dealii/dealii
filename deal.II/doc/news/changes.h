@@ -34,6 +34,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: On some systems, <code>mpiCC</code> turns out to alias the
+C compiler, not the C++ compiler as expected. Consequently, try to use
+<code>mpic++</code> or <code>mpicxx</code> before <code>mpiCC</code> as
+these should really be unambiguous.
+<br>
+(Wolfgang Bangerth, 2011/11/05)
+
 <li> Fixed: Intel's ICC compiler identifies itself as <code>icpc version
 12.1.0 (gcc version 4.2.1 compatibility)</code> which we mistook as being
 GCC version 4.2. This is now fixed.
