@@ -59,7 +59,7 @@ DEAL_II_NAMESPACE_OPEN
  * Alternatively, you can also restart the timer instead of resetting
  * it. The times between successive calls to start() / stop() will then be
  * accumulated. The usage of this class is also explained in the
- * step-12 and step-29 tutorial programs.
+ * step-28, step-29 and step-30 tutorial programs.
  *
  * @note Implementation of this class is system dependent. In case
  * multithreaded routines (matrix-vector products, error estimators, etc.) are
