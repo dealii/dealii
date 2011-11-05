@@ -98,6 +98,16 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     fi
   fi
 
+  dnl Then icc came along and started to identify itself as
+  dnl    icpc version 12.1.0 (gcc version 4.2.1 compatibility)
+  dnl which also doesn't help...
+  if test "$GXX" = "yes" ; then
+    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "icpc"`
+    if test "x$GXX_VERSION_STRING" != "x" ; then
+      GXX=no
+    fi
+  fi
+
   if test "$GXX" = yes ; then
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`

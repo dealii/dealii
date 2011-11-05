@@ -3806,6 +3806,13 @@ fi
     fi
   fi
 
+        if test "$GXX" = "yes" ; then
+    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "icpc"`
+    if test "x$GXX_VERSION_STRING" != "x" ; then
+      GXX=no
+    fi
+  fi
+
   if test "$GXX" = yes ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
 
