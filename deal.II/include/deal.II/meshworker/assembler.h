@@ -358,6 +358,12 @@ namespace MeshWorker
 			MatrixPtrVector& matrices);
 
 					 /**
+					  * Initialize the multilevel
+                                          * constraints. 
+					  */
+        void initialize(const MGConstrainedDoFs& mg_constrained_dofs);
+
+					 /**
 					  * Multigrid methods on
 					  * locally refined meshes
 					  * need additional
@@ -369,6 +375,19 @@ namespace MeshWorker
 					  * set by this method.
 					  */
 	void initialize_edge_flux(MatrixPtrVector& up, MatrixPtrVector& down);
+
+					 /**
+					  * Multigrid methods on
+					  * locally refined meshes
+					  * need additional
+					  * matrices. For
+					  * discontinuous Galerkin
+					  * methods, these are two
+					  * flux matrices across the
+					  * refinement edge, which are
+					  * set by this method.
+					  */
+	void initialize_interfaces (MatrixPtrVector& interface_in, MatrixPtrVector& interface_out);
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -416,6 +435,76 @@ namespace MeshWorker
 	  unsigned int level1,
 	  unsigned int level2,
 	  bool transpose = false);
+
+					 /**
+					  * Assemble a single local
+					  * matrix into a global one.
+					  */
+	void assemble_fluxes(
+	  MATRIX& global,
+	  const FullMatrix<number>& local,
+	  unsigned int block_row,
+	  unsigned int block_col,
+	  const std::vector<unsigned int>& dof1,
+	  const std::vector<unsigned int>& dof2,
+	  unsigned int level1,
+	  unsigned int level2);
+
+					 /**
+					  * Assemble a single local
+					  * matrix into a global one.
+					  */
+	void assemble_up(
+	  MATRIX& global,
+	  const FullMatrix<number>& local,
+	  unsigned int block_row,
+	  unsigned int block_col,
+	  const std::vector<unsigned int>& dof1,
+	  const std::vector<unsigned int>& dof2,
+	  unsigned int level1,
+	  unsigned int level2);
+	
+					 /**
+					  * Assemble a single local
+					  * matrix into a global one.
+					  */
+	void assemble_down(
+	  MATRIX& global,
+	  const FullMatrix<number>& local,
+	  unsigned int block_row,
+	  unsigned int block_col,
+	  const std::vector<unsigned int>& dof1,
+	  const std::vector<unsigned int>& dof2,
+	  unsigned int level1,
+	  unsigned int level2);
+	
+					 /**
+					  * Assemble a single local
+					  * matrix into a global one.
+					  */
+	void assemble_in(
+	  MATRIX& global,
+	  const FullMatrix<number>& local,
+	  unsigned int block_row,
+	  unsigned int block_col,
+	  const std::vector<unsigned int>& dof1,
+	  const std::vector<unsigned int>& dof2,
+	  unsigned int level1,
+	  unsigned int level2);
+	
+					 /**
+					  * Assemble a single local
+					  * matrix into a global one.
+					  */
+	void assemble_out(
+	  MATRIX& global,
+	  const FullMatrix<number>& local,
+	  unsigned int block_row,
+	  unsigned int block_col,
+	  const std::vector<unsigned int>& dof1,
+	  const std::vector<unsigned int>& dof2,
+	  unsigned int level1,
+	  unsigned int level2);
 	
 					 /**
 					  * The level matrices,
@@ -456,6 +545,12 @@ namespace MeshWorker
        * A pointer to the object containing the block structure.
        */
       SmartPointer<const BlockInfo, MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number> > block_info;
+
+      /**
+       * A pointer to the object containing constraints.
+       */
+      SmartPointer<const MGConstrainedDoFs,MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number> > mg_constrained_dofs;
+
       
 					 /**
 					  * The smallest positive
@@ -707,6 +802,15 @@ namespace MeshWorker
       AssertDimension(block_info->local().size(), block_info->global().size());
       matrices = &m;
     }
+
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize(
+      const MGConstrainedDoFs& mg_c)
+    {
+      mg_constrained_dofs = &mg_c;
+    }
     
 
     template <class MATRIX ,typename number>
@@ -731,6 +835,17 @@ namespace MeshWorker
       flux_down = down;
     }
     
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::initialize_interfaces(
+      MatrixPtrVector& in,
+      MatrixPtrVector& out)
+    {
+      interface_in = in;
+      interface_out = out;
+    }
+
     
     template <class MATRIX, typename number>
     inline void
@@ -771,11 +886,333 @@ namespace MeshWorker
 	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
 	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
 
-	      if (transpose)
-		global.add(kglobal, jglobal, local(j,k));
-	      else
-		global.add(jglobal, kglobal, local(j,k));
+              if(mg_constrained_dofs == 0)
+              {
+                if (transpose)
+                  global.add(kglobal, jglobal, local(j,k));
+                else
+                  global.add(jglobal, kglobal, local(j,k));
+              }
+              else
+              {
+                if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                    !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                {
+                  if (mg_constrained_dofs->set_boundary_values())
+                  {
+                    if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
+                          !mg_constrained_dofs->is_boundary_index(level2, kglobal))
+                        ||
+                        (mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
+                         mg_constrained_dofs->is_boundary_index(level2, kglobal) &&
+                         jglobal == kglobal))
+                    {
+                      if (transpose)
+                        global.add(kglobal, jglobal, local(j,k));
+                      else
+                        global.add(jglobal, kglobal, local(j,k));
+                    }
+                  }
+                  else
+                  {
+                    if (transpose)
+                      global.add(kglobal, jglobal, local(j,k));
+                    else
+                      global.add(jglobal, kglobal, local(j,k));
+                  }
+                }
+              }
 	    }
+    }
+
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble_fluxes(
+      MATRIX& global,
+      const FullMatrix<number>& local,
+      unsigned int block_row,
+      unsigned int block_col,
+      const std::vector<unsigned int>& dof1,
+      const std::vector<unsigned int>& dof2,
+      unsigned int level1,
+      unsigned int level2)
+    {
+      for (unsigned int j=0;j<local.n_rows();++j)
+	for (unsigned int k=0;k<local.n_cols();++k)
+	  if (std::fabs(local(j,k)) >= threshold)
+	    {
+					       // The coordinates of
+					       // the current entry in
+					       // DoFHandler
+					       // numbering, which
+					       // differs from the
+					       // block-wise local
+					       // numbering we use in
+					       // our local matrices
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+
+					       // The global dof
+					       // indices to assemble
+					       // in. Since we may
+					       // have face matrices
+					       // coupling two
+					       // different cells, we
+					       // provide two sets of
+					       // dof indices.
+	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+
+              if(mg_constrained_dofs == 0)
+                global.add(jglobal, kglobal, local(j,k));
+              else
+              {
+                if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
+                    !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                {
+                  if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                      !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                    global.add(jglobal, kglobal, local(j,k));
+                }
+              }
+            }
+    }
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble_up(
+      MATRIX& global,
+      const FullMatrix<number>& local,
+      unsigned int block_row,
+      unsigned int block_col,
+      const std::vector<unsigned int>& dof1,
+      const std::vector<unsigned int>& dof2,
+      unsigned int level1,
+      unsigned int level2)
+    {
+      for (unsigned int j=0;j<local.n_rows();++j)
+	for (unsigned int k=0;k<local.n_cols();++k)
+	  if (std::fabs(local(j,k)) >= threshold)
+	    {
+					       // The coordinates of
+					       // the current entry in
+					       // DoFHandler
+					       // numbering, which
+					       // differs from the
+					       // block-wise local
+					       // numbering we use in
+					       // our local matrices
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+
+					       // The global dof
+					       // indices to assemble
+					       // in. Since we may
+					       // have face matrices
+					       // coupling two
+					       // different cells, we
+					       // provide two sets of
+					       // dof indices.
+	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+
+              if(mg_constrained_dofs == 0)
+                global.add(jglobal, kglobal, local(j,k));
+              else
+              {
+                if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
+                    !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                {
+                  if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                      !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                    global.add(jglobal, kglobal, local(j,k));
+                }
+              }
+            }
+    }
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble_down(
+      MATRIX& global,
+      const FullMatrix<number>& local,
+      unsigned int block_row,
+      unsigned int block_col,
+      const std::vector<unsigned int>& dof1,
+      const std::vector<unsigned int>& dof2,
+      unsigned int level1,
+      unsigned int level2)
+    {
+      for (unsigned int j=0;j<local.n_rows();++j)
+	for (unsigned int k=0;k<local.n_cols();++k)
+	  if (std::fabs(local(k,j)) >= threshold)
+	    {
+					       // The coordinates of
+					       // the current entry in
+					       // DoFHandler
+					       // numbering, which
+					       // differs from the
+					       // block-wise local
+					       // numbering we use in
+					       // our local matrices
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+
+					       // The global dof
+					       // indices to assemble
+					       // in. Since we may
+					       // have face matrices
+					       // coupling two
+					       // different cells, we
+					       // provide two sets of
+					       // dof indices.
+	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+
+              if(mg_constrained_dofs == 0)
+                global.add(jglobal, kglobal, local(k,j));
+              else
+              {
+                if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
+                    !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                {
+                  if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                      !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                    global.add(jglobal, kglobal, local(k,j));
+                }
+              }
+            }
+    }
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble_in(
+      MATRIX& global,
+      const FullMatrix<number>& local,
+      unsigned int block_row,
+      unsigned int block_col,
+      const std::vector<unsigned int>& dof1,
+      const std::vector<unsigned int>& dof2,
+      unsigned int level1,
+      unsigned int level2)
+    {
+//      AssertDimension(local.n(), dof1.size());
+//      AssertDimension(local.m(), dof2.size());
+
+      for (unsigned int j=0;j<local.n_rows();++j)
+	for (unsigned int k=0;k<local.n_cols();++k)
+	  if (std::fabs(local(j,k)) >= threshold)
+	    {
+					       // The coordinates of
+					       // the current entry in
+					       // DoFHandler
+					       // numbering, which
+					       // differs from the
+					       // block-wise local
+					       // numbering we use in
+					       // our local matrices
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+
+					       // The global dof
+					       // indices to assemble
+					       // in. Since we may
+					       // have face matrices
+					       // coupling two
+					       // different cells, we
+					       // provide two sets of
+					       // dof indices.
+	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+
+              if(mg_constrained_dofs == 0)
+                global.add(jglobal, kglobal, local(j,k));
+              else
+              {
+                if (mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                    !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                {
+                  if (mg_constrained_dofs->set_boundary_values())
+                  {
+                    if ((!mg_constrained_dofs->at_refinement_edge_boundary(level1, jglobal) &&
+                          !mg_constrained_dofs->at_refinement_edge_boundary(level2, kglobal))
+                        ||
+                        (mg_constrained_dofs->at_refinement_edge_boundary(level1, jglobal) &&
+                         mg_constrained_dofs->at_refinement_edge_boundary(level2, kglobal) &&
+                         jglobal == kglobal))
+                      global.add(jglobal, kglobal, local(j,k));
+                  }
+                  else
+                    global.add(jglobal, kglobal, local(j,k));
+                }
+              }
+            }
+    }
+
+    template <class MATRIX, typename number>
+    inline void
+    MGMatrixLocalBlocksToGlobalBlocks<MATRIX, number>::assemble_out(
+      MATRIX& global,
+      const FullMatrix<number>& local,
+      unsigned int block_row,
+      unsigned int block_col,
+      const std::vector<unsigned int>& dof1,
+      const std::vector<unsigned int>& dof2,
+      unsigned int level1,
+      unsigned int level2)
+    {
+//      AssertDimension(local.n(), dof1.size());
+//      AssertDimension(local.m(), dof2.size());
+
+      for (unsigned int j=0;j<local.n_rows();++j)
+	for (unsigned int k=0;k<local.n_cols();++k)
+	  if (std::fabs(local(k,j)) >= threshold)
+	    {
+					       // The coordinates of
+					       // the current entry in
+					       // DoFHandler
+					       // numbering, which
+					       // differs from the
+					       // block-wise local
+					       // numbering we use in
+					       // our local matrices
+	      const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
+	      const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
+
+					       // The global dof
+					       // indices to assemble
+					       // in. Since we may
+					       // have face matrices
+					       // coupling two
+					       // different cells, we
+					       // provide two sets of
+					       // dof indices.
+	      const unsigned int jglobal = this->block_info->level(level1).global_to_local(dof1[jcell]).second;
+	      const unsigned int kglobal = this->block_info->level(level2).global_to_local(dof2[kcell]).second;
+
+              if(mg_constrained_dofs == 0)
+                global.add(jglobal, kglobal, local(k,j));
+              else
+              {
+                if (mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
+                    !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
+                {
+                  if (mg_constrained_dofs->set_boundary_values())
+                  {
+                    if ((!mg_constrained_dofs->at_refinement_edge_boundary(level1, jglobal) &&
+                          !mg_constrained_dofs->at_refinement_edge_boundary(level2, kglobal))
+                        ||
+                        (mg_constrained_dofs->at_refinement_edge_boundary(level1, jglobal) &&
+                         mg_constrained_dofs->at_refinement_edge_boundary(level2, kglobal) &&
+                         jglobal == kglobal))
+                      global.add(jglobal, kglobal, local(k,j));
+                  }
+                  else
+                    global.add(jglobal, kglobal, local(k,j));
+                }
+              }
+            }
     }
 
     
@@ -795,6 +1232,20 @@ namespace MeshWorker
 
 	  assemble(matrices->block(i)[level].matrix, info.matrix(i,false).matrix, row, col,
 		   info.indices, info.indices, level, level);
+          if(mg_constrained_dofs != 0)
+          {
+            if(interface_in != 0)
+            assemble_in(interface_in->block(i)[level], info.matrix(i,false).matrix, row, col, 
+                info.indices, info.indices, level, level);
+            if(interface_out != 0)
+            assemble_in(interface_out->block(i)[level], info.matrix(i,false).matrix, row, col, 
+                info.indices, info.indices, level, level);
+
+            assemble_in(matrices->block_in(i)[level], info.matrix(i,false).matrix, row, col, 
+                info.indices, info.indices, level, level);
+            assemble_out(matrices->block_out(i)[level], info.matrix(i,false).matrix, row, col,
+                info.indices, info.indices, level, level);
+          }
 	}
     }
 
@@ -820,6 +1271,8 @@ namespace MeshWorker
 
 	  if (level1 == level2)
 	    {
+              if(mg_constrained_dofs == 0)
+              {
 	      assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
 		       info1.indices, info1.indices, level1, level1);
 	      assemble(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
@@ -828,6 +1281,18 @@ namespace MeshWorker
 		       info2.indices, info2.indices, level2, level2);
 	      assemble(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
 		       info2.indices, info1.indices, level2, level1);
+              }
+              else
+              {
+	      assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
+		       info1.indices, info1.indices, level1, level1);
+	      assemble_fluxes(o[level1].matrix, info1.matrix(i,true).matrix, row, col,
+		       info1.indices, info2.indices, level1, level2);
+	      assemble_fluxes(o[level1].matrix, info2.matrix(i,false).matrix, row, col,
+		       info2.indices, info2.indices, level2, level2);
+	      assemble_fluxes(o[level1].matrix, info2.matrix(i,true).matrix, row, col,
+		       info2.indices, info1.indices, level2, level1);
+              }
 	    }
 	  else
 	    {
@@ -837,11 +1302,11 @@ namespace MeshWorker
 						   // Do not add M22,
 						   // which is done by
 						   // the coarser cell
-		  assemble(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
+		  assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
 			   info1.indices, info1.indices, level1, level1);	      
-		  assemble(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
+		  assemble_up(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
 			   info1.indices, info2.indices, level1, level2, true);
-		  assemble(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
+		  assemble_down(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
 			   info2.indices, info1.indices, level2, level1);
 		}
 	    }
