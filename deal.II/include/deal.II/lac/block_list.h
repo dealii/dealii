@@ -85,7 +85,8 @@ class BlockList :
 				      */
     void add(unsigned int block,
 	     const std::vector<unsigned int>& indices,
-	     const std::vector<bool>& selected_indices);
+	     const std::vector<bool>& selected_indices,
+             unsigned int offset = 0);
 
 				     /**
 				      * Just set up the correct size
@@ -327,7 +328,8 @@ void
 BlockList::add(
   const unsigned int block,
   const std::vector<unsigned int>& indices,
-  const std::vector<bool>& selected)
+  const std::vector<bool>& selected,
+  unsigned int offset)
 {
   AssertIndexRange(block, index_sets.size());
   AssertDimension(indices.size(), selected.size());
@@ -337,9 +339,9 @@ BlockList::add(
       const unsigned int k = indices[i];
       if (k==numbers::invalid_unsigned_int)
 	continue;
-      if (selected[i] && std::find(index_sets[block].begin(), index_sets[block].end(), k)
+      if (selected[i] && std::find(index_sets[block].begin(), index_sets[block].end(), k-offset)
 	  == index_sets[block].end())
-	index_sets[block].push_back(k);
+	index_sets[block].push_back(k-offset);
     }
 }
 
@@ -429,7 +431,7 @@ BlockList::initialize_mg(
       AssertDimension(selected_dofs.size(), cell->get_fe().dofs_per_cell);
 
       cell->get_mg_dof_indices(indices);
-      add(k, indices, selected_dofs);
+      add(k, indices, selected_dofs, offset);
     }
 }
 
