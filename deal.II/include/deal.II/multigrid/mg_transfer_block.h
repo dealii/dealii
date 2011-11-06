@@ -26,6 +26,7 @@
 #include <deal.II/lac/block_matrix_array.h>
 
 #include <deal.II/multigrid/mg_base.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
 
 
@@ -60,6 +61,19 @@ template <int dim, int spacedim> class MGDoFHandler;
 class MGTransferBlockBase
 {
   public:
+				     /**
+				      * Constructor without constraint
+				      * matrices. Use this constructor
+				      * only with discontinuous finite
+				      * elements or with no local
+				      * refinement.
+				      */
+    MGTransferBlockBase ();
+				     /**
+				      * Constructor with constraint matrices as well as mg_constrained_dofs.
+				      */
+    MGTransferBlockBase (const ConstraintMatrix& constraints, 
+        const MGConstrainedDoFs& mg_constrained_dofs);
     				     /**
 				      * Memory used by this object.
 				      */
@@ -159,6 +173,17 @@ class MGTransferBlockBase
 				     */
     std::vector<std::vector<std::vector<std::pair<unsigned int, unsigned int> > > >
       copy_indices;
+				     /**
+				      * The constraints of the global
+				      * system.
+				      */
+    SmartPointer<const ConstraintMatrix, MGTransferBlockBase> constraints;
+				     /**
+				      * The mg_constrained_dofs of the level
+				      * systems.
+				      */
+
+    SmartPointer<const MGConstrainedDoFs, MGTransferBlockBase> mg_constrained_dofs;
 };
 
 /**
@@ -315,6 +340,19 @@ class MGTransferBlockSelect : public MGTransferBase<Vector<number> >,
 			      private MGTransferBlockBase
 {
   public:
+				     /**
+				      * Constructor without constraint
+				      * matrices. Use this constructor
+				      * only with discontinuous finite
+				      * elements or with no local
+				      * refinement.
+				      */
+    MGTransferBlockSelect ();
+				     /**
+				      * Constructor with constraint matrices as well as mg_constrained_dofs.
+				      */
+    MGTransferBlockSelect (const ConstraintMatrix& constraints, 
+        const MGConstrainedDoFs& mg_constrained_dofs);
 				     /**
 				      * Destructor.
 				      */

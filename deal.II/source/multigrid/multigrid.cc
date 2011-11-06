@@ -145,6 +145,19 @@ void MGTransferPrebuilt<VECTOR>::restrict_and_add (
   prolongation_matrices[from_level-1]->Tvmult_add (dst, src);
 }
 
+
+MGTransferBlockBase::MGTransferBlockBase ()
+{}
+
+
+MGTransferBlockBase::MGTransferBlockBase (
+    const ConstraintMatrix &c, const MGConstrainedDoFs& mg_c)
+ :
+   constraints(&c),
+   mg_constrained_dofs(&mg_c)
+{}
+
+
 template <typename number>
 MGTransferBlock<number>::MGTransferBlock ()
 		:
@@ -332,6 +345,17 @@ void MGTransferSelect<number>::restrict_and_add (
 
 
 //----------------------------------------------------------------------//
+
+template <typename number>
+MGTransferBlockSelect<number>::MGTransferBlockSelect ()
+{} 
+
+
+template <typename number>
+MGTransferBlockSelect<number>::MGTransferBlockSelect (
+    const ConstraintMatrix &c, const MGConstrainedDoFs& mg_c)
+: MGTransferBlockBase(c, mg_c)
+{} 
 
 template <typename number>
 MGTransferBlockSelect<number>::~MGTransferBlockSelect () 
