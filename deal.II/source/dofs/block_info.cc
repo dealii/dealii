@@ -59,7 +59,7 @@ void
 BlockInfo::initialize(const MGDoFHandler<dim, spacedim>& dof, bool levels_only)
 {
   if (!levels_only)
-    initialize((DoFHandler<dim, spacedim>&) dof);
+    initialize(static_cast<const DoFHandler<dim, spacedim>&>(dof));
 
   std::vector<std::vector<unsigned int> > sizes (dof.get_tria().n_levels());
   for (unsigned int i=0; i<sizes.size(); ++i)
