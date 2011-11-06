@@ -5861,7 +5861,12 @@ namespace DoFTools
   }
 
   template <class DH, class Sparsity>
-  void make_cell_patches(Sparsity& block_list, const DH& dof_handler, const unsigned int level)
+  void make_cell_patches(
+      Sparsity& block_list, 
+      const DH& dof_handler, 
+      const unsigned int level, 
+      const std::vector<bool>& selected_dofs, 
+      unsigned int offset)
   {
     typename DH::cell_iterator cell;
     typename DH::cell_iterator endc = dof_handler.end(level);
@@ -5872,8 +5877,20 @@ namespace DoFTools
       {
 	indices.resize(cell->get_fe().dofs_per_cell);
 	cell->get_mg_dof_indices(indices);
-	for (unsigned int j=0;j<indices.size();++j)
-	  block_list.add(i,indices[j]);
+
+        if(selected_dofs.size()!=0)
+          AssertDimension(indices.size(), selected_dofs.size());
+	
+        for (unsigned int j=0;j<indices.size();++j)
+        {
+          if(selected_dofs.size() == 0)
+            block_list.add(i,indices[j]-offset);
+          else
+          {
+            if(selected_dofs[j])
+              block_list.add(i,indices[j]-offset);
+          }
+        }
       }
   }
   

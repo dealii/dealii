@@ -116,7 +116,7 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 
     template void
       DoFTools::make_cell_patches<MGDoFHandler<deal_II_dimension>,SP>
-      (SP&, const MGDoFHandler<deal_II_dimension>&, unsigned int);
+      (SP&, const MGDoFHandler<deal_II_dimension>&, unsigned int, const std::vector<bool>&, unsigned int);
 
 #if deal_II_dimension > 1
 

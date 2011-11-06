@@ -1488,7 +1488,9 @@ namespace DoFTools
   template <class DH, class Sparsity>
   void make_cell_patches(Sparsity& block_list,
 			 const DH& dof_handler,
-			 const unsigned int level);
+			 const unsigned int level, 
+                         const std::vector<bool>& selected_dofs = std::vector<bool>(), 
+                         unsigned int offset = 0);
   
 				    /**
 				     * Create a sparsity pattern which
