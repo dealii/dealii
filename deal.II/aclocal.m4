@@ -1237,8 +1237,18 @@ dnl -------------------------------------------------------------
 AC_DEFUN(DEAL_II_DETERMINE_CC_BRAND, dnl
 [
   if test "$GCC" = "yes" ; then
+    dnl Verify that we indeed have a compiler that identifies
+    dnl itself as GCC
     CC_VERSION_STRING=`($CC -v 2>&1) | grep "gcc version"`
     if test "x$CC_VERSION_STRING" = "x" ; then
+      GCC=no
+    fi
+
+    dnl Then icc came along and started to identify itself as
+    dnl    icc version 12.1.0 (gcc version 4.2.1 compatibility)
+    dnl which also doesn't help...
+    CC_VERSION_STRING=`($CC -v 2>&1) | grep "icc"`
+    if test "x$CC_VERSION_STRING" != "x" ; then
       GCC=no
     fi
   fi

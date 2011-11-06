@@ -43,7 +43,7 @@ these should really be unambiguous.
 
 <li> Fixed: Intel's ICC compiler identifies itself as <code>icpc version
 12.1.0 (gcc version 4.2.1 compatibility)</code> which we mistook as being
-GCC version 4.2. This is now fixed.
+GCC version 4.2. The same is true for the Intel C compiler. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2011/11/05)
 
