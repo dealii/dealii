@@ -424,11 +424,11 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl BOOST uses long long, so don't warn about this
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
-    dnl See whether the gcc we use already has a flag for C++1x features.
+    dnl See whether the gcc we use already has a flag for C++2011 features.
+    AC_MSG_CHECKING(whether compiler has a flag to support C++2011)
+
     OLD_CXXFLAGS="$CXXFLAGS"
     CXXFLAGS=-std=c++0x
-
-    AC_MSG_CHECKING(whether compiler has a flag to support C++1x)
     AC_TRY_COMPILE([], [;],
        [
          AC_MSG_RESULT(yes)
