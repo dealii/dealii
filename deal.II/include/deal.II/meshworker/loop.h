@@ -113,115 +113,114 @@ namespace MeshWorker
     dof_info.cell.reinit(cell);
     if (integrate_cell)
       info.cell.reinit(dof_info.cell);
-				     // Execute this, if cells
-				     // have to be dealt with
-				     // before faces
+    // Execute this, if cells
+    // have to be dealt with
+    // before faces
     if (integrate_cell && cells_first)
       cell_worker(dof_info.cell, info.cell);
 
-				     // Call the callback function in
-				     // the info box to do
-				     // computations between cell and
-				     // face action.
+    // Call the callback function in
+    // the info box to do
+    // computations between cell and
+    // face action.
     info.post_cell(dof_info);
 
     if (integrate_interior_face || integrate_boundary)
       for (unsigned int face_no=0; face_no < GeometryInfo<ITERATOR::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
-	{
-	  typename ITERATOR::AccessorType::Container::face_iterator face = cell->face(face_no);
-	  if (cell->at_boundary(face_no))
-	    {
-	      if (integrate_boundary)
-		{
-		  dof_info.interior_face_available[face_no] = true;
-		  dof_info.interior[face_no].reinit(cell, face, face_no);
-		  info.boundary.reinit(dof_info.interior[face_no]);
-		  boundary_worker(dof_info.interior[face_no], info.boundary);
-		}
-	    }
-	  else if (integrate_interior_face)
-	    {
-					       // Interior face
-	      typename ITERATOR::AccessorType::Container::cell_iterator
-		neighbor = cell->neighbor(face_no);
+      {
+        typename ITERATOR::AccessorType::Container::face_iterator face = cell->face(face_no);
+        if (cell->at_boundary(face_no))
+        {
+          if (integrate_boundary)
+          {
+            dof_info.interior_face_available[face_no] = true;
+            dof_info.interior[face_no].reinit(cell, face, face_no);
+            info.boundary.reinit(dof_info.interior[face_no]);
+            boundary_worker(dof_info.interior[face_no], info.boundary);
+          }
+        }
+        else if (integrate_interior_face)
+        {
+          // Interior face
+          typename ITERATOR::AccessorType::Container::cell_iterator
+            neighbor = cell->neighbor(face_no);
 
-					       // Deal with
-					       // refinement edges
-					       // from the refined
-					       // side. Assuming
-					       // one-irregular
-					       // meshes, this
-					       // situation should
-					       // only occur if
-					       // both cells are
-					       // active.
-	      if (neighbor->level() < cell->level())
-		{
-		  Assert(!cell->has_children(), ExcInternalError());
-		  Assert(!neighbor->has_children(), ExcInternalError());
+          // Deal with
+          // refinement edges
+          // from the refined
+          // side. Assuming
+          // one-irregular
+          // meshes, this
+          // situation should
+          // only occur if
+          // both cells are
+          // active.
+          if (cell->neighbor_is_coarser(face_no)) 
+          {
+            Assert(!cell->has_children(), ExcInternalError());
+            Assert(!neighbor->has_children(), ExcInternalError());
 
-		  std::pair<unsigned int, unsigned int> neighbor_face_no
-		    = cell->neighbor_of_coarser_neighbor(face_no);
-		  typename ITERATOR::AccessorType::Container::face_iterator nface
-		    = neighbor->face(neighbor_face_no.first);
+            std::pair<unsigned int, unsigned int> neighbor_face_no
+              = cell->neighbor_of_coarser_neighbor(face_no);
+            typename ITERATOR::AccessorType::Container::face_iterator nface
+              = neighbor->face(neighbor_face_no.first);
 
-		  dof_info.interior_face_available[face_no] = true;
-		  dof_info.exterior_face_available[face_no] = true;
-		  dof_info.interior[face_no].reinit(cell, face, face_no);
-		  info.face.reinit(dof_info.interior[face_no]);
-		  dof_info.exterior[face_no].reinit(
-		    neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
-		  info.subface.reinit(dof_info.exterior[face_no]);
+            dof_info.interior_face_available[face_no] = true;
+            dof_info.exterior_face_available[face_no] = true;
+            dof_info.interior[face_no].reinit(cell, face, face_no);
+            info.face.reinit(dof_info.interior[face_no]);
+            dof_info.exterior[face_no].reinit(
+                neighbor, nface, neighbor_face_no.first, neighbor_face_no.second);
+            info.subface.reinit(dof_info.exterior[face_no]);
 
-		  face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
-			      info.face, info.subface);
-		}
-	      else
-		{
-						   // Neighbor is
-						   // on same
-						   // level, but
-						   // only do this
-						   // from one side.
-		  if (unique_faces_only && (neighbor < cell)) continue;
+            face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
+                info.face, info.subface);
+          }
+          else
+          {
+            // Neighbor is
+            // on same
+            // level, but
+            // only do this
+            // from one side.
+            if (unique_faces_only && (neighbor < cell)) continue;
 
-						   // If iterator
-						   // is active
-						   // and neighbor
-						   // is refined,
-						   // skip
-						   // internal face.
-		  if (internal::is_active_iterator(cell) && neighbor->has_children())
-		    continue;
+            // If iterator
+            // is active
+            // and neighbor
+            // is refined,
+            // skip
+            // internal face.
+            if (internal::is_active_iterator(cell) && neighbor->has_children())
+              continue;
 
-		  unsigned int neighbor_face_no = cell->neighbor_of_neighbor(face_no);
-		  Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
-						   // Regular interior face
-		  dof_info.interior_face_available[face_no] = true;
-		  dof_info.exterior_face_available[face_no] = true;
-		  dof_info.interior[face_no].reinit(cell, face, face_no);
-		  info.face.reinit(dof_info.interior[face_no]);
-		  dof_info.exterior[face_no].reinit(
-		    neighbor, neighbor->face(neighbor_face_no), neighbor_face_no);
-		  info.neighbor.reinit(dof_info.exterior[face_no]);
+            unsigned int neighbor_face_no = cell->neighbor_face_no(face_no);
+            Assert (neighbor->face(neighbor_face_no) == face, ExcInternalError());
+            // Regular interior face
+            dof_info.interior_face_available[face_no] = true;
+            dof_info.exterior_face_available[face_no] = true;
+            dof_info.interior[face_no].reinit(cell, face, face_no);
+            info.face.reinit(dof_info.interior[face_no]);
+            dof_info.exterior[face_no].reinit(
+                neighbor, neighbor->face(neighbor_face_no), neighbor_face_no);
+            info.neighbor.reinit(dof_info.exterior[face_no]);
 
-		  face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
-			      info.face, info.neighbor);
-		}
-	    }
-	} // faces
-				     // Call the callback function in
-				     // the info box to do
-				     // computations between face and
-				     // cell action.
+            face_worker(dof_info.interior[face_no], dof_info.exterior[face_no],
+                info.face, info.neighbor);
+          }
+        }
+      } // faces
+    // Call the callback function in
+    // the info box to do
+    // computations between face and
+    // cell action.
     info.post_faces(dof_info);
 
-				     // Execute this, if faces
-				     // have to be handled first
+    // Execute this, if faces
+    // have to be handled first
     if (integrate_cell && !cells_first)
       cell_worker(dof_info.cell, info.cell);
   }
-
 
 /**
  * The main work function of this namespace. It is a loop over all
