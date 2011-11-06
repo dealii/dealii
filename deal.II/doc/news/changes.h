@@ -34,6 +34,13 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: Intel ICC 12.1 gets into trouble with BOOST because BOOST
+believes that the compiler supports C++0x but one then still has to
+specify the corresponding flag on the command line to avoid compiler
+errors. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/11/06)
+
 <li> Fixed: On some systems, <code>mpiCC</code> turns out to alias the
 C compiler, not the C++ compiler as expected. Consequently, try to use
 <code>mpic++</code> or <code>mpicxx</code> before <code>mpiCC</code> as

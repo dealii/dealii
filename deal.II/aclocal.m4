@@ -425,24 +425,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     CXXFLAGSG="$CXXFLAGSG -Wno-long-long"
 
     dnl See whether the gcc we use already has a flag for C++2011 features.
-    AC_MSG_CHECKING(whether compiler has a flag to support C++2011)
+    DEAL_II_CHECK_CXX1X
 
-    OLD_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS=-std=c++0x
-    AC_TRY_COMPILE([], [;],
-       [
-         AC_MSG_RESULT(yes)
-         test_cxx1x=yes
-       ],
-       [
-         AC_MSG_RESULT(no)
-         test_cxx1x=no
-       ])
-    CXXFLAGS="${OLD_CXXFLAGS}"
-
-    if test "x$test_cxx1x" = "xyes" ; then
-      DEAL_II_CHECK_CXX1X_COMPONENTS("-std=c++0x")
-    fi
 
     dnl On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
     dnl warning. This is unfortunate, since we happen to stumble on this
@@ -808,6 +792,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
                 esac
 		;;
 	  esac
+
+	  dnl Finally, see if the compiler supports C++0x
+	  DEAL_II_CHECK_CXX1X
           ;;
 
       compaq_cxx)
@@ -1060,6 +1047,38 @@ AC_DEFUN(DEAL_II_SET_CXX_DEBUG_FLAG, dnl
   fi
 ])
 
+
+
+dnl -------------------------------------------------------------
+dnl See if there is a compiler flag to enable C++1x features
+dnl
+dnl Usage: DEAL_II_CHECK_CXX1X
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_CXX1X, dnl
+[
+  AC_MSG_CHECKING(whether compiler has a flag to support C++2011)
+
+  dnl See if -std=c++0x exists
+  OLD_CXXFLAGS="$CXXFLAGS"
+  CXXFLAGS=-std=c++0x
+  AC_TRY_COMPILE([], [;],
+     [
+       AC_MSG_RESULT(yes)
+       test_cxx1x=yes
+     ],
+     [
+       AC_MSG_RESULT(no)
+       test_cxx1x=no
+     ])
+  CXXFLAGS="${OLD_CXXFLAGS}"
+
+  dnl If the flag above works, then see if the compiler is complete
+  dnl enough in this area
+  if test "x$test_cxx1x" = "xyes" ; then
+    DEAL_II_CHECK_CXX1X_COMPONENTS("-std=c++0x")
+  fi
+])
 
 
 dnl -------------------------------------------------------------
