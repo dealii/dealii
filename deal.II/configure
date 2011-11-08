@@ -4470,6 +4470,11 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
               else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+
+                    if test "x$GXX_VERSION" = "xintel_icc12" ; then
+      CXXFLAGSG="$CXXFLAGSG "-std=c++0x""
+      CXXFLAGSO="$CXXFLAGSO "-std=c++0x""
+    fi
   fi
 
   fi
@@ -5198,6 +5203,11 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
               else
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+
+                    if test "x$GXX_VERSION" = "xintel_icc12" ; then
+      CXXFLAGSG="$CXXFLAGSG "-std=c++0x""
+      CXXFLAGSO="$CXXFLAGSO "-std=c++0x""
+    fi
   fi
 
   fi

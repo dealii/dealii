@@ -1198,7 +1198,9 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
     CXXFLAGSO="$CXXFLAGSO $1"
 
     AC_DEFINE(DEAL_II_CAN_USE_CXX1X, 1,
-              [Defined if the compiler we use supports the upcoming C++1x standard.])
+              [Defined if the compiler we use supports the C++2011 standard
+               well enough to allow using the standard library classes instead
+               of the corresponding BOOST classes.])
 
 
     dnl Also test for a couple C++1x things that we don't use in the library
@@ -1240,6 +1242,15 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
     dnl and that we could use to test these features.
   else
     AC_MSG_RESULT(no)
+
+    dnl Intel icc 12.1 has this crazy behavior where it needs -std=c++0x
+    dnl to compile BOOST, but it fails every single one of the header
+    dnl file tests above. So we end up here. Work around this by using
+    dnl the flag even though we can't use a single piece of functionality.
+    if test "x$GXX_VERSION" = "xintel_icc12" ; then
+      CXXFLAGSG="$CXXFLAGSG $1"
+      CXXFLAGSO="$CXXFLAGSO $1"
+    fi
   fi
 ])
 
