@@ -1305,7 +1305,7 @@ namespace MeshWorker
 		  assemble_fluxes(o[level1].matrix, info1.matrix(i,false).matrix, row, col,
 			   info1.indices, info1.indices, level1, level1);	      
 		  assemble_up(flux_up->block(i)[level1].matrix, info1.matrix(i,true).matrix, row, col,
-			   info1.indices, info2.indices, level1, level2, true);
+			   info1.indices, info2.indices, level1, level2);
 		  assemble_down(flux_down->block(i)[level1].matrix, info2.matrix(i,true).matrix, row, col,
 			   info2.indices, info1.indices, level2, level1);
 		}
