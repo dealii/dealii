@@ -34,6 +34,11 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: The Intel compiler complains that it can't copy Trilinos vector
+reference objects, preventing the compiling of step-32. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/11/09)
+
 <li> Fixed: Intel ICC 12.1 gets into trouble with BOOST because BOOST
 believes that the compiler supports C++0x but one then still has to
 specify the corresponding flag on the command line to avoid compiler

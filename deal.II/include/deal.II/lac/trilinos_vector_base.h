@@ -121,6 +121,13 @@ namespace TrilinosWrappers
 	const VectorReference &
 	  operator = (const VectorReference &r) const;
 
+					 /**
+					  * Same as above but for non-const
+					  * reference objects.
+					  */
+	const VectorReference &
+	  operator = (const VectorReference &r);
+
                                        /**
 					* Set the referenced element of the
 					* vector to <tt>s</tt>.
@@ -1039,6 +1046,17 @@ namespace TrilinosWrappers
       return *this;
     }
 
+
+
+    inline
+    const VectorReference &
+    VectorReference::operator = (const VectorReference &r)
+    {
+                                        // as above
+      *this = static_cast<TrilinosScalar> (r);
+
+      return *this;
+    }
 
 
     inline
