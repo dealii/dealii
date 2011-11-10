@@ -75,7 +75,7 @@ enabled due to a missing include file in file
 <ol>
 <li> New: FETools::get_fe_from_name() can now return objects of type FE_Nothing.
 <br>
-(Jonathan Pitt, 2011/11/10)
+(Scott Miller, Jonathan Pitt, 2011/11/10)
 
 <li> Changed: WorkStream now allocates one scratch object per thread instead of
 one scratch object per item.
