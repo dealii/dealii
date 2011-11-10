@@ -36,6 +36,7 @@
 #include <deal.II/fe/fe_dgp_nonparametric.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_cartesian.h>
@@ -154,6 +155,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
     default_map["FE_Q"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
+    default_map["FE_Nothing"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
 
     return default_map;
   }

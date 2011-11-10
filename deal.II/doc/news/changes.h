@@ -73,6 +73,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: FETools::get_fe_from_name() can now return objects of type FE_Nothing.
+<br>
+(Jonathan Pitt, 2011/11/10)
+
 <li> Changed: WorkStream now allocates one scratch object per thread instead of
 one scratch object per item.
 <br>
@@ -85,7 +89,7 @@ distribute_local_to_global() and determines whether the correct or
 zero values (this was the case before and still is the default) are
 kept in the linear system during the solution process.
 <br>
-(Jörg Frohne, 2011/11/01)
+(Joerg Frohne, 2011/11/01)
 
 <li> Fixed: SparseMatrix::mmult and SpareMatrix::Tmmult had a number of
 issues that are now fixed: (i) rebuilding the sparsity pattern was allowed
@@ -97,7 +101,7 @@ template context deducible by the compiler.
 (Wolfgang Bangerth, 2011/10/30)
 
 <li> New:
-parallel::distributed::Triangulation<dim>::mesh_reconstruction_after_repartitioning
+parallel::distributed::Triangulation::mesh_reconstruction_after_repartitioning
 setting which is necessary for save()/load() to be deterministic. Otherwise
 the matrix assembly is done in a different order depending on the order of old
 refinements.
