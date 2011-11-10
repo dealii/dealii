@@ -18,6 +18,7 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #if DEAL_II_USE_MT == 1
 #  include <deal.II/base/thread_management.h>
@@ -155,7 +156,7 @@ namespace WorkStream
 					  */
 	typedef
 	std_cxx1x::tuple<std::vector<Iterator>,
-			 ScratchData*,
+			 Threads::ThreadLocalStorage<ScratchData>*,
 			 std::vector<CopyData>,
 			 unsigned int>
 	ItemType;
@@ -179,6 +180,7 @@ namespace WorkStream
 			tbb::filter (/*is_serial=*/true),
 			remaining_iterator_range (begin, end),
 			ring_buffer (buffer_size),
+			thread_local_scratch(sample_scratch_data),
 			n_emitted_items (0),
 			chunk_size (chunk_size)
 	  {
@@ -193,20 +195,10 @@ namespace WorkStream
 	      tasks += Threads::new_task (&IteratorRangeToItemStream::init_buffer_elements,
 					  *this,
 					  i,
-					  std_cxx1x::cref(sample_scratch_data),
 					  std_cxx1x::cref(sample_copy_data));
 	    tasks.join_all ();
 	  }
 
-					 /**
-					  * Destructor.
-					  */
-	~IteratorRangeToItemStream ()
-	  {
-	    for (unsigned int i=0; i<ring_buffer.size(); ++i)
-	      delete std_cxx1x::get<1>(ring_buffer[i]);
-	  }
-      
 					 /**
 					  * Create a item and return a
 					  * pointer to it.
@@ -259,6 +251,12 @@ namespace WorkStream
 	std::vector<ItemType>        ring_buffer;
 
 					 /**
+					  * Scratch data object. Each thread will 
+					  * have its own local copy. 
+					  */
+	Threads::ThreadLocalStorage<ScratchData> thread_local_scratch;
+
+					 /**
 					  * Counter for the number of emitted
 					  * items. Each item may consist of up
 					  * to chunk_size iterator elements.
@@ -285,7 +283,6 @@ namespace WorkStream
 					  * the ring buffer.
 					  */
 	void init_buffer_elements (const unsigned int element,
-				   const ScratchData &sample_scratch_data,
 				   const CopyData    &sample_copy_data)
 	  {
 	    Assert (std_cxx1x::get<1>(ring_buffer[element]) == 0,
@@ -294,7 +291,7 @@ namespace WorkStream
 	    std_cxx1x::get<0>(ring_buffer[element])
 	      .resize (chunk_size, remaining_iterator_range.second);
 	    std_cxx1x::get<1>(ring_buffer[element])
-	      = new ScratchData(sample_scratch_data);
+	        = &thread_local_scratch;
 	    std_cxx1x::get<2>(ring_buffer[element])
 	      .resize (chunk_size, sample_copy_data);
 	  }
@@ -349,7 +346,7 @@ namespace WorkStream
 					     // were given
 	    for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
 	      worker (std_cxx1x::get<0>(*current_item)[i],
-		      *std_cxx1x::get<1>(*current_item),
+		      std_cxx1x::get<1>(*current_item)->get(),
 		      std_cxx1x::get<2>(*current_item)[i]);
 	    
 					     // then return the original pointer
