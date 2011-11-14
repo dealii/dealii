@@ -1491,7 +1491,7 @@ namespace DoFTools
 			 const unsigned int level, 
                          const std::vector<bool>& selected_dofs = std::vector<bool>(), 
                          unsigned int offset = 0);
-  
+
 				    /**
 				     * Create a sparsity pattern which
 				     * in each row lists the degrees
@@ -1558,7 +1558,7 @@ namespace DoFTools
 			    const bool boundary_patches = false,
 			    const bool level_boundary_patches = false,
 			    const bool single_cell_patches = false);
-  
+
 				    /**
 				     * Create a sparsity pattern which
 				     * in each row lists the degrees of
@@ -1587,7 +1587,7 @@ namespace DoFTools
 				     * conditions.
 				     *
 				     * Since the patches are defined
-				     * through refinement, th 
+				     * through refinement, th
 				     *
 				     * @arg <tt>block_list</tt>: the
 				     * SparsityPattern into which the
@@ -1654,7 +1654,7 @@ namespace DoFTools
 			  const DH& dof_handler,
 			  const unsigned int level,
 			  const bool interior_dofs_only = false);
-  
+
 				   //@}
 				   /**
 				    * Extract a vector that represents the
@@ -1843,12 +1843,12 @@ namespace DoFTools
 				    * in the target_blocks argument
 				    * if given.
 				    */
-  template <int dim, int spacedim>
+  template <class DH>
   void
-  count_dofs_per_block (const DoFHandler<dim,spacedim>&     dof_handler,
-			std::vector<unsigned int>& dofs_per_block,
-			std::vector<unsigned int>  target_blocks
-			= std::vector<unsigned int>());
+  count_dofs_per_block (const DH &dof,
+                        std::vector<unsigned int> &dofs_per_block,
+                        std::vector<unsigned int>  target_block
+                          = std::vector<unsigned int>());
 
 				   /**
 				    * @deprecated See the previous

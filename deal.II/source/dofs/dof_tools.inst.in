@@ -543,10 +543,21 @@ DoFTools::extract_level_dofs<deal_II_dimension, deal_II_dimension+1>
 
 template
 void
-DoFTools::count_dofs_per_block<deal_II_dimension> (
+DoFTools::count_dofs_per_block<DoFHandler<deal_II_dimension> > (
   const DoFHandler<deal_II_dimension>&,
   std::vector<unsigned int>&, std::vector<unsigned int>);
 
+template
+void
+DoFTools::count_dofs_per_block<hp::DoFHandler<deal_II_dimension> > (
+  const hp::DoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
+
+template
+void
+DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension> > (
+  const MGDoFHandler<deal_II_dimension>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
 
 template
 void
@@ -619,8 +630,20 @@ DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
 
 template
 void
-DoFTools::count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
+DoFTools::count_dofs_per_block<DoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
+
+template
+void
+DoFTools::count_dofs_per_block<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > (
+  const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+  std::vector<unsigned int>&, std::vector<unsigned int>);
+
+template
+void
+DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension,deal_II_dimension+1> > (
+  const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
   std::vector<unsigned int>&, std::vector<unsigned int>);
 
 #endif

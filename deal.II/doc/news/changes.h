@@ -34,6 +34,11 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> New: The DoFTools::count_dofs_per_block function now also works
+for objects of type hp::DoFHandler.
+<br>
+(Jason Sheldon, 2011/11/13)
+
 <li> Fixed: The Intel compiler complains that it can't copy Trilinos vector
 reference objects, preventing the compiling of step-32. This is now fixed.
 <br>

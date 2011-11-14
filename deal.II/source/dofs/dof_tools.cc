@@ -4671,78 +4671,84 @@ namespace DoFTools
 
 
 
-  template <int dim, int spacedim>
+  template <class DH>
   void
-  count_dofs_per_block (const DoFHandler<dim,spacedim>& dof_handler,
-			std::vector<unsigned int> &dofs_per_block,
-			std::vector<unsigned int>  target_block)
+  count_dofs_per_block (const DH &dof_handler,
+                        std::vector<unsigned int> &dofs_per_block,
+                        std::vector<unsigned int>  target_block)
   {
-    const FiniteElement<dim,spacedim>& fe = dof_handler.get_fe();
+    const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
+      fe_collection (dof_handler.get_fe());
+    Assert (fe_collection.size() < 256, ExcNotImplemented());
 
-    std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
-
-				     // If the empty vector was given as
-				     // default argument, set up this
-				     // vector as identity.
-    if (target_block.size()==0)
+    for (unsigned int this_fe=0; this_fe<fe_collection.size(); ++this_fe)
       {
-	target_block.resize(fe.n_blocks());
-	for (unsigned int i=0; i<fe.n_blocks(); ++i)
-	  target_block[i] = i;
-      }
-    else
-      Assert (target_block.size()==fe.n_blocks(),
-	      ExcDimensionMismatch(target_block.size(),
-				   fe.n_blocks()));
+        const FiniteElement<DH::dimension,DH::space_dimension>& fe = fe_collection[this_fe];
+        std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
+
+					 // If the empty vector was given as
+					 // default argument, set up this
+					 // vector as identity.
+        if (target_block.size()==0)
+	  {
+            target_block.resize(fe.n_blocks());
+            for (unsigned int i=0; i<fe.n_blocks(); ++i)
+	      target_block[i] = i;
+	  }
+        else
+	  Assert (target_block.size()==fe.n_blocks(),
+		  ExcDimensionMismatch(target_block.size(),
+				       fe.n_blocks()));
 
 
 
-    const unsigned int max_block
-      = *std::max_element (target_block.begin(),
-			   target_block.end());
-    const unsigned int n_target_blocks = max_block + 1;
-    const unsigned int n_blocks = fe.n_blocks();
+        const unsigned int max_block
+	  = *std::max_element (target_block.begin(),
+			       target_block.end());
+        const unsigned int n_target_blocks = max_block + 1;
+        const unsigned int n_blocks = fe.n_blocks();
 
-    AssertDimension (dofs_per_block.size(), n_target_blocks);
+        AssertDimension (dofs_per_block.size(), n_target_blocks);
 
-				     // special case for only one
-				     // block. treat this first
-				     // since it does not require any
-				     // computations
-    if (n_blocks == 1)
-      {
-	dofs_per_block[0] = dof_handler.n_dofs();
-	return;
-      }
-				     // otherwise determine the number
-				     // of dofs in each block
-				     // separately.
-    std::vector<unsigned char> dofs_by_block (dof_handler.n_locally_owned_dofs());
-    internal::extract_dofs_by_component (dof_handler, std::vector<bool>(),
-					 true, dofs_by_block);
+					 // special case for only one
+					 // block. treat this first
+					 // since it does not require any
+					 // computations
+        if (n_blocks == 1)
+	  {
+            dofs_per_block[0] = dof_handler.n_dofs();
+            return;
+	  }
+					 // otherwise determine the number
+					 // of dofs in each block
+					 // separately.
+        std::vector<unsigned char> dofs_by_block (dof_handler.n_locally_owned_dofs());
+        internal::extract_dofs_by_component (dof_handler, std::vector<bool>(),
+					     true, dofs_by_block);
 
-				     // next count what we got
-    for (unsigned int block=0; block<fe.n_blocks(); ++block)
-      dofs_per_block[target_block[block]]
-	+= std::count(dofs_by_block.begin(), dofs_by_block.end(),
-		      block);
+					 // next count what we got
+        for (unsigned int block=0; block<fe.n_blocks(); ++block)
+	  dofs_per_block[target_block[block]]
+	    += std::count(dofs_by_block.begin(), dofs_by_block.end(),
+			  block);
 
 #ifdef DEAL_II_USE_P4EST
 #if DEAL_II_COMPILER_SUPPORTS_MPI
-				     // if we are working on a parallel
-				     // mesh, we now need to collect
-				     // this information from all
-				     // processors
-    if (const parallel::distributed::Triangulation<dim> * tria
-	= (dynamic_cast<const parallel::distributed::Triangulation<dim>*>
-	   (&dof_handler.get_tria())))
-      {
-	std::vector<unsigned int> local_dof_count = dofs_per_block;
-	MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0], n_target_blocks,
-			MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
+					 // if we are working on a parallel
+					 // mesh, we now need to collect
+					 // this information from all
+					 // processors
+        if (const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> * tria
+	    = (dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+	       (&dof_handler.get_tria())))
+	  {
+            std::vector<unsigned int> local_dof_count = dofs_per_block;
+            MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0], n_target_blocks,
+			    MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
+	  }
+#endif
+#endif
       }
-#endif
-#endif
   }
 
 
@@ -5871,7 +5877,7 @@ namespace DoFTools
     typename DH::cell_iterator cell;
     typename DH::cell_iterator endc = dof_handler.end(level);
     std::vector<unsigned int> indices;
-    
+
     unsigned int i=0;
     for (cell=dof_handler.begin(level); cell != endc; ++i, ++cell)
       {
@@ -5893,8 +5899,8 @@ namespace DoFTools
         }
       }
   }
-  
-  
+
+
   template <class DH>
   void make_single_patch(
     SparsityPattern& block_list,
@@ -5906,15 +5912,15 @@ namespace DoFTools
       block_list.reinit(1, dof_handler.n_dofs(level), dof_handler.n_dofs(level));
       typename DH::cell_iterator cell;
       typename DH::cell_iterator endc = dof_handler.end(level);
-      
+
       std::vector<unsigned int> indices;
       std::vector<bool> exclude;
-      
+
       for (cell=dof_handler.begin(level); cell != endc;++cell)
       {
 	indices.resize(cell->get_fe().dofs_per_cell);
 	cell->get_mg_dof_indices(indices);
-	
+
 	if (interior_only)
 	  {
 					     // Exclude degrees of
@@ -5923,7 +5929,7 @@ namespace DoFTools
 	    exclude.resize(fe.dofs_per_cell);
 	    std::fill(exclude.begin(), exclude.end(), false);
 	    const unsigned int dpf = fe.dofs_per_face;
-	    
+
 	    for (unsigned int face=0;face<GeometryInfo<DH::dimension>::faces_per_cell;++face)
 	      if (cell->at_boundary(face) || cell->neighbor(face)->level() != cell->level())
 		for (unsigned int i=0;i<dpf;++i)
@@ -5940,7 +5946,7 @@ namespace DoFTools
       }
     }
 
-  
+
   template <class DH>
   void make_child_patches(
     SparsityPattern& block_list,
@@ -5955,10 +5961,10 @@ namespace DoFTools
     typename DH::cell_iterator cell;
     typename DH::cell_iterator pcell = dof_handler.begin(level-1);
     typename DH::cell_iterator endc = dof_handler.end(level-1);
-    
+
     std::vector<unsigned int> indices;
     std::vector<bool> exclude;
-    
+
     for (unsigned int block = 0;pcell != endc;++pcell)
       {
 	if (!pcell->has_children()) continue;
@@ -5982,7 +5988,7 @@ namespace DoFTools
 						 // which are on faces
 						 // of the parent
 		const unsigned int dpf = fe.dofs_per_face;
-		
+
 		for (unsigned int d=0;d<DH::dimension;++d)
 		  {
 		    const unsigned int face = GeometryInfo<DH::dimension>::vertex_to_face[child][d];
@@ -6000,7 +6006,7 @@ namespace DoFTools
 		      for (unsigned int i=0;i<dpf;++i)
 			exclude[fe.face_to_cell_index(i,face)] = false;
 	      }
-	    
+
 	    for (unsigned int i=0;i<n_dofs;++i)
 	      if (!exclude[i])
 		block_list.add(block, indices[i]);
@@ -6008,9 +6014,9 @@ namespace DoFTools
 	++block;
       }
   }
-  
-  
-    
+
+
+
   template <class DH>
   void make_vertex_patches(
     SparsityPattern& block_list,
@@ -6037,7 +6043,7 @@ namespace DoFTools
 				     // Estimate for the number of
 				     // dofs at this point
     std::vector<unsigned int> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
-    
+
 				     // Identify all vertices active
 				     // on this level and remember
 				     // some data about them
@@ -6061,7 +6067,7 @@ namespace DoFTools
 				     // From now on, only vertices
 				     // with positive dof count are
 				     // "in".
-    
+
 				     // Remove vertices at boundaries
 				     // or in corners
     for (unsigned int vg=0;vg<vertex_dof_count.size();++vg)
@@ -6081,12 +6087,12 @@ namespace DoFTools
     for (unsigned int vg=0;vg<vertex_mapping.size();++vg)
       if (vertex_dof_count[vg] != 0)
 	vertex_dof_count[vertex_mapping[vg]] = vertex_dof_count[vg];
-    
+
 				     // Now that we have all the data,
 				     // we reduce it to the part we
 				     // actually want
     vertex_dof_count.resize(i);
-    
+
 				     // At this point, the list of
 				     // patches is ready. Now we enter
 				     // the dofs into the sparsity
@@ -6097,23 +6103,23 @@ namespace DoFTools
     for (unsigned int i=0;i<vertex_dof_count.size();++i)
       deallog << ' ' << vertex_dof_count[i];
     deallog << std::endl;
-    
+
     std::vector<unsigned int> indices;
     std::vector<bool> exclude;
-    
+
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
       {
 	const FiniteElement<DH::dimension>& fe = cell->get_fe();
 	indices.resize(fe.dofs_per_cell);
 	cell->get_mg_dof_indices(indices);
-	
+
 	for (unsigned int v=0;v<GeometryInfo<DH::dimension>::vertices_per_cell;++v)
 	  {
 	    const unsigned int vg = cell->vertex_index(v);
 	    const unsigned int block = vertex_mapping[vg];
 	    if (block == numbers::invalid_unsigned_int)
 	      continue;
-	    
+
 	    if (interior_only)
 	      {
 						 // Exclude degrees of
@@ -6122,7 +6128,7 @@ namespace DoFTools
 		exclude.resize(fe.dofs_per_cell);
 		std::fill(exclude.begin(), exclude.end(), false);
 		const unsigned int dpf = fe.dofs_per_face;
-		
+
 		for (unsigned int d=0;d<DH::dimension;++d)
 		  {
 		    const unsigned int a_face = GeometryInfo<DH::dimension>::vertex_to_face[v][d];
