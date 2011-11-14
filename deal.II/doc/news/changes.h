@@ -82,11 +82,6 @@ enabled due to a missing include file in file
 <br>
 (Scott Miller, Jonathan Pitt, 2011/11/10)
 
-<li> Changed: WorkStream now allocates one scratch object per thread instead of
-one scratch object per item.
-<br>
-(Moritz Allmaras, 2011/11/10)
-
 <li> New: Implementation of an alternative handling of
 inhomogeneous constraints in ConstraintMatrix. This is controlled with
 a new parameter use_inhomogeneities_for_rhs in
