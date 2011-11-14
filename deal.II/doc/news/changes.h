@@ -89,7 +89,7 @@ distribute_local_to_global() and determines whether the correct or
 zero values (this was the case before and still is the default) are
 kept in the linear system during the solution process.
 <br>
-(Joerg Frohne, 2011/11/01)
+(J&ouml;rg Frohne, 2011/11/01)
 
 <li> Fixed: SparseMatrix::mmult and SpareMatrix::Tmmult had a number of
 issues that are now fixed: (i) rebuilding the sparsity pattern was allowed
