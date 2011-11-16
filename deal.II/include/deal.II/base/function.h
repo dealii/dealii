@@ -19,6 +19,8 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx1x/function.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -702,6 +704,112 @@ class ComponentSelectFunction : public ConstantFunction<dim>
 				      * components.
 				      */
     const std::pair<unsigned int,unsigned int> selected_components;
+};
+
+
+/**
+ * This class provides a way to convert a scalar function of the kind
+ * @code
+ *   double foo (const Point<dim> &);
+ * @endcode
+ * into an object of type Function@<dim@>. 
+ * Since the argument returns a scalar, the result is clearly a
+ * Function object for which <code>function.n_components==1</code>.
+ * The class works by storing a pointer to the given function and
+ * every time <code>function.value(p,component)</code> is called,
+ * calls <code>foo(p)</code> and returns the corresponding value. It
+ * also makes sure that <code>component</code> is in fact zero, as needs
+ * be for scalar functions.
+ * 
+ * The class provides an easy way to turn a simple global function into
+ * something that has the required Function@<dim@> interface for operations
+ * like VectorTools::interpolate_boundary_values() etc., and thereby
+ * allows for simpler experimenting without having to write all the
+ * boiler plate code of declaring a class that is derived from Function
+ * and implementing the Function::value() function.
+ * 
+ * The class gains additional expressvive power because the argument it
+ * takes does not have to be a pointer to an actual function. Rather, it is
+ * a function object, i.e., it can also be the result of call to 
+ * std::bind (or boost::bind) or some other object that can be called with
+ * a single argument. For example, if you need a Function object that
+ * returns the norm of a point, you could write it like so:
+ * @code
+ *   template <int dim> 
+ *   class Norm : public Function<dim> {
+ *     public:
+ *       virtual double value (const Point<dim> &p,
+ *                             const unsigned int component) const {
+ *         Assert (component == 0, ExcMessage ("This object is scalar!"));
+ *         return p.norm();
+ *       }
+ *    };
+ * 
+ *    Norm<2> my_norm_object;
+ * @endcode
+ * and then pass the <code>my_norm_object</code> around, or you could write it
+ * like so:
+ * @code
+ *   ScalarFunctionFromFunctionObject<dim> my_norm_object (&Point<dim>::norm);
+ * @endcode
+ * 
+ * Similarly, to generate an object that computes the distance to a point
+ * <code>q</code>, we could do this:
+ * @code
+ *   template <int dim> 
+ *   class DistanceTo : public Function<dim> {
+ *     public:
+ *       DistanceTo (const Point<dim> &q) : q(q) {}
+ *       virtual double value (const Point<dim> &p,
+ *                             const unsigned int component) const {
+ *         Assert (component == 0, ExcMessage ("This object is scalar!"));
+ *         return q.distance(p);
+ *       }
+ *     private:
+ *       const Point<dim> q;
+ *    };
+ * 
+ *    Point<2> q (2,3);
+ *    DistanceTo<2> my_distance_object;
+ * @endcode
+ * or we could write it like so:
+ * @code
+ *    ScalarFunctionFromFunctionObject<dim>
+ *      my_distance_object (std_cxx1x::bind (&Point<dim>::distance,
+ *	  		                     q,
+ *			                     std_cxx1x::_1));
+ * @endcode
+ * The savings in work to write this are apparent.
+ * 
+ * @author Wolfgang Bangerth, 2011
+ */
+template <int dim>
+class ScalarFunctionFromFunctionObject : public Function<dim>
+{
+public:
+  /**
+   * Given a function object that takes a Point and returns a double
+   * value, convert this into an object that matches the Function<dim>
+   * interface.
+   */
+  ScalarFunctionFromFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object);
+
+  /**
+   * Return the value of the
+   * function at the given
+   * point. Returns the value the
+   * function given to the constructor
+   * produces for this point.
+   */
+  virtual double value (const Point<dim>   &p,
+			const unsigned int  component = 0) const;
+
+private:
+  /**
+   * The function object which we call when this class's value() or
+   * value_list() functions are called.
+   **/
+  const std_cxx1x::function<double (const Point<dim> &)> function_object;
 };
 
 

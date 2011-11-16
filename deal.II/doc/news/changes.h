@@ -78,6 +78,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The class ScalarFunctionFromFunctionObject provides a quick way to
+convert an arbitrary function into a function object that can be passed
+to part of the library that require the Function@<dim@> interface.
+<br>
+(Wolfgang Bangerth, 2011/10/30)
+
 <li> New: FETools::get_fe_from_name() can now return objects of type FE_Nothing.
 <br>
 (Scott Miller, Jonathan Pitt, 2011/11/10)

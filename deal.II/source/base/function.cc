@@ -516,19 +516,47 @@ ComponentSelectFunction<dim>::memory_consumption () const
 }
 
 
+template <int dim>
+ScalarFunctionFromFunctionObject<dim>::
+ScalarFunctionFromFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object)
+:
+Function<dim>(1),
+function_object (function_object)
+{}
+
+
+
+template <int dim>
+double
+ScalarFunctionFromFunctionObject<dim>::value (const Point<dim> &p,
+					      const unsigned int component) const
+{
+  Assert (component == 0,
+	  ExcMessage ("This object represents only scalar functions"));
+  return function_object (p);
+}
+
+
+
 // explicit instantiations
 
 template class Function<1>;
 template class ZeroFunction<1>;
 template class ConstantFunction<1>;
 template class ComponentSelectFunction<1>;
+template class ScalarFunctionFromFunctionObject<1>;
+
 template class Function<2>;
 template class ZeroFunction<2>;
 template class ConstantFunction<2>;
 template class ComponentSelectFunction<2>;
+template class ScalarFunctionFromFunctionObject<2>;
+
 template class Function<3>;
 template class ZeroFunction<3>;
 template class ConstantFunction<3>;
 template class ComponentSelectFunction<3>;
+template class ScalarFunctionFromFunctionObject<3>;
+
 
 DEAL_II_NAMESPACE_CLOSE
