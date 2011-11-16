@@ -6098,12 +6098,7 @@ namespace DoFTools
 				     // the dofs into the sparsity
 				     // pattern.
     block_list.reinit(vertex_dof_count.size(), dof_handler.n_dofs(level), vertex_dof_count);
-
-    deallog << "Vertex Dofs (" << vertex_dof_count.size() << ')';
-    for (unsigned int i=0;i<vertex_dof_count.size();++i)
-      deallog << ' ' << vertex_dof_count[i];
-    deallog << std::endl;
-
+    
     std::vector<unsigned int> indices;
     std::vector<bool> exclude;
 
