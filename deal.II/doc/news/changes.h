@@ -34,11 +34,6 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> New: The DoFTools::count_dofs_per_block function now also works
-for objects of type hp::DoFHandler.
-<br>
-(Jason Sheldon, 2011/11/13)
-
 <li> Fixed: The Intel compiler complains that it can't copy Trilinos vector
 reference objects, preventing the compiling of step-32. This is now fixed.
 <br>
@@ -78,11 +73,22 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The copy constructor of the SparseMatrixEZ function now works
+(rather than throwing an exception) if the copied matrix has size zero.
+This is in accordance to the other matrix classes.
+<br>
+(Wolfgang Bangerth, 2011/11/15)
+
 <li> New: The class ScalarFunctionFromFunctionObject provides a quick way to
 convert an arbitrary function into a function object that can be passed
 to part of the library that require the Function@<dim@> interface.
 <br>
-(Wolfgang Bangerth, 2011/10/30)
+(Wolfgang Bangerth, 2011/11/15)
+
+<li> New: The DoFTools::count_dofs_per_block function now also works
+for objects of type hp::DoFHandler.
+<br>
+(Jason Sheldon, 2011/11/13)
 
 <li> New: FETools::get_fe_from_name() can now return objects of type FE_Nothing.
 <br>
