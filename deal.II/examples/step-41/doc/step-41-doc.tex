@@ -1,0 +1,202 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Documentation of step-41, The obstacle problem}
+\author{Joerg Frohne}
+\date{November 11th, 2011}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+This example is based on the Laplace equation in a two-dimensional space $\Omega = \left[-1,1\right]^2$. It shows how to handle an obstacle problem. Therefore we have to solve a variational inequality. We will derive it from classical formulation.\\
+As a physical interpretation you imagine a membrane which is fixed on the boundary $\partial\Omega$. The membrane shows elastic material behavior with Young's modulus $E = 1.0$ for simplicity and there acts a force like from the earth gravitation on it. So the membrane dents in one direction and hits the cascaded obstacle which is described by the function $g$.
+
+\section{Classical formulation}
+
+The classical formulation of the problem possesses the following form:
+\begin{align}
+ -div (\sigma) &\geq f & &\quad\text{in } \Omega,\\
+ \sigma &= E\nabla u & &\quad\text{in } \Omega,\\
+ u(x,y) &= 0 & &\quad\text{on }\partial\Omega,\\
+(\Delta u + f)(u - g) &= 0 & &\quad\text{in } \Omega,\\
+ u(x,y) &\geq g(x,y) & &\quad\text{in } \Omega
+\end{align}
+with $u\in H^2(\Omega)$.
+
+\noindent
+$u$ is a scalar valued function that denotes the displacement of the membrane. The first equation is called equilibrium condition with the force of areal density $f$. The second one is known as Hooke's Law with the stresses $\sigma$. At the boundary we have zero Dirichlet conditions. And (4) together with the last inequality builds the obstacle condition which has to hold for the hole domain.\\
+In this case it is possible to join the first two equations which yields the Laplace equation:
+\begin{equation}
+ -\Delta u(x,y) \geq f(x,y)\quad\text{in }(x,y)\in \Omega.
+\end{equation}
+As mentioned above we choose $E=1.0$ for simplicity.
+
+\section{Derivation of the variational inequality}
+
+An obvious way to obtain the variational formulation of the obstacle problem is to consider the total potential energy:
+\begin{equation}
+ E(u):=\dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla - \int\limits_{\Omega} fu.
+\end{equation}
+We have to find a solution $u\in G$ of the following minimization problem
+\begin{equation}
+ E(u)\leq E(v)\quad \forall v\in G,
+\end{equation}
+with the convex set of admissble displacements:
+\begin{equation}
+ G:=\lbrace v\in V: v\geq g \text{ a.e. in } \Omega\rbrace,\quad V:=H^1_0(\Omega).
+\end{equation}
+This set takes care of the conditions (3) and (5).\\
+Now we consider a function
+\begin{equation}
+ F(\varepsilon) := E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],\quad u,v\in G,
+\end{equation}
+which takes its minimum at $\varepsilon = 0$, so that $F'(0)\geq 0$. Note that $u+\varepsilon(v-u) = (1-\varepsilon)u+\varepsilon v\in G$ because of the convexity of $G$. If we compute $F'(\varepsilon)\vert_{\varepsilon=0}$ it yields the variational formulation we are searching for:\\
+\textit{Find a function $u\in G$ with}
+\begin{equation}
+ \left(\nabla u, \nabla(v-u)\right) \geq \left(f,v-u\right) \quad \forall v\in G.
+\end{equation}
+For the equivalent saddle point formulation of this problem we introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W:=V^*$ of Lagrange multipliers. This yields to:\\
+Find $u\in V$ and $\lambda\in K$ such that
+\begin{eqnarray}
+ a(u,v) + b(v,\lambda) &=& f(v),\quad v\in V\\
+ b(u,\mu - \lambda) &\leq& \langle g,(\mu - \lambda)\rangle,\quad\mu\in K,
+\end{eqnarray}
+with
+\begin{eqnarray}
+ a(u,v) &:=& \left(\nabla u, \nabla v\right),\quad u,v\in V\\
+ b(u,\mu) &:=& (u,\mu),\quad u\in V,\quad\mu\in W.
+\end{eqnarray}
+The existence and uniqueness of $(u,\mu)\in V\times K$ of the saddle point problem (14) and (15) has been stated in Grossmann and Roos: Numerical treatment of partial differential equations, Springer-Verlag, Heidelberg-Berlin, 2007, 596 pages, ISBN 978-3-540-71582-5.
+
+
+
+\section{Active Set methods to solve (11)}
+
+There are different methods to solve the variational inequality. As one possibility you can understand (11) as a convex quadratic program (QP) with inequality constraints.\\
+After we discretized the saddle point problem, we obtain the following system of equations and inequalities for $p\in\mathcal{S}:=\Omega_h\backslash\partial\Omega_h$:
+\begin{eqnarray}
+ &A_h u_h + B_h\lambda_h = f_h,&\\
+ &u_{n,p} \leq g_p,\quad \lambda_p \geq 0,\quad \lambda_p(u_{n,p} - g_p) = 0.&
+\end{eqnarray}
+with $u_{n,p}:=D_{pp} u_p\leq g_p, p\in S$ as a non-pentration condition. The matrix $B_h$ has the form $B_h:=D$ where $D$ is a diagonal matrix with the entries
+\begin{equation}
+ D_{pp} := \int\limits_{\Omega}\varphi_p^2 dx,\quad p\in\mathcal{S}.
+\end{equation}
+Now we define for each vertex $p\in \mathcal{S}$ the function
+\begin{equation}
+ C(u_{n,p},\lambda_p):=\lambda_p - \max\lbrace 0, \lambda_p + c( u_{n,p} - g_p\rbrace,\quad c>0.
+\end{equation}
+So we can express the conditions in (17) as
+\begin{equation}
+ C(u_{n,p},\lambda_p) = 0,\quad p\in\mathcal{S}.
+\end{equation}
+The primal-dual active set strategy is an iterative scheme which is based on (19) to predict the next active and inactive sets $\mathcal{A}_k$ and $\mathcal{F}_k$. (See Hintermueller, Ito, Kunisch: The primal-dual active set strategy as a semismooth newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3, pp. 865-888.)\\
+% \begin{eqnarray}
+%  \min\limits_{u_h} q(u_h) &=& \dfrac{1}{2}u_h^TAu_h + u_h^Tb\\
+%  \text{subject to}\quad c_i^Tu_h &=& 0,\quad i\in I_{\partial\Omega}\\
+%  c_i^T u_h &\geq& g_i,\quad i\in I_{\Omega}.
+% \end{eqnarray}
+% In this formulation $A$ is the mass matrix with $A_{ij} = \left(\nabla\varphi_i,\nabla\varphi_j\right)$ which includes the Dirichlet-Boundary conditions and $b$ is the right-hand-side with $b_i = \left(f_i,\varphi_i\right)$. $u_h$ and $c$ are also vectors with the same dimension as $b$.\\
+The algorithm for primal-dual active set method works as follows:
+\begin{itemize}
+ \item [(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and $\mathcal{A}_k\cap\mathcal{F}_k=\O{}$ and set $k=1$.
+ \item [(1)] Find the primal-dual pair $(u^k_h,\lambda^k_h)$\\
+ \begin{equation}
+ \begin{split}
+  A_h u^k_h + B_h\lambda^k_h = f_h,\\
+  u^k_{n,p} = g_p\quad\forall p\in\mathcal{A}_k,\\
+  \lambda_p = 0\quad\forall p\in\mathcal{F}_k.
+ \end{split}
+ \end{equation}
+ \item [(2)] Define the new active and inactive sets by
+ \begin{equation}
+ \begin{split}
+  \mathcal{A}_{k+1}:=\lbrace p\in\mathcal{S}:\lambda^k_p + c(u^k_{n,p} - g_p)> 0\rbrace,\\
+  \mathcal{F}_{k+1}:=\lbrace p\in\mathcal{S}:\lambda^k_p + c(u^k_{n,p} - g_p)\leq 0\rbrace.
+ \end{split}
+ \end{equation}
+ \item [(3)] If $\mathcal{A}_{k+1}=\mathcal{A}_k$ and $\mathcal{F}_{k+1}=\mathcal{F}_k$ then stop, else set $k=k+1$ and go to step (1).
+%  \item [(2)] Solve $A^k u_h^k = b^k$.
+%  \item [(3)] Error control
+%  \item [(4)] Compute $res =  b - Au_h^k$
+%  \item [(5)] Set $u_h^{k+1} = u_h^k,\quad k = k+1$ and go to step (1).
+\end{itemize}
+For any the primal-dual pair $(u^k_h,\lambda^k_h)$ that satisfies the conditions in step (3), we differ between three cases:
+\begin{itemize}
+ \item [1.] $\lambda^k_p + c(u^k_{n,p} - g_p)> 0$ (p active):\\
+  Then either $u^k_{n,p}>g_p$ and $\lambda^k_{n,p}=0$ (pentration) or $\lambda^k_{n,p}>0$ and $u^k_{n,p}=g_p$ (pressing load).
+ \item [2.] $\lambda^k_p + c(u^k_{n,p} - g_p)\leq 0$ (p inactive):\\
+  Then either $u^k_{n,p}\leq g_p$ and $\lambda^k_{n,p}=0$ (no contact) or $\lambda^k_{n,p}\leq0$ and $u^k_{n,p}=g_p$ (unpressing load).
+\end{itemize}
+Now we want to show the slantly derivation function of $C(.,.)$:
+\begin{equation}
+ \dfrac{\partial}{\partial u^k_p}C(u^k_p,\lambda^k_p) = \begin{cases}
+                                   -cD_{pp},\quad \lambda^k_p + c(u^k_{n,p} - g_p)> 0\\
+                                   0\lambda^k_p,\quad \lambda^k_p + c(u^k_{n,p} - g_p)\leq 0.
+                                  \end{cases}
+\end{equation}
+\begin{equation}
+ \dfrac{\partial}{\partial\lambda^k_p}C(u^k_p,\lambda^k_p) = \begin{cases}
+                                   0,\quad \lambda^k_p + c(u^k_{n,p} - g_p)> 0\\
+                                   \lambda^k_p,\quad \lambda^k_p + c(u^k_{n,p} - g_p)\leq 0.
+                                  \end{cases}
+\end{equation}
+This suggest a semismooth Newton step of the form
+\begin{equation}
+ \begin{pmatrix}
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & D_{\mathcal{F}_k} & 0\\
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & D_{\mathcal{A}_k}\\
+ 0 & 0 & Id_{\mathcal{F}_k} & 0\\
+ 0 & -cD_{\mathcal{A}_k} & 0 & 0
+\end{pmatrix}
+\begin{pmatrix}
+ \delta u^k_{\mathcal{F}_k}\\ \delta u^k_{\mathcal{A}_k}\\ \delta \lambda^k_{\mathcal{F}_k}\\ \delta \lambda^k_{\mathcal{A}_k}
+\end{pmatrix}
+=
+-\begin{pmatrix}
+ (Au^k + \lambda^k - f)_{\mathcal{F}_k}\\ (Au^k + \lambda^k - f)_{\mathcal{A}_k}\\ \lambda^k_{\mathcal{F}_k}\\ -c(D_{\mathcal{A}_k} u^k - g)_{\mathcal{A}_k}
+\end{pmatrix}.
+\end{equation}
+The algebraic representation of (20) follows now by setting $\delta u^k := u^{k+1} - u^k$ and $\delta \lambda^k := \lambda^{k+1} - \lambda^k$
+\begin{equation}
+\begin{pmatrix}
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & D_{\mathcal{F}_k} & 0\\
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & D_{\mathcal{A}_k}\\
+ 0 & 0 & Id_{\mathcal{F}_k} & 0\\
+ 0 & D_{\mathcal{A}_k} & 0 & 0
+\end{pmatrix}
+\begin{pmatrix}
+ u^k_{\mathcal{F}_k}\\ u^k_{\mathcal{A}_k}\\ \lambda^k_{\mathcal{F}_k}\\ \lambda^k_{\mathcal{A}_k}
+\end{pmatrix}
+=
+\begin{pmatrix}
+ f_{\mathcal{F}_k}\\ f_{\mathcal{A}_k}\\ 0\\ g_{\mathcal{A}_k}
+\end{pmatrix}.
+\end{equation}
+It's easy to see that we can eliminate the third row and the third column because it implies $\lambda_{\mathcal{F}_k} = 0$:
+\begin{equation}
+\begin{pmatrix}
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & 0\\
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & D_{\mathcal{A}_k}\\
+ 0 & D_{\mathcal{A}_k} & 0
+\end{pmatrix}
+\begin{pmatrix}
+ u^k_{\mathcal{F}_k}\\ u^k_{\mathcal{A}_k}\\ \lambda^k_{\mathcal{A}_k}
+\end{pmatrix}
+=
+\begin{pmatrix}
+ f_{\mathcal{F}_k}\\ f_{\mathcal{A}_k}\\ g_{\mathcal{A}_k}
+\end{pmatrix}.
+\end{equation}
+And it yields
+\begin{equation}
+ \lambda_h = D^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}u_{\mathcal{S}}\right).
+\end{equation}
+
+
+Finally we have to solve linear problems for what we use CG-Solver with a AMG preconditioner from Trilinos.
+
+\end{document}
