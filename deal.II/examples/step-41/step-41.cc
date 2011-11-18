@@ -64,6 +64,7 @@ class Step41
     void make_grid ();
     void setup_system();
     void assemble_system ();
+    void assemble_mass_matrix ();
     void projection_active_set ();
     void solve ();
     void output_results (const std::string& title) const;
@@ -78,6 +79,7 @@ class Step41
     SparsityPattern                sparsity_pattern;
     TrilinosWrappers::SparseMatrix system_matrix;
     TrilinosWrappers::SparseMatrix system_matrix_complete;
+    TrilinosWrappers::SparseMatrix mass_matrix;
 
     TrilinosWrappers::Vector       solution;
     TrilinosWrappers::Vector       tmp_solution;
@@ -220,6 +222,7 @@ void Step41<dim>::setup_system ()
   
   system_matrix.reinit (sparsity_pattern);
   system_matrix_complete.reinit (sparsity_pattern);
+  mass_matrix.reinit (sparsity_pattern);
   
   solution.reinit (dof_handler.n_dofs());
   tmp_solution.reinit (dof_handler.n_dofs());
@@ -297,6 +300,51 @@ void Step41<dim>::assemble_system ()
     }
 }
 
+template <int dim>
+void Step41<dim>::assemble_mass_matrix () 
+{  
+  QTrapez<dim>  quadrature_formula;
+
+  FEValues<dim> fe_values (fe, quadrature_formula, 
+			   update_values   | update_quadrature_points | update_JxW_values);
+
+  const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+  const unsigned int   n_q_points    = quadrature_formula.size();
+
+  FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+
+  typename DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  
+  for (; cell!=endc; ++cell)
+    {
+      fe_values.reinit (cell);
+      cell_matrix = 0;
+
+      for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+	for (unsigned int i=0; i<dofs_per_cell; ++i)
+	  for (unsigned int j=0; j<dofs_per_cell; ++j)
+	    cell_matrix(i,j) += (fe_values.shape_value (i, q_point) *
+				 fe_values.shape_value (j, q_point) *
+				 fe_values.JxW (q_point));
+
+      cell->get_dof_indices (local_dof_indices);
+
+                                       // This function apply the constraints
+                                       // to the system matrix and system rhs.
+                                       // The true parameter is set to make sure
+                                       // that the system rhs contains correct
+                                       // values in the rows with inhomogeneity
+                                       // constraints.
+      constraints.distribute_local_to_global (cell_matrix,
+                                              local_dof_indices,
+                                              mass_matrix);
+    }
+}
+
                                  // @sect4{Step41::projection_active_set}
 
 				 // Updating of the active set which means to
@@ -324,6 +372,7 @@ void Step41<dim>::projection_active_set ()
                                        // to find and supply the constraints for the
                                        // obstacle condition
   active_set = 0.0;
+  const double c = 100.0;
   for (; cell!=endc; ++cell)
     for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
       {
@@ -340,7 +389,8 @@ void Step41<dim>::projection_active_set ()
                                        // the diag-entry of the mass-matrix.
 
                                        // TODO: I have to check the condition
-	if ((resid_vector (index_x)*std::pow (2, 2*n_refinements)*diag_mass_matrix_vector (index_x) >= solution_index_x - obstacle_value))
+	if (resid_vector (index_x) +
+	   diag_mass_matrix_vector (index_x)*c*(obstacle_value - solution_index_x) > 0)
 	{
 	  constraints.add_line (index_x);
 	  constraints.set_inhomogeneity (index_x, obstacle_value);
@@ -370,7 +420,7 @@ void Step41<dim>::projection_active_set ()
 template <int dim>
 void Step41<dim>::solve () 
 {
-  ReductionControl        reduction_control (100, 1e-12, 1e-2);
+  ReductionControl        reduction_control (100, 1e-12, 1e-3);
   SolverCG<TrilinosWrappers::Vector>   solver (reduction_control); 
   TrilinosWrappers::PreconditionAMG precondition;
   precondition.initialize (system_matrix);
@@ -382,6 +432,8 @@ void Step41<dim>::solve ()
 	    << " CG iterations needed to obtain convergence with an error: "
 	    <<  reduction_control.last_value()
 	    << std::endl;
+
+  constraints.distribute (solution);
 }
 
                                  // @sect4{Step41::output_results}
@@ -395,14 +447,14 @@ void Step41<dim>::output_results (const std::string& title) const
   DataOut<dim> data_out;
   
   data_out.attach_dof_handler (dof_handler);
-  data_out.add_data_vector (tmp_solution, "Displacement");
-  data_out.add_data_vector (resid_vector, "Residual");
+  // data_out.add_data_vector (tmp_solution, "Displacement");
+  // data_out.add_data_vector (resid_vector, "Residual");
   data_out.add_data_vector (active_set, "ActiveSet");
 
   data_out.build_patches ();
 
   std::ofstream output_vtk ((title + ".vtk").c_str ());
-  data_out.write_vtk (output_vtk);
+  data_out.write_gnuplot (output_vtk);
 }
 
 
@@ -438,19 +490,24 @@ void Step41<dim>::run ()
                                        // step of the active-set-iteration
   system_matrix_complete.copy_from (system_matrix);
   system_rhs_complete = system_rhs;
-  
+ 
+                                       // to compute the factor which is used
+                                       // to scale the residual. You can consider
+                                       // this diagonal matrix as the discretization
+                                       // of a lagrange multiplier for the
+                                       // contact force
+  assemble_mass_matrix ();
+  for (unsigned int j=0; j<solution.size (); j++)
+    diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
+
   resid_vector = 0;
   resid_vector -= system_rhs_complete;
   system_matrix_complete.vmult_add  (resid_vector, solution);
 
-                                       // for the factor which is used
-                                       // to scale the residual
-  for (unsigned int j=0; j<solution.size (); j++)
-    diag_mass_matrix_vector (j) = system_matrix_complete.diag_element (j);
-
+                                      // to compute a start active set
   std::cout<< "Update Active Set:" <<std::endl;
   projection_active_set ();
-
+  TrilinosWrappers::Vector       active_set_old (active_set);
   for (unsigned int i=0; i<solution.size (); i++)
     {
       std::cout<< "Assemble System:" <<std::endl;
@@ -465,12 +522,13 @@ void Step41<dim>::run ()
       resid_vector = 0;
       resid_vector -= system_rhs_complete;
       system_matrix_complete.vmult_add  (resid_vector, solution);
-      for (unsigned int k = 0; k<solution.size (); k++)
-	if (resid_vector (k) > 0)
-	  resid_vector (k) = 0;
 
       std::cout<< "Update Active Set:"<<std::endl;
       projection_active_set ();
+
+      for (unsigned int k = 0; k<solution.size (); k++)
+      	if (active_set (k) == 1)
+      	  resid_vector (k) = 0;
 
       std::cout<< "Create Output:" <<std::endl;
       std::ostringstream filename_output;
@@ -478,12 +536,19 @@ void Step41<dim>::run ()
       filename_output << i;
       output_results (filename_output.str ());
 
+                                     // the residual of the non-contact part
+                                     // of the system serves as an additional
+                                     // control which is not necassary for
+                                     // for the primal-dual active set strategy
       double resid = resid_vector.l2_norm ();
-      std::cout<< i << ". Residual = " << resid <<std::endl;
-      if (resid < 1e-10)
-	{
-	  break;
-	}
+      std::cout<< i << ". Residual of the non-contact part of the system = " << resid <<std::endl;
+
+                                      // if both the old and the new
+                                      // active set are identical the
+                                      // computation stops
+      if (active_set == active_set_old)
+	break;
+      active_set_old = active_set;
     }
 }
 
