@@ -607,7 +607,7 @@ class ConstantFunction : public ZeroFunction<dim>
  * This is a constant vector-valued function, in which one or more
  * components of the vector have a constant value and all other
  * components are zero.  It is especially useful as a weight function
- * for <tt>VectorTools::integrate_difference</tt>, where it allows to
+ * for VectorTools::integrate_difference, where it allows to
  * integrate only one or a few vector components, rather than the
  * entire vector-valued solution. See the step-20
  * tutorial program for a detailed explanation.
@@ -810,6 +810,84 @@ private:
    * value_list() functions are called.
    **/
   const std_cxx1x::function<double (const Point<dim> &)> function_object;
+};
+
+
+/**
+ * This class is similar to the ScalarFunctionFromFunctionObject class in that it
+ * allows for the easy conversion of a function object to something that
+ * satisfies the interface of the Function base class. The difference is
+ * that here, the given function object is still a scalar function
+ * (i.e. it has a single value at each space point) but that the Function
+ * object generated is vector valued. The number of vector components
+ * is specified in the constructor, where one also selectes a single
+ * one of these vector components that should be filled by the passed
+ * object. The result is a vector Function object that returns zero in
+ * each component except the single selected one where it returns the
+ * value returned by the given as the first argument to the constructor.
+ * 
+ * @note In the above discussion, note the difference between the
+ * (scalar) "function object" (i.e., a C++ object <code>x</code> that can
+ * be called as in <code>x(p)</code>) and the capitalized (vector valued)
+ * "Function object" (i.e., an object of a class that is derived from
+ * the Function base class).
+ * 
+ * @author Wolfgang Bangerth, 2011
+ */
+template <int dim>
+class VectorFunctionFromScalarFunctionObject : public Function<dim>
+{
+public:
+  /**
+   * Given a function object that takes a Point and returns a double
+   * value, convert this into an object that matches the Function@<dim@>
+   * interface.
+   * 
+   * @param function_object The scalar function that will form one component
+   *     of the resulting Function object.
+   * @param n_components The total number of vector components of the
+   *     resulting Function object.
+   * @param selected_component The single component that should be
+   *     filled by the first argument.
+   **/
+  VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object,
+                                          const unsigned int n_components,
+                                          const unsigned int selected_component);
+
+  /**
+   * Return the value of the
+   * function at the given
+   * point. Returns the value the
+   * function given to the constructor
+   * produces for this point.
+   */
+  virtual double value (const Point<dim>   &p,
+                        const unsigned int  component = 0) const;
+
+  /**
+   * Return all components of a
+   * vector-valued function at a
+   * given point.
+   *
+   * <tt>values</tt> shall have the right
+   * size beforehand,
+   * i.e. #n_components.
+   */
+  virtual void vector_value (const Point<dim>   &p,
+                             Vector<double>     &values) const;
+                        
+private:
+  /**
+   * The function object which we call when this class's value() or
+   * value_list() functions are called.
+   **/
+  const std_cxx1x::function<double (const Point<dim> &)> function_object;
+  
+  /**
+   * The vector component whose value is to be filled by the
+   * given scalar function.
+   */
+  const unsigned int selected_component;
 };
 
 

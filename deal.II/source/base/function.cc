@@ -66,9 +66,8 @@ double Function<dim>::value (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::vector_value (
-  const Point<dim>& p,
-  Vector<double>& v) const
+void Function<dim>::vector_value (const Point<dim>& p,
+                                  Vector<double>& v) const
 {
   AssertDimension(v.size(), this->n_components);
   for (unsigned int i=0;i<this->n_components;++i)
@@ -538,6 +537,50 @@ ScalarFunctionFromFunctionObject<dim>::value (const Point<dim> &p,
 
 
 
+template <int dim>
+VectorFunctionFromScalarFunctionObject<dim>::
+VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object,
+                                        const unsigned int n_components,
+                                        const unsigned int selected_component)
+:
+Function<dim>(n_components),
+function_object (function_object),
+selected_component (selected_component)
+{}
+
+
+
+template <int dim>
+double
+VectorFunctionFromScalarFunctionObject<dim>::value (const Point<dim> &p,
+                                                    const unsigned int component) const
+{
+  Assert (component < this->n_components,
+          ExcIndexRange (component, 0, this->n_components));
+  
+  if (component == selected_component)
+    return function_object (p);
+  else
+    return 0;
+}
+
+
+
+template <int dim>
+void
+VectorFunctionFromScalarFunctionObject<dim>::
+vector_value (const Point<dim>   &p,
+              Vector<double>     &values) const
+{
+  AssertDimension(values.size(), this->n_components);
+
+  // set everything to zero, and then the right component to its correct value
+  values = 0;
+  values(selected_component) = function_object (p);
+}
+
+
+
 // explicit instantiations
 
 template class Function<1>;
@@ -545,18 +588,21 @@ template class ZeroFunction<1>;
 template class ConstantFunction<1>;
 template class ComponentSelectFunction<1>;
 template class ScalarFunctionFromFunctionObject<1>;
+template class VectorFunctionFromScalarFunctionObject<1>;
 
 template class Function<2>;
 template class ZeroFunction<2>;
 template class ConstantFunction<2>;
 template class ComponentSelectFunction<2>;
 template class ScalarFunctionFromFunctionObject<2>;
+template class VectorFunctionFromScalarFunctionObject<2>;
 
 template class Function<3>;
 template class ZeroFunction<3>;
 template class ConstantFunction<3>;
 template class ComponentSelectFunction<3>;
 template class ScalarFunctionFromFunctionObject<3>;
+template class VectorFunctionFromScalarFunctionObject<3>;
 
 
 DEAL_II_NAMESPACE_CLOSE

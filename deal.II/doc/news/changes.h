@@ -82,6 +82,7 @@ This is in accordance to the other matrix classes.
 <li> New: The class ScalarFunctionFromFunctionObject provides a quick way to
 convert an arbitrary function into a function object that can be passed
 to part of the library that require the Function@<dim@> interface.
+The VectorFunctionFromScalarFunctionObject class does a similar thing.
 <br>
 (Wolfgang Bangerth, 2011/11/15)
 
