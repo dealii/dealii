@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -712,7 +712,7 @@ class ComponentSelectFunction : public ConstantFunction<dim>
  * @code
  *   double foo (const Point<dim> &);
  * @endcode
- * into an object of type Function@<dim@>. 
+ * into an object of type Function@<dim@>.
  * Since the argument returns a scalar, the result is clearly a
  * Function object for which <code>function.n_components==1</code>.
  * The class works by storing a pointer to the given function and
@@ -720,22 +720,22 @@ class ComponentSelectFunction : public ConstantFunction<dim>
  * calls <code>foo(p)</code> and returns the corresponding value. It
  * also makes sure that <code>component</code> is in fact zero, as needs
  * be for scalar functions.
- * 
+ *
  * The class provides an easy way to turn a simple global function into
  * something that has the required Function@<dim@> interface for operations
  * like VectorTools::interpolate_boundary_values() etc., and thereby
  * allows for simpler experimenting without having to write all the
  * boiler plate code of declaring a class that is derived from Function
  * and implementing the Function::value() function.
- * 
+ *
  * The class gains additional expressvive power because the argument it
  * takes does not have to be a pointer to an actual function. Rather, it is
- * a function object, i.e., it can also be the result of call to 
+ * a function object, i.e., it can also be the result of call to
  * std::bind (or boost::bind) or some other object that can be called with
  * a single argument. For example, if you need a Function object that
  * returns the norm of a point, you could write it like so:
  * @code
- *   template <int dim> 
+ *   template <int dim>
  *   class Norm : public Function<dim> {
  *     public:
  *       virtual double value (const Point<dim> &p,
@@ -744,7 +744,7 @@ class ComponentSelectFunction : public ConstantFunction<dim>
  *         return p.norm();
  *       }
  *    };
- * 
+ *
  *    Norm<2> my_norm_object;
  * @endcode
  * and then pass the <code>my_norm_object</code> around, or you could write it
@@ -752,11 +752,11 @@ class ComponentSelectFunction : public ConstantFunction<dim>
  * @code
  *   ScalarFunctionFromFunctionObject<dim> my_norm_object (&Point<dim>::norm);
  * @endcode
- * 
+ *
  * Similarly, to generate an object that computes the distance to a point
  * <code>q</code>, we could do this:
  * @code
- *   template <int dim> 
+ *   template <int dim>
  *   class DistanceTo : public Function<dim> {
  *     public:
  *       DistanceTo (const Point<dim> &q) : q(q) {}
@@ -768,7 +768,7 @@ class ComponentSelectFunction : public ConstantFunction<dim>
  *     private:
  *       const Point<dim> q;
  *    };
- * 
+ *
  *    Point<2> q (2,3);
  *    DistanceTo<2> my_distance_object;
  * @endcode
@@ -780,7 +780,7 @@ class ComponentSelectFunction : public ConstantFunction<dim>
  *			                     std_cxx1x::_1));
  * @endcode
  * The savings in work to write this are apparent.
- * 
+ *
  * @author Wolfgang Bangerth, 2011
  */
 template <int dim>
@@ -825,13 +825,26 @@ private:
  * object. The result is a vector Function object that returns zero in
  * each component except the single selected one where it returns the
  * value returned by the given as the first argument to the constructor.
- * 
+ *
  * @note In the above discussion, note the difference between the
  * (scalar) "function object" (i.e., a C++ object <code>x</code> that can
  * be called as in <code>x(p)</code>) and the capitalized (vector valued)
  * "Function object" (i.e., an object of a class that is derived from
  * the Function base class).
- * 
+ *
+ * To be more concrete, let us consider the following example:
+ * @code
+ *   double one (const Point<2> &p) { return 1; }
+ *   VectorFunctionFromScalarFunctionObject<2>
+ *      component_mask (&one, 1, 3);
+ * @endcode
+ * Here, <code>component_mask</code> then represents a Function object
+ * that for every point returns the vector $(0, 1, 0)^T$, i.e. a mask
+ * function that could, for example, be passed to VectorTools::integrate_difference().
+ * This effect can also be achieved using the ComponentSelectFunction
+ * class but is obviously easily extended to functions that are
+ * non-constant in their one component.
+ *
  * @author Wolfgang Bangerth, 2011
  */
 template <int dim>
@@ -842,7 +855,7 @@ public:
    * Given a function object that takes a Point and returns a double
    * value, convert this into an object that matches the Function@<dim@>
    * interface.
-   * 
+   *
    * @param function_object The scalar function that will form one component
    *     of the resulting Function object.
    * @param n_components The total number of vector components of the
@@ -851,8 +864,8 @@ public:
    *     filled by the first argument.
    **/
   VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object,
-                                          const unsigned int n_components,
-                                          const unsigned int selected_component);
+                                          const unsigned int selected_component,
+                                          const unsigned int n_components);
 
   /**
    * Return the value of the
@@ -875,14 +888,14 @@ public:
    */
   virtual void vector_value (const Point<dim>   &p,
                              Vector<double>     &values) const;
-                        
+
 private:
   /**
    * The function object which we call when this class's value() or
    * value_list() functions are called.
    **/
   const std_cxx1x::function<double (const Point<dim> &)> function_object;
-  
+
   /**
    * The vector component whose value is to be filled by the
    * given scalar function.

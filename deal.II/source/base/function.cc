@@ -540,13 +540,16 @@ ScalarFunctionFromFunctionObject<dim>::value (const Point<dim> &p,
 template <int dim>
 VectorFunctionFromScalarFunctionObject<dim>::
 VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object,
-                                        const unsigned int n_components,
-                                        const unsigned int selected_component)
+                                        const unsigned int selected_component,
+                                        const unsigned int n_components)
 :
 Function<dim>(n_components),
 function_object (function_object),
 selected_component (selected_component)
-{}
+{
+  Assert (selected_component < this->n_components,
+          ExcIndexRange (selected_component, 0, this->n_components));
+}
 
 
 
@@ -557,7 +560,7 @@ VectorFunctionFromScalarFunctionObject<dim>::value (const Point<dim> &p,
 {
   Assert (component < this->n_components,
           ExcIndexRange (component, 0, this->n_components));
-  
+
   if (component == selected_component)
     return function_object (p);
   else

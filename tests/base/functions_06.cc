@@ -22,7 +22,7 @@ template <int dim>
 void check1 ()
 {
   VectorFunctionFromScalarFunctionObject<dim>
-    object (&Point<dim>::norm, 3, 1);
+    object (&Point<dim>::norm, 1, 3);
 
   Assert (object.n_components == 3, ExcInternalError());
 
