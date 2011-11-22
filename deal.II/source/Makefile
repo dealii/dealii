@@ -29,12 +29,9 @@ inst-files    := $(inst-in-files:%.in=%)
 
 
 # build unique object file names
-tmp1               := $(shell echo $(cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
-tmp-o-files-indep  := $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
-tmp-go-files-indep := $(addprefix $(LIBDIR)/debug/, $(tmp1:.cc=.$(OBJEXT)))
-
-o-files  := $(tmp-o-files-indep)
-go-files := $(tmp-go-files-indep)
+tmp1     := $(shell echo $(cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
+o-files  := $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
+go-files := $(addprefix $(LIBDIR)/debug/, $(tmp1:.cc=.$(OBJEXT)))
 
 
 debug: $(LIBDIR)/libdeal_II.g$(lib-suffix)
