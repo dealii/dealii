@@ -310,8 +310,8 @@ class ConstraintMatrix;
  *   that requires the computation of a gradient, then the provided
  *   function is automatically projected along the curve, and the
  *   difference is only computed on the tangential part of the
- *   gradient, since no information is available, on the finite
- *   dimensional one, on the normal component of the gradient.
+ *   gradient, since no information is available on the normal 
+ *   component of the gradient anyway.
  * </ul>
  *
  * All functions use the finite element given to the DoFHandler object the last
@@ -1720,7 +1720,20 @@ namespace VectorTools
 				    * weighting function is given,
 				    * i.e. weight=1 in the whole
 				    * domain for all vector
-				    * components uniformly.
+				    * components uniformly. Note that
+                                    * one often wants to compute the
+                                    * error in only one component of 
+                                    * a solution vector (e.g. for the
+                                    * pressure in the Stokes system,
+                                    * when the solution vector also
+                                    * contains the velocity components).
+                                    * In these cases, the weight should
+                                    * be a <i>mask</i>, i.e., be a
+                                    * vector function for which individual
+                                    * components are either zero or one.
+                                    * This can easily be achieved using
+                                    * the ComponentSelectFunction
+                                    * class.
 				    *
 				    * It is assumed that the number
 				    * of components of the function
