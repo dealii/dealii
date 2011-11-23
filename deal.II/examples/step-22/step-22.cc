@@ -1235,7 +1235,7 @@ namespace Step22
 				   // \times 1$ (in 2d) or $4 \times 1 \times
 				   // 1$ (in 3d), placed in $R^2/R^3$ as
 				   // $(-2,2)\times(-1,0)$ or
-				   // $(-2,2)\times(0,1)\times(-1,1)$,
+				   // $(-2,2)\times(0,1)\times(-1,0)$,
 				   // respectively. It is natural to start
 				   // with equal mesh size in each direction,
 				   // so we subdivide the initial rectangle
