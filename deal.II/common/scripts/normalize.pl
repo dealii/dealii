@@ -1,7 +1,7 @@
 ######################################################################
 # $Id$
 #
-# Copyright (C) 2001, 2003, 2005, 2010, the deal.II authors
+# Copyright (C) 2001, 2003, 2005, 2010, 2011, the deal.II authors
 #
 # Remove insignificant volatile data from output files of tests
 #
@@ -40,9 +40,9 @@ s/line <\d+> of file <.*\//file </;
 
 #s/-?\d?\.\d+e-[123456789]\d+/0.00/g;
 
-# Zeroes are zero
-
-s/-0\.00/0.00/g;
+# See if we have a -0.0... (not followed by any other digit) and replace it
+# by the same number without the negative sign
+s/-0\.(0+)(?!\d)/0.\1/g;
 
 # Residual values
 
