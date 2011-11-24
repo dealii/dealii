@@ -11,7 +11,7 @@ DEAL::Number of cells: 1186
 DEAL::Number of dofs: 1537
 DEAL::|A|=0
 DEAL::|B|=1.20834e+09
-DEAL::|b1|=0
+DEAL::|b1|=1.33751e-09
 DEAL::|b2|=1.28179e+08
 DEAL::3D
 DEAL::Number of cells: 736

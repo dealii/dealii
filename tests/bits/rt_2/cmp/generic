@@ -1312,7 +1312,7 @@ DEAL::quadrature point 5 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=26.5032, u_n*nx+v_n*
 DEAL::cell=2.54, face=2
 DEAL::quadrature point 0 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=3.54227, u_n*nx+v_n*ny=3.54227
 DEAL::quadrature point 1 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=2.15643, u_n*nx+v_n*ny=2.15643
-DEAL::quadrature point 2 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=0.00254793, u_n*nx+v_n*ny=0.00254793
+DEAL::quadrature point 2 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-0.00254793, u_n*nx+v_n*ny=-0.00254793
 DEAL::quadrature point 3 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-2.44072, u_n*nx+v_n*ny=-2.44072
 DEAL::quadrature point 4 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-4.59969, u_n*nx+v_n*ny=-4.59969
 DEAL::quadrature point 5 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-5.98554, u_n*nx+v_n*ny=-5.98554
@@ -2825,7 +2825,7 @@ DEAL::quadrature point 5 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=26.8370, u_n*nx+v_n*
 DEAL::cell=2.54, face=2
 DEAL::quadrature point 0 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=3.54730, u_n*nx+v_n*ny=3.54730
 DEAL::quadrature point 1 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=2.15949, u_n*nx+v_n*ny=2.15949
-DEAL::quadrature point 2 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=0.00255155, u_n*nx+v_n*ny=0.00255155
+DEAL::quadrature point 2 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-0.00255155, u_n*nx+v_n*ny=-0.00255155
 DEAL::quadrature point 3 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-2.44418, u_n*nx+v_n*ny=-2.44418
 DEAL::quadrature point 4 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-4.60622, u_n*nx+v_n*ny=-4.60622
 DEAL::quadrature point 5 (u-u_n)*nx+(v-v_n)*ny=0, u*nx+v*ny=-5.99403, u_n*nx+v_n*ny=-5.99403

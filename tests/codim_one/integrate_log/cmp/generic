@@ -1,10 +1,10 @@
 
 DEAL::Calculation of the integral of ln(x-a)*f(x) on the interval [a,b] = [1.00000, 5.00000]
 DEAL::f(x) = x^0
-DEAL:: No. of points = 1  Error: 0.00000
+DEAL:: No. of points = 1  Error: 0
 DEAL:: No. of points = 2  Error: 0.00000
 DEAL:: No. of points = 3  Error: 0.00000
-DEAL:: No. of points = 4  Error: 0.00000
+DEAL:: No. of points = 4  Error: 0
 DEAL:: No. of points = 5  Error: 0.00000
 DEAL:: No. of points = 6  Error: 0.00000
 DEAL:: No. of points = 7  Error: 0.00000
@@ -124,7 +124,7 @@ DEAL:: No. of points = 8  Error: 0.00000
 DEAL:: No. of points = 9  Error: 0.00000
 DEAL:: No. of points = 10  Error: 0.00000
 DEAL:: No. of points = 11  Error: 0.00000
-DEAL:: No. of points = 12  Error: 0.00001
+DEAL:: No. of points = 12  Error: -0.00001
 DEAL::
 DEAL::f(x) = x^9
 DEAL:: No. of points = 1  Error: 117499.98572
@@ -138,7 +138,7 @@ DEAL:: No. of points = 8  Error: 0.00000
 DEAL:: No. of points = 9  Error: 0.00000
 DEAL:: No. of points = 10  Error: 0.00000
 DEAL:: No. of points = 11  Error: 0.00001
-DEAL:: No. of points = 12  Error: 0.00006
+DEAL:: No. of points = 12  Error: -0.00006
 DEAL::
 DEAL::f(x) = x^10
 DEAL:: No. of points = 1  Error: 498676.59525
@@ -152,7 +152,7 @@ DEAL:: No. of points = 8  Error: 0.00000
 DEAL:: No. of points = 9  Error: 0.00000
 DEAL:: No. of points = 10  Error: 0.00000
 DEAL:: No. of points = 11  Error: 0.00005
-DEAL:: No. of points = 12  Error: 0.00030
+DEAL:: No. of points = 12  Error: -0.00030
 DEAL::
 DEAL::f(x) = x^11
 DEAL:: No. of points = 1  Error: 2125433.33449
@@ -163,10 +163,10 @@ DEAL:: No. of points = 5  Error: 84.21203
 DEAL:: No. of points = 6  Error: 0.00000
 DEAL:: No. of points = 7  Error: 0.00000
 DEAL:: No. of points = 8  Error: 0.00000
-DEAL:: No. of points = 9  Error: 0.00001
-DEAL:: No. of points = 10  Error: 0.00002
+DEAL:: No. of points = 9  Error: -0.00001
+DEAL:: No. of points = 10  Error: -0.00002
 DEAL:: No. of points = 11  Error: 0.00022
-DEAL:: No. of points = 12  Error: 0.00154
+DEAL:: No. of points = 12  Error: -0.00154
 DEAL::
 DEAL::f(x) = x^12
 DEAL:: No. of points = 1  Error: 9122068.36282
@@ -175,10 +175,10 @@ DEAL:: No. of points = 3  Error: 1380871.31163
 DEAL:: No. of points = 4  Error: 87320.12961
 DEAL:: No. of points = 5  Error: 1427.93492
 DEAL:: No. of points = 6  Error: 2.74235
-DEAL:: No. of points = 7  Error: 0.00001
-DEAL:: No. of points = 8  Error: 0.00001
-DEAL:: No. of points = 9  Error: 0.00002
-DEAL:: No. of points = 10  Error: 0.00009
+DEAL:: No. of points = 7  Error: -0.00001
+DEAL:: No. of points = 8  Error: -0.00001
+DEAL:: No. of points = 9  Error: -0.00002
+DEAL:: No. of points = 10  Error: -0.00009
 DEAL:: No. of points = 11  Error: 0.00102
-DEAL:: No. of points = 12  Error: 0.00769
+DEAL:: No. of points = 12  Error: -0.00769
 DEAL::

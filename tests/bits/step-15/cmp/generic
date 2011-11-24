@@ -677,7 +677,7 @@ DEAL:cg::Starting value 1.8
 DEAL:cg::Convergence step 2 value 0.0078
 DEAL:cg::Starting value 1.9
 DEAL:cg::Convergence step 2 value 0.0024
-DEAL:cg::Starting value 1.00
+DEAL:cg::Starting value 1.0
 DEAL:cg::Convergence step 2 value 0.0029
 DEAL:cg::Starting value 1.0
 DEAL:cg::Convergence step 2 value 0.0015
@@ -1764,10 +1764,6 @@ DEAL::   Energy: 9.9e+06
 0.81 0.96 
 
 
-0.11 0.27 
-0.12 0.28 
-
-
 0.12 0.28 
 0.12 0.29 
 
@@ -2113,10 +2109,10 @@ DEAL::   Energy: 9.9e+06
 
 
 0.098 0.24 
-0.100 0.25 
+0.10 0.25 
 
 
-0.100 0.25 
+0.10 0.25 
 0.10 0.25 
 
 
@@ -2142,6 +2138,14 @@ DEAL::   Energy: 9.9e+06
 
 0.11 0.27 
 0.11 0.27 
+
+
+0.11 0.27 
+0.12 0.28 
+
+
+0.12 0.28 
+0.12 0.28 
 
 
 0.13 0.30 
@@ -3592,10 +3596,10 @@ DEAL::   Energy: 8.1e+02
 
 
 0.023 0.093 
-0.025 0.100 
+0.025 0.10 
 
 
-0.025 0.100 
+0.025 0.10 
 0.027 0.11 
 
 
@@ -3947,10 +3951,10 @@ DEAL::   Energy: 1.9e+04
 
 
 0.098 0.31 
-0.100 0.25 
+0.10 0.25 
 
 
-0.100 0.25 
+0.10 0.25 
 0.10 0.30 
 
 
