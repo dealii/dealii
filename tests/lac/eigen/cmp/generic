@@ -1,7 +1,7 @@
 
 DEAL:Power method::Starting value 1.246
 DEAL:Power method::Convergence step 44 value 9.310e-06
-DEAL::Eigenvalue 7.802 Error 0.002634
+DEAL::Eigenvalue 7.802 Error -0.002634
 DEAL:Power method::Starting value 0.02241
 DEAL:Power method::Convergence step 21 value 9.269e-06
 DEAL::Eigenvalue 0.2045 Error 0.008767
