@@ -2013,7 +2013,8 @@ ParameterHandler::scan_line (std::string        line,
       if (!entries->get_child_optional (get_current_full_path(subsection)))
 	{
 	  std::cerr << "Line " << lineno
-                    << ": There is no such subsection to be entered:" << get_current_full_path(subsection) <<std::endl;
+                    << ": There is no such subsection to be entered: "
+                    << demangle(get_current_full_path(subsection)) << std::endl;
 	  for (unsigned int i=0; i<subsection_path.size(); ++i)
 	    std::cerr << std::setw(i*2+4) << " "
 		      << "subsection " << subsection_path[i] << std::endl;
