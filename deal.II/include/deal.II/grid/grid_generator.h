@@ -563,12 +563,11 @@ class GridGenerator
 				      * <tt>inner_radius</tt> and
 				      * <tt>outer_radius</tt>.
 				      *
-				      * If the flag @p colorize is @p
-				      * true, then the outer boundary
-				      * will have the id 1, while the
-				      * inner boundary has id zero. If
-				      * the flag is @p false, both
-				      * have id zero.
+				      * If the flag @p colorize is @p true,
+				      * then the outer boundary will have the
+				      * indicator 1, while the inner boundary
+				      * has id zero. If the flag is @p false,
+				      * both have indicator zero.
 				      *
 				      * In 2D, the number
 				      * <tt>n_cells</tt> of elements
@@ -716,7 +715,7 @@ class GridGenerator
 				      * and 3, respectively. Otherwise
 				      * all indicators are set to 0.
 				      *
-					  * @note The triangulation needs to be
+				      * @note The triangulation needs to be
 				      * void upon calling this
 				      * function. Only implemented in 2d so far.
 				      */
