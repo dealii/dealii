@@ -150,7 +150,7 @@ double Timer::operator() () const
 
       const double running_time = dtime - start_time + dtime_children
 				  - start_time_children + cumulative_time;
-      
+
       if (Utilities::System::job_supports_mpi())
 				   // in case of MPI, need to get the time
 				   // passed by summing the time over all
@@ -369,8 +369,9 @@ TimerOutput::print_summary () const
 				   // precision and width of output
 				   // below. store the old values so we
 				   // can restore it later on
-  std::streamsize old_precision = out_stream.get_stream().precision ();
-  std::streamsize old_width     = out_stream.get_stream().width ();
+  const std::istream::fmtflags old_flags = out_stream.get_stream().flags();
+  const std::streamsize    old_precision = out_stream.get_stream().precision ();
+  const std::streamsize    old_width     = out_stream.get_stream().width ();
 
 				   // in case we want to write CPU times
   if (output_type != wall_times)
@@ -396,8 +397,7 @@ TimerOutput::print_summary () const
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
 		 << "| Total CPU time elapsed since start          |";
-      out_stream << std::setw(10);
-      out_stream << std::setprecision(3);
+      out_stream << std::setw(10) << std::setprecision(3) << std::right;
       out_stream << total_cpu_time << "s |            |\n";
       out_stream << "|                                             |            "
 		 << "|            |\n";
@@ -464,8 +464,7 @@ TimerOutput::print_summary () const
 		 << "+---------------------------------------------+------------"
 		 << "+------------+\n"
 		 << "| Total wallclock time elapsed since start    |";
-      out_stream << std::setw(10);
-      out_stream << std::setprecision(3);
+      out_stream << std::setw(10) << std::setprecision(3) << std::right;
       out_stream << total_wall_time << "s |            |\n";
       out_stream << "|                                             |            "
 		 << "|            |\n";
@@ -512,6 +511,7 @@ TimerOutput::print_summary () const
 				   // restore previous precision and width
   out_stream.get_stream().precision (old_precision);
   out_stream.get_stream().width (old_width);
+  out_stream.get_stream().flags (old_flags);
 }
 
 

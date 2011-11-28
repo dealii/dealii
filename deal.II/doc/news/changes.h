@@ -73,6 +73,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The TimerOutput class set the alignment of output to right-aligned
+under some circumstances, but didn't reset this to the previous value at the
+end of output. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/11/28)
+
 <li> New: The copy constructor of the SparseMatrixEZ function now works
 (rather than throwing an exception) if the copied matrix has size zero.
 This is in accordance to the other matrix classes.
