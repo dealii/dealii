@@ -73,6 +73,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: Output of ParameterHandler::print_parameters with argument
+ParameterHandler::LaTeX was not particularly readable. The output has
+therefore been rewritten to be more structured and readable.
+<br>
+(Wolfgang Bangerth, 2011/11/28)
+
 <li> Fixed: The TimerOutput class set the alignment of output to right-aligned
 under some circumstances, but didn't reset this to the previous value at the
 end of output. This is now fixed.

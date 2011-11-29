@@ -1193,7 +1193,7 @@ namespace
 						 // satisfies its constraints
 		const std::string new_value
 		  = p->second.get<std::string>("value");
-		
+
 		const unsigned int pattern_index
 		  = destination.get<unsigned int> (full_path +
 						   path_separator +
@@ -1214,7 +1214,7 @@ namespace
 						 // the destination argument
 		destination.put (full_path + path_separator + "value",
 				 new_value);
-		
+
 						 // this node might have
 						 // sub-nodes in addition to
 						 // "value", such as
@@ -1578,10 +1578,8 @@ ParameterHandler::print_parameters (std::ostream     &out,
 		<< "# ---------------------" << std::endl;
 	    break;
       case LaTeX:
-	    out << "\\subsubsection*{Listing of parameters}";
+	    out << "\\subsection{Global parameters}";
 	    out << std::endl << std::endl;
-	    out << "\\begin{itemize}"
-	        << std::endl;
 	    break;
       case Description:
 	    out << "Listing of Parameters:" << std::endl << std::endl;
@@ -1602,7 +1600,6 @@ ParameterHandler::print_parameters (std::ostream     &out,
       case ShortText:
 	    break;
       case LaTeX:
-	    out << "\\end{itemize}" << std::endl;
 	    break;
       default:
 	    Assert (false, ExcNotImplemented());
@@ -1736,6 +1733,9 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
       case LaTeX:
       {
+	out << "\\begin{itemize}"
+	    << std::endl;
+
 					 // print entries one by
 					 // one. make sure they are
 					 // sorted by using the
@@ -1748,23 +1748,28 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 	      const std::string value = p->second.get<std::string>("value");
 
 					       // print name and value
-	      out << "\\item {\\bf " << demangle(p->first) << ":} "
-		  << value
-		  << " (";
+	      out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\\\\"
+		  << std::endl
+		  << "{\\it Value:} " << value << "\\\\"
+		  << std::endl
+		  << "{\\it Default:} "
+		  << p->second.get<std::string>("default_value") << "\\\\"
+		  << std::endl;
 
 					       // if there is a
 					       // documenting string,
 					       // print it as well
 	      if (!p->second.get<std::string>("documentation").empty())
-		out <<p->second.get<std::string>("documentation")  << ", ";
+		out << "{\\it Description:} "
+		    << p->second.get<std::string>("documentation") << "\\\\"
+		    << std::endl;
 
-					       // finally print default
-					       // value
-	      out << "{\\it default:} "
-		  << p->second.get<std::string>("default_value")
-		  << ")"
+					       // also output possible values
+	      out << "{\\it Possible values:} "
+		  << p->second.get<std::string> ("pattern_description")
 		  << std::endl;
 	    }
+	out << "\\end{itemize}" << std::endl;
 
         break;
       }
@@ -1875,13 +1880,23 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                       << "subsection " << demangle(p->first) << std::endl;
                   break;
             case LaTeX:
-                  out << std::endl
-                      << "\\item {\\bf "
-                      << "Subsection " << demangle(p->first)
-                      << "}" << std::endl
-                      << "\\begin{itemize}"
-                      << std::endl;
-                  break;
+	    {
+	      out << std::endl
+		  << "\\subsection{Parameters in section \\tt ";
+
+					       // find the path to the
+					       // current section so that we
+					       // can print it in the
+					       // \subsection{...} heading
+	      for (unsigned int i=0; i<subsection_path.size(); ++i)
+		out << subsection_path[i] << "/";
+	      out << demangle(p->first);
+
+	      out << "}" << std::endl
+		  << std::endl;
+	      break;
+	    }
+
             default:
                   Assert (false, ExcNotImplemented());
           };
@@ -1918,8 +1933,6 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 		      << "end" << std::endl;
                   break;
             case LaTeX:
-                  out << "\\end{itemize}"
-                      << std::endl;
                   break;
             default:
                   Assert (false, ExcNotImplemented());
