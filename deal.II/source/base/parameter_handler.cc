@@ -1748,12 +1748,12 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 	      const std::string value = p->second.get<std::string>("value");
 
 					       // print name and value
-	      out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\\\\"
+	      out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n\n"
 		  << std::endl
-		  << "{\\it Value:} " << value << "\\\\"
+		  << "{\\it Value:} " << value << "\n\n"
 		  << std::endl
 		  << "{\\it Default:} "
-		  << p->second.get<std::string>("default_value") << "\\\\"
+		  << p->second.get<std::string>("default_value") << "\n\n"
 		  << std::endl;
 
 					       // if there is a
@@ -1761,7 +1761,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 					       // print it as well
 	      if (!p->second.get<std::string>("documentation").empty())
 		out << "{\\it Description:} "
-		    << p->second.get<std::string>("documentation") << "\\\\"
+		    << p->second.get<std::string>("documentation") << "\n\n"
 		    << std::endl;
 
 					       // also output possible values
