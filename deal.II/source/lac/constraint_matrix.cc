@@ -2279,8 +2279,10 @@ ConstraintMatrix::memory_consumption () const
 
 VECTOR_FUNCTIONS(Vector<float>);
 VECTOR_FUNCTIONS(Vector<double>);
-VECTOR_FUNCTIONS(BlockVector<double>);
+VECTOR_FUNCTIONS(Vector<long double>);
 VECTOR_FUNCTIONS(BlockVector<float>);
+VECTOR_FUNCTIONS(BlockVector<double>);
+VECTOR_FUNCTIONS(BlockVector<long double>);
 
 // TODO: Can PETSc really do all the operations required by the above
 // condense/distribute function etc also on distributed vectors? Trilinos
