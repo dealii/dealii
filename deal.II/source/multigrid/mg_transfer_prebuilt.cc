@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
 //
@@ -105,42 +104,6 @@ namespace
 	v[level].collect_sizes();
       }
   }
-}
-
-
-
-template <class VECTOR>
-template <int dim, class InVector, int spacedim>
-void
-MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim>& mg_dof_handler,
-  MGLevelObject<VECTOR>& dst,
-  const InVector& src) const
-{
-  reinit_vector(mg_dof_handler, component_to_block_map, dst);
-  bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels();level != 0;)
-    {
-      --level;
-      VECTOR& dst_level = dst[level];
-
-      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
-      for (IT i= copy_indices[level].begin();
-	   i != copy_indices[level].end();++i)
-	dst_level(i->second) = src(i->first);
-
-				       // For non-DG: degrees of
-				       // freedom in the refinement
-				       // face may need special
-				       // attention, since they belong
-				       // to the coarse level, but
-				       // have fine level basis
-				       // functions
-      if (!first)
-       restrict_and_add (level+1, dst[level], dst[level+1]);
-
-      first = false;
-    }
 }
 
 
