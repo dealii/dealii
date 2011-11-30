@@ -54,8 +54,33 @@ DEAL_II_NAMESPACE_OPEN
  * <li> <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
  * </ul>
  *
+ * <h3>LogStream and reproducible regression test output</h3>
+ *
+ * Generating reproducible floating point output for regression tests
+ * is mildly put a nightmare. In order to make life a little easier,
+ * LogStream implements a few features that try to achieve such a
+ * goal. These features are turned on by calling test_mode(), and it
+ * is not recommended to use them in any other environment. Right now,
+ * LogStream implements the following:
+ *
+ * <ol>
+ * <li> A double number very close to zero will end up being output in
+ * exponential format, although it has no significant digits. The
+ * parameter #double_threshold determines which numbers are too close
+ * to zero to be considered nonzero.
+ * <li> For float numbers holds the same, but with a typically larger
+ * #float_threshold.
+ * <li> Rounded numbers become unreliable with inexact
+ * arithmetics. Therefore, adding a small number before rounding makes
+ * results more reproducible, assuming that numbers like 0.5 are more
+ * likely than 0.49997.
+ * </ol>
+ * It should be pointed out that all of these measures distort the
+ * output and make it less accurate. Therefore, they are only
+ * recommended if the output needs to be reproducible.
+ * 
  * @ingroup textoutput
- * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003
+ * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003, 2011
  */
 class LogStream
 {
@@ -87,6 +112,26 @@ class LogStream
 				      */
     void detach ();
 
+				     /**
+				      * Setup the logstream for
+				      * regression test mode.
+				      *
+				      * This sets the parameters
+				      * #double_threshold,
+				      * #float_threshold, and #offset
+				      * to nonzero values. The exact
+				      * values being used have been
+				      * determined experimentally and
+				      * can be found in the source
+				      * code.
+				      *
+				      * Called with an argument
+				      * <tt>false</tt>, switches off
+				      * test mode and sets all
+				      * involved parameters to zero.
+				      */
+    void test_mode (bool on=true);
+    
 				     /**
 				      * Gives the default stream (<tt>std_out</tt>).
 				      */
@@ -259,14 +304,28 @@ class LogStream
 				     /**
 				      * Output double precision
 				      * numbers through this
-				      * stream. This function
-				      * eliminates floating point
-				      * numbers smaller than
-				      * #double_threshold, which can
-				      * be changed using
-				      * threshold_double().
+				      * stream.
+				      *
+				      * If they are set, this function
+				      * applies the methods for making
+				      * floating point output
+				      * reproducible as discussed in
+				      * the introduction.
 				      */
     LogStream & operator << (const double t);
+
+				     /**
+				      * Output single precision
+				      * numbers through this
+				      * stream.
+				      *
+				      * If they are set, this function
+				      * applies the methods for making
+				      * floating point output
+				      * reproducible as discussed in
+				      * the introduction.
+				      */
+    LogStream & operator << (const float t);
 
 				     /**
 				      * Treat ostream
@@ -383,9 +442,55 @@ class LogStream
 
 				     /**
 				      * Threshold for printing double
-				      * values.
+				      * values. Every number with
+				      * absolute value less than this
+				      * is printed as zero.
 				      */
     double double_threshold;
+
+				     /**
+				      * Threshold for printing float
+				      * values. Every number with
+				      * absolute value less than this
+				      * is printed as zero.
+				      */
+    float float_threshold;
+
+				     /**
+				      * An offset added to every float
+				      * or double number upon
+				      * output. This is done after the
+				      * number is compared to
+				      * #double_threshold or #float_threshold,
+				      * but before rounding.
+				      *
+				      * This functionality was
+				      * introduced to produce more
+				      * reproducable floating point
+				      * output for regression
+				      * tests. The rationale is, that
+				      * an exact output value is much
+				      * more likely to be 1/8 than
+				      * 0.124997. If we round to two
+				      * digits though, 1/8 becomes
+				      * unreliably either .12 or .13
+				      * due to machine accuracy. On
+				      * the other hand, if we add a
+				      * something above machine
+				      * accuracy first, we will always
+				      * get .13.
+				      *
+				      * It is safe to leave this
+				      * value equal to zero. For
+				      * regression tests, the function
+				      * test_mode() sets it to a
+				      * reasonable value.
+				      *
+				      * The offset is relative to the
+				      * magnitude of the number.
+				      */
+    double offset;
+    
 				     /**
 				      * Flag for printing thread id.
 				      */
@@ -493,14 +598,6 @@ inline
 LogStream &
 LogStream::operator<< (const double t)
 {
-				   // for doubles, we want to make
-				   // sure that if a number is smaller
-				   // than a given threshold, then we
-				   // simply print zero (the default
-				   // threshold is zero, but can be
-				   // changed for automated testsuite
-				   // runs)
-                                   //
                                    // we have to make sure that we
                                    // don't catch NaN's and +-Inf's
                                    // with the test, because for these
@@ -509,12 +606,38 @@ LogStream::operator<< (const double t)
                                    // both t<=0 and t>=0 are false at
                                    // the same time, which can't be
                                    // said for any other number
-  if ((std::fabs(t) > double_threshold)
-      ||
-      (! (t<=0) && !(t>=0)))
+  if (! (t<=0) && !(t>=0))
     print (t);
   else
-    print('0');
+    if (std::fabs(t) < double_threshold)
+      print ('0');
+    else
+      print(t*(1.+offset));
+  
+  return *this;
+}
+
+
+
+inline
+LogStream &
+LogStream::operator<< (const float t)
+{
+                                   // we have to make sure that we
+                                   // don't catch NaN's and +-Inf's
+                                   // with the test, because for these
+                                   // denormals all comparisons are
+                                   // always false. thus, for a NaN,
+                                   // both t<=0 and t>=0 are false at
+                                   // the same time, which can't be
+                                   // said for any other number
+  if (! (t<=0) && !(t>=0))
+    print (t);
+  else
+    if (std::fabs(t) < float_threshold)
+      print ('0');
+    else
+      print(t*(1.+offset));
   
   return *this;
 }

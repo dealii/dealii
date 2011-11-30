@@ -55,7 +55,8 @@ LogStream::LogStream()
 		std_out(&std::cerr), file(0),
 		std_depth(10000), file_depth(10000),
 		print_utime(false), diff_utime(false),
-		last_time (0.), double_threshold(0.), old_cerr(0)
+		last_time (0.), double_threshold(0.), float_threshold(0.),
+		offset(0), old_cerr(0)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
@@ -104,6 +105,24 @@ LogStream::~LogStream()
       delete dummy;
     }
 #endif
+}
+
+
+void
+LogStream::test_mode(bool on)
+{
+  if (on)
+    {
+      double_threshold = 1.e-10;
+      float_threshold = 1.e-7;
+      offset = 1.e-7;
+    }
+  else
+    {
+      double_threshold = 0.;
+      float_threshold = 0.;
+      offset = 0.;
+    }  
 }
 
 
