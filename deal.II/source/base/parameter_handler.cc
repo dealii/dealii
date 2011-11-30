@@ -1578,7 +1578,8 @@ ParameterHandler::print_parameters (std::ostream     &out,
 		<< "# ---------------------" << std::endl;
 	    break;
       case LaTeX:
-	    out << "\\subsection{Global parameters}";
+	    out << "\\subsection{Global parameters}" << std::endl;
+	    out << "\\label{parameters:global}" << std::endl;
 	    out << std::endl << std::endl;
 	    break;
       case Description:
@@ -1892,8 +1893,14 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 		out << subsection_path[i] << "/";
 	      out << demangle(p->first);
 
-	      out << "}" << std::endl
-		  << std::endl;
+	      out << "}" << std::endl;
+	      out << "\\label{parameters:";
+	      for (unsigned int i=0; i<subsection_path.size(); ++i)
+		out << mangle(subsection_path[i]) << "/";
+	      out << p->first << "}";
+	      out << std::endl;
+
+	      out << std::endl;
 	      break;
 	    }
 
