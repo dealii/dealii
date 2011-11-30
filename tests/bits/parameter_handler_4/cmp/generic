@@ -1,12 +1,49 @@
 
-\subsubsection*{Listing of parameters}
+\subsection{Global parameters}
+\label{parameters:global}
+
 
 \begin{itemize}
-
-\item {\bf Subsection Testing}
-\begin{itemize}
-\item {\bf double:} 3.1415926 (docs 3, {\it default:} 3.1415926)
-\item {\bf int:} 3 ({\it default:} 1)
-\item {\bf string list:} a, b, c (docs 1, {\it default:} a)
 \end{itemize}
+
+\subsection{Parameters in section \tt Testing}
+\label{parameters:Testing}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt double}
+
+
+{\it Value:} 3.1415926
+
+
+{\it Default:} 3.1415926
+
+
+{\it Description:} docs 3
+
+
+{\it Possible values:} [Double -1.79769e+308...1.79769e+308 (inclusive)]
+\item {\it Parameter name:} {\tt int}
+
+
+{\it Value:} 3
+
+
+{\it Default:} 1
+
+
+{\it Possible values:} [Integer range -2147483648...2147483647 (inclusive)]
+\item {\it Parameter name:} {\tt string list}
+
+
+{\it Value:} a, b, c
+
+
+{\it Default:} a
+
+
+{\it Description:} docs 1
+
+
+{\it Possible values:} [List list of <[Selection a|b|c|d|e|f|g|h ]> of length 0...4294967295 (inclusive)]
 \end{itemize}
