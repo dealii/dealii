@@ -1,0 +1,93 @@
+######################################################################
+# Definitions for vectors of common template instantiations
+######################################################################
+package dealiitemplates;
+
+use strict;
+use warnings;
+
+BEGIN {
+    use Exporter();
+    our @ISA = qw(Exporter);
+    our @EXPORT = qw(@dimensions @dofhandlers @dofhandler_templates
+                     @real_scalars @complex_scalars @all_scalars
+                     @deal_vector_templates @deal_vectors @deal_real_vectors @deal_complex_vectors
+                     @trilinos_vectors @petsc_vectors
+                     @sequential_vectors @parallel_vectors
+                     @sparsity_patterns);
+}
+our @EXPORT;
+our $t;
+
+# Dimensions
+our @dimensions = (1,2,3);
+
+# DoFHandlers
+our @dofhandler_templates = qw(DoFHandler hp::DoFHandler MGDoFHandler);
+our @dofhandlers = map { $t = $_ ; map { "$_<$t>" } @dofhandler_templates } @dimensions;
+
+# All possible number types
+our @real_scalars = ('float', 'double', 'long double');
+our @complex_scalars = map { "std::complex<$_>" } @real_scalars;
+our @all_scalars = (@real_scalars, @complex_scalars);
+
+# The vectors built into deal.II
+our @deal_vector_templates = qw(Vector BlockVector);
+our @deal_real_vectors = map { $t = $_ ; map { "$_<$t >" } @deal_vector_templates } @real_scalars;
+our @deal_complex_vectors = map { $t = $_ ; map { "$_<$t >" } @deal_vector_templates } @complex_scalars;
+our @deal_vectors = (@deal_real_vectors, @deal_complex_vectors);
+
+### Array of all sequential vectors, which includes deal.II vectors.
+our @sequential_vectors = @deal_real_vectors;
+
+### Array of all parallel vectors. None of those yet.
+our @parallel_vectors;
+
+######################################################################
+# Configured arrays start here.
+######################################################################
+# For each of those, first set up a temporary array with parameters
+# replaced by autoconf. Then, copy into the actual array, omitting all
+# empty strings.
+######################################################################
+our @tmp;
+
+@tmp = ('@DEAL_II_EXPAND_TRILINOS_VECTOR@',
+	'@DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@',
+	'');
+our @trilinos_vectors = grep {!/^$/} @tmp;
+push(@sequential_vectors, @trilinos_vectors);
+
+@tmp = ('@DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@',
+	'@DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@',
+	'');
+push (@trilinos_vectors, grep {!/^$/} @tmp);
+push (@parallel_vectors, grep {!/^$/} @tmp);
+
+######################################################################
+
+@tmp = ('@DEAL_II_EXPAND_PETSC_VECTOR@',
+	'@DEAL_II_EXPAND_PETSC_BLOCKVECTOR@',
+	'');
+our @petsc_vectors = grep {!/^$/} @tmp;
+push(@sequential_vectors, @petsc_vectors);
+
+@tmp = ('@DEAL_II_EXPAND_PETSC_MPI_VECTOR@',
+	'@DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@',
+	'');
+push (@petsc_vectors, grep {!/^$/} @tmp);
+push (@parallel_vectors, grep {!/^$/} @tmp);
+
+######################################################################
+
+@tmp = qw(SparsityPattern
+          CompressedSparsityPattern
+          CompressedSetSparsityPattern
+          CompressedSimpleSparsityPattern
+          @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@
+          BlockSparsityPattern
+          BlockCompressedSparsityPattern
+          BlockCompressedSetSparsityPattern
+          BlockCompressedSimpleSparsityPattern
+          @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@);
+our @sparsity_patterns = grep {!/^$/} @tmp;

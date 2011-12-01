@@ -13884,7 +13884,8 @@ process_files="common/Make.global_options
                common/scripts/make_dependencies.pl
 	       common/scripts/make_todo.pl
 	       Version
-               common/template-arguments"
+               common/template-arguments
+               common/dealiitemplates.pm"
 
 if test -d doc ; then
   process_files="${process_files}

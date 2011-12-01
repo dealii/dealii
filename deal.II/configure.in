@@ -873,7 +873,8 @@ process_files="common/Make.global_options
                common/scripts/make_dependencies.pl
 	       common/scripts/make_todo.pl
 	       Version
-               common/template-arguments"
+               common/template-arguments
+               common/dealiitemplates.pm"
 
 dnl Also replace stuff in the doc/ files, but we can't rely on
 dnl their presence because we package the .nodoc.tar.gz files
