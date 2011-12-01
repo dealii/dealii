@@ -25,7 +25,8 @@ cc-files      := $(shell for i in $(all-dirs) ; do echo $D/source/$$i/*.cc ; don
 h-files       := $(sort $(shell echo $D/include/deal.II/*/*.h))
 
 inst-in-files := $(shell echo */*.inst.in)
-inst-files    := $(inst-in-files:%.in=%)
+pl-files      := $(shell echo */*.pl)
+inst-files    := $(inst-in-files:%.in=%) $(pl-files:%.pl=%.inst)
 
 
 # build unique object file names
@@ -52,6 +53,10 @@ $(LIBDIR)/optimized/%.$(OBJEXT) :
 %.inst : %.inst.in $D/common/template-arguments
 	@echo "===================================== $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@ || exit 1
+
+%.inst : %.pl $D/common/dealiitemplates.pm
+	@echo "===================================== $(@F)"
+	@perl -I $D/common/ $< > $@ || exit 1
 
 
 

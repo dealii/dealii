@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
@@ -2276,76 +2275,20 @@ ConstraintMatrix::memory_consumption () const
 					     const FullMatrix<double>        &) const
 
 
-
-VECTOR_FUNCTIONS(Vector<float>);
-VECTOR_FUNCTIONS(Vector<double>);
-VECTOR_FUNCTIONS(Vector<long double>);
-VECTOR_FUNCTIONS(BlockVector<float>);
-VECTOR_FUNCTIONS(BlockVector<double>);
-VECTOR_FUNCTIONS(BlockVector<long double>);
-
 // TODO: Can PETSc really do all the operations required by the above
 // condense/distribute function etc also on distributed vectors? Trilinos
 // can't do that - we have to rewrite those functions by hand if we want to
 // use them. The key is to use local ranges etc., which still needs to be
 // implemented.
 #ifdef DEAL_II_USE_PETSC
-VECTOR_FUNCTIONS(PETScWrappers::Vector);
-VECTOR_FUNCTIONS(PETScWrappers::BlockVector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
 #endif
 
 #ifdef DEAL_II_USE_TRILINOS
-VECTOR_FUNCTIONS(TrilinosWrappers::Vector);
-VECTOR_FUNCTIONS(TrilinosWrappers::BlockVector);
 PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::Vector);
 PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
 #endif
-
-#define CONDENSE_FUNCTIONS(VectorType, number, MatrixType)		\
-  template void ConstraintMatrix::condense<number,VectorType >(MatrixType &uncondensed, \
-							       VectorType &vec) const \
-
-
-CONDENSE_FUNCTIONS(Vector<float>,float,SparseMatrix<float>);
-CONDENSE_FUNCTIONS(Vector<double>,float,SparseMatrix<float>);
-CONDENSE_FUNCTIONS(Vector<double>,double,SparseMatrix<double>);
-CONDENSE_FUNCTIONS(Vector<float>,double,SparseMatrix<double>);
-CONDENSE_FUNCTIONS(BlockVector<double>,float,BlockSparseMatrix<float>);
-CONDENSE_FUNCTIONS(BlockVector<float>,float,BlockSparseMatrix<float>);
-CONDENSE_FUNCTIONS(BlockVector<double>,double,BlockSparseMatrix<double>);
-CONDENSE_FUNCTIONS(BlockVector<float>,double,BlockSparseMatrix<double>);
-
-
-template
-void
-ConstraintMatrix::condense<float>(const SparseMatrix<float> &uncondensed,
-                                  SparseMatrix<float> &condensed) const;
-template
-void
-ConstraintMatrix::condense<float>(SparseMatrix<float> &uncondensed) const;
-
-template
-void
-ConstraintMatrix::condense<double>(const SparseMatrix<double> &uncondensed,
-                                   SparseMatrix<double> &condensed) const;
-
-template
-void
-ConstraintMatrix::condense<double>(SparseMatrix<double> &uncondensed) const;
-
-
-// block sparse matrices are only implemented for one of the two matrix
-// functions (the single-argument, in-place function)
-template
-void
-ConstraintMatrix::condense<double>(BlockSparseMatrix<double> &uncondensed) const;
-
-template
-void
-ConstraintMatrix::condense<float>(BlockSparseMatrix<float> &uncondensed) const;
-
 
 #define MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType) \
 template void ConstraintMatrix:: \
@@ -2487,5 +2430,7 @@ ONLY_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 #endif
+
+#include "constraint_matrix.inst"
 
 DEAL_II_NAMESPACE_CLOSE
