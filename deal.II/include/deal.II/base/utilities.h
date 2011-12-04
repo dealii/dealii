@@ -399,6 +399,21 @@ namespace Utilities
 	      const MPI_Comm &mpi_communicator,
 	      T (&sums)[N]);
 
+                                     /**
+                                      * Like the previous function,
+                                      * but take the sums over the
+                                      * elements of a std::vector. In other words,
+                                      * the i-th element of the
+                                      * results array is the sum over
+                                      * the i-th entries of the input
+                                      * arrays from each processor.
+                                      */
+    template <typename T>
+    inline
+    void sum (const std::vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              std::vector<T> &sums);
+    
     /**
      * Return the maximum over all processors of the value @p t. This function
      * is collective over all processors given in the communicator. If
@@ -1076,6 +1091,24 @@ namespace Utilities
       (void)mpi_communicator;
       for (unsigned int i=0; i<N; ++i)
 	sums[i] = values[i];
+#endif
+    }
+
+
+    template <typename T>
+    inline
+    void sum (const std::vector<T> &values,
+              const MPI_Comm       &mpi_communicator,
+              std::vector<T>       &sums)
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      sums.resize (values.size());
+      MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&values[0])),
+                     &sums[0], values.size(), internal::mpi_type_id((T*)0), MPI_SUM,
+                     mpi_communicator);
+#else
+      (void)mpi_communicator;
+      sums = values;
 #endif
     }
 
