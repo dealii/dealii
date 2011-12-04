@@ -53,32 +53,10 @@ initlog(const char* filename, bool console=false)
   deallog.attach(deallogfile);
   if (!console)
     deallog.depth_console(0);
+
+//TODO: Remove this line and replace by test_mode()				   
+  deallog.threshold_float(1.e-8);
 }
-
-
-// overload floating point output operators for LogStream so that small
-// numbers below a certain threshold are simply printed as zeros. this removes
-// a number of possible places where output may differ depending on platform,
-// compiler options, etc, simply because round-off is different.
-inline
-LogStream & operator << (LogStream &logstream,
-                         const float d)
-{
-  if (std::fabs (d) < 1e-8)
-    logstream.
-#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
-      template
-#endif
-      operator << <float> (0.);
-  else
-    logstream.
-#ifdef DEAL_II_TEMPL_OP_DISAMBIGUATION_BUG
-      template
-#endif
-      operator << <float> (d);
-  return logstream;
-}
-
 
 
 #ifndef DEAL_II_STACKTRACE_SWITCH
