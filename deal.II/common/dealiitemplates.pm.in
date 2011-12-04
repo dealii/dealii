@@ -16,7 +16,80 @@ BEGIN {
                      @sequential_vectors @parallel_vectors
                      @sparsity_patterns);
 }
+
 our @EXPORT;
+
+######################################################################
+# A function substituting multiple patterns in a string with all
+# combinations of values of the vectors provided and printing the result.
+#
+# Its arguments are
+#
+# 1. The text with patterns to be replaced
+# 2. A reference to an array with all the patterns
+# 3. For each pattern, a reference to an array with replacements
+#
+# The function will then loop through all vectors in lexicographical
+# order, first fastest, and replace globally all occurences of each
+# pattern. This is only done if the pattern is not part of a C++ token.
+#
+######################################################################
+# Usage example:
+######################################################################
+#
+# use strict;
+# use dealiitemplates;
+#
+# my $text = <<'EOT'
+#   template class Test<D,S1,V1>;
+#   template void Test<D,S1,V1>::Dimension();
+# EOT
+# ;
+# my @patterns = qw(D S1 V1);
+#
+# multisubst($text, \@patterns, \@dimensions, \@real_scalars, \@sequential_vectors)
+#
+######################################################################
+sub multisubst
+{
+    my $text = shift;
+    my $patterns = shift;
+    my @sizes = map { $#{$_} } @_;
+    my $n = 1;
+    grep { $n *= ($_+1); } @sizes;
+    my @index;
+    
+    ($#_ == $#{$patterns}) ||
+	die "multisubst function received $#{$patterns} replacement patterns, but $#_ vectors";
+    
+    for (my $i=0;$i<$n;++$i)
+    {
+	my $t = $text;
+	for (my $j=0;$j<=$#sizes;++$j)
+	{
+	    my $v = $patterns->[$j];
+	    my $r = $_[$j]->[$index[$j]];
+	    $t =~ s/(?<![\w_])$v(?![\w_])/$r /g;
+	}
+	print "$t\n";
+	for (my $j=0;$j<=$#sizes;++$j)
+	{
+	    if ($index[$j] < $sizes[$j])
+	    {
+		++$index[$j];
+		last;
+	    }
+	    else
+	    {
+		$index[$j] = 0;
+	    }
+	}
+    }
+}
+
+
+
+
 our $t;
 
 # Dimensions
