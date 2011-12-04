@@ -24,11 +24,6 @@ all-dirs      := numerics fe dofs lac base grid hp multigrid distributed
 cc-files      := $(shell for i in $(all-dirs) ; do echo $D/source/$$i/*.cc ; done)
 h-files       := $(sort $(shell echo $D/include/deal.II/*/*.h))
 
-inst-in-files := $(shell echo */*.inst.in)
-pl-files      := $(shell echo */*.pl)
-inst-files    := $(inst-in-files:%.in=%) $(pl-files:%.pl=%.inst)
-
-
 # build unique object file names
 tmp1     := $(shell echo $(cc-files) | $(PERL) -pi -e 's,$D/source/,,g; s,/,_,g;')
 o-files  := $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
@@ -51,11 +46,16 @@ $(LIBDIR)/optimized/%.$(OBJEXT) :
 
 
 %.inst : %.inst.in $D/common/template-arguments
-	@echo "===================================== $(@F)"
+	@echo "======================instantiate==== $(@F)"
 	@$D/common/scripts/expand_instantiations $D/common/template-arguments < $< > $@ || exit 1
 
+%.inst : %.inst.pl $D/common/dealiitemplates.pm
+	@echo "======================instantiate==== $(@F)"
+	@perl -I $D/common/ $< > $@ || exit 1
+
+#Todo: remove this target after renaming files
 %.inst : %.pl $D/common/dealiitemplates.pm
-	@echo "===================================== $(@F)"
+	@echo "======================instantiate==== $(@F)"
 	@perl -I $D/common/ $< > $@ || exit 1
 
 
@@ -196,7 +196,7 @@ $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files) $(extra-o-files)
 # A rule to make sure the various */Makefile.dep files have the right
 # dependencies on their source files. Use the opportunity to also ensure that
 # .inst and the lapack file are built before everything else
-Makefile.dep: $(inst-files) ../include/deal.II/lac/lapack_templates.h \
+Makefile.dep: ../include/deal.II/lac/lapack_templates.h \
 		$(cc-files)
 	@echo "===================================== Remaking $@"
 	@for i in $(all-dirs) ; do \
