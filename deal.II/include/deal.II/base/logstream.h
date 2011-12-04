@@ -293,6 +293,12 @@ class LogStream
 				      * this case.
 				      */
     void threshold_double(const double t);
+				     /**
+				      * The same as
+				      * threshold_double(), but for
+				      * float values.
+				      */
+    void threshold_float(const float t);
     
 				     /**
 				      * Output a constant something

@@ -111,6 +111,7 @@ LogStream::~LogStream()
 void
 LogStream::test_mode(bool on)
 {
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
   if (on)
     {
       double_threshold = 1.e-10;
@@ -276,6 +277,14 @@ LogStream::threshold_double (const double t)
 {
   Threads::ThreadMutex::ScopedLock lock(log_lock);
   double_threshold = t;
+}
+
+
+void
+LogStream::threshold_float (const float t)
+{
+  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  float_threshold = t;
 }
 
 
