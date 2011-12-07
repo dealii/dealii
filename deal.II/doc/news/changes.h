@@ -73,6 +73,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Fixed: Finite element Hessians get computed for codimension one,
+at least for FE_Poly derived classes.
+<br>
+(Guido Kanschat, 2011/12/07)
+
 <li> Changed: Output of ParameterHandler::print_parameters with argument
 ParameterHandler::LaTeX was not particularly readable. The output has
 therefore been rewritten to be more structured and readable.
