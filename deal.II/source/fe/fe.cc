@@ -937,7 +937,6 @@ FiniteElement<dim,spacedim>::compute_2nd (
   InternalDataBase                     &fe_internal,
   FEValuesData<dim,spacedim>                    &data) const
 {
-  AssertDimension(dim,spacedim);
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_hessians,
 	  ExcInternalError());
