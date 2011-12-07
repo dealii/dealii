@@ -927,38 +927,6 @@ FiniteElement<dim,spacedim>::memory_consumption () const
 }
 
 
-template<>
-void
-FiniteElement<1,2>::compute_2nd (
-  const Mapping<1,2>                   &,
-  const Triangulation<1,2>::cell_iterator &,
-  const unsigned int,
-  Mapping<1,2>::InternalDataBase &,
-  InternalDataBase                     &,
-  FEValuesData<1,2>                    &) const
-{
-
-	Assert(false, ExcNotImplemented());
-}
-
-
-
-template<>
-void
-FiniteElement<2,3>::compute_2nd (
-  const Mapping<2,3>                   &,
-  const Triangulation<2,3>::cell_iterator &,
-  const unsigned int,
-  Mapping<2,3>::InternalDataBase &,
-  InternalDataBase                     &,
-  FEValuesData<2,3>                    &) const
-{
-
-	Assert(false, ExcNotImplemented());
-}
-
-
-
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::compute_2nd (
@@ -969,6 +937,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
   InternalDataBase                     &fe_internal,
   FEValuesData<dim,spacedim>                    &data) const
 {
+  AssertDimension(dim,spacedim);
   Assert ((fe_internal.update_each | fe_internal.update_once)
 	  & update_hessians,
 	  ExcInternalError());
@@ -999,8 +968,8 @@ FiniteElement<dim,spacedim>::compute_2nd (
 				   // direction (first index) and at
 				   // all q-points (second index)
   std::vector<std::vector<Tensor<1,dim> > >
-    diff_quot (dim, std::vector<Tensor<1,dim> > (n_q_points));
-  std::vector<Tensor<1,dim> > diff_quot2 (n_q_points);
+    diff_quot (spacedim, std::vector<Tensor<1,dim> > (n_q_points));
+  std::vector<Tensor<1,spacedim> > diff_quot2 (n_q_points);
 
 				   // for all nonzero components of
 				   // all shape functions at all
@@ -1028,7 +997,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
                                                // so find out about
                                                // the actual component
                                                // if necessary
-              Tensor<1,dim> right, left;
+              Tensor<1,spacedim> right, left;
               if (is_primitive(shape_index))
                 {
                   right = fe_internal.differences[d1]->shape_grad(shape_index, q+offset);
@@ -1077,7 +1046,7 @@ FiniteElement<dim,spacedim>::compute_2nd (
                                                // derivative from a
                                                // symmetric difference
                                                // approximation
-              for (unsigned int d=0; d<dim; ++d)
+              for (unsigned int d=0; d<spacedim; ++d)
                 diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
             }
 
@@ -1086,16 +1055,12 @@ FiniteElement<dim,spacedim>::compute_2nd (
                                          // unit cell, so transform it
                                          // to something on the real
                                          // cell
-        for (unsigned int d=0; d<dim; ++d)
+        for (unsigned int d=0; d<spacedim; ++d)
           {
-            Assert (diff_quot2.size() <=
-                    diff_quot[d].size(),
-                    ExcInternalError());
-            mapping.transform (diff_quot[d], diff_quot2,
-			       mapping_internal, mapping_covariant);
+            mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_covariant);
 
             for (unsigned int q=0; q<n_q_points; ++q)
-              for (unsigned int d1=0; d1<dim; ++d1)
+              for (unsigned int d1=0; d1<spacedim; ++d1)
                 data.shape_hessians[total_index][q][d][d1]
                   = diff_quot2[q][d1];
           }
