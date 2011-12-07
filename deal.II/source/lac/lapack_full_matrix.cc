@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -218,11 +218,11 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   const int nn = this->n_cols();
   number* values = const_cast<number*> (this->data());
   ipiv.resize(mm);
-  int info;
+  int info = 0;
   getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
 
-  Assert(info >= 0, ExcInternalError());
-  Assert(info == 0, LACExceptions::ExcSingular());
+  AssertThrow(info >= 0, ExcInternalError());
+  AssertThrow(info == 0, LACExceptions::ExcSingular());
 
   state = lu;
 }
@@ -246,7 +246,7 @@ LAPACKFullMatrix<number>::compute_svd()
   svd_vt.reset (new LAPACKFullMatrix<number>(nn,nn));
   number* mu  = const_cast<number*> (svd_u->data());
   number* mvt = const_cast<number*> (svd_vt->data());
-  int info;
+  int info = 0;
 
 				   // see comment on this #if
 				   // below. Another reason to love Petsc
@@ -259,7 +259,7 @@ LAPACKFullMatrix<number>::compute_svd()
   gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
 	&wr[0], mu, &mm, mvt, &nn,
 	&work[0], &lwork, &ipiv[0], &info);
-  Assert (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
+  AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
 				   // Now resize work array and
   lwork = static_cast<int>(work[0] + .5);
 #else
@@ -271,7 +271,7 @@ LAPACKFullMatrix<number>::compute_svd()
   gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
 	&wr[0], mu, &mm, mvt, &nn,
 	&work[0], &lwork, &ipiv[0], &info);
-  Assert (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
+  AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
 
   work.resize(0);
   ipiv.resize(0);
@@ -313,21 +313,21 @@ LAPACKFullMatrix<number>::invert()
 
   number* values = const_cast<number*> (this->data());
   ipiv.resize(mm);
-  int info;
+  int info = 0;
 
   if (state == matrix)
     {
       getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
 
-      Assert(info >= 0, ExcInternalError());
-      Assert(info == 0, LACExceptions::ExcSingular());
+      AssertThrow(info >= 0, ExcInternalError());
+      AssertThrow(info == 0, LACExceptions::ExcSingular());
     }
 
   inv_work.resize (mm);
   getri(&mm, values, &mm, &ipiv[0], &inv_work[0], &mm, &info);
 
-  Assert(info >= 0, ExcInternalError());
-  Assert(info == 0, LACExceptions::ExcSingular());
+  AssertThrow(info >= 0, ExcInternalError());
+  AssertThrow(info == 0, LACExceptions::ExcSingular());
 
   state = inverse_matrix;
 }
@@ -345,12 +345,12 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number>& v,
   const char* trans = transposed ? &T : &N;
   const int nn = this->n_cols();
   const number* values = this->data();
-  int info;
+  int info = 0;
 
   getrs(trans, &nn, &one, values, &nn, &ipiv[0],
 	v.begin(), &nn, &info);
 
-  Assert(info == 0, ExcInternalError());
+  AssertThrow(info == 0, ExcInternalError());
 }
 
 
