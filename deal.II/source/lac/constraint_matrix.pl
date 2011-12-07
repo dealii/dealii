@@ -23,11 +23,6 @@ template void ConstraintMatrix::distribute<V1 >(V1 &) const;
 EOT
     ;
 
-my $scalar_vector_functions = <<'EOT'
-
-EOT
-    ;
-
 my $scalar_functions = <<'EOT'
 
 template void ConstraintMatrix::condense<S1>(const SparseMatrix<S1>&, SparseMatrix<S1> &) const;
@@ -50,25 +45,6 @@ EOT
 # End of definitions, now come the loops
 ######################################################################
 
-foreach my $v (@sequential_vectors)
-{
-    my $t = $vector_functions;
-    $t =~ s/V1/$v/g;
-    print $t;
-    
-}
-
-foreach my $r1 (@real_scalars)
-{
-    my $t = $scalar_functions;
-    $t =~ s/S1/$r1/g;
-    print $t;
-    
-    foreach my $r2 (@real_scalars)
-    {
-	my $t = $scalar_scalar_functions;
-	$t =~ s/S1/$r1/g;
-	$t =~ s/S2/$r2/g;
-	print $t
-    }
-}
+multisubst($vector_functions, ['V1'], \@sequential_vectors);
+multisubst($scalar_functions, ['S1'], \@real_scalars);
+multisubst($scalar_scalar_functions, ['S1','S2'], \@real_scalars, \@real_scalars);
