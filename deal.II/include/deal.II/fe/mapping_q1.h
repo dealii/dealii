@@ -521,6 +521,18 @@ class MappingQ1 : public Mapping<dim,spacedim>
     virtual
     bool preserves_vertex_locations () const;
 
+				     /**
+				      * The Newton iteration computing
+				      * the mapping between a
+				      * real space point and a point
+				      * in reference space did not
+				      * converge, thus resulting in a
+				      * wrong mapping.
+				      *
+				      * @ingroup Exceptions
+				      */
+    DeclException0(ExcTransformationFailed);
+    
   private:
 				     /**
 				      * Implementation of the interface in

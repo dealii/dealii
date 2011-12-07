@@ -1519,8 +1519,10 @@ transform_real_to_unit_cell_internal
   Point<spacedim> f = p_real-p;
 
   const double eps=1e-15*cell->diameter();
+  const unsigned int loop_limit = 10;
+  
   unsigned int loop=0;
-  while (f.square()>eps*eps && loop++<10)
+  while (f.square()>eps*eps && loop++<loop_limit)
     {
 				       // f'(x)
       Tensor<2,spacedim> df;
@@ -1552,7 +1554,7 @@ transform_real_to_unit_cell_internal
 	      df = transpose(df);
 	    }
 	}
-
+      
 				       // Solve  [f'(x)]d=f(x)
       Tensor<1,spacedim> d;
       Tensor<2,spacedim> df_1;
@@ -1587,6 +1589,15 @@ transform_real_to_unit_cell_internal
       if(dim<spacedim)
 	f -= (transpose(df)[dim]*f)*f;
     }
+				   // Here we check that in the last
+				   // execution of while the first
+				   // condition was already wrong,
+				   // menaing the residual was below
+				   // eps. Only if the first condition
+				   // failed, loop will have been
+				   // increased and tested, and thus
+				   // havereached the limit.
+  AssertThrow(loop<loop_limit, ExcTransformationFailed());
 }
 
 
