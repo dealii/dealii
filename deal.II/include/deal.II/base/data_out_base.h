@@ -1845,7 +1845,10 @@ class DataOutBase
 				      * <li> <tt>povray</tt>: <tt>.pov</tt>
 				      * <li> <tt>eps</tt>: <tt>.eps</tt>
 				      * <li> <tt>gmv</tt>: <tt>.gmv</tt>
+				      * <li> <tt>tecplot</tt>: <tt>.dat</tt>
+				      * <li> <tt>tecplot_binary</tt>: <tt>.plt</tt>
 				      * <li> <tt>vtk</tt>: <tt>.vtk</tt>
+				      * <li> <tt>vtu</tt>: <tt>.vtu</tt>
 				      * <li> <tt>deal_II_intermediate</tt>: <tt>.d2</tt>.
 				      * </ul>
 				      */
