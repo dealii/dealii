@@ -1,16 +1,16 @@
 
 DEAL::Ndofs :257
 DEAL::V norm: 11.3358
-DEAL::Interpolation error: 0
+DEAL::Interpolation error: 0.00000
 DEAL::H1 Interpolation error: 0.00196741
-DEAL::H1 Interpolation error with fef: 0
+DEAL::H1 Interpolation error with fef: 0.00000
 DEAL::Ndofs :289
 DEAL::V norm: 8.50000
-DEAL::Interpolation error: 0
+DEAL::Interpolation error: 0.00000
 DEAL::H1 Interpolation error: 0.0314971
-DEAL::H1 Interpolation error with fef: 0
+DEAL::H1 Interpolation error with fef: 0.00000
 DEAL::Ndofs :125
 DEAL::V norm: 3.95285
-DEAL::Interpolation error: 0
+DEAL::Interpolation error: 0.00000
 DEAL::H1 Interpolation error: 0.112288
-DEAL::H1 Interpolation error with fef: 0
+DEAL::H1 Interpolation error with fef: 0.00000
