@@ -1518,7 +1518,7 @@ transform_real_to_unit_cell_internal
   Point<spacedim> p_real(transform_unit_to_real_cell_internal(mdata));
   Point<spacedim> f = p_real-p;
 
-  const double eps=1e-15*cell->diameter();
+  const double eps = 1.e-8*cell->diameter();
   const unsigned int loop_limit = 10;
   
   unsigned int loop=0;
