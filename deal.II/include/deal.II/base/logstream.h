@@ -13,6 +13,7 @@
 #define __deal2__logstream_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
 
@@ -48,10 +49,10 @@ DEAL_II_NAMESPACE_OPEN
  * <li> <tt>deallog.attach(std::ostream)</tt>: write logging information into a file.
  * <li> <tt>deallog.depth_console(n)</tt>: restrict output on screen to outer loops.
  * <li> Before entering a new phase of your program, e.g. a new loop,
- *       <tt>deallog.push("loopname")</tt>.
+ *       <tt>LogStream::Prefix p("loopname")</tt>.
  * <li> <tt>deallog << anything << std::endl;</tt> to write logging information
  *       (Usage of <tt>std::endl</tt> is mandatory!).
- * <li> <tt>deallog.pop()</tt> when leaving that stage entered with <tt>push</tt>.
+ * <li> Destructor of the prefix will pop the prefix text from the stack.
  * </ul>
  *
  * <h3>LogStream and reproducible regression test output</h3>
@@ -82,9 +83,53 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup textoutput
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003, 2011
  */
-class LogStream
+class LogStream : public Subscriptor
 {
   public:
+				     /**
+				      * A subclass allowing for the
+				      * safe generation and removal of
+				      * prefices.
+				      *
+				      * Somewhere at the beginning of
+				      * a block, create one of these
+				      * objects, and it will appear as
+				      * a prefix in LogStream output
+				      * like #deallog. At the end of
+				      * the block, the prefix will
+				      * automatically be removed, when
+				      * this object is destroyed.
+				      */
+    class Prefix
+    {
+      public:
+					 /**
+					  * Set a new prefix for
+					  * #deallog, which will be
+					  * removed when the variable
+					  * is destroyed .
+					  */
+	Prefix(const std::string& text);
+	
+					 /**
+					  * Set a new prefix for the
+					  * given stream, which will
+					  * be removed when the
+					  * variable is destroyed .
+					  */
+	Prefix(const std::string& text, LogStream& stream);
+
+					 /**
+					  * Remove the prefix
+					  * associated with this
+					  * variable.
+					  */
+	~Prefix ();
+	
+      private:
+	SmartPointer<LogStream,LogStream::Prefix> stream;
+    };
+    
 				     /**
 				      * Standard constructor, since we
 				      * intend to provide an object
@@ -163,6 +208,8 @@ class LogStream
     const std::string& get_prefix () const;
     
 				     /**
+				      * @deprecated Use Prefix instead
+				      *
 				      * Push another prefix on the
 				      * stack. Prefixes are
 				      * automatically separated by a
@@ -172,6 +219,8 @@ class LogStream
     void push (const std::string& text);
         
 				     /**
+				      * @deprecated Use Prefix instead
+				      *
 				      * Remove the last prefix.
 				      */
     void pop ();
@@ -649,6 +698,22 @@ LogStream::operator<< (const float t)
 }
 
 
+inline
+LogStream::Prefix::Prefix(const std::string& text, LogStream& s)
+		:
+		stream(&s)
+{
+  stream->push(text);
+}
+
+
+inline
+LogStream::Prefix::~Prefix()
+{
+  stream->pop();
+}
+
+
 
 /**
  * The standard log object of DEAL.
@@ -656,6 +721,17 @@ LogStream::operator<< (const float t)
  * @author Guido Kanschat, 1999
  */
 extern LogStream deallog;
+
+
+inline
+LogStream::Prefix::Prefix(const std::string& text)
+		:
+		stream(&deallog)
+{
+  stream->push(text);
+}
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 

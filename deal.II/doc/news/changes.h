@@ -74,6 +74,12 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> Improved: Objects of the type LogStream::Prefix can now be used
+as a safe implementation of the push and pop mechanism for log
+prefices.
+<br>
+(Guido Kanschat, 2011/12/09)
+
 <li> New: IndexSet::add_indices(IndexSet).
 <br>
 (Timo Heister, 2011/12/09)
