@@ -116,6 +116,13 @@ class IndexSet
 		      const ForwardIterator &end);
 
 				     /**
+				      * Add the given IndexSet @p other to the
+				      * current one, constructing the union of
+				      * *this and @p other.
+				      */
+    void add_indices(const IndexSet & other);
+    
+				     /**
 				      * Return whether the specified
 				      * index is an element of the
 				      * index set.
@@ -676,6 +683,25 @@ IndexSet::add_indices (const ForwardIterator &begin,
       add_range (begin_index, end_index);
       p = q;
     }
+}
+
+
+
+inline
+void
+IndexSet::add_indices(const IndexSet & other)
+{
+  if (this == &other)
+    return;
+  
+  for (std::vector<Range>::iterator range = other.ranges.begin();
+       range != other.ranges.end();
+       ++range)
+    {
+      add_range(range->begin, range->end);
+    }
+
+  compress();
 }
 
 
