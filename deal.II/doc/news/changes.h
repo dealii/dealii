@@ -74,6 +74,10 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> New: IndexSet::add_indices(IndexSet).
+<br>
+(Timo Heister, 2011/12/09)
+
 <li> Fixed: Finite element Hessians get computed for codimension one,
 at least for FE_Poly derived classes.
 <br>
