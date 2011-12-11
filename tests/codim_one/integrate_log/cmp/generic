@@ -1,10 +1,10 @@
 
 DEAL::Calculation of the integral of ln(x-a)*f(x) on the interval [a,b] = [1.00000, 5.00000]
 DEAL::f(x) = x^0
-DEAL:: No. of points = 1  Error: 0
+DEAL:: No. of points = 1  Error: 0.00000
 DEAL:: No. of points = 2  Error: 0.00000
 DEAL:: No. of points = 3  Error: 0.00000
-DEAL:: No. of points = 4  Error: 0
+DEAL:: No. of points = 4  Error: 0.00000
 DEAL:: No. of points = 5  Error: 0.00000
 DEAL:: No. of points = 6  Error: 0.00000
 DEAL:: No. of points = 7  Error: 0.00000

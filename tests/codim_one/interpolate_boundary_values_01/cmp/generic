@@ -4,7 +4,7 @@ DEAL::25 degrees of freedom
 DEAL::16 boundary degrees of freedom
 DEAL::1 1.00000
 DEAL::2 1.00000
-DEAL::3 0
+DEAL::3 0.00000
 DEAL::5 0.250000
 DEAL::7 0.250000
 DEAL::9 5.00000

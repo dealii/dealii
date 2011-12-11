@@ -1,43 +1,43 @@
 
 DEAL::Test<1,2>, finite element q_1
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_1
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_2
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_2
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_3
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_3
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_4
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_4
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_5
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_5
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_6
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_6
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_7
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
 DEAL::Test<1,2>, finite element q_7
-DEAL::L2 Norm of difference: 0
-DEAL::Linfty Norm of difference: 0
+DEAL::L2 Norm of difference: 0.00000
+DEAL::Linfty Norm of difference: 0.00000
