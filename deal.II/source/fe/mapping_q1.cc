@@ -1518,8 +1518,8 @@ transform_real_to_unit_cell_internal
   Point<spacedim> p_real(transform_unit_to_real_cell_internal(mdata));
   Point<spacedim> f = p_real-p;
 
-  const double eps = 1.e-8*cell->diameter();
-  const unsigned int loop_limit = 10;
+  const double eps = 1.e-12*cell->diameter();
+  const unsigned int loop_limit = 50;
   
   unsigned int loop=0;
   while (f.square()>eps*eps && loop++<loop_limit)
@@ -1592,7 +1592,7 @@ transform_real_to_unit_cell_internal
 				   // Here we check that in the last
 				   // execution of while the first
 				   // condition was already wrong,
-				   // menaing the residual was below
+				   // meaning the residual was below
 				   // eps. Only if the first condition
 				   // failed, loop will have been
 				   // increased and tested, and thus
