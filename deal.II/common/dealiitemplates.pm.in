@@ -9,7 +9,8 @@ use warnings;
 BEGIN {
     use Exporter();
     our @ISA = qw(Exporter);
-    our @EXPORT = qw(@dimensions @dofhandlers @dofhandler_templates
+    our @EXPORT = qw(&multisubst
+                     @dimensions @codim1_dimensions @dofhandlers @dofhandler_templates
                      @real_scalars @complex_scalars @all_scalars
                      @deal_vector_templates @deal_vectors @deal_real_vectors @deal_complex_vectors
                      @trilinos_vectors @petsc_vectors
@@ -54,13 +55,17 @@ sub multisubst
 {
     my $text = shift;
     my $patterns = shift;
+    
+    my $npat = $#{$patterns}+1;
+    my $nvec = $#_+1;
+    ($nvec == $npat) ||
+	die "multisubst function received $npat replacement patterns, but $nvec vectors\n",
+	"Did you by chance use '\@vec' instead of '\\\@vec?";
+    
     my @sizes = map { $#{$_} } @_;
     my $n = 1;
     grep { $n *= ($_+1); } @sizes;
-    my @index;
-    
-    ($#_ == $#{$patterns}) ||
-	die "multisubst function received $#{$patterns} replacement patterns, but $#_ vectors";
+    my @index = map { 0 } @sizes;
     
     for (my $i=0;$i<$n;++$i)
     {
@@ -93,7 +98,8 @@ sub multisubst
 our $t;
 
 # Dimensions
-our @dimensions = (1,2,3);
+our @dimensions       = (1,2,3);
+our @codim1_dimensions = (1,2);
 
 # DoFHandlers
 our @dofhandler_templates = qw(DoFHandler hp::DoFHandler MGDoFHandler);
