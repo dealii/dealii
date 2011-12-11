@@ -106,6 +106,10 @@ for (deal_II_dimension : DIMENSIONS)
 	void
 	extract_inner_interface_dofs (const MGDoFHandler<deal_II_dimension> &mg_dof_handler,
 				      std::vector<std::vector<bool> >  &interface_dofs);
+      template
+        void
+        extract_non_interface_dofs (const MGDoFHandler<deal_II_dimension> & mg_dof_handler,
+                                    std::vector<std::set<unsigned int> > &non_interface_dofs);
 
 #if deal_II_dimension < 3
       template void count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (

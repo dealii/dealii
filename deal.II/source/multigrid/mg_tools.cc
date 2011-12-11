@@ -1460,6 +1460,72 @@ namespace MGTools
   }
 
 
+template <int dim, int spacedim>
+void
+extract_non_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+			    std::vector<std::set<unsigned int> >  &non_interface_dofs)
+{
+  Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+	  ExcDimensionMismatch (non_interface_dofs.size(),
+				mg_dof_handler.get_tria().n_levels()));
+
+  const unsigned int nlevels = mg_dof_handler.get_tria().n_levels();
+  const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
+
+  const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
+  const unsigned int   dofs_per_face   = fe.dofs_per_face;
+
+  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<bool> cell_dofs(dofs_per_cell, false);
+  std::vector<bool> cell_dofs_interface(dofs_per_cell, false);
+
+  typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+					    endc = mg_dof_handler.end();
+
+
+  bool any_dof_set = false;
+  for (; cell!=endc; ++cell)
+    {
+      std::fill (cell_dofs.begin(), cell_dofs.end(), false);
+      std::fill (cell_dofs_interface.begin(), cell_dofs_interface.end(), false);
+
+      for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
+	{
+	  const typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_nr);
+	  if (!face->at_boundary())
+	    {
+					       //interior face
+	      const typename MGDoFHandler<dim>::cell_iterator
+		neighbor = cell->neighbor(face_nr);
+
+	      if ((neighbor->level() < cell->level()))
+		{
+		  for (unsigned int j=0; j<dofs_per_face; ++j)
+		    cell_dofs_interface[fe.face_to_cell_index(j,face_nr)] = true;
+		}
+              else
+              {
+                for (unsigned int j=0; j<dofs_per_face; ++j)
+		    cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+              }
+	    }
+          else
+          {
+					       //boundary face
+                for (unsigned int j=0; j<dofs_per_face; ++j)
+		    cell_dofs[fe.face_to_cell_index(j,face_nr)] = true;
+          }
+	}
+
+      const unsigned int level = cell->level();
+      cell->get_mg_dof_indices (local_dof_indices);
+
+      for(unsigned int i=0; i<dofs_per_cell; ++i)
+	  if (cell_dofs[i] && !cell_dofs_interface[i])
+	    non_interface_dofs[level].insert(local_dof_indices[i]);
+    }
+}
+
 
   template <int dim, int spacedim>
   void

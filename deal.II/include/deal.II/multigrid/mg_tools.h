@@ -297,6 +297,11 @@ namespace MGTools
   void
   extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 				std::vector<std::vector<bool> >  &interface_dofs);
+
+  template <int dim, int spacedim>
+  void
+  extract_non_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+				std::vector<std::set<unsigned int> >  &non_interface_dofs);
 }
 
 /* @} */
