@@ -76,6 +76,14 @@ class MGConstrainedDoFs : public Subscriptor
 
 				     /**
 				      * Determine whether a dof index
+				      * is at an edge that is not
+                                      * a refinement edge.
+				      */
+    bool non_refinement_edge_index (const unsigned int level,
+			     const unsigned int index) const;
+
+				     /**
+				      * Determine whether a dof index
 				      * is at the refinement edge.
 				      */
     bool at_refinement_edge (const unsigned int level,
@@ -97,6 +105,14 @@ class MGConstrainedDoFs : public Subscriptor
 				      */
     const std::vector<std::set<unsigned int> > &
       get_boundary_indices () const;
+
+				     /**
+				      * Return the indices of dofs for each
+				      * level that lie on the boundary of the
+				      * domain.
+				      */
+    const std::vector<std::set<unsigned int> > &
+      get_non_refinement_edge_indices () const;
 
 				     /**
 				      * Return the indices of dofs for each
@@ -139,6 +155,14 @@ class MGConstrainedDoFs : public Subscriptor
     std::vector<std::set<unsigned int> > boundary_indices;
 
 				     /**
+				      * The degrees of freedom on egdges
+                                      * that are not a
+				      * refinement edge between a
+				      * level and coarser cells.
+				      */
+    std::vector<std::set<unsigned int> > non_refinement_edge_indices;
+
+				     /**
 				      * The degrees of freedom on the
 				      * refinement edge between a
 				      * level and coarser cells.
@@ -166,6 +190,7 @@ MGConstrainedDoFs::initialize(const MGDoFHandler<dim,spacedim>& dof)
   const unsigned int nlevels = dof.get_tria().n_levels();
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
+  non_refinement_edge_indices.resize(nlevels);
   for(unsigned int l=0; l<nlevels; ++l)
     {
       refinement_edge_indices[l].resize(dof.n_dofs(l));
@@ -173,6 +198,8 @@ MGConstrainedDoFs::initialize(const MGDoFHandler<dim,spacedim>& dof)
     }
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
 					 refinement_edge_boundary_indices);
+
+  MGTools::extract_non_interface_dofs (dof, non_refinement_edge_indices);
 }
 
 
@@ -188,6 +215,7 @@ MGConstrainedDoFs::initialize(
   boundary_indices.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
+  non_refinement_edge_indices.resize(nlevels);
 
   for(unsigned int l=0; l<nlevels; ++l)
     {
@@ -199,6 +227,7 @@ MGConstrainedDoFs::initialize(
   MGTools::make_boundary_list (dof, function_map, boundary_indices, component_mask);
   MGTools::extract_inner_interface_dofs (dof, refinement_edge_indices,
 					 refinement_edge_boundary_indices);
+  MGTools::extract_non_interface_dofs (dof, non_refinement_edge_indices);
 }
 
 
@@ -214,6 +243,9 @@ MGConstrainedDoFs::clear()
 
   for(unsigned int l=0; l<refinement_edge_boundary_indices.size(); ++l)
     refinement_edge_boundary_indices[l].clear();
+
+  for(unsigned int l=0; l<non_refinement_edge_indices.size(); ++l)
+    non_refinement_edge_indices[l].clear();
 }
 
 
@@ -229,6 +261,18 @@ MGConstrainedDoFs::is_boundary_index (const unsigned int level,
     return false;
 }
 
+inline
+bool
+MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
+			     const unsigned int index) const
+{
+  AssertIndexRange(level, non_refinement_edge_indices.size());
+
+  if(non_refinement_edge_indices[level].find(index) != non_refinement_edge_indices[level].end())
+    return true;
+  else
+    return false;
+}
 
 inline
 bool
@@ -258,6 +302,13 @@ const std::vector<std::set<unsigned int> > &
 MGConstrainedDoFs::get_boundary_indices () const
 {
   return boundary_indices;
+}
+
+inline
+const std::vector<std::set<unsigned int> > &
+MGConstrainedDoFs::get_non_refinement_edge_indices () const
+{
+  return non_refinement_edge_indices;
 }
 
 inline
