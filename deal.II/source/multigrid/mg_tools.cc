@@ -1469,7 +1469,6 @@ extract_non_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 	  ExcDimensionMismatch (non_interface_dofs.size(),
 				mg_dof_handler.get_tria().n_levels()));
 
-  const unsigned int nlevels = mg_dof_handler.get_tria().n_levels();
   const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
   const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
@@ -1483,7 +1482,6 @@ extract_non_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
 					    endc = mg_dof_handler.end();
 
 
-  bool any_dof_set = false;
   for (; cell!=endc; ++cell)
     {
       std::fill (cell_dofs.begin(), cell_dofs.end(), false);
