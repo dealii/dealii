@@ -88,7 +88,7 @@ DataPostprocessor<dim>::get_data_component_interpretation () const
 				   // components are independent scalars
   return
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    (n_output_variables(),
+    (get_names().size(),
      DataComponentInterpretation::component_is_scalar);
 }
 

@@ -126,24 +126,16 @@ DataEntryBase::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data
 		names(data_postprocessor->get_names()),
 		data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
 		postprocessor(data_postprocessor, typeid(*this).name()),
-		n_output_variables(data_postprocessor->n_output_variables())
+		n_output_variables(names.size())
 {
-				   // if there is a post processor, then we
-				   // should have gotten the names from the
-				   // postprocessor. check that the number of
-				   // elements in the names vector is
-				   // correct. otherwise there is nothing for
-				   // us to check
-  Assert(data_postprocessor->n_output_variables()==names.size(),
-	 ExcDimensionMismatch(data_postprocessor->n_output_variables(),
-			      names.size()));
-  Assert (names.size() == data_component_interpretation.size(),
-	  ExcDimensionMismatch(data_component_interpretation.size(),
-			       names.size()));
-
+  Assert (data_postprocessor->get_names().size()
+          ==
+          data_postprocessor->get_data_component_interpretation().size(),
+          ExcDimensionMismatch (data_postprocessor->get_names().size(), 
+                                data_postprocessor->get_data_component_interpretation().size()));
+  
 				   // check that the names use only allowed
 				   // characters
-				   // check names for invalid characters
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
 				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

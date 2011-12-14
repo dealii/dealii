@@ -908,8 +908,6 @@ namespace Step47
 
       virtual std::vector<std::string> get_names () const;
 
-      virtual unsigned int n_output_variables() const;
-
       virtual
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
       get_data_component_interpretation () const;
@@ -925,14 +923,6 @@ namespace Step47
     std::vector<std::string> solution_names (1, "total_solution");
     solution_names.push_back ("error");
     return solution_names;
-  }
-
-
-  template <int dim>
-  unsigned int
-  Postprocessor<dim>::n_output_variables() const
-  {
-    return get_names().size();
   }
 
 
@@ -969,7 +959,6 @@ namespace Step47
     const unsigned int n_quadrature_points = uh.size();
     Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
     Assert (uh[0].size() == 2,                                  ExcInternalError());
-    Assert (computed_quantities[0].size()==n_output_variables(),ExcInternalError());
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {

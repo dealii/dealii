@@ -725,8 +725,6 @@ namespace Step33
 
 	  virtual UpdateFlags get_needed_update_flags () const;
 
-	  virtual unsigned int n_output_variables() const;
-
 	private:
 	  const bool do_schlieren_plot;
       };
@@ -883,19 +881,6 @@ namespace Step33
       return update_values | update_gradients;
     else
       return update_values;
-  }
-
-
-
-  template <int dim>
-  unsigned int
-  EulerEquations<dim>::Postprocessor::
-  n_output_variables () const
-  {
-    if (do_schlieren_plot == true)
-      return dim+2;
-    else
-      return dim+1;
   }
 
 

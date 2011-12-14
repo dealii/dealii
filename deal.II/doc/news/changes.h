@@ -73,6 +73,14 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: The DataPostprocessor class previously required users of this
+class to overload DataPostprocessor::get_names(), 
+DataPostprocessor::get_data_component_interpretation()
+and DataPostprocessor::n_output_variables(). The latter function is redundant
+since its output must equal the length of the arrays returned by the
+first two of these functions. It has therefore been removed.
+<br>
+(Wolfgang Bangerth, 2011/12/15)
 
 <li> Improved: Objects of the type LogStream::Prefix can now be used
 as a safe implementation of the push and pop mechanism for log

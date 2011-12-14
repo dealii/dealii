@@ -422,7 +422,6 @@ namespace Step29
 
       virtual std::vector<std::string> get_names () const;
       virtual UpdateFlags              get_needed_update_flags () const;
-      virtual unsigned int             n_output_variables () const;
   };
 
 				   // The <code>get_names</code>
@@ -468,20 +467,6 @@ namespace Step29
   ComputeIntensity<dim>::get_needed_update_flags () const
   {
     return update_values;
-  }
-
-				   // To allow the caller to find out
-				   // how many derived quantities are
-				   // returned by the postprocessor, the
-				   // <code>n_output_variables</code>
-				   // function is used. Since we compute
-				   // only $|u|$, the correct value to
-				   // return in our case is just 1:
-  template <int dim>
-  unsigned int
-  ComputeIntensity<dim>::n_output_variables () const
-  {
-    return 1;
   }
 
 

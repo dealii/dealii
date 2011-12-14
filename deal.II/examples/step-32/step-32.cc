@@ -3804,8 +3804,6 @@ namespace Step32
 
       virtual std::vector<std::string> get_names () const;
 
-      virtual unsigned int n_output_variables() const;
-
       virtual
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
       get_data_component_interpretation () const;
@@ -3850,14 +3848,6 @@ namespace Step32
     solution_names.push_back ("partition");
 
     return solution_names;
-  }
-
-
-  template <int dim>
-  unsigned int
-  BoussinesqFlowProblem<dim>::Postprocessor::n_output_variables() const
-  {
-    return get_names().size();
   }
 
 
@@ -3921,7 +3911,6 @@ namespace Step32
     Assert (duh.size() == n_quadrature_points,                  ExcInternalError());
     Assert (computed_quantities.size() == n_quadrature_points,  ExcInternalError());
     Assert (uh[0].size() == dim+2,                              ExcInternalError());
-    Assert (computed_quantities[0].size()==n_output_variables(),ExcInternalError());
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {

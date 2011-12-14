@@ -181,7 +181,7 @@ class DataPostprocessor: public Subscriptor
 				      * Return the vector of strings describing
 				      * the names of the computed quantities.
 				      */
-    virtual std::vector<std::string> get_names () const=0;
+    virtual std::vector<std::string> get_names () const = 0;
 
 				     /**
 				      * This functions returns
@@ -236,21 +236,7 @@ class DataPostprocessor: public Subscriptor
 				      * also ask for a update of normals via the
 				      * @p update_normal_vectors flag.
 				      */
-    virtual UpdateFlags get_needed_update_flags () const=0;
-
-				     /**
-				      * Number of postprocessed
-				      * variables. Has to match the
-				      * number of entries filled by
-				      * compute_derived_quantities_scalar()
-				      * or
-				      * compute_derived_quantities_vector()
-				      * as well as the size of the
-				      * vector of names returned by
-				      * get_names().
-				      */
-    virtual unsigned int n_output_variables() const=0;
-
+    virtual UpdateFlags get_needed_update_flags () const = 0;
 };
 
 DEAL_II_NAMESPACE_CLOSE
