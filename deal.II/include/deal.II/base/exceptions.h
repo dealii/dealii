@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <exception>
+#include <string>
 
 // we only need output streams, but older compilers did not provide
 // them in a separate include file
@@ -902,8 +903,10 @@ namespace StandardExceptions
 				   /**
 				    * This exception works around a
 				    * design flaw in the
-				    * <tt>DeclException0</tt> macro: that
-				    * does not allow one to specify a
+				    * <tt>DeclException0</tt> macro:
+				    * exceptions desclared through
+				    * DeclException0 
+				    * do not allow one to specify a
 				    * message that is displayed when
 				    * the exception is raised, as
 				    * opposed to the other exceptions
@@ -912,11 +915,17 @@ namespace StandardExceptions
 				    *
 				    * When throwing this exception,
 				    * you can give a message as a
-				    * <tt>char*</tt> as argument to the
+				    * <tt>std::string</tt> as argument to the
 				    * exception that is then
-				    * displayed.
+				    * displayed. The argument can, of
+				    * course, be constructed at run-time,
+				    * for example including the name of a
+				    * file that can't be opened, or any
+				    * other text you may want to assemble
+				    * from different pieces.
 				    */
-  DeclException1 (ExcMessage, char*,
+  DeclException1 (ExcMessage,
+		  std::string,
 		  << arg1);
 
 				   /**

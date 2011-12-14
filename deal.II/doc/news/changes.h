@@ -73,6 +73,25 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed: The ExcMessage exception class took an argument of
+type <code>char*</code> that was displayed when the exception
+was raised. However, character pointers are awkward to work with
+because (i) they can not easily be composed to contain things like
+file names that are only known at run-time, and (ii) the string
+pointed to by the pointer had to live longer than the local expression
+in which the exception is generated when using the AssertThrow macro
+(because, when we create an exception, the exception object is passed
+up the call stack until we find a catch-clause; at that time, however,
+the scope in which the exception object was created has long been left).
+This restriction made it impossible to construct the message using std::string
+and then just do something like <code>(std::string("file: ")+filename).c_str()</code>.
+<br>
+To remedy this flaw, the type of the argument to ExcMessage has been
+changed to std::string since objects of this type are readily copyable
+and therefore live long enough.
+<br>
+(Wolfgang Bangerth, 2011/12/14)
+
 <li> New: Setting up a class derived from DataPostprocessor required some
 pretty mechanical steps in which one has to overload four member functions.
 For common cases where a postprocessor only computes a single scalar or
