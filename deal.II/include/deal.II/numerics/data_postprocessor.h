@@ -39,33 +39,58 @@ DEAL_II_NAMESPACE_OPEN
  * be overloaded to compute new quantities.
  *
  * A data vector and an object of a derived class can be given to the
- * <tt>DataOut::add_data_vector</tt> function, which will write the derived
+ * DataOut::add_data_vector() function, which will write the derived
  * quantities instead of the provided data to the output file. Note, that the
- * DataPostprocessor has to live until @p build_patches has been
+ * DataPostprocessor has to live until DataOut::build_patches has been
  * called. DataOutFaces and DataOutRotation can be used as well.
  *
  * In order not to perform needless calculations, DataPostprocessor
- * has to provide the information, which input data is needed for the
+ * has to provide information which input data is needed for the
  * calculation of the derived quantities, i.e. whether it needs the
  * values, the first derivative and/or the second derivative of the
  * provided data. DataPostprocessor objects which are used in
  * combination with a DataOutFaces object can also ask for the normal
- * vectors at each point. The information, which data is needed has to
- * be provided via the UpdateFlags returned by the virtual function @p
- * get_needed_update_flags. It is your responsibility to use only
+ * vectors at each point. The information which data is needed has to
+ * be provided via the UpdateFlags returned by the virtual function
+ * get_needed_update_flags(). It is your responsibility to use only
  * those values which were updated in the calculation of derived
  * quantities. The DataOut object will provide references to the
  * requested data in the call to compute_derived_quantities_scalar()
  * or compute_derived_quantities_vector() (DataOut decides which of
  * the two functions to call depending on whether the finite element
- * in use has only a single, or multiple vector components).
+ * in use has only a single, or multiple vector components; note that
+ * this is only determined by the number of components in the finite
+ * element in use, and not by whether the data computed by a class
+ * derived from the current one is scalar or vector valued).
  *
- * Furthermore, derived classes have to implement the @p get_names and @p
- * n_output_variables functions, where the number of output variables returned
+ * Furthermore, derived classes have to implement the get_names()
+ * function, where the number of output variables returned
  * by the latter function has to match the size of the vector returned by the
  * former. Furthermore, this number has to match the number of computed
  * quantities, of course.
  *
+ * 
+ * <h3>Use in simpler cases</h3>
+ * 
+ * Deriving from the current class allows to implement very general postprocessors.
+ * For example, in the step-32 program, we implement a postprocessor that
+ * takes a solution that consists of velocity, pressure and temperature (dim+2
+ * components) and computes a variety of output quantities, some of which
+ * are vector valued and some of which are scalar. On the other hand,
+ * in step-28 we implement a postprocessor that only computes the magnitude
+ * of a complex number given by a two-component finite element. It seems silly
+ * to have to implement four virtual functions for this 
+ * (compute_derived_quantities_scalar() or compute_derived_quantities_vector(),
+ * get_names(), get_update_flags() and get_data_component_interpretation()).
+ * 
+ * To this end there are two classes DataPostprocessorScalar and 
+ * DataPostprocessorVector that are meant to be used if the output quantity
+ * is either a single scalar or a single vector (here used meaning to have
+ * exactly dim components). When using these classes, one only has to write a
+ * constructor that passes the name of the output variable and the update
+ * flags to the constructor of the base class and overload the function
+ * that actually computes the results.
+ * 
  * @ingroup output
  * @author Tobias Leicht, 2007
  */
@@ -75,7 +100,7 @@ class DataPostprocessor: public Subscriptor
   public:
 				     /**
 				      * Virtual desctructor for safety. Does not
-				      * do anything so far.
+				      * do anything.
 				      */
     virtual ~DataPostprocessor ();
 
@@ -238,6 +263,186 @@ class DataPostprocessor: public Subscriptor
 				      */
     virtual UpdateFlags get_needed_update_flags () const = 0;
 };
+
+
+
+/**
+ * This class provides a simpler interface to the functionality offered by
+ * the DataPostprocessor class in case one wants to compute only a
+ * single scalar quantity from the finite element field passed to the
+ * DataOut class. For this particular case, it is clear what the returned
+ * value of DataPostprocessor::get_data_component_interpretation() should
+ * be and we pass the values returned by get_names() and get_needed_update_flags()
+ * to the constructor so that derived classes do not have to implement these
+ * functions by hand.
+ * 
+ * All derived classes have to do is implement a constructor and overload
+ * either DataPostprocessor::compute_derived_quantities_scalar() or 
+ * DataPostprocessor::compute_derived_quantities_vector().
+ * 
+ * An example of how this class can be used can be found in step-29.
+ * 
+ * @ingroup output
+ * @author Wolfgang Bangerth, 2011
+ */
+template <int dim>
+class DataPostprocessorScalar : public DataPostprocessor<dim>
+{
+public:
+  /**
+   * Constructor. Take the name of the single scalar variable
+   * computed by classes derived from the current one, as well
+   * as the update flags necessary to compute this quantity.
+   *
+   * @param name The name by which the scalar variable
+   *   computed by this class should be made available in
+   *   graphical output files.
+   * @param update_flags This has
+   * to be a combination of @p update_values,
+   * @p update_gradients and @p
+   * update_hessians. If the
+   * DataPostprocessor is to be used in
+   * combination with DataOutFaces, you may
+   * also ask for a update of normals via the
+   * @p update_normal_vectors flag.
+   **/
+  DataPostprocessorScalar (const std::string &name,
+			   const UpdateFlags  update_flags);
+  
+				     /**
+				      * Return the vector of strings describing
+				      * the names of the computed quantities.
+				      * Given the purpose of this class, this
+				      * is a vector with a single entry equal
+				      * to the name given to the constructor.
+				      */
+    virtual std::vector<std::string> get_names () const;
+
+				     /**
+				      * This functions returns
+				      * information about how the
+				      * individual components of
+				      * output files that consist of
+				      * more than one data set are to
+				      * be interpreted. Since the current
+				      * class is meant to be used for a
+				      * single scalar result variable,
+				      * the returned value is obviously
+				      * DataComponentInterpretation::component_is_scalar.
+				      */
+    virtual
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    get_data_component_interpretation () const;
+
+				     /**
+				      * Return, which data has to be provided to
+				      * compute the derived quantities.
+				      * The flags returned here are the ones
+				      * passed to the constructor of this
+				      * class.
+				      */
+    virtual UpdateFlags get_needed_update_flags () const;
+
+private:
+  /**
+   * Copies of the two arguments given to the constructor of this
+   * class.
+   */
+  const std::string name;
+  const UpdateFlags update_flags;
+};
+
+
+
+/**
+ * This class provides a simpler interface to the functionality offered by
+ * the DataPostprocessor class in case one wants to compute only a
+ * single vector quantity (defined as having exactly dim components)
+ * from the finite element field passed to the
+ * DataOut class. For this particular case, it is clear what the returned
+ * value of DataPostprocessor::get_data_component_interpretation() should
+ * be and we pass the values returned by get_names() and get_needed_update_flags()
+ * to the constructor so that derived classes do not have to implement these
+ * functions by hand.
+ * 
+ * All derived classes have to do is implement a constructor and overload
+ * either DataPostprocessor::compute_derived_quantities_scalar() or 
+ * DataPostprocessor::compute_derived_quantities_vector().
+ * 
+ * An example of how the closely related class DataPostprocessorScalar is
+ * used can be found in step-29.
+ * 
+ * @ingroup output
+ * @author Wolfgang Bangerth, 2011
+ */
+template <int dim>
+class DataPostprocessorVector : public DataPostprocessor<dim>
+{
+public:
+  /**
+   * Constructor. Take the name of the single vector variable
+   * computed by classes derived from the current one, as well
+   * as the update flags necessary to compute this quantity.
+   *
+   * @param name The name by which the vector variable
+   *   computed by this class should be made available in
+   *   graphical output files.
+   * @param update_flags This has
+   * to be a combination of @p update_values,
+   * @p update_gradients and @p
+   * update_hessians. If the
+   * DataPostprocessor is to be used in
+   * combination with DataOutFaces, you may
+   * also ask for a update of normals via the
+   * @p update_normal_vectors flag.
+   **/
+  DataPostprocessorVector (const std::string &name,
+			   const UpdateFlags  update_flags);
+  
+				     /**
+				      * Return the vector of strings describing
+				      * the names of the computed quantities.
+				      * Given the purpose of this class, this
+				      * is a vector with dim entries all equal
+				      * to the name given to the constructor.
+				      */
+    virtual std::vector<std::string> get_names () const;
+
+				     /**
+				      * This functions returns
+				      * information about how the
+				      * individual components of
+				      * output files that consist of
+				      * more than one data set are to
+				      * be interpreted. Since the current
+				      * class is meant to be used for a
+				      * single vector result variable,
+				      * the returned value is obviously
+				      * DataComponentInterpretation::component_is_part
+				      * repeated dim times.
+				      */
+    virtual
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    get_data_component_interpretation () const;
+
+				     /**
+				      * Return which data has to be provided to
+				      * compute the derived quantities.
+				      * The flags returned here are the ones
+				      * passed to the constructor of this
+				      * class.
+				      */
+    virtual UpdateFlags get_needed_update_flags () const;
+
+private:
+  /**
+   * Copies of the two arguments given to the constructor of this
+   * class.
+   */
+  const std::string name;
+  const UpdateFlags update_flags;
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 

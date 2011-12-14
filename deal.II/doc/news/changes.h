@@ -73,14 +73,23 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Setting up a class derived from DataPostprocessor required some
+pretty mechanical steps in which one has to overload four member functions.
+For common cases where a postprocessor only computes a single scalar or
+a single vector, this is tedious and unnecessary. For these cases, the
+new classes DataPostprocessorScalar and DataPostprocessorVector provide
+short cuts that make life simpler.
+<br>
+(Wolfgang Bangerth, 2011/12/14)
+
 <li> Changed: The DataPostprocessor class previously required users of this
-class to overload DataPostprocessor::get_names(), 
+class to overload DataPostprocessor::get_names(),
 DataPostprocessor::get_data_component_interpretation()
 and DataPostprocessor::n_output_variables(). The latter function is redundant
 since its output must equal the length of the arrays returned by the
 first two of these functions. It has therefore been removed.
 <br>
-(Wolfgang Bangerth, 2011/12/15)
+(Wolfgang Bangerth, 2011/12/14)
 
 <li> Improved: Objects of the type LogStream::Prefix can now be used
 as a safe implementation of the push and pop mechanism for log

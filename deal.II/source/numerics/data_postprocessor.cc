@@ -15,6 +15,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+
+// -------------------------- DataPostprocessor ---------------------------
+
 template <int dim>
 DataPostprocessor<dim>::~DataPostprocessor()
 {}
@@ -92,6 +95,92 @@ DataPostprocessor<dim>::get_data_component_interpretation () const
      DataComponentInterpretation::component_is_scalar);
 }
 
+
+// -------------------------- DataPostprocessorScalar ---------------------------
+
+template <int dim>
+DataPostprocessorScalar<dim>::
+DataPostprocessorScalar (const std::string &name,
+			 const UpdateFlags  update_flags)
+:
+name (name),
+update_flags (update_flags)
+{}
+
+ 
+ 
+template <int dim>
+std::vector<std::string> 
+DataPostprocessorScalar<dim>::
+get_names () const
+{
+  return std::vector<std::string> (1, name);
+}
+
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+DataPostprocessorScalar<dim>::
+get_data_component_interpretation () const
+{
+  return 
+  std::vector<DataComponentInterpretation::DataComponentInterpretation> 
+  (1, DataComponentInterpretation::component_is_scalar);
+}
+
+
+template <int dim>
+UpdateFlags 
+DataPostprocessorScalar<dim>::
+get_needed_update_flags () const
+{
+  return update_flags;
+}
+
+
+
+  // -------------------------- DataPostprocessorVector ---------------------------
+
+template <int dim>
+DataPostprocessorVector<dim>::
+DataPostprocessorVector (const std::string &name,
+			 const UpdateFlags  update_flags)
+:
+name (name),
+update_flags (update_flags)
+{}
+
+ 
+ 
+template <int dim>
+std::vector<std::string> 
+DataPostprocessorVector<dim>::
+get_names () const
+{
+  return std::vector<std::string> (dim, name);
+}
+
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+DataPostprocessorVector<dim>::
+get_data_component_interpretation () const
+{
+  return 
+  std::vector<DataComponentInterpretation::DataComponentInterpretation> 
+  (dim, DataComponentInterpretation::component_is_part_of_vector);
+}
+
+
+template <int dim>
+UpdateFlags 
+DataPostprocessorVector<dim>::
+get_needed_update_flags () const
+{
+  return update_flags;
+}
 
 
 // explicit instantiation

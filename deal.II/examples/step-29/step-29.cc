@@ -345,7 +345,7 @@ namespace Step29
 				   // @sect3{The <code>ComputeIntensity</code> class}
 
 				   // As mentioned in the introduction,
-				   // the quantitiy that we are really
+				   // the quantity that we are really
 				   // after is the spatial distribution
 				   // of the intensity of the ultrasound
 				   // wave, which corresponds to
@@ -373,7 +373,7 @@ namespace Step29
 				   // when this function is used for
 				   // output is that at each point where
 				   // output data is to be generated,
-				   // the compute_derived_quantities
+				   // the DataPostprocessor::compute_derived_quantities_scalar or DataPostprocessor::compute_derived_quantities_vector
 				   // function of the specified
 				   // DataPostprocessor object is
 				   // invoked to compute the output
@@ -393,23 +393,30 @@ namespace Step29
 				   // doesn't even involve any
 				   // derivatives of $v$ or $w$.
 
-				   // In practice, the DataPostprocessor
-				   // class only provides an interface
-				   // to this functionality, and we need
-				   // to derive our own class from it in
+				   // In practice, the
+				   // DataPostprocessor class only
+				   // provides an interface to this
+				   // functionality, and we need to
+				   // derive our own class from it in
 				   // order to implement the functions
-				   // specified by the interface.  This
-				   // is what the
+				   // specified by the interface. In
+				   // the most general case one has to
+				   // implement several member
+				   // functions but if the output
+				   // quantity is a single scalar then
+				   // some of this boilerplate code
+				   // can be handled by a more
+				   // specialized class,
+				   // DataPostprocessorScalar and we
+				   // can derive from that one
+				   // instead. This is what the
 				   // <code>ComputeIntensity</code>
-				   // class is about.  Notice that all
-				   // its member functions are
-				   // implementations of virtual
-				   // functions defined by the interface
-				   // class DataPostprocessor.
+				   // class does:
   template <int dim>
-  class ComputeIntensity : public DataPostprocessor<dim>
+  class ComputeIntensity : public DataPostprocessorScalar<dim>
   {
     public:
+      ComputeIntensity ();
 
       virtual
       void
@@ -419,29 +426,20 @@ namespace Step29
 					 const std::vector< Point< dim > > &normals,
 					 const std::vector<Point<dim> > &evaluation_points,
 					 std::vector< Vector< double > > &computed_quantities) const;
-
-      virtual std::vector<std::string> get_names () const;
-      virtual UpdateFlags              get_needed_update_flags () const;
   };
 
-				   // The <code>get_names</code>
-				   // function returns a vector of
-				   // strings representing the names we
-				   // assign to the individual
-				   // quantities that our postprocessor
-				   // outputs. In our case, the
-				   // postprocessor has only $|u|$ as an
-				   // output, so we return a vector with
-				   // a single component named
-				   // "Intensity":
-  template <int dim>
-  std::vector<std::string>
-  ComputeIntensity<dim>::get_names() const
-  {
-    return std::vector<std::string> (1, "Intensity");
-  }
-
-				   // The next function returns a set of
+				   // In the constructor, we need to
+				   // call the constructor of the base
+				   // class with two arguments. The
+				   // first denotes the name by which
+				   // the single scalar quantity
+				   // computed by this class should be
+				   // represented in output files. In
+				   // our case, the postprocessor has
+				   // $|u|$ as output, so we use
+				   // "Intensity".
+				   //
+				   // The second argument is a set of
 				   // flags that indicate which data is
 				   // needed by the postprocessor in
 				   // order to compute the output
@@ -463,11 +461,11 @@ namespace Step29
 				   // $|u|$, so we're good with the
 				   // update_values flag.
   template <int dim>
-  UpdateFlags
-  ComputeIntensity<dim>::get_needed_update_flags () const
-  {
-    return update_values;
-  }
+  ComputeIntensity<dim>::ComputeIntensity ()
+		  :
+		  DataPostprocessorScalar<dim> ("Intensity",
+						update_values)
+  {}
 
 
 				   // The actual prostprocessing happens
