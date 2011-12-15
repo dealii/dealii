@@ -19,6 +19,8 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -675,22 +677,23 @@ DerivativeApproximation::approximate (const Mapping<dim,spacedim>    &mapping,
   std::advance (endc, static_cast<int>(index_interval.second));
 
   for (; cell!=endc; ++cell, ++derivative_norm_on_this_cell)
-    {
-      typename DerivativeDescription::Derivative derivative;
-				       // call the function doing the actual
-				       // work on this cell
-      DerivativeApproximation::
-	template approximate_cell<DerivativeDescription,dim,DH,InputVector>
-	(mapping,
-	 dof_handler,
-	 solution,
-	 component,
-	 cell,
-	 derivative);
-				       // evaluate the norm and fill the vector
-      *derivative_norm_on_this_cell
-	= DerivativeDescription::derivative_norm (derivative);
-    }
+    if (cell->is_locally_owned())
+      {
+	typename DerivativeDescription::Derivative derivative;
+					 // call the function doing the actual
+					 // work on this cell
+	DerivativeApproximation::
+	  template approximate_cell<DerivativeDescription,dim,DH,InputVector>
+	  (mapping,
+	   dof_handler,
+	   solution,
+	   component,
+	   cell,
+	   derivative);
+					 // evaluate the norm and fill the vector
+	*derivative_norm_on_this_cell
+	  = DerivativeDescription::derivative_norm (derivative);
+      }
 }
 
 

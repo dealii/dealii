@@ -73,6 +73,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: DerivativeApproximation for distributed computations.
+<br>
+(Timo Heister, 2011/12/15)
+
 <li> Changed: The ExcMessage exception class took an argument of
 type <code>char*</code> that was displayed when the exception
 was raised. However, character pointers are awkward to work with
