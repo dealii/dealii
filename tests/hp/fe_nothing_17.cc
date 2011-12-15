@@ -37,28 +37,9 @@
 #include <vector>
 
 
-template<int dim>
-class MyFunction : public Function<dim>
-{
-  public:
-    MyFunction () : Function<dim>(2) {};
-
-    virtual double value (const Point<dim>   &p,
-			  const unsigned int) const
-      {	double f=sin(p[0]*4);
-	if (dim>1)
-	  f*=cos(p[1]*4);
-	if (dim>2)
-	  f*=exp(p[2]*4);
-	return f;
-      };
-};
-
-
 template <int dim>
 void transfer(std::ostream &out)
 {
-  MyFunction<dim> function;
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(5-dim);
