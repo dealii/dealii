@@ -33,7 +33,13 @@ FE_Nothing<dim>::FE_Nothing (const unsigned n_components)
 					FiniteElementData<dim>::unknown),
 		 std::vector<bool>(),
 		 std::vector<std::vector<bool> >() )
-{}
+{
+// in most other elements we have to set up all sorts of stuff
+// here. there isn't much that we have to do here; in particular,
+// we can simply leave the restriction and prolongation matrices
+// empty since their proper size is in fact zero given that the
+// element here has no degrees of freedom
+}
 
 
 template <int dim>

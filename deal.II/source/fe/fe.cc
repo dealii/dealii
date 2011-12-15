@@ -343,7 +343,7 @@ FiniteElement<dim,spacedim>::get_restriction_matrix (const unsigned int child,
 				   // RefinementCase<dim>::no_refinement (=0) there is no
 				   // data available and so the vector indices
 				   // are shifted
-  Assert (restriction[refinement_case-1][child].n() != 0, ExcProjectionVoid());
+  Assert (restriction[refinement_case-1][child].n() == this->dofs_per_cell, ExcProjectionVoid());
   return restriction[refinement_case-1][child];
 }
 
@@ -365,7 +365,7 @@ FiniteElement<dim,spacedim>::get_prolongation_matrix (const unsigned int child,
 				   // RefinementCase::no_refinement (=0) there is no
 				   // data available and so the vector indices
 				   // are shifted
-  Assert (prolongation[refinement_case-1][child].n() != 0, ExcEmbeddingVoid());
+  Assert (prolongation[refinement_case-1][child].n() == this->dofs_per_cell, ExcEmbeddingVoid());
   return prolongation[refinement_case-1][child];
 }
 

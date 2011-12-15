@@ -1890,9 +1890,9 @@ void FESystem<dim,spacedim>::initialize ()
 
       for (unsigned int i=0; i<this->n_base_elements(); ++i)
 	{
-	  if (base_element(i).restriction[ref_case-1][0].n() == 0)
+	  if (base_element(i).restriction[ref_case-1][0].n() != base_element(i).dofs_per_cell)
 	    do_restriction = false;
-	  if (base_element(i).prolongation[ref_case-1][0].n() == 0)
+	  if (base_element(i).prolongation[ref_case-1][0].n() != base_element(i).dofs_per_cell)
 	    do_prolongation = false;
 	}
 

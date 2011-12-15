@@ -73,7 +73,13 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Fixed: DerivativeApproximation for distributed computations.
+<li> Fixed: Restriction and prolongation didn't work for elements of
+kind FE_Nothing. Consequently, many other parts of the library also
+didn't work, such as the SolutionTransfer class. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2011/12/15)
+
+<li> Fixed: The DerivativeApproximation class now works for distributed computations.
 <br>
 (Timo Heister, 2011/12/15)
 
