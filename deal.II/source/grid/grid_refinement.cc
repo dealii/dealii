@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -504,7 +504,8 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
 template <int dim, class Vector, int spacedim>
 void
 GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
-					     const Vector       &criteria)
+					     const Vector       &criteria,
+					     const unsigned int  order=2)
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -518,7 +519,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 
   qsort_index(criteria,tmp,0,criteria.size()-1);
 
-  double s0 = 0.75 * criteria(tmp[0]);
+  double s0 = (1-std::pow(2,-order)) * criteria(tmp[0]);
   double E  = criteria.l1_norm();
 
   unsigned int N = criteria.size();
@@ -529,23 +530,24 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 				   // multiplied with the expected
 				   // number of cells.
 				   // We assume that the error is
-				   // decreased by 3/4 a_K if the cell
+				   // decreased by (1-2^(-order)) a_K if the cell
 				   // K with error indicator a_K is
-				   // refined.
+				   // refined and 'order' ist the expected
+                                   // order of convergence.
 				   // The expected number of cells is
-				   // N+3*M (N is the current number
+				   // N+(2^d-1)*M (N is the current number
 				   // of cells)
-  double min = (3.*(1.+M)+N) * (E-s0);
+  double min = ((std::pow(2.,dim)-1)*(1.+M)+N) * (E-s0);
 
   unsigned int minArg = N-1;
 
   for (M=1;M<criteria.size();++M)
     {
-      s0+= 0.75 * criteria(tmp[M]);
+      s0 += (1-std::pow(2.,-order)) * criteria(tmp[M]);
 
-      if ( (3.*(1+M)+N)*(E-s0) <= min)
+      if ( ((std::pow(2.,dim)-1)*(1+M)+N)*(E-s0) <= min)
 	{
-	  min = (3.*(1+M)+N)*(E-s0);
+	  min = ((std::pow(2.,dim)-1)*(1+M)+N)*(E-s0);
 	  minArg = M;
 	}
     }

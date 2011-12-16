@@ -73,6 +73,14 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: The GridRefinement::refine_and_coarsen_optimize function
+assumed that the expected convergence order was 2. It has now gotten an
+argument by which the user can prescribe a different value. A bug has also
+been fixed in which the function incorrectly assumed in its algorithm that
+the mesh was two-dimensional.
+<br>
+(Christian Goll, 2011/12/16)
+
 <li> Fixed: Restriction and prolongation didn't work for elements of
 kind FE_Nothing. Consequently, many other parts of the library also
 didn't work, such as the SolutionTransfer class. This is now fixed.
