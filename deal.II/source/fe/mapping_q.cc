@@ -1378,9 +1378,12 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 				   // on a Q1 mapping
   Point<dim> p_unit = MappingQ1<dim,spacedim>::transform_real_to_unit_cell(cell, p);
 
-                                   // then a Newton iteration based on
-                                   // the full MappingQ if we need
-                                   // this
+                                   // then a Newton iteration based on the
+                                   // full MappingQ if we need this. note that
+                                   // for interior cells with dim==spacedim,
+                                   // the mapping used is in fact a Q1
+                                   // mapping, so there is nothing we need to
+                                   // do
   if (cell->has_boundary_lines() ||
       use_mapping_q_on_all_cells ||
       (dim!=spacedim) )
@@ -1394,13 +1397,13 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
       mdata->use_mapping_q1_on_current_cell = false;
 
-      std::vector<Point<spacedim> > &points = mdata->mapping_support_points;
-      compute_mapping_support_points (cell, points);
+      compute_mapping_support_points (cell, mdata->mapping_support_points);
+
 				       // If this is a q1 mapping,
 				       // then only use the support
 				       // points on the vertices.
-      if(mdata->shape_values.size()<points.size())
-	points.resize(GeometryInfo<dim>::vertices_per_cell);
+      if (mdata->shape_values.size() < mdata->mapping_support_points.size())
+	mdata->mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
 
 
       this->transform_real_to_unit_cell_internal(cell, p, *mdata, p_unit);
