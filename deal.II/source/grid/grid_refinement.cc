@@ -528,7 +528,10 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 				   // The first M cells are refined
 				   // to minimize the expected error
 				   // multiplied with the expected
-				   // number of cells.
+				   // number of cells to the power of
+				   // 2 * expected order of the finite
+				   // element space divided by the dimension
+				   // of the discretized space.
 				   // We assume that the error is
 				   // decreased by (1-2^(-order)) a_K if the cell
 				   // K with error indicator a_K is
@@ -537,17 +540,17 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 				   // The expected number of cells is
 				   // N+(2^d-1)*M (N is the current number
 				   // of cells)
-  double min = ((std::pow(2.,dim)-1)*(1.+M)+N) * (E-s0);
+  double min =std::pow( ((std::pow(2.,dim)-1)*(1.+M)+N),(double) order/dim) * (E-s0);
 
   unsigned int minArg = N-1;
 
   for (M=1;M<criteria.size();++M)
     {
-      s0 += (1-std::pow(2.,-order)) * criteria(tmp[M]);
+      s0+= (1-std::pow(2.,-order)) * criteria(tmp[M]);
 
-      if ( ((std::pow(2.,dim)-1)*(1+M)+N)*(E-s0) <= min)
+      if ( std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0) <= min)
 	{
-	  min = ((std::pow(2.,dim)-1)*(1+M)+N)*(E-s0);
+	  min =  std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0);
 	  minArg = M;
 	}
     }
