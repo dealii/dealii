@@ -519,7 +519,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 
   qsort_index(criteria,tmp,0,criteria.size()-1);
 
-  double s0 = (1-std::pow(2,-order)) * criteria(tmp[0]);
+  double s0 = (1.-std::pow(2.,-1.*order)) * criteria(tmp[0]);
   double E  = criteria.l1_norm();
 
   unsigned int N = criteria.size();
