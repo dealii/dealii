@@ -73,6 +73,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: When <code>./configure</code> does not detect the presence
+of <code>zlib</code>, writing output in VTU format failed to produce
+a valid output file.
+<br>
+(Timo Heister, 2011/12/16)
+
 <li> Improved: The GridRefinement::refine_and_coarsen_optimize function
 assumed that the expected convergence order was 2. It has now gotten an
 argument by which the user can prescribe a different value. A bug has also
