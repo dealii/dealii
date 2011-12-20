@@ -575,7 +575,7 @@ void GridIn<dim, spacedim>::read_msh (std::istream &in)
       in >> version >> file_type >> data_size;
 
       Assert ( (version >= 2.0) &&
-	       (version <= 2.1), ExcNotImplemented());
+	       (version <= 2.2), ExcNotImplemented());
       Assert (file_type == 0, ExcNotImplemented());
       Assert (data_size == sizeof(double), ExcNotImplemented());
 

@@ -73,6 +73,11 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The GridIn class now also reads the GMSH format 2.2 as written by
+GMSH 2.5.
+<br>
+(Vijay Mahadevan, Wolfgang Bangerth, 2011/12/19)
+
 <li> Fixed: When <code>./configure</code> does not detect the presence
 of <code>zlib</code>, writing output in VTU format failed to produce
 a valid output file.
