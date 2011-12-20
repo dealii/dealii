@@ -546,7 +546,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 
   for (M=1;M<criteria.size();++M)
     {
-      s0+= (1-std::pow(2.,-order)) * criteria(tmp[M]);
+      s0 += (1-std::pow(2.,-1.*order)) * criteria(tmp[M]);
 
       if ( std::pow(((std::pow(2.,dim)-1)*(1+M)+N), (double) order/dim) * (E-s0) <= min)
 	{
