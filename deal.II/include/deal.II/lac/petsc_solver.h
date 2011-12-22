@@ -59,7 +59,7 @@ namespace PETScWrappers
  * href="http://www.mcs.anl.gov/petsc">documentation and manual
  * pages</a>.
  *
- * Note: Repeated calls to solve() on a solver object with a Preconditioner
+ * @note Repeated calls to solve() on a solver object with a Preconditioner
  * must be used with care. The preconditioner is initialized in the first call
  * to solve() and subsequent calls reuse the solver and preconditioner
  * object. This is done for performance reasons. The solver and preconditioner
