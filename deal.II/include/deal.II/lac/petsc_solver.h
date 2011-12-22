@@ -41,6 +41,24 @@ namespace PETScWrappers
  * classes simply set the right flags to select one solver or another, or to
  * set certain parameters for individual solvers.
  *
+ * Optionally, the user can create a solver derived from the
+ * SolverBase class and can set the default arguments necessary to
+ * solve the linear system of equations with SolverControl. These
+ * default options can be overridden by specifying command line
+ * arguments of the form @p -ksp_*. For example,
+ * @p -ksp_monitor_true_residual prints out true residual norm
+ * (unpreconditioned) at each iteration and @p -ksp_view provides
+ * information about the linear solver and the preconditioner used in
+ * the current context. The type of the solver can also be changed
+ * during runtime by specifying @p -ksp_type {richardson, cg, gmres,
+ * fgmres, ..} to dynamically test the optimal solver along with a
+ * suitable preconditioner set using @p -pc_type {jacobi, bjacobi,
+ * ilu, lu, ..}. There are several other command line options
+ * available to modify the behavior of the PETSc linear solver and can
+ * be obtained from the <a
+ * href="http://www.mcs.anl.gov/petsc">documentation and manual
+ * pages</a>.
+ *
  * Note: Repeated calls to solve() on a solver object with a Preconditioner
  * must be used with care. The preconditioner is initialized in the first call
  * to solve() and subsequent calls reuse the solver and preconditioner
@@ -70,24 +88,6 @@ namespace PETScWrappers
  * appropriate argument for the sequential case (which is why it is
  * the default argument), so this error only shows up in parallel
  * mode.
- *
- * Optionally, the user can create a solver derived from the
- * SolverBase class and can set the default arguments necessary to
- * solve the linear system of equations with SolverControl. These
- * default options can be overridden by specifying command line
- * arguments of the form @verbatim -ksp_*@verbatim. For example,
- * @verbatim -ksp_monitor_true_residual@verbatim prints out true
- * residual norm (unpreconditioned) at each iteration and @verbatim
- * -ksp_view@verbatim provides information about the linear solver and
- * the preconditioner used in the current context. The type of the
- * solver can also be changed during runtime by specifying -ksp_type
- * {richardson, cg, gmres, fgmres, ..} to dynamically test the optimal
- * solver along with a suitable preconditioner set using -pc_type
- * {jacobi, bjacobi, ilu, lu, ..}. There are several other command
- * line options available to modify the behavior of the PETSc linear
- * solver and can be obtained from the <a
- * href="http://www.mcs.anl.gov/petsc">documentation and manual
- * pages</a>.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
