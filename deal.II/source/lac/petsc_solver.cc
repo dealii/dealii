@@ -115,6 +115,15 @@ namespace PETScWrappers
 
       }
 
+                                     // set the command line option prefix name
+    ierr = KSPSetOptionsPrefix(solver_data->ksp, prefix_name.c_str());
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
+                                     // set the command line options provided
+                                     // by the user to override the defaults
+    ierr = KSPSetFromOptions (solver_data->ksp);
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+    
                                      // then do the real work: set up solver
                                      // internal data and solve the
                                      // system. 
@@ -133,6 +142,13 @@ namespace PETScWrappers
       throw SolverControl::NoConvergence (solver_control.last_step(),
                                           solver_control.last_value());
                                      // otherwise exit as normal
+  }
+
+
+  void
+  SolverBase::set_prefix(const std::string &prefix)
+  {
+    prefix_name = prefix ;
   }
 
 

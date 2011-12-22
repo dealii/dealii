@@ -61,13 +61,33 @@ namespace PETScWrappers
  *   [1]PETSC ERROR: KSPSetUp() line 195 in src/ksp/ksp/interface/itfunc.c
  * @endverbatim
  *
- * This error, on which one can spend a very long time figuring out what
- * exactly goes wrong, results from not specifying an MPI communicator. Note
- * that the communicator @em must match that of the matrix and all vectors in
- * the linear system which we want to solve. Aggravating the situation is the
- * fact that the default argument to the solver classes, @p PETSC_COMM_SELF,
- * is the appropriate argument for the sequential case (which is why it is the
- * default argument), so this error only shows up in parallel mode.
+ * This error, on which one can spend a very long time figuring out
+ * what exactly goes wrong, results from not specifying an MPI
+ * communicator. Note that the communicator @em must match that of the
+ * matrix and all vectors in the linear system which we want to
+ * solve. Aggravating the situation is the fact that the default
+ * argument to the solver classes, @p PETSC_COMM_SELF, is the
+ * appropriate argument for the sequential case (which is why it is
+ * the default argument), so this error only shows up in parallel
+ * mode.
+ *
+ * Optionally, the user can create a solver derived from the
+ * SolverBase class and can set the default arguments necessary to
+ * solve the linear system of equations with SolverControl. These
+ * default options can be overridden by specifying command line
+ * arguments of the form @verbatim -ksp_*@verbatim. For example,
+ * @verbatim -ksp_monitor_true_residual@verbatim prints out true
+ * residual norm (unpreconditioned) at each iteration and @verbatim
+ * -ksp_view@verbatim provides information about the linear solver and
+ * the preconditioner used in the current context. The type of the
+ * solver can also be changed during runtime by specifying -ksp_type
+ * {richardson, cg, gmres, fgmres, ..} to dynamically test the optimal
+ * solver along with a suitable preconditioner set using -pc_type
+ * {jacobi, bjacobi, ilu, lu, ..}. There are several other command
+ * line options available to modify the behavior of the PETSc linear
+ * solver and can be obtained from the <a
+ * href="http://www.mcs.anl.gov/petsc">documentation and manual
+ * pages</a>.
  *
  * @ingroup PETScWrappers
  * @author Wolfgang Bangerth, 2004
@@ -126,6 +146,15 @@ namespace PETScWrappers
       virtual void reset();
 					
       
+                                      /**
+                                        * Sets a prefix name for the solver 
+                                        * object. Useful when customizing the
+                                        * PETSc KSP object with command-line
+                                        * options.
+                                        */
+      void set_prefix(const std::string &prefix);
+					
+      
                                        /**
                                         * Access to object that controls
                                         * convergence.
@@ -169,6 +198,17 @@ namespace PETScWrappers
       virtual void set_solver_type (KSP &ksp) const = 0;
 
     private:
+                                       /**
+                                        * Solver prefix name to qualify options
+                                        * specific to the PETSc KSP object in the
+                                        * current context.
+                                        * Note: A hyphen (-) must NOT be given 
+                                        * at the beginning of the prefix name. 
+                                        * The first character of all runtime 
+                                        * options is AUTOMATICALLY the hyphen.
+                                        */
+      std::string prefix_name;
+
                                        /**
                                         * A function that is used in PETSc as
                                         * a callback to check on
