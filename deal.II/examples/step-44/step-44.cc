@@ -566,7 +566,7 @@ public:
     // The tangent matrix for this material is also calculated from the SEF by
     // \f$ JC_{ijkl} = F_{iA} F_{jB} H_{ABCD} F_{kC} F_{lD}\f$
     // with
-    // \f$ \mathbf{H} = \frac{\partial^{2} \hat{\phi}}{\partial \mathbf{C} \partial \mathbf{C}}
+    // \f$ \mathbf{H} = \frac{\partial^{2} \hat{\phi}}{\partial \mathbf{C} \partial \mathbf{C}} \f$
     SymmetricTensor<4, dim> get_JC (const double & J,
                                     const SymmetricTensor <2, dim> & B)
     {
