@@ -310,7 +310,7 @@ class ConstraintMatrix;
  *   that requires the computation of a gradient, then the provided
  *   function is automatically projected along the curve, and the
  *   difference is only computed on the tangential part of the
- *   gradient, since no information is available on the normal 
+ *   gradient, since no information is available on the normal
  *   component of the gradient anyway.
  * </ul>
  *
@@ -1722,7 +1722,7 @@ namespace VectorTools
 				    * domain for all vector
 				    * components uniformly. Note that
                                     * one often wants to compute the
-                                    * error in only one component of 
+                                    * error in only one component of
                                     * a solution vector (e.g. for the
                                     * pressure in the Stokes system,
                                     * when the solution vector also
@@ -1868,7 +1868,6 @@ namespace VectorTools
 				    * point_difference() function.
 				    */
   template <int dim, class InVector, int spacedim>
-
   void
   point_value (const DoFHandler<dim,spacedim> &dof,
 	       const InVector        &fe_function,
@@ -1894,7 +1893,6 @@ namespace VectorTools
 				    * "step-3".
 				    */
   template <int dim, class InVector, int spacedim>
-
   double
   point_value (const DoFHandler<dim,spacedim> &dof,
 	       const InVector        &fe_function,
@@ -1916,7 +1914,6 @@ namespace VectorTools
 				    * mapping to evaluate the difference.
 				    */
   template <int dim, class InVector, int spacedim>
-
   void
   point_value (const Mapping<dim, spacedim>    &mapping,
 	       const DoFHandler<dim,spacedim> &dof,
@@ -1938,7 +1935,6 @@ namespace VectorTools
 				    * mapping to evaluate the difference.
 				    */
   template <int dim, class InVector, int spacedim>
-
   double
   point_value (const Mapping<dim,spacedim>    &mapping,
 	       const DoFHandler<dim,spacedim> &dof,
