@@ -1,2 +1,39 @@
 <h1>Results</h1>
 
+...
+
+<table align="center" class="tutorial" cellspacing="3" cellpadding="3">
+  <tr>
+    <td align="center">
+        @image html "Q1P0_Ref_2.png"
+	<p align="center">
+        Two refinement levels for a tri-linear displacement formulation.
+	</p>
+    </td>
+    <td align="center">
+        @image html "Q2P1_Ref_1.png"
+	<p align="center">
+        One refinement level for a tri-quadratic displacement formulation.
+	</p>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="center">
+        @image html "Q1P0_Ref_4.png"
+	<p align="center">
+        Four refinement levels for a tri-linear displacement formulation.
+	</p>
+    </td>
+    <td align="center">
+        @image html "Q2P1_Ref_3.png"
+	<p align="center">
+        Three refinement levels for a tri-quadratic displacement formulation.
+	</p>
+    </td>
+  </tr>
+</table>
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
