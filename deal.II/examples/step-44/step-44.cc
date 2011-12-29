@@ -11,6 +11,7 @@
 /*    further information on this license.                          */
 
 // @sect3{Include files}
+
 // We start by including all the necessary
 // deal.II header files and some C++ related
 // ones. They have been discussed in detail
@@ -157,7 +158,7 @@ void Geometry::parse_parameters (ParameterHandler &prm)
     prm.leave_subsection();
 }
 
-// @sect{Materials}
+// @sect4{Materials}
 // Store the shear modulus and Lame constant
 // for the Neo-Hookean material
 struct Materials
@@ -249,9 +250,9 @@ void LinearSolver::parse_parameters (ParameterHandler &prm)
     prm.leave_subsection();
 }
 
-// Nonlinear solver
+// @sect4{Nonlinear solver}
 // Define the tolerances and maximum number of iterations for the
-// Newton-Raphson nono-linear solver.
+// Newton-Raphson nonlinear solver.
 struct NonlinearSolver
 {
     unsigned int max_iterations_NR;
@@ -333,7 +334,7 @@ void Time::parse_parameters (ParameterHandler &prm)
     prm.leave_subsection();
 }
 
-// sect4{All parameters}
+// @sect4{All parameters}
 // Finally we consolidate all of the above structures into
 // a single container that holds all of our run-time selections.
 struct AllParameters
@@ -388,9 +389,9 @@ void AllParameters::parse_parameters (ParameterHandler &prm)
 // in a seperate namespace for convenience.
 namespace AdditionalTools
 {
-// Define an operation that takes two tensors \f$ \mathbf{A} \f$ and
-// \f$ \mathbf{B} \f$ such that their outer-product
-// \f$ \mathbf{A} \bar{\otimes} \mathbf{B} \Rightarrow C_{ijkl} = A_{ik} B_{jl} \f$
+// Define an operation that takes two tensors $ \mathbf{A} $ and
+// $ \mathbf{B} $ such that their outer-product
+// $ \mathbf{A} \bar{\otimes} \mathbf{B} \Rightarrow C_{ijkl} = A_{ik} B_{jl} $
 template <int dim>
 SymmetricTensor<4,dim> outer_product_T23 (const SymmetricTensor<2,dim> & A,
                                           const SymmetricTensor<2,dim> & B)
@@ -413,7 +414,7 @@ SymmetricTensor<4,dim> outer_product_T23 (const SymmetricTensor<2,dim> & A,
 // The \a extract_submatrix function takes specific entries from a \a matrix,
 // and copies them to a \a sub_matrix. The copied entries are defined by the
 // first two parameters which hold the row and column entries to be extracted.
-// The \a matrix is automatically resized to size \f$ r \times c \f$.
+// The \a matrix is automatically resized to size $ r \times c $.
 template <typename MatrixType>
 void extract_submatrix(const std::vector< unsigned int > &row_index_set,
                        const std::vector< unsigned int > &column_index_set,
@@ -530,20 +531,19 @@ private:
 // with constant properties throughout. This class defines
 // the behaviour of this material. Neo-Hookean materials
 // can be described by a strain-energy function (SEF)
-// \f$ \phi = \phi_{B} + \phi_{V}  \f$
+// $ \phi = \phi_{B} + \phi_{V}  $
 // where the bulk deformation is given by
-// \f$ \phi_{B} = C_{1} \left( I_{1} - 3 \right)  \f$
-// where \f$ C_{1} - \frac{\mu}{2} \f$ and $I_{1}$ is the first
+// $ \phi_{B} = C_{1} \left( I_{1} - 3 \right)  $
+// where $ C_{1} - \frac{\mu}{2} $ and $I_{1}$ is the first
 // invariant of the left- or right- Cauchy deformation tensors.
 // In this example the SEF that governs the volumetric
 // response is defined as
-// \f$ \phi_{V} = \kappa \left( \frac{1}{2} \left( \theta^{2} - 1 \right) - ln \left( \theta \right) \right)  \f$
+// $ \phi_{V} = \kappa \left( \frac{1}{2} \left( \theta^{2} - 1 \right) - ln \left( \theta \right) \right)  $
 // where $\kappa$ is the bulk modulus.
 template <int dim>
 class Material_NH
 {
 public:
-    /// \brief Class constructor
     Material_NH (const double & lambda,
 		 const double & mu)
         :
@@ -555,7 +555,7 @@ public:
 
     // The Kirchhoff stress tensor is required in the formulation
     // used in this work. This is obtained from the SEF by
-    // \f$ \mathbf{T} = \mathbf{F} \frac{\partial \hat{\phi}}{\partial \mathbf{C}} \mathbf{F}^{T} = \frac{\partial \phi}{\partial \mathbf{B}} \mathbf{B} \f$
+    // $ \mathbf{T} = \mathbf{F} \frac{\partial \hat{\phi}}{\partial \mathbf{C}} \mathbf{F}^{T} = \frac{\partial \phi}{\partial \mathbf{B}} \mathbf{B} $
     SymmetricTensor<2, dim> get_T (const double & J,
                                    const SymmetricTensor <2, dim> & B)
     {
@@ -564,9 +564,9 @@ public:
     }
 
     // The tangent matrix for this material is also calculated from the SEF by
-    // \f$ JC_{ijkl} = F_{iA} F_{jB} H_{ABCD} F_{kC} F_{lD}\f$
+    // $ JC_{ijkl} = F_{iA} F_{jB} H_{ABCD} F_{kC} F_{lD}$
     // with
-    // \f$ \mathbf{H} = \frac{\partial^{2} \hat{\phi}}{\partial \mathbf{C} \partial \mathbf{C}} \f$
+    // $ \mathbf{H} = \frac{\partial^{2} \hat{\phi}}{\partial \mathbf{C} \partial \mathbf{C}} $
     SymmetricTensor<4, dim> get_JC (const double & J,
                                     const SymmetricTensor <2, dim> & B)
     {
@@ -607,32 +607,32 @@ template <int dim> SymmetricTensor<4, dim> const Material_NH<dim>::II  = Symmetr
 // We introduce the multiplicative decomposition of the
 // deformation gradient into a volume-preserving and volume
 // changing component:
-// \f$ \mathbf{F} = \hat{\mathbf{F}} \bar{\mathbf{F}} \f$
+// $ \mathbf{F} = \hat{\mathbf{F}} \bar{\mathbf{F}} $
 // where the volumetric part is
-// \f$ \hat{\mathbf{F}} = J^{\frac{1}{3}} \mathbf{I} \f$
+// $ \hat{\mathbf{F}} = J^{\frac{1}{3}} \mathbf{I} $
 // and the isochoric part is given by
-// \f$ \bar{\mathbf{F}} = J^{-\frac{1}{3}} \mathbf{F} \f$
+// $ \bar{\mathbf{F}} = J^{-\frac{1}{3}} \mathbf{F} $
 // . From this, the deviatoric left Cauchy-Green deformation
 // tensor can be defined as
-// \f$ \bar{\mathbf{B}} = \bar{\mathbf{F}} \bar{\mathbf{F}}^{T} = J^{-\frac{2}{3}} \mathbf{F} \mathbf{F}^{T} \f$
+// $ \bar{\mathbf{B}} = \bar{\mathbf{F}} \bar{\mathbf{F}}^{T} = J^{-\frac{2}{3}} \mathbf{F} \mathbf{F}^{T} $
 //
 // Here we also introduce an additive volumetric-deviatoric split
 // in the material reponse. We can express the governing SEF as
-// \f$ \phi = \phi_{V} + \phi_{I} \f$
+// $ \phi = \phi_{V} + \phi_{I} $
 // with the result that the Kirchhoff stress is additively
 // decomposed into
-// \f$ \mathbf{\tau} = \mathbf{\tau}_{V} + \mathbf{\tau}_{I} \f$
+// $ \mathbf{\tau} = \mathbf{\tau}_{V} + \mathbf{\tau}_{I} $
 // as is the tangent matrix
-// \f$ J\mathbf{C} = J\mathbf{C}_{V} + J\mathbf{C}_{I} \f$.
+// $ J\mathbf{C} = J\mathbf{C}_{V} + J\mathbf{C}_{I} $.
 //
 // These quantities are calculated as
-// \f$  \mathbf{\tau}_{I} = pJ\mathbf{I} \f$
-// \f$  \mathbf{\tau}_{V} = \mathcal{P}:\bar{\mathbf{\tau}} \f$
-// with \f$ \bar{\mathbf{\tau}} = \mathbf{\tau} \vert_{\mathbf{B} = \bar{\mathbf{B}}} \f$
-// and the deviatoric tensor \f$ \mathcal{P} = \mathcal{I} - \mathbf{I} \otimes \mathbf{I} \f$
-// \f$  J\mathbf{C}_{I} = pJ(\mathbf{I} \otimes \mathbf{I} - 2 \mathcal{I}) \f$
-// \f$  J\mathbf{C}_{V} = \frac{2}{3} tr\left(\bar{\mathbf{\tau}}\right) \mathcal{P} - \frac{2}{3} \left(\mathbf{\tau}_{I}\otimes\mathbf{I} + \mathbf{I}\otimes\mathbf{\tau}_{I} \right) +  \mathcal{P}:\bar{\mathcal{C}}:\mathcal{P} \f$
-// with \f$ \bar{\mathcal{C}} = \mathcal{C} \vert_{\mathbf{B} = \bar{\mathbf{B}}} \f$
+// $  \mathbf{\tau}_{I} = pJ\mathbf{I} $
+// $  \mathbf{\tau}_{V} = \mathcal{P}:\bar{\mathbf{\tau}} $
+// with $ \bar{\mathbf{\tau}} = \mathbf{\tau} \vert_{\mathbf{B} = \bar{\mathbf{B}}} $
+// and the deviatoric tensor $ \mathcal{P} = \mathcal{I} - \frac{1}{3} \mathbf{I} \otimes \mathbf{I} $
+// $  J\mathbf{C}_{I} = pJ(\mathbf{I} \otimes \mathbf{I} - 2 \mathcal{I}) $
+// $  J\mathbf{C}_{V} = \frac{2}{3} tr\left(\bar{\mathbf{\tau}}\right) \mathcal{P} - \frac{2}{3} \left(\mathbf{\tau}_{I}\otimes\mathbf{I} + \mathbf{I}\otimes\mathbf{\tau}_{I} \right) +  \mathcal{P}:\bar{\mathcal{C}}:\mathcal{P} $
+// with $ \bar{\mathcal{C}} = \mathcal{C} \vert_{\mathbf{B} = \bar{\mathbf{B}}} $
 template <int dim>
 class PointHistory
 {
@@ -677,9 +677,7 @@ public:
 	pressure_n = pressure;
 	dilatation_n = dilatation;
 
-        // Now that all the necessary variables are set, we can update the stress tensors
-        // Stress update can only update the stresses once the
-        // dilatation has been set as p = p(d).
+        // Now that all the necessary variables are set, we can update the stress tensors.
         // Note that T_iso depends on T_bar so it must be calculated afterwards.
         T_bar = material->get_T (get_J(), get_B_bar());
         T_iso = dev_P*get_T_bar();
@@ -816,7 +814,7 @@ private:
                                      ScratchData_SC & scratch,
                                      PerTaskData_SC & data);
     void copy_local_to_global_SC    (const PerTaskData_SC & data);
-    /// \brief Apply Dirichlet boundary values
+    // Apply Dirichlet boundary values
     void make_constraints (const int & it_nr,
 			   ConstraintMatrix & constraints);
 
