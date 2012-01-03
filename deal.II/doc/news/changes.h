@@ -74,6 +74,10 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> Fixed: writing vtu output when no ZLIB is found.
+<br>
+(Timo Heister, 2012/01/03)
+
 <li> Improved: <code>PETScWrappers::SolverXXX</code> class was
 restricted to using default solver options for the KSP only. It is now
 possible to override those by using PETSc command-line options

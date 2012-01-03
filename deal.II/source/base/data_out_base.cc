@@ -4877,8 +4877,17 @@ DataOutBase::write_vtu (const std::vector<Patch<dim,spacedim> > &patches,
       << ascii_or_binary << "\">\n";
 
   {
+				     // uint8_t might be a typedef to unsigned
+				     // char which is then not printed as
+				     // ascii integers
+#ifdef HAVE_LIBZ
+    std::vector<uint8_t> cell_types (n_cells,
+				     static_cast<uint8_t>(vtk_cell_type[dim]));
+#else
+    std::vector<unsigned int> cell_types (n_cells,
+				     vtk_cell_type[dim]);
+#endif
 				     // this should compress well :-)
-    std::vector<uint8_t> cell_types (n_cells, vtk_cell_type[dim]);
     vtu_out << cell_types;
   }
   out << "\n";
