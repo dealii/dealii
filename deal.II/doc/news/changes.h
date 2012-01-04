@@ -74,7 +74,9 @@ enabled due to a missing include file in file
 
 <ol>
 
-<li> Fixed: writing vtu output when no ZLIB is found.
+<li> Fixed: When <code>./configure</code> does not detect the presence
+of <code>zlib</code>, writing output in VTU format failed to produce
+a valid output file.
 <br>
 (Timo Heister, 2012/01/03)
 
@@ -83,19 +85,13 @@ restricted to using default solver options for the KSP only. It is now
 possible to override those by using PETSc command-line options
 <code>-ksp_*</code>; giving greater flexability in controling PETSc
 solvers. (See class documentation).
-<br> 
+<br>
 (Vijay S. Mahadevan, 2011/12/22)
 
 <li> New: The GridIn class now also reads the GMSH format 2.2 as written by
 GMSH 2.5.
 <br>
 (Vijay S. Mahadevan, Wolfgang Bangerth, 2011/12/19)
-
-<li> Fixed: When <code>./configure</code> does not detect the presence
-of <code>zlib</code>, writing output in VTU format failed to produce
-a valid output file.
-<br>
-(Timo Heister, 2011/12/16)
 
 <li> Improved: The GridRefinement::refine_and_coarsen_optimize function
 assumed that the expected convergence order was 2. It has now gotten an
