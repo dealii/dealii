@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -538,22 +538,21 @@
  * DoFHandler objects. In essence, it is a guide to the parallel::distributed
  * namespace and the techniques used in step-40.
  *
- * The paper is accepted for publication in the ACM Transactions on
- * Mathematical Software (ACM TOMS). It is also available as
- * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
- * preprint 2011-187</a>. Its current BiBTex entry is
+ * The full reference for the paper is as follows:
  * @code
-TechReport{BBHK11,
+@Article{BBHK11,
   author = 	 {Wolfgang Bangerth and Carsten Burstedde and Timo Heister
                   and Martin Kronbichler},
   title = 	 {Algorithms and data structures for massively parallel generic
-                  adaptive finite element codes},
-  institution =  {Institute for Applied Mathematics and Computational Science,
-                  Texas A&M University},
-  year = 	 2010,
-  number = 	 {2011-187, accepted for publication in ACM Trans. Math. Softw.}
-}
+  adaptive finite element codes},
+  journal = 	 {ACM Trans. Math. Softw.},
+  year = 	 2011,
+  volume = 	 38,
+  pages = 	 {14/1--28}}
  * @endcode
+ * It is also available as
+ * <a href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=237">IAMCS
+ * preprint 2011-187</a>.
  *
  * For massively %parallel
  * computations, deal.II builds on the
