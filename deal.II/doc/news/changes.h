@@ -74,6 +74,11 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> Fixed: make_dependencies now behaves like the c++ compiler when
+searching include paths for #include "..." directives.
+<br>
+(Timo Heister, 2012/01/10)
+
 <li> Fixed: When <code>./configure</code> does not detect the presence
 of <code>zlib</code>, writing output in VTU format failed to produce
 a valid output file.
