@@ -82,7 +82,7 @@ introducing the <a target="_top"
 href="http://en.wikipedia.org/wiki/Rayleigh_number">Rayleigh
 number</a> $\mathrm{Ra}=\frac{\|g\| \beta \rho}{\eta \kappa} \delta T L^3$ using a
 typical length scale $L$, typical temperature difference $\delta T$, density
-$\rho$, thermal diffusivity $\kappa$, and thermal conductivity $\kappa$.
+$\rho$, thermal diffusivity $\eta$, and thermal conductivity $\kappa$.
 $\mathrm{Ra}$ is a dimensionless number that describes the ratio of heat
 transport due to convection induced by buoyancy changes from
 temperature differences, and of heat transport due to thermal
