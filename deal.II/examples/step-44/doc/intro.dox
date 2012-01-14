@@ -1,4 +1,301 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
-<h3>List of references</h3>
+The subject of this tutorial is nonlinear solid mechanics. 
+A three-field formulation is used to model the fully-nonlinear (geometrical and material) response of an isotropic continuum body. 
+The material response is approximated as hyperelastic. 
+Additionally, the three-field formulation employed is valid for incompressible as well as compressible materials.
+
+The objective of this presentation is to provide a basis for using deal.II for problems in nonlinear solid mechanics. 
+The linear problem was addressed in step-8. 
+The geometrically nonlinear problem was partially considered in step-18: the problem domain evolves with the motion. 
+Important concepts surrounding the nonlinear kinematics are absent in the theory and implementation. 
+Step-18 does, however, describe many of the key concepts to implement elasticity within the framework of deal.II. 
+
+We begin with a crash-course in nonlinear kinematics. 
+For the sake of simplicity, we restrict our attention to the quasi-static problem. 
+Thereafter, various key stress measures are introduced and the constitutive model described. 
+
+<h2>List of references</h2>
+
+The three-field formulation implemented here was pioneered by Simo et al (1985) and is known as the mixed Jacobian-pressure formulation. 
+Important related contributions include those by Simo and Taylor (1991), and Miehe (1994). 
+The notation adopted here draws heavily on the excellent overview of the theoretical aspects of nonlinear solid mechanics see Holzapfel (2001), among numerous others. 
+
+<ol>
+	<li> J.C. Simo, R.L. Taylor and K.S. Pister (1985), 
+		Variational and projection methods for the volume constraint in finite deformation elasto-plasticity,
+		<em> Computer Methods in Applied Mechanics and Engineering </em>,
+		<strong> 51 </strong>, 1-3,
+		177-208;
+	<li> J.C. Simo and R.L. Taylor (1991),
+  		Quasi-incompressible finite elasticity in principal stretches. Continuum
+			basis and numerical algorithms,
+		<em> Computer Methods in Applied Mechanics and Engineering </em>,
+		<strong> 85 </strong>, 3,
+		273--310;
+	<li> C. Miehe (1994), 
+		Aspects of the formulation and finite element implementation of large 	strain isotropic elasticity
+		<em> International Journal for Numerical Methods in Engineering </em>
+		<strong> 37 </strong>, 12, 
+		1981-2004;
+	<li> G.A. Holzapfel (2001), 
+		Nonlinear Solid Mechanics. A Continuum Approach for Engineering,
+		John Wiley & Sons.
+</ol>
+
+<h2> Notation </h2>
+
+There are various fourth-order unit tensors. 
+The fourth-order unit tensors $\mathscr{I}$ and $\overline{\mathscr{I}}$ are defined by
+@f[
+	\mathbf{A} = \mathscr{I}:\mathbf{A} 
+		\qquad \text{and} \qquad
+	\mathbf{A}^T = \wideline{\mathscr{I}}:\mathbf{A} \, . 
+@f]
+Note $\mathscr{I} \neq \overline{\mathscr{I}}^T$. 
+Furthermore, we define the symmetric and skew-symmetric fourth-order unit tensors
+@f[
+	\mathscr{S} = \dfrac{1}{2}(\mathscr{I} + \overline{\mathscr{I}})
+		\qquad \text{and} \qquad
+	\mathscr{W} = \dfrac{1}{2}(\mathscr{I} - \overline{\mathscr{I}}) \, ,
+@f]
+such that
+@f[
+	\dfrac{1}{2}(\mathbf{A} + \mathbf{A}^T) = \math\mathscr{S}:\mathbf{A}
+		\qquad \text{and} \qquad
+	\dfrac{1}{2}(\mathbf{A} - \mathbf{A}^T) = \math\mathscr{W}:\mathbf{A} \, .
+@f]
+The fourth-order <code>SymmetricTensor</code> returned by <code>identity_tensor</code> is $\mathscr{S}$. 
+
+ 
+<h2>Kinematics</h2>
+
+Consider a continuum body that occupies the reference configuration $\Omega_0$ at time $t=0$. 
+Particles in the reference configuration are identified by the position vector $\mathbf{X}$.
+The configuration of the body at a later time $t>0$ is termed the current configuration, denoted $\Omega$, with particles identified by the vector $\mathbf{x}$. 
+The nonlinear map between the reference and current configurations, denoted $\mathbf{\varphi}$, is given by
+@f[
+	\mathbf{x} = \mathbf{\varphi}(\mathbf{X},t) \, .
+@f]
+The material description of the displacement of a particle is defined by 
+$\mathbf{U}(\mathbf{X},t) = \mathbf{x}(\mathbf{X},t) - \mathbf{X}$. 
+
+The deformation gradient $\mathbf{F}$ is defined as the material gradient of the motion:
+@f[
+	\mathbf{F}(\mathbf{X},t)} 
+		:= \dfrac{\partial \mathbf{\varphi}(\mathbf{X},t)}{\partial \mathbf{X}}
+		= \text{Grad}\mathbf{x}(\mathbf{X},t) \, .
+@f]
+The determination of the of the deformation gradient 
+$J(\mathbf{X},t):= \textrm{det} \mathbf{F}(\mathbf{X},t)} > 0$ 
+maps corresponding volume elements in the reference and current configurations, denoted 
+$\textrm{d}V$ and $\textrm{d}v$, 
+respectively, as 
+@f[
+	\textrm{d}v = J(\mathbf{X},t) \textrm{d}V \, .
+@f]
+
+An important measure of the deformation in terms of the spatial coordinates is the left Cauchy-Green tensor $\mathbf{b} = \mathbf{F}\mathbf{F}^T$.
+The left Cauchy-Green tensor is symmetric and positive definite. 
+Similarly, the (material) right Cauchy-Green tensor is defined by $\mathbf{C} = \mathbf{F}^T\mathbf{F}$. 
+It is also symmetric and positive definite. 
+
+In order to handle the different response that materials exhibit when subjected to bulk and shear type deformations we consider the following decomposition of the deformation gradient $\mathbf{F}$  and the left Cauchy-Green tensor $\mathbf{b}$ into volume-changing (volumetric) and volume-preserving (isochoric) parts:
+@f[
+	\mathbf{F} 
+		= (J^{1/3}\mathbf{I})\overline{\mathbf{F}} 
+	\qquad \text{and} \qquad 
+	\mathbf{b} 
+		= \overline{\mathbf{F}}\overline{\mathbf{F}}^T 
+		=  (J^{2/3}\mathbf{I})\overline{\mathbf{b}} \, . 
+@f]
+Clearly, $\textrm{det} \mathbf{F} = \textrm{det} (J^{1/3}\mathbf{I}) = J$. 
+
+The spatial velocity field is denoted $\mathbf{v}(\mathbf{x},t)$.
+The derivative of the spatial velocity field with respect to the spatial coordinates gives the spatial velocity gradient $\mathbf{l}(\mathbf{x},t)$, that is
+@f[
+	\mathbf{l}(\mathbf{x},t) 
+		= \dfrac{\mathbf{v}(\mathbf{x},t)}{\mathbf{x}} 
+		= \textrm{grad}\mathbf{v}(\mathbf{x},t) \, .
+@f]
+
+<h2>Kinetics</h2>
+
+Cauchy's stress theorem equates the Cauchy traction $\mathbf{t}$ acting on an infinitesimal surface element in the current configuration to the product of the Cauchy stress tensor $\mathbf{\sigma}$ (a spatial quantity)  and the outward unit normal to the surface $\mathbf{n}$ as
+@f[
+	\mathbf{t}(\mathbf{x},t, \mathbf{n}) = \mathbf{\sigma}\mathbf{n} \, .
+@f]
+The Cauchy stress is symmetric. 
+Similarly,  the first Piola-Kirchhoff traction $\mathbf{T}$ acts on an infinitesimal surface element in the reference configuration is the product of the first Piola-Kirchhoff stress tensor $\mathbf{P}$ (a two-point tensor)  and the outward unit normal to the surface $\mathbf{N}$ as
+@f[
+	\mathbf{T}(\mathbf{X},t, \mathbf{N}) = \mathbf{P}\mathbf{N} \, .
+@f]
+The first Piola-Kirchhoff stress tensor is related to the Cauchy stress as
+@f[
+	\mathbf{P} = J \mathbf{\sigma}\mathbf{F}^{-T} \, .
+@f]
+Further important stress measures are the (spatial) Kirchhoff stress $\mathbf{\tau} = J \mathbf{\sigma}$ 
+and the (referential) second Piola-Kirchhoff stress 
+$\mathbf{S} = \mathbf{F}^{-1}\mathbf{\tau}\mathbf{F}^{-T}$.
+
+
+<h2> Push-forward and pull-back operators </h2>
+
+Push-forward and pull-back operators allow one to transform various measures between the material and spatial settings.
+The stress measures used here are contravariant, while the strain measures are covariant. 
+
+The push-forward and-pull back operations for second-order covariant tensors $(\bullet)^{\text{cov}}$ are respectively given by:
+@f[
+	\chi_{*}(\bullet)^{\text{cov}}:= \mathbf{F}^{-T} (\bullet)^{\text{cov}} \mathbf{F}^{-1} 
+	\qquad \text{and} \qquad
+	\chi^{-1}_{*}(\bullet)^{\text{cov}}:= \mathbf{F}^{T} (\bullet)^{\text{cov}} \mathbf{F} \, .
+@f]
+
+The push-forward and pull back operations for second-order contravariant tensors $(\bullet)^{\text{con}}$ are respectively given by:
+@f[
+	\chi_{*}(\bullet)^{\text{con}}:= \mathbf{F} (\bullet)^{\text{con}} \mathbf{F}^T
+	\qquad \text{and} \qquad
+	\chi^{-1}_{*}(\bullet)^{\text{con}}:= \mathbf{F}^{-1} (\bullet)^{\text{con}} \mathbf{F}^{-T} \, .
+@f]
+For example $\mathbf{\tau} = \chi_{*}(\mathbf{S})$
+
+
+<h2>Hyperelastic materials</h2>
+
+A hyperelastic material response is governed by a Helmholtz free energy function $\Psi$ which serves as a potential for the stress. 
+For example, if the Helmholtz free energy depends on the right Cauchy-Green tensor $\mathbf{C}$ then the isotropic hyperelastic response is
+@f[
+	\mathbf{S} 
+		= 2 \dfrac{\partial \Psi(\mathbf{C})}{\partial \mathbf{C}} \, .
+@f]
+If the Helmholtz free energy depends on the left Cauchy-Green tensor $\mathbf{b}$ then the isotropic hyperelastic response is 
+@f[
+	\mathbf{\tau} 
+		= 2 \dfrac{\partial \Psi(\mathbf{b})}{\partial \mathbf{b}} \mathbf{b} 
+		=  2 \mathbf{b} \dfrac{\partial \Psi(\mathbf{b})}{\partial \mathbf{b}} \, .
+@f]
+
+Following the multiplicative decomposition of the deformation gradient, the Helmholtz free energy can be decomposed as $\Psi(\mathbf{b}) = \Psi(\mathbf{J})_{\text{vol}} + \Psi(\wideline{\mathbf{b}})_{\text{iso}}$.
+Similarly, the Kirchhoff stress can be decomposed into volumetric and isochoric parts as $\mathbf{\tau} = \mathbf{\tau}_{\text{vol}} + \mathbf{\tau}_{\text{iso}}$ where:
+@f{align*}
+	\mathbf{\tau}_{\text{vol}} &= 
+		2 \mathbf{b} \dfrac{\partial \Psi(\mathbf{J})}{\partial \mathbf{b}} 
+		\\
+		&= p \mathbf{I} \, , 
+		\\
+	\mathbf{\tau}_{\text{iso}} &= 
+		2 \mathbf{b} \dfrac{\partial \Psi(\overline{\mathbf{b}})}{\partial \mathbf{b}} 
+		\\ 
+		&= \underbrace{( \mathbb{I} - \dfrac{1}{3} \mathbf{I} \otimes \mathbf{I})}_{\mathbb{P}} : \overline{\mathbf{\tau}}
+@f}
+where $p = - 1/3 \textrm{tr} \mathbf{\sigma}$ is the hydrostatic pressure and $\mathbb{P}$ is the projection tensor and provides the deviatoric operator in the Eulerian setting. 
+The fictitious Cauchy stress tensor $\overline{\mathbf{\sigma}}$ is defined by
+@f[
+	\overline{\mathbf{\sigma}} 
+		:= 2 \overline{\mathbf{b}} \dfrac{\partial \Psi(\overline{\mathbf{b}})}{\partial \overline{\mathbf{b}}} \, . 
+@f]
+
+
+<h2>Elasticity tensors</h2>
+
+We will use a Newton-Raphson strategy to solve the nonlinear boundary value problem. 
+Thus, we will need to linearise the constitutive relations. 
+
+The fourth-order elasticity tensor in the material description is defined by
+@f[
+	\mathscr{C} 
+		= 2\dfrac{\partial \mathbf{S}(\mathbf{C})}{\partial \mathbf{C}}
+		= 4\dfrac{\partial^2 \Psi(\mathbf{C})}{\partial \mathbf{C} \partial \mathbf{C}} \, .
+@f]
+The fourth-order elasticity tensor in the spatial description $\mathscr{c}$ is obtained from the push-forward of $\mathscr{C}$ as
+@f[
+	\mathscr{c} = J^{-1} \chi_{*}(\mathscr{C})
+		\qquad \text{and thus} \qquad 
+	J\matscr{c} = 4 \mathbf{b} \dfrac{\partial^2 \Psi(\mathbf{b})} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}	\, .
+@f]
+The fourth-order elasticity tensors (for hyperelastic materials) possess both major and minor symmetries. 
+
+The fourth-order spatial elasticity tensor can be written in the following decoupled form:
+@f[
+	\mathscr{c} = \mathscr{c}_{\text{vol}} + \mathscr{c}_{\text{iso}}
+@f]
+where
+@f{align*}
+	J \mathscr{c}_{\text{vol}} 
+		&= 4 \mathbf{b} \dfrac{\partial^2 \Psi_{\text{vol}}(J)} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}
+		\\
+		&= J(\widetilde{p} \mathbf{I} \otimes \mathbf{I} - 2p \matscr{I})
+			\qquad \text{where} \qquad 
+		\widetilde{p} := p + \dfrac{\textrm{d} p}{\textrm{d}J} \, ,
+		\\ 
+	J \mathscr{c}_{\text{vol}} 
+		&=  4 \mathbf{b} \dfrac{\partial^2 \Psi_{\text{iso}}(\overline{\mathbf{b}})} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}
+		\\
+		&= \mathbb{P} : \mathscr{\overline{c}} : \mathbb{P} 
+			+ \dfrac{2}{3}(\overline{\mathbf{\tau}}:\mathbf{I})\mathbb{P}
+			- \dfrac{2}{3}( \mathbf{I}\otimes\mathbf{\tau}_{\text{iso}}
+				+ \mathbf{\tau}_{\text{iso}} \otimes \mathbf{I} ) \, ,
+@f}
+where the fictitious elasticity tensor $\overline{\mathscr{c}}$ in the spatial description is defined by
+@f[
+	\overline{\mathscr{c}}
+		&= 4 \overline{\mathbf{b}} \dfrac{ \partial^2 \Psi_{\text{iso}}(\overline{\mathbf{b}})} {\partial \overline{\mathbf{b}} \partial \overline{\mathbf{b}}} \overline{\mathbf{b}} \, .
+@f]
+
+<h2>Principle of stationary potential energy</h2>
+
+The total potential energy of the system $\Pi$ is the sum of the internal and external potential energies, denoted $\Pi_{\text{int}}$ and $\Pi_{\text{ext}}$, respectively. 
+We wish to find the equilibrium configuration by minimising the potential energy. 
+
+We denote the set of primary unknowns by 
+$\mathbf{\Xi}:= \{ \mathbf{u}, p, \widetilde{J} ; \Lambda \}$. 
+The independent kinematic variable $\widetilde{J}$ enters the formulation as a constraint on $J$ enforced by the Lagrange multiplier $p$ (the pressure). 
+The Lagrange multiplier $\Lambda$ is to enforce the incompressibility constraint $J=1$. 
+
+The three-field variational principle used here is given by
+@f[
+	\Pi(\mathbf{\Xi}) := \int_\Omega \lbracket[ 
+		\Psi_{\text{vol}}(\widetilde{J})
+		+ p(J(\mathbf{u}) - \widetilde{J})
+		+ \Psi_{\text{iso}}(\mathbf{b}(\mathbf{u}))
+		+ \Lambda(\widetilde{J}-1)
+		\rbracket] \textrm{d}v 
+	+ 	\Pi_{\text{ext}} \, .
+@f]
+where the external potential is defined by
+@f[
+	\Pi_{\text{ext}} 
+		= - \int_\Omega \mathbf{b} \cdot \mathbf{u}~\textrm{d}v
+			+ \int_{\partial \Omega_{\sigma}} \overline{\mathbf{t}} \cdot \mathbf{u}~\textrm{d}a \, .
+@f]
+The boundary of the current configuration  $\partial \Omega$ is composed into two parts as 
+$\partial \Omega = \partial \Omega_{\mathbf{u}} \cup \partial \Omega_{\sigma}$,
+where 
+$\partial \Omega_{\mathbf{u}} \cap \partial \Omega_{\sigma} = \emptyset$. 
+The prescribed Cauchy traction, denoted $\overline{\mathbf{t}}$, is applied to $ \partial \Omega_{\sigma}$ while the motion is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$. 
+The body force per unit current volume is denoted $\mathbf{b}$. 
+
+The stationarity of the potential follows as
+@f{align*}
+	R(\mathbf\Xi;\delta \mathbf{\Xi}) 
+		&= D_{\delta \mathbf{\Xi}}\Pi(\mathbf{\Xi})
+		\\
+		&= \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial \mathbf{u}} \cdot \delta \mathbf{u}
+			+ \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial p} \delta p
+			+ \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial \widetilde{J}} \delta \tilde{J} 
+			\\
+		&= \int_{\Omega_0} \lbracket[
+			\textrm{grad}\delta\mathbf{u} : [ \mathbf{\tau}_{\text{iso}} +  \mathbf{\tau}_{\text{vol}}] 
+			+ \delta p [ J(\mathbf{u}) - \widetilde{J}]
+			+ \delta \widetilde{J}[ \dfrac{\textrm{d} \Psi_{\text{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}} - p + \Lambda]
+			\rbracket]~\textrm{d}V 
+			\\
+		&\quad - \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{b}~\textrm{d}v
+			+ \int_{\partial \Omega_{0~\sigma}} \mathbf{u} \cdot \overline{\mathbf{t}}~\textrm{d}a
+			\\
+		&=0 \, ,
+@f}
+for all virtual displacements $\delta \mathbf{u} \in H^1(\Omega)$ subject to the constraint that $\mathbf{u} = \mathbf{0}$ on $\partial \Omega_{\mathbf{u}}$, and all virtual pressures $\delta p \in L^2(\Omega)$ and virtual dilatations $\delta \widetilde{J} \in L^2(\Omega)$.
+Note that although the variables are all expressed in terms of spatial quantities, the domain of integration is the reference configuration. 
+This approach is called an updated-Lagrangian formulation. 
