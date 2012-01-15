@@ -2390,9 +2390,8 @@ deviator_tensor ()
 
 
 /**
- * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
- * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
- * representation of the linear deviator operator.
+ * Returns the fourth-order symmetric identity tensor which maps symmetric
+ * second-order tensors to themselves. 
  *
  * Note that this tensor, even though it is the identity, has a somewhat funny
  * form, and in particular does not only consist of zeros and ones. For
