@@ -44,6 +44,7 @@ The notation adopted here draws heavily on the excellent overview of the theoret
 		John Wiley & Sons.
 </ol>
 
+<!-- 
 <h2> Notation </h2>
 
 There are various fourth-order unit tensors. 
@@ -200,6 +201,7 @@ The fictitious Cauchy stress tensor $\overline{\mathbf{\sigma}}$ is defined by
 	\overline{\mathbf{\tau}} 
 		:= 2 \overline{\mathbf{b}} \dfrac{\partial \Psi(\overline{\mathbf{b}})}{\partial \overline{\mathbf{b}}} \, . 
 @f]
+ -->
 
 <!--
 <h2>Elasticity tensors</h2>
