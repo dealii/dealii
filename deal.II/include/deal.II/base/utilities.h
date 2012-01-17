@@ -126,11 +126,14 @@ namespace Utilities
                                     * something, and try to break it into
                                     * individual lines of text at most @p
                                     * width characters wide, by breaking at
-                                    * positions marked by @p delimiter in the text.
-                                    * If this is not possible, return the shortest
-                                    * lines that are longer than @p width.
-                                    * The default value of the delimiter is a
-                                    * space character.
+                                    * positions marked by @p delimiter in the
+                                    * text. If this is not possible, return
+                                    * the shortest lines that are longer than
+                                    * @p width.  The default value of the
+                                    * delimiter is a space character. If
+                                    * original_text contains newline
+                                    * characters (\n), the string is split at
+                                    * these locations, too.
                                     */
   std::vector<std::string>
   break_text_into_lines (const std::string &original_text,

@@ -262,11 +262,25 @@ namespace Utilities
         while ((text.length() != 0) && (text[0] == delimiter))
           text.erase(0, 1);
 
+	std::size_t pos_newline = text.find_first_of("\n", 0);
+	if (pos_newline != std::string::npos && pos_newline <= width)
+	  {
+	    std::string line (text, 0, pos_newline);
+	    while ((line.length() != 0) && (line[line.length()-1] == delimiter))
+	      line.erase(line.length()-1,1);
+	    lines.push_back (line);
+            text.erase (0, pos_newline+1);
+	    continue;
+	  }
+	  
                                          // if we can fit everything into one
                                          // line, then do so. otherwise, we have
                                          // to keep breaking
         if (text.length() < width)
           {
+					     // remove trailing spaces
+	    while ((text.length() != 0) && (text[text.length()-1] == delimiter))
+	      text.erase(text.length()-1,1);
             lines.push_back (text);
             text = "";
           }
@@ -292,7 +306,10 @@ namespace Utilities
                                              // now take the text up to the found
                                              // location and put it into a single
                                              // line, and remove it from 'text'
-            lines.push_back (std::string (text, 0, location));
+	    std::string line (text, 0, location);
+	    while ((line.length() != 0) && (line[line.length()-1] == delimiter))
+	      line.erase(line.length()-1,1);
+            lines.push_back (line);
             text.erase (0, location);
           }
       }

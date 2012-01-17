@@ -74,6 +74,10 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> Improved: Utilities::break_text_into_lines now also splits the string at \n.
+<br>
+(Timo Heister, 2012/01/17)
+
 <li> Fixed: make_dependencies now behaves like the c++ compiler when
 searching include paths for #include "..." directives.
 <br>
