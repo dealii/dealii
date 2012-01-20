@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2179,6 +2179,19 @@ namespace FETools
 					     // clause. check that we
 					     // never get here
 	    Assert (false, ExcInternalError());
+	  }
+	else if (name_part == "FE_Nothing")
+	  {
+					     // remove the () from FE_Nothing()
+	    name.erase(0,2);
+
+					     // this is a bit of a hack, as
+					     // FE_Nothing does not take a
+					     // degree, but it does take an
+					     // argument, which defaults to 1,
+					     // so this properly returns
+					     // FE_Nothing()
+	    return fe_name_map.find(name_part)->second->get(1);
 	  }
 	else
 	  {
