@@ -1510,7 +1510,7 @@ template<>
 void
 TorusBoundary<2,3>::
 get_normals_at_vertices (const Triangulation<2,3 >::face_iterator &face,
-			 FaceVertexNormals &face_vertex_normals) const
+			 Boundary<2,3>::FaceVertexNormals &face_vertex_normals) const
 {
   for(unsigned i=0; i<GeometryInfo<2>::vertices_per_face; i++)
     face_vertex_normals[i]=get_surf_norm(face->vertex(i));
