@@ -1,6 +1,6 @@
 //----------------------------  trilinos_vector_equality_4.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
 //    Copyright (C) 2004, 2005, 2008, 2010 by the deal.II authors
 //
@@ -15,10 +15,10 @@
 // check correct behaviour of Trilinos ghosted vectors
 // create distributed and copy into ghosted...
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/trilinos_vector.h>    
+#include <deal.II/lac/trilinos_vector.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -42,7 +42,6 @@ void test ()
 
   TrilinosWrappers::MPI::Vector v(local_active, MPI_COMM_WORLD);
   TrilinosWrappers::MPI::Vector v_tmp(local_relevant, MPI_COMM_WORLD);
-  
 
                                      // set local values
   v(myid*2)=myid*2.0;
@@ -56,17 +55,17 @@ void test ()
       deallog << myid*2 << ":" << v(myid*2) << std::endl;
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
     }
-  
+
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
   v_tmp.reinit(v,false,true);
-  
+
                                   // check ghost values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "ghost: " << v_tmp(1) << std::endl;
   Assert(v_tmp(1) == 2.0, ExcInternalError());
-  
+
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }

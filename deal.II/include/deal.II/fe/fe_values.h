@@ -1643,7 +1643,7 @@ class FEValuesData
  * <h3>UpdateFlags</h3>
  *
  * The UpdateFlags object handed to the constructor is used to
- * determine, which of the data fields to compute. This way, it is
+ * determine which of the data fields to compute. This way, it is
  * possible to avoid expensive computations of useless derivatives.
  * In the beginning, these flags are processed through the functions
  * Mapping::update_once(), Mapping::update_each(),

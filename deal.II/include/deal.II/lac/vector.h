@@ -1195,6 +1195,11 @@ inline
 Vector<Number> &
 Vector<Number>::operator = (const Vector<Number>& v)
 {
+				// if v is the same vector as *this, there is
+				// nothing to
+  if (PointerComparison::equal(this, &v) == true)
+    return *this;
+
   if (v.vec_size != vec_size)
     reinit (v.vec_size, true);
   if (vec_size>internal::Vector::minimum_parallel_grain_size)

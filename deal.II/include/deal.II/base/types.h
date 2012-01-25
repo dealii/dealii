@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,6 +65,18 @@ namespace types
 				    * more information.
 				    */
   const unsigned int artificial_subdomain_id = static_cast<subdomain_id_t>(-2);
+
+				   /**
+				    * The type used to denote global dof
+				    * indices.
+				    */
+  typedef unsigned int global_dof_index;
+
+				   /**
+				    * An invalid value for indices of degrees
+				    * of freedom.
+				    */
+  const global_dof_index invalid_dof_index = static_cast<global_dof_index>(-1);
 }
 
 

@@ -12,7 +12,7 @@ BEGIN {
     our @EXPORT = qw(&multisubst
                      @dimensions @codim1_dimensions @dofhandlers @dofhandler_templates
                      @real_scalars @complex_scalars @all_scalars
-                     @deal_vector_templates @deal_vectors @deal_real_vectors @deal_complex_vectors
+                     @deal_vector_templates @deal_vectors @deal_real_vectors @deal_complex_vectors @deal_parallel_vectors
                      @trilinos_vectors @petsc_vectors
                      @sequential_vectors @parallel_vectors
                      @sparsity_patterns);
@@ -119,8 +119,9 @@ our @deal_vectors = (@deal_real_vectors, @deal_complex_vectors);
 ### Array of all sequential vectors, which includes deal.II vectors.
 our @sequential_vectors = @deal_real_vectors;
 
-### Array of all parallel vectors. None of those yet.
-our @parallel_vectors;
+### Array of all parallel vectors.
+our @deal_parallel_vectors = map { $t = $_ ; map { "parallel::distributed::$_<$t >" } @deal_vector_templates } @real_scalars;
+our @parallel_vectors = (@deal_parallel_vectors);
 
 ######################################################################
 # Configured arrays start here.

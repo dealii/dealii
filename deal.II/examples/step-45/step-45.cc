@@ -433,8 +433,7 @@ namespace Step45
 				   // To solve the linear system of equations
 				   // $Au=b$ we use the CG solver with an
 				   // SSOR-preconditioner. This is, again,
-				   // copied almost verbatim from step-4, with
-				   // the exception of the preconditioner. As in
+				   // copied almost verbatim from step-6. As in
 				   // step-6, we need to make sure that
 				   // constrained degrees of freedom get their
 				   // correct values after solving by calling

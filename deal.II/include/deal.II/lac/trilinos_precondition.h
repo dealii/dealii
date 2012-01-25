@@ -21,6 +21,7 @@
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
 
 #  include <deal.II/lac/trilinos_vector_base.h>
+#  include <deal.II/lac/parallel_vector.h>
 
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <Epetra_MpiComm.h>
@@ -123,6 +124,15 @@ namespace TrilinosWrappers
 					*/
       void vmult (dealii::Vector<double>       &dst,
 		  const dealii::Vector<double> &src) const;
+
+				       /**
+					* Apply the preconditioner on deal.II
+				        * parallel data structures instead of
+				        * the ones provided in the Trilinos
+				        * wrapper class.
+					*/
+      void vmult (dealii::parallel::distributed::Vector<double>       &dst,
+		  const dealii::parallel::distributed::Vector<double> &src) const;
 
                                        /**
 					* Exception.
@@ -1507,12 +1517,36 @@ namespace TrilinosWrappers
   void PreconditionBase::vmult (dealii::Vector<double>       &dst,
 				const dealii::Vector<double> &src) const
   {
-    Epetra_Vector LHS (View, preconditioner->OperatorDomainMap(),
-		       dst.begin());
-    Epetra_Vector RHS (View, preconditioner->OperatorRangeMap(),
-		       const_cast<double*>(src.begin()));
+    AssertDimension (dst.size(),
+		     preconditioner->OperatorDomainMap().NumMyElements());
+    AssertDimension (src.size(),
+		     preconditioner->OperatorRangeMap().NumMyElements());
+    Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
+			    dst.begin());
+    Epetra_Vector tril_src (View, preconditioner->OperatorRangeMap(),
+			    const_cast<double*>(src.begin()));
 
-    const int ierr = preconditioner->ApplyInverse (RHS, LHS);
+    const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+  }
+
+
+
+  inline
+  void
+  PreconditionBase::vmult (parallel::distributed::Vector<double>       &dst,
+			   const parallel::distributed::Vector<double> &src) const
+  {
+    AssertDimension (dst.local_size(),
+		     preconditioner->OperatorDomainMap().NumMyElements());
+    AssertDimension (src.local_size(),
+		     preconditioner->OperatorRangeMap().NumMyElements());
+    Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
+			    dst.begin());
+    Epetra_Vector tril_src (View, preconditioner->OperatorRangeMap(),
+			    const_cast<double*>(src.begin()));
+
+    const int ierr = preconditioner->ApplyInverse (tril_src, tril_dst);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
   }
 

@@ -17,6 +17,14 @@ SERIAL_VECTORS := { Vector<double>;
                     BlockVector<float>;
                     BlockVector<long double>;
 
+		    parallel::distributed::Vector<double>;
+		    parallel::distributed::Vector<float> ;
+		    parallel::distributed::Vector<long double>;
+
+                    parallel::distributed::BlockVector<double>;
+                    parallel::distributed::BlockVector<float> ;
+                    parallel::distributed::BlockVector<long double>;
+
 		    @DEAL_II_EXPAND_TRILINOS_VECTOR@;
 		    @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
 		    @DEAL_II_EXPAND_PETSC_VECTOR@;

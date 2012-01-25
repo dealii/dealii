@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id$
+//    $Id: solution_transfer.cc 23752 2011-05-30 00:16:00Z bangerth $
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010, 2011 by the deal.II authors
@@ -16,9 +16,10 @@
 #ifdef DEAL_II_USE_P4EST
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
@@ -247,7 +248,7 @@ namespace parallel
       typename DH::cell_iterator cell(&dof_handler->get_tria(), cell_->level(), cell_->index(), dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-      Vector<double> dofvalues(dofs_per_cell);
+      ::dealii::Vector<double> dofvalues(dofs_per_cell);
       for (typename std::vector<const VECTOR*>::iterator it=input_vectors.begin();
 	   it !=input_vectors.end();
 	   ++it)
@@ -271,7 +272,7 @@ namespace parallel
 	cell(&dof_handler->get_tria(), cell_->level(), cell_->index(), dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
-      Vector<double> dofvalues(dofs_per_cell);
+      ::dealii::Vector<double> dofvalues(dofs_per_cell);
       const double *data_store = reinterpret_cast<const double *>(data);
 
       for (typename std::vector<VECTOR*>::iterator it = all_out.begin();

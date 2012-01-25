@@ -438,7 +438,7 @@ MappingQ1<dim,spacedim>::update_each (const UpdateFlags in) const
 				       // is a Piola transformation, which
 				       // requires the determinant of the
 				       // Jacobi matrix of the transformation.
-				       // Therefore these values have to
+				       // Therefore these values have to be
 				       // updated for each cell.
       if (out & update_contravariant_transformation)
 	out |= update_JxW_values;
@@ -635,52 +635,65 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
                                    // first compute quadrature points
   if (update_flags & update_quadrature_points)
     {
-      Assert (quadrature_points.size() == n_q_points,
-	      ExcDimensionMismatch(quadrature_points.size(), n_q_points));
-      std::fill(quadrature_points.begin(), quadrature_points.end(),
-		Point<spacedim>());
+      AssertDimension (quadrature_points.size(), n_q_points);
 
       for (unsigned int point=0; point<n_q_points; ++point)
-	for (unsigned int k=0; k<data.n_shape_functions; ++k)
-	  quadrature_points[point]
-	    += data.shape(point+data_set,k) * data.mapping_support_points[k];
+	{
+	  const double * shape = &data.shape(point+data_set,0);
+	  Point<spacedim> result = (shape[0] *
+				    data.mapping_support_points[0]);
+	  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+	    for (unsigned int i=0; i<spacedim; ++i)
+	      result[i] += shape[k] * data.mapping_support_points[k][i];
+	  quadrature_points[point] = result;
+	}
     }
 
                                    // then Jacobians
   if (update_flags & update_contravariant_transformation)
     {
-      Assert (data.contravariant.size() == n_q_points,
-	      ExcDimensionMismatch(data.contravariant.size(), n_q_points));
+      AssertDimension (data.contravariant.size(), n_q_points);
 
 				   // if the current cell is just a
 				   // translation of the previous one, no
 				   // need to recompute jacobians...
       if (cell_similarity != CellSimilarity::translation)
 	{
-	  std::fill(data.contravariant.begin(), data.contravariant.end(),
-		    Tensor<2,spacedim>());
+	  Assert (data.n_shape_functions > 0, ExcInternalError());
+	  const Tensor<1,spacedim> *supp_pts =
+	    &data.mapping_support_points[0];
 	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int k=0; k<data.n_shape_functions; ++k)
-	      {
-				   // some compilers seem to have problems
-				   // to detected that the two innermost
-				   // loops just use the data of the same
-				   // tensors, so get a reference to them by
-				   // hand
-		const Tensor<1,dim> &data_derv = data.derivative(point+data_set, k);
-		const Tensor<1,spacedim> &supp_pts = data.mapping_support_points[k];
+	    {
+	      const Tensor<1,dim> * data_derv =
+		&data.derivative(point+data_set, 0);
 
+	      double result [spacedim][dim];
+
+				// peel away part of sum to avoid zeroing the
+				// entries and adding for the first time
+	      for (unsigned int i=0; i<spacedim; ++i)
+		for (unsigned int j=0; j<dim; ++j)
+		  result[i][j] = data_derv[0][j] * supp_pts[0][i];
+	      for (unsigned int k=1; k<data.n_shape_functions; ++k)
 		for (unsigned int i=0; i<spacedim; ++i)
 		  for (unsigned int j=0; j<dim; ++j)
-		    data.contravariant[point][i][j] += data_derv[j] * supp_pts[i];
-	      }
+		    result[i][j] += data_derv[k][j] * supp_pts[k][i];
+
+				// write result into contravariant data. for
+				// j=dim in the case dim<spacedim, there will
+				// never be any nonzero data that arrives in
+				// here, so it is ok anyway because it was
+				// initialized to zero at the initialization
+	      for (unsigned int i=0; i<spacedim; ++i)
+		for (unsigned int j=0; j<dim; ++j)
+		  data.contravariant[point][i][j] = result[i][j];
+	    }
 	}
     }
 
   if (update_flags & update_covariant_transformation)
     {
-      Assert (data.covariant.size() == n_q_points,
-	      ExcDimensionMismatch(data.covariant.size(), n_q_points));
+      AssertDimension (data.covariant.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
 	{
 	  if (dim == spacedim)
@@ -773,8 +786,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   if (update_flags & (update_normal_vectors
 		      | update_JxW_values))
     {
-      Assert (JxW_values.size() == n_q_points,
-	      ExcDimensionMismatch(JxW_values.size(), n_q_points));
+      AssertDimension (JxW_values.size(), n_q_points);
 
       Assert( !(update_flags & update_normal_vectors ) ||
 	      (normal_vectors.size() == n_q_points),
@@ -865,8 +877,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 				   // vector given by reference
   if (update_flags & update_jacobians)
     {
-      Assert (jacobians.size() == n_q_points,
-	      ExcDimensionMismatch(jacobians.size(), n_q_points));
+      AssertDimension (jacobians.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  jacobians[point] = data.contravariant[point];
@@ -877,32 +888,45 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 				   // cells, not faces.
   if (update_flags & update_jacobian_grads)
     {
-      Assert (jacobian_grads.size() == n_q_points,
-	      ExcDimensionMismatch(jacobian_grads.size(), n_q_points));
+      AssertDimension (jacobian_grads.size(), n_q_points);
 
       if (cell_similarity != CellSimilarity::translation)
 	{
-	  std::fill(jacobian_grads.begin(),
-		    jacobian_grads.end(),
-		    Tensor<3,spacedim>());
-
+	  const unsigned int data_set = DataSetDescriptor::cell();
 	  for (unsigned int point=0; point<n_q_points; ++point)
-	    for (unsigned int k=0; k<data.n_shape_functions; ++k)
-	      for (unsigned int i=0; i<dim; ++i)
+	    {
+	      const Tensor<2,dim> * second =
+		&data.second_derivative(point+data_set, 0);
+	      double result [spacedim][dim][dim];
+	      for (unsigned int i=0; i<spacedim; ++i)
 		for (unsigned int j=0; j<dim; ++j)
 		  for (unsigned int l=0; l<dim; ++l)
-		    jacobian_grads[point][i][j][l]
-		      += (data.second_derivative(point+DataSetDescriptor::cell (), k)[j][l]
-			  *
-			  data.mapping_support_points[k][i]);
+		    result[i][j][l] = (second[0][j][l] *
+				       data.mapping_support_points[0][i]);
+	      for (unsigned int k=1; k<data.n_shape_functions; ++k)
+		for (unsigned int i=0; i<spacedim; ++i)
+		  for (unsigned int j=0; j<dim; ++j)
+		    for (unsigned int l=0; l<dim; ++l)
+		      result[i][j][l]
+			+= (second[k][j][l]
+			    *
+			    data.mapping_support_points[k][i]);
+
+				// never touch any data for j=dim in case
+				// dim<spacedim, so it will always be zero as
+				// it was initialized
+	      for (unsigned int i=0; i<spacedim; ++i)
+		for (unsigned int j=0; j<dim; ++j)
+		  for (unsigned int l=0; l<dim; ++l)
+		    jacobian_grads[point][i][j][l] = result[i][j][l];
+	    }
 	}
     }
 				   // copy values from InternalData to vector
 				   // given by reference
   if (update_flags & update_inverse_jacobians)
     {
-      Assert (inverse_jacobians.size() == n_q_points,
-	      ExcDimensionMismatch(inverse_jacobians.size(), n_q_points));
+      AssertDimension (inverse_jacobians.size(), n_q_points);
       if (cell_similarity != CellSimilarity::translation)
 	for (unsigned int point=0; point<n_q_points; ++point)
 	  inverse_jacobians[point] = transpose(data.covariant[point]);
@@ -935,14 +959,11 @@ namespace internal
 
       if (update_flags & update_boundary_forms)
       	{
-      	  Assert (boundary_forms.size()==n_q_points,
-      		  ExcDimensionMismatch(boundary_forms.size(), n_q_points));
+	  AssertDimension (boundary_forms.size(), n_q_points);
       	  if (update_flags & update_normal_vectors)
-      	    Assert (normal_vectors.size()==n_q_points,
-      		    ExcDimensionMismatch(normal_vectors.size(), n_q_points));
+	    AssertDimension (normal_vectors.size(), n_q_points);
       	  if (update_flags & update_JxW_values)
-      	    Assert (JxW_values.size() == n_q_points,
-      		    ExcDimensionMismatch(JxW_values.size(), n_q_points));
+	    AssertDimension (JxW_values.size(), n_q_points);
 
 					   // map the unit tangentials to the
 					   // real cell. checking for d!=dim-1
@@ -1013,8 +1034,7 @@ namespace internal
 					       // use the same method used in
 					       // fill_fe_values for cells
 					       // above
-	      Assert (data.contravariant.size() == n_q_points,
-		      ExcInternalError());
+	      AssertDimension (data.contravariant.size(), n_q_points);
 	      for (unsigned int point=0; point<n_q_points; ++point)
 		{
 		  Tensor<1,spacedim> cell_normal;
@@ -1421,7 +1441,7 @@ MappingQ1<dim,spacedim>::
 transform_unit_to_real_cell_internal (const InternalData &data) const
 {
   const unsigned int n_mapping_points=data.mapping_support_points.size();
-  Assert(data.shape_values.size()==n_mapping_points, ExcInternalError());
+  AssertDimension (data.shape_values.size(), n_mapping_points);
 
 				   // use now the InternalData to
 				   // compute the point in real space.
@@ -1488,10 +1508,10 @@ transform_real_to_unit_cell_internal
 {
   const unsigned int n_shapes=mdata.shape_values.size();
   Assert(n_shapes!=0, ExcInternalError());
-  Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
+  AssertDimension (mdata.shape_derivatives.size(), n_shapes);
 
   std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
-  Assert(points.size()==n_shapes, ExcInternalError());
+  AssertDimension (points.size(), n_shapes);
 
 
 				   // Newton iteration to solve

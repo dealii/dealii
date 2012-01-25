@@ -4923,6 +4923,106 @@ AC_DEFUN(DEAL_II_CHECK_ADVANCE_WARNING, dnl
 
 
 dnl -------------------------------------------------------------
+dnl Check whether the compiler allows to use arithmetic operations
+dnl +-*/ on vectorized data types or whether we need to use
+dnl _mm_add_pd for addition and so on. +-*/ is preferred because
+dnl it allows the compiler to choose other optimizations like
+dnl fused multiply add, whereas _mm_add_pd explicitly enforces the
+dnl assembler command.
+dnl
+dnl Usage: DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_VECTOR_ARITHMETICS, dnl
+
+[
+  AC_MSG_CHECKING(whether compiler supports vector arithmetics)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+#include <emmintrin.h>
+    ],
+    [
+        __m128d a, b;
+        a = _mm_set_sd (1.0);
+	b = _mm_set1_pd (2.1);
+	__m128d c = a + b;
+	__m128d d = b - c;
+	__m128d e = c * a + d;
+	__m128d f = e/a;
+	(void)f;
+    ],
+    [
+	AC_MSG_RESULT(yes)
+        AC_DEFINE(DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS, 1,
+                  [Defined if the compiler can use arithmetic operations on
+		  vectorized data types])
+    ],
+    [
+        AC_MSG_RESULT(no)
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
+dnl Check for existence of a strong inline function. This can be used
+dnl to force a compiler to inline some functions also at low optimization
+dnl levels. We use it in vectorized data types, where we want inlining
+dnl also for debug code. If we cannot find a good inlining routine, we
+dnl just use 'inline'.
+dnl
+dnl Usage: DEAL_II_ALWAYS_INLINE
+dnl
+dnl -------------------------------------------------------------
+AC_DEFUN(DEAL_II_CHECK_ALWAYS_INLINE, dnl
+
+[
+  if test "$GXX" = "yes" ; then
+     dnl force inline for gcc compiler
+     TEMP_ALWAYS_INLINE='__inline __attribute__((__always_inline__))'
+  else
+    case "$GXX_VERSION" in
+      clang*)
+        dnl force inline for clang compiler
+	TEMP_ALWAYS_INLINE='__inline __attribute__((__always_inline__))'
+	;;
+
+      *)
+	dnl for all other compilers, try with __forceinline
+	TEMP_ALWAYS_INLINE=__forceinline
+	;;
+    esac
+  fi
+  AC_MSG_CHECKING(for forced inlining)
+  AC_LANG(C++)
+  CXXFLAGS="$CXXFLAGSG"
+  AC_TRY_COMPILE(
+    [
+        $TEMP_ALWAYS_INLINE
+	void f() {};
+    ],
+    [
+	f();
+    ],
+    [
+	AC_MSG_RESULT(yes)
+        AC_DEFINE_UNQUOTED(DEAL_II_ALWAYS_INLINE, $TEMP_ALWAYS_INLINE,
+                  [Forces the compiler to always inline functions, also in
+		   debug mode])
+    ],
+    [
+        AC_MSG_RESULT(no)
+	AC_DEFINE(DEAL_II_ALWAYS_INLINE, inline,
+                  [Forces the compiler to always inline functions, also in
+		   debug mode])
+    ])
+])
+
+
+
+dnl -------------------------------------------------------------
 dnl
 dnl Usage: DEAL_II_CHECK_MIN_VECTOR_CAPACITY
 dnl -------------------------------------------------------------

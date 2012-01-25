@@ -1125,8 +1125,8 @@ Tensor<1,dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 	      values[2] * p.values[2]);
       break;
     default:
-      Number q=0;
-      for (unsigned int i=0; i<dim; ++i)
+      Number q = values[0] * values[0];
+      for (unsigned int i=1; i<dim; ++i)
 	q += values[i] * p.values[i];
       return q;
     }
@@ -1156,7 +1156,7 @@ template <int dim, typename Number>
 inline
 Tensor<1,dim,Number> Tensor<1,dim,Number>::operator - () const
 {
-  Tensor<1,dim,Number> result;
+  Tensor<1,dim,Number> result (false);
   for (unsigned int i=0; i<dim; ++i)
     result.values[i] = -values[i];
   return result;
@@ -1179,8 +1179,8 @@ inline
 typename Tensor<1,dim,Number>::real_type
 Tensor<1,dim,Number>::norm_square () const
 {
-  real_type s = 0;
-  for (unsigned int i=0; i<dim; ++i)
+  real_type s = numbers::NumberTraits<Number>::abs_square(values[0]);
+  for (unsigned int i=1; i<dim; ++i)
     s += numbers::NumberTraits<Number>::abs_square(values[i]);
 
   return s;
@@ -1308,7 +1308,7 @@ Tensor<1,dim,Number>
 operator * (const Tensor<1,dim,Number> &t,
 	    const Number                factor)
 {
-  Tensor<1,dim,Number> tt;
+  Tensor<1,dim,Number> tt (false);
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
@@ -1327,7 +1327,7 @@ Tensor<1,dim,Number>
 operator * (const Number                factor,
 	    const Tensor<1,dim,Number> &t)
 {
-  Tensor<1,dim,Number> tt;
+  Tensor<1,dim,Number> tt (false);
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
@@ -1346,7 +1346,7 @@ Tensor<1,dim,Number>
 operator / (const Tensor<1,dim,Number> &t,
 	    const Number                factor)
 {
-  Tensor<1,dim,Number> tt;
+  Tensor<1,dim,Number> tt (false);
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] / factor;
   return tt;
@@ -1365,7 +1365,7 @@ Tensor<1,dim>
 operator * (const Tensor<1,dim> &t,
 	    const double         factor)
 {
-  Tensor<1,dim> tt;
+  Tensor<1,dim> tt (false);
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
@@ -1384,7 +1384,7 @@ Tensor<1,dim>
 operator * (const double         factor,
 	    const Tensor<1,dim> &t)
 {
-  Tensor<1,dim> tt;
+  Tensor<1,dim> tt (false);
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] * factor;
   return tt;
@@ -1403,7 +1403,7 @@ Tensor<1,dim>
 operator / (const Tensor<1,dim> &t,
 	    const double         factor)
 {
-  Tensor<1,dim> tt;
+  Tensor<1,dim> tt (false);
   for (unsigned int d=0; d<dim; ++d)
     tt[d] = t[d] / factor;
   return tt;

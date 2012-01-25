@@ -505,7 +505,7 @@ template <int dim, class Vector, int spacedim>
 void
 GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 					     const Vector       &criteria,
-					     const unsigned int  order=2)
+					     const unsigned int  order)
 {
   Assert (criteria.size() == tria.n_active_cells(),
 	  ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));

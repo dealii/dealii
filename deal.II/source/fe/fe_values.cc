@@ -16,6 +16,8 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -3263,7 +3265,7 @@ maybe_invalidate_previous_present_cell (const typename Triangulation<dim,spacedi
   if (present_cell.get() != 0)
   {
     if (&cell->get_triangulation() !=
-        &static_cast<typename Triangulation<dim,spacedim>::cell_iterator>(*present_cell)
+        &present_cell->operator typename Triangulation<dim,spacedim>::cell_iterator()
 	->get_triangulation())
       {
 	// the triangulations for the previous cell and the current cell

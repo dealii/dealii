@@ -1,0 +1,17 @@
+
+DEAL:0::numproc=10
+DEAL:0::Check add (scalar): OK
+DEAL:0::Check add (vector): OK
+DEAL:0::Check add (factor, vector): OK
+DEAL:0::Check add (factor, vector, factor, vector): OK
+DEAL:0::Check sadd (factor, factor, vector): OK
+DEAL:0::Check sadd (factor, factor, vector, factor, vector): OK
+DEAL:0::Check sadd (factor, factor, vector, factor, vector, factor, vector): OK
+DEAL:0::Check add (factor, vector_1, factor, vector_1): OK
+DEAL:0::Check operator * (scalar): OK
+DEAL:0::Check operator / (scalar): OK
+DEAL:0::Check scale (vector): OK
+DEAL:0::Check equ (factor, vector): OK
+DEAL:0::Check equ (factor, vector, factor, vector): OK
+DEAL:0::Check equ (factor, vector, factor, vector, factor, vector): OK
+DEAL:0::Check equ<float> (factor, vector): OK

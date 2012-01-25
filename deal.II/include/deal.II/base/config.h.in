@@ -46,6 +46,9 @@
    */
 #undef DEAL_II_ABORT_NOTHROW_EXCEPTION
 
+/* Forces the compiler to always inline functions, also in debug mode */
+#undef DEAL_II_ALWAYS_INLINE
+
 /* Flag indicating whether there is a bug in the compiler that leads to bogus
    warnings for inline class members in anonymous namespaces */
 #undef DEAL_II_ANON_NAMESPACE_BOGUS_WARNING
@@ -90,6 +93,10 @@
 
 /* Defined if the compiler supports including <mpi.h> */
 #undef DEAL_II_COMPILER_SUPPORTS_MPI
+
+/* Defined if the compiler can use arithmetic operations on vectorized data
+   types */
+#undef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
 
 /* Defined if the compiler has a bug in deducing the type of pointers to const
    member functions. */

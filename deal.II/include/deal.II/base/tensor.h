@@ -114,6 +114,18 @@ class Tensor
     Tensor (const array_type &initializer);
 
 				     /**
+				      * Conversion operator from tensor of
+				      * tensors.
+				      */
+    Tensor (const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in);
+
+				     /**
+				      * Conversion operator to tensor of
+				      * tensors.
+				      */
+    operator Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const;
+
+				     /**
 				      * Read-Write access operator.
 				      */
     Tensor<rank_-1,dim,Number> &operator [] (const unsigned int i);
@@ -327,11 +339,31 @@ Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 
 template <int rank_, int dim, typename Number>
 inline
+Tensor<rank_,dim,Number>::Tensor
+(const Tensor<1,dim,Tensor<rank_-1,dim,Number> > &tensor_in)
+{
+  for (unsigned int i=0; i<dim; ++i)
+    subtensor[i] = tensor_in[i];
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+Tensor<rank_,dim,Number>::operator
+  Tensor<1,dim,Tensor<rank_-1,dim,Number> > () const
+{
+  return Tensor<1,dim,Tensor<rank_-1,dim,Number> > (subtensor);
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
 typename Tensor<rank_,dim,Number>::value_type&
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
   Assert (i<dim, ExcIndexRange(i, 0, dim));
-
   return subtensor[i];
 }
 
@@ -671,10 +703,12 @@ void contract (Tensor<1,dim,Number>       &dest,
 	       const Tensor<2,dim,Number> &src1,
 	       const Tensor<1,dim,Number> &src2)
 {
-  dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      dest[i] += src1[i][j] * src2[j];
+    {
+      dest[i] = src1[i][0] * src2[0];
+      for (unsigned int j=1; j<dim; ++j)
+	dest[i] += src1[i][j] * src2[j];
+    }
 }
 
 
@@ -699,10 +733,13 @@ Tensor<1,dim,Number>
 operator * (const Tensor<2,dim,Number> &src1,
             const Tensor<1,dim,Number> &src2)
 {
-  Tensor<1,dim,Number> dest;
+  Tensor<1,dim,Number> dest (false);
   for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      dest[i] += src1[i][j] * src2[j];
+    {
+      dest[i] = src1[i][0] * src2[0];
+      for (unsigned int j=1; j<dim; ++j)
+	dest[i] += src1[i][j] * src2[j];
+    }
   return dest;
 }
 
@@ -720,10 +757,12 @@ void contract (Tensor<1,dim,Number>       &dest,
 	       const Tensor<1,dim,Number> &src1,
 	       const Tensor<2,dim,Number> &src2)
 {
-  dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      dest[i] += src1[j] * src2[j][i];
+    {
+      dest[i] = src1[0] * src2[0][i];
+      for (unsigned int j=1; j<dim; ++j)
+	dest[i] += src1[j] * src2[j][i];
+    }
 }
 
 
@@ -749,10 +788,13 @@ Tensor<1,dim,Number>
 operator * (const Tensor<1,dim,Number> &src1,
             const Tensor<2,dim,Number> &src2)
 {
-  Tensor<1,dim,Number> dest;
+  Tensor<1,dim,Number> dest (false);
   for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      dest[i] += src1[j] * src2[j][i];
+    {
+      dest[i] = src1[0] * src2[0][i];
+      for (unsigned int j=1; j<dim; ++j)
+	dest[i] += src1[j] * src2[j][i];
+    }
   return dest;
 }
 
@@ -770,12 +812,15 @@ void contract (Tensor<2,dim,Number>       &dest,
 	       const Tensor<2,dim,Number> &src1,
 	       const Tensor<2,dim,Number> &src2)
 {
-  dest.clear ();
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-	dest[i][j] += src1[i][k] * src2[k][j];
+      {
+	dest[i][j] = src1[i][0] * src2[0][j];
+	for (unsigned int k=1; k<dim; ++k)
+	  dest[i][j] += src1[i][k] * src2[k][j];
+      }
 }
+
 
 
 /**
@@ -1611,7 +1656,7 @@ inline
 Tensor<2,dim,Number>
 invert (const Tensor<2,dim,Number> &t)
 {
-  Tensor<2,dim,Number> return_tensor;
+  Number return_tensor [dim][dim];
   switch (dim)
     {
       case 1:
@@ -1641,13 +1686,13 @@ invert (const Tensor<2,dim,Number> &t)
 		    t07 = 1.0/(t4*t[2][2]-t6*t[2][1]-t8*t[2][2]+
 			       t00*t[2][1]+t01*t[1][2]-t04*t[1][1]);
 	return_tensor[0][0] = (t[1][1]*t[2][2]-t[1][2]*t[2][1])*t07;
-	return_tensor[0][1] = -(t[0][1]*t[2][2]-t[0][2]*t[2][1])*t07;
-	return_tensor[0][2] = -(-t[0][1]*t[1][2]+t[0][2]*t[1][1])*t07;
-	return_tensor[1][0] = -(t[1][0]*t[2][2]-t[1][2]*t[2][0])*t07;
+	return_tensor[0][1] = (t[0][2]*t[2][1]-t[0][1]*t[2][2])*t07;
+	return_tensor[0][2] = (t[0][1]*t[1][2]-t[0][2]*t[1][1])*t07;
+	return_tensor[1][0] = (t[1][2]*t[2][0]-t[1][0]*t[2][2])*t07;
 	return_tensor[1][1] = (t[0][0]*t[2][2]-t04)*t07;
-	return_tensor[1][2] = -(t6-t00)*t07;
-	return_tensor[2][0] = -(-t[1][0]*t[2][1]+t[1][1]*t[2][0])*t07;
-	return_tensor[2][1] = -(t[0][0]*t[2][1]-t01)*t07;
+	return_tensor[1][2] = (t00-t6)*t07;
+	return_tensor[2][0] = (t[1][0]*t[2][1]-t[1][1]*t[2][0])*t07;
+	return_tensor[2][1] = (t01-t[0][0]*t[2][1])*t07;
 	return_tensor[2][2] = (t4-t8)*t07;
 
 	break;
@@ -1660,7 +1705,7 @@ invert (const Tensor<2,dim,Number> &t)
       default:
 	    AssertThrow (false, ExcNotImplemented());
     }
-  return return_tensor;
+  return Tensor<2,dim,Number>(return_tensor);
 }
 
 
@@ -1680,15 +1725,17 @@ inline
 Tensor<2,dim,Number>
 transpose (const Tensor<2,dim,Number> &t)
 {
-  Tensor<2,dim,Number> tt = t;
+  Number tt[dim][dim];
   for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=i+1; j<dim; ++j)
-      {
-        const Number x = tt[i][j];
-        tt[i][j] = tt[j][i];
-        tt[j][i] = x;
-      };
-  return tt;
+    {
+      tt[i][i] = t[i][i];
+      for (unsigned int j=i+1; j<dim; ++j)
+	{
+	  tt[i][j] = t[j][i];
+	  tt[j][i] = t[i][j];
+	};
+    }
+  return Tensor<2,dim,Number>(tt);
 }
 
 #ifndef DOXYGEN

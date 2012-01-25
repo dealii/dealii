@@ -34,6 +34,14 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> New: There is now a distributed deal.II vector class
+parallel::distributed::Vector<Number> that can be used with MPI. The
+vector is based on a contiguous locally owned range and allows easy
+access of ghost entries from other processors. The vector interface is
+very similar to the non-distributed class Vector<Number>.
+<br>
+(Katharina Kormann, Martin Kronbichler, 2012/01/25)
+
 <li> Fixed: The Intel compiler complains that it can't copy Trilinos vector
 reference objects, preventing the compiling of step-32. This is now fixed.
 <br>
