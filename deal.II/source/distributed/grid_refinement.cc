@@ -710,9 +710,8 @@ namespace parallel
 	      RefineAndCoarsenFixedFraction::
 	      master_compute_threshold (locally_owned_indicators,
 					global_min_and_max,
-					static_cast<unsigned int>
-					(top_fraction_of_error *
-					 total_error),
+					top_fraction_of_error *
+					 total_error,
 					mpi_communicator);
 
 					     // compute bottom
@@ -727,9 +726,8 @@ namespace parallel
 		RefineAndCoarsenFixedFraction::
 		master_compute_threshold (locally_owned_indicators,
 					  global_min_and_max,
-					  static_cast<unsigned int>
-					  ((1-bottom_fraction_of_error) *
-					   total_error),
+					  (1-bottom_fraction_of_error) *
+					   total_error,
 					  mpi_communicator);
 	    else
 	      {

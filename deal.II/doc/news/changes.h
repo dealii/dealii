@@ -74,6 +74,11 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
+contained a rounding bug that often produced wrong results.
+<br>
+(Timo Heister, 2012/01/24)
+
 <li> Improved: Utilities::break_text_into_lines now also splits the string at \n.
 <br>
 (Timo Heister, 2012/01/17)
