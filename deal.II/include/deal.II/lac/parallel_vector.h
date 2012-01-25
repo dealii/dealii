@@ -952,6 +952,7 @@ namespace parallel
     inline
     Vector<Number>::Vector (const Vector<Number> &v)
 		    :
+		    Subscriptor(),
 		    allocated_size (0),
 		    val (0),
 		    import_data (0),
