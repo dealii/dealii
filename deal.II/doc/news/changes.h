@@ -82,6 +82,11 @@ enabled due to a missing include file in file
 
 <ol>
 
+<li> Improved: <code>VectorTools::point_value</code> now also works within the hp framework.
+Fixed: <code>GridTools::find_active_cell_around_point</code> for the hp-case works now also with MappingCollections containing only one mapping, as is the standard case in other functions using hp.
+<br>
+(Christian Goll, 2012/01/26)
+
 <li> Fixed: parallel::distributed::refine_and_coarsen_fixed_fraction()
 contained a rounding bug that often produced wrong results.
 <br>
