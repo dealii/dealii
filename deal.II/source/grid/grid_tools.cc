@@ -840,52 +840,68 @@ namespace GridTools
 				 const hp::DoFHandler<dim,spacedim> &container,
 				 const Point<spacedim>     &p)
   {
+    Assert ((mapping.size() == 1) ||
+             (mapping.size() == container.get_fe().size()),
+             ExcMessage ("Mapping collection needs to have either size 1 "
+                         "or size equal to the number of elements in "
+                         "the FECollection."));
+
     typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell_iterator;
 
-				     // The best distance is set to the
-				     // maximum allowable distance from
-				     // the unit cell; we assume a
-				     // max. deviation of 1e-10
-    double best_distance = 1e-10;
-    int    best_level = -1;
     std::pair<cell_iterator, Point<spacedim> > best_cell;
-
-				     // Find closest vertex and determine
-				     // all adjacent cells
-    unsigned int vertex = find_closest_vertex(container, p);
-
-    std::vector<cell_iterator> adjacent_cells =
-      find_cells_adjacent_to_vertex(container, vertex);
-
-    typename std::vector<cell_iterator>::const_iterator
-      cell = adjacent_cells.begin(),
-      endc = adjacent_cells.end();
-
-    for(; cell != endc; ++cell)
+            //If we have only one element in the MappingCollection,
+            //we use find_active_cell_around_point using only one
+            //mapping.
+    if(mapping.size()==1)
+      best_cell = find_active_cell_around_point(mapping[0], container, p);
+    else
       {
-	const Point<spacedim> p_cell
-	  = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
-					 // calculate the infinity norm of
-					 // the distance vector to the unit cell.
-	const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-					 // We compare if the point is inside the
-					 // unit cell (or at least not too far
-					 // outside). If it is, it is also checked
-					 // that the cell has a more refined state
-	if (dist < best_distance ||
-	    (dist == best_distance && (*cell)->level() > best_level))
-	  {
-	    best_distance = dist;
-	    best_level    = (*cell)->level();
-	    best_cell     = std::make_pair(*cell, p_cell);
-	  }
+                 // The best distance is set to the
+                 // maximum allowable distance from
+                 // the unit cell; we assume a
+                 // max. deviation of 1e-10
+        double best_distance = 1e-10;
+        int    best_level = -1;
+
+
+                 // Find closest vertex and determine
+                 // all adjacent cells
+        unsigned int vertex = find_closest_vertex(container, p);
+
+        std::vector<cell_iterator> adjacent_cells =
+          find_cells_adjacent_to_vertex(container, vertex);
+
+        typename std::vector<cell_iterator>::const_iterator
+          cell = adjacent_cells.begin(),
+          endc = adjacent_cells.end();
+
+        for(; cell != endc; ++cell)
+          {
+      const Point<spacedim> p_cell
+        = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
+
+               // calculate the infinity norm of
+               // the distance vector to the unit cell.
+      const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+               // We compare if the point is inside the
+               // unit cell (or at least not too far
+               // outside). If it is, it is also checked
+               // that the cell has a more refined state
+      if (dist < best_distance ||
+          (dist == best_distance && (*cell)->level() > best_level))
+        {
+          best_distance = dist;
+          best_level    = (*cell)->level();
+          best_cell     = std::make_pair(*cell, p_cell);
+        }
       }
 
     Assert (best_cell.first.state() == IteratorState::valid,
 	    ExcPointNotFound<dim>(p));
-
+      }
     return best_cell;
   }
 
