@@ -24,7 +24,10 @@ help:
 	@echo "=    distclean  : removes all object files, libraries, etc in subdirs  ="
 	@echo "========================================================================"
 
-deps:
+config.log: configure
+	$(error Error: configuration not up to date. Please run ./configure or ./reconfigure)
+
+deps: config.log
 	@cd common/scripts && $(MAKE) $(MAKEOPTIONS)
 	@cd source && if $(MAKE) $(MAKEOPTIONS) Makefile.dep;\
 	  then : ;\
