@@ -1251,11 +1251,12 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::lp_norm (const real_type p) const
     {
-      Number local_result = (partitioner->local_size()>0 ?
-			     std::pow(vector_view.lp_norm(p),p)
-			     : 0);
-      return std::pow(Utilities::MPI::sum(local_result,
-					  partitioner->get_communicator()), 1.0/p);
+      const Number local_result = (partitioner->local_size()>0 ?
+				   std::pow(vector_view.lp_norm(p),p)
+				   : 0);
+      return std::pow (Utilities::MPI::sum(local_result,
+					   partitioner->get_communicator()),
+		       static_cast<Number>(1.0/p));
     }
 
 
@@ -1265,9 +1266,9 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::linfty_norm () const
     {
-      Number local_result = (partitioner->local_size()>0 ?
-			     vector_view.linfty_norm()
-			     : 0);
+      const Number local_result = (partitioner->local_size()>0 ?
+				   vector_view.linfty_norm()
+				   : 0);
       return Utilities::MPI::max (local_result, partitioner->get_communicator());
     }
 
