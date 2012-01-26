@@ -5359,6 +5359,20 @@ namespace VectorTools
   }
 
 
+  template <int dim, class InVector, int spacedim>
+  void
+  point_value (const hp::DoFHandler<dim,spacedim> &dof,
+         const InVector        &fe_function,
+         const Point<spacedim>      &point,
+         Vector<double>        &value)
+  {
+      point_value(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
+            dof,
+            fe_function,
+            point,
+            value);
+  }
+
 
   template <int dim, class InVector, int spacedim>
   double
@@ -5371,6 +5385,20 @@ namespace VectorTools
 			fe_function,
 			point);
   }
+
+
+  template <int dim, class InVector, int spacedim>
+  double
+  point_value (const hp::DoFHandler<dim,spacedim> &dof,
+         const InVector        &fe_function,
+         const Point<spacedim>      &point)
+  {
+      return point_value(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
+          dof,
+          fe_function,
+          point);
+  }
+
 
   template <int dim, class InVector, int spacedim>
   void
@@ -5410,6 +5438,42 @@ namespace VectorTools
   }
 
 
+  template <int dim, class InVector, int spacedim>
+   void
+   point_value (const hp::MappingCollection<dim, spacedim>    &mapping,
+       const hp::DoFHandler<dim,spacedim> &dof,
+       const InVector        &fe_function,
+       const Point<spacedim>      &point,
+       Vector<double>        &value)
+   {
+     const hp::FECollection<dim, spacedim>& fe = dof.get_fe();
+
+     Assert(value.size() == fe.n_components(),
+     ExcDimensionMismatch(value.size(), fe.n_components()));
+
+                                      // first find the cell in which this point
+                                      // is, initialize a quadrature rule with
+                                      // it, and then a FEValues object
+     const std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+     cell_point =  GridTools::find_active_cell_around_point (mapping, dof, point);
+
+     Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
+         ExcInternalError());
+
+     const Quadrature<dim>
+     quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+     hp::FEValues<dim, spacedim> hp_fe_values(mapping, fe, hp::QCollection<dim>(quadrature), update_values);
+     hp_fe_values.reinit(cell_point.first);
+     const FEValues<dim, spacedim>& fe_values = hp_fe_values.get_present_fe_values();
+
+                                      // then use this to get at the values of
+                                      // the given fe_function at this point
+     std::vector<Vector<double> > u_value(1, Vector<double> (fe.n_components()));
+     fe_values.get_function_values(fe_function, u_value);
+
+     value = u_value[0];
+   }
+
 
   template <int dim, class InVector, int spacedim>
   double
@@ -5443,6 +5507,42 @@ namespace VectorTools
     fe_values.get_function_values(fe_function, u_value);
 
     return u_value[0];
+  }
+
+
+  template <int dim, class InVector, int spacedim>
+  double
+  point_value (const hp::MappingCollection<dim, spacedim>    &mapping,
+      const hp::DoFHandler<dim,spacedim> &dof,
+      const InVector        &fe_function,
+      const Point<spacedim>      &point)
+  {
+      const hp::FECollection<dim, spacedim>& fe = dof.get_fe();
+
+      Assert(fe.n_components() == 1,
+          ExcMessage ("Finite element is not scalar as is necessary for this function"));
+
+      // first find the cell in which this point
+      // is, initialize a quadrature rule with
+      // it, and then a FEValues object
+      const std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+      cell_point =  GridTools::find_active_cell_around_point (mapping, dof, point);
+
+      Assert(GeometryInfo<dim>::distance_to_unit_cell(cell_point.second) < 1e-10,
+          ExcInternalError());
+
+      const Quadrature<dim>
+      quadrature (GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
+      hp::FEValues<dim, spacedim> hp_fe_values(mapping, fe, hp::QCollection<dim>(quadrature), update_values);
+      hp_fe_values.reinit(cell_point.first);
+      const FEValues<dim, spacedim>& fe_values = hp_fe_values.get_present_fe_values();
+
+      // then use this to get at the values of
+      // the given fe_function at this point
+      std::vector<double> u_value(1);
+      fe_values.get_function_values(fe_function, u_value);
+
+      return u_value[0];
   }
 
 

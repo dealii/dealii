@@ -1874,6 +1874,18 @@ namespace VectorTools
 	       const Point<spacedim>      &point,
 	       Vector<double>        &value);
 
+  /**
+   * Same as above for hp.
+   */
+
+  template <int dim, class InVector, int spacedim>
+  void
+  point_value (const hp::DoFHandler<dim,spacedim> &dof,
+         const InVector        &fe_function,
+         const Point<spacedim>      &point,
+         Vector<double>        &value);
+
+
 				   /**
 				    * Evaluate a scalar finite
 				    * element function defined by
@@ -1898,6 +1910,16 @@ namespace VectorTools
 	       const InVector        &fe_function,
 	       const Point<spacedim>      &point);
 
+  /**
+   * Same as above for hp.
+   */
+
+  template <int dim, class InVector, int spacedim>
+  double
+  point_value (const hp::DoFHandler<dim,spacedim> &dof,
+         const InVector        &fe_function,
+         const Point<spacedim>      &point);
+
 				   /**
 				    * Evaluate a possibly
 				    * vector-valued finite element
@@ -1921,6 +1943,18 @@ namespace VectorTools
 	       const Point<spacedim>      &point,
 	       Vector<double>        &value);
 
+  /**
+   * Same as above for hp.
+   */
+
+  template <int dim, class InVector, int spacedim>
+  void
+  point_value (const hp::MappingCollection<dim, spacedim>    &mapping,
+         const hp::DoFHandler<dim,spacedim> &dof,
+         const InVector        &fe_function,
+         const Point<spacedim>      &point,
+         Vector<double>        &value);
+
 				   /**
 				    * Evaluate a scalar finite
 				    * element function defined by
@@ -1940,6 +1974,17 @@ namespace VectorTools
 	       const DoFHandler<dim,spacedim> &dof,
 	       const InVector        &fe_function,
 	       const Point<spacedim>      &point);
+
+  /**
+   * Same as above for hp.
+   */
+
+  template <int dim, class InVector, int spacedim>
+  double
+  point_value (const hp::MappingCollection<dim,spacedim>    &mapping,
+         const hp::DoFHandler<dim,spacedim> &dof,
+         const InVector        &fe_function,
+         const Point<spacedim>      &point);
 
 				   //@}
 				   /**
