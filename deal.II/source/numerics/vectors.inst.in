@@ -219,10 +219,23 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
       const VEC&,
       const Point<deal_II_dimension>&,
       Vector<double>&);
+      
+  template
+    void point_value<deal_II_dimension> (
+      const hp::DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&,
+      Vector<double>&);
 
   template
     double point_value<deal_II_dimension> (
       const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&);
+      
+  template
+    double point_value<deal_II_dimension> (
+      const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&);
 
@@ -233,11 +246,26 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
       const VEC&,
       const Point<deal_II_dimension>&,
       Vector<double>&);
+      
+  template
+    void point_value<deal_II_dimension> (
+      const hp::MappingCollection<deal_II_dimension>&,
+      const hp::DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&,
+      Vector<double>&);
 
   template
     double point_value<deal_II_dimension> (
       const Mapping<deal_II_dimension>&,
       const DoFHandler<deal_II_dimension>&,
+      const VEC&,
+      const Point<deal_II_dimension>&);
+      
+  template
+    double point_value<deal_II_dimension> (
+      const hp::MappingCollection<deal_II_dimension>&,
+      const hp::DoFHandler<deal_II_dimension>&,
       const VEC&,
       const Point<deal_II_dimension>&);
 
