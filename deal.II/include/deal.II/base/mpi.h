@@ -182,7 +182,7 @@ namespace Utilities
     void sum (const std::vector<T> &values,
               const MPI_Comm &mpi_communicator,
               std::vector<T> &sums);
-    
+
 				     /**
 				      * Return the maximum over all processors of the value @p t. This function
 				      * is collective over all processors given in the communicator. If
@@ -214,6 +214,21 @@ namespace Utilities
     void max (const T (&values)[N],
 	      const MPI_Comm &mpi_communicator,
 	      T (&maxima)[N]);
+
+                                     /**
+                                      * Like the previous function,
+                                      * but take the maximum over the
+                                      * elements of a std::vector. In other words,
+                                      * the i-th element of the
+                                      * results array is the maximum over
+                                      * the i-th entries of the input
+                                      * arrays from each processor.
+                                      */
+    template <typename T>
+    inline
+    void max (const std::vector<T> &values,
+              const MPI_Comm &mpi_communicator,
+              std::vector<T> &maxima);
 
 				     /**
 				      * Data structure to store the result of
@@ -392,7 +407,7 @@ namespace Utilities
 #endif
     }
 
-    
+
     template <typename T>
     inline
     void sum (const std::vector<T> &values,
@@ -410,7 +425,7 @@ namespace Utilities
 #endif
     }
 
-    
+
     template <typename T>
     inline
     T max (const T &t,
@@ -443,6 +458,24 @@ namespace Utilities
       (void)mpi_communicator;
       for (unsigned int i=0; i<N; ++i)
 	maxima[i] = values[i];
+#endif
+    }
+
+
+    template <typename T>
+    inline
+    void max (const std::vector<T> &values,
+              const MPI_Comm       &mpi_communicator,
+              std::vector<T>       &maxima)
+    {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      maxima.resize (values.size());
+      MPI_Allreduce (const_cast<void*>(static_cast<const void*>(&values[0])),
+                     &maxima[0], values.size(), internal::mpi_type_id((T*)0), MPI_MAX,
+                     mpi_communicator);
+#else
+      (void)mpi_communicator;
+      maxima = values;
 #endif
     }
   } // end of namespace MPI

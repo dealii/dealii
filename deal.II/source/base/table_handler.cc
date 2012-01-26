@@ -18,7 +18,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
-#include "../../contrib/boost-1.46.1/include/boost/mpl/string.hpp"
+#include "boost/mpl/string.hpp"
 
 
 DEAL_II_NAMESPACE_OPEN

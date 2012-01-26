@@ -83,7 +83,9 @@
    floating point computations on cygwin systems. */
 #undef DEAL_II_BROKEN_SOCKETS
 
-/* Defined if the compiler we use supports the upcoming C++1x standard. */
+/* Defined if the compiler we use supports the C++2011 standard well enough to
+   allow using the standard library classes instead of the corresponding BOOST
+   classes. */
 #undef DEAL_II_CAN_USE_CXX1X
 
 /* Backward compatibility support for functions and classes that do not take
