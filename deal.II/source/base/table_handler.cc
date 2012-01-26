@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,6 @@
 
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/table.h>
-#include <boost/mpl/string.hpp>
 
 #include <sstream>
 #include <iostream>
@@ -90,7 +89,7 @@ namespace internal
   {
     TableEntry new_entry = *this;
     boost::apply_visitor(Local::GetDefaultValue(), new_entry.value);
-    
+
     return new_entry;
   }
 
@@ -127,7 +126,7 @@ TableHandler::Column::pad_column_below (const unsigned int size)
   // we should never have a column that is completely
   // empty and that needs to be padded
   Assert (entries.size() > 0, ExcInternalError());
-  
+
   // add as many elements as necessary
   while (entries.size() < size)
     entries.push_back (entries.back().get_default_constructed_copy());
@@ -284,7 +283,7 @@ void TableHandler::write_text(std::ostream &out,
 	 p != columns.end(); ++p)
       p->second.pad_column_below (max_rows);
   }
-  
+
   std::vector<std::string> sel_columns;
   get_selected_columns(sel_columns);
 
@@ -370,10 +369,10 @@ void TableHandler::write_text(std::ostream &out,
 
 	  // finally column break
 	  out << ' ';
-	  
+
 	  break;
 	}
-	
+
 	case table_with_separate_column_description:
 	{
 	  // print column key with column number. enumerate
@@ -381,12 +380,12 @@ void TableHandler::write_text(std::ostream &out,
 	  out << "# " << j+1 << ": " << key << std::endl;
 	  break;
 	}
-	
+
 	default:
 	  Assert (false, ExcInternalError());
       }
     }
-  if (format == table_with_headers)  
+  if (format == table_with_headers)
     out << std::endl;
 
   for (unsigned int i=0; i<nrows; ++i)
@@ -575,7 +574,7 @@ unsigned int TableHandler::n_rows() const
 {
   if (columns.size() == 0)
     return 0;
-  
+
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();
   unsigned int n = col_iter->second.entries.size();
   std::string first_name=col_iter->first;
