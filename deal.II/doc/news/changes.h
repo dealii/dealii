@@ -81,9 +81,13 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: There is now a constructor for FESystem that allows to
+create collections of finite elements of arbitrary length.
+<br>
+(Jason Sheldon, 2012/01/27)
 
-<li> Improved: <code>VectorTools::point_value</code> now also works within the hp framework.
-Fixed: <code>GridTools::find_active_cell_around_point</code> for the hp-case works now also with MappingCollections containing only one mapping, as is the standard case in other functions using hp.
+<li> Improved: VectorTools::point_value() now also works within the hp framework.
+Fixed: GridTools::find_active_cell_around_point() for the hp-case works now also with MappingCollections containing only one mapping, as is the standard case in other functions using hp.
 <br>
 (Christian Goll, 2012/01/26)
 

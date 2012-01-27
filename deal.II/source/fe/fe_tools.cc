@@ -2027,6 +2027,10 @@ namespace FETools
 					 // have to figure out what the
 					 // base elements are. this can
 					 // only be done recursively
+
+
+
+
 	if (name_part == "FESystem")
 	  {
 					     // next we have to get at the
@@ -2038,7 +2042,7 @@ namespace FETools
 					     // recursive calls if one of
 					     // these calls should throw
 					     // an exception
-	    std::vector<FiniteElement<dim,spacedim>*> base_fes;
+	    std::vector<const FiniteElement<dim,spacedim>*> base_fes;
 	    std::vector<unsigned int>        base_multiplicities;
 	    try
 	      {
@@ -2112,38 +2116,12 @@ namespace FETools
 						 // generate the composed
 						 // element
 		FiniteElement<dim,spacedim> *system_element = 0;
-		switch (base_fes.size())
-		  {
-		    case 1:
-		    {
-		      system_element = new FESystem<dim>(*base_fes[0],
-							 base_multiplicities[0]);
-		      break;
-		    }
 
-		    case 2:
-		    {
-		      system_element = new FESystem<dim>(*base_fes[0],
-							 base_multiplicities[0],
-							 *base_fes[1],
-							 base_multiplicities[1]);
-		      break;
-		    }
-
-		    case 3:
-		    {
-		      system_element = new FESystem<dim>(*base_fes[0],
-							 base_multiplicities[0],
-							 *base_fes[1],
-							 base_multiplicities[1],
-							 *base_fes[2],
-							 base_multiplicities[2]);
-		      break;
-		    }
-
-		    default:
-			  AssertThrow (false, ExcNotImplemented());
-		  }
+                         // uses new FESystem constructor
+                         // which is independent of
+                         // the number of FEs in the system
+    system_element = new FESystem<dim>(base_fes,
+                                       base_multiplicities);
 
 						 // now we don't need the
 						 // list of base elements

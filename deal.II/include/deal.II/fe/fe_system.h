@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -221,6 +221,21 @@ class FESystem : public FiniteElement<dim,spacedim>
 	      const FiniteElement<dim,spacedim> &fe5, const unsigned int n5);
 
 				     /**
+				      * Same as above but for any
+				      * number of base
+				      * elements. Pointers to the base
+				      * elements and their
+				      * multiplicities are passed as
+				      * vectors to this
+				      * constructor. The length of
+				      * these vectors is assumed to be
+				      * equal.
+				      */
+
+    FESystem (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+	      const std::vector<unsigned int>			&multiplicities);
+
+				     /**
 				      * Destructor.
 				      */
     virtual ~FESystem ();
@@ -424,7 +439,7 @@ class FESystem : public FiniteElement<dim,spacedim>
     virtual void
     get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
 			      FullMatrix<double>           &matrix) const;
-    
+
 				     /**
 				      * Access to a composing
 				      * element. The index needs to be
@@ -888,6 +903,16 @@ class FESystem : public FiniteElement<dim,spacedim>
 			  const unsigned int            N4,
 			  const FiniteElementData<dim> &fe5,
 			  const unsigned int            N5);
+
+				   /**
+				    * Same as above but for
+				    * any number of sub-elements.
+				    */
+    static FiniteElementData<dim>
+    multiply_dof_numbers (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+			  const std::vector<unsigned int>                       &multiplicities);
+
+
 
 				     /**
 				      * Helper function used in the

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -292,7 +292,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   this->base_to_block_indices.push_back(n3);
   this->base_to_block_indices.push_back(n4);
   this->base_to_block_indices.push_back(n5);
-  
+
   base_elements[0] = ElementPair(fe1.clone(), n1);
   base_elements[0].first->subscribe (typeid(*this).name());
   base_elements[1] = ElementPair(fe2.clone(), n2);
@@ -305,6 +305,35 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   base_elements[4].first->subscribe (typeid(*this).name());
   initialize ();
 }
+
+
+
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::FESystem (
+  const std::vector<const FiniteElement<dim,spacedim>*>  &fes,
+  const std::vector<unsigned int>                  &multiplicities)
+		:
+		FiniteElement<dim,spacedim> (multiply_dof_numbers(fes, multiplicities),
+					     compute_restriction_is_additive_flags (fes, multiplicities),
+					     compute_nonzero_components(fes, multiplicities)),
+		base_elements(fes.size())
+{
+  Assert (fes.size() == multiplicities.size(),
+	  ExcDimensionMismatch (fes.size(), multiplicities.size()) );
+
+  this->base_to_block_indices.reinit(0, 0);
+
+  for (unsigned int i=0; i<fes.size(); i++)
+    this->base_to_block_indices.push_back( multiplicities[i] );
+
+  for (unsigned int i=0; i<fes.size(); i++)
+    {
+      base_elements[i] = ElementPair(fes[i]->clone(), multiplicities[i]);
+      base_elements[i].first->subscribe (typeid(*this).name());
+    }
+  initialize ();
+}
+
 
 
 template <int dim, int spacedim>
@@ -1129,7 +1158,7 @@ FESystem<dim,spacedim>::compute_fill (
                                            // those shape functions
                                            // that belong to a given
                                            // base element
-//TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style	  
+//TODO: Introduce the needed table and loop only over base element shape functions. This here is not efficient at all AND very bad style
           const UpdateFlags base_flags(dim_1==dim ?
                                        base_fe_data.current_update_flags() :
                                        base_fe_data.update_flags);
@@ -1183,7 +1212,7 @@ FESystem<dim,spacedim>::compute_fill (
 			for (unsigned int q=0; q<n_q_points; ++q)
 			  data.shape_values[out_index+s][q] =
 			    base_data.shape_values(in_index+s,q);
-		      
+
 		      if (base_flags & update_gradients)
 			for (unsigned int q=0; q<n_q_points; ++q)
 			  data.shape_gradients[out_index+s][q]=
@@ -1245,7 +1274,7 @@ FESystem<dim,spacedim>::build_cell_tables()
 
   unsigned total_index = 0;
   this->block_indices_data.reinit(0,0);
-  
+
   for (unsigned int base=0; base < this->n_base_elements(); ++base)
     for (unsigned int m = 0; m < this->element_multiplicity(base); ++m)
       {
@@ -1256,7 +1285,7 @@ FESystem<dim,spacedim>::build_cell_tables()
       }
   Assert (total_index == this->component_to_base_table.size(),
 	  ExcInternalError());
-  
+
 				   // Initialize index tables.
 				   // Multi-component base elements
 				   // have to be thought of. For
@@ -2803,6 +2832,62 @@ FESystem<dim,spacedim>::multiply_dof_numbers (const FiniteElementData<dim> &fe1,
 						& fe5.conforming_space),
     N1 + N2 + N3 + N4 + N5);
 }
+
+
+
+template <int dim, int spacedim>
+FiniteElementData<dim>
+FESystem<dim,spacedim>::multiply_dof_numbers (
+  const std::vector<const FiniteElement<dim,spacedim>*>   &fes,
+  const std::vector<unsigned int>                   &multiplicities)
+{
+  Assert (fes.size() == multiplicities.size(), ExcDimensionMismatch (fes.size(), multiplicities.size()));
+
+  unsigned int multiplied_dofs_per_vertex = 0;
+  unsigned int multiplied_dofs_per_line = 0;
+  unsigned int multiplied_dofs_per_quad = 0;
+  unsigned int multiplied_dofs_per_hex = 0;
+
+  unsigned int multiplied_n_components = 0;
+
+  unsigned int degree = 0; // degree is the maximal degree of the components
+
+  unsigned int summed_multiplicities = 0;
+
+  for (unsigned int i=0; i<fes.size(); i++)
+    {
+      multiplied_dofs_per_vertex+=fes[i]->dofs_per_vertex * multiplicities[i];
+      multiplied_dofs_per_line+=fes[i]->dofs_per_line * multiplicities[i];
+      multiplied_dofs_per_quad+=fes[i]->dofs_per_quad * multiplicities[i];
+      multiplied_dofs_per_hex+=fes[i]->dofs_per_hex * multiplicities[i];
+
+      multiplied_n_components+=fes[i]->n_components() * multiplicities[i];
+
+      degree = std::max(degree, fes[i]->tensor_degree() );
+
+      summed_multiplicities += multiplicities[i];
+    }
+
+  unsigned char total_conformity = fes[0]->conforming_space;
+
+  for (unsigned int i=1; i<fes.size(); i++)
+    total_conformity &= fes[i]->conforming_space;
+
+
+  std::vector<unsigned int> dpo;
+  dpo.push_back(multiplied_dofs_per_vertex);
+  dpo.push_back(multiplied_dofs_per_line);
+  if (dim>1) dpo.push_back(multiplied_dofs_per_quad);
+  if (dim>2) dpo.push_back(multiplied_dofs_per_hex);
+
+  return FiniteElementData<dim> (
+    dpo,
+    multiplied_n_components,
+    degree,
+    typename FiniteElementData<dim>::Conformity(total_conformity),
+    summed_multiplicities);
+}
+
 
 
 template <int dim, int spacedim>
