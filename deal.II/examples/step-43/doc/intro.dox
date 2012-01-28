@@ -7,18 +7,27 @@ following publications:
 - Chih-Che Chueh, Marc Secanell, Wolfgang Bangerth, Ned Djilali. Multi-level
   adaptive simulation of transient two-phase flow in heterogeneous porous
   media. Computers &amp; Fluids, 39:1585-1596, 2010
-- Chih-Che Chueh, Wolfgang Bangerth, Ned Djilali. An h-adaptive operator
+- Chih-Che Chueh, Ned Djilali, Wolfgang Bangerth. An h-adaptive operator
   splitting method for two-phase flow in 3D heterogeneous porous
-  media. Submitted to Communications in Computational Physics.
+  media. Submitted.
 
 The implementation discussed here uses and extends
 parts of the step-21 and step-31 tutorial programs.
 
-The work of the first author was funded through the Canada Research Chairs
+The work of the Chih-Che Chueh was funded through the Canada Research Chairs
 Program and the MITACS Network of Centres of Excellence. Parts of the work by
-the second author were funded through Award No. KUS-C1-016-04, made by the King
+Wolfgang Bangerth were funded through Award No. KUS-C1-016-04, made by the King
 Abdullah University of Science and Technology, and through an Alfred P. Sloan
 Research Fellowship.
+This material is also in parts based upon work supported by the National
+Science Foundation under Award No. EAR-0426271 and The California Institute of
+Technology; and in a continuation by the National Science
+Foundation under Award No. EAR-0949446 and The University of California
+&ndash; Davis. Any opinions, findings, and conclusions or recommendations
+expressed in this publication are those of the author and do not
+necessarily reflect the views of the National Science Foundation, The
+California Institute of Technology, or of The University of California
+&ndash; Davis.
 </i>
 
 
@@ -107,8 +116,8 @@ operator splitting" scheme.
 
 Here, we use the following a posteriori criterion to decide when to re-compute
 pressure and velocity variables
-(detailed derivations and descriptions can be found in [Chueh, Bangerth
-and Djilali 2011]):
+(detailed derivations and descriptions can be found in [Chueh, Djilali
+and Bangerth 2011]):
 @f{align*}
   \theta(n,n_p)
   =
@@ -196,12 +205,12 @@ polynomials of degree $s$ in each variable.
 The chosen $Q_1$ elements for the saturation equation do not lead to a stable
 discretization without upwinding or other kinds of stabilization, and spurious
 oscillations will appear in the numerical solution. Adding an artificial
-diffusion term is is one approach to eliminating these oscillations
+diffusion term is one approach to eliminating these oscillations
 [Chen 2005]. On the other hand, adding too much diffusion smears sharp
 fronts in the solution and suffers from grid-orientation difficulties
 [Chen 2005]. To avoid these effects, we use the artificial diffusion
-term proposed by [Guermond and Pasquetti 2008] and already
-validated in [Chueh, Bangerth, Djilali 2011] and
+term proposed by [Guermond and Pasquetti 2008] and
+validated in [Chueh, Djilali, Bangerth 2011] and
 [Kronbichler, Heister and Bangerth, 2011], as well as in step-31.
 
 This method modifies the (discrete) weak form of the saturation equation
@@ -224,11 +233,12 @@ where $\nu$ is the artificial diffusion parameter and $\hat F$ is an
 appropriately chosen numerical flux on the boundary of the domain (we choose
 the obvious full upwind flux for this).
 
-Following [Guermond and Pasquetti 2008], we use
+Following [Guermond and Pasquetti 2008] (and as detailed in
+[Chueh, Djilali and Bangerth 2011]), we use
 the parameter as a piecewise
 constant function set on each cell $K$ with the diameter $h_{K}$ as
 @f[
-   \nu(S_h)|_{K} = \beta \| \mathbf{u}_t \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S_h)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
+   \nu(S_h)|_{K} = \beta \| \mathbf{u}_t \max\{F'(S_h),1\} \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S_h)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
 @f]
 where $\alpha$ is a stabilization exponent and $\beta$ is a dimensionless
 user-defined stabilization constant. Following [Guermond and Pasquetti 2008]
@@ -236,7 +246,7 @@ as well as the implementation in step-31, the velocity and saturation global
 normalization constant, $c(\mathbf{u}_t,S)$, and the residual $\textrm{Res}(S)$
 are respectively given by
 @f[
-   c(\mathbf{u}_t,S) = c_R \|\mathbf{u}_t\|_{L^{\infty}(\Omega)} \textrm{var}(S) | \textrm{diam} (\Omega) |^{\alpha - 2}
+   c(\mathbf{u}_t,S) = c_R \|\mathbf{u}_t \max\{F'(S),1\}\|_{L^{\infty}(\Omega)} \textrm{var}(S)^\alpha | \textrm{diam} (\Omega) |^{\alpha - 2}
 @f]
 and
 @f[
@@ -289,13 +299,13 @@ neighboring boundary $\partial\Omega_{(-)}$.
 Choosing meshes adaptively to resolve sharp
 saturation fronts is an essential ingredient to achieve efficiency in our
 algorithm. Here, we use the same shock-type refinement approach used in
-[Chueh, Bangerth and Djilali 2011] to select those cells that should be refined or
+[Chueh, Djilali and Bangerth 2011] to select those cells that should be refined or
 coarsened. The refinement indicator for each cell $K$ of the triangulation is
 computed by
 @f[
-   \eta_{K} = |\nabla_h S_h(\mathbf x_K)|
+   \eta_{K} = |\nabla S_h(\mathbf x_K)|
 @f]
-where $\nabla_h S_h(\mathbf x_K)$ is the gradient of the discrete saturation
+where $\nabla S_h(\mathbf x_K)$ is the gradient of the discrete saturation
 variable evaluated at the center $\mathbf x_K$ of cell $K$. This approach is
 analogous to ones frequently used in compressible flow problems, where density
 gradients are used to indicate refinement.
@@ -417,8 +427,7 @@ optimal since
   \end{array}
  \right),
 @f}
-and consequently all eigenvalues are equal to one. GMRES with this
-preconditioner would then converge in one iteration.
+for which it can be shown that GMRES converges in two iterations.
 
 However, we cannot of course expect to use exact inverses of the
 velocity mass matrix and the Schur complement. We therefore follow the
@@ -519,10 +528,10 @@ cases are listed in the following table:
 
 <ol>
 <li>
-CC Chueh, W Bangerth, and N Djilali.
+CC Chueh, N Djilali and W Bangerth.
 <br> An h-adaptive operator splitting method for two-phase flow in 3D
   heterogeneous porous media.
-<br> <i>Submitted to Communications in Computational Physics</i>, 2011.
+<br> <i>Submitted</i>, 2012.
 
 <li>
 M. Kronbichler, T. Heister, and W. Bangerth
