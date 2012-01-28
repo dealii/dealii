@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -987,7 +987,7 @@ namespace Step21
 					 // First for the cell terms. These are,
 					 // following the formulas in the
 					 // introduction, $(S^n,\sigma)-(F(S^n)
-					 // \mathbf{v}^{n+1},\nabla sigma)$,
+					 // \mathbf{v}^{n+1},\nabla \sigma)$,
 					 // where $\sigma$ is the saturation
 					 // component of the test function:
 	for (unsigned int q=0; q<n_q_points; ++q)
