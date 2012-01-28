@@ -4,7 +4,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2010, 2011 by Chih-Che Chueh and the deal.II authors */
+/*    Copyright (C) 2010, 2011, 2012 by Chih-Che Chueh and the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -2424,7 +2424,7 @@ compute_viscosity (const std::vector<double>          &old_saturation,
 	max_velocity = std::max (std::sqrt (u*u), max_velocity);
       }
 
-    const double global_scaling = global_u_infty * global_S_variation /
+    const double global_scaling = global_u_infty * std::pow(global_S_variation,alpha) /
 				  std::pow(global_Omega_diameter, alpha - 2.);
 
     return (beta *
