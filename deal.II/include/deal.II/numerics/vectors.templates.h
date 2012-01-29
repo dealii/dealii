@@ -3307,13 +3307,19 @@ namespace VectorTools
 		    if (dynamic_cast<const FE_Nothing<dim>*> (&cell->get_fe ()) != 0)
 		      return;
 
-						     // this is only
+						     // This is only
 						     // implemented, if the
 						     // FE is a Nedelec
-						     // element
-		    typedef FiniteElement<dim> FEL;
-		    AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
-				 typename FEL::ExcInterpolationNotImplemented ());
+						     // element. If the FE is
+						     // a FESystem we cannot
+						     // check this.
+		    if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == 0)
+		      {
+			typedef FiniteElement<dim> FEL;
+
+			AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != 0,
+				     typename FEL::ExcInterpolationNotImplemented ());
+		      }
 
 		    for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
 		      dof_values[dof] = 0.0;
