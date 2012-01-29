@@ -320,6 +320,8 @@ FESystem<dim,spacedim>::FESystem (
 {
   Assert (fes.size() == multiplicities.size(),
 	  ExcDimensionMismatch (fes.size(), multiplicities.size()) );
+  Assert (fes.size() > 0,
+	  ExcMessage ("Need to pass at least one finite element."));
 
   this->base_to_block_indices.reinit(0, 0);
 
