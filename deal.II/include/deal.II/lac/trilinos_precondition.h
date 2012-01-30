@@ -1517,9 +1517,9 @@ namespace TrilinosWrappers
   void PreconditionBase::vmult (dealii::Vector<double>       &dst,
 				const dealii::Vector<double> &src) const
   {
-    AssertDimension (dst.size(),
+    AssertDimension (static_cast<int>(dst.size()),
 		     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension (src.size(),
+    AssertDimension (static_cast<int>(src.size()),
 		     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
 			    dst.begin());
@@ -1537,9 +1537,9 @@ namespace TrilinosWrappers
   PreconditionBase::vmult (parallel::distributed::Vector<double>       &dst,
 			   const parallel::distributed::Vector<double> &src) const
   {
-    AssertDimension (dst.local_size(),
+    AssertDimension (static_cast<int>(dst.local_size()),
 		     preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension (src.local_size(),
+    AssertDimension (static_cast<int>(src.local_size()),
 		     preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
 			    dst.begin());
