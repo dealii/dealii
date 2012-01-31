@@ -237,6 +237,25 @@ namespace Utilities
     import_targets() const;
 
 				/**
+				 * Checks whether the given
+				 * partitioner is compatible with the
+				 * partitioner used for this
+				 * vector. Two partitioners are
+				 * compatible if the have the same
+				 * local size and the same ghost
+				 * indices. They do not necessarily
+				 * need to be the same data
+				 * field. This is a local operation
+				 * only, i.e., if only some
+				 * processors decide that the
+				 * partitioning is not compatible,
+				 * only these processors will return
+				 * @p false, whereas the other
+				 * processors will return @p true.
+				 */
+    bool is_compatible (const Partitioner &part) const;
+
+				/**
 				 * Returns the MPI ID of the calling
 				 * processor. Cached to have simple access.
 				 */
@@ -500,6 +519,21 @@ namespace Utilities
       return import_targets_data;
     }
 
+
+
+    inline
+    bool
+    Partitioner::is_compatible (const Partitioner &part) const
+    {
+				// is the partitioner points to the same
+				// memory location as the calling processor
+      if (&part == this)
+	return true;
+      else
+	return (global_size == part.global_size &&
+		local_range_data == part.local_range_data &&
+		ghost_indices_data == part.ghost_indices_data);
+    }
 
 
     inline

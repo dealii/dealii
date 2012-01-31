@@ -824,6 +824,27 @@ namespace parallel
 					  */
 					 //@{
 					 /**
+					  * Checks whether the given
+					  * partitioner is compatible with the
+					  * partitioner used for this
+					  * vector. Two partitioners are
+					  * compatible if the have the same
+					  * local size and the same ghost
+					  * indices. They do not necessarily
+					  * need to be the same data
+					  * field. This is a local operation
+					  * only, i.e., if only some
+					  * processors decide that the
+					  * partitioning is not compatible,
+					  * only these processors will return
+					  * @p false, whereas the other
+					  * processors will return @p true.
+					  */
+      bool
+      partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
+
+
+					 /**
 					  * Prints the vector to the output stream @p
 					  * out.
 					  */
@@ -1826,6 +1847,17 @@ namespace parallel
       std::swap (compress_requests,      v.compress_requests);
       std::swap (update_ghost_values_requests, v.update_ghost_values_requests);
 #endif
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
+    Vector<Number>::partitioners_are_compatible 
+    (const Utilities::MPI::Partitioner &part) const
+    {
+      return partitioner->is_compatible (part);
     }
 
 #endif  // ifndef DOXYGEN
