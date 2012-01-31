@@ -1979,6 +1979,7 @@ namespace Step43
 	fe_values.get_function_grads (predictor_saturation_solution,
 				      grad_saturation);
 
+//TODO: fix this up
 	refinement_indicators(cell_no)
 	  = std::log( 1.0 + std::sqrt( grad_saturation[0] *
 				       grad_saturation[0] ) );
