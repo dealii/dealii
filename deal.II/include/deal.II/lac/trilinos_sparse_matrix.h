@@ -3241,8 +3241,8 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
-    AssertDimension (dst.local_size(), matrix->RangeMap().NumMyElements());
-    AssertDimension (src.local_size(), matrix->DomainMap().NumMyElements());
+    AssertDimension (dst.local_size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
+    AssertDimension (src.local_size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
 
     Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->DomainMap(),
@@ -3282,8 +3282,8 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
-    AssertDimension (dst.local_size(), matrix->DomainMap().NumMyElements());
-    AssertDimension (src.local_size(), matrix->RangeMap().NumMyElements());
+    AssertDimension (dst.local_size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
+    AssertDimension (src.local_size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
 
     Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->RangeMap(),
