@@ -23,6 +23,7 @@
 #include <deal.II/dofs/function_map.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/hp/mapping_collection.h>
 
 #include <vector>
 #include <set>
@@ -39,6 +40,7 @@ template <int dim, int spacedim> class DoFHandler;
 namespace hp
 {
   template <int dim, int spacedim> class DoFHandler;
+  template <int dim, int spacedim> class MappingCollection;
 }
 template <int dim, int spacedim> class MGDoFHandler;
 class ConstraintMatrix;
@@ -2191,6 +2193,16 @@ namespace DoFTools
   map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
 			      const DoFHandler<dim,spacedim>    &dof_handler,
 			      std::vector<Point<spacedim> >     &support_points);
+
+            /**
+             * Same as above for the hp case.
+             */
+
+  template <int dim, int spacedim>
+  void
+  map_dofs_to_support_points (const dealii::hp::MappingCollection<dim,spacedim>   &mapping,
+        const hp::DoFHandler<dim,spacedim>    &dof_handler,
+        std::vector<Point<spacedim> > &support_points);
 
 				   /**
 				    * This is the opposite function

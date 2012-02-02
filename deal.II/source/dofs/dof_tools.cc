@@ -36,6 +36,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/hp/fe_collection.h>
+#include <deal.II/hp/q_collection.h>
+#include <deal.II/hp/fe_values.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/vectors.h>
 
@@ -5688,51 +5690,103 @@ namespace DoFTools
 		     dof_handler.n_boundary_dofs (boundary_indicators));
   }
 
+  namespace internal
+  {
+    namespace
+    {
+      template<class DH>
+      void  map_dofs_to_support_points_internal(
+          const hp::MappingCollection<DH::dimension, DH::space_dimension> & mapping,
+          const DH  &dof_handler,
+          std::vector<Point<DH::space_dimension> >  &support_points)
+      {
+          AssertDimension(support_points.size(), dof_handler.n_dofs());
 
+          const unsigned int dim = DH::dimension;
+          const unsigned int spacedim = DH::space_dimension;
+
+          hp::FECollection<dim, spacedim> fe_collection(dof_handler.get_fe());
+          hp::QCollection<dim> q_coll_dummy;
+
+          for (unsigned int fe_index = 0; fe_index < fe_collection.size(); ++fe_index)
+            {
+              // check whether every fe in the collection
+              // has support points
+              Assert(fe_collection[fe_index].has_support_points(),
+                  typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+              q_coll_dummy.push_back(
+                  Quadrature<dim> (
+                      fe_collection[fe_index].get_unit_support_points()));
+            }
+
+          // now loop over all cells and
+          // enquire the support points on
+          // each of these. we use dummy
+          // quadrature formulas where the
+          // quadrature points are located at
+          // the unit support points to
+          // enquire the location of the
+          // support points in real space
+          //
+          // the weights of the quadrature
+          // rule have been set to invalid values
+          // by the used constructor.
+          hp::FEValues<dim, spacedim> hp_fe_values(mapping, fe_collection,
+              q_coll_dummy, update_quadrature_points);
+          typename DH::active_cell_iterator cell =
+              dof_handler.begin_active(), endc = dof_handler.end();
+
+          std::vector<unsigned int> local_dof_indices;
+          for (; cell != endc; ++cell)
+            {
+              hp_fe_values.reinit(cell);
+              const FEValues<dim, spacedim> &fe_values = hp_fe_values.get_present_fe_values();
+
+              local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+              cell->get_dof_indices(local_dof_indices);
+
+              const std::vector<Point<spacedim> > & points =
+                  fe_values.get_quadrature_points();
+              for (unsigned int i = 0; i < cell->get_fe().dofs_per_cell; ++i)
+                support_points[local_dof_indices[i]] = points[i];
+            };
+      }
+    }
+  }
 
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
-			      const DoFHandler<dim,spacedim>    &dof_handler,
-			      std::vector<Point<spacedim> > &support_points)
+      const DoFHandler<dim,spacedim>    &dof_handler,
+      std::vector<Point<spacedim> > &support_points)
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    AssertDimension(support_points.size(), dof_handler.n_dofs());
 
-				     // check whether fe has support
-				     // points
-    Assert (dof_handler.get_fe().has_support_points(),
-	    typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
-    AssertDimension (support_points.size(), dof_handler.n_dofs());
+    //Let the internal function do all the work,
+    //just make sure that it gets a MappingCollection
+    const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-				     // now loop over all cells and
-				     // enquire the support points on
-				     // each of these. use a dummy
-				     // quadrature formula where the
-				     // quadrature points are located at
-				     // the unit support points to
-				     // enquire the location of the
-				     // support points in real space
-				     //
-				     // the weights of the quadrature
-				     // rule are set to invalid values
-				     // by the used constructor.
-    Quadrature<dim> q_dummy(dof_handler.get_fe().get_unit_support_points());
-    FEValues<dim,spacedim> fe_values (mapping, dof_handler.get_fe(),
-				      q_dummy, update_quadrature_points);
-    typename DoFHandler<dim,spacedim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    internal::map_dofs_to_support_points_internal(
+        mapping_collection,
+        dof_handler, support_points);
+  }
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-    for (; cell!=endc; ++cell)
-      {
-	fe_values.reinit (cell);
-	cell->get_dof_indices (local_dof_indices);
-	const std::vector<Point<spacedim> > & points
-	  = fe_values.get_quadrature_points ();
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  support_points[local_dof_indices[i]] = points[i];
-      };
+
+  template<int dim, int spacedim>
+  void
+  map_dofs_to_support_points(
+      const hp::MappingCollection<dim, spacedim> &mapping,
+      const hp::DoFHandler<dim, spacedim> &dof_handler,
+      std::vector<Point<spacedim> > &support_points)
+  {
+    AssertDimension(support_points.size(), dof_handler.n_dofs());
+
+    //Let the internal function do all the work,
+    //just make sure that it gets a MappingCollection
+    internal::map_dofs_to_support_points_internal(
+        mapping,
+        dof_handler,
+        support_points);
   }
 
 

@@ -81,6 +81,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: DoFTools::map_dofs_to_support_points() now also works within the hp framework.
+<br>
+(Christian Goll, 2012/02/02)
+
 <li> Improved: There is now a constructor for FESystem that allows to
 create collections of finite elements of arbitrary length.
 <br>
