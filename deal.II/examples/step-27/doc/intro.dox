@@ -5,7 +5,7 @@ This tutorial program attempts to show how to use $hp$ finite element methods
 with deal.II. It solves the Laplace equation and so builds only on the first
 few tutorial programs, in particular on step-4 for dimension
 independent programming and step-6 for adaptive mesh
-refinement. 
+refinement.
 
 The $hp$ finite element method was proposed in the early 1980s by
 Babuska and Guo as an alternative to either
@@ -19,7 +19,7 @@ degrees of regularity can not be guaranteed in the vicinity of boundaries,
 corners, or where coefficients are discontinuous; consequently, the
 approximation can not be improved in these areas by increasing the polynomial
 degree $p$ but only by refining the mesh, i.e. by reducing the mesh size
-$h$. These differing means to reduce the 
+$h$. These differing means to reduce the
 error have led to the notion of $hp$ finite elements, where the approximating
 finite element spaces are adapted to have a high polynomial degree $p$
 wherever the solution is sufficiently smooth, while the mesh width $h$ is
@@ -58,7 +58,7 @@ introduction. It will not come as a big surprise that most of these
 tasks are already well supported by functionality provided by the
 deal.II libraries, and that we will only have to provide the logic of
 what the program should do, not exactly how all this is going to
-happen. 
+happen.
 
 In deal.II, the $hp$ functionality is largely packaged into
 the hp namespace. This namespace provides classes that handle
@@ -72,7 +72,7 @@ module and the links found there.
 It may be worth giving a slightly larger perspective at the end of
 this first part of the introduction. $hp$ functionality has been
 implemented in a number of different finite element packages (see, for
-example, the list of references cited in the @ref hp_paper "hp paper"). 
+example, the list of references cited in the @ref hp_paper "hp paper").
 However, by and large, most of these packages have implemented it only
 for the (i) the 2d case, and/or (ii) the discontinuous Galerkin
 method. The latter is a significant simplification because
@@ -85,7 +85,7 @@ discontinuous elements in 1d, 2d, and 3d, and automatically handles
 the resulting complexity. In particular, it handles computing the
 constraints (similar to hanging node constraints) of elements of
 different degree meeting at a face or edge. The many algorithmic and
-data structure techniques necessary for this are described in the 
+data structure techniques necessary for this are described in the
 @ref hp_paper "hp paper" for those interested in such detail.
 
 We hope that providing such a general implementation will help explore
@@ -203,7 +203,7 @@ that we do not use the same finite element object on each cell. In fact, we
 should not even use the same quadrature object for all cells, but rather
 higher order quadrature formulas for cells where we use higher order finite
 elements. Similarly, we may want to use higher order mappings on such cells as
-well. 
+well.
 
 To facilitate these considerations, deal.II has a class hp::FEValues that does
 what we need in the current context. The difference is that instead of a
@@ -214,7 +214,7 @@ i.e. the interesting part of the loop over all cells would look like this:
 @code
   hp::FEValues<dim> hp_fe_values (mapping_collection,
                                   fe_collection,
-				  quadrature_collection, 
+				  quadrature_collection,
 				  update_values    |  update_gradients |
 				  update_q_points  |  update_JxW_values);
 
@@ -227,7 +227,7 @@ i.e. the interesting part of the loop over all cells would look like this:
                            cell->active_fe_index(),
                            cell->active_fe_index(),
                            cell->active_fe_index());
-      
+
       const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values ();
 
       ...  // assemble local contributions and copy them into global object
@@ -267,7 +267,7 @@ inspect the computed solution (a posteriori) with an indicator that tells us
 which are the cells where the error is largest, and then refine them. In many
 of the other tutorial programs, we use the KellyErrorEstimator class to get an
 indication of the size of the error on a cell, although we also discuss more
-complicated strategies in some programs, most importantly in step-14. 
+complicated strategies in some programs, most importantly in step-14.
 
 In any case, as long as the decision is only "refine this cell" or "do not
 refine this cell", the actual refinement step is not particularly
@@ -325,7 +325,7 @@ with Fourier vectors ${\bf k}=(k_x,k_y)$ in 2d, ${\bf k}=(k_x,k_y,k_z)$
 in 3d, etc, and $k_x,k_y,k_z=0,\pi,2\pi,3\pi,\ldots$. If we re-compose $\hat u$
 from $\hat U$ using the formula
 @f[
-	\hat u(\hat{\bf x}) 
+	\hat u(\hat{\bf x})
 	= \frac 1{(2\pi)^{d/2}} \sum_{\bf k} e^{-i {\bf k}\cdot \hat{\bf x}} \hat U_{\bf k},
 @f]
 then it becomes clear that we can write the $H^s$ norm of $\hat u$ as
@@ -338,7 +338,7 @@ then it becomes clear that we can write the $H^s$ norm of $\hat u$ as
 	  \sum_{\bf k} |{\bf k}|^s e^{-i{\bf k}\cdot \hat{\bf x}} \hat U_{\bf k}
         \right|^2 \; d\hat{\bf x}
 	=
-	\sum_{\bf k} 
+	\sum_{\bf k}
 	  |{\bf k}|^{2s}
 	  |\hat U_{\bf k}|^2.
 @f]
@@ -363,7 +363,7 @@ much the same way as we can transform the volume element $dx\;dy$ into
 $2\pi r\; dr$. Consequently, it is no longer $|{\bf k}|^{2s}|\hat
 U_{\bf k}|^2$ that has to decay as ${\cal O}(|{\bf k}|^{-1-\epsilon})$, but
 it is in fact $|{\bf k}|^{2s}|\hat U_{\bf k}|^2 |{\bf k}|^{d-1}$. A
-comparison of exponents yields the result.) 
+comparison of exponents yields the result.)
 
 We can turn this around: Assume we are given a function $\hat u$ of unknown
 smoothness. Let us compute its Fourier coefficients $\hat U_{\bf k}$
@@ -397,7 +397,7 @@ is not particularly hard: from the definition
 we see that we can compute the coefficient $\hat U_{\bf k}$ as
 @f[
 	\hat U_{\bf k}
-	= \frac 1{(2\pi)^{d/2}} 
+	= \frac 1{(2\pi)^{d/2}}
           \sum_{i=0}^{\textrm{\tiny dofs per cell}}
           \left[\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_i(\hat{\bf x})
 	  d\hat{\bf x} \right] u_i,
@@ -411,7 +411,7 @@ cell. In other words, we can write it as a matrix-vector product
 with the matrix
 @f[
 	{\cal F}_{{\bf k},j}
-	= \frac 1{(2\pi)^{d/2}} 
+	= \frac 1{(2\pi)^{d/2}}
 	\int_{\hat K} e^{i {\bf k}\cdot \hat{\bf x}} \hat \varphi_j(\hat{\bf x}) d\hat{\bf x}.
 @f]
 This matrix is easily computed for a given number of shape functions
@@ -436,15 +436,15 @@ logarithm of our coefficients to the logarithm of $\alpha |{\bf k}|^{-\mu}$,
 like this:
 @f[
 	\min_{\alpha,\mu}
-	Q(\alpha,\mu) = 
+	Q(\alpha,\mu) =
 	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
 	\left( \ln |\hat U_{\bf k}| - \ln (\alpha |{\bf k}|^{-\mu})\right)^2.
 @f]
 Using the usual facts about logarithms, we see that this yields the
-problem 
+problem
 @f[
 	\min_{\beta,\mu}
-	Q(\beta,\mu) = 
+	Q(\beta,\mu) =
 	\frac 12 \sum_{{\bf k}, |{\bf k}|\le N}
 	\left( \ln |\hat U_{\bf k}| - \beta + \mu \ln |{\bf k}|\right)^2,
 @f]
@@ -455,10 +455,10 @@ write these conditions as follows:
 @f[
 	\left(\begin{array}{cc}
 	\sum_{{\bf k}, |{\bf k}|\le N} 1 &
-	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}| 
+	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|
 	\\
 	\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}| &
-	\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2 
+	\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2
 	\end{array}\right)
 	\left(\begin{array}{c}
 	\beta \\ -\mu
@@ -467,12 +467,12 @@ write these conditions as follows:
 	\left(\begin{array}{c}
 	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}|
 	\\
-	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}| 
+	\sum_{{\bf k}, |{\bf k}|\le N} \ln |\hat U_{{\bf k}}| \ln |{\bf k}|
 	\end{array}\right)
 @f]
 This linear system is readily inverted to yield
 @f[
-	\beta = 
+	\beta =
 	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
                 \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
 		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
@@ -486,7 +486,7 @@ This linear system is readily inverted to yield
 @f]
 and
 @f[
-	\mu = 
+	\mu =
 	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
                 \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
 		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
@@ -533,7 +533,7 @@ viewpoint that we should tailor the polynomial degree to the lowest amount of
 regularity, in order to keep numerical efforts low. Consequently, instead of
 using the formula
 @f[
-	\mu = 
+	\mu =
 	\frac 1{\left(\sum_{{\bf k}, |{\bf k}|\le N} 1\right)
                 \left(\sum_{{\bf k}, |{\bf k}|\le N} (\ln |{\bf k}|)^2\right)
 		-\left(\sum_{{\bf k}, |{\bf k}|\le N} \ln |{\bf k}|\right)^2}
@@ -553,8 +553,8 @@ following sums:
 @f[
   \sum_{{\bf k}, |{\bf k}|\le N}
   \longrightarrow
-  \sum_{{{\bf k}, |{\bf k}|\le N} \atop {|\hat U_{{\bf k}}| \ge |\hat U_{{\bf k}'}|
-  \ \textrm{for all}\ {\bf k}'\ \textrm{with}\ |{\bf k}'|=|{\bf k}|}}
+  \sum_{\footnotesize \begin{matrix}{{\bf k}, |{\bf k}|\le N} \\ {|\hat U_{{\bf k}}| \ge |\hat U_{{\bf k}'}|
+  \ \textrm{for all}\ {\bf k}'\ \textrm{with}\ |{\bf k}'|=|{\bf k}|}\end{matrix}}
 @f]
 This is the form we will implement in the program.
 
@@ -584,12 +584,12 @@ cell</i>, but to fit the coefficients $\hat U_{{\bf k}}$ computed on the
 reference cell <i>to the Fourier frequencies on the real cell $|\vec
 k|h$</i>, where $h$ is the norm of the transformation operator (i.e. something
 like the diameter of the cell). In other words, we would have to minimize the
-sum of squares of the terms 
+sum of squares of the terms
 @f[
 	\ln |\hat U_{{\bf k}}| - \beta + \mu \ln (|{\bf k}|h).
 @f]
 instead. However, using fundamental properties of the logarithm, this is
-simply equivalent to minimizing 
+simply equivalent to minimizing
 @f[
 	\ln |\hat U_{{\bf k}}| - (\beta - \mu \ln h) + \mu \ln (|{\bf k}|).
 @f]
@@ -612,7 +612,7 @@ freedom leads to matrices with large numbers of nonzero entries in some
 rows. At the same time, because there are areas where we use low polynomial
 degree and consequently matrix rows with relatively few nonzero
 entries. Consequently, allocating the sparsity pattern for these matrices is a
-challenge. 
+challenge.
 
 Most programs built on deal.II use the DoFTools::make_sparsity_pattern
 function to allocate the sparsity pattern of a matrix, and later add a few
@@ -647,7 +647,7 @@ object, something that can be done very efficient and without having to
 over-allocate memory. Typical code doing this is shown in the documentation of
 the CompressedSparsityPattern class. This solution is slower than directly
 building a SparsityPattern object, but only uses as much memory as is really
-necessary. 
+necessary.
 
 As it now turns out, the storage format used in the
 CompressedSparsityPattern class is not very good for matrices with
@@ -686,7 +686,7 @@ these constrained degrees of freedom by first building an object of type
 ConstraintMatrix that stores the constraints, and then "condensing" away these
 degrees of freedom first from the sparsity pattern. The same scheme is used
 for the matrix and right hand side, which are also both first built then
-condensed. 
+condensed.
 
 Dealing with sparsity patterns and matrices in this way turns out to be
 inefficient because the effort necessary is at least ${\cal O}(N \log N)$ in
@@ -694,7 +694,7 @@ the number of unknowns, whereas an ideal finite element program would of
 course only have algorithms that are linear in the number of unknowns. The
 solution to this problem is to use the ConstraintMatrix object already at the
 time of creating the sparsity pattern, or while copying local contributions
-into the global matrix object (or global vector). 
+into the global matrix object (or global vector).
 
 So, instead of the code snippet (taken from step-6)
 @code
@@ -741,7 +741,7 @@ we have always used a process like this:
 	  for (unsigned int j=0; j<dofs_per_cell; ++j)
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
-			       cell_matrix(i,j));	  
+			       cell_matrix(i,j));
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
     }

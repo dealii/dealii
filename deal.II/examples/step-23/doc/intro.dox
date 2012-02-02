@@ -15,19 +15,19 @@ $u(x,t), x\in\Omega, t\in[0,T]$ that satisfies
 	\frac{\partial^2 u}{\partial t^2}
 	-
 	\Delta u &=& f
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega\times [0,T],
 \\
 	u(x,t) &=& g
-	\qquad 
+	\qquad
 	\textrm{on}\ \partial\Omega\times [0,T],
 \\
 	u(x,0) &=& u_0(x)
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega,
 \\
 	\frac{\partial u(x,0)}{\partial t} &=& u_1(x)
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega.
 @f}
 Note that since this is an equation with second-order time
@@ -55,7 +55,7 @@ There is a long-standing debate in the numerical analysis community
 over whether a discretization of time dependent equations should
 involve first discretizing the time variable leading to a stationary
 PDE at each time step that is then solved using standard finite
-element techniques (this is called the Rothe method), or whether 
+element techniques (this is called the Rothe method), or whether
 one should first discretize the spatial variables, leading to a large
 system of ordinary differential equations that can then be handled by
 one of the usual ODE solvers (this is called the method of lines).
@@ -98,7 +98,7 @@ all. On the other hand, for the Rothe method, we just get a PDE for
 each time step that we may choose to discretize independently of the
 mesh used for the previous time step; this approach is not without
 perils and difficulties, but at least is a sensible and well-defined
-procedure. 
+procedure.
 
 For all these reasons, for the present program, we choose to use the
 Rothe method for discretization, i.e. we first discretize in time and
@@ -130,25 +130,25 @@ then reformulate the original wave equation as follows:
 	-
 	v
 	&=& 0
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega\times [0,T],
 \\
 	\frac{\partial v}{\partial t}
 	-
 	\Delta u &=& f
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega\times [0,T],
 \\
 	u(x,t) &=& g
-	\qquad 
+	\qquad
 	\textrm{on}\ \partial\Omega\times [0,T],
 \\
 	u(x,0) &=& u_0(x)
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega,
 \\
 	v(x,0) &=& u_1(x)
-	\qquad 
+	\qquad
 	\textrm{in}\ \Omega.
 @f}
 The advantage of this formulation is that it now only contains first
@@ -158,16 +158,16 @@ conditions for $v$ at first. However, we could enforce $v=\frac{\partial
 g}{\partial t}$ on the boundary. It turns out in numerical examples that this
 as actually necessary: without doing so the solution doesn't look particularly
 wrong, but the Crank-Nicolson scheme does not conserve energy if one doesn't
-enforce these boundary conditions. 
+enforce these boundary conditions.
 
 With this formulation, let us introduce the following time
 discretization where a superscript $n$ indicates the number of a time
-step and $k=t_n-t_{n-1}$ is the length of the present time step: 
+step and $k=t_n-t_{n-1}$ is the length of the present time step:
 \f{eqnarray*}
-  \frac{u^n - u^{n-1}}{k} 
+  \frac{u^n - u^{n-1}}{k}
   - \left[\theta v^n + (1-\theta) v^{n-1}\right] &=& 0,
   \\
-  \frac{v^n - v^{n-1}}{k} 
+  \frac{v^n - v^{n-1}}{k}
   - \Delta\left[\theta u^n + (1-\theta) u^{n-1}\right]
   &=& \theta f^n + (1-\theta) f^{n-1}.
 \f}
@@ -175,14 +175,14 @@ Note how we introduced a parameter $\theta$ here. If we chose
 $\theta=0$, for example, the first equation would reduce to
 $\frac{u^n - u^{n-1}}{k}  - v^{n-1} = 0$, which is well-known as the
 forward or explicit Euler method. On the other hand, if we set
-$\theta=1$, then we would get 
+$\theta=1$, then we would get
 $\frac{u^n - u^{n-1}}{k}  - v^n = 0$, which corresponds to the
 backward or implicit Euler method. Both these methods are first order
 accurate methods. They are simple to implement, but they are not
 really very accurate.
 
 The third case would be to choose $\theta=\frac 12$. The first of the
-equations above would then read $\frac{u^n - u^{n-1}}{k} 
+equations above would then read $\frac{u^n - u^{n-1}}{k}
 - \frac 12 \left[v^n + v^{n-1}\right] = 0$. This method is known as
 the Crank-Nicolson method and has the advantage that it is second
 order accurate. In addition, it has the nice property that it
@@ -204,7 +204,7 @@ simplified a bit by eliminating $v^n$ from the first equation and
 rearranging terms. We then get
 \f{eqnarray*}
   \left[ 1-k^2\theta^2\Delta \right] u^n &=&
-  	 \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} + k v^{n-1} 
+  	 \left[ 1+k^2\theta(1-\theta)\Delta\right] u^{n-1} + k v^{n-1}
    	 + k^2\theta\left[\theta f^n + (1-\theta) f^{n-1}\right],\\
    v^n &=& v^{n-1} + k\Delta\left[ \theta u^n + (1-\theta) u^{n-1}\right]
    + k\left[\theta f^n + (1-\theta) f^{n-1}\right].
@@ -238,10 +238,10 @@ to
   \right],
   \\
   (v^n,\varphi)
-   &=& 
+   &=&
    (v^{n-1},\varphi)
-    - 
-    k\left[ \theta (\nabla u^n,\nabla\varphi) + 
+    -
+    k\left[ \theta (\nabla u^n,\nabla\varphi) +
     (1-\theta) (\nabla u^{n-1},\nabla \varphi)\right]
   + k
   \left[
@@ -264,7 +264,7 @@ we have to use shape functions $\phi^{n-1}_i(x)$.
 
 If we plug these expansions into above equations and test with the
 test functions from the present mesh, we get the following linear
-system: 
+system:
 \f{eqnarray*}
   (M^n + k^2\theta^2 A^n)U^n &=&
   M^{n,n-1}U^{n-1} - k^2\theta(1-\theta) A^{n,n-1}U^{n-1}
@@ -276,9 +276,9 @@ system:
   \right],
   \\
   M^nV^n
-   &=& 
+   &=&
    M^{n,n-1}V^{n-1}
-    - 
+    -
     k\left[ \theta A^n U^n +
     (1-\theta) A^{n,n-1} U^{n-1}\right]
    + k
@@ -288,11 +288,11 @@ system:
 \f}
 where
 @f{eqnarray*}
-	M^n_{ij} &=& (\phi_i^n, \phi_j^n), 
+	M^n_{ij} &=& (\phi_i^n, \phi_j^n),
 	\\
-	A^n_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^n), 
+	A^n_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^n),
 	\\
-	M^{n,n-1}_{ij} &=& (\phi_i^n, \phi_j^{n-1}), 
+	M^{n,n-1}_{ij} &=& (\phi_i^n, \phi_j^{n-1}),
 	\\
 	A^{n,n-1}_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^{n-1}),
 	\\
@@ -317,7 +317,7 @@ detail in step-28.
 Under these conditions (i.e. a mesh that doesn't change), one can optimize the
 solution procedure a bit by basically eliminating the solution of the second
 linear system. We will discuss this in the introduction of the @ref step_25
-"step-25" program. 
+"step-25" program.
 
 <h3>Energy conservation</h3>
 
@@ -343,7 +343,7 @@ that
 	t}\right)^2 + (\nabla u)^2 \; dx
 @f]
 is a conserved quantity, i.e. one that doesn't change with time. We
-will compute this quantity after each time 
+will compute this quantity after each time
 step. It is straightforward to see that if we replace $u$ by its finite
 element approximation, and $\frac{\partial u}{\partial t}$ by the finite
 element approximation of the velocity $v$, then
@@ -354,7 +354,7 @@ element approximation of the velocity $v$, then
 @f]
 As we will see in the results section, the Crank-Nicolson scheme does indeed
 conserve the energy, whereas neither the forward nor the backward Euler scheme
-do. 
+do.
 
 
 <h3>Who are Courant, Friedrichs, and Lewy?</h3>
@@ -403,11 +403,11 @@ a square $[-1,1]^2$ and
 	\\
 	u_1 &=& 0,
 	\\
-	g &=& \left\{{\sin (4\pi t) \atop 0} 
-	\qquad {\textrm{for}\ t\le \frac 12, x=-1, -\frac 13<y<\frac 13 
+	g &=& \left\{\begin{matrix}\sin (4\pi t) \\ 0\end{matrix}
+	\qquad {\textrm{for}\ t\le \frac 12, x=-1, -\frac 13<y<\frac 13
 	\atop \textrm{otherwise}}
 	\right.
 @f}
 This corresponds to a membrane initially at rest and clamped all around, where
 someone is waving a part of the clamped boundary once up and down, thereby
-shooting a wave into the domain. 
+shooting a wave into the domain.

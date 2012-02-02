@@ -52,7 +52,7 @@ equations. We here adopt the convention of the solid mechanics community which
 uses the symmetric gradient. This differs from the convention in the fluids
 community by a factor of two since the fact that $\textrm{div}\; \textbf{u}=0$
 implies that $-\textrm{div}\; \varepsilon(\textbf{u}) = \frac 12 \Delta
-\textbf{u}$. The equations above are therefore equivalent to 
+\textbf{u}$. The equations above are therefore equivalent to
 @f{eqnarray*}
   -\frac 12 \Delta\textbf{u} + \nabla p &=& \textbf{f},
   \\
@@ -69,20 +69,20 @@ system matrix and preconditioner.
 The weak form of the equations is obtained by writing it in vector
 form as
 @f{eqnarray*}
-  \left(
-  {-\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
-  \atop
-  {-\textrm{div}\; \textbf{u}}
-  \right)
+  \begin{pmatrix}
+    {-\textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
+    \\
+    {-\textrm{div}\; \textbf{u}}
+  \end{pmatrix}
   =
-  \left(
+  \begin{pmatrix}
   {\textbf{f}}
-  \atop
+  \\
   0
-  \right),
+  \end{pmatrix},
 @f}
 forming the dot product from the left with a vector-valued test
-function $\phi = \left({\textbf v \atop q}\right)$ and integrating
+function $\phi = \begin{pmatrix}\textbf v \\ q\end{pmatrix}$ and integrating
 over the domain $\Omega$, yielding the following set of equations:
 @f{eqnarray*}
   (\mathrm v,
@@ -92,8 +92,8 @@ over the domain $\Omega$, yielding the following set of equations:
   =
   (\textbf{v}, \textbf{f})_\Omega,
 @f}
-which has to hold for all test functions $\phi = \left({\textbf v
-\atop q}\right)$.
+which has to hold for all test functions $\phi = \begin{pmatrix}\textbf v
+\\ q\end{pmatrix}$.
 
 In practice, one wants to impose as little regularity on the pressure
 variable as possible; consequently, we integrate by parts the second term:

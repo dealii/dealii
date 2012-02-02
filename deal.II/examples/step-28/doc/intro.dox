@@ -18,7 +18,7 @@ bibliographic details are as follows:
 @endcode
 A preprint that mostly matches the final version of the paper is
 available <a target="_top"
-href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=19">here</a>. 
+href="http://iamcs.tamu.edu/file_dl.php?type=preprint&preprint_id=19">here</a>.
 </i>
 
 <br>
@@ -33,7 +33,7 @@ the neutron transport equation. Essentially, the way to view this is as follows:
 nuclear reactor, neutrons are speeding around at different energies, get
 absorbed or scattered, or start a new fission
 event. If viewed at long enough length scales, the movement of neutrons can be
-considered a diffusion process. 
+considered a diffusion process.
 
 A mathematical description of this would group neutrons into energy bins, and
 consider the balance equations for the neutron fluxes in each of these
@@ -64,11 +64,11 @@ time in flux of neutrons in group $g$ is governed by the following
 processes:
 <ul>
 <li> Diffusion $\nabla \cdot(D_g(x) \nabla \phi_g(x,t))$. Here, $D_g$ is the
-  (spatially variable) diffusion coefficient. 
+  (spatially variable) diffusion coefficient.
 <li> Absorption $\Sigma_{r,g}(x)\phi_g(x,t)$ (note the
   negative sign). The coefficient $\Sigma_{r,g}$ is called the <i>removal
   cross section</i>.
-<li> Nuclear fission $\chi_g\sum_{g'=1}^G\nu\Sigma_{f,g'}(x)\phi_{g'}(x,t)$. 
+<li> Nuclear fission $\chi_g\sum_{g'=1}^G\nu\Sigma_{f,g'}(x)\phi_{g'}(x,t)$.
   The production of neutrons of energy $g$ is
   proportional to the flux of neutrons of energy $g'$ times the
   probability $\Sigma_{f,g'}$ that neutrons of energy $g'$ cause a fission
@@ -78,7 +78,7 @@ processes:
   $\chi_g$ the <i>fission spectrum</i>. We will denote the term
   $\chi_g\nu\Sigma_{f,g'}$ as the <i>fission distribution cross
     section</i> in the program.
-<li> Scattering $\sum_{g'\ne g}\Sigma_{s,g'\to g}(x)\phi_{g'}(x,t)$ 
+<li> Scattering $\sum_{g'\ne g}\Sigma_{s,g'\to g}(x)\phi_{g'}(x,t)$
   of neutrons of energy $g'$ producing neutrons
   of energy $g$. $\Sigma_{s,g'\to g}$ is called the <i>scattering cross
     section</i>. The case of elastic, in-group scattering $g'=g$ exists, too, but
@@ -96,7 +96,7 @@ For realistic simulations in reactor analysis, one may want to split the
 continuous spectrum of neutron energies into many energy groups, often up to
 100. However, if neutron energy spectra are known well enough for some type of
 reactor (for example Pressurized Water Reactors, PWR), it is possible to obtain
-satisfactory results with only 2 energy groups. 
+satisfactory results with only 2 energy groups.
 
 In the program shown in this tutorial program, we provide the structure to
 compute with as many energy groups as desired. However, to keep computing
@@ -105,7 +105,7 @@ only provide the coefficients for above equations for a two-group simulation,
 i.e. $g=1,2$. We do, however, consider a realistic situation by assuming that
 the coefficients are not constant, but rather depend on the materials that are
 assembled into reactor fuel assemblies in rather complicated ways (see
-below). 
+below).
 
 
 <h3>The eigenvalue problem</h3>
@@ -186,7 +186,7 @@ $k_{\mathrm{eff}}=1$, one therefore has many seconds to react until all the
 neutrons created in fission re-enter the fission cycle. Nevertheless, control
 rods in nuclear reactors absorbing neutrons -- and therefore reducing
 $k_{\mathrm{eff}}$ -- are designed in such a way that they are all the way in
-the reactor in at most 2 seconds. 
+the reactor in at most 2 seconds.
 
 One therefore has on the order of 10-60 seconds to regulate the nuclear reaction
 if $k_{\mathrm{eff}}$ should be larger than one for some time, as indicated by
@@ -212,7 +212,7 @@ like this:
 
 <ol>
 <li> Initialize $\phi_g$ and $k_{\mathrm{eff}}$ with $\phi_g^{(0)}$
-  and $k_{\mathrm{eff}}^{(0)}$ and let $n=1$. 
+  and $k_{\mathrm{eff}}^{(0)}$ and let $n=1$.
 
 <li> Define the so-called <i>fission source</i> by
   @f{eqnarray*}
@@ -227,9 +227,9 @@ like this:
     -\nabla \cdot D_g\nabla \phi_g^{(n)}
     +
     \Sigma_{r,g}\phi_g^{(n)}
-    = 
+    =
     \chi_g s_f^{(n-1)}
-    + 
+    +
     \sum_{g'< g} \Sigma_{s,g'\to g} \phi_{g'}^{(n)}
     +
     \sum_{g'> g}\Sigma_{s,g'\to g}\phi_{g'}^{(n-1)}.
@@ -323,7 +323,7 @@ whose errors satisfy
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   >
   \alpha_1
-  \displaystyle{\max_{{1\le g\le G \atop K\in {\cal T}_g}}
+  \displaystyle{\max_{\footnotesize \begin{matrix}1\le g\le G \\ K\in {\cal T}_g\end{matrix}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}
 @f}
 and coarsen the cells where
@@ -331,7 +331,7 @@ and coarsen the cells where
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   <
   \alpha_2
-  \displaystyle{\max_{{1\le g\le G \choose K\in {\cal T}_g}}
+  \displaystyle{\max_{\footnotesize \begin{matrix}1\le g\le G \\ K\in {\cal T}_g\end{matrix}}
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}.
 @f}
 We chose $\alpha_1=0.3$ and $\alpha_2=0.01$ in the code. Note that this will,
@@ -360,15 +360,15 @@ compute the right hand side vector that contains terms of the following form:
   F_i = \int_\Omega f(x) \varphi_g^i(x) \phi_{g'}(x) \ dx,
 @f}
 where $f(x)$ is one of the coefficient functions $\Sigma_{s,g'\to g}$ or
-$\nu\chi_g\Sigma_{f,g'}$ used in the right hand side 
+$\nu\chi_g\Sigma_{f,g'}$ used in the right hand side
 of eigenvalue equation. The difficulty now is that $\phi_{g'}$ is defined on
 the mesh for energy group $g'$, i.e. it can be expanded as
 $\phi_{g'}(x)=\sum_j\phi_{g'}^j \varphi_{g'}^j(x)$, with basis functions
 $\varphi_{g'}^j(x)$ defined on mesh $g'$. The contribution to the right hand
 side can therefore be written as
 @f{eqnarray*}
-  F_i = \sum_j \left\{\int_\Omega f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
-  \ dx \right\} \phi_{g'}^j , 
+  F_i = \sum_j \left\{\int_\Omega f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
+  \ dx \right\} \phi_{g'}^j ,
 @f}
 On the other hand, the test functions $\varphi_g^i(x)$ are defined on mesh
 $g$. This means that we can't just split the integral $\Omega$ into integrals
@@ -394,10 +394,10 @@ of cells that are active on at least one of two meshes.
 
 With this, we can write above integral as follows:
 @f{eqnarray*}
-  F_i 
-  = 
+  F_i
+  =
   \sum_{K \in {\cal T}_g \cap {\cal T}_{g'}}
-  \sum_j \left\{\int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
+  \sum_j \left\{\int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
   \ dx \right\} \phi_{g'}^j.
 @f}
  In the code, we
@@ -452,13 +452,13 @@ these three cases, as follows:
   @f{eqnarray*}
     F_i|_K
     &=&
-    \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
-    \ dx \right\} \phi_{g'}^j 
+    \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
+    \ dx \right\} \phi_{g'}^j
     \\
     &=&
     \left\{
     \sum_{0\le c<2^{\texttt{dim}}}
-    B_c^{il} \int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x) 
+    B_c^{il} \int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x)
     \ dx \right\} \phi_{g'}^j.
   @f}
   In matrix notation, this can be written as
@@ -474,7 +474,7 @@ these three cases, as follows:
   @f}
   where $M_{K_c}^{lj}=\int_{K_c} f(x) \varphi_{g'}^l(x) \varphi_{g'}^j(x)$ is
   the weighted mass matrix on child $c$ of cell $K$.
-  
+
   The next question is what happens if a child $K_c$ of $K$ is not
   active. Then, we have to apply the process recursively, i.e. we have to
   interpolate the basis functions $\varphi_g^i$ onto child $K_c$ of $K$, then
@@ -506,13 +506,13 @@ these three cases, as follows:
   @f{eqnarray*}
     F_i|_K
     &=&
-    \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x) 
-    \ dx \right\} \phi_{g'}^j 
+    \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
+    \ dx \right\} \phi_{g'}^j
     \\
     &=&
     \left\{
     \sum_{0\le c<2^{\texttt{dim}}}
-    \int_{K_c} f(x) \varphi_g^i(x) B_c^{jl} \varphi_{g}^l(x) 
+    \int_{K_c} f(x) \varphi_g^i(x) B_c^{jl} \varphi_{g}^l(x)
     \ dx \right\} \phi_{g'}^j.
   @f}
   In matrix notation, this expression now reads as
@@ -539,7 +539,7 @@ these three cases, as follows:
   @f}
   etc. In other words, the process works in exactly the same way as before,
   except that we have to take the transpose of the prolongation matrices and
-  need to multiply it to the mass matrix from the other side. 
+  need to multiply it to the mass matrix from the other side.
 </ol>
 
 
