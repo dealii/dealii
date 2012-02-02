@@ -454,14 +454,6 @@ namespace Step27
 					solution,
 					estimated_error_per_cell);
 
-    std::vector<dealii::Point<2> > support_points(dof_handler.n_dofs());
-
-    DoFTools::map_dofs_to_support_points(hp::StaticMappingQ1<dim>::mapping_collection,
-        dof_handler, support_points);
-
-
-    dealii::Point<dim> p(0.5,0.75);
-    std::cout << VectorTools::point_value(dof_handler, solution, p) << std::endl;
 
     Vector<float> smoothness_indicators (triangulation.n_active_cells());
     estimate_smoothness (smoothness_indicators);
