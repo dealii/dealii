@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -77,6 +77,12 @@ namespace MeshWorker
 					 /**
 					  * Assemble the local residuals
 					  * into the global residuals.
+					  *
+					  * Values are added to the
+					  * previous contents. If
+					  * constraints are active,
+					  * ConstraintMatrix::distribute_local_to_global()
+					  * is used.
 					  */
 	template <class DOFINFO>
 	void assemble(const DOFINFO& info);
