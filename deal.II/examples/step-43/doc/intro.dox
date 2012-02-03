@@ -473,16 +473,23 @@ method, using an incomplete Cholesky decomposition as preconditioner once
 more.
 
 <h3>The test cases.</h3>
-The implementation discussed here uses and extends
-parts of the step-21, step-31 and step-33 tutorial programs of this library. We
-use the implementation of the incomplete Cholesky decomposition provided by
-the <code>Trilinos</code> library (see [Trilinos 2004]).
 
-We show numerical results that illustrate the
-efficiency and accuracy of our combined methods in solving the two-phase flow equations
+@note
+The implementation discussed here uses and extends
+parts of the step-21, step-31 and step-33 tutorial programs of this
+library. In particular, if you want to understand how it works, please
+consult step-21 for a discussion of the mathematical problem, and
+step-31 from which most of the implementation is derived. We will not
+discuss aspects of the implementation that have already been discussed
+in step-31.
+
+We show numerical results for some two-phase flow equations
 augmented by
 appropriate initial and boundary conditions in conjunction with two different choices of the
-permeability model. In the problems considered, there is no internal source term ($q=0$).
+permeability model. In the problems considered, there is no internal
+source term ($q=0$). As mentioned above, quantitative numerical
+results are presented in [Chueh, Djilali
+and Bangerth 2011].
 
 For simplicity, we choose $\Omega=[0,1]^d,d=2,3$, though all methods (as well
 as our implementation) should work equally well on general unstructured meshes.
@@ -583,13 +590,6 @@ D Silvester and A Wathen.
 GH Golub and CF van Loan.
 <br> <i>Matrix Computations</i>.
 <br> 3rd Edition, Johns Hopkins, 1996.
-
-<li>
-MA Heroux, RA Bartlett, VE Howle, RJ Hoekstra, JJ Hu, TG Kolda, RB Lehoucq,
-  KR Long, RP Pawlowski, ET Phipps, AG Salinger, HK Thornquist, RS Tuminaro,
-  JM Willenbring, A Williams, and KS Stanley.
-<br> An overview of the trilinos project.
-<br> <i>ACM Trans. Math. Softw.</i>, 31(3):397-423, 2005.
 
 <li>
 SE Buckley and MC Leverett.

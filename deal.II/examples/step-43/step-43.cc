@@ -1,4 +1,4 @@
-/* Author: Chih-Che Chueh, University of Victoria, 2010 */
+﻿/* Author: Chih-Che Chueh, University of Victoria, 2010 */
 /*         Wolfgang Bangerth, Texas A&M University, 2010 */
 
 /*    $Id$       */
@@ -13,31 +13,18 @@
 
 				 // @sect3{Include files}
 
-				 // The first step, as always, is to include
-				 // the functionality of these well-known
-				 // deal.II library files and some C++ header
+				 // The first step, as always, is to
+				 // include the functionality of a
+				 // number of deal.II and C++ header
 				 // files.
 				 //
-				 // In this program, we use a tensor-valued
-				 // coefficient. Since it may have a spatial
-				 // dependence, we consider it a tensor-valued
-				 // function. The following include file
-				 // provides the TensorFunction class that
-				 // offers such functionality:
-				 //
-				 // Then we need to include some header files
-				 // that provide vector, matrix, and
-				 // preconditioner classes that implement
-				 // interfaces to the respective Trilinos
-				 // classes, which has been used in
-				 // step-31. In particular, we will need
-				 // interfaces to the matrix and vector
-				 // classes based on Trilinos as well as
-				 // Trilinos preconditioners:
-				 //
-				 // At the end of this top-matter, we import
-				 // all deal.II names into the global
-				 // namespace:
+				 // The list includes some header
+				 // files that provide vector, matrix,
+				 // and preconditioner classes that
+				 // implement interfaces to the
+				 // respective Trilinos classes; some
+				 // more information on these may be
+				 // found in step-31.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -78,23 +65,32 @@
 #include <fstream>
 #include <sstream>
 
+
+				 // At the end of this top-matter, we
+				 // open a namespace for the current
+				 // project into which all the
+				 // following material will go, and
+				 // then import all deal.II names into
+				 // this namespace:
 namespace Step43
 {
   using namespace dealii;
 
 
-				   // @sect3{The InverseMatrix class template}
+				   // @sect3{Helper classes for solvers and preconditioners}
 
-				   // This part is exactly the same as that used in step-31.
-
-				   // @sect3{Schur complement preconditioner}
-
-				   // This part for the Schur complement
-				   // preconditioner is almost the same as that
-				   // used in step-31. The only difference is
-				   // that the original variable name
-				   // stokes_matrix is replaced by another name
-				   // darcy_matrix to satisfy our problem.
+				   // In this first part we define a
+				   // number of classes that we need
+				   // in the construction of linear
+				   // solvers and
+				   // preconditioners. This part is
+				   // essentially the same as that
+				   // used in step-31. The only
+				   // difference is that the original
+				   // variable name stokes_matrix is
+				   // replaced by another name
+				   // darcy_matrix to match our
+				   // problem.
   namespace LinearSolvers
   {
     template <class Matrix, class Preconditioner>
@@ -201,31 +197,39 @@ namespace Step43
 
 				   // @sect3{The TwoPhaseFlowProblem class}
 
-				   // The definition of the class that defines
-				   // the top-level logic of solving the
-				   // time-dependent advection-dominated
-				   // two-phase flow problem (or
+				   // The definition of the class that
+				   // defines the top-level logic of
+				   // solving the time-dependent
+				   // advection-dominated two-phase
+				   // flow problem (or
 				   // Buckley-Leverett problem
-				   // [Buckley 1942]) is mainly based on
-				   // three tutorial programs (step-21, step-31,
-				   // step-33). The main difference is that,
-				   // since adaptive operator splitting is
-				   // considered, we need a bool-type variable
-				   // solve_pressure_velocity_part to tell us
-				   // when we need to solve the pressure and
-				   // velocity part, need another bool-type
-				   // variable
-				   // previous_solve_pressure_velocity_part to
-				   // determine if we have to cumulate
-				   // micro-time steps that we need them to do
-				   // extrapolation for the total velocity, and
-				   // some solution vectors
+				   // [Buckley 1942]) is mainly based
+				   // on tutorial programs step-21 and
+				   // step-33, and in particular on
+				   // step-31 where we have used
+				   // basically the same general
+				   // structure as done here. The main
+				   // difference to step-31 is that,
+				   // since adaptive operator
+				   // splitting is considered, we need
+				   // a bool-type variable
+				   // <code>solve_for_pressure_and_velocity</code> to
+				   // tell us whether we need to solve
+				   // the pressure and velocity part,
+				   // need another bool-type variable
+				   // <code>previous_solve_for_pressure_and_velocity</code>
+				   // to determine if we have to
+				   // cumulate micro-time steps that
+				   // we need them to do extrapolation
+				   // for the total velocity, and some
+				   // solution vectors
 				   // (e.g. nth_darcy_solution_after_solving_pressure_part
 				   // and
 				   // n_minus_oneth_darcy_solution_after_solving_pressure_part)
-				   // to store some solutions in previous time
-				   // steps after the solution of the pressure
-				   // and velocity part.
+				   // to store some solutions in
+				   // previous time steps after the
+				   // solution of the pressure and
+				   // velocity part.
 				   //
 				   // The member functions within this class
 				   // have been named so properly so that
@@ -287,7 +291,7 @@ namespace Step43
       double get_maximal_velocity_times_dF_dS () const;
       std::pair<double,double> get_extrapolated_saturation_range () const;
       void solve ();
-      bool determine_whether_to_solve_pressure_velocity_part () const;
+      bool determine_whether_to_solve_for_pressure_and_velocity () const;
       void compute_refinement_indicators (Vector<double> &indicator) const;
       void refine_grid (const Vector<double> &indicator);
       void project_back_saturation ();
@@ -345,8 +349,8 @@ namespace Step43
       TrilinosWrappers::Vector             nth_saturation_solution_after_solving_pressure_part;
 
       const unsigned int        n_refinement_steps;
-      bool                      solve_pressure_velocity_part;
-      bool                      previous_solve_pressure_velocity_part;
+      bool                      solve_for_pressure_and_velocity;
+      bool                      previous_solve_for_pressure_and_velocity;
 
       const double              saturation_level;
       const double              saturation_refinement_threshold;
@@ -672,8 +676,8 @@ namespace Step43
 		  saturation_dof_handler (triangulation),
 
 		  n_refinement_steps (4),
-		  solve_pressure_velocity_part (false),
-		  previous_solve_pressure_velocity_part (false),
+		  solve_for_pressure_and_velocity (false),
+		  previous_solve_for_pressure_and_velocity (false),
 
 		  saturation_level (2),
 		  saturation_refinement_threshold (0.5),
@@ -1719,8 +1723,8 @@ namespace Step43
 				   // compute the present time step.
 				   //
 				   // Next, we need to use two bool variables
-				   // solve_pressure_velocity_part and
-				   // previous_solve_pressure_velocity_part to
+				   // <code>solve_for_pressure_and_velocity</code> and
+				   // <code>previous_solve_for_pressure_and_velocity</code> to
 				   // decide whether we stop or continue
 				   // cumulating the micro time steps for linear
 				   // extropolations in the next iteration. With
@@ -1737,9 +1741,9 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::solve ()
   {
-    solve_pressure_velocity_part = determine_whether_to_solve_pressure_velocity_part ();
+    solve_for_pressure_and_velocity = determine_whether_to_solve_for_pressure_and_velocity ();
 
-    if ( timestep_number <= 3 || solve_pressure_velocity_part == true )
+    if ( timestep_number <= 3 || solve_for_pressure_and_velocity == true )
       {
 	std::cout << "   Solving darcy system (pressure-velocity part)..." << std::endl;
 
@@ -1801,7 +1805,7 @@ namespace Step43
 				     // if we haven't computed the
 				     // velocity before, then
 				     // extrapolate now
-    if ( !(timestep_number <= 3 || solve_pressure_velocity_part == true ))
+    if ( !(timestep_number <= 3 || solve_for_pressure_and_velocity == true ))
       {
 	darcy_solution.block(0) = nth_darcy_solution_after_solving_pressure_part.block(0);
 	darcy_solution.block(0).sadd (2.0, -1.0, n_minus_oneth_darcy_solution_after_solving_pressure_part.block(0) );
@@ -1819,12 +1823,12 @@ namespace Step43
       }
 
     if ( timestep_number <= 3 ||
-	 ( solve_pressure_velocity_part == true && previous_solve_pressure_velocity_part == true ) )
+	 ( solve_for_pressure_and_velocity == true && previous_solve_for_pressure_and_velocity == true ) )
       {
 	n_minus_oneth_time_step = time_step;
 	cumulative_nth_time_step = 0.0;
       }
-    else if ( solve_pressure_velocity_part == true && previous_solve_pressure_velocity_part == false )
+    else if ( solve_for_pressure_and_velocity == true && previous_solve_for_pressure_and_velocity == false )
       {
 	n_minus_oneth_time_step = cumulative_nth_time_step;
 	cumulative_nth_time_step = 0.0;
@@ -1834,7 +1838,7 @@ namespace Step43
 	cumulative_nth_time_step += time_step;
       }
 
-    previous_solve_pressure_velocity_part = solve_pressure_velocity_part;
+    previous_solve_for_pressure_and_velocity = solve_for_pressure_and_velocity;
 
     std::cout << "   Solving saturation transport equation..." << std::endl;
 
@@ -1867,7 +1871,7 @@ namespace Step43
 
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_pressure_velocity_part}
+				   // @sect3{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity}
 
 				   // This function is to implement the a
 				   // posteriori criterion for
@@ -1893,7 +1897,7 @@ namespace Step43
 				   // method.
   template <int dim>
   bool
-  TwoPhaseFlowProblem<dim>::determine_whether_to_solve_pressure_velocity_part () const
+  TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity () const
   {
     if (timestep_number <= 3)
       return true;
@@ -2158,7 +2162,7 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results ()  const
   {
-    if ( solve_pressure_velocity_part == false )
+    if ( solve_for_pressure_and_velocity == false )
       return;
 
     const FESystem<dim> joint_fe (darcy_fe, 1,
@@ -2528,7 +2532,7 @@ namespace Step43
 
 	output_results ();
 
-	solve_pressure_velocity_part = false;
+	solve_for_pressure_and_velocity = false;
 
 	if ((timestep_number == 0) &&
 	    (pre_refinement_step < saturation_level))
