@@ -3,7 +3,7 @@
 <i>
 This program was contributed by Chih-Che Chueh (University of Victoria) and
 Wolfgang Bangerth. Results from this program are used and discussed in the
-following publications:
+following publications (in particular in the second one):
 - Chih-Che Chueh, Marc Secanell, Wolfgang Bangerth, Ned Djilali. Multi-level
   adaptive simulation of transient two-phase flow in heterogeneous porous
   media. Computers &amp; Fluids, 39:1585-1596, 2010
