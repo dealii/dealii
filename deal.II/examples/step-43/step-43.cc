@@ -1,4 +1,3 @@
-/* $Id$ */
 /* Author: Chih-Che Chueh, University of Victoria, 2010 */
 /*         Wolfgang Bangerth, Texas A&M University, 2010 */
 
@@ -278,13 +277,14 @@ namespace Step43
       void assemble_saturation_rhs_cell_term (const FEValues<dim>             &saturation_fe_values,
 					      const FEValues<dim>             &darcy_fe_values,
 					      const std::vector<unsigned int> &local_dof_indices,
-					      const double                     global_u_infty,
+					      const double                     global_u_infty_times_dF_dS,
 					      const double                     global_S_variation,
 					      const double                     global_Omega_diameter);
       void assemble_saturation_rhs_boundary_term (const FEFaceValues<dim>             &saturation_fe_face_values,
 						  const FEFaceValues<dim>             &darcy_fe_face_values,
 						  const std::vector<unsigned int>     &local_dof_indices);
-      double get_maximal_velocity () const;
+
+      double get_maximal_velocity_times_dF_dS () const;
       std::pair<double,double> get_extrapolated_saturation_range () const;
       void solve ();
       bool determine_whether_to_solve_pressure_velocity_part () const;
@@ -296,17 +296,17 @@ namespace Step43
       static
       double
       compute_viscosity(const std::vector<double>          &old_saturation,
-                        const std::vector<double>          &old_old_saturation,
-                        const std::vector<Tensor<1,dim> >  &old_saturation_grads,
-                        const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
-                        const std::vector<Vector<double> > &present_darcy_values,
-                        const double                        global_u_infty,
-                        const double                        global_S_variation,
-                        const double                        global_Omega_diameter,
-                        const double                        cell_diameter,
-                        const double                        old_time_step,
-                        const double                        viscosity,
-                        const double                        porosity);
+			const std::vector<double>          &old_old_saturation,
+			const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+			const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
+			const std::vector<Vector<double> > &present_darcy_values,
+			const double                        global_u_infty_times_dF_dS,
+			const double                        global_S_variation,
+			const double                        global_Omega_diameter,
+			const double                        cell_diameter,
+			const double                        old_time_step,
+			const double                        viscosity,
+			const double                        porosity);
 
 
       const unsigned int degree;
@@ -1495,7 +1495,7 @@ namespace Step43
     const unsigned int dofs_per_cell = saturation_dof_handler.get_fe().dofs_per_cell;
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-    const double global_u_infty = get_maximal_velocity ();
+    const double global_u_infty_times_dF_dS = get_maximal_velocity_times_dF_dS ();
     const std::pair<double,double>
       global_S_range = get_extrapolated_saturation_range ();
     const double global_S_variasion = global_S_range.second - global_S_range.first;
@@ -1516,7 +1516,7 @@ namespace Step43
 	assemble_saturation_rhs_cell_term(saturation_fe_values,
 					  darcy_fe_values,
 					  local_dof_indices,
-					  global_u_infty,
+					  global_u_infty_times_dF_dS,
 					  global_S_variasion,
 					  global_Omega_diameter);
 
@@ -1555,7 +1555,7 @@ namespace Step43
   assemble_saturation_rhs_cell_term (const FEValues<dim>             &saturation_fe_values,
 				     const FEValues<dim>             &darcy_fe_values,
 				     const std::vector<unsigned int> &local_dof_indices,
-				     const double                     global_u_infty,
+				     const double                     global_u_infty_times_dF_dS,
 				     const double                     global_S_variation,
 				     const double                     global_Omega_diameter)
   {
@@ -1578,17 +1578,18 @@ namespace Step43
 
     const double nu
       = compute_viscosity (old_saturation_solution_values,
-                           old_old_saturation_solution_values,
-                           old_grad_saturation_solution_values,
-                           old_old_grad_saturation_solution_values,
-                           present_darcy_solution_values,
-                           global_u_infty,
-                           global_S_variation,
-                           global_Omega_diameter,
-                           saturation_fe_values.get_cell()->diameter(),
-                           old_time_step,
-                           viscosity,
-                           porosity);
+			   old_old_saturation_solution_values,
+			   old_grad_saturation_solution_values,
+			   old_old_grad_saturation_solution_values,
+			   present_darcy_solution_values,
+			   global_u_infty_times_dF_dS,
+			   global_S_variation,
+			   global_Omega_diameter,
+			   saturation_fe_values.get_cell()->diameter(),
+			   old_time_step,
+			   viscosity,
+			   porosity);
+
 
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1755,7 +1756,7 @@ namespace Step43
 	    preconditioner (darcy_matrix, mp_inverse, *Amg_preconditioner);
 
 	  SolverControl solver_control (darcy_matrix.m(),
-					1e-6*darcy_rhs.l2_norm());
+					1e-16*darcy_rhs.l2_norm());
 
 	  SolverGMRES<TrilinosWrappers::BlockVector>
 	    gmres (solver_control,
@@ -1783,15 +1784,29 @@ namespace Step43
 	  nth_saturation_solution_after_solving_pressure_part = saturation_solution;
 	}
       }
-    else
+
+				     // compute optimal time step...
+    old_time_step = time_step;
+    time_step = porosity *
+		GridTools::minimal_cell_diameter(triangulation) /
+		get_maximal_velocity_times_dF_dS() / 12;
+
+				     // ...but don't move beyond the
+				     // specified end time (except for a
+				     // single second, so that we can
+				     // keep comparing in FP arithmetic)
+//  if (time + time_step > 1500.*24*3600)
+//    time_step = 1500.*24*3600 - time + 1;
+
+				     // if we haven't computed the
+				     // velocity before, then
+				     // extrapolate now
+    if ( !(timestep_number <= 3 || solve_pressure_velocity_part == true ))
       {
 	darcy_solution.block(0) = nth_darcy_solution_after_solving_pressure_part.block(0);
 	darcy_solution.block(0).sadd (2.0, -1.0, n_minus_oneth_darcy_solution_after_solving_pressure_part.block(0) );
 
-	double extrapolated_time_step = GridTools::minimal_cell_diameter(triangulation) /
-					get_maximal_velocity() / 8.0;
-
-	double local_cumulative_time_step = cumulative_nth_time_step + extrapolated_time_step;
+	double local_cumulative_time_step = cumulative_nth_time_step + time_step;
 	double coef_1 = local_cumulative_time_step / n_minus_oneth_time_step;
 	double coef_2 = ( 1.0 + coef_1 );
 
@@ -1803,12 +1818,8 @@ namespace Step43
 	darcy_solution.block(0).sadd (0.5, 0.5, tmp);
       }
 
-
-    old_time_step = time_step;
-    time_step = GridTools::minimal_cell_diameter(triangulation) /
-		get_maximal_velocity() / 8.0;
-
-    if ( timestep_number <= 3 || ( solve_pressure_velocity_part == true && previous_solve_pressure_velocity_part == true ) )
+    if ( timestep_number <= 3 ||
+	 ( solve_pressure_velocity_part == true && previous_solve_pressure_velocity_part == true ) )
       {
 	n_minus_oneth_time_step = time_step;
 	cumulative_nth_time_step = 0.0;
@@ -1831,7 +1842,7 @@ namespace Step43
 
     {
       SolverControl solver_control (saturation_matrix.m(),
-				    1e-8*saturation_rhs.l2_norm());
+				    1e-16*saturation_rhs.l2_norm());
       SolverCG<TrilinosWrappers::Vector> cg (solver_control);
 
       TrilinosWrappers::PreconditionIC preconditioner;
@@ -1979,7 +1990,6 @@ namespace Step43
 	fe_values.get_function_grads (predictor_saturation_solution,
 				      grad_saturation);
 
-//TODO: fix this up
 	refinement_indicators(cell_no)
 	  = std::log( 1.0 + std::sqrt( grad_saturation[0] *
 				       grad_saturation[0] ) );
@@ -2267,7 +2277,7 @@ namespace Step43
 
   template <int dim>
   double
-  TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
+  TwoPhaseFlowProblem<dim>::get_maximal_velocity_times_dF_dS () const
   {
     QGauss<dim>   quadrature_formula(darcy_degree+2);
     const unsigned int   n_q_points
@@ -2275,17 +2285,27 @@ namespace Step43
 
     FEValues<dim> darcy_fe_values (darcy_fe, quadrature_formula,
 				   update_values);
+    FEValues<dim> saturation_fe_values (saturation_fe, quadrature_formula,
+					update_values);
+
     std::vector<Vector<double> > darcy_solution_values(n_q_points,
 						       Vector<double>(dim+1));
-    double max_velocity = 0;
+    std::vector<double>          saturation_values (n_q_points);
+
+    double max_velocity_times_dF_dS = 0;
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = darcy_dof_handler.begin_active(),
       endc = darcy_dof_handler.end();
-    for (; cell!=endc; ++cell)
+    typename DoFHandler<dim>::active_cell_iterator
+      saturation_cell = saturation_dof_handler.begin_active();
+    for (; cell!=endc; ++cell, ++saturation_cell)
       {
 	darcy_fe_values.reinit (cell);
+	saturation_fe_values.reinit (saturation_cell);
+
 	darcy_fe_values.get_function_values (darcy_solution, darcy_solution_values);
+	saturation_fe_values.get_function_values (old_saturation_solution, saturation_values);
 
 	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
@@ -2293,12 +2313,14 @@ namespace Step43
 	    for (unsigned int i=0; i<dim; ++i)
 	      velocity[i] = darcy_solution_values[q](i);
 
-	    max_velocity = std::max (max_velocity,
-				     velocity.norm());
+	    double dF_dS = std::fabs( get_fractional_flow_derivative(saturation_values[q],viscosity) );
+
+	    max_velocity_times_dF_dS = std::max (max_velocity_times_dF_dS,
+						 velocity.norm()*dF_dS);
 	  }
       }
 
-    return max_velocity;
+    return max_velocity_times_dF_dS;
   }
 
 
@@ -2374,32 +2396,34 @@ namespace Step43
       }
   }
 
-template <int dim>
-double
-TwoPhaseFlowProblem<dim>::
-compute_viscosity (const std::vector<double>          &old_saturation,
-                   const std::vector<double>          &old_old_saturation,
-                   const std::vector<Tensor<1,dim> >  &old_saturation_grads,
-                   const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
-                   const std::vector<Vector<double> > &present_darcy_values,
-                   const double                        global_u_infty,
-                   const double                        global_S_variation,
-                   const double                        global_Omega_diameter,
-                   const double                        cell_diameter,
-                   const double                        old_time_step,
-                   const double                        viscosity,
-                   const double                        porosity)
+  template <int dim>
+  double
+  TwoPhaseFlowProblem<dim>::
+  compute_viscosity (const std::vector<double>          &old_saturation,
+		     const std::vector<double>          &old_old_saturation,
+		     const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+		     const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
+		     const std::vector<Vector<double> > &present_darcy_values,
+		     const double                        global_u_infty_times_dF_dS,
+		     const double                        global_S_variation,
+		     const double                        global_Omega_diameter,
+		     const double                        cell_diameter,
+		     const double                        old_time_step,
+		     const double                        viscosity,
+		     const double                        porosity)
   {
-    const double beta = 0.27 * dim;
+    const double beta = .35 * dim;
     const double alpha = 1;
 
-    if (global_u_infty == 0)
+    if (global_u_infty_times_dF_dS == 0)
       return 5e-3 * cell_diameter;
 
     const unsigned int n_q_points = old_saturation.size();
 
     double max_residual = 0;
-    double max_velocity = 0;
+    double max_velocity_times_dF_dS = 0;
+
+    const bool use_dF_dS = true;
 
     for (unsigned int q=0; q < n_q_points; ++q)
       {
@@ -2410,8 +2434,7 @@ compute_viscosity (const std::vector<double>          &old_saturation,
 	const double dS_dt = porosity * (old_saturation[q] - old_old_saturation[q])
 			     / old_time_step;
 
-	const double dF_dS = get_fractional_flow_derivative ((old_saturation[q] + old_old_saturation[q]) / 2.0,
-							     viscosity);
+	const double dF_dS = get_fractional_flow_derivative ((old_saturation[q] + old_old_saturation[q]) / 2.0,viscosity);
 
 	const double u_grad_S = u * dF_dS *
 				(old_saturation_grads[q] + old_old_saturation_grads[q]) / 2.0;
@@ -2422,14 +2445,39 @@ compute_viscosity (const std::vector<double>          &old_saturation,
 			      alpha-1.));
 
 	max_residual = std::max (residual,        max_residual);
-	max_velocity = std::max (std::sqrt (u*u), max_velocity);
+	max_velocity_times_dF_dS = std::max (std::sqrt (u*u) *
+					     (use_dF_dS
+					      ?
+					      std::max(dF_dS,1.)
+					      :
+					      1),
+					     max_velocity_times_dF_dS);
       }
 
-    const double global_scaling = global_u_infty * std::pow(global_S_variation,alpha) /
+    const double c_R = 0.0003;
+    const double global_scaling = c_R * porosity * (global_u_infty_times_dF_dS) * global_S_variation /
 				  std::pow(global_Omega_diameter, alpha - 2.);
 
+// first order stabilization
+//  return beta * max_velocity_times_dF_dS * cell_diameter / porosity;
+
+// entropy diffusion stabilization
+
+//  if (time > 1500.*24*3600)
+//    std::cout << "xxx "
+//	      << (beta *
+//		  1./porosity *
+//		  (max_velocity_times_dF_dS) *
+//		  cell_diameter)
+//	      << ' '
+//	      << (beta *
+//		  1./porosity *
+//		  (max_velocity_times_dF_dS) *
+//		  std::pow(cell_diameter,alpha) *
+//		  max_residual / global_scaling)
+//	      << std::endl;
     return (beta *
-	    max_velocity *
+	    (max_velocity_times_dF_dS) *
 	    std::min (cell_diameter,
 		      std::pow(cell_diameter,alpha) *
 		      max_residual / global_scaling));
