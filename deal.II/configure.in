@@ -370,6 +370,7 @@ if test "x$enableshared" = "xyes" ; then
              *powerpc* )
                   SHLIBFLAGS="$SHLIBFLAGS -Wl,--relax"
                   ;;
+           esac
            ;;
   esac
 
