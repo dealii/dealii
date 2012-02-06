@@ -292,7 +292,8 @@ namespace Step43
       std::pair<double,double> get_extrapolated_saturation_range () const;
       void solve ();
       bool determine_whether_to_solve_for_pressure_and_velocity () const;
-      void compute_refinement_indicators (Vector<double> &indicator) const;
+      void compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
+					  Vector<double> &refinement_indicators) const;
       void refine_grid (const Vector<double> &indicator);
       void project_back_saturation ();
       void output_results () const;
@@ -330,8 +331,9 @@ namespace Step43
       TrilinosWrappers::BlockVector        darcy_solution;
       TrilinosWrappers::BlockVector        darcy_rhs;
 
-      TrilinosWrappers::BlockVector        nth_darcy_solution_after_solving_pressure_part;
-      TrilinosWrappers::BlockVector        n_minus_oneth_darcy_solution_after_solving_pressure_part;
+      TrilinosWrappers::BlockVector        last_computed_darcy_solution;
+      TrilinosWrappers::BlockVector        second_last_computed_darcy_solution;
+
 
       const unsigned int                   saturation_degree;
       FE_Q<dim>                            saturation_fe;
@@ -340,23 +342,21 @@ namespace Step43
 
       TrilinosWrappers::SparseMatrix       saturation_matrix;
 
-      TrilinosWrappers::Vector             predictor_saturation_solution;
+
       TrilinosWrappers::Vector             saturation_solution;
       TrilinosWrappers::Vector             old_saturation_solution;
       TrilinosWrappers::Vector             old_old_saturation_solution;
       TrilinosWrappers::Vector             saturation_rhs;
 
-      TrilinosWrappers::Vector             nth_saturation_solution_after_solving_pressure_part;
+      TrilinosWrappers::Vector             saturation_matching_last_computed_darcy_solution;
 
       const unsigned int        n_refinement_steps;
-      bool                      solve_for_pressure_and_velocity;
-      bool                      previous_solve_for_pressure_and_velocity;
 
       const double              saturation_level;
       const double              saturation_refinement_threshold;
 
-      double n_minus_oneth_time_step;
-      double cumulative_nth_time_step;
+      double old_macro_time_step;
+      double current_macro_time_step;
 
       double time_step;
       double old_time_step;
@@ -676,8 +676,6 @@ namespace Step43
 		  saturation_dof_handler (triangulation),
 
 		  n_refinement_steps (4),
-		  solve_for_pressure_and_velocity (false),
-		  previous_solve_for_pressure_and_velocity (false),
 
 		  saturation_level (2),
 		  saturation_refinement_threshold (0.5),
@@ -876,27 +874,26 @@ namespace Step43
     darcy_solution.block(1).reinit (n_p);
     darcy_solution.collect_sizes ();
 
-    nth_darcy_solution_after_solving_pressure_part.reinit (2);
-    nth_darcy_solution_after_solving_pressure_part.block(0).reinit (n_u);
-    nth_darcy_solution_after_solving_pressure_part.block(1).reinit (n_p);
-    nth_darcy_solution_after_solving_pressure_part.collect_sizes ();
+    last_computed_darcy_solution.reinit (2);
+    last_computed_darcy_solution.block(0).reinit (n_u);
+    last_computed_darcy_solution.block(1).reinit (n_p);
+    last_computed_darcy_solution.collect_sizes ();
 
-    n_minus_oneth_darcy_solution_after_solving_pressure_part.reinit (2);
-    n_minus_oneth_darcy_solution_after_solving_pressure_part.block(0).reinit (n_u);
-    n_minus_oneth_darcy_solution_after_solving_pressure_part.block(1).reinit (n_p);
-    n_minus_oneth_darcy_solution_after_solving_pressure_part.collect_sizes ();
+    second_last_computed_darcy_solution.reinit (2);
+    second_last_computed_darcy_solution.block(0).reinit (n_u);
+    second_last_computed_darcy_solution.block(1).reinit (n_p);
+    second_last_computed_darcy_solution.collect_sizes ();
 
     darcy_rhs.reinit (2);
     darcy_rhs.block(0).reinit (n_u);
     darcy_rhs.block(1).reinit (n_p);
     darcy_rhs.collect_sizes ();
 
-    predictor_saturation_solution.reinit (n_s);
     saturation_solution.reinit (n_s);
     old_saturation_solution.reinit (n_s);
     old_old_saturation_solution.reinit (n_s);
 
-    nth_saturation_solution_after_solving_pressure_part.reinit (n_s);
+    saturation_matching_last_computed_darcy_solution.reinit (n_s);
 
     saturation_rhs.reinit (n_s);
   }
@@ -1729,9 +1726,9 @@ namespace Step43
 				   // cumulating the micro time steps for linear
 				   // extropolations in the next iteration. With
 				   // the reason, we need one variable
-				   // cumulative_nth_time_step for keeping the
+				   // current_macro_time_step for keeping the
 				   // present aggregated micro time steps and
-				   // anther one n_minus_oneth_time_step for
+				   // anther one old_macro_time_step for
 				   // retaining the previous micro time steps.
 				   //
 				   // Finally, we start to calculate the
@@ -1741,11 +1738,12 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::solve ()
   {
-    solve_for_pressure_and_velocity = determine_whether_to_solve_for_pressure_and_velocity ();
+    const bool
+      solve_for_pressure_and_velocity = determine_whether_to_solve_for_pressure_and_velocity ();
 
-    if ( timestep_number <= 3 || solve_for_pressure_and_velocity == true )
+    if (solve_for_pressure_and_velocity == true)
       {
-	std::cout << "   Solving darcy system (pressure-velocity part)..." << std::endl;
+	std::cout << "   Solving Darcy (pressure-velocity) system..." << std::endl;
 
 	assemble_darcy_system ();
 	build_darcy_preconditioner ();
@@ -1776,18 +1774,42 @@ namespace Step43
 
 	  std::cout << "     "
 		    << solver_control.last_step()
-		    << " GMRES iterations for darcy system (pressure-velocity part)."
+		    << " GMRES iterations for Darcy (pressure-velocity) system."
 		    << std::endl;
-
 	}
 
 	{
-	  n_minus_oneth_darcy_solution_after_solving_pressure_part = nth_darcy_solution_after_solving_pressure_part;
-	  nth_darcy_solution_after_solving_pressure_part = darcy_solution;
+	  second_last_computed_darcy_solution = last_computed_darcy_solution;
+	  last_computed_darcy_solution = darcy_solution;
 
-	  nth_saturation_solution_after_solving_pressure_part = saturation_solution;
+	  saturation_matching_last_computed_darcy_solution = saturation_solution;
 	}
       }
+				     // On the other hand, if we have
+				     // decided that we don't want to
+				     // compute the solution of the
+				     // Darcy system for the current
+				     // time step, then we need to
+				     // simply extrapolate the
+				     // previous two Darcy solutions
+				     // to the current time:
+    else
+      {
+	darcy_solution = last_computed_darcy_solution;
+	darcy_solution.sadd (2.0, -1.0, second_last_computed_darcy_solution);
+
+	double coef_1 = current_macro_time_step / old_macro_time_step;
+	double coef_2 = ( 1.0 + coef_1 );
+
+	TrilinosWrappers::BlockVector tmp (darcy_solution);
+	tmp = last_computed_darcy_solution;
+
+	tmp.sadd (coef_2, -coef_1, second_last_computed_darcy_solution);
+
+	darcy_solution.sadd (0.5, 0.5, tmp);
+      }
+
+
 
 				     // compute optimal time step...
     old_time_step = time_step;
@@ -1795,50 +1817,22 @@ namespace Step43
 		GridTools::minimal_cell_diameter(triangulation) /
 		get_maximal_velocity_times_dF_dS() / 12;
 
-				     // ...but don't move beyond the
-				     // specified end time (except for a
-				     // single second, so that we can
-				     // keep comparing in FP arithmetic)
-//  if (time + time_step > 1500.*24*3600)
-//    time_step = 1500.*24*3600 - time + 1;
 
-				     // if we haven't computed the
-				     // velocity before, then
-				     // extrapolate now
-    if ( !(timestep_number <= 3 || solve_for_pressure_and_velocity == true ))
+				     //TODO: need to figure out how
+				     //this is supposed to work. i
+				     //think the inner if can only
+				     //happen in time step==1
+    if (solve_for_pressure_and_velocity == true)
       {
-	darcy_solution.block(0) = nth_darcy_solution_after_solving_pressure_part.block(0);
-	darcy_solution.block(0).sadd (2.0, -1.0, n_minus_oneth_darcy_solution_after_solving_pressure_part.block(0) );
+//	if (previous_solve_for_pressure_and_velocity == true)
+	  old_macro_time_step = time_step;
+//	else
+	  old_macro_time_step = current_macro_time_step;
 
-	double local_cumulative_time_step = cumulative_nth_time_step + time_step;
-	double coef_1 = local_cumulative_time_step / n_minus_oneth_time_step;
-	double coef_2 = ( 1.0 + coef_1 );
-
-	TrilinosWrappers::Vector tmp (darcy_solution.block(0).size());
-	tmp = nth_darcy_solution_after_solving_pressure_part.block(0);
-
-	tmp.sadd (coef_2, -coef_1, n_minus_oneth_darcy_solution_after_solving_pressure_part.block(0) );
-
-	darcy_solution.block(0).sadd (0.5, 0.5, tmp);
-      }
-
-    if ( timestep_number <= 3 ||
-	 ( solve_for_pressure_and_velocity == true && previous_solve_for_pressure_and_velocity == true ) )
-      {
-	n_minus_oneth_time_step = time_step;
-	cumulative_nth_time_step = 0.0;
-      }
-    else if ( solve_for_pressure_and_velocity == true && previous_solve_for_pressure_and_velocity == false )
-      {
-	n_minus_oneth_time_step = cumulative_nth_time_step;
-	cumulative_nth_time_step = 0.0;
+	current_macro_time_step = 0;
       }
     else
-      {
-	cumulative_nth_time_step += time_step;
-      }
-
-    previous_solve_for_pressure_and_velocity = solve_for_pressure_and_velocity;
+      current_macro_time_step += time_step;
 
     std::cout << "   Solving saturation transport equation..." << std::endl;
 
@@ -1927,7 +1921,7 @@ namespace Step43
 	double max_local_permeability_inverse_l1_norm = 0.0;
 
 	fe_values.reinit(cell);
-	fe_values.get_function_values (nth_saturation_solution_after_solving_pressure_part,
+	fe_values.get_function_values (saturation_matching_last_computed_darcy_solution,
 				       old_saturation_after_solving_pressure);
 	fe_values.get_function_values (saturation_solution,
 				       present_saturation);
@@ -1976,7 +1970,8 @@ namespace Step43
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
-  compute_refinement_indicators (Vector<double> &refinement_indicators) const
+  compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
+				 Vector<double>                 &refinement_indicators) const
   {
 
     const QMidpoint<dim> quadrature_formula;
@@ -1991,7 +1986,7 @@ namespace Step43
     for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
       {
 	fe_values.reinit(cell);
-	fe_values.get_function_grads (predictor_saturation_solution,
+	fe_values.get_function_grads (predicted_saturation_solution,
 				      grad_saturation);
 
 	refinement_indicators(cell_no)
@@ -2080,11 +2075,11 @@ namespace Step43
 	std::vector<TrilinosWrappers::Vector> x_saturation (3);
 	x_saturation[0] = saturation_solution;
 	x_saturation[1] = old_saturation_solution;
-	x_saturation[2] = nth_saturation_solution_after_solving_pressure_part;
+	x_saturation[2] = saturation_matching_last_computed_darcy_solution;
 
 	std::vector<TrilinosWrappers::BlockVector> x_darcy (2);
-	x_darcy[0] = nth_darcy_solution_after_solving_pressure_part;
-	x_darcy[1] = n_minus_oneth_darcy_solution_after_solving_pressure_part;
+	x_darcy[0] = last_computed_darcy_solution;
+	x_darcy[1] = second_last_computed_darcy_solution;
 
 	SolutionTransfer<dim,TrilinosWrappers::Vector> saturation_soltrans(saturation_dof_handler);
 
@@ -2107,15 +2102,15 @@ namespace Step43
 
 	saturation_solution = tmp_saturation[0];
 	old_saturation_solution = tmp_saturation[1];
-	nth_saturation_solution_after_solving_pressure_part = tmp_saturation[2];
+	saturation_matching_last_computed_darcy_solution = tmp_saturation[2];
 
 	std::vector<TrilinosWrappers::BlockVector> tmp_darcy (2);
 	tmp_darcy[0].reinit (darcy_solution);
 	tmp_darcy[1].reinit (darcy_solution);
 	darcy_soltrans.interpolate(x_darcy, tmp_darcy);
 
-	nth_darcy_solution_after_solving_pressure_part = tmp_darcy[0];
-	n_minus_oneth_darcy_solution_after_solving_pressure_part = tmp_darcy[1];
+	last_computed_darcy_solution = tmp_darcy[0];
+	second_last_computed_darcy_solution = tmp_darcy[1];
 
 	rebuild_saturation_matrix    = true;
       }
@@ -2162,9 +2157,6 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results ()  const
   {
-    if ( solve_for_pressure_and_velocity == false )
-      return;
-
     const FESystem<dim> joint_fe (darcy_fe, 1,
 				  saturation_fe, 1);
     DoFHandler<dim> joint_dof_handler (triangulation);
@@ -2532,26 +2524,24 @@ namespace Step43
 
 	output_results ();
 
-	solve_for_pressure_and_velocity = false;
+	{
+					   // check if this already initializes the vector of if we need the next line
+	  TrilinosWrappers::Vector predicted_saturation_solution (saturation_solution);
+	  predicted_saturation_solution = saturation_solution;
+	  predicted_saturation_solution.sadd (2.0, -1.0, old_saturation_solution);
+
+	  Vector<double> refinement_indicators (triangulation.n_active_cells());
+
+	  compute_refinement_indicators(predicted_saturation_solution,
+					refinement_indicators);
+	  refine_grid(refinement_indicators);
+	}
 
 	if ((timestep_number == 0) &&
 	    (pre_refinement_step < saturation_level))
 	  {
-	    predictor_saturation_solution = saturation_solution;
-	    predictor_saturation_solution.sadd (2.0, -1.0, old_saturation_solution);
-	    Vector<double> refinement_indicators (triangulation.n_active_cells());
-	    compute_refinement_indicators(refinement_indicators);
-	    refine_grid(refinement_indicators);
 	    ++pre_refinement_step;
 	    goto start_time_iteration;
-	  }
-	else
-	  {
-	    predictor_saturation_solution = saturation_solution;
-	    predictor_saturation_solution.sadd (2.0, -1.0, old_saturation_solution);
-	    Vector<double> refinement_indicators (triangulation.n_active_cells());
-	    compute_refinement_indicators(refinement_indicators);
-	    refine_grid(refinement_indicators);
 	  }
 
 	time += time_step;
@@ -2559,7 +2549,6 @@ namespace Step43
 
 	old_old_saturation_solution = old_saturation_solution;
 	old_saturation_solution = saturation_solution;
-
       }
     while (time <= 250);
   }
