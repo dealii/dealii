@@ -355,8 +355,8 @@ namespace Step43
       const double              saturation_level;
       const double              saturation_refinement_threshold;
 
-      double old_macro_time_step;
       double current_macro_time_step;
+      double old_macro_time_step;
 
       double time_step;
       double old_time_step;
@@ -679,6 +679,9 @@ namespace Step43
 
 		  saturation_level (2),
 		  saturation_refinement_threshold (0.5),
+
+		  current_macro_time_step (0),
+		  old_macro_time_step (0),
 
 		  time_step (0),
 		  old_time_step (0),
@@ -1687,54 +1690,31 @@ namespace Step43
 
 				   // @sect3{TwoPhaseFlowProblem<dim>::solve}
 
-				   // This function is to implement the operator
-				   // splitting algorithm. At the beginning of
-				   // the implementation, we decide whther to
-				   // solve the pressure-velocity part by
-				   // running an a posteriori criterion, which
-				   // will be described in the following
-				   // function. If we get the bool variable true
-				   // from that function, we will solve the
-				   // pressure-velocity part for updated
-				   // velocity. Then, we use GMRES with the
-				   // Schur complement preconditioner to solve
-				   // this linear system, as is described in the
-				   // Introduction. After solving the velocity
-				   // and pressure, we need to keep the
-				   // solutions for linear extrapolations in the
-				   // future. It is noted that we always solve
-				   // the pressure-velocity part in the first
-				   // three micro time steps to ensure accuracy
-				   // at the beginning of computation, and to
-				   // provide starting data to linearly
-				   // extrapolate previously computed velocities
-				   // to the current time step.
+				   // This function implements the
+				   // operator splitting algorithm,
+				   // i.e. in each time step it either
+				   // re-computes the solution of the
+				   // Darcy system or extrapolates
+				   // velocity/pressure from previous
+				   // time steps, then determines the
+				   // size of the time step, and then
+				   // updates the saturation
+				   // variable. The implementation
+				   // largely follows similar code in
+				   // step-31.
 				   //
-				   // On the other hand, if we get a false
-				   // variable from the criterion, we will
-				   // directly use linear extrapolation to
-				   // compute the updated velocity for the
-				   // solution of saturation later.
-				   //
-				   // Next, like step-21, this program need to
-				   // compute the present time step.
-				   //
-				   // Next, we need to use two bool variables
-				   // <code>solve_for_pressure_and_velocity</code> and
-				   // <code>previous_solve_for_pressure_and_velocity</code> to
-				   // decide whether we stop or continue
-				   // cumulating the micro time steps for linear
-				   // extropolations in the next iteration. With
-				   // the reason, we need one variable
-				   // current_macro_time_step for keeping the
-				   // present aggregated micro time steps and
-				   // anther one old_macro_time_step for
-				   // retaining the previous micro time steps.
-				   //
-				   // Finally, we start to calculate the
-				   // saturation part with the use of the
-				   // incomplete Cholesky decomposition for
-				   // preconditioning.
+				   // At the beginning of the
+				   // function, we decide whether
+				   // to solve the pressure-velocity
+				   // part by evaluating the
+				   // posteriori criterion, which will
+				   // be implemented in the following
+				   // function. If necessary, we will
+				   // solve the pressure-velocity part
+				   // using the GMRES solver with the
+				   // Schur complement preconditioner
+				   // as is described in the
+				   // introduction.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::solve ()
   {
@@ -1792,7 +1772,18 @@ namespace Step43
 				     // time step, then we need to
 				     // simply extrapolate the
 				     // previous two Darcy solutions
-				     // to the current time:
+				     // to the same time as we would
+				     // have computed the
+				     // velocity/pressure at. Note
+				     // that the algorithm here only
+				     // works if we have at least two
+				     // previously computed Darcy
+				     // solutions from which we can
+				     // extrapolate to the current
+				     // time, and this is ensured by
+				     // requiring re-computation of
+				     // the Darcy solution for the
+				     // first 3 time steps.
     else
       {
 	darcy_solution = last_computed_darcy_solution;
@@ -1810,35 +1801,60 @@ namespace Step43
       }
 
 
-
-				     // compute optimal time step...
+				     // With the so computed velocity
+				     // vector, compute the optimal
+				     // time step based on the CFL
+				     // criterion discussed in the
+				     // introduction...
     old_time_step = time_step;
     time_step = porosity *
 		GridTools::minimal_cell_diameter(triangulation) /
 		get_maximal_velocity_times_dF_dS() / 12;
 
 
-				     //TODO: need to figure out how
-				     //this is supposed to work. i
-				     //think the inner if can only
-				     //happen in time step==1
+				     // ...and then also update the
+				     // length of the macro time steps
+				     // we use while we're dealing
+				     // with time step sizes. In
+				     // particular, this involves: (i)
+				     // If we have just recomputed the
+				     // Darcy solution, then the
+				     // length of the previous macro
+				     // time step is now fixed and the
+				     // length of the current macro
+				     // time step is, up to now,
+				     // simply the length of the
+				     // current (micro) time
+				     // step. (ii) If we have not
+				     // recomputed the Darcy solution,
+				     // then the length of the current
+				     // macro time step has just grown
+				     // by <code>time_step</code>.
     if (solve_for_pressure_and_velocity == true)
       {
-//	if (previous_solve_for_pressure_and_velocity == true)
-	  old_macro_time_step = time_step;
-//	else
-	  old_macro_time_step = current_macro_time_step;
-
-	current_macro_time_step = 0;
+	old_macro_time_step     = current_macro_time_step;
+	current_macro_time_step = time_step;
       }
     else
       current_macro_time_step += time_step;
 
-    std::cout << "   Solving saturation transport equation..." << std::endl;
-
-    assemble_saturation_system ();
-
+				     // The last step in this function
+				     // is to recompute the saturation
+				     // solution based on the velocity
+				     // field we've just
+				     // obtained. This naturally
+				     // happens in every time step,
+				     // and we don't skip any of these
+				     // computations. At the end of
+				     // computing the saturation, we
+				     // project back into the allowed
+				     // interval $[0,1]$ to make sure
+				     // our solution remains physical.
     {
+      std::cout << "   Solving saturation transport equation..." << std::endl;
+
+      assemble_saturation_system ();
+
       SolverControl solver_control (saturation_matrix.m(),
 				    1e-16*saturation_rhs.l2_norm());
       SolverCG<TrilinosWrappers::Vector> cg (solver_control);
@@ -1849,18 +1865,14 @@ namespace Step43
       cg.solve (saturation_matrix, saturation_solution,
 		saturation_rhs, preconditioner);
 
-
       saturation_constraints.distribute (saturation_solution);
-
       project_back_saturation ();
 
       std::cout << "     "
 		<< solver_control.last_step()
 		<< " CG iterations for saturation."
 		<< std::endl;
-
     }
-
   }
 
 
@@ -2511,6 +2523,9 @@ namespace Step43
 			  old_saturation_solution);
 
     timestep_number = 0;
+    time_step = old_time_step = 0;
+    current_macro_time_step = old_macro_time_step = 0;
+
     double time = 0;
 
     do
