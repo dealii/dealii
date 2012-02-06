@@ -360,6 +360,17 @@ if test "x$enableshared" = "xyes" ; then
     ibm_xlc* )
            SHLIBFLAGS="-qmkshrobj"
 	   ;;
+
+    gcc*)
+           dnl When using GCC on PowerPC (e.g. on BlueGene systems) we
+           dnl get errors from the linker about relocations that have be
+           dnl truncated to fit. Passing --relax to the linker helps in
+           dnl these cases.
+           case "$target" in
+             *powerpc* )
+                  SHLIBFLAGS="$SHLIBFLAGS -Wl,--relax"
+                  ;;
+           ;;
   esac
 
   dnl See if we can use -Wl,-soname,... for linking

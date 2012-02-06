@@ -34,6 +34,12 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> Fixed: Linking shared libraries on PowerPC systems (e.g. on
+BlueGene systems) failed due to a miscommunication between compiler
+and linker. This is now worked around.
+<br>
+(Aron Ahmedia, Wolfgang Bangerth, 2012/02/06)
+
 <li> New: There is now a distributed deal.II vector class
 parallel::distributed::Vector<Number> that can be used with MPI. The
 vector is based on a contiguous locally owned range and allows easy
