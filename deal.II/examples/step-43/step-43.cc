@@ -208,61 +208,53 @@ namespace Step43
 				   // step-33, and in particular on
 				   // step-31 where we have used
 				   // basically the same general
-				   // structure as done here. The main
-				   // difference to step-31 is that,
-				   // since adaptive operator
+				   // structure as done here. As in
+				   // step-31, the key routines to
+				   // look for in the implementation
+				   // below are the <code>run()</code>
+				   // and <code>solve()</code>
+				   // functions.
+				   //
+				   // The main difference to step-31
+				   // is that, since adaptive operator
 				   // splitting is considered, we need
-				   // a bool-type variable
-				   // <code>solve_for_pressure_and_velocity</code> to
-				   // tell us whether we need to solve
-				   // the pressure and velocity part,
-				   // need another bool-type variable
-				   // <code>previous_solve_for_pressure_and_velocity</code>
-				   // to determine if we have to
-				   // cumulate micro-time steps that
-				   // we need them to do extrapolation
-				   // for the total velocity, and some
-				   // solution vectors
-				   // (e.g. nth_darcy_solution_after_solving_pressure_part
-				   // and
-				   // n_minus_oneth_darcy_solution_after_solving_pressure_part)
-				   // to store some solutions in
-				   // previous time steps after the
-				   // solution of the pressure and
-				   // velocity part.
+				   // a couple more member variables
+				   // to hold the last two computed
+				   // Darcy (velocity/pressure)
+				   // solutions in addition to the
+				   // current one (which is either
+				   // computed directly, or
+				   // extrapolated from the previous
+				   // two), and we need to remember
+				   // the last two times we computed
+				   // the Darcy solution. We also need
+				   // a helper function that figures
+				   // out whether we do indeed need to
+				   // recompute the Darcy solution.
 				   //
-				   // The member functions within this class
-				   // have been named so properly so that
-				   // readers can easily understand what they
-				   // are doing.
-				   //
-				   // Like step-31, this tutorial uses two
-				   // DoFHandler objects for the darcy system
-				   // (presure and velocity) and
-				   // saturation. This is because we want it to
-				   // run faster, which reasons have been
-				   // described in step-31.
-				   //
-				   // There is yet another important thing:
-				   // unlike step-31. this step uses one more
-				   // ConstraintMatrix object called
+				   // Unlike step-31, this step uses
+				   // one more ConstraintMatrix object
+				   // called
 				   // darcy_preconditioner_constraints. This
-				   // constraint object only for assembling the
-				   // matrix for darcy preconditioner includes
-				   // hanging node constrants as well as
-				   // Dirichlet boundary value
-				   // constraints. Without this constraint
-				   // object for the preconditioner, we cannot
-				   // get the convergence results when we solve
-				   // darcy linear system.
+				   // constraint object is used only
+				   // for assembling the matrix for
+				   // the Darcy preconditioner and
+				   // includes hanging node constrants
+				   // as well as Dirichlet boundary
+				   // value constraints for the
+				   // pressure variable. We need this
+				   // because we are building a
+				   // Laplace matrix for the pressure
+				   // *as an approximation of the
+				   // Schur complement) which is only
+				   // definite if boundary conditions
+				   // are applied.
 				   //
-				   // The last one variable indicates whether
-				   // the matrix needs to be rebuilt the next
-				   // time the corresponding build functions are
-				   // called. This allows us to move the
-				   // corresponding if into the function and
-				   // thereby keeping our main run() function
-				   // clean and easy to read.
+				   // The collection of member
+				   // functions and variables thus
+				   // declared in this class is then
+				   // rather similar to those in
+				   // step-31:
   template <int dim>
   class TwoPhaseFlowProblem
   {
@@ -282,41 +274,50 @@ namespace Step43
 					      const FEValues<dim>             &darcy_fe_values,
 					      const std::vector<unsigned int> &local_dof_indices,
 					      const double                     global_u_infty_times_dF_dS,
-					      const double                     global_S_variation,
-					      const double                     global_Omega_diameter);
+					      const double                     global_S_variation);
       void assemble_saturation_rhs_boundary_term (const FEFaceValues<dim>             &saturation_fe_face_values,
 						  const FEFaceValues<dim>             &darcy_fe_face_values,
 						  const std::vector<unsigned int>     &local_dof_indices);
-
-      double get_maximal_velocity_times_dF_dS () const;
-      std::pair<double,double> get_extrapolated_saturation_range () const;
       void solve ();
-      bool determine_whether_to_solve_for_pressure_and_velocity () const;
       void compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
 					  Vector<double> &refinement_indicators) const;
-      void refine_grid (const Vector<double> &indicator);
-      void project_back_saturation ();
+      void refine_mesh (const unsigned int    max_grid_level,
+			const Vector<double> &indicator);
       void output_results () const;
 
-      static
-      double
-      compute_viscosity(const std::vector<double>          &old_saturation,
-			const std::vector<double>          &old_old_saturation,
-			const std::vector<Tensor<1,dim> >  &old_saturation_grads,
-			const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
-			const std::vector<Vector<double> > &present_darcy_values,
-			const double                        global_u_infty_times_dF_dS,
-			const double                        global_S_variation,
-			const double                        global_Omega_diameter,
-			const double                        cell_diameter,
-			const double                        old_time_step,
-			const double                        viscosity,
-			const double                        porosity);
+				       // We follow with a number of
+				       // helper functions that are
+				       // used in a variety of places
+				       // throughout the program:
+      double                   get_maximal_velocity_times_dF_dS () const;
+      std::pair<double,double> get_extrapolated_saturation_range () const;
+      bool                     determine_whether_to_solve_for_pressure_and_velocity () const;
+      void                     project_back_saturation ();
+      double                   compute_viscosity (const std::vector<double>          &old_saturation,
+						  const std::vector<double>          &old_old_saturation,
+						  const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+						  const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
+						  const std::vector<Vector<double> > &present_darcy_values,
+						  const double                        global_u_infty_times_dF_dS,
+						  const double                        global_S_variation,
+						  const double                        cell_diameter,
+						  const double                        old_time_step,
+						  const double                        viscosity,
+						  const double                        porosity) const;
 
 
+				       // This all is followed by the
+				       // member variables, most of
+				       // which are similar to the
+				       // ones in step-31, with the
+				       // exception of the ones that
+				       // pertain to the macro time
+				       // stepping for the
+				       // velocity/pressure system:
       const unsigned int degree;
 
       Triangulation<dim>                   triangulation;
+      double                               global_Omega_diameter;
 
       const unsigned int                   darcy_degree;
       FESystem<dim>                        darcy_fe;
@@ -350,25 +351,22 @@ namespace Step43
 
       TrilinosWrappers::Vector             saturation_matching_last_computed_darcy_solution;
 
-      const unsigned int        n_refinement_steps;
+      const double                         saturation_refinement_threshold;
 
-      const double              saturation_level;
-      const double              saturation_refinement_threshold;
+      double                               current_macro_time_step;
+      double                               old_macro_time_step;
 
-      double current_macro_time_step;
-      double old_macro_time_step;
-
-      double time_step;
-      double old_time_step;
-      unsigned int timestep_number;
-      double viscosity;
-      double porosity;
-      double AOS_threshold;
+      double                               time_step;
+      double                               old_time_step;
+      unsigned int                         timestep_number;
+      double                               viscosity;
+      double                               porosity;
+      double                               AOS_threshold;
 
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
 
-      bool rebuild_saturation_matrix;
+      bool                                rebuild_saturation_matrix;
   };
 
 
@@ -675,9 +673,6 @@ namespace Step43
 		  saturation_fe (saturation_degree),
 		  saturation_dof_handler (triangulation),
 
-		  n_refinement_steps (4),
-
-		  saturation_level (2),
 		  saturation_refinement_threshold (0.5),
 
 		  current_macro_time_step (0),
@@ -1444,7 +1439,7 @@ namespace Step43
 				   //
 				   // Next, before looping over all the cells,
 				   // we have to compute some parameters
-				   // (e.g. global_u_infty, global_S_variasion,
+				   // (e.g. global_u_infty, global_S_variation,
 				   // and global_Omega_diameter) that the
 				   // artificial viscosity $\nu$ needs, which
 				   // desriptions have been appearing in
@@ -1502,8 +1497,7 @@ namespace Step43
     const double global_u_infty_times_dF_dS = get_maximal_velocity_times_dF_dS ();
     const std::pair<double,double>
       global_S_range = get_extrapolated_saturation_range ();
-    const double global_S_variasion = global_S_range.second - global_S_range.first;
-    const double global_Omega_diameter = GridTools::diameter (triangulation);
+    const double global_S_variation = global_S_range.second - global_S_range.first;
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = saturation_dof_handler.begin_active(),
@@ -1521,8 +1515,7 @@ namespace Step43
 					  darcy_fe_values,
 					  local_dof_indices,
 					  global_u_infty_times_dF_dS,
-					  global_S_variasion,
-					  global_Omega_diameter);
+					  global_S_variation);
 
 	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	     ++face_no)
@@ -1560,8 +1553,7 @@ namespace Step43
 				     const FEValues<dim>             &darcy_fe_values,
 				     const std::vector<unsigned int> &local_dof_indices,
 				     const double                     global_u_infty_times_dF_dS,
-				     const double                     global_S_variation,
-				     const double                     global_Omega_diameter)
+				     const double                     global_S_variation)
   {
     const unsigned int dofs_per_cell = saturation_fe_values.dofs_per_cell;
     const unsigned int n_q_points    = saturation_fe_values.n_quadrature_points;
@@ -1588,7 +1580,6 @@ namespace Step43
 			   present_darcy_solution_values,
 			   global_u_infty_times_dF_dS,
 			   global_S_variation,
-			   global_Omega_diameter,
 			   saturation_fe_values.get_cell()->diameter(),
 			   old_time_step,
 			   viscosity,
@@ -1759,8 +1750,8 @@ namespace Step43
 	}
 
 	{
-	  second_last_computed_darcy_solution = last_computed_darcy_solution;
-	  last_computed_darcy_solution = darcy_solution;
+	  second_last_computed_darcy_solution              = last_computed_darcy_solution;
+	  last_computed_darcy_solution                     = darcy_solution;
 
 	  saturation_matching_last_computed_darcy_solution = saturation_solution;
 	}
@@ -2007,13 +1998,11 @@ namespace Step43
 	max_refinement_indicator = std::max(max_refinement_indicator,
 					    refinement_indicators(cell_no));
       }
-
-//  std::cout << "max_refinement_indicator =" << max_refinement_indicator << std::endl;
   }
 
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::refine_grid}
+				   // @sect3{TwoPhaseFlowProblem<dim>::refine_mesh}
 
 				   // This function is to decide if every cell
 				   // is refined or coarsened with computed
@@ -2028,11 +2017,9 @@ namespace Step43
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
-  refine_grid (const Vector<double> &refinement_indicators)
+  refine_mesh (const unsigned int    max_grid_level,
+	       const Vector<double> &refinement_indicators)
   {
-    const double current_saturation_level = saturation_level +
-					    n_refinement_steps;
-
     {
       typename DoFHandler<dim>::active_cell_iterator
 	cell = saturation_dof_handler.begin_active(),
@@ -2043,12 +2030,11 @@ namespace Step43
 	  cell->clear_coarsen_flag();
 	  cell->clear_refine_flag();
 
-	  if ((cell->level() < current_saturation_level) &&
+	  if ((static_cast<unsigned int>(cell->level()) < max_grid_level) &&
 	      (std::fabs(refinement_indicators(cell_no)) > saturation_refinement_threshold))
 	    cell->set_refine_flag();
 	  else
-	    if ((cell->level() > double(n_refinement_steps)) &&
-		(std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_refinement_threshold))
+	    if (std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_refinement_threshold)
 	      cell->set_coarsen_flag();
 	}
     }
@@ -2404,6 +2390,8 @@ namespace Step43
       }
   }
 
+
+
   template <int dim>
   double
   TwoPhaseFlowProblem<dim>::
@@ -2414,11 +2402,10 @@ namespace Step43
 		     const std::vector<Vector<double> > &present_darcy_values,
 		     const double                        global_u_infty_times_dF_dS,
 		     const double                        global_S_variation,
-		     const double                        global_Omega_diameter,
 		     const double                        cell_diameter,
 		     const double                        old_time_step,
 		     const double                        viscosity,
-		     const double                        porosity)
+		     const double                        porosity) const
   {
     const double beta = .35 * dim;
     const double alpha = 1;
@@ -2507,12 +2494,17 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
-    unsigned int pre_refinement_step = 0;
+    const unsigned int initial_refinement     = (dim == 2 ? 4 : 2);
+    const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
+
 
     GridGenerator::hyper_cube (triangulation, 0, 1);
-    triangulation.refine_global (n_refinement_steps);
+    triangulation.refine_global (initial_refinement);
+    global_Omega_diameter = GridTools::diameter (triangulation);
 
     setup_dofs ();
+
+    unsigned int pre_refinement_step = 0;
 
     start_time_iteration:
 
@@ -2549,11 +2541,12 @@ namespace Step43
 
 	  compute_refinement_indicators(predicted_saturation_solution,
 					refinement_indicators);
-	  refine_grid(refinement_indicators);
+	  refine_mesh (initial_refinement + n_pre_refinement_steps,
+		       refinement_indicators);
 	}
 
 	if ((timestep_number == 0) &&
-	    (pre_refinement_step < saturation_level))
+	    (pre_refinement_step < n_pre_refinement_steps))
 	  {
 	    ++pre_refinement_step;
 	    goto start_time_iteration;
