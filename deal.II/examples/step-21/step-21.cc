@@ -486,8 +486,8 @@ namespace Step21
     return 1.0 / (1.0/viscosity * S * S + (1-S) * (1-S));
   }
 
-  double f_saturation (const double S,
-		       const double viscosity)
+  double fractional_flow (const double S,
+			  const double viscosity)
   {
     return S*S / (S * S + viscosity * (1-S) * (1-S));
   }
@@ -1002,7 +1002,7 @@ namespace Step21
 	      const Tensor<1,dim> grad_phi_i_s = fe_values[saturation].gradient (i, q);
 
 	      local_rhs(i) += (time_step *
-			       f_saturation(old_s,viscosity) *
+			       fractional_flow(old_s,viscosity) *
 			       present_u *
 			       grad_phi_i_s
 			       +
@@ -1071,12 +1071,12 @@ namespace Step21
 		for (unsigned int i=0; i<dofs_per_cell; ++i)
 		  local_rhs(i) -= time_step *
 				  normal_flux *
-				  f_saturation((is_outflow_q_point == true
-						?
-						old_solution_values_face[q](dim+1)
-						:
-						neighbor_saturation[q]),
-					       viscosity) *
+				  fractional_flow((is_outflow_q_point == true
+						   ?
+						   old_solution_values_face[q](dim+1)
+						   :
+						   neighbor_saturation[q]),
+						  viscosity) *
 				  fe_face_values[saturation].value (i,q) *
 				  fe_face_values.JxW(q);
 	      }
