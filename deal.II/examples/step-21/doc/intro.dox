@@ -8,7 +8,7 @@ flow problems in porous media. This problem includes one
 elliptic equation and one nonlinear, time dependent transport
 equation. This is therefore also the first time-dependent tutorial
 program (besides the somewhat strange time-dependence of @ref step_18
-"step-18").  
+"step-18").
 
 The equations covered here are an extension of the material already covered in
 step-20. In particular, they fall into the class of
@@ -33,15 +33,15 @@ compressibility, and capillary pressure. Porosity will be considered
 to be constant. We will denote variables refering to either of the two
 phases using subscripts $w$ and $o$, short for water and oil. The
 derivation of the equations holds for other pairs of fluids as well,
-however. 
+however.
 
 The velocity with which molecules of each of the two phases move is
 determined by Darcy's law that states that the velocity is
 proportional to the pressure gradient:
 @f{eqnarray*}
-  \mathbf{u}_{j} 
-  = 
-  -\frac{k_{rj}(S)}{\mu_{j}} \mathbf{K} \cdot \nabla p 
+  \mathbf{u}_{j}
+  =
+  -\frac{k_{rj}(S)}{\mu_{j}} \mathbf{K} \cdot \nabla p
 @f}
 where $\mathbf{u}_{j}$ is the velocity of phase $j=o,w$, $K$ is the
 permeability tensor, $k_{rj}$ is the relative permeability of phase
@@ -58,7 +58,7 @@ each phase,
 @f[
   \textrm{div}\ \mathbf{u}_{j} = q_j,
 @f]
-with a source term for each phase. By summing over the two phases, 
+with a source term for each phase. By summing over the two phases,
 we can express the governing equations in terms of the
 so-called pressure equation:
 @f{eqnarray*}
@@ -86,17 +86,22 @@ where $\mathbf u$ is the total velocity
   \mathbf{u} =
   \mathbf{u}_{o} + \mathbf{u}_{w} = -\lambda(S) \mathbf{K}\cdot\nabla p.
 @f]
-In addition, 
+In addition,
 @f[
-  F(S) 
-  = 
+  F(S)
+  =
   \frac{k_{rw}(S)/\mu_{w}}{k_{rw}(S)/\mu_{w} + k_{ro}(S)/\mu_{o}}
 @f]
 Note that the advection equation contains the term $\mathbf{u} \cdot \nabla
 F(S)$ rather than $\mathbf{u} \cdot \nabla S$ to indicate that the saturation
 is not simply transported along; rather, since the two phases move with
 different velocities, the saturation can actually change even in the advected
-coordinate system.
+coordinate system. To see this, rewrite $\mathbf{u} \cdot \nabla F(S)
+= \mathbf{u} F'(S) \cdot \nabla S$ to observe that the <i>actual</i>
+velocity with which the phase with saturation $S$ is transported is
+$\mathbf u F'(S)$ whereas the other phase is transported at velocity
+$\mathbf u (1-F'(S))$. $F(S)$ is consequently often referred to as the
+<i>fractional flow</i>.
 
 In summary, what we get are the following two equations:
 @f{eqnarray*}
@@ -134,7 +139,7 @@ constraint is that the divergence of the electric displacement field
 equals the charge density, $\textrm{div}\ \mathbf D = \rho$ and that the
 divergence of the magnetic flux density is zero: $\textrm{div}\ \mathbf
 B = 0$); even the quasistatic model of step-18 falls into this
-category. We will see that the different character of the two equations 
+category. We will see that the different character of the two equations
 will inform our discretization strategy for the two equations.
 
 
@@ -154,8 +159,8 @@ total velocity $\mathbf u$ appearing in the transport equation as a function
 of the pressure, but can rather take the primary variable for it. Given the
 saddle point structure of the first two equations and their similarity to the
 mixed Laplace formulation we have introduced in step-20, it
-will come as no surprise that we will use a mixed discretization again. 
-                                  
+will come as no surprise that we will use a mixed discretization again.
+
 But let's postpone this for a moment. The first business we have with these
 equations is to think about the time discretization. In reservoir simulation,
 there is a rather standard algorithm that we will use here. It first solves
@@ -166,7 +171,7 @@ al. in 1959 and Stone and Gardner in 1961 (J. W. Sheldon, B. Zondek and
 W. T. Cardwell: <i>One-dimensional, incompressible, non-capillary, two-phase
 fluid flow in a porous medium</i>, Trans. SPE AIME, 216 (1959), pp. 290-296; H.
 L. Stone and A. O. Gardner Jr: <i>Analysis of gas-cap or dissolved-gas
-reservoirs</i>, Trans. SPE AIME, 222 (1961), pp. 92-104). 
+reservoirs</i>, Trans. SPE AIME, 222 (1961), pp. 92-104).
 In a slightly modified form, this algorithm can be
 written as follows: for each time step, solve
 @f{eqnarray*}
@@ -186,10 +191,10 @@ equation with test functions $\mathbf v$, $\phi$, and $\sigma$ and integrating
 terms by parts:
 @f{eqnarray*}
   \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{u}^{n+1},\mathbf v\right)_\Omega -
-  (p^{n+1}, \nabla\cdot\mathbf v)_\Omega &=& 
-  - (p^{n+1}, \mathbf v)_{\partial\Omega} 
+  (p^{n+1}, \nabla\cdot\mathbf v)_\Omega &=&
+  - (p^{n+1}, \mathbf v)_{\partial\Omega}
   \\
-  (\nabla \cdot\mathbf{u}^{n+1}, \phi)_\Omega &=& (q^{n+1},\phi)_\Omega 
+  (\nabla \cdot\mathbf{u}^{n+1}, \phi)_\Omega &=& (q^{n+1},\phi)_\Omega
 @f}
 Note that in the first term, we have to prescribe the pressure $p^{n+1}$ on
 the boundary $\partial\Omega$ as boundary values for our problem. $\mathbf n$
@@ -199,7 +204,7 @@ For the saturation equation, we obtain after integrating by parts
 @f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
   -
-  \triangle t 
+  \triangle t
   \sum_K
   \left\{
   \left(F(S^n), \nabla \cdot (\mathbf{u}^{n+1} \sigma)\right)_K
@@ -214,7 +219,7 @@ cell term to get an equation as follows:
 @f{eqnarray*}
   (S^{n+1}, \sigma)_\Omega
   -
-  \triangle t 
+  \triangle t
   \sum_K
   \left\{
   \left(F(S^n) \mathbf{u}^{n+1}, \nabla \sigma\right)_K
@@ -222,7 +227,7 @@ cell term to get an equation as follows:
   \left(F(S^n) (\mathbf n \cdot \mathbf{u}^{n+1}), \sigma\right)_{\partial K}
   \right\}
   &=&
-  (S^n,\sigma)_\Omega + 
+  (S^n,\sigma)_\Omega +
   \triangle t \sum_K  \left(F(S^n) q^{n+1}, \sigma\right)_K.
 @f}
 
@@ -263,7 +268,7 @@ fluxes can also be found in step-12.
 
 The linear solvers used in this program are a straightforward extension of the
 ones used in step-20. Essentially, we simply have to extend
-everything from 
+everything from
 two to three solution components. If we use the discrete spaces
 mentioned above and put shape functions into the bilinear forms, we
 arrive at the following linear system to be solved for time step $n+1$:
@@ -334,7 +339,7 @@ The solution scheme then involves the following steps:
   step-20.
 
   <li>Compute the term $F_3-\triangle t\; H \mathbf u^{n+1}$, using
-  the just computed velocities. 
+  the just computed velocities.
 
   <li>Solve for the saturation $S^{n+1}$.
 </ol>
@@ -431,7 +436,7 @@ other hand, this flow field determines whether a piece of the boundary is of
 inflow or outflow type, which is of relevance because we have to impose
 boundary conditions for the saturation on the inflow part of the boundary,
 @f[
-  \Gamma_{in}(t) = \{\mathbf{x}\in\partial\Omega: 
+  \Gamma_{in}(t) = \{\mathbf{x}\in\partial\Omega:
                      \mathbf{n} \cdot \mathbf{u}(\mathbf{x},t) < 0\}.
 @f]
 On this inflow boundary, we impose the following saturation values:
@@ -449,10 +454,10 @@ In our simulations, we choose the total mobility as
   \lambda (S) = \frac{1.0}{\mu} S^2 +(1-S)^2
 @f]
 where we use $\mu=0.2$ for the viscosity. In addition, the fractional flow of
-water is given by 
+water is given by
 @f[
   F(S)=\frac{S^2}{S^2+\mu (1-S)^2}
-@f] 
+@f]
 
 Finally, we will show results for computations with the two permeability
 functions introduced at the end of the results section of @ref step_20
@@ -462,8 +467,8 @@ functions introduced at the end of the results section of @ref step_20
   domain. In analgy to step-20, but taking care of the slightly
   different geometry we have here, we describe this by the following function:
   @f[
-    k(\mathbf x) 
-    = 
+    k(\mathbf x)
+    =
     \max \left\{ e^{-\left(\frac{x_2-\frac 12 - 0.1\sin(10x_1)}{0.1}\right)^2}, 0.01 \right\}.
   @f]
   Taking the maximum is necessary to ensure that the ratio between maximal and
@@ -473,14 +478,14 @@ functions introduced at the end of the results section of @ref step_20
   Schur complement matrix, and if too large leads to problems for which our
   linear solvers will no longer converge properly.
 
-  <li>A function that models a somewhat random medium. Here, we choose 
+  <li>A function that models a somewhat random medium. Here, we choose
   @f{eqnarray*}
-    k(\mathbf x) 
-    &=& 
+    k(\mathbf x)
+    &=&
     \min \left\{ \max \left\{ \sum_{i=1}^N \sigma_i(\mathbf{x}), 0.01 \right\}, 4\right\},
     \\
-    \sigma_i(\mathbf x) 
-    &=& 
+    \sigma_i(\mathbf x)
+    &=&
     e^{-\left(\frac{|\mathbf{x}-\mathbf{x}_i|}{0.05}\right)^2},
   @f}
   where the centers $\mathbf{x}_i$ are $N$ randomly chosen locations inside
