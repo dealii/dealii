@@ -483,13 +483,13 @@ namespace Step21
   double mobility_inverse (const double S,
 			   const double viscosity)
   {
-    return 1.0 /(1.0/viscosity * S * S + (1-S) * (1-S));
+    return 1.0 / (1.0/viscosity * S * S + (1-S) * (1-S));
   }
 
   double f_saturation (const double S,
 		       const double viscosity)
   {
-    return S*S /( S * S +viscosity * (1-S) * (1-S));
+    return S*S / (S * S + viscosity * (1-S) * (1-S));
   }
 
 
