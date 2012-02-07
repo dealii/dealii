@@ -77,6 +77,295 @@ namespace Step43
   using namespace dealii;
 
 
+				   // @sect3{Pressure right hand side, pressure boundary values and saturation initial value classes}
+
+				   // The following part is taken
+				   // directly from step-21 so there is
+				   // no need to repeat the
+				   // descriptions found there.
+  template <int dim>
+  class PressureRightHandSide : public Function<dim>
+  {
+    public:
+      PressureRightHandSide () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+  };
+
+
+
+  template <int dim>
+  double
+  PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
+				     const unsigned int /*component*/) const
+  {
+    return 0;
+  }
+
+
+  template <int dim>
+  class PressureBoundaryValues : public Function<dim>
+  {
+    public:
+      PressureBoundaryValues () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+  };
+
+
+  template <int dim>
+  double
+  PressureBoundaryValues<dim>::value (const Point<dim>  &p,
+				      const unsigned int /*component*/) const
+  {
+    return 1-p[0];
+  }
+
+
+  template <int dim>
+  class SaturationBoundaryValues : public Function<dim>
+  {
+    public:
+      SaturationBoundaryValues () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+  };
+
+
+
+  template <int dim>
+  double
+  SaturationBoundaryValues<dim>::value (const Point<dim> &p,
+					const unsigned int /*component*/) const
+  {
+    if (p[0] == 0)
+      return 1;
+    else
+      return 0;
+  }
+
+
+  template <int dim>
+  class SaturationInitialValues : public Function<dim>
+  {
+    public:
+      SaturationInitialValues () : Function<dim>(1) {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+
+      virtual void vector_value (const Point<dim> &p,
+				 Vector<double>   &value) const;
+  };
+
+
+  template <int dim>
+  double
+  SaturationInitialValues<dim>::value (const Point<dim>  &/*p*/,
+				       const unsigned int /*component*/) const
+  {
+    return 0;
+  }
+
+
+  template <int dim>
+  void
+  SaturationInitialValues<dim>::vector_value (const Point<dim> &p,
+					      Vector<double>   &values) const
+  {
+    for (unsigned int c=0; c<this->n_components; ++c)
+      values(c) = SaturationInitialValues<dim>::value (p,c);
+  }
+
+
+				   // @sect3{Permeability models}
+
+				   // In this tutorial, we still use
+				   // the two permeability models
+				   // previously used in step-21 so we
+				   // again refrain from commenting in
+				   // detail about them.
+  namespace SingleCurvingCrack
+  {
+    template <int dim>
+    class KInverse : public TensorFunction<2,dim>
+    {
+      public:
+	KInverse ()
+			:
+			TensorFunction<2,dim> ()
+	  {}
+
+	virtual void value_list (const std::vector<Point<dim> > &points,
+				 std::vector<Tensor<2,dim> >    &values) const;
+    };
+
+
+    template <int dim>
+    void
+    KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
+			       std::vector<Tensor<2,dim> >    &values) const
+    {
+      Assert (points.size() == values.size(),
+	      ExcDimensionMismatch (points.size(), values.size()));
+
+      for (unsigned int p=0; p<points.size(); ++p)
+	{
+	  values[p].clear ();
+
+	  const double distance_to_flowline
+	    = std::fabs(points[p][1]-0.5-0.1*std::sin(10*points[p][0]));
+
+	  const double permeability = std::max(std::exp(-(distance_to_flowline*
+							  distance_to_flowline)
+							/ (0.1 * 0.1)),
+					       0.01);
+
+	  for (unsigned int d=0; d<dim; ++d)
+	    values[p][d][d] = 1./permeability;
+	}
+    }
+  }
+
+
+  namespace RandomMedium
+  {
+    template <int dim>
+    class KInverse : public TensorFunction<2,dim>
+    {
+      public:
+	KInverse ()
+			:
+			TensorFunction<2,dim> ()
+	  {}
+
+	virtual void value_list (const std::vector<Point<dim> > &points,
+				 std::vector<Tensor<2,dim> >    &values) const;
+
+      private:
+	static std::vector<Point<dim> > centers;
+
+	static std::vector<Point<dim> > get_centers ();
+    };
+
+
+
+    template <int dim>
+    std::vector<Point<dim> >
+    KInverse<dim>::centers = KInverse<dim>::get_centers();
+
+
+    template <int dim>
+    std::vector<Point<dim> >
+    KInverse<dim>::get_centers ()
+    {
+      const unsigned int N = (dim == 2 ?
+			      40 :
+			      (dim == 3 ?
+			       100 :
+			       throw ExcNotImplemented()));
+
+      std::vector<Point<dim> > centers_list (N);
+      for (unsigned int i=0; i<N; ++i)
+	for (unsigned int d=0; d<dim; ++d)
+	  centers_list[i][d] = static_cast<double>(rand())/RAND_MAX;
+
+      return centers_list;
+    }
+
+
+
+    template <int dim>
+    void
+    KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
+			       std::vector<Tensor<2,dim> >    &values) const
+    {
+      Assert (points.size() == values.size(),
+	      ExcDimensionMismatch (points.size(), values.size()));
+
+      for (unsigned int p=0; p<points.size(); ++p)
+	{
+	  values[p].clear ();
+
+	  double permeability = 0;
+	  for (unsigned int i=0; i<centers.size(); ++i)
+	    permeability += std::exp(-(points[p]-centers[i]).square()
+				     / (0.05 * 0.05));
+
+	  const double normalized_permeability
+	    = std::min (std::max(permeability, 0.01), 4.);
+
+	  for (unsigned int d=0; d<dim; ++d)
+	    values[p][d][d] = 1./normalized_permeability;
+	}
+    }
+  }
+
+
+				   // @sect3{Physical quantities}
+
+				   // The implementations of all the
+				   // physical quantities such as
+				   // total mobility $\lambda_t$ and
+				   // fractional flow of water $F$ are
+				   // taken from step-21 so again we
+				   // don't have do any comment about
+				   // them. Compared to step-21 we
+				   // have added checks that the
+				   // saturation passed to these
+				   // functions is in fact within the
+				   // physically valid
+				   // range. Furthermore, given that
+				   // the wetting phase moves at speed
+				   // $\mathbf u F'(S)$ it is clear
+				   // that $F'(S)$ must be greater or
+				   // equal to zero, so we assert that
+				   // as well to make sure that our
+				   // calculations to get at the
+				   // formula for the derivative made
+				   // sense.
+  double mobility_inverse (const double S,
+			   const double viscosity)
+  {
+    return 1.0 / (1.0/viscosity * S * S + (1-S) * (1-S));
+  }
+
+
+  double fractional_flow (const double S,
+			  const double viscosity)
+  {
+    Assert ((S >= 0) && (S<=1),
+	    ExcMessage ("Saturation is outside its physically valid range."));
+
+    return S*S / ( S * S + viscosity * (1-S) * (1-S));
+  }
+
+
+  double fractional_flow_derivative (const double S,
+				     const double viscosity)
+  {
+    Assert ((S >= 0) && (S<=1),
+	    ExcMessage ("Saturation is outside its physically valid range."));
+
+    const double temp = ( S * S + viscosity * (1-S) * (1-S) );
+
+    const double numerator   =  2.0 * S * temp
+				-
+				S * S *
+				( 2.0 * S - 2.0 * viscosity * (1-S) );
+    const double denominator =  std::pow(temp, 2.0);
+
+    const double F_prime = numerator / denominator;
+
+    Assert (F_prime >= 0, ExcInternalError());
+
+    return F_prime;
+  }
+
+
 				   // @sect3{Helper classes for solvers and preconditioners}
 
 				   // In this first part we define a
@@ -245,10 +534,10 @@ namespace Step43
 				   // pressure variable. We need this
 				   // because we are building a
 				   // Laplace matrix for the pressure
-				   // *as an approximation of the
-				   // Schur complement) which is only
-				   // definite if boundary conditions
-				   // are applied.
+				   // as an approximation of the Schur
+				   // complement) which is only
+				   // positive definite if boundary
+				   // conditions are applied.
 				   //
 				   // The collection of member
 				   // functions and variables thus
@@ -281,7 +570,8 @@ namespace Step43
       void solve ();
       void compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
 					  Vector<double> &refinement_indicators) const;
-      void refine_mesh (const unsigned int    max_grid_level,
+      void refine_mesh (const unsigned int    min_grid_level,
+			const unsigned int    max_grid_level,
 			const Vector<double> &indicator);
       void output_results () const;
 
@@ -364,300 +654,49 @@ namespace Step43
       double                               AOS_threshold;
 
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
-      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+      std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC> Mp_preconditioner;
 
       bool                                rebuild_saturation_matrix;
+
+				       // At the very end we declare a
+				       // variable that denotes the
+				       // material model. Compared to
+				       // step-21, we do this here as
+				       // a member variable since we
+				       // will want to use it in a
+				       // variety of places and so
+				       // having a central place where
+				       // such a variable is declared
+				       // will make it simpler to
+				       // replace one class by another
+				       // (e.g. replace
+				       // RandomMedium::KInverse by
+				       // SingleCurvingCrack::KInverse).
+      const RandomMedium::KInverse<dim>   k_inverse;
   };
-
-
-				   // @sect3{Pressure right hand side, Pressure boundary values and saturation initial value classes}
-
-				   // This part is directly taken from step-21
-				   // so there is no need to repeat the same
-				   // descriptions.
-  template <int dim>
-  class PressureRightHandSide : public Function<dim>
-  {
-    public:
-      PressureRightHandSide () : Function<dim>(1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-  };
-
-
-
-  template <int dim>
-  double
-  PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
-				     const unsigned int /*component*/) const
-  {
-    return 0;
-  }
-
-
-  template <int dim>
-  class PressureBoundaryValues : public Function<dim>
-  {
-    public:
-      PressureBoundaryValues () : Function<dim>(1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-  };
-
-
-  template <int dim>
-  double
-  PressureBoundaryValues<dim>::value (const Point<dim>  &p,
-				      const unsigned int /*component*/) const
-  {
-    return 1-p[0];
-  }
-
-
-  template <int dim>
-  class SaturationBoundaryValues : public Function<dim>
-  {
-    public:
-      SaturationBoundaryValues () : Function<dim>(1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-  };
-
-
-
-  template <int dim>
-  double
-  SaturationBoundaryValues<dim>::value (const Point<dim> &p,
-					const unsigned int /*component*/) const
-  {
-    if (p[0] == 0)
-      return 1;
-    else
-      return 0;
-  }
-
-
-  template <int dim>
-  class SaturationInitialValues : public Function<dim>
-  {
-    public:
-      SaturationInitialValues () : Function<dim>(1) {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-
-      virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &value) const;
-
-  };
-
-
-  template <int dim>
-  double
-  SaturationInitialValues<dim>::value (const Point<dim>  &/*p*/,
-				       const unsigned int /*component*/) const
-  {
-    return 0;
-  }
-
-
-  template <int dim>
-  void
-  SaturationInitialValues<dim>::vector_value (const Point<dim> &p,
-					      Vector<double>   &values) const
-  {
-    for (unsigned int c=0; c<this->n_components; ++c)
-      values(c) = SaturationInitialValues<dim>::value (p,c);
-  }
-
-
-				   // @sect3{Permeability models}
-
-				   // In this tutorial, we still use two
-				   // permeability models previous used in
-				   // step-21 so we refrain from excessive
-				   // comments about them. But we want to note
-				   // that if ones use the Random Medium model,
-				   // they can change one parameter called the
-				   // number of high-permeability regions/points
-				   // to increase the amount of permeability in
-				   // the computational domain.
-  namespace SingleCurvingCrack
-  {
-    template <int dim>
-    class KInverse : public TensorFunction<2,dim>
-    {
-      public:
-	KInverse ()
-			:
-			TensorFunction<2,dim> ()
-	  {}
-
-	virtual void value_list (const std::vector<Point<dim> > &points,
-				 std::vector<Tensor<2,dim> >    &values) const;
-    };
-
-
-    template <int dim>
-    void
-    KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-			       std::vector<Tensor<2,dim> >    &values) const
-    {
-      Assert (points.size() == values.size(),
-	      ExcDimensionMismatch (points.size(), values.size()));
-
-      for (unsigned int p=0; p<points.size(); ++p)
-	{
-	  values[p].clear ();
-
-	  const double distance_to_flowline
-	    = std::fabs(points[p][1]-0.5-0.1*std::sin(10*points[p][0]));
-
-	  const double permeability = std::max(std::exp(-(distance_to_flowline*
-							  distance_to_flowline)
-							/ (0.1 * 0.1)),
-					       0.01);
-
-	  for (unsigned int d=0; d<dim; ++d)
-	    values[p][d][d] = 1./permeability;
-	}
-    }
-  }
-
-
-  namespace RandomMedium
-  {
-    template <int dim>
-    class KInverse : public TensorFunction<2,dim>
-    {
-      public:
-	KInverse ()
-			:
-			TensorFunction<2,dim> ()
-	  {}
-
-	virtual void value_list (const std::vector<Point<dim> > &points,
-				 std::vector<Tensor<2,dim> >    &values) const;
-
-      private:
-	static std::vector<Point<dim> > centers;
-
-	static std::vector<Point<dim> > get_centers ();
-    };
-
-
-
-    template <int dim>
-    std::vector<Point<dim> >
-    KInverse<dim>::centers = KInverse<dim>::get_centers();
-
-
-    template <int dim>
-    std::vector<Point<dim> >
-    KInverse<dim>::get_centers ()
-    {
-      const unsigned int N = (dim == 2 ?
-			      40 :
-			      (dim == 3 ?
-			       100 :
-			       throw ExcNotImplemented()));
-
-      std::vector<Point<dim> > centers_list (N);
-      for (unsigned int i=0; i<N; ++i)
-	for (unsigned int d=0; d<dim; ++d)
-	  centers_list[i][d] = static_cast<double>(rand())/RAND_MAX;
-
-      return centers_list;
-    }
-
-
-
-    template <int dim>
-    void
-    KInverse<dim>::value_list (const std::vector<Point<dim> > &points,
-			       std::vector<Tensor<2,dim> >    &values) const
-    {
-      Assert (points.size() == values.size(),
-	      ExcDimensionMismatch (points.size(), values.size()));
-
-      for (unsigned int p=0; p<points.size(); ++p)
-	{
-	  values[p].clear ();
-
-	  double permeability = 0;
-	  for (unsigned int i=0; i<centers.size(); ++i)
-	    permeability += std::exp(-(points[p]-centers[i]).square()
-				     / (0.05 * 0.05));
-
-	  const double normalized_permeability
-	    = std::min (std::max(permeability, 0.01), 4.);
-
-	  for (unsigned int d=0; d<dim; ++d)
-	    values[p][d][d] = 1./normalized_permeability;
-	}
-    }
-  }
-
-
-				   // @sect3{Physical quantities}
-
-				   // The implementations of all the physical
-				   // quantities such as total mobility
-				   // $\lambda_t$ and fractional flow of water
-				   // $F$ are taken from step-21 so again we
-				   // don't have do any comment about them.
-  double mobility_inverse (const double S,
-			   const double viscosity)
-  {
-    return 1.0 /(1.0/viscosity * S * S + (1-S) * (1-S));
-  }
-
-  double f_saturation (const double S,
-		       const double viscosity)
-  {
-    return S*S /( S * S +viscosity * (1-S) * (1-S));
-  }
-
-  double get_fractional_flow_derivative (const double S,
-					 const double viscosity)
-  {
-    const double temp = ( S * S + viscosity * (1-S) * (1-S) );
-
-    const double numerator   =  2.0 * S * temp
-				-
-				S * S *
-				( 2.0 * S - 2.0 * viscosity * (1-S) );
-
-    const double denomerator =  std::pow(temp, 2.0 );
-
-    return numerator / denomerator;
-  }
 
 
 				   // @sect3{TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem}
 
 				   // The constructor of this class is an
-				   // extension of the constructor in step-21
+				   // extension of the constructors in step-21
 				   // and step-31. We need to add the various
 				   // variables that concern the saturation. As
 				   // discussed in the introduction, we are
 				   // going to use $Q_2 \times Q_1$
-				   // (Taylor-Hood) elements again for the darcy
-				   // system, which element combination fulfills
+				   // (Taylor-Hood) elements again for the Darcy
+				   // system, an element combination that fulfills
 				   // the Ladyzhenskaya-Babuska-Brezzi (LBB)
 				   // conditions
 				   // [Brezzi and Fortin 1991, Chen 2005], and $Q_1$
 				   // elements for the saturation. However, by
 				   // using variables that store the polynomial
-				   // degree of the darcy and temperature finite
+				   // degree of the Darcy and temperature finite
 				   // elements, it is easy to consistently
 				   // modify the degree of the elements as well
 				   // as all quadrature formulas used on them
 				   // downstream. Moreover, we initialize the
-				   // time stepping, variables related to
+				   // time stepping variables related to
 				   // operator splitting as well as the option
 				   // for matrix assembly and preconditioning:
   template <int dim>
@@ -692,58 +731,67 @@ namespace Step43
 
 				   // This is the function that sets up the
 				   // DoFHandler objects we have here (one for
-				   // the darcy part and one for the saturation
+				   // the Darcy part and one for the saturation
 				   // part) as well as set to the right sizes
 				   // the various objects required for the
 				   // linear algebra in this program. Its basic
-				   // operations are similar to what authors in
+				   // operations are similar to what
 				   // step-31 did.
 				   //
 				   // The body of the function first enumerates
-				   // all degrees of freedom for the darcy and
-				   // saturation systems. For the darcy part,
+				   // all degrees of freedom for the Darcy and
+				   // saturation systems. For the Darcy part,
 				   // degrees of freedom are then sorted to
 				   // ensure that velocities precede pressure
-				   // DoFs so that we can partition the darcy
-				   // matrix into a $2 \times 2$ matrix. Like
-				   // step-31, the present step does not perform
-				   // any additional DoF renumbering.
+				   // DoFs so that we can partition the Darcy
+				   // matrix into a $2 \times 2$ matrix.
 				   //
-				   // Then, we need to incorporate hanging node
-				   // constraints and Dirichlet boundary value
+				   // Then, we need to incorporate
+				   // hanging node constraints and
+				   // Dirichlet boundary value
 				   // constraints into
-				   // darcy_preconditioner_constraints. However,
-				   // this constraints are only set to the
-				   // pressure component since the Schur
-				   // complement preconditioner that corresponds
-				   // to the porous media flow operator in
-				   // non-mixed form, $-\nabla \cdot [\mathbf K
-				   // \lambda_t(S)]\nabla$. Therefore, we use a
-				   // component_mask that filters out the
-				   // velocity component, so that the
-				   // condensation is performed on pressure
-				   // degrees of freedom only.
+				   // darcy_preconditioner_constraints.
+				   // The boundary condition
+				   // constraints are only set on the
+				   // pressure component since the
+				   // Schur complement preconditioner
+				   // that corresponds to the porous
+				   // media flow operator in non-mixed
+				   // form, $-\nabla \cdot [\mathbf K
+				   // \lambda_t(S)]\nabla$, acts only
+				   // on the pressure
+				   // variable. Therefore, we use a
+				   // component_mask that filters out
+				   // the velocity component, so that
+				   // the condensation is performed on
+				   // pressure degrees of freedom
+				   // only.
 				   //
-				   // After having done so, we count the number
-				   // of degrees of freedom in the various
-				   // blocks:
-				   //
-				   // The next step is to create the sparsity
-				   // pattern for the darcy and saturation
-				   // system matrices as well as the
-				   // preconditioner matrix from which we build
-				   // the darcy preconditioner. As in step-31,
-				   // we choose to create the pattern not as in
-				   // the first few tutorial programs, but by
-				   // using the blocked version of
+				   // After having done so, we count
+				   // the number of degrees of freedom
+				   // in the various blocks. This
+				   // information is then used to
+				   // create the sparsity pattern for
+				   // the Darcy and saturation system
+				   // matrices as well as the
+				   // preconditioner matrix from which
+				   // we build the Darcy
+				   // preconditioner. As in step-31,
+				   // we choose to create the pattern
+				   // not as in the first few tutorial
+				   // programs, but by using the
+				   // blocked version of
 				   // CompressedSimpleSparsityPattern. The
-				   // reason for doing this is mainly memory,
-				   // that is, the SparsityPattern class would
-				   // consume too much memory when used in three
-				   // spatial dimensions as we intend to do for
-				   // this program. So, for this, we follow the
-				   // same way as step-31 did and we don't have
-				   // to repeat descriptions again for the rest
+				   // reason for doing this is mainly
+				   // memory, that is, the
+				   // SparsityPattern class would
+				   // consume too much memory when
+				   // used in three spatial dimensions
+				   // as we intend to do for this
+				   // program. So, for this, we follow
+				   // the same way as step-31 did and
+				   // we don't have to repeat
+				   // descriptions again for the rest
 				   // of the member function.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::setup_dofs ()
@@ -897,11 +945,20 @@ namespace Step43
   }
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner}
+				   // @sect3{Assembling matrices and preconditioners}
+
+				   // The next few functions are
+				   // devoted to setting up the
+				   // various system and
+				   // preconditioner matrices and
+				   // right hand sides that we have to
+				   // deal with in this program.
+
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner}
 
 				   // This function assembles the matrix we use
-				   // for preconditioning the darcy system. What
-				   // we need are a vector matrix weighted by
+				   // for preconditioning the Darcy system. What
+				   // we need are a vector mass matrix weighted by
 				   // $\left(\mathbf{K} \lambda_t\right)^{-1}$
 				   // on the velocity components and a mass
 				   // matrix weighted by $\left(\mathbf{K}
@@ -922,27 +979,41 @@ namespace Step43
 				   // specify which components are pressure and
 				   // which are velocity.
 				   //
-				   // The creation of the local matrix is rather
-				   // simple. There are only a term weighted by
-				   // $\left(\mathbf{K} \lambda_t\right)^{-1}$
-				   // (on the velocity) and a mass matrix
+				   // The creation of the local matrix
+				   // is rather simple. There are only
+				   // a term weighted by
+				   // $\left(\mathbf{K}
+				   // \lambda_t\right)^{-1}$ (on the
+				   // velocity) and a mass matrix
 				   // weighted by $\left(\mathbf{K}
-				   // \lambda_t\right)$ to be generated, so the
-				   // creation of the local matrix is done in
-				   // two lines. Once the local matrix is ready
-				   // (loop over rows and columns in the local
-				   // matrix on each quadrature point), we get
-				   // the local DoF indices and write the local
-				   // information into the global matrix. We do
-				   // this by directly applying the constraints
+				   // \lambda_t\right)$ to be
+				   // generated, so the creation of
+				   // the local matrix is done in two
+				   // lines. Once the local matrix is
+				   // ready (loop over rows and
+				   // columns in the local matrix on
+				   // each quadrature point), we get
+				   // the local DoF indices and write
+				   // the local information into the
+				   // global matrix. We do this by
+				   // directly applying the
+				   // constraints
 				   // (i.e. darcy_preconditioner_constraints)
-				   // from hanging nodes locally and Dirichlet
-				   // boundary conditions with zero values. By
-				   // doing so, we don't have to do that
-				   // afterwards, and we don't also write into
-				   // entries of the matrix that will actually
-				   // be set to zero again later when
-				   // eliminating constraints.
+				   // that takes care of hanging node
+				   // and zero Dirichlet boundary
+				   // condition constraints. By doing
+				   // so, we don't have to do that
+				   // afterwards, and we later don't
+				   // have to use
+				   // ConstraintMatrix::condense and
+				   // MatrixTools::apply_boundary_values,
+				   // both functions that would need
+				   // to modify matrix and vector
+				   // entries and so are difficult to
+				   // write for the Trilinos classes
+				   // where we don't immediately have
+				   // access to individual memory
+				   // locations.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner ()
@@ -962,9 +1033,6 @@ namespace Step43
 
     const unsigned int   dofs_per_cell   = darcy_fe.dofs_per_cell;
     const unsigned int   n_q_points      = quadrature_formula.size();
-
-    const RandomMedium::KInverse<dim> k_inverse;
-//  const SingleCurvingCrack::KInverse<dim> k_inverse;
 
     std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
     Tensor<2,dim>                     k_value;
@@ -1033,7 +1101,7 @@ namespace Step43
   }
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::build_darcy_preconditioner}
+				   // @sect4{TwoPhaseFlowProblem<dim>::build_darcy_preconditioner}
 
 				   // This function generates the inner
 				   // preconditioners that are going to be used
@@ -1049,7 +1117,7 @@ namespace Step43
 				   // complement $\mathbf{S}$. As explained in
 				   // the introduction, we are going to use an
 				   // IC preconditioner based on a vector matrix
-				   // (which is spectrally close to the darcy
+				   // (which is spectrally close to the Darcy
 				   // matrix $\mathbf{M}^{\mathbf{u}}$) and
 				   // another based on a Laplace vector matrix
 				   // (which is spectrally close to the
@@ -1075,10 +1143,10 @@ namespace Step43
   }
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_darcy_system}
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_darcy_system}
 
 				   // This is the function that assembles the
-				   // linear system for the darcy system.
+				   // linear system for the Darcy system.
 				   //
 				   // Regarding the technical details of
 				   // implementation, the procedures are similar
@@ -1169,7 +1237,7 @@ namespace Step43
 				   // DoFHandlers for this assembly routine, so
 				   // we must have two different cell iterators
 				   // for the two objects in use. This might
-				   // seem a bit peculiar, since both the darcy
+				   // seem a bit peculiar, since both the Darcy
 				   // system and the saturation system use the
 				   // same grid, but that's the only way to keep
 				   // degrees of freedom in sync. The first
@@ -1228,8 +1296,6 @@ namespace Step43
 
     const PressureRightHandSide<dim>  pressure_right_hand_side;
     const PressureBoundaryValues<dim> pressure_boundary_values;
-    const RandomMedium::KInverse<dim> k_inverse;
-//  const SingleCurvingCrack::KInverse<dim> k_inverse;
 
     std::vector<double>               pressure_rhs_values (n_q_points);
     std::vector<double>               boundary_values (n_face_q_points);
@@ -1330,7 +1396,7 @@ namespace Step43
   }
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_saturation_system}
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_system}
 
 				   // This function is to assemble the linear
 				   // system for the saturation transport
@@ -1361,7 +1427,7 @@ namespace Step43
 
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_saturation_matrix}
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_matrix}
 
 				   // This function is easily understood since
 				   // it only forms a simple mass matrix for the
@@ -1422,12 +1488,12 @@ namespace Step43
 
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs}
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs}
 
 				   // This function is to assemble the right
 				   // hand side of the saturation transport
 				   // equation. Before assembling it, we have to
-				   // call two FEValues objects for the darcy
+				   // call two FEValues objects for the Darcy
 				   // and saturation systems respectively and,
 				   // even more, two FEFaceValues objects for
 				   // the both systems because we have a
@@ -1446,7 +1512,7 @@ namespace Step43
 				   // step-31.
 				   //
 				   // Next, we start to loop over all the
-				   // saturation and darcy cells to put the
+				   // saturation and Darcy cells to put the
 				   // local contributions into the global
 				   // vector. In this loop, in order to simplify
 				   // the implementation in this function, we
@@ -1535,7 +1601,7 @@ namespace Step43
 
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_cell_term}
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_cell_term}
 
 				   // In this function, we actually compute
 				   // every artificial viscosity for every
@@ -1598,7 +1664,7 @@ namespace Step43
 	  const Tensor<1,dim> grad_phi_i_s = saturation_fe_values.shape_grad (i, q);
 
 	  local_rhs(i) += (time_step *
-			   f_saturation(old_s,viscosity) *
+			   fractional_flow(old_s,viscosity) *
 			   present_u *
 			   grad_phi_i_s
 			   -
@@ -1617,7 +1683,7 @@ namespace Step43
   }
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_boundary_term}
+				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_boundary_term}
 
 				   // In this function, we have to give
 				   // upwinding in the global boundary faces,
@@ -1664,12 +1730,12 @@ namespace Step43
 	for (unsigned int i=0; i<dofs_per_cell; ++i)
 	  local_rhs(i) -= time_step *
 			  normal_flux *
-			  f_saturation((is_outflow_q_point == true
-					?
-					old_saturation_solution_values_face[q]
-					:
-					neighbor_saturation[q]),
-				       viscosity) *
+			  fractional_flow((is_outflow_q_point == true
+					   ?
+					   old_saturation_solution_values_face[q]
+					   :
+					   neighbor_saturation[q]),
+					  viscosity) *
 			  saturation_fe_face_values.shape_value (i,q) *
 			  saturation_fe_face_values.JxW(q);
       }
@@ -1908,9 +1974,6 @@ namespace Step43
     std::vector<double> old_saturation_after_solving_pressure (n_q_points);
     std::vector<double> present_saturation (n_q_points);
 
-    const RandomMedium::KInverse<dim> k_inverse;
-//  const SingleCurvingCrack::KInverse<dim> k_inverse;
-
     std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
 
     double max_global_aop_indicator = 0.0;
@@ -2017,9 +2080,11 @@ namespace Step43
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
-  refine_mesh (const unsigned int    max_grid_level,
+  refine_mesh (const unsigned int    min_grid_level,
+	       const unsigned int    max_grid_level,
 	       const Vector<double> &refinement_indicators)
   {
+				     //TODO: use a useful refinement criterion, in much the same way as we do in step-31
     {
       typename DoFHandler<dim>::active_cell_iterator
 	cell = saturation_dof_handler.begin_active(),
@@ -2034,7 +2099,8 @@ namespace Step43
 	      (std::fabs(refinement_indicators(cell_no)) > saturation_refinement_threshold))
 	    cell->set_refine_flag();
 	  else
-	    if (std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_refinement_threshold)
+	    if ((static_cast<unsigned int>(cell->level()) > min_grid_level) &&
+		(std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_refinement_threshold))
 	      cell->set_coarsen_flag();
 	}
     }
@@ -2307,10 +2373,10 @@ namespace Step43
 	    for (unsigned int i=0; i<dim; ++i)
 	      velocity[i] = darcy_solution_values[q](i);
 
-	    double dF_dS = std::fabs( get_fractional_flow_derivative(saturation_values[q],viscosity) );
+	    const double dF_dS = fractional_flow_derivative(saturation_values[q],viscosity);
 
 	    max_velocity_times_dF_dS = std::max (max_velocity_times_dF_dS,
-						 velocity.norm()*dF_dS);
+						 velocity.norm() * dF_dS);
 	  }
       }
 
@@ -2429,7 +2495,7 @@ namespace Step43
 	const double dS_dt = porosity * (old_saturation[q] - old_old_saturation[q])
 			     / old_time_step;
 
-	const double dF_dS = get_fractional_flow_derivative ((old_saturation[q] + old_old_saturation[q]) / 2.0,viscosity);
+	const double dF_dS = fractional_flow_derivative ((old_saturation[q] + old_old_saturation[q]) / 2.0,viscosity);
 
 	const double u_grad_S = u * dF_dS *
 				(old_saturation_grads[q] + old_old_saturation_grads[q]) / 2.0;
@@ -2537,11 +2603,13 @@ namespace Step43
 	  predicted_saturation_solution = saturation_solution;
 	  predicted_saturation_solution.sadd (2.0, -1.0, old_saturation_solution);
 
+					   // TODO: move this into refine_mesh
 	  Vector<double> refinement_indicators (triangulation.n_active_cells());
 
 	  compute_refinement_indicators(predicted_saturation_solution,
 					refinement_indicators);
-	  refine_mesh (initial_refinement + n_pre_refinement_steps,
+	  refine_mesh (initial_refinement,
+		       initial_refinement + n_pre_refinement_steps,
 		       refinement_indicators);
 	}
 
@@ -2564,7 +2632,15 @@ namespace Step43
 
 
 
-int main ()
+				 // @sect3{The <code>main</code> function}
+				 //
+				 // The main function looks almost the
+				 // same as in all other programs. In
+				 // particular, it is essentially the
+				 // same as in step-31 where we also
+				 // explain the need to initialize the
+				 // MPI subsystem.
+int main (int argc, char *argv[])
 {
   try
     {
@@ -2572,6 +2648,8 @@ int main ()
       using namespace Step43;
 
       deallog.depth_console (0);
+
+      Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
       TwoPhaseFlowProblem<3> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();
