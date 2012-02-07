@@ -984,20 +984,29 @@ namespace Step43
 				   // a term weighted by
 				   // $\left(\mathbf{K}
 				   // \lambda_t\right)^{-1}$ (on the
-				   // velocity) and a mass matrix
+				   // velocity) and a Laplace matrix
 				   // weighted by $\left(\mathbf{K}
 				   // \lambda_t\right)$ to be
 				   // generated, so the creation of
-				   // the local matrix is done in two
-				   // lines. Once the local matrix is
-				   // ready (loop over rows and
-				   // columns in the local matrix on
-				   // each quadrature point), we get
-				   // the local DoF indices and write
-				   // the local information into the
-				   // global matrix. We do this by
-				   // directly applying the
-				   // constraints
+				   // the local matrix is done in
+				   // essentially two lines. Since the
+				   // material model functions at the
+				   // top of this file only provide
+				   // the inverses of the permeability
+				   // and mobility, we have to compute
+				   // $\mathbf K$ and $\lambda_t$ by
+				   // hand from the given values, once
+				   // per quadrature point.
+				   //
+				   // Once the
+				   // local matrix is ready (loop over
+				   // rows and columns in the local
+				   // matrix on each quadrature
+				   // point), we get the local DoF
+				   // indices and write the local
+				   // information into the global
+				   // matrix. We do this by directly
+				   // applying the constraints
 				   // (i.e. darcy_preconditioner_constraints)
 				   // that takes care of hanging node
 				   // and zero Dirichlet boundary
@@ -1035,12 +1044,11 @@ namespace Step43
     const unsigned int   n_q_points      = quadrature_formula.size();
 
     std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
-    Tensor<2,dim>                     k_value;
 
     std::vector<double>               old_saturation_values (n_q_points);
 
-    FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    FullMatrix<double>                local_matrix (dofs_per_cell, dofs_per_cell);
+    std::vector<unsigned int>         local_dof_indices (dofs_per_cell);
 
     std::vector<Tensor<1,dim> > phi_u   (dofs_per_cell);
     std::vector<Tensor<1,dim> > grad_phi_p (dofs_per_cell);
@@ -1069,11 +1077,10 @@ namespace Step43
 	for (unsigned int q=0; q<n_q_points; ++q)
 	  {
 	    const double old_s = old_saturation_values[q];
-	    const double mobility = 1.0 / mobility_inverse(old_s,viscosity);
 
-	    k_value.clear ();
-	    for (unsigned int d=0; d<dim; d++)
-	      k_value[d][d] = 1.0 / k_inverse_values[q][d][d];
+	    const double        inverse_mobility = mobility_inverse(old_s,viscosity);
+	    const double        mobility         = 1.0 / inverse_mobility;
+	    const Tensor<2,dim> permeability     = invert(k_inverse_values[q]);
 
 	    for (unsigned int k=0; k<dofs_per_cell; ++k)
 	      {
@@ -1084,10 +1091,10 @@ namespace Step43
 	    for (unsigned int i=0; i<dofs_per_cell; ++i)
 	      for (unsigned int j=0; j<dofs_per_cell; ++j)
 		{
-		  local_matrix(i,j) += (k_inverse_values[q] * mobility_inverse(old_s,viscosity) *
+		  local_matrix(i,j) += (k_inverse_values[q] * inverse_mobility *
 					phi_u[i] * phi_u[j]
 					+
-					k_value * mobility *
+					permeability * mobility *
 					grad_phi_p[i] * grad_phi_p[j])
 				       * darcy_fe_values.JxW(q);
 		}
@@ -1103,29 +1110,43 @@ namespace Step43
 
 				   // @sect4{TwoPhaseFlowProblem<dim>::build_darcy_preconditioner}
 
-				   // This function generates the inner
-				   // preconditioners that are going to be used
-				   // for the Schur complement block
-				   // preconditioner. The preconditioners need
-				   // to be regenerated at every saturation time
-				   // step since they contain the independent
-				   // variables saturation $S$ with time.
+				   // After calling the above
+				   // functions to assemble the
+				   // preconditioner matrix, this
+				   // function generates the inner
+				   // preconditioners that are going
+				   // to be used for the Schur
+				   // complement block
+				   // preconditioner. The
+				   // preconditioners need to be
+				   // regenerated at every saturation
+				   // time step since they depend on
+				   // the saturation $S$ that varies
+				   // with time.
 				   //
-				   // Next, we set up the preconditioner for the
+				   // In here, we set up the
+				   // preconditioner for the
 				   // velocity-velocity matrix
-				   // $\mathbf{M}^{\mathbf{u}}$ and the Schur
-				   // complement $\mathbf{S}$. As explained in
-				   // the introduction, we are going to use an
-				   // IC preconditioner based on a vector matrix
-				   // (which is spectrally close to the Darcy
-				   // matrix $\mathbf{M}^{\mathbf{u}}$) and
-				   // another based on a Laplace vector matrix
-				   // (which is spectrally close to the
-				   // non-mixed pressure matrix
-				   // $\mathbf{S}$). Usually, the
-				   // TrilinosWrappers::PreconditionIC class can
-				   // be seen as a good black-box preconditioner
-				   // which does not need any special knowledge.
+				   // $\mathbf{M}^{\mathbf{u}}$ and
+				   // the Schur complement
+				   // $\mathbf{S}$. As explained in
+				   // the introduction, we are going
+				   // to use an IC preconditioner
+				   // based on the vector matrix
+				   // $\mathbf{M}^{\mathbf{u}}$ and
+				   // another based on the scalar
+				   // Laplace matrix
+				   // $\tilde\mathbf{S}^p$ (which is
+				   // spectrally close to the Schur
+				   // complement of the Darcy
+				   // matrix). Usually, the
+				   // TrilinosWrappers::PreconditionIC
+				   // class can be seen as a good
+				   // black-box preconditioner which
+				   // does not need any special
+				   // knowledge of the matrix
+				   // structure and/or the operator
+				   // that's behind it.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::build_darcy_preconditioner ()
@@ -1150,21 +1171,13 @@ namespace Step43
 				   //
 				   // Regarding the technical details of
 				   // implementation, the procedures are similar
-				   // to those in step-22 and step-31 we reset
+				   // to those in step-22 and step-31. We reset
 				   // matrix and vector, create a quadrature
 				   // formula on the cells, and then create the
-				   // respective FEValues object. For the update
-				   // flags, we require basis function
-				   // derivatives only in case of a full
-				   // assembly, since they are not needed for
-				   // the right hand side; as always, choosing
-				   // the minimal set of flags depending on what
-				   // is currently needed makes the call to
-				   // FEValues::reinit further down in the
-				   // program more efficient.
+				   // respective FEValues object.
 				   //
 				   // There is one thing that needs to be
-				   // commented �V since we have a separate
+				   // commented: since we have a separate
 				   // finite element and DoFHandler for the
 				   // saturation, we need to generate a second
 				   // FEValues object for the proper evaluation
@@ -1185,85 +1198,6 @@ namespace Step43
 				   // the local matrix, right hand side as well
 				   // as the vector for the indices of the local
 				   // dofs compared to the global system.
-				   //
-				   // Note that in its present form, the
-				   // function uses the permeability implemented
-				   // in the RandomMedium::KInverse
-				   // class. Switching to the single curved
-				   // crack permeability function is as simple
-				   // as just changing the namespace name.
-				   //
-				   // Here's the an important step: we have to
-				   // get the values of the saturation function
-				   // of the previous time step at the
-				   // quadrature points. To this end, we can use
-				   // the FEValues::get_function_values
-				   // (previously already used in step-9,
-				   // step-14 and step-15), a function that
-				   // takes a solution vector and returns a list
-				   // of function values at the quadrature
-				   // points of the present cell. In fact, it
-				   // returns the complete vector-valued
-				   // solution at each quadrature point,
-				   // i.e. not only the saturation but also the
-				   // velocities and pressure:
-				   //
-				   // Next we need a vector that will contain
-				   // the values of the saturation solution at
-				   // the previous time level at the quadrature
-				   // points to assemble the source term in the
-				   // right hand side of the momentum
-				   // equation. Let's call this vector
-				   // old_saturation_values.
-				   //
-				   // The set of vectors we create next hold the
-				   // evaluations of the basis functions as well
-				   // as their gradients and symmetrized
-				   // gradients that will be used for creating
-				   // the matrices. Putting these into their own
-				   // arrays rather than asking the FEValues
-				   // object for this information each time it
-				   // is needed is an optimization to accelerate
-				   // the assembly process, see step-22 for
-				   // details.
-				   //
-				   // The last two declarations are used to
-				   // extract the individual blocks (velocity,
-				   // pressure, saturation) from the total FE
-				   // system.
-				   //
-				   // Now start the loop over all cells in the
-				   // problem. We are working on two different
-				   // DoFHandlers for this assembly routine, so
-				   // we must have two different cell iterators
-				   // for the two objects in use. This might
-				   // seem a bit peculiar, since both the Darcy
-				   // system and the saturation system use the
-				   // same grid, but that's the only way to keep
-				   // degrees of freedom in sync. The first
-				   // statements within the loop are again all
-				   // very familiar, doing the update of the
-				   // finite element data as specified by the
-				   // update flags, zeroing out the local arrays
-				   // and getting the values of the old solution
-				   // at the quadrature points. Then we are
-				   // ready to loop over the quadrature points
-				   // on the cell.
-				   //
-				   // Once this is done, we start the loop over
-				   // the rows and columns of the local matrix
-				   // and feed the matrix with the relevant
-				   // products.
-				   //
-				   // The last step in the loop over all cells
-				   // is to enter the local contributions into
-				   // the global matrix and vector structures to
-				   // the positions specified in
-				   // local_dof_indices. Again, we let the
-				   // ConstraintMatrix class do the insertion of
-				   // the cell matrix elements to the global
-				   // matrix, which already condenses the
-				   // hanging node constraints.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_darcy_system ()
   {
@@ -1301,15 +1235,108 @@ namespace Step43
     std::vector<double>               boundary_values (n_face_q_points);
     std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
 
+				     // Next we need a vector that
+				     // will contain the values of the
+				     // saturation solution at the
+				     // previous time level at the
+				     // quadrature points to assemble
+				     // the saturation dependent
+				     // coefficients in the Darcy
+				     // equations.
+				     //
+				     // The set of vectors we create
+				     // next hold the evaluations of
+				     // the basis functions as well as
+				     // their gradients that will be
+				     // used for creating the
+				     // matrices. Putting these into
+				     // their own arrays rather than
+				     // asking the FEValues object for
+				     // this information each time it
+				     // is needed is an optimization
+				     // to accelerate the assembly
+				     // process, see step-22 for
+				     // details.
+				     //
+				     // The last two declarations are used to
+				     // extract the individual blocks (velocity,
+				     // pressure, saturation) from the total FE
+				     // system.
     std::vector<double>               old_saturation_values (n_q_points);
 
-    std::vector<Tensor<1,dim> > phi_u (dofs_per_cell);
-    std::vector<double>         div_phi_u (dofs_per_cell);
-    std::vector<double>         phi_p (dofs_per_cell);
+    std::vector<Tensor<1,dim> >       phi_u (dofs_per_cell);
+    std::vector<double>               div_phi_u (dofs_per_cell);
+    std::vector<double>               phi_p (dofs_per_cell);
 
-    const FEValuesExtractors::Vector velocities (0);
-    const FEValuesExtractors::Scalar pressure (dim);
+    const FEValuesExtractors::Vector  velocities (0);
+    const FEValuesExtractors::Scalar  pressure (dim);
 
+				     // Now start the loop over all
+				     // cells in the problem. We are
+				     // working on two different
+				     // DoFHandlers for this assembly
+				     // routine, so we must have two
+				     // different cell iterators for
+				     // the two objects in use. This
+				     // might seem a bit peculiar, but
+				     // since both the Darcy system
+				     // and the saturation system use
+				     // the same grid we can assume
+				     // that the two iterators run in
+				     // sync over the cells of the two
+				     // DoFHandler objects.
+				     //
+				     // The first statements within
+				     // the loop are again all very
+				     // familiar, doing the update of
+				     // the finite element data as
+				     // specified by the update flags,
+				     // zeroing out the local arrays
+				     // and getting the values of the
+				     // old solution at the quadrature
+				     // points.  At this point we also
+				     // have to get the values of the
+				     // saturation function of the
+				     // previous time step at the
+				     // quadrature points. To this
+				     // end, we can use the
+				     // FEValues::get_function_values
+				     // (previously already used in
+				     // step-9, step-14 and step-15),
+				     // a function that takes a
+				     // solution vector and returns a
+				     // list of function values at the
+				     // quadrature points of the
+				     // present cell. In fact, it
+				     // returns the complete
+				     // vector-valued solution at each
+				     // quadrature point, i.e. not
+				     // only the saturation but also
+				     // the velocities and pressure.
+				     //
+				     // Then we are ready to loop over
+				     // the quadrature points on the
+				     // cell to do the
+				     // integration. The formula for
+				     // this follows in a
+				     // straightforward way from what
+				     // has been discussed in the
+				     // introduction.
+				     //
+				     // Once this is done, we start the loop over
+				     // the rows and columns of the local matrix
+				     // and feed the matrix with the relevant
+				     // products.
+				     //
+				     // The last step in the loop over all cells
+				     // is to enter the local contributions into
+				     // the global matrix and vector structures to
+				     // the positions specified in
+				     // local_dof_indices. Again, we let the
+				     // ConstraintMatrix class do the insertion of
+				     // the cell matrix elements to the global
+				     // matrix, which already condenses the
+				     // hanging node constraints.
     typename DoFHandler<dim>::active_cell_iterator
       cell = darcy_dof_handler.begin_active(),
       endc = darcy_dof_handler.end();
@@ -1415,7 +1442,7 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_system ()
   {
-    if ( rebuild_saturation_matrix == true )
+    if (rebuild_saturation_matrix == true)
       {
 	saturation_matrix = 0;
 	assemble_saturation_matrix ();
