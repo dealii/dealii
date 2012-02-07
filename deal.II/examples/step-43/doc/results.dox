@@ -69,3 +69,15 @@ between multiple phases also play a role in oil reservoir modeling when
 considering controlled burns of oil in the reservoir to raise pressure and
 temperature. These are much more complex problems, though, and left for future
 projects.
+
+Finally, from a mathematical perspective, we have derived the
+criterion for re-computing the velocity/pressure solution at a given
+time step under the assumption that we want to compare the solution we
+would get at the current time step with that computed the last time we
+actually solved this system. However, in the program, whenever we did
+not re-compute the solution, we didn't just use the previously
+computed solution but instead extrapolated from the previous two times
+we solved the system. Consequently, the criterion was pessimistically
+stated: what we should really compare is the solution we would get at
+the current time step with the extrapolated one. Re-stating the
+theorem in this regard is left as an exercise.
