@@ -561,9 +561,9 @@ namespace Step43
       void assemble_saturation_rhs ();
       void assemble_saturation_rhs_cell_term (const FEValues<dim>             &saturation_fe_values,
 					      const FEValues<dim>             &darcy_fe_values,
-					      const std::vector<unsigned int> &local_dof_indices,
 					      const double                     global_max_u_F_prime,
-					      const double                     global_S_variation);
+					      const double                     global_S_variation,
+					      const std::vector<unsigned int> &local_dof_indices);
       void assemble_saturation_rhs_boundary_term (const FEFaceValues<dim>             &saturation_fe_face_values,
 						  const FEFaceValues<dim>             &darcy_fe_face_values,
 						  const std::vector<unsigned int>     &local_dof_indices);
@@ -1427,18 +1427,16 @@ namespace Step43
 
 				   // This function is to assemble the linear
 				   // system for the saturation transport
-				   // equation. It includes two member
-				   // functions: assemble_saturation_matrix ()
-				   // and assemble_saturation_rhs (). The former
-				   // function that assembles the saturation
-				   // left hand side needs to be changed only
-				   // when grids have been changed since the
-				   // matrix is filled only with basis
-				   // functions. However, the latter that
-				   // assembles the right hand side must be
-				   // changed at every saturation time step
-				   // since it depends on an unknown variable
-				   // saturation.
+				   // equation. It calls, if necessary, two
+				   // other member functions:
+				   // assemble_saturation_matrix() and
+				   // assemble_saturation_rhs(). The former
+				   // function then assembles the saturation
+				   // matrix that only needs to be changed
+				   // occasionally. On the other hand, the
+				   // latter function that assembles the right
+				   // hand side must be called at every
+				   // saturation time step.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_system ()
   {
@@ -1519,70 +1517,56 @@ namespace Step43
 
 				   // This function is to assemble the right
 				   // hand side of the saturation transport
-				   // equation. Before assembling it, we have to
-				   // call two FEValues objects for the Darcy
+				   // equation. Before going about it, we have to
+				   // create two FEValues objects for the Darcy
 				   // and saturation systems respectively and,
-				   // even more, two FEFaceValues objects for
-				   // the both systems because we have a
+				   // in addition, two FEFaceValues objects for
+				   // the two systems because we have a
 				   // boundary integral term in the weak form of
 				   // saturation equation. For the FEFaceValues
 				   // object of the saturation system, we also
-				   // enter the normal vectors with an update
-				   // flag update_normal_vectors.
+				   // require normal vectors, which we request
+				   // using the update_normal_vectors flag.
 				   //
 				   // Next, before looping over all the cells,
 				   // we have to compute some parameters
 				   // (e.g. global_u_infty, global_S_variation,
 				   // and global_Omega_diameter) that the
-				   // artificial viscosity $\nu$ needs, which
-				   // desriptions have been appearing in
-				   // step-31.
+				   // artificial viscosity $\nu$ needs. This is
+				   // largely the same as was done in
+				   // step-31, so you may see there for more
+				   // information.
 				   //
-				   // Next, we start to loop over all the
+				   // The real works starts with the loop over all the
 				   // saturation and Darcy cells to put the
 				   // local contributions into the global
 				   // vector. In this loop, in order to simplify
-				   // the implementation in this function, we
-				   // generate two more functions: one is
-				   // assemble_saturation_rhs_cell_term and the
-				   // other is
-				   // assemble_saturation_rhs_boundary_term,
-				   // which is contained in an inner boudary
-				   // loop. The former is to assemble the
-				   // integral cell term with neccessary
-				   // arguments and the latter is to assemble
-				   // the integral global boundary $\Omega$
-				   // terms. It should be noted that we achieve
-				   // the insertion of the cell or boundary
-				   // vector elements to the global vector in
-				   // the two functions rather than in this
-				   // present function by giving these two
-				   // functions with a common argument
-				   // local_dof_indices, and two arguments
-				   // saturation_fe_values darcy_fe_values for
+				   // the implementation, we split some of the
+				   // work into two helper functions:
 				   // assemble_saturation_rhs_cell_term and
-				   // another two arguments
-				   // saturation_fe_face_values
-				   // darcy_fe_face_values for
 				   // assemble_saturation_rhs_boundary_term.
+				   // We note that we insert cell or boundary
+				   // contributions into the global vector in
+				   // the two functions rather than in this
+				   // present function.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs ()
   {
     QGauss<dim>   quadrature_formula(saturation_degree+2);
     QGauss<dim-1> face_quadrature_formula(saturation_degree+2);
 
-    FEValues<dim> saturation_fe_values                          (saturation_fe, quadrature_formula,
-								 update_values    | update_gradients |
-								 update_quadrature_points  | update_JxW_values);
-    FEValues<dim> darcy_fe_values                               (darcy_fe, quadrature_formula,
-								 update_values);
-    FEFaceValues<dim> saturation_fe_face_values                 (saturation_fe, face_quadrature_formula,
-								 update_values    | update_normal_vectors |
-								 update_quadrature_points  | update_JxW_values);
-    FEFaceValues<dim> darcy_fe_face_values                      (darcy_fe, face_quadrature_formula,
-								 update_values);
-    FEFaceValues<dim> saturation_fe_face_values_neighbor        (saturation_fe, face_quadrature_formula,
-								 update_values);
+    FEValues<dim> saturation_fe_values                   (saturation_fe, quadrature_formula,
+							  update_values    | update_gradients |
+							  update_quadrature_points  | update_JxW_values);
+    FEValues<dim> darcy_fe_values                        (darcy_fe, quadrature_formula,
+							  update_values);
+    FEFaceValues<dim> saturation_fe_face_values          (saturation_fe, face_quadrature_formula,
+							  update_values    | update_normal_vectors |
+							  update_quadrature_points  | update_JxW_values);
+    FEFaceValues<dim> darcy_fe_face_values               (darcy_fe, face_quadrature_formula,
+							  update_values);
+    FEFaceValues<dim> saturation_fe_face_values_neighbor (saturation_fe, face_quadrature_formula,
+							  update_values);
 
     const unsigned int dofs_per_cell = saturation_dof_handler.get_fe().dofs_per_cell;
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
@@ -1604,11 +1588,11 @@ namespace Step43
 
 	cell->get_dof_indices (local_dof_indices);
 
-	assemble_saturation_rhs_cell_term(saturation_fe_values,
-					  darcy_fe_values,
-					  local_dof_indices,
-					  global_max_u_F_prime,
-					  global_S_variation);
+	assemble_saturation_rhs_cell_term (saturation_fe_values,
+					   darcy_fe_values,
+					   global_max_u_F_prime,
+					   global_S_variation,
+					   local_dof_indices);
 
 	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	     ++face_no)
@@ -1630,28 +1614,33 @@ namespace Step43
 
 				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_cell_term}
 
-				   // In this function, we actually compute
-				   // every artificial viscosity for every
-				   // element. Then, with the artificial value,
-				   // we can finish assembling the saturation
-				   // right hand side cell integral
-				   // terms. Finally, we can pass the local
-				   // contributions on to the global vector with
-				   // the position specified in
+				   // This function takes care of integrating
+				   // the cell terms of the right hand side of
+				   // the saturation equation, and then
+				   // assembling it into the global right hand
+				   // side vector. Given the discussion in the
+				   // introduction, the form of these
+				   // contributions is clear. The only tricky
+				   // part is getting the artificial viscosity
+				   // and all that is necessary to compute
+				   // it. The first half of the function is
+				   // devoted to this task.
+				   //
+				   // The last part of the function is copying
+				   // the local contributions into the global
+				   // vector with position specified in
 				   // local_dof_indices.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
   assemble_saturation_rhs_cell_term (const FEValues<dim>             &saturation_fe_values,
 				     const FEValues<dim>             &darcy_fe_values,
-				     const std::vector<unsigned int> &local_dof_indices,
 				     const double                     global_max_u_F_prime,
-				     const double                     global_S_variation)
+				     const double                     global_S_variation,
+				     const std::vector<unsigned int> &local_dof_indices)
   {
     const unsigned int dofs_per_cell = saturation_fe_values.dofs_per_cell;
     const unsigned int n_q_points    = saturation_fe_values.n_quadrature_points;
-
-    Vector<double> local_rhs (dofs_per_cell);
 
     std::vector<double>          old_saturation_solution_values(n_q_points);
     std::vector<double>          old_old_saturation_solution_values(n_q_points);
@@ -1678,6 +1667,7 @@ namespace Step43
 			   viscosity,
 			   porosity);
 
+    Vector<double> local_rhs (dofs_per_cell);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1712,11 +1702,15 @@ namespace Step43
 
 				   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_boundary_term}
 
-				   // In this function, we have to give
-				   // upwinding in the global boundary faces,
-				   // i.e. we impose the Dirichlet boundary
-				   // conditions only on inflow parts of global
-				   // boundary, which has been described in
+				   // The next function is responsible for the
+				   // boundary integral terms in the right
+				   // hand side form of the saturation
+				   // equation.  For these, we have to compute
+				   // the upwinding flux on the global
+				   // boundary faces, i.e. we impose Dirichlet
+				   // boundary conditions weakly only on
+				   // inflow parts of the global boundary. As
+				   // before, this has been described in
 				   // step-21 so we refrain from giving more
 				   // descriptions about that.
   template <int dim>
@@ -1732,11 +1726,14 @@ namespace Step43
     Vector<double> local_rhs (dofs_per_cell);
 
     std::vector<double>          old_saturation_solution_values_face(n_face_q_points);
-    std::vector<Vector<double> > present_darcy_solution_values_face(n_face_q_points, Vector<double>(dim+1));
+    std::vector<Vector<double> > present_darcy_solution_values_face(n_face_q_points,
+								    Vector<double>(dim+1));
     std::vector<double>          neighbor_saturation (n_face_q_points);
 
-    saturation_fe_face_values.get_function_values (old_saturation_solution, old_saturation_solution_values_face);
-    darcy_fe_face_values.get_function_values (darcy_solution, present_darcy_solution_values_face);
+    saturation_fe_face_values.get_function_values (old_saturation_solution,
+						   old_saturation_solution_values_face);
+    darcy_fe_face_values.get_function_values (darcy_solution,
+					      present_darcy_solution_values_face);
 
     SaturationBoundaryValues<dim> saturation_boundary_values;
     saturation_boundary_values
@@ -1774,31 +1771,28 @@ namespace Step43
 
 				   // @sect3{TwoPhaseFlowProblem<dim>::solve}
 
-				   // This function implements the
-				   // operator splitting algorithm,
-				   // i.e. in each time step it either
-				   // re-computes the solution of the
-				   // Darcy system or extrapolates
-				   // velocity/pressure from previous
-				   // time steps, then determines the
-				   // size of the time step, and then
-				   // updates the saturation
-				   // variable. The implementation
+				   // This function implements the operator
+				   // splitting algorithm, i.e. in each time
+				   // step it either re-computes the solution
+				   // of the Darcy system or extrapolates
+				   // velocity/pressure from previous time
+				   // steps, then determines the size of the
+				   // time step, and then updates the
+				   // saturation variable. The implementation
 				   // largely follows similar code in
-				   // step-31.
+				   // step-31. It is, next to the run()
+				   // function, the central one in this
+				   // program.
 				   //
-				   // At the beginning of the
-				   // function, we decide whether
-				   // to solve the pressure-velocity
-				   // part by evaluating the
-				   // posteriori criterion, which will
-				   // be implemented in the following
-				   // function. If necessary, we will
-				   // solve the pressure-velocity part
-				   // using the GMRES solver with the
-				   // Schur complement preconditioner
-				   // as is described in the
-				   // introduction.
+				   // At the beginning of the function, we ask
+				   // whether to solve the pressure-velocity
+				   // part by evaluating the posteriori
+				   // criterion (see the following
+				   // function). If necessary, we will solve
+				   // the pressure-velocity part using the
+				   // GMRES solver with the Schur complement
+				   // block preconditioner as is described in
+				   // the introduction.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::solve ()
   {
@@ -1849,39 +1843,44 @@ namespace Step43
 	  saturation_matching_last_computed_darcy_solution = saturation_solution;
 	}
       }
-				     // On the other hand, if we have
-				     // decided that we don't want to
-				     // compute the solution of the
-				     // Darcy system for the current
-				     // time step, then we need to
-				     // simply extrapolate the
-				     // previous two Darcy solutions
-				     // to the same time as we would
-				     // have computed the
-				     // velocity/pressure at. Note
-				     // that the algorithm here only
+				     // On the other hand, if we have decided
+				     // that we don't want to compute the
+				     // solution of the Darcy system for the
+				     // current time step, then we need to
+				     // simply extrapolate the previous two
+				     // Darcy solutions to the same time as we
+				     // would have computed the
+				     // velocity/pressure at. We do a simple
+				     // linear extrapolation, i.e. given the
+				     // current length $dt$ of the macro time
+				     // step from the time when we last
+				     // computed the Darcy solution to now
+				     // (given by
+				     // <code>current_macro_time_step</code>),
+				     // and $DT$ the length of the last macro
+				     // time step (given by
+				     // <code>old_macro_time_step</code>),
+				     // then we get
+				     // $u^\ast = u_p + dt \frac{u_p-u_{pp}}{DT}
+				     // = (1+dt/DT)u_p - dt/DT u_{pp}$, where
+				     // $u_p$ and $u_{pp}$ are the last two
+				     // computed Darcy solutions. We can
+				     // implement this formula using just
+				     // two lines of code.
+				     //
+				     // Note that the algorithm here only
 				     // works if we have at least two
-				     // previously computed Darcy
-				     // solutions from which we can
-				     // extrapolate to the current
-				     // time, and this is ensured by
-				     // requiring re-computation of
-				     // the Darcy solution for the
-				     // first 3 time steps.
+				     // previously computed Darcy solutions
+				     // from which we can extrapolate to the
+				     // current time, and this is ensured by
+				     // requiring re-computation of the Darcy
+				     // solution for the first 2 time steps.
     else
       {
 	darcy_solution = last_computed_darcy_solution;
-	darcy_solution.sadd (2.0, -1.0, second_last_computed_darcy_solution);
-
-	double coef_1 = current_macro_time_step / old_macro_time_step;
-	double coef_2 = ( 1.0 + coef_1 );
-
-	TrilinosWrappers::BlockVector tmp (darcy_solution);
-	tmp = last_computed_darcy_solution;
-
-	tmp.sadd (coef_2, -coef_1, second_last_computed_darcy_solution);
-
-	darcy_solution.sadd (0.5, 0.5, tmp);
+	darcy_solution.sadd (1 + current_macro_time_step / old_macro_time_step,
+			     -current_macro_time_step / old_macro_time_step,
+			     second_last_computed_darcy_solution);
       }
 
 
@@ -1960,8 +1959,9 @@ namespace Step43
   }
 
 
+				   // @sect3{Tool functions}
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity}
+				   // @sect4{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity}
 
 				   // This function is to implement the a
 				   // posteriori criterion for
@@ -1989,7 +1989,7 @@ namespace Step43
   bool
   TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity () const
   {
-    if (timestep_number <= 3)
+    if (timestep_number <= 2)
       return true;
 
     const QGauss<dim> quadrature_formula(saturation_degree+2);
@@ -2066,7 +2066,6 @@ namespace Step43
   compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
 				 Vector<double>                 &refinement_indicators) const
   {
-
     const QMidpoint<dim> quadrature_formula;
     FEValues<dim> fe_values (saturation_fe, quadrature_formula, update_gradients);
     std::vector<Tensor<1,dim> > grad_saturation (1);
@@ -2082,9 +2081,7 @@ namespace Step43
 	fe_values.get_function_grads (predicted_saturation_solution,
 				      grad_saturation);
 
-	refinement_indicators(cell_no)
-	  = std::log( 1.0 + std::sqrt( grad_saturation[0] *
-				       grad_saturation[0] ) );
+	refinement_indicators(cell_no) = grad_saturation[0].norm();
 	max_refinement_indicator = std::max(max_refinement_indicator,
 					    refinement_indicators(cell_no));
       }
