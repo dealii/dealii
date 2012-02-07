@@ -151,7 +151,7 @@ namespace Step43
 	BlockSchurPreconditioner (
 	  const TrilinosWrappers::BlockSparseMatrix     &S,
 	  const InverseMatrix<TrilinosWrappers::SparseMatrix,
-	  PreconditionerMp>         &Mpinv,
+			      PreconditionerMp>         &Mpinv,
 	  const PreconditionerA                         &Apreconditioner);
 
 	void vmult (TrilinosWrappers::BlockVector       &dst,
@@ -172,7 +172,7 @@ namespace Step43
     BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
     BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
 			     const InverseMatrix<TrilinosWrappers::SparseMatrix,
-			     PreconditionerMp>      &Mpinv,
+						 PreconditionerMp>      &Mpinv,
 			     const PreconditionerA                      &Apreconditioner)
 		    :
 		    darcy_matrix            (&S),
@@ -273,7 +273,7 @@ namespace Step43
       void assemble_saturation_rhs_cell_term (const FEValues<dim>             &saturation_fe_values,
 					      const FEValues<dim>             &darcy_fe_values,
 					      const std::vector<unsigned int> &local_dof_indices,
-					      const double                     global_u_infty_times_dF_dS,
+					      const double                     global_max_u_F_prime,
 					      const double                     global_S_variation);
       void assemble_saturation_rhs_boundary_term (const FEFaceValues<dim>             &saturation_fe_face_values,
 						  const FEFaceValues<dim>             &darcy_fe_face_values,
@@ -289,7 +289,7 @@ namespace Step43
 				       // helper functions that are
 				       // used in a variety of places
 				       // throughout the program:
-      double                   get_maximal_velocity_times_dF_dS () const;
+      double                   get_max_u_F_prime () const;
       std::pair<double,double> get_extrapolated_saturation_range () const;
       bool                     determine_whether_to_solve_for_pressure_and_velocity () const;
       void                     project_back_saturation ();
@@ -298,7 +298,7 @@ namespace Step43
 						  const std::vector<Tensor<1,dim> >  &old_saturation_grads,
 						  const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
 						  const std::vector<Vector<double> > &present_darcy_values,
-						  const double                        global_u_infty_times_dF_dS,
+						  const double                        global_max_u_F_prime,
 						  const double                        global_S_variation,
 						  const double                        cell_diameter,
 						  const double                        old_time_step,
@@ -1494,7 +1494,7 @@ namespace Step43
     const unsigned int dofs_per_cell = saturation_dof_handler.get_fe().dofs_per_cell;
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-    const double global_u_infty_times_dF_dS = get_maximal_velocity_times_dF_dS ();
+    const double global_max_u_F_prime = get_max_u_F_prime ();
     const std::pair<double,double>
       global_S_range = get_extrapolated_saturation_range ();
     const double global_S_variation = global_S_range.second - global_S_range.first;
@@ -1514,7 +1514,7 @@ namespace Step43
 	assemble_saturation_rhs_cell_term(saturation_fe_values,
 					  darcy_fe_values,
 					  local_dof_indices,
-					  global_u_infty_times_dF_dS,
+					  global_max_u_F_prime,
 					  global_S_variation);
 
 	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
@@ -1552,7 +1552,7 @@ namespace Step43
   assemble_saturation_rhs_cell_term (const FEValues<dim>             &saturation_fe_values,
 				     const FEValues<dim>             &darcy_fe_values,
 				     const std::vector<unsigned int> &local_dof_indices,
-				     const double                     global_u_infty_times_dF_dS,
+				     const double                     global_max_u_F_prime,
 				     const double                     global_S_variation)
   {
     const unsigned int dofs_per_cell = saturation_fe_values.dofs_per_cell;
@@ -1578,7 +1578,7 @@ namespace Step43
 			   old_grad_saturation_solution_values,
 			   old_old_grad_saturation_solution_values,
 			   present_darcy_solution_values,
-			   global_u_infty_times_dF_dS,
+			   global_max_u_F_prime,
 			   global_S_variation,
 			   saturation_fe_values.get_cell()->diameter(),
 			   old_time_step,
@@ -1725,7 +1725,7 @@ namespace Step43
 	    mp_inverse (darcy_preconditioner_matrix.block(1,1), *Mp_preconditioner);
 
 	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionIC,
-	    TrilinosWrappers::PreconditionIC>
+							TrilinosWrappers::PreconditionIC>
 	    preconditioner (darcy_matrix, mp_inverse, *Amg_preconditioner);
 
 	  SolverControl solver_control (darcy_matrix.m(),
@@ -1800,7 +1800,7 @@ namespace Step43
     old_time_step = time_step;
     time_step = porosity *
 		GridTools::minimal_cell_diameter(triangulation) /
-		get_maximal_velocity_times_dF_dS() / 12;
+		get_max_u_F_prime() / 12;
 
 
 				     // ...and then also update the
@@ -2271,7 +2271,7 @@ namespace Step43
 
   template <int dim>
   double
-  TwoPhaseFlowProblem<dim>::get_maximal_velocity_times_dF_dS () const
+  TwoPhaseFlowProblem<dim>::get_max_u_F_prime () const
   {
     QGauss<dim>   quadrature_formula(darcy_degree+2);
     const unsigned int   n_q_points
@@ -2400,7 +2400,7 @@ namespace Step43
 		     const std::vector<Tensor<1,dim> >  &old_saturation_grads,
 		     const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
 		     const std::vector<Vector<double> > &present_darcy_values,
-		     const double                        global_u_infty_times_dF_dS,
+		     const double                        global_max_u_F_prime,
 		     const double                        global_S_variation,
 		     const double                        cell_diameter,
 		     const double                        old_time_step,
@@ -2410,7 +2410,7 @@ namespace Step43
     const double beta = .35 * dim;
     const double alpha = 1;
 
-    if (global_u_infty_times_dF_dS == 0)
+    if (global_max_u_F_prime == 0)
       return 5e-3 * cell_diameter;
 
     const unsigned int n_q_points = old_saturation.size();
@@ -2450,7 +2450,7 @@ namespace Step43
       }
 
     const double c_R = 0.0003;
-    const double global_scaling = c_R * porosity * (global_u_infty_times_dF_dS) * global_S_variation /
+    const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
 				  std::pow(global_Omega_diameter, alpha - 2.);
 
 // first order stabilization
