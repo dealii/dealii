@@ -87,6 +87,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There are now global functions l1_norm() and linfty_norm() that compute
+the respective norms of a rank-2 tensor.
+<br>
+(Wolfgang Bangerth, 2012/02/08)
 
 <li> New: VectorTools::interpolation_to_different_mesh implemented which interpolates between
      DoFHandlers with different triangulations based on a common coarse grid.
