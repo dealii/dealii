@@ -2334,9 +2334,9 @@ namespace Step43
     data_out.build_patches ();
 
     std::string filename = "solution-" +
-			   Utilities::int_to_string (timestep_number, 5) + ".tec";
+			   Utilities::int_to_string (timestep_number, 5) + ".vtu";
     std::ofstream output (filename.c_str());
-    data_out.write_tecplot (output);
+    data_out.write_vtu (output);
   }
 
 
