@@ -568,11 +568,8 @@ namespace Step43
 						  const FEFaceValues<dim>             &darcy_fe_face_values,
 						  const std::vector<unsigned int>     &local_dof_indices);
       void solve ();
-      void compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
-					  Vector<double> &refinement_indicators) const;
-      void refine_mesh (const unsigned int    min_grid_level,
-			const unsigned int    max_grid_level,
-			const Vector<double> &indicator);
+      void refine_mesh (const unsigned int              min_grid_level,
+			const unsigned int              max_grid_level);
       void output_results () const;
 
 				       // We follow with a number of
@@ -590,10 +587,7 @@ namespace Step43
 						  const std::vector<Vector<double> > &present_darcy_values,
 						  const double                        global_max_u_F_prime,
 						  const double                        global_S_variation,
-						  const double                        cell_diameter,
-						  const double                        old_time_step,
-						  const double                        viscosity,
-						  const double                        porosity) const;
+						  const double                        cell_diameter) const;
 
 
 				       // This all is followed by the
@@ -712,14 +706,14 @@ namespace Step43
 			    FE_Q<dim>(darcy_degree), 1),
 		  darcy_dof_handler (triangulation),
 
-		  saturation_degree (degree),
+		  saturation_degree (degree+1),
 		  saturation_fe (saturation_degree),
 		  saturation_dof_handler (triangulation),
 
 		  saturation_refinement_threshold (0.5),
 
 		  time (0),
-		  end_time (250),
+		  end_time (10),
 
 		  current_macro_time_step (0),
 		  old_macro_time_step (0),
@@ -1578,10 +1572,9 @@ namespace Step43
     const unsigned int dofs_per_cell = saturation_dof_handler.get_fe().dofs_per_cell;
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
-    const double global_max_u_F_prime = get_max_u_F_prime ();
-    const std::pair<double,double>
-      global_S_range = get_extrapolated_saturation_range ();
-    const double global_S_variation = global_S_range.second - global_S_range.first;
+    const double                   global_max_u_F_prime = get_max_u_F_prime ();
+    const std::pair<double,double> global_S_range       = get_extrapolated_saturation_range ();
+    const double                   global_S_variation   = global_S_range.second - global_S_range.first;
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = saturation_dof_handler.begin_active(),
@@ -1666,10 +1659,7 @@ namespace Step43
 			   present_darcy_solution_values,
 			   global_max_u_F_prime,
 			   global_S_variation,
-			   saturation_fe_values.get_cell()->diameter(),
-			   old_time_step,
-			   viscosity,
-			   porosity);
+			   saturation_fe_values.get_cell()->diameter());
 
     Vector<double> local_rhs (dofs_per_cell);
 
@@ -1834,9 +1824,9 @@ namespace Step43
 
 	  darcy_constraints.distribute (darcy_solution);
 
-	  std::cout << "     "
+	  std::cout << "        ..."
 		    << solver_control.last_step()
-		    << " GMRES iterations for Darcy (pressure-velocity) system."
+		    << " GMRES iterations."
 		    << std::endl;
 	}
 
@@ -1900,7 +1890,8 @@ namespace Step43
       if (max_u_F_prime > 0)
 	time_step = porosity *
 		    GridTools::minimal_cell_diameter(triangulation) /
-		    max_u_F_prime / 12;
+		    saturation_degree /
+		    max_u_F_prime / 50;
       else
 	time_step = end_time - time;
     }
@@ -1963,164 +1954,67 @@ namespace Step43
       saturation_constraints.distribute (saturation_solution);
       project_back_saturation ();
 
-      std::cout << "     "
+      std::cout << "        ..."
 		<< solver_control.last_step()
-		<< " CG iterations for saturation."
+		<< " CG iterations."
 		<< std::endl;
     }
   }
 
 
-				   // @sect3{Tool functions}
-
-				   // @sect4{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity}
-
-				   // This function is to implement the a
-				   // posteriori criterion for
-				   // adaptive operator splitting. As mentioned
-				   // in step-31, we use two FEValues objects
-				   // initialized with two cell iterators that
-				   // we walk in parallel through the two
-				   // DoFHandler objects associated with the
-				   // same Triangulation object; for these two
-				   // FEValues objects, we use of course the
-				   // same quadrature objects so that we can
-				   // iterate over the same set of quadrature
-				   // points, but each FEValues object will get
-				   // update flags only according to what it
-				   // actually needs to compute.
-				   //
-				   // In addition to this, if someone doesn't
-				   // want to perform their simulation with
-				   // operator splitting, they can lower the
-				   // criterion value (default value is $5.0$)
-				   // down to zero ad therefore numerical
-				   // algorithm becomes the original IMPES
-				   // method.
-  template <int dim>
-  bool
-  TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity () const
-  {
-    if (timestep_number <= 2)
-      return true;
-
-    const QGauss<dim> quadrature_formula(saturation_degree+2);
-    const unsigned int   n_q_points = quadrature_formula.size();
-
-    FEValues<dim> fe_values (saturation_fe, quadrature_formula,
-			     update_values | update_quadrature_points);
-
-    std::vector<double> old_saturation_after_solving_pressure (n_q_points);
-    std::vector<double> present_saturation (n_q_points);
-
-    std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
-
-    double max_global_aop_indicator = 0.0;
-
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = saturation_dof_handler.begin_active(),
-      endc = saturation_dof_handler.end();
-    for (; cell!=endc; ++cell)
-      {
-	double max_local_mobility_reciprocal_difference = 0.0;
-	double max_local_permeability_inverse_l1_norm = 0.0;
-
-	fe_values.reinit(cell);
-	fe_values.get_function_values (saturation_matching_last_computed_darcy_solution,
-				       old_saturation_after_solving_pressure);
-	fe_values.get_function_values (saturation_solution,
-				       present_saturation);
-
-	k_inverse.value_list (fe_values.get_quadrature_points(),
-			      k_inverse_values);
-
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    double mobility_reciprocal_difference = std::fabs( mobility_inverse(present_saturation[q],viscosity)
-							       -
-							       mobility_inverse(old_saturation_after_solving_pressure[q],viscosity) );
-
-	    max_local_mobility_reciprocal_difference = std::max(max_local_mobility_reciprocal_difference,
-								mobility_reciprocal_difference);
-
-	    max_local_permeability_inverse_l1_norm = std::max(max_local_permeability_inverse_l1_norm,
-							      k_inverse_values[q][0][0]);
-	  }
-
-	max_global_aop_indicator = std::max(max_global_aop_indicator,
-					    (max_local_mobility_reciprocal_difference*max_local_permeability_inverse_l1_norm));
-      }
-
-    if ( max_global_aop_indicator > AOS_threshold )
-      {
-	return true;
-      }
-    else
-      {
-	std::cout << "   Activating adaptive operating splitting" << std::endl;
-	return false;
-      }
-  }
-
-
-
-				   // @sect3{TwoPhaseFlowProblem<dim>::compute_refinement_indicators}
-
-				   // This function is to to compute the
-				   // refinement indicator discussed in the
-				   // introduction for each cell and its
-				   // implementation is similar to that
-				   // contained in step-33. There is no need to
-				   // repeat descriptions about it.
-  template <int dim>
-  void
-  TwoPhaseFlowProblem<dim>::
-  compute_refinement_indicators (const TrilinosWrappers::Vector &predicted_saturation_solution,
-				 Vector<double>                 &refinement_indicators) const
-  {
-    const QMidpoint<dim> quadrature_formula;
-    FEValues<dim> fe_values (saturation_fe, quadrature_formula, update_gradients);
-    std::vector<Tensor<1,dim> > grad_saturation (1);
-
-    double max_refinement_indicator = 0.0;
-
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = saturation_dof_handler.begin_active(),
-      endc = saturation_dof_handler.end();
-    for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
-      {
-	fe_values.reinit(cell);
-	fe_values.get_function_grads (predicted_saturation_solution,
-				      grad_saturation);
-
-	refinement_indicators(cell_no) = grad_saturation[0].norm();
-	max_refinement_indicator = std::max(max_refinement_indicator,
-					    refinement_indicators(cell_no));
-      }
-  }
-
-
-
 				   // @sect3{TwoPhaseFlowProblem<dim>::refine_mesh}
 
-				   // This function is to decide if every cell
-				   // is refined or coarsened with computed
-				   // refinement indicators in the previous
-				   // function and do the interpolations of the
-				   // solution vectors. The main difference from
-				   // the previous time-dependent tutorials is
-				   // that there is no need to do the solution
-				   // interpolations if we don't have any cell
-				   // that is refined or coarsend, saving some
-				   // additional computing time.
+				   // The next function does the
+				   // refinement and coarsening of the
+				   // mesh. It does its work in three
+				   // blocks: (i) Compute refinement
+				   // indicators by looking at the
+				   // gradient of a solution vector
+				   // extrapolated linearly from the
+				   // previous two using the
+				   // respective sizes of the time
+				   // step (or taking the only
+				   // solution we have if this is the
+				   // first time step). (ii) Flagging
+				   // those cells for refinement and
+				   // coarsening where the gradient is
+				   // larger or smaller than a certain
+				   // threshold, preserving minimal
+				   // and maximal levels of mesh
+				   // refinement. (iii) Transfering
+				   // the solution from the old to the
+				   // new mesh. None of this is
+				   // particularly difficult.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
-  refine_mesh (const unsigned int    min_grid_level,
-	       const unsigned int    max_grid_level,
-	       const Vector<double> &refinement_indicators)
+  refine_mesh (const unsigned int              min_grid_level,
+	       const unsigned int              max_grid_level)
   {
-				     //TODO: use a useful refinement criterion, in much the same way as we do in step-31
+    Vector<double> refinement_indicators (triangulation.n_active_cells());
+    {
+      const QMidpoint<dim> quadrature_formula;
+      FEValues<dim> fe_values (saturation_fe, quadrature_formula, update_gradients);
+      std::vector<Tensor<1,dim> > grad_saturation (1);
+
+      TrilinosWrappers::Vector extrapolated_saturation_solution (saturation_solution);
+      if (timestep_number != 0)
+	extrapolated_saturation_solution.sadd ((1. + time_step/old_time_step),
+					       time_step/old_time_step, old_saturation_solution);
+
+      typename DoFHandler<dim>::active_cell_iterator
+	cell = saturation_dof_handler.begin_active(),
+	endc = saturation_dof_handler.end();
+      for (unsigned int cell_no=0; cell!=endc; ++cell, ++cell_no)
+	{
+	  fe_values.reinit(cell);
+	  fe_values.get_function_grads (extrapolated_saturation_solution,
+					grad_saturation);
+
+	  refinement_indicators(cell_no) = grad_saturation[0].norm();
+	}
+    }
+
     {
       typename DoFHandler<dim>::active_cell_iterator
 	cell = saturation_dof_handler.begin_active(),
@@ -2136,124 +2030,66 @@ namespace Step43
 	    cell->set_refine_flag();
 	  else
 	    if ((static_cast<unsigned int>(cell->level()) > min_grid_level) &&
-		(std::fabs(refinement_indicators(cell_no)) < 0.75 * saturation_refinement_threshold))
+		(std::fabs(refinement_indicators(cell_no)) < 0.5 * saturation_refinement_threshold))
 	      cell->set_coarsen_flag();
 	}
     }
 
     triangulation.prepare_coarsening_and_refinement ();
 
-    unsigned int number_of_cells_refine  = 0;
-    unsigned int number_of_cells_coarsen = 0;
-
     {
-      typename DoFHandler<dim>::active_cell_iterator
-	cell = saturation_dof_handler.begin_active(),
-	endc = saturation_dof_handler.end();
+      std::vector<TrilinosWrappers::Vector> x_saturation (3);
+      x_saturation[0] = saturation_solution;
+      x_saturation[1] = old_saturation_solution;
+      x_saturation[2] = saturation_matching_last_computed_darcy_solution;
 
-      for (; cell!=endc; ++cell)
-	if (cell->refine_flag_set())
-	  ++number_of_cells_refine;
-	else
-	  if (cell->coarsen_flag_set())
-	    ++number_of_cells_coarsen;
+      std::vector<TrilinosWrappers::BlockVector> x_darcy (2);
+      x_darcy[0] = last_computed_darcy_solution;
+      x_darcy[1] = second_last_computed_darcy_solution;
+
+      SolutionTransfer<dim,TrilinosWrappers::Vector> saturation_soltrans(saturation_dof_handler);
+
+      SolutionTransfer<dim,TrilinosWrappers::BlockVector> darcy_soltrans(darcy_dof_handler);
+
+
+      triangulation.prepare_coarsening_and_refinement();
+      saturation_soltrans.prepare_for_coarsening_and_refinement(x_saturation);
+
+      darcy_soltrans.prepare_for_coarsening_and_refinement(x_darcy);
+
+      triangulation.execute_coarsening_and_refinement ();
+      setup_dofs ();
+
+      std::vector<TrilinosWrappers::Vector> tmp_saturation (3);
+      tmp_saturation[0].reinit (saturation_solution);
+      tmp_saturation[1].reinit (saturation_solution);
+      tmp_saturation[2].reinit (saturation_solution);
+      saturation_soltrans.interpolate(x_saturation, tmp_saturation);
+
+      saturation_solution = tmp_saturation[0];
+      old_saturation_solution = tmp_saturation[1];
+      saturation_matching_last_computed_darcy_solution = tmp_saturation[2];
+
+      std::vector<TrilinosWrappers::BlockVector> tmp_darcy (2);
+      tmp_darcy[0].reinit (darcy_solution);
+      tmp_darcy[1].reinit (darcy_solution);
+      darcy_soltrans.interpolate(x_darcy, tmp_darcy);
+
+      last_computed_darcy_solution        = tmp_darcy[0];
+      second_last_computed_darcy_solution = tmp_darcy[1];
+
+      rebuild_saturation_matrix    = true;
     }
-
-    std::cout << "   "
-	      << number_of_cells_refine
-	      << " cell(s) are going to be refined."
-	      << std::endl;
-    std::cout << "   "
-	      << number_of_cells_coarsen
-	      << " cell(s) are going to be coarsened."
-	      << std::endl;
-
-    std::cout << std::endl;
-
-    if ( number_of_cells_refine > 0 || number_of_cells_coarsen > 0 )
-      {
-	std::vector<TrilinosWrappers::Vector> x_saturation (3);
-	x_saturation[0] = saturation_solution;
-	x_saturation[1] = old_saturation_solution;
-	x_saturation[2] = saturation_matching_last_computed_darcy_solution;
-
-	std::vector<TrilinosWrappers::BlockVector> x_darcy (2);
-	x_darcy[0] = last_computed_darcy_solution;
-	x_darcy[1] = second_last_computed_darcy_solution;
-
-	SolutionTransfer<dim,TrilinosWrappers::Vector> saturation_soltrans(saturation_dof_handler);
-
-	SolutionTransfer<dim,TrilinosWrappers::BlockVector> darcy_soltrans(darcy_dof_handler);
-
-
-	triangulation.prepare_coarsening_and_refinement();
-	saturation_soltrans.prepare_for_coarsening_and_refinement(x_saturation);
-
-	darcy_soltrans.prepare_for_coarsening_and_refinement(x_darcy);
-
-	triangulation.execute_coarsening_and_refinement ();
-	setup_dofs ();
-
-	std::vector<TrilinosWrappers::Vector> tmp_saturation (3);
-	tmp_saturation[0].reinit (saturation_solution);
-	tmp_saturation[1].reinit (saturation_solution);
-	tmp_saturation[2].reinit (saturation_solution);
-	saturation_soltrans.interpolate(x_saturation, tmp_saturation);
-
-	saturation_solution = tmp_saturation[0];
-	old_saturation_solution = tmp_saturation[1];
-	saturation_matching_last_computed_darcy_solution = tmp_saturation[2];
-
-	std::vector<TrilinosWrappers::BlockVector> tmp_darcy (2);
-	tmp_darcy[0].reinit (darcy_solution);
-	tmp_darcy[1].reinit (darcy_solution);
-	darcy_soltrans.interpolate(x_darcy, tmp_darcy);
-
-	last_computed_darcy_solution = tmp_darcy[0];
-	second_last_computed_darcy_solution = tmp_darcy[1];
-
-	rebuild_saturation_matrix    = true;
-      }
-    else
-      {
-	rebuild_saturation_matrix    = false;
-
-	std::vector<unsigned int> darcy_block_component (dim+1,0);
-	darcy_block_component[dim] = 1;
-
-	std::vector<unsigned int> darcy_dofs_per_block (2);
-	DoFTools::count_dofs_per_block (darcy_dof_handler, darcy_dofs_per_block, darcy_block_component);
-	const unsigned int n_u = darcy_dofs_per_block[0],
-			   n_p = darcy_dofs_per_block[1],
-			   n_s = saturation_dof_handler.n_dofs();
-
-	std::cout << "Number of active cells: "
-		  << triangulation.n_active_cells()
-		  << " (on "
-		  << triangulation.n_levels()
-		  << " levels)"
-		  << std::endl
-		  << "Number of degrees of freedom: "
-		  << n_u + n_p + n_s
-		  << " (" << n_u << '+' << n_p << '+'<< n_s <<')'
-		  << std::endl
-		  << std::endl;
-      }
-
   }
 
 
 
 				   // @sect3{TwoPhaseFlowProblem<dim>::output_results}
 
-				   // This function to process the output
-				   // data. We only store the results when we
-				   // actually solve the pressure and velocity
-				   // part at the present time step. The rest of
-				   // the implementation is similar to that
-				   // output function in step-31, which
-				   // implementations has been explained in that
-				   // tutorial.
+				   // This function generates
+				   // graphical output. It is in
+				   // essence a copy of the
+				   // implementation in step-31.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results ()  const
   {
@@ -2337,11 +2173,126 @@ namespace Step43
 
 
 
-				   // @sect3{TwoPhaseFlowProblem<dim>::THE_REMAINING_FUNCTIONS}
+				   // @sect3{Tool functions}
 
-				   // The remaining functions that have been
-				   // used in step-31 so we don't have to
-				   // describe their implementations.
+				   // @sect4{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity}
+
+				   // This function implements the a
+				   // posteriori criterion for
+				   // adaptive operator splitting. The
+				   // function is relatively
+				   // straightforward given the way we
+				   // have implemented other functions
+				   // above and given the formula for
+				   // the criterion derived in the
+				   // paper.
+				   //
+				   // If one decides that one wants
+				   // the original IMPES method in
+				   // which the Darcy equation is
+				   // solved in every time step, then
+				   // this can be achieved by setting
+				   // the threshold value
+				   // <code>AOS_threshold</code> (with
+				   // a default of $5.0$) to zero,
+				   // thereby forcing the function to
+				   // always return true.
+				   //
+				   // Finally, note that the function
+				   // returns true unconditionally for
+				   // the first two time steps to
+				   // ensure that we have always
+				   // solved the Darcy system at least
+				   // twice when skipping its
+				   // solution, thereby allowing us to
+				   // extrapolate the velocity from
+				   // the last two solutions in
+				   // <code>solve()</code>.
+  template <int dim>
+  bool
+  TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity () const
+  {
+    if (timestep_number <= 2)
+      return true;
+
+    const QGauss<dim>  quadrature_formula(saturation_degree+2);
+    const unsigned int n_q_points = quadrature_formula.size();
+
+    FEValues<dim> fe_values (saturation_fe, quadrature_formula,
+			     update_values | update_quadrature_points);
+
+    std::vector<double> old_saturation_after_solving_pressure (n_q_points);
+    std::vector<double> present_saturation (n_q_points);
+
+    std::vector<Tensor<2,dim> > k_inverse_values (n_q_points);
+
+    double max_global_aop_indicator = 0.0;
+
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = saturation_dof_handler.begin_active(),
+      endc = saturation_dof_handler.end();
+    for (; cell!=endc; ++cell)
+      {
+	double max_local_mobility_reciprocal_difference = 0.0;
+	double max_local_permeability_inverse_l1_norm = 0.0;
+
+	fe_values.reinit(cell);
+	fe_values.get_function_values (saturation_matching_last_computed_darcy_solution,
+				       old_saturation_after_solving_pressure);
+	fe_values.get_function_values (saturation_solution,
+				       present_saturation);
+
+	k_inverse.value_list (fe_values.get_quadrature_points(),
+			      k_inverse_values);
+
+	for (unsigned int q=0; q<n_q_points; ++q)
+	  {
+	    const double mobility_reciprocal_difference
+	      = std::fabs(mobility_inverse(present_saturation[q],viscosity)
+			  -
+			  mobility_inverse(old_saturation_after_solving_pressure[q],viscosity));
+
+	    max_local_mobility_reciprocal_difference = std::max(max_local_mobility_reciprocal_difference,
+								mobility_reciprocal_difference);
+
+	    max_local_permeability_inverse_l1_norm = std::max(max_local_permeability_inverse_l1_norm,
+							      l1_norm(k_inverse_values[q]));
+	  }
+
+	max_global_aop_indicator = std::max(max_global_aop_indicator,
+					    (max_local_mobility_reciprocal_difference *
+					     max_local_permeability_inverse_l1_norm));
+      }
+
+    return (max_global_aop_indicator > AOS_threshold);
+  }
+
+
+
+				   // @sect4{TwoPhaseFlowProblem<dim>::project_back_saturation}
+
+				   // The next function simply makes
+				   // sure that the saturation values
+				   // always remain within the
+				   // physically reasonable range of
+				   // $[0,1]$. While the continuous
+				   // equations guarantee that this is
+				   // so, the discrete equations
+				   // don't. However, if we allow the
+				   // discrete solution to escape this
+				   // range we get into trouble
+				   // because terms like $F(S)$ and
+				   // $F'(S)$ will produce
+				   // unreasonable results
+				   // (e.g. $F'(S)<0$ for $S<0$, which
+				   // would imply that the wetting
+				   // fluid phase flows <i>against</i>
+				   // the direction of the bulk fluid
+				   // velocity)). Consequently, at the
+				   // end of each time step, we simply
+				   // project the saturation field
+				   // back into the physically
+				   // reasonable region.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::project_back_saturation ()
@@ -2355,13 +2306,26 @@ namespace Step43
   }
 
 
+
+				   // @sect4{TwoPhaseFlowProblem<dim>::get_max_u_F_prime}
+				   //
+				   // Another simpler helper function:
+				   // Compute the maximum of the total
+				   // velocity times the derivative of
+				   // the fraction flow function,
+				   // i.e., compute $\|\mathbf{u}
+				   // F'(S)\|_{L_\infty(\Omega)}$. This
+				   // term is used in both the
+				   // computation of the time step as
+				   // well as in normalizing the
+				   // entropy-residual term in the
+				   // artificial viscosity.
   template <int dim>
   double
   TwoPhaseFlowProblem<dim>::get_max_u_F_prime () const
   {
-    QGauss<dim>   quadrature_formula(darcy_degree+2);
-    const unsigned int   n_q_points
-      = quadrature_formula.size();
+    const QGauss<dim>  quadrature_formula(darcy_degree+2);
+    const unsigned int n_q_points = quadrature_formula.size();
 
     FEValues<dim> darcy_fe_values (darcy_fe, quadrature_formula,
 				   update_values);
@@ -2404,6 +2368,26 @@ namespace Step43
   }
 
 
+				   // @sect4{TwoPhaseFlowProblem<dim>::get_extrapolated_saturation_range}
+				   //
+				   // For computing the stabilization
+				   // term, we need to know the range
+				   // of the saturation
+				   // variable. Unlike in step-31,
+				   // this range is trivially bounded
+				   // by the interval $[0,1]$ but we
+				   // can do a bit better by looping
+				   // over a collection of quadrature
+				   // points and seeing what the
+				   // values are there. If we can,
+				   // i.e., if there are at least two
+				   // timesteps around, we can even
+				   // take the values extrapolated to
+				   // the next time step.
+				   //
+				   // As before, the function is taken
+				   // with minimal modifications from
+				   // step-31.
   template <int dim>
   std::pair<double,double>
   TwoPhaseFlowProblem<dim>::get_extrapolated_saturation_range () const
@@ -2418,12 +2402,8 @@ namespace Step43
 
     if (timestep_number != 0)
       {
-	double min_saturation = (1. + time_step/old_time_step) *
-				old_saturation_solution.linfty_norm()
-				+
-				time_step/old_time_step *
-				old_old_saturation_solution.linfty_norm(),
-	       max_saturation = -min_saturation;
+	double min_saturation = std::numeric_limits<double>::max(),
+	       max_saturation = -std::numeric_limits<double>::max();
 
 	typename DoFHandler<dim>::active_cell_iterator
 	  cell = saturation_dof_handler.begin_active(),
@@ -2451,8 +2431,8 @@ namespace Step43
       }
     else
       {
-	double min_saturation = old_saturation_solution.linfty_norm(),
-	       max_saturation = -min_saturation;
+	double min_saturation = std::numeric_limits<double>::max(),
+	       max_saturation = -std::numeric_limits<double>::max();
 
 	typename DoFHandler<dim>::active_cell_iterator
 	  cell = saturation_dof_handler.begin_active(),
@@ -2478,6 +2458,21 @@ namespace Step43
 
 
 
+				   // @sect4{TwoPhaseFlowProblem<dim>::compute_viscosity}
+				   //
+				   // The final tool function is used
+				   // to compute the artificial
+				   // viscosity on a given cell. This
+				   // isn't particularly complicated
+				   // if you have the formula for it
+				   // in front of you, and looking at
+				   // the implementation in
+				   // step-31. The major difference to
+				   // that tutorial program is that
+				   // the velocity here is not simply
+				   // $\mathbf u$ but $\mathbf u
+				   // F'(S)$ and some of the formulas
+				   // need to be adjusted accordingly.
   template <int dim>
   double
   TwoPhaseFlowProblem<dim>::
@@ -2488,12 +2483,9 @@ namespace Step43
 		     const std::vector<Vector<double> > &present_darcy_values,
 		     const double                        global_max_u_F_prime,
 		     const double                        global_S_variation,
-		     const double                        cell_diameter,
-		     const double                        old_time_step,
-		     const double                        viscosity,
-		     const double                        porosity) const
+		     const double                        cell_diameter) const
   {
-    const double beta = .35 * dim;
+    const double beta = .4 * dim;
     const double alpha = 1;
 
     if (global_max_u_F_prime == 0)
@@ -2529,15 +2521,19 @@ namespace Step43
 	max_velocity_times_dF_dS = std::max (std::sqrt (u*u) *
 					     (use_dF_dS
 					      ?
-					      std::max(dF_dS,1.)
+					      std::max(dF_dS, 1.)
 					      :
 					      1),
 					     max_velocity_times_dF_dS);
       }
 
-    const double c_R = 1;
+    const double c_R = 1e-16;
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
 				  std::pow(global_Omega_diameter, alpha - 2.);
+
+    return (beta *
+	    (max_velocity_times_dF_dS) *
+	    cell_diameter);
 
     return (beta *
 	    (max_velocity_times_dF_dS) *
@@ -2549,21 +2545,30 @@ namespace Step43
 
 				   // @sect3{TwoPhaseFlowProblem<dim>::run}
 
-				   // In this function, we follow the structure
-				   // of the same function partly in step-21 and
-				   // partly in step-31 so again there is no
-				   // need to repeat it. However, since we
-				   // consider the simulation with grid
-				   // adaptivity, we need to compute a
-				   // saturation predictor, which implementation
-				   // was first used in step-33, for the
-				   // function that computes the refinement
-				   // indicators.
+				   // This function is, besides
+				   // <code>solve()</code>, the
+				   // primary function of this program
+				   // as it controls the time
+				   // iteration as well as when the
+				   // solution is written into output
+				   // files and when to do mesh
+				   // refinement.
+				   //
+				   // With the exception of the
+				   // startup code that loops back to
+				   // the beginning of the function
+				   // through the <code>goto
+				   // start_time_iteration</code>
+				   // label, everything should be
+				   // relatively straightforward. In
+				   // any case, it mimicks the
+				   // corresponding function in
+				   // step-31.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
     const unsigned int initial_refinement     = (dim == 2 ? 4 : 2);
-    const unsigned int n_pre_refinement_steps = (dim == 2 ? 4 : 3);
+    const unsigned int n_pre_refinement_steps = (dim == 2 ? 2 : 2);
 
 
     GridGenerator::hyper_cube (triangulation, 0, 1);
@@ -2597,23 +2602,14 @@ namespace Step43
 
 	solve ();
 
-	output_results ();
+	std::cout << std::endl;
 
-	{
-					   // check if this already initializes the vector of if we need the next line
-	  TrilinosWrappers::Vector predicted_saturation_solution (saturation_solution);
-	  predicted_saturation_solution = saturation_solution;
-	  predicted_saturation_solution.sadd (2.0, -1.0, old_saturation_solution);
+	if (timestep_number % 100 == 0)
+	  output_results ();
 
-					   // TODO: move this into refine_mesh
-	  Vector<double> refinement_indicators (triangulation.n_active_cells());
-
-	  compute_refinement_indicators(predicted_saturation_solution,
-					refinement_indicators);
+	if (timestep_number % 25 == 0)
 	  refine_mesh (initial_refinement,
-		       initial_refinement + n_pre_refinement_steps,
-		       refinement_indicators);
-	}
+		       initial_refinement + n_pre_refinement_steps);
 
 	if ((timestep_number == 0) &&
 	    (pre_refinement_step < n_pre_refinement_steps))
@@ -2634,7 +2630,7 @@ namespace Step43
 
 
 
-				 // @sect3{The <code>main</code> function}
+				 // @sect3{The <code>main()</code> function}
 				 //
 				 // The main function looks almost the
 				 // same as in all other programs. In
