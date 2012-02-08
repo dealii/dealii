@@ -459,7 +459,37 @@ water is given by
   F(S)=\frac{S^2}{S^2+\mu (1-S)^2}
 @f]
 
-Finally, we will show results for computations with the two permeability
+@note Coming back to this testcase in step-43 several years later revealed an
+oddity in the setup of this testcase. To this end, consider that we can
+rewrite the advection equation for the saturation as $S_{t} + (\mathbf{u}
+F'(S)) \cdot \nabla S = 0$. Now, at the initial time, we have $S=0$, and with
+the given choice of function $F(S)$, we happen to have $F'(0)=0$. In other
+words, at $t=0$, the equation reduces to $S_t=0$ for all $\mathbf x$, so the
+saturation is zero everywhere and it is going to stay zero everywhere! This is
+despite the fact that $\mathbf u$ is not necessarily zero: the combined fluid
+is moving, but we've chosen our partial flux $F(S)$ in such a way that
+infinitesimal amounts of wetting fluid also only move at infinitesimal speeds
+(i.e., they stick to the medium more than the non-wetting phase in which they
+are embedded). That said, how can we square this with the knowledge that
+wetting fluid is invading from the left, leading to the flow patterns seen in
+the <a href="#Results">results section</a>? That's where we get into
+mathematics: Equations like the transport equation we are considering here
+have infinitely many solutions, but only one of them is physical: the one that
+results from the so-called viscosity limit, called the <a
+href="http://en.wikipedia.org/wiki/Viscosity_solution">viscosity
+solution</a>. The thing is that with discontinuous elements we arrive at this
+viscosity limit because using a numerical flux introduces a finite amount of
+artificial viscosity into the numerical scheme. On the other hand, in step-43,
+we use an artificial viscosity that is proportional to $\|\mathbf u F'(S)\|$
+on every cell, which at the initial time is zero. Thus, the saturation there is
+zero and remains zero; the solution we then get is <i>one</i> solution of the
+advection equation, but the method does not converge to the viscosity solution
+without further changes. We will therefore use a different initial condition in
+that program.
+
+
+Finally, to come back to the description of the testcase, we will show results
+for computations with the two permeability
 functions introduced at the end of the results section of @ref step_20
 "step-20":
 <ul>
