@@ -483,20 +483,27 @@ step-31 from which most of the implementation is derived. We will not
 discuss aspects of the implementation that have already been discussed
 in step-31.
 
-We show numerical results for some two-phase flow equations
-augmented by
-appropriate initial and boundary conditions in conjunction with two different choices of the
-permeability model. In the problems considered, there is no internal
-source term ($q=0$). As mentioned above, quantitative numerical
-results are presented in [Chueh, Djilali
-and Bangerth 2011].
+We show numerical results for some two-phase flow equations augmented by
+appropriate initial and boundary conditions in conjunction with two different
+choices of the permeability model. In the problems considered, there is no
+internal source term ($q=0$). As mentioned above, quantitative numerical
+results are presented in [Chueh, Djilali and Bangerth 2011].
 
 For simplicity, we choose $\Omega=[0,1]^d,d=2,3$, though all methods (as well
 as our implementation) should work equally well on general unstructured meshes.
 
 Initial conditions are only required for the saturation variable, and we
-choose $S(\mathbf{x},0)=0$, i.e. the porous medium is initially filled by the
-non-wetting phase. We prescribe a linear pressure on the boundaries:
+choose $S(\mathbf{x},0)=0.2$, i.e. the porous medium is initially filled by a
+mixture of the non-wetting (80%) and wetting (20%) phases. This differs from
+the initial condition in step-21 where we had taken $S(\mathbf{x},0)=0$, but
+for complicated mathematical reasons that are mentioned there in a longish
+remark, the current method using an entropy-based artificial diffusion term
+does not converge to the viscosity solution with this initial condition
+without additional modifications to the method. We therefore choose this
+modified version for the current program.
+
+Furthermore, we prescribe a linear pressure on
+the boundaries:
 @f[
    p(\mathbf{x},t) = 1 - x \qquad
    \textrm{on} \quad \partial \Omega \times [0,T].
