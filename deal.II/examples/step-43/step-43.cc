@@ -167,7 +167,7 @@ namespace Step43
   SaturationInitialValues<dim>::value (const Point<dim>  &/*p*/,
 				       const unsigned int /*component*/) const
   {
-    return 0;
+    return 0.2;
   }
 
 
@@ -643,15 +643,19 @@ namespace Step43
 
       const double                         saturation_refinement_threshold;
 
+      double                               time;
+      const double                         end_time;
+
       double                               current_macro_time_step;
       double                               old_macro_time_step;
 
       double                               time_step;
       double                               old_time_step;
       unsigned int                         timestep_number;
-      double                               viscosity;
-      double                               porosity;
-      double                               AOS_threshold;
+
+      const double                         viscosity;
+      const double                         porosity;
+      const double                         AOS_threshold;
 
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC> Amg_preconditioner;
       std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionIC> Mp_preconditioner;
@@ -672,7 +676,7 @@ namespace Step43
 				       // (e.g. replace
 				       // RandomMedium::KInverse by
 				       // SingleCurvingCrack::KInverse).
-      const RandomMedium::KInverse<dim>   k_inverse;
+      const SingleCurvingCrack::KInverse<dim>   k_inverse;
   };
 
 
@@ -713,6 +717,9 @@ namespace Step43
 		  saturation_dof_handler (triangulation),
 
 		  saturation_refinement_threshold (0.5),
+
+		  time (0),
+		  end_time (250),
 
 		  current_macro_time_step (0),
 		  old_macro_time_step (0),
@@ -1596,17 +1603,14 @@ namespace Step43
 
 	for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
 	     ++face_no)
-	  {
-
-	    if (cell->at_boundary(face_no))
-	      {
-		darcy_fe_face_values.reinit (darcy_cell, face_no);
-		saturation_fe_face_values.reinit (cell, face_no);
-		assemble_saturation_rhs_boundary_term (saturation_fe_face_values,
-						       darcy_fe_face_values,
-						       local_dof_indices);
-	      }
-	  }
+	  if (cell->at_boundary(face_no))
+	    {
+	      darcy_fe_face_values.reinit (darcy_cell, face_no);
+	      saturation_fe_face_values.reinit (cell, face_no);
+	      assemble_saturation_rhs_boundary_term (saturation_fe_face_values,
+						     darcy_fe_face_values,
+						     local_dof_indices);
+	    }
       }
   }
 
@@ -1889,10 +1893,18 @@ namespace Step43
 				     // time step based on the CFL
 				     // criterion discussed in the
 				     // introduction...
-    old_time_step = time_step;
-    time_step = porosity *
-		GridTools::minimal_cell_diameter(triangulation) /
-		get_max_u_F_prime() / 12;
+    {
+      old_time_step = time_step;
+
+      const double max_u_F_prime = get_max_u_F_prime();
+      if (max_u_F_prime > 0)
+	time_step = porosity *
+		    GridTools::minimal_cell_diameter(triangulation) /
+		    max_u_F_prime / 12;
+      else
+	time_step = end_time - time;
+    }
+
 
 
 				     // ...and then also update the
@@ -2296,23 +2308,7 @@ namespace Step43
 
 	}
     }
-    std::vector<std::string> joint_solution_names;
-    switch (dim)
-      {
-	case 2:
-	      joint_solution_names.push_back ("u");
-	      joint_solution_names.push_back ("v");
-	      break;
-
-	case 3:
-	      joint_solution_names.push_back ("u");
-	      joint_solution_names.push_back ("v");
-	      joint_solution_names.push_back ("w");
-	      break;
-
-	default:
-	      Assert (false, ExcNotImplemented());
-      }
+    std::vector<std::string> joint_solution_names (dim, "velocity");
     joint_solution_names.push_back ("pressure");
     joint_solution_names.push_back ("saturation");
 
@@ -2539,28 +2535,10 @@ namespace Step43
 					     max_velocity_times_dF_dS);
       }
 
-    const double c_R = 0.0003;
+    const double c_R = 1;
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
 				  std::pow(global_Omega_diameter, alpha - 2.);
 
-// first order stabilization
-//  return beta * max_velocity_times_dF_dS * cell_diameter / porosity;
-
-// entropy diffusion stabilization
-
-//  if (time > 1500.*24*3600)
-//    std::cout << "xxx "
-//	      << (beta *
-//		  1./porosity *
-//		  (max_velocity_times_dF_dS) *
-//		  cell_diameter)
-//	      << ' '
-//	      << (beta *
-//		  1./porosity *
-//		  (max_velocity_times_dF_dS) *
-//		  std::pow(cell_diameter,alpha) *
-//		  max_residual / global_scaling)
-//	      << std::endl;
     return (beta *
 	    (max_velocity_times_dF_dS) *
 	    std::min (cell_diameter,
@@ -2608,7 +2586,7 @@ namespace Step43
     time_step = old_time_step = 0;
     current_macro_time_step = old_macro_time_step = 0;
 
-    double time = 0;
+    time = 0;
 
     do
       {
@@ -2650,7 +2628,7 @@ namespace Step43
 	old_old_saturation_solution = old_saturation_solution;
 	old_saturation_solution = saturation_solution;
       }
-    while (time <= 250);
+    while (time <= end_time);
   }
 }
 
@@ -2675,7 +2653,7 @@ int main (int argc, char *argv[])
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
-      TwoPhaseFlowProblem<3> two_phase_flow_problem(1);
+      TwoPhaseFlowProblem<2> two_phase_flow_problem(1);
       two_phase_flow_problem.run ();
     }
   catch (std::exception &exc)
