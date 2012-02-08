@@ -34,6 +34,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/intergrid_map.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -417,6 +418,112 @@ namespace VectorTools
 	      boundary_values[face_dof_indices[i]] = 0.;
 	  }
     }
+  }
+
+
+
+  template <int dim, int spacedim,
+            template <int,int> class DH,
+            class Vector>
+  void
+  interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
+                                 const Vector            &u1,
+                                 const DH<dim, spacedim> &dof2,
+                                 Vector                  &u2)
+  {
+    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+           ExcMessage ("The two containers must represent triangulations that "
+                       "have the same coarse meshes"));
+
+    InterGridMap<DH<dim, spacedim> > intergridmap;
+    intergridmap.make_mapping(dof1, dof2);
+
+    ConstraintMatrix dummy;
+    dummy.close();
+
+    interpolate_to_different_mesh(intergridmap, u1, dummy, u2);
+  }
+
+
+
+  template <int dim, int spacedim,
+            template <int,int> class DH,
+            class Vector>
+  void
+  interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
+                                 const Vector            &u1,
+                                 const DH<dim, spacedim> &dof2,
+                                 const ConstraintMatrix  &constraints,
+                                 Vector                  &u2)
+  {
+    Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
+           ExcMessage ("The two containers must represent triangulations that "
+                       "have the same coarse meshes"));
+
+    InterGridMap<DH<dim, spacedim> > intergridmap;
+    intergridmap.make_mapping(dof1, dof2);
+
+    interpolate_to_different_mesh(intergridmap, u1, constraints, u2);
+  }
+
+
+
+  template <int dim, int spacedim,
+            template <int,int> class DH,
+            class Vector>
+  void
+  interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
+                                 const Vector                           &u1,
+                                 const ConstraintMatrix                 &constraints,
+                                 Vector                                 &u2)
+  {
+    const DH<dim, spacedim> &dof1 = intergridmap.get_source_grid();
+    const DH<dim, spacedim> &dof2 = intergridmap.get_destination_grid();
+
+    Assert(u1.size()==dof1.n_dofs(),
+           ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
+    Assert(u2.size()==dof2.n_dofs(),
+           ExcDimensionMismatch(u2.size(),dof2.n_dofs()));
+
+    Vector cache;
+
+                                     // Looping over the finest common
+                                     // mesh, this means that source and
+                                     // destination cells have to be on the
+                                     // same level and at least one has to
+                                     // be active.
+                                     //
+                                     // Therefor, loop over all cells
+                                     // (active and inactive) of the source
+                                     // grid ..
+    typename DH<dim,spacedim>::cell_iterator       cell1 = dof1.begin();
+    const typename DH<dim,spacedim>::cell_iterator endc1 = dof1.end();
+
+    for (; cell1 != endc1; ++cell1) {
+      const typename DH<dim,spacedim>::cell_iterator cell2 = intergridmap[cell1];
+
+                                     // .. and skip if source and destination
+                                     // cells are not on the same level ..
+      if (cell1->level() != cell2->level())
+        continue;
+                                     // .. or none of them is active.
+      if (!cell1->active() && !cell2->active())
+        continue;
+
+      Assert(cell1->get_fe().get_name() ==
+             cell2->get_fe().get_name(),
+             ExcMessage ("Source and destination cells need to use the same finite element"));
+
+      cache.reinit(dof1.get_fe().dofs_per_cell);
+
+                                     // Get and set the corresponding
+                                     // dof_values by interpolation.
+      cell1->get_interpolated_dof_values(u1, cache);
+      cell2->set_dof_values_by_interpolation(cache, u2);
+    }
+
+                                     // Apply hanging node constraints.
+    constraints.distribute(u2);
   }
 
 

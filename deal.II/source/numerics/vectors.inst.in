@@ -299,6 +299,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
      const unsigned int);
 #endif
 
+
   template
     void project
     (const Mapping<deal_II_dimension>      &,
@@ -837,4 +838,57 @@ void create_right_hand_side<deal_II_dimension,deal_II_dimension+1>
 #endif
   \}
 }
+
+
+for (deal_II_dimension : DIMENSIONS)
+{
+  namespace VectorTools \{
+
+  template
+    void interpolate_to_different_mesh
+    (const DoFHandler<deal_II_dimension> &,
+     const Vector<float>                 &,
+     const DoFHandler<deal_II_dimension> &,
+     Vector<float>                       &);
+
+  template
+    void interpolate_to_different_mesh
+    (const DoFHandler<deal_II_dimension> &,
+     const Vector<float>                 &,
+     const DoFHandler<deal_II_dimension> &,
+     const ConstraintMatrix              &,
+     Vector<float>                       &);
+
+  template
+    void interpolate_to_different_mesh
+    (const InterGridMap<DoFHandler<deal_II_dimension> > &,
+     const Vector<float>                                &,
+     const ConstraintMatrix                             &,
+     Vector<float>                                      &);
+
+  template
+    void interpolate_to_different_mesh
+    (const DoFHandler<deal_II_dimension> &,
+     const Vector<double>                &,
+     const DoFHandler<deal_II_dimension> &,
+     Vector<double>                      &);
+
+  template
+    void interpolate_to_different_mesh
+    (const DoFHandler<deal_II_dimension> &,
+     const Vector<double>                &,
+     const DoFHandler<deal_II_dimension> &,
+     const ConstraintMatrix              &,
+     Vector<double>                      &);
+
+  template
+    void interpolate_to_different_mesh
+    (const InterGridMap<DoFHandler<deal_II_dimension> > &,
+     const Vector<double>                               &,
+     const ConstraintMatrix                             &,
+     Vector<double>                                     &);
+
+  \}
+}
+
 

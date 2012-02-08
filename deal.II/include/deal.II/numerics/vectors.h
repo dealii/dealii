@@ -36,6 +36,7 @@ template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <int dim, int spacedim> class Mapping;
 template <int dim, int spacedim> class DoFHandler;
+template <typename gridtype> class InterGridMap;
 namespace hp
 {
   template <int dim, int spacedim> class DoFHandler;
@@ -494,6 +495,109 @@ namespace VectorTools
 		    const FullMatrix<double> &transfer,
 		    const InVector           &data_1,
 		    OutVector                &data_2);
+
+                                   /**
+                                    * Gives the interpolation of a
+                                    * @p dof1-function @p u1 to a
+                                    * @p dof2-function @p u2, where @p
+                                    * dof1 and @p dof2 represent
+                                    * different triangulations with a
+                                    * common coarse grid.
+                                    *
+                                    * dof1 and dof2 need to have the
+                                    * same finite element
+                                    * discretization.
+                                    *
+                                    * Note that for continuous
+                                    * elements on grids with hanging
+                                    * nodes (i.e. locally refined
+                                    * grids) this function does not
+                                    * give the expected output.
+                                    * Indeed, the resulting output
+                                    * vector does not necessarily
+                                    * respect continuity
+                                    * requirements at hanging nodes,
+                                    * due to local cellwise
+                                    * interpolation.
+                                    *
+                                    * For this case (continuous
+                                    * elements on grids with hanging
+                                    * nodes), please use the
+                                    * interpolate_to_different_mesh
+                                    * function with an additional
+                                    * ConstraintMatrix argument,
+                                    * see below, or make the field
+                                    * conforming yourself by calling the
+                                    * @p ConstraintsMatrix::distribute
+                                    * function of your hanging node
+                                    * constraints object.
+                                    */
+  template <int dim, int spacedim,
+            template <int,int> class DH,
+            class VECTOR>
+  void
+  interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
+                                 const VECTOR            &u1,
+                                 const DH<dim, spacedim> &dof2,
+                                 VECTOR                  &u2);
+
+                                   /**
+                                    * Gives the interpolation of a
+                                    * @p dof1-function @p u1 to a
+                                    * @p dof2-function @p u2, where @p
+                                    * dof1 and @p dof2 represent
+                                    * different triangulations with a
+                                    * common coarse grid.
+                                    *
+                                    * dof1 and dof2 need to have the
+                                    * same finite element
+                                    * discretization.
+                                    *
+                                    * @p constraints is a hanging node
+                                    * constraints object corresponding
+                                    * to @p dof2. This object is
+                                    * particularly important when
+                                    * interpolating onto continuous
+                                    * elements on grids with hanging
+                                    * nodes (locally refined grids):
+                                    * Without it - due to cellwise
+                                    * interpolation - the resulting
+                                    * output vector does not necessarily
+                                    * respect continuity requirements
+                                    * at hanging nodes.
+                                    */
+  template <int dim, int spacedim,
+            template <int,int> class DH,
+            class VECTOR>
+  void
+  interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
+                                 const VECTOR            &u1,
+                                 const DH<dim, spacedim> &dof2,
+                                 const ConstraintMatrix  &constraints,
+                                 VECTOR                  &u2);
+
+
+                                   /**
+                                    * The same function as above, but
+                                    * takes an InterGridMap object
+                                    * directly as a parameter. Useful
+                                    * for interpolating several vectors
+                                    * at the same time.
+                                    *
+                                    * @p intergridmap
+                                    * has to be initialized via
+                                    * InterGridMap::make_mapping pointing
+                                    * from a source DoFHandler to a
+                                    * destination DoFHandler.
+                                    */
+  template <int dim, int spacedim,
+            template <int,int> class DH,
+            class VECTOR>
+  void
+  interpolate_to_different_mesh (const InterGridMap<DH<dim, spacedim> > &intergridmap,
+                                 const VECTOR                           &u1,
+                                 const ConstraintMatrix                 &constraints,
+                                 VECTOR                                 &u2);
 
 				   /**
 				    * Compute the projection of

@@ -87,6 +87,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: VectorTools::interpolation_to_different_mesh implemented which interpolates between
+     DoFHandlers with different triangulations based on a common coarse grid.
+<br>
+(Matthias Maier, 2012/02/08)
+
 <li> Improved: DoFTools::map_dofs_to_support_points() now also works within the hp framework.
 <br>
 (Christian Goll, 2012/02/02)
