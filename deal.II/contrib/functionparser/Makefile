@@ -9,6 +9,7 @@ include $D/common/Make.global_options
 # rules
 $(LIBDIR)/contrib/functionparser/fparser.$(OBJEXT): fparser.cc fparser.h
 	@echo =====function parser==optimized==$(MT)== $(<F)
+	@mkdir -p $(LIBDIR)/contrib/functionparser/
 	@$(CXX) $(CXXFLAGS.o) -c fparser.cc -o $@
 
 
