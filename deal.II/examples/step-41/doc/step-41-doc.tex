@@ -2,6 +2,8 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{a4wide}
+\usepackage{graphicx}
 
 \title{Documentation of step-41, The obstacle problem}
 \author{Joerg Frohne}
@@ -11,192 +13,342 @@
 
 \section{Introduction}
 
-This example is based on the Laplace equation in a two-dimensional space $\Omega = \left[-1,1\right]^2$. It shows how to handle an obstacle problem. Therefore we have to solve a variational inequality. We will derive it from classical formulation.\\
-As a physical interpretation you imagine a membrane which is fixed on the boundary $\partial\Omega$. The membrane shows elastic material behavior with Young's modulus $E = 1.0$ for simplicity and there acts a force like from the earth gravitation on it. So the membrane dents in one direction and hits the cascaded obstacle which is described by the function $g$.
+This example is based on the Laplace equation in a two-dimensional space
+$\Omega = \left[-1,1\right]^2$ and deals with the question what happens if a
+membrane is deflected by some external force but is also constrained by an
+obstacle. In other words, think of a elastic membrane clamped at the boundary
+to a rectangular frame and that sags through due to gravity acting on it. What
+happens now if there is an obstacle under the membrane that prevents it from
+reaching its equilibrium position if gravity was the only existing force? In
+the current example program, we will consider that under the membrane is a
+stair step obstacle against which gravity pushes the membrane.
+
+This problem is typically called the "obstacle problem", and it results in a
+variational inequality, rather than a variational equation when put into the
+weak form. We will below derive it from classical formulation, but before we
+go on to discuss the mathematics let us show the solution of the problem we
+will consider in this tutorial program looks to gain some intuition of what
+we should expect:
+
+XXX (see files step-41.*.png) XXX
+
+Here, at the left, we see the displacement of the membrane. The shape of the
+obstacle underneath is clearly visible. On the right, we overlay which parts
+of the membrane are in contact with the obstacle. We will later call this set
+of points the "active set" to indicate that an inequality constraint is active
+there.
+
 
 \section{Classical formulation}
 
 The classical formulation of the problem possesses the following form:
-\begin{align}
- -div (\sigma) &\geq f & &\quad\text{in } \Omega,\\
- \sigma &= E\nabla u & &\quad\text{in } \Omega,\\
- u(x,y) &= 0 & &\quad\text{on }\partial\Omega,\\
-(\Delta u + f)(u - g) &= 0 & &\quad\text{in } \Omega,\\
- u(x,y) &\geq g(x,y) & &\quad\text{in } \Omega
-\end{align}
-with $u\in H^2(\Omega)$.
+\begin{align*}
+ -\textrm{div}\ \sigma &\geq f & &\quad\text{in } \Omega,\\
+ \sigma &= \nabla u & &\quad\text{in } \Omega,\\
+ u(\mathbf x) &= 0 & &\quad\text{on }\partial\Omega,\\
+(-\Delta u - f)(u - g) &= 0 & &\quad\text{in } \Omega,\\
+ u(\mathbf x) &\geq g(\mathbf x) & &\quad\text{in } \Omega
+\end{align*}
+with $u\in H^2(\Omega)$.  $u$ is a scalar valued function that denotes the
+displacement of the membrane. The first equation is called equilibrium
+condition with the force of areal density $f$. Here, this force is
+gravity. The second one is known as Hooke's Law that says that the stresses
+$\sigma$ are proportional to the gradient of the displacements $u$ (the
+proportionality constant, often denoted by $E$, has been set to one here,
+without loss of generality; if it is constant, it can be put into the right
+hand side function). At the boundary we have zero Dirichlet
+conditions. Obviously, the first two equations can be combined to yield
+$-\Delta u \ge f$.
 
-\noindent
-$u$ is a scalar valued function that denotes the displacement of the membrane. The first equation is called equilibrium condition with the force of areal density $f$. The second one is known as Hooke's Law with the stresses $\sigma$. At the boundary we have zero Dirichlet conditions. And (4) together with the last inequality builds the obstacle condition which has to hold for the hole domain.\\
-In this case it is possible to join the first two equations which yields the Laplace equation:
-\begin{equation}
- -\Delta u(x,y) \geq f(x,y)\quad\text{in }(x,y)\in \Omega.
-\end{equation}
-As mentioned above we choose $E=1.0$ for simplicity.
+Intuitively, gravity acts downward and so $f(\mathbf x)$ is a negative
+function (we choose $f=-10$ in this program). The first condition then means
+that the total force acting on the membrane is gravity plus something
+positive: namely the upward force that the obstacle exerts on the membrane at
+those places where the two of them are in contact. How big is this additional
+force? We don't know yet (and neither do we know "where" it actually acts) but
+it must be so that the membrane doesn't penetrate the obstacle.
+
+The fourth equality above together with the last inequality forms the
+obstacle condition which has to hold for the whole domain. The latter of these
+two means that the membrane must be above the obstacle $g(\mathbf x)$
+everywhere. The second to last equation, often called the "complementarity
+condition" says that where the membrane is not in contact with the obstacle
+(i.e., those $\mathbf x$ where $u(\mathbf x) - g(\mathbf x) \neq 0$), then
+$-\Delta u=f$ at these locations; in other words, no additional forces act
+there, as expected. On the other hand, where $u=g$ we can have $-\Delta u-f
+\neq 0$, i.e., there can be additional forces (though there don't have to be:
+it is possible for the membrane to just touch, not press against, the obstacle).
+
 
 \section{Derivation of the variational inequality}
 
 An obvious way to obtain the variational formulation of the obstacle problem is to consider the total potential energy:
-\begin{equation}
+\begin{equation*}
  E(u):=\dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla - \int\limits_{\Omega} fu.
-\end{equation}
+\end{equation*}
 We have to find a solution $u\in G$ of the following minimization problem
-\begin{equation}
+\begin{equation*}
  E(u)\leq E(v)\quad \forall v\in G,
-\end{equation}
+\end{equation*}
 with the convex set of admissble displacements:
-\begin{equation}
+\begin{equation*}
  G:=\lbrace v\in V: v\geq g \text{ a.e. in } \Omega\rbrace,\quad V:=H^1_0(\Omega).
-\end{equation}
-This set takes care of the conditions (3) and (5).\\
-Now we consider a function
-\begin{equation}
- F(\varepsilon) := E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],\quad u,v\in G,
-\end{equation}
-which takes its minimum at $\varepsilon = 0$, so that $F'(0)\geq 0$. Note that $u+\varepsilon(v-u) = (1-\varepsilon)u+\varepsilon v\in G$ because of the convexity of $G$. If we compute $F'(\varepsilon)\vert_{\varepsilon=0}$ it yields the variational formulation we are searching for:\\
+\end{equation*}
+This set takes care of the third and fifth conditions above (the boundary
+values and the complementarity condition).
+
+Consider now the minimizer $u\in G$ of $E$ and any other function $v\in
+G$. Then the function
+\begin{equation*}
+ F(\varepsilon) := E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],
+\end{equation*}
+takes its minimum at $\varepsilon = 0$, so that $F'(0)\geq 0$ for any choice
+of $v$. Note that
+$u+\varepsilon(v-u) = (1-\varepsilon)u+\varepsilon v\in G$ because of the
+convexity of $G$. If we compute $F'(\varepsilon)\vert_{\varepsilon=0}$ it
+yields the variational formulation we are searching for:
+
 \textit{Find a function $u\in G$ with}
-\begin{equation}
+\begin{equation*}
  \left(\nabla u, \nabla(v-u)\right) \geq \left(f,v-u\right) \quad \forall v\in G.
-\end{equation}
-For the equivalent saddle point formulation of this problem we introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W:=V^*$ of Lagrange multipliers. This yields to:\\
-Find $u\in V$ and $\lambda\in K$ such that
-\begin{eqnarray}
- a(u,v) + b(v,\lambda) &=& f(v),\quad v\in V\\
- b(u,\mu - \lambda) &\leq& \langle g,(\mu - \lambda)\rangle,\quad\mu\in K,
-\end{eqnarray}
-with
-\begin{eqnarray}
- a(u,v) &:=& \left(\nabla u, \nabla v\right),\quad u,v\in V\\
- b(u,\mu) &:=& (u,\mu),\quad u\in V,\quad\mu\in W.
-\end{eqnarray}
-The existence and uniqueness of $(u,\mu)\in V\times K$ of the saddle point problem (14) and (15) has been stated in Grossmann and Roos: Numerical treatment of partial differential equations, Springer-Verlag, Heidelberg-Berlin, 2007, 596 pages, ISBN 978-3-540-71582-5.
+\end{equation*}
+
+This is the typical form of variational inequalities, where not just $v$
+appears in the bilinear form but in fact $v-u$. The reason is this: if $u$ is
+not constrained, then we can find test functions $v$ in $G$ so that $v-u$ can have
+any sign. By choosing test functions $v_1,v_2$ so that $v_1-u = -(v_2-u)$ it
+follows that the inequality can only hold for both $v_1$ and $v_2$ if the two
+sides are in fact equal, i.e., we obtain a variational equality.
+
+On the other hand, if $u=g$ then $G$ only allows test functions $v$ so that in fact
+$v-u\ge 0$. This means that we can't test the equation with both $v-u$ and
+$-(v-u)$ as above, and so we can no longer conclude that the two sides are in
+fact equal. Thus, this mimicks the way we have discussed the complementarity
+condition above.
+
+\section{Formulation as a saddle point problem}
+
+The variational inequality above is awkward to work with. We would therefore
+like to reformulate it as an equivalent saddle point problem. We introduce a
+Lagrange multiplier $\lambda$ and the convex cone $K\subset W:=V^*, K=\{\mu\in
+W: \mu(\mathbf x)\le 0\}$ of
+\marginpar{JF: Is this definition of $K$ correct?}
+Lagrange multipliers. This yields:
+
+\textit{Find $u\in V$ and $\lambda\in K$ such that}
+\begin{align*}
+ a(u,v) + b(v,\lambda) &= f(v),\quad &&v\in V\\
+ b(u,\mu - \lambda) &\leq \langle g,(\mu - \lambda)\rangle,\quad&&\mu\in K,
+\end{align*}
+\textit{with}
+\begin{align*}
+ a(u,v) &:= \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
+ b(u,\mu) &:= (u,\mu),\quad &&u\in V,\quad\mu\in W.
+\end{align*}
+In other words, we can consider $\lambda$ as the negative of the additional, positive force that the
+obstacle exerts on the membrane. The inequality in the second line of the
+statement above only appears to have the wrong sign because we have
+$\mu-\lambda<0$ at points where $\lambda=0$, given the definition of $K$.
+
+The existence and uniqueness of $(u,\lambda)\in V\times K$ of this saddle
+point problem has been stated in Grossmann and Roos: Numerical treatment of
+partial differential equations, Springer-Verlag, Heidelberg-Berlin, 2007, 596
+pages, ISBN 978-3-540-71582-5.
 
 
 
-\section{Active Set methods to solve (11)}
+\section{Active Set methods to solve the saddle point problem}
 
-There are different methods to solve the variational inequality. As one possibility you can understand (11) as a convex quadratic program (QP) with inequality constraints.\\
-After we discretized the saddle point problem, we obtain the following system of equations and inequalities for $p\in\mathcal{S}:=\Omega_h\backslash\partial\Omega_h$:
-\begin{eqnarray}
- &A_h u_h + B_h\lambda_h = f_h,&\\
- &u_{n,p} \leq g_p,\quad \lambda_p \geq 0,\quad \lambda_p(u_{n,p} - g_p) = 0.&
-\end{eqnarray}
-with $u_{n,p}:=D_{pp} u_p\leq g_p, p\in S$ as a non-pentration condition. The matrix $B_h$ has the form $B_h:=D$ where $D$ is a diagonal matrix with the entries
-\begin{equation}
- D_{pp} := \int\limits_{\Omega}\varphi_p^2 dx,\quad p\in\mathcal{S}.
-\end{equation}
-Now we define for each vertex $p\in \mathcal{S}$ the function
-\begin{equation}
- C(u_{n,p},\lambda_p):=\lambda_p - \max\lbrace 0, \lambda_p + c( u_{n,p} - g_p\rbrace,\quad c>0.
-\end{equation}
-So we can express the conditions in (17) as
-\begin{equation}
- C(u_{n,p},\lambda_p) = 0,\quad p\in\mathcal{S}.
-\end{equation}
-The primal-dual active set strategy is an iterative scheme which is based on (19) to predict the next active and inactive sets $\mathcal{A}_k$ and $\mathcal{F}_k$. (See Hintermueller, Ito, Kunisch: The primal-dual active set strategy as a semismooth newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3, pp. 865-888.)\\
-% \begin{eqnarray}
-%  \min\limits_{u_h} q(u_h) &=& \dfrac{1}{2}u_h^TAu_h + u_h^Tb\\
-%  \text{subject to}\quad c_i^Tu_h &=& 0,\quad i\in I_{\partial\Omega}\\
-%  c_i^T u_h &\geq& g_i,\quad i\in I_{\Omega}.
-% \end{eqnarray}
-% In this formulation $A$ is the mass matrix with $A_{ij} = \left(\nabla\varphi_i,\nabla\varphi_j\right)$ which includes the Dirichlet-Boundary conditions and $b$ is the right-hand-side with $b_i = \left(f_i,\varphi_i\right)$. $u_h$ and $c$ are also vectors with the same dimension as $b$.\\
-The algorithm for primal-dual active set method works as follows:
+There are different methods to solve the variational inequality. As one
+possibility you can understand the saddle point problem as a convex quadratic program (QP) with
+inequality constraints.
+
+To get there, let us assume that we discretize both $u$ and $\lambda$ with the
+same finite element space, for example the usual $Q_k$ spaces. We would then
+get the equations
+\marginpar{JF: Aren't the inequalities the wrong way around here (and below)?}
+\begin{eqnarray*}
+ &A U + B\Lambda = F,&\\
+ &[BU-G]_i \le 0, \quad \Lambda_i \geq 0,\quad \Lambda_i[BU-G]_i = 0
+\qquad \forall i.&
+\end{eqnarray*}
+where $B$ is the mass matrix on the chosen finite element space and the
+indices $i$ above are for all degrees of freedom in the set $\cal S$ of degrees of
+freedom located in the interior of the domain
+(we have Dirichlet conditions on the perimeter). However, we
+can make our life simpler if we use a particular quadrature rule when
+assembling all terms that yield this mass matrix, namely a quadrature formula
+one where quadrature points are only located at the interpolation points at
+which shape functions are defined; since all but one shape function are zero
+at these locations, we get a diagonal mass matrix with
+\begin{align*}
+  B_{ii} = \int_\Omega \varphi_i(\mathbf x)^2\ \textrm{d}x,
+  \qquad
+  B_{ij}=0 \ \text{for } i\neq j.
+\end{align*}
+
+With this, the equations above can be restated as
+\begin{eqnarray*}
+ &A U + B\Lambda = F,&\\
+ &U_i-B_{ii}^{-1}G_i \le 0, \quad \Lambda_i \geq 0,\quad \Lambda_i[U_i-B_{ii}^{-1}G_i] = 0
+\qquad \forall i\in{\cal S}.&
+\end{eqnarray*}
+
+Now we define for each degree of freedom $i$ the function
+\begin{equation*}
+ C([BU]_i,\Lambda_i):=\Lambda_i - \max\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
+\end{equation*}
+with some $c>0$.
+\marginpar{JF: How do you choose $c$?}
+After some headscratching one can then convince oneself that the inequalities
+above can equivalently be rewritten as
+\begin{equation*}
+ C([BU]_i,\Lambda_i) = 0, \qquad \forall i\in{\cal S}
+\end{equation*}
+The primal-dual active set strategy we will use here is an iterative scheme which is based on
+this condition to predict the next active and inactive sets $\mathcal{A}_k$ and
+$\mathcal{F}_k$ (that is, those complementary sets of indices $i$ for which
+$U_i$ is either equal to or not equal to the value of the obstacle
+$B^{-1}G$). For a more in depth treatment of this approach, see Hintermueller, Ito, Kunisch: The primal-dual active set
+strategy as a semismooth newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3,
+pp. 865-888.
+
+\section{The primal-dual active set algorithm}
+
+The algorithm for the primal-dual active set method works as follows:
 \begin{itemize}
  \item [(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and $\mathcal{A}_k\cap\mathcal{F}_k=\O{}$ and set $k=1$.
- \item [(1)] Find the primal-dual pair $(u^k_h,\lambda^k_h)$\\
- \begin{equation}
- \begin{split}
-  A_h u^k_h + B_h\lambda^k_h = f_h,\\
-  u^k_{n,p} = g_p\quad\forall p\in\mathcal{A}_k,\\
-  \lambda_p = 0\quad\forall p\in\mathcal{F}_k.
- \end{split}
- \end{equation}
+ \item [(1)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
+ \begin{align*}
+  AU^k + B\Lambda^k &= F,\\
+  [BU^k]_i &= G\quad&&\forall i\in\mathcal{A}_k,\\
+  \Lambda_i^k &= 0\quad&&\forall i\in\mathcal{F}_k.
+ \end{align*}
+ Note that the second and third conditions imply that exactly $|S|$ unknowns
+ are fixed, with the first condition yielding the remaining $|S|$ equations
+ necessary to determine both $U$ and $\Lambda$.
  \item [(2)] Define the new active and inactive sets by
- \begin{equation}
+ \begin{equation*}
  \begin{split}
-  \mathcal{A}_{k+1}:=\lbrace p\in\mathcal{S}:\lambda^k_p + c(u^k_{n,p} - g_p)> 0\rbrace,\\
-  \mathcal{F}_{k+1}:=\lbrace p\in\mathcal{S}:\lambda^k_p + c(u^k_{n,p} - g_p)\leq 0\rbrace.
+  \mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)> 0\rbrace,\\
+  \mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\leq 0\rbrace.
  \end{split}
- \end{equation}
- \item [(3)] If $\mathcal{A}_{k+1}=\mathcal{A}_k$ and $\mathcal{F}_{k+1}=\mathcal{F}_k$ then stop, else set $k=k+1$ and go to step (1).
-%  \item [(2)] Solve $A^k u_h^k = b^k$.
-%  \item [(3)] Error control
-%  \item [(4)] Compute $res =  b - Au_h^k$
-%  \item [(5)] Set $u_h^{k+1} = u_h^k,\quad k = k+1$ and go to step (1).
+ \end{equation*}
+ \item [(3)] If $\mathcal{A}_{k+1}=\mathcal{A}_k$ (and then, obviously, also $\mathcal{F}_{k+1}=\mathcal{F}_k$) then stop, else set $k=k+1$ and go to step (1).
 \end{itemize}
-For any the primal-dual pair $(u^k_h,\lambda^k_h)$ that satisfies the conditions in step (3), we differ between three cases:
+The method is called "primal-dual" because it uses both primal (the
+displacement $U$) as well as dual variables (the Lagrange multiplier
+$\Lambda$) to determine the next active set.
+
+At the end of this section, let us add two observations. First,
+for any primal-dual pair $(U^k,\Lambda^k)$ that satisfies these
+condition, we can distinguish the following cases:
 \begin{itemize}
- \item [1.] $\lambda^k_p + c(u^k_{n,p} - g_p)> 0$ (p active):\\
-  Then either $u^k_{n,p}>g_p$ and $\lambda^k_{n,p}=0$ (pentration) or $\lambda^k_{n,p}>0$ and $u^k_{n,p}=g_p$ (pressing load).
- \item [2.] $\lambda^k_p + c(u^k_{n,p} - g_p)\leq 0$ (p inactive):\\
-  Then either $u^k_{n,p}\leq g_p$ and $\lambda^k_{n,p}=0$ (no contact) or $\lambda^k_{n,p}\leq0$ and $u^k_{n,p}=g_p$ (unpressing load).
+ \item [1.] $\Lambda^k_i + c([BU^k]_i - G_i)> 0$ (p active):
+
+  Then either $[BU^k]_i>G_i$ and $\Lambda^k_{n,p}=0$ (penetration) or $\Lambda^k_{n,p}>0$ and $[BU^k]_i=G_i$ (pressing load).
+ \item [2.] $\Lambda^k_i + c([BU^k]_i - G_i)\leq 0$ (p inactive):
+
+  Then either $[BU^k]_i\leq G_i$ and $\Lambda^k_{n,p}=0$ (no contact) or $\Lambda^k_{n,p}\leq0$ and $[BU^k]_i=G_i$ (unpressing load).
 \end{itemize}
-Now we want to show the slantly derivation function of $C(.,.)$:
-\begin{equation}
- \dfrac{\partial}{\partial u^k_p}C(u^k_p,\lambda^k_p) = \begin{cases}
-                                   -cD_{pp},\quad \lambda^k_p + c(u^k_{n,p} - g_p)> 0\\
-                                   0\lambda^k_p,\quad \lambda^k_p + c(u^k_{n,p} - g_p)\leq 0.
+
+Second, the method above appears untuitively correct and useful but a bit ad
+hoc. However, it can be derived in a concisely in the following way. To this
+end, note that we'd like to solve the nonlinear system
+\begin{eqnarray*}
+ &A U + B\Lambda = F,&\\
+ &C([BU-G]_i, \Lambda_i) = 0,
+\qquad \forall i.&
+\end{eqnarray*}
+We can iteratively solve this by always linearizing around the previous
+iterate (i.e., applying a Newton method), but for this we need to linearize
+the function $C(\cdot,\cdot)$ that is not differentiable. That said, it is
+slantly differentiable, and in fact we have
+\marginpar{JF: what should be in the second line? Zero or Lambda?}
+\begin{equation*}
+ \dfrac{\partial}{\partial U^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
+                                   -cB_{ii},& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)> 0\\
+                                   0\Lambda^k_i,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\leq 0.
                                   \end{cases}
-\end{equation}
-\begin{equation}
- \dfrac{\partial}{\partial\lambda^k_p}C(u^k_p,\lambda^k_p) = \begin{cases}
-                                   0,\quad \lambda^k_p + c(u^k_{n,p} - g_p)> 0\\
-                                   \lambda^k_p,\quad \lambda^k_p + c(u^k_{n,p} - g_p)\leq 0.
+\end{equation*}
+\begin{equation*}
+ \dfrac{\partial}{\partial\Lambda^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
+                                   0,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)> 0\\
+                                   \Lambda^k_i,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\leq 0.
                                   \end{cases}
-\end{equation}
+\end{equation*}
 This suggest a semismooth Newton step of the form
-\begin{equation}
+\begin{equation*}
  \begin{pmatrix}
- A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & D_{\mathcal{F}_k} & 0\\
- A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & D_{\mathcal{A}_k}\\
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & B_{\mathcal{F}_k} & 0\\
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & B_{\mathcal{A}_k}\\
  0 & 0 & Id_{\mathcal{F}_k} & 0\\
- 0 & -cD_{\mathcal{A}_k} & 0 & 0
+ 0 & -cB_{\mathcal{A}_k} & 0 & 0
 \end{pmatrix}
 \begin{pmatrix}
- \delta u^k_{\mathcal{F}_k}\\ \delta u^k_{\mathcal{A}_k}\\ \delta \lambda^k_{\mathcal{F}_k}\\ \delta \lambda^k_{\mathcal{A}_k}
+ \delta U^k_{\mathcal{F}_k}\\ \delta U^k_{\mathcal{A}_k}\\ \delta \Lambda^k_{\mathcal{F}_k}\\ \delta \Lambda^k_{\mathcal{A}_k}
 \end{pmatrix}
 =
 -\begin{pmatrix}
- (Au^k + \lambda^k - f)_{\mathcal{F}_k}\\ (Au^k + \lambda^k - f)_{\mathcal{A}_k}\\ \lambda^k_{\mathcal{F}_k}\\ -c(D_{\mathcal{A}_k} u^k - g)_{\mathcal{A}_k}
-\end{pmatrix}.
-\end{equation}
-The algebraic representation of (20) follows now by setting $\delta u^k := u^{k+1} - u^k$ and $\delta \lambda^k := \lambda^{k+1} - \lambda^k$
-\begin{equation}
+ (AU^k + \Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + \Lambda^k - F)_{\mathcal{A}_k}\\ \Lambda^k_{\mathcal{F}_k}\\ -c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
+\end{pmatrix},
+\end{equation*}
+where we have split matrices $A,B$ as well as vectors in the natural way into
+rows and columns whose indices belong to either the active set
+${\mathcal{A}_k}$ or the inactive set ${\mathcal{F}_k}$.
+
+Rather than solving for updates $\delta U, \delta \Lambda$, we can also solve
+for the variables we are interested in right away by setting $\delta U^k :=
+U^{k+1} - U^k$ and $\delta \Lambda^k := \Lambda^{k+1} - \Lambda^k$ and
+bringing all known terms to the right hand side. This yields
+\begin{equation*}
 \begin{pmatrix}
- A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & D_{\mathcal{F}_k} & 0\\
- A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & D_{\mathcal{A}_k}\\
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & B_{\mathcal{F}_k} & 0\\
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & B_{\mathcal{A}_k}\\
  0 & 0 & Id_{\mathcal{F}_k} & 0\\
- 0 & D_{\mathcal{A}_k} & 0 & 0
+ 0 & B_{\mathcal{A}_k} & 0 & 0
 \end{pmatrix}
 \begin{pmatrix}
- u^k_{\mathcal{F}_k}\\ u^k_{\mathcal{A}_k}\\ \lambda^k_{\mathcal{F}_k}\\ \lambda^k_{\mathcal{A}_k}
+ U^k_{\mathcal{F}_k}\\ U^k_{\mathcal{A}_k}\\ \Lambda^k_{\mathcal{F}_k}\\ \Lambda^k_{\mathcal{A}_k}
 \end{pmatrix}
 =
 \begin{pmatrix}
  f_{\mathcal{F}_k}\\ f_{\mathcal{A}_k}\\ 0\\ g_{\mathcal{A}_k}
 \end{pmatrix}.
-\end{equation}
-It's easy to see that we can eliminate the third row and the third column because it implies $\lambda_{\mathcal{F}_k} = 0$:
-\begin{equation}
+\end{equation*}
+These are the equations outlines above in the description of the basic algorithm.
+
+We could even drive this a bit further.
+It's easy to see that we can eliminate the third row and the third column
+because it implies $\Lambda_{\mathcal{F}_k} = 0$:
+\begin{equation*}
 \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & 0\\
- A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & D_{\mathcal{A}_k}\\
- 0 & D_{\mathcal{A}_k} & 0
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & B_{\mathcal{A}_k}\\
+ 0 & B_{\mathcal{A}_k} & 0
 \end{pmatrix}
 \begin{pmatrix}
- u^k_{\mathcal{F}_k}\\ u^k_{\mathcal{A}_k}\\ \lambda^k_{\mathcal{A}_k}
+ U^k_{\mathcal{F}_k}\\ U^k_{\mathcal{A}_k}\\ \Lambda^k_{\mathcal{A}_k}
 \end{pmatrix}
 =
 \begin{pmatrix}
- f_{\mathcal{F}_k}\\ f_{\mathcal{A}_k}\\ g_{\mathcal{A}_k}
+ F_{\mathcal{F}_k}\\ F_{\mathcal{A}_k}\\ G_{\mathcal{A}_k}
 \end{pmatrix}.
-\end{equation}
-And it yields
-\begin{equation}
- \lambda_h = D^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}u_{\mathcal{S}}\right).
-\end{equation}
+\end{equation*}
+This shows that one in fact only needs to solve for the Lagrange multipliers
+located on the active set. One would then recover the full Lagrange multiplier
+vector through
+\begin{equation*}
+ \Lambda = B^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}u_{\mathcal{S}}\right).
+\end{equation*}
+
+Finally we have to solve linear problems for which we use CG-Solver with a AMG
+preconditioner from Trilinos.
+\marginpar{Which system do we actually solve with CG?}
 
 
-Finally we have to solve linear problems for what we use CG-Solver with a AMG preconditioner from Trilinos.
+\section{Implementation}
+
+... need to write something here...
 
 \end{document}
