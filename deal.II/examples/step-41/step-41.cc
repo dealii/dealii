@@ -68,22 +68,18 @@ namespace Step41
       void assemble_mass_matrix ();
       void projection_active_set ();
       void solve ();
-      void output_results (const std::string& title) const;
+      void output_results (const unsigned int iteration) const;
 
       Triangulation<dim>   triangulation;
       FE_Q<dim>            fe;
       DoFHandler<dim>      dof_handler;
-      unsigned int         n_refinements;
-
       ConstraintMatrix     constraints;
 
-      SparsityPattern                sparsity_pattern;
       TrilinosWrappers::SparseMatrix system_matrix;
       TrilinosWrappers::SparseMatrix system_matrix_complete;
       TrilinosWrappers::SparseMatrix mass_matrix;
 
       TrilinosWrappers::Vector       solution;
-      TrilinosWrappers::Vector       tmp_solution;
       TrilinosWrappers::Vector       system_rhs;
       TrilinosWrappers::Vector       system_rhs_complete;
       TrilinosWrappers::Vector       resid_vector;
@@ -193,15 +189,14 @@ namespace Step41
   void ObstacleProblem<dim>::make_grid ()
   {
     GridGenerator::hyper_cube (triangulation, -1, 1);
-    n_refinements = 8;
-    triangulation.refine_global (n_refinements);
+    triangulation.refine_global (7);
 
-    std::cout << "   Number of active cells: "
+    std::cout << "Number of active cells: "
 	      << triangulation.n_active_cells()
 	      << std::endl
-	      << "   Total number of cells: "
+	      << "Total number of cells: "
 	      << triangulation.n_cells()
-	      << std::endl;
+    	      << std::endl;
   }
 
 				   // @sect4{ObstacleProblem::setup_system}
@@ -211,20 +206,19 @@ namespace Step41
   {
     dof_handler.distribute_dofs (fe);
 
-    std::cout << "   Number of degrees of freedom: "
+    std::cout << "Number of degrees of freedom: "
 	      << dof_handler.n_dofs()
+	      << std::endl
 	      << std::endl;
 
     CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
-    sparsity_pattern.copy_from(c_sparsity);
 
-    system_matrix.reinit (sparsity_pattern);
-    system_matrix_complete.reinit (sparsity_pattern);
-    mass_matrix.reinit (sparsity_pattern);
+    system_matrix.reinit (c_sparsity);
+    system_matrix_complete.reinit (c_sparsity);
+    mass_matrix.reinit (c_sparsity);
 
     solution.reinit (dof_handler.n_dofs());
-    tmp_solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
     system_rhs_complete.reinit (dof_handler.n_dofs());
     resid_vector.reinit (dof_handler.n_dofs());
@@ -246,6 +240,8 @@ namespace Step41
   template <int dim>
   void ObstacleProblem<dim>::assemble_system ()
   {
+    std::cout << "   Assembling system..." << std::endl;
+
     QGauss<dim>  quadrature_formula(2);
 
     const RightHandSide<dim> right_hand_side;
@@ -357,6 +353,8 @@ namespace Step41
   template <int dim>
   void ObstacleProblem<dim>::projection_active_set ()
   {
+    std::cout << "   Updating active set..." << std::endl;
+
     const Obstacle<dim>     obstacle;
     std::vector<bool>       vertex_touched (triangulation.n_vertices(),
 					    false);
@@ -403,7 +401,8 @@ namespace Step41
 		}
 	    }
 	}
-    std::cout<< "Number of Contact-Constaints: " << counter_contact_constraints <<std::endl;
+    std::cout << "      Size of active set: " << counter_contact_constraints
+	      << std::endl;
 
 				     // To supply the boundary values of the
 				     // dirichlet-boundary in constraints
@@ -419,20 +418,22 @@ namespace Step41
   template <int dim>
   void ObstacleProblem<dim>::solve ()
   {
+    std::cout << "   Solving system..." << std::endl;
+
     ReductionControl        reduction_control (100, 1e-12, 1e-3);
     SolverCG<TrilinosWrappers::Vector>   solver (reduction_control);
     TrilinosWrappers::PreconditionAMG precondition;
     precondition.initialize (system_matrix);
 
     solver.solve (system_matrix, solution, system_rhs, precondition);
-
-    std::cout << "Initial error: " << reduction_control.initial_value() <<std::endl;
-    std::cout << "   " << reduction_control.last_step()
-	      << " CG iterations needed to obtain convergence with an error: "
-	      <<  reduction_control.last_value()
-	      << std::endl;
-
     constraints.distribute (solution);
+
+    std::cout << "      Error: " << reduction_control.initial_value()
+	      << " -> " << reduction_control.last_value()
+	      << " in "
+	      <<  reduction_control.last_step()
+	      << " CG iterations."
+	      << std::endl;
   }
 
 				   // @sect4{ObstacleProblem::output_results}
@@ -441,18 +442,22 @@ namespace Step41
 				   // The file contains the displacement,
 				   // the residual and active set vectors.
   template <int dim>
-  void ObstacleProblem<dim>::output_results (const std::string& title) const
+  void ObstacleProblem<dim>::output_results (const unsigned int iteration) const
   {
+    std::cout << "   Writing graphical output..." << std::endl;
+
     DataOut<dim> data_out;
 
     data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (tmp_solution, "Displacement");
-    data_out.add_data_vector (resid_vector, "Residual");
-    data_out.add_data_vector (active_set, "ActiveSet");
+    data_out.add_data_vector (solution, "displacement");
+    data_out.add_data_vector (resid_vector, "residual");
+    data_out.add_data_vector (active_set, "active_set");
 
     data_out.build_patches ();
 
-    std::ofstream output_vtk ((title + ".vtk").c_str ());
+    std::ofstream output_vtk ((std::string("output_") +
+			       Utilities::int_to_string (iteration) +
+			       ".vtk").c_str ());
     data_out.write_vtk (output_vtk);
   }
 
@@ -469,10 +474,13 @@ namespace Step41
   template <int dim>
   void ObstacleProblem<dim>::run ()
   {
-    std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
-
     make_grid();
     setup_system ();
+
+				     // TODO: can't some of this be
+				     // merged with the first Newton
+				     // iteration?
+    std::cout << "Initial start-up step" << std::endl;
 
     constraints.clear ();
     VectorTools::interpolate_boundary_values (dof_handler,
@@ -499,48 +507,47 @@ namespace Step41
     for (unsigned int j=0; j<solution.size (); j++)
       diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
 
+				     //TODO: use system_matrix_complete.residual
     resid_vector = 0;
     resid_vector -= system_rhs_complete;
     system_matrix_complete.vmult_add  (resid_vector, solution);
 
 				     // to compute a start active set
-    std::cout<< "Update Active Set:" <<std::endl;
     projection_active_set ();
-    TrilinosWrappers::Vector       active_set_old (active_set);
-    for (unsigned int i=0; i<solution.size (); i++)
+
+    std::cout << std::endl;
+
+    TrilinosWrappers::Vector active_set_old (active_set);
+    for (unsigned int iteration=1; iteration<=solution.size (); ++iteration)
       {
-	std::cout<< "Assemble System:" <<std::endl;
+	std::cout << "Newton iteration " << iteration << std::endl;
+
 	system_matrix = 0;
 	system_rhs = 0;
+
 	assemble_system ();
-
-	std::cout<< "Solve System:" <<std::endl;
 	solve ();
-	tmp_solution = solution;
 
+				     //TODO: use system_matrix_complete.residual
 	resid_vector = 0;
 	resid_vector -= system_rhs_complete;
 	system_matrix_complete.vmult_add  (resid_vector, solution);
 
-	std::cout<< "Update Active Set:"<<std::endl;
 	projection_active_set ();
 
 	for (unsigned int k = 0; k<solution.size (); k++)
 	  if (active_set (k) == 1)
 	    resid_vector (k) = 0;
 
-	std::cout<< "Create Output:" <<std::endl;
-	std::ostringstream filename_output;
-	filename_output << "output_";
-	filename_output << i;
-	output_results (filename_output.str ());
+	output_results (iteration);
 
 					 // the residual of the non-contact part
 					 // of the system serves as an additional
 					 // control which is not necassary for
 					 // for the primal-dual active set strategy
-	double resid = resid_vector.l2_norm ();
-	std::cout<< i << ". Residual of the non-contact part of the system = " << resid <<std::endl;
+	std::cout << "   Residual of the non-contact part of the system: "
+		  << resid_vector.l2_norm()
+		  << std::endl;
 
 					 // if both the old and the new
 					 // active set are identical the
@@ -548,6 +555,8 @@ namespace Step41
 	if (active_set == active_set_old)
 	  break;
 	active_set_old = active_set;
+
+	std::cout << std::endl;
       }
   }
 }
