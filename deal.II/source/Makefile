@@ -30,17 +30,9 @@ o-files  := $(addprefix $(LIBDIR)/optimized/, $(tmp1:.cc=.$(OBJEXT)) )
 go-files := $(addprefix $(LIBDIR)/debug/, $(tmp1:.cc=.$(OBJEXT)))
 
 
-debug: mkdir-debug $(LIBDIR)/libdeal_II.g$(lib-suffix)
-optimized: mkdir-optimized $(LIBDIR)/libdeal_II$(lib-suffix)
+debug: $(LIBDIR)/libdeal_II.g$(lib-suffix)
+optimized: $(LIBDIR)/libdeal_II$(lib-suffix)
 
-
-mkdir-debug:
-	@mkdir -p "$(LIBDIR)/debug/"
-	@echo Created $(LIBDIR)/debug directory.
-
-mkdir-optimized:
-	@mkdir -p "$(LIBDIR)/optimized/"
-	@echo Created $(LIBDIR)/optimized directory.
 
 
 # rules how to generate object files from source files.
@@ -238,6 +230,7 @@ include Makefile.dep
 include $(addsuffix /Makefile.dep, $(all-dirs))
 
 endif
+
 
 
 ################### some clean-up rules
