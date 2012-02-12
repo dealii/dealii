@@ -81,11 +81,11 @@ namespace Step41
       IndexSet             active_set;
 
       TrilinosWrappers::SparseMatrix system_matrix;
-      TrilinosWrappers::SparseMatrix system_matrix_complete;
+      TrilinosWrappers::SparseMatrix complete_system_matrix;
 
       TrilinosWrappers::Vector       solution;
       TrilinosWrappers::Vector       system_rhs;
-      TrilinosWrappers::Vector       system_rhs_complete;
+      TrilinosWrappers::Vector       complete_system_rhs;
       TrilinosWrappers::Vector       force_residual;
       TrilinosWrappers::Vector       diagonal_of_mass_matrix;
   };
@@ -228,11 +228,11 @@ namespace Step41
 				     false);
 
     system_matrix.reinit (c_sparsity);
-    system_matrix_complete.reinit (c_sparsity);
+    complete_system_matrix.reinit (c_sparsity);
 
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
-    system_rhs_complete.reinit (dof_handler.n_dofs());
+    complete_system_rhs.reinit (dof_handler.n_dofs());
     force_residual.reinit (dof_handler.n_dofs());
 
 				     // to compute the factor which is used
@@ -311,9 +311,12 @@ namespace Step41
 					 // that the system rhs contains correct
 					 // values in the rows with inhomogeneity
 					 // constraints.
-	constraints.distribute_local_to_global (cell_matrix, cell_rhs,
+	constraints.distribute_local_to_global (cell_matrix,
+						cell_rhs,
 						local_dof_indices,
-						system_matrix, system_rhs, true);
+						system_matrix,
+						system_rhs,
+						true);
       }
   }
 
@@ -507,20 +510,19 @@ namespace Step41
 				     // iteration?
     std::cout << "Initial start-up step" << std::endl;
 
-    ConstraintMatrix constraints_complete (constraints);
     assemble_system ();
-    solve ();
 
 				     // to save the system_matrix and the
 				     // rhs to compute the residual in every
 				     // step of the active-set-iteration
-    system_matrix_complete.copy_from (system_matrix);
-    system_rhs_complete = system_rhs;
+    complete_system_matrix.copy_from (system_matrix);
+    complete_system_rhs = system_rhs;
 
-				     //TODO: use system_matrix_complete.residual
-    force_residual = 0;
-    force_residual -= system_rhs_complete;
-    system_matrix_complete.vmult_add  (force_residual, solution);
+    solve ();
+
+    complete_system_matrix.residual (force_residual,
+				     solution, complete_system_rhs);
+    force_residual *= -1;
 
 				     // to compute a start active set
     projection_active_set ();
@@ -538,10 +540,9 @@ namespace Step41
 	assemble_system ();
 	solve ();
 
-				     //TODO: use system_matrix_complete.residual
-	force_residual = 0;
-	force_residual -= system_rhs_complete;
-	system_matrix_complete.vmult_add  (force_residual, solution);
+	complete_system_matrix.residual (force_residual,
+					 solution, complete_system_rhs);
+	force_residual *= -1;
 
 	projection_active_set ();
 
@@ -551,10 +552,11 @@ namespace Step41
 
 	output_results (iteration);
 
-					 // the residual of the non-contact part
-					 // of the system serves as an additional
-					 // control which is not necassary for
-					 // for the primal-dual active set strategy
+					 // the residual of the non-contact
+					 // part of the system serves as an
+					 // additional control which is not
+					 // necassary for for the primal-dual
+					 // active set strategy
 	std::cout << "   Residual of the non-contact part of the system: "
 		  << force_residual.l2_norm()
 		  << std::endl;
