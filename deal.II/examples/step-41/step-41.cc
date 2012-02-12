@@ -1,6 +1,8 @@
-/* Author: Joerg Frohne Wolfgang Bangerth, Texas A&M University, 2011, 2012 */
+/* Authors: Joerg Frohne, Texas A&M University and                */
+/*                        University of Siegen, 2011, 2012        */
+/*          Wolfgang Bangerth, Texas A&M University, 2012         */
 
-/*    $Id: step-4.cc 24093 2011-08-16 13:58:12Z bangerth $       */
+/*    $Id: step-4.cc 24093 2011-08-16 13:58:12Z bangerth $        */
 /*                                                                */
 /*    Copyright (C) 2011, 2012 by the deal.II authors */
 /*                                                                */
