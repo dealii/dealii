@@ -53,7 +53,7 @@ namespace Step41
 
 				   // This class supplies all function and
 				   // variables to an obstacle problem. The
-				   // projection_active_set function and the
+				   // update_solution_and_constraints function and the
 				   // ConstaintMatrix are important for the
 				   // handling of the active set as we see
 				   // later.
@@ -70,7 +70,7 @@ namespace Step41
       void setup_system();
       void assemble_system ();
       void assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix);
-      void projection_active_set ();
+      void update_solution_and_constraints ();
       void solve ();
       void output_results (const unsigned int iteration) const;
 
@@ -257,26 +257,29 @@ namespace Step41
 				   // to our system. The constraint consists not
 				   // only of the zero Dirichlet boundary values,
 				   // in addition they contain the obstacle values.
-				   // The projection_active_set function are used
+				   // The update_solution_and_constraints function are used
 				   // to fill the ConstraintMatrix.
   template <int dim>
   void ObstacleProblem<dim>::assemble_system ()
   {
     std::cout << "   Assembling system..." << std::endl;
 
-    QGauss<dim>  quadrature_formula(2);
+    system_matrix = 0;
+    system_rhs    = 0;
 
-    const RightHandSide<dim> right_hand_side;
+    const QGauss<dim>         quadrature_formula(2);
+    const RightHandSide<dim>  right_hand_side;
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values   | update_gradients |
-			     update_quadrature_points | update_JxW_values);
+    FEValues<dim>             fe_values (fe, quadrature_formula,
+					update_values   | update_gradients |
+					update_quadrature_points |
+					update_JxW_values);
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
+    const unsigned int        dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int        n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-    TrilinosWrappers::Vector       cell_rhs (dofs_per_cell);
+    FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
+    TrilinosWrappers::Vector  cell_rhs (dofs_per_cell);
 
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -320,19 +323,23 @@ namespace Step41
       }
   }
 
+
   template <int dim>
-  void ObstacleProblem<dim>::assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix)
+  void
+  ObstacleProblem<dim>::
+  assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix)
   {
-    QTrapez<dim>  quadrature_formula;
+    const QTrapez<dim>        quadrature_formula;
+    FEValues<dim>             fe_values (fe,
+					 quadrature_formula,
+					 update_values   |
+					 update_quadrature_points |
+					 update_JxW_values);
 
-    FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values   | update_quadrature_points | update_JxW_values);
+    const unsigned int        dofs_per_cell = fe.dofs_per_cell;
+    const unsigned int        n_q_points    = quadrature_formula.size();
 
-    const unsigned int   dofs_per_cell = fe.dofs_per_cell;
-    const unsigned int   n_q_points    = quadrature_formula.size();
-
-    FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
-
+    FullMatrix<double>        cell_matrix (dofs_per_cell, dofs_per_cell);
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -365,7 +372,7 @@ namespace Step41
       }
   }
 
-				   // @sect4{ObstacleProblem::projection_active_set}
+				   // @sect4{ObstacleProblem::update_solution_and_constraints}
 
 				   // Updating of the active set which means to
 				   // set a inhomogeneity constraint in the
@@ -376,13 +383,12 @@ namespace Step41
 				   // that is not in the active set and elsewise a
 				   // one. With the output file you can visualize it.
   template <int dim>
-  void ObstacleProblem<dim>::projection_active_set ()
+  void
+  ObstacleProblem<dim>::update_solution_and_constraints ()
   {
     std::cout << "   Updating active set..." << std::endl;
 
     const Obstacle<dim>     obstacle;
-    std::vector<bool>       vertex_touched (triangulation.n_vertices(),
-					    false);
     unsigned int            counter_contact_constraints = 0;
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -396,14 +402,15 @@ namespace Step41
     active_set.clear ();
     const double c = 100.0;
     for (; cell!=endc; ++cell)
+				       // note: we touch vertices more than
+				       // once, but there's no harm doing this
       for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
 	{
 	  unsigned int index_x = cell->vertex_dof_index (v,0);
 
 					   // the local row where
-	  Point<dim> point (cell->vertex (v)[0], cell->vertex (v)[1]);
-	  double obstacle_value = obstacle.value (point);
-	  double solution_index_x = solution (index_x);
+	  const double obstacle_value = obstacle.value (cell->vertex(v));
+	  const double solution_value = solution (index_x);
 
 					   // To decide which dof belongs to the
 					   // active-set. For that we scale the
@@ -411,22 +418,20 @@ namespace Step41
 					   // the diag-entry of the mass-matrix.
 
 					   // TODO: I have to check the condition
+
 	  if (force_residual (index_x) +
-	      diagonal_of_mass_matrix (index_x)*c*(obstacle_value - solution_index_x) > 0)
+	      c * diagonal_of_mass_matrix(index_x) * (obstacle_value - solution_value)
+	      >
+	      0)
 	    {
+	      active_set.add_index (index_x);
 	      constraints.add_line (index_x);
 	      constraints.set_inhomogeneity (index_x, obstacle_value);
-	      solution (index_x) = obstacle_value;
-	      active_set.add_index (index_x);
 
-	      if (vertex_touched[cell->vertex_index(v)] == false)
-		{
-		  vertex_touched[cell->vertex_index(v)] = true;
-		  counter_contact_constraints += 1;
-		}
+	      solution (index_x) = obstacle_value;
 	    }
 	}
-    std::cout << "      Size of active set: " << counter_contact_constraints
+    std::cout << "      Size of active set: " << active_set.n_elements()
 	      << std::endl;
 
 				     // To supply the boundary values of the
@@ -459,6 +464,11 @@ namespace Step41
 	      <<  reduction_control.last_step()
 	      << " CG iterations."
 	      << std::endl;
+
+
+    complete_system_matrix.residual (force_residual,
+				     solution, complete_system_rhs);
+    force_residual *= -1;
   }
 
 				   // @sect4{ObstacleProblem::output_results}
@@ -505,50 +515,26 @@ namespace Step41
     make_grid();
     setup_system ();
 
-				     // TODO: can't some of this be
-				     // merged with the first Newton
-				     // iteration?
-    std::cout << "Initial start-up step" << std::endl;
-
-    assemble_system ();
-
-				     // to save the system_matrix and the
-				     // rhs to compute the residual in every
-				     // step of the active-set-iteration
-    complete_system_matrix.copy_from (system_matrix);
-    complete_system_rhs = system_rhs;
-
-    solve ();
-
-    complete_system_matrix.residual (force_residual,
-				     solution, complete_system_rhs);
-    force_residual *= -1;
-
-				     // to compute a start active set
-    projection_active_set ();
-
-    std::cout << std::endl;
-
     IndexSet active_set_old (active_set);
-    for (unsigned int iteration=1; iteration<=solution.size (); ++iteration)
+    for (unsigned int iteration=0; iteration<=solution.size (); ++iteration)
       {
 	std::cout << "Newton iteration " << iteration << std::endl;
 
-	system_matrix = 0;
-	system_rhs = 0;
-
 	assemble_system ();
+
+	if (iteration == 0)
+	  {
+					     // to save the system_matrix and
+					     // the rhs to compute the
+					     // residual in every step of the
+					     // active-set-iteration
+	    complete_system_matrix.copy_from (system_matrix);
+	    complete_system_rhs = system_rhs;
+	  }
+
 	solve ();
 
-	complete_system_matrix.residual (force_residual,
-					 solution, complete_system_rhs);
-	force_residual *= -1;
-
-	projection_active_set ();
-
-	for (unsigned int k = 0; k<solution.size (); k++)
-	  if (active_set.is_element (k))
-	    force_residual (k) = 0;
+	update_solution_and_constraints ();
 
 	output_results (iteration);
 
@@ -557,6 +543,10 @@ namespace Step41
 					 // additional control which is not
 					 // necassary for for the primal-dual
 					 // active set strategy
+	for (unsigned int k = 0; k<solution.size (); k++)
+	  if (active_set.is_element (k))
+	    force_residual (k) = 0;
+
 	std::cout << "   Residual of the non-contact part of the system: "
 		  << force_residual.l2_norm()
 		  << std::endl;
