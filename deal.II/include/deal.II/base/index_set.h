@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -67,6 +67,13 @@ class IndexSet
     IndexSet (const unsigned int size);
 
 				     /**
+				      * Remove all indices from this
+				      * index set. The index set retains
+				      * its size, however.
+				      */
+    void clear ();
+
+				     /**
 				      * Set the maximal size of the
 				      * indices upon which this object
 				      * operates.
@@ -74,6 +81,8 @@ class IndexSet
 				      * This function can only be
 				      * called if the index set does
 				      * not yet contain any elements.
+				      * This can be achieved by calling
+				      * clear(), for example.
 				      */
     void set_size (const unsigned int size);
 
@@ -121,7 +130,7 @@ class IndexSet
 				      * *this and @p other.
 				      */
     void add_indices(const IndexSet & other);
-    
+
 				     /**
 				      * Return whether the specified
 				      * index is an element of the
@@ -369,11 +378,11 @@ class IndexSet
     DeclException1 (ExcIndexNotPresent, int,
 		    << "The global index " << arg1
 		    << " is not an element of this set.");
-		    
+
     /**
-     * Write or read the data of this object to or 
+     * Write or read the data of this object to or
      * from a stream for the purpose of serialization
-     */ 
+     */
     template <class Archive>
     void serialize (Archive & ar, const unsigned int version);
 
@@ -410,7 +419,7 @@ class IndexSet
 	 * never get to see an invalid range in the wild.
 	 **/
 	Range ();
-	
+
 	/**
 	 * Constructor. Create a half-open interval with the given indices.
 	 *
@@ -456,11 +465,11 @@ class IndexSet
 	{
 	  return sizeof(Range);
 	}
-	  
+
 	  /**
-	   * Write or read the data of this object to or 
+	   * Write or read the data of this object to or
 	   * from a stream for the purpose of serialization
-	   */ 
+	   */
 	  template <class Archive>
 	  void serialize (Archive & ar, const unsigned int version);
     };
@@ -566,6 +575,16 @@ IndexSet::IndexSet (const unsigned int size)
 		largest_range (deal_II_numbers::invalid_unsigned_int)
 {}
 
+
+
+inline
+void
+IndexSet::clear ()
+{
+  ranges.clear ();
+  largest_range = 0;
+  is_compressed = true;
+}
 
 
 inline
@@ -693,7 +712,7 @@ IndexSet::add_indices(const IndexSet & other)
 {
   if (this == &other)
     return;
-  
+
   for (std::vector<Range>::iterator range = other.ranges.begin();
        range != other.ranges.end();
        ++range)
@@ -739,7 +758,7 @@ IndexSet::is_element (const unsigned int index) const
 				       // of the following ranges
 				       // because otherwise p would be
 				       // a different iterator
-				       // 
+				       //
 				       // since we already know the position
 				       // relative to the largest range (we
 				       // called compress!), we can perform
@@ -749,7 +768,7 @@ IndexSet::is_element (const unsigned int index) const
       std::vector<Range>::const_iterator
 	p = std::upper_bound (ranges.begin() + (index<ranges[largest_range].begin?
 						0 : largest_range+1),
-			      index<ranges[largest_range].begin ? 
+			      index<ranges[largest_range].begin ?
 			      ranges.begin() + largest_range:
 			      ranges.end(),
 			      Range (index, size()+1));
@@ -799,16 +818,16 @@ IndexSet::n_elements () const
       Range & r = ranges.back();
       v = r.nth_index_in_set + r.end - r.begin;
     }
-  
-#ifdef DEBUG  
+
+#ifdef DEBUG
   unsigned int s = 0;
   for (std::vector<Range>::iterator range = ranges.begin();
        range != ranges.end();
        ++range)
     s += (range->end - range->begin);
   Assert(s==v, ExcInternalError());
-#endif  
-  
+#endif
+
   return v;
 }
 
@@ -850,7 +869,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
       range_end   = ranges.end();
     }
 
-  std::vector<Range>::const_iterator 
+  std::vector<Range>::const_iterator
     p = Utilities::lower_bound(range_begin, range_end, r,
 			 Range::nth_index_compare);
 
@@ -896,7 +915,7 @@ IndexSet::index_within_set (const unsigned int n) const
       range_end   = ranges.end();
     }
 
-  std::vector<Range>::const_iterator 
+  std::vector<Range>::const_iterator
     p = Utilities::lower_bound(range_begin, range_end, r,
 			 Range::end_compare);
 
