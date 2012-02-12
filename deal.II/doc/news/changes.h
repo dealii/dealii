@@ -34,6 +34,19 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> New: It has long been a nuisance that the deal.II vector classes
+could only be accessed using <code>operator()</code> whereas the C++
+<code>std::vector</code> class required <code>operator[]</code>. This
+diminished the usefulness of template code. Historically, the reason
+was that the deal.II vector classes should use the same operator as
+the matrix classes, and C++ does not allow to use <code>operator[]</code>
+for matrices since this operator can only take a single argument.
+<br>
+In any case, all deal.II vector classes now support both kinds of
+access operators interchangeably.
+<br>
+(Wolfgang Bangerth, 2012/02/12)
+
 <li> Fixed: Linking shared libraries on PowerPC systems (e.g. on
 BlueGene systems) failed due to a miscommunication between compiler
 and linker. This is now worked around.

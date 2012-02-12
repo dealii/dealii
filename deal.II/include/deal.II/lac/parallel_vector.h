@@ -567,22 +567,50 @@ namespace parallel
 					 //@{
 
 					 /**
-					  * Read access to the data in the position
-					  * corresponding to @p global_index. The index
-					  * must be either in the local range of the
-					  * vector or be specified as a ghost index at
-					  * construction.
+					  * Read access to the data in the
+					  * position corresponding to @p
+					  * global_index. The index must be
+					  * either in the local range of the
+					  * vector or be specified as a ghost
+					  * index at construction.
 					  */
-	Number operator() (const types::global_dof_index global_index) const;
+	Number operator () (const types::global_dof_index global_index) const;
 
 					 /**
-					  * Read and write access to the data in the
-					  * position corresponding to @p
-					  * global_index. The index must be either in
-					  * the local range of the vector or be
-					  * specified as a ghost index at construction.
+					  * Read and write access to the data
+					  * in the position corresponding to
+					  * @p global_index. The index must be
+					  * either in the local range of the
+					  * vector or be specified as a ghost
+					  * index at construction.
 					  */
-	Number& operator() (const types::global_dof_index global_index);
+	Number& operator () (const types::global_dof_index global_index);
+
+					 /**
+					  * Read access to the data in the
+					  * position corresponding to @p
+					  * global_index. The index must be
+					  * either in the local range of the
+					  * vector or be specified as a ghost
+					  * index at construction.
+					  *
+					  * This function does the same thing
+					  * as operator().
+					  */
+	Number operator [] (const types::global_dof_index global_index) const;
+
+					 /**
+					  * Read and write access to the data
+					  * in the position corresponding to
+					  * @p global_index. The index must be
+					  * either in the local range of the
+					  * vector or be specified as a ghost
+					  * index at construction.
+					  *
+					  * This function does the same thing
+					  * as operator().
+					  */
+	Number& operator [] (const types::global_dof_index global_index);
 
 					 /**
 					  * Read access to the data field specified by
@@ -1417,6 +1445,26 @@ namespace parallel
     template <typename Number>
     inline
     Number
+    Vector<Number>::operator[] (const types::global_dof_index global_index) const
+    {
+      return operator()(global_index);
+    }
+
+
+
+    template <typename Number>
+    inline
+    Number&
+    Vector<Number>::operator[] (const types::global_dof_index global_index)
+    {
+      return operator()(global_index);
+    }
+
+
+
+    template <typename Number>
+    inline
+    Number
     Vector<Number>::local_element (const unsigned int local_index) const
     {
       AssertIndexRange (local_index,
@@ -1854,7 +1902,7 @@ namespace parallel
     template <typename Number>
     inline
     bool
-    Vector<Number>::partitioners_are_compatible 
+    Vector<Number>::partitioners_are_compatible
     (const Utilities::MPI::Partitioner &part) const
     {
       return partitioner->is_compatible (part);

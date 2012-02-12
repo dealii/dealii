@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -590,6 +590,25 @@ namespace TrilinosWrappers
 	operator () (const unsigned int index) const;
 
                                        /**
+                                        * Provide access to a given
+                                        * element, both read and write.
+					*
+					* Exactly the same as operator().
+                                        */
+      reference
+	operator [] (const unsigned int index);
+
+                                       /**
+                                        * Provide read-only access to an
+                                        * element. This is equivalent to
+                                        * the <code>el()</code> command.
+					*
+					* Exactly the same as operator().
+                                        */
+      TrilinosScalar
+	operator [] (const unsigned int index) const;
+
+                                       /**
                                         * Return the value of the vector
                                         * entry <i>i</i>. Note that this
                                         * function does only work
@@ -1147,6 +1166,23 @@ namespace TrilinosWrappers
   VectorBase::operator () (const unsigned int index)
   {
     return internal::VectorReference (*this, index);
+  }
+
+
+
+  inline
+  internal::VectorReference
+  VectorBase::operator [] (const unsigned int index)
+  {
+    return operator() (index);
+  }
+
+
+  inline
+  TrilinosScalar
+  VectorBase::operator [] (const unsigned int index) const
+  {
+    return operator() (index);
   }
 
 

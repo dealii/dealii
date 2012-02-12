@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -277,7 +277,7 @@ namespace PETScWrappers
 					* PETSc object in the destructor.
 					*/
       explicit VectorBase (const Vec & v);
-      
+
                                        /**
                                         * Destructor
                                         */
@@ -392,7 +392,7 @@ namespace PETScWrappers
 					* elements.
 					*/
       bool has_ghost_elements() const;
-       
+
                                        /**
                                         * Provide access to a given element,
                                         * both read and write.
@@ -406,6 +406,25 @@ namespace PETScWrappers
                                         */
       PetscScalar
       operator () (const unsigned int index) const;
+
+                                       /**
+                                        * Provide access to a given
+                                        * element, both read and write.
+					*
+					* Exactly the same as operator().
+                                        */
+      reference
+      operator [] (const unsigned int index);
+
+                                       /**
+                                        * Provide read-only access to an
+                                        * element. This is equivalent to
+                                        * the <code>el()</code> command.
+					*
+					* Exactly the same as operator().
+                                        */
+      PETScScalar
+      operator [] (const unsigned int index) const;
 
                                        /**
                                         * A collective set operation: instead
@@ -841,7 +860,7 @@ namespace PETScWrappers
 					* the destructor.
 					*/
       bool attained_ownership;
-      
+
 				       /**
                                         * Collective set or add
                                         * operation: This function is
@@ -1127,7 +1146,7 @@ namespace PETScWrappers
   {
     return ghosted;
   }
-  
+
 
 
   inline
@@ -1144,6 +1163,24 @@ namespace PETScWrappers
   VectorBase::operator () (const unsigned int index) const
   {
     return static_cast<PetscScalar>(internal::VectorReference (*this, index));
+  }
+
+
+
+  inline
+  internal::VectorReference
+  VectorBase::operator [] (const unsigned int index)
+  {
+    return operator()(index);
+  }
+
+
+
+  inline
+  PetscScalar
+  VectorBase::operator [] (const unsigned int index) const
+  {
+    return operator()(index);
   }
 
 

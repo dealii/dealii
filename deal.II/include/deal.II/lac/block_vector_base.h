@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -863,6 +863,21 @@ class BlockVectorBase : public Subscriptor
 				      * as a writeable reference.
 				      */
     reference operator() (const unsigned int i);
+
+				     /**
+				      * Access components, returns U(i).
+				      *
+				      * Exactly the same as operator().
+				      */
+    value_type operator[] (const unsigned int i) const;
+
+				     /**
+				      * Access components, returns U(i)
+				      * as a writeable reference.
+				      *
+				      * Exactly the same as operator().
+				      */
+    reference operator[] (const unsigned int i);
 
 				     /**
 				      * Copy operator: fill all components of
@@ -2395,6 +2410,26 @@ BlockVectorBase<VectorType>::operator() (const unsigned int i)
   const std::pair<unsigned int,unsigned int> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
+}
+
+
+
+template <class VectorType>
+inline
+typename BlockVectorBase<VectorType>::value_type
+BlockVectorBase<VectorType>::operator[] (const unsigned int i) const
+{
+  return operator()(i);
+}
+
+
+
+template <class VectorType>
+inline
+typename BlockVectorBase<VectorType>::reference
+BlockVectorBase<VectorType>::operator[] (const unsigned int i)
+{
+  return operator()(i);
 }
 
 #endif // DOXYGEN

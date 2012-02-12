@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -638,6 +638,22 @@ class Vector : public Subscriptor
 				      * as a writeable reference.
 				      */
     Number& operator() (const unsigned int i);
+
+				     /**
+				      * Access the value of the @p ith
+				      * component.
+				      *
+				      * Exactly the same as operator().
+				      */
+    Number operator[] (const unsigned int i) const;
+
+				     /**
+				      * Access the @p ith component
+				      * as a writeable reference.
+				      *
+				      * Exactly the same as operator().
+				      */
+    Number& operator[] (const unsigned int i);
 				     //@}
 
 
@@ -1305,6 +1321,24 @@ Number& Vector<Number>::operator() (const unsigned int i)
 {
   Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
   return val[i];
+}
+
+
+
+template <typename Number>
+inline
+Number Vector<Number>::operator[] (const unsigned int i) const
+{
+  return operator()(i);
+}
+
+
+
+template <typename Number>
+inline
+Number& Vector<Number>::operator[] (const unsigned int i)
+{
+  return operator()(i);
 }
 
 
