@@ -265,6 +265,29 @@ class IndexSet
 				      */
     void fill_index_vector(std::vector<unsigned int> & indices) const;
 
+				     /**
+				      * Fill the given vector with either
+				      * zero or one elements, providing
+				      * a binary representation of this
+				      * index set. The given vector is
+				      * assumed to already have the correct
+				      * size.
+				      *
+				      * The given argument is filled with
+				      * integer values zero and one, using
+				      * <code>vector.operator[]</code>. Thus,
+				      * any object that has such an operator
+				      * can be used as long as it allows
+				      * conversion of integers zero and one to
+				      * elements of the vector. Specifically,
+				      * this is the case for classes Vector,
+				      * BlockVector, but also
+				      * std::vector@<bool@>,
+				      * std::vector@<int@>, and
+				      * std::vector@<double@>.
+				      */
+    template <typename Vector>
+    void fill_binary_vector (Vector &vector) const;
 
 				     /**
 				      * Outputs a text representation of this
@@ -954,6 +977,31 @@ IndexSet::operator != (const IndexSet &is) const
 
   return ranges != is.ranges;
 }
+
+
+
+template <typename Vector>
+void
+IndexSet::fill_binary_vector (Vector &vector) const
+{
+  Assert (vector.size() == size(),
+	  ExcDimensionMismatch (vector.size(), size()));
+
+  compress();
+				   // first fill all elements of the vector
+				   // with zeroes.
+  std::fill (vector.begin(), vector.end(), 0);
+
+				   // then write ones into the elements whose
+				   // indices are contained in the index set
+  for (std::vector<Range>::iterator it = ranges.begin();
+       it != ranges.end();
+       ++it)
+    for (unsigned int i=it->begin; i<it->end; ++i)
+      vector[i] = 1;
+}
+
+
 
 template <class STREAM>
 inline

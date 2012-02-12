@@ -87,6 +87,11 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The function IndexSet::fill_binary_vector creates a numerical
+representation of an IndexSet containing zeros and ones.
+<br>
+(Wolfgang Bangerth, 2012/02/12)
+
 <li> New: The function IndexSet::clear resets an index set to be empty.
 <br>
 (Wolfgang Bangerth, 2012/02/12)
