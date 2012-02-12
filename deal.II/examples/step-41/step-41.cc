@@ -391,22 +391,26 @@ namespace Step41
     const Obstacle<dim>     obstacle;
     unsigned int            counter_contact_constraints = 0;
 
-    typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
-
     constraints.clear();
 
 				     // to find and supply the constraints for the
 				     // obstacle condition
     active_set.clear ();
     const double c = 100.0;
+
+    std::vector<bool> vertex_touched (triangulation.n_vertices(),
+				      false);
+
+    typename DoFHandler<dim>::active_cell_iterator
+      cell = dof_handler.begin_active(),
+      endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-				       // note: we touch vertices more than
-				       // once, but there's no harm doing this
       for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
 	{
-	  unsigned int index_x = cell->vertex_dof_index (v,0);
+	  const unsigned int index_x = cell->vertex_dof_index (v,0);
+
+	  if (vertex_touched[index_x] == true)
+	    continue;
 
 					   // the local row where
 	  const double obstacle_value = obstacle.value (cell->vertex(v));
@@ -429,6 +433,14 @@ namespace Step41
 	      constraints.set_inhomogeneity (index_x, obstacle_value);
 
 	      solution (index_x) = obstacle_value;
+					       // the residual of the non-contact
+					       // part of the system serves as an
+					       // additional control which is not
+					       // necessary for for the primal-dual
+					       // active set strategy
+	      force_residual (index_x) = 0;
+
+	      vertex_touched[index_x] = true;
 	    }
 	}
     std::cout << "      Size of active set: " << active_set.n_elements()
@@ -441,6 +453,11 @@ namespace Step41
 					      BoundaryValues<dim>(),
 					      constraints);
     constraints.close ();
+
+    std::cout << "   Residual of the non-contact part of the system: "
+	      << force_residual.l2_norm()
+	      << std::endl;
+
   }
 
 				   // @sect4{ObstacleProblem::solve}
@@ -537,19 +554,6 @@ namespace Step41
 	update_solution_and_constraints ();
 
 	output_results (iteration);
-
-					 // the residual of the non-contact
-					 // part of the system serves as an
-					 // additional control which is not
-					 // necassary for for the primal-dual
-					 // active set strategy
-	for (unsigned int k = 0; k<solution.size (); k++)
-	  if (active_set.is_element (k))
-	    force_residual (k) = 0;
-
-	std::cout << "   Residual of the non-contact part of the system: "
-		  << force_residual.l2_norm()
-		  << std::endl;
 
 					 // if both the old and the new
 					 // active set are identical the
