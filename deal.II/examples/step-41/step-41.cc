@@ -15,6 +15,7 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -50,10 +51,11 @@ namespace Step41
 
 				   // @sect3{The <code>Step41</code> class template}
 
-				   // This class supply all function and variables
-				   // to an obstacle problem. The projection_active_set
-				   // function and the ConstaintMatrix are important
-				   // for the handling of the active set as we see
+				   // This class supplies all function and
+				   // variables to an obstacle problem. The
+				   // projection_active_set function and the
+				   // ConstaintMatrix are important for the
+				   // handling of the active set as we see
 				   // later.
 
   template <int dim>
@@ -67,7 +69,7 @@ namespace Step41
       void make_grid ();
       void setup_system();
       void assemble_system ();
-      void assemble_mass_matrix ();
+      void assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix);
       void projection_active_set ();
       void solve ();
       void output_results (const unsigned int iteration) const;
@@ -76,17 +78,16 @@ namespace Step41
       FE_Q<dim>            fe;
       DoFHandler<dim>      dof_handler;
       ConstraintMatrix     constraints;
+      IndexSet             active_set;
 
       TrilinosWrappers::SparseMatrix system_matrix;
       TrilinosWrappers::SparseMatrix system_matrix_complete;
-      TrilinosWrappers::SparseMatrix mass_matrix;
 
       TrilinosWrappers::Vector       solution;
       TrilinosWrappers::Vector       system_rhs;
       TrilinosWrappers::Vector       system_rhs_complete;
-      TrilinosWrappers::Vector       resid_vector;
-      TrilinosWrappers::Vector       active_set;
-      TrilinosWrappers::Vector       diag_mass_matrix_vector;
+      TrilinosWrappers::Vector       force_residual;
+      TrilinosWrappers::Vector       diagonal_of_mass_matrix;
   };
 
 
@@ -207,25 +208,44 @@ namespace Step41
   void ObstacleProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
+    active_set.set_size (dof_handler.n_dofs());
 
     std::cout << "Number of degrees of freedom: "
 	      << dof_handler.n_dofs()
 	      << std::endl
 	      << std::endl;
 
+    VectorTools::interpolate_boundary_values (dof_handler,
+					      0,
+					      BoundaryValues<dim>(),
+					      constraints);
+    constraints.close ();
+
     CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, c_sparsity, constraints, false);
+    DoFTools::make_sparsity_pattern (dof_handler,
+				     c_sparsity,
+				     constraints,
+				     false);
 
     system_matrix.reinit (c_sparsity);
     system_matrix_complete.reinit (c_sparsity);
-    mass_matrix.reinit (c_sparsity);
 
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
     system_rhs_complete.reinit (dof_handler.n_dofs());
-    resid_vector.reinit (dof_handler.n_dofs());
-    active_set.reinit (dof_handler.n_dofs());
-    diag_mass_matrix_vector.reinit (dof_handler.n_dofs());
+    force_residual.reinit (dof_handler.n_dofs());
+
+				     // to compute the factor which is used
+				     // to scale the residual. You can consider
+				     // this diagonal matrix as the discretization
+				     // of a lagrange multiplier for the
+				     // contact force
+    TrilinosWrappers::SparseMatrix mass_matrix;
+    mass_matrix.reinit (c_sparsity);
+    assemble_mass_matrix (mass_matrix);
+    diagonal_of_mass_matrix.reinit (dof_handler.n_dofs());
+    for (unsigned int j=0; j<solution.size (); j++)
+      diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
   }
 
 
@@ -298,7 +318,7 @@ namespace Step41
   }
 
   template <int dim>
-  void ObstacleProblem<dim>::assemble_mass_matrix ()
+  void ObstacleProblem<dim>::assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix)
   {
     QTrapez<dim>  quadrature_formula;
 
@@ -370,7 +390,7 @@ namespace Step41
 
 				     // to find and supply the constraints for the
 				     // obstacle condition
-    active_set = 0.0;
+    active_set.clear ();
     const double c = 100.0;
     for (; cell!=endc; ++cell)
       for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
@@ -388,13 +408,13 @@ namespace Step41
 					   // the diag-entry of the mass-matrix.
 
 					   // TODO: I have to check the condition
-	  if (resid_vector (index_x) +
-	      diag_mass_matrix_vector (index_x)*c*(obstacle_value - solution_index_x) > 0)
+	  if (force_residual (index_x) +
+	      diagonal_of_mass_matrix (index_x)*c*(obstacle_value - solution_index_x) > 0)
 	    {
 	      constraints.add_line (index_x);
 	      constraints.set_inhomogeneity (index_x, obstacle_value);
 	      solution (index_x) = obstacle_value;
-	      active_set (index_x) = 1.0;
+	      active_set.add_index (index_x);
 
 	      if (vertex_touched[cell->vertex_index(v)] == false)
 		{
@@ -452,8 +472,11 @@ namespace Step41
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "displacement");
-    data_out.add_data_vector (resid_vector, "residual");
-    data_out.add_data_vector (active_set, "active_set");
+    data_out.add_data_vector (force_residual, "residual");
+
+    Vector<double> numerical_active_set (dof_handler.n_dofs());
+    active_set.fill_binary_vector (numerical_active_set);
+    data_out.add_data_vector (numerical_active_set, "active_set");
 
     data_out.build_patches ();
 
@@ -484,12 +507,6 @@ namespace Step41
 				     // iteration?
     std::cout << "Initial start-up step" << std::endl;
 
-    constraints.clear ();
-    VectorTools::interpolate_boundary_values (dof_handler,
-					      0,
-					      BoundaryValues<dim>(),
-					      constraints);
-    constraints.close ();
     ConstraintMatrix constraints_complete (constraints);
     assemble_system ();
     solve ();
@@ -500,26 +517,17 @@ namespace Step41
     system_matrix_complete.copy_from (system_matrix);
     system_rhs_complete = system_rhs;
 
-				     // to compute the factor which is used
-				     // to scale the residual. You can consider
-				     // this diagonal matrix as the discretization
-				     // of a lagrange multiplier for the
-				     // contact force
-    assemble_mass_matrix ();
-    for (unsigned int j=0; j<solution.size (); j++)
-      diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
-
 				     //TODO: use system_matrix_complete.residual
-    resid_vector = 0;
-    resid_vector -= system_rhs_complete;
-    system_matrix_complete.vmult_add  (resid_vector, solution);
+    force_residual = 0;
+    force_residual -= system_rhs_complete;
+    system_matrix_complete.vmult_add  (force_residual, solution);
 
 				     // to compute a start active set
     projection_active_set ();
 
     std::cout << std::endl;
 
-    TrilinosWrappers::Vector active_set_old (active_set);
+    IndexSet active_set_old (active_set);
     for (unsigned int iteration=1; iteration<=solution.size (); ++iteration)
       {
 	std::cout << "Newton iteration " << iteration << std::endl;
@@ -531,15 +539,15 @@ namespace Step41
 	solve ();
 
 				     //TODO: use system_matrix_complete.residual
-	resid_vector = 0;
-	resid_vector -= system_rhs_complete;
-	system_matrix_complete.vmult_add  (resid_vector, solution);
+	force_residual = 0;
+	force_residual -= system_rhs_complete;
+	system_matrix_complete.vmult_add  (force_residual, solution);
 
 	projection_active_set ();
 
 	for (unsigned int k = 0; k<solution.size (); k++)
-	  if (active_set (k) == 1)
-	    resid_vector (k) = 0;
+	  if (active_set.is_element (k))
+	    force_residual (k) = 0;
 
 	output_results (iteration);
 
@@ -548,7 +556,7 @@ namespace Step41
 					 // control which is not necassary for
 					 // for the primal-dual active set strategy
 	std::cout << "   Residual of the non-contact part of the system: "
-		  << resid_vector.l2_norm()
+		  << force_residual.l2_norm()
 		  << std::endl;
 
 					 // if both the old and the new
