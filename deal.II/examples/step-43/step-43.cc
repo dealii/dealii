@@ -598,10 +598,10 @@ namespace Step43
 				       // pertain to the macro time
 				       // stepping for the
 				       // velocity/pressure system:
-      const unsigned int degree;
-
       Triangulation<dim>                   triangulation;
       double                               global_Omega_diameter;
+
+      const unsigned int degree;
 
       const unsigned int                   darcy_degree;
       FESystem<dim>                        darcy_fe;
@@ -670,7 +670,7 @@ namespace Step43
 				       // (e.g. replace
 				       // RandomMedium::KInverse by
 				       // SingleCurvingCrack::KInverse).
-      const SingleCurvingCrack::KInverse<dim>   k_inverse;
+      const RandomMedium::KInverse<dim>   k_inverse;
   };
 
 
@@ -700,6 +700,8 @@ namespace Step43
   template <int dim>
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
 		  :
+		  triangulation (Triangulation<dim>::maximum_smoothing),
+
 		  degree (degree),
 		  darcy_degree (degree),
 		  darcy_fe (FE_Q<dim>(darcy_degree+1), dim,
@@ -2567,8 +2569,8 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
-    const unsigned int initial_refinement     = (dim == 2 ? 4 : 2);
-    const unsigned int n_pre_refinement_steps = (dim == 2 ? 2 : 2);
+    const unsigned int initial_refinement     = (dim == 2 ? 5 : 2);
+    const unsigned int n_pre_refinement_steps = (dim == 2 ? 3 : 2);
 
 
     GridGenerator::hyper_cube (triangulation, 0, 1);
@@ -2604,7 +2606,7 @@ namespace Step43
 
 	std::cout << std::endl;
 
-	if (timestep_number % 100 == 0)
+	if (timestep_number % 200 == 0)
 	  output_results ();
 
 	if (timestep_number % 25 == 0)
