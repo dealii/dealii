@@ -1,9 +1,8 @@
-/* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010, 2011 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2010, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -386,9 +385,9 @@ void Step5<dim>::setup_system ()
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
   sparsity_pattern.copy_from(c_sparsity);
-  
+
   system_matrix.reinit (sparsity_pattern);
-  
+
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 }
@@ -914,7 +913,7 @@ void Step5<dim>::run ()
 				   // would like to use here.
   static const HyperBallBoundary<dim> boundary;
   triangulation.set_boundary (0, boundary);
-  
+
   for (unsigned int cycle=0; cycle<6; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;

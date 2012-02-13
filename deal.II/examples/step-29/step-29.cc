@@ -1,8 +1,7 @@
-/* $Id$ */
 /* Author: Moritz Allmaras, Texas A&M University, 2007 */
 
-/*                                                                */
-/*    Copyright (C) 2007, 2008, 2010, 2011 by the deal.II authors and M. Allmaras   */
+/* $Id$ */
+/*    Copyright (C) 2007, 2008, 2010, 2011, 2012 by the deal.II authors and M. Allmaras   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */

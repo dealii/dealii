@@ -1,9 +1,8 @@
-/* $Id$ */
-/* Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2009 */
+/* Authors: Katharina Kormann, Martin Kronbichler, Uppsala University, 2009 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2009, 2010 by the deal.II authors                   */
+/*    Copyright (C) 2009, 2010, 2012 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */

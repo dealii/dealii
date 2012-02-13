@@ -1,9 +1,8 @@
-/* $Id$ */
 /* Author: Wolfgang Bangerth, University of Heidelberg, 1999 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors */
+/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -75,12 +74,12 @@ using namespace dealii;
 				 // respectively. Apart from this,
 				 // everything is as before.
 template <int dim>
-class Step4 
+class Step4
 {
   public:
     Step4 ();
     void run ();
-    
+
   private:
     void make_grid ();
     void setup_system();
@@ -152,11 +151,11 @@ class Step4
 				 // constructor which has default
 				 // values for all arguments.
 template <int dim>
-class RightHandSide : public Function<dim> 
+class RightHandSide : public Function<dim>
 {
   public:
     RightHandSide () : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 };
@@ -164,11 +163,11 @@ class RightHandSide : public Function<dim>
 
 
 template <int dim>
-class BoundaryValues : public Function<dim> 
+class BoundaryValues : public Function<dim>
 {
   public:
     BoundaryValues () : Function<dim>() {}
-    
+
     virtual double value (const Point<dim>   &p,
 			  const unsigned int  component = 0) const;
 };
@@ -211,7 +210,7 @@ class BoundaryValues : public Function<dim>
 				 // at zero as usual in C and C++.
 template <int dim>
 double RightHandSide<dim>::value (const Point<dim> &p,
-				  const unsigned int /*component*/) const 
+				  const unsigned int /*component*/) const
 {
   double return_value = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -230,7 +229,7 @@ double RightHandSide<dim>::value (const Point<dim> &p,
 				 // what we return:
 template <int dim>
 double BoundaryValues<dim>::value (const Point<dim> &p,
-				   const unsigned int /*component*/) const 
+				   const unsigned int /*component*/) const
 {
   return p.square();
 }
@@ -320,7 +319,7 @@ void Step4<dim>::make_grid ()
 {
   GridGenerator::hyper_cube (triangulation, -1, 1);
   triangulation.refine_global (4);
-  
+
   std::cout << "   Number of active cells: "
 	    << triangulation.n_active_cells()
 	    << std::endl
@@ -352,9 +351,9 @@ void Step4<dim>::setup_system ()
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern (dof_handler, c_sparsity);
   sparsity_pattern.copy_from(c_sparsity);
-  
+
   system_matrix.reinit (sparsity_pattern);
-  
+
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
 }
@@ -376,7 +375,7 @@ void Step4<dim>::setup_system ()
 				 // way we assemble matrix and right
 				 // hand side vector dimension
 				 // independently: there is simply no
-				 // difference to the 
+				 // difference to the
 				 // two-dimensional case. Since the
 				 // important objects used in this
 				 // function (quadrature formula,
@@ -393,8 +392,8 @@ void Step4<dim>::setup_system ()
 				 // don't have to care about most
 				 // things.
 template <int dim>
-void Step4<dim>::assemble_system () 
-{  
+void Step4<dim>::assemble_system ()
+{
   QGauss<dim>  quadrature_formula(2);
 
 				   // We wanted to have a non-constant right
@@ -420,7 +419,7 @@ void Step4<dim>::assemble_system ()
 				   // us by also giving it the
 				   // #update_quadrature_points
 				   // flag:
-  FEValues<dim> fe_values (fe, quadrature_formula, 
+  FEValues<dim> fe_values (fe, quadrature_formula,
 			   update_values   | update_gradients |
                            update_quadrature_points | update_JxW_values);
 
@@ -456,7 +455,7 @@ void Step4<dim>::assemble_system ()
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  
+
   for (; cell!=endc; ++cell)
     {
       fe_values.reinit (cell);
@@ -529,7 +528,7 @@ void Step4<dim>::assemble_system ()
                                        // making things a lot simpler if one
                                        // wants to write code dimension
                                        // independently.
-      
+
 				       // With the local systems assembled,
 				       // the transfer into the global matrix
 				       // and right hand side is done exactly
@@ -542,12 +541,12 @@ void Step4<dim>::assemble_system ()
 	    system_matrix.add (local_dof_indices[i],
 			       local_dof_indices[j],
 			       cell_matrix(i,j));
-	  
+
 	  system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	}
     }
 
-  
+
 				   // As the final step in this function, we
 				   // wanted to have non-homogeneous boundary
 				   // values in this example, unlike the one
@@ -580,7 +579,7 @@ void Step4<dim>::assemble_system ()
 				 // function is copied verbatim from the
 				 // previous example.
 template <int dim>
-void Step4<dim>::solve () 
+void Step4<dim>::solve ()
 {
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              solver (solver_control);
@@ -651,10 +650,10 @@ void Step4<dim>::output_results () const
 				 // additional output, it is the same
 				 // as for the previous example.
 template <int dim>
-void Step4<dim>::run () 
+void Step4<dim>::run ()
 {
   std::cout << "Solving problem in " << dim << " space dimensions." << std::endl;
-  
+
   make_grid();
   setup_system ();
   assemble_system ();
@@ -738,18 +737,18 @@ void Step4<dim>::run ()
                                  // written. By changing it you can get more
                                  // information about the innards of the
                                  // library.
-int main () 
+int main ()
 {
   deallog.depth_console (0);
   {
     Step4<2> laplace_problem_2d;
     laplace_problem_2d.run ();
   }
-  
+
   {
     Step4<3> laplace_problem_3d;
     laplace_problem_3d.run ();
   }
-  
+
   return 0;
 }

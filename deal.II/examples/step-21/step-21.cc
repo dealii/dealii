@@ -1,4 +1,3 @@
-/* $Id$ */
 /* Author: Yan Li, Wolfgang Bangerth, Texas A&M University, 2006 */
 
 /*    $Id$       */

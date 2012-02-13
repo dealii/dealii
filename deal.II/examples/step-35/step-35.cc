@@ -1,8 +1,8 @@
-/* $Id$ */
-/* Version: $Name:  $ */
-/*      */
-/*    Copyright (C) 2007, 2008, 2009, 2010, 2011 by the deal.II authors */
-/*    Author: Abner Salgado, Texas A&M University 2009 */
+/* Author: Abner Salgado, Texas A&M University 2009               */
+
+/*    $Id$       */
+/*                                                                */
+/*    Copyright (C) 2009, 2010, 2011, 2012 by deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */

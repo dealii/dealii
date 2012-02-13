@@ -1,9 +1,8 @@
-/* $Id$ */
 /* Author: David Neckels, Boulder, Colorado, 2007, 2008 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2007, 2008, 2009, 2010, 2011 by the deal.II authors and David Neckels */
+/*    Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors and David Neckels */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */

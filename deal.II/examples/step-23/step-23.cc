@@ -1,10 +1,9 @@
-/* $Id$ */
 /* Author: Wolfgang Bangerth, Texas A&M University, 2006 */
 
 /*    $Id$       */
 /*    Version: $Name:  $                                          */
 /*                                                                */
-/*    Copyright (C) 2006, 2007, 2008, 2009, 2011 by the deal.II authors */
+/*    Copyright (C) 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */

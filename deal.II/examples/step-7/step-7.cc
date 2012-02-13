@@ -1,9 +1,8 @@
-/* $Id$ */
 /* Author: Wolfgang Bangerth and Ralf Hartmann, University of Heidelberg, 2000 */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2009, 2011 by the deal.II authors */
+/*    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -124,10 +123,10 @@ namespace Step7
 				   // place of declaration (i.e. where we
 				   // declare that such a variable exists).
   template <int dim>
-  class SolutionBase 
+  class SolutionBase
   {
     protected:
-      static const unsigned int n_source_centers = 3;    
+      static const unsigned int n_source_centers = 3;
       static const Point<dim>   source_centers[n_source_centers];
       static const double       width;
   };
@@ -169,8 +168,8 @@ namespace Step7
   template <>
   const Point<1>
   SolutionBase<1>::source_centers[SolutionBase<1>::n_source_centers]
-  = { Point<1>(-1.0 / 3.0), 
-      Point<1>(0.0), 
+  = { Point<1>(-1.0 / 3.0),
+      Point<1>(0.0),
       Point<1>(+1.0 / 3.0)   };
 
 				   // Likewise, we can provide an explicit
@@ -179,8 +178,8 @@ namespace Step7
   template <>
   const Point<2>
   SolutionBase<2>::source_centers[SolutionBase<2>::n_source_centers]
-  = { Point<2>(-0.5, +0.5), 
-      Point<2>(-0.5, -0.5), 
+  = { Point<2>(-0.5, +0.5),
+      Point<2>(-0.5, -0.5),
       Point<2>(+0.5, -0.5)   };
 
 				   // There remains to assign a value to the
@@ -239,10 +238,10 @@ namespace Step7
   {
     public:
       Solution () : Function<dim>() {}
-    
+
       virtual double value (const Point<dim>   &p,
 			    const unsigned int  component = 0) const;
-    
+
       virtual Tensor<1,dim> gradient (const Point<dim>   &p,
 				      const unsigned int  component = 0) const;
   };
@@ -284,7 +283,7 @@ namespace Step7
 	return_value += std::exp(-x_minus_xi.square() /
 				 (this->width * this->width));
       }
-  
+
     return return_value;
   }
 
@@ -336,7 +335,7 @@ namespace Step7
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
 	const Point<dim> x_minus_xi = p - this->source_centers[i];
-      
+
 					 // For the gradient, note that
 					 // its direction is along
 					 // (x-x_i), so we add up
@@ -348,7 +347,7 @@ namespace Step7
 				  (this->width * this->width)) *
 			 x_minus_xi);
       }
-  
+
     return return_value;
   }
 
@@ -372,7 +371,7 @@ namespace Step7
   {
     public:
       RightHandSide () : Function<dim>() {}
-    
+
       virtual double value (const Point<dim>   &p,
 			    const unsigned int  component = 0) const;
   };
@@ -391,11 +390,11 @@ namespace Step7
     for (unsigned int i=0; i<this->n_source_centers; ++i)
       {
 	const Point<dim> x_minus_xi = p - this->source_centers[i];
-      
+
 					 // The first contribution is
 					 // the Laplacian:
 	return_value += ((2*dim - 4*x_minus_xi.square()/
-			  (this->width * this->width)) / 
+			  (this->width * this->width)) /
 			 (this->width * this->width) *
 			 std::exp(-x_minus_xi.square() /
 				  (this->width * this->width)));
@@ -404,7 +403,7 @@ namespace Step7
 	return_value += std::exp(-x_minus_xi.square() /
 				 (this->width * this->width));
       }
-  
+
     return return_value;
   }
 
@@ -437,20 +436,20 @@ namespace Step7
 				   // the number of the refinement cycle, and
 				   // consequently gets it as an argument.
   template <int dim>
-  class HelmholtzProblem 
+  class HelmholtzProblem
   {
     public:
       enum RefinementMode {
 	    global_refinement, adaptive_refinement
       };
-    
+
       HelmholtzProblem (const FiniteElement<dim> &fe,
 			const RefinementMode      refinement_mode);
 
       ~HelmholtzProblem ();
 
       void run ();
-    
+
     private:
       void setup_system ();
       void assemble_system ();
@@ -710,7 +709,7 @@ namespace Step7
 
 				   // This is no different than before:
   template <int dim>
-  HelmholtzProblem<dim>::~HelmholtzProblem () 
+  HelmholtzProblem<dim>::~HelmholtzProblem ()
   {
     dof_handler.clear ();
   }
@@ -734,7 +733,7 @@ namespace Step7
 				   // library. It requires only a single
 				   // line of code. Some more information
 				   // on this can be found in step-2.
-				   // 
+				   //
 				   // Note, however, that when you
 				   // renumber the degrees of freedom,
 				   // you must do so immediately after
@@ -812,8 +811,8 @@ namespace Step7
 				   // face quadrature formula is then
 				   // straightforward:
   template <int dim>
-  void HelmholtzProblem<dim>::assemble_system () 
-  {  
+  void HelmholtzProblem<dim>::assemble_system ()
+  {
     QGauss<dim>   quadrature_formula(3);
     QGauss<dim-1> face_quadrature_formula(3);
 
@@ -826,7 +825,7 @@ namespace Step7
     Vector<double>       cell_rhs (dofs_per_cell);
 
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-  
+
 				     // Then we need objects which can
 				     // evaluate the values, gradients,
 				     // etc of the shape functions at
@@ -873,11 +872,11 @@ namespace Step7
 				     // (see below). The class that gives
 				     // us this information is called
 				     // FEFaceValues:
-    FEValues<dim>  fe_values (*fe, quadrature_formula, 
+    FEValues<dim>  fe_values (*fe, quadrature_formula,
 			      update_values   | update_gradients |
 			      update_quadrature_points | update_JxW_values);
 
-    FEFaceValues<dim> fe_face_values (*fe, face_quadrature_formula, 
+    FEFaceValues<dim> fe_face_values (*fe, face_quadrature_formula,
 				      update_values         | update_quadrature_points  |
 				      update_normal_vectors | update_JxW_values);
 
@@ -915,7 +914,7 @@ namespace Step7
 				     // would to go other ways here, of
 				     // course.
     const Solution<dim> exact_solution;
-  
+
 				     // Now for the main loop over all
 				     // cells. This is mostly unchanged
 				     // from previous examples, so we
@@ -933,7 +932,7 @@ namespace Step7
 
 	right_hand_side.value_list (fe_values.get_quadrature_points(),
 				    rhs_values);
-      
+
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
 	    {
@@ -971,7 +970,7 @@ namespace Step7
 					 // which is the value that we
 					 // have assigned to that
 					 // portions of the boundary
-					 // composing Gamma2 in the 
+					 // composing Gamma2 in the
 					 // <code>run()</code> function further
 					 // below. (The
 					 // default value of boundary
@@ -1048,7 +1047,7 @@ namespace Step7
 	      system_matrix.add (local_dof_indices[i],
 				 local_dof_indices[j],
 				 cell_matrix(i,j));
-	  
+
 	    system_rhs(local_dof_indices[i]) += cell_rhs(i);
 	  }
       }
@@ -1094,7 +1093,7 @@ namespace Step7
 				   // Solving the system of equations is
 				   // done in the same way as before:
   template <int dim>
-  void HelmholtzProblem<dim>::solve () 
+  void HelmholtzProblem<dim>::solve ()
   {
     SolverControl           solver_control (1000, 1e-12);
     SolverCG<>              cg (solver_control);
@@ -1174,7 +1173,7 @@ namespace Step7
   template <int dim>
   void HelmholtzProblem<dim>::refine_grid ()
   {
-    switch (refinement_mode) 
+    switch (refinement_mode)
       {
 	case global_refinement:
 	{
@@ -1196,7 +1195,7 @@ namespace Step7
 	  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
 							   estimated_error_per_cell,
 							   0.3, 0.03);
-	
+
 	  triangulation.execute_coarsening_and_refinement ();
 
 	  break;
@@ -1263,7 +1262,7 @@ namespace Step7
 				     // of that value. This is
 				     // equivalent to taking the l2
 				     // (lower case <code>l</code>) norm of the
-				     // vector of norms on each cell:  
+				     // vector of norms on each cell:
     Vector<float> difference_per_cell (triangulation.n_active_cells());
     VectorTools::integrate_difference (dof_handler,
 				       solution,
@@ -1343,8 +1342,8 @@ namespace Step7
 				     // first time.
     const unsigned int n_active_cells=triangulation.n_active_cells();
     const unsigned int n_dofs=dof_handler.n_dofs();
-  
-    std::cout << "Cycle " << cycle << ':' 
+
+    std::cout << "Cycle " << cycle << ':'
 	      << std::endl
 	      << "   Number of active cells:       "
 	      << n_active_cells
@@ -1381,7 +1380,7 @@ namespace Step7
 				   // that we want to have part of the
 				   // boundary marked as Neumann type,
 				   // rather than Dirichlet.
-				   // 
+				   //
 				   // For this, we will use the
 				   // following convention: Faces
 				   // belonging to Gamma1 will have the
@@ -1434,7 +1433,7 @@ namespace Step7
 				   // refinement step) and refined the
 				   // mesh only after that.
   template <int dim>
-  void HelmholtzProblem<dim>::run () 
+  void HelmholtzProblem<dim>::run ()
   {
     for (unsigned int cycle=0; cycle<7; ++cycle)
       {
@@ -1457,7 +1456,7 @@ namespace Step7
 	  }
 	else
 	  refine_grid ();
-      
+
 
 					 // The next steps are already
 					 // known from previous
@@ -1465,7 +1464,7 @@ namespace Step7
 					 // basic set-up of every finite
 					 // element program:
 	setup_system ();
-      
+
 	assemble_system ();
 	solve ();
 
@@ -1482,9 +1481,9 @@ namespace Step7
 					 // number as an argument.
 	process_solution (cycle);
       }
-  
+
 				     // @sect5{Output of graphical data}
-  
+
 				     // After the last iteration we output the
 				     // solution on the finest grid. This is
 				     // done using the following sequence of
@@ -1552,7 +1551,7 @@ namespace Step7
 				     // appropriate for GMV output, open a file,
 				     // and add the solution vector to the
 				     // object that will do the actual output:
-    gmv_filename += ".gmv";    
+    gmv_filename += ".gmv";
     std::ofstream output (gmv_filename.c_str());
 
     DataOut<dim> data_out;
@@ -1624,7 +1623,7 @@ namespace Step7
     data_out.write_gmv (output);
 
 				     // @sect5{Output of convergence tables}
-  
+
 				     // After graphical output, we would also
 				     // like to generate tables from the error
 				     // computations we have done in
@@ -1632,7 +1631,7 @@ namespace Step7
 				     // filled a table object with the number of
 				     // cells for each refinement step as well
 				     // as the errors in different norms.
-  
+
 				     // For a nicer textual output of this data,
 				     // one may want to set the precision with
 				     // which the values will be written upon
@@ -1688,7 +1687,7 @@ namespace Step7
 				     // above the specific columns.
     std::cout << std::endl;
     convergence_table.write_text(std::cout);
-  
+
 				     // The table can also be written
 				     // into a LaTeX file.  The (nicely)
 				     // formatted table can be viewed at
@@ -1723,13 +1722,13 @@ namespace Step7
 	default:
 	      Assert (false, ExcNotImplemented());
       }
-  
+
     error_filename += ".tex";
     std::ofstream error_table_file(error_filename.c_str());
-  
+
     convergence_table.write_tex(error_table_file);
 
-  
+
 				     // @sect5{Further table manipulations}
 
 				     // In case of global refinement, it
@@ -1765,7 +1764,7 @@ namespace Step7
 					 // cells":
 	convergence_table.add_column_to_supercolumn("cycle", "n cells");
 	convergence_table.add_column_to_supercolumn("cells", "n cells");
-      
+
 					 // Next, it isn't necessary to
 					 // always output all columns,
 					 // or in the order in which
@@ -1880,7 +1879,7 @@ namespace Step7
 				 // will then only have to change this
 				 // one instance, rather than all uses
 				 // below:
-int main () 
+int main ()
 {
   const unsigned int dim = 2;
 
@@ -1888,7 +1887,7 @@ int main ()
     {
       using namespace dealii;
       using namespace Step7;
-      
+
       deallog.depth_console (0);
 
 				       // Now for the three calls to
@@ -1912,7 +1911,7 @@ int main ()
 	std::cout << "Solving with Q1 elements, adaptive refinement" << std::endl
 		  << "=============================================" << std::endl
 		  << std::endl;
-	
+
 	FE_Q<dim> fe(1);
 	HelmholtzProblem<dim>
 	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::adaptive_refinement);
@@ -1921,12 +1920,12 @@ int main ()
 
 	std::cout << std::endl;
       }
-	
+
       {
 	std::cout << "Solving with Q1 elements, global refinement" << std::endl
 		  << "===========================================" << std::endl
 		  << std::endl;
-	
+
 	FE_Q<dim> fe(1);
 	HelmholtzProblem<dim>
 	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
@@ -1935,12 +1934,12 @@ int main ()
 
 	std::cout << std::endl;
       }
-       
+
       {
 	std::cout << "Solving with Q2 elements, global refinement" << std::endl
 		  << "===========================================" << std::endl
 		  << std::endl;
-	
+
 	FE_Q<dim> fe(2);
 	HelmholtzProblem<dim>
 	  helmholtz_problem_2d (fe, HelmholtzProblem<dim>::global_refinement);
@@ -1949,7 +1948,7 @@ int main ()
 
 	std::cout << std::endl;
       }
-       
+
     }
   catch (std::exception &exc)
     {
@@ -1963,7 +1962,7 @@ int main ()
 		<< std::endl;
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

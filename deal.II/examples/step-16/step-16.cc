@@ -1,11 +1,10 @@
-/* $Id$ */
 /* Author: Guido Kanschat, University of Heidelberg, 2003  */
 /*         Baerbel Janssen, University of Heidelberg, 2010 */
 /*         Wolfgang Bangerth, Texas A&M University, 2010   */
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors                   */
+/*    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
