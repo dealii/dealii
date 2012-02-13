@@ -398,23 +398,27 @@ namespace Step41
     active_set.clear ();
     const double c = 100.0;
 
-    std::vector<bool> vertex_touched (triangulation.n_vertices(),
-				      false);
+    std::vector<bool> dof_touched (dof_handler.n_dofs(),
+				   false);
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
-      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
 	{
-	  const unsigned int index_x = cell->vertex_dof_index (v,0);
+	  Assert (dof_handler.get_fe().dofs_per_cell ==
+		  GeometryInfo<dim>::vertices_per_cell,
+		  ExcNotImplemented());
 
-	  if (vertex_touched[index_x] == true)
+	  const unsigned int dof_index = cell->vertex_dof_index (v,0);
+
+	  if (dof_touched[dof_index] == true)
 	    continue;
 
 					   // the local row where
 	  const double obstacle_value = obstacle.value (cell->vertex(v));
-	  const double solution_value = solution (index_x);
+	  const double solution_value = solution (dof_index);
 
 					   // To decide which dof belongs to the
 					   // active-set. For that we scale the
@@ -423,24 +427,24 @@ namespace Step41
 
 					   // TODO: I have to check the condition
 
-	  if (force_residual (index_x) +
-	      c * diagonal_of_mass_matrix(index_x) * (obstacle_value - solution_value)
+	  if (force_residual (dof_index) +
+	      c * diagonal_of_mass_matrix(dof_index) * (obstacle_value - solution_value)
 	      >
 	      0)
 	    {
-	      active_set.add_index (index_x);
-	      constraints.add_line (index_x);
-	      constraints.set_inhomogeneity (index_x, obstacle_value);
+	      active_set.add_index (dof_index);
+	      constraints.add_line (dof_index);
+	      constraints.set_inhomogeneity (dof_index, obstacle_value);
 
-	      solution (index_x) = obstacle_value;
+	      solution (dof_index) = obstacle_value;
 					       // the residual of the non-contact
 					       // part of the system serves as an
 					       // additional control which is not
 					       // necessary for for the primal-dual
 					       // active set strategy
-	      force_residual (index_x) = 0;
+	      force_residual (dof_index) = 0;
 
-	      vertex_touched[index_x] = true;
+	      dof_touched[dof_index] = true;
 	    }
 	}
     std::cout << "      Size of active set: " << active_set.n_elements()
