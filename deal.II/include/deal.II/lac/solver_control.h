@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -51,7 +51,7 @@ class ParameterHandler;
  * <li> <tt>iterate = 0</tt>: continue the iteration.
  * <li> @p success: the goal is reached, the iterative method can terminate
  *       successfully.
- * <li> @p failure: the iterative method should stop because convergence 
+ * <li> @p failure: the iterative method should stop because convergence
  *       could not be achieved or at least was not achieved within the given
  *       maximal number of iterations.
  * </ul>
@@ -96,7 +96,7 @@ class SolverControl : public Subscriptor
 				      * catching an exception of this
 				      * class.
 				      */
-    class NoConvergence : public std::exception 
+    class NoConvergence : public std::exception
     {
       public:
 					 /**
@@ -122,8 +122,8 @@ class SolverControl : public Subscriptor
 					  */
 	const double       last_residual;
     };
-    
-    
+
+
 				     /**
 				      * Constructor. The parameters
 				      * @p n and @p tol are the
@@ -148,14 +148,14 @@ class SolverControl : public Subscriptor
 		   const double       tol         = 1.e-10,
 		   const bool         log_history = false,
 		   const bool         log_result  = true);
-    
+
 				     /**
 				      * Virtual destructor is needed
 				      * as there are virtual functions
 				      * in this class.
 				      */
     virtual ~SolverControl();
-    
+
 				     /**
 				      * Interface to parameter file.
 				      */
@@ -217,7 +217,7 @@ class SolverControl : public Subscriptor
 				      * Return the result of the last check operation.
 				      */
     State last_check() const;
-    
+
 				     /**
 				      * Return the initial convergence
 				      * criterion.
@@ -230,7 +230,7 @@ class SolverControl : public Subscriptor
 				      * called by the solver.
 				      */
     double last_value() const;
-    
+
 				     /**
 				      * Number of last iteration step.
 				      */
@@ -240,7 +240,7 @@ class SolverControl : public Subscriptor
 				      * Maximum number of steps.
 				      */
     unsigned int max_steps () const;
-    
+
 				     /**
 				      * Change maximum number of steps.
 				      */
@@ -263,7 +263,7 @@ class SolverControl : public Subscriptor
 				      * zero.
 				      */
     void clear_failure_criterion ();
-    
+
 				     /**
 				      * Tolerance.
 				      */
@@ -300,7 +300,7 @@ class SolverControl : public Subscriptor
 				      * enable_history_data()
 				      */
     double final_reduction() const;
-    
+
 				     /**
 				      * Error reduction of any
 				      * iteration step.
@@ -309,7 +309,7 @@ class SolverControl : public Subscriptor
 				      * enable_history_data()
 				      */
     double step_reduction(unsigned int step) const;
-    
+
 				     /**
 				      * Log each iteration step. Use
 				      * @p log_frequency for skipping
@@ -321,7 +321,7 @@ class SolverControl : public Subscriptor
 				      * Returns the @p log_history flag.
 				      */
     bool log_history () const;
-    
+
 				     /**
 				      * Set logging frequency.
 				      */
@@ -331,7 +331,7 @@ class SolverControl : public Subscriptor
 				      * Log start and end step.
 				      */
     void log_result (const bool);
-    
+
 				     /**
 				      * Returns the @p log_result flag.
 				      */
@@ -347,13 +347,13 @@ class SolverControl : public Subscriptor
 				      * enable_history_data().
 				      */
     DeclException0(ExcHistoryDataRequired);
-    
+
   protected:
 				     /**
 				      * Maximum number of steps.
 				      */
     unsigned int maxsteps;
-    
+
 				     /**
 				      * Prescribed tolerance to be achieved.
 				      */
@@ -363,17 +363,17 @@ class SolverControl : public Subscriptor
 				      * Result of last check operation.
 				      */
     State        lcheck;
-    
+
 				     /**
 				      * Initial value.
 				      */
     double initial_val;
-    
+
 				     /**
 				      * Last value of the convergence criterion.
 				      */
     double       lvalue;
-    
+
 				     /**
 				      * Last step.
 				      */
@@ -392,7 +392,7 @@ class SolverControl : public Subscriptor
 				      * @p set_failure_criterion
 				      */
     double       relative_failure_residual;
-    
+
 				     /**
 				      * @p failure_residual equals the
 				      * first residual multiplied by
@@ -403,7 +403,7 @@ class SolverControl : public Subscriptor
 				      * known it is 0.
 				      */
     double       failure_residual;
-    
+
 				     /**
 				      * Log convergence history to
 				      * @p deallog.
@@ -413,7 +413,7 @@ class SolverControl : public Subscriptor
 				      * Log only every nth step.
 				      */
     unsigned int m_log_frequency;
-    
+
 				     /**
 				      * Log iteration result to
 				      * @p deallog.  If true, after
@@ -430,7 +430,7 @@ class SolverControl : public Subscriptor
 				      * enable_history_data().
 				      */
     bool history_data_enabled;
-    
+
 				     /**
 				      * Vector storing the result
 				      * after each iteration step for
@@ -462,9 +462,11 @@ class ReductionControl : public SolverControl
   public:
 				     /**
 				      * Constructor.  Provide the
-				      * reduction factor additional to
-				      * the arguments of the Control
-				      * constructor.
+				      * reduction factor in addition
+				      * to arguments that have the
+				      * same meaning as those of the
+				      * constructor of the
+				      * SolverControl constructor.
 				      */
     ReductionControl (const unsigned int maxiter = 100,
 		      const double   tolerance   = 1.e-10,
@@ -479,8 +481,8 @@ class ReductionControl : public SolverControl
 				      * SolverControl by setting
 				      * #reduce to zero.
 				      */
-    ReductionControl(const SolverControl& c);
-    
+    ReductionControl (const SolverControl& c);
+
 				     /**
 				      * Assign a SolverControl object
 				      * to ReductionControl. The
@@ -489,14 +491,14 @@ class ReductionControl : public SolverControl
 				      * setting #reduce to zero.
 				      */
     ReductionControl& operator= (const SolverControl& c);
-    
+
 				     /**
 				      * Virtual destructor is needed
 				      * as there are virtual functions
 				      * in this class.
 				      */
     virtual ~ReductionControl();
-    
+
 				     /**
 				      * Interface to parameter file.
 				      */
@@ -506,7 +508,7 @@ class ReductionControl : public SolverControl
 				      * Read parameters from file.
 				      */
     void parse_parameters (ParameterHandler& param);
-    
+
 				     /**
 				      * Decide about success or failure
 				      * of an iteration.  This function
@@ -533,7 +535,7 @@ class ReductionControl : public SolverControl
 				      * Desired reduction factor.
 				      */
     double reduce;
-    
+
 				     /**
 				      * Reduced tolerance. Stop iterations
 				      * if either this value is achieved
