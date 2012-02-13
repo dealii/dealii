@@ -1,1 +1,193 @@
 <h1>Results</h1>
+
+Running the program produces output like this:
+@code
+Number of active cells: 16384
+Total number of cells: 21845
+Number of degrees of freedom: 16641
+
+Newton iteration 0
+   Assembling system...
+   Solving system...
+      Error: 0.310059 -> 5.16619e-05 in 5 CG iterations.
+   Updating active set...
+      Size of active set: 13164
+   Residual of the non-contact part of the system: 1.61863e-05
+   Writing graphical output...
+
+Newton iteration 1
+   Assembling system...
+   Solving system...
+      Error: 1.11987 -> 0.00109377 in 6 CG iterations.
+   Updating active set...
+      Size of active set: 12363
+   Residual of the non-contact part of the system: 3.9373
+   Writing graphical output...
+
+...
+
+Newton iteration 17
+   Assembling system...
+   Solving system...
+      Error: 0.00713308 -> 2.29249e-06 in 4 CG iterations.
+   Updating active set...
+      Size of active set: 5399
+   Residual of the non-contact part of the system: 0.000957525
+   Writing graphical output...
+
+Newton iteration 18
+   Assembling system...
+   Solving system...
+      Error: 0.000957525 -> 2.8033e-07 in 4 CG iterations.
+   Updating active set...
+      Size of active set: 5399
+   Residual of the non-contact part of the system: 2.8033e-07
+   Writing graphical output...
+@endcode
+
+The iterations end once the active set doesn't change any more (it has
+5,399 constrained degrees of freedom at that point). More revealing is
+to look at a sequence of graphical output files (every third step is
+shown, with the number of the iteration in the leftmost column):
+
+<table align="center">
+  <tr>
+    <td valign="top">
+      0 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.00.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.00.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.00.png
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      3 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.03.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.03.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.03.png
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      6 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.06.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.06.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.06.png
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      9 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.09.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.09.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.09.png
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      12 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.12.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.12.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.12.png
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      15 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.15.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.15.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.15.png
+    </td>
+  </tr>
+
+  <tr>
+    <td valign="top">
+      18 &nbsp;
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.18.png
+    </td>
+    <td valign="top">
+      @image html step-41.active-set.18.png
+    </td>
+    <td valign="top">
+      @image html step-41.displacement.3d.18.png
+    </td>
+  </tr>
+</table>
+
+The pictures show that in the first step, the solution (which has been
+computed without any of the constraints active) bends through so much
+that pretty much every interior point has to be bounced back to the
+stairstep function, producing a discontinuous solution. Over the
+course of the active set iterations, this unphysical membrane shape is
+smoothed out, the contact with the lower-most stair step disappears,
+and the solution stabilizes.
+
+
+<a name="extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+As with any of the programs of this tutorial, there are a number of
+obvious possibilities for extensions and experiments. The first one is
+clear: introduce adaptivity. Contact problems are prime candidates for
+adaptive meshes because the solution has lines along which it is less
+regular (the places where contact is established between membrane and
+obstacle) and other areas where the solution is very smooth (or, in
+the present context, constant wherever it is in contact with the
+obstacle). Adding this to the current program should not pose too many
+difficulties.
+
+A more challenging task would be an extension to 3d. The problem here
+is not so much to simply make everything run in 3d. Rather, it is that
+when a 3d body is deformed and gets into contact with an obstacle,
+then the obstacle does not act as a constraining body force within the
+domain as is the case here. Rather, the contact force only acts on the
+boundary of the object. The inequality then is not in the differential
+equation but in fact in the (Neumann-type) boundary conditions, though
+this leads to a similar kind of variational
+inequality. Mathematically, this means that the Lagrange multiplier
+only lives on the surface, though it can of course be extended by zero
+into the domain if that is convenient. As in the current program, one
+does not need to form and store this Lagrange multiplier explicitly.
