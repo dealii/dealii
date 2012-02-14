@@ -13,6 +13,12 @@
 
                                  // @sect3{Include files}
 
+				 // As usual, at the beginning we
+				 // include all the header files we
+				 // need in here. With the exception
+				 // of the various files that provide
+				 // interfaces to the Trilinos
+				 // library, there are no surprises:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/index_set.h>
@@ -49,15 +55,31 @@ namespace Step41
 {
   using namespace dealii;
 
-				   // @sect3{The <code>Step41</code> class template}
+				   // @sect3{The <code>ObstacleProblem</code> class template}
 
-				   // This class supplies all function and
-				   // variables to an obstacle problem. The
-				   // update_solution_and_constraints function and the
-				   // ConstaintMatrix are important for the
-				   // handling of the active set as we see
-				   // later.
-
+				   // This class supplies all function
+				   // and variables needed to describe
+				   // the obstacle problem. It is
+				   // close to what we had to do in
+				   // step-4, and so relatively
+				   // simple. The only real new
+				   // components are the
+				   // update_solution_and_constraints
+				   // function that computes the
+				   // active set and a number of
+				   // variables that are necessary to
+				   // describe the original
+				   // (unconstrained) form of the
+				   // linear system
+				   // (<code>complete_system_matrix</code>
+				   // and
+				   // <code>complete_system_rhs</code>)
+				   // as well as the active set itself
+				   // and the diagonal of the mass
+				   // matrix $B$ used in scaling
+				   // Lagrange multipliers in the
+				   // active set formulation. The rest
+				   // is as in step-4:
   template <int dim>
   class ObstacleProblem
   {
@@ -69,7 +91,7 @@ namespace Step41
       void make_grid ();
       void setup_system();
       void assemble_system ();
-      void assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix);
+      void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
       void update_solution_and_constraints ();
       void solve ();
       void output_results (const unsigned int iteration) const;
@@ -90,8 +112,27 @@ namespace Step41
   };
 
 
-				   // @sect3{Right hand side and boundary values}
+				   // @sect3{Right hand side, boundary values, and the obstacle}
 
+				   // In the following, we define
+				   // classes that describe the right
+				   // hand side function, the
+				   // Dirichlet boundary values, and
+				   // the height of the obstacle as a
+				   // function of $\mathbf x$. In all
+				   // three cases, we derive these
+				   // classes from Function@<dim@>,
+				   // although in the case of
+				   // <code>RightHandSide</code> and
+				   // <code>Obstacle</code> this is
+				   // more out of convention than
+				   // necessity since we never pass
+				   // such objects to the library. In
+				   // any case, the definition of the
+				   // right hand side and boundary
+				   // values classes is obvious given
+				   // our choice of $f=-10$,
+				   // $u|_{\partial\Omega}=0$:
   template <int dim>
   class RightHandSide : public Function<dim>
   {
@@ -101,6 +142,17 @@ namespace Step41
       virtual double value (const Point<dim>   &p,
 			    const unsigned int  component = 0) const;
   };
+
+  template <int dim>
+  double RightHandSide<dim>::value (const Point<dim> &p,
+				    const unsigned int component) const
+  {
+    Assert (component == 0, ExcNotImplemented());
+
+    return -10;
+  }
+
+
 
   template <int dim>
   class BoundaryValues : public Function<dim>
@@ -113,32 +165,6 @@ namespace Step41
   };
 
   template <int dim>
-  class Obstacle : public Function<dim>
-  {
-    public:
-      Obstacle () : Function<dim>() {}
-
-      virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
-  };
-
-
-
-				   // For this example, we choose as right hand
-				   // side function a constant force density
-				   // like the gravitation attraction.
-  template <int dim>
-  double RightHandSide<dim>::value (const Point<dim> &p,
-				    const unsigned int component) const
-  {
-    Assert (component == 0, ExcNotImplemented());
-
-    return -10;
-  }
-
-
-				   // As boundary values, we choose the zero.
-  template <int dim>
   double BoundaryValues<dim>::value (const Point<dim> &p,
 				     const unsigned int component) const
   {
@@ -148,10 +174,19 @@ namespace Step41
   }
 
 
-				   // The obstacle function describes a cascaded
-				   // barrier. So if the gravitation attraction
-				   // pulls the membrane down it blows over the
-				   // steps.
+
+				   // We describe the obstacle function by a cascaded
+				   // barrier (think: stair steps):
+  template <int dim>
+  class Obstacle : public Function<dim>
+  {
+    public:
+      Obstacle () : Function<dim>() {}
+
+      virtual double value (const Point<dim>   &p,
+			    const unsigned int  component = 0) const;
+  };
+
   template <int dim>
   double Obstacle<dim>::value (const Point<dim> &p,
 			       const unsigned int component) const
@@ -175,6 +210,10 @@ namespace Step41
 
 				   // @sect4{ObstacleProblem::ObstacleProblem}
 
+				   // To everyone who has taken a look
+				   // at the first few tutorial
+				   // programs, the constructor is
+				   // completely obvious:
   template <int dim>
   ObstacleProblem<dim>::ObstacleProblem ()
 		  :
@@ -185,8 +224,11 @@ namespace Step41
 
 				   // @sect4{ObstacleProblem::make_grid}
 
-				   // We solve our obstacle problem on the square
-				   // $[-1,1]\times [-1,1]$ in 2D.
+				   // We solve our obstacle problem on
+				   // the square $[-1,1]\times [-1,1]$
+				   // in 2D. This function therefore
+				   // just sets up one of the simplest
+				   // possible meshes.
   template <int dim>
   void ObstacleProblem<dim>::make_grid ()
   {
@@ -201,8 +243,18 @@ namespace Step41
     	      << std::endl;
   }
 
+
 				   // @sect4{ObstacleProblem::setup_system}
 
+				   // In this first function of note,
+				   // we set up the degrees of freedom
+				   // handler, resize vectors and
+				   // matrices, and deal with the
+				   // constraints. Initially, the
+				   // constraints are, of course, only
+				   // given by boundary values, so we
+				   // interpolate them towards the top
+				   // of the function.
   template <int dim>
   void ObstacleProblem<dim>::setup_system ()
   {
@@ -233,14 +285,21 @@ namespace Step41
     system_rhs.reinit (dof_handler.n_dofs());
     complete_system_rhs.reinit (dof_handler.n_dofs());
 
-				     // to compute the factor which is used
-				     // to scale the residual. You can consider
-				     // this diagonal matrix as the discretization
-				     // of a lagrange multiplier for the
-				     // contact force
+				     // The only other thing to do
+				     // here is to compute the factors
+				     // in the $B$ matrix which is
+				     // used to scale the residual. As
+				     // discussed in the introduction,
+				     // we'll use a little trick to
+				     // make this mass matrix
+				     // diagonal, and in the following
+				     // then first compute all of this
+				     // as a matrix and then extract
+				     // the diagonal elements for
+				     // later use:
     TrilinosWrappers::SparseMatrix mass_matrix;
     mass_matrix.reinit (c_sparsity);
-    assemble_mass_matrix (mass_matrix);
+    assemble_mass_matrix_diagonal (mass_matrix);
     diagonal_of_mass_matrix.reinit (dof_handler.n_dofs());
     for (unsigned int j=0; j<solution.size (); j++)
       diagonal_of_mass_matrix (j) = mass_matrix.diag_element (j);
@@ -249,14 +308,16 @@ namespace Step41
 
 				   // @sect4{ObstacleProblem::assemble_system}
 
-
-				   // At once with assembling the system matrix and
-				   // right-hand-side we apply the constraints
-				   // to our system. The constraint consists not
-				   // only of the zero Dirichlet boundary values,
-				   // in addition they contain the obstacle values.
-				   // The update_solution_and_constraints function are used
-				   // to fill the ConstraintMatrix.
+				   // This function at once assembles
+				   // the system matrix and
+				   // right-hand-side and applied the
+				   // constraints (both due to the
+				   // active set as well as from
+				   // boundary values) to our
+				   // system. Otherwise, it is
+				   // functionally equivalent to the
+				   // corresponding function in, for
+				   // example, step-4.
   template <int dim>
   void ObstacleProblem<dim>::assemble_system ()
   {
@@ -265,13 +326,13 @@ namespace Step41
     system_matrix = 0;
     system_rhs    = 0;
 
-    const QGauss<dim>         quadrature_formula(2);
+    const QGauss<dim>         quadrature_formula(fe.degree+1);
     const RightHandSide<dim>  right_hand_side;
 
     FEValues<dim>             fe_values (fe, quadrature_formula,
-					update_values   | update_gradients |
-					update_quadrature_points |
-					update_JxW_values);
+					 update_values   | update_gradients |
+					 update_quadrature_points |
+					 update_JxW_values);
 
     const unsigned int        dofs_per_cell = fe.dofs_per_cell;
     const unsigned int        n_q_points    = quadrature_formula.size();
@@ -306,12 +367,6 @@ namespace Step41
 
 	cell->get_dof_indices (local_dof_indices);
 
-					 // This function apply the constraints
-					 // to the system matrix and system rhs.
-					 // The true parameter is set to make sure
-					 // that the system rhs contains correct
-					 // values in the rows with inhomogeneity
-					 // constraints.
 	constraints.distribute_local_to_global (cell_matrix,
 						cell_rhs,
 						local_dof_indices,
@@ -322,16 +377,65 @@ namespace Step41
   }
 
 
+
+				   // @sect4{ObstacleProblem::assemble_mass_matrix_diagonal}
+
+				   // The next function is used in the
+				   // computation of the diagonal mass
+				   // matrix $B$ used to scale
+				   // variables in the active set
+				   // method. As discussed in the
+				   // introduction, we get the mass
+				   // matrix to be diagonal by
+				   // choosing the trapezoidal rule
+				   // for quadrature. Doing so we
+				   // don't really need the triple
+				   // loop over quadrature points,
+				   // indices $i$ and indices $j$ any
+				   // more and can, instead, just use
+				   // a double loop. The rest of the
+				   // function is obvious given what
+				   // we have discussed in many of the
+				   // previous tutorial programs.
+				   //
+				   // Note that at the time this
+				   // function is called, the
+				   // constraints object only contains
+				   // boundary value constraints; we
+				   // therefore do not have to pay
+				   // attention in the last
+				   // copy-local-to-global step to
+				   // preserve the values of matrix
+				   // entries that may later on be
+				   // constrained by the active set.
+				   //
+				   // Note also that the trick with
+				   // the trapezoidal rule only works
+				   // if we have in fact $Q_1$
+				   // elements. For higher order
+				   // elements, one would need to use
+				   // a quadrature formula that has
+				   // quadrature points at all the
+				   // support points of the finite
+				   // element. Constructing such a
+				   // quadrature formula isn't really
+				   // difficult, but not the point
+				   // here, and so we simply assert at
+				   // the top of the function that our
+				   // implicit assumption about the
+				   // finite element is in fact
+				   // satisfied.
   template <int dim>
   void
   ObstacleProblem<dim>::
-  assemble_mass_matrix (TrilinosWrappers::SparseMatrix &mass_matrix)
+  assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
   {
+    Assert (fe.degree == 1, ExcNotImplemented());
+
     const QTrapez<dim>        quadrature_formula;
     FEValues<dim>             fe_values (fe,
 					 quadrature_formula,
 					 update_values   |
-					 update_quadrature_points |
 					 update_JxW_values);
 
     const unsigned int        dofs_per_cell = fe.dofs_per_cell;
@@ -351,59 +455,135 @@ namespace Step41
 
 	for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
 	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      cell_matrix(i,j) += (fe_values.shape_value (i, q_point) *
-				   fe_values.shape_value (j, q_point) *
-				   fe_values.JxW (q_point));
+	    cell_matrix(i,i) += (fe_values.shape_value (i, q_point) *
+				 fe_values.shape_value (i, q_point) *
+				 fe_values.JxW (q_point));
 
 	cell->get_dof_indices (local_dof_indices);
 
-					 // This function apply the constraints
-					 // to the system matrix and system rhs.
-					 // The true parameter is set to make sure
-					 // that the system rhs contains correct
-					 // values in the rows with inhomogeneity
-					 // constraints.
 	constraints.distribute_local_to_global (cell_matrix,
 						local_dof_indices,
 						mass_matrix);
       }
   }
 
+
 				   // @sect4{ObstacleProblem::update_solution_and_constraints}
 
-				   // Updating of the active set which means to
-				   // set a inhomogeneity constraint in the
-				   // ConstraintMatrix. At the same time we set
-				   // the solution to the correct value - the obstacle value.
-				   // To control the active set we use the vector
-				   // active_set which contains a zero in a component
-				   // that is not in the active set and elsewise a
-				   // one. With the output file you can visualize it.
+				   // In a sense, this is the central
+				   // function of this program.  It
+				   // updates the active set of
+				   // constrained degrees of freedom
+				   // as discussed in the introduction
+				   // and computes a ConstraintMatrix
+				   // object from it that can then be
+				   // used to eliminate constrained
+				   // degrees of freedom from the
+				   // solution of the next
+				   // iteration. At the same time we
+				   // set the constrained degrees of
+				   // freedom of the solution to the
+				   // correct value, namely the height
+				   // of the obstacle.
+				   //
+				   // Fundamentally, the function is
+				   // rather simple: We have to loop
+				   // over all degrees of freedom and
+				   // check the sign of the function
+				   // $\Lambda^k_i + c([BU^k]_i -
+				   // G_i)$. To this end, we use the
+				   // formula given in the
+				   // introduction by which we can
+				   // compute the Lagrange multiplier
+				   // as the residual of the original
+				   // linear system (given via the
+				   // variables
+				   // <code>complete_system_matrix</code>
+				   // and
+				   // <code>complete_system_rhs</code>.
+				   // At the top of this function, we
+				   // compute this residual using a
+				   // function that is part of the
+				   // matrix classes (but
+				   // unfortunately for us computes
+				   // the residual with the wrong
+				   // sign).
   template <int dim>
   void
   ObstacleProblem<dim>::update_solution_and_constraints ()
   {
     std::cout << "   Updating active set..." << std::endl;
 
-    const Obstacle<dim>     obstacle;
-    unsigned int            counter_contact_constraints = 0;
+    const double penalty_parameter = 100.0;
 
-
-    TrilinosWrappers::Vector       force_residual (dof_handler.n_dofs());
-    complete_system_matrix.residual (force_residual,
+    TrilinosWrappers::Vector lambda (dof_handler.n_dofs());
+    complete_system_matrix.residual (lambda,
 				     solution, complete_system_rhs);
-    force_residual *= -1;
+    lambda *= -1;
 
+
+				     // The next step is to reset the
+				     // active set and constraints
+				     // objects and to start the loop
+				     // over all degrees of
+				     // freedom. This is made slightly
+				     // more complicated by the fact
+				     // that we can't just loop over
+				     // all elements of the solution
+				     // vector since there is no way
+				     // for us then to find out what
+				     // location a DoF is associated
+				     // with; however, we need this
+				     // location to test whether the
+				     // displacement of a DoF is
+				     // larger or smaller than the
+				     // height of the obstacle at this
+				     // location.
+				     //
+				     // We work around this by looping
+				     // over all cells and DoFs
+				     // defined on each of these
+				     // cells. We use here that the
+				     // displacement is described
+				     // using a $Q_1$ function for
+				     // which degrees of freedom are
+				     // always located on the vertices
+				     // of the cell; thus, we can get
+				     // the index of each degree of
+				     // freedom and its location by
+				     // asking the vertex for this
+				     // information. On the other
+				     // hand, this clearly wouldn't
+				     // work for higher order
+				     // elements, and so we add an
+				     // assertion that makes sure that
+				     // we only deal with elements for
+				     // which all degrees of freedom
+				     // are located in vertices to
+				     // avoid tripping ourselves with
+				     // non-functional code in case
+				     // someone wants to play with
+				     // increasing the polynomial
+				     // degree of the solution.
+				     //
+				     // The price to pay for having to
+				     // loop over cells rather than
+				     // DoFs is that we may encounter
+				     // some degrees of freedom more
+				     // than once, namely each time we
+				     // visit one of the cells
+				     // adjacent to a given vertex. We
+				     // will therefore have to keep
+				     // track which vertices we have
+				     // already touched and which we
+				     // haven't so far. We do so by
+				     // using an array of flags
+				     // <code>dof_touched</code>:
     constraints.clear();
-
-				     // to find and supply the constraints for the
-				     // obstacle condition
     active_set.clear ();
-    const double c = 100.0;
 
-    std::vector<bool> dof_touched (dof_handler.n_dofs(),
-				   false);
+    const Obstacle<dim> obstacle;
+    std::vector<bool>   dof_touched (dof_handler.n_dofs(), false);
 
     typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
@@ -417,22 +597,68 @@ namespace Step41
 
 	  const unsigned int dof_index = cell->vertex_dof_index (v,0);
 
-	  if (dof_touched[dof_index] == true)
+	  if (dof_touched[dof_index] == false)
+	    dof_touched[dof_index] = true;
+	  else
 	    continue;
 
-					   // the local row where
+					   // Now that we know that we
+					   // haven't touched this DoF
+					   // yet, let's get the value
+					   // of the displacement
+					   // function there as well
+					   // as the value of the
+					   // obstacle function and
+					   // use this to decide
+					   // whether the current DoF
+					   // belongs to the active
+					   // set. For that we use the
+					   // function given above and
+					   // in the introduction.
+					   //
+					   // If we decide that the
+					   // DoF should be part of
+					   // the active set, we add
+					   // its index to the active
+					   // set, introduce a
+					   // nonhomogeneous equality
+					   // constraint in the
+					   // ConstraintMatrix object,
+					   // and reset the solution
+					   // value to the height of
+					   // the obstacle. Finally,
+					   // the residual of the
+					   // non-contact part of the
+					   // system serves as an
+					   // additional control (the
+					   // residual equals the
+					   // remaining, unaccounted
+					   // forces, and should be
+					   // zero outside the contact
+					   // zone), so we zero out
+					   // the components of the
+					   // residual vector (i.e.,
+					   // the Lagrange multiplier
+					   // lambda) that correspond
+					   // to the area where the
+					   // body is in contact; at
+					   // the end of the loop over
+					   // all cells, the residual
+					   // will therefore only
+					   // consist of the residual
+					   // in the non-contact
+					   // zone. We output the norm
+					   // of this residual along
+					   // with the size of the
+					   // active set after the
+					   // loop.
 	  const double obstacle_value = obstacle.value (cell->vertex(v));
 	  const double solution_value = solution (dof_index);
 
-					   // To decide which dof belongs to the
-					   // active-set. For that we scale the
-					   // residual-vector with the cell-size and
-					   // the diag-entry of the mass-matrix.
-
-					   // TODO: I have to check the condition
-
-	  if (force_residual (dof_index) +
-	      c * diagonal_of_mass_matrix(dof_index) * (obstacle_value - solution_value)
+	  if (lambda (dof_index) +
+	      penalty_parameter *
+	      diagonal_of_mass_matrix(dof_index) *
+	      (obstacle_value - solution_value)
 	      >
 	      0)
 	    {
@@ -441,43 +667,57 @@ namespace Step41
 	      constraints.set_inhomogeneity (dof_index, obstacle_value);
 
 	      solution (dof_index) = obstacle_value;
-					       // the residual of the non-contact
-					       // part of the system serves as an
-					       // additional control which is not
-					       // necessary for for the primal-dual
-					       // active set strategy
-	      force_residual (dof_index) = 0;
 
-	      dof_touched[dof_index] = true;
+	      lambda (dof_index) = 0;
 	    }
 	}
     std::cout << "      Size of active set: " << active_set.n_elements()
 	      << std::endl;
 
-				     // To supply the boundary values of the
-				     // dirichlet-boundary in constraints
+    std::cout << "   Residual of the non-contact part of the system: "
+	      << lambda.l2_norm()
+	      << std::endl;
+
+				     // In a final step, we add to the
+				     // set of constraints on DoFs we
+				     // have so far from the active
+				     // set those that result from
+				     // Dirichlet boundary values, and
+				     // close the constraints object:
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      BoundaryValues<dim>(),
 					      constraints);
     constraints.close ();
-
-    std::cout << "   Residual of the non-contact part of the system: "
-	      << force_residual.l2_norm()
-	      << std::endl;
-
   }
 
 				   // @sect4{ObstacleProblem::solve}
 
+				   // There is nothing to say really
+				   // about the solve function. In the
+				   // context of a Newton method, we
+				   // are not typically interested in
+				   // very high accuracy (why ask for
+				   // a highly accurate solution of a
+				   // linear problem that we know only
+				   // gives us an approximation of the
+				   // solution of the nonlinear
+				   // problem), and so we use the
+				   // ReductionControl class that
+				   // stops iterations when either an
+				   // absolute tolerance is reached
+				   // (for which we choose $10^{-12}$)
+				   // or when the residual is reduced
+				   // by a certain factor (here,
+				   // $10^{-3}$).
   template <int dim>
   void ObstacleProblem<dim>::solve ()
   {
     std::cout << "   Solving system..." << std::endl;
 
-    ReductionControl        reduction_control (100, 1e-12, 1e-3);
-    SolverCG<TrilinosWrappers::Vector>   solver (reduction_control);
-    TrilinosWrappers::PreconditionAMG precondition;
+    ReductionControl                    reduction_control (100, 1e-12, 1e-3);
+    SolverCG<TrilinosWrappers::Vector>  solver (reduction_control);
+    TrilinosWrappers::PreconditionAMG   precondition;
     precondition.initialize (system_matrix);
 
     solver.solve (system_matrix, solution, system_rhs, precondition);
