@@ -532,11 +532,7 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 
 				     /**
 				      * Add a data vector together
-				      * with its name and the physical
-				      * unit (for example meter,
-				      * kelvin, etc). By default,
-				      * "<dimensionless>" is assumed
-				      * for the units.
+				      * with its name.
 				      *
 				      * A pointer to the vector is
 				      * stored, so you have to make
