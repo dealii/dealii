@@ -48,7 +48,9 @@ Newton iteration 18
 The iterations end once the active set doesn't change any more (it has
 5,399 constrained degrees of freedom at that point). The algebraic
 precondition is apparently working nicely since we only need 4-6 CG
-iterations to solve the linear system.
+iterations to solve the linear system (although this also has a lot to
+do with the fact that we are not asking for very high accuracy of the
+linear solver).
 
 More revealing is to look at a sequence of graphical output files
 (every third step is shown, with the number of the iteration in the
