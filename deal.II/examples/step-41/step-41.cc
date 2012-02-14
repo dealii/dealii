@@ -86,7 +86,6 @@ namespace Step41
       TrilinosWrappers::Vector       solution;
       TrilinosWrappers::Vector       system_rhs;
       TrilinosWrappers::Vector       complete_system_rhs;
-      TrilinosWrappers::Vector       force_residual;
       TrilinosWrappers::Vector       diagonal_of_mass_matrix;
   };
 
@@ -233,7 +232,6 @@ namespace Step41
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
     complete_system_rhs.reinit (dof_handler.n_dofs());
-    force_residual.reinit (dof_handler.n_dofs());
 
 				     // to compute the factor which is used
 				     // to scale the residual. You can consider
@@ -391,6 +389,12 @@ namespace Step41
     const Obstacle<dim>     obstacle;
     unsigned int            counter_contact_constraints = 0;
 
+
+    TrilinosWrappers::Vector       force_residual (dof_handler.n_dofs());
+    complete_system_matrix.residual (force_residual,
+				     solution, complete_system_rhs);
+    force_residual *= -1;
+
     constraints.clear();
 
 				     // to find and supply the constraints for the
@@ -485,18 +489,25 @@ namespace Step41
 	      <<  reduction_control.last_step()
 	      << " CG iterations."
 	      << std::endl;
-
-
-    complete_system_matrix.residual (force_residual,
-				     solution, complete_system_rhs);
-    force_residual *= -1;
   }
+
 
 				   // @sect4{ObstacleProblem::output_results}
 
-				   // We use the vtk-format for the output.
-				   // The file contains the displacement,
-				   // the residual and active set vectors.
+				   // We use the vtk-format for the
+				   // output.  The file contains the
+				   // displacement and a numerical
+				   // represenation of the active
+				   // set. The function looks standard
+				   // but note that we can add an
+				   // IndexSet object to the DataOut
+				   // object in exactly the same way
+				   // as a regular solution vector: it
+				   // is simply interpreted as a
+				   // function that is either zero
+				   // (when a degree of freedom is not
+				   // part of the IndexSet) or one (if
+				   // it is).
   template <int dim>
   void ObstacleProblem<dim>::output_results (const unsigned int iteration) const
   {
@@ -506,16 +517,12 @@ namespace Step41
 
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "displacement");
-    data_out.add_data_vector (force_residual, "residual");
-
-    Vector<double> numerical_active_set (dof_handler.n_dofs());
-    active_set.fill_binary_vector (numerical_active_set);
-    data_out.add_data_vector (numerical_active_set, "active_set");
+    data_out.add_data_vector (active_set, "active_set");
 
     data_out.build_patches ();
 
     std::ofstream output_vtk ((std::string("output_") +
-			       Utilities::int_to_string (iteration) +
+			       Utilities::int_to_string (iteration, 3) +
 			       ".vtk").c_str ());
     data_out.write_vtk (output_vtk);
   }
@@ -524,12 +531,42 @@ namespace Step41
 
 				   // @sect4{ObstacleProblem::run}
 
-				   // This is the function which has the
-				   // top-level control over everything.
-				   // Here the active set method is implemented.
-
-				   // TODO: I have to compare it with the algorithm
-				   // in the Wohlmuth-paper
+				   // This is the function which has
+				   // the top-level control over
+				   // everything.  It is not very
+				   // long, and in fact rather
+				   // straightforward: in every
+				   // iteration of the active set
+				   // method, we assemble the linear
+				   // system, solve it, update the
+				   // active set and project the
+				   // solution back to the feasible
+				   // set, and then output the
+				   // results. The iteration is
+				   // terminated whenever the active
+				   // set has not changed in the
+				   // previous iteration.
+				   //
+				   // The only trickier part is that
+				   // we have to save the linear
+				   // system (i.e., the matrix and
+				   // right hand side) after
+				   // assembling it in the first
+				   // iteration. The reason is that
+				   // this is the only step where we
+				   // can access the linear system as
+				   // built without any of the contact
+				   // constraints active. We need this
+				   // to compute the residual of the
+				   // solution at other iterations,
+				   // but in other iterations that
+				   // linear system we form has the
+				   // rows and columns that correspond
+				   // to constrained degrees of
+				   // freedom eliminated, and so we
+				   // can no longer access the full
+				   // residual of the original
+				   // equation.
   template <int dim>
   void ObstacleProblem<dim>::run ()
   {
@@ -545,25 +582,17 @@ namespace Step41
 
 	if (iteration == 0)
 	  {
-					     // to save the system_matrix and
-					     // the rhs to compute the
-					     // residual in every step of the
-					     // active-set-iteration
 	    complete_system_matrix.copy_from (system_matrix);
 	    complete_system_rhs = system_rhs;
 	  }
 
 	solve ();
-
 	update_solution_and_constraints ();
-
 	output_results (iteration);
 
-					 // if both the old and the new
-					 // active set are identical the
-					 // computation stops
 	if (active_set == active_set_old)
 	  break;
+
 	active_set_old = active_set;
 
 	std::cout << std::endl;
@@ -574,79 +603,13 @@ namespace Step41
 
                                  // @sect3{The <code>main</code> function}
 
-				 // And this is the main function. It also
-				 // looks mostly like in step-3, but if you
-				 // look at the code below, note how we first
-				 // create a variable of type
-				 // <code>ObstacleProblem@<2@></code> (forcing
-				 // the compiler to compile the class template
-				 // with <code>dim</code> replaced by
-				 // <code>2</code>) and run a 2d simulation,
-				 // and then we do the whole thing over in 3d.
-				 //
-				 // In practice, this is probably not what you
-				 // would do very frequently (you probably
-				 // either want to solve a 2d problem, or one
-				 // in 3d, but not both at the same
-				 // time). However, it demonstrates the
-				 // mechanism by which we can simply change
-				 // which dimension we want in a single place,
-				 // and thereby force the compiler to
-				 // recompile the dimension independent class
-				 // templates for the dimension we
-				 // request. The emphasis here lies on the
-				 // fact that we only need to change a single
-				 // place. This makes it rather trivial to
-				 // debug the program in 2d where computations
-				 // are fast, and then switch a single place
-				 // to a 3 to run the much more computing
-				 // intensive program in 3d for `real'
-				 // computations.
-				 //
-				 // Each of the two blocks is enclosed in
-				 // braces to make sure that the
-				 // <code>laplace_problem_2d</code> variable
-				 // goes out of scope (and releases the memory
-				 // it holds) before we move on to allocate
-				 // memory for the 3d case. Without the
-				 // additional braces, the
-				 // <code>laplace_problem_2d</code> variable
-				 // would only be destroyed at the end of the
-				 // function, i.e. after running the 3d
-				 // problem, and would needlessly hog memory
-				 // while the 3d run could actually use it.
-                                 //
-                                 // Finally, the first line of the function is
-                                 // used to suppress some output.  Remember
-                                 // that in the previous example, we had the
-                                 // output from the linear solvers about the
-                                 // starting residual and the number of the
-                                 // iteration where convergence was
-                                 // detected. This can be suppressed through
-                                 // the <code>deallog.depth_console(0)</code>
-                                 // call.
-                                 //
-                                 // The rationale here is the following: the
-                                 // deallog (i.e. deal-log, not de-allog)
-                                 // variable represents a stream to which some
-                                 // parts of the library write output. It
-                                 // redirects this output to the console and
-                                 // if required to a file. The output is
-                                 // nested in a way so that each function can
-                                 // use a prefix string (separated by colons)
-                                 // for each line of output; if it calls
-                                 // another function, that may also use its
-                                 // prefix which is then printed after the one
-                                 // of the calling function. Since output from
-                                 // functions which are nested deep below is
-                                 // usually not as important as top-level
-                                 // output, you can give the deallog variable
-                                 // a maximal depth of nested output for
-                                 // output to console and file. The depth zero
-                                 // which we gave here means that no output is
-                                 // written. By changing it you can get more
-                                 // information about the innards of the
-                                 // library.
+				 // And this is the main function. It
+				 // follows the pattern of all other
+				 // main functions. The call to
+				 // initialize MPI exists because the
+				 // Trilinos library upon which we
+				 // build our linear solvers in this
+				 // program requires it.
 int main (int argc, char *argv[])
 {
   try
