@@ -592,16 +592,14 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      *
 				      * If it is a vector holding DoF
 				      * data, the names given shall be
-				      * one for each component, if the
-				      * finite element in use is
-				      * composed of several
-				      * subelements.  If it is a
-				      * finite element composed of
-				      * only one subelement, then
-				      * there is another function
-				      * following which takes a single
-				      * name instead of a vector of
-				      * names.
+				      * one for each component of the
+				      * underlying finite element.  If
+				      * it is a finite element
+				      * composed of only one
+				      * subelement, then there is
+				      * another function following
+				      * which takes a single name
+				      * instead of a vector of names.
 				      *
 				      * The data_component_interpretation
 				      * argument contains information about
@@ -648,11 +646,17 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * class to see which characters
 				      * are valid and which are not.
 				      *
-				      * The actual type for the template
-				      * argument may be any vector type from
-				      * which FEValues can extract values
-				      * on a cell using the
-				      * FEValuesBase::get_function_values() function.
+				      * @note The actual type for the
+				      * vector argument may be any
+				      * vector type from which
+				      * FEValues can extract values on
+				      * a cell using the
+				      * FEValuesBase::get_function_values()
+				      * function. In particular, this
+				      * includes all of the usual
+				      * vector types, but also
+				      * IndexSet (see step-41 for a
+				      * use of this).
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR                   &data,
@@ -715,11 +719,17 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * type is also known implicitly and does
 				      * not have to be given.
 				      *
-				      * The actual type for the template
-				      * argument may be any vector type from
-				      * which FEValues can extract values
-				      * on a cell using the
-				      * FEValuesBase::get_function_values() function.
+				      * @note The actual type for the
+				      * vector argument may be any
+				      * vector type from which
+				      * FEValues can extract values on
+				      * a cell using the
+				      * FEValuesBase::get_function_values()
+				      * function. In particular, this
+				      * includes all of the usual
+				      * vector types, but also
+				      * IndexSet (see step-41 for a
+				      * use of this).
 				      */
     template <class VECTOR>
     void add_data_vector (const VECTOR                           &data,

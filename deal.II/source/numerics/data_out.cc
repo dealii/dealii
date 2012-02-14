@@ -96,6 +96,70 @@ namespace internal
 {
   namespace DataOut
   {
+    template <class DH>
+    DataEntryBase<DH>::DataEntryBase (const std::vector<std::string> &names_in,
+				      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+		    :
+		    names(names_in),
+		    data_component_interpretation (data_component_interpretation),
+		    postprocessor(0, typeid(*this).name()),
+		    n_output_variables(names.size())
+    {
+      Assert (names.size() == data_component_interpretation.size(),
+	      ExcDimensionMismatch(data_component_interpretation.size(),
+				   names.size()));
+
+				       // check that the names use only allowed
+				       // characters
+				       // check names for invalid characters
+      for (unsigned int i=0; i<names.size(); ++i)
+	Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+					   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+					   "0123456789_<>()") == std::string::npos,
+		typename dealii::DataOut<DH::dimension>::
+		ExcInvalidCharacter (names[i],
+				     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+								"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+								"0123456789_<>()")));
+    }
+
+
+
+    template <class DH>
+    DataEntryBase<DH>::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor)
+		    :
+		    names(data_postprocessor->get_names()),
+		    data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
+		    postprocessor(data_postprocessor, typeid(*this).name()),
+		    n_output_variables(names.size())
+    {
+      Assert (data_postprocessor->get_names().size()
+	      ==
+	      data_postprocessor->get_data_component_interpretation().size(),
+	      ExcDimensionMismatch (data_postprocessor->get_names().size(),
+				    data_postprocessor->get_data_component_interpretation().size()));
+
+				       // check that the names use only allowed
+				       // characters
+      for (unsigned int i=0; i<names.size(); ++i)
+	Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+					   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+					   "0123456789_<>()") == std::string::npos,
+		typename dealii::DataOut<DH::dimension>::
+		ExcInvalidCharacter (names[i],
+				     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+								"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+								"0123456789_<>()")));
+    }
+
+
+
+    template <class DH>
+    DataEntryBase<DH>::~DataEntryBase ()
+    {}
+
+
+
                                      /**
                                       * Class that stores a pointer to a
                                       * vector of type equal to the template
@@ -238,70 +302,6 @@ namespace internal
 
 
 
-    template <class DH>
-    DataEntryBase<DH>::DataEntryBase (const std::vector<std::string> &names_in,
-				      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
-		    :
-		    names(names_in),
-		    data_component_interpretation (data_component_interpretation),
-		    postprocessor(0, typeid(*this).name()),
-		    n_output_variables(names.size())
-    {
-      Assert (names.size() == data_component_interpretation.size(),
-	      ExcDimensionMismatch(data_component_interpretation.size(),
-				   names.size()));
-
-				       // check that the names use only allowed
-				       // characters
-				       // check names for invalid characters
-      for (unsigned int i=0; i<names.size(); ++i)
-	Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-					   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-					   "0123456789_<>()") == std::string::npos,
-		typename dealii::DataOut<DH::dimension>::
-		ExcInvalidCharacter (names[i],
-				     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-								"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-								"0123456789_<>()")));
-    }
-
-
-
-    template <class DH>
-    DataEntryBase<DH>::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor)
-		    :
-		    names(data_postprocessor->get_names()),
-		    data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
-		    postprocessor(data_postprocessor, typeid(*this).name()),
-		    n_output_variables(names.size())
-    {
-      Assert (data_postprocessor->get_names().size()
-	      ==
-	      data_postprocessor->get_data_component_interpretation().size(),
-	      ExcDimensionMismatch (data_postprocessor->get_names().size(),
-				    data_postprocessor->get_data_component_interpretation().size()));
-
-				       // check that the names use only allowed
-				       // characters
-      for (unsigned int i=0; i<names.size(); ++i)
-	Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-					   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-					   "0123456789_<>()") == std::string::npos,
-		typename dealii::DataOut<DH::dimension>::
-		ExcInvalidCharacter (names[i],
-				     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-								"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-								"0123456789_<>()")));
-    }
-
-
-
-    template <class DH>
-    DataEntryBase<DH>::~DataEntryBase ()
-    {}
-
-
-
     template <class DH, class VectorType>
     DataEntry<DH,VectorType>::
     DataEntry (const VectorType                       *data,
@@ -324,13 +324,33 @@ namespace internal
     {}
 
 
+    namespace
+    {
+      template <class VectorType>
+      double
+      get_vector_element (const VectorType &vector,
+			  const unsigned int cell_number)
+      {
+	return vector[cell_number];
+      }
+
+
+      double
+      get_vector_element (const IndexSet &is,
+			  const unsigned int cell_number)
+      {
+	return (is.is_element(cell_number) ? 1 : 0);
+      }
+    }
+
+
 
     template <class DH, class VectorType>
     double
     DataEntry<DH,VectorType>::
     get_cell_data_value (const unsigned int cell_number) const
     {
-      return (*vector)(cell_number);
+      return get_vector_element(*vector, cell_number);
     }
 
 

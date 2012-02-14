@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -33,6 +33,41 @@
 #include <iomanip>
 
 DEAL_II_NAMESPACE_OPEN
+
+
+namespace
+{
+  template <class VectorType>
+  double
+  get_vector_element (const VectorType &vector,
+		      const unsigned int cell_number)
+  {
+    return vector[cell_number];
+  }
+
+
+  double
+  get_vector_element (const IndexSet &is,
+		      const unsigned int cell_number)
+  {
+    return (is.is_element(cell_number) ? 1 : 0);
+  }
+
+
+
+  template <typename VectorType>
+  struct ValueType
+  {
+      typedef typename VectorType::value_type type;
+  };
+
+
+  template <>
+  struct ValueType<IndexSet>
+  {
+      typedef double type;
+  };
+}
 
 
 namespace
@@ -356,7 +391,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (values.begin(), values.end(), value_type());
@@ -398,7 +433,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (gradients.begin(), gradients.end(), gradient_type());
@@ -441,7 +476,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (hessians.begin(), hessians.end(), hessian_type());
@@ -484,7 +519,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (laplacians.begin(), laplacians.end(), value_type());
@@ -526,7 +561,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (values.begin(), values.end(), value_type());
@@ -588,7 +623,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (gradients.begin(), gradients.end(), gradient_type());
@@ -651,7 +686,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (symmetric_gradients.begin(), symmetric_gradients.end(),
@@ -716,7 +751,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (divergences.begin(), divergences.end(), divergence_type());
@@ -774,7 +809,7 @@ namespace FEValuesViews
      Assert (fe_function.size () == fe_values.present_cell->n_dofs_for_dof_handler (),
          ExcDimensionMismatch (fe_function.size (), fe_values.present_cell->n_dofs_for_dof_handler ()));
      // get function values of dofs on this cell
-     dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+     dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
      fe_values.present_cell->get_interpolated_dof_values (fe_function, dof_values);
 
      std::fill (curls.begin (), curls.end (), curl_type ());
@@ -947,7 +982,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (hessians.begin(), hessians.end(), hessian_type());
@@ -1010,7 +1045,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type> dof_values (fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill (laplacians.begin(), laplacians.end(), value_type());
@@ -1073,7 +1108,7 @@ namespace FEValuesViews
 
 				     // get function values of dofs
 				     // on this cell
-    dealii::Vector<typename InputVector::value_type > dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type > dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill(values.begin(), values.end(), value_type());
@@ -1138,7 +1173,7 @@ namespace FEValuesViews
 
                                      // get function values of dofs
                                      // on this cell
-    dealii::Vector<typename InputVector::value_type > dof_values(fe_values.dofs_per_cell);
+    dealii::Vector<typename ValueType<InputVector>::type > dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
     std::fill(divergences.begin(), divergences.end(), divergence_type());
@@ -1336,6 +1371,15 @@ class FEValuesBase<dim,spacedim>::CellIteratorBase
     n_dofs_for_dof_handler () const = 0;
 
 #include "fe_values.decl.1.inst"
+
+				      /// Call
+				      /// @p get_interpolated_dof_values
+				      /// of the iterator with the
+				      /// given arguments.
+    virtual
+    void
+    get_interpolated_dof_values (const IndexSet &in,
+				 Vector<double> &out) const = 0;
 };
 
 
@@ -1396,6 +1440,15 @@ class FEValuesBase<dim,spacedim>::CellIterator : public FEValuesBase<dim,spacedi
     n_dofs_for_dof_handler () const;
 
 #include "fe_values.decl.2.inst"
+
+				      /// Call
+				      /// @p get_interpolated_dof_values
+				      /// of the iterator with the
+				      /// given arguments.
+    virtual
+    void
+    get_interpolated_dof_values (const IndexSet &in,
+				 Vector<double> &out) const;
 
   private:
 				     /**
@@ -1491,6 +1544,15 @@ class FEValuesBase<dim,spacedim>::TriaCellIterator : public FEValuesBase<dim,spa
 
 #include "fe_values.decl.2.inst"
 
+				      /// Call
+				      /// @p get_interpolated_dof_values
+				      /// of the iterator with the
+				      /// given arguments.
+    virtual
+    void
+    get_interpolated_dof_values (const IndexSet &in,
+				 Vector<double> &out) const;
+
   private:
 				     /**
 				      * Copy of the iterator which
@@ -1548,6 +1610,23 @@ FEValuesBase<dim,spacedim>::CellIterator<CI>::n_dofs_for_dof_handler () const
 #include "fe_values.impl.1.inst"
 
 
+template <int dim, int spacedim>
+template <typename CI>
+void
+FEValuesBase<dim,spacedim>::CellIterator<CI>::
+get_interpolated_dof_values (const IndexSet &in,
+			     Vector<double>       &out) const
+{
+  Assert (cell->has_children() == false, ExcNotImplemented());
+
+  std::vector<unsigned int> dof_indices (cell->get_fe().dofs_per_cell);
+  cell->get_dof_indices (dof_indices);
+
+  for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+    out[i] = (in.is_element (dof_indices[i]) ? 1 : 0);
+}
+
+
 /* ---------------- FEValuesBase<dim,spacedim>::TriaCellIterator --------- */
 
 template <int dim, int spacedim>
@@ -1590,6 +1669,16 @@ FEValuesBase<dim,spacedim>::TriaCellIterator::n_dofs_for_dof_handler () const
 
 
 #include "fe_values.impl.2.inst"
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim,spacedim>::TriaCellIterator::
+get_interpolated_dof_values (const IndexSet &,
+			     Vector<double>       &) const
+{
+  Assert (false, ExcMessage (message_string));
+}
 
 
 
@@ -1730,7 +1819,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -1818,7 +1907,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 				   // innermost loop)
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
-      const double value = fe_function(indices[shape_func]);
+      const double value = get_vector_element (fe_function, indices[shape_func]);
       if (value == 0.)
 	continue;
 
@@ -1862,7 +1951,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -1997,7 +2086,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   for (unsigned int mc = 0; mc < component_multiple; ++mc)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	const double value = get_vector_element (fe_function, indices[shape_func+mc*dofs_per_cell]);
 	if (value == 0.)
 	  continue;
 
@@ -2101,7 +2190,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   for (unsigned int mc = 0; mc < component_multiple; ++mc)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	const double value = get_vector_element (fe_function, indices[shape_func+mc*dofs_per_cell]);
 	if (value == 0.)
 	  continue;
 
@@ -2171,7 +2260,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -2261,7 +2350,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 				   // in the innermost loop)
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
-      const double value = fe_function(indices[shape_func]);
+      const double value = get_vector_element (fe_function, indices[shape_func]);
       if (value == 0.)
 	continue;
 
@@ -2299,7 +2388,7 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -2417,7 +2506,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   for (unsigned int mc = 0; mc < component_multiple; ++mc)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	const double value = get_vector_element (fe_function, indices[shape_func+mc*dofs_per_cell]);
 	if (value == 0.)
 	  continue;
 
@@ -2487,7 +2576,7 @@ get_function_hessians (const InputVector           &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -2545,7 +2634,7 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
 				   // functions
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
-      const double value = fe_function(indices[shape_func]);
+      const double value = get_vector_element (fe_function, indices[shape_func]);
       if (value == 0.)
 	continue;
 
@@ -2584,7 +2673,7 @@ get_function_hessians (const InputVector                         &fe_function,
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -2708,7 +2797,7 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
   for (unsigned int mc = 0; mc < component_multiple; ++mc)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	const double value = get_vector_element (fe_function, indices[shape_func+mc*dofs_per_cell]);
 	if (value == 0.)
 	  continue;
 
@@ -2778,7 +2867,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -2842,7 +2931,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 				   // the hessians and get their trace
   for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
     {
-      const double value = fe_function(indices[shape_func]);
+      const double value = get_vector_element (fe_function, indices[shape_func]);
       if (value == 0.)
 	continue;
 
@@ -2887,7 +2976,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
 				   // get function values of dofs
 				   // on this cell
-  Vector<typename InputVector::value_type> dof_values (dofs_per_cell);
+  Vector<typename ValueType<InputVector>::type> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
 
 				   // initialize with zero
@@ -2994,7 +3083,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   for (unsigned int mc = 0; mc < component_multiple; ++mc)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	const double value = get_vector_element (fe_function, indices[shape_func+mc*dofs_per_cell]);
 	if (value == 0.)
 	  continue;
 
@@ -3100,7 +3189,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
   for (unsigned int mc = 0; mc < component_multiple; ++mc)
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-	const double value = fe_function(indices[shape_func+mc*dofs_per_cell]);
+	const double value = get_vector_element (fe_function, indices[shape_func+mc*dofs_per_cell]);
 	if (value == 0.)
 	  continue;
 

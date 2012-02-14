@@ -34,6 +34,18 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
+<li> New: Functions like FEValues::get_function_values have long been
+able to extract values from pretty much any vector kind given to it (e.g.
+of kind Vector, BlockVector, PETScWrappers::Vector, etc). The list of
+allowed "vector" types now also includes IndexSet, which is interpreted
+as a vector of elements that are either zero or one, depending on whether
+an index is in the IndexSet or not.
+<br>
+As a consequence of this, the DataOut::add_data_vector functions now also
+work for such types of vectors, a use demonstrated in step-41.
+<br>
+(Wolfgang Bangerth, 2012/02/14)
+
 <li> New: It has long been a nuisance that the deal.II vector classes
 could only be accessed using <code>operator()</code> whereas the C++
 <code>std::vector</code> class required <code>operator[]</code>. This
