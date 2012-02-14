@@ -73,6 +73,12 @@ very similar to the non-distributed class Vector<Number>.
 <br>
 (Katharina Kormann, Martin Kronbichler, 2012/01/25)
 
+<li> Fixed: The <code>common/scripts/make_dependencies</code> program
+now behaves like the C++ compiler when
+searching include paths for <code># include "..."</code> directives.
+<br>
+(Timo Heister, 2012/01/10)
+
 <li> Fixed: The Intel compiler complains that it can't copy Trilinos vector
 reference objects, preventing the compiling of step-32. This is now fixed.
 <br>
@@ -153,11 +159,6 @@ contained a rounding bug that often produced wrong results.
 <li> Improved: Utilities::break_text_into_lines now also splits the string at \n.
 <br>
 (Timo Heister, 2012/01/17)
-
-<li> Fixed: make_dependencies now behaves like the c++ compiler when
-searching include paths for #include "..." directives.
-<br>
-(Timo Heister, 2012/01/10)
 
 <li> Fixed: When <code>./configure</code> does not detect the presence
 of <code>zlib</code>, writing output in VTU format failed to produce
