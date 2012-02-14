@@ -1,6 +1,20 @@
 <h1>Results</h1>
 
-...
+
+Still to do:
+- play a bit with beta, c_R, CFL
+- switch back to residual-based viscosity
+
+
+The output of this program is not really much different from that of
+step-21: it solves the same problem, after all. Of more importance are
+quantitative metrics such as the accuracy of the solution as well as
+the time needed to compute it. These are documented in detail in the
+two publications listed at the top of this page and we won't repeat
+them here.
+
+That said, no tutorial program is complete without a couple of good
+pictures, so here is some output of a run in 3d:
 
 <table align="center" class="tutorial" cellspacing="3" cellpadding="3">
   <tr>
