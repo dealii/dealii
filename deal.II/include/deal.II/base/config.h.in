@@ -351,6 +351,9 @@
 /* Define to 1 if you have the `dstev_' function. */
 #undef HAVE_DSTEV_
 
+/* Define to 1 if you have the `dsygvx_' function. */
+#undef HAVE_DSYGVX_
+
 /* Define to 1 if you have the `dsygv_' function. */
 #undef HAVE_DSYGV_
 

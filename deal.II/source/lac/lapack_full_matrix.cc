@@ -436,6 +436,117 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
 
 template <typename number>
 void
+LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
+  LAPACKFullMatrix<number> & B,
+  const number lower_bound,
+  const number upper_bound,
+  const number abs_accuracy,
+  Vector<number> & eigenvalues,
+  std::vector<Vector<number> > & eigenvectors,
+  const int itype)
+{
+  Assert(state == matrix, ExcState(state));
+  const int nn = (this->n_cols() > 0 ? this->n_cols() : 1);
+  Assert(static_cast<unsigned int>(nn) == this->n_rows(), ExcNotQuadratic());
+  Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
+  Assert(static_cast<unsigned int>(nn) == B.n_cols(), 
+	 ExcDimensionMismatch (nn, B.n_cols()));
+
+  wr.resize(nn);
+  LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
+
+  number* values_A = const_cast<number*> (this->data());
+  number* values_B = const_cast<number*> (B.data());
+  number* values_eigenvectors = const_cast<number*> (matrix_eigenvectors.data());
+  
+  int info(0),
+      lwork(1),
+      n_eigenpairs(0);
+  const char * const jobz(&V);
+  const char * const uplo(&U);
+  const char * const range(&V);
+  const int * const  dummy(&one);
+  std::vector<int> iwork(static_cast<unsigned int> (5*nn));
+  std::vector<int> ifail(static_cast<unsigned int> (nn));
+  
+  
+				   // Optimal workspace query:
+
+				   // The LAPACK routine ?SYGVX requires
+				   // a sufficient large workspace variable,
+				   // minimum requirement is
+				   //    work.size>=3*nn-1.
+				   // However, to improve performance, a
+				   // somewhat larger workspace may be needed.
+  
+				   // SOME implementations of the LAPACK routine
+				   // provide a workspace query call,
+				   //   info:=0, lwork:=-1
+				   // which returns an optimal value for the
+				   // size of the workspace array
+				   // (the PETSc 2.3.0 implementation does NOT
+				   // provide this functionality!).
+
+				   // define the DEAL_II_LIBLAPACK_NOQUERYMODE flag to
+				   // disable the workspace query.
+#ifndef DEAL_II_LIBLAPACK_NOQUERYMODE
+  lwork = -1;
+  work.resize(1);
+  
+  sygvx (&itype, jobz, range, uplo, &nn, values_A, &nn,
+         values_B, &nn, &lower_bound, &upper_bound,
+         dummy, dummy, &abs_accuracy, &n_eigenpairs,
+         &wr[0], values_eigenvectors, &nn, &work[0],
+         &lwork, &iwork[0], &ifail[0], &info);
+				   // sygvx returns info=0 on
+				   // success. Since we only queried
+				   // the optimal size for work,
+				   // everything else would not be
+				   // acceptable.
+  Assert (info == 0, ExcInternalError());
+				   // Allocate working array according
+				   // to suggestion.
+  lwork = (int) (work[0]+.1);
+#else
+  lwork = 8*nn > 1 ? 8*nn : 1; // no query mode
+#endif
+				   // resize workspace arrays
+  work.resize(static_cast<unsigned int> (lwork));
+
+				   // Finally compute the generalized
+				   // eigenvalues.
+  sygvx (&itype, jobz, range, uplo, &nn, values_A, &nn,
+         values_B, &nn, &lower_bound, &upper_bound,
+         dummy, dummy, &abs_accuracy, &n_eigenpairs,
+         &wr[0], values_eigenvectors, &nn, &work[0],
+         &lwork, &iwork[0], &ifail[0], &info);
+
+				   // Negative return value implies a
+				   // wrong argument. This should be
+				   // internal.
+  Assert (info >=0, ExcInternalError());
+  if (info != 0)
+    std::cerr << "LAPACK error in sygv" << std::endl;
+
+  eigenvalues.reinit(n_eigenpairs);
+  eigenvectors.resize(n_eigenpairs);
+  for(unsigned int i=0; i < static_cast<unsigned int> (n_eigenpairs); ++i)
+  {
+    eigenvalues(i) = wr[i];
+    unsigned int col_begin(i*nn);
+    eigenvectors[i].reinit(nn, true);
+    for (unsigned int j=0; j < static_cast<unsigned int> (nn); ++j)
+    {
+      eigenvectors[i](j) = values_eigenvectors[col_begin+j];
+    }
+  }
+
+  state = LAPACKSupport::State(unusable);
+}
+
+
+template <typename number>
+void
 LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   LAPACKFullMatrix<number> & B,
   std::vector<Vector<number> > & eigenvectors,

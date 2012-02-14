@@ -326,7 +326,7 @@ class LAPACKFullMatrix : public TransposeTable<number>
 
 				     /**
 				      * Compute generalized eigenvalues
-				      * and (optionally) eigenvectors of
+				      * and eigenvectors of
 				      * a real generalized symmetric
 				      * eigenproblem of the form
 				      * itype = 1: $Ax=\lambda B x$
@@ -335,17 +335,53 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * where A is this matrix.
 				      * A and B are assumed to be symmetric,
 				      * and B has to be positive definite.
+				      * Only eigenvalues in the interval
+				      * (lower_bound, upper_bound] are
+				      * computed with the absolute tolerance
+				      * abs_accuracy.
+				      * An approximate eigenvalue is accepted
+				      * as converged when it is determined to
+				      * lie in an interval [a,b] of width less
+				      * than or equal to abs_accuracy + eps * max( |a|,|b| ) ,
+                                      * where eps is the machine precision.
+                                      * If abs_accuracy is less than
+                                      * or equal to zero, then  eps*|t| will 
+                                      * be used in its place, where |t| is the 
+                                      * 1-norm of the tridiagonal matrix obtained
+                                      * by reducing A to tridiagonal form.
+                                      * Eigenvalues will be computed most accurately
+                                      * when abs_accuracy is set to twice the 
+                                      * underflow threshold, not zero. 
 				      * After this routine has
-				      * been called, eigenvalues can
-				      * be retrieved using the
-				      * eigenvalue() function. The
-				      * matrix itself will be
-				      * LAPACKSupport::unusable after
-				      * this operation. The number of
-				      * computed eigenvectors is equal
-				      * to eigenvectors.size()
+				      * been called, all eigenvalues in
+				      * (lower_bound, upper_bound] will be
+				      * stored in eigenvalues and the
+				      * corresponding eigenvectors will be stored
+				      * in eigenvectors, whose dimension is set
+				      * accordingly.
 				      *
-				      * Note that the function does
+				      * @note Calls the LAPACK
+				      * function Xsygvx. For this to
+				      * work, ./configure has to
+				      * be told to use LAPACK.
+				      */
+    void compute_generalized_eigenvalues_symmetric(
+                              LAPACKFullMatrix<number> & B,
+                              const number lower_bound,
+                              const number upper_bound,
+                              const number abs_accuracy,
+                              Vector<number> & eigenvalues,
+                              std::vector<Vector<number> > & eigenvectors,
+                              const int itype = 1);
+
+				     /**
+				      * Same as the other
+				      * compute_generalized_eigenvalues_symmetric
+				      * function except that all
+				      * eigenvalues are computed
+				      * and the tolerance is set
+				      * automatically.
+				      * Note that this function does
 				      * not return the computed
 				      * eigenvalues right away since
 				      * that involves copying data
@@ -362,7 +398,12 @@ class LAPACKFullMatrix : public TransposeTable<number>
 				      * eigenvalues and have a
 				      * separate function that returns
 				      * whatever eigenvalue is
-				      * requested.
+				      * requested. Eigenvalues can
+				      * be retrieved using the
+				      * eigenvalue() function.
+				      * The number of computed 
+				      * eigenvectors is equal
+				      * to eigenvectors.size()
 				      *
 				      * @note Calls the LAPACK
 				      * function Xsygv. For this to
