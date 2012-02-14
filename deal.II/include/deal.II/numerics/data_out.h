@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,6 +36,190 @@ namespace internal
 {
   namespace DataOut
   {
+    				     /**
+                                      * For each vector that has been added
+                                      * through the add_data_vector()
+                                      * functions, we need to keep track of a
+                                      * pointer to it, and allow data
+                                      * extraction from it when we generate
+                                      * patches. Unfortunately, we need to do
+                                      * this for a number of different vector
+                                      * types. Fortunately, they all have the
+                                      * same interface. So the way we go is to
+                                      * have a base class that provides the
+                                      * functions to access the vector's
+                                      * information, and to have a derived
+                                      * template class that can be
+                                      * instantiated for each vector
+                                      * type. Since the vectors all have the
+                                      * same interface, this is no big
+                                      * problem, as they can all use the same
+                                      * general templatized code.
+                                      *
+                                      * @author Wolfgang Bangerth, 2004
+				      */
+    template <class DH>
+    class DataEntryBase
+    {
+      public:
+					 /**
+					  * Constructor. Give a list of names
+					  * for the individual components of
+					  * the vector and their
+					  * interpretation as scalar or vector
+					  * data. This constructor assumes
+					  * that no postprocessor is going to
+					  * be used.
+					  */
+	DataEntryBase (const std::vector<std::string> &names,
+		       const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
+
+					 /**
+					  * Constructor when a data
+					  * postprocessor is going to be
+					  * used. In that case, the names and
+					  * vector declarations are going to
+					  * be aquired from the postprocessor.
+					  */
+	DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor);
+
+                                         /**
+                                          * Destructor made virtual.
+                                          */
+        virtual ~DataEntryBase ();
+
+                                         /**
+                                          * Assuming that the stored vector is
+                                          * a cell vector, extract the given
+                                          * element from it.
+                                          */
+        virtual
+        double
+        get_cell_data_value (const unsigned int cell_number) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+                             std::vector<double>             &patch_values) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+                             std::vector<dealii::Vector<double> >    &patch_values_system) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store.
+                                          */
+        virtual
+        void
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const = 0;
+
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store. This function does
+                                          * the same as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const = 0;
+
+                                         /**
+                                          * Clear all references to the
+                                          * vectors.
+                                          */
+        virtual void clear () = 0;
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
+					  */
+	virtual std::size_t memory_consumption () const = 0;
+
+					 /**
+					  * Names of the components of this
+					  * data vector.
+					  */
+	const std::vector<std::string> names;
+
+					 /**
+					  * A vector that for each of the
+					  * n_output_variables variables of
+					  * the current data set indicates
+					  * whether they are scalar fields,
+					  * parts of a vector-field, or any of
+					  * the other supported kinds of data.
+					  */
+	const std::vector<DataComponentInterpretation::DataComponentInterpretation>
+	data_component_interpretation;
+
+					 /**
+					  * Pointer to a DataPostprocessing
+					  * object which shall be applied to
+					  * this data vector.
+					  */
+	SmartPointer<const dealii::DataPostprocessor<DH::space_dimension> > postprocessor;
+
+					 /**
+					  * Number of output variables this
+					  * dataset provides (either number of
+					  * components in vector valued function
+					  * / data vector or number of computed
+					  * quantities, if DataPostprocessor is
+					  * applied). This variable is
+					  * determined via and thus equivalent
+					  * to <tt>names.size()</tt>.
+					  */
+	unsigned int n_output_variables;
+    };
+
+
 				     /**
 				      * A data structure that holds
 				      * all data needed in one thread
@@ -720,330 +904,6 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 		    << "> does not satisfy these conditions.");
 
   protected:
-    				     /**
-                                      * For each vector that has been added
-                                      * through the add_data_vector()
-                                      * functions, we need to keep track of a
-                                      * pointer to it, and allow data
-                                      * extraction from it when we generate
-                                      * patches. Unfortunately, we need to do
-                                      * this for a number of different vector
-                                      * types. Fortunately, they all have the
-                                      * same interface. So the way we go is to
-                                      * have a base class that provides the
-                                      * functions to access the vector's
-                                      * information, and to have a derived
-                                      * template class that can be
-                                      * instantiated for each vector
-                                      * type. Since the vectors all have the
-                                      * same interface, this is no big
-                                      * problem, as they can all use the same
-                                      * general templatized code.
-                                      *
-                                      * @author Wolfgang Bangerth, 2004
-				      */
-    class DataEntryBase
-    {
-      public:
-					 /**
-					  * Constructor. Give a list of names
-					  * for the individual components of
-					  * the vector and their
-					  * interpretation as scalar or vector
-					  * data. This constructor assumes
-					  * that no postprocessor is going to
-					  * be used.
-					  */
-	DataEntryBase (const std::vector<std::string> &names,
-		       const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
-
-					 /**
-					  * Constructor when a data
-					  * postprocessor is going to be
-					  * used. In that case, the names and
-					  * vector declarations are going to
-					  * be aquired from the postprocessor.
-					  */
-	DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor);
-
-                                         /**
-                                          * Destructor made virtual.
-                                          */
-        virtual ~DataEntryBase ();
-
-                                         /**
-                                          * Assuming that the stored vector is
-                                          * a cell vector, extract the given
-                                          * element from it.
-                                          */
-        virtual
-        double
-        get_cell_data_value (const unsigned int cell_number) const = 0;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the values on the present
-                                          * cell from the vector we actually
-                                          * store.
-                                          */
-        virtual
-        void
-        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<double>             &patch_values) const = 0;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the values on the present
-                                          * cell from the vector we actually
-                                          * store. This function does the same
-                                          * as the one above but for
-                                          * vector-valued finite elements.
-                                          */
-        virtual
-        void
-        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<Vector<double> >    &patch_values_system) const = 0;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the gradients on the present
-                                          * cell from the vector we actually
-                                          * store.
-                                          */
-        virtual
-        void
-        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const = 0;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the gradients on the present
-                                          * cell from the vector we actually
-                                          * store. This function does the same
-                                          * as the one above but for
-                                          * vector-valued finite elements.
-                                          */
-        virtual
-        void
-        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-				std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const = 0;
-
-                                         /**
-                                          * Given a FEValuesBase object, extract
-                                          * the second derivatives on the
-                                          * present cell from the vector we
-                                          * actually store.
-                                          */
-        virtual
-        void
-        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const = 0;
-
-                                         /**
-                                          * Given a FEValuesBase object, extract
-                                          * the second derivatives on the
-                                          * present cell from the vector we
-                                          * actually store. This function does
-                                          * the same as the one above but for
-                                          * vector-valued finite elements.
-                                          */
-        virtual
-        void
-        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-			       std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const = 0;
-
-                                         /**
-                                          * Clear all references to the
-                                          * vectors.
-                                          */
-        virtual void clear () = 0;
-
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this object.
-					  */
-	virtual std::size_t memory_consumption () const = 0;
-
-					 /**
-					  * Names of the components of this
-					  * data vector.
-					  */
-	const std::vector<std::string> names;
-
-					 /**
-					  * A vector that for each of the
-					  * n_output_variables variables of
-					  * the current data set indicates
-					  * whether they are scalar fields,
-					  * parts of a vector-field, or any of
-					  * the other supported kinds of data.
-					  */
-	const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-	data_component_interpretation;
-
-					 /**
-					  * Pointer to a DataPostprocessing
-					  * object which shall be applied to
-					  * this data vector.
-					  */
-	SmartPointer<const DataPostprocessor<DH::space_dimension>,DataOut_DoFData<DH,patch_dim,patch_space_dim>  > postprocessor;
-
-					 /**
-					  * Number of output variables this
-					  * dataset provides (either number of
-					  * components in vector valued function
-					  * / data vector or number of computed
-					  * quantities, if DataPostprocessor is
-					  * applied). This variable is
-					  * determined via and thus equivalent
-					  * to <tt>names.size()</tt>.
-					  */
-	unsigned int n_output_variables;
-    };
-
-
-                                     /**
-                                      * Class that stores a pointer to a
-                                      * vector of type equal to the template
-                                      * argument, and provides the functions
-                                      * to extract data from it.
-                                      *
-                                      * @author Wolfgang Bangerth, 2004
-                                      */
-    template <typename VectorType>
-    class DataEntry : public DataEntryBase
-    {
-      public:
-					 /**
-					  * Constructor. Give a list of names
-					  * for the individual components of
-					  * the vector and their
-					  * interpretation as scalar or vector
-					  * data. This constructor assumes
-					  * that no postprocessor is going to
-					  * be used.
-					  */
-	DataEntry (const VectorType               *data,
-		   const std::vector<std::string> &names,
-		   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
-
-					 /**
-					  * Constructor when a data
-					  * postprocessor is going to be
-					  * used. In that case, the names and
-					  * vector declarations are going to
-					  * be aquired from the postprocessor.
-					  */
-	DataEntry (const VectorType                       *data,
-		   const DataPostprocessor<DH::space_dimension> *data_postprocessor);
-
-                                         /**
-                                          * Assuming that the stored vector is
-                                          * a cell vector, extract the given
-                                          * element from it.
-                                          */
-        virtual
-        double
-        get_cell_data_value (const unsigned int cell_number) const;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the values on the present
-                                          * cell from the vector we actually
-                                          * store.
-                                          */
-        virtual
-        void
-        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<double>             &patch_values) const;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the values on the present
-                                          * cell from the vector we actually
-                                          * store. This function does the same
-                                          * as the one above but for
-                                          * vector-valued finite elements.
-                                          */
-        virtual
-        void
-        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                             std::vector<Vector<double> >    &patch_values_system) const;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the gradients on the present
-                                          * cell from the vector we actually
-                                          * store.
-                                          */
-        virtual
-        void
-        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const;
-
-                                         /**
-                                          * Given a FEValuesBase object,
-                                          * extract the gradients on the present
-                                          * cell from the vector we actually
-                                          * store. This function does the same
-                                          * as the one above but for
-                                          * vector-valued finite elements.
-                                          */
-        virtual
-        void
-        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-				std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const;
-
-                                         /**
-                                          * Given a FEValuesBase object, extract
-                                          * the second derivatives on the
-                                          * present cell from the vector we
-                                          * actually store.
-                                          */
-        virtual
-        void
-        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const;
-
-                                         /**
-                                          * Given a FEValuesBase object, extract
-                                          * the second derivatives on the
-                                          * present cell from the vector we
-                                          * actually store. This function does
-                                          * the same as the one above but for
-                                          * vector-valued finite elements.
-                                          */
-        virtual
-        void
-        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-			       std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const;
-
-                                         /**
-                                          * Clear all references to the
-                                          * vectors.
-                                          */
-        virtual void clear ();
-
-					 /**
-					  * Determine an estimate for
-					  * the memory consumption (in
-					  * bytes) of this object.
-					  */
-	virtual std::size_t memory_consumption () const;
-
-      private:
-                                         /**
-                                          * Pointer to the data
-                                          * vector. Note that
-                                          * ownership of the vector
-                                          * pointed to remains with
-                                          * the caller of this class.
-                                          */
-        const VectorType *vector;
-    };
-
-
 				     /**
 				      * Abbreviate the somewhat lengthy
 				      * name for the Patch class.
@@ -1059,13 +919,13 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      * List of data elements with vectors of
 				      * values for each degree of freedom.
 				      */
-    std::vector<std_cxx1x::shared_ptr<DataEntryBase> >  dof_data;
+    std::vector<std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> > >  dof_data;
 
 				     /**
 				      * List of data elements with vectors of
 				      * values for each cell.
 				      */
-    std::vector<std_cxx1x::shared_ptr<DataEntryBase> >  cell_data;
+    std::vector<std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> > >  cell_data;
 
 				     /**
 				      * This is a list of patches that is
@@ -1111,33 +971,6 @@ class DataOut_DoFData : public DataOutInterface<patch_dim,patch_space_dim>
 				      */
     template <class, int, int>
     friend class DataOut_DoFData;
-
-#ifdef DEAL_II_NESTED_CLASS_FRIEND_BUG
-                                     /**
-                                      * Make DataEntry a friend. This should
-                                      * not be strictly necessary, since
-                                      * members are implicitly friends, but in
-                                      * this case it seems as if icc needs
-                                      * this. Otherwise, it complains that
-                                      * DataEntry can't derive from
-                                      * DataEntryBase since the latter is a
-                                      * private member of DataOut_DoFData.
-				      *
-				      * For whatever weird reason, it is also
-				      * not enough to make just DataEntry a
-				      * friend, but we have to fully qualify
-				      * it for icc, while gcc 2.95 insists on
-				      * the non-qualified version...
-                                      */
-#  ifdef DEAL_II_NESTED_CLASS_TEMPL_FRIEND_BUG
-    template <typename>
-    friend class DataEntry;
-#  else
-    template <int N1, template <int> class DH1, int N2, int N3>
-    template <typename>
-    friend class DataOut_DoFData<DH1,N2,N3>::DataEntry;
-#  endif
-#endif
 };
 
 

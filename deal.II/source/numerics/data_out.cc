@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -92,213 +92,333 @@ namespace internal
 }
 
 
-template <class DH, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::DataEntryBase (const std::vector<std::string> &names_in,
-			      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
-		:
-		names(names_in),
-		data_component_interpretation (data_component_interpretation),
-		postprocessor(0, typeid(*this).name()),
-		n_output_variables(names.size())
+namespace internal
 {
-  Assert (names.size() == data_component_interpretation.size(),
-	  ExcDimensionMismatch(data_component_interpretation.size(),
-			       names.size()));
+  namespace DataOut
+  {
+                                     /**
+                                      * Class that stores a pointer to a
+                                      * vector of type equal to the template
+                                      * argument, and provides the functions
+                                      * to extract data from it.
+                                      *
+                                      * @author Wolfgang Bangerth, 2004
+                                      */
+    template <class DH, typename VectorType>
+    class DataEntry : public DataEntryBase<DH>
+    {
+      public:
+					 /**
+					  * Constructor. Give a list of names
+					  * for the individual components of
+					  * the vector and their
+					  * interpretation as scalar or vector
+					  * data. This constructor assumes
+					  * that no postprocessor is going to
+					  * be used.
+					  */
+	DataEntry (const VectorType               *data,
+		   const std::vector<std::string> &names,
+		   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation);
 
-				   // check that the names use only allowed
-				   // characters
-				   // check names for invalid characters
-  for (unsigned int i=0; i<names.size(); ++i)
-    Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				       "0123456789_<>()") == std::string::npos,
-	    ExcInvalidCharacter (names[i],
-				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							    "0123456789_<>()")));
+					 /**
+					  * Constructor when a data
+					  * postprocessor is going to be
+					  * used. In that case, the names and
+					  * vector declarations are going to
+					  * be aquired from the postprocessor.
+					  */
+	DataEntry (const VectorType                       *data,
+		   const DataPostprocessor<DH::space_dimension> *data_postprocessor);
+
+                                         /**
+                                          * Assuming that the stored vector is
+                                          * a cell vector, extract the given
+                                          * element from it.
+                                          */
+        virtual
+        double
+        get_cell_data_value (const unsigned int cell_number) const;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+                             std::vector<double>             &patch_values) const;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the values on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+                             std::vector<dealii::Vector<double> >    &patch_values_system) const;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const;
+
+                                         /**
+                                          * Given a FEValuesBase object,
+                                          * extract the gradients on the present
+                                          * cell from the vector we actually
+                                          * store. This function does the same
+                                          * as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+				std::vector<std::vector<Tensor<1,DH::space_dimension> > > &patch_gradients_system) const;
+
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store.
+                                          */
+        virtual
+        void
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const;
+
+                                         /**
+                                          * Given a FEValuesBase object, extract
+                                          * the second derivatives on the
+                                          * present cell from the vector we
+                                          * actually store. This function does
+                                          * the same as the one above but for
+                                          * vector-valued finite elements.
+                                          */
+        virtual
+        void
+        get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			       std::vector<std::vector< Tensor<2,DH::space_dimension> > > &patch_hessians_system) const;
+
+                                         /**
+                                          * Clear all references to the
+                                          * vectors.
+                                          */
+        virtual void clear ();
+
+					 /**
+					  * Determine an estimate for
+					  * the memory consumption (in
+					  * bytes) of this object.
+					  */
+	virtual std::size_t memory_consumption () const;
+
+      private:
+                                         /**
+                                          * Pointer to the data
+                                          * vector. Note that
+                                          * ownership of the vector
+                                          * pointed to remains with
+                                          * the caller of this class.
+                                          */
+        const VectorType *vector;
+    };
+
+
+
+    template <class DH>
+    DataEntryBase<DH>::DataEntryBase (const std::vector<std::string> &names_in,
+				      const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+		    :
+		    names(names_in),
+		    data_component_interpretation (data_component_interpretation),
+		    postprocessor(0, typeid(*this).name()),
+		    n_output_variables(names.size())
+    {
+      Assert (names.size() == data_component_interpretation.size(),
+	      ExcDimensionMismatch(data_component_interpretation.size(),
+				   names.size()));
+
+				       // check that the names use only allowed
+				       // characters
+				       // check names for invalid characters
+      for (unsigned int i=0; i<names.size(); ++i)
+	Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+					   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+					   "0123456789_<>()") == std::string::npos,
+		typename dealii::DataOut<DH::dimension>::
+		ExcInvalidCharacter (names[i],
+				     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+								"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+								"0123456789_<>()")));
+    }
+
+
+
+    template <class DH>
+    DataEntryBase<DH>::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor)
+		    :
+		    names(data_postprocessor->get_names()),
+		    data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
+		    postprocessor(data_postprocessor, typeid(*this).name()),
+		    n_output_variables(names.size())
+    {
+      Assert (data_postprocessor->get_names().size()
+	      ==
+	      data_postprocessor->get_data_component_interpretation().size(),
+	      ExcDimensionMismatch (data_postprocessor->get_names().size(),
+				    data_postprocessor->get_data_component_interpretation().size()));
+
+				       // check that the names use only allowed
+				       // characters
+      for (unsigned int i=0; i<names.size(); ++i)
+	Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+					   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+					   "0123456789_<>()") == std::string::npos,
+		typename dealii::DataOut<DH::dimension>::
+		ExcInvalidCharacter (names[i],
+				     names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+								"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+								"0123456789_<>()")));
+    }
+
+
+
+    template <class DH>
+    DataEntryBase<DH>::~DataEntryBase ()
+    {}
+
+
+
+    template <class DH, class VectorType>
+    DataEntry<DH,VectorType>::
+    DataEntry (const VectorType                       *data,
+	       const std::vector<std::string>         &names,
+	       const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
+		    :
+		    DataEntryBase<DH> (names, data_component_interpretation),
+		    vector (data)
+    {}
+
+
+
+    template <class DH, class VectorType>
+    DataEntry<DH,VectorType>::
+    DataEntry (const VectorType                       *data,
+	       const DataPostprocessor<DH::space_dimension> *data_postprocessor)
+		    :
+		    DataEntryBase<DH> (data_postprocessor),
+		    vector (data)
+    {}
+
+
+
+    template <class DH, class VectorType>
+    double
+    DataEntry<DH,VectorType>::
+    get_cell_data_value (const unsigned int cell_number) const
+    {
+      return (*vector)(cell_number);
+    }
+
+
+
+    template <class DH, class VectorType>
+    void
+    DataEntry<DH,VectorType>::
+    get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			 std::vector<dealii::Vector<double> >    &patch_values_system) const
+    {
+      fe_patch_values.get_function_values (*vector, patch_values_system);
+    }
+
+
+
+    template <class DH, typename VectorType>
+    void
+    DataEntry<DH,VectorType>::
+    get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			 std::vector<double>             &patch_values) const
+    {
+      fe_patch_values.get_function_values (*vector, patch_values);
+    }
+
+
+
+    template <class DH, class VectorType>
+    void
+    DataEntry<DH,VectorType>::
+    get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			    std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
+    {
+      fe_patch_values.get_function_grads (*vector, patch_gradients_system);
+    }
+
+
+
+    template <class DH, typename VectorType>
+    void
+    DataEntry<DH,VectorType>::
+    get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			    std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
+    {
+      fe_patch_values.get_function_grads (*vector, patch_gradients);
+    }
+
+
+
+    template <class DH, class VectorType>
+    void
+    DataEntry<DH,VectorType>::
+    get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			   std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
+    {
+      fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians_system);
+    }
+
+
+
+    template <class DH, typename VectorType>
+    void
+    DataEntry<DH,VectorType>::
+    get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
+			   std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
+    {
+      fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians);
+    }
+
+
+
+    template <class DH, typename VectorType>
+    std::size_t
+    DataEntry<DH,VectorType>::memory_consumption () const
+    {
+      return (sizeof (vector) +
+	      MemoryConsumption::memory_consumption (this->names));
+    }
+
+
+
+    template <class DH, class VectorType>
+    void
+    DataEntry<DH,VectorType>::clear ()
+    {
+      vector = 0;
+    }
+  }
 }
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::DataEntryBase (const DataPostprocessor<DH::space_dimension> *data_postprocessor)
-		:
-		names(data_postprocessor->get_names()),
-		data_component_interpretation (data_postprocessor->get_data_component_interpretation()),
-		postprocessor(data_postprocessor, typeid(*this).name()),
-		n_output_variables(names.size())
-{
-  Assert (data_postprocessor->get_names().size()
-          ==
-          data_postprocessor->get_data_component_interpretation().size(),
-          ExcDimensionMismatch (data_postprocessor->get_names().size(), 
-                                data_postprocessor->get_data_component_interpretation().size()));
-  
-				   // check that the names use only allowed
-				   // characters
-  for (unsigned int i=0; i<names.size(); ++i)
-    Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-				       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				       "0123456789_<>()") == std::string::npos,
-	    ExcInvalidCharacter (names[i],
-				 names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-							    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							    "0123456789_<>()")));
-}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntryBase::~DataEntryBase ()
-{}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-DataEntry (const VectorType                       *data,
-	   const std::vector<std::string>         &names,
-	   const std::vector<DataComponentInterpretation::DataComponentInterpretation> &data_component_interpretation)
-		:
-                DataEntryBase (names, data_component_interpretation),
-		vector (data)
-{}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-DataEntry (const VectorType                       *data,
-	   const DataPostprocessor<DH::space_dimension> *data_postprocessor)
-		:
-                DataEntryBase (data_postprocessor),
-		vector (data)
-{}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-double
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_cell_data_value (const unsigned int cell_number) const
-{
-  return (*vector)(cell_number);
-}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                     std::vector<Vector<double> >    &patch_values_system) const
-{
-  fe_patch_values.get_function_values (*vector, patch_values_system);
-}
-
-
-
-template <class DH,
-	  int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_function_values (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-                     std::vector<double>             &patch_values) const
-{
-  fe_patch_values.get_function_values (*vector, patch_values);
-}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-			std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
-{
-  fe_patch_values.get_function_grads (*vector, patch_gradients_system);
-}
-
-
-
-template <class DH,
-	  int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-			std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
-{
-  fe_patch_values.get_function_grads (*vector, patch_gradients);
-}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-		       std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
-{
-  fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians_system);
-}
-
-
-
-template <class DH,
-	  int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::
-get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
-		       std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
-{
-  fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians);
-}
-
-
-
-template <class DH,
-	  int patch_dim, int patch_space_dim>
-template <typename VectorType>
-std::size_t
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::memory_consumption () const
-{
-  return (sizeof (vector) +
-	  MemoryConsumption::memory_consumption (this->names));
-}
-
-
-
-template <class DH, int patch_dim, int patch_space_dim>
-template <typename VectorType>
-void
-DataOut_DoFData<DH,patch_dim,patch_space_dim>::
-DataEntry<VectorType>::clear ()
-{
-  vector = 0;
-}
-
 
 
 
@@ -431,12 +551,13 @@ add_data_vector (const VECTOR                             &vec,
 	    Assert (false, ExcInternalError());
     }
 
-  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, names,
-						    data_component_interpretation);
+  internal::DataOut::DataEntryBase<DH> * new_entry
+    = new internal::DataOut::DataEntry<DH,VECTOR>(&vec, names,
+						  data_component_interpretation);
   if (actual_type == type_dof_data)
-    dof_data.push_back (std_cxx1x::shared_ptr<DataEntryBase>(new_entry));
+    dof_data.push_back (std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
   else
-    cell_data.push_back (std_cxx1x::shared_ptr<DataEntryBase>(new_entry));
+    cell_data.push_back (std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
 }
 
 
@@ -464,8 +585,9 @@ add_data_vector (const VECTOR                           &vec,
 				dofs->n_dofs(),
 				dofs->get_tria().n_active_cells()));
 
-  DataEntryBase * new_entry = new DataEntry<VECTOR>(&vec, &data_postprocessor);
-  dof_data.push_back (std_cxx1x::shared_ptr<DataEntryBase>(new_entry));
+  internal::DataOut::DataEntryBase<DH> * new_entry
+    = new internal::DataOut::DataEntry<DH,VECTOR>(&vec, &data_postprocessor);
+  dof_data.push_back (std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> >(new_entry));
 }
 
 
@@ -530,7 +652,7 @@ get_dataset_names () const
 				   // collect the names of dof
 				   // and cell data
   typedef
-    typename std::vector<std_cxx1x::shared_ptr<DataEntryBase> >::const_iterator
+    typename std::vector<std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> > >::const_iterator
     data_iterator;
 
   for (data_iterator  d=dof_data.begin();
@@ -559,7 +681,7 @@ DataOut_DoFData<DH,patch_dim,patch_space_dim>::get_vector_data_ranges () const
 				   // collect the ranges of dof
 				   // and cell data
   typedef
-    typename std::vector<std_cxx1x::shared_ptr<DataEntryBase> >::const_iterator
+    typename std::vector<std_cxx1x::shared_ptr<internal::DataOut::DataEntryBase<DH> > >::const_iterator
     data_iterator;
 
   unsigned int output_component = 0;
