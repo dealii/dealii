@@ -423,8 +423,8 @@ namespace PETScWrappers
 					*
 					* Exactly the same as operator().
                                         */
-      PETScScalar
-      operator [] (const unsigned int index) const;
+      PetscScalar 
+      operator [] (const unsigned int index) const; 
 
                                        /**
                                         * A collective set operation: instead
