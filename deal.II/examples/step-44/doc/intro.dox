@@ -16,9 +16,9 @@ We begin with a crash-course in nonlinear kinematics.
 For the sake of simplicity, we restrict our attention to the quasi-static problem.
 Thereafter, various key stress measures are introduced and the constitutive model described.
 
-<h2>List of references</h2>
+<h3>List of references</h3>
 
-The three-field formulation implemented here was pioneered by Simo et al (1985) and is known as the mixed Jacobian-pressure formulation.
+The three-field formulation implemented here was pioneered by Simo et al. (1985) and is known as the mixed Jacobian-pressure formulation.
 Important related contributions include those by Simo and Taylor (1991), and Miehe (1994).
 The notation adopted here draws heavily on the excellent overview of the theoretical aspects of nonlinear solid mechanics by Holzapfel (2001).
 
@@ -45,8 +45,11 @@ The notation adopted here draws heavily on the excellent overview of the theoret
 </ol>
 
 
-<h2> Notation </h2>
+<h3> Notation </h3>
 
+One can think of fourth-order tensors as linear operators mapping second-order
+tensors (matrices) onto themselves in much the same way as matrices map
+vectors onto vectors.
 There are various fourth-order unit tensors.
 The fourth-order unit tensors $\mathcal{I}$ and $\overline{\mathcal{I}}$ are defined by
 @f[
@@ -67,10 +70,10 @@ such that
 		\qquad \text{and} \qquad
 	\dfrac{1}{2}[\mathbf{A} - \mathbf{A}^T] = \mathcal{W}:\mathbf{A} \, .
 @f]
-The fourth-order <code>SymmetricTensor</code> returned by <code>identity_tensor</code> is $\mathcal{S}$.
+The fourth-order <code>SymmetricTensor</code> returned by identity_tensor() is $\mathcal{S}$.
 
 
-<h2>Kinematics</h2>
+<h3>Kinematics</h3>
 
 Let the time domain be denoted $\mathbb{T} = [0,T_{\textrm{end}}]$, where $t \in \mathbb{T}$ and $T_{\textrm{end}}$ is the total problem duration.
 Consider a continuum body that occupies the reference configuration $\Omega_0$ at time $t=0$.
@@ -89,31 +92,35 @@ The deformation gradient $\mathbf{F}$ is defined as the material gradient of the
 @f[
 	\mathbf{F}(\mathbf{X},t)
 		:= \dfrac{\partial \boldsymbol{\varphi}(\mathbf{X},t)}{\partial \mathbf{X}}
-		= \textrm{Grad}\mathbf{x}(\mathbf{X},t)
-		= \mathbf{I} + \textrm{Grad}\mathbf{U} \, .
+		= \textrm{Grad}\ \mathbf{x}(\mathbf{X},t)
+		= \mathbf{I} + \textrm{Grad}\ \mathbf{U} \, .
 @f]
-The determinant of the of the deformation gradient
-$J(\mathbf{X},t):= \textrm{det} \mathbf{F}(\mathbf{X},t) > 0$
+The determinant of the deformation gradient
+$J(\mathbf{X},t):= \textrm{det}\ \mathbf{F}(\mathbf{X},t) > 0$
 maps corresponding volume elements in the reference and current configurations, denoted
 $\textrm{d}V$ and $\textrm{d}v$,
 respectively, as
 @f[
-	\textrm{d}v = J(\mathbf{X},t) \textrm{d}V \, .
+	\textrm{d}v = J(\mathbf{X},t)\; \textrm{d}V \, .
 @f]
 
 An important measure of the deformation in terms of the spatial coordinates is the left Cauchy-Green tensor $\mathbf{b} := \mathbf{F}\mathbf{F}^T$.
-The left Cauchy-Green tensor is symmetric and positive definite.
+The left Cauchy-Green tensor is obviously symmetric and positive definite.
 Similarly, the (material) right Cauchy-Green tensor is defined by $\mathbf{C} := \mathbf{F}^T\mathbf{F}$.
 It is also symmetric and positive definite.
 
 The Green-Lagrange strain tensor is defined by
 @f[
 	\mathbf{E}:= \frac{1}{2}[\mathbf{C} - \mathbf{I} ]
-		= \underbrace{\frac{1}{2}[\textrm{Grad}^T\mathbf{U} + \textrm{Grad}\mathbf{U}]}_{\boldsymbol{\varepsilon}}
-			+ \frac{1}{2}\textrm{Grad}^T\mathbf{U}\textrm{Grad}\mathbf{U} \, ,
+		= \underbrace{\frac{1}{2}[\textrm{Grad}^T\ \mathbf{U} + \textrm{Grad}\ \mathbf{U}]}_{\boldsymbol{\varepsilon}}
+			+ \frac{1}{2}[\textrm{Grad}^T\ \mathbf{U}][\textrm{Grad}\ \mathbf{U}] \, .
 @f]
-where $\boldsymbol{\varepsilon}$ is the linearised strain tensor used when the assumption of infinitesimal deformations is valid.
-Note, the use of $\boldsymbol{\varepsilon}$ as the strain measure in step-18 is questionable.
+If the assumption of infinitesimal deformations is valid, then the second term
+on the right can be neglected, and $\boldsymbol{\varepsilon}$ (the linearised
+strain tensor) is the only component of the strain tensor.
+This assumption is, looking at the setup of the problem, not valid in step-18,
+making the use of the linearized $\boldsymbol{\varepsilon}$ as the strain
+measure in that tutorial program questionable.
 
 In order to handle the different response that materials exhibit when subjected to bulk and shear type deformations we consider the following decomposition of the deformation gradient $\mathbf{F}$  and the left Cauchy-Green tensor $\mathbf{b}$ into volume-changing (volumetric) and volume-preserving (isochoric) parts:
 @f[
@@ -124,17 +131,19 @@ In order to handle the different response that materials exhibit when subjected 
 		= \overline{\mathbf{F}}\overline{\mathbf{F}}^T
 		=  (J^{2/3}\mathbf{I})\overline{\mathbf{b}} \, .
 @f]
-Clearly, $\textrm{det} \mathbf{F} = \textrm{det} (J^{1/3}\mathbf{I}) = J$.
+Clearly, $\textrm{det}\ \mathbf{F} = \textrm{det}\ (J^{1/3}\mathbf{I}) = J$.
 
 The spatial velocity field is denoted $\mathbf{v}(\mathbf{x},t)$.
 The derivative of the spatial velocity field with respect to the spatial coordinates gives the spatial velocity gradient $\mathbf{l}(\mathbf{x},t)$, that is
 @f[
 	\mathbf{l}(\mathbf{x},t)
 		:= \dfrac{\mathbf{v}(\mathbf{x},t)}{\mathbf{x}}
-		= \textrm{grad}\mathbf{v}(\mathbf{x},t) \, ,
+		= \textrm{grad}\ \mathbf{v}(\mathbf{x},t) \, ,
 @f]
 where $\textrm{grad}(\bullet):= \textrm{Grad}(\bullet) \mathbf{F}^{-1}$.
-<h2>Kinetics</h2>
+
+
+<h3>Kinetics</h3>
 
 Cauchy's stress theorem equates the Cauchy traction $\mathbf{t}$ acting on an infinitesimal surface element in the current configuration to the product of the Cauchy stress tensor $\boldsymbol{\sigma}$ (a spatial quantity)  and the outward unit normal to the surface $\mathbf{n}$ as
 @f[
@@ -154,7 +163,7 @@ and the (referential) second Piola-Kirchhoff stress
 $\mathbf{S} = {\mathbf{F}}^{-1} \boldsymbol{\tau} {\mathbf{F}}^{-T}$.
 
 
-<h2> Push-forward and pull-back operators </h2>
+<h3> Push-forward and pull-back operators </h3>
 
 Push-forward and pull-back operators allow one to transform various measures between the material and spatial settings.
 The stress measures used here are contravariant, while the strain measures are covariant.
@@ -175,7 +184,7 @@ The push-forward and pull back operations for second-order contravariant tensors
 For example $\boldsymbol{\tau} = \chi_{*}(\mathbf{S})$.
 
 
-<h2>Hyperelastic materials</h2>
+<h3>Hyperelastic materials</h3>
 
 A hyperelastic material response is governed by a Helmholtz free energy function $\Psi$ which serves as a potential for the stress.
 For example, if the Helmholtz free energy depends on the right Cauchy-Green tensor $\mathbf{C}$ then the isotropic hyperelastic response is
@@ -215,30 +224,30 @@ The fictitious Cauchy stress tensor $\overline{\boldsymbol{\tau}}$ is defined by
 		:= 2 \overline{\mathbf{b}} \dfrac{\partial \Psi_{\textrm{iso}}(\overline{\mathbf{b}})}{\partial \overline{\mathbf{b}}} \, .
 @f]
 
-<h3> Neo-Hookean materials </h3>
+<h4> Neo-Hookean materials </h4>
 
-The Helmholtz free energy corresponding to a compressible neo-Hookean material is given by
+The Helmholtz free energy corresponding to a compressible <a href="http://en.wikipedia.org/wiki/Neo-Hookean_solid">neo-Hookean material</a> is given by
 @f[
     \Psi \equiv
         \underbrace{\kappa [ \mathcal{G}(J) ] }_{\Psi_{\textrm{vol}}(J)}
         + \underbrace{\bigl[c_1 [ \overline{I}_1 - 3] \bigr]}_{\Psi_{\text{iso}}(\overline{\mathbf{b}})} \, ,
 @f]
 where $\kappa := \lambda + 2/3 \mu$ is the bulk modulus
-and $\overline{I}_1 := \textrm{tr}\overline{\mathbf{b}}$.
+and $\overline{I}_1 := \textrm{tr}\ \overline{\mathbf{b}}$.
 The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$.
 In this work $\mathcal{G}:=\bigl[ \frac{1}{2} [{J}^{2} - 1 ] - \textrm{ln}( {J}) ] \bigr]$.
 
-Incompressibility imposes the iscohoric consraint that $J=1$ for all motions $\mathbf{\varphi}$.
+Incompressibility imposes the isochoric constraint that $J=1$ for all motions $\mathbf{\varphi}$.
 The Helmholtz free energy corresponding to an incompressible neo-Hookean material is given by
 @f[
     \Psi \equiv
         \underbrace{\bigl[ c_1 [ I_1 - 3] \bigr] }_{\Psi_{\textrm{iso}}(\mathbf{b})} \, ,
 @f]
-$ I_1 := \textrm{tr}\mathbf{b} $.
-Thus, the incompressible response of obtained by removing the volumetric component from the compressible free energy.
+$ I_1 := \textrm{tr}\ \mathbf{b} $.
+Thus, the incompressible response is obtained by removing the volumetric component from the compressible free energy.
 
 
-<h2>Elasticity tensors</h2>
+<h3>Elasticity tensors</h3>
 
 We will use a Newton-Raphson strategy to solve the nonlinear boundary value problem.
 Thus, we will need to linearise the constitutive relations.
@@ -284,7 +293,7 @@ where the fictitious elasticity tensor $\overline{\mathfrak{c}}$ in the spatial 
 		= 4 \overline{\mathbf{b}} \dfrac{ \partial^2 \Psi_{\textrm{iso}}(\overline{\mathbf{b}})} {\partial \overline{\mathbf{b}} \partial \overline{\mathbf{b}}} \overline{\mathbf{b}} \, .
 @f]
 
-<h2>Principle of stationary potential energy</h2>
+<h3>Principle of stationary potential energy</h3>
 
 The total potential energy of the system $\Pi$ is the sum of the internal and external potential energies, denoted $\Pi_{\textrm{int}}$ and $\Pi_{\textrm{ext}}$, respectively.
 We wish to find the equilibrium configuration by minimising the potential energy.
@@ -326,11 +335,11 @@ The stationarity of the potential follows as
 			+ \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial p} \delta p
 			+ \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial \widetilde{J}} \delta \tilde{J}
 			\\
-		&= \int_{\Omega_0}  \bigl[
-			\textrm{grad}\delta\mathbf{u} : [ \boldsymbol{\tau}_{\textrm{iso}} +  \boldsymbol{\tau}_{\textrm{vol}}]
+		&= \int_{\Omega_0}  \left\{
+			\textrm{grad}\ \delta\mathbf{u} : [ \boldsymbol{\tau}_{\textrm{iso}} +  \boldsymbol{\tau}_{\textrm{vol}}]
 			+ \delta p [ J(\mathbf{u}) - \widetilde{J}]
-			+ \delta \widetilde{J}[ \dfrac{\textrm{d} \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}} - p]
-			\bigr]~\textrm{d}V
+			+ \delta \widetilde{J}\left[ \dfrac{\textrm{d} \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}} - p\right]
+			\right\}~\textrm{d}V
 			\\
 		&\quad - \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{b}~\textrm{d}v
 			- \int_{\partial \Omega_{0,\boldsymbol{\sigma}}} \mathbf{u} \cdot \overline{\mathbf{t}}~\textrm{d}a
@@ -343,14 +352,15 @@ This approach is called a total-Lagrangian formulation.
 The approach given in step-18 could be called updated Lagrangian.
 The Euler-Lagrange equations corresponding to the residual are:
 @f{align*}
-	&\textrm{div} \boldsymbol{\sigma} + \mathbf{b} = \mathbf{0} && \textrm{[equilibrium]}
+	&\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b} = \mathbf{0} && \textrm{[equilibrium]}
 		\\
 	&J(\mathbf{u}) = \widetilde{J} 		&& \textrm{[dilatation]}
 		\\
 	&p = \dfrac{\textrm{d} \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}} && \textrm{[pressure]} \, .
 @f}
 The first equation is the equilibrium equation in the spatial setting.
-The second is the constraint that $J(\mathbf{u}) = \widetilde{J}$.
+The second is the constraint that $J(\mathbf{u}) = \widetilde{J}$, i.e., the
+incompressibility.
 The third is the definition of the pressure $p$.
 
 We will use the iterative Newton-Raphson method to solve the nonlinear residual equation $R$.
@@ -395,16 +405,16 @@ where
 @f{align*}
 	D_{\varDelta \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
  	&=
- 	\int_\Omega \bigl[ \textrm{grad} \delta \mathbf{u} :
- 			\textrm{grad} \varDelta \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} + \boldsymbol{\tau}_{\textrm{vol}}]
- 			+ \textrm{grad} \delta \mathbf{u} :[J\mathfrak{c}_{\textrm{vol}} + J\mathfrak{c}_{\textrm{iso}}] :\textrm{grad} \varDelta \mathbf{u}
+ 	\int_\Omega \bigl[ \textrm{grad}\ \delta \mathbf{u} :
+ 			\textrm{grad}\ \varDelta \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} + \boldsymbol{\tau}_{\textrm{vol}}]
+ 			+ \textrm{grad}\ \delta \mathbf{u} :[J\mathfrak{c}_{\textrm{vol}} + J\mathfrak{c}_{\textrm{iso}}] :\textrm{grad}\ \varDelta \mathbf{u}
  		\bigr]~\textrm{d}V \, ,
  		\\
- 	&\quad + \int_\Omega \delta p J \mathbf{I} : \textrm{grad} \varDelta \mathbf{u} ~\textrm{d}V
+ 	&\quad + \int_\Omega \delta p J \mathbf{I} : \textrm{grad}\ \varDelta \mathbf{u} ~\textrm{d}V
  	\\
  	D_{\varDelta p} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
  	&=
- 	\int_\Omega \textrm{grad} \delta \mathbf{u} : J \mathbf{I} \varDelta p ~\textrm{d}V
+ 	\int_\Omega \textrm{grad}\ \delta \mathbf{u} : J \mathbf{I} \varDelta p ~\textrm{d}V
  		-  \int_\Omega \delta \widetilde{J} \varDelta p  ~\textrm{d}V \, ,
  	\\
  	D_{\varDelta \widetilde{J}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
@@ -414,28 +424,34 @@ where
 
 Note that the following terms are termed the geometrical stress and  the material contributions to the tangent matrix:
 @f{align*}
-& \int_\Omega \textrm{grad} \delta \mathbf{u} :
- 			\textrm{grad} \varDelta \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} +  \boldsymbol{\tau}_{\textrm{vol}}]~\textrm{d}V
+& \int_\Omega \textrm{grad}\ \delta \mathbf{u} :
+ 			\textrm{grad}\ \varDelta \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} +  \boldsymbol{\tau}_{\textrm{vol}}]~\textrm{d}V
  			&& \quad {[\textrm{Geometrical stress}]} \, ,
  		\\
-& \int_\Omega \textrm{grad} \delta \mathbf{u} :
- 			[J\mathfrak{c}_{\textrm{vol}} + J\mathfrak{c}_{\textrm{iso}}] :\textrm{grad} \varDelta \mathbf{u}
+& \int_\Omega \textrm{grad}\ \delta \mathbf{u} :
+ 			[J\mathfrak{c}_{\textrm{vol}} + J\mathfrak{c}_{\textrm{iso}}] :\textrm{grad}\ \varDelta \mathbf{u}
  		~\textrm{d}V
  		&& \quad {[\textrm{Material}]} \, .
 @f}
 
 
-<h2> Discretisation of governing equations </h2>
+<h3> Discretisation of governing equations </h3>
 
 The three-field formulation used here is effective for quasi-incompressible materials,
-that is where $\nu \rightarrow 0.5$ subject to a good choice of the interpolation fields
+that is where $\nu \rightarrow 0.5$ (where $\nu$ is <a
+href="http://en.wikipedia.org/wiki/Poisson's_ratio">Poisson's ratio</a>)
+subject to a good choice of the interpolation fields
 for $\mathbf{u},~p$ and $\widetilde{J}$.
-Typically a choice of $Q_n - P_{n-1} - P_{n-1}$ is made.
-A popoular choice is $Q_1 - P_0- P_0$ which is known as the mean dilatation method.
-This code can accomodate a $Q_n - P_{n-1} - P_{n-1}$ formulation.
+Typically a choice of $Q_n \times DGP_{n-1} \times DGP_{n-1}$ is made.
+A popoular choice is $Q_1 \times DGP_0 \times DGP_0$ which is known as the mean dilatation method.
+This code can accomodate a $Q_n \times DGP_{n-1} \times DGP_{n-1}$ formulation.
 The discontinuous approximation
-allows $p$ and $\widetilde{J}$ to be condensed out
-and a classical displacement based method is recovered.
+allows $p$ and $\widetilde{J}$ to be condensed out: because there are no
+derivatives on these variables, a discontinuous finite element yields a block
+diagonal matrix and we can express $p$ and $\widetilde{J}$ on each cell simply
+by inverting the local mass matrix and multiplying it by the local right hand
+side. We can then insert the result into the remaining equations and recover
+a classical displacement-based method.
 
 For fully incompressible materials $\nu = 0.5$ and the three-field formulation will still exhibit
 locking behaviour.
@@ -530,7 +546,8 @@ Note that due to the choice of $p$ and $\widetilde{J}$ as discontinuous at the e
 		\end{bmatrix}}_{ {\mathbf{\mathsf{K}}}_{\textrm{store}}}
 @f]
 
-<h2> Numerical example </h2>
+
+<h3> Numerical example </h3>
 
 The numerical example considered here is a nearly-incompressible block under compression.
 This benchmark problem is taken from
@@ -545,4 +562,5 @@ This benchmark problem is taken from
 
  @image html "step-44.setup.png"
 
-
+Using symmetry, we solve for only one quarter of the geometry, as shown in
+highlights in the figure above.
