@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2326,7 +2326,7 @@ unit_symmetric_tensor ()
 
 /**
  * Return the tensor of rank 4 that, when multiplied by a symmetric rank 2
- * tensor <tt>t</tt> returns the deviator <tt>dev t</tt>. It is the operator
+ * tensor <tt>t</tt> returns the deviator $\textrm{dev}\ t$. It is the operator
  * representation of the linear deviator operator.
  *
  * For every tensor <tt>t</tt>, there holds the identity
@@ -2391,7 +2391,7 @@ deviator_tensor ()
 
 /**
  * Returns the fourth-order symmetric identity tensor which maps symmetric
- * second-order tensors to themselves. 
+ * second-order tensors to themselves.
  *
  * Note that this tensor, even though it is the identity, has a somewhat funny
  * form, and in particular does not only consist of zeros and ones. For
@@ -2399,7 +2399,7 @@ deviator_tensor ()
  * except for <tt>id[0][0][0][0]=id[1][1][1][1]=1</tt> and
  * <tt>id[0][1][0][1]=id[0][1][1][0]=id[1][0][0][1]=id[1][0][1][0]=1/2</tt>. To
  * see why this factor of 1/2 is necessary, consider computing <tt>A=Id
- * . B</tt>. For the element <tt>a_01</tt> we have <tt>a_01=id_0100 b_00 +
+ * : B</tt>. For the element <tt>a_01</tt> we have <tt>a_01=id_0100 b_00 +
  * id_0111 b_11 + id_0101 b_01 + id_0110 b_10</tt>. On the other hand, we need
  * to have <tt>a_01=b_01</tt>, and symmetry implies <tt>b_01=b_10</tt>,
  * leading to <tt>a_01=(id_0101+id_0110) b_01</tt>, or, again by symmetry,
