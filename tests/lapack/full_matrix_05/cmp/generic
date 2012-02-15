@@ -1,0 +1,31 @@
+
+DEAL::
+DEAL::generalized eigenvalue problem of type 1
+DEAL::generalized eigenvalue 3.726107e-01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	1.134792e+00	1.311583e+00	1.553625e+00	
+DEAL::generalized eigenvalue 6.768858e-01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	1.721100e+00	6.171030e+00	-3.892130e+00	
+DEAL::generalized eigenvalue 8.071810e-01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	6.144108e+00	-1.482613e+00	-6.614950e-01	
+DEAL::generalized eigenvalue 1.000000e+00	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	
+DEAL::
+DEAL::generalized eigenvalue problem of type 2
+DEAL::generalized eigenvalue 2.288432e+00	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	8.195699e-01	6.942977e-01	6.022441e-01	
+DEAL::generalized eigenvalue 2.698958e+01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	-6.608984e-01	-2.483742e-01	-1.529221e-01	
+DEAL::generalized eigenvalue 3.257479e+01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	2.941906e+00	-3.123354e+00	-1.020145e+00	
+DEAL::generalized eigenvalue 3.814720e+01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	1.613708e+00	4.177430e+00	-7.095844e+00	
+DEAL::
+DEAL::generalized eigenvalue problem of type 3
+DEAL::generalized eigenvalue 2.288432e+00	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	9.561649e-01	9.257303e-01	9.033661e-01	
+DEAL::generalized eigenvalue 2.698958e+01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	-7.710481e-01	-3.311655e-01	-2.293832e-01	
+DEAL::generalized eigenvalue 3.257479e+01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	3.432224e+00	-4.164472e+00	-1.530217e+00	
+DEAL::generalized eigenvalue 3.814720e+01	0.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	1.882659e+00	5.569907e+00	-1.064377e+01	
