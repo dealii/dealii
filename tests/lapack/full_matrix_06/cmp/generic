@@ -1,0 +1,17 @@
+
+DEAL::
+DEAL::generalized eigenvalue problem of type 1
+DEAL::generalized eigenvalue 6.768858e-01
+DEAL::generalized eigenvector 1.000000e+00	1.721100e+00	6.171030e+00	-3.892130e+00	
+DEAL::generalized eigenvalue 8.071810e-01
+DEAL::generalized eigenvector 1.000000e+00	6.144108e+00	-1.482613e+00	-6.614950e-01	
+DEAL::generalized eigenvalue 1.000000e+00
+DEAL::generalized eigenvector 1.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	
+DEAL::
+DEAL::generalized eigenvalue problem of type 2
+DEAL::generalized eigenvalue 2.288432e+00
+DEAL::generalized eigenvector 1.000000e+00	8.195699e-01	6.942977e-01	6.022441e-01	
+DEAL::
+DEAL::generalized eigenvalue problem of type 3
+DEAL::generalized eigenvalue 2.288432e+00
+DEAL::generalized eigenvector 1.000000e+00	9.561649e-01	9.257303e-01	9.033661e-01	
