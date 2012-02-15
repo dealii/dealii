@@ -841,33 +841,33 @@ namespace GridTools
 				 const Point<spacedim>     &p)
   {
     Assert ((mapping.size() == 1) ||
-             (mapping.size() == container.get_fe().size()),
-             ExcMessage ("Mapping collection needs to have either size 1 "
-                         "or size equal to the number of elements in "
-                         "the FECollection."));
+	    (mapping.size() == container.get_fe().size()),
+	    ExcMessage ("Mapping collection needs to have either size 1 "
+			"or size equal to the number of elements in "
+			"the FECollection."));
 
     typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell_iterator;
 
     std::pair<cell_iterator, Point<spacedim> > best_cell;
-            //If we have only one element in the MappingCollection,
-            //we use find_active_cell_around_point using only one
-            //mapping.
+				     //If we have only one element in the MappingCollection,
+				     //we use find_active_cell_around_point using only one
+				     //mapping.
     if(mapping.size()==1)
       best_cell = find_active_cell_around_point(mapping[0], container, p);
     else
       {
 
 
-                 // The best distance is set to the
-                 // maximum allowable distance from
-                 // the unit cell; we assume a
-                 // max. deviation of 1e-10
+					 // The best distance is set to the
+					 // maximum allowable distance from
+					 // the unit cell; we assume a
+					 // max. deviation of 1e-10
         double best_distance = 1e-10;
         int    best_level = -1;
 
 
-                 // Find closest vertex and determine
-                 // all adjacent cells
+					 // Find closest vertex and determine
+					 // all adjacent cells
         unsigned int vertex = find_closest_vertex(container, p);
 
         std::vector<cell_iterator> adjacent_cells =
@@ -879,28 +879,28 @@ namespace GridTools
 
         for(; cell != endc; ++cell)
           {
-      const Point<spacedim> p_cell
-        = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
+	    const Point<spacedim> p_cell
+	      = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
-               // calculate the infinity norm of
-               // the distance vector to the unit cell.
-      const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+					     // calculate the infinity norm of
+					     // the distance vector to the unit cell.
+	    const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
 
-               // We compare if the point is inside the
-               // unit cell (or at least not too far
-               // outside). If it is, it is also checked
-               // that the cell has a more refined state
-      if (dist < best_distance ||
-          (dist == best_distance && (*cell)->level() > best_level))
-        {
-          best_distance = dist;
-          best_level    = (*cell)->level();
-          best_cell     = std::make_pair(*cell, p_cell);
-        }
-      }
+					     // We compare if the point is inside the
+					     // unit cell (or at least not too far
+					     // outside). If it is, it is also checked
+					     // that the cell has a more refined state
+	    if (dist < best_distance ||
+		(dist == best_distance && (*cell)->level() > best_level))
+	      {
+		best_distance = dist;
+		best_level    = (*cell)->level();
+		best_cell     = std::make_pair(*cell, p_cell);
+	      }
+	  }
 
-    Assert (best_cell.first.state() == IteratorState::valid,
-	    ExcPointNotFound<dim>(p));
+	Assert (best_cell.first.state() == IteratorState::valid,
+		ExcPointNotFound<dim>(p));
       }
     return best_cell;
   }
@@ -1546,7 +1546,7 @@ namespace GridTools
 		     const bool respect_manifold)
       {
 	const Boundary<Iterator::AccessorType::dimension,
-		       Iterator::AccessorType::space_dimension>
+	  Iterator::AccessorType::space_dimension>
 	  *manifold = (respect_manifold ?
 		       &object->get_boundary() :
 		       0);
@@ -1902,13 +1902,13 @@ namespace GridTools
 //    pass by CellData and that it will not reorder the vertices.
 
     std::map<typename Container<dim-1,spacedim>::cell_iterator,
-	     typename Container<dim,spacedim>::face_iterator>
-    surface_to_volume_mapping;
+      typename Container<dim,spacedim>::face_iterator>
+      surface_to_volume_mapping;
 
     const unsigned int boundary_dim = dim-1; //dimension of the boundary mesh
 
-				   // First create surface mesh and mapping
-				   // from only level(0) cells of volume_mesh
+				     // First create surface mesh and mapping
+				     // from only level(0) cells of volume_mesh
     std::vector<typename Container<dim,spacedim>::face_iterator>
       mapping;  // temporary map for level==0
 
