@@ -23,13 +23,13 @@ end
 
 subsection Linear solver
   # Linear solver iterations (multiples of the system matrix size)
-  set Max iteration multiplier = 2
+  set Max iteration multiplier = 1
 
   # Linear solver residual (scaled by residual norm)
   set Residual                 = 1e-6
 
   # SSOR preconditioner relaxation value
-  set SSOR Relaxation          = 0.6
+  set SSOR Relaxation          = 0.65
 
   # Type of solver used to solve the linear system
   set Solver type              = CG
@@ -50,7 +50,7 @@ subsection Nonlinear solver
   set Max iterations Newton-Raphson = 10
 
   # Displacement error tolerance
-  set Tolerance displacement        = 1.0e-3
+  set Tolerance displacement        = 1.0e-6
 
   # Force residual tolerance
   set Tolerance force               = 1.0e-9

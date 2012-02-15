@@ -90,10 +90,10 @@ struct FESystem {
 void FESystem::declare_parameters(ParameterHandler &prm) {
 	prm.enter_subsection("Finite element system");
 	{
-		prm.declare_entry("Polynomial degree", "1", Patterns::Integer(),
+		prm.declare_entry("Polynomial degree", "2", Patterns::Integer(),
 				"Displacement system polynomial order");
 
-		prm.declare_entry("Quadrature order", "2", Patterns::Integer(),
+		prm.declare_entry("Quadrature order", "3", Patterns::Integer(),
 				"Gauss quadrature order");
 	}
 	prm.leave_subsection();
@@ -130,10 +130,10 @@ void Geometry::declare_parameters(ParameterHandler &prm) {
 		prm.declare_entry("Global refinement", "2", Patterns::Integer(),
 				"Global refinement level");
 
-		prm.declare_entry("Grid scale", "1.0", Patterns::Double(),
+		prm.declare_entry("Grid scale", "1e-3", Patterns::Double(),
 				"Global grid scaling factor");
 
-		prm.declare_entry("Pressure ratio p/p0", "40",
+		prm.declare_entry("Pressure ratio p/p0", "100",
 				Patterns::Selection("20|40|60|80|100"),
 				"Ratio of applied pressure to reference pressure");
 	}
@@ -164,13 +164,14 @@ struct Materials {
 	parse_parameters(ParameterHandler &prm);
 };
 
+// ToDo: add a range check
 void Materials::declare_parameters(ParameterHandler &prm) {
 	prm.enter_subsection("Material properties");
 	{
-		prm.declare_entry("Poisson's ratio", "0.49", Patterns::Double(),
+		prm.declare_entry("Poisson's ratio", "0.4999", Patterns::Double(),
 				"Poisson's ratio");
 
-		prm.declare_entry("Shear modulus", "1.0e6", Patterns::Double(),
+		prm.declare_entry("Shear modulus", "80.194e6", Patterns::Double(),
 				"Shear modulus");
 	}
 	prm.leave_subsection();
@@ -211,11 +212,11 @@ void LinearSolver::declare_parameters(ParameterHandler &prm) {
 
 		prm.declare_entry(
 				"Max iteration multiplier",
-				"2",
+				"1",
 				Patterns::Double(),
 				"Linear solver iterations (multiples of the system matrix size)");
 
-		prm.declare_entry("SSOR Relaxation", "0.6", Patterns::Double(),
+		prm.declare_entry("SSOR Relaxation", "0.65", Patterns::Double(),
 				"SSOR preconditioner relaxation value");
 	}
 	prm.leave_subsection();
@@ -258,7 +259,7 @@ void NonlinearSolver::declare_parameters(ParameterHandler &prm) {
 		prm.declare_entry("Tolerance force", "1.0e-9", Patterns::Double(),
 				"Force residual tolerance");
 
-		prm.declare_entry("Tolerance displacement", "1.0e-3",
+		prm.declare_entry("Tolerance displacement", "1.0e-6",
 				Patterns::Double(), "Displacement error tolerance");
 	}
 	prm.leave_subsection();
@@ -530,16 +531,16 @@ public:
 	virtual ~Time(void) {
 	}
 
-	const double current(void) const {
+	double current(void) const {
 		return time_current;
 	}
-	const double end(void) const {
+	double end(void) const {
 		return time_end;
 	}
-	const double get_delta_t(void) const {
+	double get_delta_t(void) const {
 		return delta_t;
 	}
-	const unsigned int get_timestep(void) const {
+	unsigned int get_timestep(void) const {
 		return timestep;
 	}
 	void increment(void) {
@@ -616,9 +617,6 @@ public:
 
 		// include a coupled of checks on the input data
 		Assert(det_F > 0, ExcInternalError());
-		// ToDo: is this Assert a good idea?
-		Assert(J_tilde > 0, ExcInternalError());
-
 	}
 
 	// Determine the Kirchhoff stress
@@ -749,9 +747,6 @@ public:
 	}
 
 	// We first create a material object.
-	// This object could, potentially, be shared among QPH objects
-	// but this could cause data-race issues when assembling the system matrix.
-	// ToDo: This issue of the data race needs to be clarified
 	void setup_lqp(Parameters::AllParameters & parameters) {
 
 		// Create an instance of a neo-Hookean material
@@ -1177,7 +1172,7 @@ struct Solid<dim>::ScratchData_K {
 	void reset(void) {
 		const unsigned int n_q_points = Nx.size();
 		const unsigned int n_dofs_per_cell = Nx[0].size();
-		for (unsigned int q_point = 0; q_point < Nx.size(); ++q_point) {
+		for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
 			Assert( Nx[q_point].size() == n_dofs_per_cell, ExcInternalError());
 			Assert( grad_Nx[q_point].size() == n_dofs_per_cell,
 					ExcInternalError());
@@ -1334,8 +1329,7 @@ struct Solid<dim>::PerTaskData_UQPH {
 // quadrature points.
 template<int dim>
 struct Solid<dim>::ScratchData_UQPH {
-	// ToDo: i'm not sure I understand the use of the &
-	// ToD: can we make this static?
+
 	 const BlockVector<double> & solution_total;
 
 	std::vector<Tensor<2, dim> > solution_grads_u_total;
@@ -1366,7 +1360,6 @@ struct Solid<dim>::ScratchData_UQPH {
 	}
 
 	void reset(void) {
-		// ToDo: Is this necessary? Won't the call to fe_values.get_gradient overwrite this data?
 		const unsigned int n_q_points = solution_grads_u_total.size();
 		for (unsigned int q = 0; q < n_q_points; ++q) {
 			solution_grads_u_total[q] = 0.0;
@@ -1637,7 +1630,6 @@ void Solid<dim>::update_qph_incremental_one_cell(
 	Assert(scratch.solution_values_J_total.size() == n_q_points,
 			ExcInternalError());
 
-	// ToDo: this is probably not needed
 	scratch.reset();
 
 	// Firstly we need to find the values and gradients at quadrature points
@@ -1803,11 +1795,11 @@ void Solid<dim>::print_conv_footer(void) {
 // which is then normalised by the current volume
 // $\int_{\Omega_0}  J ~\textrm{d}V = \int_\Omega  ~\textrm{d}v$.
 template<int dim>
+// ToDO: return the ratio of the reference and current volumes
 double Solid<dim>::get_error_dil(void) {
 
 	double dil_L2_error = 0.0;
 	vol_current = 0.0;
-
 
 	FEValues<dim> fe_values_ref(fe, qf_cell, update_JxW_values);
 
@@ -1834,7 +1826,7 @@ double Solid<dim>::get_error_dil(void) {
 		}Assert(vol_current > 0, ExcInternalError());
 	}
 
-	return (std::sqrt(dil_L2_error)) / vol_current;
+	return (std::sqrt(dil_L2_error));
 }
 
 // Determine the true residual error for the problem. 
