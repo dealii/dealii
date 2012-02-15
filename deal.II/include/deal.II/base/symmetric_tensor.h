@@ -2406,6 +2406,8 @@ deviator_tensor ()
  * <tt>id_0101=id_0110=1/2</tt>. Similar considerations hold for the
  * three-dimensional case.
  *
+ * This issue is also explained in the introduction to step-44.
+ *
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
