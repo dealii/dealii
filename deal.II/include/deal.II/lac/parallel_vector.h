@@ -868,8 +868,8 @@ namespace parallel
 					  * @p false, whereas the other
 					  * processors will return @p true.
 					  */
-      bool
-      partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
+	bool
+	partitioners_are_compatible (const Utilities::MPI::Partitioner &part) const;
 
 
 					 /**
@@ -947,14 +947,14 @@ namespace parallel
 	mutable std::vector<MPI_Request>   update_ghost_values_requests;
 #endif
 
-				     /**
-				      * A lock that makes sure that
-				      * the @p compress and @p
-				      * update_ghost_values functions
-				      * give reasonable results also
-				      * when used with several
-				      * threads.
-				      */
+					 /**
+					  * A lock that makes sure that
+					  * the @p compress and @p
+					  * update_ghost_values functions
+					  * give reasonable results also
+					  * when used with several
+					  * threads.
+					  */
         mutable Threads::ThreadMutex mutex;
 
 					 /**
