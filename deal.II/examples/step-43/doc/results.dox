@@ -4,6 +4,7 @@
 Still to do:
 - play a bit with beta, c_R, CFL
 - switch back to residual-based viscosity
+- always recompute the Darcy solution whenever we refine the mesh
 
 
 The output of this program is not really much different from that of
