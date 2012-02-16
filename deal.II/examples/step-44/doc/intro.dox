@@ -201,7 +201,7 @@ If the Helmholtz free energy depends on the left Cauchy-Green tensor $\mathbf{b}
 
 Following the multiplicative decomposition of the deformation gradient, the Helmholtz free energy can be decomposed as
 @f[
-	\Psi(\mathbf{b}) = \Psi_{\text{vol}}(\mathbf{J}) + \Psi_{\text{iso}}(\overline{\mathbf{b}}) \, .
+	\Psi(\mathbf{b}) = \Psi_{\text{vol}}(J) + \Psi_{\text{iso}}(\overline{\mathbf{b}}) \, .
 @f]
 Similarly, the Kirchhoff stress can be decomposed into volumetric and isochoric parts as $\boldsymbol{\tau} = \boldsymbol{\tau}_{\text{vol}} + \boldsymbol{\tau}_{\text{iso}}$ where:
 @f{align*}
@@ -216,13 +216,20 @@ Similarly, the Kirchhoff stress can be decomposed into volumetric and isochoric 
 		&= \underbrace{( \mathcal{I} - \dfrac{1}{3} \mathbf{I} \otimes \mathbf{I})}_{\mathbb{P}} : \overline{\boldsymbol{\tau}} \, ,
 @f}
 where
-$p = - 1/3 \textrm{tr} \boldsymbol{\sigma} = - 1/3 J^{-1} \textrm{tr} \boldsymbol{\tau}$
-is the hydrostatic pressure and $\mathbb{P}$ is the projection tensor which provides the deviatoric operator in the Eulerian setting.
+$p := \dfrac{\partial \Psi_{\text{vol}}(J)}{\partial J}$ is the pressure response. 
+$\mathbb{P}$ is the projection tensor which provides the deviatoric operator in the Eulerian setting. 
 The fictitious Cauchy stress tensor $\overline{\boldsymbol{\tau}}$ is defined by
 @f[
 	\overline{\boldsymbol{\tau}}
 		:= 2 \overline{\mathbf{b}} \dfrac{\partial \Psi_{\textrm{iso}}(\overline{\mathbf{b}})}{\partial \overline{\mathbf{b}}} \, .
 @f]
+
+
+@note The pressure response as defined above differs from the widely-used definition of the
+pressure in solid mechanics as
+$p = - 1/3 \textrm{tr} \boldsymbol{\sigma} = - 1/3 J^{-1} \textrm{tr} \boldsymbol{\tau}$.
+Here $p$ is the hydrostatic pressure.
+We make use of the pressure response throughout this tut (although we refer to it as the pressure). 
 
 <h4> Neo-Hookean materials </h4>
 
