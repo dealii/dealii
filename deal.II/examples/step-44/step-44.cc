@@ -67,12 +67,12 @@ namespace Parameters {
 // @sect4{Finite Element system}
 // As mentioned in the introduction, a different order
 // interpolation should be used for the displacement
-// $\mathbf{u}$ than for the pressure $p$ and
+// $\mathbf{u}$ than for the pressure $\widetilde{p}$ and
 // the dilatation $\widetilde{J}$.
-// Choosing $p$ and $\widetilde{J}$ as discontinuous (constant)
+// Choosing $\widetilde{p}$ and $\widetilde{J}$ as discontinuous (constant)
 // functions at the element level leads to the
 // mean-dilatation method. The discontinuous approximation
-// allows $p$ and $\widetilde{J}$ to be condensed out
+// allows $\widetilde{p}$ and $\widetilde{J}$ to be condensed out
 // and a classical displacement based method is recovered.
 // Here we specify the polynomial order used to
 // approximate the solution.
@@ -164,11 +164,10 @@ struct Materials {
 	parse_parameters(ParameterHandler &prm);
 };
 
-// ToDo: add a range check
 void Materials::declare_parameters(ParameterHandler &prm) {
 	prm.enter_subsection("Material properties");
 	{
-		prm.declare_entry("Poisson's ratio", "0.4999", Patterns::Double(),
+		prm.declare_entry("Poisson's ratio", "0.4999", Patterns::Double(-1.0,0.5),
 				"Poisson's ratio");
 
 		prm.declare_entry("Shear modulus", "80.194e6", Patterns::Double(),
@@ -563,21 +562,21 @@ private:
 // The entire domain is assumed 
 // to be composed of a compressible neo-Hookean material. 
 // This class defines
-// the behaviour of this material. 
+// the behaviour of this material within a three-field formulation.
 // Compressible neo-Hookean materials
 // can be described by a strain-energy function (SEF)
-// $ \Psi = \Psi_{\text{iso}}(\overline{\mathbf{b}}) + \Psi_{\text{vol}}(J) $.
+// $ \Psi = \Psi_{\text{iso}}(\overline{\mathbf{b}}) + \Psi_{\text{vol}}(\widetilde{J}) $.
 //
 // The isochoric response is given by
-// $ \Psi_{\text{iso}}(\mathbf{b}) = c_{1} [\overline{I}_{1} - 3]  $
+// $ \Psi_{\text{iso}}(\overline{\mathbf{b}}) = c_{1} [\overline{I}_{1} - 3]  $
 // where $ c_{1} = \frac{\mu}{2} $ and $\overline{I}_{1}$ is the first
 // invariant of the left- or right- isochoric Cauchy-Green deformation tensors.
 // That is $\overline{I}_1 :=\textrm{tr}(\overline{\mathbf{b}})$.
 // In this example the SEF that governs the volumetric
 // response is defined as
 // $ \Psi_{\text{vol}}(\widetilde{J})  = \kappa \bigl[ \frac{1}{2} [ \widetilde{J}^{2} - 1 ] - \textrm{ln}( \widetilde{J}) ] \bigr]  $
-// where $\kappa:= \lambda + 2/3 \mu$ is the bulk modulus and
-// $\lambda$ is a Lame moduli.
+// where $\kappa:= \lambda + 2/3 \mu$ is the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk modulus</a> and
+// $\lambda$ is <a href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lame's first parameter</a>.
 template<int dim>
 class Material_Compressible_Neo_Hook_Three_Field {
 public:
@@ -1795,7 +1794,6 @@ void Solid<dim>::print_conv_footer(void) {
 // which is then normalised by the current volume
 // $\int_{\Omega_0}  J ~\textrm{d}V = \int_\Omega  ~\textrm{d}v$.
 template<int dim>
-// ToDO: return the ratio of the reference and current volumes
 double Solid<dim>::get_error_dil(void) {
 
 	double dil_L2_error = 0.0;

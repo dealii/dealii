@@ -537,36 +537,42 @@ where
 		\overline{\overline{\mathbf{\mathsf{K}}}} :=
 			\mathbf{\mathsf{K}}_{u\widetilde{p}} \overline{\mathbf{\mathsf{K}}} \mathbf{\mathsf{K}}_{\widetilde{p}u} \, .
 @f]
-
 Note that due to the choice of $\widetilde{p}$ and $\widetilde{J}$ as discontinuous at the element level, all matrices that need to be inverted are defined at the element level.
 
-
-NEED TO DISCUSS THE STORAGE
-@f[
-\underbrace{\begin{bmatrix}
-			\mathbf{\mathsf{K}}_{\textrm{con}}	&	\mathbf{\mathsf{K}}_{up}	& \mathbf{0}
+The procedure to construct the various contributions is as follows:
+- Construct $\mathbf{\mathsf{K}}$. 
+- Form $\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}$ for element and store where $\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$ was stored in $\mathbf{\mathsf{K}}$.
+- Form $\overline{\overline{\mathbf{\mathsf{K}}}}$ and add to $\mathbf{\mathsf{K}}_{uu}$ to get $\mathbf{\mathsf{K}}_{\textrm{con}}$
+- The modified system matrix is called ${\mathbf{\mathsf{K}}}_{\textrm{store}}$. 
+  That is
+  @f[
+  \underbrace{\begin{bmatrix}
+			\mathbf{\mathsf{K}}_{\textrm{con}}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
 			\\
-			\mathbf{\mathsf{K}}_{pu}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{p\widetilde{J}}^{-1}
+			\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
 			\\
-			\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}p}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+			\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
 		\end{bmatrix}}_{ {\mathbf{\mathsf{K}}}_{\textrm{store}}}
-@f]
+  @f]
 
 
 <h3> Numerical example </h3>
 
 The numerical example considered here is a nearly-incompressible block under compression.
 This benchmark problem is taken from
-<ol>
-	<li>
-		S. Reese, P. Wriggers, B.D. Reddy (2000),
-		A new locking-free brick element technique for large deformation problems in elasticity,
-		<em> Computers and Structures </em>,
-		<strong> 75 </strong>,
-		291-304.
-</ol>
+- S. Reese, P. Wriggers, B.D. Reddy (2000),
+  A new locking-free brick element technique for large deformation problems in elasticity,
+  <em> Computers and Structures </em>,
+  <strong> 75 </strong>,
+  291-304.
 
  @image html "step-44.setup.png"
 
-Using symmetry, we solve for only one quarter of the geometry, as shown in
-highlights in the figure above.
+The material is quasi-incompressible neo-Hookean with <a href="http://en.wikipedia.org/wiki/Shear_modulus">shear modulus</a> $\mu = 80.194e6$ and $\nu = 0.4999$.
+For such a choice of material properties a conventional $Q_1$ approach would lock.
+That is, the response would be overly stiff.
+The initial and final configurations are shown in the image above.
+Using symmetry, we solve for only one quarter of the geometry (i.e. a cube with dimension $0.001$).
+The inner-quarter of the upper surface of the domain is subject to a load of $p_0$. 
+ 
+ 
