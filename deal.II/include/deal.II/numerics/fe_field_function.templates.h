@@ -139,6 +139,52 @@ namespace Functions
     return grads[comp];
   }
 
+
+
+  template <int dim, typename DH, typename VECTOR>
+  void FEFieldFunction<dim, DH, VECTOR>::vector_laplacian
+  (const Point<dim> &p,Vector<double>   &values) const
+  {
+    Assert (values.size() == n_components,
+        ExcDimensionMismatch(values.size(), n_components));
+    typename DH::active_cell_iterator cell = cell_hint.get();
+    if (cell == dh->end())
+      cell = dh->begin_active();
+    Point<dim> qp = mapping.transform_real_to_unit_cell(cell, p);
+
+    // Check if we already have all we need
+    if (!GeometryInfo<dim>::is_inside_unit_cell(qp))
+      {
+        const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
+        = GridTools::find_active_cell_around_point (mapping, *dh, p);
+        cell = my_pair.first;
+        qp = my_pair.second;
+      }
+
+    cell_hint.get() = cell;
+
+    // Now we can find out about the point
+    Quadrature<dim> quad(qp);
+    FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
+        update_hessians);
+    fe_v.reinit(cell);
+    std::vector< Vector<double> > vvalues (1, values);
+    fe_v.get_function_laplacians(data_vector, vvalues);
+    values = vvalues[0];
+  }
+
+
+
+  template <int dim, typename DH, typename VECTOR>
+  double FEFieldFunction<dim, DH, VECTOR>::laplacian
+  (const Point<dim>   &p, const unsigned int  comp) const
+  {
+    Vector<double> lap(n_components);
+    vector_laplacian(p, lap);
+    return lap[comp];
+  }
+
+
 				   // Now the list versions
 				   // ==============================
 
@@ -247,6 +293,58 @@ namespace Functions
     vector_gradient_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q][component];
+  }
+
+
+  template <int dim, typename DH, typename VECTOR>
+  void
+  FEFieldFunction<dim, DH, VECTOR>::
+  vector_laplacian_list (const std::vector<Point< dim > > &    points,
+         std::vector< Vector<double> > &values) const
+  {
+    Assert(points.size() == values.size(),
+     ExcDimensionMismatch(points.size(), values.size()));
+
+    std::vector<typename DH::active_cell_iterator > cells;
+    std::vector<std::vector<Point<dim> > > qpoints;
+    std::vector<std::vector<unsigned int> > maps;
+
+    unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
+
+             // Now gather all the informations we need
+    for (unsigned int i=0; i<ncells; ++i)
+      {
+           // Number of quadrature points on this cell
+  unsigned int nq = qpoints[i].size();
+
+           // Construct a quadrature formula
+  std::vector< double > ww(nq, 1./((double) nq));
+  Quadrature<dim> quad(qpoints[i], ww);
+
+           // Get a function value object
+  FEValues<dim> fe_v(mapping, dh->get_fe(), quad,
+         update_hessians);
+  fe_v.reinit(cells[i]);
+  std::vector< Vector<double> > vvalues (nq, Vector<double>(n_components));
+  fe_v.get_function_laplacians(data_vector, vvalues);
+  for (unsigned int q=0; q<nq; ++q)
+    values[maps[i][q]] = vvalues[q];
+      }
+  }
+
+  template <int dim, typename DH, typename VECTOR>
+  void
+  FEFieldFunction<dim, DH, VECTOR>::
+  laplacian_list (const std::vector<Point< dim > > &points,
+        std::vector< double > &values,
+        const unsigned int  component) const
+  {
+    Assert(points.size() == values.size(),
+     ExcDimensionMismatch(points.size(), values.size()));
+    std::vector< Vector<double> > vvalues(points.size(), Vector<double>(n_components));
+    vector_laplacian_list(points, vvalues);
+    for (unsigned int q=0; q<points.size(); ++q)
+      values[q] = vvalues[q](component);
   }
 
   

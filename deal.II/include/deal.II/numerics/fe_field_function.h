@@ -297,6 +297,41 @@ namespace Functions
       gradient_list (const std::vector< Point< dim > > &p, 
 		     std::vector< Tensor< 1, dim > > &gradients, 
 		     const unsigned int component=0) const;
+
+
+      /**
+       * Compute the Laplacian of a
+       * given component at point <tt>p</tt>.
+       */
+      virtual double
+      laplacian (const Point<dim>   &p,
+          const unsigned int  component = 0) const;
+
+      /**
+       * Compute the Laplacian of all
+       * components at point <tt>p</tt> and
+       * store them in <tt>values</tt>.
+       */
+      virtual void
+      vector_laplacian (const Point<dim>   &p,
+          Vector<double>     &values) const;
+
+      /**
+       * Compute the Laplacian of one
+       * component at a set of points.
+       */
+      virtual void
+      laplacian_list (const std::vector<Point<dim> > &points,
+          std::vector<double>            &values,
+          const unsigned int              component = 0) const;
+
+      /**
+       * Compute the Laplacians of all
+       * components at a set of points.
+       */
+      virtual void
+      vector_laplacian_list (const std::vector<Point<dim> > &points,
+          std::vector<Vector<double> >   &values) const;
   
 				       /**
 					* Create quadrature
