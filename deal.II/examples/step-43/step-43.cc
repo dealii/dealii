@@ -670,7 +670,7 @@ namespace Step43
 				       // (e.g. replace
 				       // RandomMedium::KInverse by
 				       // SingleCurvingCrack::KInverse).
-      const RandomMedium::KInverse<dim>   k_inverse;
+      const SingleCurvingCrack::KInverse<dim>   k_inverse;
   };
 
 
@@ -708,7 +708,7 @@ namespace Step43
 			    FE_Q<dim>(darcy_degree), 1),
 		  darcy_dof_handler (triangulation),
 
-		  saturation_degree (degree+1),
+		  saturation_degree (degree),
 		  saturation_fe (saturation_degree),
 		  saturation_dof_handler (triangulation),
 
@@ -1139,7 +1139,7 @@ namespace Step43
 				   // $\mathbf{M}^{\mathbf{u}}$ and
 				   // another based on the scalar
 				   // Laplace matrix
-				   // $\tilde\mathbf{S}^p$ (which is
+				   // $\tilde{\mathbf S}^p$ (which is
 				   // spectrally close to the Schur
 				   // complement of the Darcy
 				   // matrix). Usually, the
@@ -2300,8 +2300,8 @@ namespace Step43
   TwoPhaseFlowProblem<dim>::project_back_saturation ()
   {
     for (unsigned int i=0; i<saturation_solution.size(); ++i)
-      if (saturation_solution(i) < 0)
-	saturation_solution(i) = 0;
+      if (saturation_solution(i) < 0.2)
+	saturation_solution(i) = 0.2;
       else
 	if (saturation_solution(i) > 1)
 	  saturation_solution(i) = 1;
@@ -2529,7 +2529,7 @@ namespace Step43
 					     max_velocity_times_dF_dS);
       }
 
-    const double c_R = 1e-16;
+    const double c_R = 1;
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
 				  std::pow(global_Omega_diameter, alpha - 2.);
 
@@ -2569,7 +2569,7 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
-    const unsigned int initial_refinement     = (dim == 2 ? 5 : 2);
+    const unsigned int initial_refinement     = (dim == 2 ? 4 : 2);
     const unsigned int n_pre_refinement_steps = (dim == 2 ? 3 : 2);
 
 
