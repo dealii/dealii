@@ -112,7 +112,7 @@ It is also symmetric and positive definite.
 The Green-Lagrange strain tensor is defined by
 @f[
 	\mathbf{E}:= \frac{1}{2}[\mathbf{C} - \mathbf{I} ]
-		= \underbrace{\frac{1}{2}[\textrm{Grad}^T\ \mathbf{U} +	\textrm{Grad}\ mathbf{U}]}_{\boldsymbol{\varepsilon}}
+		= \underbrace{\frac{1}{2}[\textrm{Grad}^T \mathbf{U} +	\textrm{Grad}\mathbf{U}]}_{\boldsymbol{\varepsilon}}
 			+ \frac{1}{2}[\textrm{Grad}^T\ \mathbf{U}][\textrm{Grad}\ \mathbf{U}] \, ,
 @f]
 If the assumption of infinitesimal deformations is valid, then the second term
@@ -242,7 +242,7 @@ The Helmholtz free energy corresponding to a compressible <a href="http://en.wik
 where $\kappa := \lambda + 2/3 \mu$ is the bulk modulus
 and $\overline{I}_1 := \textrm{tr}\ \overline{\mathbf{b}}$.
 The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$.
-In this work $\mathcal{G}:=\bigl[ \frac{1}{2} [{J}^{2} - 1 ] - \textrm{ln}( {J}) ] \bigr]$.
+In this work $\mathcal{G}:=\frac{1}{4} [ J^2 - 1 - 2\textrm{ln}J ]$.
 
 Incompressibility imposes the isochoric constraint that $J=1$ for all motions $\mathbf{\varphi}$.
 The Helmholtz free energy corresponding to an incompressible neo-Hookean material is given by

@@ -583,7 +583,7 @@ private:
 // That is $\overline{I}_1 :=\textrm{tr}(\overline{\mathbf{b}})$.
 // In this example the SEF that governs the volumetric
 // response is defined as
-// $ \Psi_{\text{vol}}(\widetilde{J})  = \kappa \bigl[ \frac{1}{2} [ \widetilde{J}^{2} - 1 ] - \textrm{ln}( \widetilde{J}) ] \bigr]  $
+// $ \Psi_{\text{vol}}(\widetilde{J})  = \kappa \frac{1}{4} [ \widetilde{J}^2 - 1 - 2\textrm{ln}\widetilde{J} ]$.
 // where $\kappa:= \lambda + 2/3 \mu$ is the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk modulus</a> and
 // $\lambda$ is <a href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lame's first parameter</a>.
 template<int dim>
@@ -645,7 +645,7 @@ public:
 	// Derivative of the volumetric free energy wrt $\widetilde{J}$
 	// return $\frac{\partial \Psi_{\text{vol}}(\widetilde{J})}{\partial \widetilde{J}}$
 	double get_dPsi_vol_dJ(void) const {
-		return kappa * (J_tilde - 1.0 / J_tilde);
+		return (kappa / 2.0) * (J_tilde - 1.0 / J_tilde);
 	}
 
 	// Second derivative of the volumetric free energy wrt $\widetilde{J}$
@@ -654,7 +654,7 @@ public:
 	// We calculate
 	// $\frac{\partial^2 \Psi_{\textrm{vol}}(\widetilde{J})}{\partial \widetilde{J} \partial \widetilde{J}}$
 	double get_d2Psi_vol_dJ2(void) const {
-		return kappa * (1.0 + 1.0 / (J_tilde * J_tilde));
+		return ( (kappa / 2.0) * (1.0 + 1.0 / (J_tilde * J_tilde)));
 	}
 
 	// Return various data that we choose to store with the material
