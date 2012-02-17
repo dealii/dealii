@@ -83,15 +83,11 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
-
 				 // Finally, this is for output to a
 				 // file and to the console:
 #include <deal.II/numerics/data_out.h>
 #include <fstream>
 #include <iostream>
-
-
-
 
 				 // ...and this is to import the
 				 // deal.II namespace into the global
