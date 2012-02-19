@@ -514,7 +514,7 @@ namespace VectorTools
              cell2->get_fe().get_name(),
              ExcMessage ("Source and destination cells need to use the same finite element"));
 
-      cache.reinit(dof1.get_fe().dofs_per_cell);
+      cache.reinit(cell1->get_fe().dofs_per_cell);
 
                                      // Get and set the corresponding
                                      // dof_values by interpolation.
