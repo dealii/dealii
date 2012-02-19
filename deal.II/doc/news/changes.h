@@ -136,7 +136,7 @@ the respective norms of a rank-2 tensor.
 <br>
 (Wolfgang Bangerth, 2012/02/08)
 
-<li> New: VectorTools::interpolation_to_different_mesh implemented which interpolates between
+<li> New: VectorTools::interpolate_to_different_mesh implemented which interpolates between
      DoFHandlers with different triangulations based on a common coarse grid.
 <br>
 (Matthias Maier, 2012/02/08)
