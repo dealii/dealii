@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -209,7 +209,7 @@ namespace parallel
 	enum Settings
 	{
 	  default_setting = 0x0,
-	  mesh_reconstruction_after_repartitioning = 0x1,
+	  mesh_reconstruction_after_repartitioning = 0x1
 	};
 
 
