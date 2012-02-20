@@ -3063,16 +3063,16 @@ namespace Step44
     cell->get_dof_indices(data.local_dof_indices);
 
 				     // We now extract the contribution of
-				     // the  dof associated with the current cell
+				     // the  dofs associated with the current cell
 				     // to the global stiffness matrix.
 				     // The discontinuous nature of the $\widetilde{p}$
 				     // and $\widetilde{J}$
 				     // interpolations mean that their is no
 				     // coupling of the local contributions at the
 				     // global level. This is not the case with the u dof.
-				     // In other words, k_Jp, k_pJ and k_JJ, when extracted
+				     // In other words, $k_{Jp}, k_{pJ} and k_{JJ}$, when extracted
 				     // from the global stiffness matrix are the element
-				     // contributions. This is not the case for k_uu.
+				     // contributions. This is not the case for $k_{uu}$.
 
 				     // Currently the matrix corresponding to
 				     // the dof associated with the current element
@@ -3089,15 +3089,15 @@ namespace Step44
 				     //  | k_pu  |     0    |   k_pJ^-1 |
 				     //  |   0   |   k_Jp   |   k_JJ    |
 				     // @endcode
-				     // with k_con = k_uu + k_bbar
+				     // with $k_{con} = k_{uu} + k_{\bar b}$
 				     // where
-				     // k_bbar = k_up k_bar k_pu
+				     // $k_{\bar b} = k_{up} k_{bar} k_{pu}$
 				     // and
-				     // k_bar = k_Jp^{-1} k_JJ kpJ^{-1}
+				     // $k_{bar} = k_{Jp}^{-1} k_{JJ} k_{pJ}^{-1}$.
 				     //
 				     // At this point, we need to take note of
 				     // the fact that global data already exists
-				     // in the K_uu, K_pt, K_tp subblocks.  So
+				     // in the $K_{uu}, K_{pt}, K_{tp}$ sub-blocks.  So
 				     // if we are to modify them, we must
 				     // account for the data that is already
 				     // there (i.e. simply add to it or remove
@@ -3106,7 +3106,7 @@ namespace Step44
 				     // operation, we need to take this into
 				     // account
 				     //
-				     // For the K_uu block in particular, this
+				     // For the $K_{uu}$ block in particular, this
 				     // means that contributions have been added
 				     // from the surrounding cells, so we need
 				     // to be careful when we manipulate this
@@ -3114,38 +3114,40 @@ namespace Step44
 				     // subblocks.
 				     //
 				     // This is the strategy we will employ to
-				     // get the subblocks we want: k_store:
-				     // Since we don't have access to k_{uu},
-				     // but we know its contribution is added to
-				     // the global K_{uu} matrix, we just want
-				     // to add the element wise
-				     // static-condensation k_bbar.
+				     // get the subblocks we want:
 				     //
-				     // - $k_{pJ}^-1$: Similarly, k_pJ exists in
+				     // - $k_{store}$:
+				     // Since we don't have access to $k_{uu}$,
+				     // but we know its contribution is added to
+				     // the global $K_{uu}$ matrix, we just want
+				     // to add the element wise
+				     // static-condensation $k_{\bar b}$.
+				     //
+				     // - $k_{pJ}^{-1}$: Similarly, $k_{pJ}$ exists in
 				     //          the subblock. Since the copy
 				     //          operation is a += operation, we
 				     //          need to subtract the existing
-				     //          k_pJ submatrix in addition to
+				     //          $k_{pJ}$ submatrix in addition to
 				     //          "adding" that which we wish to
 				     //          replace it with.
 				     //
-				     // - $k_{Jp}^-1$: Since the global matrix
+				     // - $k_{Jp}^{-1}$: Since the global matrix
 				     //          is symmetric, this block is the
 				     //          same as the one above and we
-				     //          can simply use k_pJ^-1 as a
+				     //          can simply use $k_{pJ}^{-1}$ as a
 				     //          substitute for this one
 				     //
 				     // We first extract element data from the
 				     // system matrix. So first we get the
 				     // entire subblock for the cell, then
-				     // extract k for the dof associated with
+				     // extract $k$ for the dofs associated with
 				     // the current element
     AdditionalTools::extract_submatrix(data.local_dof_indices,
 				       data.local_dof_indices,
 				       tangent_matrix,
 				       data.k_orig);
-				     // and next the local matrices for k_pu,
-				     // k_pJ and k_JJ
+				     // and next the local matrices for $k_{pu}$,
+				     // $k_{pJ}$ and $k_{JJ}$
     AdditionalTools::extract_submatrix(element_indices_p,
 				       element_indices_u,
 				       data.k_orig,
@@ -3159,30 +3161,30 @@ namespace Step44
 				       data.k_orig,
 				       data.k_JJ);
 
-				     // To get the inverse of k_pJ, we invert it
+				     // To get the inverse of $k_{pJ}$, we invert it
 				     // directly.  This operation is relatively
-				     // inexpensive since k_pJ is
+				     // inexpensive since $k_{pJ}$ is
 				     // block-diagonal.
     data.k_pJ_inv.invert(data.k_pJ);
 
 				     // Now we can make condensation terms to
-				     // add to the k_uu block and put them in
-				     // the cell local matrix A = k_pJ^-1 k_pu
+				     // add to the $k_{uu}$ block and put them in
+				     // the cell local matrix $A = k_pJ^{-1} k_{pu}$:
     data.k_pJ_inv.mmult(data.A, data.k_pu);
-				     // B = k_JJ k_pJ^-1 k_pu
+				     // $B = k_{JJ} k_{pJ}^{-1} k_{pu}$
     data.k_JJ.mmult(data.B, data.A);
-				     // C = k_Jp^-1 k_JJ k_pJ^-1 k_pu
+				     // $C = k_{Jp}^{-1} k_{JJ} k_{pJ}^{-1} k_{pu}$
     data.k_pJ_inv.Tmmult(data.C, data.B);
-				     // k_bbar = k_up k_Jp^-1 k_JJ k_pJ^-1 k_pu
+				     // $k_{\bar b} = k_{up} k_{Jp}^{-1} k_{JJ} k_{pJ}^{-1} k_{pu}$
     data.k_pu.Tmmult(data.k_bbar, data.C);
     AdditionalTools::replace_submatrix(element_indices_u,
 				       element_indices_u,
 				       data.k_bbar,
 				       data.cell_matrix);
 
-				     // Next we place k_{pJ}^-1 in the k_{pJ}
+				     // Next we place $k_{pJ}^{-1}$ in the $k_{pJ}$
 				     // block for post-processing.  Note again
-				     // that we need to remove the k_pJ
+				     // that we need to remove the k_{pJ}
 				     // contribution that already exists there.
     data.k_pJ_inv.add(-1.0, data.k_pJ);
     AdditionalTools::replace_submatrix(element_indices_p,
@@ -3193,7 +3195,7 @@ namespace Step44
 
 // @sect4{Solid::output_results}
 // Here we present how the results are written to file to be viewed
-// using ParaView. The method is similar to that shown in previous
+// using ParaView or Visit. The method is similar to that shown in previous
 // tutorials so will not be discussed in detail.
   template <int dim>
   void Solid<dim>::output_results() const
@@ -3216,18 +3218,20 @@ namespace Step44
 			     data_component_interpretation);
 
 				     // Since we are dealing with a large
-				     // deformation problem, it would be nice to
-				     // display the result on a displaced grid!
-				     // The MappingQEulerian class linked with
-				     // the DataOut class provides an interface
-				     // through which this can be achieved
-				     // without physically moving the grid
-				     // points ourselves.  We first need to copy
-				     // the solution to a temporary vector and
-				     // then create the Eulerian mapping. We
-				     // also specify the polynomial degree to
-				     // the DataOut object in order to produce a
-				     // more refined output data set when higher
+				     // deformation problem, it would be nice
+				     // to display the result on a displaced
+				     // grid!  The MappingQEulerian class
+				     // linked with the DataOut class provides
+				     // an interface through which this can be
+				     // achieved without physically moving the
+				     // grid points in the Triangulation
+				     // object ourselves.  We first need to
+				     // copy the solution to a temporary
+				     // vector and then create the Eulerian
+				     // mapping. We also specify the
+				     // polynomial degree to the DataOut
+				     // object in order to produce a more
+				     // refined output data set when higher
 				     // order polynomials are used.
     Vector<double> soln(solution_n.size());
     for (unsigned int i = 0; i < soln.size(); ++i)
