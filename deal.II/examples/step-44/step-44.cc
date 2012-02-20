@@ -915,13 +915,34 @@ namespace Step44
 				       // + \textrm{Grad}\ \mathbf{u}$ and
 				       // then let the material model
 				       // associated with this quadrature
-				       // point update itself.
+				       // point update itself. When computing
+				       // the deformation gradient, we have to
+				       // take care with which data types we
+				       // compare the sum $\mathbf{I} +
+				       // \textrm{Grad}\ \mathbf{u}$: Since
+				       // $I$ has data type SymmetricTensor,
+				       // just writing <code>I +
+				       // Grad_u_n</code> would convert the
+				       // second argument to a symmetric
+				       // tensor, perform the sum, and then
+				       // cast the result to a Tensor (i.e.,
+				       // the type of a possibly non-symmetric
+				       // tensor). However, since
+				       // <code>Grad_u_n</code> is
+				       // nonsymmetric in general, the
+				       // conversion to SymmetricTensor will
+				       // fail. We can avoid this back and
+				       // forth by converting $I$ to Tensor
+				       // first, and then performing the
+				       // addition as between non-symmetric
+				       // tensors:
       void update_values (const Tensor<2, dim> & Grad_u_n,
 			  const double p_tilde,
 			  const double J_tilde)
 	{
-	  const Tensor<2, dim> F = AdditionalTools::StandardTensors<dim>::I +
-				   Grad_u_n;
+	  const Tensor<2, dim> F
+	    = (Tensor<2, dim>(AdditionalTools::StandardTensors<dim>::I) +
+	       Grad_u_n);
 	  material->update_material_data(F, p_tilde, J_tilde);
 
 					   // The material has been updated so
