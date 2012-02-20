@@ -118,7 +118,15 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Improved: FEFieldFunction allows now for the computation of laplacians.
+<li> Fixed: parallel::distributed::Triangulation::clear() forgot
+to update the number cache of this class, leading to wrong results
+when calling functions like
+parallel::distributed::Triangulation::n_global_active_cells();
+<br>
+(Wolfgang Bangerth, 2012/02/20)
+
+<ol>
+<li> Improved: FEFieldFunction allows now for the computation of Laplacians.
 <br>
 (Christian Goll, 2012/02/16)
 

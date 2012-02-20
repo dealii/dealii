@@ -1919,6 +1919,8 @@ namespace parallel
       p4est_tree_to_coarse_cell_permutation.resize (0);
 
       dealii::Triangulation<dim,spacedim>::clear ();
+
+      update_number_cache ();
     }
 
 
@@ -2793,11 +2795,12 @@ namespace parallel
 		 number_cache.n_locally_owned_active_cells.end(),
 		 0);
 
-      for (typename Triangulation<dim,spacedim>::active_cell_iterator
-	     cell = this->begin_active();
-	   cell != this->end(); ++cell)
-	if (cell->subdomain_id() == my_subdomain)
-	  ++number_cache.n_locally_owned_active_cells[my_subdomain];
+      if (this->n_levels() > 0)
+	for (typename Triangulation<dim,spacedim>::active_cell_iterator
+	       cell = this->begin_active();
+	     cell != this->end(); ++cell)
+	  if (cell->subdomain_id() == my_subdomain)
+	    ++number_cache.n_locally_owned_active_cells[my_subdomain];
 
       unsigned int send_value
 	= number_cache.n_locally_owned_active_cells[my_subdomain];
