@@ -174,7 +174,8 @@ There are a number of obvious extensions for this work:
   model is very basic. It may be beneficial to split the material
   class into two separate classes, one dealing with the volumetric
   response and the other the isochoric response, and produce a generic
-  materials class that would allow for the addition of more complex
+  materials class (i.e. having abstract virtual functions that derived
+  classes have to implement) that would allow for the addition of more complex
   material models. Such models could include other hyperelastic
   materials, plasticity and viscoelastic materials and others.
 - The program has been developed for solving problems on single-node
