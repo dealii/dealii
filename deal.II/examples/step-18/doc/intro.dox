@@ -101,7 +101,27 @@ variable, but only a time-like parameter that governs the evolution of the
 problem.
 
 While these equations are sufficient to describe small deformations, computing
-large deformations is a little more complicated. To do so, let us first
+large deformations is a little more complicated and, in general, leads
+to nonlinear equations such as those treated in step-44. In the
+following, let us consider some of the tools one would employ when
+simulating problems in which the deformation becomes <i>large</i>.
+
+@note The model we will consider below is not founded on anything that
+would be mathematical sound: we will consider a model in which we
+produce a small deformation, deform the physical coordinates of the
+body by this deformation, and then consider the next loading step
+again as a linear problem. This isn't consistent, since the assumption
+of linearity implies that deformations are infinitesimal and so moving
+around the vertices of our mesh by a finite amount before solving the
+next linear problem is an inconsistent approach. We should therefore
+note that it is not surprising that the equations discussed below
+can't be found in the literature: <b>The model considered here has
+little to do with reality!</b> On the other hand, the implementational
+techniques we consider are very much what one would need to use when
+implementing a <i>real</i> model, as we will see in step-44.
+
+
+To come back to defining our "artificial" model, let us first
 introduce a tensorial stress variable $\sigma$, and write the differential
 equations in terms of the stress:
 @f{eqnarray*}
