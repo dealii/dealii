@@ -215,8 +215,6 @@ namespace Step44
 // The use of an effective preconditioner is critical to ensure
 // convergence when a large nonlinear motion occurs
 // in a Newton increment.
-// ToDo: explain
-// The default values are optimal for single-thread conditions this particular problem.
     struct LinearSolver
     {
 	std::string type_lin;
@@ -2230,9 +2228,8 @@ namespace Step44
 
 // Calculate how well the dilatation $\widetilde{J}$ agrees with $J :=
 // \textrm{det}\ \mathbf{F}$ from the $L^2$ error $ \bigl[ \int_{\Omega_0} {[ J
-// - \widetilde{J}]}^{2}\textrm{d}V \bigr]^{1/2}$ which is then normalised by
-// the current volume $\int_{\Omega_0} J ~\textrm{d}V = \int_\Omega
-// ~\textrm{d}v$.  We also return the ratio of the current volume of the
+// - \widetilde{J}]}^{2}\textrm{d}V \bigr]^{1/2}$.
+// We also return the ratio of the current volume of the
 // domain to the reference volume. This is of interest for incompressible
 // media where we want to check how well the isochoric constraint has been
 // enforced.

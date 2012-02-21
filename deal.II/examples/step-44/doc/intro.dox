@@ -1,3 +1,11 @@
+<br>
+
+<i>This program was contributed by Jean-Paul Pelteret and Andrew McBride.
+<br>
+This material is based upon work supported by  the German Science Foundation (Deutsche
+Forschungsgemeinschaft, DFG), grant STE 544/39-1,  and the National Research Foundation of South Africa. 
+</i>
+
 <a name="Intro"></a>
 <h1>Introduction</h1>
 
@@ -322,15 +330,15 @@ The three-field variational principle used here is given by
 where the external potential is defined by
 @f[
 	\Pi_{\textrm{ext}}
-		= - \int_\Omega \mathbf{b} \cdot \mathbf{u}~\textrm{d}v
-			- \int_{\partial \Omega_{\sigma}} \overline{\mathbf{t}} \cdot \mathbf{u}~\textrm{d}a \, .
+		= - \int_\Omega \mathbf{b}^\text{p} \cdot \mathbf{u}~\textrm{d}v
+			- \int_{\partial \Omega_{\sigma}} \mathbf{t}^\text{p} \cdot \mathbf{u}~\textrm{d}a \, .
 @f]
 The boundary of the current configuration  $\partial \Omega$ is composed into two parts as
 $\partial \Omega = \partial \Omega_{\mathbf{u}} \cup \partial \Omega_{\sigma}$,
 where
 $\partial \Omega_{\mathbf{u}} \cap \partial \Omega_{\boldsymbol{\sigma}} = \emptyset$.
-The prescribed Cauchy traction, denoted $\overline{\mathbf{t}}$, is applied to $ \partial \Omega_{\boldsymbol{\sigma}}$ while the motion is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$.
-The body force per unit current volume is denoted $\mathbf{b}$.
+The prescribed Cauchy traction, denoted $\mathbf{t}^\text{p}$, is applied to $ \partial \Omega_{\boldsymbol{\sigma}}$ while the motion is prescribed on the remaining portion of the boundary $\partial \Omega_{\mathbf{u}}$.
+The body force per unit current volume is denoted $\mathbf{b}^\text{p}$.
 
 
 
@@ -351,12 +359,12 @@ The stationarity of the potential follows as
             -\widetilde{p}\right]
 			\right\}~\textrm{d}V
 			\\
-		&\quad - \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{b}~\textrm{d}v
-			- \int_{\partial \Omega_{0,\boldsymbol{\sigma}}} \mathbf{u} \cdot \overline{\mathbf{t}}~\textrm{d}a
+		&\quad - \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\textrm{d}V
+			- \int_{\partial \Omega_{0,\boldsymbol{\sigma}}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\textrm{d}A
 			\\
 		&=0 \, ,
 @f}
-for all virtual displacements $\delta \mathbf{u} \in H^1(\Omega)$ subject to the constraint that $\mathbf{u} = \mathbf{0}$ on $\partial \Omega_{\mathbf{u}}$, and all virtual pressures $\delta p \in L^2(\Omega)$ and virtual dilatations $\delta \widetilde{J} \in L^2(\Omega)$.
+for all virtual displacements $\delta \mathbf{u} \in H^1(\Omega)$ subject to the constraint that $\mathbf{u} = \mathbf{0}$ on $\partial \Omega_{\mathbf{u}}$, and all virtual pressures $\delta \widetilde{p} \in L^2(\Omega)$ and virtual dilatations $\delta \widetilde{J} \in L^2(\Omega)$.
 One should note that the definitions of the volumetric Cauchy stress and the subsequent tangent differs slightly from the general form given in the section on hyperelastic materials.
 This is because the pressure $\widetilde{p}$ is now a primary field.
 Note that although the variables are all expressed in terms of spatial quantities, the domain of integration is the reference configuration.
@@ -364,14 +372,14 @@ This approach is called a total-Lagrangian formulation.
 The approach given in step-18 could be called updated Lagrangian.
 The Euler-Lagrange equations corresponding to the residual are:
 @f{align*}
-	&\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b} = \mathbf{0} && \textrm{[equilibrium]}
+	&\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b}^\text{p} = \mathbf{0} && \textrm{[equilibrium]}
 		\\
 	&J(\mathbf{u}) = \widetilde{J} 		&& \textrm{[dilatation]}
 		\\
 	&\widetilde{p} = \dfrac{\textrm{d} \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}} && \textrm{[pressure]} \, .
 @f}
 The first equation is the equilibrium equation in the spatial setting.
-The second is the constraint that $J(\mathbf{u}) = \widetilde{J}$, i.e., the incompressibility.
+The second is the constraint that $J(\mathbf{u}) = \widetilde{J}$.
 The third is the definition of the pressure $\widetilde{p}$.
 
 We will use the iterative Newton-Raphson method to solve the nonlinear residual equation $R$.
@@ -416,32 +424,32 @@ where
 @f{align*}
 	D_{\varDelta \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
  	&=
- 	\int_\Omega \bigl[ \textrm{grad}\ \delta \mathbf{u} :
+ 	\int_{\Omega_0} \bigl[ \textrm{grad}\ \delta \mathbf{u} :
  			\textrm{grad}\ \varDelta \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} + \boldsymbol{\tau}_{\textrm{vol}}]
  			+ \textrm{grad}\ \delta \mathbf{u} :[
              \underbrace{[\widetilde{p}J[\mathbf{I}\otimes\mathbf{I} - 2 \mathcal{I}]}_{\equiv J\mathfrak{c}_{\textrm{vol}}} +
              J\mathfrak{c}_{\textrm{iso}}] :\textrm{grad} \varDelta \mathbf{u}
  		\bigr]~\textrm{d}V \, ,
  		\\
- 	&\quad + \int_\Omega \delta \widetilde{p} J \mathbf{I} : \textrm{grad}\ \varDelta \mathbf{u} ~\textrm{d}V
+ 	&\quad + \int_{\Omega_0} \delta \widetilde{p} J \mathbf{I} : \textrm{grad}\ \varDelta \mathbf{u} ~\textrm{d}V
  	\\
  	D_{\varDelta \widetilde{p}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
  	&=
- 	\int_\Omega \textrm{grad}\ \delta \mathbf{u} : J \mathbf{I} \varDelta \widetilde{p} ~\textrm{d}V
- 		-  \int_\Omega \delta \widetilde{J} \varDelta \widetilde{p}  ~\textrm{d}V \, ,
+ 	\int_{\Omega_0} \textrm{grad}\ \delta \mathbf{u} : J \mathbf{I} \varDelta \widetilde{p} ~\textrm{d}V
+ 		-  \int_{\Omega_0} \delta \widetilde{J} \varDelta \widetilde{p}  ~\textrm{d}V \, ,
  	\\
  	D_{\varDelta \widetilde{J}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
- 	&=  -\int_\Omega \delta \widetilde{p} \varDelta \widetilde{J}~\textrm{d}V
- 	 + \int_\Omega \delta \widetilde{J}  \dfrac{\textrm{d}^2 \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}\textrm{d}\widetilde{J}} \varDelta \widetilde{J} ~\textrm{d}V \, .
+ 	&=  -\int_{\Omega_0} \delta \widetilde{p} \varDelta \widetilde{J}~\textrm{d}V
+ 	 + \int_{\Omega_0} \delta \widetilde{J}  \dfrac{\textrm{d}^2 \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}\textrm{d}\widetilde{J}} \varDelta \widetilde{J} ~\textrm{d}V \, .
 @f}
 
 Note that the following terms are termed the geometrical stress and  the material contributions to the tangent matrix:
 @f{align*}
-& \int_\Omega \textrm{grad}\ \delta \mathbf{u} :
+& \int_{\Omega_0} \textrm{grad}\ \delta \mathbf{u} :
  			\textrm{grad}\ \varDelta \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} +  \boldsymbol{\tau}_{\textrm{vol}}]~\textrm{d}V
  			&& \quad {[\textrm{Geometrical stress}]} \, ,
  		\\
-& \int_\Omega \textrm{grad} \delta \mathbf{u} :
+& \int_{\Omega_0} \textrm{grad} \delta \mathbf{u} :
  			[J\mathfrak{c}_{\textrm{vol}} + J\mathfrak{c}_{\textrm{iso}}] :\textrm{grad}\ \varDelta \mathbf{u}
  		~\textrm{d}V
  		&& \quad {[\textrm{Material}]} \, .
@@ -464,7 +472,7 @@ and a classical displacement based method is recovered.
 For fully-incompressible materials $\nu = 0.5$ and the three-field formulation will still exhibit
 locking behaviour.
 This can be overcome by introducing an additional constraint into the free energy of the form
-$\int_\Omega \Lambda [ \widetilde{J} - 1]~\textrm{d}V$.
+$\int_{\Omega_0} \Lambda [ \widetilde{J} - 1]~\textrm{d}V$.
 Here $\Lambda$ is a Lagrange multiplier to enforce the isochoric constraint.
 For further details see Miehe (1994).
 
