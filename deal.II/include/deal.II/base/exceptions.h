@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -652,7 +652,7 @@ namespace StandardExceptions
 				    * ExcDivideByZero for those).
 				    */
   DeclException0 (ExcNumberNotFinite);
-  
+
 				   /**
 				    * Trying to allocate a new
 				    * object failed due to lack of
@@ -824,7 +824,7 @@ namespace StandardExceptions
 				    * both of type <tt>int</tt>.
 				    */
   DeclException2 (ExcDimensionMismatch,
-		  int, int,
+		  std::size_t, std::size_t,
 		  << "Dimension " << arg1 << " not equal to " << arg2);
 
                                    /**
@@ -905,7 +905,7 @@ namespace StandardExceptions
 				    * design flaw in the
 				    * <tt>DeclException0</tt> macro:
 				    * exceptions desclared through
-				    * DeclException0 
+				    * DeclException0
 				    * do not allow one to specify a
 				    * message that is displayed when
 				    * the exception is raised, as
