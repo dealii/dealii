@@ -24,7 +24,6 @@
       <li> <a href="#prerequisites">System requirements</a>
 	<ul>
 	  <li> <a href="#supported">Supported platforms</a>
-	  <li> <a href="#unsupported">Unsupported and partly supported platforms</a>
 	  <li> <a href="#additional-software">Additional software requirements</a>
 	</ul>
       <li> <a href="#installation">Installation</a>
@@ -84,29 +83,13 @@
     FreeBSD, or Linux on chips like SPARC, PA-RISC, PowerPC, etc) using
     gcc as compiler, but we do not regularly test them.
 
-    <a name="unsupported"></a>
-    <h3>Unsupported / partly supported platforms</h3>
-
-    For the following list of systems, we have collected
-    our experiences on separate pages:
-    <ul>
-      <li> <a href="platforms/sgi-irix.html" target="body">SGI
-           IRIX64</a> with gcc 3.2, 3.3 and 3.4, and with MIPSpro 7.41;
-
-      <li> <a href="platforms/dec-osf5.html" target="body">OSF1 V5.3 on
-           Alpha</a> with gcc newer than 2.95.x (the same notes probably also
-	   apply to Linux on DEC Alpha) and using DEC's cxx compiler version
-           6.3; for older systems with OSF1 4.0 and cxx6.0 please see
-	   <a href="platforms/dec-osf.html" target="body">this page</a>.
-
-      <li> <a href="platforms/ibm_aix_xlc.html" target="body">IBM AIX
-           with IBM's xlC 5.0 and 6.0 compilers</a>.
-
-      <li> <a href="platforms/windows.html" target="body">Microsoft
-           Windows 95/98/2000/NT/XP</a>.
-
-      <li> <a href="platforms/bcc.html" target="body">Borland C++/Kylix</a>.
-    </ul>
+    <p>
+      There are of course many other C++ compilers out there though
+      they seem to become fewer and fewer. Our experience is that with
+      most of them some part or other of the C++ standard is not
+      supported and they eventually fail on a project as large as
+      deal.II. Some may in fact work if one puts in enough time, but
+      your best bet is probably to stick with the ones listed above.
     </p>
 
     <p>
@@ -117,6 +100,7 @@
     describes <a href="porting.html" target="body">porting the library
     to new systems</a>.
     </p>
+
 
     <a name="additional-software"></a>
     <h3>Additional software requirements</h3>
