@@ -351,13 +351,13 @@ The stationarity of the potential follows as
 			+ \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial \widetilde{p}} \delta \widetilde{p}
 			+ \dfrac{\partial \Pi(\mathbf{\Xi})}{\partial \widetilde{J}} \delta \tilde{J}
 			\\
-		&= \int_{\Omega_0}  \left\{
-			\textrm{grad}\ \delta\mathbf{u} : [ \underbrace{[\widetilde{p} J \mathbf{I}]}_{\equiv \boldsymbol{\tau}_{\textrm{iso}}}
-            +  \boldsymbol{\tau}_{\textrm{vol}}]
+		&= \int_{\Omega_0}  \left[
+			\textrm{grad}\ \delta\mathbf{u} : [ \underbrace{[\widetilde{p} J \mathbf{I}]}_{\equiv \boldsymbol{\tau}_{\textrm{vol}}}
+            +  \boldsymbol{\tau}_{\textrm{iso}}]
 			+ \delta \widetilde{p}\, [ J(\mathbf{u}) - \widetilde{J}]
 			+ \delta \widetilde{J}\left[ \dfrac{\textrm{d} \Psi_{\textrm{vol}}(\widetilde{J})}{\textrm{d} \widetilde{J}}
             -\widetilde{p}\right]
-			\right\}~\textrm{d}V
+			\right]~\textrm{d}V
 			\\
 		&\quad - \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\textrm{d}V
 			- \int_{\partial \Omega_{0,\boldsymbol{\sigma}}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\textrm{d}A
@@ -365,11 +365,21 @@ The stationarity of the potential follows as
 		&=0 \, ,
 @f}
 for all virtual displacements $\delta \mathbf{u} \in H^1(\Omega)$ subject to the constraint that $\mathbf{u} = \mathbf{0}$ on $\partial \Omega_{\mathbf{u}}$, and all virtual pressures $\delta \widetilde{p} \in L^2(\Omega)$ and virtual dilatations $\delta \widetilde{J} \in L^2(\Omega)$.
-One should note that the definitions of the volumetric Cauchy stress and the subsequent tangent differs slightly from the general form given in the section on hyperelastic materials.
-This is because the pressure $\widetilde{p}$ is now a primary field.
-Note that although the variables are all expressed in terms of spatial quantities, the domain of integration is the reference configuration.
-This approach is called a total-Lagrangian formulation.
-The approach given in step-18 could be called updated Lagrangian.
+
+One should note that the definitions of the volumetric Cauchy stress in the three field formulation
+$\boldsymbol{\tau}_{\textrm{vol}} \equiv \widetilde{p} J \mathbf{I}$
+ and the subsequent volumetric tangent differs slightly from the general form given in the section on hyperelastic materials where 
+$\boldsymbol{\tau}_{\textrm{vol}} \equiv p J\mathbf{I}$.
+This is because the pressure $\widetilde{p}$ is now a primary field as opposed to a constitutively derived quantity.
+One needs to carefully distinguish between the primary fields and those obtained from the constitutive relations. 
+
+@note Although the variables are all expressed in terms of spatial quantities, the domain of integration is the initial configuration.
+This approach is called a <em> total-Lagrangian formulation </em>.
+The approach given in step-18, where the domain of integration is the current configuration, could be called an <em> updated Lagrangian formulation </em>. 
+These various merits of these two approaches are discussed widely in the literature.
+It should be noted however that they are equivalent.
+
+
 The Euler-Lagrange equations corresponding to the residual are:
 @f{align*}
 	&\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b}^\text{p} = \mathbf{0} && \textrm{[equilibrium]}
@@ -381,6 +391,21 @@ The Euler-Lagrange equations corresponding to the residual are:
 The first equation is the equilibrium equation in the spatial setting.
 The second is the constraint that $J(\mathbf{u}) = \widetilde{J}$.
 The third is the definition of the pressure $\widetilde{p}$.
+
+@note The simplified single-field derivation ($\mathbf{u}$ is the only primary variable) below makes it clear how we transform the limits of integration to the reference domain.
+@f{align*}
+&=
+\int_{\Omega} [-\mathrm{grad}\delta \mathbf{u}:\boldsymbol{\sigma} + \delta \mathbf{u} \cdot\mathbf{b}^\text{p}]~\mathrm{d}v
+  + \int_{\partial \Omega} \delta \mathbf{u} \cdot \mathbf{t}^\text{p}~\mathrm{d}a \\
+&=
+- \int_{\Omega} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V 
++ \int_{\Omega_0} \delta \mathbf{u} \cdot J\mathbf{b}^\text{p}~\mathrm{d}V
+ + \int_{\partial \Omega_0} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \\
+&=
+- \int_{\Omega_0} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V 
++ \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\mathrm{d}V
+ + \int_{\partial \Omega_{0,\sigma}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \,.
+@f}
 
 We will use the iterative Newton-Raphson method to solve the nonlinear residual equation $R$.
 For the sake of simplicity we assume dead loading, i.e. the loading does not change due to the deformation.
@@ -569,6 +594,26 @@ The procedure to construct the various contributions is as follows:
 			\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
 		\end{bmatrix}}_{ {\mathbf{\mathsf{K}}}_{\textrm{store}}}
   @f]
+
+
+<h3> The material class </h3>
+
+A good object-oriented design of a Material class would facilitate the extension of this tutorial to a wide range of material types. 
+In this tutorial we simply have one Material class named Material_Compressible_Neo_Hook_Three_Field.
+Ideally this class would derive from a class HyperelasticMaterial which would derive from the base class Material.
+The three-field nature of the formulation used here also complicates the matter. 
+
+The free energy function for the three field formulation is $\Psi = \Psi_\text{vol}(\widetilde{J}) + \Psi_\text{iso}(\overline{\mathbf{b}})$. 
+The isochoric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{iso}}(\overline{\mathbf{b}})$ is identical to that obtained using a one-field formulation for a hyperelastic material. 
+However, the volumetric part of the free energy is now a function of the primary variable $\widetilde{J}$. 
+Thus, for a three field formulation the constitutive response for the volumetric part of the Kirchhoff stress ${\boldsymbol{\tau}}_{\text{vol}}$ (and the tangent) is not given by the hyperelastic constitutive law as in a one-field formulation. 
+One can label the term
+$\boldsymbol{\tau}_{\textrm{vol}} \equiv \widetilde{p} J \mathbf{I}$
+as the volumetric Kirchhoff stress, but the pressure $\widetilde{p}$ is not derived from the free energy; it is a primary field.  
+
+In order to have a flexible approach, it was decided that the Material_Compressible_Neo_Hook_Three_Field would still be able to calculate and return a volumetric Kirchhoff stress and tangent. 
+In order to do this, we choose to store the interpolated primary fields $\widetilde{p}$ and $\widetilde{J}$ in the Material_Compressible_Neo_Hook_Three_Field class associated with the quadrature point. 
+This decision should be revisited at a later stage when the tutorial is extended to account for other materials.
 
 
 <h3> Numerical example </h3>
