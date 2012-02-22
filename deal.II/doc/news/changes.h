@@ -125,7 +125,6 @@ parallel::distributed::Triangulation::n_global_active_cells();
 <br>
 (Wolfgang Bangerth, 2012/02/20)
 
-<ol>
 <li> Improved: FEFieldFunction allows now for the computation of Laplacians.
 <br>
 (Christian Goll, 2012/02/16)
