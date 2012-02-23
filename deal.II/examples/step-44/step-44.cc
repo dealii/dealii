@@ -1134,8 +1134,7 @@ namespace Step44
 				       // Apply Dirichlet boundary conditions on
 				       // the displacement field
       void
-      make_constraints(const int & it_nr,
-		       ConstraintMatrix & constraints);
+      make_constraints(const int & it_nr);
 
 				       // Create and update the quadrature
 				       // points. Here, no data needs to be
@@ -2120,10 +2119,10 @@ namespace Step44
 					 // continue with the iteration, we
 					 // assemble the tangent, make and
 					 // impose the Dirichlet constraints,
-					 // and do the solve of the linearized
+					 // and do the solve of the linearised
 					 // system:
 	assemble_system_tangent();
-	make_constraints(newton_iteration, constraints);
+	make_constraints(newton_iteration);
 	constraints.condense(tangent_matrix, system_rhs);
 
 	const std::pair<unsigned int, double>
@@ -2707,8 +2706,7 @@ namespace Step44
 // additional contributions are to be made since the constraints
 // are already exactly satisfied.
   template <int dim>
-  void Solid<dim>::make_constraints(const int & it_nr,
-				    ConstraintMatrix & constraints)
+  void Solid<dim>::make_constraints(const int & it_nr)
   {
     std::cout << " CST " << std::flush;
 
