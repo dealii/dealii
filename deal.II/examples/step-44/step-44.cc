@@ -124,8 +124,8 @@ namespace Step44
 // @sect4{Geometry}
 // Make adjustments to the problem geometry and the applied load.
 // Since the problem modelled here is quite specific, the load
-// scale can be altered to specific values to attain results given
-// in the literature.
+// scale can be altered to specific values to compare with the
+// results given in the literature.
     struct Geometry
     {
 	unsigned int global_refinement;
@@ -211,10 +211,10 @@ namespace Step44
     }
 
 // @sect4{Linear solver}
-// Next, choose both solver and preconditioner settings.
+// Next, we choose both solver and preconditioner settings.
 // The use of an effective preconditioner is critical to ensure
 // convergence when a large nonlinear motion occurs
-// in a Newton increment.
+// within a Newton increment.
     struct LinearSolver
     {
 	std::string type_lin;
@@ -273,7 +273,7 @@ namespace Step44
 // @sect4{Nonlinear solver}
 // A Newton-Raphson scheme is used to
 // solve the nonlinear system of governing equations.
-// Define the tolerances and the maximum number of
+// We now define the tolerances and the maximum number of
 // iterations for the Newton-Raphson nonlinear solver.
     struct NonlinearSolver
     {
@@ -412,7 +412,7 @@ namespace Step44
 // in the deal.II library yet.
 // We place these common operations
 // in a separate namespace for convenience.
-// We also include some widely used operators
+// We also include some widely used operators.
   namespace AdditionalTools
   {
 
@@ -525,7 +525,7 @@ namespace Step44
 	}
     }
 
-// Define some frequently used
+// Now we define some frequently used
 // second and fourth-order tensors:
     template <int dim>
     class StandardTensors
@@ -543,7 +543,7 @@ namespace Step44
 					 // we name the tensor $\mathcal{I}$
 	static const SymmetricTensor<4, dim> II;
 					 // Fourth-order deviatoric such that
-					 // $\textrm{dev}(\bullet) = (\bullet) - (1/3)[(\bullet):\mathbf{I}]\mathbf{I}$
+					 // $\textrm{dev} \{ \bullet \} = \{ \bullet \} - [1/\textrm{dim}][ \{ \bullet\} :\mathbf{I}]\mathbf{I}$
 	static const SymmetricTensor<4, dim> dev_P;
     };
 
@@ -612,7 +612,7 @@ namespace Step44
       const double delta_t;
   };
 
-// @sect3{Compressible neo-Hookean material}
+// @sect3{Compressible neo-Hookean material within a three-field formulation}
 
 // As discussed in the Introduction, Neo-Hookean materials are a type of
 // hyperelastic materials.  The entire domain is assumed to be composed of a
@@ -629,7 +629,7 @@ namespace Step44
 // That is $\overline{I}_1 :=\textrm{tr}(\overline{\mathbf{b}})$.  In this
 // example the SEF that governs the volumetric response is defined as $
 // \Psi_{\text{vol}}(\widetilde{J}) = \kappa \frac{1}{4} [ \widetilde{J}^2 - 1
-// - 2\textrm{ln}\; \widetilde{J} ]$.  where $\kappa:= \lambda + 2/3 \mu$ is
+// - 2\textrm{ln}\; \widetilde{J} ]$,  where $\kappa:= \lambda + 2/3 \mu$ is
 // the <a href="http://en.wikipedia.org/wiki/Bulk_modulus">bulk modulus</a>
 // and $\lambda$ is <a
 // href="http://en.wikipedia.org/wiki/Lam%C3%A9_parameters">Lame's first
@@ -639,7 +639,7 @@ namespace Step44
 // and provides a central point that one would need to modify if one were to
 // implement a different material model. For it to work, we will store one
 // object of this type per quadrature point, and in each of these objects
-// store the current state (characterized by the values of the three fields)
+// store the current state (characterized by the values or measures  of the three fields)
 // so that we can compute the elastic coefficients linearized around the
 // current state.
   template <int dim>
@@ -662,37 +662,12 @@ namespace Step44
       ~Material_Compressible_Neo_Hook_Three_Field()
 	{}
 
-				       // The Kirchhoff stress tensor
-				       // $\boldsymbol{\tau}$ is the chosen
-				       // stress measure.  Recall that
-				       // $\boldsymbol{\tau} =
-				       // \chi_{*}(\mathbf{S})$, i.e.
-				       // $\boldsymbol{\tau} = \mathbf{F}
-				       // \mathbf{S} \mathbf{F}^{T}$.
-				       // Furthermore, $\boldsymbol{\tau} = 2
-				       // \mathbf{F} \frac{\partial
-				       // \Psi(\mathbf{C})}{\partial
-				       // \mathbf{C}} \mathbf{F}^{T} = 2
-				       // \mathbf{b} \frac{\partial
-				       // \Psi(\mathbf{b})}{\partial
-				       // \mathbf{b}}$.  Therefore,
-				       // $\boldsymbol{\tau} = 2 \mathbf{b}
-				       // \bigl[ \frac{\partial
-				       // \Psi_{\text{iso}}(\mathbf{b})}{\partial
-				       // \mathbf{b}} + \frac{\partial
-				       // \Psi_{\text{vol}}(J)}{\partial
-				       // J}\frac{\partial J}{\partial
-				       // \mathbf{b}} \bigr] = 2 \mathbf{b}
-				       // \frac{\partial
-				       // \Psi_{\text{iso}}(\mathbf{b})}{\partial
-				       // \mathbf{b}} + J\frac{\partial
-				       // \Psi_{\text{vol}}(J)}{\partial
-				       // J}\mathbf{I} $
-
 				       // We update the material model with
 				       // various deformation dependent data
-				       // based on $F$ and at the end of the
-				       // function include a safety check for
+				       // based on $F$ and the pressure $\widetilde{p}$
+      	  	  	  	   // and dilatation $\widetilde{J}$,
+      	  	  	  	   // and at the end of the
+				       // function include a physical check for
 				       // internal consistency:
       void update_material_data(const Tensor<2, dim> & F,
 				const double p_tilde_in,
@@ -741,7 +716,7 @@ namespace Step44
 	}
 
 				       // Second derivative of the volumetric
-				       // free energy wrt $\widetilde{J}$ We
+				       // free energy wrt $\widetilde{J}$. We
 				       // need the following computation
 				       // explicitly in the tangent so we make
 				       // it public.  We calculate
@@ -774,7 +749,8 @@ namespace Step44
 
     protected:
 				       // Define constitutive model paramaters
-				       // $\kappa$ and the neo-Hookean model
+				       // $\kappa$ (bulk modulus)
+      	  	  	  	   // and the neo-Hookean model
 				       // parameter $c_1$:
       const double kappa;
       const double c_1;
@@ -807,7 +783,7 @@ namespace Step44
 	  return AdditionalTools::StandardTensors<dim>::dev_P * get_tau_bar();
 	}
 
-				       // Then, tetermine the fictitious
+				       // Then, determine the fictitious
 				       // Kirchhoff stress
 				       // $\overline{\boldsymbol{\tau}}$:
       SymmetricTensor<2, dim> get_tau_bar() const
@@ -890,6 +866,13 @@ namespace Step44
 				       // The first function is used to create
 				       // a material object and to initialize
 				       // all tensors correctly:
+      	  	  	  	   // The second one updates the stored
+      	  	  	  	   // values and stresses based on the
+                       // current deformation measure
+                       // $\textrm{Grad}\mathbf{u}_{\textrm{n}}$,
+                       // pressure $\widetilde{p}$ and
+                       // dilation $\widetilde{J}$ field
+                       // values.
       void setup_lqp (const Parameters::AllParameters & parameters)
 	{
 	  material = new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
@@ -897,14 +880,6 @@ namespace Step44
 	  update_values(Tensor<2, dim>(), 0.0, 1.0);
 	}
 
-				       // The second one updates the stored
-				       // values and stresses based on the
-				       // current deformation measure
-				       // $\textrm{Grad}\mathbf{u}_{\textrm{n}}$,
-				       // pressure $\widetilde{p}$ and
-				       // dilation $\widetilde{J}$ field
-				       // values.
-				       //
 				       // To this end, we calculate the
 				       // deformation gradient $\mathbf{F}$
 				       // from the displacement gradient
@@ -945,17 +920,19 @@ namespace Step44
 
 					   // The material has been updated so
 					   // we now calculate the Kirchhoff
-					   // stress $\mathbf{\tau}$ and the
+					   // stress $\mathbf{\tau}$, the
 					   // tangent $J\mathfrak{c}$
+	  	  	  	  	   // and the first and second derivatives
+	  	  	  	  	   // of the volumetric free energy.
+	  	  	  	  	   //
+	   	   	   	   	   // Finally, we store the inverse of
+	   	   	   	   	   // the deformation gradient since
+	   	   	   	   	   // we frequently use it:
 	  tau = material->get_tau();
 
 	  Jc = material->get_Jc();
 	  dPsi_vol_dJ = material->get_dPsi_vol_dJ();
 	  d2Psi_vol_dJ2 = material->get_d2Psi_vol_dJ2();
-
-					   // Finally, we store the inverse of
-					   // the deformation gradient since
-					   // we frequently use it:
 	  F_inv = invert(F);
 	}
 
@@ -1056,7 +1033,7 @@ namespace Step44
 				       // parallelizing work using the
 				       // WorkStream object (see the @ref
 				       // threads module for more information
-				       // on this.)
+				       // on this).
 				       //
 				       // We declare such structures for the
 				       // computation of tangent (stiffness)
@@ -1310,6 +1287,7 @@ namespace Step44
       get_error_dilation();
 
 				       // Print information to screen
+      	  	  	  	   // in a pleasing way...
       static
       void
       print_conv_header();
@@ -1340,14 +1318,15 @@ namespace Step44
 						   // discontinuous pressure
 						   // and dilatation DOFs. In
 						   // an attempt to satisfy
-						   // the LBB conditions, we
+						   // the Babuska-Brezzi or LBB stability
+		  	  	  	  	   // conditions (see Hughes (2000)), we
 						   // setup a $Q_n \times
-						   // DGP_{n-1} \times DGP_{n-1}$
-						   // system. $Q_2 \times DGP_1
-						   // \times DGP_1$ elements
+						   // DGPM_{n-1} \times DGPM_{n-1}$
+						   // system. $Q_2 \times DGPM_1
+						   // \times DGPM_1$ elements
 						   // satisfy this condition,
-						   // while $Q_1 \times DGP_0
-						   // \times DGP_0$ elements do
+						   // while $Q_1 \times DGPM_0
+						   // \times DGPM_0$ elements do
 						   // not. However, it has
 						   // been shown that the
 						   // latter demonstrate good
@@ -1411,9 +1390,7 @@ namespace Step44
 
 					 // ...solve the current time step and
 					 // update total solution vector
-					 // $\varDelta
-					 // \mathbf{\Xi}_{\textrm{n}} =
-					 // \varDelta
+					 // $\mathbf{\Xi}_{\textrm{n}} =
 					 // \mathbf{\Xi}_{\textrm{n-1}} +
 					 // \varDelta \mathbf{\Xi}$...
 	solve_nonlinear_timestep(solution_delta);
@@ -1732,7 +1709,7 @@ namespace Step44
 // @sect4{Solid::make_grid}
 
 // On to the first of the private member functions. Here we create the
-// triangulation of the domain, for which we choose the unit cube with each
+// triangulation of the domain, for which we choose the scaled cube with each
 // face given a boundary ID number.  The grid must be refined at least once
 // for the indentation problem.
 //
@@ -1758,7 +1735,7 @@ namespace Step44
 				     // the domain and mark them with a
 				     // distinct boundary ID number.  The
 				     // faces we are looking for are on the +y
-				     // surface and will get boundary id 6
+				     // surface and will get boundary ID 6
 				     // (zero through five are already used
 				     // when creating the six faces of the
 				     // cube domain):
@@ -1831,13 +1808,26 @@ namespace Step44
 
 				       // In order to perform the static condensation efficiently,
 				       // we choose to exploit the symmetry of the the system matrix.
-				       // The global system matrix has the following structure
+				       // The global system matrix initially has the following structure
 				       // @f{align*}
-				       // K = \begin{pmatrix}
-				       //  K_{con} & K_{up} & 0 \\ K_{pu} & 0 & K_{p}J^{-1} \\ 0 & K_{Jp} & K_{JJ}
-				       // \end{pmatrix},
-				       // dU = \begin{pmatrix} dU_u \\ dU_p \\ dU_J \end{pmatrix},
-      				       // R = \begin{pmatrix} R_u \\ R_p \\ R_J \end{pmatrix}.
+						// \underbrace{\begin{bmatrix}
+						// \mathbf{\mathsf{K}}_{uu}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
+						//	\\
+						//	\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}
+						//	\\
+						//	\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+						//	\end{bmatrix}}_{\mathbf{\mathsf{K}}(\mathbf{\Xi}_{\textrm{i}})}
+						//	\underbrace{\begin{bmatrix}
+						//			d \mathbf{\mathsf{u}}\\
+						//          d \widetilde{\mathbf{\mathsf{p}}} \\
+						//          d \widetilde{\mathbf{\mathsf{J}}}
+						//	\end{bmatrix}}_{d \mathbf{\Xi}}
+						// =
+						// \underbrace{\begin{bmatrix}
+						// \mathbf{\mathsf{F}}_{u}(\mathbf{u}_{\textrm{i}}) \\
+						//  \mathbf{\mathsf{F}}_{\widetilde{p}}(\widetilde{p}_{\textrm{i}}) \\
+						//  \mathbf{\mathsf{F}}_{\widetilde{J}}(\widetilde{J}_{\textrm{i}})
+						//\end{bmatrix}}_{ \mathbf{\mathsf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
 				       // @f}
 				       // We optimise the sparsity pattern to reflect this structure
 				       // and prevent unnecessary data creation for the right-diagonal
@@ -1881,7 +1871,7 @@ namespace Step44
 
 
 // @sect4{Solid::determine_component_extractors}
-// We next compute some information from the FE system that describes which local
+// Next we compute some information from the FE system that describes which local
 // element DOFs are attached to which block component.  This is used later to
 // extract sub-blocks from the global matrix.
 //
@@ -1969,7 +1959,7 @@ namespace Step44
 // the task across a number of CPU cores.
 //
 // To start this, we first we need to obtain the total solution as it stands
-// at this Newton increment and then create the initial copy of scratch and
+// at this Newton increment and then create the initial copy of the scratch and
 // copy data objects:
   template <int dim>
   void Solid<dim>::update_qph_incremental(const BlockVector<double> & solution_delta)
@@ -2278,7 +2268,7 @@ namespace Step44
 // @sect4{Solid::get_error_residual}
 
 // Determine the true residual error for the problem.  That is, determine the
-// error in the residual for unconstrained degrees of freedom.  Note that to
+// error in the residual for the unconstrained degrees of freedom.  Note that to
 // do so, we need to ignore constrained DOFs by setting the residual in these
 // vector components to zero.
   template <int dim>
@@ -2432,9 +2422,13 @@ namespace Step44
 				     // the lower half of the local matrix and
 				     // copying the values to the upper half.
 				     // So we only assemble half of the
-				     // $K_{uu}$, $K_{pp} (= 0)$, $K_{JJ}$
-				     // blocks, while the whole $K_{pJ},
-				     // K_{uJ} (=0), K_{up}$ blocks are built.
+				     // $\mathsf{\mathbf{k}}_{uu}$,
+    				 // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{p}} = \mathbf{0}$,
+    				 // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{J}}$
+				     // blocks, while the whole $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$,
+				     // $\mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{J}} = \mathbf{0}$,
+    				 // $\mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{p}}$
+     	 	 	 	 // blocks are built.
 				     //
 				     // In doing so, we first extract some
 				     // configuration dependent variables from
@@ -2467,12 +2461,12 @@ namespace Step44
 		const unsigned int component_j = fe.system_to_component_index(j).first;
 		const unsigned int j_group     = fe.system_to_base_index(j).first.first;
 
-						 // This is the K_{uu}
-						 // contribution. It comprises of a
-						 // material contribution and a
+						 // This is the $\mathsf{\mathbf{k}}_{\mathbf{u} \mathbf{u}}$
+						 // contribution. It comprises a
+						 // material contribution, and a
 						 // geometrical stress contribution
 						 // which is only added along the
-						 // local matrix diagonals
+						 // local matrix diagonals:
 		if ((i_group == j_group) && (i_group == u_dof))
 		  {
 		    data.cell_matrix(i, j) += symm_grad_Nx[i] * Jc // The material contribution:
@@ -2481,7 +2475,7 @@ namespace Step44
 		      data.cell_matrix(i, j) += grad_Nx[i][component_i] * tau
 						* grad_Nx[j][component_j] * JxW;
 		  }
-						 // Next is the K_{pu} contribution
+						 // Next is the $\mathsf{\mathbf{k}}_{ \widetilde{p} \mathbf{u}}$ contribution
 		else if ((i_group == p_dof) && (j_group == u_dof))
 		  {
 		    data.cell_matrix(i, j) += N[i] * det_F
@@ -2489,8 +2483,8 @@ namespace Step44
 						 * AdditionalTools::StandardTensors<dim>::I)
 					      * JxW;
 		  }
-						 // and lastly the $K_{Jp}$
-						 // and $K_{JJ}$
+						 // and lastly the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{p}}$
+						 // and $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$
 						 // contributions:
 		else if ((i_group == J_dof) && (j_group == p_dof))
 		  data.cell_matrix(i, j) -= N[i] * N[j] * JxW;
@@ -2645,8 +2639,8 @@ namespace Step44
 		scratch.fe_face_values_ref.normal_vector(f_q_point);
 
 					       // Using the face normal at
-					       // this quadrature point as
-					       // just retrieved, we specify
+					       // this quadrature point
+					       // we specify
 					       // the traction in reference
 					       // configuration. For this
 					       // problem, a defined pressure
@@ -2658,8 +2652,10 @@ namespace Step44
 					       // of the domain. The traction
 					       // is defined using the first
 					       // Piola-Kirchhoff stress is
-					       // simply t_0 = P*N = (pI)*N =
-					       // p*N. We choose to use the
+					       // simply
+	      	  	  	  	   // $\mathbf{t} = \mathbf{P}\mathbf{N}
+	      	  	  	  	   // = [p_0 \mathbf{I}] \mathbf{N} = p_0 \mathbf{N}$
+					       // We use the
 					       // time variable to linearly
 					       // ramp up the pressure load.
 					       //
@@ -2834,7 +2830,8 @@ namespace Step44
 
 // @sect4{Solid::solve_linear_system}
 // Solving the entire block system is a bit problematic as there are no
-// contributions to the $K_{JJ}$ block, rendering it non-invertible.
+// contributions to the $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$
+// block, rendering it non-invertible.
 // Since the pressure and dilatation variables DOFs are discontinuous, we can
 // condense them out to form a smaller displacement-only system which
 // we will then solve and subsequently post-process to retrieve the
@@ -2846,12 +2843,52 @@ namespace Step44
 //
 // For the following, recall that
 // @f{align*}
-// K_{store} = \begin{pmatrix}
-//  K_{con} & K_{up} & 0 \\ K_{pu} & 0 & K_{p}J^{-1} \\ 0 & K_{Jp} & K_{JJ}
-// \end{pmatrix},
-// d\Xi = \begin{pmatrix} du \\ dp \\ dJ \end{pmatrix},
-// R = \begin{pmatrix} R_u \\ R_p \\ R_J \end{pmatrix}.
+//  \mathbf{\mathsf{K}}_{\textrm{store}}
+//:=
+//  \begin{bmatrix}
+//		\mathbf{\mathsf{K}}_{\textrm{con}}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
+//		\\
+//		\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+//		\\
+//		\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+//	\end{bmatrix} \, .
 // @f}
+// and
+//  @f{align*}
+//  		d \widetilde{\mathbf{\mathsf{p}}}
+//  		& = \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \bigl[
+//  			 \mathbf{\mathsf{F}}_{\widetilde{J}}
+//  			 - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathbf{\mathsf{J}}} \bigr]
+//  			\\
+//  		d \widetilde{\mathbf{\mathsf{J}}}
+//  		& = \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
+//  			\mathbf{\mathsf{F}}_{\widetilde{p}}
+//  			- \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+//  			\bigr]
+//  		\\
+//  		 \Rightarrow d \widetilde{\mathbf{\mathsf{p}}}
+//  		&=  \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{F}}_{\widetilde{J}}
+//  		- \underbrace{\bigl[\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+//  		\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}\bigr]}_{\overline{\mathbf{\mathsf{K}}}}\bigl[ \mathbf{\mathsf{F}}_{\widetilde{p}}
+//   		- \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}} \bigr]
+//  @f}
+//  and thus
+//  @f[
+//  		\underbrace{\bigl[ \mathbf{\mathsf{K}}_{uu} + \overline{\overline{\mathbf{\mathsf{K}}}}~ \bigr]
+//  		}_{\mathbf{\mathsf{K}}_{\textrm{con}}} d \mathbf{\mathsf{u}}
+//  		=
+//          \underbrace{
+//  		\Bigl[
+//  		\mathbf{\mathsf{F}}_{u}
+//  			- \mathbf{\mathsf{K}}_{u\widetilde{p}} \bigl[ \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{F}}_{\widetilde{J}}
+//  			- \overline{\mathbf{\mathsf{K}}}\mathbf{\mathsf{F}}_{\widetilde{p}} \bigr]
+//  		\Bigr]}_{\mathbf{\mathsf{F}}_{\textrm{con}}}
+//  @f]
+//  where
+//  @f[
+//  		\overline{\overline{\mathbf{\mathsf{K}}}} :=
+//  			\mathbf{\mathsf{K}}_{u\widetilde{p}} \overline{\mathbf{\mathsf{K}}} \mathbf{\mathsf{K}}_{\widetilde{p}u} \, .
+//  @f]
   template <int dim>
   std::pair<unsigned int, double>
   Solid<dim>::solve_linear_system(BlockVector<double> & newton_update)
@@ -2862,18 +2899,19 @@ namespace Step44
     unsigned int lin_it = 0;
     double lin_res = 0.0;
 
-				     // In the first step of this function, we solve for the incremental displacement $du$.
+				     // In the first step of this function, we solve for the incremental displacement $d\mathbf{u}$.
 				     // To this end, we perform static condensation to make
-				     // $K_{con} = K_{uu} + K_{\bar b}$, and put
-				     // $K_pJ^{-1}$ in the original $K_pJ$ block.
-				     // That is, we make $K_{store}$.
+    				 //    $\mathbf{\mathsf{K}}_{\textrm{con}}
+    				 //    = \bigl[ \mathbf{\mathsf{K}}_{uu} + \overline{\overline{\mathbf{\mathsf{K}}}}~ \bigr]$
+    				 // and put
+				     // $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$
+    				 // in the original $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ block.
+				     // That is, we make $\mathbf{\mathsf{K}}_{\textrm{store}}$.
     {
+    	// ToDo: fixed notation to here
       assemble_sc();
 
-				       // $K_{con} du = F_{con}$ with $F_{con} = F_u +
-				       // K_{up} [- K_Jp^{-1} F_j + K_{bar} F_p]$.
-				       // Assemble the RHS vector to solve for
-				       // $du A_J = K_pJ^{-1} F_p$
+				       // $A_J = K_pJ^{-1} F_p$
       tangent_matrix.block(p_dof, J_dof).vmult(A.block(J_dof),
 					       system_rhs.block(p_dof));
 				       // $B_J = K_{JJ}  K_pJ^{-1}  F_p$.
