@@ -126,24 +126,27 @@ $-(v-u)$ as above, and so we can no longer conclude that the two sides are in
 fact equal. Thus, this mimicks the way we have discussed the complementarity
 condition above.
 
+
+
 \section{Formulation as a saddle point problem}
 
 The variational inequality above is awkward to work with. We would therefore
-like to reformulate it as an equivalent saddle point problem. We introduce a
-Lagrange multiplier $\lambda$ and the convex cone $K\subset W:=V^*, K=\{\mu\in
-W: \mu(\mathbf x)\le 0\}$ of
+like to reformulate it as an equivalent saddle point problem. Set $V:=H^1_0(\Omega)$.
+We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset V'$, $V'$
+dual space of $V$, $K:=\{\mu\in V': \langle\mu,v\rangle\geq 0,\quad 0\geq v\in V\}$ of
 \marginpar{JF: Is this definition of $K$ correct?}
-Lagrange multipliers. This yields:
+Lagrange multipliers, where $\langle\cdot,\cdot\rangle$ denotes the duality
+pairing between $V'$ and $V$. This yields:
 
 \textit{Find $u\in V$ and $\lambda\in K$ such that}
 \begin{align*}
  a(u,v) + b(v,\lambda) &= f(v),\quad &&v\in V\\
- b(u,\mu - \lambda) &\leq \langle g,(\mu - \lambda)\rangle,\quad&&\mu\in K,
+ b(u,\mu - \lambda) &\leq \langle g,\mu - \lambda\rangle,\quad&&\mu\in K,
 \end{align*}
 \textit{with}
 \begin{align*}
  a(u,v) &:= \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
- b(u,\mu) &:= (u,\mu),\quad &&u\in V,\quad\mu\in W.
+ b(u,\mu) &:= \langle g-u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
 \end{align*}
 In other words, we can consider $\lambda$ as the negative of the additional, positive force that the
 obstacle exerts on the membrane. The inequality in the second line of the
@@ -169,7 +172,7 @@ get the equations
 \marginpar{JF: Aren't the inequalities the wrong way around here (and below)?}
 \begin{eqnarray*}
  &A U + B\Lambda = F,&\\
- &[BU-G]_i \le 0, \quad \Lambda_i \geq 0,\quad \Lambda_i[BU-G]_i = 0
+ &[BU-G]_i \geq 0, \quad \Lambda_i \leq 0,\quad \Lambda_i[BU-G]_i = 0
 \qquad \forall i.&
 \end{eqnarray*}
 where $B$ is the mass matrix on the chosen finite element space and the
@@ -186,24 +189,32 @@ at these locations, we get a diagonal mass matrix with
   \qquad
   B_{ij}=0 \ \text{for } i\neq j.
 \end{align*}
-
+To define $G$ we use the same technique as for $B$ where $g_h$ is a
+suitable approximation of $g$
+\begin{align*}
+  G_{ii} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x,
+  \qquad
+  G_{ij}=0 \ \text{for } i\neq j.
+\end{align*}
 With this, the equations above can be restated as
 \begin{eqnarray*}
  &A U + B\Lambda = F,&\\
- &U_i-B_{ii}^{-1}G_i \le 0, \quad \Lambda_i \geq 0,\quad \Lambda_i[U_i-B_{ii}^{-1}G_i] = 0
+ &U_i-B_{ii}^{-1}G_i \ge 0, \quad \Lambda_i \leq 0,\quad \Lambda_i[U_i-B_{ii}^{-1}G_i] = 0
 \qquad \forall i\in{\cal S}.&
 \end{eqnarray*}
 
 Now we define for each degree of freedom $i$ the function
 \begin{equation*}
- C([BU]_i,\Lambda_i):=\Lambda_i - \max\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
+ C([BU]_i,\Lambda_i):=-\Lambda_i + \min\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
 \end{equation*}
-with some $c>0$.
+with some $c>0$. (In this program we choose $c = 100$. It is a kind of a penalty parameter which
+depends on the problem itself. For example there is no convergence for $c = 1$ and 7 refinements.)
 \marginpar{JF: How do you choose $c$?}
+
 After some headscratching one can then convince oneself that the inequalities
 above can equivalently be rewritten as
 \begin{equation*}
- C([BU]_i,\Lambda_i) = 0, \qquad \forall i\in{\cal S}
+ C([BU]_i,\Lambda_i) = 0, \qquad \forall i\in{\cal S}.
 \end{equation*}
 The primal-dual active set strategy we will use here is an iterative scheme which is based on
 this condition to predict the next active and inactive sets $\mathcal{A}_k$ and
@@ -230,8 +241,8 @@ The algorithm for the primal-dual active set method works as follows:
  \item [(2)] Define the new active and inactive sets by
  \begin{equation*}
  \begin{split}
-  \mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)> 0\rbrace,\\
-  \mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\leq 0\rbrace.
+  \mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)< 0\rbrace,\\
+  \mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\geq 0\rbrace.
  \end{split}
  \end{equation*}
  \item [(3)] If $\mathcal{A}_{k+1}=\mathcal{A}_k$ (and then, obviously, also $\mathcal{F}_{k+1}=\mathcal{F}_k$) then stop, else set $k=k+1$ and go to step (1).
@@ -244,12 +255,12 @@ At the end of this section, let us add two observations. First,
 for any primal-dual pair $(U^k,\Lambda^k)$ that satisfies these
 condition, we can distinguish the following cases:
 \begin{itemize}
- \item [1.] $\Lambda^k_i + c([BU^k]_i - G_i)> 0$ (p active):
+ \item [1.] $\Lambda^k_i + c([BU^k]_i - G_i) < 0$ (i active):
 
-  Then either $[BU^k]_i>G_i$ and $\Lambda^k_{n,p}=0$ (penetration) or $\Lambda^k_{n,p}>0$ and $[BU^k]_i=G_i$ (pressing load).
- \item [2.] $\Lambda^k_i + c([BU^k]_i - G_i)\leq 0$ (p inactive):
+  Then either $[BU^k]_i<G_i$ and $\Lambda^k_i=0$ (penetration) or $\Lambda^k_i<0$ and $[BU^k]_i=G_i$ (pressing load).
+ \item [2.] $\Lambda^k_i + c([BU^k]_i - G_i)\geq 0$ (i inactive):
 
-  Then either $[BU^k]_i\leq G_i$ and $\Lambda^k_{n,p}=0$ (no contact) or $\Lambda^k_{n,p}\leq0$ and $[BU^k]_i=G_i$ (unpressing load).
+  Then either $[BU^k]_i\geq G_i$ and $\Lambda^k_i=0$ (no contact) or $\Lambda^k_i\geq0$ and $[BU^k]_i=G_i$ (unpressing load).
 \end{itemize}
 
 Second, the method above appears untuitively correct and useful but a bit ad
@@ -267,14 +278,14 @@ slantly differentiable, and in fact we have
 \marginpar{JF: what should be in the second line? Zero or Lambda?}
 \begin{equation*}
  \dfrac{\partial}{\partial U^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
-                                   -cB_{ii},& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)> 0\\
-                                   0\Lambda^k_i,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\leq 0.
+                                   cB_{ii},& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)< 0\\
+                                   0,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\geq 0.
                                   \end{cases}
 \end{equation*}
 \begin{equation*}
  \dfrac{\partial}{\partial\Lambda^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
-                                   0,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)> 0\\
-                                   \Lambda^k_i,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\leq 0.
+                                   0,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)< 0\\
+                                   -1,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\geq 0.
                                   \end{cases}
 \end{equation*}
 This suggest a semismooth Newton step of the form
@@ -282,15 +293,15 @@ This suggest a semismooth Newton step of the form
  \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & B_{\mathcal{F}_k} & 0\\
  A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & B_{\mathcal{A}_k}\\
- 0 & 0 & Id_{\mathcal{F}_k} & 0\\
- 0 & -cB_{\mathcal{A}_k} & 0 & 0
+ 0 & 0 & -Id_{\mathcal{F}_k} & 0\\
+ 0 & cB_{\mathcal{A}_k} & 0 & 0
 \end{pmatrix}
 \begin{pmatrix}
  \delta U^k_{\mathcal{F}_k}\\ \delta U^k_{\mathcal{A}_k}\\ \delta \Lambda^k_{\mathcal{F}_k}\\ \delta \Lambda^k_{\mathcal{A}_k}
 \end{pmatrix}
 =
 -\begin{pmatrix}
- (AU^k + \Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + \Lambda^k - F)_{\mathcal{A}_k}\\ \Lambda^k_{\mathcal{F}_k}\\ -c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
+ (AU^k + \Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + \Lambda^k - F)_{\mathcal{A}_k}\\ -\Lambda^k_{\mathcal{F}_k}\\ c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
 \end{pmatrix},
 \end{equation*}
 where we have split matrices $A,B$ as well as vectors in the natural way into
@@ -313,7 +324,7 @@ bringing all known terms to the right hand side. This yields
 \end{pmatrix}
 =
 \begin{pmatrix}
- f_{\mathcal{F}_k}\\ f_{\mathcal{A}_k}\\ 0\\ g_{\mathcal{A}_k}
+ F_{\mathcal{F}_k}\\ F_{\mathcal{A}_k}\\ 0\\ G_{\mathcal{A}_k}
 \end{pmatrix}.
 \end{equation*}
 These are the equations outlines above in the description of the basic algorithm.
@@ -336,19 +347,36 @@ because it implies $\Lambda_{\mathcal{F}_k} = 0$:
 \end{pmatrix}.
 \end{equation*}
 This shows that one in fact only needs to solve for the Lagrange multipliers
-located on the active set. One would then recover the full Lagrange multiplier
-vector through
+located on the active set. By considering the second row one would then recover
+the full Lagrange multiplier vector through
 \begin{equation*}
- \Lambda = B^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}u_{\mathcal{S}}\right).
+ \Lambda^k_S = B^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}U^k_{\mathcal{S}}\right).
 \end{equation*}
-
-Finally we have to solve linear problems for which we use CG-Solver with a AMG
-preconditioner from Trilinos.
+Because of the third row and the fact that $B_{\mathcal{A}_k}$ is a diagonal matrix we are able
+to calculate $U^k_{\mathcal{A}_k}$ directly. At least the first row yields the following reduced linear
+system for each iteration $k$
+\begin{equation*}
+\begin{pmatrix}
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k}\\
+ A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k}
+\end{pmatrix}
+\begin{pmatrix}
+ U^k_{\mathcal{F}_k}\\ U^k_{\mathcal{A}_k}
+\end{pmatrix}
+=
+\begin{pmatrix}
+ F_{\mathcal{F}_k}\\ F_{\mathcal{A}_k}
+\end{pmatrix}.
+\end{equation*}
+By considering the dofs in $\mathcal{A}_k$ as Dirichlet data we solve this system with a CG-method
+and the AMG preconditioner from Trilinos.
 \marginpar{Which system do we actually solve with CG?}
 
 
 \section{Implementation}
 
-... need to write something here...
+This tutorial is quite similar to step-4. But to solve the obstacle problem, two new methods are
+implemented: assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix) and
+update_solution_and_constraints (). 
 
 \end{document}
