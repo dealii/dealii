@@ -274,7 +274,8 @@ The Helmholtz free energy corresponding to a compressible <a href="http://en.wik
 @f]
 where $\kappa := \lambda + 2/3 \mu$ is the bulk modulus ($\lambda$ and $\mu$ are the Lame parameters)
 and $\overline{I}_1 := \textrm{tr}\ \overline{\mathbf{b}}$.
-The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$.
+The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the condition $\mathcal{G}(1) = 0$, 
+among others, see Holzapfel (2001) for further details.
 In this work $\mathcal{G}:=\frac{1}{4} [ J^2 - 1 - 2\textrm{ln}J ]$.
 
 Incompressibility imposes the isochoric constraint that $J=1$ for all motions $\mathbf{\varphi}$.
@@ -430,8 +431,14 @@ The third is the definition of the pressure $\widetilde{p}$.
 &=
 - \int_{\Omega_0} \mathrm{grad}\delta \mathbf{u}:\boldsymbol{\tau}~\mathrm{d}V 
 + \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\mathrm{d}V
- + \int_{\partial \Omega_{0,\sigma}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \,.
+ + \int_{\partial \Omega_{0,\sigma}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \\
+&=
+- \int_{\Omega_0} [\mathrm{grad}\delta\mathbf{u}]^{\text{sym}} :\boldsymbol{\tau}~\mathrm{d}V 
++ \int_{\Omega_0} \delta \mathbf{u} \cdot \mathbf{B}^\text{p}~\mathrm{d}V
+ + \int_{\partial \Omega_{0,\sigma}} \delta \mathbf{u} \cdot \mathbf{T}^\text{p}~\mathrm{d}A \, ,
 @f}
+where 
+$[\mathrm{grad}\delta\mathbf{u}]^{\text{sym}} = 1/2[ \mathrm{grad}\delta\mathbf{u} + [\mathrm{grad}\delta\mathbf{u}]^T] $.
 
 We will use an iterative Newton-Raphson method to solve the nonlinear residual equation $R$.
 For the sake of simplicity we assume dead loading, i.e. the loading does not change due to the deformation.

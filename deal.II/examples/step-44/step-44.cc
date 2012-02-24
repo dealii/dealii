@@ -1363,14 +1363,45 @@ namespace Step44
 // interchangeable. We choose to increment time linearly using a constant time
 // step size.
 //
-// We start the function with preprocessing, and then output the initial grid
-// before starting the simulation proper with the first time (and loading)
-// increment:
+// We start the function with preprocessing, setting the initial dilatation
+// values, and then output the initial grid before starting the simulation
+//  proper with the first time (and loading)
+// increment.
+//
+// Care must be taken (or at least some thought given) when imposing the
+// constraint $\widetilde{J}=1$ on the initial solution field. The constraint
+// corresponds to the determinant of the deformation gradient in the undeformed
+// configuration, which is the identity tensor.
+// We use FE_DGPMonomial bases to interpolate the dilatation field, thus we can't
+// simply set the corresponding dof to unity as they correspond to the
+// monomial coefficients. Thus we use the VectorTools::project function to do
+// the work for us. The VectorTools::project function requires an argument
+// indicating the hanging node constraints. We have none in this program
+// So we have to create a constraint object. In its original state, constraint
+// objects are unsorted, and have to be sorted (using the ConstraintMatrix::close function)
+// before they can be used. Have a look at step-21 for more information.
+// We only need to enforce the initial condition on the dilatation.
+// In order to do this, we make use of a ComponentSelectFunction which acts
+// as a mask and sets the J_component of n_components to 1. This is exactly what
+// we want. Have a look at its usage in step-20 for more information.
   template <int dim>
   void Solid<dim>::run()
   {
     make_grid();
     system_setup();
+    {
+      ConstraintMatrix constraints;
+      constraints.close();
+
+      const ComponentSelectFunction<dim>
+        J_mask (J_component, n_components);
+
+      VectorTools::project (dof_handler_ref,
+                            constraints,
+                            QGauss<dim>(degree+2),
+                            J_mask,
+                            solution_n);
+    }
     output_results();
     time.increment();
 
@@ -1647,6 +1678,9 @@ namespace Step44
 // this operation (we could, in principle simply create a new task using
 // Threads::new_task for each cell) but there is not much harm done to doing
 // it this way anyway.
+// Furthermore, should their be different material models associated with a
+// quadrature point, requiring varying levels of computational expense, then
+// the method used here could be advantageous.
   template <int dim>
   struct Solid<dim>::PerTaskData_UQPH
   {
@@ -1851,16 +1885,12 @@ namespace Step44
 
     tangent_matrix.reinit(sparsity_pattern);
 
-				     // We then set up storage vectors noting
-				     // that the dilatation is unity
-				     // (i.e. $\widetilde{J} = 1$) in the
-				     // undeformed configuration...
+				     // We then set up storage vectors
     system_rhs.reinit(dofs_per_block);
     system_rhs.collect_sizes();
 
     solution_n.reinit(dofs_per_block);
     solution_n.collect_sizes();
-    solution_n.block(J_dof) = 1.0;
 
 				     // ...and finally set up the quadrature
 				     // point history:
