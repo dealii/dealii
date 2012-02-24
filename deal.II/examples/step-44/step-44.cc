@@ -2908,24 +2908,79 @@ namespace Step44
     				 // in the original $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ block.
 				     // That is, we make $\mathbf{\mathsf{K}}_{\textrm{store}}$.
     {
-    	// ToDo: fixed notation to here
       assemble_sc();
 
-				       // $A_J = K_pJ^{-1} F_p$
+						// 		$
+						//  	\mathsf{\mathbf{A}}_{\widetilde{J}}
+						//      =
+						// 		\mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+						// 		\mathsf{\mathbf{F}}_{\widetilde{p}}
+						// 		$
       tangent_matrix.block(p_dof, J_dof).vmult(A.block(J_dof),
 					       system_rhs.block(p_dof));
-				       // $B_J = K_{JJ}  K_pJ^{-1}  F_p$.
+						//      $
+						//      \mathsf{\mathbf{B}}_{\widetilde{J}}
+						//      =
+						//      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+						//      \mathsf{\mathbf{F}}_{\widetilde{p}}
+						//      $
       tangent_matrix.block(J_dof, J_dof).vmult(B.block(J_dof),
 					       A.block(J_dof));
-				       // $A_J = F_J - K_JJ  K_pJ^{-1}  F_p$
+						//      $
+						//      \mathsf{\mathbf{A}}_{\widetilde{J}}
+						//      =
+						//      \mathsf{\mathbf{F}}_{\widetilde{J}}
+						//      -
+						//      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+						//      \mathsf{\mathbf{F}}_{\widetilde{p}}
+						//      $
       A.block(J_dof).equ(1.0, system_rhs.block(J_dof), -1.0, B.block(J_dof));
-				       // $A_p = K_Jp^{-1} [  F_J - K_JJ  K_pJ^{-1}  F_p ]$
+						//      $
+						//      \mathsf{\mathbf{A}}_{\widetilde{J}}
+						//      =
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
+						//      [
+						//      \mathsf{\mathbf{F}}_{\widetilde{J}}
+						//      -
+						//      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+						//      \mathsf{\mathbf{F}}_{\widetilde{p}}
+						//      ]
+						//      $
       tangent_matrix.block(p_dof, J_dof).Tvmult(A.block(p_dof),
 						A.block(J_dof));
-				       // $A_u = K_{up}  K_Jp^{-1} [  F_J - K_{JJ}  K_pJ^{-1}  F_p ]$
+						//      $
+						//      \mathsf{\mathbf{A}}_{\mathbf{u}}
+						//      =
+						//      \mathsf{\mathbf{K}}_{\mathbf{u} \widetilde{p}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
+						//      [
+						//      \mathsf{\mathbf{F}}_{\widetilde{J}}
+						//      -
+						//      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+						//      \mathsf{\mathbf{F}}_{\widetilde{p}}
+						//      ]
+						//      $
       tangent_matrix.block(u_dof, p_dof).vmult(A.block(u_dof),
 					       A.block(p_dof));
-				       // $F_{con} = F_u -  K_{up}  K_Jp^{-1} [  F_J - K_{JJ}  K_pJ^{-1}  F_p ]$
+						//      $
+						//      \mathsf{\mathbf{F}}_{\text{con}}
+						//      =
+						//      \mathsf{\mathbf{F}}_{\mathbf{u}}
+						//      -
+						//      \mathsf{\mathbf{K}}_{\mathbf{u} \widetilde{p}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{J} \widetilde{p}}
+						//      [
+						//      \mathsf{\mathbf{F}}_{\widetilde{J}}
+						//      -
+						//      \mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{J}}
+						//      \mathsf{\mathbf{K}}^{-1}_{\widetilde{p} \widetilde{J}}
+						//      \mathsf{\mathbf{K}}_{\widetilde{p}}
+						//      ]
+						//      $
       system_rhs.block(u_dof) -= A.block(u_dof);
 
       timer.enter_subsection("Linear solver");
@@ -2992,40 +3047,105 @@ namespace Step44
 				     // The next step after solving the displacement
 				     // problem is to post-process to get the
 				     // dilatation solution from the
-				     // substitution $dJ = KpJ^{-1} (F_p - K_pu
-				     // du )$:
+				     // substitution:
+					 //    $
+					 //     d \widetilde{\mathbf{\mathsf{J}}}
+					 //      = \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
+					 //       \mathbf{\mathsf{F}}_{\widetilde{p}}
+					 //    	- \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+					 //      \bigr]
+					 //    $
     {
-				       // $A_p  = K_{pu} du$
+					//    	$
+					//    	\mathbf{\mathsf{A}}_{\widetilde{p}}
+					//    	=
+					//    	\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+					//    	$
       tangent_matrix.block(p_dof, u_dof).vmult(A.block(p_dof),
 					       newton_update.block(u_dof));
-				       // $A_p  = -K_{pu} du$
+					//    	$
+					//    	\mathbf{\mathsf{A}}_{\widetilde{p}}
+					//    	=
+					//    	-\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+					//    	$
       A.block(p_dof) *= -1.0;
-				       // $A_p  = F_p - K_{pu} du$
+					//      $
+					//      \mathbf{\mathsf{A}}_{\widetilde{p}}
+					//      =
+					//      \mathbf{\mathsf{F}}_{\widetilde{p}}
+					//      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+					//      $
       A.block(p_dof) += system_rhs.block(p_dof);
-				       // $dJ = K_pJ^{-1} [ F_p - K_{pu} du ]$
+					//      $
+					//      d\mathbf{\mathsf{\widetilde{J}}}
+					//      =
+					//      \mathbf{\mathsf{K}}^{-1}_{\widetilde{p}\widetilde{J}}
+					//      [
+					//      \mathbf{\mathsf{F}}_{\widetilde{p}}
+					//      -\mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
+					//      ]
+					//      $
       tangent_matrix.block(p_dof, J_dof).vmult(newton_update.block(J_dof),
 					       A.block(p_dof));
     }
 
+    // we insure here that any Dirichlet constraints
+    // are distributed on the updated solution:
     constraints.distribute(newton_update);
 
 				     // Finally we solve for the pressure
-				     // update with the substitution $dp =
-				     // K_Jp^{-1} [ R_J - K_{JJ} dJ ]$
+				     // update with the substitution:
+					//    $
+					//    d \widetilde{\mathbf{\mathsf{p}}}
+					//     =
+					//    \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+					//    \bigl[
+					//     \mathbf{\mathsf{F}}_{\widetilde{J}}
+					//      - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+					//    d \widetilde{\mathbf{\mathsf{J}}}
+					//    \bigr]
+					//    $
     {
-				       // $A_J = K_{JJ} dJ$
+						//    	$
+						//    	\mathsf{\mathbf{A}}_{\widetilde{J}}
+						//    	 =
+						//    	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+						//    	d \widetilde{\mathbf{\mathsf{J}}}
+						//    	$
       tangent_matrix.block(J_dof, J_dof).vmult(A.block(J_dof),
 					       newton_update.block(J_dof));
-				       // $A_J = -K_{JJ} dJ$
+						//    	$
+						//    	\mathsf{\mathbf{A}}_{\widetilde{J}}
+						//    	 =
+						//    	-\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+						//    	d \widetilde{\mathbf{\mathsf{J}}}
+						//    	$
       A.block(J_dof) *= -1.0;
-				       // $A_J = F_J - K_{JJ} dJ$
+						//      $
+						//      \mathsf{\mathbf{A}}_{\widetilde{J}}
+						//       =
+						//      \mathsf{\mathbf{F}}_{\widetilde{J}}
+						//      -
+						//      \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+						//      d \widetilde{\mathbf{\mathsf{J}}}
+						//      $
       A.block(J_dof) += system_rhs.block(J_dof);
-				       // $dp = K_Jp^{-1}   [F_J - K_{JJ} dJ]$
+      	  	  	  	  	// and finally....
+						//    $
+						//    d \widetilde{\mathbf{\mathsf{p}}}
+						//     =
+						//    \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1}
+						//    \bigl[
+						//     \mathbf{\mathsf{F}}_{\widetilde{J}}
+						//      - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+						//    d \widetilde{\mathbf{\mathsf{J}}}
+						//    \bigr]
+						//    $
       tangent_matrix.block(p_dof, J_dof).Tvmult(newton_update.block(p_dof),
 						A.block(J_dof));
     }
 
-				     // At the end, we can distribute all
+				     // We are now at the end, so we distribute all
 				     // constrained dofs back to the Newton
 				     // update:
     constraints.distribute(newton_update);
@@ -3041,13 +3161,18 @@ namespace Step44
 // need the inverse of one of the blocks. However, since the pressure and
 // dilatation variables are discontinuous, the static condensation (SC)
 // operation can be done on a per-cell basis and we can produce the inverse of
-// the block-diagonal $K_{pt}$ block by inverting the local blocks. We can again
+// the block-diagonal $ \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$
+ // block by inverting the local blocks. We can again
 // use TBB to do this since each operation will be independent of one another.
 //
-// Using the TBB via the WorkStream class, we assemble the contributions to
-// add to $K_{uu}$ to form $K_{con}$ from each element's contributions.  These
-// contributions are then added to the glabal stiffness matrix. Given this
-// description, the following two functions should be obvious:
+// Using the TBB via the WorkStream class, we assemble the contributions to form
+//  $
+//  \mathbf{\mathsf{K}}_{\textrm{con}}
+//  = \bigl[ \mathbf{\mathsf{K}}_{uu} + \overline{\overline{\mathbf{\mathsf{K}}}}~ \bigr]
+//  $
+// from each element's contributions. These
+// contributions are then added to the global stiffness matrix. Given this
+// description, the following two functions should be clear:
   template <int dim>
   void Solid<dim>::assemble_sc()
   {
@@ -3103,34 +3228,63 @@ namespace Step44
 				     // interpolations mean that their is no
 				     // coupling of the local contributions at the
 				     // global level. This is not the case with the u dof.
-				     // In other words, $k_{Jp}, k_{pJ} and k_{JJ}$, when extracted
+				     // In other words,
+    				 // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{p}}$,
+    				 // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{p}}$
+    				 // and
+    				 // $\mathsf{\mathbf{k}}_{\widetilde{J} \widetilde{p}}$,
+    				 // when extracted
 				     // from the global stiffness matrix are the element
-				     // contributions. This is not the case for $k_{uu}$.
+				     // contributions.
+    				 // This is not the case for
+    				 // $\mathsf{\mathbf{k}}_{\mathbf{u} \mathbf{u}}$
+    				 //
+    				 // Note: a lower-case symbol is used to denote
+    				 // element stiffness matrices.
 
 				     // Currently the matrix corresponding to
 				     // the dof associated with the current element
-				     // (denoted somewhat loosely as k) is of the form
-				     // @code
-				     //  | k_uu  |   k_up   |   0   |
-				     //  | k_pu  |     0    |  k_pJ |
-				     //  |   0   |   k_Jp   |  k_JJ |
-				     // @endcode
+				     // (denoted somewhat loosely as $\mathsf{\mathbf{k}}$)
+    				 // is of the form:
+    				// @f{align*}
+					//    \begin{bmatrix}
+					//    			\mathbf{\mathsf{k}}_{uu}	&	\mathbf{\mathsf{k}}_{u\widetilde{p}}	& \mathbf{0}
+					//    			\\
+					//    			\mathbf{\mathsf{k}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}
+					//    			\\
+					//    			\mathbf{0}	& 	\mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+					//    \end{bmatrix}
+    				// @f}
 				     //
 				     // We now need to modify it such that it appear as
-				     // @code
-				     //  | k_con |   k_up   |     0     |
-				     //  | k_pu  |     0    |   k_pJ^-1 |
-				     //  |   0   |   k_Jp   |   k_JJ    |
-				     // @endcode
-				     // with $k_{con} = k_{uu} + k_{\bar b}$
+    				// @f{align*}
+					//    \begin{bmatrix}
+					//    			\mathbf{\mathsf{k}}_{\textrm{con}}	&	\mathbf{\mathsf{k}}_{u\widetilde{p}}	& \mathbf{0}
+					//    			\\
+					//    			\mathbf{\mathsf{k}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
+					//    			\\
+					//    			\mathbf{0}	& 	\mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+					//    \end{bmatrix}
+    				// @f}
+				     // with $\mathbf{\mathsf{k}}_{\textrm{con}} = \bigl[ \mathbf{\mathsf{k}}_{uu} +\overline{\overline{\mathbf{\mathsf{k}}}}~ \bigr]$
 				     // where
-				     // $k_{\bar b} = k_{up} k_{bar} k_{pu}$
+				     // $		\overline{\overline{\mathbf{\mathsf{k}}}} :=
+    				 // \mathbf{\mathsf{k}}_{u\widetilde{p}} \overline{\mathbf{\mathsf{k}}} \mathbf{\mathsf{k}}_{\widetilde{p}u}
+    				// $
 				     // and
-				     // $k_{bar} = k_{Jp}^{-1} k_{JJ} k_{pJ}^{-1}$.
+    				// $
+					//    \overline{\mathbf{\mathsf{K}}} =
+					//     \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
+					//    \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+    				// $.
 				     //
 				     // At this point, we need to take note of
 				     // the fact that global data already exists
-				     // in the $K_{uu}, K_{pt}, K_{tp}$ sub-blocks.  So
+				     // in the $\mathsf{\mathbf{K}}_{uu}$,
+    				 // $\mathsf{\mathbf{K}}_{\widetilde{p} \widetilde{J}}$
+    				 // and
+    				 //  $\mathsf{\mathbf{K}}_{\widetilde{J} \widetilde{p}}$
+    				 // sub-blocks.  So
 				     // if we are to modify them, we must
 				     // account for the data that is already
 				     // there (i.e. simply add to it or remove
@@ -3139,48 +3293,56 @@ namespace Step44
 				     // operation, we need to take this into
 				     // account
 				     //
-				     // For the $K_{uu}$ block in particular, this
+				     // For the $\mathsf{\mathbf{K}}_{uu}$ block in particular, this
 				     // means that contributions have been added
 				     // from the surrounding cells, so we need
 				     // to be careful when we manipulate this
 				     // block.  We can't just erase the
-				     // subblocks.
+				     // sub-blocks.
 				     //
 				     // This is the strategy we will employ to
-				     // get the subblocks we want:
+				     // get the sub-blocks we want:
 				     //
-				     // - $k_{store}$:
-				     // Since we don't have access to $k_{uu}$,
+				     // - $ {\mathbf{\mathsf{k}}}_{\textrm{store}}$:
+				     // Since we don't have access to $\mathsf{\mathbf{k}}_{uu}$,
 				     // but we know its contribution is added to
-				     // the global $K_{uu}$ matrix, we just want
+				     // the global $\mathsf{\mathbf{K}}_{uu}$ matrix, we just want
 				     // to add the element wise
-				     // static-condensation $k_{\bar b}$.
+				     // static-condensation $\overline{\overline{\mathbf{\mathsf{k}}}}$.
 				     //
-				     // - $k_{pJ}^{-1}$: Similarly, $k_{pJ}$ exists in
+				     // - $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$:
+    				 //			 Similarly, $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$ exists in
 				     //          the subblock. Since the copy
 				     //          operation is a += operation, we
 				     //          need to subtract the existing
-				     //          $k_{pJ}$ submatrix in addition to
+				     //          $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$
+    				 //			 submatrix in addition to
 				     //          "adding" that which we wish to
 				     //          replace it with.
 				     //
-				     // - $k_{Jp}^{-1}$: Since the global matrix
+				     // - $\mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}$:
+    				 // 		 Since the global matrix
 				     //          is symmetric, this block is the
 				     //          same as the one above and we
-				     //          can simply use $k_{pJ}^{-1}$ as a
-				     //          substitute for this one
+				     //          can simply use
+    				 // 		 $\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}$
+				     //          as a substitute for this one.
 				     //
 				     // We first extract element data from the
 				     // system matrix. So first we get the
 				     // entire subblock for the cell, then
-				     // extract $k$ for the dofs associated with
+				     // extract $\mathsf{\mathbf{k}}$
+    				 // for the dofs associated with
 				     // the current element
     AdditionalTools::extract_submatrix(data.local_dof_indices,
 				       data.local_dof_indices,
 				       tangent_matrix,
 				       data.k_orig);
-				     // and next the local matrices for $k_{pu}$,
-				     // $k_{pJ}$ and $k_{JJ}$
+				     // and next the local matrices for
+    				 // $\mathsf{\mathbf{k}}_{ \widetilde{p} \mathbf{u}}$
+    				 // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
+    				 // and
+    				 // $\mathsf{\mathbf{k}}_{ \widetilde{J} \widetilde{J}}$:
     AdditionalTools::extract_submatrix(element_indices_p,
 				       element_indices_u,
 				       data.k_orig,
@@ -3194,30 +3356,63 @@ namespace Step44
 				       data.k_orig,
 				       data.k_JJ);
 
-				     // To get the inverse of $k_{pJ}$, we invert it
+				     // To get the inverse of
+    				 // $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$,
+    				 // we invert it
 				     // directly.  This operation is relatively
-				     // inexpensive since $k_{pJ}$ is
-				     // block-diagonal.
+				     // inexpensive since $\mathsf{\mathbf{k}}_{\widetilde{p} \widetilde{J}}$
+				     // since block-diagonal.
     data.k_pJ_inv.invert(data.k_pJ);
 
 				     // Now we can make condensation terms to
-				     // add to the $k_{uu}$ block and put them in
-				     // the cell local matrix $A = k_pJ^{-1} k_{pu}$:
-    data.k_pJ_inv.mmult(data.A, data.k_pu);
-				     // $B = k_{JJ} k_{pJ}^{-1} k_{pu}$
+				     // add to the $\mathsf{\mathbf{k}}_{\mathbf{u} \mathbf{u}}$
+    				 // block and put them in
+				     // the cell local matrix
+					//    $
+					//    \mathsf{\mathbf{A}}
+					//    =
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+					//    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+					//    $:
+	data.k_pJ_inv.mmult(data.A, data.k_pu);
+					//	$
+					//	\mathsf{\mathbf{B}}
+					//	=
+					//	\mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
+					//	\mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+					//	\mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+					//	$
     data.k_JJ.mmult(data.B, data.A);
-				     // $C = k_{Jp}^{-1} k_{JJ} k_{pJ}^{-1} k_{pu}$
+					//    $
+					//    \mathsf{\mathbf{C}}
+					//    =
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+					//    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+					//    $
     data.k_pJ_inv.Tmmult(data.C, data.B);
-				     // $k_{\bar b} = k_{up} k_{Jp}^{-1} k_{JJ} k_{pJ}^{-1} k_{pu}$
+					//    $
+					//    \overline{\overline{\mathsf{\mathbf{k}}}}
+					//    =
+					//    \mathsf{\mathbf{k}}_{\mathbf{u} \widetilde{p}}
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{p}}
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{J} \widetilde{J}}
+					//    \mathsf{\mathbf{k}}^{-1}_{\widetilde{p} \widetilde{J}}
+					//    \mathsf{\mathbf{k}}_{\widetilde{p} \mathbf{u}}
+					//    $
     data.k_pu.Tmmult(data.k_bbar, data.C);
     AdditionalTools::replace_submatrix(element_indices_u,
 				       element_indices_u,
 				       data.k_bbar,
 				       data.cell_matrix);
 
-				     // Next we place $k_{pJ}^{-1}$ in the $k_{pJ}$
+				     // Next we place
+    				 // $\mathsf{\mathbf{k}}^{-1}_{ \widetilde{p} \widetilde{J}}$
+    				 // in the
+    				 // $\mathsf{\mathbf{k}}_{ \widetilde{p} \widetilde{J}}$
 				     // block for post-processing.  Note again
-				     // that we need to remove the k_{pJ}
+				     // that we need to remove the
 				     // contribution that already exists there.
     data.k_pJ_inv.add(-1.0, data.k_pJ);
     AdditionalTools::replace_submatrix(element_indices_p,
