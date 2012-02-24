@@ -134,7 +134,6 @@ The variational inequality above is awkward to work with. We would therefore
 like to reformulate it as an equivalent saddle point problem. Set $V:=H^1_0(\Omega)$.
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset V'$, $V'$
 dual space of $V$, $K:=\{\mu\in V': \langle\mu,v\rangle\geq 0,\quad 0\geq v\in V\}$ of
-\marginpar{JF: Is this definition of $K$ correct?}
 Lagrange multipliers, where $\langle\cdot,\cdot\rangle$ denotes the duality
 pairing between $V'$ and $V$. This yields:
 
@@ -169,7 +168,6 @@ inequality constraints.
 To get there, let us assume that we discretize both $u$ and $\lambda$ with the
 same finite element space, for example the usual $Q_k$ spaces. We would then
 get the equations
-\marginpar{JF: Aren't the inequalities the wrong way around here (and below)?}
 \begin{eqnarray*}
  &A U + B\Lambda = F,&\\
  &[BU-G]_i \geq 0, \quad \Lambda_i \leq 0,\quad \Lambda_i[BU-G]_i = 0
@@ -192,9 +190,7 @@ at these locations, we get a diagonal mass matrix with
 To define $G$ we use the same technique as for $B$ where $g_h$ is a
 suitable approximation of $g$
 \begin{align*}
-  G_{ii} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x,
-  \qquad
-  G_{ij}=0 \ \text{for } i\neq j.
+  G_{i} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x.
 \end{align*}
 With this, the equations above can be restated as
 \begin{eqnarray*}
@@ -209,7 +205,6 @@ Now we define for each degree of freedom $i$ the function
 \end{equation*}
 with some $c>0$. (In this program we choose $c = 100$. It is a kind of a penalty parameter which
 depends on the problem itself. For example there is no convergence for $c = 1$ and 7 refinements.)
-\marginpar{JF: How do you choose $c$?}
 
 After some headscratching one can then convince oneself that the inequalities
 above can equivalently be rewritten as
@@ -275,7 +270,6 @@ We can iteratively solve this by always linearizing around the previous
 iterate (i.e., applying a Newton method), but for this we need to linearize
 the function $C(\cdot,\cdot)$ that is not differentiable. That said, it is
 slantly differentiable, and in fact we have
-\marginpar{JF: what should be in the second line? Zero or Lambda?}
 \begin{equation*}
  \dfrac{\partial}{\partial U^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
                                    cB_{ii},& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)< 0\\
@@ -370,13 +364,12 @@ system for each iteration $k$
 \end{equation*}
 By considering the dofs in $\mathcal{A}_k$ as Dirichlet data we solve this system with a CG-method
 and the AMG preconditioner from Trilinos.
-\marginpar{Which system do we actually solve with CG?}
 
 
 \section{Implementation}
 
 This tutorial is quite similar to step-4. But to solve the obstacle problem, two new methods are
-implemented: assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix) and
-update_solution_and_constraints (). 
+implemented: assemble\_mass\_matrix\_diagonal (TrilinosWrappers::SparseMatrix \&mass\_matrix) and
+update\_solution\_and\_constraints (). 
 
 \end{document}
