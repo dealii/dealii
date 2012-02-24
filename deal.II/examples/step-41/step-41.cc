@@ -491,8 +491,10 @@ namespace Step41
 				   // over all degrees of freedom and
 				   // check the sign of the function
 				   // $\Lambda^k_i + c([BU^k]_i -
-				   // G_i)$. To this end, we use the
-				   // formula given in the
+				   // G_i) = \Lambda^k_i + cB_i(U^k_i -
+				   // [g_h]_i)$ because in our case
+                                   // $G_i = B_i[g_h]_i$. To this end,
+				   // we use the formula given in the
 				   // introduction by which we can
 				   // compute the Lagrange multiplier
 				   // as the residual of the original
@@ -504,10 +506,7 @@ namespace Step41
 				   // At the top of this function, we
 				   // compute this residual using a
 				   // function that is part of the
-				   // matrix classes (but
-				   // unfortunately for us computes
-				   // the residual with the wrong
-				   // sign).
+				   // matrix classes.
   template <int dim>
   void
   ObstacleProblem<dim>::update_solution_and_constraints ()
@@ -519,7 +518,6 @@ namespace Step41
     TrilinosWrappers::Vector lambda (dof_handler.n_dofs());
     complete_system_matrix.residual (lambda,
 				     solution, complete_system_rhs);
-    lambda *= -1;
 
 
 				     // The next step is to reset the
@@ -658,8 +656,8 @@ namespace Step41
 	  if (lambda (dof_index) +
 	      penalty_parameter *
 	      diagonal_of_mass_matrix(dof_index) *
-	      (obstacle_value - solution_value)
-	      >
+	      (solution_value - obstacle_value)
+	      <
 	      0)
 	    {
 	      active_set.add_index (dof_index);
