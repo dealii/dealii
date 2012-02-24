@@ -223,7 +223,7 @@ pp. 865-888.
 
 The algorithm for the primal-dual active set method works as follows:
 \begin{itemize}
- \item [(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and $\mathcal{A}_k\cap\mathcal{F}_k=\O{}$ and set $k=1$.
+ \item [(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and $\mathcal{A}_k\cap\mathcal{F}_k=\emptyset$ and set $k=1$.
  \item [(1)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
  \begin{align*}
   AU^k + B\Lambda^k &= F,\\
@@ -370,6 +370,6 @@ and the AMG preconditioner from Trilinos.
 
 This tutorial is quite similar to step-4. But to solve the obstacle problem, two new methods are
 implemented: assemble\_mass\_matrix\_diagonal (TrilinosWrappers::SparseMatrix \&mass\_matrix) and
-update\_solution\_and\_constraints (). 
+update\_solution\_and\_constraints ().
 
 \end{document}
