@@ -32,7 +32,7 @@ The setup of the example problem is then presented.
 
 @note This tutorial has been developed for the problem of elasticity in three dimensions.
  While the space dimension could be changed in the main() routine, care needs to be taken.
- Two-dimensional elasticity problems, in general, exist only as idealisation of a three-dimensional ones.
+ Two-dimensional elasticity problems, in general, exist only as idealisations of three-dimensional ones.
  That is, they are either plane strain or plane stress. 
  The assumptions that follow either of these choices needs to be consistently imposed. 
  For more information see the note in step-8.
@@ -104,7 +104,7 @@ Let the time domain be denoted $\mathbb{T} = [0,T_{\textrm{end}}]$, where $t \in
 Consider a continuum body that occupies the reference configuration $\Omega_0$ at time $t=0$.
 Particles in the reference configuration are identified by the position vector $\mathbf{X}$.
 The configuration of the body at a later time $t>0$ is termed the current configuration, denoted $\Omega$, with particles identified by the vector $\mathbf{x}$.
-The nonlinear map between the reference and current configurations, denoted $\mathbf{\varphi}$, acts as follows:
+The nonlinear map between the reference and current configurations, denoted $\boldsymbol{\varphi}$, acts as follows:
 @f[
 	\mathbf{x} = \boldsymbol{\varphi}(\mathbf{X},t) \, .
 @f]
@@ -129,7 +129,7 @@ respectively, as
 	\textrm{d}v = J(\mathbf{X},t)\; \textrm{d}V \, .
 @f]
 
-Two important measure of the deformation in terms of the spatial and material coordinates are the left and right Cauchy-Green tensors, respectively, 
+Two important measures of the deformation in terms of the spatial and material coordinates are the left and right Cauchy-Green tensors, respectively, 
 and denoted $\mathbf{b} := \mathbf{F}\mathbf{F}^T$ and $\mathbf{C} := \mathbf{F}^T\mathbf{F}$.
 They are both symmetric and positive definite.
 
@@ -137,9 +137,9 @@ The Green-Lagrange strain tensor is defined by
 @f[
 	\mathbf{E}:= \frac{1}{2}[\mathbf{C} - \mathbf{I} ]
 		= \underbrace{\frac{1}{2}[\textrm{Grad}^T \mathbf{U} +	\textrm{Grad}\mathbf{U}]}_{\boldsymbol{\varepsilon}}
-			+ \frac{1}{2}[\textrm{Grad}^T\ \mathbf{U}][\textrm{Grad}\ \mathbf{U}] \, ,
+			+ \frac{1}{2}[\textrm{Grad}^T\ \mathbf{U}][\textrm{Grad}\ \mathbf{U}] \, .
 @f]
-If the assumption of infinitesimal deformations is valid, then the second term
+If the assumption of infinitesimal deformations is made, then the second term
 on the right can be neglected, and $\boldsymbol{\varepsilon}$ (the linearised
 strain tensor) is the only component of the strain tensor.
 This assumption is, looking at the setup of the problem, not valid in step-18,
@@ -278,7 +278,7 @@ The function $\mathcal{G}(J)$ is required to be strictly convex and satisfy the 
 among others, see Holzapfel (2001) for further details.
 In this work $\mathcal{G}:=\frac{1}{4} [ J^2 - 1 - 2\textrm{ln}J ]$.
 
-Incompressibility imposes the isochoric constraint that $J=1$ for all motions $\mathbf{\varphi}$.
+Incompressibility imposes the isochoric constraint that $J=1$ for all motions $\boldsymbol{\varphi}$.
 The Helmholtz free energy corresponding to an incompressible neo-Hookean material is given by
 @f[
     \Psi \equiv
@@ -334,7 +334,7 @@ where the fictitious elasticity tensor $\overline{\mathfrak{c}}$ in the spatial 
 		= 4 \overline{\mathbf{b}} \dfrac{ \partial^2 \Psi_{\textrm{iso}}(\overline{\mathbf{b}})} {\partial \overline{\mathbf{b}} \partial \overline{\mathbf{b}}} \overline{\mathbf{b}} \, .
 @f]
 
-<h3>Principle of stationary potential energy</h3>
+<h3>Principle of stationary potential energy and the three-field formulation</h3>
 
 The total potential energy of the system $\Pi$ is the sum of the internal and external potential energies, denoted $\Pi_{\textrm{int}}$ and $\Pi_{\textrm{ext}}$, respectively.
 We wish to find the equilibrium configuration by minimising the potential energy.
@@ -572,10 +572,14 @@ where
 		\end{bmatrix}}_{ \mathbf{\mathsf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
 @f}
 
-Because there are no
-derivatives of the pressure and dilatation (primary) variables in the formulation, a discontinuous finite element yields a block
-diagonal matrix and we can express $p$ and $\widetilde{J}$ on each cell simply
-by inverting the local mass matrix and multiplying it by the local right hand
+There are no derivatives of the pressure and dilatation (primary) variables present in the formulation. 
+Thus the discontinuous finite element interpolation of the pressure ana dilatation yields a block
+diagonal matrix for
+$\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}$,
+$\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}$ and 
+$\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}$.
+Therefore we can easily express the fields $\widetilde{p}$ and $\widetilde{J}$ on each cell simply
+by inverting a local matrix and multiplying it by the local right hand
 side. We can then insert the result into the remaining equations and recover
 a classical displacement-based method.
 In order to condense out the pressure and dilatation contributions at the element level we need the following results:
