@@ -13,11 +13,11 @@
 
 \section{Introduction}
 
-This example is based on the Laplace equation in a two-dimensional space
-$\Omega = \left[-1,1\right]^2$ and deals with the question what happens if a
-membrane is deflected by some external force but is also constrained by an
-obstacle. In other words, think of a elastic membrane clamped at the boundary
-to a rectangular frame and that sags through due to gravity acting on it. What
+This example is based on the Laplace equation in 2d and deals with the
+question what happens if a membrane is deflected by some external force but is
+also constrained by an obstacle. In other words, think of a elastic membrane
+clamped at the boundary to a rectangular frame (we choose $\Omega =
+\left[-1,1\right]^2$) and that sags through due to gravity acting on it. What
 happens now if there is an obstacle under the membrane that prevents it from
 reaching its equilibrium position if gravity was the only existing force? In
 the current example program, we will consider that under the membrane is a
@@ -25,18 +25,18 @@ stair step obstacle against which gravity pushes the membrane.
 
 This problem is typically called the "obstacle problem", and it results in a
 variational inequality, rather than a variational equation when put into the
-weak form. We will below derive it from classical formulation, but before we
-go on to discuss the mathematics let us show the solution of the problem we
+weak form. We will below derive it from the classical formulation, but before we
+go on to discuss the mathematics let us show how the solution of the problem we
 will consider in this tutorial program looks to gain some intuition of what
 we should expect:
 
 XXX (see files step-41.*.png) XXX
 
-Here, at the left, we see the displacement of the membrane. The shape of the
-obstacle underneath is clearly visible. On the right, we overlay which parts
-of the membrane are in contact with the obstacle. We will later call this set
-of points the "active set" to indicate that an inequality constraint is active
-there.
+Here, at the left, we see the displacement of the membrane. The shape
+of the obstacle underneath is clearly visible. On the right, we overlay which
+parts of the membrane are in contact with the obstacle. We will later call
+this set of points the "active set" to indicate that an inequality constraint
+is active there.
 
 
 \section{Classical formulation}
@@ -50,9 +50,9 @@ The classical formulation of the problem possesses the following form:
  u(\mathbf x) &\geq g(\mathbf x) & &\quad\text{in } \Omega
 \end{align*}
 with $u\in H^2(\Omega)$.  $u$ is a scalar valued function that denotes the
-displacement of the membrane. The first equation is called equilibrium
-condition with the force of areal density $f$. Here, this force is
-gravity. The second one is known as Hooke's Law that says that the stresses
+vertical displacement of the membrane. The first equation is called equilibrium
+condition with a force of areal density $f$. Here, we will consider this force
+to be gravity. The second one is known as Hooke's Law that says that the stresses
 $\sigma$ are proportional to the gradient of the displacements $u$ (the
 proportionality constant, often denoted by $E$, has been set to one here,
 without loss of generality; if it is constant, it can be put into the right
@@ -68,16 +68,17 @@ those places where the two of them are in contact. How big is this additional
 force? We don't know yet (and neither do we know "where" it actually acts) but
 it must be so that the membrane doesn't penetrate the obstacle.
 
-The fourth equality above together with the last inequality forms the
-obstacle condition which has to hold for the whole domain. The latter of these
-two means that the membrane must be above the obstacle $g(\mathbf x)$
+The fourth equality above together with the last inequality forms the obstacle
+condition which has to hold at every point of the whole domain. The latter of
+these two means that the membrane must be above the obstacle $g(\mathbf x)$
 everywhere. The second to last equation, often called the "complementarity
 condition" says that where the membrane is not in contact with the obstacle
 (i.e., those $\mathbf x$ where $u(\mathbf x) - g(\mathbf x) \neq 0$), then
 $-\Delta u=f$ at these locations; in other words, no additional forces act
 there, as expected. On the other hand, where $u=g$ we can have $-\Delta u-f
 \neq 0$, i.e., there can be additional forces (though there don't have to be:
-it is possible for the membrane to just touch, not press against, the obstacle).
+it is possible for the membrane to just touch, not press against, the
+obstacle).
 
 
 \section{Derivation of the variational inequality}
@@ -86,7 +87,7 @@ An obvious way to obtain the variational formulation of the obstacle problem is 
 \begin{equation*}
  E(u):=\dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla - \int\limits_{\Omega} fu.
 \end{equation*}
-We have to find a solution $u\in G$ of the following minimization problem
+We have to find a solution $u\in G$ of the following minimization problem:
 \begin{equation*}
  E(u)\leq E(v)\quad \forall v\in G,
 \end{equation*}
@@ -102,7 +103,8 @@ G$. Then the function
 \begin{equation*}
  F(\varepsilon) := E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],
 \end{equation*}
-takes its minimum at $\varepsilon = 0$, so that $F'(0)\geq 0$ for any choice
+takes its minimum at $\varepsilon = 0$ (because $u$ is a minimizer of the
+energy functional $E(\cdot)$), so that $F'(0)\geq 0$ for any choice
 of $v$. Note that
 $u+\varepsilon(v-u) = (1-\varepsilon)u+\varepsilon v\in G$ because of the
 convexity of $G$. If we compute $F'(\varepsilon)\vert_{\varepsilon=0}$ it
@@ -133,9 +135,13 @@ condition above.
 The variational inequality above is awkward to work with. We would therefore
 like to reformulate it as an equivalent saddle point problem. Set $V:=H^1_0(\Omega)$.
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset V'$, $V'$
-dual space of $V$, $K:=\{\mu\in V': \langle\mu,v\rangle\geq 0,\quad 0\geq v\in V\}$ of
+dual space of $V$, $K:=\{\mu\in V': \langle\mu,v\rangle\geq 0,\quad \forall
+v\in V, v \le 0 \}$ of
 Lagrange multipliers, where $\langle\cdot,\cdot\rangle$ denotes the duality
-pairing between $V'$ and $V$. This yields:
+pairing between $V'$ and $V$. Intuitively, $K$ is the cone of all "non-positive
+functions", except that $K\subset (H_0^1)'$ and so contains other objects
+besides regular functions as well.
+This yields:
 
 \textit{Find $u\in V$ and $\lambda\in K$ such that}
 \begin{align*}
@@ -179,7 +185,7 @@ freedom located in the interior of the domain
 (we have Dirichlet conditions on the perimeter). However, we
 can make our life simpler if we use a particular quadrature rule when
 assembling all terms that yield this mass matrix, namely a quadrature formula
-one where quadrature points are only located at the interpolation points at
+where quadrature points are only located at the interpolation points at
 which shape functions are defined; since all but one shape function are zero
 at these locations, we get a diagonal mass matrix with
 \begin{align*}
@@ -187,11 +193,15 @@ at these locations, we get a diagonal mass matrix with
   \qquad
   B_{ij}=0 \ \text{for } i\neq j.
 \end{align*}
-To define $G$ we use the same technique as for $B$ where $g_h$ is a
-suitable approximation of $g$
+To define $G$ we use the same technique as for $B$. In other words, we
+define
 \begin{align*}
   G_{i} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x.
 \end{align*}
+where $g_h$ is a
+suitable approximation of $g$ and $\mathbf x_i$ is the support point of the
+$i$the shape function. The integral in the definition of $B_{ii}$ and $G_i$
+are then approximated by the trapezoidal rule.
 With this, the equations above can be restated as
 \begin{eqnarray*}
  &A U + B\Lambda = F,&\\
@@ -203,8 +213,10 @@ Now we define for each degree of freedom $i$ the function
 \begin{equation*}
  C([BU]_i,\Lambda_i):=-\Lambda_i + \min\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
 \end{equation*}
-with some $c>0$. (In this program we choose $c = 100$. It is a kind of a penalty parameter which
-depends on the problem itself. For example there is no convergence for $c = 1$ and 7 refinements.)
+with some $c>0$. (In this program we choose $c = 100$. It is a kind of a
+penalty parameter which depends on the problem itself and needs to be chosen
+large enough; for example there is no convergence for $c = 1$ using the
+current program if we use 7 global refinements.)
 
 After some headscratching one can then convince oneself that the inequalities
 above can equivalently be rewritten as
@@ -321,7 +333,7 @@ bringing all known terms to the right hand side. This yields
  F_{\mathcal{F}_k}\\ F_{\mathcal{A}_k}\\ 0\\ G_{\mathcal{A}_k}
 \end{pmatrix}.
 \end{equation*}
-These are the equations outlines above in the description of the basic algorithm.
+These are the equations outlined above in the description of the basic algorithm.
 
 We could even drive this a bit further.
 It's easy to see that we can eliminate the third row and the third column
@@ -347,11 +359,28 @@ the full Lagrange multiplier vector through
  \Lambda^k_S = B^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}U^k_{\mathcal{S}}\right).
 \end{equation*}
 Because of the third row and the fact that $B_{\mathcal{A}_k}$ is a diagonal matrix we are able
-to calculate $U^k_{\mathcal{A}_k}$ directly. At least the first row yields the following reduced linear
-system for each iteration $k$
+to calculate $U^k_{\mathcal{A}_k}=B^{-1}_{\mathcal{A}_k}G_{\mathcal{A}_k}$ directly. We can therefore also write the
+linear system as follows:
 \begin{equation*}
 \begin{pmatrix}
- A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k}\\
+ A_{\mathcal{F}_k\mathcal{F}_k} & 0\\
+ 0 & Id_{\mathcal{A}_k} \\
+\end{pmatrix}
+\begin{pmatrix}
+ U^k_{\mathcal{F}_k}\\ U^k_{\mathcal{A}_k}
+\end{pmatrix}
+=
+\begin{pmatrix}
+ F_{\mathcal{F}_k} - A_{\mathcal{F}_k\mathcal{A}_k}B^{-1}_{\mathcal{A}_k}G_{\mathcal{A}_k}
+ \\
+ B_{\mathcal{A}_k}^{-1}G_{\mathcal{A}_k}
+\end{pmatrix}.
+\end{equation*}
+Fortunately, this form is easy to arrive at: we simply build the usual Laplace
+linear system
+\begin{equation*}
+\begin{pmatrix}
+ A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} \\
  A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k}
 \end{pmatrix}
 \begin{pmatrix}
@@ -360,16 +389,23 @@ system for each iteration $k$
 =
 \begin{pmatrix}
  F_{\mathcal{F}_k}\\ F_{\mathcal{A}_k}
-\end{pmatrix}.
+\end{pmatrix},
 \end{equation*}
-By considering the dofs in $\mathcal{A}_k$ as Dirichlet data we solve this system with a CG-method
+and then let the ConstraintMatrix class eliminate all constrained degrees of
+freedom, namely $U^k_{\mathcal{A}_k}=B^{-1}_{\mathcal{A}_k}G_{\mathcal{A}_k}$,
+in the same way as if the dofs in $\mathcal{A}_k$ were Dirichlet data. The
+result linear system (the second to last one above) is symmetric and positive
+definite and we solve it with a CG-method
 and the AMG preconditioner from Trilinos.
 
 
 \section{Implementation}
 
-This tutorial is quite similar to step-4. But to solve the obstacle problem, two new methods are
-implemented: assemble\_mass\_matrix\_diagonal (TrilinosWrappers::SparseMatrix \&mass\_matrix) and
-update\_solution\_and\_constraints ().
+This tutorial is quite similar to step-4. The general structure of the program
+follows step-4 with minor differences:
+- We need two new methods are, assemble\_mass\_matrix\_diagonal and
+  update\_solution\_and\_constraints ().
+- We need new member variables that denote the constraints we have here.
+- We change the preconditioner for the solver.
 
 \end{document}
