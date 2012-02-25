@@ -1845,14 +1845,12 @@ namespace Step44
 				       // The global system matrix initially has the following structure
 				       // @f{align*}
 						// \underbrace{\begin{bmatrix}
-						// \mathbf{\mathsf{K}}_{uu}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
-						//	\\
-						//	\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}
-						//	\\
+						// \mathbf{\mathsf{K}}_{uu}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0} \\
+						//	\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}} \\
 						//	\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
 						//	\end{bmatrix}}_{\mathbf{\mathsf{K}}(\mathbf{\Xi}_{\textrm{i}})}
 						//	\underbrace{\begin{bmatrix}
-						//			d \mathbf{\mathsf{u}}\\
+						//			d \mathbf{\mathsf{u}} \\
 						//          d \widetilde{\mathbf{\mathsf{p}}} \\
 						//          d \widetilde{\mathbf{\mathsf{J}}}
 						//	\end{bmatrix}}_{d \mathbf{\Xi}}
@@ -2876,10 +2874,8 @@ namespace Step44
 //  \mathbf{\mathsf{K}}_{\textrm{store}}
 //:=
 //  \begin{bmatrix}
-//		\mathbf{\mathsf{K}}_{\textrm{con}}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
-//		\\
-//		\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
-//		\\
+//		\mathbf{\mathsf{K}}_{\textrm{con}}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0} \\
+//		\mathbf{\mathsf{K}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \\
 //		\mathbf{0}	& 	\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
 //	\end{bmatrix} \, .
 // @f}
@@ -2888,14 +2884,12 @@ namespace Step44
 //  		d \widetilde{\mathbf{\mathsf{p}}}
 //  		& = \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \bigl[
 //  			 \mathbf{\mathsf{F}}_{\widetilde{J}}
-//  			 - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathbf{\mathsf{J}}} \bigr]
-//  			\\
+//  			 - \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}} d \widetilde{\mathbf{\mathsf{J}}} \bigr] \\
 //  		d \widetilde{\mathbf{\mathsf{J}}}
 //  		& = \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1} \bigl[
 //  			\mathbf{\mathsf{F}}_{\widetilde{p}}
 //  			- \mathbf{\mathsf{K}}_{\widetilde{p}u} d \mathbf{\mathsf{u}}
-//  			\bigr]
-//  		\\
+//  			\bigr] \\
 //  		 \Rightarrow d \widetilde{\mathbf{\mathsf{p}}}
 //  		&=  \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{F}}_{\widetilde{J}}
 //  		- \underbrace{\bigl[\mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
@@ -3278,10 +3272,8 @@ namespace Step44
     				 // is of the form:
     				// @f{align*}
 					//    \begin{bmatrix}
-					//    			\mathbf{\mathsf{k}}_{uu}	&	\mathbf{\mathsf{k}}_{u\widetilde{p}}	& \mathbf{0}
-					//    			\\
-					//    			\mathbf{\mathsf{k}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}
-					//    			\\
+					//    			\mathbf{\mathsf{k}}_{uu}	&	\mathbf{\mathsf{k}}_{u\widetilde{p}}	& \mathbf{0} \\
+					//    			\mathbf{\mathsf{k}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}} \\
 					//    			\mathbf{0}	& 	\mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
 					//    \end{bmatrix}
     				// @f}
@@ -3289,10 +3281,8 @@ namespace Step44
 				     // We now need to modify it such that it appear as
     				// @f{align*}
 					//    \begin{bmatrix}
-					//    			\mathbf{\mathsf{k}}_{\textrm{con}}	&	\mathbf{\mathsf{k}}_{u\widetilde{p}}	& \mathbf{0}
-					//    			\\
-					//    			\mathbf{\mathsf{k}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
-					//    			\\
+					//    			\mathbf{\mathsf{k}}_{\textrm{con}}	&	\mathbf{\mathsf{k}}_{u\widetilde{p}}	& \mathbf{0} \\
+					//    			\mathbf{\mathsf{k}}_{\widetilde{p}u}	&	\mathbf{0}	&	\mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1} \\
 					//    			\mathbf{0}	& 	\mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}		& \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
 					//    \end{bmatrix}
     				// @f}
