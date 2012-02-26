@@ -109,6 +109,7 @@ namespace Step41
       TrilinosWrappers::Vector       system_rhs;
       TrilinosWrappers::Vector       complete_system_rhs;
       TrilinosWrappers::Vector       diagonal_of_mass_matrix;
+      TrilinosWrappers::Vector       contact_force;
   };
 
 
@@ -284,6 +285,7 @@ namespace Step41
     solution.reinit (dof_handler.n_dofs());
     system_rhs.reinit (dof_handler.n_dofs());
     complete_system_rhs.reinit (dof_handler.n_dofs());
+    contact_force.reinit (dof_handler.n_dofs());
 
 				     // The only other thing to do
 				     // here is to compute the factors
@@ -518,7 +520,8 @@ namespace Step41
     TrilinosWrappers::Vector lambda (dof_handler.n_dofs());
     complete_system_matrix.residual (lambda,
 				     solution, complete_system_rhs);
-
+    contact_force.ratio (lambda, diagonal_of_mass_matrix);
+    contact_force *= -1;
 
 				     // The next step is to reset the
 				     // active set and constraints
@@ -756,6 +759,7 @@ namespace Step41
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "displacement");
     data_out.add_data_vector (active_set, "active_set");
+    data_out.add_data_vector (contact_force, "lambda");
 
     data_out.build_patches ();
 
