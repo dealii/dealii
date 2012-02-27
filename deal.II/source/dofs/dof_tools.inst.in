@@ -312,14 +312,14 @@ DoFTools::extract_boundary_dofs<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const std::vector<bool>                  &,
  std::vector<bool>                        &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 template
 void
 DoFTools::extract_boundary_dofs<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const std::vector<bool>                  &,
  std::vector<bool>                        &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 
 template
 void
@@ -327,14 +327,14 @@ DoFTools::extract_dofs_with_support_on_boundary<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const std::vector<bool>                  &,
  std::vector<bool>                        &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 template
 void
 DoFTools::extract_dofs_with_support_on_boundary<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const std::vector<bool>                  &,
  std::vector<bool>                        &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 
 template
 void
@@ -453,7 +453,7 @@ DoFTools::extract_boundary_dofs<DoFHandler<deal_II_dimension,deal_II_dimension+1
   (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
    const std::vector<bool>                  &,
    std::vector<bool>                        &,
-   const std::set<unsigned char> &);
+   const std::set<types::boundary_id_t> &);
 template
 unsigned int
 DoFTools::count_dofs_with_subdomain_association<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
@@ -586,7 +586,7 @@ template
 void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
- const std::set<unsigned char> &,
+ const std::set<types::boundary_id_t> &,
  std::vector<unsigned int> &);
 
 template
@@ -601,7 +601,7 @@ template
 void
 DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
- const std::set<unsigned char> &,
+ const std::set<types::boundary_id_t> &,
  std::vector<unsigned int> &);
 
 template
@@ -695,7 +695,7 @@ template
 void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const std::set<unsigned char> &,
+ const std::set<types::boundary_id_t> &,
  std::vector<unsigned int> &);
 
 template
@@ -711,18 +711,18 @@ DoFTools::extract_hanging_node_dofs
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
  std::vector<bool>     &selected_dofs);
 
-// template
-// void
-// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-//  const std::set<unsigned char> &,
-//  std::vector<unsigned int> &);
+ template
+ void
+ DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+ (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+  const std::set<types::boundary_id_t> &,
+  std::vector<unsigned int> &);
 
-// template
-// void
-// DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
-// (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-//  std::vector<unsigned int> &);
+ template
+ void
+ DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
+ (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
+  std::vector<unsigned int> &);
 
 #endif
 

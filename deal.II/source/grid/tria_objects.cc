@@ -105,10 +105,10 @@ namespace internal
 			   new_size-children.size(),
 			   -1);
 
-          material_id.reserve (new_size);
-          material_id.insert (material_id.end(),
-			      new_size-material_id.size(),
-			      255);
+          boundary_or_material_id.reserve (new_size);
+          boundary_or_material_id.insert (boundary_or_material_id.end(),
+			      new_size-boundary_or_material_id.size(),
+			      BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
@@ -307,10 +307,10 @@ namespace internal
 			       RefinementCase<2>::no_refinement);
 
 
-          material_id.reserve (new_size);
-          material_id.insert (material_id.end(),
-			      new_size-material_id.size(),
-			      255);
+          boundary_or_material_id.reserve (new_size);
+          boundary_or_material_id.insert (boundary_or_material_id.end(),
+			      new_size-boundary_or_material_id.size(),
+			      BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
@@ -490,10 +490,10 @@ namespace internal
 			   4*new_size-children.size(),
 			   -1);
 
-          material_id.reserve (new_size);
-          material_id.insert (material_id.end(),
-			      new_size-material_id.size(),
-			      255);
+          boundary_or_material_id.reserve (new_size);
+          boundary_or_material_id.insert (boundary_or_material_id.end(),
+			      new_size-boundary_or_material_id.size(),
+			      BoundaryOrMaterialId());
 
           user_data.reserve (new_size);
           user_data.insert (user_data.end(),
@@ -633,8 +633,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), user_flags.size()));
       Assert (cells.size() == children.size(),
               ExcMemoryInexact (cells.size(), children.size()));
-      Assert (cells.size() == material_id.size(),
-              ExcMemoryInexact (cells.size(), material_id.size()));
+      Assert (cells.size() == boundary_or_material_id.size(),
+              ExcMemoryInexact (cells.size(), boundary_or_material_id.size()));
       Assert (cells.size() == user_data.size(),
               ExcMemoryInexact (cells.size(), user_data.size()));
     }
@@ -675,8 +675,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), children.size()));
       Assert (cells.size() == refinement_cases.size(),
               ExcMemoryInexact (cells.size(), refinement_cases.size()));
-      Assert (cells.size() == material_id.size(),
-              ExcMemoryInexact (cells.size(), material_id.size()));
+      Assert (cells.size() == boundary_or_material_id.size(),
+              ExcMemoryInexact (cells.size(), boundary_or_material_id.size()));
       Assert (cells.size() == user_data.size(),
               ExcMemoryInexact (cells.size(), user_data.size()));
     }
@@ -714,8 +714,8 @@ namespace internal
               ExcMemoryInexact (cells.size(), user_flags.size()));
       Assert (4*cells.size() == children.size(),
               ExcMemoryInexact (cells.size(), children.size()));
-      Assert (cells.size() == material_id.size(),
-              ExcMemoryInexact (cells.size(), material_id.size()));
+      Assert (cells.size() == boundary_or_material_id.size(),
+              ExcMemoryInexact (cells.size(), boundary_or_material_id.size()));
       Assert (cells.size() == user_data.size(),
               ExcMemoryInexact (cells.size(), user_data.size()));
       Assert (cells.size() * GeometryInfo<3>::faces_per_cell
@@ -761,7 +761,7 @@ namespace internal
       refinement_cases.clear();
       used.clear();
       user_flags.clear();
-      material_id.clear();
+      boundary_or_material_id.clear();
       user_data.clear();
       user_data_type = data_unknown;
     }
@@ -793,7 +793,7 @@ namespace internal
               MemoryConsumption::memory_consumption (children) +
               MemoryConsumption::memory_consumption (used) +
               MemoryConsumption::memory_consumption (user_flags) +
-              MemoryConsumption::memory_consumption (material_id) +
+              MemoryConsumption::memory_consumption (boundary_or_material_id) +
               MemoryConsumption::memory_consumption (refinement_cases) +
 	      user_data.capacity() * sizeof(UserData) + sizeof(user_data));
     }

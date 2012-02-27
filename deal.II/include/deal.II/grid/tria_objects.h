@@ -127,12 +127,29 @@ namespace internal
 					  *  Triangulation::clear_user_flags().
 					  */
 	std::vector<bool> user_flags;
-	
+
+
+	/**
+	 * We use this union to store boundary and material
+	 * data. Because only one one out of these two is 
+	 * actually needed here, we use an union.
+	 */
+  union BoundaryOrMaterialId
+    {
+        types::boundary_id_t boundary_id;
+        types::material_id_t material_id;
+
+        std::size_t memory_consumption () const
+        {
+          return std::max(sizeof(material_id),sizeof(boundary_id));
+        }
+    };
 					 /**
 					  * Store boundary and material data. For
 					  * example, in one dimension, this field
 					  * stores the material id of a line, which
-					  * is a number between 0 and 254. In more
+					  * is a number between 0 and
+					  * types::invalid_material_id-1. In more
 					  * than one dimension, lines have no
 					  * material id, but they may be at the
 					  * boundary; then, we store the
@@ -141,36 +158,39 @@ namespace internal
 					  * boundary this line belongs and which
 					  * boundary conditions hold on this
 					  * part. The boundary indicator also
-					  * is a number between zero and 254;
-					  * the id 255 is reserved for lines
+					  * is a number between zero and
+					  * types::internal_face_boundary_id-1;
+					  * the id types::internal_face_boundary_id
+					  * is reserved for lines
 					  * in the interior and may be used
 					  * to check whether a line is at the
 					  * boundary or not, which otherwise
 					  * is not possible if you don't know
 					  * which cell it belongs to.
 					  */
-	std::vector<unsigned char> material_id;
 	
-                                         /**
-                                          *  Assert that enough space
-                                          *  is allocated to
-                                          *  accomodate
-                                          *  <code>new_objs_in_pairs</code>
-                                          *  new objects, stored in
-                                          *  pairs, plus
-                                          *  <code>new_obj_single</code>
-                                          *  stored individually.
-                                          *  This function does not
-                                          *  only call
-                                          *  <code>vector::reserve()</code>,
-                                          *  but does really append
-                                          *  the needed elements.
-					  *
-					  *  In 2D e.g. refined lines have to be
-					  *  stored in pairs, whereas new lines in the
-					  *  interior of refined cells can be stored as
-					  *  single lines.
-                                          */
+	std::vector<BoundaryOrMaterialId> boundary_or_material_id;
+
+            /**
+             *  Assert that enough space
+             *  is allocated to
+             *  accomodate
+             *  <code>new_objs_in_pairs</code>
+             *  new objects, stored in
+             *  pairs, plus
+             *  <code>new_obj_single</code>
+             *  stored individually.
+             *  This function does not
+             *  only call
+             *  <code>vector::reserve()</code>,
+             *  but does really append
+             *  the needed elements.
+             *
+             *  In 2D e.g. refined lines have to be
+             *  stored in pairs, whereas new lines in the
+             *  interior of refined cells can be stored as
+             *  single lines.
+             */
         void reserve_space (const unsigned int new_objs_in_pairs,
 			    const unsigned int new_objs_single = 0);
 
@@ -792,7 +812,7 @@ namespace internal
       ar & refinement_cases;
       ar & used;
       ar & user_flags;
-      ar & material_id;
+      ar & boundary_or_material_id;
       ar & next_free_single & next_free_pair & reverse_order_next_free_single;
       ar & user_data & user_data_type;
     }

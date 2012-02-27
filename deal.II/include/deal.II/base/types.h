@@ -77,6 +77,29 @@ namespace types
 				    * of freedom.
 				    */
   const global_dof_index invalid_dof_index = static_cast<global_dof_index>(-1);
+
+          /**
+           * The type used to denote boundary_indicators.
+           */
+  typedef unsigned char boundary_id_t;
+
+          /**
+           * The number which we reserve for internal faces.
+           * We assume that all boundary_ids lie in the range [0, internal_face_boundary_id).
+           */
+  const boundary_id_t internal_face_boundary_id = static_cast<boundary_id_t>(-1);
+
+          /**
+           * The type used to denote boundary_indicators.
+           */
+  typedef unsigned char material_id_t;
+
+          /**
+           * Invalid material_id which we need in several places as a default value.
+           * We assume that all material_ids lie in the range [0, invalid_material_id).
+           */
+  const material_id_t invalid_material_id = static_cast<material_id_t>(-1);
+
 }
 
 

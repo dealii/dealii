@@ -244,7 +244,7 @@ for (deal_II_dimension : DIMENSIONS)
 		 Triangulation<deal_II_dimension>::face_iterator>
       extract_boundary_mesh (const Triangulation<deal_II_dimension> &volume_mesh,
 					Triangulation<deal_II_dimension-1,deal_II_dimension>  &surface_mesh,
-					const std::set<unsigned char> &boundary_ids);
+					const std::set<types::boundary_id_t> &boundary_ids);
 #endif
     \}
   }
@@ -259,7 +259,7 @@ for (deal_II_dimension : DIMENSIONS; Container : DOFHANDLER_TEMPLATES)
 		 Container<deal_II_dimension>::face_iterator>
       extract_boundary_mesh (const Container<deal_II_dimension> &volume_mesh,
 					Container<deal_II_dimension-1,deal_II_dimension>  &surface_mesh,
-					const std::set<unsigned char> &boundary_ids);
+					const std::set<types::boundary_id_t> &boundary_ids);
 #endif
   \}
   }

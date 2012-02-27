@@ -233,7 +233,7 @@ namespace internal
 					  * The material id we are to care
 					  * for.
 					  */
-	const unsigned int material_id;
+	const types::material_id_t material_id;
 
 					 /**
 					  * Some more references to input data to
@@ -254,7 +254,7 @@ namespace internal
 		      const bool         need_quadrature_points,
 		      const unsigned int n_solution_vectors,
 		      const types::subdomain_id_t subdomain_id,
-		      const unsigned int material_id,
+		      const types::material_id_t material_id,
 		      const typename FunctionMap<spacedim>::type *neumann_bc,
 		      const std::vector<bool>                component_mask,
 		      const Function<spacedim>                   *coefficients);
@@ -278,7 +278,7 @@ namespace internal
 		  const bool     need_quadrature_points,
 		  const unsigned int n_solution_vectors,
 		  const types::subdomain_id_t subdomain_id,
-		  const unsigned int material_id,
+		  const types::material_id_t material_id,
 		  const typename FunctionMap<spacedim>::type *neumann_bc,
 		  const std::vector<bool>                component_mask,
 		  const Function<spacedim>         *coefficients)
@@ -547,7 +547,7 @@ namespace internal
 					 // difference between normal
 					 // derivative and boundary function
 	{
-	  const unsigned char boundary_indicator = face->boundary_indicator();
+	  const types::boundary_id_t boundary_indicator = face->boundary_indicator();
 
 	  Assert (parallel_data.neumann_bc->find(boundary_indicator) !=
 		  parallel_data.neumann_bc->end(),
@@ -907,7 +907,7 @@ namespace internal
 		    ||
 		    (cell->subdomain_id() == subdomain_id))
 		   &&
-		   ((material_id == numbers::invalid_unsigned_int)
+		   ((material_id == types::invalid_material_id)
 		    ||
 		    (cell->material_id() == material_id))) )
 	    {
@@ -927,7 +927,7 @@ namespace internal
 				 &&
 				 ((cell->neighbor(face_no)->material_id()
 				   == material_id) ||
-				  (material_id == numbers::invalid_unsigned_int));
+				  (material_id == types::invalid_material_id));
 	      else
 		{
 		  for (unsigned int sf=0; sf<face->n_children(); ++sf)
@@ -935,7 +935,7 @@ namespace internal
 			  ->subdomain_id() == subdomain_id)
 			 &&
 			 (material_id ==
-			  numbers::invalid_unsigned_int))
+			  types::invalid_material_id))
 			||
 			((cell->neighbor_child_on_subface(face_no,sf)
 			  ->material_id() == material_id)
@@ -1017,7 +1017,7 @@ estimate (const Mapping<1,spacedim>      &mapping,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
@@ -1041,7 +1041,7 @@ estimate (const DH   &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
@@ -1063,7 +1063,7 @@ estimate (const DH   &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
@@ -1086,7 +1086,7 @@ estimate (const Mapping<1,spacedim>      &mapping,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
@@ -1109,7 +1109,7 @@ estimate (const DH   &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
@@ -1131,7 +1131,7 @@ estimate (const DH   &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
@@ -1154,7 +1154,7 @@ estimate (const Mapping<1,spacedim>                    &/*mapping*/,
           const Function<spacedim>                   */*coefficient*/,
           const unsigned int,
           const types::subdomain_id_t          /*subdomain_id*/,
-          const unsigned int                   /*material_id*/)
+          const types::material_id_t                   /*material_id*/)
 {
   Assert (false, ExcInternalError());
 }
@@ -1174,7 +1174,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
           const Function<spacedim>                   *coefficient,
           const unsigned int,
           const types::subdomain_id_t         subdomain_id_,
-          const unsigned int                  material_id)
+          const types::material_id_t                  material_id)
 {
 #ifdef DEAL_II_USE_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
@@ -1207,7 +1207,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   const unsigned int n_solution_vectors = solutions.size();
 
 				   // sanity checks
-  Assert (neumann_bc.find(255) == neumann_bc.end(),
+  Assert (neumann_bc.find(types::internal_face_boundary_id) == neumann_bc.end(),
 	  ExcInvalidBoundaryIndicator());
 
   for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
@@ -1305,7 +1305,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
          ||
          (cell->subdomain_id() == subdomain_id))
         &&
-        ((material_id == numbers::invalid_unsigned_int)
+        ((material_id == types::invalid_material_id)
          ||
          (cell->material_id() == material_id)))
       {
@@ -1444,7 +1444,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
@@ -1467,7 +1467,7 @@ estimate (const DH                &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
@@ -1490,7 +1490,7 @@ estimate (const Mapping<dim, spacedim>      &mapping,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
 				   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
@@ -1513,7 +1513,7 @@ estimate (const DH                &dof_handler,
           const Function<spacedim>     *coefficients,
           const unsigned int       n_threads,
           const types::subdomain_id_t subdomain_id,
-          const unsigned int       material_id)
+          const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
@@ -1538,7 +1538,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const Function<spacedim>                 *coefficients,
           const unsigned int                   ,
           const types::subdomain_id_t          subdomain_id_,
-          const unsigned int                   material_id)
+          const types::material_id_t                   material_id)
 {
 #ifdef DEAL_II_USE_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
@@ -1668,7 +1668,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           ||
           (cell->subdomain_id() == subdomain_id))
          &&
-         ((material_id == numbers::invalid_unsigned_int)
+         ((material_id == types::invalid_material_id)
           ||
           (cell->material_id() == material_id)))
       {
@@ -1715,7 +1715,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const Function<spacedim>                 *coefficients,
           const unsigned int                   n_threads,
           const types::subdomain_id_t          subdomain_id,
-          const unsigned int                   material_id)
+          const types::material_id_t                   material_id)
 {
 				   // forward to the function with the QCollection
   estimate (mapping, dof_handler,
@@ -1737,7 +1737,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
 					 const Function<spacedim>                 *coefficients,
 					 const unsigned int                   n_threads,
                                          const types::subdomain_id_t subdomain_id,
-                                         const unsigned int       material_id)
+                                         const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
@@ -1758,7 +1758,7 @@ void KellyErrorEstimator<dim, spacedim>::estimate (const DH                     
 					 const Function<spacedim>                 *coefficients,
 					 const unsigned int                   n_threads,
                                          const types::subdomain_id_t subdomain_id,
-                                         const unsigned int       material_id)
+                                         const types::material_id_t       material_id)
 {
   Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
   estimate(StaticMappingQ1<dim, spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,

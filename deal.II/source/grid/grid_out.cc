@@ -1162,8 +1162,8 @@ void GridOut::write_xfig (
 	  {
 	    Triangulation<dim>::face_iterator
 	      face = cell->face(face_reorder[f]);
-	    const unsigned char bi = face->boundary_indicator();
-	    if (bi != 255)
+	    const types::boundary_id_t bi = face->boundary_indicator();
+	    if (bi != types::internal_face_boundary_id)
 	      {
 						 // Code for polyline
 		out << "2 1 "
@@ -2304,7 +2304,7 @@ namespace internal
 	if (eps_flags_base.color_lines_level && (line->level > 0))
 					   // lines colored according to
 					   // refinement level,
-					   // contributed by Jörg
+					   // contributed by Jï¿½rg
 					   // R. Weimar
 	  out << line->level
 	      << " l "

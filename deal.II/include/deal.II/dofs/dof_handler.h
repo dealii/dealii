@@ -1073,7 +1073,7 @@ class DoFHandler  :  public Subscriptor
 				      * consideration.
 				      */
     unsigned int
-    n_boundary_dofs (const std::set<unsigned char> &boundary_indicators) const;
+    n_boundary_dofs (const std::set<types::boundary_id_t> &boundary_indicators) const;
 
 				     /**
 				      * Access to an object informing
@@ -1419,7 +1419,7 @@ class DoFHandler  :  public Subscriptor
 
 template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
-template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<unsigned char> &) const;
+template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id_t> &) const;
 
 
 /* ----------------------- Inline functions ---------------------------------- */

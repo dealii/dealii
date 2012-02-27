@@ -280,7 +280,7 @@ class GridGenerator
     subdivided_hyper_rectangle (Triangulation<dim>                       &tria,
 				const std::vector< std::vector<double> > &spacing,
 				const Point<dim>                         &p,
-				const Table<dim,unsigned char>           &material_id,
+				const Table<dim,types::material_id_t>           &material_id,
 				const bool                               colorize=false);
 
 				     /**

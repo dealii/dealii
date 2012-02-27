@@ -306,7 +306,7 @@ namespace VectorTools
 
 					     // count, how often we have
 					     // added to this dof
-	    Assert (touch_count[local_dof_indices[j]] < 255,
+	    Assert (touch_count[local_dof_indices[j]] < types::internal_face_boundary_id,
 		    ExcInternalError());
 	    ++touch_count[local_dof_indices[j]];
 	  };
@@ -569,7 +569,7 @@ namespace VectorTools
 					   // function to hold on
 					   // all parts of the boundary
 	  typename FunctionMap<spacedim>::type boundary_functions;
-	  for (unsigned char c=0; c<255; ++c)
+	  for (types::boundary_id_t c=0; c<types::internal_face_boundary_id; ++c)
 	    boundary_functions[c] = &function;
 	  project_boundary_values (dof, boundary_functions, q_boundary,
 				   boundary_values);
@@ -1016,7 +1016,7 @@ namespace VectorTools
 				   const Quadrature<0>   &,
 				   const Function<1>     &,
 				   Vector<double>        &,
-				   const std::set<unsigned char> &)
+				   const std::set<types::boundary_id_t> &)
   {
     Assert (false, ExcImpossibleInDim(1));
   }
@@ -1030,7 +1030,7 @@ namespace VectorTools
 				   const Quadrature<0>   &,
 				   const Function<2>     &,
 				   Vector<double>        &,
-				   const std::set<unsigned char> &)
+				   const std::set<types::boundary_id_t> &)
   {
     Assert (false, ExcImpossibleInDim(1));
   }
@@ -1044,7 +1044,7 @@ namespace VectorTools
 				   const Quadrature<dim-1> &quadrature,
 				   const Function<spacedim>     &rhs_function,
 				   Vector<double>          &rhs_vector,
-				   const std::set<unsigned char> &boundary_indicators)
+				   const std::set<types::boundary_id_t> &boundary_indicators)
   {
     const FiniteElement<dim> &fe  = dof_handler.get_fe();
     Assert (fe.n_components() == rhs_function.n_components,
@@ -1166,7 +1166,7 @@ namespace VectorTools
 				   const Quadrature<dim-1> &quadrature,
 				   const Function<spacedim>     &rhs_function,
 				   Vector<double>          &rhs_vector,
-				   const std::set<unsigned char> &boundary_indicators)
+				   const std::set<types::boundary_id_t> &boundary_indicators)
   {
     Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
 
@@ -1187,7 +1187,7 @@ namespace VectorTools
 				   const hp::QCollection<0> &,
 				   const Function<1>     &,
 				   Vector<double>          &,
-				   const std::set<unsigned char> &)
+				   const std::set<types::boundary_id_t> &)
   {
     Assert (false, ExcImpossibleInDim(1));
   }
@@ -1201,7 +1201,7 @@ namespace VectorTools
 				   const hp::QCollection<0> &,
 				   const Function<2>     &,
 				   Vector<double>          &,
-				   const std::set<unsigned char> &)
+				   const std::set<types::boundary_id_t> &)
   {
     Assert (false, ExcImpossibleInDim(1));
   }
@@ -1215,7 +1215,7 @@ namespace VectorTools
 				   const hp::QCollection<dim-1>  &quadrature,
 				   const Function<spacedim>      &rhs_function,
 				   Vector<double>                &rhs_vector,
-				   const std::set<unsigned char> &boundary_indicators)
+				   const std::set<types::boundary_id_t> &boundary_indicators)
   {
     const hp::FECollection<dim> &fe  = dof_handler.get_fe();
     Assert (fe.n_components() == rhs_function.n_components,
@@ -1349,7 +1349,7 @@ namespace VectorTools
 				   const hp::QCollection<dim-1>  &quadrature,
 				   const Function<spacedim>      &rhs_function,
 				   Vector<double>                &rhs_vector,
-				   const std::set<unsigned char> &boundary_indicators)
+				   const std::set<types::boundary_id_t> &boundary_indicators)
   {
     Assert (DEAL_II_COMPAT_MAPPING, ExcCompatibility("mapping"));
     create_boundary_right_hand_side(hp::StaticMappingQ1<dim>::mapping_collection,
@@ -1487,7 +1487,7 @@ namespace VectorTools
       if (function_map.size() == 0)
 	return;
 
-      Assert (function_map.find(255) == function_map.end(),
+      Assert (function_map.find(types::internal_face_boundary_id) == function_map.end(),
 	      ExcInvalidBoundaryIndicator());
 
       const unsigned int        n_components = DoFTools::n_components(dof);
@@ -1645,7 +1645,7 @@ namespace VectorTools
 					       // cast the face iterator to a DoFHandler
 					       // iterator so that we can access the boundary
 					       // indicators
-	      const unsigned char boundary_component = face->boundary_indicator();
+	      const types::boundary_id_t boundary_component = face->boundary_indicator();
 	      if (function_map.find(boundary_component) != function_map.end())
 		{
 						   // face is of the right component
@@ -1833,7 +1833,7 @@ namespace VectorTools
   void
   interpolate_boundary_values (const Mapping<DH::dimension, DH::space_dimension>            &mapping,
 			       const DH                 &dof,
-			       const unsigned char            boundary_component,
+			       const types::boundary_id_t            boundary_component,
 			       const Function<DH::space_dimension>           &boundary_function,
 			       std::map<unsigned int,double> &boundary_values,
 			       const std::vector<bool>       &component_mask)
@@ -1849,7 +1849,7 @@ namespace VectorTools
   template <class DH>
   void
   interpolate_boundary_values (const DH                 &dof,
-			       const unsigned char            boundary_component,
+			       const types::boundary_id_t            boundary_component,
 			       const Function<DH::space_dimension>           &boundary_function,
 			       std::map<unsigned int,double> &boundary_values,
 			       const std::vector<bool>       &component_mask)
@@ -1916,7 +1916,7 @@ namespace VectorTools
   interpolate_boundary_values
   (const Mapping<DH::dimension, DH::space_dimension> &mapping,
    const DH                                          &dof,
-   const unsigned char                                boundary_component,
+   const types::boundary_id_t                                boundary_component,
    const Function<DH::space_dimension>               &boundary_function,
    ConstraintMatrix                                  &constraints,
    const std::vector<bool>                           &component_mask)
@@ -1933,7 +1933,7 @@ namespace VectorTools
   void
   interpolate_boundary_values
   (const DH                            &dof,
-   const unsigned char                  boundary_component,
+   const types::boundary_id_t                  boundary_component,
    const Function<DH::space_dimension> &boundary_function,
    ConstraintMatrix                    &constraints,
    const std::vector<bool>             &component_mask)
@@ -2033,7 +2033,7 @@ namespace VectorTools
       AssertDimension (dof.get_fe().n_components(), component_mapping.size());
 
     std::vector<unsigned int> dof_to_boundary_mapping;
-    std::set<unsigned char> selected_boundary_components;
+    std::set<types::boundary_id_t> selected_boundary_components;
     for (typename FunctionMap<spacedim>::type::const_iterator i=boundary_functions.begin();
 	 i!=boundary_functions.end(); ++i)
       selected_boundary_components.insert (i->first);
@@ -3248,7 +3248,7 @@ namespace VectorTools
   project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 					   const unsigned int first_vector_component,
 					   const Function<dim>& boundary_function,
-					   const unsigned char boundary_component,
+					   const types::boundary_id_t boundary_component,
 					   ConstraintMatrix& constraints,
 					   const Mapping<dim>& mapping)
   {
@@ -3549,7 +3549,7 @@ namespace VectorTools
   project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 					   const unsigned int first_vector_component,
 					   const Function<dim>& boundary_function,
-					   const unsigned char boundary_component,
+					   const types::boundary_id_t boundary_component,
 					   ConstraintMatrix& constraints,
 					   const hp::MappingCollection<dim>& mapping_collection)
   {
@@ -3968,7 +3968,7 @@ namespace VectorTools
   project_boundary_values_div_conforming (const DoFHandler<dim>& dof_handler,
 					  const unsigned int first_vector_component,
 					  const Function<dim>& boundary_function,
-					  const unsigned char boundary_component,
+					  const types::boundary_id_t boundary_component,
 					  ConstraintMatrix& constraints,
 					  const Mapping<dim>& mapping)
   {
@@ -4133,7 +4133,7 @@ namespace VectorTools
   project_boundary_values_div_conforming (const hp::DoFHandler<dim>& dof_handler,
 					  const unsigned int first_vector_component,
 					  const Function<dim>& boundary_function,
-					  const unsigned char boundary_component,
+					  const types::boundary_id_t boundary_component,
 					  ConstraintMatrix& constraints,
 					  const hp::MappingCollection<dim, dim>& mapping_collection)
   {
@@ -4269,7 +4269,7 @@ namespace VectorTools
 
   compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 				      const unsigned int     first_vector_component,
-				      const std::set<unsigned char> &boundary_ids,
+				      const std::set<types::boundary_id_t> &boundary_ids,
 				      ConstraintMatrix      &constraints,
 				      const Mapping<dim, spacedim>    &mapping)
   {

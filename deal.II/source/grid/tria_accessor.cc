@@ -1235,25 +1235,26 @@ bool CellAccessor<dim, spacedim>::at_boundary () const
 
 
 template <int dim, int spacedim>
-unsigned char CellAccessor<dim, spacedim>::material_id () const
+types::material_id_t CellAccessor<dim, spacedim>::material_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]->cells.material_id[this->present_index];
+  return this->tria->levels[this->present_level]->cells.boundary_or_material_id[this->present_index].material_id;
 }
 
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::set_material_id (const unsigned char mat_id) const
+void CellAccessor<dim, spacedim>::set_material_id (const types::material_id_t mat_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  this->tria->levels[this->present_level]->cells.material_id[this->present_index] = mat_id;
+  Assert ( mat_id < types::invalid_material_id, ExcIndexRange(mat_id,0,types::invalid_material_id));
+  this->tria->levels[this->present_level]->cells.boundary_or_material_id[this->present_index].material_id = mat_id;
 }
 
 
 
 template <int dim, int spacedim>
-void CellAccessor<dim, spacedim>::recursively_set_material_id (const unsigned char mat_id) const
+void CellAccessor<dim, spacedim>::recursively_set_material_id (const types::material_id_t mat_id) const
 {
   set_material_id (mat_id);
 

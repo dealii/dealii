@@ -428,7 +428,7 @@ create_boundary_right_hand_side<deal_II_dimension>
  const Quadrature<deal_II_dimension-1> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 #endif
 
 template
@@ -438,7 +438,7 @@ create_boundary_right_hand_side<deal_II_dimension>
  const Quadrature<deal_II_dimension-1> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 
 #if deal_II_dimension > 1
 template
@@ -449,7 +449,7 @@ create_boundary_right_hand_side<deal_II_dimension>
  const hp::QCollection<deal_II_dimension-1> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 #endif
 
 template
@@ -459,12 +459,12 @@ create_boundary_right_hand_side<deal_II_dimension>
  const hp::QCollection<deal_II_dimension-1> &,
  const Function<deal_II_dimension>   &,
  Vector<double>                      &,
- const std::set<unsigned char> &);
+ const std::set<types::boundary_id_t> &);
 
 template
 void interpolate_boundary_values (
   const DoFHandler<deal_II_dimension> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension>   &,
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
@@ -472,7 +472,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const hp::DoFHandler<deal_II_dimension> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension>   &,
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
@@ -480,7 +480,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const MGDoFHandler<deal_II_dimension> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension>   &,
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
@@ -488,7 +488,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const DoFHandler<deal_II_dimension> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension>   &,
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
@@ -496,7 +496,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const hp::DoFHandler<deal_II_dimension> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension>   &,
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
@@ -504,7 +504,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const MGDoFHandler<deal_II_dimension> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension>   &,
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
@@ -558,7 +558,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension+1>   &,
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
@@ -566,7 +566,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension+1>   &,
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
@@ -574,7 +574,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension+1>   &,
   std::map<unsigned int,double>       &,
   const std::vector<bool>    &);
@@ -582,7 +582,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension+1>   &,
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
@@ -590,7 +590,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension+1>   &,
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
@@ -598,7 +598,7 @@ void interpolate_boundary_values (
 template
 void interpolate_boundary_values (
   const MGDoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  const unsigned char,
+  const types::boundary_id_t,
   const Function<deal_II_dimension+1>   &,
   ConstraintMatrix                    &,
   const std::vector<bool>    &);
@@ -689,7 +689,7 @@ void project_boundary_values_curl_conforming<deal_II_dimension>
 (const DoFHandler<deal_II_dimension>&,
  const unsigned int,
  const Function<deal_II_dimension>&,
- const unsigned char,
+ const types::boundary_id_t,
  ConstraintMatrix&,
  const Mapping<deal_II_dimension>&);
 template
@@ -697,7 +697,7 @@ void project_boundary_values_curl_conforming<deal_II_dimension>
 (const hp::DoFHandler<deal_II_dimension>&,
  const unsigned int,
  const Function<deal_II_dimension>&,
- const unsigned char,
+ const types::boundary_id_t,
  ConstraintMatrix&,
  const hp::MappingCollection<deal_II_dimension>&);
 template
@@ -705,7 +705,7 @@ void project_boundary_values_div_conforming<deal_II_dimension>
 (const DoFHandler<deal_II_dimension>&,
  const unsigned int,
  const Function<deal_II_dimension>&,
- const unsigned char,
+ const types::boundary_id_t,
  ConstraintMatrix&,
  const Mapping<deal_II_dimension>&);
 template
@@ -713,21 +713,21 @@ void project_boundary_values_div_conforming<deal_II_dimension>
 (const hp::DoFHandler<deal_II_dimension>&,
  const unsigned int,
  const Function<deal_II_dimension>&,
- const unsigned char,
+ const types::boundary_id_t,
  ConstraintMatrix&,
  const hp::MappingCollection<deal_II_dimension>&);
 template
 void
 compute_no_normal_flux_constraints (const DoFHandler<deal_II_dimension> &dof_handler,
 						 const unsigned int     first_vector_component,
-						 const std::set<unsigned char> &boundary_ids,
+						 const std::set<types::boundary_id_t> &boundary_ids,
 						 ConstraintMatrix      &constraints,
 						 const Mapping<deal_II_dimension>    &mapping);
 template
 void
 compute_no_normal_flux_constraints (const hp::DoFHandler<deal_II_dimension> &dof_handler,
 						 const unsigned int     first_vector_component,
-						 const std::set<unsigned char> &boundary_ids,
+						 const std::set<types::boundary_id_t> &boundary_ids,
 						 ConstraintMatrix      &constraints,
 						 const Mapping<deal_II_dimension>    &mapping);
 #endif
@@ -762,7 +762,7 @@ template
 void interpolate_boundary_values
 (const Mapping<deal_II_dimension>    &,
  const DoFHandler<deal_II_dimension> &,
- const unsigned char,
+ const types::boundary_id_t,
  const Function<deal_II_dimension>   &,
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);
@@ -771,7 +771,7 @@ template
 void interpolate_boundary_values
 (const Mapping<deal_II_dimension>    &,
  const hp::DoFHandler<deal_II_dimension> &,
- const unsigned char,
+ const types::boundary_id_t,
  const Function<deal_II_dimension>   &,
  ConstraintMatrix       &,
  const std::vector<bool>    &);
@@ -789,7 +789,7 @@ template
 void interpolate_boundary_values
 (const Mapping<deal_II_dimension,deal_II_dimension+1>    &,
  const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- const unsigned char,
+ const types::boundary_id_t,
  const Function<deal_II_dimension+1>   &,
  std::map<unsigned int,double>       &,
  const std::vector<bool>    &);

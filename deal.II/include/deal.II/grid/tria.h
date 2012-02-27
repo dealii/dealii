@@ -97,20 +97,22 @@ struct CellData
     unsigned int vertices[GeometryInfo<structdim>::vertices_per_cell];
 
 				     /**
-				      * Material indicator of this
-				      * cell. May be used to denote
+				      * Material or boundary indicator
+				      * of this cell. The material_id
+				      * may be used to denote
 				      * different coefficients, etc.
 				      *
 				      * Note that if this object is part of a
 				      * SubCellData object, then it represents
-				      * a face or edge of a cell. Since
-				      * deal.II only allows material_id tags
-				      * on cells, this field is re-interpreted
-				      * to indicate the boundary_indicator of
-				      * a face or edge. In other words, for
-				      * faces, this field is a misnomer.
+				      * a face or edge of a cell. In this case
+				      * one should use the field boundary_id
+				      * instead of material_id.
 				      */
-    unsigned char material_id;
+    union
+    {
+        types::boundary_id_t boundary_id;
+        types::material_id_t material_id;
+    };
 };
 
 
@@ -133,10 +135,10 @@ struct CellData
  *  boundary component is a list of lines which are given a common
  *  number describing the boundary condition to hold on this part of the
  *  boundary. The triangulation creation function gives lines not in this
- *  list either the boundary indicator zero (if on the boundary) or 255
- *  (if in the interior). Explicitely giving a line the indicator 255
- *  will result in an error, as well as giving an interior line a boundary
- *  indicator.
+ *  list either the boundary indicator zero (if on the boundary) or
+ *  types::internal_face_boundary_id (if in the interior). Explicitely giving a
+ *  line the indicator types::internal_face_boundary_id will result in an error, as well as giving
+ *  an interior line a boundary indicator.
  *
  * @ingroup grid
  */
@@ -338,7 +340,6 @@ namespace internal
 			const unsigned int version);
     };
 
-//TODO: Replace boundary[255] by a std::vector so we can use constructor of SmartPointer
 
 /**
  * Cache class used to store the number of used and active elements
@@ -975,11 +976,13 @@ namespace internal
  *   side vector to indicate these different parts of the model (this
  *   use is like the material id of cells).
 
- *   Material and boundary indicators may be in the range from zero to
- *   254. The value 255 is reserved to denote interior lines (in 2D)
+ *   Boundary indicators may be in the range from zero to
+ *   types::internal_face_boundary_id-1. The value
+ *   types::internal_face_boundary_id is reserved to denote interior lines (in 2D)
  *   and interior lines and quads (in 3D), which do not have a
- *   boundary or material indicator. This way, a program can easily
+ *   boundary indicator. This way, a program can easily
  *   determine, whether such an object is at the boundary or not.
+ *   Material indicators may be in the range from zero to types::invalid_material_id-1.
  *
  *   Lines in two dimensions and quads in three dimensions inherit their
  *   boundary indicator to their children upon refinement. You should therefore
@@ -1806,10 +1809,11 @@ class Triangulation : public Subscriptor
 				      * boundary, for instance the material id
 				      * in a UCD input file. They are not
 				      * necessarily consecutive but must be in
-				      * the range 0-254.  Material IDs on
-				      * boundaries are also called boundary
-				      * indicators and are accessed with
-				      * accessor functions of that name.
+				      * the range 0-(types::boundary_id_t-1).
+				      * Material IDs on boundaries are also
+				      * called boundary indicators and are
+				      * accessed with accessor functions
+				      * of that name.
 				      *
 				      * The @p boundary_object is not copied
 				      * and MUST persist until the
@@ -1832,7 +1836,7 @@ class Triangulation : public Subscriptor
 				      * before by a straight boundary
 				      * approximation.
 				      */
-    void set_boundary (const unsigned int   number,
+    void set_boundary (const types::boundary_id_t   number,
 		       const Boundary<dim,spacedim> &boundary_object);
 
                                      /**
@@ -1844,7 +1848,7 @@ class Triangulation : public Subscriptor
                                       * boundary object by the function of
                                       * same name and two arguments.
                                       */
-    void set_boundary (const unsigned int number);
+    void set_boundary (const types::boundary_id_t number);
 
 				     /**
 				      * Return a constant reference to
@@ -1853,7 +1857,7 @@ class Triangulation : public Subscriptor
 				      * the same as in
 				      * @p set_boundary
 				      */
-    const Boundary<dim,spacedim> & get_boundary (const unsigned int number) const;
+    const Boundary<dim,spacedim> & get_boundary (const types::boundary_id_t number) const;
 
 				     /**
 				      * Returns a vector containing
@@ -1868,7 +1872,7 @@ class Triangulation : public Subscriptor
 				      * indicators (which is greater
 				      * or equal one).
 				      */
-    std::vector<unsigned char> get_boundary_indicators() const;
+    std::vector<types::boundary_id_t> get_boundary_indicators() const;
 
 				     /**
 				      *  Copy a triangulation. This
@@ -3699,14 +3703,11 @@ class Triangulation : public Subscriptor
 
 				     /**
 				      *  Collection of boundary
-				      *  objects. We only need 255
-				      *  objects rather than 256,
-				      *  since the indicator 255 is
-				      *  reserved for interior faces
-				      *  and can thus never be
-				      *  associated with a boundary.
+				      *  objects. We store only
+				      *  objects, which are not
+				      *  of type StraightBoundary.
 				      */
-    SmartPointer<const Boundary<dim,spacedim>,Triangulation<dim,spacedim> > boundary[255];
+    std::map<types::boundary_id_t, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >  boundary;
 
 				     /**
 				      * Flag indicating whether
@@ -3765,7 +3766,7 @@ class Triangulation : public Subscriptor
 				      * TriaAccessor::set_boundary_indicator)
 				      * were not a pointer.
 				      */
-    std::map<unsigned int, unsigned char> *vertex_to_boundary_id_map_1d;
+    std::map<unsigned int, types::boundary_id_t> *vertex_to_boundary_id_map_1d;
 
     /**
      * A map that correlates each refinement listener that has been added

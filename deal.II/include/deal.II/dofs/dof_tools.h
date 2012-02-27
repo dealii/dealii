@@ -1120,7 +1120,7 @@ namespace DoFTools
   extract_boundary_dofs (const DH                   &dof_handler,
 			 const std::vector<bool>    &component_select,
 			 std::vector<bool>          &selected_dofs,
-			 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+			 const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
 				   /**
 				    * This function is similar to
@@ -1157,7 +1157,7 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH                   &dof_handler,
 					 const std::vector<bool>    &component_select,
 					 std::vector<bool>          &selected_dofs,
-					 const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+					 const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
 				   /**
 				    * @name Hanging Nodes
@@ -2168,7 +2168,7 @@ namespace DoFTools
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                      &dof_handler,
-			       const std::set<unsigned char> &boundary_indicators,
+			       const std::set<types::boundary_id_t> &boundary_indicators,
 			       std::vector<unsigned int>     &mapping);
 
 				   /**

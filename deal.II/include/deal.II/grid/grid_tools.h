@@ -898,8 +898,8 @@ namespace GridTools
 	   typename Container<dim,spacedim>::face_iterator>
   extract_boundary_mesh (const Container<dim,spacedim> &volume_mesh,
 			 Container<dim-1,spacedim>     &surface_mesh,
-			 const std::set<unsigned char> &boundary_ids
-			 = std::set<unsigned char>());
+			 const std::set<types::boundary_id_t> &boundary_ids
+			 = std::set<types::boundary_id_t>());
 
 				 /**
 				  * Exception

@@ -121,8 +121,9 @@ class ConstraintMatrix;
  *   the trace of the function to the boundary is done with the
  *   VectorTools::project_boundary_values() (see below) function,
  *   which is called with a map of boundary functions FunctioMap in
- *   which all boundary indicators from zero to 254 (255 is used for
- *   other purposes, see the Triangulation class documentation) point
+ *   which all boundary indicators from zero to types::internal_face_boundary_id-1
+ *   (types::internal_face_boundary_id is used for other purposes,
+ *   see the Triangulation class documentation) point
  *   to the function to be projected. The projection to the boundary
  *   takes place using a second quadrature formula on the boundary
  *   given to the project() function. The first quadrature formula is
@@ -193,7 +194,7 @@ class ConstraintMatrix;
  *   of boundary nodes and their values. You can get such a list by interpolation
  *   of a boundary function using the interpolate_boundary_values() function.
  *   To use it, you have to
- *   specify a list of pairs of boundary indicators (of type <tt>unsigned char</tt>;
+ *   specify a list of pairs of boundary indicators (of type <tt>types::boundary_id_t</tt>;
  *   see the section in the documentation of the Triangulation class for more
  *   details) and the according functions denoting the dirichlet boundary values
  *   of the nodes on boundary faces with this boundary indicator.
@@ -688,9 +689,9 @@ namespace VectorTools
 				    * @p boundary_component
 				    * corresponds to the number
 				    * @p boundary_indicator of the
-				    * face.  255 is an illegal
-				    * value, since it is reserved
-				    * for interior faces.
+				    * face.  types::internal_face_boundary_id
+				    * is an illegal value, since
+				    * it is reserved for interior faces.
 				    *
 				    * The flags in the last
 				    * parameter, @p component_mask
@@ -762,7 +763,7 @@ namespace VectorTools
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
 			       const DH                 &dof,
-			       const unsigned char            boundary_component,
+			       const types::boundary_id_t            boundary_component,
 			       const Function<DH::space_dimension>           &boundary_function,
 			       std::map<unsigned int,double> &boundary_values,
 			       const std::vector<bool>       &component_mask = std::vector<bool>());
@@ -777,7 +778,7 @@ namespace VectorTools
 
   void
   interpolate_boundary_values (const DH        &dof,
-			       const unsigned char            boundary_component,
+			       const types::boundary_id_t            boundary_component,
 			       const Function<DH::space_dimension>           &boundary_function,
 			       std::map<unsigned int,double> &boundary_values,
 			       const std::vector<bool>       &component_mask = std::vector<bool>());
@@ -837,7 +838,8 @@ namespace VectorTools
 				    *
 				    * The parameter @p boundary_component
 				    * corresponds to the number @p
-				    * boundary_indicator of the face.  255
+				    * boundary_indicator of the face.
+				    * types::internal_face_boundary_id
 				    * is an illegal value, since it is
 				    * reserved for interior faces.
 				    *
@@ -905,7 +907,7 @@ namespace VectorTools
   void
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension> &mapping,
 			       const DH                            &dof,
-			       const unsigned char                  boundary_component,
+			       const types::boundary_id_t                  boundary_component,
 			       const Function<DH::space_dimension> &boundary_function,
 			       ConstraintMatrix                    &constraints,
 			       const std::vector<bool>             &component_mask = std::vector<bool>());
@@ -922,7 +924,7 @@ namespace VectorTools
 
   void
   interpolate_boundary_values (const DH                            &dof,
-			       const unsigned char                  boundary_component,
+			       const types::boundary_id_t                  boundary_component,
 			       const Function<DH::space_dimension> &boundary_function,
 			       ConstraintMatrix                    &constraints,
 			       const std::vector<bool>             &component_mask = std::vector<bool>());
@@ -1145,7 +1147,8 @@ namespace VectorTools
 				    *
 				    * The parameter @p boundary_component
 				    * corresponds to the number
-				    * @p boundary_indicator of the face. 255
+				    * @p boundary_indicator of the face.
+				    * types::internal_face_boundary_id
 				    * is an illegal value, since it is
 				    * reserved for interior faces.
 				    *
@@ -1177,7 +1180,7 @@ namespace VectorTools
   void project_boundary_values_curl_conforming (const DoFHandler<dim>& dof_handler,
 						const unsigned int first_vector_component,
 						const Function<dim>& boundary_function,
-						const unsigned char boundary_component,
+						const types::boundary_id_t boundary_component,
 						ConstraintMatrix& constraints,
 						const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
@@ -1190,7 +1193,7 @@ namespace VectorTools
   void project_boundary_values_curl_conforming (const hp::DoFHandler<dim>& dof_handler,
 						const unsigned int first_vector_component,
 						const Function<dim>& boundary_function,
-						const unsigned char boundary_component,
+						const types::boundary_id_t boundary_component,
 						ConstraintMatrix& constraints,
 						const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
@@ -1239,7 +1242,8 @@ namespace VectorTools
 				    *
 				    * The parameter @p boundary_component
 				    * corresponds to the number
-				    * @p boundary_indicator of the face. 255
+				    * @p boundary_indicator of the face.
+				    *  types::internal_face_boundary_id
 				    * is an illegal value, since it is
 				    * reserved for interior faces.
 				    *
@@ -1262,7 +1266,7 @@ namespace VectorTools
   void project_boundary_values_div_conforming (const DoFHandler<dim>& dof_handler,
 					       const unsigned int first_vector_component,
 					       const Function<dim>& boundary_function,
-					       const unsigned char boundary_component,
+					       const types::boundary_id_t boundary_component,
 					       ConstraintMatrix& constraints,
 					       const Mapping<dim>& mapping = StaticMappingQ1<dim>::mapping);
 
@@ -1275,7 +1279,7 @@ namespace VectorTools
   void project_boundary_values_div_conforming (const hp::DoFHandler<dim>& dof_handler,
 					       const unsigned int first_vector_component,
 					       const Function<dim>& boundary_function,
-					       const unsigned char boundary_component,
+					       const types::boundary_id_t boundary_component,
 					       ConstraintMatrix& constraints,
 					       const hp::MappingCollection<dim, dim>& mapping_collection = hp::StaticMappingQ1<dim>::mapping_collection);
 
@@ -1600,7 +1604,7 @@ namespace VectorTools
   void
   compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
 				      const unsigned int     first_vector_component,
-				      const std::set<unsigned char> &boundary_ids,
+				      const std::set<types::boundary_id_t> &boundary_ids,
 				      ConstraintMatrix      &constraints,
 				      const Mapping<dim, spacedim>    &mapping = StaticMappingQ1<dim>::mapping);
 
@@ -1726,7 +1730,7 @@ namespace VectorTools
 					const Quadrature<dim-1> &q,
 					const Function<spacedim>     &rhs,
 					Vector<double>          &rhs_vector,
-					const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+					const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
 				   /**
 				    * Calls the
@@ -1739,7 +1743,7 @@ namespace VectorTools
 					const Quadrature<dim-1> &q,
 					const Function<spacedim>     &rhs,
 					Vector<double>          &rhs_vector,
-					const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+					const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
 				   /**
 				    * Same as the set of functions above,
@@ -1751,7 +1755,7 @@ namespace VectorTools
 					const hp::QCollection<dim-1> &q,
 					const Function<spacedim>     &rhs,
 					Vector<double>          &rhs_vector,
-					const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+					const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
 				   /**
 				    * Calls the
@@ -1768,7 +1772,7 @@ namespace VectorTools
 					const hp::QCollection<dim-1> &q,
 					const Function<spacedim>     &rhs,
 					Vector<double>          &rhs_vector,
-					const std::set<unsigned char> &boundary_indicators = std::set<unsigned char>());
+					const std::set<types::boundary_id_t> &boundary_indicators = std::set<types::boundary_id_t>());
 
 				   //@}
 				   /**

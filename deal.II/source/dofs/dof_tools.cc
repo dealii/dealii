@@ -472,7 +472,7 @@ namespace DoFTools
     const unsigned int n_dofs = dof.n_dofs();
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
-    Assert (boundary_indicators.find(255) == boundary_indicators.end(),
+    Assert (boundary_indicators.find(types::internal_face_boundary_id) == boundary_indicators.end(),
 	    typename DH::ExcInvalidBoundaryIndicator());
     Assert (sparsity.n_rows() == dof.n_boundary_dofs (boundary_indicators),
 	    ExcDimensionMismatch (sparsity.n_rows(), dof.n_boundary_dofs (boundary_indicators)));
@@ -3732,10 +3732,10 @@ namespace DoFTools
   extract_boundary_dofs (const DH                      &dof_handler,
 			 const std::vector<bool>       &component_select,
 			 std::vector<bool>             &selected_dofs,
-			 const std::set<unsigned char> &boundary_indicators)
+			 const std::set<types::boundary_id_t> &boundary_indicators)
   {
     AssertDimension (component_select.size(),n_components(dof_handler));
-    Assert (boundary_indicators.find (255) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
     const unsigned int dim=DH::dimension;
 
@@ -3856,10 +3856,10 @@ namespace DoFTools
   extract_dofs_with_support_on_boundary (const DH                      &dof_handler,
 					 const std::vector<bool>       &component_select,
 					 std::vector<bool>             &selected_dofs,
-					 const std::set<unsigned char> &boundary_indicators)
+					 const std::set<types::boundary_id_t> &boundary_indicators)
   {
     AssertDimension (component_select.size(), n_components(dof_handler));
-    Assert (boundary_indicators.find (255) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
 
 				     // let's see whether we have to
@@ -5652,11 +5652,11 @@ namespace DoFTools
   template <class DH>
   void map_dof_to_boundary_indices (
     const DH                      &dof_handler,
-    const std::set<unsigned char> &boundary_indicators,
+    const std::set<types::boundary_id_t> &boundary_indicators,
     std::vector<unsigned int>     &mapping)
   {
     Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
-    Assert (boundary_indicators.find (255) == boundary_indicators.end(),
+    Assert (boundary_indicators.find (types::internal_face_boundary_id) == boundary_indicators.end(),
 	    ExcInvalidBoundaryIndicator());
 
     mapping.clear ();

@@ -1789,8 +1789,8 @@ namespace internal
 		if (n_adj_cells == 1)
 		  line->set_boundary_indicator (0);
 		else
-						   // interior line -> 255
-		  line->set_boundary_indicator (255);
+						   // interior line -> types::internal_face_boundary_id
+		  line->set_boundary_indicator (types::internal_face_boundary_id);
 	      }
 
 					     // set boundary indicators where
@@ -1824,16 +1824,16 @@ namespace internal
 						 // assert that we only set
 						 // boundary info once
 		AssertThrow (! (line->boundary_indicator() != 0 &&
-				line->boundary_indicator() != 255),
+				line->boundary_indicator() != types::internal_face_boundary_id),
 			     ExcMultiplySetLineInfoOfLine(line_vertices.first,
 							  line_vertices.second));
 
 						 // Assert that only exterior lines
 						 // are given a boundary indicator
-		AssertThrow (! (line->boundary_indicator() == 255),
+		AssertThrow (! (line->boundary_indicator() == types::internal_face_boundary_id),
 			     ExcInteriorLineCantBeBoundary());
 
-		line->set_boundary_indicator (boundary_line->material_id);
+		line->set_boundary_indicator (boundary_line->boundary_id);
 	      }
 
 
@@ -2509,8 +2509,8 @@ namespace internal
 		if (n_adj_cells == 1)
 		  quad->set_boundary_indicator (0);
 		else
-						   // interior quad -> 255
-		  quad->set_boundary_indicator (255);
+						   // interior quad -> types::internal_face_boundary_id
+		  quad->set_boundary_indicator (types::internal_face_boundary_id);
 	      }
 
 					     /////////////////////////////////////////
@@ -2522,7 +2522,7 @@ namespace internal
 					     // as interior
 	    for (typename Triangulation<dim,spacedim>::line_iterator
 		   line=triangulation.begin_line(); line!=triangulation.end_line(); ++line)
-	      line->set_boundary_indicator (255);
+	      line->set_boundary_indicator (types::internal_face_boundary_id);
 					     // next reset all lines bounding
 					     // boundary quads as on the
 					     // boundary also. note that since
@@ -2590,11 +2590,11 @@ namespace internal
 						 // different than the
 						 // previously set value
 		if (line->boundary_indicator() != 0)
-		  AssertThrow (line->boundary_indicator() == boundary_line->material_id,
+		  AssertThrow (line->boundary_indicator() == boundary_line->boundary_id,
 			       ExcMessage ("Duplicate boundary lines are only allowed "
 					   "if they carry the same boundary indicator."));
 
-		line->set_boundary_indicator (boundary_line->material_id);
+		line->set_boundary_indicator (boundary_line->boundary_id);
 	      }
 
 
@@ -2722,11 +2722,11 @@ namespace internal
 						 // different than the
 						 // previously set value
 		if (quad->boundary_indicator() != 0)
-		  AssertThrow (quad->boundary_indicator() == boundary_quad->material_id,
+		  AssertThrow (quad->boundary_indicator() == boundary_quad->boundary_id,
 			       ExcMessage ("Duplicate boundary quads are only allowed "
 					   "if they carry the same boundary indicator."));
 
-		quad->set_boundary_indicator (boundary_quad->material_id);
+		quad->set_boundary_indicator (boundary_quad->boundary_id);
 	      }
 
 
@@ -3561,7 +3561,7 @@ namespace internal
 				   switch_1->line_orientation(1),
 				   switch_1->line_orientation(2),
 				   switch_1->line_orientation(3)};
-				const unsigned char switch_1_boundary_indicator=switch_1->boundary_indicator();
+				const types::boundary_id_t switch_1_boundary_indicator=switch_1->boundary_indicator();
 				const unsigned int switch_1_user_index=switch_1->user_index();
 				const bool switch_1_user_flag=switch_1->user_flag_set();
 
@@ -4007,6 +4007,14 @@ namespace internal
 						     // set or not
 		    cell->clear_user_flag();
 
+
+
+		             // An assert to make sure that the
+		             // static_cast in the next line has
+		             // the chance to give reasonable results.
+		    Assert(cell->material_id()<= std::numeric_limits<types::material_id_t>::max(),
+		        ExcIndexRange(cell->material_id(),0,std::numeric_limits<types::material_id_t>::max()));
+
 						     // new vertex is
 						     // placed on the
 						     // surface according
@@ -4014,8 +4022,8 @@ namespace internal
 						     // stored in the
 						     // boundary class
 		    triangulation.vertices[next_unused_vertex] =
-		      triangulation.boundary[cell->material_id()]
-		      ->get_new_point_on_quad (cell);
+		      triangulation.get_boundary(static_cast<types::boundary_id_t>(cell->material_id()))
+		      .get_new_point_on_quad (cell);
 		  }
 	      }
 
@@ -4109,7 +4117,7 @@ namespace internal
 		new_lines[l]->clear_user_data();
 		new_lines[l]->clear_children();
 						 // interior line
-		new_lines[l]->set_boundary_indicator(255);
+		new_lines[l]->set_boundary_indicator(types::internal_face_boundary_id);
 	      }
 
 					     // Now add the four (two)
@@ -4403,8 +4411,8 @@ namespace internal
 			  (cell->vertex(0) + cell->vertex(1)) / 2;
 		      else
 			triangulation.vertices[next_unused_vertex] =
-			  triangulation.boundary[cell->material_id()]
-			  ->get_new_point_on_line(cell);
+			  triangulation.get_boundary(static_cast<types::boundary_id_t>(cell->material_id()))
+			  .get_new_point_on_line(cell);
 		      triangulation.vertices_used[next_unused_vertex] = true;
 
 						       // search for next two
@@ -4816,8 +4824,8 @@ namespace internal
 							   // the two vertices:
 			  if (line->at_boundary())
 			    triangulation.vertices[next_unused_vertex]
-			      = triangulation.boundary[line->boundary_indicator()]
-			      ->get_new_point_on_line (line);
+			      = triangulation.get_boundary(line->boundary_indicator())
+			      .get_new_point_on_line (line);
 			  else
 			    triangulation.vertices[next_unused_vertex]
 			      = (line->vertex(0) + line->vertex(1)) / 2;
@@ -4828,7 +4836,7 @@ namespace internal
 							 // boundary object for its
 							 // answer
 			triangulation.vertices[next_unused_vertex]
-			  = triangulation.boundary[line->user_index()]->get_new_point_on_line (line);
+			  = triangulation.get_boundary(line->user_index()).get_new_point_on_line (line);
 
 						       // now that we created
 						       // the right point, make
@@ -5356,7 +5364,7 @@ namespace internal
 
 		      if (line->at_boundary())
 			triangulation.vertices[next_unused_vertex]
-			  = triangulation.boundary[line->boundary_indicator()]->get_new_point_on_line (line);
+			  = triangulation.get_boundary(line->boundary_indicator()).get_new_point_on_line (line);
 		      else
 			triangulation.vertices[next_unused_vertex]
 			  = (line->vertex(0) + line->vertex(1)) / 2;
@@ -5810,7 +5818,7 @@ namespace internal
 				   switch_1->line_orientation(1),
 				   switch_1->line_orientation(2),
 				   switch_1->line_orientation(3)};
-				const unsigned char switch_1_boundary_indicator=switch_1->boundary_indicator();
+				const types::boundary_id_t switch_1_boundary_indicator=switch_1->boundary_indicator();
 				const unsigned int switch_1_user_index=switch_1->user_index();
 				const bool switch_1_user_flag=switch_1->user_flag_set();
 				const RefinementCase<dim-1> switch_1_refinement_case=switch_1->refinement_case();
@@ -6011,7 +6019,7 @@ namespace internal
 							 // appropriately
 			if (quad->at_boundary())
 			  triangulation.vertices[next_unused_vertex]
-			    = triangulation.boundary[quad->boundary_indicator()]->get_new_point_on_quad (quad);
+			    = triangulation.get_boundary(quad->boundary_indicator()).get_new_point_on_quad (quad);
 			else
 							   // it might be that the
 							   // quad itself is not
@@ -6367,7 +6375,7 @@ namespace internal
 			  new_lines[i]->clear_user_data();
 			  new_lines[i]->clear_children();
 							   // interior line
-			  new_lines[i]->set_boundary_indicator(255);
+			  new_lines[i]->set_boundary_indicator(types::internal_face_boundary_id);
 			}
 
 						       // find some space for the newly to
@@ -6386,7 +6394,7 @@ namespace internal
 			  new_quads[i]->clear_user_data();
 			  new_quads[i]->clear_children();
 							   // interior quad
-			  new_quads[i]->set_boundary_indicator (255);
+			  new_quads[i]->set_boundary_indicator (types::internal_face_boundary_id);
 							   // set all line orientation
 							   // flags to true by default,
 							   // change this afterwards, if
@@ -9001,8 +9009,8 @@ namespace internal
 							     // boundary would be
 							     // this one.
 			    const Point<spacedim> new_bound
-			      = triangulation.boundary[face->boundary_indicator()]
-			      ->get_new_point_on_face (face);
+			      = triangulation.get_boundary(face->boundary_indicator())
+			      .get_new_point_on_face (face);
 							     // to check it,
 							     // transform to the
 							     // unit cell with
@@ -9394,14 +9402,15 @@ Triangulation (const MeshSmoothing smooth_grid,
 		check_for_distorted_cells(check_for_distorted_cells),
 		vertex_to_boundary_id_map_1d (0)
 {
-				   // set default boundary for all
-				   // possible components
-  for (unsigned int i=0;i<255;++i)
-    boundary[i] = &straight_boundary;
+  //Set default value at types::internal_face_boundary_id.
+  //Because this value is reserved for inner faces, we
+  //will never set this one to anything else.
+  //TODO This line vanishes, if we resolve the TODO in the get_boundary function
+  boundary[types::internal_face_boundary_id] = &straight_boundary;
 
   if (dim == 1)
     vertex_to_boundary_id_map_1d
-      = new std::map<unsigned int, unsigned char>();
+      = new std::map<unsigned int, types::boundary_id_t>();
 
   // connect the any_change signal to the other signals
   signals.create.connect (signals.any_change);
@@ -9466,10 +9475,10 @@ Triangulation<dim, spacedim>::set_mesh_smoothing(const MeshSmoothing mesh_smooth
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_boundary (const unsigned int number,
+Triangulation<dim, spacedim>::set_boundary (const types::boundary_id_t number,
 					    const Boundary<dim, spacedim>& boundary_object)
 {
-  Assert(number<255, ExcIndexRange(number,0,255));
+  Assert(number < types::internal_face_boundary_id, ExcIndexRange(number,0,types::internal_face_boundary_id));
 
   boundary[number] = &boundary_object;
 }
@@ -9478,25 +9487,50 @@ Triangulation<dim, spacedim>::set_boundary (const unsigned int number,
 
 template <int dim, int spacedim>
 void
-Triangulation<dim, spacedim>::set_boundary (const unsigned int number)
+Triangulation<dim, spacedim>::set_boundary (const types::boundary_id_t number)
 {
-  set_boundary (number, straight_boundary);
+  Assert(number < types::internal_face_boundary_id, ExcIndexRange(number,0,types::internal_face_boundary_id));
+
+  //delete the entry located at number.
+  boundary.erase(number);
 }
 
 
 
 template <int dim, int spacedim>
 const Boundary<dim, spacedim> &
-Triangulation<dim, spacedim>::get_boundary (const unsigned int number) const
+Triangulation<dim, spacedim>::get_boundary (const types::boundary_id_t number) const
 {
-  Assert(number<255, ExcIndexRange(number,0,255));
+  Assert(number<types::internal_face_boundary_id, ExcIndexRange(number,0,types::internal_face_boundary_id));
 
-  return *(boundary[number]);
+  //look, if there is a boundary stored at
+  //boundary_id number.
+  typename std::map<types::boundary_id_t, SmartPointer<const Boundary<dim, spacedim>, Triangulation<dim, spacedim> > >::const_iterator it
+  = boundary.find(number);
+
+  if(it != boundary.end())
+    {
+      //if we have found an entry, return it
+      return *(it->second);
+    }
+  else
+    {
+      //if we have not found an entry
+      //connected with number, we return
+      //straight_boundary, stored at types::internal_face_boundary_id
+      it = boundary.find(types::internal_face_boundary_id);
+
+      return *(it->second);
+     // TODO: This should get returned, atm there are some errors
+     // connected to Boundary<1,3>. If this issue is resolved, the TODOs in
+     // the constructor and clear_despite_subscriptions can also get resolved.
+     //return straight_boundary;
+    }
 }
 
 
 template <int dim, int spacedim>
-std::vector<unsigned char>
+std::vector<types::boundary_id_t>
 Triangulation<dim, spacedim>::get_boundary_indicators () const
 {
 				   // in 1d, we store a map of all used
@@ -9504,8 +9538,8 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
 				   // purposes
   if (dim == 1)
     {
-      std::vector<unsigned char> boundary_indicators;
-      for (std::map<unsigned int, unsigned char>::const_iterator
+      std::vector<types::boundary_id_t> boundary_indicators;
+      for (std::map<unsigned int, types::boundary_id_t>::const_iterator
 	     p = vertex_to_boundary_id_map_1d->begin();
 	   p !=  vertex_to_boundary_id_map_1d->end();
 	   ++p)
@@ -9515,7 +9549,7 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
     }
   else
     {
-      std::vector<bool> bi_exists(255, false);
+      std::vector<bool> bi_exists(types::internal_face_boundary_id, false);
       active_cell_iterator cell=begin_active();
       for (; cell!=end(); ++cell)
 	for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -9525,7 +9559,7 @@ Triangulation<dim, spacedim>::get_boundary_indicators () const
       const unsigned int n_bi=
 	std::count(bi_exists.begin(), bi_exists.end(), true);
 
-      std::vector<unsigned char> boundary_indicators(n_bi);
+      std::vector<types::boundary_id_t> boundary_indicators(n_bi);
       unsigned int bi_counter=0;
       for (unsigned int i=0; i<bi_exists.size(); ++i)
 	if (bi_exists[i]==true)
@@ -9562,8 +9596,11 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
 
   faces         = new internal::Triangulation::TriaFaces<dim>(*old_tria.faces);
 
-  for (unsigned i=0;i<255;++i)
-    boundary[i] = old_tria.boundary[i];
+  typename std::map<types::boundary_id_t, SmartPointer<const Boundary<dim, spacedim> , Triangulation<dim, spacedim> > >::const_iterator
+      bdry_iterator = old_tria.boundary.begin();
+  for (; bdry_iterator != old_tria.boundary.end() ; bdry_iterator++)
+    boundary[bdry_iterator->first] = bdry_iterator->second;
+
 
   levels.reserve (old_tria.levels.size());
   for (unsigned int level=0; level<old_tria.levels.size(); ++level)
@@ -9577,7 +9614,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
     {
       delete vertex_to_boundary_id_map_1d;
       vertex_to_boundary_id_map_1d
-	= (new std::map<unsigned int, unsigned char>
+	= (new std::map<unsigned int, types::boundary_id_t>
 	   (*old_tria.vertex_to_boundary_id_map_1d));
     }
 
@@ -12531,8 +12568,10 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
   vertices.clear ();
   vertices_used.clear ();
 
-  for (unsigned int i=0; i<255; ++i)
-    boundary[i] = &straight_boundary;
+  boundary.clear();
+  //TODO: This is connected with the TODO in get_boundary and vanishes, if
+  //this TODO has been dealt with.
+  boundary[types::internal_face_boundary_id] = &straight_boundary;
 
   number_cache = internal::Triangulation::NumberCache<dim>();
 }
@@ -14620,7 +14659,7 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
 // functions that currently only exist for <1,1> and <1,2>
 template
 const Boundary<1,3> &
-Triangulation<1,3>::get_boundary (const unsigned int number) const;
+Triangulation<1,3>::get_boundary (const types::boundary_id_t number) const;
 
 DEAL_II_NAMESPACE_CLOSE
 
