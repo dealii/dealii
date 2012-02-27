@@ -3,7 +3,8 @@
 <i>This program was contributed by J&ouml;rg Frohne (University of Siegen,
 Germany) while on a long-term visit to Texas A&amp;M University.
 <br>
-This material is based upon work partly supported by the ...
+This material is based upon work partly supported by the ThyssenKrupp Steel Europe
+company in the line with the BMBF promoted project IMAUF (www.imauf.de).
 </i>
 
 
@@ -138,8 +139,8 @@ condition above.
 <h3>Formulation as a saddle point problem</h3>
 
 The variational inequality above is awkward to work with. We would therefore
-like to reformulate it as an equivalent saddle point problem. Set $V:=H^1_0(\Omega)$.
-We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset V'$, $V'$
+like to reformulate it as an equivalent saddle point problem. We introduce a
+Lagrange multiplier $\lambda$ and the convex cone $K\subset V'$, $V'$
 dual space of $V$, $K:=\{\mu\in V': \langle\mu,v\rangle\geq 0,\quad \forall
 v\in V, v \le 0 \}$ of
 Lagrange multipliers, where $\langle\cdot,\cdot\rangle$ denotes the duality
@@ -201,12 +202,10 @@ at these locations, we get a diagonal mass matrix with
 To define $G$ we use the same technique as for $B$. In other words, we
 define
 @f{align*}
-  G_{i} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x.
+  G_{i} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x,
 @f}
-where $g_h$ is a
-suitable approximation of $g$ and $\mathbf x_i$ is the support point of the
-$i$the shape function. The integral in the definition of $B_{ii}$ and $G_i$
-are then approximated by the trapezoidal rule.
+where $g_h$ is a suitable approximation of $g$. The integral in the definition
+of $B_{ii}$ and $G_i$ are then approximated by the trapezoidal rule.
 With this, the equations above can be restated as
 @f{eqnarray*}
  &A U + B\Lambda = F,&\\
@@ -278,7 +277,7 @@ condition, we can distinguish the following cases:
   <br>
   Then either $[BU^k]_i\geq G_i$ and $\Lambda^k_i=0$ (no contact) or $\Lambda^k_i\geq0$ and $[BU^k]_i=G_i$ (unpressing load).
 
-Second, the method above appears untuitively correct and useful but a bit ad
+Second, the method above appears intuitively correct and useful but a bit ad
 hoc. However, it can be derived in a concisely in the following way. To this
 end, note that we'd like to solve the nonlinear system
 @f{eqnarray*}
