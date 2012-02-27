@@ -171,6 +171,50 @@ course of the active set iterations, this unphysical membrane shape is
 smoothed out, the contact with the lower-most stair step disappears,
 and the solution stabilizes.
 
+In addition to this, the program also outputs the values of the
+Lagrange multipliers. Remember that these are the contact forces and
+so should only be positive on the contact set, and zero outside. If,
+on the other hand, a Lagrange multiplier is negative in the active
+set, then this degree of freedom must be removed from the active
+set. The following pictures show the multipliers in iterations 1, 9
+and 18, where we use red and browns to indicate positive values, and
+blue for negative values.
+
+<table align="center">
+  <tr>
+    <td valign="top">
+      @image html step-41.forces.01.png
+    </td>
+    <td valign="top">
+      @image html step-41.forces.09.png
+    </td>
+    <td valign="top">
+      @image html step-41.forces.18.png
+    </td>
+  </tr>
+
+  <tr>
+    <td align="center">
+      Iteration 1
+    </td>
+    <td align="center">
+      Iteration 9
+    </td>
+    <td align="center">
+      Iteration 18
+    </td>
+  </tr>
+</table>
+
+It is easy to see that the positive values converge nicely to moderate
+values in the interior of the contact set and large upward forces at
+the edges of the steps, as one would expect (to support the large
+curvature of the membrane there); at the fringes of the active set,
+multipliers are initially negative, causing the set to shrink until,
+in iteration 18, there are no more negative multipliers and the
+algorithm has converged.
+
+
 
 <a name="extensions"></a>
 <h3>Possibilities for extensions</h3>
