@@ -183,7 +183,8 @@ regular (the places where contact is established between membrane and
 obstacle) and other areas where the solution is very smooth (or, in
 the present context, constant wherever it is in contact with the
 obstacle). Adding this to the current program should not pose too many
-difficulties.
+difficulties, but it is not trivial to find a good error estimator for
+that purpose.
 
 A more challenging task would be an extension to 3d. The problem here
 is not so much to simply make everything run in 3d. Rather, it is that
@@ -197,3 +198,14 @@ inequality. Mathematically, this means that the Lagrange multiplier
 only lives on the surface, though it can of course be extended by zero
 into the domain if that is convenient. As in the current program, one
 does not need to form and store this Lagrange multiplier explicitly.
+
+A further interesting problem for the 3d case is to consider contact problems
+with friction. In almost every mechanical process friction has a big influence.
+For the modelling we have to take into account tangential stresses at the contact
+surface. Also we have to observe that friction adds another nonlinearity to
+our problem.
+
+Another nontrivial modification is to implement a more complex constitutive
+law like nonlinear elasticity or elasto-plastic  material behavior.
+The difficulty here is to handle the additional nonlinearity arising
+through the nonlinear constitutive law.
