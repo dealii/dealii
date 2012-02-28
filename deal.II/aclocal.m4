@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -624,8 +624,29 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl  f(p);
 	  dnl }
 	  dnl ----------------------------------------------
-          CXXFLAGSG="$CXXFLAGSG -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909 -qxflag=EnableIssue214PartialOrdering"
-          CXXFLAGSO="$CXXFLAGSO -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909 -qxflag=EnableIssue214PartialOrdering"
+          dnl
+          dnl Similarly, -qxflag=IgnoreCVOnTopOfFunctionTypes is necessary for
+	  dnl ----------------------------------------------
+	  dnl struct S {};
+	  dnl S & foo (const S&);
+	  dnl
+	  dnl struct X {
+	  dnl   template <typename T>
+	  dnl   void f (const T &t) const;
+	  dnl };
+	  dnl
+	  dnl void
+	  dnl print_summary ()
+	  dnl {
+	  dnl   X x;
+	  dnl   x.f (foo);
+	  dnl }
+	  dnl ----------------------------------------------
+          dnl We have this kind of code with S=std::ostream, foo=std::endl
+          dnl and X=LogStream when we do things like
+          dnl     deallog << std::endl;
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -check=bounds -info=all -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909 -qxflag=EnableIssue214PartialOrdering -qxflag=IgnoreCVOnTopOfFunctionTypes"
+          CXXFLAGSO="$CXXFLAGSO -O2 -w -qansialias -qrtti=all -qsuppress=1540-2907 -qsuppress=1540-2909 -qxflag=EnableIssue214PartialOrdering -qxflag=IgnoreCVOnTopOfFunctionTypes"
           CXXFLAGSPIC="-qpic"
           LDFLAGSPIC="-qpic"
           ;;
