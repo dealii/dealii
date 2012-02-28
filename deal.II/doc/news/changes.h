@@ -24,7 +24,17 @@ inconvenience this causes.
 </p>
 
 <ol>
-<li> Changed: The the argument material_id of the estimate-functions of the KellyErrorEstimator class  are now of type types::material_id_type with the default value types::invalid_material_id instead of type unsigned int with the default value numbers::invalid_unsigned_int. The member functions Triangulation::set_boundary and Triangulation::get_boundary now take a types::boundary_id_t instead of an unsigned int.
+<li> Changed: The argument material_id of the estimate-functions of
+the KellyErrorEstimator class is now of type types::material_id_type
+with default value types::invalid_material_id, instead of type
+unsigned int with default value numbers::invalid_unsigned_int. This
+should not make a difference to most users unless you specified the
+argument's default value by hand.
+<br>
+The member functions Triangulation::set_boundary and
+Triangulation::get_boundary now take a types::boundary_id_t instead of
+an unsigned int as argument. This now matches the actual data type
+used for boundary indicators.
 <br>
 (Wolfgang Bangerth, Christian Goll 2012/02/27)
 </ol>
@@ -36,10 +46,18 @@ inconvenience this causes.
 <h3>General</h3>
 
 <ol>
-<li> Changed: Material and Boundary indicators have been both of the type unsigned char. Throughout the library, we changed their datatype to <code>types::material_id_t</code> resp. <code>types::boundary_id_t</code>, both typedefs of unsigned char. Internal faces are now characterized by types::internal_face_boundary_id(<code>=static_cast<boundary_id_t>(-1)</code>) instead of 255,
-so we get rid of that mysterious numberin the source code.
-Material_ids are also assumed  to lie in the range from 0 to types::invalid_material_id-1 (where <code>types::invalid_material_id = static_cast<material_id_t>(-1)</code>). With this change, it is now much easier to extend the range of boundary or material ids, if needed. 
-
+<li> Changed: Material and Boundary indicators have been both of the
+type unsigned char. Throughout the library, we changed their datatype
+to <code>types::material_id_t</code>
+resp. <code>types::boundary_id_t</code>, both typedefs of unsigned
+char. Internal faces are now characterized by
+types::internal_face_boundary_id(<code>=static_cast<boundary_id_t>(-1)</code>)
+instead of 255, so we get rid of that mysterious number in the source
+code.  Material_ids are also assumed to lie in the range from 0 to
+types::invalid_material_id-1 (where <code>types::invalid_material_id =
+static_cast<material_id_t>(-1)</code>). With this change, it is now
+much easier to extend the range of boundary or material ids, if
+needed.
 <br>
 (Wolfgang Bangerth, Christian Goll 2012/02/27)
 
