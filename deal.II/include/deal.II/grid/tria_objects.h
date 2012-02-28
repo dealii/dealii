@@ -137,16 +137,37 @@ namespace internal
 					  * actually needed here, we
 					  * use an union.
 					  */
-	union BoundaryOrMaterialId
+	struct BoundaryOrMaterialId
 	{
-	    types::boundary_id_t boundary_id;
-	    types::material_id_t material_id;
+	    union
+	    {
+		types::boundary_id_t boundary_id;
+		types::material_id_t material_id;
+	    };
 
-	    std::size_t memory_consumption () const
-	      {
-		return std::max(sizeof(material_id),sizeof(boundary_id));
-	      }
 
+					     /**
+					      * Default constructor.
+					      */
+	    BoundaryOrMaterialId ();
+
+					     /**
+					      * Return the size of objects
+					      * of this kind.
+					      */
+	    static
+	    std::size_t memory_consumption ();
+
+					     /**
+					      * Read or write the data
+					      * of this object to or
+					      * from a stream for the
+					      * purpose of
+					      * serialization
+					      */
+	    template <class Archive>
+	    void serialize(Archive & ar,
+			   const unsigned int version);
 	};
 					 /**
 					  * Store boundary and material data. For
@@ -685,6 +706,46 @@ namespace internal
     };
 
 //----------------------------------------------------------------------//
+
+
+    template <typename G>
+    inline
+    TriaObjects<G>::BoundaryOrMaterialId::BoundaryOrMaterialId ()
+    {
+      material_id = types::invalid_material_id;
+    }
+
+
+
+    template <typename G>
+    std::size_t
+    TriaObjects<G>::BoundaryOrMaterialId::memory_consumption ()
+    {
+      return sizeof(BoundaryOrMaterialId);
+    }
+
+
+
+    template <typename G>
+    template <class Archive>
+    void
+    TriaObjects<G>::BoundaryOrMaterialId::serialize(Archive & ar,
+						    const unsigned int version)
+    {
+				       // serialize this
+				       // structure by
+				       // writing and
+				       // reading the larger
+				       // of the two values,
+				       // in order to make
+				       // sure we get all
+				       // bits
+      if (sizeof(material_id) > sizeof(boundary_id))
+	ar & material_id;
+      else
+	ar & boundary_id;
+    }
+
 
     template<typename G>
     inline
