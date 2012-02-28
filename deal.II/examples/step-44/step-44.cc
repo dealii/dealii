@@ -561,7 +561,7 @@ namespace Step44
 
     template <int dim>
     const SymmetricTensor<4, dim>
-    StandardTensors<dim>::dev_P = (II - (1.0 / dim) * IxI);
+    StandardTensors<dim>::dev_P = deviator_tensor<dim>();
   }
 
 // @sect3{Time class}
@@ -706,7 +706,7 @@ namespace Step44
 	}
 
 				       // Derivative of the volumetric free
-				       // energy wrt $\widetilde{J}$ return
+				       // energy with respect to $\widetilde{J}$ return
 				       // $\frac{\partial
 				       // \Psi_{\text{vol}}(\widetilde{J})}{\partial
 				       // \widetilde{J}}$
@@ -925,15 +925,15 @@ namespace Step44
 	  	  	  	  	   // and the first and second derivatives
 	  	  	  	  	   // of the volumetric free energy.
 	  	  	  	  	   //
-	   	   	   	   	   // Finally, we store the inverse of
+	   	   	   	   	   // We also store the inverse of
 	   	   	   	   	   // the deformation gradient since
 	   	   	   	   	   // we frequently use it:
+	  F_inv = invert(F);
 	  tau = material->get_tau();
-
 	  Jc = material->get_Jc();
 	  dPsi_vol_dJ = material->get_dPsi_vol_dJ();
 	  d2Psi_vol_dJ2 = material->get_d2Psi_vol_dJ2();
-	  F_inv = invert(F);
+
 	}
 
 				       // We offer an interface to retrieve
@@ -949,7 +949,7 @@ namespace Step44
 	  return material->get_det_F();
 	}
 
-      Tensor<2, dim> get_F_inv() const
+      const Tensor<2, dim>& get_F_inv() const
 	{
 	  return F_inv;
 	}
@@ -963,7 +963,7 @@ namespace Step44
 	  return material->get_p_tilde();
 	}
 
-      SymmetricTensor<2, dim> get_tau() const
+     const SymmetricTensor<2, dim>& get_tau() const
 	{
 	  return tau;
 	}
@@ -979,7 +979,7 @@ namespace Step44
 	}
 
 				       // and finally the tangent
-      SymmetricTensor<4, dim> get_Jc() const
+      const SymmetricTensor<4, dim>& get_Jc() const
 	{
 	  return Jc;
 	}
@@ -1678,7 +1678,7 @@ namespace Step44
 // this operation (we could, in principle simply create a new task using
 // Threads::new_task for each cell) but there is not much harm done to doing
 // it this way anyway.
-// Furthermore, should their be different material models associated with a
+// Furthermore, should there be different material models associated with a
 // quadrature point, requiring varying levels of computational expense, then
 // the method used here could be advantageous.
   template <int dim>
@@ -1803,7 +1803,7 @@ namespace Step44
     block_component[p_component] = p_dof; // Pressure
     block_component[J_component] = J_dof; // Dilatation
 
-				     // DOF handler is then initialised and we
+				     // The DOF handler is then initialised and we
 				     // renumber the grid in an efficient
 				     // manner. We also record the number of
 				     // DOF's per block.
@@ -1840,8 +1840,6 @@ namespace Step44
       csp.block(J_dof, J_dof).reinit(n_dofs_J, n_dofs_J);
       csp.collect_sizes();
 
-				       // In order to perform the static condensation efficiently,
-				       // we choose to exploit the symmetry of the the system matrix.
 				       // The global system matrix initially has the following structure
 				       // @f{align*}
 						// \underbrace{\begin{bmatrix}
@@ -3025,7 +3023,8 @@ namespace Step44
 					   // preconditioner as it appears to
 					   // provide the fastest solver
 					   // convergence characteristics for this
-					   // problem.  However, for multicore
+					   // problem on a single-thread machine.
+	  	  	  	  	   // However, for multicore
 					   // computing, the Jacobi preconditioner
 					   // which is multithreaded may converge
 					   // quicker for larger linear systems.
@@ -3293,9 +3292,9 @@ namespace Step44
     				// $
 				     // and
     				// $
-					//    \overline{\mathbf{\mathsf{K}}} =
-					//     \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{J}}
-					//    \mathbf{\mathsf{K}}_{\widetilde{p}\widetilde{J}}^{-1}
+					//    \overline{\mathbf{\mathsf{k}}} =
+					//     \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{p}}^{-1} \mathbf{\mathsf{k}}_{\widetilde{J}\widetilde{J}}
+					//    \mathbf{\mathsf{k}}_{\widetilde{p}\widetilde{J}}^{-1}
     				// $.
 				     //
 				     // At this point, we need to take note of

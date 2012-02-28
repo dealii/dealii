@@ -128,7 +128,7 @@ The pressure solution is very coarse and has large jumps between adjacent cells.
 It is clear that the volume nearest to the applied traction undergoes compression while the outer extents 
 of the domain are in a state of expansion. 
 The dilatation solution field and pressure field are clearly linked, 
-with positive dilatation indicating regions of positive hyprodstatic pressure and negative showing regions placed in compression.
+with positive dilatation indicating regions of positive pressure and negative showing regions placed in compression.
 As discussed in the Introduction, a compressive pressure has a negative sign 
 while an expansive pressure takes a positive sign. 
 This stems from the definition of the volumetric strain energy function 
