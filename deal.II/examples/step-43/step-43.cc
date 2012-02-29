@@ -1,4 +1,4 @@
-﻿/* Author: Chih-Che Chueh, University of Victoria, 2010 */
+/* Author: Chih-Che Chueh, University of Victoria, 2010 */
 /*         Wolfgang Bangerth, Texas A&M University, 2010 */
 
 /*    $Id$       */
@@ -670,7 +670,7 @@ namespace Step43
 				       // (e.g. replace
 				       // RandomMedium::KInverse by
 				       // SingleCurvingCrack::KInverse).
-      const SingleCurvingCrack::KInverse<dim>   k_inverse;
+      const RandomMedium::KInverse<dim>   k_inverse;
   };
 
 
@@ -708,7 +708,7 @@ namespace Step43
 			    FE_Q<dim>(darcy_degree), 1),
 		  darcy_dof_handler (triangulation),
 
-		  saturation_degree (degree),
+		  saturation_degree (degree+1),
 		  saturation_fe (saturation_degree),
 		  saturation_dof_handler (triangulation),
 
@@ -1139,7 +1139,7 @@ namespace Step43
 				   // $\mathbf{M}^{\mathbf{u}}$ and
 				   // another based on the scalar
 				   // Laplace matrix
-				   // $\tilde{\mathbf S}^p$ (which is
+				   // $\tilde{\mathbf{S}}^p$ (which is
 				   // spectrally close to the Schur
 				   // complement of the Darcy
 				   // matrix). Usually, the
@@ -2529,13 +2529,13 @@ namespace Step43
 					     max_velocity_times_dF_dS);
       }
 
-    const double c_R = 1;
+    const double c_R = 1.0;
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
 				  std::pow(global_Omega_diameter, alpha - 2.);
 
-    return (beta *
-	    (max_velocity_times_dF_dS) *
-	    cell_diameter);
+//    return (beta *
+//	    (max_velocity_times_dF_dS) *
+//	    cell_diameter);
 
     return (beta *
 	    (max_velocity_times_dF_dS) *
@@ -2569,7 +2569,7 @@ namespace Step43
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
-    const unsigned int initial_refinement     = (dim == 2 ? 4 : 2);
+    const unsigned int initial_refinement     = (dim == 2 ? 5 : 2);
     const unsigned int n_pre_refinement_steps = (dim == 2 ? 3 : 2);
 
 
