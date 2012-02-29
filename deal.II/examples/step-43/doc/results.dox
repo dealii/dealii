@@ -1,12 +1,6 @@
 <h1>Results</h1>
 
 
-Still to do:
-- play a bit with beta, c_R, CFL
-- switch back to residual-based viscosity
-- always recompute the Darcy solution whenever we refine the mesh
-
-
 The output of this program is not really much different from that of
 step-21: it solves the same problem, after all. Of more importance are
 quantitative metrics such as the accuracy of the solution as well as
@@ -96,3 +90,12 @@ we solved the system. Consequently, the criterion was pessimistically
 stated: what we should really compare is the solution we would get at
 the current time step with the extrapolated one. Re-stating the
 theorem in this regard is left as an exercise.
+
+There are also other ways to extend the mathematical foundation of
+this program; for example, one may say that it isn't the velocity we
+care about, but in fact the saturation. Thus, one may ask whether the
+criterion we use here to decide whether $\mathbf u$ needs to be
+recomputed is appropriate; one may, for example, suggest that it is
+also important to decide whether (and by how much) a wrong velocity
+field in fact affects the solution of the saturation equation. This
+would then naturally lead to a sensitivity analysis.
