@@ -22,6 +22,8 @@
 #include <vector>
 #include <string>
 
+#include <deal.II/base/mpi.h>
+
 // Only include the Tecplot API header if the appropriate files
 // were detected by configure
 #ifdef DEAL_II_HAVE_TECPLOT
@@ -1724,6 +1726,35 @@ class DataOutBase
 			   std::ostream                            &out);
 
 /**
+ * This writes the header for the xml based vtu file format. This
+ * routine is used internally together with
+ * DataOutInterface::write_vtu_footer() and DataOutInterface::write_vtu_main()
+ * by DataOutBase::write_vtu().
+ */
+    static void write_vtu_header (std::ostream &out);
+
+/**
+ * This writes the footer for the xml based vtu file format. This
+ * routine is used internally together with
+ * DataOutInterface::write_vtu_header() and DataOutInterface::write_vtu_main()
+ * by DataOutBase::write_vtu().
+ */
+    static void write_vtu_footer (std::ostream &out);
+
+/**
+ * This writes the main part for the xml based vtu file format. This
+ * routine is used internally together with
+ * DataOutInterface::write_vtu_header() and DataOutInterface::write_vtu_footer()
+ * by DataOutBase::write_vtu().
+ */
+    template <int dim, int spacedim>
+    static void write_vtu_main (const std::vector<Patch<dim,spacedim> > &patches,
+                         const std::vector<std::string>          &data_names,
+                         const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
+                         const VtkFlags                          &flags,
+                         std::ostream                            &out);
+
+/**
  * Write the given list of patches to the output stream in deal.II
  * intermediate format. This is not a format understood by any other
  * graphics program, but is rather a direct dump of the intermediate
@@ -1995,6 +2026,8 @@ class DataOutBase
     write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
 				    Table<2,double>                         &data_vectors);
 
+
+
 };
 
 
@@ -2252,6 +2285,21 @@ class DataOutInterface : private DataOutBase
 				      * does the same for VisIt.
 				      */
     void write_vtu (std::ostream &out) const;
+
+                                     /**
+                                      * Collective MPI call to write the
+				      * solution from all participating nodes
+				      * (those in the given communicator) to a
+				      * single compressed .vtu file on a
+				      * shared file system.  The communicator
+				      * can be a sub communicator of the one
+				      * used by the computation.  This routine
+				      * uses MPI I/O to achieve high
+				      * performance on parallel filesystems.
+				      * Also see
+				      * DataOutInterface::write_vtu().
+                                      */
+    void write_vtu_in_parallel (const char* filename, MPI_Comm comm) const;
 
 				     /**
 				      * Some visualization programs, such as

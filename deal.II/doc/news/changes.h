@@ -145,6 +145,11 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: DataOut::write_vtu_in_parallel(). This routine uses MPI I/O to write
+a big vtu file in parallel.
+<br>
+(Timo Heister, 2012/02/29)
+
 <li> Fixed: parallel::distributed::Triangulation::clear() forgot
 to update the number cache of this class, leading to wrong results
 when calling functions like
