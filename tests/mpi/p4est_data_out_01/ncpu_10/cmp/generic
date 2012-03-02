@@ -10,3 +10,20 @@ DEAL:0:2d::0
 DEAL:0:2d::0
 DEAL:0:2d::0
 DEAL:0:2d::9
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="0" NumberOfCells="0" >
+<Cells>
+<DataArray type="UInt8" Name="types"></DataArray>
+</Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float64" Name="x"></DataArray>
+</PointData>
+</Piece>
+ </UnstructuredGrid>
+</VTKFile>
