@@ -4791,7 +4791,61 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
   Assert (patches.size() > 0, ExcNoPatches());
 #else
   if (patches.size() == 0)
-    return;
+    {
+      // we still need to output a valid vtu file, because other CPUs
+      // might output data. This is the minimal file that is accepted by paraview and visit.
+      // if we remove the field definitions, visit is complaining.
+      out << "<Piece NumberOfPoints=\"0\" NumberOfCells=\"0\" >\n"
+          << "<Cells>\n"
+          << "<DataArray type=\"UInt8\" Name=\"types\"></DataArray>\n"
+          << "</Cells>\n"
+          << "  <PointData Scalars=\"scalars\">\n";
+      std::vector<bool> data_set_written (data_names.size(), false);
+      for (unsigned int n_th_vector=0; n_th_vector<vector_data_ranges.size(); ++n_th_vector)
+        {
+                                           // mark these components as already
+                                           // written:
+          for (unsigned int i=std_cxx1x::get<0>(vector_data_ranges[n_th_vector]);
+               i<=std_cxx1x::get<1>(vector_data_ranges[n_th_vector]);
+               ++i)
+            data_set_written[i] = true;
+
+                                           // write the
+                                           // header. concatenate all the
+                                           // component names with double
+                                           // underscores unless a vector
+                                           // name has been specified
+          out << "    <DataArray type=\"Float64\" Name=\"";
+
+          if (std_cxx1x::get<2>(vector_data_ranges[n_th_vector]) != "")
+            out << std_cxx1x::get<2>(vector_data_ranges[n_th_vector]);
+          else
+            {
+              for (unsigned int i=std_cxx1x::get<0>(vector_data_ranges[n_th_vector]);
+                   i<std_cxx1x::get<1>(vector_data_ranges[n_th_vector]);
+                   ++i)
+                out << data_names[i] << "__";
+              out << data_names[std_cxx1x::get<1>(vector_data_ranges[n_th_vector])];
+            }
+
+          out << "\" NumberOfComponents=\"3\"></DataArray>\n";
+        }
+
+      for (unsigned int data_set=0; data_set<data_names.size(); ++data_set)
+        if (data_set_written[data_set] == false)
+          {
+            out << "    <DataArray type=\"Float64\" Name=\""
+                << data_names[data_set]
+                << "\"></DataArray>\n";
+          }
+
+      out << "</PointData>\n";
+
+      out
+          << "</Piece>" << std::endl;
+
+      return;
+    }
 #endif
 
   VtuStream vtu_out(out, flags);
