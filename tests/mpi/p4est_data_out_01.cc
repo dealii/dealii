@@ -15,6 +15,10 @@
 // create a parallel DoFHandler and output data on a single
 // cell. DataOut was not prepared to handle situations where a
 // processor has no active cells at all.
+// We are checking the output by proc 0, who has 0 own cells to write.
+// Note that we can not write an empty file, because the collection
+// needs to be readable by paraview and visit. We check that
+// the format stays as it is right now.
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
