@@ -3,7 +3,7 @@ project(deal.II)
 
 # common defines
 include_directories(include)
-include_directories(contrib/boost-1.46.1)
+include_directories(contrib/boost-1.46.1/include)
 include_directories(contrib/tbb/tbb30_104oss/include)
 include_directories(contrib)
 
