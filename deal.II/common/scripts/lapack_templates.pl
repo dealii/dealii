@@ -2,7 +2,7 @@
 #    $Id$
 #    Version: $Name$
 #
-#    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal authors
+#    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal authors
 #
 #    This file is subject to QPL and may not be  distributed
 #    without copyright and license information. Please refer
@@ -54,8 +54,8 @@ print << 'EOT'
 #ifndef __LAPACK_TEMPLATES_H
 #define __LAPACK_TEMPLATES_H
 
-#include <base/config.h>
-#include <lac/lapack_support.h>
+#include <deal.II/base/config.h>
+#include <deal.II/lac/lapack_support.h>
 
 extern "C"
 {
@@ -89,7 +89,7 @@ while(<>)
 	$single =~ s/d$name/s$name/;
 	$single =~ s/double/float/g;
 	print $double,$single;
-	
+
 	$double =~ m/\(([^\)]*)/;
 	my $args = $1;
 	# The arglist for the C++ function
@@ -116,7 +116,7 @@ while(<>)
 	    $numbers++;
 	}
 	$typet =~ s/double/number1/g;
-	
+
 	$templates .= "\n\n//--------------------------------------------------------------------------------//\ntemplate<typename number1";
 	for (my $i=2;$i<$numbers;++$i)
 	{
@@ -132,7 +132,7 @@ while(<>)
 	$templates .= "\ninline $type\n$name ($args)\n{\n  d$name\_ ($args2);\n}\n";
 	$templates .= "#else\ninline $type\n$name ($args0)\n";
 	$templates .= "{\n  Assert (false, LAPACKSupport::ExcMissing(\"d$name\"));\n}\n#endif\n";
-	
+
 	$args =~ s/double/float/g;
 	$args0 =~ s/double/float/g;
 	$type =~ s/double/float/g;
