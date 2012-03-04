@@ -1,5 +1,58 @@
+# -----------------------------------------------------------------
+#      Configuration and build system description for deal.II
+#
+# This file is subject to QPL and may not be  distributed
+# without copyright and license information. Please refer
+# to the file deal.II/doc/license.html for the  text  and
+# further information on this license.
+#
+# Copyright (C) 2012 by the deal.II authors
+#
+# $Id: aclocal.m4 24924 2012-01-25 12:35:17Z kormann $
+
+
+# ###########################################################
+#                Configuration of deal.II                   #
+# ###########################################################
+
+message ("")
+message ("=========================================")
+message ("==         Configuring deal.II         ==")
+message ("=========================================")
+message ("")
+
+message ("------ Configuring the compilers")
+
 cmake_minimum_required(VERSION 2.8)
 project(deal.II)
+
+
+# -----------------------------------------------------------
+# Find a few programs that we need throughout this script and
+# deal.II.
+# -----------------------------------------------------------
+
+message ("")
+message ("------ Searching for external programs")
+find_program (perl perl)
+if (${perl} STREQUAL perl-NOTFOUND)
+  message (FATAL_ERROR "** Searching for perl: not found")
+else()
+  message ("-- Searching for perl: " ${perl})
+endif()
+
+find_program (doxygen doxygen)
+if (${doxygen} STREQUAL doxygen-NOTFOUND)
+  message (FATAL_ERROR "** Searching for doxygen: not found")
+else()
+  message ("-- Searching for doxygen: " ${doxygen})
+endif()
+
+
+
+# ###########################################################
+#                 Build system of deal.II                   #
+# ###########################################################
 
 # common defines
 include_directories(include)
@@ -24,17 +77,28 @@ get_target_property (expand_instantiations_exe
 
 # we then need to describe how we can build the .inst files from the
 # .inst.in files
-foreach (inst_file source/distributed/grid_refinement.inst source/distributed/solution_transfer.inst source/distributed/tria.inst source/dofs/block_info.inst source/dofs/dof_accessor.inst source/dofs/dof_handler.inst source/dofs/dof_handler_policy.inst source/dofs/dof_objects.inst source/dofs/dof_renumbering.inst source/dofs/dof_tools.inst source/fe/fe_abf.inst source/fe/fe_bdm.inst source/fe/fe_dgp.inst source/fe/fe_dgp_monomial.inst source/fe/fe_dgp_nonparametric.inst source/fe/fe_dgq.inst source/fe/fe_dg_vector.inst source/fe/fe_face.inst source/fe/fe.inst source/fe/fe_nedelec.inst source/fe/fe_nothing.inst source/fe/fe_poly.inst source/fe/fe_poly_tensor.inst source/fe/fe_q_hierarchical.inst source/fe/fe_q.inst source/fe/fe_raviart_thomas.inst source/fe/fe_raviart_thomas_nodal.inst source/fe/fe_system.inst source/fe/fe_tools.inst source/fe/fe_values.decl.1.inst source/fe/fe_values.decl.2.inst source/fe/fe_values.impl.1.inst source/fe/fe_values.impl.2.inst source/fe/fe_values.inst source/fe/mapping_c1.inst source/fe/mapping_cartesian.inst source/fe/mapping.inst source/fe/mapping_q1_eulerian.inst source/fe/mapping_q1.inst source/fe/mapping_q_eulerian.inst source/fe/mapping_q.inst source/grid/grid_generator.inst source/grid/grid_in.inst source/grid/grid_out.inst source/grid/grid_refinement.inst source/grid/grid_tools.inst source/grid/intergrid_map.inst source/grid/tria_accessor.inst source/grid/tria_boundary.inst source/grid/tria_boundary_lib.inst source/grid/tria.inst source/grid/tria_objects.inst source/hp/dof_handler.inst source/hp/fe_collection.inst source/hp/fe_values.inst source/hp/mapping_collection.inst source/lac/block_vector.inst source/lac/chunk_sparse_matrix.inst source/lac/full_matrix.inst source/lac/operator.inst source/lac/parallel_vector.inst source/lac/precondition_block.inst source/lac/relaxation_block.inst source/lac/sparse_matrix_ez.inst source/lac/sparse_matrix.inst source/lac/trilinos_vector_base.inst source/lac/vector.inst source/lac/vector_memory.inst source/lac/vector_view.inst source/multigrid/mg_dof_accessor.inst source/multigrid/mg_dof_handler.inst source/multigrid/mg_tools.inst source/multigrid/mg_transfer_block.inst source/multigrid/mg_transfer_component.inst source/multigrid/mg_transfer_prebuilt.inst source/numerics/data_out_faces.inst source/numerics/data_out.inst source/numerics/data_out_rotation.inst source/numerics/data_out_stack.inst source/numerics/data_postprocessor.inst source/numerics/derivative_approximation.inst source/numerics/error_estimator.inst source/numerics/fe_field_function.inst source/numerics/matrices.inst source/numerics/mesh_worker_info.inst source/numerics/mesh_worker_vector_selector.inst source/numerics/operator.inst source/numerics/point_value_history.inst source/numerics/solution_transfer.inst source/numerics/time_dependent.inst source/numerics/vectors.inst)
+file (GLOB_RECURSE inst_in_files source/*.inst.in)
+foreach (inst_file ${inst_in_files})
   add_custom_command (OUTPUT ${PROJECT_BINARY_DIR}/${inst_file}
-                      DEPENDS expand_instantiations
+                      DEPENDS expand_instantiations ${inst_file}.in
                       COMMAND ${expand_instantiations_exe}
                       ARGS common/template-arguments < ${inst_file}.in
                                                      > ${PROJECT_BINARY_DIR}/${inst_file})
   set (inst_files ${inst_files} ${PROJECT_BINARY_DIR}/${inst_file})
 endforeach()
 
+# then do the same for the .inst.pl files
+file (GLOB_RECURSE inst_pl_files source/*.inst.pl)
+foreach (inst_file ${inst_pl_files})
+  add_custom_command (OUTPUT ${PROJECT_BINARY_DIR}/${inst_file}
+                      DEPENDS ${inst_file}.pl
+                      COMMAND ${perl}
+                      ARGS -I common ${inst_file}.pl
+                                     > ${PROJECT_BINARY_DIR}/${inst_file})
+  set (inst_files ${inst_files} ${PROJECT_BINARY_DIR}/${inst_file})
+endforeach ()
+
 
 # then define what's needed for the deal.II library
-set (SOURCES ${inst_files} source/base/auto_derivative_function.cc source/base/boost_serialization.cc source/base/boost_threads.cc source/base/conditional_ostream.cc source/base/config.cc source/base/convergence_table.cc source/base/data_out_base.cc source/base/event.cc source/base/exceptions.cc source/base/flow_function.cc source/base/function.cc source/base/function_derivative.cc source/base/function_lib.cc source/base/function_lib_cutoff.cc source/base/function_parser.cc source/base/function_time.cc source/base/geometry_info.cc source/base/index_set.cc source/base/job_identifier.cc source/base/logstream.cc source/base/memory_consumption.cc source/base/mpi.cc source/base/multithread_info.cc source/base/parallel.cc source/base/parameter_handler.cc source/base/parsed_function.cc source/base/partitioner.cc source/base/path_search.cc source/base/polynomial.cc source/base/polynomials_abf.cc source/base/polynomials_adini.cc source/base/polynomials_bdm.cc source/base/polynomials_nedelec.cc source/base/polynomial_space.cc source/base/polynomials_p.cc source/base/polynomials_raviart_thomas.cc source/base/quadrature.cc source/base/quadrature_lib.cc source/base/quadrature_selector.cc source/base/subscriptor.cc source/base/symmetric_tensor.cc source/base/table_handler.cc source/base/tensor_function.cc source/base/tensor_product_polynomials.cc source/base/thread_management.cc source/base/timer.cc source/base/utilities.cc source/distributed/grid_refinement.cc source/distributed/solution_transfer.cc source/distributed/tria.cc source/dofs/block_info.cc source/dofs/dof_accessor.cc source/dofs/dof_faces.cc source/dofs/dof_handler.cc source/dofs/dof_handler_policy.cc source/dofs/dof_levels.cc source/dofs/dof_objects.cc source/dofs/dof_renumbering.cc source/dofs/dof_tools.cc source/dofs/number_cache.cc source/fe/fe_abf.cc source/fe/fe_bdm.cc source/fe/fe.cc source/fe/fe_data.cc source/fe/fe_dgp.cc source/fe/fe_dgp_monomial.cc source/fe/fe_dgp_nonparametric.cc source/fe/fe_dgq.cc source/fe/fe_dg_vector.cc source/fe/fe_face.cc source/fe/fe_nedelec.cc source/fe/fe_nothing.cc source/fe/fe_poly.cc source/fe/fe_poly_tensor.cc source/fe/fe_q.cc source/fe/fe_q_hierarchical.cc source/fe/fe_raviart_thomas.cc source/fe/fe_raviart_thomas_nodal.cc source/fe/fe_system.cc source/fe/fe_tools.cc source/fe/fe_values.cc source/fe/mapping_c1.cc source/fe/mapping_cartesian.cc source/fe/mapping.cc source/fe/mapping_q1.cc source/fe/mapping_q1_eulerian.cc source/fe/mapping_q.cc source/fe/mapping_q_eulerian.cc source/grid/grid_generator.cc source/grid/grid_in.cc source/grid/grid_out.cc source/grid/grid_refinement.cc source/grid/grid_reordering.cc source/grid/grid_tools.cc source/grid/intergrid_map.cc source/grid/persistent_tria.cc source/grid/tria_accessor.cc source/grid/tria_boundary.cc source/grid/tria_boundary_lib.cc source/grid/tria.cc source/grid/tria_faces.cc source/grid/tria_levels.cc source/grid/tria_objects.cc source/hp/dof_faces.cc source/hp/dof_handler.cc source/hp/dof_levels.cc source/hp/dof_objects.cc source/hp/fe_collection.cc source/hp/fe_values.cc source/hp/mapping_collection.cc source/lac/block_matrix_array.cc source/lac/block_sparse_matrix.cc source/lac/block_sparse_matrix_ez.cc source/lac/block_sparsity_pattern.cc source/lac/block_vector.cc source/lac/chunk_sparse_matrix.cc source/lac/chunk_sparsity_pattern.cc source/lac/compressed_set_sparsity_pattern.cc source/lac/compressed_simple_sparsity_pattern.cc source/lac/compressed_sparsity_pattern.cc source/lac/constraint_matrix.cc source/lac/full_matrix.cc source/lac/lapack_full_matrix.cc source/lac/matrix_lib.cc source/lac/matrix_out.cc source/lac/operator.cc source/lac/parallel_vector.cc source/lac/petsc_block_sparse_matrix.cc source/lac/petsc_full_matrix.cc source/lac/petsc_matrix_base.cc source/lac/petsc_parallel_block_sparse_matrix.cc source/lac/petsc_parallel_block_vector.cc source/lac/petsc_parallel_sparse_matrix.cc source/lac/petsc_parallel_vector.cc source/lac/petsc_precondition.cc source/lac/petsc_solver.cc source/lac/petsc_sparse_matrix.cc source/lac/petsc_vector_base.cc source/lac/petsc_vector.cc source/lac/precondition_block.cc source/lac/precondition_block_ez.cc source/lac/relaxation_block.cc source/lac/slepc_solver.cc source/lac/slepc_spectral_transformation.cc source/lac/solver.cc source/lac/solver_control.cc source/lac/sparse_decomposition.cc source/lac/sparse_direct.cc source/lac/sparse_ilu.cc source/lac/sparse_matrix.cc source/lac/sparse_matrix_ez.cc source/lac/sparse_mic.cc source/lac/sparse_vanka.cc source/lac/sparsity_pattern.cc source/lac/sparsity_tools.cc source/lac/swappable_vector.cc source/lac/timestep_control.cc source/lac/tridiagonal_matrix.cc source/lac/trilinos_block_sparse_matrix.cc source/lac/trilinos_block_vector.cc source/lac/trilinos_precondition.cc source/lac/trilinos_solver.cc source/lac/trilinos_sparse_matrix.cc source/lac/trilinos_sparsity_pattern.cc source/lac/trilinos_vector_base.cc source/lac/trilinos_vector.cc source/lac/vector.cc source/lac/vector_memory.cc source/lac/vector_view.cc source/multigrid/mg_base.cc source/multigrid/mg_dof_accessor.cc source/multigrid/mg_dof_handler.cc source/multigrid/mg_tools.cc source/multigrid/mg_transfer_block.cc source/multigrid/mg_transfer_component.cc source/multigrid/mg_transfer_prebuilt.cc source/multigrid/multigrid.cc source/numerics/data_out.cc source/numerics/data_out_faces.cc source/numerics/data_out_rotation.cc source/numerics/data_out_stack.cc source/numerics/data_postprocessor.cc source/numerics/derivative_approximation.cc source/numerics/error_estimator.cc source/numerics/fe_field_function.cc source/numerics/histogram.cc source/numerics/matrices.cc source/numerics/mesh_worker.cc source/numerics/mesh_worker_info.cc source/numerics/mesh_worker_vector_selector.cc source/numerics/operator.cc source/numerics/point_value_history.cc source/numerics/solution_transfer.cc source/numerics/time_dependent.cc source/numerics/vectors.cc)
-
-add_library(deal_II ${SOURCES})
+file (GLOB_RECURSE cc_files source/*.cc)
+add_library(deal_II ${inst_files} ${cc_files})
