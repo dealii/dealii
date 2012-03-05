@@ -2841,16 +2841,138 @@ GridGenerator::half_hyper_shell (Triangulation<3>& tria,
 
 }
 
-
+// Implementation for 3D only
 template <>
-void GridGenerator::quarter_hyper_shell (Triangulation<3> &,
-					 const Point<3>&,
-					 const double,
-					 const double,
-					 const unsigned int,
-					 const bool)
+void
+GridGenerator::colorize_quarter_hyper_shell(Triangulation<3> & tria,
+                                            const Point<3>& center,
+                                            const double inner_radius,
+                                            const double outer_radius)
 {
-  Assert (false, ExcNotImplemented());
+
+  if (tria.n_cells() != 3)
+    AssertThrow (false, ExcNotImplemented());
+
+  double middle = (outer_radius-inner_radius)/2e0 + inner_radius;
+  double eps = 1e-3*middle;
+  Triangulation<3>::cell_iterator cell = tria.begin();
+
+  for (;cell!=tria.end();++cell)
+    for(unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+      {
+        if(!cell->face(f)->at_boundary())
+          continue;
+
+        double radius = cell->face(f)->center().norm() - center.norm();
+        if (std::fabs(cell->face(f)->center()(0)) < eps ) // x = 0 set boundary 2
+          {
+            cell->face(f)->set_boundary_indicator(2);
+            for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
+              if(cell->face(f)->line(j)->at_boundary())
+                if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
+                  cell->face(f)->line(j)->set_boundary_indicator(2);
+          }
+        else if (std::fabs(cell->face(f)->center()(1)) < eps) // y = 0 set boundary 3
+          {
+            cell->face(f)->set_boundary_indicator(3);
+            for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
+              if(cell->face(f)->line(j)->at_boundary())
+                if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
+                  cell->face(f)->line(j)->set_boundary_indicator(3);
+          }
+        else if (std::fabs(cell->face(f)->center()(2)) < eps ) // z = 0 set boundary 4
+          {
+            cell->face(f)->set_boundary_indicator(4);
+            for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
+              if(cell->face(f)->line(j)->at_boundary())
+                if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) > eps)
+                  cell->face(f)->line(j)->set_boundary_indicator(4);
+          }
+        else if (radius < middle) // inner radius set boundary 0
+          {
+            cell->face(f)->set_boundary_indicator(0);
+            for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
+              if(cell->face(f)->line(j)->at_boundary())
+                if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) < eps)
+                  cell->face(f)->line(j)->set_boundary_indicator(0);
+          }
+        else if (radius > middle) // outer radius set boundary 1
+          {
+            cell->face(f)->set_boundary_indicator(1);
+            for (unsigned int j=0;j<GeometryInfo<3>::lines_per_face;++j)
+              if(cell->face(f)->line(j)->at_boundary())
+                if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() - cell->face(f)->line(j)->vertex(1).norm()) < eps)
+                  cell->face(f)->line(j)->set_boundary_indicator(1);
+          }
+        else
+          AssertThrow (false, ExcInternalError());
+      }
+}
+
+
+
+// Implementation for 3D only
+template <>
+void GridGenerator::quarter_hyper_shell (Triangulation<3> & tria,
+                                         const Point<3>& center,
+                                         const double inner_radius,
+                                         const double outer_radius,
+                                         const unsigned int n,
+                                         const bool colorize)
+{
+  Assert ((inner_radius > 0) && (inner_radius < outer_radius),
+          ExcInvalidRadii ());
+  if (n == 0 || n == 3)
+    {
+      const double a = inner_radius*std::sqrt(2.0)/2e0;
+      const double b = outer_radius*std::sqrt(2.0)/2e0;
+      const double c = a*std::sqrt(3.0)/2e0;
+      const double d = b*std::sqrt(3.0)/2e0;
+      const double e = outer_radius/2e0;
+      const double f = outer_radius*std::sqrt(3.0)/2e0;
+      const double g = f*std::sqrt(3.0)/2e0;
+      const double h = inner_radius/2e0;
+
+      std::vector<Point<3> > vertices;
+
+      vertices.push_back (center+Point<3>( 0,  inner_radius, 0)); //0
+      vertices.push_back (center+Point<3>( a,  a, 0));			//1
+      vertices.push_back (center+Point<3>( b,  b, 0));			//2
+      vertices.push_back (center+Point<3>( 0, outer_radius, 0));	//3
+      vertices.push_back (center+Point<3>( 0, a , a));			//4
+      vertices.push_back (center+Point<3>( c, c , h));			//5
+      vertices.push_back (center+Point<3>( d, d , e));			//6
+      vertices.push_back (center+Point<3>( 0, b , b));			//7
+      vertices.push_back (center+Point<3>( inner_radius, 0 , 0));	//8
+      vertices.push_back (center+Point<3>( outer_radius, 0 , 0));	//9
+      vertices.push_back (center+Point<3>( a, 0 , a));	//10
+      vertices.push_back (center+Point<3>( b, 0 , b));	//11
+      vertices.push_back (center+Point<3>( 0, 0 , inner_radius));	//12
+      vertices.push_back (center+Point<3>( 0, 0 , outer_radius));	//13
+
+      const int cell_vertices[3][8] = {
+        {0, 1, 3, 2, 4, 5, 7, 6},
+        {1, 8, 2, 9, 5, 10, 6, 11},
+        {4, 5, 7, 6, 12, 10, 13, 11},
+      };
+      std::vector<CellData<3> > cells(n);
+
+      for (unsigned int i=0; i<n; ++i)
+        {
+          for (unsigned int j=0; j<8; ++j)
+            cells[i].vertices[j] = cell_vertices[i][j];
+          cells[i].material_id = 0;
+        }
+
+      tria.create_triangulation ( vertices, cells, SubCellData());       // no boundary information
+    }
+  else
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+  if (colorize)
+      colorize_quarter_hyper_shell(tria, center, inner_radius, outer_radius);
 }
 
 

@@ -691,33 +691,28 @@ class GridGenerator
 
 				     /**
 				      * Produce a quarter hyper-shell,
-				      * i.e. the space between two
-				      * circles in two space
-				      * dimensions and the region
-				      * between two spheres in 3d,
-				      * with given inner and outer
-				      * radius and a given number of
-				      * elements for this initial
-				      * triangulation. All components are
-				      * restricted to be positive, so the
-				      * opening angle is 90 degrees.
+				      * i.e. the space between two circles in
+				      * two space dimensions and the region
+				      * between two spheres in 3d, with given
+				      * inner and outer radius and a given
+				      * number of elements for this initial
+				      * triangulation.
 				      *
-				      * If the number of
-				      * initial cells is zero (as is
-				      * the default), then it is
-				      * computed adaptively such that
-				      * the resulting elements have
-				      * the least aspect ratio.
+				      * If the number of initial cells is zero
+				      * (as is the default), then it is
+				      * computed adaptively such that the
+				      * resulting elements have the least
+				      * aspect ratio in 2d.
 				      *
-				      * If colorize is set to true, the
-				      * inner, outer, left, and right
-				      * boundary get indicator 0, 1, 2,
-				      * and 3, respectively. Otherwise
-				      * all indicators are set to 0.
+				      * If colorize is set to true, the inner,
+				      * outer, left, and right boundary get
+				      * indicator 0, 1, 2, and 3 in 2d,
+				      * respectively. Otherwise all indicators
+				      * are set to 0. In 3d indicator 2 is at
+				      * the face x=0, 3 at y=0, 4 at z=0.
 				      *
 				      * @note The triangulation needs to be
-				      * void upon calling this
-				      * function. Only implemented in 2d so far.
+				      * void upon calling this function.
 				      */
     template <int dim>
     static void quarter_hyper_shell (Triangulation<dim>   &tria,
@@ -988,6 +983,22 @@ class GridGenerator
 			  const double inner_radius,
 			  const double outer_radius);
 
+
+				     /**
+				      * Assign boundary number zero the inner
+				      * shell boundary, one to the outer shell
+				      * boundary, two to the face with x=0,
+				      * three to the face with y=0, four to
+				      * the face with z=0.
+				      */
+    template<int dim>
+    static
+    void
+    colorize_quarter_hyper_shell(Triangulation<dim> & tria,
+				 const Point<dim>& center,
+				 const double inner_radius,
+				 const double outer_radius);
+    
 				     /**
 				      * Solve the Laplace equation for
 				      * @p laplace_transformation

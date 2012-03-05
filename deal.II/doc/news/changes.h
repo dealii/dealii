@@ -145,6 +145,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: GridGenerator::quarter_hyper_shell() in 3d.
+<br>
+(Thomas Geenen, 2012/03/05)
+
 <li> New: DataOut::write_vtu_in_parallel(). This routine uses MPI I/O to write
 a big vtu file in parallel.
 <br>
