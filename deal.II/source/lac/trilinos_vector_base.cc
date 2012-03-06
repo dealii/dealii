@@ -299,6 +299,9 @@ namespace TrilinosWrappers
   bool
   VectorBase::is_non_negative () const
   {
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+    AssertThrow(false, ExcNotImplemented());
+#endif
                                      // get a representation of the vector and
                                      // loop over all the elements
     TrilinosScalar *start_ptr;
