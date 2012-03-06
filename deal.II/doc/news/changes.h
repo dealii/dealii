@@ -145,6 +145,10 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: TrilinosWrappers::Vector::all_zero() in parallel.
+<br>
+(Timo Heister, J&ouml;rg Frohne, 2012/03/06)
+
 <li> New: GridGenerator::quarter_hyper_shell() in 3d.
 <br>
 (Thomas Geenen, 2012/03/05)

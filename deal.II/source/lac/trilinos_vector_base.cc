@@ -270,18 +270,28 @@ namespace TrilinosWrappers
     TrilinosScalar *start_ptr = (*vector)[0];
     const TrilinosScalar *ptr  = start_ptr,
                          *eptr = start_ptr + local_size();
-    bool flag = true;
+    unsigned int flag = 0;
     while (ptr != eptr)
       {
 	if (*ptr != 0)
 	  {
-	    flag = false;
+	    flag = 1;
 	    break;
 	  }
 	++ptr;
       }
 
-    return flag;
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+				     // in parallel, check that the vector
+				     // is zero on _all_ processors.
+    const Epetra_MpiComm *mpi_comm
+      = dynamic_cast<const Epetra_MpiComm*>(&vector->Map().Comm());
+    unsigned int num_nonzero = Utilities::MPI::sum(flag, mpi_comm->Comm());
+    return num_nonzero == 0;
+#else
+    return flag == 0;
+#endif
+    
   }
 
 
