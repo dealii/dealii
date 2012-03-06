@@ -193,12 +193,21 @@ namespace PETScWrappers
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
                                        // for all rows globally
+#ifdef DEAL_II_PETSC_VERSION_DEV
+      const int ierr
+        = MatCreateAIJ(communicator,
+		       local_rows, local_columns,
+		       m, n,
+		       n_nonzero_per_row, 0, 0, 0,
+		       &matrix);
+#else
       const int ierr
         = MatCreateMPIAIJ(communicator,
 			  local_rows, local_columns,
 			  m, n,
                           n_nonzero_per_row, 0, 0, 0,
                           &matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                        // set symmetric flag, if so requested
@@ -234,7 +243,7 @@ namespace PETScWrappers
 				       // For the case that
 				       // local_columns is smaller
 				       // than one of the row lengths
-				       // MatCreateMPIAIJ throws an
+				       // MatCreate(MPI)AIJ throws an
 				       // error. In this case use a
 				       // PETScWrappers::SparseMatrix
       for (unsigned int i=0; i<row_lengths.size(); ++i)
@@ -259,12 +268,21 @@ namespace PETScWrappers
 
 //TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
 
+#ifdef DEAL_II_PETSC_VERSION_DEV
+      const int ierr
+        = MatCreateAIJ(communicator,
+		       local_rows, local_columns,
+		       m, n,
+		       0, &int_row_lengths[0], 0, 0,
+		       &matrix);
+#else
       const int ierr
         = MatCreateMPIAIJ(communicator,
 			  local_rows, local_columns,
 			  m, n,
                           0, &int_row_lengths[0], 0, 0,
                           &matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                        // set symmetric flag, if so requested
