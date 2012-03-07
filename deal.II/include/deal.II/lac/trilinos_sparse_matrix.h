@@ -1619,7 +1619,11 @@ namespace TrilinosWrappers
                                         * element in the <i>i</i>th
                                         * row. This function throws an
                                         * error if the matrix is not
-                                        * quadratic.
+                                        * quadratic and it also throws
+					* an error if <i>(i,i)</i> is not
+					* element of the local matrix.
+					* See also the comment in
+					* trilinos_sparse_matrix.cc.
                                         */
       TrilinosScalar diag_element (const unsigned int i) const;
 
