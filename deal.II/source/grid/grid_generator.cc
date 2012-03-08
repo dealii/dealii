@@ -2955,9 +2955,9 @@ void GridGenerator::quarter_hyper_shell (Triangulation<3> & tria,
         {1, 8, 2, 9, 5, 10, 6, 11},
         {4, 5, 7, 6, 12, 10, 13, 11},
       };
-      std::vector<CellData<3> > cells(n);
+      std::vector<CellData<3> > cells(3);
 
-      for (unsigned int i=0; i<n; ++i)
+      for (unsigned int i=0; i<3; ++i)
         {
           for (unsigned int j=0; j<8; ++j)
             cells[i].vertices[j] = cell_vertices[i][j];
