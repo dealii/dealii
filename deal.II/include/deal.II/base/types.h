@@ -79,7 +79,9 @@ namespace types
   const global_dof_index invalid_dof_index = static_cast<global_dof_index>(-1);
 
           /**
-           * The type used to denote boundary_indicators.
+           * The type used to denote boundary indicators associated with every
+           * piece of the boundary and, in the case of meshes that describe
+           * manifolds in higher dimensions, associated with every cell.
            */
   typedef unsigned char boundary_id_t;
 
@@ -90,7 +92,8 @@ namespace types
   const boundary_id_t internal_face_boundary_id = static_cast<boundary_id_t>(-1);
 
           /**
-           * The type used to denote boundary_indicators.
+           * The type used to denote material indicators associated with every
+           * cell.
            */
   typedef unsigned char material_id_t;
 
