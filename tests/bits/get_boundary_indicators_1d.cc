@@ -26,7 +26,7 @@ int main ()
 
   Triangulation<1>   triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
-  const std::vector<unsigned char> indicators = triangulation.get_boundary_indicators();
+  const std::vector<types::boundary_id_t> indicators = triangulation.get_boundary_indicators();
   for (unsigned int i=0; i<indicators.size(); ++i)
     deallog << int (indicators[i]) << std::endl;
 

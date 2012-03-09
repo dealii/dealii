@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,39 +27,39 @@
 #include <iomanip>
 
 
-template <int dim> Table<dim,unsigned char> material_ids();
+template <int dim> Table<dim,types::material_id_t> material_ids();
 
-template <> Table<1,unsigned char> material_ids<1>()
+template <> Table<1,types::material_id_t> material_ids<1>()
 {
-  Table<1,unsigned char> t(2);
+  Table<1,types::material_id_t> t(2);
   for (unsigned int i=0; i<2; ++i)
     t[i] = 1;
   return t;
 }
 
 
-template <> Table<2,unsigned char> material_ids<2>()
+template <> Table<2,types::material_id_t> material_ids<2>()
 {
-  Table<2,unsigned char> t(2,3);
+  Table<2,types::material_id_t> t(2,3);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<3; ++j)
       t[i][j] = 1;
 				   // produce a hole in the middle
-  t[1][1] = (unsigned char)(-1);
+  t[1][1] = (types::material_id_t)(-1);
   return t;
 }
 
 
-template <> Table<3,unsigned char> material_ids<3>()
+template <> Table<3,types::material_id_t> material_ids<3>()
 {
-  Table<3,unsigned char> t(2,3,4);
+  Table<3,types::material_id_t> t(2,3,4);
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<3; ++j)
       for (unsigned int k=0; k<4; ++k)
 	t[i][j][k] = 1;
 				   // produce a hole in the middle
-  t[1][1][1] = (unsigned char)(-1);
-  t[1][1][2] = (unsigned char)(-1);
+  t[1][1][1] = (types::material_id_t)(-1);
+  t[1][1][2] = (types::material_id_t)(-1);
   return t;
 }
 
@@ -72,7 +72,7 @@ void test(std::ostream& out)
   p1[0] = 2.;
   if (dim>1) p1[1] = -1.;
   if (dim>2) p1[2] = 0.;
-  
+
   Point<dim> p2;
   p2[0] = 3.;
   if (dim>1) p2[1] = 2.;
@@ -82,7 +82,7 @@ void test(std::ostream& out)
   p3[0] = 2.;
   if (dim>1) p3[1] = 1.;
   if (dim>2) p3[2] = 4.;
-  
+
   GridOut go;
 
                                    // uniformly subdivided mesh
@@ -128,7 +128,7 @@ int main()
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  
+
   deallog.push("1d");
   test<1>(logfile);
   deallog.pop();

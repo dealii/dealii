@@ -82,7 +82,7 @@ void test()
   ConstraintMatrix constraints;
   constraints.reinit(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, constraints);
-  std::set<unsigned char> no_normal_flux_boundaries;
+  std::set<types::boundary_id_t> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);
   const unsigned int degree = 1;
   VectorTools::compute_no_normal_flux_constraints (dofh, 0,

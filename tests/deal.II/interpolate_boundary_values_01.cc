@@ -148,7 +148,7 @@ void FindBug<dim>::dirichlet_conditions ()
 
 
   std::vector<bool> fixed_dofs (dof_handler.n_dofs());
-  std::set<unsigned char> boundary_indicators;
+  std::set<types::boundary_id_t> boundary_indicators;
   boundary_indicators.insert (0);
 
                                    // get a list of those boundary DoFs which

@@ -134,7 +134,7 @@ void test_projection (const Triangulation<dim>& tr,
   TestFunction<dim> f(degree-1);
   std::map<unsigned int, double> boundary_constraints;
   typename FunctionMap<dim>::type boundary_map;
-  for (unsigned char i=0;i<255;++i)
+  for (types::boundary_id_t i=0;i<255;++i)
     boundary_map[i] = &f;
   VectorTools::project_boundary_values(mapping, dof, boundary_map, quadrature,
 				       boundary_constraints);

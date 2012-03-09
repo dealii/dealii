@@ -47,7 +47,7 @@ void test (const Triangulation<dim>& tr,
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
-  std::set<unsigned char> boundary_ids;
+  std::set<types::boundary_id_t> boundary_ids;
   boundary_ids.insert (0);
 
   ConstraintMatrix cm;

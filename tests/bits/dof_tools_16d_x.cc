@@ -35,7 +35,7 @@ check_this (const DoFHandler<dim> &dof_handler)
     return;
   
   std::vector<unsigned int> map (dof_handler.n_dofs());
-  std::set<unsigned char> set;
+  std::set<types::boundary_id_t> set;
   set.insert (0);
   DoFTools::map_dof_to_boundary_indices (dof_handler, set, map);
 

@@ -45,7 +45,7 @@ void test (const Triangulation<dim>& tr,
 	      << ", case=" << i
 	      << std::endl;
 
-      std::set<unsigned char> boundary_ids;
+      std::set<types::boundary_id_t> boundary_ids;
       for (unsigned int j=0; j<=i; ++j)
 	boundary_ids.insert (j);
 

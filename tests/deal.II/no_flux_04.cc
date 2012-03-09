@@ -78,7 +78,7 @@ void test (const Triangulation<dim>& tr,
   deallog << "FE=" << fe.get_name()
 	  << std::endl;
 
-  std::set<unsigned char> boundary_ids;
+  std::set<types::boundary_id_t> boundary_ids;
   boundary_ids.insert (0);
 
   ConstraintMatrix cm;
