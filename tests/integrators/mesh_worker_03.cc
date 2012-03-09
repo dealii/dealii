@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id$
+//    $Id: mesh_worker_02.cc 23710 2011-05-17 04:50:10Z bangerth $
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
@@ -10,7 +10,7 @@
 //
 //----------------------------------------------------------------------
 
-// Test consistency of assemblers MatrixSimple and MGMatrixSimple
+// Test consistency of assemblers MatrixSimple with and without local blocks
 
 #include "../tests.h"
 #include <deal.II/numerics/mesh_worker.h>
@@ -33,20 +33,23 @@
 
 using namespace dealii;
 
-
-// Use local matrices for Laplacian / interior penalty DG
+// Local integrators fill every matrix entry with 10*block_row + block_col
 template <int dim>
 class MatrixIntegrator : public Subscriptor
 {
   public:
     static void cell(MeshWorker::DoFInfo<dim>& dinfo,
 		     MeshWorker::IntegrationInfo<dim>& info);
-    static void bdry(MeshWorker::DoFInfo<dim>& dinfo,
-		     MeshWorker::IntegrationInfo<dim>& info);
     static void face(MeshWorker::DoFInfo<dim>& dinfo1,
 		     MeshWorker::DoFInfo<dim>& dinfo2,
 		     MeshWorker::IntegrationInfo<dim>& info1,
 		     MeshWorker::IntegrationInfo<dim>& info2);
+    static void block_cell(MeshWorker::DoFInfo<dim>& dinfo,
+			   MeshWorker::IntegrationInfo<dim>& info);
+    static void block_face(MeshWorker::DoFInfo<dim>& dinfo1,
+			   MeshWorker::DoFInfo<dim>& dinfo2,
+			   MeshWorker::IntegrationInfo<dim>& info1,
+			   MeshWorker::IntegrationInfo<dim>& info2);
 };
 
 
@@ -54,34 +57,15 @@ template <int dim>
 void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>& dinfo,
 				 MeshWorker::IntegrationInfo<dim>& info)
 {
-  const FEValuesBase<dim>& fe = info.fe_values();
+  const FiniteElement<dim>& fe = info.fe_values().get_fe();
   FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
   
-  for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-	local_matrix(i,j) += (fe.shape_grad(i,k) * fe.shape_grad(j,k))
-			     * fe.JxW(k);
-}
-
-
-template <int dim>
-void MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>& dinfo,
-				 MeshWorker::IntegrationInfo<dim>& info)
-{
-  const FEValuesBase<dim>& fe = info.fe_values();
-  FullMatrix<double>& local_matrix = dinfo.matrix(0).matrix;
-  
-  const unsigned int deg = fe.get_fe().tensor_degree();
-  const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
-  
-  for (unsigned k=0;k<fe.n_quadrature_points;++k)
-    for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
-	local_matrix(i,j) += (fe.shape_value(i,k) * penalty * fe.shape_value(j,k)
-			      - (fe.normal_vector(k) * fe.shape_grad(i,k)) * fe.shape_value(j,k)
-			      - (fe.normal_vector(k) * fe.shape_grad(j,k)) * fe.shape_value(i,k))
-			     * fe.JxW(k);
+  for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+    for (unsigned int j=0; j<fe.dofs_per_cell; ++j)
+      {
+	local_matrix(i,j) = 10 * fe.system_to_block_index(i).first
+			    + fe.system_to_block_index(j).first;
+      }
 }
 
 
@@ -91,39 +75,67 @@ void MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim>& dinfo1,
 				 MeshWorker::IntegrationInfo<dim>& info1,
 				 MeshWorker::IntegrationInfo<dim>& info2)
 {
-  const FEValuesBase<dim>& fe1 = info1.fe_values();
-  const FEValuesBase<dim>& fe2 = info2.fe_values();
-  FullMatrix<double>& matrix_v1u1 = dinfo1.matrix(0, false).matrix;
+  const FiniteElement<dim>& fe1 = info1.fe_values().get_fe();
+  const FiniteElement<dim>& fe2 = info2.fe_values().get_fe();
   FullMatrix<double>& matrix_v1u2 = dinfo1.matrix(0, true).matrix;
   FullMatrix<double>& matrix_v2u1 = dinfo2.matrix(0, true).matrix;
-  FullMatrix<double>& matrix_v2u2 = dinfo2.matrix(0, false).matrix;
   
-  const unsigned int deg = fe1.get_fe().tensor_degree();
-  const double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
-  const double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
-  const double penalty = penalty1 + penalty2;
-  
-  for (unsigned k=0;k<fe1.n_quadrature_points;++k)
-    for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
-      for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
-	{
-	  matrix_v1u1(i,j) += (fe1.shape_value(i,k) * penalty * fe1.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe1.shape_grad(i,k)) * fe1.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe1.shape_grad(j,k)) * fe1.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	  matrix_v1u2(i,j) += (-fe1.shape_value(i,k) * penalty * fe2.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe1.shape_grad(i,k)) * fe2.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe2.shape_grad(j,k)) * fe1.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	  matrix_v2u1(i,j) += (-fe2.shape_value(i,k) * penalty * fe1.shape_value(j,k)
-			       - (fe1.normal_vector(k) * fe2.shape_grad(i,k)) * fe1.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe1.shape_grad(j,k)) * fe2.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	  matrix_v2u2(i,j) += (fe2.shape_value(i,k) * penalty * fe2.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe2.shape_grad(i,k)) * fe2.shape_value(j,k)
-			       + (fe1.normal_vector(k) * fe2.shape_grad(j,k)) * fe2.shape_value(i,k)
-	  ) * .5 * fe1.JxW(k);
-	}
+  for (unsigned int i=0; i<fe1.dofs_per_cell; ++i)
+    for (unsigned int j=0; j<fe1.dofs_per_cell; ++j)
+      {
+	matrix_v1u2(i,j) = 10 * fe1.system_to_block_index(i).first
+			    + fe2.system_to_block_index(j).first;
+	matrix_v2u1(i,j) = 10 * fe2.system_to_block_index(i).first
+			    + fe1.system_to_block_index(j).first;
+      }
+}
+
+
+template <int dim>
+void MatrixIntegrator<dim>::block_cell(
+  MeshWorker::DoFInfo<dim>& dinfo,
+  MeshWorker::IntegrationInfo<dim>&)
+{
+  for (unsigned int m=0;m<dinfo.n_matrices();++m)
+    {
+      MatrixBlock<FullMatrix<double> >& loc = dinfo.matrix(m);
+      
+      for (unsigned int i=0; i<loc.matrix.m(); ++i)
+	for (unsigned int j=0; j<loc.matrix.n(); ++j)
+	  {
+	    loc.matrix(i,j) = 10 * loc.row + loc.column;
+	  }
+    }
+}
+
+
+template <int dim>
+void MatrixIntegrator<dim>::block_face(
+  MeshWorker::DoFInfo<dim>& dinfo1,
+  MeshWorker::DoFInfo<dim>& dinfo2,
+  MeshWorker::IntegrationInfo<dim>&,
+  MeshWorker::IntegrationInfo<dim>&)
+{
+  for (unsigned int m=0;m<dinfo1.n_matrices();++m)
+    {
+      MatrixBlock<FullMatrix<double> >& loc = dinfo1.matrix(m, true);
+      
+      for (unsigned int i=0; i<loc.matrix.m(); ++i)
+	for (unsigned int j=0; j<loc.matrix.n(); ++j)
+	  {
+	    loc.matrix(i,j) = 10 * loc.row + loc.column;
+	  }
+    }
+  for (unsigned int m=0;m<dinfo2.n_matrices();++m)
+    {
+      MatrixBlock<FullMatrix<double> >& loc = dinfo2.matrix(m, true);
+      
+      for (unsigned int i=0; i<loc.matrix.m(); ++i)
+	for (unsigned int j=0; j<loc.matrix.n(); ++j)
+	  {
+	    loc.matrix(i,j) = 10 * loc.row + loc.column;
+	  }
+    }
 }
 
 
@@ -153,7 +165,7 @@ assemble(const DoFHandler<dim>& dof_handler, SparseMatrix<double>& matrix)
      dof_info,
      info_box,
      &MatrixIntegrator<dim>::cell,
-     &MatrixIntegrator<dim>::bdry,
+     0,//&MatrixIntegrator<dim>::bdry,
      &MatrixIntegrator<dim>::face,
      assembler);
 }
