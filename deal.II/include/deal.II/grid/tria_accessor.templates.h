@@ -2645,6 +2645,15 @@ CellAccessor<1,2>::subface_case(const unsigned int) const
 
 template <>
 inline
+internal::SubfaceCase<1>
+CellAccessor<1,3>::subface_case(const unsigned int) const
+{
+  return internal::SubfaceCase<1>::case_none;
+}
+
+
+template <>
+inline
 internal::SubfaceCase<2>
 CellAccessor<2>::subface_case(const unsigned int face_no) const
 {

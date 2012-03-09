@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2005 by the deal.II authors 
+//    Copyright (C) 2005, 2012 by the deal.II authors 
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -97,7 +97,8 @@ LaplaceKernelIntegration<2>::LaplaceKernelIntegration()
     static Quadrature<2> quadrature(qps, ws);
     fe_values = new FEValues<2,3>(fe,quadrature,
 				  update_values | 
-				  update_jacobians );
+				  update_jacobians |
+				  update_normal_vectors);
 }
 
 template <int dim>
@@ -117,19 +118,22 @@ LaplaceKernelIntegration<2>::compute_SD_integral_on_cell(vector<double> &dst,
     Assert(dst.size() == 2,
 	   ExcDimensionMismatch(dst.size(), 2));
     fe_values->reinit(cell);
-    vector<Tensor<2,3> > jacobians = fe_values->get_jacobians();
+    vector<DerivativeForm<1,2,3> > jacobians = fe_values->get_jacobians();
+    vector<Point<3> > normals = fe_values->get_normal_vectors();
+
     Point<3> r,a1,a2,n,r_c,n_c;
     r_c = point-cell->center();
-    n_c = jacobians[4][2];
+    n_c = normals[4];
+       
     double rn_c = r_c*n_c;
     vector<double> i_S(4);
     vector<double> i_D(4);
     for (unsigned int q_point=0; q_point < 4; ++q_point)
     {
 	r = point-cell->vertex(q_point);
-	a1 = jacobians[q_point][0];
-	a2 = jacobians[q_point][1];
-	n =  jacobians[q_point][2];
+	a1 = transpose(jacobians[q_point])[0];
+	a2 = transpose(jacobians[q_point])[1];
+	n =  normals[q_point];
 	i_S[q_point]=term_S(r,a1,a2,n,rn_c);
 	i_D[q_point]=term_D(r,a1,a2);
     }

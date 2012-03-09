@@ -377,7 +377,7 @@ namespace GridTools
 				    * by the algorithm.
 				    */
   template <int dim, template<int, int> class Container, int spacedim>
-  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<dim> >
   find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
 				 const Container<dim,spacedim> &container,
 				 const Point<spacedim>     &p);
@@ -393,7 +393,7 @@ namespace GridTools
 				    * handlers is always zero.
 				    */
   template <int dim, int spacedim>
-  std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+  std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
   find_active_cell_around_point (const hp::MappingCollection<dim,spacedim>   &mapping,
 				 const hp::DoFHandler<dim,spacedim> &container,
 				 const Point<spacedim>     &p);

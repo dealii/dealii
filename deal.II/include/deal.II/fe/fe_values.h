@@ -17,7 +17,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/base/quadrature.h>
@@ -1469,19 +1469,19 @@ class FEValuesData
 				      * Array of the Jacobian matrices at the
 				      * quadrature points.
 				      */
-    std::vector<Tensor<2,spacedim> > jacobians;
+    std::vector< DerivativeForm<1,dim,spacedim> > jacobians;
 
 				     /**
 				      * Array of the derivatives of the Jacobian
 				      * matrices at the quadrature points.
 				      */
-    std::vector<Tensor<3,spacedim> > jacobian_grads;
+    std::vector<DerivativeForm<2,dim,spacedim> >  jacobian_grads;
 
 				     /**
 				      * Array of the inverse Jacobian matrices
 				      * at the quadrature points.
 				      */
-    std::vector<Tensor<2,spacedim> > inverse_jacobians;
+    std::vector<DerivativeForm<1,spacedim,dim> > inverse_jacobians;
 
 				     /**
 				      * Array of quadrature points. This array
@@ -2720,13 +2720,13 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * quadrature point, i.e.
 				      * $J_{ij}=dx_i/d\hat x_j$
 				      */
-    const Tensor<2,spacedim> & jacobian (const unsigned int quadrature_point) const;
+    const DerivativeForm<1,dim,spacedim> & jacobian (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
 				      * the values returned by jacobian().
 				      */
-    const std::vector<Tensor<2,spacedim> > & get_jacobians () const;
+    const std::vector<DerivativeForm<1,dim,spacedim> > & get_jacobians () const;
 
     				     /**
 				      * Return the second derivative of the
@@ -2735,14 +2735,14 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * Jacobian, at the specified quadrature
 				      * point, i.e. $G_{ijk}=dJ_{jk}/d\hat x_i$.
 				      */
-    const Tensor<3,spacedim> & jacobian_grad (const unsigned int quadrature_point) const;
+    const DerivativeForm<2,dim,spacedim> & jacobian_grad (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
 				      * the values returned by
 				      * jacobian_grads().
 				      */
-    const std::vector<Tensor<3,spacedim> > & get_jacobian_grads () const;
+    const std::vector<DerivativeForm<2,dim,spacedim> > & get_jacobian_grads () const;
 
 				     /**
 				      * Return the inverse Jacobian of the
@@ -2750,14 +2750,14 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * quadrature point, i.e.
 				      * $J_{ij}=d\hat x_i/dx_j$
 				      */
-    const Tensor<2,spacedim> & inverse_jacobian (const unsigned int quadrature_point) const;
+    const DerivativeForm<1,spacedim,dim> & inverse_jacobian (const unsigned int quadrature_point) const;
 
 				     /**
 				      * Pointer to the array holding
 				      * the values returned by
 				      * inverse_jacobian().
 				      */
-    const std::vector<Tensor<2,spacedim> > & get_inverse_jacobians () const;
+    const std::vector<DerivativeForm<1,spacedim,dim> > & get_inverse_jacobians () const;
     				     /**
 				      * For a face, return the outward
 				      * normal vector to the cell at
@@ -4894,7 +4894,7 @@ FEValuesBase<dim,spacedim>::get_JxW_values () const
 
 template <int dim, int spacedim>
 inline
-const std::vector<Tensor<2,spacedim> >&
+const std::vector<DerivativeForm<1,dim,spacedim> > &
 FEValuesBase<dim,spacedim>::get_jacobians () const
 {
   Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
@@ -4905,7 +4905,7 @@ FEValuesBase<dim,spacedim>::get_jacobians () const
 
 template <int dim, int spacedim>
 inline
-const std::vector<Tensor<3,spacedim> >&
+const std::vector<DerivativeForm<2,dim,spacedim> > &
 FEValuesBase<dim,spacedim>::get_jacobian_grads () const
 {
   Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
@@ -4916,7 +4916,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_grads () const
 
 template <int dim, int spacedim>
 inline
-const std::vector<Tensor<2,spacedim> >&
+const std::vector<DerivativeForm<1,spacedim,dim> > &
 FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
 {
   Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());
@@ -4954,7 +4954,7 @@ FEValuesBase<dim,spacedim>::JxW (const unsigned int i) const
 
 template <int dim, int spacedim>
 inline
-const Tensor<2,spacedim> &
+const DerivativeForm<1,dim,spacedim> &
 FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobians, ExcAccessToUninitializedField());
@@ -4967,7 +4967,7 @@ FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
 
 template <int dim, int spacedim>
 inline
-const Tensor<3,spacedim> &
+const DerivativeForm<2,dim,spacedim> &
 FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
 {
   Assert (this->update_flags & update_jacobian_grads, ExcAccessToUninitializedField());
@@ -4980,7 +4980,7 @@ FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
 
 template <int dim, int spacedim>
 inline
-const Tensor<2,spacedim> &
+const DerivativeForm<1,spacedim,dim> &
 FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
 {
   Assert (this->update_flags & update_inverse_jacobians, ExcAccessToUninitializedField());

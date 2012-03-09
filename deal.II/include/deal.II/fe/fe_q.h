@@ -606,7 +606,12 @@ template <>
 std::vector<unsigned int>
 FE_Q<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
+template <>
+void FE_Q<1,3>::initialize_unit_face_support_points ();
 
+template <>
+std::vector<unsigned int>
+FE_Q<1,3>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
 DEAL_II_NAMESPACE_CLOSE
 

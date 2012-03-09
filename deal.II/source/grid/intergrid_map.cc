@@ -47,9 +47,9 @@ namespace
 
 
 // specialization for grid==tria
-  template <int dim>
+  template <int dim, int spacedim>
   unsigned int
-  get_n_levels (const Triangulation<dim> &grid)
+  get_n_levels (const Triangulation<dim, spacedim> &grid)
   {
 				     // if GridClass==Triangulation, then
 				     // we can ask directly.

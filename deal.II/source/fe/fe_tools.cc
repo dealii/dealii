@@ -659,8 +659,18 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
+  
+  template<>
+  void
+  compute_embedding_matrices(const FiniteElement<1,3> &,
+			     std::vector<std::vector<FullMatrix<double> > > &,
+			     const bool)
+  {
+    Assert(false, ExcNotImplemented());
+  }
 
 
+  
   template<>
   void
   compute_embedding_matrices(const FiniteElement<2,3>&,
@@ -1071,7 +1081,14 @@ namespace FETools
     Assert(false, ExcNotImplemented());
   }
 
-
+  
+  template <>
+  void
+  compute_projection_matrices(const FiniteElement<1,3>&,
+			      std::vector<std::vector<FullMatrix<double> > >&, bool)
+  {
+    Assert(false, ExcNotImplemented());
+  }
 
   template <>
   void

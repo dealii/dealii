@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -643,6 +643,17 @@ get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
 				 std::vector<Point<2> > &) const;
 
 
+
+template <>
+Point<3>
+Boundary<1,3>::
+get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const;
+
+template <>
+void
+Boundary<1,3>::
+get_intermediate_points_on_face (const Triangulation<1,3>::face_iterator &,
+				 std::vector<Point<3> > &) const;
 template <>
 void
 StraightBoundary<1,1>::
@@ -675,6 +686,13 @@ void
 StraightBoundary<3,3>::
 get_intermediate_points_on_quad (const Triangulation<3,3>::quad_iterator &quad,
 				 std::vector<Point<3> > &points) const;
+
+template <>
+Point<3>
+StraightBoundary<1,3>::
+project_to_surface (const Triangulation<1, 3>::quad_iterator &quad,
+		    const Point<3>  &y) const;
+
 
 #endif // DOXYGEN
 

@@ -45,7 +45,14 @@ used for boundary indicators.
 <a name="general"></a>
 <h3>General</h3>
 
+
 <ol>
+<li>
+New: Added support for codimension 2, i.e. for dim-dimensional objects
+embedded into spacedim=dim+2 dimensional space.
+<br>
+(Sebastian Pauletti, 2012/03/02)
+
 <li> Changed: Material and Boundary indicators have been both of the
 type unsigned char. Throughout the library, we changed their datatype
 to <code>types::material_id_t</code>
@@ -59,7 +66,7 @@ static_cast<material_id_t>(-1)</code>). With this change, it is now
 much easier to extend the range of boundary or material ids, if
 needed.
 <br>
-(Wolfgang Bangerth, Christian Goll 2012/02/27)
+(Christian Goll 2012/02/27)
 
 <li> New: Functions like FEValues::get_function_values have long been
 able to extract values from pretty much any vector kind given to it (e.g.
@@ -145,6 +152,28 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Changed:
+A new method to determine an initial guess for the Newton method was coded
+in MappingQ::transform_real_to_unit_cell.
+The code in transform_real_to_unit_cell was cleaned a little bit and a new code
+for the @<2,3@> case was added.
+<br>
+(Sebastian Pauletti, 2012/03/02)
+
+<li> Changed:
+In the context of codim@>0, Mapping::transform would require different inputs
+depending on the mapping type.
+For mapping_covariant, mapping_contravariant the input is DerivativeForm<1, dim, spacedim>
+but for mapping_covariant_gradient,  mapping_contravariant_gradient the input is Tensor<2,dim>.
+<br>
+(Sebastian Pauletti,  2012/03/02)
+
+<li> New:
+A new class DerivativeForm was added.
+This class is supposed to represent the derivatives of a mapping.
+<br>
+(Sebastian Pauletti, 2012/03/02)
+
 <li> Fixed: TrilinosWrappers::Vector::all_zero() in parallel.
 <br>
 (Timo Heister, J&ouml;rg Frohne, 2012/03/06)

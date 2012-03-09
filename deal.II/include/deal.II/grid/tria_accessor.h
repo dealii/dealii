@@ -2831,9 +2831,13 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * may be different as to whether
 				      * a point is in- or outside the
 				      * cell in real space.
+
+				      In case of codim>0, the point is first projected
+				      to the manifold where the cell is embedded and
+				      then check if this projection is inside the cell. 
+				      
 				      */
     bool point_inside (const Point<spacedim> &p) const;
-
 
 				     /**
 				      *  Set the neighbor @p i of
@@ -2904,6 +2908,17 @@ class CellAccessor :  public TriaAccessor<dim,dim,spacedim>
 				      * neighbors.
 				      */
     unsigned int neighbor_of_neighbor_internal (const unsigned int neighbor) const;
+
+				     /**
+					As for any codim>0 we can use a similar code
+					and c++ does not allow partial templates.
+					we use this auxiliary function that is then
+					called from point_inside.
+				     */
+    template<int dim_,int spacedim_ >
+    bool point_inside_codim(const Point<spacedim_> &p) const;
+    
+    
 
   private:
 				     /**
@@ -3023,11 +3038,12 @@ CellAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
 
 #ifndef DOXYGEN
 
-template <> bool CellAccessor<1,1>::point_inside (const Point<1> &p) const;
-template <> bool CellAccessor<2,2>::point_inside (const Point<2> &p) const;
+template <> bool CellAccessor<1,1>::point_inside (const Point<1> &) const;
+template <> bool CellAccessor<2,2>::point_inside (const Point<2> &) const;
 template <> bool CellAccessor<3,3>::point_inside (const Point<3> &) const;
-template <> bool CellAccessor<1,2>::point_inside (const Point<2> &p) const;
-template <> bool CellAccessor<2,3>::point_inside (const Point<3> &p) const;
+template <> bool CellAccessor<1,2>::point_inside (const Point<2> &) const;
+template <> bool CellAccessor<1,3>::point_inside (const Point<3> &) const;
+template <> bool CellAccessor<2,3>::point_inside (const Point<3> &) const;
 // -------------------------------------------------------------------
 
 #endif // DOXYGEN

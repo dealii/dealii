@@ -41,8 +41,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 2001, Wolfgang Bangerth, 2007
  */
-template <int dim>
-class CylinderBoundary : public StraightBoundary<dim>
+template <int dim, int spacedim = dim>
+class CylinderBoundary : public StraightBoundary<dim,spacedim>
 {
   public:
 				     /**
@@ -70,24 +70,24 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * point on the axis.
 				      */
     CylinderBoundary (const double       radius,
-		      const Point<dim>   direction,
-		      const Point<dim>   point_on_axis);
+		      const Point<spacedim>   direction,
+		      const Point<spacedim>   point_on_axis);
 
 				     /**
 				      * Refer to the general documentation of
 				      * this class and the documentation of the
 				      * base class.
 				      */
-    virtual Point<dim>
-    get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const;
+    virtual Point<spacedim>
+    get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const;
 
 				     /**
 				      * Refer to the general documentation of
 				      * this class and the documentation of the
 				      * base class.
 				      */
-    virtual Point<dim>
-    get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const;
+    virtual Point<spacedim>
+    get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
 				     /**
 				      * Refer to the general
@@ -99,8 +99,8 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * @p get_intermediate_points_between_points.
 				      */
     virtual void
-    get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Refer to the general
@@ -112,8 +112,8 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * and for <tt>points.size()==1</tt>.
 				      */
     virtual void
-    get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterator &quad,
-				     std::vector<Point<dim> > &points) const;
+    get_intermediate_points_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
+				     std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Compute the normals to the
@@ -126,8 +126,8 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * base class.
 				      */
     virtual void
-    get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			     typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
+    get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
+			     typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const;
 
 				     /**
 				      * Return the radius of the cylinder.
@@ -152,12 +152,12 @@ class CylinderBoundary : public StraightBoundary<dim>
 				     /**
 				      * The direction vector of the axis.
 				      */
-    const Point<dim> direction;
+    const Point<spacedim> direction;
 
 				     /**
 				      * An arbitrary point on the axis.
 				      */
-    const Point<dim> point_on_axis;
+    const Point<spacedim> point_on_axis;
 
   private:
 
@@ -173,15 +173,15 @@ class CylinderBoundary : public StraightBoundary<dim>
 				      * in the documentation of the
 				      * base class.
 				      */
-    void get_intermediate_points_between_points (const Point<dim> &p0, const Point<dim> &p1,
-						 std::vector<Point<dim> > &points) const;
+    void get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
+						 std::vector<Point<spacedim> > &points) const;
 
 				     /**
 				      * Given a number for the axis,
 				      * return a vector that denotes
 				      * this direction.
 				      */
-    static Point<dim> get_axis_vector (const unsigned int axis);
+    static Point<spacedim> get_axis_vector (const unsigned int axis);
 };
 
 

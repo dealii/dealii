@@ -1236,6 +1236,16 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<1,2> &) const
   return 0;
 }
 
+unsigned int GridOut::n_boundary_faces (const Triangulation<1,3> &) const
+{
+  return 0;
+}
+
+unsigned int GridOut::n_boundary_lines (const Triangulation<1,3> &) const
+{
+  return 0;
+}
+
 unsigned int GridOut::n_boundary_lines (const Triangulation<2> &) const
 {
   return 0;
@@ -1298,6 +1308,13 @@ void GridOut::write_msh_faces (const Triangulation<1,2> &,
   return;
 }
 
+void GridOut::write_msh_faces (const Triangulation<1,3> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
 
 void GridOut::write_msh_lines (const Triangulation<1> &,
 			       const unsigned int,
@@ -1307,6 +1324,14 @@ void GridOut::write_msh_lines (const Triangulation<1> &,
 }
 
 void GridOut::write_msh_lines (const Triangulation<1,2> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+
+void GridOut::write_msh_lines (const Triangulation<1,3> &,
 			       const unsigned int,
 			       std::ostream &) const
 {
@@ -1412,6 +1437,13 @@ void GridOut::write_ucd_faces (const Triangulation<1,2> &,
   return;
 }
 
+void GridOut::write_ucd_faces (const Triangulation<1,3> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
 void GridOut::write_ucd_lines (const Triangulation<1> &,
 			       const unsigned int,
 			       std::ostream &) const
@@ -1420,6 +1452,14 @@ void GridOut::write_ucd_lines (const Triangulation<1> &,
 }
 
 void GridOut::write_ucd_lines (const Triangulation<1,2> &,
+			       const unsigned int,
+			       std::ostream &) const
+{
+  return;
+}
+
+
+void GridOut::write_ucd_lines (const Triangulation<1,3> &,
 			       const unsigned int,
 			       std::ostream &) const
 {

@@ -927,6 +927,54 @@ FiniteElement<dim,spacedim>::memory_consumption () const
 }
 
 
+
+template<>
+void
+FiniteElement<1,2>::compute_2nd (
+  const Mapping<1,2>                   &,
+  const Triangulation<1,2>::cell_iterator &,
+  const unsigned int,
+  Mapping<1,2>::InternalDataBase &,
+  InternalDataBase                     &,
+  FEValuesData<1,2>                    &) const
+{
+
+	Assert(false, ExcNotImplemented());
+}
+
+
+template<>
+void
+FiniteElement<1,3>::compute_2nd (
+  const Mapping<1,3>                   &,
+  const Triangulation<1,3>::cell_iterator &,
+  const unsigned int,
+  Mapping<1,3>::InternalDataBase &,
+  InternalDataBase                     &,
+  FEValuesData<1,3>                    &) const
+{
+
+	Assert(false, ExcNotImplemented());
+}
+
+
+
+template<>
+void
+FiniteElement<2,3>::compute_2nd (
+  const Mapping<2,3>                   &,
+  const Triangulation<2,3>::cell_iterator &,
+  const unsigned int,
+  Mapping<2,3>::InternalDataBase &,
+  InternalDataBase                     &,
+  FEValuesData<2,3>                    &) const
+{
+
+	Assert(false, ExcNotImplemented());
+}
+
+
+
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::compute_2nd (

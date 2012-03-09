@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,7 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/tensor.h>
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -47,28 +47,21 @@ template <int dim, int spacedim> class FESubfaceValues;
                                       * the transform() functions of
                                       * inheriting classes in order to
                                       * work.
-				      *
-				      * Mappings are usually defined
-				      * for vectors. If such a
-				      * MappingType is applied to a
-				      * rank 2 tensor, it is implied
-				      * that the mapping is applied to
-				      * each column.
-                                      */
+				      */
 enum MappingType
 {
 /// No mapping
       mapping_none = 0x0000,
-/// Covariant mapping
+/// Covariant mapping (see Mapping::transform() for details)
       mapping_covariant = 0x0001,
-/// Contravariant mapping
+/// Contravariant mapping (see Mapping::transform() for details)
       mapping_contravariant = 0x0002,
-/// Mapping of the gradient of a covariant vector field
+/// Mapping of the gradient of a covariant vector field (see Mapping::transform() for details)
       mapping_covariant_gradient = 0x0003,
-/// Mapping of the gradient of a contravariant vector field
+/// Mapping of the gradient of a contravariant vector field (see Mapping::transform() for details)
       mapping_contravariant_gradient = 0x0004,
-/// The Piola transform usually used for Hdiv elements
 				       /**
+					* The Piola transform usually used for Hdiv elements.
 					* Piola transform is the
 					* standard transformation of
 					* vector valued elements in
@@ -77,15 +70,16 @@ enum MappingType
 					* transformation scaled by the
 					* inverse of the volume
 					* element.
-					*
-					* If applied to a rank 2
-					* tensor, the mapping class
-					* will apply the correct
-					* transformation for the
-					* gradient of such a vector
-					* field.
 					*/
       mapping_piola = 0x0100,
+				       /**
+					  transformation for the gradient of
+					  for a vector field
+					  correspoing to a mapping_piola
+					  transformation (see Mapping::transform() for details).
+				       */
+      
+      mapping_piola_gradient = 0x0101, 
 /// The mapping used for Nedelec elements
 				       /**
 					* curl-conforming elements are
@@ -94,16 +88,13 @@ enum MappingType
 					* introduce a separate mapping
 					* type, such that we can use
 					* the same flag for the vector
-					* and its gradient (the
-					* transformation of the
-					* gradient differs from the
-					* one used by #mapping_covariant).
+					* and its gradient (see Mapping::transform() for details).
 					*/
       mapping_nedelec = 0x0200,
 /// The mapping used for Raviart-Thomas elements
-      mapping_raviart_thomas = mapping_piola,
+      mapping_raviart_thomas = 0x0300,
 /// The mapping used for BDM elements
-      mapping_bdm = mapping_piola
+      mapping_bdm = mapping_raviart_thomas
 };
 
 
@@ -128,10 +119,11 @@ enum MappingType
  *
  * The mapping is a transformation $\mathbf x = \Phi(\mathbf{\hat x})$
  * which maps the reference cell [0,1]<sup>dim</sup> to the actual
- * grid cell. In order to describe the application of the mapping to
+ * grid cell in R<sup>spacedim</sup>.
+ * In order to describe the application of the mapping to
  * different objects, we introduce the notation for the Jacobian
  * $J(\mathbf{\hat x}) = \nabla\Phi(\mathbf{\hat x})$. For instance,
- * in two dimensions, we have
+ * if dim=spacedim=2, we have
  * @f[
  * J(\mathbf{\hat x}) = \begin{matrix}
  * \frac{\partial x}{\partial \hat x} & \frac{\partial x}{\partial \hat y}
@@ -175,9 +167,10 @@ enum MappingType
  *
  * @todo Add documentation on the codimension-one case
  *
- * <h4>Mapping of vector fields and tensor fields</h4>
+ * <h4>Mapping of vector fields, differential forms and gradients of vector fields</h4>
  *
- * Mappings of a vector field <b>v</b> and a tensor field <b>T</b>
+ * The tranfomation of vector fields, differential forms (gradients/jacobians) and
+ * gradients of vector fields between the reference cell and the actual grid cell
  * follows the general form
  *
  * @f[
@@ -187,9 +180,12 @@ enum MappingType
  * \mathbf T(\mathbf x) = \mathbf A(\mathbf{\hat x})
  * \mathbf{\hat T}(\mathbf{\hat x}) \mathbf B(\mathbf{\hat x}),
  * @f]
- * respectively, where the tensors <b>A</b> and <b>B</b> are
+ *
+ * where <b>v</b> is a vector field or a differential form and
+ * and <b>T</b> a tensor field of gradients.
+ * The differential forms <b>A</b> and <b>B</b> are
  * determined by the MappingType enumerator.
- * These transformations are performed through the two functions
+ * These transformations are performed through the functions
  * transform(). See the documentation there for possible
  * choices.
  *
@@ -429,7 +425,7 @@ class Mapping : public Subscriptor
     };
 
 /**
- * Transform a field of vectors or forms according to the selected
+ * Transform a field of vectors or 1-differential forms according to the selected
  * MappingType.
  *
  * @note Normally, this function is called by a finite element,
@@ -439,100 +435,147 @@ class Mapping : public Subscriptor
  *
  * The mapping types currently implemented by derived classes are:
  * <ul>
- * <li>
- * A vector field on the reference cell is mapped to the physical cell
- * by the Jacobian:
+ * <li> #mapping_contravariant: maps a vector field on the reference cell
+ * is to the physical cell through the Jacobian:
  * @f[
- * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat
- * u}(\mathbf{\hat x}).
+ * \mathbf u(\mathbf x) = J(\mathbf{\hat x})\mathbf{\hat u}(\mathbf{\hat x}).
  * @f]
  * In physics, this is usually refered to as the contravariant
- * transformation, and here it is triggered by the MappingType
- * #mapping_contravariant. Mathematically, it is the push forward of a
+ * transformation. Mathematically, it is the push forward of a
  * vector field.
  *
- * <li> A field of one-forms on the reference cell is usually
- * represented as a vector field as well, but is transformed by the
- * pull back, which is selected by #mapping_covariant:
+ * <li> #mapping_covariant: maps a field of one-forms on the reference cell
+ * to a field of one-forms on the physical cell.
+ * (theoretically this would refer to a DerivativeForm<1, dim, 1> but it
+ * canonically identified with a Tensor<1,dim>).
+ * Mathematically, it is the pull back of the differential form
+ * @f[
+ * \mathbf u(\mathbf x) = J*(J^{T} J)^{-1}(\mathbf{\hat x})\mathbf{\hat
+ * u}(\mathbf{\hat x}).
+ * @f]
+ In the case when dim=spacedim the previous formula reduces to
  * @f[
  * \mathbf u(\mathbf x) = J^{-T}(\mathbf{\hat x})\mathbf{\hat
  * u}(\mathbf{\hat x}).
  * @f]
- * Gradients of differentiable functions are transformed this way.
+ * Gradients of scalar differentiable functions are transformed this way.
  *
- * <li> A field of <i>n-1</i>-forms on the reference cell is also
+ * <li> #mapping_piola: A field of <i>n-1</i>-forms on the reference cell is also
  * represented by a vector field, but again transforms differently,
- * namely by the Piola transform (#mapping_piola)
+ * namely by the Piola transform 
  * @f[
  *  \mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
  * J(\mathbf x) \mathbf{\hat u}(\mathbf x).
  * @f]
- *
+ * @todo What is n in mapping_piola description?
  * </ul>
  *
  */
     virtual
     void
     transform (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
-               VectorSlice<std::vector<Tensor<1,spacedim> > >             output,
+               VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
                const InternalDataBase &internal,
                const MappingType type) const = 0;
 
 
+    
 /**
- * Transform a field of rank two tensors according to the selected
- * MappingType.
- *
- * @note Normally, this function is called by a finite element,
- * filling FEValues objects. For this finite element, there should be
- * an alias MappingType like #mapping_bdm, #mapping_nedelec, etc. This
- * alias should be preferred to using the types below.
- *
- * This function is most of the time applied to gradients of a
- * Tensor<1,dim> object, thus in the formulas below, it is useful to
- * think of $\mathbf{T} = \nabla \mathbf u$ and $\mathbf{\hat T} =
- * \hat\nabla \mathbf{\hat u}$.
- *
- * @todo The formulas for #mapping_covariant_gradient and
- * #mapping_contravariant_gradient have been reverse engineered from
- * MappingQ1. They should be verified for consistency with
- * mathematics. The description of the Piola transform is from Hoppe's
- * lecture notes and the implementation should be verified.
- *
- * The mapping types currently implemented by derived classes are:
- * <ul>
- * <li> #mapping_contravariant_gradient, which is the consistent gradient
- * for a vector field mapped with #mapping_contravariant, namely
- * @f[
- *  \mathbf T(\mathbf x) =
- * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
- * J^{-T}(\mathbf{\hat x}).
- * @f]
- *
- * <li> Correspondingly, #mapping_covariant_gradient is the consistent
- * gradient of a one-form, namely,
- * @f[
- *  \mathbf T(\mathbf x) =
- * J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
- * J^{-T}(\mathbf{\hat x}).
- * @f]
- *
- * <li> The gradients of <i>n-1</i>-forms mapped by the Piola
- * transform are mapped by #mapping_piola, and the formul is
- * @f[
- *  \mathbf T(\mathbf x) =
- * \frac{1}{\text{det}J(\mathbf x)}
- * J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
- * J^{-1}(\mathbf{\hat x}).
- * @f]
- * </ul>
- */
+   Transform a field of differential forms from the reference cell to the physical cell.
+
+   It is useful to think of $\mathbf{T} = D \mathbf u$ and
+   $\mathbf{\hat T} = \hat D \mathbf{\hat u}$, with $\mathbf u$ a vector field.
+
+   The mapping types currently implemented by derived classes are:
+   <ul>
+   <li> #mapping_covariant: maps a field of forms on the reference cell
+   to a field of forms on the physical cell.
+   Mathematically, it is the pull back of the differential form
+   @f[
+   \mathbf T(\mathbf x) = \mathbf{\hat T}(\mathbf{\hat x})
+                          J*(J^{T} J)^{-1}(\mathbf{\hat x}).
+   @f]
+   n the case when dim=spacedim the previous formula reduces to
+   @f[
+   \mathbf T(\mathbf x) = \mathbf{\hat u}(\mathbf{\hat x})
+                          J^{-1}(\mathbf{\hat x}).
+   @f]
+  Jacobians of spacedim-vector valued differentiable functions are transformed this way.
+   </ul>
+
+   @note It would have been more reasonable to make this transform a template function
+   with the rank in DerivativeForm<1, dim, rank>. Unfortunately C++ does not
+   allow templatized virtual functions. This is why we identified
+   DerivativeForm<1, dim, 1> with a Tensor<1,dim> when using  mapping_covariant
+   in the function transform above this one.
+*/
+    
     virtual
     void
-    transform (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+    transform (const VectorSlice<const std::vector< DerivativeForm<1, dim, spacedim> > > input,
                VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
                const InternalDataBase &internal,
                const MappingType type) const = 0;
+
+    
+    
+/**
+   Transform a tensor field from the reference cell to the physical cell.
+   This tensors are most of times the jacobians in the reference cell of
+   vector fields that have been pulled back from the physical cell.
+
+   The mapping types currently implemented by derived classes are:
+   <ul>
+
+   <li> #mapping_contravariant_gradient, it
+   assumes $\mathbf u(\mathbf x) = J \mathbf{\hat u}$ so that
+   @f[
+   \mathbf T(\mathbf x) =
+   J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+   J^{-1}(\mathbf{\hat x}).
+   @f]
+
+   <li> #mapping_covariant_gradient, it
+   assumes $\mathbf u(\mathbf x) = J^{-T} \mathbf{\hat u}$ so that
+   @f[
+   \mathbf T(\mathbf x) =
+   J^{-T}(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+   J^{-1}(\mathbf{\hat x}).
+   @f]
+   
+   <li> #mapping_piola_gradient, it
+   assumes $\mathbf u(\mathbf x) = \frac{1}{\text{det}J(\mathbf x)}
+   J(\mathbf x) \mathbf{\hat u}(\mathbf x)$
+   so that
+   @f[
+   \mathbf T(\mathbf x) =
+   \frac{1}{\text{det}J(\mathbf x)}
+   J(\mathbf{\hat x}) \mathbf{\hat T}(\mathbf{\hat x})
+   J^{-1}(\mathbf{\hat x}).
+   @f]
+   </ul>
+ 
+   @todo The formulas for #mapping_covariant_gradient,
+   #mapping_contravariant_gradient and #mapping_piola_gradient
+   are only true as stated for linear mappings,
+   if the mapping is bilinear for example then there is a missing
+   term associated with the derivative of of J.
+   
+*/
+    virtual
+    void
+    transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
+               VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+               const InternalDataBase &internal,
+               const MappingType type) const = 0;
+
+
+
+
+
+
+
+
 
 				     /**
 				      * @deprecated Use transform() instead.
@@ -547,7 +590,7 @@ class Mapping : public Subscriptor
 				      * @deprecated Use transform() instead.
                                       */
     void
-    transform_covariant (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+    transform_covariant (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> > > input,
                          const unsigned int                 offset,
 			 VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
 			 const InternalDataBase &internal) const;
@@ -566,7 +609,7 @@ class Mapping : public Subscriptor
                                       */
 
     void
-    transform_contravariant (const VectorSlice<const std::vector<Tensor<2,dim> > > intput,
+    transform_contravariant (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
                              const unsigned int                 offset,
 			     const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
 			     const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
@@ -739,9 +782,9 @@ class Mapping : public Subscriptor
 		    InternalDataBase                                          &internal,
 		    std::vector<Point<spacedim> >                             &quadrature_points,
 		    std::vector<double>                                       &JxW_values,
-		    std::vector<Tensor<2,spacedim> >                          &jacobians,
-		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+		    std::vector<DerivativeForm<1,dim,spacedim>  >       &jacobians,
+		    std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
+		    std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
 		    std::vector<Point<spacedim> >                             &cell_normal_vectors,
 		    CellSimilarity::Similarity                           &cell_similarity
 	           ) const=0;

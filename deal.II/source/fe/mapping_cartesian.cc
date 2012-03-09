@@ -316,10 +316,10 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
 	        typename Mapping<dim,spacedim>::InternalDataBase& mapping_data,
                 std::vector<Point<spacedim> >& quadrature_points,
                 std::vector<double>& JxW_values,
-		std::vector<Tensor<2,spacedim> >& jacobians,
-		std::vector<Tensor<3,spacedim> >& jacobian_grads,
-		std::vector<Tensor<2,spacedim> >& inverse_jacobians,
-	        std::vector<Point<spacedim> >       &,
+		std::vector< DerivativeForm<1,dim,spacedim> > & jacobians,
+		std::vector<DerivativeForm<2,dim,spacedim> >      &jacobian_grads,
+		std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
+		std::vector<Point<spacedim> >       &,
 		CellSimilarity::Similarity& cell_similarity) const
 {
 				   // convert data object to internal
@@ -358,7 +358,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<jacobians.size();++i)
 	{
-	  jacobians[i]=Tensor<2,dim>();
+	  jacobians[i] =  DerivativeForm<1,dim,spacedim>();
 	  for (unsigned int j=0; j<dim; ++j)
 	    jacobians[i][j][j]=data.length[j];
 	}
@@ -368,7 +368,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator& cell,
   if (data.current_update_flags() & update_jacobian_grads)
     if (cell_similarity != CellSimilarity::translation)
       for (unsigned int i=0; i<jacobian_grads.size();++i)
-	jacobian_grads[i]=Tensor<3,dim>();
+	jacobian_grads[i]=DerivativeForm<2,dim,spacedim>();
 				   // "compute" inverse Jacobian at the
 				   // quadrature points, which are all
 				   // the same
@@ -578,6 +578,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
 
 
 
+
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::transform (
@@ -636,7 +637,7 @@ MappingCartesian<dim,spacedim>::transform (
 template<int dim, int spacedim>
 void
 MappingCartesian<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
@@ -716,6 +717,45 @@ MappingCartesian<dim,spacedim>::transform (
     }
 }
 
+
+
+
+template<int dim, int spacedim>
+void
+MappingCartesian<dim,spacedim>::transform (
+  const VectorSlice<const std::vector<Tensor<2, dim> > >    input,
+  VectorSlice<std::vector<Tensor<2, spacedim> > > output,
+  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const MappingType mapping_type) const
+{
+
+  AssertDimension (input.size(), output.size());
+  Assert (dynamic_cast<const InternalData *>(&mapping_data) != 0,
+	  ExcInternalError());
+  const InternalData &data = static_cast<const InternalData&>(mapping_data);
+
+  switch (mapping_type)
+    {
+  case mapping_piola_gradient:
+      {
+	Assert (data.update_flags & update_contravariant_transformation,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+	Assert (data.update_flags & update_volume_elements,
+		typename FEValuesBase<dim>::ExcAccessToUninitializedField());
+
+	for (unsigned int i=0; i<output.size(); ++i)
+	  for (unsigned int d1=0;d1<dim;++d1)
+	    for (unsigned int d2=0;d2<dim;++d2)
+	      output[i][d1][d2] = input[i][d1][d2] * data.length[d2]
+				  / data.length[d1] / data.volume_element;
+	return;
+      }
+
+      default:
+	    Assert(false, ExcNotImplemented());
+    }
+
+}
 
 
 template <int dim, int spacedim>

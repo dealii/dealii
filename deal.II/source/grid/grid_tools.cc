@@ -779,7 +779,7 @@ namespace GridTools
 
 
   template <int dim, template <int, int> class Container, int spacedim>
-  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+  std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<dim> >
   find_active_cell_around_point (const Mapping<dim,spacedim>   &mapping,
 				 const Container<dim,spacedim> &container,
 				 const Point<spacedim>     &p)
@@ -792,7 +792,7 @@ namespace GridTools
 				     // max. deviation of 1e-10
     double best_distance = 1e-10;
     int    best_level = -1;
-    std::pair<cell_iterator, Point<spacedim> > best_cell;
+    std::pair<cell_iterator, Point<dim> > best_cell;
 
 				     // Find closest vertex and determine
 				     // all adjacent cells
@@ -807,27 +807,35 @@ namespace GridTools
 
     for(; cell != endc; ++cell)
       {
-	const Point<spacedim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
-
-					 // calculate the infinity norm of
-					 // the distance vector to the unit cell.
-	const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
-
-					 // We compare if the point is inside the
-					 // unit cell (or at least not too far
-					 // outside). If it is, it is also checked
-					 // that the cell has a more refined state
-	if (dist < best_distance ||
-	    (dist == best_distance && (*cell)->level() > best_level))
+	try
 	  {
-	    best_distance = dist;
-	    best_level    = (*cell)->level();
-	    best_cell     = std::make_pair(*cell, p_cell);
+	    const Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+
+					     // calculate the infinity norm of
+					     // the distance vector to the unit cell.
+	    const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+					     // We compare if the point is inside the
+					     // unit cell (or at least not too far
+					     // outside). If it is, it is also checked
+					     // that the cell has a more refined state
+	    if (dist < best_distance ||
+		(dist == best_distance && (*cell)->level() > best_level))
+	      {
+		best_distance = dist;
+		best_level    = (*cell)->level();
+		best_cell     = std::make_pair(*cell, p_cell);
+	      }
 	  }
+	catch (typename MappingQ1<dim,spacedim>::ExcTransformationFailed &)
+	  {
+//TODO: Maybe say something
+	  }
+
       }
 
     Assert (best_cell.first.state() == IteratorState::valid,
-	    ExcPointNotFound<dim>(p));
+	    ExcPointNotFound<spacedim>(p));
 
     return best_cell;
   }
@@ -835,7 +843,7 @@ namespace GridTools
 
 
   template <int dim, int spacedim>
-  std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<spacedim> >
+  std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
   find_active_cell_around_point (const hp::MappingCollection<dim,spacedim>   &mapping,
 				 const hp::DoFHandler<dim,spacedim> &container,
 				 const Point<spacedim>     &p)
@@ -848,7 +856,7 @@ namespace GridTools
 
     typedef typename hp::DoFHandler<dim,spacedim>::active_cell_iterator cell_iterator;
 
-    std::pair<cell_iterator, Point<spacedim> > best_cell;
+    std::pair<cell_iterator, Point<dim> > best_cell;
 				     //If we have only one element in the MappingCollection,
 				     //we use find_active_cell_around_point using only one
 				     //mapping.
@@ -879,7 +887,7 @@ namespace GridTools
 
         for(; cell != endc; ++cell)
           {
-	    const Point<spacedim> p_cell
+	    const Point<dim> p_cell
 	      = mapping[(*cell)->active_fe_index()].transform_real_to_unit_cell(*cell, p);
 
 					     // calculate the infinity norm of
@@ -900,7 +908,7 @@ namespace GridTools
 	  }
 
 	Assert (best_cell.first.state() == IteratorState::valid,
-		ExcPointNotFound<dim>(p));
+		ExcPointNotFound<spacedim>(p));
       }
     return best_cell;
   }
@@ -1771,6 +1779,17 @@ namespace GridTools
       }
 
 
+
+      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
+			 dealii::internal::int2type<1>,
+			 dealii::internal::int2type<1>)
+      {
+					 // nothing to do for the faces of
+					 // cells in 1d
+      }
+
+      
+      
 				       // possibly fix up the faces of
 				       // a cell by moving around its
 				       // mid-points
@@ -1830,25 +1849,11 @@ namespace GridTools
       }
 
 
-      template <int spacedim>
-      void fix_up_faces (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
-			 dealii::internal::int2type<1>,
-			 dealii::internal::int2type<spacedim>)
-      {
-					 // nothing to do for the faces of
-					 // cells in 1d
-      }
-
-
-      void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
-			 dealii::internal::int2type<1>,
-			 dealii::internal::int2type<1>)
-      {
-					 // nothing to do for the faces of
-					 // cells in 1d
-      }
+      
+      
     }
   }
+
 
 
 

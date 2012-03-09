@@ -1338,7 +1338,12 @@ class GridOut
     void write_msh_faces (const Triangulation<1,2> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
+    void write_msh_faces (const Triangulation<1,3> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
 
+
+    
 				     /**
 				      * Write the grid information about
 				      * lines to @p out. Only those lines
@@ -1388,6 +1393,9 @@ class GridOut
 				      * nothing.
 				      */
     void write_msh_lines (const Triangulation<1,2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+    void write_msh_lines (const Triangulation<1,3> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
 				     /**
@@ -1455,6 +1463,9 @@ class GridOut
     void write_ucd_faces (const Triangulation<1,2> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
+    void write_ucd_faces (const Triangulation<1,3> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
 
 
 				     /**
@@ -1503,6 +1514,9 @@ class GridOut
 				      * nothing.
 				      */
     void write_ucd_lines (const Triangulation<1,2> &tria,
+			  const unsigned int      starting_index,
+			  std::ostream           &out) const;
+     void write_ucd_lines (const Triangulation<1,3> &tria,
 			  const unsigned int      starting_index,
 			  std::ostream           &out) const;
 
@@ -1558,7 +1572,7 @@ class GridOut
 				      * 1d, 2sd. Simply returns zero.
 				      */
     unsigned int n_boundary_faces (const Triangulation<1,2> &tria) const;
-
+    unsigned int n_boundary_faces (const Triangulation<1,3> &tria) const;
 				     /**
 				      * Return the number of lines in the
 				      * triangulation which have a boundary
@@ -1594,6 +1608,7 @@ class GridOut
 				      * 1d, 2sd. Simply returns zero.
 				      */
     unsigned int n_boundary_lines (const Triangulation<1,2> &tria) const;
+    unsigned int n_boundary_lines (const Triangulation<1,3> &tria) const;
 
 				     /**
 				      * Declaration of the specialization

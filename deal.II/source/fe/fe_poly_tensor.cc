@@ -11,6 +11,7 @@
 //
 //---------------------------------------------------------------------------
 
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
@@ -388,7 +389,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 				   // concept cannot be used because of
 				   // possible sign changes from one cell to
 				   // the next.
-  if (mapping_type == mapping_piola)
+  if ( (mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas) )
     if (cell_similarity == CellSimilarity::translation)
       cell_similarity = CellSimilarity::none;
 
@@ -420,6 +421,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
 	      break;
 	    }
+					     
+	  case mapping_raviart_thomas:
 	  case mapping_piola:
 	    {
 	      std::vector<Tensor<1,dim> > shape_values (n_q_points);
@@ -451,8 +454,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
       if (flags & update_gradients && cell_similarity != CellSimilarity::translation)
 	{
-	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
-	  std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
+	  std::vector<Tensor<2, spacedim > > shape_grads1 (n_q_points);
+					   //std::vector<DerivativeForm<1,dim,spacedim> > shape_grads2 (n_q_points);
 
 	  switch (mapping_type)
 	    {
@@ -483,14 +486,21 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
-		    data.shape_gradients[first+d][k] = shape_grads2[k][d];
+		    data.shape_gradients[first+d][k] = shape_grads1[k][d];
 
 		break;
 	      }
-	      case mapping_piola:
+	      case mapping_raviart_thomas:
+	      case mapping_piola_gradient:
 	      {
-		mapping.transform(fe_data.shape_grads[i], shape_grads1,
-				  mapping_data, mapping_piola);
+
+		
+		std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+		for (unsigned int k=0; k<input.size(); ++k)
+		  input[k] = fe_data.shape_grads[i][k];
+				
+		mapping.transform(input, shape_grads1,
+				  mapping_data, mapping_piola_gradient);
 
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
@@ -509,38 +519,23 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
                                            // cell, then
                                            // (J^-T)Dv(J^-1) is the
                                            // value we want to have on
-                                           // the real cell. so, we
-                                           // will have to apply a
-                                           // covariant transformation
-                                           // to Dv twice. since the
-                                           // interface only allows
-                                           // multiplication with
-                                           // (J^-1) from the right,
-                                           // we have to trick a
-                                           // little in between
+                                           // the real cell.
+		std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+		for (unsigned int k=0; k<input.size(); ++k)
+		  input[k] = fe_data.shape_grads[i][k];
+		mapping.transform (input,shape_grads1,
+				   mapping_data, mapping_covariant_gradient);	
 
-                                           // do first transformation
-	      	 mapping.transform (fe_data.shape_grads[i], shape_grads1,
-	      	   mapping_data, mapping_covariant);
-                                           // transpose matrix
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-                                           // do second transformation
-	      	 mapping.transform (shape_grads2, shape_grads1,
-	      	   mapping_data, mapping_covariant);
-                                           // transpose back
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    for (unsigned int d = 0; d < dim; ++d)
-	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];
-					   // then copy over to target:
-	         break;
+		for (unsigned int k = 0; k < n_q_points; ++k)
+		  for (unsigned int d = 0; d < dim; ++d)
+		    data.shape_gradients[first + d][k] = shape_grads1[k][d];
+						 // then copy over to target:
+		
+		break;
 	      }
-
+		    
 	      default:
-		Assert(false, ExcNotImplemented());
+		    Assert(false, ExcNotImplemented());
 	    }
 	}
     }
@@ -627,6 +622,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 
 		break;
 	      }
+	      case mapping_raviart_thomas:
 	      case mapping_piola:
 	      {
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
@@ -659,7 +655,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
       if (flags & update_gradients)
 	{
 	  std::vector<Tensor<2,dim> > shape_grads1 (n_q_points);
-	  std::vector<Tensor<2,dim> > shape_grads2 (n_q_points);
+					   //  std::vector<DerivativeForm<1,dim,spacedim> > shape_grads2 (n_q_points);
+	  
 
 	  switch (mapping_type)
 	    {
@@ -694,11 +691,16 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 
 		break;
 	      }
-	      case mapping_piola:
+	      case mapping_raviart_thomas:
+	      case mapping_piola_gradient:
 	      {
-		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-				  shape_grads1, mapping_data, mapping_piola);
-
+		std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+		for (unsigned int k=0; k<input.size(); ++k)
+		  input[k] = fe_data.shape_grads[i][k];
+				
+		mapping.transform(make_slice(input, offset, n_q_points), shape_grads1,
+				  mapping_data, mapping_piola_gradient);
+		
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
@@ -706,43 +708,28 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 		break;
 	      }
 
-	      case mapping_nedelec: {
-                                           // treat the gradients of
-                                           // this particular shape
-                                           // function at all
-                                           // q-points. if Dv is the
-                                           // gradient of the shape
-                                           // function on the unit
-                                           // cell, then
-                                           // (J^-T)Dv(J^-1) is the
-                                           // value we want to have on
-                                           // the real cell. so, we
-                                           // will have to apply a
-                                           // covariant transformation
-                                           // to Dv twice. since the
-                                           // interface only allows
-                                           // multiplication with
-                                           // (J^-1) from the right,
-                                           // we have to trick a
-                                           // little in between
+	      case mapping_nedelec:
+	      {
+						 // treat the gradients of
+						 // this particular shape
+						 // function at all
+						 // q-points. if Dv is the
+						 // gradient of the shape
+						 // function on the unit
+						 // cell, then
+						 // (J^-T)Dv(J^-1) is the
+						 // value we want to have on
+						 // the real cell.
+		std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+		for (unsigned int k=0; k<input.size(); ++k)
+		  input[k] = fe_data.shape_grads[i][k];
+		mapping.transform (make_slice (input, offset, n_q_points),
+				   shape_grads1, mapping_data, mapping_covariant_gradient);
 
-                                           // do first transformation
-	      	 mapping.transform (make_slice (fe_data.shape_grads[i], offset, n_q_points),
-	      	   shape_grads1, mapping_data, mapping_covariant);
-                                           // transpose matrix
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-                                           // do second transformation
-	      	 mapping.transform (shape_grads2, shape_grads1,
-	      	   mapping_data, mapping_covariant);
-                                           // transpose back
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
+		for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    for (unsigned int d = 0; d < dim; ++d)
-	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];
-					   // then copy over to target:
+	      	       data.shape_gradients[first + d][k] = shape_grads1[k][d];
+		 			   // then copy over to target:
 	         break;
 	      }
 
@@ -837,6 +824,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 
 		break;
 	      }
+	      case mapping_raviart_thomas:
 	      case mapping_piola:
 	      {
 		std::vector<Tensor<1,dim> > shape_values (n_q_points);
@@ -904,12 +892,17 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		break;
 	      }
 
-	      case mapping_piola:
+	      case mapping_raviart_thomas:	
+	      case mapping_piola_gradient:
 	      {
-		mapping.transform(make_slice(fe_data.shape_grads[i], offset, n_q_points),
-				  shape_grads1,
-				  mapping_data, mapping_piola);
 
+		std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+		for (unsigned int k=0; k<input.size(); ++k)
+		  input[k] = fe_data.shape_grads[i][k];
+				
+		mapping.transform(make_slice(input, offset, n_q_points), shape_grads1,
+				  mapping_data, mapping_piola_gradient);
+		
 		for (unsigned int k=0; k<n_q_points; ++k)
 		  for (unsigned int d=0; d<dim; ++d)
 		    data.shape_gradients[first+d][k] = sign_change[i] * shape_grads1[k][d];
@@ -917,44 +910,30 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 		break;
 	      }
 
-	      case mapping_nedelec: {
-                                           // treat the gradients of
-                                           // this particular shape
-                                           // function at all
-                                           // q-points. if Dv is the
-                                           // gradient of the shape
-                                           // function on the unit
-                                           // cell, then
-                                           // (J^-T)Dv(J^-1) is the
-                                           // value we want to have on
-                                           // the real cell. so, we
-                                           // will have to apply a
-                                           // covariant transformation
-                                           // to Dv twice. since the
-                                           // interface only allows
-                                           // multiplication with
-                                           // (J^-1) from the right,
-                                           // we have to trick a
-                                           // little in between
-
-                                           // do first transformation
-	      	 mapping.transform (make_slice (fe_data.shape_grads[i], offset, n_q_points),
-	      	   shape_grads1, mapping_data, mapping_covariant);
-                                           // transpose matrix
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    shape_grads2[k] = transpose (shape_grads1[k]);
-                                           // do second transformation
-	      	 mapping.transform (shape_grads2, shape_grads1,
-	      	   mapping_data, mapping_covariant);
-                                           // transpose back
-	      	 for (unsigned int k = 0; k < n_q_points; ++k)
-	      	    shape_grads2[k] = transpose (shape_grads1[k]);
+	      case mapping_nedelec:
+	      {
+						 // this particular shape
+						 // function at all
+						 // q-points. if Dv is the
+						 // gradient of the shape
+						 // function on the unit
+						 // cell, then
+						 // (J^-T)Dv(J^-1) is the
+						 // value we want to have on
+						 // the real cell. 
+		std::vector <Tensor<2,spacedim> > input(fe_data.shape_grads[i].size());
+		for (unsigned int k=0; k<input.size(); ++k)
+		  input[k] = fe_data.shape_grads[i][k];
+		
+		mapping.transform (make_slice (input, offset, n_q_points),
+				   shape_grads1, mapping_data, mapping_covariant_gradient);		
+                                           
 
 	      	 for (unsigned int k = 0; k < n_q_points; ++k)
 	      	    for (unsigned int d = 0; d < dim; ++d)
-	      	       data.shape_gradients[first + d][k] = shape_grads2[k][d];
-					   // then copy over to target:
-	         break;
+	      	       data.shape_gradients[first + d][k] = shape_grads1[k][d];
+
+		 break;
 	      }
 
 	      default:
@@ -992,7 +971,23 @@ FE_PolyTensor<POLY,dim,spacedim>::update_each (const UpdateFlags flags) const
 
   switch (mapping_type)
     {
+      case mapping_raviart_thomas:
       case mapping_piola:
+      {
+	if (flags & update_values)
+	  out |= update_values | update_piola;
+
+	if (flags & update_gradients)
+	  out |= update_gradients | update_piola | update_covariant_transformation;
+
+	if (flags & update_hessians)
+	  out |= update_hessians | update_piola | update_covariant_transformation;
+
+	break;
+      }
+
+
+      case mapping_piola_gradient:
       {
 	if (flags & update_values)
 	  out |= update_values | update_piola;

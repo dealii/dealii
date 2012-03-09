@@ -2000,6 +2000,24 @@ namespace DoFTools
     }
 
 
+    void
+    make_hp_hanging_node_constraints (const dealii::DoFHandler<1,3> &,
+				      ConstraintMatrix    &)
+    {
+				       // nothing to do for regular
+				       // dof handlers in 1d
+    }
+    
+    void
+    make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,3> &,
+					    ConstraintMatrix    &,
+					    dealii::internal::int2type<1>)
+    {
+				       // nothing to do for regular
+				       // dof handlers in 1d
+    }
+
+    
 //   currently not used but may be in the future:
 
 //     void

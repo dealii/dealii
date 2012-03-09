@@ -121,9 +121,9 @@ MappingQ1Eulerian<dim,EulerVectorType,spacedim>::fill_fe_values (
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
-  std::vector<Tensor<2,spacedim> >                          &jacobians,
-  std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-  std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+  std::vector< DerivativeForm<1,dim,spacedim>   >              &jacobians,
+  std::vector<DerivativeForm<2,dim,spacedim>    >   &jacobian_grads,
+  std::vector<DerivativeForm<1,spacedim,dim>    >   &inverse_jacobians,
   std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                           &cell_similarity) const
 {

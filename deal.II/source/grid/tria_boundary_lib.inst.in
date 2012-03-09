@@ -23,6 +23,9 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension != 3
     template class HyperBallBoundary<deal_II_dimension,deal_II_dimension+1>;
 #endif
+#if deal_II_dimension == 3
+   template class CylinderBoundary<deal_II_dimension-1,deal_II_dimension>;
+#endif
   }
 
 

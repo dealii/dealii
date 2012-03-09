@@ -15,6 +15,7 @@
 
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/base/derivative_form.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -267,7 +268,7 @@ class FE_PolyTensor : public FiniteElement<dim,spacedim>
 					  * values for each quadrature
 					  * point.
 					  */      
-	std::vector<std::vector<Tensor<2,dim> > > shape_grads;
+	std::vector< std::vector< DerivativeForm<1, dim, spacedim> > > shape_grads;
     };
     
                                      /**

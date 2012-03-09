@@ -1101,7 +1101,27 @@ namespace MatrixCreator
     {
       Assert(false,ExcNotImplemented());
     }
+
+
+    
+    template <>
+    void
+    create_boundary_mass_matrix_1<1,3> (std_cxx1x::tuple<const Mapping<1,3> &,
+							 const DoFHandler<1,3> &,
+							 const Quadrature<0> & > ,
+					SparseMatrix<double>  &,
+					const FunctionMap<3>::type &,
+					Vector<double> &,
+					std::vector<unsigned int> &,
+					const Function<3> * const ,
+					const std::vector<unsigned int> &,
+					const MatrixCreator::internal::IteratorRange<DoFHandler<1,3> > ,
+					Threads::ThreadMutex &)
+    {
+      Assert(false,ExcNotImplemented());
+    }
   }
+  
 
 
 

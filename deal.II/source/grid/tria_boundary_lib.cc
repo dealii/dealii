@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,20 +25,20 @@ DEAL_II_NAMESPACE_OPEN
 
 
 
-template <int dim>
-CylinderBoundary<dim>::CylinderBoundary (const double radius,
+template <int dim, int spacedim>
+CylinderBoundary<dim,spacedim>::CylinderBoundary (const double radius,
 					 const unsigned int axis)
 		:
 		radius(radius),
 		direction (get_axis_vector (axis)),
-		point_on_axis (Point<dim>())
+		point_on_axis (Point<spacedim>())
 {}
 
 
-template <int dim>
-CylinderBoundary<dim>::CylinderBoundary (const double     radius,
-					 const Point<dim> direction,
-					 const Point<dim> point_on_axis)
+template <int dim, int spacedim>
+CylinderBoundary<dim,spacedim>::CylinderBoundary (const double     radius,
+					 const Point<spacedim> direction,
+					 const Point<spacedim> point_on_axis)
 		:
 		radius(radius),
 		direction (direction / direction.norm()),
@@ -46,26 +46,26 @@ CylinderBoundary<dim>::CylinderBoundary (const double     radius,
 {}
 
 
-template <int dim>
-Point<dim>
-CylinderBoundary<dim>::get_axis_vector (const unsigned int axis)
+template <int dim, int spacedim>
+Point<spacedim>
+CylinderBoundary<dim,spacedim>::get_axis_vector (const unsigned int axis)
 {
   Assert (axis < dim, ExcIndexRange (axis, 0, dim));
 
-  Point<dim> axis_vector;
+  Point<spacedim> axis_vector;
   axis_vector[axis] = 1;
   return axis_vector;
 }
 
 
 
-template <int dim>
-Point<dim>
-CylinderBoundary<dim>::
-get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+template <int dim, int spacedim>
+Point<spacedim>
+CylinderBoundary<dim,spacedim>::
+get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator &line) const
 {
 				   // compute a proposed new point
-  const Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+  const Point<spacedim> middle = StraightBoundary<dim,spacedim>::get_new_point_on_line (line);
 
 				   // we then have to project this
 				   // point out to the given radius
@@ -73,7 +73,7 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
 				   // have to take into account the
 				   // offset point_on_axis and the
 				   // direction of the axis
-  const Point<dim> vector_from_axis = (middle-point_on_axis) -
+  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
 				      ((middle-point_on_axis) * direction) * direction;
 				   // scale it to the desired length
 				   // and put everything back
@@ -97,8 +97,28 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
   const Point<3> middle = StraightBoundary<3>::get_new_point_on_quad (quad);
 
 				   // same algorithm as above
-  const unsigned int dim = 3;
-  const Point<dim> vector_from_axis = (middle-point_on_axis) -
+  const unsigned int spacedim = 3;
+
+  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
+				      ((middle-point_on_axis) * direction) * direction;
+  if (vector_from_axis.norm() <= 1e-10 * middle.norm())
+    return middle;
+  else
+    return (vector_from_axis / vector_from_axis.norm() * radius +
+	    ((middle-point_on_axis) * direction) * direction +
+	    point_on_axis);
+}
+
+template<>
+Point<3>
+CylinderBoundary<2,3>::
+get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
+{
+  const Point<3> middle = StraightBoundary<2,3>::get_new_point_on_quad (quad);
+
+				   // same algorithm as above
+  const unsigned int spacedim = 3;
+  const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
 				      ((middle-point_on_axis) * direction) * direction;
   if (vector_from_axis.norm() <= 1e-10 * middle.norm())
     return middle;
@@ -109,23 +129,22 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 }
 
 
-
-template <int dim>
-Point<dim>
-CylinderBoundary<dim>::
-get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
+template <int dim, int spacedim>
+Point<spacedim>
+CylinderBoundary<dim,spacedim>::
+get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &) const
 {
   Assert (false, ExcImpossibleInDim(dim));
-  return Point<dim>();
+  return Point<spacedim>();
 }
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-CylinderBoundary<dim>::get_intermediate_points_on_line (
-  const typename Triangulation<dim>::line_iterator &line,
-  std::vector<Point<dim> > &points) const
+CylinderBoundary<dim,spacedim>::get_intermediate_points_on_line (
+  const typename Triangulation<dim,spacedim>::line_iterator &line,
+  std::vector<Point<spacedim> > &points) const
 {
   if (points.size()==1)
     points[0]=get_new_point_on_line(line);
@@ -134,12 +153,12 @@ CylinderBoundary<dim>::get_intermediate_points_on_line (
 }
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-CylinderBoundary<dim>::get_intermediate_points_between_points (
-  const Point<dim> &v0,
-  const Point<dim> &v1,
-  std::vector<Point<dim> > &points) const
+CylinderBoundary<dim,spacedim>::get_intermediate_points_between_points (
+  const Point<spacedim> &v0,
+  const Point<spacedim> &v1,
+  std::vector<Point<spacedim> > &points) const
 {
   const unsigned int n=points.size();
   Assert(n>0, ExcInternalError());
@@ -147,13 +166,13 @@ CylinderBoundary<dim>::get_intermediate_points_between_points (
 				   // Do a simple linear interpolation
 				   // followed by projection, using
 				   // the same algorithm as above
-  const Point<dim> ds = (v1-v0) / (n+1);
+  const Point<spacedim> ds = (v1-v0) / (n+1);
 
   for (unsigned int i=0; i<n; ++i)
     {
-      const Point<dim> middle = v0 + (i+1)*ds;
+      const Point<spacedim> middle = v0 + (i+1)*ds;
 
-      const Point<dim> vector_from_axis = (middle-point_on_axis) -
+      const Point<spacedim> vector_from_axis = (middle-point_on_axis) -
 					  ((middle-point_on_axis) * direction) * direction;
       if (vector_from_axis.norm() <= 1e-10 * middle.norm())
 	points[i] = middle;
@@ -198,11 +217,11 @@ CylinderBoundary<3>::get_intermediate_points_on_quad (
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 void
-CylinderBoundary<dim>::get_intermediate_points_on_quad (
-  const typename Triangulation<dim>::quad_iterator &,
-  std::vector<Point<dim> > &) const
+CylinderBoundary<dim,spacedim>::get_intermediate_points_on_quad (
+  const typename Triangulation<dim,spacedim>::quad_iterator &,
+  std::vector<Point<spacedim> > &) const
 {
   Assert (false, ExcImpossibleInDim(dim));
 }
@@ -221,17 +240,18 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 
 
 
-template <int dim>
+
+template <int dim, int spacedim>
 void
-CylinderBoundary<dim>::
-get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
-			 typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const
+CylinderBoundary<dim,spacedim>::
+get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
+			 typename Boundary<dim,spacedim>::FaceVertexNormals &face_vertex_normals) const
 {
   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_face; ++v)
     {
-      const Point<dim> vertex = face->vertex(v);
+      const Point<spacedim> vertex = face->vertex(v);
 
-      const Point<dim> vector_from_axis = (vertex-point_on_axis) -
+      const Point<spacedim> vector_from_axis = (vertex-point_on_axis) -
 					  ((vertex-point_on_axis) * direction) * direction;
 
       face_vertex_normals[v] = (vector_from_axis / vector_from_axis.norm());
@@ -240,9 +260,9 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 
 
-template <int dim>
+template <int dim, int spacedim>
 double
-CylinderBoundary<dim>::get_radius () const
+CylinderBoundary<dim,spacedim>::get_radius () const
 {
   return radius;
 }

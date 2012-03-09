@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -144,6 +144,27 @@ void
 Boundary<1,2>::
 get_intermediate_points_on_face (const Triangulation<1,2>::face_iterator &,
 				 std::vector<Point<2> > &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+}
+
+
+
+template <>
+Point<3>
+Boundary<1,3>::
+get_new_point_on_face (const Triangulation<1,3>::face_iterator &) const
+{
+  Assert (false, ExcImpossibleInDim(1));
+  return Point<3>();
+}
+
+
+template <>
+void
+Boundary<1,3>::
+get_intermediate_points_on_face (const Triangulation<1,3>::face_iterator &,
+				 std::vector<Point<3> > &) const
 {
   Assert (false, ExcImpossibleInDim(1));
 }
@@ -507,6 +528,16 @@ normal_vector (const Triangulation<1,2>::face_iterator &,
 }
 
 
+template <>
+Tensor<1,3>
+StraightBoundary<1,3>::
+normal_vector (const Triangulation<1,3>::face_iterator &,
+	       const Point<3> &) const
+{
+  Assert (false, ExcNotImplemented());
+  return Tensor<1,3>();
+}
+
 
 namespace internal
 {
@@ -650,6 +681,16 @@ void
 StraightBoundary<1,2>::
 get_normals_at_vertices (const Triangulation<1,2>::face_iterator &,
 			 Boundary<1,2>::FaceVertexNormals &) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <>
+void
+StraightBoundary<1,3>::
+get_normals_at_vertices (const Triangulation<1,3>::face_iterator &,
+			 Boundary<1,3>::FaceVertexNormals &) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -868,6 +909,18 @@ namespace internal
 
 
 
+
+
+template <>
+Point<3>
+StraightBoundary<1,3>::
+project_to_surface (const Triangulation<1, 3>::quad_iterator &,
+		    const Point<3>  &y) const
+{
+  return y;
+}
+
+//TODO[SP]: This is just a horrible way out to make it compile in codim 2.
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::

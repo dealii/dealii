@@ -3154,6 +3154,47 @@ namespace parallel
     {
       return MPI_COMM_WORLD;
     }
+
+
+    template <>
+    Triangulation<1,3>::Triangulation (MPI_Comm)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+
+    template <>
+    Triangulation<1,3>::~Triangulation ()
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+
+
+    template <>
+    types::subdomain_id_t
+    Triangulation<1,3>::locally_owned_subdomain () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
+    unsigned int
+    Triangulation<1,3>::n_global_active_cells () const
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+    template <>
+    MPI_Comm
+    Triangulation<1,3>::get_communicator () const
+    {
+      return MPI_COMM_WORLD;
+    }
   }
 }
 

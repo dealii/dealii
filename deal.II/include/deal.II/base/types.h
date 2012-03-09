@@ -25,6 +25,16 @@ namespace types
 {
 
 				   /**
+				      Type for boundary indicators.
+				   */
+  typedef unsigned char boundary_indicator_t;
+
+				   /**
+				      Type for material ids.
+				   */
+  typedef unsigned int material_indicator_t;
+  
+				   /**
 				    * The type used to denote
 				    * subdomain_ids of cells.
 				    *

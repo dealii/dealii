@@ -5,3 +5,16 @@ D = @DEAL2_DIR@
 
 TEST_MINUS_L = @TEST_MINUS_L@
 ULIMIT = @ULIMIT@
+
+# however, also define a variable that identifies the current directory,
+# including if necessary a description of the branch we are on. we put
+# this into Makefile.paths because not all */Makefile files include
+# Makefile.rules (e.g. not the ones in all-headers or mesh-conversion)
+# but they do generally include the current file
+#
+# so get the path of the current directory so we can prefix every test
+# in the report with it. for a branch, prefix everything
+# with x-branch-name/ so that tests run from the branch will show up
+# in different folders on the webpage.
+WORKDIR = x-branch_codim_two/$(notdir $(shell pwd))
+

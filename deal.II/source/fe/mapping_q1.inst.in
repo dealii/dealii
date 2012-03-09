@@ -11,15 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
   {
-    template class MappingQ1<deal_II_dimension>;
-    template struct StaticMappingQ1<deal_II_dimension>;
-
-#if deal_II_dimension != 3
-    template class MappingQ1<deal_II_dimension,deal_II_dimension+1>;
-    template struct StaticMappingQ1<deal_II_dimension,deal_II_dimension+1>;
+#if deal_II_dimension <= deal_II_space_dimension 	
+    template class MappingQ1<deal_II_dimension, deal_II_space_dimension>;
+    template class StaticMappingQ1<deal_II_dimension, deal_II_space_dimension>;
 #endif
   }
 

@@ -1084,13 +1084,6 @@ bool CellAccessor<1>::point_inside (const Point<1> &p) const
 
 
 
-template <>
-bool CellAccessor<1,2>::point_inside (const Point<2> &) const
-{
-  Assert (false, ExcNotImplemented());
-  return 0;
-}
-
 
 
 
@@ -1153,12 +1146,7 @@ bool CellAccessor<2>::point_inside (const Point<2> &p) const
 }
 
 
-template <>
-bool CellAccessor<2,3>::point_inside (const Point<3> &) const
-{
-  Assert (false, ExcNotImplemented());
-  return 0;
-}
+
 
 
 
@@ -1208,7 +1196,47 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 
 
 
+
 /*------------------------ Functions: CellAccessor<dim,spacedim> -----------------------*/
+
+				 // For codim>0 we proceed as follows:
+				 // 1) project point onto manifold and
+				 // 2) transform to the unit cell with a Q1 mapping
+				 // 3) then check if inside unit cell
+template<int dim, int spacedim>
+template<int dim_,int spacedim_ >
+bool CellAccessor<dim,spacedim>::
+point_inside_codim(const Point<spacedim_> &p) const
+{
+  const TriaRawIterator< CellAccessor<dim_,spacedim_> > cell_iterator (*this);
+  const Point< dim_ > p_unit =
+    StaticMappingQ1<dim_,spacedim_>::mapping.transform_real_to_unit_cell(cell_iterator, p);
+
+  return GeometryInfo< dim_ >::is_inside_unit_cell(p_unit);
+
+}
+
+
+
+template <>
+bool CellAccessor<1,2>::point_inside (const Point<2> &p) const
+{
+  return point_inside_codim<1,2>(p);
+}
+
+
+template <>
+bool CellAccessor<1,3>::point_inside (const Point<3> &p) const
+{
+  return point_inside_codim<1,3>(p);
+}
+
+
+template <>
+bool CellAccessor<2,3>::point_inside (const Point<3> &p) const
+{
+  return point_inside_codim<2,3>(p);
+}
 
 
 

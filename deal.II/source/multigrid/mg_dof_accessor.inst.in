@@ -84,17 +84,22 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension == 1
   template class MGDoFAccessor<0, 1, 1>;
   template class MGDoFAccessor<0, 1, 2>;
-
+  template class MGDoFAccessor<0, 1, 3>;	
+  
   template class MGDoFAccessor<1, 1, 1>;
   template class MGDoFAccessor<1, 1, 2>;
+  template class MGDoFAccessor<1, 1, 3>;
 
   template class MGDoFCellAccessor<1>;
   template class MGDoFCellAccessor<1,2>;
+  template class MGDoFCellAccessor<1,3>;
 
   template MGDoFAccessor<0, 1, 1>::MGDoFAccessor (const MGDoFCellAccessor<1, 1> &);
   template MGDoFAccessor<0, 1, 1>::MGDoFAccessor (const InvalidAccessor<2, 1, 1> &);
   template MGDoFAccessor<0, 1, 2>::MGDoFAccessor (const MGDoFCellAccessor<1, 2> &);
   template MGDoFAccessor<0, 1, 2>::MGDoFAccessor (const InvalidAccessor<2, 1, 2> &);
+  template MGDoFAccessor<0, 1, 3>::MGDoFAccessor (const MGDoFCellAccessor<1, 3> &);
+  template MGDoFAccessor<0, 1, 3>::MGDoFAccessor (const InvalidAccessor<2, 1, 3> &);
 
   template class TriaRawIterator<MGDoFCellAccessor<1> >;
   template class TriaIterator<MGDoFCellAccessor<1> >;

@@ -13,6 +13,7 @@
 #ifndef _deal2__vectors_templates_h
 #define _deal2__vectors_templates_h
 
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/lac/vector.h>
@@ -2602,7 +2603,8 @@ namespace VectorTools
     {
       const double tol = 0.5 * cell->get_fe ().degree * 1e-13 / cell->face (face)->line (line)->diameter ();
       const unsigned int dim = 3;
-
+      const unsigned int spacedim = 3;
+      
       hp_fe_values.reinit
 	(cell,
 	 (cell->active_fe_index () * GeometryInfo<dim>::faces_per_cell + face)
@@ -2612,7 +2614,7 @@ namespace VectorTools
 				       // objects.
       const FEValues<dim>&
 	fe_values = hp_fe_values.get_present_fe_values ();
-      const std::vector<Tensor<2, dim> >&
+      const std::vector< DerivativeForm<1,dim,spacedim> > &
 	jacobians = fe_values.get_jacobians ();
       const std::vector<Point<dim> >&
 	quadrature_points = fe_values.get_quadrature_points ();
@@ -2814,13 +2816,14 @@ namespace VectorTools
 					     const unsigned int first_vector_component,
 					     std::vector<double>& dof_values)
     {
+      const unsigned int spacedim = dim;
       hp_fe_values.reinit (cell, cell->active_fe_index ()
 			   * GeometryInfo<dim>::faces_per_cell + face);
 				       // Initialize the required
 				       // objects.
       const FEValues<dim>&
 	fe_values = hp_fe_values.get_present_fe_values ();
-      const std::vector<Tensor<2, dim> >&
+      const std::vector< DerivativeForm<1,dim,spacedim> > &
 	jacobians = fe_values.get_jacobians ();
 
       std::vector<Vector<double> >
@@ -3782,7 +3785,7 @@ namespace VectorTools
 					    const FEFaceValues<2>& fe_values,
 					    const unsigned int first_vector_component,
 					    const Function<2>& boundary_function,
-					    const std::vector<Tensor<2, 2> >& jacobians,
+					    const std::vector<DerivativeForm<1,2,2> > & jacobians,
 					    ConstraintMatrix& constraints)
     {
 				       // Compute the intergral over
@@ -3857,7 +3860,7 @@ namespace VectorTools
 					    const FEFaceValues<dim>&,
 					    const unsigned int,
 					    const Function<dim>&,
-					    const std::vector<Tensor<2, dim> >&,
+					    const std::vector<DerivativeForm<1,dim,dim> >&,
 					    ConstraintMatrix&)
     {
       Assert (false, ExcNotImplemented ());
@@ -3874,7 +3877,7 @@ namespace VectorTools
 					    const FEFaceValues<3>& fe_values,
 					    const unsigned int first_vector_component,
 					    const Function<3>& boundary_function,
-					    const std::vector<Tensor<2, 3> >& jacobians,
+					    const std::vector<DerivativeForm<1,3,3> >& jacobians,
 					    std::vector<double>& dof_values,
 					    std::vector<unsigned int>& projected_dofs)
     {
@@ -3954,7 +3957,7 @@ namespace VectorTools
 					    const FEFaceValues<dim>&,
 					    const unsigned int,
 					    const Function<dim>&,
-					    const std::vector<Tensor<2, dim> >&,
+					    const std::vector<DerivativeForm<1,dim,dim> > &,
 					    std::vector<double>&,
 					    std::vector<unsigned int>&)
     {
@@ -3972,6 +3975,7 @@ namespace VectorTools
 					  ConstraintMatrix& constraints,
 					  const Mapping<dim>& mapping)
   {
+    const unsigned int spacedim = dim;
 				     // Interpolate the normal components
 				     // of the boundary functions. Since
 				     // the Raviart-Thomas elements are
@@ -4034,7 +4038,7 @@ namespace VectorTools
 		    fe_values.reinit (cell, face + cell->active_fe_index ()
 				      * GeometryInfo<dim>::faces_per_cell);
 
-		    const std::vector<Tensor<2, dim> >&
+		    const std::vector<DerivativeForm<1,dim,spacedim> > &
 		      jacobians = fe_values.get_present_fe_values ().get_jacobians ();
 
 		    fe_face_values.reinit (cell, face);
@@ -4098,7 +4102,7 @@ namespace VectorTools
 		    fe_values.reinit (cell, face + cell->active_fe_index ()
 				      * GeometryInfo<dim>::faces_per_cell);
 
-		    const std::vector<Tensor<2, dim> >&
+		    const std::vector<DerivativeForm<1,dim ,spacedim> >&
 		      jacobians = fe_values.get_present_fe_values ().get_jacobians ();
 
 		    fe_face_values.reinit (cell, face);
@@ -4137,6 +4141,7 @@ namespace VectorTools
 					  ConstraintMatrix& constraints,
 					  const hp::MappingCollection<dim, dim>& mapping_collection)
   {
+    const unsigned int spacedim = dim;
     const hp::FECollection<dim>& fe_collection = dof_handler.get_fe ();
     hp::QCollection<dim - 1> face_quadrature_collection;
     hp::QCollection<dim> quadrature_collection;
@@ -4187,7 +4192,7 @@ namespace VectorTools
 		    fe_values.reinit (cell, face + cell->active_fe_index ()
 				      * GeometryInfo<dim>::faces_per_cell);
 
-		    const std::vector<Tensor<2, dim> >&
+		    const std::vector<DerivativeForm<1,dim,spacedim> > &
 		      jacobians = fe_values.get_present_fe_values ().get_jacobians ();
 
 		    fe_face_values.reinit (cell, face);
@@ -4234,7 +4239,7 @@ namespace VectorTools
 		    fe_values.reinit (cell, face + cell->active_fe_index ()
 				      * GeometryInfo<dim>::faces_per_cell);
 
-		    const std::vector<Tensor<2, dim> >&
+		    const std::vector<DerivativeForm<1,dim,spacedim> > &
 		      jacobians = fe_values.get_present_fe_values ().get_jacobians ();
 
 		    fe_face_values.reinit (cell, face);

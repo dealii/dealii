@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,6 +13,7 @@
 #define __deal2__mapping_q1_h
 
 
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/qprojector.h>
@@ -90,10 +91,55 @@ class MappingQ1 : public Mapping<dim,spacedim>
 	       const MappingType type) const;
 
     virtual void
-    transform (const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+    transform (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > >    input,
                VectorSlice<std::vector<Tensor<2,spacedim> > > output,
                const typename Mapping<dim,spacedim>::InternalDataBase &internal,
 	       const MappingType type) const;
+
+    virtual
+    void
+    transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
+               VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+               const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+               const MappingType type) const;
+
+
+  protected:
+/**
+   This function and the next allow to generate the transform require by
+   the virtual transform() in mapping, but unfortunately in C++ one cannot
+   declare a virtual template function.
+*/
+    template < int rank >
+    void
+    transform_fields(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
+		           VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
+		     const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+		     const MappingType type) const;
+/**
+   see doc in transform_fields
+*/
+    template < int rank >
+    void
+    transform_gradients(const VectorSlice<const std::vector<Tensor<rank,dim>      > > input,
+			VectorSlice<      std::vector<Tensor<rank,spacedim> > > output,
+			const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+			const MappingType type) const;
+/**
+   see doc in transform_fields
+*/
+    template < int rank >
+    void
+    transform_differential_forms(
+      const VectorSlice<const std::vector<DerivativeForm<rank, dim, spacedim> > >    input,
+      VectorSlice<std::vector<DerivativeForm<rank, spacedim, spacedim> > > output,
+      const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+      const MappingType type) const;
+
+  public:
+    
+
+    
 
                                      /**
                                       * Return a pointer to a copy of the
@@ -206,6 +252,12 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * transformation at each of
 					  * the quadrature points. The
 					  * matrix stored is the
+					  * Jacobian * G^{-1},
+					  * where G = Jacobian^{t} * Jacobian,
+					  * is the first fundamental
+					  * form of the map;
+					  * if dim=spacedim then
+					  * it reduces to the transpose of the
 					  * inverse of the Jacobian
 					  * matrix, which itself is
 					  * stored in the
@@ -214,7 +266,7 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  *
 					  * Computed on each cell.
 					  */
-	std::vector<Tensor<2,spacedim> > covariant;
+	std::vector<DerivativeForm<1,dim, spacedim > >  covariant;
 
 					 /**
 					  * Tensors of contravariant
@@ -226,23 +278,8 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					  * i.e. $J_{ij}=dx_i/d\hat x_j$.
 					  *
 					  * Computed on each cell.
-					  *
-					  * @note If dim<spacedim,
-					  * then the Jacobian matrix
-					  * is rectangular, with
-					  * spacedim rows and dim
-					  * columns. We nevertheless
-					  * store it as a square
-					  * rank-2 tensor. The unused
-					  * columns are internally
-					  * used to store temporary
-					  * data, such as the
-					  * "missing" vectors spanning
-					  * the full space (for
-					  * example the cell normal
-					  * vector).
 					  */
-	std::vector<Tensor<2,spacedim> > contravariant;
+	std::vector< DerivativeForm<1,dim,spacedim> > contravariant;
 
 					 /**
 					  * Unit tangential vectors. Used
@@ -333,9 +370,9 @@ class MappingQ1 : public Mapping<dim,spacedim>
 		    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
 		    typename std::vector<Point<spacedim> >                    &quadrature_points,
 		    std::vector<double>                                       &JxW_values,
-		    std::vector<Tensor<2,spacedim> >                          &jacobians,
-		    std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-		    std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+		    std::vector<DerivativeForm<1,dim,spacedim> >        &jacobians,
+		    std::vector<DerivativeForm<2,dim,spacedim> >       &jacobian_grads,
+		    std::vector<DerivativeForm<1,spacedim,dim> >      &inverse_jacobians,
 		    std::vector<Point<spacedim> >                             &cell_normal_vectors,
 		    CellSimilarity::Similarity                           &cell_similarity) const;
 
@@ -514,10 +551,17 @@ class MappingQ1 : public Mapping<dim,spacedim>
 					       InternalData &mdata,
 					       Point<dim> &p_unit) const;
 
-				     /**
-				      * Always returns @p true because
-				      * MappingQ1 preserves vertex locations.
-				      */
+
+
+
+
+
+
+
+				       /**
+					* Always returns @p true because
+					* MappingQ1 preserves vertex locations.
+					*/
     virtual
     bool preserves_vertex_locations () const;
 
@@ -532,6 +576,60 @@ class MappingQ1 : public Mapping<dim,spacedim>
 				      * @ingroup Exceptions
 				      */
     DeclException0(ExcTransformationFailed);
+
+    
+  protected:
+				     /* Trick to templatize transform_real_to_unit_cell<dim, dim+1> */
+    template<int dim_>
+    void transform_real_to_unit_cell_internal_codim1
+    (const typename Triangulation<dim_,dim_+1>::cell_iterator &cell,
+     const Point<dim_+1> &p,
+     InternalData        &mdata,
+     Point<dim_>         &p_unit) const;
+
+/**
+   Compute an initial guess to pass to the Newton method in
+   transform_real_to_unit_cell.
+
+   For the initial guess we proceed in the following way:
+   <ul>
+   <li> find the least square dim-dimensional plane
+        approximating the cell vertices, i.e. we find and affine
+	map A x_hat + b from the reference cell to the real space.
+   <li> Solve the equation A x_hat + b = p for x_hat
+   <li> This x_hat is the initial solution used for the Newton Method.
+   </ul>
+
+   @note if dim<spacedim we first project p onto the plane.
+   @note if dim==1 (for any spacedim) the initial guess is the exact solution
+   and no Newton iteration is needed.
+
+
+   Some details about how we compute the least square plane.
+   We look for a  spacedim x (dim + 1) matrix  X such that
+
+   X * M = Y
+
+   where M is a (dim+1) x n_vertices  matrix and Y a spacedim x n_vertices.
+
+   And:
+   The i-th column of M is unit_vertex[i] and the last row all 1's.
+   The i-th column of Y is real_vertex[i].
+
+   If we split X=[A|b], the least square approx is A x_hat+b
+
+   Classically  X = Y * (M^t (M M^t)^{-1})
+
+   Let K = M^t * (M M^t)^{-1} = [KA Kb]
+   this can be precomputed, and that is exactely
+   what we do.
+
+   Finally A = Y*KA  and  b = Y*Kb.
+*/
+    Point<dim>
+    transform_real_to_unit_cell_initial_guess (const std::vector<Point<spacedim> > &vertex,
+					       const Point<spacedim>                            &p) const;
+
     
   private:
 				     /**
@@ -652,6 +750,34 @@ class MappingQ1 : public Mapping<dim,spacedim>
 				      */
     static const unsigned int n_shape_functions = GeometryInfo<dim>::vertices_per_cell;
 };
+
+
+template<>
+void
+MappingQ1<2,3>::
+transform_real_to_unit_cell_internal
+(const Triangulation<2,3>::cell_iterator &cell,
+ const Point<3>                            &p,
+ InternalData                                     &mdata,
+ Point<2>                                       &p_unit) const;
+
+/* Only used in mapping Q if degree > 1 */
+template<>
+void
+MappingQ1<1,2>::
+transform_real_to_unit_cell_internal (const Triangulation<1,2>::cell_iterator &cell,
+				      const Point<2> &p,
+				      InternalData   &mdata,
+				      Point<1>       &p_unit) const;
+
+/* Only used in mapping Q if degree > 1 */
+template<>
+void
+MappingQ1<1,3>::
+transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator &cell,
+				      const Point<3> &p,
+				      InternalData   &mdata,
+				      Point<1>       &p_unit) const;
 
 
 /**

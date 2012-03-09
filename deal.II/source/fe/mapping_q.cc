@@ -304,9 +304,9 @@ MappingQ<dim,spacedim>::fill_fe_values (
   typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
   std::vector<Point<spacedim> >                             &quadrature_points,
   std::vector<double>                                       &JxW_values,
-  std::vector<Tensor<2,spacedim> >                          &jacobians,
-  std::vector<Tensor<3,spacedim> >                          &jacobian_grads,
-  std::vector<Tensor<2,spacedim> >                          &inverse_jacobians,
+  std::vector<DerivativeForm<1,dim,spacedim>   >    &jacobians,
+  std::vector<DerivativeForm<2,dim,spacedim>    >   &jacobian_grads,
+  std::vector<DerivativeForm<1,spacedim,dim>    >   &inverse_jacobians,
   std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                           &cell_similarity) const
 {
@@ -353,6 +353,7 @@ MappingQ<dim,spacedim>::fill_fe_values (
 	        			  quadrature_points, JxW_values,
 				          jacobians, jacobian_grads, inverse_jacobians,
 					  normal_vectors, cell_similarity);
+
 }
 
 
@@ -1295,7 +1296,7 @@ MappingQ<dim,spacedim>::transform (
 template<int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::transform (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim>  > >  input,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   const MappingType mapping_type) const
@@ -1388,12 +1389,15 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
       use_mapping_q_on_all_cells ||
       (dim!=spacedim) )
     {
+           
       const Quadrature<dim> point_quadrature(p_unit);
+
+      UpdateFlags update_flags = update_transformation_values|update_transformation_gradients;
+      if (spacedim>dim)
+	update_flags |= update_jacobian_grads;
       std::auto_ptr<InternalData>
         mdata (dynamic_cast<InternalData *> (
-                 get_data(update_transformation_values |
-                          update_transformation_gradients,
-                          point_quadrature)));
+                 get_data(update_flags,point_quadrature)));
 
       mdata->use_mapping_q1_on_current_cell = false;
 
@@ -1429,6 +1433,7 @@ MappingQ<dim,spacedim>::clone () const
 {
   return new MappingQ<dim,spacedim>(*this);
 }
+
 
 
 

@@ -12,17 +12,20 @@
 //---------------------------------------------------------------------------
 
 
-for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
-{
-  namespace MGTools
+for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension: SPACE_DIMENSIONS)
+  {
+    namespace MGTools
   \{
 
-    template void
-      make_sparsity_pattern<deal_II_dimension> (
-	const MGDoFHandler<deal_II_dimension> &,
-	PATTERN &,
-	const unsigned int);
-
+#if deal_II_dimension <= deal_II_space_dimension
+      template void
+	make_sparsity_pattern<deal_II_dimension, PATTERN, deal_II_space_dimension> (
+	  const MGDoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+	  PATTERN &,
+	  const unsigned int);
+#endif
+#if deal_II_dimension == deal_II_space_dimension
     template void
       make_flux_sparsity_pattern<deal_II_dimension> (
 	const MGDoFHandler<deal_II_dimension> &,
@@ -51,6 +54,7 @@ for (PATTERN : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 	PATTERN &,
 	const unsigned int,
 	const Table<2,DoFTools::Coupling>&);
+#endif
 #endif
     \}
 }
@@ -114,6 +118,12 @@ for (deal_II_dimension : DIMENSIONS)
 #if deal_II_dimension < 3
       template void count_dofs_per_block<deal_II_dimension,deal_II_dimension+1> (
 	const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
+	std::vector<std::vector<unsigned int> >&, std::vector<unsigned int>);
+#endif
+
+#if deal_II_dimension == 3
+      template void count_dofs_per_block<1,3> (
+	const MGDoFHandler<1,3>&,
 	std::vector<std::vector<unsigned int> >&, std::vector<unsigned int>);
 #endif
       \}

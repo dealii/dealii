@@ -1,0 +1,1951 @@
+
+DEAL::Vertex displacement: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.0800000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.160000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.240000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.320000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.0800000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.160000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.240000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.320000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.0800000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.160000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.240000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.320000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.0800000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.160000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.240000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.320000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.0800000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.160000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.240000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::
+DEAL::Vertex displacement: 0.320000
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::Distance: 0
+DEAL::
+DEAL::
+DEAL::

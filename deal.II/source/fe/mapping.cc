@@ -42,7 +42,7 @@ Mapping<dim,spacedim>::transform_covariant (
 template <int dim, int spacedim>
 void
 Mapping<dim, spacedim>::transform_covariant (
-    const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+    const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
     const unsigned int                 offset,
     VectorSlice<std::vector<Tensor<2,spacedim> > > output,
     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const
@@ -74,7 +74,7 @@ Mapping<dim,spacedim>::transform_contravariant (
 template<int dim, int spacedim>
 void
 Mapping<dim,spacedim>::transform_contravariant (
-  const VectorSlice<const std::vector<Tensor<2,dim> > > input,
+  const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
   const unsigned int                 offset,
   VectorSlice<std::vector<Tensor<2,spacedim> > > output,
   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data) const

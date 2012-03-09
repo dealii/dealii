@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -9402,12 +9402,6 @@ Triangulation (const MeshSmoothing smooth_grid,
 		check_for_distorted_cells(check_for_distorted_cells),
 		vertex_to_boundary_id_map_1d (0)
 {
-  //Set default value at types::internal_face_boundary_id.
-  //Because this value is reserved for inner faces, we
-  //will never set this one to anything else.
-  //TODO This line vanishes, if we resolve the TODO in the get_boundary function
-  boundary[types::internal_face_boundary_id] = &straight_boundary;
-
   if (dim == 1)
     vertex_to_boundary_id_map_1d
       = new std::map<unsigned int, types::boundary_id_t>();
@@ -9517,14 +9511,8 @@ Triangulation<dim, spacedim>::get_boundary (const types::boundary_id_t number) c
     {
       //if we have not found an entry
       //connected with number, we return
-      //straight_boundary, stored at types::internal_face_boundary_id
-      it = boundary.find(types::internal_face_boundary_id);
-
-      return *(it->second);
-     // TODO: This should get returned, atm there are some errors
-     // connected to Boundary<1,3>. If this issue is resolved, the TODOs in
-     // the constructor and clear_despite_subscriptions can also get resolved.
-     //return straight_boundary;
+      //straight_boundary
+	  return straight_boundary;
     }
 }
 
@@ -12105,7 +12093,7 @@ unsigned int Triangulation<dim, spacedim>::n_lines () const
 }
 
 
-
+//TODO: Merge the following 6 functions somehow
 template <>
 unsigned int Triangulation<1,1>::n_raw_lines (const unsigned int level) const
 {
@@ -12133,6 +12121,21 @@ unsigned int Triangulation<1,2>::n_raw_lines (const unsigned int level) const
 
 template <>
 unsigned int Triangulation<1,2>::n_raw_lines () const
+{
+  Assert(false, ExcNotImplemented());
+  return 0;
+}
+
+
+template <>
+unsigned int Triangulation<1,3>::n_raw_lines (const unsigned int level) const
+{
+  Assert(level < n_levels(), ExcIndexRange(level,0,n_levels()));
+  return levels[level]->cells.cells.size();
+}
+
+template <>
+unsigned int Triangulation<1,3>::n_raw_lines () const
 {
   Assert(false, ExcNotImplemented());
   return 0;
@@ -12225,6 +12228,8 @@ unsigned int Triangulation<1,1>::n_active_quads () const
 }
 
 
+
+
 template <>
 unsigned int Triangulation<1,2>::n_quads () const
 {
@@ -12265,6 +12270,49 @@ unsigned int Triangulation<1,2>::n_active_quads () const
 {
   return 0;
 }
+
+
+template <>
+unsigned int Triangulation<1,3>::n_quads () const
+{
+  return 0;
+}
+
+
+template <>
+unsigned int Triangulation<1,3>::n_quads (const unsigned int) const
+{
+  return 0;
+}
+
+
+template <>
+unsigned int Triangulation<1,3>::n_raw_quads (const unsigned int) const
+{
+  return 0;
+}
+
+
+template <>
+unsigned int Triangulation<1,3>::n_raw_hexs (const unsigned int) const
+{
+  return 0;
+}
+
+
+template <>
+unsigned int Triangulation<1,3>::n_active_quads (const unsigned int) const
+{
+  return 0;
+}
+
+
+template <>
+unsigned int Triangulation<1,3>::n_active_quads () const
+{
+  return 0;
+}
+
 
 
 template <int dim, int spacedim>
@@ -12467,6 +12515,12 @@ unsigned int Triangulation<1,2>::max_adjacent_cells () const
 }
 
 
+template <>
+unsigned int Triangulation<1,3>::max_adjacent_cells () const
+{
+  return 2;
+}
+
 
 template <int dim, int spacedim>
 unsigned int Triangulation<dim, spacedim>::max_adjacent_cells () const
@@ -12569,9 +12623,6 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
   vertices_used.clear ();
 
   boundary.clear();
-  //TODO: This is connected with the TODO in get_boundary and vanishes, if
-  //this TODO has been dealt with.
-  boundary[types::internal_face_boundary_id] = &straight_boundary;
 
   number_cache = internal::Triangulation::NumberCache<dim>();
 }
@@ -12963,7 +13014,7 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags ()
 }
 
 
-
+//TODO: merge the following 3 functions since they are the same
 template <>
 bool Triangulation<1,1>::prepare_coarsening_and_refinement ()
 {
@@ -13002,6 +13053,27 @@ bool Triangulation<1,2>::prepare_coarsening_and_refinement ()
 
   return (flags_before != flags_after);
 }
+
+
+template <>
+bool Triangulation<1,3>::prepare_coarsening_and_refinement ()
+{
+				   // save the flags to determine
+				   // whether something was changed in
+				   // the course of this function
+  std::vector<bool> flags_before;
+  save_coarsen_flags (flags_before);
+
+				   // do nothing in 1d, except setting
+				   // the coarsening flags correctly
+  fix_coarsen_flags ();
+
+  std::vector<bool> flags_after;
+  save_coarsen_flags (flags_after);
+
+  return (flags_before != flags_after);
+}
+
 
 
 
@@ -14657,9 +14729,9 @@ Triangulation<dim, spacedim>::remove_refinement_listener (RefinementListener &li
 // TriaAccessor<1,1,3> uses it. We could instead instantiate
 // Triangulation<1,3>, but that requires a lot more specializations of
 // functions that currently only exist for <1,1> and <1,2>
-template
-const Boundary<1,3> &
-Triangulation<1,3>::get_boundary (const types::boundary_id_t number) const;
+// template
+// const Boundary<1,3> &
+// Triangulation<1,3>::get_boundary (const types::boundary_id_t number) const;
 
 DEAL_II_NAMESPACE_CLOSE
 

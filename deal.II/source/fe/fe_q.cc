@@ -824,6 +824,33 @@ get_subface_interpolation_matrix (const FiniteElement<1,2> &/*x_source_fe*/,
 }
 
 
+template <>
+void
+FE_Q<1,3>::
+get_face_interpolation_matrix (const FiniteElement<1,3> &/*x_source_fe*/,
+			       FullMatrix<double>     &/*interpolation_matrix*/) const
+{
+  typedef FiniteElement<1,3> FEL;
+  Assert (false,
+	  FEL::
+	   ExcInterpolationNotImplemented ());
+}
+
+
+template <>
+void
+FE_Q<1,3>::
+get_subface_interpolation_matrix (const FiniteElement<1,3> &/*x_source_fe*/,
+				  const unsigned int      /*subface*/,
+				  FullMatrix<double>     &/*interpolation_matrix*/) const
+{
+  typedef FiniteElement<1,3> FEL;
+  Assert (false,
+	  FEL::
+	  ExcInterpolationNotImplemented ());
+}
+
+
 
 template <int dim, int spacedim>
 void
@@ -1336,7 +1363,17 @@ void FE_Q<1,2>::initialize_unit_face_support_points (const Quadrature<1> &/*poin
 				   // no faces in 1d, so nothing to do
 }
 
+template <>
+void FE_Q<1,3>::initialize_unit_face_support_points ()
+{
+				   // no faces in 1d, so nothing to do
+}
 
+template <>
+void FE_Q<1,3>::initialize_unit_face_support_points (const Quadrature<1> &/*points*/)
+{
+				   // no faces in 1d, so nothing to do
+}
 
 template <int dim, int spacedim>
 void FE_Q<dim,spacedim>::initialize_unit_face_support_points ()
@@ -1524,6 +1561,13 @@ FE_Q<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
   return std::vector<unsigned int>();
 }
 
+
+template <>
+std::vector<unsigned int>
+FE_Q<1,3>::face_lexicographic_to_hierarchic_numbering (const unsigned int)
+{
+  return std::vector<unsigned int>();
+}
 
 
 template <int dim, int spacedim>
@@ -1888,6 +1932,26 @@ FE_Q<1,2>::has_support_on_face (const unsigned int shape_index,
           ((shape_index == 1) && (face_index == 1)));
 }
 
+template <>
+bool
+FE_Q<1,3>::has_support_on_face (const unsigned int shape_index,
+                              const unsigned int face_index) const
+{
+  Assert (shape_index < this->dofs_per_cell,
+	  ExcIndexRange (shape_index, 0, this->dofs_per_cell));
+  Assert (face_index < GeometryInfo<1>::faces_per_cell,
+	  ExcIndexRange (face_index, 0, GeometryInfo<1>::faces_per_cell));
+
+
+				   // in 1d, things are simple. since
+				   // there is only one degree of
+				   // freedom per vertex in this
+				   // class, the first is on vertex 0
+				   // (==face 0 in some sense), the
+				   // second on face 1:
+  return (((shape_index == 0) && (face_index == 0)) ||
+          ((shape_index == 1) && (face_index == 1)));
+}
 
 
 template <int dim, int spacedim>
