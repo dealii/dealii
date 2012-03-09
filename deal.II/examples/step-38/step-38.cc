@@ -344,25 +344,28 @@ namespace Step38
 				   // There is one point that needs to be
 				   // mentioned. In order to refine a surface
 				   // mesh appropriately if the manifold is
-				   // curved (similarly to refining the faces of
-				   // cells that are adjacent to a curved
+				   // curved (similarly to refining the faces
+				   // of cells that are adjacent to a curved
 				   // boundary), the triangulation has to have
-				   // an object attached to it that described
+				   // an object attached to it that describes
 				   // where new vertices should be located. If
 				   // you don't attach such a boundary object,
 				   // they will be located halfway between
-				   // existing vertices; this is appropriate if
-				   // you have a domain with straight boundaries
-				   // (e.g. a polygon) but not when, as here,
-				   // the manifold has curvature. So for things
-				   // to work properly, we need to attach a
-				   // manifold object to our (surface)
-				   // triangulation. We create such an object
-				   // (with indefinite, <code>static</code>,
-				   // lifetime) at the top of the function and
-				   // attach it to the triangulation for all
-				   // cells with boundary indicator zero that
-				   // will be created henceforth.
+				   // existing vertices; this is appropriate
+				   // if you have a domain with straight
+				   // boundaries (e.g. a polygon) but not
+				   // when, as here, the manifold has
+				   // curvature. So for things to work
+				   // properly, we need to attach a manifold
+				   // object to our (surface) triangulation,
+				   // in much the same way as we've already
+				   // done in 1d for the boundary. We create
+				   // such an object (with indefinite,
+				   // <code>static</code>, lifetime) at the
+				   // top of the function and attach it to the
+				   // triangulation for all cells with
+				   // boundary indicator zero that will be
+				   // created henceforth.
 				   //
 				   // The final step in creating the mesh is to
 				   // refine it a number of times. The rest of
@@ -378,7 +381,7 @@ namespace Step38
       Triangulation<spacedim> volume_mesh;
       GridGenerator::half_hyper_ball(volume_mesh);
 
-      std::set<unsigned char> boundary_ids;
+      std::set<types::boundary_id_t> boundary_ids;
       boundary_ids.insert (0);
 
       GridTools::extract_boundary_mesh (volume_mesh, triangulation,
