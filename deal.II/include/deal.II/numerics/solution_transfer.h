@@ -273,7 +273,7 @@ class SolutionTransfer
 				     /**
 				      * This function
 				      * interpolates the discrete functions
-				      * that are stored in @p all_out onto
+				      * that are stored in @p all_in onto
 				      * the refined and/or coarsenend grid.
 				      * It assumes the vectors in @p all_in
 				      * denote the same vectors
@@ -423,17 +423,29 @@ class SolutionTransfer
 				      * <tt>vector<double> dof_values</tt> (if the
 				      * children of this cell will be deleted)
 				      * is needed, hence one @p user_pointer should
-				      * be sufficient, but to allow some errorchecks
+				      * be sufficient, but to allow some error checks
 				      * and to preserve the user from making
 				      * user errors the @p user_pointer will be
 				      * 'multiplied' by this structure.
 				      */
     struct Pointerstruct {
-	Pointerstruct();
+      Pointerstruct() : indices_ptr(0), dof_values_ptr(0), active_fe_index(0) {};
+      Pointerstruct(std::vector<unsigned int> *indices_ptr_in,
+		    const unsigned int active_fe_index_in = 0)
+	: 
+	indices_ptr(indices_ptr_in),
+	dof_values_ptr (0),
+	active_fe_index(active_fe_index_in) {};
+      Pointerstruct(std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr_in,
+		    const unsigned int active_fe_index_in = 0) :
+	indices_ptr (0),
+	dof_values_ptr(dof_values_ptr_in),
+	active_fe_index(active_fe_index_in) {};
 	std::size_t memory_consumption () const;
 
 	std::vector<unsigned int>    *indices_ptr;
 	std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr;
+        unsigned int active_fe_index;
     };
 
 				     /**

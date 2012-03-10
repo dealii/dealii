@@ -152,6 +152,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Extended:
+SolutionTransfer is now also able to transfer solutions between hp::DoFHandler where
+the finite element index changes during refinement.
+<br>
+(Katharina Kormann, Martin Kronbichler, 2012/03/10)
+
 <li> Changed:
 A new method to determine an initial guess for the Newton method was coded
 in MappingQ::transform_real_to_unit_cell.
