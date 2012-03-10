@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//    $Id: mesh_worker_02.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    $Id$
 //
 //    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
 //
@@ -166,7 +166,7 @@ assemble(const DoFHandler<dim>& dof_handler, SparseMatrix<double>& matrix)
      dof_info,
      info_box,
      &MatrixIntegrator<dim>::cell,
-     0,//&MatrixIntegrator<dim>::bdry,
+     0,
      &MatrixIntegrator<dim>::face,
      assembler);
 }
