@@ -26,6 +26,7 @@
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/multigrid/mg_tools.h>
 
 #include <fstream>
@@ -225,7 +226,7 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   
   assemble(dofs, matrix);
   deallog << std::setprecision(3);
-  matrix.print(deallog);
+  matrix.print_formatted(deallog.get_file_stream(),0,false,4);
 
   MGLevelObject<SparsityPattern> mg_sparsity;
   MGLevelObject<SparsityPattern> mg_sparsity_dg_interface;
@@ -270,6 +271,7 @@ template<int dim>
 void
 test(const FiniteElement<dim>& fe)
 {
+  deallog << fe.get_name() << std::endl;
   Triangulation<dim> tr;
   GridGenerator::hyper_L(tr);
   tr.begin()->set_refine_flag();
@@ -300,16 +302,21 @@ test(const FiniteElement<dim>& fe)
 
 int main ()
 {
-  std::ofstream logfile ("mesh_worker_02/output");
-  logfile << std::setprecision (2);
-  logfile << std::fixed;  
-  deallog << std::setprecision (2);
-  deallog << std::fixed;  
+  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
+  std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog.depth_console (0);
-
+  
+  FE_DGP<2> dgp0(0);
+  FE_DGP<2> dgp1(1);
+  FE_Q<2> q1(1);
+  
   std::vector<std_cxx1x::shared_ptr<FiniteElement<2> > > fe2;
-  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_DGP<2>(1)));
+  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FE_DGP<2>(0)));
+  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp0,3)));
+  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp1,2)));
+  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(q1,2)));
+  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new FESystem<2>(dgp0,1,q1,1)));
 //  fe2.push_back(std_cxx1x::shared_ptr<FiniteElement<2> >(new  FE_Q<2>(1)));
   
   for (unsigned int i=0;i<fe2.size();++i)
