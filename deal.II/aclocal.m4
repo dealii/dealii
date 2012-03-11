@@ -454,9 +454,18 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
     dnl of object files). Unfortunately, the sections have to be
     dnl unpacked again when they are put into the shared libs, so
     dnl no savings there.
-    CXXFLAGS="-Wa,--compress-debug-sections"
-    AC_MSG_CHECKING([whether the assembler understands -Wa,--compress-debug-sections])
-    AC_TRY_LINK(
+    dnl
+    dnl The flag also doesn't appear to be working on Cygwin, as
+    dnl per email by John Fowkes on the mailing list in Feb 2012,
+    dnl so don't run the test on cygwin.
+    case "$target" in
+      *cygwin* )
+         ;;
+
+      * )
+         CXXFLAGS="-Wa,--compress-debug-sections"
+         AC_MSG_CHECKING([whether the assembler understands -Wa,--compress-debug-sections])
+         AC_TRY_LINK(
           [
           ],
           [;],
@@ -467,7 +476,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           [
             AC_MSG_RESULT(no)
           ])
-
+         ;;
+    esac
 
     dnl Set PIC flags. On some systems, -fpic/PIC is implied, so don't set
     dnl anything to avoid a warning. on AIX make sure we always pass -lpthread
