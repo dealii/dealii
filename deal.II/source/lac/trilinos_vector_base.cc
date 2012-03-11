@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -291,7 +291,7 @@ namespace TrilinosWrappers
 #else
     return flag == 0;
 #endif
-    
+
   }
 
 
@@ -300,7 +300,12 @@ namespace TrilinosWrappers
   VectorBase::is_non_negative () const
   {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-    AssertThrow(false, ExcNotImplemented());
+				     // if this vector is a parallel one, then
+				     // we need to communicate to determine
+				     // the answer to the current
+				     // function. this still has to be
+				     // implemented
+    AssertThrow(local_size() == size(), ExcNotImplemented());
 #endif
                                      // get a representation of the vector and
                                      // loop over all the elements
