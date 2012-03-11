@@ -13,6 +13,8 @@
 
 #include <deal.II/base/config.h>
 
+#ifndef DEAL_II_USE_EXTERNAL_BOOST
+
 #include "../../contrib/boost-1.46.1/libs/serialization/src/basic_archive.cpp"
 #include "../../contrib/boost-1.46.1/libs/serialization/src/basic_iarchive.cpp"
 #include "../../contrib/boost-1.46.1/libs/serialization/src/basic_iserializer.cpp"
@@ -42,3 +44,5 @@
 #include "../../contrib/boost-1.46.1/libs/serialization/src/xml_oarchive.cpp"
 #include "../../contrib/boost-1.46.1/libs/serialization/src/xml_archive_exception.cpp"
 #include "../../contrib/boost-1.46.1/libs/serialization/src/shared_ptr_helper.cpp"
+
+#endif /* DEAL_II_USE_EXTERNAL_BOOST */

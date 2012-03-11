@@ -7561,6 +7561,9 @@ AC_DEFUN(DEAL_II_WITH_BOOST, dnl
     if test "$LD_PATH_OPTION" != "no" ; then
       BOOST_LIB_DIR="$LD_PATH_OPTION$1/lib"
     fi
+    AC_DEFINE([DEAL_II_USE_EXTERNAL_BOOST], [1],
+              [Defined if deal.II is configured with an external Boost library])
+    DEAL_II_ADD_EXTERNAL_LIBS_AT_FRONT(-lboost_thread-mt -lboost_serialization-mt)
   else
     BOOST_INCLUDE_DIR=''
     BOOST_LIB_DIR=''
