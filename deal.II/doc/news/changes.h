@@ -152,6 +152,12 @@ enabled due to a missing include file in file
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed:
+The method FEValues<dim>::inverse_jacobian() previously returned the transpose of the
+inverse Jacobians instead of just the inverse Jacobian as documented. This is now fixed.
+<br>
+(Sebastian Pauletti, Katharina Kormann, Martin Kronbichler, 2012/03/11)
+
 <li> Extended:
 SolutionTransfer is now also able to transfer solutions between hp::DoFHandler where
 the finite element index changes during refinement.
