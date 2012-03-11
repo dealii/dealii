@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2568,7 +2568,11 @@ namespace VectorTools
 		tmp[2] *= -1;
 	      }
 
-	    Assert (std::fabs(vector * tmp) < 1e-12,
+					     // make sure the two vectors
+					     // are indeed not collinear
+	    Assert (std::fabs(vector * tmp / vector.norm() / tmp.norm())
+		    <
+		    (1-1e-12),
 		    ExcInternalError());
 
 					     // now compute the
