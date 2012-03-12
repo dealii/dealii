@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2930,7 +2930,6 @@ void GridGenerator::quarter_hyper_shell (Triangulation<3> & tria,
       const double d = b*std::sqrt(3.0)/2e0;
       const double e = outer_radius/2e0;
       const double f = outer_radius*std::sqrt(3.0)/2e0;
-      const double g = f*std::sqrt(3.0)/2e0;
       const double h = inner_radius/2e0;
 
       std::vector<Point<3> > vertices;
