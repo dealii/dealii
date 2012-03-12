@@ -115,6 +115,16 @@ namespace MeshWorker
  * this class can be used in a MeshWorker::loop() to assemble the cell
  * and face matrices into the global matrix.
  *
+ * The assembler can handle two different types of local data. First,
+ * by default, the obvious choice of taking a single local matrix with
+ * dimensions equal to the number of degrees of freedom of the
+ * cell. Alternatively, a local block structure can be initialized
+ * with initialize_local_blocks(). After this, the local data will be
+ * arranged as an array of n by n FullMatrix blocks, which are
+ * ordered lexicographically in DoFInfo. Note that
+ * initialize_local_blocks() has to be called before initialize_info()
+ * to take the desired effect.
+ *
  * @todo On locally refined meshes, a ConstraintMatrix should be used
  * to automatically eliminate hanging nodes.
  *
@@ -140,9 +150,45 @@ namespace MeshWorker
 					  */
 	void initialize(MATRIX& m);
 					 /**
-					  * Initialize the constraints.
+					  * Initialize the
+					  * constraints for laer use
+					  * by the assemble functions. 
 					  */
         void initialize(const ConstraintMatrix& constraints);
+	
+					 /**
+					  * Store information on the
+					  * local block structure. If
+					  * the assembler is
+					  * inititialized with this
+					  * function,
+					  * initialize_info() will
+					  * generate one local matrix
+					  * for each block row and
+					  * column, whch will be
+					  * numbered
+					  * lexicographically, row by
+					  * row.
+					  *
+					  * In spite of using local
+					  * block structure, all
+					  * blocks will be enteres
+					  * into the same global
+					  * matrix, disregarding any
+					  * global block structure.
+					  *
+					  * @note The argument of this
+					  * function will be copied
+					  * into the member object
+					  * #local_indices. Thus,
+					  * every subsequent change in
+					  * the block structure must
+					  * be initialzied or will not
+					  * be used by the assembler.
+					  */
+	
+	void initialize_local_blocks(const BlockIndices& local_indices);
+	
 					 /**
 					  * Initialize the local data
 					  * in the
@@ -191,10 +237,21 @@ namespace MeshWorker
 					  */
 	SmartPointer<MATRIX,MatrixSimple<MATRIX> > matrix;
 					 /**
-					  * A pointer to the object containing constraints.
+					  * A pointer to the object
+					  * containing constraints.
 					  */
         SmartPointer<const ConstraintMatrix,MatrixSimple<MATRIX> > constraints;
 
+					 /**
+					  * The object containing the
+					  * local block structure. Set
+					  * by
+					  * initialize_local_blocks()
+					  * and used by assembling
+					  * functions.
+					  */
+	BlockIndices local_indices;
+	
 					 /**
 					  * The smallest positive
 					  * number that will be
@@ -579,7 +636,15 @@ namespace MeshWorker
       constraints = &c;
     }
 
+    
+    template <class MATRIX>
+    inline void
+    MatrixSimple<MATRIX>::initialize_local_blocks(const BlockIndices& b)
+    {
+      local_indices = b;
+    }
 
+    
     template <class MATRIX >
     template <class DOFINFO>
     inline void
@@ -598,7 +663,7 @@ namespace MeshWorker
     {
       AssertDimension(M.m(), i1.size());
       AssertDimension(M.n(), i2.size());
-
+      
       if(constraints == 0)
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
@@ -617,7 +682,11 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::assemble(const DOFINFO& info)
     {
-      assemble(info.matrix(0,false).matrix, info.indices, info.indices);
+      if (local_indices.size() == 0)
+	assemble(info.matrix(0,false).matrix, info.indices, info.indices);
+      else
+	{
+	}
     }
 
 
@@ -627,12 +696,18 @@ namespace MeshWorker
     MatrixSimple<MATRIX>::assemble(const DOFINFO& info1,
 				   const DOFINFO& info2)
     {
-      assemble(info1.matrix(0,false).matrix, info1.indices, info1.indices);
-      assemble(info1.matrix(0,true).matrix, info1.indices, info2.indices);
-      assemble(info2.matrix(0,false).matrix, info2.indices, info2.indices);
-      assemble(info2.matrix(0,true).matrix, info2.indices, info1.indices);
+      if (local_indices.size() == 0)
+	{
+	  assemble(info1.matrix(0,false).matrix, info1.indices, info1.indices);
+	  assemble(info1.matrix(0,true).matrix, info1.indices, info2.indices);
+	  assemble(info2.matrix(0,false).matrix, info2.indices, info2.indices);
+	  assemble(info2.matrix(0,true).matrix, info2.indices, info1.indices);
+	}
+      else
+	{
+	}
     }
-
+  
 
 //----------------------------------------------------------------------//
 

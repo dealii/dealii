@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -93,9 +93,19 @@ namespace MeshWorker
 					*/
       unsigned int sub_number;
 
-				       /// The DoF indices of the current cell
+				       /*
+					* The DoF indices of the
+					* current cell
+					*/
       std::vector<unsigned int> indices;
 
+				       /**
+					* The DoF indices on the
+					* current cell, organized by
+					* local blocks
+					*/
+      std::vector<std::vector<unsigned int> > indices_by_block;
+      
 				       /**
 					* Constructor setting the
 					* #block_info pointer.
