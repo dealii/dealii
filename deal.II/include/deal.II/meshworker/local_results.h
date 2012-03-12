@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -340,12 +340,6 @@ namespace MeshWorker
 					* themselves are resized by
 					* reinit().
 					*
-					* The template parameter @p
-					* MatrixPtr should point to
-					* a MatrixBlock
-					* instantiation in order to
-					* provide row and column info.
-					*
 					* @note This function is
 					* usually only called by the
 					* assembler.
@@ -407,6 +401,9 @@ namespace MeshWorker
 					*/
       void reinit(const BlockIndices& local_sizes);
 
+      template <class STREAM>
+      void print_debug(STREAM& os) const;
+      
 				       /**
 					* The memory used by this object.
 					*/
@@ -707,7 +704,36 @@ namespace MeshWorker
   {
     return quadrature_data(k,i);
   }
+
+
+  template <typename number>
+  template <class STREAM>
+  void
+  LocalResults<number>::print_debug(STREAM& os) const
+  {
+    os << "J: " << J.size() << std::endl;
+    os << "R: " << R.size() << std::endl;
+    for (unsigned int i=0;i<R.size();++i)
+      {
+	os << "  " << R[i].n_blocks() << " -";
+	for (unsigned int j=0;j<R[i].n_blocks();++j)
+	  os << ' ' << R[i].block(j).size();
+	os << std::endl;
+      }
+    os << "M: " << M1.size() << " face " << M2.size() << std::endl;
+    for (unsigned int i=0;i<M1.size();++i)
+      {
+	os << "  " << M1[i].row << "," << M1[i].column
+	   << " " << M1[i].matrix.m() << 'x' << M1[i].matrix.n();
+	if (i < M2.size())
+	  os << " face " << M2[i].row << "," << M2[i].column
+	     << " " << M2[i].matrix.m() << 'x' << M2[i].matrix.n();
+	os << std::endl;
+      }
+  }
+  
 }
+
 
 DEAL_II_NAMESPACE_CLOSE
 
