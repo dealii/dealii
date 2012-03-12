@@ -16,9 +16,9 @@
  */
 
 #include "../tests.h"
-#include <base/logstream.h>
-#include <lac/full_matrix.h>
-#include <lac/block_indices.h>
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/block_indices.h>
 #include <deal.II/meshworker/local_results.h>
 #include <deal.II/meshworker/simple.h>
 
