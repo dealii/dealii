@@ -165,7 +165,7 @@ namespace MeshWorker
 					  * initialize_info() will
 					  * generate one local matrix
 					  * for each block row and
-					  * column, whch will be
+					  * column, which will be
 					  * numbered
 					  * lexicographically, row by
 					  * row.
@@ -650,7 +650,26 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::initialize_info(DOFINFO& info, bool face) const
     {
-      info.initialize_matrices(1, face);
+      const unsigned int n = local_indices.size();
+      
+      if (n == 0)
+	info.initialize_matrices(1, face);
+      else
+	{
+	  info.initialize_matrices(n*n, face);
+	  unsigned int k=0;
+	  for (unsigned int i=0;i<n;++i)
+	    for (unsigned int j=0;j<n;++j,++k)
+	      {
+		info.matrix(k,false).row = i;
+		info.matrix(k,false).column = j;
+		if (face)
+		  {
+		    info.matrix(k,true).row = i;
+		    info.matrix(k,true).column = j;
+		  }
+	      }
+	}
     }
 
 
