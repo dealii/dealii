@@ -139,3 +139,40 @@ DEAL:face2::  5,2 3x1 face 5,2 3x1
 DEAL:face2::  5,3 3x1 face 5,3 3x1
 DEAL:face2::  5,4 3x1 face 5,4 3x1
 DEAL:face2::  5,5 3x3 face 5,5 3x3
+DEAL::FESystem<2>[FE_DGP<2>(0)^2-FE_RaviartThomas<2>(0)]
+DEAL:cell::J: 0
+DEAL:cell::R: 0
+DEAL:cell::M: 9 face 0
+DEAL:cell::  0,0 1x1
+DEAL:cell::  0,1 1x1
+DEAL:cell::  0,2 1x4
+DEAL:cell::  1,0 1x1
+DEAL:cell::  1,1 1x1
+DEAL:cell::  1,2 1x4
+DEAL:cell::  2,0 4x1
+DEAL:cell::  2,1 4x1
+DEAL:cell::  2,2 4x4
+DEAL:face1::J: 0
+DEAL:face1::R: 0
+DEAL:face1::M: 9 face 0
+DEAL:face1::  0,0 1x1
+DEAL:face1::  0,1 1x1
+DEAL:face1::  0,2 1x4
+DEAL:face1::  1,0 1x1
+DEAL:face1::  1,1 1x1
+DEAL:face1::  1,2 1x4
+DEAL:face1::  2,0 4x1
+DEAL:face1::  2,1 4x1
+DEAL:face1::  2,2 4x4
+DEAL:face2::J: 0
+DEAL:face2::R: 0
+DEAL:face2::M: 9 face 9
+DEAL:face2::  0,0 1x1 face 0,0 1x1
+DEAL:face2::  0,1 1x1 face 0,1 1x1
+DEAL:face2::  0,2 1x4 face 0,2 1x4
+DEAL:face2::  1,0 1x1 face 1,0 1x1
+DEAL:face2::  1,1 1x1 face 1,1 1x1
+DEAL:face2::  1,2 1x4 face 1,2 1x4
+DEAL:face2::  2,0 4x1 face 2,0 4x1
+DEAL:face2::  2,1 4x1 face 2,1 4x1
+DEAL:face2::  2,2 4x4 face 2,2 4x4
