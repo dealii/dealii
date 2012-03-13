@@ -1625,6 +1625,9 @@ inline
 void
 FullMatrix<number>::add (const unsigned int r, const unsigned int c, const number v)
 {
+  AssertIndexRange(r, this->m());
+  AssertIndexRange(c, this->n());
+  
   this->operator()(r,c) += v;
 }
 
