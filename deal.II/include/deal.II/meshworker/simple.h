@@ -691,8 +691,7 @@ namespace MeshWorker
 		matrix->add(i1[j], i2[k], M(j,k));
 	}
       else
-	constraints->distribute_local_to_global(
-	  M, i1, i2, *matrix);
+	constraints->distribute_local_to_global(M, i1, i2, *matrix);
     }
 
 
@@ -705,6 +704,12 @@ namespace MeshWorker
 	assemble(info.matrix(0,false).matrix, info.indices, info.indices);
       else
 	{
+	  for (unsigned int k=0;k<info.n_matrices();++k)
+	    {
+	      assemble(info.matrix(k,false).matrix,
+		       info.indices_by_block[info.matrix(k,false).row],
+		       info.indices_by_block[info.matrix(k,false).column]);
+	    }
 	}
     }
 
@@ -712,8 +717,7 @@ namespace MeshWorker
     template <class MATRIX>
     template <class DOFINFO>
     inline void
-    MatrixSimple<MATRIX>::assemble(const DOFINFO& info1,
-				   const DOFINFO& info2)
+    MatrixSimple<MATRIX>::assemble(const DOFINFO& info1, const DOFINFO& info2)
     {
       if (local_indices.size() == 0)
 	{
@@ -723,8 +727,20 @@ namespace MeshWorker
 	  assemble(info2.matrix(0,true).matrix, info2.indices, info1.indices);
 	}
       else
-	{
-	}
+	for (unsigned int k=0;k<info1.n_matrices();++k)
+	  {
+	    const unsigned int row = info1.matrix(k,false).row;
+	    const unsigned int column = info1.matrix(k,false).column;
+
+	    assemble(info1.matrix(k,false).matrix,
+		     info1.indices_by_block[row], info1.indices_by_block[column]);
+	    assemble(info1.matrix(k,true).matrix,
+		     info1.indices_by_block[row], info2.indices_by_block[column]);
+	    assemble(info2.matrix(k,false).matrix,
+		     info2.indices_by_block[row], info2.indices_by_block[column]);
+	    assemble(info2.matrix(k,true).matrix,
+		     info2.indices_by_block[row], info1.indices_by_block[column]);
+	  }
     }
   
 
