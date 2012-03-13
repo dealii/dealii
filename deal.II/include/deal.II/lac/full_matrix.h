@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -799,6 +799,12 @@ class FullMatrix : public Table<2,number>
 	       const unsigned int src_offset_i = 0,
 	       const unsigned int src_offset_j = 0);
 
+				     /**
+				      * Adda single element at the
+				      * given position.
+				      */
+    void add(const unsigned int row, const unsigned int column, const number value);
+    
 				     /**
 				      * <i>A(i,1...n) +=
 				      * s*A(j,1...n)</i>.  Simple
@@ -1612,6 +1618,15 @@ FullMatrix<number>::end (const unsigned int r) const
   return const_iterator(this, r+1, 0);
 }
 
+
+
+template <typename number>
+inline
+void
+FullMatrix<number>::add (const unsigned int r, const unsigned int c, const number v)
+{
+  this->operator()(r,c) += v;
+}
 
 
 template <typename number>
