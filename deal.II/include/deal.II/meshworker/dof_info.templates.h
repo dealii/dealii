@@ -51,7 +51,7 @@ namespace MeshWorker
 	    for (unsigned int i=0;i<indices.size();++i)
 	      {
 		const std::pair<unsigned int, unsigned int>
-		  bi = block_info->local().global_to_local(i);
+		  bi = block_info->local().global_to_local(this->block_info->renumber(i));
 		indices_by_block[bi.first][bi.second] = indices_org[i];
 	      }
 					     // Remove this after
