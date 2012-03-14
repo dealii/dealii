@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -84,82 +84,29 @@ namespace mg
 }
 
 /**
- * @deprecated Use the much simpler class MG::Matrix instead.
- *
- * Multilevel matrix. This class implements the interface defined by
- * MGMatrixBase, using MGLevelObject of an arbitrary
- * matrix class.
- *
+ * @deprecated Use the much simpler class mg::Matrix instead.
  * @author Guido Kanschat, 2002
  */
 template <class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
 class MGMatrix : public MGMatrixBase<VECTOR>
 {
   public:
-				     /**
-				      * Constructor. The argument is
-				      * handed over to the
-				      * @p SmartPointer
-				      * constructor. The matrix object
-				      * must exist longer as the
-				      * @p MGMatrix object, since
-				      * only a pointer is stored.
-				      */
     MGMatrix (MGLevelObject<MATRIX>* = 0);
-
-				     /**
-				      * Set the matrix object to be
-				      * used. The matrix object must
-				      * exist longer as the
-				      * @p MGMatrix object, since
-				      * only a pointer is stored.
-				      */
     void set_matrix (MGLevelObject<MATRIX>* M);
-
-				     /**
-				      * Matrix-vector-multiplication on
-				      * a certain level.
-				      */
     virtual void vmult (const unsigned int level,
 			VECTOR& dst,
 			const VECTOR& src) const;
-
-				     /**
-				      * Adding matrix-vector-multiplication on
-				      * a certain level.
-				      */
     virtual void vmult_add (const unsigned int level,
 			    VECTOR& dst,
 			    const VECTOR& src) const;
-
-				     /**
-				      * Transpose
-				      * matrix-vector-multiplication on
-				      * a certain level.
-				      */
     virtual void Tvmult (const unsigned int level,
 			 VECTOR& dst,
 			 const VECTOR& src) const;
-
-				     /**
-				      * Adding transpose
-				      * matrix-vector-multiplication on
-				      * a certain level.
-				      */
     virtual void Tvmult_add (const unsigned int level,
 			     VECTOR& dst,
 			     const VECTOR& src) const;
-
-				     /**
-				      * Memory used by this object.
-				      */
     std::size_t memory_consumption () const;
-
-
   private:
-				     /**
-				      * Pointer to the matrix objects on each level.
-				      */
     SmartPointer<MGLevelObject<MATRIX>,MGMatrix<MATRIX,VECTOR> > matrix;
 };
 
