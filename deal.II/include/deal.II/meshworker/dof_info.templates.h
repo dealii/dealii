@@ -33,7 +33,24 @@ namespace MeshWorker
   DoFInfo<dim,spacedim,number>::DoFInfo()
   {}
 
+  
+  template <int dim, int spacedim, typename number>
+  void
+  DoFInfo<dim,spacedim,number>::set_block_indices()
+  {
+    for (unsigned int i=0;i<indices.size();++i)
+      {
+	const std::pair<unsigned int, unsigned int>
+	  bi = block_info->local().global_to_local(this->block_info->renumber(i));
+	indices_by_block[bi.first][bi.second] = indices_org[i];
+      }
+				     // Remove this after
+				     // changing block codes
+    for (unsigned int i=0;i<indices.size();++i)
+      indices[this->block_info->renumber(i)] = indices_org[i];
+  }
 
+  
   template <int dim, int spacedim, typename number>
   void
   DoFInfo<dim,spacedim,number>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c)
@@ -48,16 +65,7 @@ namespace MeshWorker
 	  {
 	    indices_org.resize(c->get_fe().dofs_per_cell);
 	    c->get_dof_indices(indices_org);
-	    for (unsigned int i=0;i<indices.size();++i)
-	      {
-		const std::pair<unsigned int, unsigned int>
-		  bi = block_info->local().global_to_local(this->block_info->renumber(i));
-		indices_by_block[bi.first][bi.second] = indices_org[i];
-	      }
-					     // Remove this after
-					     // changing block codes
-	    for (unsigned int i=0;i<indices.size();++i)
-	      indices[this->block_info->renumber(i)] = indices_org[i];
+	    set_block_indices();
 	  }
       }
     else
@@ -79,8 +87,7 @@ namespace MeshWorker
       {
 	indices_org.resize(c->get_fe().dofs_per_cell);
 	c->get_mg_dof_indices(indices_org);
-	for (unsigned int i=0;i<indices.size();++i)
-	  indices[this->block_info->renumber(i)] = indices_org[i];
+	set_block_indices();
       }
     level_cell = true;
   }

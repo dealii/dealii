@@ -302,6 +302,38 @@ namespace MeshWorker
         void initialize(const MGConstrainedDoFs& mg_constrained_dofs);
 
 					 /**
+					  * Store information on the
+					  * local block structure. If
+					  * the assembler is
+					  * inititialized with this
+					  * function,
+					  * initialize_info() will
+					  * generate one local matrix
+					  * for each block row and
+					  * column, which will be
+					  * numbered
+					  * lexicographically, row by
+					  * row.
+					  *
+					  * In spite of using local
+					  * block structure, all
+					  * blocks will be enteres
+					  * into the same global
+					  * matrix, disregarding any
+					  * global block structure.
+					  *
+					  * @note The argument of this
+					  * function will be copied
+					  * into the member object
+					  * #local_indices. Thus,
+					  * every subsequent change in
+					  * the block structure must
+					  * be initialzied or will not
+					  * be used by the assembler.
+					  */	
+	void initialize_local_blocks(const BlockIndices& local_indices);
+	
+					 /**
 					  * Initialize the matrices
 					  * #flux_up and #flux_down
 					  * used for local refinement
@@ -460,6 +492,16 @@ namespace MeshWorker
 					  * A pointer to the object containing constraints.
 					  */
         SmartPointer<const MGConstrainedDoFs,MGMatrixSimple<MATRIX> > mg_constrained_dofs;
+
+					 /**
+					  * The object containing the
+					  * local block structure. Set
+					  * by
+					  * initialize_local_blocks()
+					  * and used by assembling
+					  * functions.
+					  */
+	BlockIndices local_indices;
 
 					 /**
 					  * The smallest positive
@@ -770,6 +812,14 @@ namespace MeshWorker
 
     template <class MATRIX>
     inline void
+    MGMatrixSimple<MATRIX>::initialize_local_blocks(const BlockIndices& b)
+    {
+      local_indices = b;
+    }
+
+    
+    template <class MATRIX>
+    inline void
     MGMatrixSimple<MATRIX>::initialize_fluxes(
       MGLevelObject<MATRIX>& up, MGLevelObject<MATRIX>& down)
     {
@@ -793,7 +843,26 @@ namespace MeshWorker
     inline void
     MGMatrixSimple<MATRIX>::initialize_info(DOFINFO& info, bool face) const
     {
-      info.initialize_matrices(1, face);
+      const unsigned int n = local_indices.size();
+      
+      if (n == 0)
+	info.initialize_matrices(1, face);
+      else
+	{
+	  info.initialize_matrices(n*n, face);
+	  unsigned int k=0;
+	  for (unsigned int i=0;i<n;++i)
+	    for (unsigned int j=0;j<n;++j,++k)
+	      {
+		info.matrix(k,false).row = i;
+		info.matrix(k,false).column = j;
+		if (face)
+		  {
+		    info.matrix(k,true).row = i;
+		    info.matrix(k,true).column = j;
+		  }
+	      }
+	}
     }
 
 
@@ -1025,16 +1094,39 @@ namespace MeshWorker
     MGMatrixSimple<MATRIX>::assemble(const DOFINFO& info)
     {
       const unsigned int level = info.cell->level();
-      assemble((*matrix)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
 
-      if(mg_constrained_dofs != 0)
+      if (local_indices.size() == 0)
 	{
-	  assemble_in((*interface_in)[level], info.matrix(0,false).matrix, info.indices, info.indices, level);
-	  assemble_out((*interface_out)[level],info.matrix(0,false).matrix, info.indices, info.indices, level);
+	  assemble((*matrix)[level], info.matrix(0,false).matrix,
+		   info.indices, info.indices, level);
+	  if(mg_constrained_dofs != 0)
+	    {
+	      assemble_in((*interface_in)[level], info.matrix(0,false).matrix,
+			  info.indices, info.indices, level);
+	      assemble_out((*interface_out)[level],info.matrix(0,false).matrix,
+			   info.indices, info.indices, level);
+	    }
 	}
+      else
+	for (unsigned int k=0;k<info.n_matrices();++k)
+	  {
+	    const unsigned int row = info.matrix(k,false).row;
+	    const unsigned int column = info.matrix(k,false).column;
+	    
+	    assemble((*matrix)[level], info.matrix(k,false).matrix,
+		     info.indices_by_block[row], info.indices_by_block[column], level);
+	    
+	    if(mg_constrained_dofs != 0)
+	      {
+		assemble_in((*interface_in)[level], info.matrix(k,false).matrix,
+			    info.indices, info.indices, level);
+		assemble_out((*interface_out)[level],info.matrix(k,false).matrix,
+			     info.indices_by_block[row], info.indices_by_block[column], level); 
+	      }
+	  }
     }
-
-
+    
+    
     template <class MATRIX>
     template <class DOFINFO>
     inline void
@@ -1044,39 +1136,79 @@ namespace MeshWorker
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 
-      if (level1 == level2)
+      
+      if (local_indices.size() == 0)
 	{
-          if(mg_constrained_dofs == 0)
+	  if (level1 == level2)
 	    {
-	      assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
-	      assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
-	      assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
-	      assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
+	      if(mg_constrained_dofs == 0)
+		{
+		  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
+		  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices);
+		  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices);
+		  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
+		}
+	      else
+		{
+		  assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
+		  assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
+		  assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
+		  assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+		}
 	    }
-          else
+	  else
 	    {
-	      assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices, level1);
-	      assemble((*matrix)[level1], info1.matrix(0,true).matrix, info1.indices, info2.indices, level1);
-	      assemble((*matrix)[level1], info2.matrix(0,false).matrix, info2.indices, info2.indices, level1);
-	      assemble((*matrix)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+	      Assert(level1 > level2, ExcInternalError());
+					       // Do not add info2.M1,
+					       // which is done by
+					       // the coarser cell
+	      assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
+	      if(level1>0)
+		{
+		  assemble_up((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+		  assemble_down((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+		}
 	    }
 	}
       else
+	for (unsigned int k=0;k<info1.n_matrices();++k)
 	{
-	  Assert(level1 > level2, ExcInternalError());
-					   // Do not add info2.M1,
-					   // which is done by
-					   // the coarser cell
-          assemble((*matrix)[level1], info1.matrix(0,false).matrix, info1.indices, info1.indices);
-					   //assemble_transpose((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices);
-					   //assemble((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices);
-          if(level1>0)
+	  const unsigned int row = info1.matrix(k,false).row;
+	  const unsigned int column = info1.matrix(k,false).column;
+	  
+	  if (level1 == level2)
 	    {
-	      assemble_up((*flux_up)[level1],info1.matrix(0,true).matrix, info2.indices, info1.indices, level1);
-	      assemble_down((*flux_down)[level1], info2.matrix(0,true).matrix, info2.indices, info1.indices, level1);
+	      if(mg_constrained_dofs == 0)
+		{
+		  assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column]);
+		  assemble((*matrix)[level1], info1.matrix(k,true).matrix, info1.indices_by_block[row], info2.indices_by_block[column]);
+		  assemble((*matrix)[level1], info2.matrix(k,false).matrix, info2.indices_by_block[row], info2.indices_by_block[column]);
+		  assemble((*matrix)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column]);
+		}
+	      else
+		{
+		  assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column], level1);
+		  assemble((*matrix)[level1], info1.matrix(k,true).matrix, info1.indices_by_block[row], info2.indices_by_block[column], level1);
+		  assemble((*matrix)[level1], info2.matrix(k,false).matrix, info2.indices_by_block[row], info2.indices_by_block[column], level1);
+		  assemble((*matrix)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
+		}
+	    }
+	  else
+	    {
+	      Assert(level1 > level2, ExcInternalError());
+					       // Do not add info2.M1,
+					       // which is done by
+					       // the coarser cell
+	      assemble((*matrix)[level1], info1.matrix(k,false).matrix, info1.indices_by_block[row], info1.indices_by_block[column]);
+	      if(level1>0)
+		{
+		  assemble_up((*flux_up)[level1],info1.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
+		  assemble_down((*flux_down)[level1], info2.matrix(k,true).matrix, info2.indices_by_block[row], info1.indices_by_block[column], level1);
+		}
 	    }
 	}
     }
+    
 //----------------------------------------------------------------------//
 
     template <class MATRIX, class VECTOR>

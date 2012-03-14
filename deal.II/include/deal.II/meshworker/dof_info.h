@@ -187,7 +187,9 @@ namespace MeshWorker
 					* DoFInfoBox.
 					*/
       DoFInfo ();
-
+      
+				       /// Set up local block indices
+      void set_block_indices ();
       				       /// Fill index vector with active indices
       void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator& c);
 
