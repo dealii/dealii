@@ -18,11 +18,12 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/meshworker/local_results.h>
 #include <deal.II/meshworker/dof_info.h>
@@ -62,25 +63,30 @@ void test(FiniteElement<dim>& fe)
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
   
-  DoFHandler<dim> dof(tr);
+  MGDoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
   dof.initialize_local_block_info();
   DoFRenumbering::component_wise(dof);
   
   deallog << "DoFs " << dof.n_dofs() << std::endl;
   
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
-  typename DoFHandler<dim>::face_iterator face = cell->face(1);
-  typename DoFHandler<dim>::active_cell_iterator neighbor = cell->neighbor(1);
+  typename MGDoFHandler<dim>::cell_iterator cell = dof.begin_active();
+  typename MGDoFHandler<dim>::face_iterator face = cell->face(1);
+  typename MGDoFHandler<dim>::cell_iterator neighbor = cell->neighbor(1);
+
+  MGLevelObject<SparsityPattern> sparsity(0, tr.n_levels()-1);
+  MGLevelObject<SparseMatrix<double> > matrix(0, tr.n_levels()-1);
+
+  for (unsigned int level=0;level<tr.n_levels();++level)
+    {
+      CompressedSparsityPattern csp(dof.n_dofs(level),dof.n_dofs(level));
+      MGTools::make_flux_sparsity_pattern(dof, csp, level);
+      sparsity[level].copy_from(csp);
+      matrix[level].reinit(sparsity[level]);
+    }
   
-  CompressedSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
-  DoFTools::make_flux_sparsity_pattern(dof, csp);
-  SparsityPattern sparsity;
-  sparsity.copy_from(csp);
-  SparseMatrix<double> M(sparsity);
-  
-  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > ass;
-  ass.initialize(M);
+  MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > ass;
+  ass.initialize(matrix);
   ass.initialize_local_blocks(dof.block_info().local());
   MeshWorker::DoFInfo<dim> info(dof.block_info());
   ass.initialize_info(info, false);
@@ -91,8 +97,8 @@ void test(FiniteElement<dim>& fe)
   info.reinit(cell);
   fill_matrices(info, false);
   ass.assemble(info);
-  M.print_formatted(deallog.get_file_stream(), 0, false, 6);
-  M = 0.;
+  matrix[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
+  matrix[1] = 0.;
   
   deallog << "face" << std::endl;
   ass.initialize_info(info, true);
@@ -101,7 +107,7 @@ void test(FiniteElement<dim>& fe)
   fill_matrices(info, true);
   fill_matrices(infon, true);
   ass.assemble(info, infon);
-  M.print_formatted(deallog.get_file_stream(), 0, false, 6);
+  matrix[1].print_formatted(deallog.get_file_stream(), 0, false, 6);
 }
 
 int main()
