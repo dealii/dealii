@@ -639,11 +639,11 @@ namespace Step30
 						     // whether the neighbor is
 						     // coarser. If not, then it
 						     // is neither coarser nor
-						     // finer, since finer
+						     // finer, since any finer
 						     // neighbor would have been
-						     // reated above with case
+						     // treated above with case
 						     // b). Of all the cases with
-						     // thesame refinement
+						     // the same refinement
 						     // situation of our cell and
 						     // the neighbor we want to
 						     // treat only one half, so
