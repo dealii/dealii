@@ -641,7 +641,7 @@ namespace Step30
 						     // is neither coarser nor
 						     // finer, since finer
 						     // neighbor would have been
-						     // reated above withz case
+						     // reated above with case
 						     // b). Of all the cases with
 						     // thesame refinement
 						     // situation of our cell and
