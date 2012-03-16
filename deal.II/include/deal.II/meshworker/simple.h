@@ -107,13 +107,19 @@ namespace MeshWorker
     };
 
 /**
- * Assemble local matrices into a single global matrix without using
- * block structure.
+ * Assemble local matrices into a single global matrix. If this global
+ * matrix has a block structure, this structure is not used, but
+ * rather the global numbering of degrees of freedom.
  *
  * After being initialized with a SparseMatrix object (or another
  * matrix offering the same functionality as SparseMatrix::add()),
  * this class can be used in a MeshWorker::loop() to assemble the cell
  * and face matrices into the global matrix.
+ *
+ * If a ConstraintMatrix has been provided during initialization, this
+ * matrix will be used
+ * (ConstraintMatrix::distribute_local_to_global(), to be precise) to
+ * enter the local matrix into the global sparse matrix.
  *
  * The assembler can handle two different types of local data. First,
  * by default, the obvious choice of taking a single local matrix with
@@ -124,9 +130,6 @@ namespace MeshWorker
  * ordered lexicographically in DoFInfo. Note that
  * initialize_local_blocks() has to be called before initialize_info()
  * to take the desired effect.
- *
- * @todo On locally refined meshes, a ConstraintMatrix should be used
- * to automatically eliminate hanging nodes.
  *
  * @ingroup MeshWorker
  * @author Guido Kanschat, 2009
@@ -151,8 +154,16 @@ namespace MeshWorker
 	void initialize(MATRIX& m);
 					 /**
 					  * Initialize the
-					  * constraints for laer use
-					  * by the assemble functions. 
+					  * constraints. After this
+					  * function has been called
+					  * with a valid
+					  * ConstraintMatrix, the
+					  * function
+					  * ConstraintMatrix::distribute_local_to_global()
+					  * will be used by assemble()
+					  * to distribute the cell and
+					  * face matrices into a
+					  * global sparse matrix.
 					  */
         void initialize(const ConstraintMatrix& constraints);
 	
@@ -191,10 +202,8 @@ namespace MeshWorker
 	
 					 /**
 					  * Initialize the local data
-					  * in the
-					  * DoFInfo
-					  * object used later for
-					  * assembling.
+					  * in the DoFInfo object used
+					  * later for assembling.
 					  *
 					  * The info object refers to
 					  * a cell if
