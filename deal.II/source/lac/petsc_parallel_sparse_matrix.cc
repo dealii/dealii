@@ -193,12 +193,26 @@ namespace PETScWrappers
                                        // use the call sequence indicating only
                                        // a maximal number of elements per row
                                        // for all rows globally
-      const int ierr
-        = MatCreateMPIAIJ(communicator,
-			  local_rows, local_columns,
-			  m, n,
-                          n_nonzero_per_row, 0, 0, 0,
-                          &matrix);
+      int ierr;
+
+#ifdef DEAL_II_USE_PETSC_DEV
+      ierr
+        = MatCreateAIJ (communicator,
+			local_rows, local_columns,
+			m, n,
+			n_nonzero_per_row, 0, 0, 0,
+			&matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = MatSetOption (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+#else
+      ierr
+        = MatCreateMPIAIJ (communicator,
+			   local_rows, local_columns,
+			   m, n,
+			   n_nonzero_per_row, 0, 0, 0,
+			   &matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                        // set symmetric flag, if so requested
@@ -259,12 +273,28 @@ namespace PETScWrappers
 
 //TODO: There must be a significantly better way to provide information about the off-diagonal blocks of the matrix. this way, petsc keeps allocating tiny chunks of memory, and gets completely hung up over this
 
-      const int ierr
-        = MatCreateMPIAIJ(communicator,
-			  local_rows, local_columns,
-			  m, n,
-                          0, &int_row_lengths[0], 0, 0,
-                          &matrix);
+      int ierr;
+
+#ifdef DEAL_II_USE_PETSC_DEV
+      ierr
+        = MatCreateAIJ (communicator,
+			local_rows, local_columns,
+			m, n,
+			0, &int_row_lengths[0], 0, 0,
+			&matrix);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+//TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
+
+      ierr = MatSetOption (matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+#else
+      ierr
+        = MatCreateMPIAIJ (communicator,
+			   local_rows, local_columns,
+			   m, n,
+			   0, &int_row_lengths[0], 0, 0,
+			   &matrix);
+#endif
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
                                        // set symmetric flag, if so requested
