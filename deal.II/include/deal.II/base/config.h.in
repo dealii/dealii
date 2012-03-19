@@ -244,9 +244,6 @@
    provided by the compiler. */
 #undef DEAL_II_USE_DIRECT_ERRNO_H
 
-/* Defined if deal.II is configured with an external Boost library */
-#undef DEAL_II_USE_EXTERNAL_BOOST
-
 /* Defined if a Metis installation was found and is going to be used */
 #undef DEAL_II_USE_METIS
 
@@ -353,6 +350,9 @@
 
 /* Define to 1 if you have the `dstev_' function. */
 #undef HAVE_DSTEV_
+
+/* Define to 1 if you have the `dsyevx_' function. */
+#undef HAVE_DSYEVX_
 
 /* Define to 1 if you have the `dsygvx_' function. */
 #undef HAVE_DSYGVX_
@@ -490,6 +490,9 @@
 
 /* Define to 1 if you have the `sstev_' function. */
 #undef HAVE_SSTEV_
+
+/* Define to 1 if you have the `ssyevx_' function. */
+#undef HAVE_SSYEVX_
 
 /* Define to 1 if you have the `ssygvx_' function. */
 #undef HAVE_SSYGVX_
@@ -667,6 +670,9 @@
     PETSC_VERSION_SUBMINOR) \
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
+
+#define DEAL_II_PETSC_VERSION_DEV() \
+  (DEAL_II_USE_PETSC_DEV)
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>
