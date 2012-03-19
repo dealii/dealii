@@ -7,19 +7,19 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
    This class represents the (tangential) derivatives of a function
-   \f f: ${\mathbb R}^{\text{dim}} \rightarrow {\mathbb R}^{\text{spacedim}}\f$.
+   $ f: {\mathbb R}^{\text{dim}} \rightarrow {\mathbb R}^{\text{spacedim}}$.
    Such functions are always used to map the reference dim-dimensional
    cell into spacedim-dimensional space.
    For such objects, the first  derivative of the function is a linear map from
-   \f${\mathbb R}^{\text{dim}}\f$  to \f${\mathbb R}^{\text{spacedim}}\f$,
+   ${\mathbb R}^{\text{dim}}$  to ${\mathbb R}^{\text{spacedim}}$,
    the second derivative a bilinear map
-   from  \f${\mathbb R}^{\text{dim}} \times  {\mathbb R}^{\text{dim}}\f$
-   to \f${\mathbb R}^{\text{spacedim}}\f$ and so on.
-   
+   from  ${\mathbb R}^{\text{dim}} \times  {\mathbb R}^{\text{dim}}$
+   to ${\mathbb R}^{\text{spacedim}}$ and so on.
+
    In deal.II we represent these derivaties using objects of
    type DerivativeForm<1,dim,spacedim>, DerivativeForm<2,dim,spacedim> and so on.
-  
-   
+
+
    @author Sebastian Pauletti, 2011
 
 */
@@ -59,7 +59,7 @@ class DerivativeForm
 				      *  Assignment operator.
 				      */
     DerivativeForm  & operator = (const Tensor<2,dim> &);
-    
+
 				     /**
 				      *  Assignment operator.
 				      */
@@ -89,33 +89,33 @@ class DerivativeForm
 				     /**
 					Computes the volume element associated with the
 					jacobian of the tranformation F.
-					That is to say if \f$DF\f$ is square, it computes
-					\f$\det(DF)\f$, in case DF is not square returns
-					\f$\sqrt(\det(DF^{t} * DF))\f$.
+					That is to say if $DF$ is square, it computes
+					$\det(DF)$, in case DF is not square returns
+					$\sqrt(\det(DF^{t} * DF))$.
 				     */
     double determinant () const;
-    
-        
+
+
 				     /**
 					Assuming (*this) stores the jacobian of
 					the mapping F, it computes its covariant
-					matrix, namely \f$DF*G^{-1}\f$, where
-					\f$G = DF^{t}*DF\f$.
+					matrix, namely $DF*G^{-1}$, where
+					$G = DF^{t}*DF$.
 					If $DF$ is square, covariant from
-					gives \f$DF^{-t}\f$.
+					gives $DF^{-t}$.
 				     */
     DerivativeForm<1, dim, spacedim> covariant_form() const;
 
-    
-    
-    
+
+
+
 				     /**
 				      * Determine an estimate for the
 				      * memory consumption (in bytes)
 				      * of this object.
 				      */
     static std::size_t memory_consumption ();
-    				     
+
                                      /**
                                       * Exception.
                                       */
@@ -123,7 +123,7 @@ class DerivativeForm
                     int,
 		    << "Invalid DerivativeForm index " << arg1);
 
-                    
+
   private:
 				     /** Auxiliary function that computes
 					 (*this) * T^{t} */
@@ -137,7 +137,7 @@ class DerivativeForm
 				      */
     Tensor<order,dim> tensor[spacedim];
 
-				    
+
 };
 
 
@@ -165,7 +165,7 @@ DerivativeForm<order, dim, spacedim>::DerivativeForm(const Tensor<2,dim> &T)
 {
   Assert( (dim == spacedim) && (order==1),
 	  ExcMessage("Only allowed for square tensors."));
-  
+
   for (unsigned int j=0; j<dim; ++j)
     (*this)[j] = T[j];
 }
@@ -192,7 +192,7 @@ operator = (const Tensor<2,dim> &ta)
 {
   Assert( (dim == spacedim) && (order==1),
 	  ExcMessage("Only allowed for square tensors."));
-  
+
   for (unsigned int j=0; j<dim; ++j)
     (*this)[j] = ta[j];
   return *this;
@@ -208,7 +208,7 @@ operator = (const Tensor<1,dim> &T)
 {
   Assert( (1 == spacedim) && (order==1),
 	  ExcMessage("Only allowed for spacedim==1 and order==1."));
-  
+
   (*this)[0] = T;
 
   return *this;
@@ -249,7 +249,7 @@ DerivativeForm<order, dim, spacedim>::operator Tensor<1,dim>() const
 	  ExcMessage("Only allowed for spacedim==1."));
 
   return (*this)[0];
-	
+
 }
 
 
@@ -262,12 +262,12 @@ DerivativeForm<order, dim, spacedim>::operator Tensor<2,dim>() const
 	  ExcMessage("Only allowed for square tensors."));
 
   Tensor<2,dim> t;
-  
+
   for (unsigned int j=0; j<dim; ++j)
     t[j] = (*this)[j];
-  
+
   return t;
-	
+
 }
 
 
@@ -280,11 +280,11 @@ transpose () const
  {
    Assert(order==1, ExcMessage("Only for rectangular DerivativeForm."));
    DerivativeForm<1,spacedim,dim> tt;
-   
+
    for (unsigned int i=0; i<spacedim; ++i)
      for (unsigned int j=0; j<dim; ++j)
        tt[j][i] = (*this)[i][j];
-   
+
    return tt;
  }
 
@@ -326,9 +326,9 @@ DerivativeForm<order,dim,spacedim>::determinant () const
 	  G[i][j] = DF_t[i] * DF_t[j];
 
       return ( sqrt(dealii::determinant(G)) );
-      
+
     }
-  
+
 }
 
 
@@ -338,17 +338,17 @@ inline
 DerivativeForm<1,dim,spacedim>
 DerivativeForm<order,dim,spacedim>::covariant_form() const
 {
-  
+
   if (dim == spacedim)
     {
-      
+
       Tensor<2,dim> DF_t (dealii::transpose(invert(  (Tensor<2,dim>)(*this)   )));
       DerivativeForm<1,dim, spacedim> result = DF_t;
       return(result);
     }
   else
     {
-      
+
       DerivativeForm<1,spacedim,dim> DF_t = this->transpose();
       Tensor<2, dim> G; //First fundamental form
       for (unsigned int i=0; i<dim; ++i)
@@ -356,9 +356,9 @@ DerivativeForm<order,dim,spacedim>::covariant_form() const
 	  G[i][j] = DF_t[i] * DF_t[j];
 
       return (this->times_T_t(invert(G)));
-      
+
     }
-  
+
 }
 
 
@@ -379,17 +379,16 @@ DerivativeForm<order, dim, spacedim>::memory_consumption ()
 /**
    One of the uses of DerivativeForm is to apply it as a transformation.
    This is what this function does.
-   
-   If @pT is DerivativeForm<1,dim,1> it computes $DF * T$,
-   if @pT is DerivativeForm<1,dim,rank> it computes $T*DF^{t}$.
+
+   If @p T is DerivativeForm<1,dim,1> it computes $DF * T$,
+   if @p T is DerivativeForm<1,dim,rank> it computes $T*DF^{t}$.
 
    @relates DerivativeForm
    @author Sebastian Pauletti, 2011
 */
-//rank=1
 template <int spacedim, int dim>
 inline
-Tensor<1, spacedim> 
+Tensor<1, spacedim>
 apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
 		      const Tensor<1,dim>               &T)
 {
@@ -410,11 +409,11 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
 //rank=2
 template <int spacedim, int dim>
 inline
-DerivativeForm<1, spacedim, dim> 
+DerivativeForm<1, spacedim, dim>
 apply_transformation (const DerivativeForm<1,dim,spacedim> &DF,
 		      const Tensor<2,dim>               &T)
 {
- 
+
   DerivativeForm<1, spacedim, dim> dest;
   for (unsigned int i=0; i<dim; ++i)
     dest[i] = apply_transformation(DF, T[i]);
@@ -435,7 +434,7 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF1,
 		      const DerivativeForm<1,dim,spacedim> &DF2)
 {
   Tensor<2, spacedim> dest;
-  
+
   for (unsigned int i=0; i<spacedim; ++i)
     dest[i] = apply_transformation(DF1, DF2[i]);
 
@@ -452,7 +451,7 @@ apply_transformation (const DerivativeForm<1,dim,spacedim> &DF1,
 template <int dim, int spacedim>
 inline
 DerivativeForm<1,spacedim,dim>
-transpose (const DerivativeForm<1,dim,spacedim> &DF) 
+transpose (const DerivativeForm<1,dim,spacedim> &DF)
  {
    DerivativeForm<1,spacedim,dim> tt;
    tt = DF.transpose();
