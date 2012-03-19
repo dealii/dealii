@@ -16,6 +16,7 @@
 #include <deal.II/base/exceptions.h>
 
 #include <cstddef>
+#include <iostream>
 
 #ifdef DEAL_II_USE_TRILINOS
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
