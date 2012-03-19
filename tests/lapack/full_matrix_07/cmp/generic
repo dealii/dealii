@@ -1,0 +1,5 @@
+
+DEAL::eigenvalue 1.000000e+00
+DEAL::eigenvector 1.000000e+00	1.732051e+00	0.000000e+00	0.000000e+00	
+DEAL::eigenvalue 2.000000e+00
+DEAL::eigenvector 1.000000e+00	-5.773503e-01	0.000000e+00	0.000000e+00	
