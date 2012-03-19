@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -561,7 +561,12 @@ class GridGenerator
 				      * spheres around <tt>center</tt>,
 				      * with given
 				      * <tt>inner_radius</tt> and
-				      * <tt>outer_radius</tt>.
+				      * <tt>outer_radius</tt>. The number
+				      * <tt>n_cells</tt> indicates the
+				      * number of cells of the resulting
+				      * triangulation, i.e., how many cells
+				      * form the ring (in 2d) or the shell
+				      * (in 3d).
 				      *
 				      * If the flag @p colorize is @p true,
 				      * then the outer boundary will have the
@@ -998,7 +1003,7 @@ class GridGenerator
 				 const Point<dim>& center,
 				 const double inner_radius,
 				 const double outer_radius);
-    
+
 				     /**
 				      * Solve the Laplace equation for
 				      * @p laplace_transformation
