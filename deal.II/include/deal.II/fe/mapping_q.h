@@ -134,6 +134,13 @@ class MappingQ : public MappingQ1<dim,spacedim>
                const typename Mapping<dim,spacedim>::InternalDataBase &internal,
 	       const MappingType type) const;
 
+    virtual
+    void
+    transform (const VectorSlice<const std::vector<Tensor<2, dim> > >     input,
+               VectorSlice<std::vector<Tensor<2,spacedim> > >             output,
+               const typename Mapping<dim,spacedim>::InternalDataBase &internal,
+               const MappingType type) const;
+
 				     /**
 				      * Return the degree of the
 				      * mapping, i.e. the value which
