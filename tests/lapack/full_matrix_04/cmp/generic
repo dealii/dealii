@@ -4,7 +4,7 @@ DEAL:4x4::vmult ok
 DEAL:4x4::vmult ok
 DEAL:4x4::Tvmult ok
 DEAL:4x4::Tvmult ok
-DEAL:4x3::Singular values 0.0623770 0.0789748 0.162959 0
+DEAL:4x3::Singular values 0.0623770 0.0789748 0.162959 0.00000
 DEAL:4x3::vmult ok
 DEAL:4x3::vmult error 1.75406
 DEAL:4x3::Tvmult error 1.75406

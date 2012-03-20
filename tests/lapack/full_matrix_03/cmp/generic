@@ -4,7 +4,7 @@ DEAL:4x4::vmult ok
 DEAL:4x4::vmult_add ok
 DEAL:4x4::Tvmult ok
 DEAL:4x4::Tvmult_add ok
-DEAL:4x3::Singular values 16.0315 12.6623 6.13650 0
+DEAL:4x3::Singular values 16.0315 12.6623 6.13650 0.00000
 DEAL:4x3::vmult ok
 DEAL:4x3::vmult_add ok
 DEAL:4x3::Tvmult ok
