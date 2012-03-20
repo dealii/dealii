@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,7 +54,7 @@ double Cdata[] =
       1., 8.
 };
 
-int main () 
+int main ()
 {
   FullMatrix<float> A(4,4);
   FullMatrix<float> B1(4,2);
@@ -65,11 +65,11 @@ int main ()
   B1.fill(B1data);
   B2.fill(B2data);
   C.fill(Cdata);
-  
+
   GrowingVectorMemory<Vector<double> > simple_mem;
-  
+
   BlockMatrixArray<double> matrix(2, 2, simple_mem);
-  
+
   matrix.enter(A,0,0,2.);
   matrix.enter(B1,0,1,-1.);
   matrix.enter(B2,0,1,1., true);
@@ -77,11 +77,11 @@ int main ()
   matrix.enter(B1,1,0,-1., true);
   matrix.enter(C,1,1);
   matrix.print_latex(deallog);
-  
+
   std::vector<unsigned int> block_sizes(2);
   block_sizes[0] = 4;
   block_sizes[1] = 2;
-  
+
   BlockVector<double> result(block_sizes);
   BlockVector<double> x(block_sizes);
   BlockVector<double> y(block_sizes);
@@ -98,16 +98,16 @@ int main ()
   cg.solve(matrix, x, y, id);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
-  
+
   deallog << "Error A-norm "
-	  << std::sqrt(matrix.matrix_norm_square(x))
-	  << std::endl;
-  
+          << std::sqrt(matrix.matrix_norm_square(x))
+          << std::endl;
+
   FullMatrix<float> Ainv(4,4);
   Ainv.invert(A);
   FullMatrix<float> Cinv(2,2);
   Cinv.invert(C);
-  
+
   BlockTrianglePrecondition<double>
     precondition(2, simple_mem);
   precondition.enter(Ainv,0,0,.5);
@@ -116,14 +116,14 @@ int main ()
   cg.solve(matrix, x, y, precondition);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
-  
+
   precondition.enter(B1,1,0,-1., true);
   precondition.enter(B2,1,0,1.);
-  
+
   SolverGMRES<BlockVector<double> > gmres(control, mem);
   gmres.solve(matrix, x, y, precondition);
   x.add(-1., result);
   deallog << "Error " << x.l2_norm() << std::endl;
-  
+
   return 0;
 }

@@ -2557,9 +2557,9 @@ namespace Step32
       std::set<types::boundary_id_t> no_normal_flux_boundaries;
       no_normal_flux_boundaries.insert (1);
       VectorTools::compute_no_normal_flux_constraints (stokes_dof_handler, 0,
-						       no_normal_flux_boundaries,
-						       stokes_constraints,
-						       mapping);
+                                                       no_normal_flux_boundaries,
+                                                       stokes_constraints,
+                                                       mapping);
       stokes_constraints.close ();
     }
     {
@@ -2567,25 +2567,25 @@ namespace Step32
       temperature_constraints.reinit (temperature_relevant_partitioning);
 
       DoFTools::make_hanging_node_constraints (temperature_dof_handler,
-					       temperature_constraints);
+                                               temperature_constraints);
       VectorTools::interpolate_boundary_values (temperature_dof_handler,
-						0,
-						EquationData::TemperatureInitialValues<dim>(),
-						temperature_constraints);
+                                                0,
+                                                EquationData::TemperatureInitialValues<dim>(),
+                                                temperature_constraints);
       VectorTools::interpolate_boundary_values (temperature_dof_handler,
-						1,
-						EquationData::TemperatureInitialValues<dim>(),
-						temperature_constraints);
+                                                1,
+                                                EquationData::TemperatureInitialValues<dim>(),
+                                                temperature_constraints);
       temperature_constraints.close ();
     }
 
-				     // All this done, we can then initialize
-				     // the various matrix and vector objects
-				     // to their proper sizes. At the end, we
-				     // also record that all matrices and
-				     // preconditioners have to be re-computed
-				     // at the beginning of the next time
-				     // step.
+                                     // All this done, we can then initialize
+                                     // the various matrix and vector objects
+                                     // to their proper sizes. At the end, we
+                                     // also record that all matrices and
+                                     // preconditioners have to be re-computed
+                                     // at the beginning of the next time
+                                     // step.
     setup_stokes_matrix (stokes_partitioning);
     setup_stokes_preconditioner (stokes_partitioning);
     setup_temperature_matrices (temperature_partitioning);
@@ -2609,62 +2609,62 @@ namespace Step32
 
 
 
-				   // @sect4{The BoussinesqFlowProblem assembly functions}
-				   //
-				   // Following the discussion in the
-				   // introduction and in the @ref threads
-				   // module, we split the assembly functions
-				   // into different parts:
-				   //
-				   // <ul> <li> The local calculations of
-				   // matrices and right hand sides, given a
-				   // certain cell as input (these functions
-				   // are named <code>local_assemble_*</code>
-				   // below). The resulting function is, in
-				   // other words, essentially the body of the
-				   // loop over all cells in step-31. Note,
-				   // however, that these functions store the
-				   // result from the local calculations in
-				   // variables of classes from the CopyData
-				   // namespace.
-				   //
-				   // <li>These objects are then given to the
-				   // second step which writes the local data
-				   // into the global data structures (these
-				   // functions are named
-				   // <code>copy_local_to_global_*</code>
-				   // below). These functions are pretty
-				   // trivial.
-				   //
-				   // <li>These two subfunctions are then used
-				   // in the respective assembly routine
-				   // (called <code>assemble_*</code> below),
-				   // where a WorkStream object is set up and
-				   // runs over all the cells that belong to
-				   // the processor's subdomain.  </ul>
+                                   // @sect4{The BoussinesqFlowProblem assembly functions}
+                                   //
+                                   // Following the discussion in the
+                                   // introduction and in the @ref threads
+                                   // module, we split the assembly functions
+                                   // into different parts:
+                                   //
+                                   // <ul> <li> The local calculations of
+                                   // matrices and right hand sides, given a
+                                   // certain cell as input (these functions
+                                   // are named <code>local_assemble_*</code>
+                                   // below). The resulting function is, in
+                                   // other words, essentially the body of the
+                                   // loop over all cells in step-31. Note,
+                                   // however, that these functions store the
+                                   // result from the local calculations in
+                                   // variables of classes from the CopyData
+                                   // namespace.
+                                   //
+                                   // <li>These objects are then given to the
+                                   // second step which writes the local data
+                                   // into the global data structures (these
+                                   // functions are named
+                                   // <code>copy_local_to_global_*</code>
+                                   // below). These functions are pretty
+                                   // trivial.
+                                   //
+                                   // <li>These two subfunctions are then used
+                                   // in the respective assembly routine
+                                   // (called <code>assemble_*</code> below),
+                                   // where a WorkStream object is set up and
+                                   // runs over all the cells that belong to
+                                   // the processor's subdomain.  </ul>
 
-				   // @sect5{Stokes preconditioner assembly}
-				   //
-				   // Let us start with the functions that
-				   // builds the Stokes preconditioner. The
-				   // first two of these are pretty trivial,
-				   // given the discussion above. Note in
-				   // particular that the main point in using
-				   // the scratch data object is that we want
-				   // to avoid allocating any objects on the
-				   // free space each time we visit a new
-				   // cell. As a consequence, the assembly
-				   // function below only has automatic local
-				   // variables, and everything else is
-				   // accessed through the scratch data
-				   // object, which is allocated only once
-				   // before we start the loop over all cells:
+                                   // @sect5{Stokes preconditioner assembly}
+                                   //
+                                   // Let us start with the functions that
+                                   // builds the Stokes preconditioner. The
+                                   // first two of these are pretty trivial,
+                                   // given the discussion above. Note in
+                                   // particular that the main point in using
+                                   // the scratch data object is that we want
+                                   // to avoid allocating any objects on the
+                                   // free space each time we visit a new
+                                   // cell. As a consequence, the assembly
+                                   // function below only has automatic local
+                                   // variables, and everything else is
+                                   // accessed through the scratch data
+                                   // object, which is allocated only once
+                                   // before we start the loop over all cells:
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::
   local_assemble_stokes_preconditioner (const typename DoFHandler<dim>::active_cell_iterator &cell,
-					Assembly::Scratch::StokesPreconditioner<dim> &scratch,
-					Assembly::CopyData::StokesPreconditioner<dim> &data)
+                                        Assembly::Scratch::StokesPreconditioner<dim> &scratch,
+                                        Assembly::CopyData::StokesPreconditioner<dim> &data)
   {
     const unsigned int   dofs_per_cell   = stokes_fe.dofs_per_cell;
     const unsigned int   n_q_points      = scratch.stokes_fe_values.n_quadrature_points;
@@ -2679,23 +2679,23 @@ namespace Step32
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
-	for (unsigned int k=0; k<dofs_per_cell; ++k)
-	  {
-	    scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
-	    scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value (k, q);
-	  }
+        for (unsigned int k=0; k<dofs_per_cell; ++k)
+          {
+            scratch.grad_phi_u[k] = scratch.stokes_fe_values[velocities].gradient(k,q);
+            scratch.phi_p[k]      = scratch.stokes_fe_values[pressure].value (k, q);
+          }
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    data.local_matrix(i,j) += (EquationData::eta *
-				       scalar_product (scratch.grad_phi_u[i],
-						       scratch.grad_phi_u[j])
-				       +
-				       (1./EquationData::eta) *
-				       EquationData::pressure_scaling *
-				       EquationData::pressure_scaling *
-				       (scratch.phi_p[i] * scratch.phi_p[j]))
-				      * scratch.stokes_fe_values.JxW(q);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            data.local_matrix(i,j) += (EquationData::eta *
+                                       scalar_product (scratch.grad_phi_u[i],
+                                                       scratch.grad_phi_u[j])
+                                       +
+                                       (1./EquationData::eta) *
+                                       EquationData::pressure_scaling *
+                                       EquationData::pressure_scaling *
+                                       (scratch.phi_p[i] * scratch.phi_p[j]))
+                                      * scratch.stokes_fe_values.JxW(q);
       }
   }
 
@@ -2707,94 +2707,94 @@ namespace Step32
   copy_local_to_global_stokes_preconditioner (const Assembly::CopyData::StokesPreconditioner<dim> &data)
   {
     stokes_constraints.distribute_local_to_global (data.local_matrix,
-						   data.local_dof_indices,
-						   stokes_preconditioner_matrix);
+                                                   data.local_dof_indices,
+                                                   stokes_preconditioner_matrix);
   }
 
 
-				   // Now for the function that actually puts
-				   // things together, using the WorkStream
-				   // functions.  WorkStream::run needs a
-				   // start and end iterator to enumerate the
-				   // cells it is supposed to work
-				   // on. Typically, one would use
-				   // DoFHandler::begin_active() and
-				   // DoFHandler::end() for that but here we
-				   // actually only want the subset of cells
-				   // that in fact are owned by the current
-				   // processor. This is where the
-				   // FilteredIterator class comes into play:
-				   // you give it a range of cells and it
-				   // provides an iterator that only iterates
-				   // over that subset of cells that satisfy a
-				   // certain predicate (a predicate is a
-				   // function of one argument that either
-				   // returns true or false). The predicate we
-				   // use here is
-				   // IteratorFilters::LocallyOwnedCell, i.e.,
-				   // it returns true exactly if the cell is
-				   // owned by the current processor. The
-				   // resulting iterator range is then exactly
-				   // what we need.
-				   //
-				   // With this obstacle out of the way, we
-				   // call the WorkStream::run function with
-				   // this set of cells, scratch and copy
-				   // objects, and with pointers to two
-				   // functions: the local assembly and
-				   // copy-local-to-global function. These
-				   // functions need to have very specific
-				   // signatures: three arguments in the first
-				   // and one argument in the latter case (see
-				   // the documentation of the WorkStream::run
-				   // function for the meaning of these
-				   // arguments).  Note how we use the
-				   // construct <code>std_cxx1x::bind</code>
-				   // to create a function object that
-				   // satisfies this requirement. It uses
-				   // placeholders <code>_1, std_cxx1x::_2,
-				   // _3</code> for the local assembly
-				   // function that specify cell, scratch
-				   // data, and copy data, as well as the
-				   // placeholder <code>_1</code> for the copy
-				   // function that expects the data to be
-				   // written into the global matrix. On the
-				   // other hand, the implicit zeroth argument
-				   // of member functions (namely the
-				   // <code>this</code> pointer of the object
-				   // on which that member function is to
-				   // operate on) is <i>bound</i> to the
-				   // <code>this</code> pointer of the current
-				   // function. The WorkStream::run function,
-				   // as a consequence, does not need to know
-				   // anything about the object these
-				   // functions work on.
-				   //
-				   // When the WorkStream is executed, it will
-				   // create several local assembly routines
-				   // of the first kind for several cells and
-				   // let some available processors work on
-				   // them. The function that needs to be
-				   // synchronized, i.e., the write operation
-				   // into the global matrix, however, is
-				   // executed by only one thread at a time in
-				   // the prescribed order. Of course, this
-				   // only holds for the parallelization on a
-				   // single MPI process. Different MPI
-				   // processes will have their own WorkStream
-				   // objects and do that work completely
-				   // independently (and in different memory
-				   // spaces). In a distributed calculation,
-				   // some data will accumulate at degrees of
-				   // freedom that are not owned by the
-				   // respective processor. It would be
-				   // inefficient to send data around every
-				   // time we encounter such a dof. What
-				   // happens instead is that the Trilinos
-				   // sparse matrix will keep that data and
-				   // send it to the owner at the end of
-				   // assembly, by calling the
-				   // <code>compress()</code> command.
+                                   // Now for the function that actually puts
+                                   // things together, using the WorkStream
+                                   // functions.  WorkStream::run needs a
+                                   // start and end iterator to enumerate the
+                                   // cells it is supposed to work
+                                   // on. Typically, one would use
+                                   // DoFHandler::begin_active() and
+                                   // DoFHandler::end() for that but here we
+                                   // actually only want the subset of cells
+                                   // that in fact are owned by the current
+                                   // processor. This is where the
+                                   // FilteredIterator class comes into play:
+                                   // you give it a range of cells and it
+                                   // provides an iterator that only iterates
+                                   // over that subset of cells that satisfy a
+                                   // certain predicate (a predicate is a
+                                   // function of one argument that either
+                                   // returns true or false). The predicate we
+                                   // use here is
+                                   // IteratorFilters::LocallyOwnedCell, i.e.,
+                                   // it returns true exactly if the cell is
+                                   // owned by the current processor. The
+                                   // resulting iterator range is then exactly
+                                   // what we need.
+                                   //
+                                   // With this obstacle out of the way, we
+                                   // call the WorkStream::run function with
+                                   // this set of cells, scratch and copy
+                                   // objects, and with pointers to two
+                                   // functions: the local assembly and
+                                   // copy-local-to-global function. These
+                                   // functions need to have very specific
+                                   // signatures: three arguments in the first
+                                   // and one argument in the latter case (see
+                                   // the documentation of the WorkStream::run
+                                   // function for the meaning of these
+                                   // arguments).  Note how we use the
+                                   // construct <code>std_cxx1x::bind</code>
+                                   // to create a function object that
+                                   // satisfies this requirement. It uses
+                                   // placeholders <code>_1, std_cxx1x::_2,
+                                   // _3</code> for the local assembly
+                                   // function that specify cell, scratch
+                                   // data, and copy data, as well as the
+                                   // placeholder <code>_1</code> for the copy
+                                   // function that expects the data to be
+                                   // written into the global matrix. On the
+                                   // other hand, the implicit zeroth argument
+                                   // of member functions (namely the
+                                   // <code>this</code> pointer of the object
+                                   // on which that member function is to
+                                   // operate on) is <i>bound</i> to the
+                                   // <code>this</code> pointer of the current
+                                   // function. The WorkStream::run function,
+                                   // as a consequence, does not need to know
+                                   // anything about the object these
+                                   // functions work on.
+                                   //
+                                   // When the WorkStream is executed, it will
+                                   // create several local assembly routines
+                                   // of the first kind for several cells and
+                                   // let some available processors work on
+                                   // them. The function that needs to be
+                                   // synchronized, i.e., the write operation
+                                   // into the global matrix, however, is
+                                   // executed by only one thread at a time in
+                                   // the prescribed order. Of course, this
+                                   // only holds for the parallelization on a
+                                   // single MPI process. Different MPI
+                                   // processes will have their own WorkStream
+                                   // objects and do that work completely
+                                   // independently (and in different memory
+                                   // spaces). In a distributed calculation,
+                                   // some data will accumulate at degrees of
+                                   // freedom that are not owned by the
+                                   // respective processor. It would be
+                                   // inefficient to send data around every
+                                   // time we encounter such a dof. What
+                                   // happens instead is that the Trilinos
+                                   // sparse matrix will keep that data and
+                                   // send it to the owner at the end of
+                                   // assembly, by calling the
+                                   // <code>compress()</code> command.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner ()
@@ -2809,42 +2809,42 @@ namespace Step32
 
     WorkStream::
       run (CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       stokes_dof_handler.begin_active()),
-	   CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       stokes_dof_handler.end()),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    local_assemble_stokes_preconditioner,
-			    this,
-			    std_cxx1x::_1,
-			    std_cxx1x::_2,
-			    std_cxx1x::_3),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    copy_local_to_global_stokes_preconditioner,
-			    this,
-			    std_cxx1x::_1),
-	   Assembly::Scratch::
-	   StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
-				      mapping,
-				      update_JxW_values |
-				      update_values |
-				      update_gradients),
-	   Assembly::CopyData::
-	   StokesPreconditioner<dim> (stokes_fe));
+                       stokes_dof_handler.begin_active()),
+           CellFilter (IteratorFilters::LocallyOwnedCell(),
+                       stokes_dof_handler.end()),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            local_assemble_stokes_preconditioner,
+                            this,
+                            std_cxx1x::_1,
+                            std_cxx1x::_2,
+                            std_cxx1x::_3),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            copy_local_to_global_stokes_preconditioner,
+                            this,
+                            std_cxx1x::_1),
+           Assembly::Scratch::
+           StokesPreconditioner<dim> (stokes_fe, quadrature_formula,
+                                      mapping,
+                                      update_JxW_values |
+                                      update_values |
+                                      update_gradients),
+           Assembly::CopyData::
+           StokesPreconditioner<dim> (stokes_fe));
 
     stokes_preconditioner_matrix.compress();
   }
 
 
 
-				   // The final function in this block
-				   // initiates assembly of the Stokes
-				   // preconditioner matrix and then in fact
-				   // builds the Stokes preconditioner. It is
-				   // mostly the same as in the serial
-				   // case. The only difference to step-31 is
-				   // that we use a Jacobi preconditioner for
-				   // the pressure mass matrix instead of IC,
-				   // as discussed in the introduction.
+                                   // The final function in this block
+                                   // initiates assembly of the Stokes
+                                   // preconditioner matrix and then in fact
+                                   // builds the Stokes preconditioner. It is
+                                   // mostly the same as in the serial
+                                   // case. The only difference to step-31 is
+                                   // that we use a Jacobi preconditioner for
+                                   // the pressure mass matrix instead of IC,
+                                   // as discussed in the introduction.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::build_stokes_preconditioner ()
@@ -2861,7 +2861,7 @@ namespace Step32
     std::vector<bool>  velocity_components (dim+1,true);
     velocity_components[dim] = false;
     DoFTools::extract_constant_modes (stokes_dof_handler, velocity_components,
-				      constant_modes);
+                                      constant_modes);
 
     Mp_preconditioner.reset  (new TrilinosWrappers::PreconditionJacobi());
     Amg_preconditioner.reset (new TrilinosWrappers::PreconditionAMG());
@@ -2875,7 +2875,7 @@ namespace Step32
 
     Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
     Amg_preconditioner->initialize (stokes_preconditioner_matrix.block(0,0),
-				    Amg_data);
+                                    Amg_data);
 
     rebuild_stokes_preconditioner = false;
 
@@ -2884,33 +2884,33 @@ namespace Step32
   }
 
 
-				   // @sect5{Stokes system assembly}
+                                   // @sect5{Stokes system assembly}
 
-				   // The next three functions implement the
-				   // assembly of the Stokes system, again
-				   // split up into a part performing local
-				   // calculations, one for writing the local
-				   // data into the global matrix and vector,
-				   // and one for actually running the loop
-				   // over all cells with the help of the
-				   // WorkStream class. Note that the assembly
-				   // of the Stokes matrix needs only to be
-				   // done in case we have changed the
-				   // mesh. Otherwise, just the
-				   // (temperature-dependent) right hand side
-				   // needs to be calculated here. Since we
-				   // are working with distributed matrices
-				   // and vectors, we have to call the
-				   // respective <code>compress()</code>
-				   // functions in the end of the assembly in
-				   // order to send non-local data to the
-				   // owner process.
+                                   // The next three functions implement the
+                                   // assembly of the Stokes system, again
+                                   // split up into a part performing local
+                                   // calculations, one for writing the local
+                                   // data into the global matrix and vector,
+                                   // and one for actually running the loop
+                                   // over all cells with the help of the
+                                   // WorkStream class. Note that the assembly
+                                   // of the Stokes matrix needs only to be
+                                   // done in case we have changed the
+                                   // mesh. Otherwise, just the
+                                   // (temperature-dependent) right hand side
+                                   // needs to be calculated here. Since we
+                                   // are working with distributed matrices
+                                   // and vectors, we have to call the
+                                   // respective <code>compress()</code>
+                                   // functions in the end of the assembly in
+                                   // order to send non-local data to the
+                                   // owner process.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::
   local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
-				Assembly::Scratch::StokesSystem<dim> &scratch,
-				Assembly::CopyData::StokesSystem<dim> &data)
+                                Assembly::Scratch::StokesSystem<dim> &scratch,
+                                Assembly::CopyData::StokesSystem<dim> &data)
   {
     const unsigned int dofs_per_cell = scratch.stokes_fe_values.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = scratch.stokes_fe_values.n_quadrature_points;
@@ -2922,9 +2922,9 @@ namespace Step32
 
     typename DoFHandler<dim>::active_cell_iterator
       temperature_cell (&triangulation,
-			cell->level(),
-			cell->index(),
-			&temperature_dof_handler);
+                        cell->level(),
+                        cell->index(),
+                        &temperature_dof_handler);
     scratch.temperature_fe_values.reinit (temperature_cell);
 
     if (rebuild_stokes_matrix)
@@ -2932,43 +2932,43 @@ namespace Step32
     data.local_rhs = 0;
 
     scratch.temperature_fe_values.get_function_values (old_temperature_solution,
-						       scratch.old_temperature_values);
+                                                       scratch.old_temperature_values);
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
-	const double old_temperature = scratch.old_temperature_values[q];
+        const double old_temperature = scratch.old_temperature_values[q];
 
-	for (unsigned int k=0; k<dofs_per_cell; ++k)
-	  {
-	    scratch.phi_u[k] = scratch.stokes_fe_values[velocities].value (k,q);
-	    if (rebuild_stokes_matrix)
-	      {
-		scratch.grads_phi_u[k] = scratch.stokes_fe_values[velocities].symmetric_gradient(k,q);
-		scratch.div_phi_u[k]   = scratch.stokes_fe_values[velocities].divergence (k, q);
-		scratch.phi_p[k]       = scratch.stokes_fe_values[pressure].value (k, q);
-	      }
-	  }
+        for (unsigned int k=0; k<dofs_per_cell; ++k)
+          {
+            scratch.phi_u[k] = scratch.stokes_fe_values[velocities].value (k,q);
+            if (rebuild_stokes_matrix)
+              {
+                scratch.grads_phi_u[k] = scratch.stokes_fe_values[velocities].symmetric_gradient(k,q);
+                scratch.div_phi_u[k]   = scratch.stokes_fe_values[velocities].divergence (k, q);
+                scratch.phi_p[k]       = scratch.stokes_fe_values[pressure].value (k, q);
+              }
+          }
 
-	if (rebuild_stokes_matrix == true)
-	  for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      data.local_matrix(i,j) += (EquationData::eta * 2 *
-					 (scratch.grads_phi_u[i] * scratch.grads_phi_u[j])
-					 - (EquationData::pressure_scaling *
-					    scratch.div_phi_u[i] * scratch.phi_p[j])
-					 - (EquationData::pressure_scaling *
-					    scratch.phi_p[i] * scratch.div_phi_u[j]))
-					* scratch.stokes_fe_values.JxW(q);
+        if (rebuild_stokes_matrix == true)
+          for (unsigned int i=0; i<dofs_per_cell; ++i)
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              data.local_matrix(i,j) += (EquationData::eta * 2 *
+                                         (scratch.grads_phi_u[i] * scratch.grads_phi_u[j])
+                                         - (EquationData::pressure_scaling *
+                                            scratch.div_phi_u[i] * scratch.phi_p[j])
+                                         - (EquationData::pressure_scaling *
+                                            scratch.phi_p[i] * scratch.div_phi_u[j]))
+                                        * scratch.stokes_fe_values.JxW(q);
 
-	const Tensor<1,dim>
-	  gravity = EquationData::gravity_vector (scratch.stokes_fe_values
-						  .quadrature_point(q));
+        const Tensor<1,dim>
+          gravity = EquationData::gravity_vector (scratch.stokes_fe_values
+                                                  .quadrature_point(q));
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  data.local_rhs(i) += (EquationData::density(old_temperature) *
-				gravity  *
-				scratch.phi_u[i]) *
-			       scratch.stokes_fe_values.JxW(q);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          data.local_rhs(i) += (EquationData::density(old_temperature) *
+                                gravity  *
+                                scratch.phi_u[i]) *
+                               scratch.stokes_fe_values.JxW(q);
       }
 
     cell->get_dof_indices (data.local_dof_indices);
@@ -2983,14 +2983,14 @@ namespace Step32
   {
     if (rebuild_stokes_matrix == true)
       stokes_constraints.distribute_local_to_global (data.local_matrix,
-						     data.local_rhs,
-						     data.local_dof_indices,
-						     stokes_matrix,
-						     stokes_rhs);
+                                                     data.local_rhs,
+                                                     data.local_dof_indices,
+                                                     stokes_matrix,
+                                                     stokes_rhs);
     else
       stokes_constraints.distribute_local_to_global (data.local_rhs,
-						     data.local_dof_indices,
-						     stokes_rhs);
+                                                     data.local_dof_indices,
+                                                     stokes_rhs);
   }
 
 
@@ -3013,33 +3013,33 @@ namespace Step32
 
     WorkStream::
       run (CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       stokes_dof_handler.begin_active()),
-	   CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       stokes_dof_handler.end()),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    local_assemble_stokes_system,
-			    this,
-			    std_cxx1x::_1,
-			    std_cxx1x::_2,
-			    std_cxx1x::_3),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    copy_local_to_global_stokes_system,
-			    this,
-			    std_cxx1x::_1),
-	   Assembly::Scratch::
-	   StokesSystem<dim> (stokes_fe, mapping, quadrature_formula,
-			      (update_values    |
-			       update_quadrature_points  |
-			       update_JxW_values |
-			       (rebuild_stokes_matrix == true
-				?
-				update_gradients
-				:
-				UpdateFlags(0))),
-			      temperature_fe,
-			      update_values),
-	   Assembly::CopyData::
-	   StokesSystem<dim> (stokes_fe));
+                       stokes_dof_handler.begin_active()),
+           CellFilter (IteratorFilters::LocallyOwnedCell(),
+                       stokes_dof_handler.end()),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            local_assemble_stokes_system,
+                            this,
+                            std_cxx1x::_1,
+                            std_cxx1x::_2,
+                            std_cxx1x::_3),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            copy_local_to_global_stokes_system,
+                            this,
+                            std_cxx1x::_1),
+           Assembly::Scratch::
+           StokesSystem<dim> (stokes_fe, mapping, quadrature_formula,
+                              (update_values    |
+                               update_quadrature_points  |
+                               update_JxW_values |
+                               (rebuild_stokes_matrix == true
+                                ?
+                                update_gradients
+                                :
+                                UpdateFlags(0))),
+                              temperature_fe,
+                              update_values),
+           Assembly::CopyData::
+           StokesSystem<dim> (stokes_fe));
 
     stokes_matrix.compress();
     stokes_rhs.compress(Add);
@@ -3051,27 +3051,27 @@ namespace Step32
   }
 
 
-				   // @sect5{Temperature matrix assembly}
+                                   // @sect5{Temperature matrix assembly}
 
-				   // The task to be performed by the next
-				   // three functions is to calculate a mass
-				   // matrix and a Laplace matrix on the
-				   // temperature system. These will be
-				   // combined in order to yield the
-				   // semi-implicit time stepping matrix that
-				   // consists of the mass matrix plus a time
-				   // step-dependent weight factor times the
-				   // Laplace matrix. This function is again
-				   // essentially the body of the loop over
-				   // all cells from step-31.
-				   //
-				   // The two following functions perform
-				   // similar services as the ones above.
+                                   // The task to be performed by the next
+                                   // three functions is to calculate a mass
+                                   // matrix and a Laplace matrix on the
+                                   // temperature system. These will be
+                                   // combined in order to yield the
+                                   // semi-implicit time stepping matrix that
+                                   // consists of the mass matrix plus a time
+                                   // step-dependent weight factor times the
+                                   // Laplace matrix. This function is again
+                                   // essentially the body of the loop over
+                                   // all cells from step-31.
+                                   //
+                                   // The two following functions perform
+                                   // similar services as the ones above.
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-				     Assembly::Scratch::TemperatureMatrix<dim> &scratch,
-				     Assembly::CopyData::TemperatureMatrix<dim> &data)
+                                     Assembly::Scratch::TemperatureMatrix<dim> &scratch,
+                                     Assembly::CopyData::TemperatureMatrix<dim> &data)
   {
     const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
     const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
@@ -3084,24 +3084,24 @@ namespace Step32
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
-	for (unsigned int k=0; k<dofs_per_cell; ++k)
-	  {
-	    scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad (k,q);
-	    scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value (k, q);
-	  }
+        for (unsigned int k=0; k<dofs_per_cell; ++k)
+          {
+            scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad (k,q);
+            scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value (k, q);
+          }
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    {
-	      data.local_mass_matrix(i,j)
-		+= (scratch.phi_T[i] * scratch.phi_T[j]
-		    *
-		    scratch.temperature_fe_values.JxW(q));
-	      data.local_stiffness_matrix(i,j)
-		+= (EquationData::kappa * scratch.grad_phi_T[i] * scratch.grad_phi_T[j]
-		    *
-		    scratch.temperature_fe_values.JxW(q));
-	    }
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            {
+              data.local_mass_matrix(i,j)
+                += (scratch.phi_T[i] * scratch.phi_T[j]
+                    *
+                    scratch.temperature_fe_values.JxW(q));
+              data.local_stiffness_matrix(i,j)
+                += (EquationData::kappa * scratch.grad_phi_T[i] * scratch.grad_phi_T[j]
+                    *
+                    scratch.temperature_fe_values.JxW(q));
+            }
       }
   }
 
@@ -3113,11 +3113,11 @@ namespace Step32
   copy_local_to_global_temperature_matrix (const Assembly::CopyData::TemperatureMatrix<dim> &data)
   {
     temperature_constraints.distribute_local_to_global (data.local_mass_matrix,
-							data.local_dof_indices,
-							temperature_mass_matrix);
+                                                        data.local_dof_indices,
+                                                        temperature_mass_matrix);
     temperature_constraints.distribute_local_to_global (data.local_stiffness_matrix,
-							data.local_dof_indices,
-							temperature_stiffness_matrix);
+                                                        data.local_dof_indices,
+                                                        temperature_stiffness_matrix);
   }
 
 
@@ -3139,23 +3139,23 @@ namespace Step32
 
     WorkStream::
       run (CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       temperature_dof_handler.begin_active()),
-	   CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       temperature_dof_handler.end()),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    local_assemble_temperature_matrix,
-			    this,
-			    std_cxx1x::_1,
-			    std_cxx1x::_2,
-			    std_cxx1x::_3),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    copy_local_to_global_temperature_matrix,
-			    this,
-			    std_cxx1x::_1),
-	   Assembly::Scratch::
-	   TemperatureMatrix<dim> (temperature_fe, mapping, quadrature_formula),
-	   Assembly::CopyData::
-	   TemperatureMatrix<dim> (temperature_fe));
+                       temperature_dof_handler.begin_active()),
+           CellFilter (IteratorFilters::LocallyOwnedCell(),
+                       temperature_dof_handler.end()),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            local_assemble_temperature_matrix,
+                            this,
+                            std_cxx1x::_1,
+                            std_cxx1x::_2,
+                            std_cxx1x::_3),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            copy_local_to_global_temperature_matrix,
+                            this,
+                            std_cxx1x::_1),
+           Assembly::Scratch::
+           TemperatureMatrix<dim> (temperature_fe, mapping, quadrature_formula),
+           Assembly::CopyData::
+           TemperatureMatrix<dim> (temperature_fe));
 
     temperature_mass_matrix.compress();
     temperature_stiffness_matrix.compress();
@@ -3167,39 +3167,39 @@ namespace Step32
   }
 
 
-				   // @sect5{Temperature right hand side assembly}
+                                   // @sect5{Temperature right hand side assembly}
 
-				   // This is the last assembly function. It
-				   // calculates the right hand side of the
-				   // temperature system, which includes the
-				   // convection and the stabilization
-				   // terms. It includes a lot of evaluations
-				   // of old solutions at the quadrature
-				   // points (which are necessary for
-				   // calculating the artificial viscosity of
-				   // stabilization), but is otherwise similar
-				   // to the other assembly functions. Notice,
-				   // once again, how we resolve the dilemma
-				   // of having inhomogeneous boundary
-				   // conditions, by just making a right hand
-				   // side at this point (compare the comments
-				   // for the <code>project()</code> function
-				   // above): We create some matrix columns
-				   // with exactly the values that would be
-				   // entered for the temperature stiffness
-				   // matrix, in case we have inhomogeneously
-				   // constrained dofs. That will account for
-				   // the correct balance of the right hand
-				   // side vector with the matrix system of
-				   // temperature.
+                                   // This is the last assembly function. It
+                                   // calculates the right hand side of the
+                                   // temperature system, which includes the
+                                   // convection and the stabilization
+                                   // terms. It includes a lot of evaluations
+                                   // of old solutions at the quadrature
+                                   // points (which are necessary for
+                                   // calculating the artificial viscosity of
+                                   // stabilization), but is otherwise similar
+                                   // to the other assembly functions. Notice,
+                                   // once again, how we resolve the dilemma
+                                   // of having inhomogeneous boundary
+                                   // conditions, by just making a right hand
+                                   // side at this point (compare the comments
+                                   // for the <code>project()</code> function
+                                   // above): We create some matrix columns
+                                   // with exactly the values that would be
+                                   // entered for the temperature stiffness
+                                   // matrix, in case we have inhomogeneously
+                                   // constrained dofs. That will account for
+                                   // the correct balance of the right hand
+                                   // side vector with the matrix system of
+                                   // temperature.
   template <int dim>
   void BoussinesqFlowProblem<dim>::
   local_assemble_temperature_rhs (const std::pair<double,double> global_T_range,
-				  const double                   global_max_velocity,
-				  const double                   global_entropy_variation,
-				  const typename DoFHandler<dim>::active_cell_iterator &cell,
-				  Assembly::Scratch::TemperatureRHS<dim> &scratch,
-				  Assembly::CopyData::TemperatureRHS<dim> &data)
+                                  const double                   global_max_velocity,
+                                  const double                   global_entropy_variation,
+                                  const typename DoFHandler<dim>::active_cell_iterator &cell,
+                                  Assembly::Scratch::TemperatureRHS<dim> &scratch,
+                                  Assembly::CopyData::TemperatureRHS<dim> &data)
   {
     const bool use_bdf2_scheme = (timestep_number != 0);
 
@@ -3216,149 +3216,149 @@ namespace Step32
 
     typename DoFHandler<dim>::active_cell_iterator
       stokes_cell (&triangulation,
-		   cell->level(),
-		   cell->index(),
-		   &stokes_dof_handler);
+                   cell->level(),
+                   cell->index(),
+                   &stokes_dof_handler);
     scratch.stokes_fe_values.reinit (stokes_cell);
 
     scratch.temperature_fe_values.get_function_values (old_temperature_solution,
-						       scratch.old_temperature_values);
+                                                       scratch.old_temperature_values);
     scratch.temperature_fe_values.get_function_values (old_old_temperature_solution,
-						       scratch.old_old_temperature_values);
+                                                       scratch.old_old_temperature_values);
 
     scratch.temperature_fe_values.get_function_gradients (old_temperature_solution,
-							  scratch.old_temperature_grads);
+                                                          scratch.old_temperature_grads);
     scratch.temperature_fe_values.get_function_gradients (old_old_temperature_solution,
-							  scratch.old_old_temperature_grads);
+                                                          scratch.old_old_temperature_grads);
 
     scratch.temperature_fe_values.get_function_laplacians (old_temperature_solution,
-							   scratch.old_temperature_laplacians);
+                                                           scratch.old_temperature_laplacians);
     scratch.temperature_fe_values.get_function_laplacians (old_old_temperature_solution,
-							   scratch.old_old_temperature_laplacians);
+                                                           scratch.old_old_temperature_laplacians);
 
     scratch.stokes_fe_values[velocities].get_function_values (stokes_solution,
-							      scratch.old_velocity_values);
+                                                              scratch.old_velocity_values);
     scratch.stokes_fe_values[velocities].get_function_values (old_stokes_solution,
-							      scratch.old_old_velocity_values);
+                                                              scratch.old_old_velocity_values);
     scratch.stokes_fe_values[velocities].get_function_symmetric_gradients (stokes_solution,
-									   scratch.old_strain_rates);
+                                                                           scratch.old_strain_rates);
     scratch.stokes_fe_values[velocities].get_function_symmetric_gradients (old_stokes_solution,
-									   scratch.old_old_strain_rates);
+                                                                           scratch.old_old_strain_rates);
 
     const double nu
       = compute_viscosity (scratch.old_temperature_values,
-			   scratch.old_old_temperature_values,
-			   scratch.old_temperature_grads,
-			   scratch.old_old_temperature_grads,
-			   scratch.old_temperature_laplacians,
-			   scratch.old_old_temperature_laplacians,
-			   scratch.old_velocity_values,
-			   scratch.old_old_velocity_values,
-			   scratch.old_strain_rates,
-			   scratch.old_old_strain_rates,
-			   global_max_velocity,
-			   global_T_range.second - global_T_range.first,
-			   0.5 * (global_T_range.second + global_T_range.first),
-			   global_entropy_variation,
-			   cell->diameter());
+                           scratch.old_old_temperature_values,
+                           scratch.old_temperature_grads,
+                           scratch.old_old_temperature_grads,
+                           scratch.old_temperature_laplacians,
+                           scratch.old_old_temperature_laplacians,
+                           scratch.old_velocity_values,
+                           scratch.old_old_velocity_values,
+                           scratch.old_strain_rates,
+                           scratch.old_old_strain_rates,
+                           global_max_velocity,
+                           global_T_range.second - global_T_range.first,
+                           0.5 * (global_T_range.second + global_T_range.first),
+                           global_entropy_variation,
+                           cell->diameter());
 
     for (unsigned int q=0; q<n_q_points; ++q)
       {
-	for (unsigned int k=0; k<dofs_per_cell; ++k)
-	  {
-	    scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value (k, q);
-	    scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad (k,q);
-	  }
+        for (unsigned int k=0; k<dofs_per_cell; ++k)
+          {
+            scratch.phi_T[k]      = scratch.temperature_fe_values.shape_value (k, q);
+            scratch.grad_phi_T[k] = scratch.temperature_fe_values.shape_grad (k,q);
+          }
 
 
-	const double T_term_for_rhs
-	  = (use_bdf2_scheme ?
-	     (scratch.old_temperature_values[q] *
-	      (1 + time_step/old_time_step)
-	      -
-	      scratch.old_old_temperature_values[q] *
-	      (time_step * time_step) /
-	      (old_time_step * (time_step + old_time_step)))
-	     :
-	     scratch.old_temperature_values[q]);
+        const double T_term_for_rhs
+          = (use_bdf2_scheme ?
+             (scratch.old_temperature_values[q] *
+              (1 + time_step/old_time_step)
+              -
+              scratch.old_old_temperature_values[q] *
+              (time_step * time_step) /
+              (old_time_step * (time_step + old_time_step)))
+             :
+             scratch.old_temperature_values[q]);
 
-	const double ext_T
-	  = (use_bdf2_scheme ?
-	     (scratch.old_temperature_values[q] *
-	      (1 + time_step/old_time_step)
-	      -
-	      scratch.old_old_temperature_values[q] *
-	      time_step/old_time_step)
-	     :
-	     scratch.old_temperature_values[q]);
+        const double ext_T
+          = (use_bdf2_scheme ?
+             (scratch.old_temperature_values[q] *
+              (1 + time_step/old_time_step)
+              -
+              scratch.old_old_temperature_values[q] *
+              time_step/old_time_step)
+             :
+             scratch.old_temperature_values[q]);
 
-	const Tensor<1,dim> ext_grad_T
-	  = (use_bdf2_scheme ?
-	     (scratch.old_temperature_grads[q] *
-	      (1 + time_step/old_time_step)
-	      -
-	      scratch.old_old_temperature_grads[q] *
-	      time_step/old_time_step)
-	     :
-	     scratch.old_temperature_grads[q]);
+        const Tensor<1,dim> ext_grad_T
+          = (use_bdf2_scheme ?
+             (scratch.old_temperature_grads[q] *
+              (1 + time_step/old_time_step)
+              -
+              scratch.old_old_temperature_grads[q] *
+              time_step/old_time_step)
+             :
+             scratch.old_temperature_grads[q]);
 
-	const Tensor<1,dim> extrapolated_u
-	  = (use_bdf2_scheme ?
-	     (scratch.old_velocity_values[q] *
-	      (1 + time_step/old_time_step)
-	      -
-	      scratch.old_old_velocity_values[q] *
-	      time_step/old_time_step)
-	     :
-	     scratch.old_velocity_values[q]);
+        const Tensor<1,dim> extrapolated_u
+          = (use_bdf2_scheme ?
+             (scratch.old_velocity_values[q] *
+              (1 + time_step/old_time_step)
+              -
+              scratch.old_old_velocity_values[q] *
+              time_step/old_time_step)
+             :
+             scratch.old_velocity_values[q]);
 
-	const SymmetricTensor<2,dim> extrapolated_strain_rate
-	  = (use_bdf2_scheme ?
-	     (scratch.old_strain_rates[q] *
-	      (1 + time_step/old_time_step)
-	      -
-	      scratch.old_old_strain_rates[q] *
-	      time_step/old_time_step)
-	     :
-	     scratch.old_strain_rates[q]);
+        const SymmetricTensor<2,dim> extrapolated_strain_rate
+          = (use_bdf2_scheme ?
+             (scratch.old_strain_rates[q] *
+              (1 + time_step/old_time_step)
+              -
+              scratch.old_old_strain_rates[q] *
+              time_step/old_time_step)
+             :
+             scratch.old_strain_rates[q]);
 
-	const double gamma
-	  = ((EquationData::radiogenic_heating * EquationData::density(ext_T)
-	      +
-	      2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
-	     (EquationData::density(ext_T) * EquationData::specific_heat));
+        const double gamma
+          = ((EquationData::radiogenic_heating * EquationData::density(ext_T)
+              +
+              2 * EquationData::eta * extrapolated_strain_rate * extrapolated_strain_rate) /
+             (EquationData::density(ext_T) * EquationData::specific_heat));
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  {
-	    data.local_rhs(i) += (T_term_for_rhs * scratch.phi_T[i]
-				  -
-				  time_step *
-				  extrapolated_u * ext_grad_T * scratch.phi_T[i]
-				  -
-				  time_step *
-				  nu * ext_grad_T * scratch.grad_phi_T[i]
-				  +
-				  time_step *
-				  gamma * scratch.phi_T[i])
-				 *
-				 scratch.temperature_fe_values.JxW(q);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            data.local_rhs(i) += (T_term_for_rhs * scratch.phi_T[i]
+                                  -
+                                  time_step *
+                                  extrapolated_u * ext_grad_T * scratch.phi_T[i]
+                                  -
+                                  time_step *
+                                  nu * ext_grad_T * scratch.grad_phi_T[i]
+                                  +
+                                  time_step *
+                                  gamma * scratch.phi_T[i])
+                                 *
+                                 scratch.temperature_fe_values.JxW(q);
 
-	    if (temperature_constraints.is_inhomogeneously_constrained(data.local_dof_indices[i]))
-	      {
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  data.matrix_for_bc(j,i) += (scratch.phi_T[i] * scratch.phi_T[j] *
-					      (use_bdf2_scheme ?
-					       ((2*time_step + old_time_step) /
-						(time_step + old_time_step)) : 1.)
-					      +
-					      scratch.grad_phi_T[i] *
-					      scratch.grad_phi_T[j] *
-					      EquationData::kappa *
-					      time_step)
-					     *
-					     scratch.temperature_fe_values.JxW(q);
-	      }
-	  }
+            if (temperature_constraints.is_inhomogeneously_constrained(data.local_dof_indices[i]))
+              {
+                for (unsigned int j=0; j<dofs_per_cell; ++j)
+                  data.matrix_for_bc(j,i) += (scratch.phi_T[i] * scratch.phi_T[j] *
+                                              (use_bdf2_scheme ?
+                                               ((2*time_step + old_time_step) /
+                                                (time_step + old_time_step)) : 1.)
+                                              +
+                                              scratch.grad_phi_T[i] *
+                                              scratch.grad_phi_T[j] *
+                                              EquationData::kappa *
+                                              time_step)
+                                             *
+                                             scratch.temperature_fe_values.JxW(q);
+              }
+          }
       }
   }
 
@@ -3369,45 +3369,45 @@ namespace Step32
   copy_local_to_global_temperature_rhs (const Assembly::CopyData::TemperatureRHS<dim> &data)
   {
     temperature_constraints.distribute_local_to_global (data.local_rhs,
-							data.local_dof_indices,
-							temperature_rhs,
-							data.matrix_for_bc);
+                                                        data.local_dof_indices,
+                                                        temperature_rhs,
+                                                        data.matrix_for_bc);
   }
 
 
 
-				   // In the function that runs the WorkStream
-				   // for actually calculating the right hand
-				   // side, we also generate the final
-				   // matrix. As mentioned above, it is a sum
-				   // of the mass matrix and the Laplace
-				   // matrix, times some time step-dependent
-				   // weight. This weight is specified by the
-				   // BDF-2 time integration scheme, see the
-				   // introduction in step-31. What is new in
-				   // this tutorial program (in addition to
-				   // the use of MPI parallelization and the
-				   // WorkStream class), is that we now
-				   // precompute the temperature
-				   // preconditioner as well. The reason is
-				   // that the setup of the Jacobi
-				   // preconditioner takes a noticable time
-				   // compared to the solver because we
-				   // usually only need between 10 and 20
-				   // iterations for solving the temperature
-				   // system (this might sound strange, as
-				   // Jacobi really only consists of a
-				   // diagonal, but in Trilinos it is derived
-				   // from more general framework for point
-				   // relaxation preconditioners which is a
-				   // bit inefficient). Hence, it is more
-				   // efficient to precompute the
-				   // preconditioner, even though the matrix
-				   // entries may slightly change because the
-				   // time step might change. This is not too
-				   // big a problem because we remesh every
-				   // few time steps (and regenerate the
-				   // preconditioner then).
+                                   // In the function that runs the WorkStream
+                                   // for actually calculating the right hand
+                                   // side, we also generate the final
+                                   // matrix. As mentioned above, it is a sum
+                                   // of the mass matrix and the Laplace
+                                   // matrix, times some time step-dependent
+                                   // weight. This weight is specified by the
+                                   // BDF-2 time integration scheme, see the
+                                   // introduction in step-31. What is new in
+                                   // this tutorial program (in addition to
+                                   // the use of MPI parallelization and the
+                                   // WorkStream class), is that we now
+                                   // precompute the temperature
+                                   // preconditioner as well. The reason is
+                                   // that the setup of the Jacobi
+                                   // preconditioner takes a noticable time
+                                   // compared to the solver because we
+                                   // usually only need between 10 and 20
+                                   // iterations for solving the temperature
+                                   // system (this might sound strange, as
+                                   // Jacobi really only consists of a
+                                   // diagonal, but in Trilinos it is derived
+                                   // from more general framework for point
+                                   // relaxation preconditioners which is a
+                                   // bit inefficient). Hence, it is more
+                                   // efficient to precompute the
+                                   // preconditioner, even though the matrix
+                                   // entries may slightly change because the
+                                   // time step might change. This is not too
+                                   // big a problem because we remesh every
+                                   // few time steps (and regenerate the
+                                   // preconditioner then).
   template <int dim>
   void BoussinesqFlowProblem<dim>::assemble_temperature_system (const double maximal_velocity)
   {
@@ -3415,44 +3415,44 @@ namespace Step32
 
     if (use_bdf2_scheme == true)
       {
-	temperature_matrix.copy_from (temperature_mass_matrix);
-	temperature_matrix *= (2*time_step + old_time_step) /
-			      (time_step + old_time_step);
-	temperature_matrix.add (time_step, temperature_stiffness_matrix);
+        temperature_matrix.copy_from (temperature_mass_matrix);
+        temperature_matrix *= (2*time_step + old_time_step) /
+                              (time_step + old_time_step);
+        temperature_matrix.add (time_step, temperature_stiffness_matrix);
       }
     else
       {
-	temperature_matrix.copy_from (temperature_mass_matrix);
-	temperature_matrix.add (time_step, temperature_stiffness_matrix);
+        temperature_matrix.copy_from (temperature_mass_matrix);
+        temperature_matrix.add (time_step, temperature_stiffness_matrix);
       }
     temperature_matrix.compress();
 
     if (rebuild_temperature_preconditioner == true)
       {
-	T_preconditioner.reset (new TrilinosWrappers::PreconditionJacobi());
-	T_preconditioner->initialize (temperature_matrix);
-	rebuild_temperature_preconditioner = false;
+        T_preconditioner.reset (new TrilinosWrappers::PreconditionJacobi());
+        T_preconditioner->initialize (temperature_matrix);
+        rebuild_temperature_preconditioner = false;
       }
 
-				     // The next part is computing the right
-				     // hand side vectors.  To do so, we first
-				     // compute the average temperature $T_m$
-				     // that we use for evaluating the
-				     // artificial viscosity stabilization
-				     // through the residual $E(T) =
-				     // (T-T_m)^2$. We do this by defining the
-				     // midpoint between maximum and minimum
-				     // temperature as average temperature in
-				     // the definition of the entropy
-				     // viscosity. An alternative would be to
-				     // use the integral average, but the
-				     // results are not very sensitive to this
-				     // choice. The rest then only requires
-				     // calling WorkStream::run again, binding
-				     // the arguments to the
-				     // <code>local_assemble_temperature_rhs</code>
-				     // function that are the same in every
-				     // call to the correct values:
+                                     // The next part is computing the right
+                                     // hand side vectors.  To do so, we first
+                                     // compute the average temperature $T_m$
+                                     // that we use for evaluating the
+                                     // artificial viscosity stabilization
+                                     // through the residual $E(T) =
+                                     // (T-T_m)^2$. We do this by defining the
+                                     // midpoint between maximum and minimum
+                                     // temperature as average temperature in
+                                     // the definition of the entropy
+                                     // viscosity. An alternative would be to
+                                     // use the integral average, but the
+                                     // results are not very sensitive to this
+                                     // choice. The rest then only requires
+                                     // calling WorkStream::run again, binding
+                                     // the arguments to the
+                                     // <code>local_assemble_temperature_rhs</code>
+                                     // function that are the same in every
+                                     // call to the correct values:
     temperature_rhs = 0;
 
     const QGauss<dim> quadrature_formula(parameters.temperature_degree+2);
@@ -3460,7 +3460,7 @@ namespace Step32
       global_T_range = get_extrapolated_temperature_range();
 
     const double average_temperature = 0.5 * (global_T_range.first +
-					      global_T_range.second);
+                                              global_T_range.second);
     const double global_entropy_variation =
       get_entropy_variation (average_temperature);
 
@@ -3470,27 +3470,27 @@ namespace Step32
 
     WorkStream::
       run (CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       temperature_dof_handler.begin_active()),
-	   CellFilter (IteratorFilters::LocallyOwnedCell(),
-		       temperature_dof_handler.end()),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    local_assemble_temperature_rhs,
-			    this,
-			    global_T_range,
-			    maximal_velocity,
-			    global_entropy_variation,
-			    std_cxx1x::_1,
-			    std_cxx1x::_2,
-			    std_cxx1x::_3),
-	   std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
-			    copy_local_to_global_temperature_rhs,
-			    this,
-			    std_cxx1x::_1),
-	   Assembly::Scratch::
-	   TemperatureRHS<dim> (temperature_fe, stokes_fe, mapping,
-				quadrature_formula),
-	   Assembly::CopyData::
-	   TemperatureRHS<dim> (temperature_fe));
+                       temperature_dof_handler.begin_active()),
+           CellFilter (IteratorFilters::LocallyOwnedCell(),
+                       temperature_dof_handler.end()),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            local_assemble_temperature_rhs,
+                            this,
+                            global_T_range,
+                            maximal_velocity,
+                            global_entropy_variation,
+                            std_cxx1x::_1,
+                            std_cxx1x::_2,
+                            std_cxx1x::_3),
+           std_cxx1x::bind (&BoussinesqFlowProblem<dim>::
+                            copy_local_to_global_temperature_rhs,
+                            this,
+                            std_cxx1x::_1),
+           Assembly::Scratch::
+           TemperatureRHS<dim> (temperature_fe, stokes_fe, mapping,
+                                quadrature_formula),
+           Assembly::CopyData::
+           TemperatureRHS<dim> (temperature_fe));
 
     temperature_rhs.compress(Add);
   }
@@ -3498,89 +3498,89 @@ namespace Step32
 
 
 
-				   // @sect4{BoussinesqFlowProblem::solve}
+                                   // @sect4{BoussinesqFlowProblem::solve}
 
-				   // This function solves the linear systems
-				   // in each time step of the Boussinesq
-				   // problem. First, we
-				   // work on the Stokes system and then on
-				   // the temperature system. In essence, it
-				   // does the same things as the respective
-				   // function in step-31. However, there are a few
-				   // changes here.
-				   //
-				   // The first change is related to the way
-				   // we store our solution: we keep the
-				   // vectors with locally owned degrees of
-				   // freedom plus ghost nodes on each MPI
-				   // node. When we enter a solver which is
-				   // supposed to perform matrix-vector
-				   // products with a distributed matrix, this
-				   // is not the appropriate form,
-				   // though. There, we will want to have the
-				   // solution vector to be distributed in the
-				   // same way as the matrix, i.e. without any
-				   // ghosts. So what we do first is to
-				   // generate a distributed vector called
-				   // <code>distributed_stokes_solution</code>
-				   // and put only the locally owned dofs into
-				   // that, which is neatly done by the
-				   // <code>operator=</code> of the Trilinos
-				   // vector.
-				   //
-				   // Next, we scale the pressure solution (or
-				   // rather, the initial guess) for the
-				   // solver so that it matches with the
-				   // length scales in the matrices, as
-				   // discussed in the introduction. We also
-				   // immediately scale the pressure solution
-				   // back to the correct units after the
-				   // solution is completed.  We also need to
-				   // set the pressure values at hanging nodes
-				   // to zero. This we also did in step-31 in
-				   // order not to disturb the Schur
-				   // complement by some vector entries that
-				   // actually are irrelevant during the solve
-				   // stage. As a difference to step-31, here
-				   // we do it only for the locally owned
-				   // pressure dofs. After solving for the
-				   // Stokes solution, each processor copies
-				   // the distributed solution back into the
-				   // solution vector that also includes ghost
-				   // elements.
-				   //
-				   // The third and most obvious change is
-				   // that we have two variants for the Stokes
-				   // solver: A fast solver that sometimes
-				   // breaks down, and a robust solver that is
-				   // slower. This is what we already
-				   // discussed in the introduction. Here is
-				   // how we realize it: First, we perform 30
-				   // iterations with the fast solver based on
-				   // the simple preconditioner based on the
-				   // AMG V-cycle instead of an approximate
-				   // solve (this is indicated by the
-				   // <code>false</code> argument to the
-				   // <code>LinearSolvers::BlockSchurPreconditioner</code>
-				   // object). If we converge, everything is
-				   // fine. If we do not converge, the solver
-				   // control object will throw an exception
-				   // SolverControl::NoConvergence. Usually,
-				   // this would abort the program because we
-				   // don't catch them in our usual
-				   // <code>solve()</code> functions. This is
-				   // certainly not what we want to happen
-				   // here. Rather, we want to switch to the
-				   // strong solver and continue the solution
-				   // process with whatever vector we got so
-				   // far. Hence, we catch the exception with
-				   // the C++ try/catch mechanism. We then
-				   // simply go through the same solver
-				   // sequence again in the <code>catch</code>
-				   // clause, this time passing the @p true
-				   // flag to the preconditioner for the
-				   // strong solver, signaling an approximate
-				   // CG solve.
+                                   // This function solves the linear systems
+                                   // in each time step of the Boussinesq
+                                   // problem. First, we
+                                   // work on the Stokes system and then on
+                                   // the temperature system. In essence, it
+                                   // does the same things as the respective
+                                   // function in step-31. However, there are a few
+                                   // changes here.
+                                   //
+                                   // The first change is related to the way
+                                   // we store our solution: we keep the
+                                   // vectors with locally owned degrees of
+                                   // freedom plus ghost nodes on each MPI
+                                   // node. When we enter a solver which is
+                                   // supposed to perform matrix-vector
+                                   // products with a distributed matrix, this
+                                   // is not the appropriate form,
+                                   // though. There, we will want to have the
+                                   // solution vector to be distributed in the
+                                   // same way as the matrix, i.e. without any
+                                   // ghosts. So what we do first is to
+                                   // generate a distributed vector called
+                                   // <code>distributed_stokes_solution</code>
+                                   // and put only the locally owned dofs into
+                                   // that, which is neatly done by the
+                                   // <code>operator=</code> of the Trilinos
+                                   // vector.
+                                   //
+                                   // Next, we scale the pressure solution (or
+                                   // rather, the initial guess) for the
+                                   // solver so that it matches with the
+                                   // length scales in the matrices, as
+                                   // discussed in the introduction. We also
+                                   // immediately scale the pressure solution
+                                   // back to the correct units after the
+                                   // solution is completed.  We also need to
+                                   // set the pressure values at hanging nodes
+                                   // to zero. This we also did in step-31 in
+                                   // order not to disturb the Schur
+                                   // complement by some vector entries that
+                                   // actually are irrelevant during the solve
+                                   // stage. As a difference to step-31, here
+                                   // we do it only for the locally owned
+                                   // pressure dofs. After solving for the
+                                   // Stokes solution, each processor copies
+                                   // the distributed solution back into the
+                                   // solution vector that also includes ghost
+                                   // elements.
+                                   //
+                                   // The third and most obvious change is
+                                   // that we have two variants for the Stokes
+                                   // solver: A fast solver that sometimes
+                                   // breaks down, and a robust solver that is
+                                   // slower. This is what we already
+                                   // discussed in the introduction. Here is
+                                   // how we realize it: First, we perform 30
+                                   // iterations with the fast solver based on
+                                   // the simple preconditioner based on the
+                                   // AMG V-cycle instead of an approximate
+                                   // solve (this is indicated by the
+                                   // <code>false</code> argument to the
+                                   // <code>LinearSolvers::BlockSchurPreconditioner</code>
+                                   // object). If we converge, everything is
+                                   // fine. If we do not converge, the solver
+                                   // control object will throw an exception
+                                   // SolverControl::NoConvergence. Usually,
+                                   // this would abort the program because we
+                                   // don't catch them in our usual
+                                   // <code>solve()</code> functions. This is
+                                   // certainly not what we want to happen
+                                   // here. Rather, we want to switch to the
+                                   // strong solver and continue the solution
+                                   // process with whatever vector we got so
+                                   // far. Hence, we catch the exception with
+                                   // the C++ try/catch mechanism. We then
+                                   // simply go through the same solver
+                                   // sequence again in the <code>catch</code>
+                                   // clause, this time passing the @p true
+                                   // flag to the preconditioner for the
+                                   // strong solver, signaling an approximate
+                                   // CG solve.
   template <int dim>
   void BoussinesqFlowProblem<dim>::solve ()
   {
@@ -3590,19 +3590,19 @@ namespace Step32
       pcout << "   Solving Stokes system... " << std::flush;
 
       TrilinosWrappers::MPI::BlockVector
-	distributed_stokes_solution (stokes_rhs);
+        distributed_stokes_solution (stokes_rhs);
       distributed_stokes_solution = stokes_solution;
 
       distributed_stokes_solution.block(1) /= EquationData::pressure_scaling;
 
       const unsigned int
-	start = (distributed_stokes_solution.block(0).size() +
-		 distributed_stokes_solution.block(1).local_range().first),
-	end   = (distributed_stokes_solution.block(0).size() +
-		 distributed_stokes_solution.block(1).local_range().second);
+        start = (distributed_stokes_solution.block(0).size() +
+                 distributed_stokes_solution.block(1).local_range().first),
+        end   = (distributed_stokes_solution.block(0).size() +
+                 distributed_stokes_solution.block(1).local_range().second);
       for (unsigned int i=start; i<end; ++i)
-	if (stokes_constraints.is_constrained (i))
-	  distributed_stokes_solution(i) = 0;
+        if (stokes_constraints.is_constrained (i))
+          distributed_stokes_solution(i) = 0;
 
 
       PrimitiveVectorMemory<TrilinosWrappers::MPI::BlockVector> mem;
@@ -3612,42 +3612,42 @@ namespace Step32
       SolverControl solver_control (30, solver_tolerance);
 
       try
-	{
-	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-							TrilinosWrappers::PreconditionJacobi>
-	    preconditioner (stokes_matrix, stokes_preconditioner_matrix,
-			    *Mp_preconditioner, *Amg_preconditioner,
-			    false);
+        {
+          const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
+                                                        TrilinosWrappers::PreconditionJacobi>
+            preconditioner (stokes_matrix, stokes_preconditioner_matrix,
+                            *Mp_preconditioner, *Amg_preconditioner,
+                            false);
 
-	  SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
-	    solver(solver_control, mem,
-		   SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
-		   AdditionalData(30, true));
-	  solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
-		       preconditioner);
+          SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+            solver(solver_control, mem,
+                   SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
+                   AdditionalData(30, true));
+          solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
+                       preconditioner);
 
-	  n_iterations = solver_control.last_step();
-	}
+          n_iterations = solver_control.last_step();
+        }
 
       catch (SolverControl::NoConvergence)
-	{
-	  const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-							TrilinosWrappers::PreconditionJacobi>
-	    preconditioner (stokes_matrix, stokes_preconditioner_matrix,
-			    *Mp_preconditioner, *Amg_preconditioner,
-			    true);
+        {
+          const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
+                                                        TrilinosWrappers::PreconditionJacobi>
+            preconditioner (stokes_matrix, stokes_preconditioner_matrix,
+                            *Mp_preconditioner, *Amg_preconditioner,
+                            true);
 
-	  SolverControl solver_control_refined (stokes_matrix.m(), solver_tolerance);
-	  SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
-	    solver(solver_control_refined, mem,
-		   SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
-		   AdditionalData(50, true));
-	  solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
-		       preconditioner);
+          SolverControl solver_control_refined (stokes_matrix.m(), solver_tolerance);
+          SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+            solver(solver_control_refined, mem,
+                   SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
+                   AdditionalData(50, true));
+          solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
+                       preconditioner);
 
-	  n_iterations = (solver_control.last_step() +
-			  solver_control_refined.last_step());
-	}
+          n_iterations = (solver_control.last_step() +
+                          solver_control_refined.last_step());
+        }
 
 
       stokes_constraints.distribute (distributed_stokes_solution);
@@ -3656,62 +3656,62 @@ namespace Step32
 
       stokes_solution = distributed_stokes_solution;
       pcout << n_iterations  << " iterations."
-	    << std::endl;
+            << std::endl;
     }
     computing_timer.exit_section();
 
 
-				     // Now let's turn to the temperature
-				     // part: First, we compute the time step
-				     // size. We found that we need smaller
-				     // time steps for 3D than for 2D for the
-				     // shell geometry. This is because the
-				     // cells are more distorted in that case
-				     // (it is the smallest edge length that
-				     // determines the CFL number). Instead of
-				     // computing the time step from maximum
-				     // velocity and minimal mesh size as in
-				     // step-31, we compute local CFL numbers,
-				     // i.e., on each cell we compute the
-				     // maximum velocity times the mesh size,
-				     // and compute the maximum of
-				     // them. Hence, we need to choose the
-				     // factor in front of the time step
-				     // slightly smaller.
-				     //
-				     // After temperature right hand side
-				     // assembly, we solve the linear system
-				     // for temperature (with fully
-				     // distributed vectors without any
-				     // ghosts), apply constraints and copy
-				     // the vector back to one with ghosts.
-				     //
-				     // In the end, we extract the temperature
-				     // range similarly to step-31 to produce
-				     // some output (for example in order to
-				     // help us choose the stabilization
-				     // constants, as discussed in the
-				     // introduction). The only difference is
-				     // that we need to exchange maxima over
-				     // all processors.
+                                     // Now let's turn to the temperature
+                                     // part: First, we compute the time step
+                                     // size. We found that we need smaller
+                                     // time steps for 3D than for 2D for the
+                                     // shell geometry. This is because the
+                                     // cells are more distorted in that case
+                                     // (it is the smallest edge length that
+                                     // determines the CFL number). Instead of
+                                     // computing the time step from maximum
+                                     // velocity and minimal mesh size as in
+                                     // step-31, we compute local CFL numbers,
+                                     // i.e., on each cell we compute the
+                                     // maximum velocity times the mesh size,
+                                     // and compute the maximum of
+                                     // them. Hence, we need to choose the
+                                     // factor in front of the time step
+                                     // slightly smaller.
+                                     //
+                                     // After temperature right hand side
+                                     // assembly, we solve the linear system
+                                     // for temperature (with fully
+                                     // distributed vectors without any
+                                     // ghosts), apply constraints and copy
+                                     // the vector back to one with ghosts.
+                                     //
+                                     // In the end, we extract the temperature
+                                     // range similarly to step-31 to produce
+                                     // some output (for example in order to
+                                     // help us choose the stabilization
+                                     // constants, as discussed in the
+                                     // introduction). The only difference is
+                                     // that we need to exchange maxima over
+                                     // all processors.
     computing_timer.enter_section ("   Assemble temperature rhs");
     {
       old_time_step = time_step;
 
       const double scaling = (dim==3 ? 0.25 : 1.0);
       time_step = (scaling/(2.1*dim*std::sqrt(1.*dim)) /
-		   (parameters.temperature_degree *
-		    get_cfl_number()));
+                   (parameters.temperature_degree *
+                    get_cfl_number()));
 
       const double maximal_velocity = get_maximal_velocity();
       pcout << "   Maximal velocity: "
-	    << maximal_velocity *EquationData::year_in_seconds * 100
-	    << " cm/year"
-	    << std::endl;
+            << maximal_velocity *EquationData::year_in_seconds * 100
+            << " cm/year"
+            << std::endl;
       pcout << "   " << "Time step: "
-	    << time_step/EquationData::year_in_seconds
-	    << " years"
-	    << std::endl;
+            << time_step/EquationData::year_in_seconds
+            << " years"
+            << std::endl;
 
       temperature_solution = old_temperature_solution;
       assemble_temperature_system (maximal_velocity);
@@ -3721,85 +3721,85 @@ namespace Step32
     computing_timer.enter_section ("   Solve temperature system");
     {
       SolverControl solver_control (temperature_matrix.m(),
-				    1e-12*temperature_rhs.l2_norm());
+                                    1e-12*temperature_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
 
       TrilinosWrappers::MPI::Vector
-	distributed_temperature_solution (temperature_rhs);
+        distributed_temperature_solution (temperature_rhs);
       distributed_temperature_solution = temperature_solution;
 
       cg.solve (temperature_matrix, distributed_temperature_solution,
-		temperature_rhs, *T_preconditioner);
+                temperature_rhs, *T_preconditioner);
 
       temperature_constraints.distribute (distributed_temperature_solution);
       temperature_solution = distributed_temperature_solution;
 
       pcout << "   "
-	    << solver_control.last_step()
-	    << " CG iterations for temperature" << std::endl;
+            << solver_control.last_step()
+            << " CG iterations for temperature" << std::endl;
       computing_timer.exit_section();
 
       double temperature[2] = { std::numeric_limits<double>::max(),
-				-std::numeric_limits<double>::max() };
+                                -std::numeric_limits<double>::max() };
       double global_temperature[2];
 
       for (unsigned int i=0; i<distributed_temperature_solution.local_size(); ++i)
-	{
-	  temperature[0] = std::min<double> (temperature[0],
-					     distributed_temperature_solution.trilinos_vector()[0][i]);
-	  temperature[1] = std::max<double> (temperature[1],
-					     distributed_temperature_solution.trilinos_vector()[0][i]);
-	}
+        {
+          temperature[0] = std::min<double> (temperature[0],
+                                             distributed_temperature_solution.trilinos_vector()[0][i]);
+          temperature[1] = std::max<double> (temperature[1],
+                                             distributed_temperature_solution.trilinos_vector()[0][i]);
+        }
 
       temperature[0] *= -1.0;
       Utilities::MPI::max (temperature, MPI_COMM_WORLD, global_temperature);
       global_temperature[0] *= -1.0;
 
       pcout << "   Temperature range: "
-	    << global_temperature[0] << ' ' << global_temperature[1]
-	    << std::endl;
+            << global_temperature[0] << ' ' << global_temperature[1]
+            << std::endl;
     }
   }
 
 
-				   // @sect4{BoussinesqFlowProblem::output_results}
+                                   // @sect4{BoussinesqFlowProblem::output_results}
 
-				   // Next comes the function that generates
-				   // the output. The quantities to output
-				   // could be introduced manually like we did
-				   // in step-31. An alternative is to hand
-				   // this task over to a class PostProcessor
-				   // that inherits from the class
-				   // DataPostprocessor, which can be attached
-				   // to DataOut. This allows us to output
-				   // derived quantities from the solution,
-				   // like the friction heating included in
-				   // this example. It overloads the virtual
-				   // function
-				   // DataPostprocessor::compute_derived_quantities_vector,
-				   // which is then internally called from
-				   // DataOut::build_patches. We have to give
-				   // it values of the numerical solution, its
-				   // derivatives, normals to the cell, the
-				   // actual evaluation points and any
-				   // additional quantities. This follows the
-				   // same procedure as discussed in step-29
-				   // and other programs.
+                                   // Next comes the function that generates
+                                   // the output. The quantities to output
+                                   // could be introduced manually like we did
+                                   // in step-31. An alternative is to hand
+                                   // this task over to a class PostProcessor
+                                   // that inherits from the class
+                                   // DataPostprocessor, which can be attached
+                                   // to DataOut. This allows us to output
+                                   // derived quantities from the solution,
+                                   // like the friction heating included in
+                                   // this example. It overloads the virtual
+                                   // function
+                                   // DataPostprocessor::compute_derived_quantities_vector,
+                                   // which is then internally called from
+                                   // DataOut::build_patches. We have to give
+                                   // it values of the numerical solution, its
+                                   // derivatives, normals to the cell, the
+                                   // actual evaluation points and any
+                                   // additional quantities. This follows the
+                                   // same procedure as discussed in step-29
+                                   // and other programs.
   template <int dim>
   class BoussinesqFlowProblem<dim>::Postprocessor : public DataPostprocessor<dim>
   {
     public:
       Postprocessor (const unsigned int partition,
-		     const double       minimal_pressure);
+                     const double       minimal_pressure);
 
       virtual
       void
       compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-					 const std::vector<std::vector<Tensor<1,dim> > > &duh,
-					 const std::vector<std::vector<Tensor<2,dim> > > &dduh,
-					 const std::vector<Point<dim> >                  &normals,
-					 const std::vector<Point<dim> >                  &evaluation_points,
-					 std::vector<Vector<double> >                    &computed_quantities) const;
+                                         const std::vector<std::vector<Tensor<1,dim> > > &duh,
+                                         const std::vector<std::vector<Tensor<2,dim> > > &dduh,
+                                         const std::vector<Point<dim> >                  &normals,
+                                         const std::vector<Point<dim> >                  &evaluation_points,
+                                         std::vector<Vector<double> >                    &computed_quantities) const;
 
       virtual std::vector<std::string> get_names () const;
 
@@ -3818,24 +3818,24 @@ namespace Step32
   template <int dim>
   BoussinesqFlowProblem<dim>::Postprocessor::
   Postprocessor (const unsigned int partition,
-		 const double       minimal_pressure)
-		  :
-		  partition (partition),
-		  minimal_pressure (minimal_pressure)
+                 const double       minimal_pressure)
+                  :
+                  partition (partition),
+                  minimal_pressure (minimal_pressure)
   {}
 
 
-				   // Here we define the names for the
-				   // variables we want to output. These are
-				   // the actual solution values for velocity,
-				   // pressure, and temperature, as well as
-				   // the friction heating and to each cell
-				   // the number of the processor that owns
-				   // it. This allows us to visualize the
-				   // partitioning of the domain among the
-				   // processors. Except for the velocity,
-				   // which is vector-valued, all other
-				   // quantities are scalar.
+                                   // Here we define the names for the
+                                   // variables we want to output. These are
+                                   // the actual solution values for velocity,
+                                   // pressure, and temperature, as well as
+                                   // the friction heating and to each cell
+                                   // the number of the processor that owns
+                                   // it. This allows us to visualize the
+                                   // partitioning of the domain among the
+                                   // processors. Except for the velocity,
+                                   // which is vector-valued, all other
+                                   // quantities are scalar.
   template <int dim>
   std::vector<std::string>
   BoussinesqFlowProblem<dim>::Postprocessor::get_names() const
@@ -3857,7 +3857,7 @@ namespace Step32
   {
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
       interpretation (dim,
-		      DataComponentInterpretation::component_is_part_of_vector);
+                      DataComponentInterpretation::component_is_part_of_vector);
 
     interpretation.push_back (DataComponentInterpretation::component_is_scalar);
     interpretation.push_back (DataComponentInterpretation::component_is_scalar);
@@ -3876,35 +3876,35 @@ namespace Step32
   }
 
 
-				   // Now we implement the function that
-				   // computes the derived quantities. As we
-				   // also did for the output, we rescale the
-				   // velocity from its SI units to something
-				   // more readable, namely cm/year. Next, the
-				   // pressure is scaled to be between 0 and
-				   // the maximum pressure. This makes it more
-				   // easily comparable -- in essence making
-				   // all pressure variables positive or
-				   // zero. Temperature is taken as is, and
-				   // the friction heating is computed as $2
-				   // \eta \varepsilon(\mathbf{u}) \cdot
-				   // \varepsilon(\mathbf{u})$.
-				   //
-				   // The quantities we output here are more
-				   // for illustration, rather than for actual
-				   // scientific value. We come back to this
-				   // briefly in the results section of this
-				   // program and explain what one may in fact
-				   // be interested in.
+                                   // Now we implement the function that
+                                   // computes the derived quantities. As we
+                                   // also did for the output, we rescale the
+                                   // velocity from its SI units to something
+                                   // more readable, namely cm/year. Next, the
+                                   // pressure is scaled to be between 0 and
+                                   // the maximum pressure. This makes it more
+                                   // easily comparable -- in essence making
+                                   // all pressure variables positive or
+                                   // zero. Temperature is taken as is, and
+                                   // the friction heating is computed as $2
+                                   // \eta \varepsilon(\mathbf{u}) \cdot
+                                   // \varepsilon(\mathbf{u})$.
+                                   //
+                                   // The quantities we output here are more
+                                   // for illustration, rather than for actual
+                                   // scientific value. We come back to this
+                                   // briefly in the results section of this
+                                   // program and explain what one may in fact
+                                   // be interested in.
   template <int dim>
   void
   BoussinesqFlowProblem<dim>::Postprocessor::
   compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
-				     const std::vector<std::vector<Tensor<1,dim> > > &duh,
-				     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
-				     const std::vector<Point<dim> >                  &/*normals*/,
-				     const std::vector<Point<dim> >                  &/*evaluation_points*/,
-				     std::vector<Vector<double> >                    &computed_quantities) const
+                                     const std::vector<std::vector<Tensor<1,dim> > > &duh,
+                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+                                     const std::vector<Point<dim> >                  &/*normals*/,
+                                     const std::vector<Point<dim> >                  &/*evaluation_points*/,
+                                     std::vector<Vector<double> >                    &computed_quantities) const
   {
     const unsigned int n_quadrature_points = uh.size();
     Assert (duh.size() == n_quadrature_points,                  ExcInternalError());
@@ -3913,75 +3913,75 @@ namespace Step32
 
     for (unsigned int q=0; q<n_quadrature_points; ++q)
       {
-	for (unsigned int d=0; d<dim; ++d)
-	  computed_quantities[q](d)
-	    = (uh[q](d) *  EquationData::year_in_seconds * 100);
+        for (unsigned int d=0; d<dim; ++d)
+          computed_quantities[q](d)
+            = (uh[q](d) *  EquationData::year_in_seconds * 100);
 
-	const double pressure = (uh[q](dim)-minimal_pressure);
-	computed_quantities[q](dim) = pressure;
+        const double pressure = (uh[q](dim)-minimal_pressure);
+        computed_quantities[q](dim) = pressure;
 
-	const double temperature = uh[q](dim+1);
-	computed_quantities[q](dim+1) = temperature;
+        const double temperature = uh[q](dim+1);
+        computed_quantities[q](dim+1) = temperature;
 
-	Tensor<2,dim> grad_u;
-	for (unsigned int d=0; d<dim; ++d)
-	  grad_u[d] = duh[q][d];
-	const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
-	computed_quantities[q](dim+2) = 2 * EquationData::eta *
-					strain_rate * strain_rate;
+        Tensor<2,dim> grad_u;
+        for (unsigned int d=0; d<dim; ++d)
+          grad_u[d] = duh[q][d];
+        const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
+        computed_quantities[q](dim+2) = 2 * EquationData::eta *
+                                        strain_rate * strain_rate;
 
-	computed_quantities[q](dim+3) = partition;
+        computed_quantities[q](dim+3) = partition;
       }
   }
 
 
-				   // The <code>output_results()</code>
-				   // function does mostly what the
-				   // corresponding one did in to step-31, in
-				   // particular the merging data from the two
-				   // DoFHandler objects (for the Stokes and
-				   // the temperature parts of the problem)
-				   // into one. There is one minor change: we
-				   // make sure that each processor only works
-				   // on the subdomain it owns locally (and
-				   // not on ghost or artificial cells) when
-				   // building the joint solution vector. The
-				   // same will then have to be done in
-				   // DataOut::build_patches(), but that
-				   // function does so automatically.
-				   //
-				   // What we end up with is a set of patches
-				   // that we can write using the functions in
-				   // DataOutBase in a variety of output
-				   // formats. Here, we then have to pay
-				   // attention that what each processor
-				   // writes is really only its own part of
-				   // the domain, i.e. we will want to write
-				   // each processor's contribution into a
-				   // separate file. This we do by adding an
-				   // additional number to the filename when
-				   // we write the solution. This is not
-				   // really new, we did it similarly in
-				   // step-40. Note that we write in the
-				   // compressed format @p .vtu instead of
-				   // plain vtk files, which saves quite some
-				   // storage.
-				   //
-				   // All the rest of the work is done in the
-				   // PostProcessor class.
+                                   // The <code>output_results()</code>
+                                   // function does mostly what the
+                                   // corresponding one did in to step-31, in
+                                   // particular the merging data from the two
+                                   // DoFHandler objects (for the Stokes and
+                                   // the temperature parts of the problem)
+                                   // into one. There is one minor change: we
+                                   // make sure that each processor only works
+                                   // on the subdomain it owns locally (and
+                                   // not on ghost or artificial cells) when
+                                   // building the joint solution vector. The
+                                   // same will then have to be done in
+                                   // DataOut::build_patches(), but that
+                                   // function does so automatically.
+                                   //
+                                   // What we end up with is a set of patches
+                                   // that we can write using the functions in
+                                   // DataOutBase in a variety of output
+                                   // formats. Here, we then have to pay
+                                   // attention that what each processor
+                                   // writes is really only its own part of
+                                   // the domain, i.e. we will want to write
+                                   // each processor's contribution into a
+                                   // separate file. This we do by adding an
+                                   // additional number to the filename when
+                                   // we write the solution. This is not
+                                   // really new, we did it similarly in
+                                   // step-40. Note that we write in the
+                                   // compressed format @p .vtu instead of
+                                   // plain vtk files, which saves quite some
+                                   // storage.
+                                   //
+                                   // All the rest of the work is done in the
+                                   // PostProcessor class.
   template <int dim>
   void BoussinesqFlowProblem<dim>::output_results ()
   {
     computing_timer.enter_section ("Postprocessing");
 
     const FESystem<dim> joint_fe (stokes_fe, 1,
-				  temperature_fe, 1);
+                                  temperature_fe, 1);
 
     DoFHandler<dim> joint_dof_handler (triangulation);
     joint_dof_handler.distribute_dofs (joint_fe);
     Assert (joint_dof_handler.n_dofs() ==
-	    stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
-	    ExcInternalError());
+            stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
+            ExcInternalError());
 
     TrilinosWrappers::MPI::Vector joint_solution;
     joint_solution.reinit (joint_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -3992,43 +3992,43 @@ namespace Step32
       std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
 
       typename DoFHandler<dim>::active_cell_iterator
-	joint_cell       = joint_dof_handler.begin_active(),
-	joint_endc       = joint_dof_handler.end(),
-	stokes_cell      = stokes_dof_handler.begin_active(),
-	temperature_cell = temperature_dof_handler.begin_active();
+        joint_cell       = joint_dof_handler.begin_active(),
+        joint_endc       = joint_dof_handler.end(),
+        stokes_cell      = stokes_dof_handler.begin_active(),
+        temperature_cell = temperature_dof_handler.begin_active();
       for (; joint_cell!=joint_endc;
-	   ++joint_cell, ++stokes_cell, ++temperature_cell)
-	if (joint_cell->is_locally_owned())
-	  {
-	    joint_cell->get_dof_indices (local_joint_dof_indices);
-	    stokes_cell->get_dof_indices (local_stokes_dof_indices);
-	    temperature_cell->get_dof_indices (local_temperature_dof_indices);
+           ++joint_cell, ++stokes_cell, ++temperature_cell)
+        if (joint_cell->is_locally_owned())
+          {
+            joint_cell->get_dof_indices (local_joint_dof_indices);
+            stokes_cell->get_dof_indices (local_stokes_dof_indices);
+            temperature_cell->get_dof_indices (local_temperature_dof_indices);
 
-	    for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
-	      if (joint_fe.system_to_base_index(i).first.first == 0)
-		{
-		  Assert (joint_fe.system_to_base_index(i).second
-			  <
-			  local_stokes_dof_indices.size(),
-			  ExcInternalError());
+            for (unsigned int i=0; i<joint_fe.dofs_per_cell; ++i)
+              if (joint_fe.system_to_base_index(i).first.first == 0)
+                {
+                  Assert (joint_fe.system_to_base_index(i).second
+                          <
+                          local_stokes_dof_indices.size(),
+                          ExcInternalError());
 
-		  joint_solution(local_joint_dof_indices[i])
-		    = stokes_solution(local_stokes_dof_indices
-				      [joint_fe.system_to_base_index(i).second]);
-		}
-	      else
-		{
-		  Assert (joint_fe.system_to_base_index(i).first.first == 1,
-			  ExcInternalError());
-		  Assert (joint_fe.system_to_base_index(i).second
-			  <
-			  local_temperature_dof_indices.size(),
-			  ExcInternalError());
-		  joint_solution(local_joint_dof_indices[i])
-		    = temperature_solution(local_temperature_dof_indices
-					   [joint_fe.system_to_base_index(i).second]);
-		}
-	  }
+                  joint_solution(local_joint_dof_indices[i])
+                    = stokes_solution(local_stokes_dof_indices
+                                      [joint_fe.system_to_base_index(i).second]);
+                }
+              else
+                {
+                  Assert (joint_fe.system_to_base_index(i).first.first == 1,
+                          ExcInternalError());
+                  Assert (joint_fe.system_to_base_index(i).second
+                          <
+                          local_temperature_dof_indices.size(),
+                          ExcInternalError());
+                  joint_solution(local_joint_dof_indices[i])
+                    = temperature_solution(local_temperature_dof_indices
+                                           [joint_fe.system_to_base_index(i).second]);
+                }
+          }
     }
 
 
@@ -4039,7 +4039,7 @@ namespace Step32
     locally_relevant_joint_solution = joint_solution;
 
     Postprocessor postprocessor (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-				 stokes_solution.block(1).minimal_value());
+                                 stokes_solution.block(1).minimal_value());
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler (joint_dof_handler);
@@ -4048,50 +4048,50 @@ namespace Step32
 
     static int out_index=0;
     const std::string filename = ("solution-" +
-				  Utilities::int_to_string (out_index, 5) +
-				  "." +
-				  Utilities::int_to_string
-				  (triangulation.locally_owned_subdomain(), 4) +
-				  ".vtu");
+                                  Utilities::int_to_string (out_index, 5) +
+                                  "." +
+                                  Utilities::int_to_string
+                                  (triangulation.locally_owned_subdomain(), 4) +
+                                  ".vtu");
     std::ofstream output (filename.c_str());
     data_out.write_vtu (output);
 
 
-				     // At this point, all processors have
-				     // written their own files to disk. We
-				     // could visualize them individually in
-				     // Visit or Paraview, but in reality we
-				     // of course want to visualize the whole
-				     // set of files at once. To this end, we
-				     // create a master file in each of the
-				     // formats understood by Visit
-				     // (<code>.visit</code>) and Paraview
-				     // (<code>.pvtu</code>) on the zeroth
-				     // processor that describes how the
-				     // individual files are defining the
-				     // global data set.
+                                     // At this point, all processors have
+                                     // written their own files to disk. We
+                                     // could visualize them individually in
+                                     // Visit or Paraview, but in reality we
+                                     // of course want to visualize the whole
+                                     // set of files at once. To this end, we
+                                     // create a master file in each of the
+                                     // formats understood by Visit
+                                     // (<code>.visit</code>) and Paraview
+                                     // (<code>.pvtu</code>) on the zeroth
+                                     // processor that describes how the
+                                     // individual files are defining the
+                                     // global data set.
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
-	std::vector<std::string> filenames;
-	for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-	  filenames.push_back (std::string("solution-") +
-			       Utilities::int_to_string (out_index, 5) +
-			       "." +
-			       Utilities::int_to_string(i, 4) +
-			       ".vtu");
-	const std::string
-	  pvtu_master_filename = ("solution-" +
-				  Utilities::int_to_string (out_index, 5) +
-				  ".pvtu");
-	std::ofstream pvtu_master (pvtu_master_filename.c_str());
-	data_out.write_pvtu_record (pvtu_master, filenames);
+        std::vector<std::string> filenames;
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+          filenames.push_back (std::string("solution-") +
+                               Utilities::int_to_string (out_index, 5) +
+                               "." +
+                               Utilities::int_to_string(i, 4) +
+                               ".vtu");
+        const std::string
+          pvtu_master_filename = ("solution-" +
+                                  Utilities::int_to_string (out_index, 5) +
+                                  ".pvtu");
+        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        data_out.write_pvtu_record (pvtu_master, filenames);
 
-	const std::string
-	  visit_master_filename = ("solution-" +
-				   Utilities::int_to_string (out_index, 5) +
-				   ".visit");
-	std::ofstream visit_master (visit_master_filename.c_str());
-	data_out.write_visit_record (visit_master, filenames);
+        const std::string
+          visit_master_filename = ("solution-" +
+                                   Utilities::int_to_string (out_index, 5) +
+                                   ".visit");
+        std::ofstream visit_master (visit_master_filename.c_str());
+        data_out.write_visit_record (visit_master, filenames);
       }
 
     computing_timer.exit_section ();
@@ -4100,46 +4100,46 @@ namespace Step32
 
 
 
-				   // @sect4{BoussinesqFlowProblem::refine_mesh}
+                                   // @sect4{BoussinesqFlowProblem::refine_mesh}
 
-				   // This function isn't really new
-				   // either. Since the
-				   // <code>setup_dofs</code> function that we
-				   // call in the middle has its own timer
-				   // section, we split timing this function
-				   // into two sections. It will also allow us
-				   // to easily identify which of the two is
-				   // more expensive.
-				   //
-				   // One thing of note, however, is that we
-				   // only want to compute error indicators on
-				   // the locally owned subdomain. In order to
-				   // achieve this, we pass one additional
-				   // argument to the
-				   // KellyErrorEstimator::estimate
-				   // function. Note that the vector for error
-				   // estimates is resized to the number of
-				   // active cells present on the current
-				   // process, which is less than the total
-				   // number of active cells on all processors
-				   // (but more than the number of locally
-				   // owned active cells); each processor only
-				   // has a few coarse cells around the
-				   // locally owned ones, as also explained in
-				   // step-40.
-				   //
-				   // The local error estimates are then
-				   // handed to a %parallel version of
-				   // GridRefinement (in namespace
-				   // parallel::distributed::GridRefinement,
-				   // see also step-40) which looks at the
-				   // errors and finds the cells that need
-				   // refinement by comparing the error values
-				   // across processors. As in step-31, we
-				   // want to limit the maximum grid level. So
-				   // in case some cells have been marked that
-				   // are already at the finest level, we
-				   // simply clear the refine flags.
+                                   // This function isn't really new
+                                   // either. Since the
+                                   // <code>setup_dofs</code> function that we
+                                   // call in the middle has its own timer
+                                   // section, we split timing this function
+                                   // into two sections. It will also allow us
+                                   // to easily identify which of the two is
+                                   // more expensive.
+                                   //
+                                   // One thing of note, however, is that we
+                                   // only want to compute error indicators on
+                                   // the locally owned subdomain. In order to
+                                   // achieve this, we pass one additional
+                                   // argument to the
+                                   // KellyErrorEstimator::estimate
+                                   // function. Note that the vector for error
+                                   // estimates is resized to the number of
+                                   // active cells present on the current
+                                   // process, which is less than the total
+                                   // number of active cells on all processors
+                                   // (but more than the number of locally
+                                   // owned active cells); each processor only
+                                   // has a few coarse cells around the
+                                   // locally owned ones, as also explained in
+                                   // step-40.
+                                   //
+                                   // The local error estimates are then
+                                   // handed to a %parallel version of
+                                   // GridRefinement (in namespace
+                                   // parallel::distributed::GridRefinement,
+                                   // see also step-40) which looks at the
+                                   // errors and finds the cells that need
+                                   // refinement by comparing the error values
+                                   // across processors. As in step-31, we
+                                   // want to limit the maximum grid level. So
+                                   // in case some cells have been marked that
+                                   // are already at the finest level, we
+                                   // simply clear the refine flags.
   template <int dim>
   void BoussinesqFlowProblem<dim>::refine_mesh (const unsigned int max_grid_level)
   {
@@ -4147,40 +4147,40 @@ namespace Step32
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     KellyErrorEstimator<dim>::estimate (temperature_dof_handler,
-					QGauss<dim-1>(parameters.temperature_degree+1),
-					typename FunctionMap<dim>::type(),
-					temperature_solution,
-					estimated_error_per_cell,
-					std::vector<bool>(),
-					0,
-					0,
-					triangulation.locally_owned_subdomain());
+                                        QGauss<dim-1>(parameters.temperature_degree+1),
+                                        typename FunctionMap<dim>::type(),
+                                        temperature_solution,
+                                        estimated_error_per_cell,
+                                        std::vector<bool>(),
+                                        0,
+                                        0,
+                                        triangulation.locally_owned_subdomain());
 
     parallel::distributed::GridRefinement::
       refine_and_coarsen_fixed_fraction (triangulation,
-					 estimated_error_per_cell,
-					 0.3, 0.1);
+                                         estimated_error_per_cell,
+                                         0.3, 0.1);
 
     if (triangulation.n_levels() > max_grid_level)
       for (typename Triangulation<dim>::active_cell_iterator
-	     cell = triangulation.begin_active(max_grid_level);
-	   cell != triangulation.end(); ++cell)
-	cell->clear_refine_flag ();
+             cell = triangulation.begin_active(max_grid_level);
+           cell != triangulation.end(); ++cell)
+        cell->clear_refine_flag ();
 
-				     // With all flags marked as necessary, we
-				     // set up the
-				     // parallel::distributed::SolutionTransfer
-				     // object to transfer the solutions for
-				     // the current time level and the next
-				     // older one. The syntax is similar to
-				     // the non-%parallel solution transfer
-				     // (with the exception that here a
-				     // pointer to the vector entries is
-				     // enough). The remainder of the function
-				     // is concerned with setting up the data
-				     // structures again after mesh refinement
-				     // and restoring the solution vectors on
-				     // the new mesh.
+                                     // With all flags marked as necessary, we
+                                     // set up the
+                                     // parallel::distributed::SolutionTransfer
+                                     // object to transfer the solutions for
+                                     // the current time level and the next
+                                     // older one. The syntax is similar to
+                                     // the non-%parallel solution transfer
+                                     // (with the exception that here a
+                                     // pointer to the vector entries is
+                                     // enough). The remainder of the function
+                                     // is concerned with setting up the data
+                                     // structures again after mesh refinement
+                                     // and restoring the solution vectors on
+                                     // the new mesh.
     std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature (2);
     x_temperature[0] = &temperature_solution;
     x_temperature[1] = &old_temperature_solution;
@@ -4235,28 +4235,28 @@ namespace Step32
 
 
 
-				   // @sect4{BoussinesqFlowProblem::run}
+                                   // @sect4{BoussinesqFlowProblem::run}
 
-				   // This is the final and controlling
-				   // function in this class. It, in fact,
-				   // runs the entire rest of the program and
-				   // is, once more, very similar to
-				   // step-31. We use a different mesh now (a
-				   // GridGenerator::hyper_shell instead of a
-				   // simple cube geometry), and use the
-				   // <code>project_temperature_field()</code>
-				   // function instead of the library function
-				   // <code>VectorTools::project</code>, the
-				   // rest is as before.
+                                   // This is the final and controlling
+                                   // function in this class. It, in fact,
+                                   // runs the entire rest of the program and
+                                   // is, once more, very similar to
+                                   // step-31. We use a different mesh now (a
+                                   // GridGenerator::hyper_shell instead of a
+                                   // simple cube geometry), and use the
+                                   // <code>project_temperature_field()</code>
+                                   // function instead of the library function
+                                   // <code>VectorTools::project</code>, the
+                                   // rest is as before.
   template <int dim>
   void BoussinesqFlowProblem<dim>::run ()
   {
     GridGenerator::hyper_shell (triangulation,
-				Point<dim>(),
-				EquationData::R0,
-				EquationData::R1,
-				(dim==3) ? 96 : 12,
-				true);
+                                Point<dim>(),
+                                EquationData::R0,
+                                EquationData::R1,
+                                (dim==3) ? 96 : 12,
+                                true);
     static HyperShellBoundary<dim> boundary;
     triangulation.set_boundary (0, boundary);
     triangulation.set_boundary (1, boundary);
@@ -4280,117 +4280,117 @@ namespace Step32
 
     do
       {
-	pcout << "Timestep " << timestep_number
-	      << ":  t=" << time/EquationData::year_in_seconds
-	      << " years"
-	      << std::endl;
+        pcout << "Timestep " << timestep_number
+              << ":  t=" << time/EquationData::year_in_seconds
+              << " years"
+              << std::endl;
 
-	assemble_stokes_system ();
-	build_stokes_preconditioner ();
-	assemble_temperature_matrix ();
+        assemble_stokes_system ();
+        build_stokes_preconditioner ();
+        assemble_temperature_matrix ();
 
-	solve ();
+        solve ();
 
-	pcout << std::endl;
+        pcout << std::endl;
 
-	if ((timestep_number == 0) &&
-	    (pre_refinement_step < parameters.initial_adaptive_refinement))
-	  {
-	    refine_mesh (parameters.initial_global_refinement +
-			 parameters.initial_adaptive_refinement);
-	    ++pre_refinement_step;
-	    goto start_time_iteration;
-	  }
-	else if ((timestep_number > 0)
-		 &&
-		 (timestep_number % parameters.adaptive_refinement_interval == 0))
-	  refine_mesh (parameters.initial_global_refinement +
-		       parameters.initial_adaptive_refinement);
+        if ((timestep_number == 0) &&
+            (pre_refinement_step < parameters.initial_adaptive_refinement))
+          {
+            refine_mesh (parameters.initial_global_refinement +
+                         parameters.initial_adaptive_refinement);
+            ++pre_refinement_step;
+            goto start_time_iteration;
+          }
+        else if ((timestep_number > 0)
+                 &&
+                 (timestep_number % parameters.adaptive_refinement_interval == 0))
+          refine_mesh (parameters.initial_global_refinement +
+                       parameters.initial_adaptive_refinement);
 
-	if ((parameters.generate_graphical_output == true)
-	    &&
-	    (timestep_number % parameters.graphical_output_interval == 0))
-	  output_results ();
+        if ((parameters.generate_graphical_output == true)
+            &&
+            (timestep_number % parameters.graphical_output_interval == 0))
+          output_results ();
 
-					 // In order to speed up linear
-					 // solvers, we extrapolate the
-					 // solutions from the old time levels
-					 // to the new one. This gives a very
-					 // good initial guess, cutting the
-					 // number of iterations needed in
-					 // solvers by more than one half. We
-					 // do not need to extrapolate in the
-					 // last iteration, so if we reached
-					 // the final time, we stop here.
-				         //
-				         // As the last thing during a
-				         // time step (before actually
-				         // bumping up the number of
-				         // the time step), we check
-				         // whether the current time
-				         // step number is divisible
-				         // by 100, and if so we let
-				         // the computing timer print
-				         // a summary of CPU times
-				         // spent so far.
-	if (time > parameters.end_time * EquationData::year_in_seconds)
-	  break;
+                                         // In order to speed up linear
+                                         // solvers, we extrapolate the
+                                         // solutions from the old time levels
+                                         // to the new one. This gives a very
+                                         // good initial guess, cutting the
+                                         // number of iterations needed in
+                                         // solvers by more than one half. We
+                                         // do not need to extrapolate in the
+                                         // last iteration, so if we reached
+                                         // the final time, we stop here.
+                                         //
+                                         // As the last thing during a
+                                         // time step (before actually
+                                         // bumping up the number of
+                                         // the time step), we check
+                                         // whether the current time
+                                         // step number is divisible
+                                         // by 100, and if so we let
+                                         // the computing timer print
+                                         // a summary of CPU times
+                                         // spent so far.
+        if (time > parameters.end_time * EquationData::year_in_seconds)
+          break;
 
-	TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
-	old_old_stokes_solution      = old_stokes_solution;
-	old_stokes_solution          = stokes_solution;
-	old_old_temperature_solution = old_temperature_solution;
-	old_temperature_solution     = temperature_solution;
-	if (old_time_step > 0)
-	  {
-	    stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
-				  old_old_stokes_solution);
-	    temperature_solution.sadd (1.+time_step/old_time_step,
-				       -time_step/old_time_step,
-				       old_old_temperature_solution);
-	  }
+        TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
+        old_old_stokes_solution      = old_stokes_solution;
+        old_stokes_solution          = stokes_solution;
+        old_old_temperature_solution = old_temperature_solution;
+        old_temperature_solution     = temperature_solution;
+        if (old_time_step > 0)
+          {
+            stokes_solution.sadd (1.+time_step/old_time_step, -time_step/old_time_step,
+                                  old_old_stokes_solution);
+            temperature_solution.sadd (1.+time_step/old_time_step,
+                                       -time_step/old_time_step,
+                                       old_old_temperature_solution);
+          }
 
-	if ((timestep_number > 0) && (timestep_number % 100 == 0))
-	  computing_timer.print_summary ();
+        if ((timestep_number > 0) && (timestep_number % 100 == 0))
+          computing_timer.print_summary ();
 
-	time += time_step;
-	++timestep_number;
+        time += time_step;
+        ++timestep_number;
       }
     while (true);
 
-				     // If we are generating graphical
-				     // output, do so also for the last
-				     // time step unless we had just
-				     // done so before we left the
-				     // do-while loop
+                                     // If we are generating graphical
+                                     // output, do so also for the last
+                                     // time step unless we had just
+                                     // done so before we left the
+                                     // do-while loop
     if ((parameters.generate_graphical_output == true)
-	&&
-	!((timestep_number-1) % parameters.graphical_output_interval == 0))
+        &&
+        !((timestep_number-1) % parameters.graphical_output_interval == 0))
       output_results ();
   }
 }
 
 
 
-				 // @sect3{The <code>main</code> function}
+                                 // @sect3{The <code>main</code> function}
 
-				 // The main function is short as usual and
-				 // very similar to the one in step-31. Since
-				 // we use a parameter file which is specified
-				 // as an argument in the command line, we
-				 // have to read it in here and pass it on to
-				 // the Parameters class for parsing. If no
-				 // filename is given in the command line, we
-				 // simply use the <code>\step-32.prm</code>
-				 // file which is distributed together with
-				 // the program.
-				 //
-				 // Because 3d computations are simply
-				 // very slow unless you throw a lot
-				 // of processors at them, the program
-				 // defaults to 2d. You can get the 3d
-				 // version by changing the constant
-				 // dimension below to 3.
+                                 // The main function is short as usual and
+                                 // very similar to the one in step-31. Since
+                                 // we use a parameter file which is specified
+                                 // as an argument in the command line, we
+                                 // have to read it in here and pass it on to
+                                 // the Parameters class for parsing. If no
+                                 // filename is given in the command line, we
+                                 // simply use the <code>\step-32.prm</code>
+                                 // file which is distributed together with
+                                 // the program.
+                                 //
+                                 // Because 3d computations are simply
+                                 // very slow unless you throw a lot
+                                 // of processors at them, the program
+                                 // defaults to 2d. You can get the 3d
+                                 // version by changing the constant
+                                 // dimension below to 3.
 int main (int argc, char *argv[])
 {
   using namespace Step32;

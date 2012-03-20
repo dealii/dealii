@@ -10,10 +10,10 @@
 /*    further information on this license.                        */
 
 
-				 // @sect3{Include files}
+                                 // @sect3{Include files}
 
-				 // As usual, we start by including
-				 // some well-known files:
+                                 // As usual, we start by including
+                                 // some well-known files:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
@@ -94,7 +94,7 @@ namespace Step42
 
   template <typename MATRIX>
   void copy(const MATRIX &matrix,
-	    FullMatrix<double> &full_matrix)
+            FullMatrix<double> &full_matrix)
   {
     const unsigned int m = matrix.m();
     const unsigned int n = matrix.n();
@@ -104,13 +104,13 @@ namespace Step42
     Vector<double> result (m);
     for(unsigned int i=0; i<n; ++i)
       {
-	unit(i) = 1;
-	for(unsigned int j=0; j<m; ++j)
-	  {
-	    matrix.vmult(result,unit);
-	    full_matrix(i,j) = result(j);
-	  }
-	unit(i) = 0;
+        unit(i) = 1;
+        for(unsigned int j=0; j<m; ++j)
+          {
+            matrix.vmult(result,unit);
+            full_matrix(i,j) = result(j);
+          }
+        unit(i) = 0;
       }
   }
 
@@ -129,7 +129,7 @@ namespace Step42
       void solve_block ();
 
       void find_dofs_on_lower_level (std::vector<std::vector<bool> > &lower_dofs,
-				     std::vector<std::vector<bool> > &boundary_dofs);
+                                     std::vector<std::vector<bool> > &boundary_dofs);
 
       void output_results (const unsigned int refinement_cycle) const;
       void refine_mesh ();
@@ -168,20 +168,20 @@ namespace Step42
       BoundaryValues () : Function<dim>(dim+1) {}
 
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
+                            const unsigned int  component = 0) const;
 
       virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &value) const;
+                                 Vector<double>   &value) const;
   };
 
 
   template <int dim>
   double
   BoundaryValues<dim>::value (const Point<dim>  &p,
-			      const unsigned int component) const
+                              const unsigned int component) const
   {
     Assert (component < this->n_components,
-	    ExcIndexRange (component, 0, this->n_components));
+            ExcIndexRange (component, 0, this->n_components));
 
     if (component == 0 && p[0] == 0)
       return (dim == 2 ? - p[1]*(p[1]-1.) : p[1]*(p[1]-1.) * p[2]*(p[2]-1.));
@@ -192,7 +192,7 @@ namespace Step42
   template <int dim>
   void
   BoundaryValues<dim>::vector_value (const Point<dim> &p,
-				     Vector<double>   &values) const
+                                     Vector<double>   &values) const
   {
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value (p, c);
@@ -208,10 +208,10 @@ namespace Step42
       RightHandSide () : Function<dim>(dim+1) {}
 
       virtual double value (const Point<dim>   &p,
-			    const unsigned int  component = 0) const;
+                            const unsigned int  component = 0) const;
 
       virtual void vector_value (const Point<dim> &p,
-				 Vector<double>   &value) const;
+                                 Vector<double>   &value) const;
 
   };
 
@@ -219,7 +219,7 @@ namespace Step42
   template <int dim>
   double
   RightHandSide<dim>::value (const Point<dim>  &/*p*/,
-			     const unsigned int component) const
+                             const unsigned int component) const
   {
     return (component == 1 ? 1 : 0);
   }
@@ -228,7 +228,7 @@ namespace Step42
   template <int dim>
   void
   RightHandSide<dim>::vector_value (const Point<dim> &p,
-				    Vector<double>   &values) const
+                                    Vector<double>   &values) const
   {
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = RightHandSide<dim>::value (p, c);
@@ -242,10 +242,10 @@ namespace Step42
   {
     public:
       InverseMatrix (const Matrix         &m,
-		     const Preconditioner &preconditioner);
+                     const Preconditioner &preconditioner);
 
       void vmult (Vector<double>       &dst,
-		  const Vector<double> &src) const;
+                  const Vector<double> &src) const;
 
       mutable std::string name;
     private:
@@ -256,16 +256,16 @@ namespace Step42
 
   template <class Matrix, class Preconditioner>
   InverseMatrix<Matrix,Preconditioner>::InverseMatrix (const Matrix &m,
-						       const Preconditioner &preconditioner)
-		  :
-		  matrix (&m),
-		  preconditioner (&preconditioner)
+                                                       const Preconditioner &preconditioner)
+                  :
+                  matrix (&m),
+                  preconditioner (&preconditioner)
   {}
 
 
   template <class Matrix, class Preconditioner>
   void InverseMatrix<Matrix,Preconditioner>::vmult (Vector<double>       &dst,
-						    const Vector<double> &src) const
+                                                    const Vector<double> &src) const
   {
     SolverControl solver_control (src.size(), 1.0e-12*src.l2_norm());
     SolverCG<>    cg (solver_control);
@@ -274,29 +274,29 @@ namespace Step42
 
     try
       {
-	cg.solve (*matrix, dst, src, *preconditioner);
+        cg.solve (*matrix, dst, src, *preconditioner);
       }
     catch (...)
       {
-	std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
-	abort ();
+        std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
+        abort ();
       }
 
 #ifdef STEP_42_TEST
     if (name == "in schur")
       std::cout << "      " << solver_control.last_step()
-		<< " inner CG steps inside the Schur complement ";
+                << " inner CG steps inside the Schur complement ";
     else if (name == "top left")
       std::cout << "    " << solver_control.last_step()
-		<< " CG steps on the top left block ";
+                << " CG steps on the top left block ";
     else if (name == "rhs")
       std::cout << "    " << solver_control.last_step()
-		<< " CG steps for computing the r.h.s. ";
+                << " CG steps for computing the r.h.s. ";
     else
       abort ();
 
     std::cout << solver_control.initial_value() << "->" << solver_control.last_value()
-	      << std::endl;
+              << std::endl;
 #endif
   }
 
@@ -306,16 +306,16 @@ namespace Step42
   {
     public:
       BlockSchurPreconditioner (const BlockSparseMatrix<double>         &S,
-				const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
-				const PreconditionerA &Apreconditioner);
+                                const InverseMatrix<SparseMatrix<double>,PreconditionerMp>  &Mpinv,
+                                const PreconditionerA &Apreconditioner);
 
       void vmult (BlockVector<double>       &dst,
-		  const BlockVector<double> &src) const;
+                  const BlockVector<double> &src) const;
 
     private:
       const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
       const SmartPointer<const InverseMatrix<SparseMatrix<double>,
-					     PreconditionerMp > > m_inverse;
+                                             PreconditionerMp > > m_inverse;
       const PreconditionerA &a_preconditioner;
 
       mutable Vector<double> tmp;
@@ -328,30 +328,30 @@ namespace Step42
     const InverseMatrix<SparseMatrix<double>,PreconditionerMp> &Mpinv,
     const PreconditionerA &Apreconditioner
   )
-		  :
-		  system_matrix           (&S),
-		  m_inverse               (&Mpinv),
-		  a_preconditioner        (Apreconditioner),
-		  tmp                     (S.block(1,1).m())
+                  :
+                  system_matrix           (&S),
+                  m_inverse               (&Mpinv),
+                  a_preconditioner        (Apreconditioner),
+                  tmp                     (S.block(1,1).m())
   {}
 
-				   // Now the interesting function, the multiplication of
-				   // the preconditioner with a BlockVector.
+                                   // Now the interesting function, the multiplication of
+                                   // the preconditioner with a BlockVector.
   template <class PreconditionerA, class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::vmult (
     BlockVector<double>       &dst,
     const BlockVector<double> &src) const
   {
-				     // Form u_new = A^{-1} u
+                                     // Form u_new = A^{-1} u
     a_preconditioner.vmult (dst.block(0), src.block(0));
-				     // Form tmp = - B u_new + p
-				     // (<code>SparseMatrix::residual</code>
-				     // does precisely this)
+                                     // Form tmp = - B u_new + p
+                                     // (<code>SparseMatrix::residual</code>
+                                     // does precisely this)
     system_matrix->block(1,0).residual(tmp, dst.block(0), src.block(1));
-				     // Change sign in tmp
+                                     // Change sign in tmp
     tmp *= -1;
-				     // Multiply by approximate Schur complement
-				     // (i.e. a pressure mass matrix)
+                                     // Multiply by approximate Schur complement
+                                     // (i.e. a pressure mass matrix)
     m_inverse->vmult (dst.block(1), tmp);
   }
 
@@ -360,20 +360,20 @@ namespace Step42
   {
     public:
       SchurComplement (const BlockSparseMatrix<double> &system_matrix,
-		       const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse);
+                       const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse);
 
       void vmult (Vector<double>       &dst,
-		  const Vector<double> &src) const;
+                  const Vector<double> &src) const;
 
       unsigned int m() const
-	{
-	  return system_matrix->block(1,1).m();
-	}
+        {
+          return system_matrix->block(1,1).m();
+        }
 
       unsigned int n() const
-	{
-	  return system_matrix->block(1,1).n();
-	}
+        {
+          return system_matrix->block(1,1).n();
+        }
 
     private:
       const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
@@ -387,18 +387,18 @@ namespace Step42
   template <class Preconditioner>
   SchurComplement<Preconditioner>::
   SchurComplement (const BlockSparseMatrix<double> &system_matrix,
-		   const InverseMatrix<SparseMatrix<double>,Preconditioner> &A_inverse)
-		  :
-		  system_matrix (&system_matrix),
-		  A_inverse (&A_inverse),
-		  tmp1 (system_matrix.block(0,0).m()),
-		  tmp2 (system_matrix.block(0,0).m())
+                   const InverseMatrix<SparseMatrix<double>,Preconditioner> &A_inverse)
+                  :
+                  system_matrix (&system_matrix),
+                  A_inverse (&A_inverse),
+                  tmp1 (system_matrix.block(0,0).m()),
+                  tmp2 (system_matrix.block(0,0).m())
   {}
 
 
   template <class Preconditioner>
   void SchurComplement<Preconditioner>::vmult (Vector<double>       &dst,
-					       const Vector<double> &src) const
+                                               const Vector<double> &src) const
   {
     system_matrix->block(0,1).vmult (tmp1, src);
     A_inverse->name = "in schur";
@@ -413,12 +413,12 @@ namespace Step42
 
   template <int dim>
   StokesProblem<dim>::StokesProblem (const unsigned int degree)
-		  :
-		  degree (degree),
-		  triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
-		  fe (FE_Q<dim>(degree+1), dim,
-		      FE_Q<dim>(degree), 1),
-		  dof_handler (triangulation)
+                  :
+                  degree (degree),
+                  triangulation (Triangulation<dim>::limit_level_difference_at_vertices),
+                  fe (FE_Q<dim>(degree+1), dim,
+                      FE_Q<dim>(degree), 1),
+                  dof_handler (triangulation)
   {}
 
 
@@ -451,13 +451,13 @@ namespace Step42
       std::vector<bool> component_mask (dim+1, true);
       component_mask[dim] = false;
       VectorTools::interpolate_boundary_values (mapping,
-						dof_handler,
-						dirichlet_boundary,
-						constraints,
-						component_mask);
+                                                dof_handler,
+                                                dirichlet_boundary,
+                                                constraints,
+                                                component_mask);
 
       DoFTools::make_hanging_node_constraints (dof_handler,
-					       constraints);
+                                               constraints);
 
       mg_constrained_dofs.clear();
       mg_constrained_dofs.initialize(dof_handler, dirichlet_boundary);
@@ -468,17 +468,17 @@ namespace Step42
 
     std::vector<unsigned int> dofs_per_block (2);
     DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
-				    block_component);
+                                    block_component);
     const unsigned int n_u = dofs_per_block[0],
-		       n_p = dofs_per_block[1];
+                       n_p = dofs_per_block[1];
 
     std::cout << "   Number of active cells: "
-	      << triangulation.n_active_cells()
-	      << std::endl
-	      << "   Number of degrees of freedom: "
-	      << dof_handler.n_dofs()
-	      << " (" << n_u << '+' << n_p << ')'
-	      << std::endl;
+              << triangulation.n_active_cells()
+              << std::endl
+              << "   Number of degrees of freedom: "
+              << dof_handler.n_dofs()
+              << " (" << n_u << '+' << n_p << ')'
+              << std::endl;
 
     {
       BlockCompressedSimpleSparsityPattern csp (2,2);
@@ -509,7 +509,7 @@ namespace Step42
     system_rhs.block(1).reinit (n_p);
     system_rhs.collect_sizes ();
 
-				     //now setup stuff for mg
+                                     //now setup stuff for mg
     const unsigned int nlevels = triangulation.n_levels();
 
     mg_matrices.resize(0, nlevels-1);
@@ -523,24 +523,24 @@ namespace Step42
       mg_dofs_per_component[level].resize (2);
 
     MGTools::count_dofs_per_block (dof_handler, mg_dofs_per_component,
-				   block_component);
+                                   block_component);
     for (unsigned int level=0; level<nlevels; ++level)
       std::cout << "                        Level " << level << ": "
-		<< dof_handler.n_dofs (level) << " ("
-		<< mg_dofs_per_component[level][0] << '+'
-		<< mg_dofs_per_component[level][1] << ')'
-		<< std::endl;
+                << dof_handler.n_dofs (level) << " ("
+                << mg_dofs_per_component[level][0] << '+'
+                << mg_dofs_per_component[level][1] << ')'
+                << std::endl;
 
     for (unsigned int level=0; level<nlevels; ++level)
       {
-	DoFRenumbering::component_wise (dof_handler, level, block_component);
+        DoFRenumbering::component_wise (dof_handler, level, block_component);
 
-	BlockCompressedSparsityPattern bcsp (mg_dofs_per_component[level],
-					     mg_dofs_per_component[level]);
-	MGTools::make_sparsity_pattern(dof_handler, bcsp, level);
-	mg_sparsity[level].copy_from (bcsp);
-	mg_matrices[level].reinit (mg_sparsity[level]);
-	mg_interface_matrices[level].reinit (mg_sparsity[level]);
+        BlockCompressedSparsityPattern bcsp (mg_dofs_per_component[level],
+                                             mg_dofs_per_component[level]);
+        MGTools::make_sparsity_pattern(dof_handler, bcsp, level);
+        mg_sparsity[level].copy_from (bcsp);
+        mg_matrices[level].reinit (mg_sparsity[level]);
+        mg_interface_matrices[level].reinit (mg_sparsity[level]);
       }
   }
 
@@ -555,10 +555,10 @@ namespace Step42
     QGauss<dim>   quadrature_formula(degree+2);
 
     FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values    |
-			     update_quadrature_points  |
-			     update_JxW_values |
-			     update_gradients);
+                             update_values    |
+                             update_quadrature_points  |
+                             update_JxW_values |
+                             update_gradients);
 
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
 
@@ -571,7 +571,7 @@ namespace Step42
 
     const RightHandSide<dim>          right_hand_side;
     std::vector<Vector<double> >      rhs_values (n_q_points,
-						  Vector<double>(dim+1));
+                                                  Vector<double>(dim+1));
 
 
     const FEValuesExtractors::Vector velocities (0);
@@ -588,49 +588,49 @@ namespace Step42
       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-	fe_values.reinit (cell);
-	local_matrix = 0;
-	local_rhs = 0;
+        fe_values.reinit (cell);
+        local_matrix = 0;
+        local_rhs = 0;
 
-	right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
-					  rhs_values);
+        right_hand_side.vector_value_list(fe_values.get_quadrature_points(),
+                                          rhs_values);
 
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_grads_u[k] = fe_values[velocities].gradient (k, q);
-		div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-		phi_p[k]       = fe_values[pressure].value (k, q);
-	      }
+        for (unsigned int q=0; q<n_q_points; ++q)
+          {
+            for (unsigned int k=0; k<dofs_per_cell; ++k)
+              {
+                phi_grads_u[k] = fe_values[velocities].gradient (k, q);
+                div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+                phi_p[k]       = fe_values[pressure].value (k, q);
+              }
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      {
-		for (unsigned int j=0; j<dofs_per_cell; ++j)
-		  {
-		    local_matrix(i,j) += (scalar_product(phi_grads_u[i], phi_grads_u[j])
-					  - div_phi_u[i] * phi_p[j]
-					  - phi_p[i] * div_phi_u[j]
-					  - phi_p[i] * phi_p[j]
-		    )
-					 * fe_values.JxW(q);
-		  }
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              {
+                for (unsigned int j=0; j<dofs_per_cell; ++j)
+                  {
+                    local_matrix(i,j) += (scalar_product(phi_grads_u[i], phi_grads_u[j])
+                                          - div_phi_u[i] * phi_p[j]
+                                          - phi_p[i] * div_phi_u[j]
+                                          - phi_p[i] * phi_p[j]
+                    )
+                                         * fe_values.JxW(q);
+                  }
 
-		const unsigned int component_i =
-		  fe.system_to_component_index(i).first;
-		local_rhs(i) += fe_values.shape_value(i,q) *
-				rhs_values[q](component_i) *
-				fe_values.JxW(q);
-	      }
-	  }
-
-
+                const unsigned int component_i =
+                  fe.system_to_component_index(i).first;
+                local_rhs(i) += fe_values.shape_value(i,q) *
+                                rhs_values[q](component_i) *
+                                fe_values.JxW(q);
+              }
+          }
 
 
-	cell->get_dof_indices (local_dof_indices);
-	constraints.distribute_local_to_global (local_matrix, local_rhs,
-						local_dof_indices,
-						system_matrix, system_rhs);
+
+
+        cell->get_dof_indices (local_dof_indices);
+        constraints.distribute_local_to_global (local_matrix, local_rhs,
+                                                local_dof_indices,
+                                                system_matrix, system_rhs);
       }
   }
 
@@ -640,10 +640,10 @@ namespace Step42
   {
     QGauss<dim>   quadrature_formula(degree+2);
     FEValues<dim> fe_values (fe, quadrature_formula,
-			     update_values    |
-			     update_quadrature_points  |
-			     update_JxW_values |
-			     update_gradients);
+                             update_values    |
+                             update_quadrature_points  |
+                             update_JxW_values |
+                             update_gradients);
 
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   n_q_points      = quadrature_formula.size();
@@ -669,13 +669,13 @@ namespace Step42
     std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
     for (unsigned int level=0; level<triangulation.n_levels(); ++level)
       {
-	boundary_constraints[level].add_lines (interface_dofs[level]);
-	boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
-	boundary_constraints[level].close ();
+        boundary_constraints[level].add_lines (interface_dofs[level]);
+        boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
+        boundary_constraints[level].close ();
 
-	boundary_interface_constraints[level]
-	  .add_lines (boundary_interface_dofs[level]);
-	boundary_interface_constraints[level].close ();
+        boundary_interface_constraints[level]
+          .add_lines (boundary_interface_dofs[level]);
+        boundary_interface_constraints[level].close ();
       }
 
     typename MGDoFHandler<dim>::cell_iterator
@@ -683,60 +683,60 @@ namespace Step42
       endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-					 // Remember the level of the
-					 // current cell.
-	const unsigned int level = cell->level();
-					 // Compute the values specified
-					 // by update flags above.
-	fe_values.reinit (cell);
-	local_matrix = 0;
+                                         // Remember the level of the
+                                         // current cell.
+        const unsigned int level = cell->level();
+                                         // Compute the values specified
+                                         // by update flags above.
+        fe_values.reinit (cell);
+        local_matrix = 0;
 
-	for (unsigned int q=0; q<n_q_points; ++q)
-	  {
-	    for (unsigned int k=0; k<dofs_per_cell; ++k)
-	      {
-		phi_grads_u[k] = fe_values[velocities].gradient (k, q);
-		div_phi_u[k]   = fe_values[velocities].divergence (k, q);
-		phi_p[k]       = fe_values[pressure].value (k, q);
-	      }
+        for (unsigned int q=0; q<n_q_points; ++q)
+          {
+            for (unsigned int k=0; k<dofs_per_cell; ++k)
+              {
+                phi_grads_u[k] = fe_values[velocities].gradient (k, q);
+                div_phi_u[k]   = fe_values[velocities].divergence (k, q);
+                phi_p[k]       = fe_values[pressure].value (k, q);
+              }
 
-	    for (unsigned int i=0; i<dofs_per_cell; ++i)
-	      for (unsigned int j=0; j<dofs_per_cell; ++j)
-		local_matrix(i,j) += (
-		  scalar_product(phi_grads_u[i], phi_grads_u[j])
-		  - div_phi_u[i] * phi_p[j]
-		  - phi_p[i] * div_phi_u[j]
+            for (unsigned int i=0; i<dofs_per_cell; ++i)
+              for (unsigned int j=0; j<dofs_per_cell; ++j)
+                local_matrix(i,j) += (
+                  scalar_product(phi_grads_u[i], phi_grads_u[j])
+                  - div_phi_u[i] * phi_p[j]
+                  - phi_p[i] * div_phi_u[j]
 //                                        - phi_p[i] * phi_p[j]
-		)
-				     * fe_values.JxW(q);
-	  }
+                )
+                                     * fe_values.JxW(q);
+          }
 
-	cell->get_mg_dof_indices (local_dof_indices);
-	boundary_constraints[level]
-	  .distribute_local_to_global (local_matrix,
-				       local_dof_indices,
-				       mg_matrices[level]);
+        cell->get_mg_dof_indices (local_dof_indices);
+        boundary_constraints[level]
+          .distribute_local_to_global (local_matrix,
+                                       local_dof_indices,
+                                       mg_matrices[level]);
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    if( !(interface_dofs[level][local_dof_indices[i]]==true &&
-		  interface_dofs[level][local_dof_indices[j]]==false))
-	      local_matrix(i,j) = 0;
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            if( !(interface_dofs[level][local_dof_indices[i]]==true &&
+                  interface_dofs[level][local_dof_indices[j]]==false))
+              local_matrix(i,j) = 0;
 
-	boundary_interface_constraints[level]
-	  .distribute_local_to_global (local_matrix,
-				       local_dof_indices,
-				       mg_interface_matrices[level]);
+        boundary_interface_constraints[level]
+          .distribute_local_to_global (local_matrix,
+                                       local_dof_indices,
+                                       mg_interface_matrices[level]);
       }
 
     mg_A_preconditioner.resize (triangulation.n_levels());
     for (unsigned int level=0; level<triangulation.n_levels(); ++level)
       {
-	mg_A_preconditioner[level]
-	  = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
-	mg_A_preconditioner[level]
-	  ->initialize (mg_matrices[level].block(0,0),
-			typename InnerPreconditioner<dim>::type::AdditionalData());
+        mg_A_preconditioner[level]
+          = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+        mg_A_preconditioner[level]
+          ->initialize (mg_matrices[level].block(0,0),
+                        typename InnerPreconditioner<dim>::type::AdditionalData());
       }
   }
 
@@ -747,17 +747,17 @@ namespace Step42
     public:
       struct AdditionalData
       {
-	  const InnerPreconditioner *A_preconditioner;
+          const InnerPreconditioner *A_preconditioner;
       };
 
       void initialize (const BlockSparseMatrix<double> &system_matrix,
-		       const AdditionalData            &data);
+                       const AdditionalData            &data);
 
       void vmult (BlockVector<double> &dst,
-		  const BlockVector<double> &src) const;
+                  const BlockVector<double> &src) const;
 
       void Tvmult (BlockVector<double> &dst,
-		   const BlockVector<double> &src) const;
+                   const BlockVector<double> &src) const;
 
       void clear ();
 
@@ -771,7 +771,7 @@ namespace Step42
   void
   SchurComplementSmoother<InnerPreconditioner>::
   initialize (const BlockSparseMatrix<double> &system_matrix,
-	      const AdditionalData            &data)
+              const AdditionalData            &data)
   {
     this->system_matrix    = &system_matrix;
     this->A_preconditioner = data.A_preconditioner;
@@ -784,7 +784,7 @@ namespace Step42
   void
   SchurComplementSmoother<InnerPreconditioner>::
   vmult (BlockVector<double> &dst,
-	 const BlockVector<double> &src) const
+         const BlockVector<double> &src) const
   {
 #ifdef STEP_42_TEST
     std::cout << "Entering smoother with " << dst.size() << " unknowns" << std::endl;
@@ -816,28 +816,28 @@ schur_rhs -= src.block(1);
 SchurComplement<InnerPreconditioner>
 schur_complement (*system_matrix, A_inverse);
 
-				 // The usual control structures for
-								  // the solver call are created...
-								  SolverControl solver_control (dst.block(1).size(),
-								  1e-1*schur_rhs.l2_norm());
-								  SolverGMRES<>    cg (solver_control);
+                                 // The usual control structures for
+                                                                  // the solver call are created...
+                                                                  SolverControl solver_control (dst.block(1).size(),
+                                                                  1e-1*schur_rhs.l2_norm());
+                                                                  SolverGMRES<>    cg (solver_control);
 
-								  #ifdef STEP_42_TEST
-								  std::cout << "    Starting Schur complement solver -- "
-								  << schur_complement.m() << " unknowns"
-								  << std::endl;
-								  #endif
-								  try
-								  {
-								  cg.solve (schur_complement, dst.block(1), schur_rhs,
-								  PreconditionIdentity());
-								  }
-								  catch (...)
-								  {
-								  std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
-								  std::cout << schur_rhs.l2_norm () << std::endl;
-								  abort ();
-								  }
+                                                                  #ifdef STEP_42_TEST
+                                                                  std::cout << "    Starting Schur complement solver -- "
+                                                                  << schur_complement.m() << " unknowns"
+                                                                  << std::endl;
+                                                                  #endif
+                                                                  try
+                                                                  {
+                                                                  cg.solve (schur_complement, dst.block(1), schur_rhs,
+                                                                  PreconditionIdentity());
+                                                                  }
+                                                                  catch (...)
+                                                                  {
+                                                                  std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
+                                                                  std::cout << schur_rhs.l2_norm () << std::endl;
+                                                                  abort ();
+                                                                  }
 
 // no constraints to be taken care of here
 #ifdef STEP_42_TEST
@@ -878,7 +878,7 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
   void
   SchurComplementSmoother<InnerPreconditioner>::
   Tvmult (BlockVector<double> &,
-	  const BlockVector<double> &) const
+          const BlockVector<double> &) const
   {
     Assert (false, ExcNotImplemented());
   }
@@ -932,24 +932,24 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
     mg_smoother.set_steps(2);
 
     Multigrid<BlockVector<double> > mg(dof_handler,
-				       mg_matrix,
-				       mg_coarse,
-				       mg_transfer,
-				       mg_smoother,
-				       mg_smoother);
+                                       mg_matrix,
+                                       mg_coarse,
+                                       mg_transfer,
+                                       mg_smoother,
+                                       mg_smoother);
     mg.set_debug(3);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     MGPREC  preconditioner(dof_handler, mg, mg_transfer);
 
     SolverControl solver_control (system_matrix.m(),
-				  1e-6*system_rhs.l2_norm());
+                                  1e-6*system_rhs.l2_norm());
     GrowingVectorMemory<BlockVector<double> > vector_memory;
     SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
     gmres_data.max_n_tmp_vectors = 100;
 
     SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
-					    gmres_data);
+                                            gmres_data);
 
 //  PreconditionIdentity precondition_identity;
 #ifdef STEP_42_TEST
@@ -957,19 +957,19 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
 #endif
     try
       {
-	gmres.solve(system_matrix, solution, system_rhs,
-		    preconditioner);
+        gmres.solve(system_matrix, solution, system_rhs,
+                    preconditioner);
       }
     catch (...)
       {
-	std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
-	abort ();
+        std::cout << "Failure in " << __PRETTY_FUNCTION__ << std::endl;
+        abort ();
       }
 
     constraints.distribute (solution);
 
     std::cout << solver_control.last_step()
-	      << " outer GMRES iterations ";
+              << " outer GMRES iterations ";
   }
 
 
@@ -981,7 +981,7 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
     A_preconditioner
       = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
     A_preconditioner->initialize (system_matrix.block(0,0),
-				  typename InnerPreconditioner<dim>::type::AdditionalData());
+                                  typename InnerPreconditioner<dim>::type::AdditionalData());
 
     SparseMatrix<double> pressure_mass_matrix;
     pressure_mass_matrix.reinit(sparsity_pattern.block(1,1));
@@ -990,7 +990,7 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
 
     SparseILU<double> pmass_preconditioner;
     pmass_preconditioner.initialize (pressure_mass_matrix,
-				     SparseILU<double>::AdditionalData());
+                                     SparseILU<double>::AdditionalData());
 
     InverseMatrix<SparseMatrix<double>,SparseILU<double> >
       m_inverse (pressure_mass_matrix, pmass_preconditioner);
@@ -1000,22 +1000,22 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
       preconditioner (system_matrix, m_inverse, *A_preconditioner);
 
     SolverControl solver_control (system_matrix.m(),
-				  1e-6*system_rhs.l2_norm());
+                                  1e-6*system_rhs.l2_norm());
     GrowingVectorMemory<BlockVector<double> > vector_memory;
     SolverGMRES<BlockVector<double> >::AdditionalData gmres_data;
     gmres_data.max_n_tmp_vectors = 100;
 
     SolverGMRES<BlockVector<double> > gmres(solver_control, vector_memory,
-					    gmres_data);
+                                            gmres_data);
 
     gmres.solve(system_matrix, solution, system_rhs,
-		preconditioner);
+                preconditioner);
 
     constraints.distribute (solution);
 
     std::cout << " "
-	      << solver_control.last_step()
-	      << " block GMRES iterations ";
+              << solver_control.last_step()
+              << " block GMRES iterations ";
   }
 
 
@@ -1035,14 +1035,14 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
     DataOut<dim> data_out;
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, solution_names,
-			      DataOut<dim>::type_dof_data,
-			      data_component_interpretation);
+                              DataOut<dim>::type_dof_data,
+                              data_component_interpretation);
     data_out.build_patches ();
 
     std::ostringstream filename;
     filename << "solution-"
-	     << Utilities::int_to_string (refinement_cycle, 2)
-	     << ".vtk";
+             << Utilities::int_to_string (refinement_cycle, 2)
+             << ".vtk";
 
     std::ofstream output (filename.str().c_str());
     data_out.write_vtk (output);
@@ -1059,15 +1059,15 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
     std::vector<bool> component_mask (dim+1, false);
     component_mask[dim] = true;
     KellyErrorEstimator<dim>::estimate (static_cast<const DoFHandler<dim>&>(dof_handler),
-					QGauss<dim-1>(degree+1),
-					typename FunctionMap<dim>::type(),
-					solution,
-					estimated_error_per_cell,
-					component_mask);
+                                        QGauss<dim-1>(degree+1),
+                                        typename FunctionMap<dim>::type(),
+                                        solution,
+                                        estimated_error_per_cell,
+                                        component_mask);
 
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						     estimated_error_per_cell,
-						     0.3, 0.0);
+                                                     estimated_error_per_cell,
+                                                     0.3, 0.0);
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -1081,25 +1081,25 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
       subdivisions[0] = 1;
 
       const Point<dim> bottom_left = (dim == 2 ?
-				      Point<dim>(0,0) :
-				      Point<dim>(0,0,0));
+                                      Point<dim>(0,0) :
+                                      Point<dim>(0,0,0));
       const Point<dim> top_right   = (dim == 2 ?
-				      Point<dim>(1,1) :
-				      Point<dim>(1,1,1));
+                                      Point<dim>(1,1) :
+                                      Point<dim>(1,1,1));
 
       GridGenerator::subdivided_hyper_rectangle (triangulation,
-						 subdivisions,
-						 bottom_left,
-						 top_right);
+                                                 subdivisions,
+                                                 bottom_left,
+                                                 top_right);
     }
 
 
     for (typename Triangulation<dim>::active_cell_iterator
-	   cell = triangulation.begin_active();
-	 cell != triangulation.end(); ++cell)
+           cell = triangulation.begin_active();
+         cell != triangulation.end(); ++cell)
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-	if (cell->face(f)->center()[0] == 1)
-	  cell->face(f)->set_all_boundary_indicators(1);
+        if (cell->face(f)->center()[0] == 1)
+          cell->face(f)->set_all_boundary_indicators(1);
 
 
 
@@ -1107,40 +1107,40 @@ std::cout << "Exiting smoother with " << dst.size() << " unknowns" << std::endl;
 
 
     for (unsigned int refinement_cycle = 0; refinement_cycle<10;
-	 ++refinement_cycle)
+         ++refinement_cycle)
       {
-	std::cout << "Refinement cycle " << refinement_cycle << std::endl;
+        std::cout << "Refinement cycle " << refinement_cycle << std::endl;
 
-	if (refinement_cycle > 0)
-	  refine_mesh ();
+        if (refinement_cycle > 0)
+          refine_mesh ();
 
-	std::ostringstream out_filename;
-	out_filename << "gitter"
-		     << refinement_cycle
-		     << ".eps";
+        std::ostringstream out_filename;
+        out_filename << "gitter"
+                     << refinement_cycle
+                     << ".eps";
 
-	std::ofstream grid_output (out_filename.str().c_str());
-	GridOut grid_out;
-	grid_out.write_eps (triangulation, grid_output);
+        std::ofstream grid_output (out_filename.str().c_str());
+        GridOut grid_out;
+        grid_out.write_eps (triangulation, grid_output);
 
-	setup_dofs ();
+        setup_dofs ();
 
-	std::cout << "   Assembling..." << std::endl << std::flush;
-	assemble_system ();
+        std::cout << "   Assembling..." << std::endl << std::flush;
+        assemble_system ();
 
-	std::cout << "   Solving..." << std::flush;
+        std::cout << "   Solving..." << std::flush;
 
-	solve_block ();
-	output_results (refinement_cycle);
-	system ("mv solution-* block");
+        solve_block ();
+        output_results (refinement_cycle);
+        system ("mv solution-* block");
 
-	solution = 0;
+        solution = 0;
 
-	solve ();
-	output_results (refinement_cycle);
-	system ("mv solution-* mg");
+        solve ();
+        output_results (refinement_cycle);
+        system ("mv solution-* mg");
 
-	std::cout << std::endl;
+        std::cout << std::endl;
       }
   }
 }

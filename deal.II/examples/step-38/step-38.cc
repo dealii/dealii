@@ -396,8 +396,8 @@ namespace Step38
     dof_handler.distribute_dofs (fe);
 
     std::cout << "Surface mesh has " << dof_handler.n_dofs()
-	      << " degrees of freedom."
-	      << std::endl;
+              << " degrees of freedom."
+              << std::endl;
 
     CompressedSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern (dof_handler, csp);
@@ -410,22 +410,22 @@ namespace Step38
   }
 
 
-				   // @sect4{LaplaceBeltramiProblem::assemble_system}
+                                   // @sect4{LaplaceBeltramiProblem::assemble_system}
 
-				   // The following is the central function of
-				   // this program, assembling the matrix that
-				   // corresponds to the surface Laplacian
-				   // (Laplace-Beltrami operator). Maybe
-				   // surprisingly, it actually looks exactly
-				   // the same as for the regular Laplace
-				   // operator discussed in, for example,
-				   // step-4. The key is that the
-				   // FEValues::shape_gradient function does the
-				   // magic: It returns the surface gradient
-				   // $\nabla_K \phi_i(x_q)$ of the $i$th shape
-				   // function at the $q$th quadrature
-				   // point. The rest then does not need any
-				   // changes either:
+                                   // The following is the central function of
+                                   // this program, assembling the matrix that
+                                   // corresponds to the surface Laplacian
+                                   // (Laplace-Beltrami operator). Maybe
+                                   // surprisingly, it actually looks exactly
+                                   // the same as for the regular Laplace
+                                   // operator discussed in, for example,
+                                   // step-4. The key is that the
+                                   // FEValues::shape_gradient function does the
+                                   // magic: It returns the surface gradient
+                                   // $\nabla_K \phi_i(x_q)$ of the $i$th shape
+                                   // function at the $q$th quadrature
+                                   // point. The rest then does not need any
+                                   // changes either:
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::assemble_system ()
   {
@@ -434,10 +434,10 @@ namespace Step38
 
     const QGauss<dim>  quadrature_formula(2*fe.degree);
     FEValues<dim,spacedim> fe_values (mapping, fe, quadrature_formula,
-				      update_values              |
-				      update_gradients           |
-				      update_quadrature_points   |
-				      update_JxW_values);
+                                      update_values              |
+                                      update_gradients           |
+                                      update_quadrature_points   |
+                                      update_JxW_values);
 
     const unsigned int        dofs_per_cell = fe.dofs_per_cell;
     const unsigned int        n_q_points    = quadrature_formula.size();
@@ -451,132 +451,132 @@ namespace Step38
     const RightHandSide<spacedim> rhs;
 
     for (typename DoFHandler<dim,spacedim>::active_cell_iterator
-	   cell = dof_handler.begin_active(),
-	   endc = dof_handler.end();
-	 cell!=endc; ++cell)
+           cell = dof_handler.begin_active(),
+           endc = dof_handler.end();
+         cell!=endc; ++cell)
       {
-	cell_matrix = 0;
-	cell_rhs = 0;
+        cell_matrix = 0;
+        cell_rhs = 0;
 
-	fe_values.reinit (cell);
+        fe_values.reinit (cell);
 
-	rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
+        rhs.value_list (fe_values.get_quadrature_points(), rhs_values);
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int j=0; j<dofs_per_cell; ++j)
-	    for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	      cell_matrix(i,j) += fe_values.shape_grad(i,q_point) *
-				  fe_values.shape_grad(j,q_point) *
-				  fe_values.JxW(q_point);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int j=0; j<dofs_per_cell; ++j)
+            for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+              cell_matrix(i,j) += fe_values.shape_grad(i,q_point) *
+                                  fe_values.shape_grad(j,q_point) *
+                                  fe_values.JxW(q_point);
 
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
-	    cell_rhs(i) += fe_values.shape_value(i,q_point) *
-			   rhs_values[q_point]*
-			   fe_values.JxW(q_point);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          for (unsigned int q_point=0; q_point<n_q_points; ++q_point)
+            cell_rhs(i) += fe_values.shape_value(i,q_point) *
+                           rhs_values[q_point]*
+                           fe_values.JxW(q_point);
 
-	cell->get_dof_indices (local_dof_indices);
-	for (unsigned int i=0; i<dofs_per_cell; ++i)
-	  {
-	    for (unsigned int j=0; j<dofs_per_cell; ++j)
-	      system_matrix.add (local_dof_indices[i],
-				 local_dof_indices[j],
-				 cell_matrix(i,j));
+        cell->get_dof_indices (local_dof_indices);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          {
+            for (unsigned int j=0; j<dofs_per_cell; ++j)
+              system_matrix.add (local_dof_indices[i],
+                                 local_dof_indices[j],
+                                 cell_matrix(i,j));
 
-	    system_rhs(local_dof_indices[i]) += cell_rhs(i);
-	  }
+            system_rhs(local_dof_indices[i]) += cell_rhs(i);
+          }
       }
 
     std::map<unsigned int,double> boundary_values;
     VectorTools::interpolate_boundary_values (mapping,
-					      dof_handler,
-					      0,
-					      Solution<spacedim>(),
-					      boundary_values);
+                                              dof_handler,
+                                              0,
+                                              Solution<spacedim>(),
+                                              boundary_values);
 
     MatrixTools::apply_boundary_values (boundary_values,
-					system_matrix,
-					solution,
-					system_rhs,false);
+                                        system_matrix,
+                                        solution,
+                                        system_rhs,false);
   }
 
 
 
-				   // @sect4{LaplaceBeltramiProblem::solve}
+                                   // @sect4{LaplaceBeltramiProblem::solve}
 
-				   // The next function is the one that solves
-				   // the linear system. Here, too, no changes
-				   // are necessary:
+                                   // The next function is the one that solves
+                                   // the linear system. Here, too, no changes
+                                   // are necessary:
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::solve ()
   {
     SolverControl solver_control (solution.size(),
-				  1e-7 * system_rhs.l2_norm());
+                                  1e-7 * system_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
 
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve (system_matrix, solution, system_rhs,
-	      preconditioner);
+              preconditioner);
   }
 
 
 
-				   // @sect4{LaplaceBeltramiProblem::output_result}
+                                   // @sect4{LaplaceBeltramiProblem::output_result}
 
-				   // This is the function that generates
-				   // graphical output from the solution. Most
-				   // of it is boilerplate code, but there are
-				   // two points worth pointing out:
-				   //
-				   // - The DataOut::add_data_vector function
-				   //   can take two kinds of vectors: Either
-				   //   vectors that have one value per degree
-				   //   of freedom defined by the DoFHandler
-				   //   object previously attached via
-				   //   DataOut::attach_dof_handler; and vectors
-				   //   that have one value for each cell of the
-				   //   triangulation, for example to output
-				   //   estimated errors for each
-				   //   cell. Typically, the DataOut class knows
-				   //   to tell these two kinds of vectors
-				   //   apart: there are almost always more
-				   //   degrees of freedom than cells, so we can
-				   //   differentiate by the two kinds looking
-				   //   at the length of a vector. We could do
-				   //   the same here, but only because we got
-				   //   lucky: we use a half sphere. If we had
-				   //   used the whole sphere as domain and
-				   //   $Q_1$ elements, we would have the same
-				   //   number of cells as vertices and
-				   //   consequently the two kinds of vectors
-				   //   would have the same number of
-				   //   elements. To avoid the resulting
-				   //   confusion, we have to tell the
-				   //   DataOut::add_data_vector function which
-				   //   kind of vector we have: DoF data. This
-				   //   is what the third argument to the
-				   //   function does.
-				   // - The DataOut::build_patches function can
-				   //   generate output that subdivides each
-				   //   cell so that visualization programs can
-				   //   resolve curved manifolds or higher
-				   //   polynomial degree shape functions
-				   //   better. We here subdivide each element
-				   //   in each coordinate direction as many
-				   //   times as the polynomial degree of the
-				   //   finite element in use.
+                                   // This is the function that generates
+                                   // graphical output from the solution. Most
+                                   // of it is boilerplate code, but there are
+                                   // two points worth pointing out:
+                                   //
+                                   // - The DataOut::add_data_vector function
+                                   //   can take two kinds of vectors: Either
+                                   //   vectors that have one value per degree
+                                   //   of freedom defined by the DoFHandler
+                                   //   object previously attached via
+                                   //   DataOut::attach_dof_handler; and vectors
+                                   //   that have one value for each cell of the
+                                   //   triangulation, for example to output
+                                   //   estimated errors for each
+                                   //   cell. Typically, the DataOut class knows
+                                   //   to tell these two kinds of vectors
+                                   //   apart: there are almost always more
+                                   //   degrees of freedom than cells, so we can
+                                   //   differentiate by the two kinds looking
+                                   //   at the length of a vector. We could do
+                                   //   the same here, but only because we got
+                                   //   lucky: we use a half sphere. If we had
+                                   //   used the whole sphere as domain and
+                                   //   $Q_1$ elements, we would have the same
+                                   //   number of cells as vertices and
+                                   //   consequently the two kinds of vectors
+                                   //   would have the same number of
+                                   //   elements. To avoid the resulting
+                                   //   confusion, we have to tell the
+                                   //   DataOut::add_data_vector function which
+                                   //   kind of vector we have: DoF data. This
+                                   //   is what the third argument to the
+                                   //   function does.
+                                   // - The DataOut::build_patches function can
+                                   //   generate output that subdivides each
+                                   //   cell so that visualization programs can
+                                   //   resolve curved manifolds or higher
+                                   //   polynomial degree shape functions
+                                   //   better. We here subdivide each element
+                                   //   in each coordinate direction as many
+                                   //   times as the polynomial degree of the
+                                   //   finite element in use.
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::output_results () const
   {
     DataOut<dim,DoFHandler<dim,spacedim> > data_out;
     data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution,
-			      "solution",
-			      DataOut<dim,DoFHandler<dim,spacedim> >::type_dof_data);
+                              "solution",
+                              DataOut<dim,DoFHandler<dim,spacedim> >::type_dof_data);
     data_out.build_patches (mapping,
-			    mapping.get_degree());
+                            mapping.get_degree());
 
     std::string filename ("solution-");
     filename += ('0'+spacedim);
@@ -587,40 +587,40 @@ namespace Step38
 
 
 
-				   // @sect4{LaplaceBeltramiProblem::compute_error}
+                                   // @sect4{LaplaceBeltramiProblem::compute_error}
 
-				   // This is the last piece of functionality:
-				   // we want to compute the error in the
-				   // numerical solution. It is a verbatim copy
-				   // of the code previously shown and discussed
-				   // in step-7. As mentioned in the
-				   // introduction, the <code>Solution</code>
-				   // class provides the (tangential) gradient
-				   // of the solution. To avoid evaluating the
-				   // error only a superconvergence points, we
-				   // choose a quadrature rule of sufficiently
-				   // high order.
+                                   // This is the last piece of functionality:
+                                   // we want to compute the error in the
+                                   // numerical solution. It is a verbatim copy
+                                   // of the code previously shown and discussed
+                                   // in step-7. As mentioned in the
+                                   // introduction, the <code>Solution</code>
+                                   // class provides the (tangential) gradient
+                                   // of the solution. To avoid evaluating the
+                                   // error only a superconvergence points, we
+                                   // choose a quadrature rule of sufficiently
+                                   // high order.
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::compute_error () const
   {
     Vector<float> difference_per_cell (triangulation.n_active_cells());
     VectorTools::integrate_difference (mapping, dof_handler, solution,
-				       Solution<spacedim>(),
-				       difference_per_cell,
-				       QGauss<dim>(2*fe.degree+1),
-				       VectorTools::H1_norm);
+                                       Solution<spacedim>(),
+                                       difference_per_cell,
+                                       QGauss<dim>(2*fe.degree+1),
+                                       VectorTools::H1_norm);
 
     std::cout << "H1 error = "
-	      << difference_per_cell.l2_norm()
-	      << std::endl;
+              << difference_per_cell.l2_norm()
+              << std::endl;
   }
 
 
 
-				   // @sect4{LaplaceBeltramiProblem::run}
+                                   // @sect4{LaplaceBeltramiProblem::run}
 
-				   // The last function provides the top-level
-				   // logic. Its contents are self-explanatory:
+                                   // The last function provides the top-level
+                                   // logic. Its contents are self-explanatory:
   template <int spacedim>
   void LaplaceBeltramiProblem<spacedim>::run ()
   {
@@ -635,11 +635,11 @@ namespace Step38
 
                                  // @sect3{The main() function}
 
-				 // The remainder of the program is taken up
-				 // by the <code>main()</code> function. It
-				 // follows exactly the general layout first
-				 // introduced in step-6 and used in all
-				 // following tutorial programs:
+                                 // The remainder of the program is taken up
+                                 // by the <code>main()</code> function. It
+                                 // follows exactly the general layout first
+                                 // introduced in step-6 and used in all
+                                 // following tutorial programs:
 int main ()
 {
   try
@@ -655,24 +655,24 @@ int main ()
   catch (std::exception &exc)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Exception on processing: " << std::endl
-		<< exc.what() << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     }
   catch (...)
     {
       std::cerr << std::endl << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "----------------------------------------------------"
+                << std::endl;
       std::cerr << "Unknown exception!" << std::endl
-		<< "Aborting!" << std::endl
-		<< "----------------------------------------------------"
-		<< std::endl;
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
       return 1;
     }
 
