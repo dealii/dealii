@@ -97,6 +97,7 @@ endif
 # file produced from the single C++ file into the executable. Since
 # this is the first rule in the Makefile, it is the one `make' selects
 # if you call it without arguments.
+all: $(target)$(EXEEXT)
 $(target)$(EXEEXT) : $(libraries)
 	@echo ============================ Linking $@
 	@$(CXX) -o $@ $^ $(LIBS) $(LDFLAGS)
@@ -140,7 +141,7 @@ clean:
 # The following statement tells make that the rules `run' and `clean'
 # are not expected to produce files of the same name as Makefile rules
 # usually do.
-.PHONY: run clean
+.PHONY: all run clean
 
 
 # Finally there is a rule which you normally need not care much about:
