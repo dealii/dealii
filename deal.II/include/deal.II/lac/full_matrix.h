@@ -354,6 +354,17 @@ class FullMatrix : public Table<2,number>
     template <class MATRIX>
     void copy_from (const MATRIX&);
 
+                                     /**
+				      * Transposing assignment from
+				      * different matrix classes. This
+				      * assignment operator uses
+				      * iterators of the class
+				      * MATRIX. Therefore, sparse
+				      * matrices are possible sources.
+				      */
+    template <class MATRIX>
+    void copy_transposed (const MATRIX&);
+
 				     /**
 				      * Fill rectangular block.
 				      *
@@ -1424,6 +1435,19 @@ FullMatrix<number>::copy_from (const MATRIX& M)
   for (typename MATRIX::const_iterator entry = M.begin();
        entry != end; ++entry)
     this->el(entry->row(), entry->column()) = entry->value();
+}
+
+
+template <typename number>
+template <class MATRIX>
+void
+FullMatrix<number>::copy_transposed (const MATRIX& M)
+{
+  this->reinit (M.n(), M.m());
+  const typename MATRIX::const_iterator end = M.end();
+  for (typename MATRIX::const_iterator entry = M.begin();
+       entry != end; ++entry)
+    this->el(entry->column(), entry->row()) = entry->value();
 }
 
 
