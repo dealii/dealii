@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,7 +35,7 @@ namespace LocalIntegrators
   namespace Divergence
   {
 /**
- * Auxiliary function. Computes the grad-dic-operator from a set of
+ * Auxiliary function. Computes the grad-div-operator from a set of
  * Hessians.
  *
  * @note The third tensor argument is not used in two dimensions and
@@ -63,11 +63,14 @@ namespace LocalIntegrators
     
     
 /**
- * Cell matrix for divergence. The derivative is on the trial function.
- *
+ * Cell matrix for divergence. The derivative is on the trial
+ * function.
  * \f[
  * \int_Z v\nabla \cdot \mathbf u \,dx
  * \f]
+ * This is the strong divergence operator and the trial
+ * space should be at least <b>H</b><sup>div</sup>. The test functions
+ * may be discontinuous.
  */
     template <int dim>
     void cell_matrix (
@@ -100,11 +103,14 @@ namespace LocalIntegrators
 	}
     }
 /**
- * Cell matrix for divergence. The derivative is on the test function.
- *
+ * Cell matrix for gradient. The derivative is on the trial
+ * function.
  * \f[
  * \int_Z \nabla u \cdot \mathbf v\,dx
  * \f]
+ * This is the strong gradient and the trial space
+ * should be at least in <i>H</i><sup>1</sup>. The test functions can
+ * be discontinuous.
  */
     template <int dim>
     void gradient_matrix(
