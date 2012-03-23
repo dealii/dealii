@@ -366,6 +366,27 @@ namespace LocalIntegrators
 		}
 	}
     }
+
+    template <int dim>
+    double norm(const FEValuesBase<dim>& fe,
+		const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > >& Du)
+    {
+      unsigned int fecomp = fe.get_fe().n_components();
+      
+      AssertDimension(fecomp, dim);
+      AssertVectorVectorDimension (Du, dim, fe.n_quadrature_points);
+
+      double result = 0;
+      for (unsigned k=0;k<fe.n_quadrature_points;++k)
+	{
+	  double div = Du[0][k][0];
+	  for (unsigned int d=1;d<dim;++d)
+	    div += Du[d][k][d];
+	  result += div+div;
+	}
+      return result;
+    }
+
   }
 }
 
