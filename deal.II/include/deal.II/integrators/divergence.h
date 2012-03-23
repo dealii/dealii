@@ -382,7 +382,7 @@ namespace LocalIntegrators
 	  double div = Du[0][k][0];
 	  for (unsigned int d=1;d<dim;++d)
 	    div += Du[d][k][d];
-	  result += div+div;
+	  result += div*div;
 	}
       return result;
     }
