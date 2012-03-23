@@ -2513,7 +2513,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 				   // loops filling all components
   const unsigned int component_multiple = result_components / n_components;
 
-  Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
+  Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
 
 				   // initialize with zero
   for (unsigned i=0;i<gradients.size();++i)
