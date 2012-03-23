@@ -1742,12 +1742,17 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * shape_value_component()
 				      * function.
 				      *
-				      * @arg function_no Number
+				      * @param function_no Number
 				      * of the shape function to be
-				      * computed
-				      * @arg point_no Number of
+				      * evaluated. Note that this
+				      * number runs from zero to
+				      * dofs_per_cell, even in the
+				      * case of an FEFaceValues or
+				      * FESubfaceValues object.
+				      *
+				      * @param point_no Number of
 				      * the quadrature point at which
-				      * function is to be computed
+				      * function is to be evaluated
 				      */
     const double & shape_value (const unsigned int function_no,
 				const unsigned int point_no) const;
@@ -1776,13 +1781,13 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * is necessary since the other
 				      * function cannot be used.
 				      *
-				      * @arg function_no Number
+				      * @param function_no Number
 				      * of the shape function to be
-				      * computed
-				      * @arg point_no Number of
+				      * evaluated
+				      * @param point_no Number of
 				      * the quadrature point at which
-				      * function is to be computed
-				      * @arg component vector component to be computed
+				      * function is to be evaluated
+				      * @param component vector component to be evaluated
 				      */
     double shape_value_component (const unsigned int function_no,
 				  const unsigned int point_no,
@@ -1816,6 +1821,10 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * that case, use the
 				      * shape_grad_component()
 				      * function.
+				      *
+				      * The same holds for the arguments
+				      * of this function as for the
+				      * shape_value() function.
 				      */
     const Tensor<1,spacedim> &
     shape_grad (const unsigned int function,
@@ -1844,6 +1853,10 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * is not primitive, but then it
 				      * is necessary since the other
 				      * function cannot be used.
+				      *
+				      * The same holds for the arguments
+				      * of this function as for the
+				      * shape_value_component() function.
 				      */
     Tensor<1,spacedim>
     shape_grad_component (const unsigned int function_no,
@@ -1878,6 +1891,10 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * that case, use the
 				      * shape_grad_grad_component()
 				      * function.
+				      *
+				      * The same holds for the arguments
+				      * of this function as for the
+				      * shape_value() function.
 				      */
     const Tensor<2,spacedim> &
     shape_hessian (const unsigned int function_no,
@@ -1916,6 +1933,10 @@ class FEValuesBase : protected FEValuesData<dim,spacedim>,
 				      * is not primitive, but then it
 				      * is necessary since the other
 				      * function cannot be used.
+				      *
+				      * The same holds for the arguments
+				      * of this function as for the
+				      * shape_value_component() function.
 				      */
     Tensor<2,spacedim>
     shape_hessian_component (const unsigned int function_no,
