@@ -356,6 +356,18 @@ namespace FEValuesViews
 					* component selected by this view, for
 					* the shape function and quadrature
 					* point selected by the arguments.
+					*
+					* @param shape_function Number
+					* of the shape function to be
+					* evaluated. Note that this
+					* number runs from zero to
+					* dofs_per_cell, even in the
+					* case of an FEFaceValues or
+					* FESubfaceValues object.
+					*
+					* @param q_point Number of
+					* the quadrature point at which
+					* function is to be evaluated
 					*/
       value_type
       value (const unsigned int shape_function,
@@ -367,6 +379,10 @@ namespace FEValuesViews
 					* selected by this view, for the shape
 					* function and quadrature point
 					* selected by the arguments.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       gradient_type
       gradient (const unsigned int shape_function,
@@ -379,6 +395,10 @@ namespace FEValuesViews
 					* this view, for the shape function
 					* and quadrature point selected by the
 					* arguments.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       hessian_type
       hessian (const unsigned int shape_function,
@@ -684,6 +704,18 @@ namespace FEValuesViews
 					* <code>dim</code> components, the
 					* return type is a tensor of rank 1
 					* with <code>dim</code> components.
+					*
+					* @param shape_function Number
+					* of the shape function to be
+					* evaluated. Note that this
+					* number runs from zero to
+					* dofs_per_cell, even in the
+					* case of an FEFaceValues or
+					* FESubfaceValues object.
+					*
+					* @param q_point Number of
+					* the quadrature point at which
+					* function is to be evaluated
 					*/
       value_type
       value (const unsigned int shape_function,
@@ -695,6 +727,10 @@ namespace FEValuesViews
 					* selected by this view, for the shape
 					* function and quadrature point
 					* selected by the arguments.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       gradient_type
       gradient (const unsigned int shape_function,
@@ -716,6 +752,10 @@ namespace FEValuesViews
 					* from the FEValuesBase object, and
 					* $x_q$ is the location of the $q$-th
 					* quadrature point.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       symmetric_gradient_type
       symmetric_gradient (const unsigned int shape_function,
@@ -727,6 +767,10 @@ namespace FEValuesViews
 					* this view, for the shape function
 					* and quadrature point selected by the
 					* arguments.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       divergence_type
       divergence (const unsigned int shape_function,
@@ -755,6 +799,10 @@ namespace FEValuesViews
 					* \end{array}
 					* \right).
 					* @f}
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       curl_type
       curl (const unsigned int shape_function,
@@ -767,6 +815,10 @@ namespace FEValuesViews
 					* this view, for the shape function
 					* and quadrature point selected by the
 					* arguments.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       hessian_type
       hessian (const unsigned int shape_function,
@@ -1127,10 +1179,22 @@ namespace FEValuesViews
 					* <code>(dim*dim + dim)/2</code> components
 					* (the unique components of a symmetric second-order tensor),
 					* the return type is a symmetric tensor of rank 2.
+					*
+					* @param shape_function Number
+					* of the shape function to be
+					* evaluated. Note that this
+					* number runs from zero to
+					* dofs_per_cell, even in the
+					* case of an FEFaceValues or
+					* FESubfaceValues object.
+					*
+					* @param q_point Number of
+					* the quadrature point at which
+					* function is to be evaluated
 					*/
       value_type
-      value(const unsigned int shape_function,
-	    const unsigned int q_point) const;
+      value (const unsigned int shape_function,
+	     const unsigned int q_point) const;
 
 
 				       /**
@@ -1144,10 +1208,14 @@ namespace FEValuesViews
 					* of this class for a
 					* definition of the
 					* divergence.
+					*
+					* @note The meaning of the arguments
+					* is as documented for the value()
+					* function.
 					*/
       divergence_type
-      divergence(const unsigned int shape_function,
-		 const unsigned int q_point) const;
+      divergence (const unsigned int shape_function,
+		  const unsigned int q_point) const;
 
 				       /**
 					* Return the values of the selected
@@ -1166,8 +1234,8 @@ namespace FEValuesViews
 					* selected vector components.
 					*/
       template <class InputVector>
-      void get_function_values(const InputVector& fe_function,
-			       std::vector<value_type>& values) const;
+      void get_function_values (const InputVector& fe_function,
+				std::vector<value_type>& values) const;
 
 				       /**
 					* Return the divergence of the selected
@@ -1193,8 +1261,8 @@ namespace FEValuesViews
 					* divergence.
 					*/
       template <class InputVector>
-      void get_function_divergences(const InputVector& fe_function,
-				    std::vector<divergence_type>& divergences) const;
+      void get_function_divergences (const InputVector& fe_function,
+				     std::vector<divergence_type>& divergences) const;
 
     private:
 				       /**
