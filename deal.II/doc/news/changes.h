@@ -48,6 +48,13 @@ used for boundary indicators.
 
 <ol>
 <li>
+New: We have added a brief section to the step-12 tutorial programs that
+compares the DG solution computed there with one that one would obtain by
+using a continuous finite element.
+<br>
+(Wolfgang Bangerth, 2012/03/25)
+
+<li>
 New: Added support for codimension 2, i.e. for dim-dimensional objects
 embedded into spacedim=dim+2 dimensional space.
 <br>
@@ -58,7 +65,7 @@ type unsigned char. Throughout the library, we changed their datatype
 to <code>types::material_id_t</code>
 resp. <code>types::boundary_id_t</code>, both typedefs of unsigned
 char. Internal faces are now characterized by
-types::internal_face_boundary_id(<code>=static_cast<boundary_id_t>(-1)</code>)
+types::internal_face_boundary_id(<code>=static_cast@<boundary_id_t@>(-1)</code>)
 instead of 255, so we get rid of that mysterious number in the source
 code.  Material_ids are also assumed to lie in the range from 0 to
 types::invalid_material_id-1 (where <code>types::invalid_material_id =
