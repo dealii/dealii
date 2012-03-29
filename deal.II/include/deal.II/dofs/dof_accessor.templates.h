@@ -3176,6 +3176,8 @@ get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   Assert (this->is_artificial() == false,
 	  ExcMessage ("Can't ask for DoF indices on artificial cells."));
+  AssertDimension (dof_indices.size(), this->get_fe().dofs_per_cell);
+
   internal::DoFCellAccessor::Implementation::get_dof_indices (*this, dof_indices);
 }
 
@@ -3189,6 +3191,8 @@ DoFCellAccessor<DH>::get_dof_values (const InputVector &values,
 {
   Assert (this->is_artificial() == false,
 	  ExcMessage ("Can't ask for DoF indices on artificial cells."));
+  AssertDimension (local_values.size(), this->get_fe().dofs_per_cell);
+
   internal::DoFCellAccessor::Implementation
     ::get_dof_values (*this, values, local_values.begin(), local_values.end());
 }
