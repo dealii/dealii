@@ -1076,7 +1076,7 @@ namespace MeshWorker
 	{
 	  for (unsigned int j=0; j<i1.size(); ++j)
 	    for (unsigned int k=0; k<i2.size(); ++k)
-	      if (std::fabs(M(j,k)) >= threshold)
+	      if (std::fabs(M(k,j)) >= threshold)
 		if(mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
 		   !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
 		  {
@@ -1128,9 +1128,9 @@ namespace MeshWorker
 	    if(mg_constrained_dofs != 0)
 	      {
 		assemble_in((*interface_in)[level], info.matrix(k,false).matrix,
-			    info.indices, info.indices, level);
+			    info.indices_by_block[row], info.indices_by_block[column], level);
 		assemble_out((*interface_out)[level],info.matrix(k,false).matrix,
-			     info.indices_by_block[row], info.indices_by_block[column], level); 
+			     info.indices_by_block[column], info.indices_by_block[row], level); 
 	      }
 	  }
     }
@@ -1144,7 +1144,6 @@ namespace MeshWorker
     {
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
-
       
       if (local_indices.size() == 0)
 	{
